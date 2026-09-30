@@ -38,31 +38,6 @@ function isRedirectToLogin(response: Response): boolean {
 	return new URL(response.url).pathname.replace(/\/$/, '').endsWith(LOGIN_PATH);
 }
 
-/**
- * Marks the options of a request retried after re-authentication. The client hands its interceptors a
- * copy of the options it was called with, so the mark travels with the retry where the options object
- * itself does not.
- */
-const RETRIED_AFTER_REAUTHENTICATION = Symbol('RetriedAfterReauthentication');
-
-/**
- * Builds the problem details for a request the user is not allowed to make.
- * @param {string} [title] The title to use instead of the default one.
- * @returns {UmbProblemDetails} The problem details of a 403 Forbidden response.
- */
-function createForbiddenProblemDetails(title?: string): UmbProblemDetails {
-	return {
-		status: 403,
-		title:
-			title ||
-			'You do not have the necessary permissions to complete the requested action. If you believe this is in error, please reach out to your administrator.',
-		detail: undefined,
-		errors: undefined,
-		type: 'Unauthorized',
-		stack: undefined,
-	};
-}
-
 export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
 	 * Store pending requests that received a 401 response and are waiting for re-authentication.
@@ -138,26 +113,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			const redirectedToLogin = isRedirectToLogin(response);
 			if (response.status !== 401 && !redirectedToLogin) return response;
 
-			// A retry already carries the re-established session, so asking for re-authentication again
-			// would only loop. Ending up on the login page now means the user is signed in but not allowed.
-			if (RETRIED_AFTER_REAUTHENTICATION in requestConfig) {
-				return redirectedToLogin ? this.#createResponse(createForbiddenProblemDetails(), undefined, 403) : response;
-			}
-
 			// The login page's 200 is not the API's answer, so nothing of it is carried over.
-			const unauthorizedResponse = redirectedToLogin ? undefined : response;
-
-			// Build a plain ProblemDetails object for the response body
-			const problemDetails: UmbProblemDetails = {
-				status: 401,
-				title: unauthorizedResponse?.statusText || 'Unauthorized request, waiting for re-authentication.',
-				detail: undefined,
-				errors: undefined,
-				type: 'Unauthorized',
-				stack: undefined,
-			};
-
-			const newResponse = this.#createResponse(problemDetails, unauthorizedResponse, 401);
+			const newResponse = this.#createUnauthorizedResponse(redirectedToLogin ? undefined : response);
 
 			const signaler = this.#signaler;
 
@@ -176,16 +133,28 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				this.#pending401Requests.push({
 					requestConfig,
 					retry: async () => {
-						const { data, response: retryResponse } = await client.request({
-							...requestConfig,
-							[RETRIED_AFTER_REAUTHENTICATION]: true,
-						} as never);
+						// Re-issued below the client, as the request it already sent: the original call then reads
+						// the answer with its own options (a download stays a download, headers and all), and the
+						// retry cannot come back through this interceptor. Called unbound, as the client calls it:
+						// as a method of the options, the browser's fetch throws "Illegal invocation".
+						const clientFetch = requestConfig.fetch ?? fetch;
+						const retryResponse = await clientFetch(request.clone());
 
-						if (!retryResponse) {
-							throw new Error('The retried request did not produce a response.');
+						// The retry carries the re-established session, so its answer is final: asking for
+						// re-authentication again would only loop.
+						if (isRedirectToLogin(retryResponse)) {
+							// Signed in, yet sent to the login page: the server's access-denied path. The forbidden
+							// interceptor next in the chain gives it its problem details.
+							return new Response(null, { status: 403 });
 						}
-
-						return this.#createResponse(data, retryResponse);
+						if (retryResponse.status === 401) {
+							return this.#createUnauthorizedResponse(retryResponse);
+						}
+						// The activity interceptor has already run, on the answer that was retried.
+						if (retryResponse.ok) {
+							this.#signaler.signalActivity();
+						}
+						return retryResponse;
 					},
 					resolve,
 					reject,
@@ -208,7 +177,19 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		client.interceptors.response.use((response): Response => {
 			if (response.status !== 403) return response;
 
-			return this.#createResponse(createForbiddenProblemDetails(response.statusText), response);
+			// Build a plain ProblemDetails object for the response body
+			const problemDetails: UmbProblemDetails = {
+				status: response.status,
+				title:
+					response.statusText ||
+					'You do not have the necessary permissions to complete the requested action. If you believe this is in error, please reach out to your administrator.',
+				detail: undefined,
+				errors: undefined,
+				type: 'Unauthorized',
+				stack: undefined,
+			};
+
+			return this.#createResponse(problemDetails, response);
 		});
 	}
 
@@ -395,6 +376,24 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			},
 			'_authClearNonGet401Requests',
 		);
+	}
+
+	/**
+	 * Helper to create the ProblemDetails response for a request that was not authorized.
+	 * @param {Response} [unauthorizedResponse] The server's 401 response to take the status text and headers from, if any.
+	 * @returns {Response} A 401 response with a ProblemDetails body.
+	 */
+	#createUnauthorizedResponse(unauthorizedResponse?: Response): Response {
+		const problemDetails: UmbProblemDetails = {
+			status: 401,
+			title: unauthorizedResponse?.statusText || 'Unauthorized request, waiting for re-authentication.',
+			detail: undefined,
+			errors: undefined,
+			type: 'Unauthorized',
+			stack: undefined,
+		};
+
+		return this.#createResponse(problemDetails, unauthorizedResponse, 401);
 	}
 
 	/**

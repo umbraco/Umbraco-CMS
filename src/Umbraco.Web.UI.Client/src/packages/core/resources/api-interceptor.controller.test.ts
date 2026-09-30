@@ -154,13 +154,16 @@ describe('UmbApiInterceptorController', () => {
 		 * as where the request ended up. Only fetch can produce a followed redirect, so fake the two
 		 * properties it sets on one.
 		 * @param {string} url The URL the request ended up at.
-		 * @returns {Response} A 200 response that reports having been redirected to `url`.
+		 * @param {Response} [response] The response to mark as redirected; the login page by default.
+		 * @returns {Response} `response`, reporting that it was redirected to `url`.
 		 */
-		function redirectedResponse(url: string): Response {
-			const response = new Response('<!doctype html><title>Log in</title>', {
+		function redirectedResponse(
+			url: string,
+			response = new Response('<!doctype html><title>Log in</title>', {
 				status: 200,
 				headers: { 'Content-Type': 'text/html' },
-			});
+			}),
+		): Response {
 			Object.defineProperties(response, {
 				redirected: { value: true },
 				url: { value: url },
@@ -169,29 +172,29 @@ describe('UmbApiInterceptorController', () => {
 		}
 
 		describe('redirect to the login page', () => {
-			const requestConfig = { url: '/umbraco/management/api/v1/document' };
-
 			let chain: Array<ResponseInterceptor>;
-			let retriedConfigs: Array<unknown>;
+			let retriedRequests: Array<Request>;
+
+			const requestConfig = {
+				url: '/umbraco/management/api/v1/document',
+				// The client's fetch, which a retry after re-authentication re-issues the request with.
+				fetch: async (request: Request) => {
+					retriedRequests.push(request);
+					return new Response('{"retried":true}', {
+						status: 200,
+						headers: { 'Content-Type': 'application/json' },
+					});
+				},
+			};
 
 			beforeEach(() => {
 				chain = [];
-				retriedConfigs = [];
+				retriedRequests = [];
 				const chainClient = {
 					interceptors: {
 						response: {
 							use: (fn: ResponseInterceptor) => chain.push(fn),
 						},
-					},
-					request: async (config: unknown) => {
-						retriedConfigs.push(config);
-						return {
-							data: { retried: true },
-							response: new Response('{"retried":true}', {
-								status: 200,
-								headers: { 'Content-Type': 'application/json' },
-							}),
-						};
 					},
 				} as unknown as typeof umbHttpClient;
 
@@ -213,13 +216,13 @@ describe('UmbApiInterceptorController', () => {
 
 				expect(timeoutRequests).to.equal(1);
 				expect(activityDetectedAt).to.be.undefined;
-				expect(retriedConfigs).to.be.empty;
+				expect(retriedRequests).to.be.empty;
 
 				signaler.setAuthorized(true);
 				const response = await result;
 
-				expect(retriedConfigs).to.have.lengthOf(1);
-				expect(retriedConfigs[0]).to.include(requestConfig);
+				expect(retriedRequests).to.have.lengthOf(1);
+				expect(retriedRequests[0].url).to.equal(request.url);
 				expect(response.status).to.equal(200);
 				expect(await response.json()).to.deep.equal({ retried: true });
 			});
@@ -244,7 +247,7 @@ describe('UmbApiInterceptorController', () => {
 				signaler.setAuthorized(true);
 				await waitUntil(() => peeks.length > 0, 'the failed action was never reported');
 
-				expect(retriedConfigs).to.be.empty;
+				expect(retriedRequests).to.be.empty;
 				expect(peeks[0].errors).to.have.property(`POST ${request.url}`);
 			});
 
@@ -276,8 +279,9 @@ describe('UmbApiInterceptorController', () => {
 			});
 		});
 
-		// A retry goes through the client, and so through the interceptors, again. Whatever it gets then is
-		// final: asking for re-authentication a second time would only repeat the same round trip.
+		// A retry re-issues the original request, and the original call reads whatever it gets with its own
+		// options. That answer is final: asking for re-authentication a second time would only repeat the
+		// same round trip.
 		describe('retry after re-authentication', () => {
 			const DOCUMENT_URL = '/umbraco/management/api/v1/document/123';
 
@@ -305,11 +309,14 @@ describe('UmbApiInterceptorController', () => {
 			/**
 			 * Makes a GET, lets the user re-authenticate once it has been queued for that, and waits for the
 			 * retry to have been answered.
+			 * @param {{ parseAs?: 'blob' }} [options] Options for the GET, on top of its URL.
 			 * @returns {Promise<{ settled: Promise<unknown> }>} What the call settles with: its result, or what
 			 * it threw. Wrapped, so a call that never settles can still be inspected.
 			 */
-			async function getThroughReauthentication(): Promise<{ settled: Promise<unknown> }> {
-				const settled = client.get({ url: DOCUMENT_URL }).then(
+			async function getThroughReauthentication(options: { parseAs?: 'blob' } = {}): Promise<{
+				settled: Promise<unknown>;
+			}> {
+				const settled = client.get({ url: DOCUMENT_URL, ...options }).then(
 					(value) => value,
 					(error: unknown) => error,
 				);
@@ -322,7 +329,7 @@ describe('UmbApiInterceptorController', () => {
 				return { settled };
 			}
 
-			it('resolves with the retried response when re-authentication fixed the request', async () => {
+			it('resolves with the retried response, and counts it as activity, when re-authentication fixed the request', async () => {
 				responses.push(
 					redirectedResponse(LOGIN_URL),
 					new Response('{"name":"Home"}', { status: 200, headers: { 'Content-Type': 'application/json' } }),
@@ -332,6 +339,29 @@ describe('UmbApiInterceptorController', () => {
 
 				expect(timeoutRequests).to.equal(1);
 				expect(((await settled) as { data: unknown }).data).to.deep.equal({ name: 'Home' });
+				expect(activityDetectedAt).to.be.a('number');
+			});
+
+			it('hands a download retried after re-authentication to the caller as it arrived', async () => {
+				const pdf = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x00, 0xff]);
+				const contentDisposition = 'attachment; filename="report.pdf"';
+				responses.push(
+					new Response(null, { status: 401 }),
+					redirectedResponse(
+						'https://example.com/media/exports/report.pdf',
+						new Response(pdf, {
+							status: 200,
+							headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': contentDisposition },
+						}),
+					),
+				);
+
+				const { settled } = await getThroughReauthentication({ parseAs: 'blob' });
+
+				const result = (await settled) as { data: Blob; response: Response };
+				expect(new Uint8Array(await result.data.arrayBuffer())).to.deep.equal(pdf);
+				expect(result.response.headers.get('Content-Disposition')).to.equal(contentDisposition);
+				expect(timeoutRequests).to.equal(1);
 			});
 
 			// The retried request carries the session that was just re-established, so ending up on the
@@ -349,20 +379,16 @@ describe('UmbApiInterceptorController', () => {
 				expect(activityDetectedAt).to.be.undefined;
 			});
 
-			it('gives up with the 401 when a GET is still unauthorized after re-authentication', async () => {
-				const stillUnauthorized = { status: 401, title: 'Still unauthorized', type: 'Unauthorized' };
-				responses.push(
-					new Response(null, { status: 401 }),
-					new Response(JSON.stringify(stillUnauthorized), {
-						status: 401,
-						headers: { 'Content-Type': 'application/json' },
-					}),
-				);
+			// The server's 401 has no body, so the problem details are what tells the caller it was a 401.
+			it('gives up with 401 problem details when a GET is still unauthorized after re-authentication', async () => {
+				responses.push(new Response(null, { status: 401 }), new Response(null, { status: 401 }));
 
 				const { settled } = await getThroughReauthentication();
 
 				expect(timeoutRequests).to.equal(1);
-				expect(await settled).to.deep.equal(stillUnauthorized);
+				const error = (await settled) as { status: number; type: string };
+				expect(error.status).to.equal(401);
+				expect(error.type).to.equal('Unauthorized');
 			});
 		});
 	});
