@@ -3,6 +3,7 @@
 
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
@@ -329,6 +330,33 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         lastSynced = await lastSyncedManager.GetLastSyncedExternalAsync();
         Assert.AreEqual(2, lastSynced);
+    }
+
+    [Test]
+    public void ProcessInternalInstructions_Does_Not_Run_The_Published_Cache_Refresh()
+    {
+        var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
+
+        // A payload instruction: only Refresh raises the notification, RefreshInternal does not.
+        var payload = GetRequiredService<UserCacheRefresher>().Serialize(new UserCacheRefresher.JsonPayload
+        {
+            Id = Constants.Security.SuperUserId,
+            Key = Constants.Security.SuperUserKey,
+        });
+        sut.DeliverInstructions(
+            [new RefreshInstruction(UserCacheRefresher.UniqueId, RefreshMethodType.RefreshByJson, Guid.Empty, 0, null!, payload)],
+            AlternateIdentity);
+
+        var notified = 0;
+        UserCacheRefresherNotificationHandler.Refreshing = _ => notified++;
+
+        sut.ProcessInternalInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
+
+        Assert.That(notified, Is.EqualTo(0), "ProcessInternalInstructions raised the cache refresher notification, which only Refresh raises.");
+
+        sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
+
+        Assert.That(notified, Is.EqualTo(1));
     }
 
     private void CreateAndDeliveryMultipleInstructions(CacheInstructionService sut)

@@ -183,6 +183,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 var pathid = "," + payload.Id + ",";
                 isolatedCache.ClearOfType<IContent>((k, v) => v.Path?.Contains(pathid) ?? false);
             }
+
+            HandleIdKeyMap(payload);
         }
 
         base.RefreshInternal(payloads);
@@ -219,8 +221,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             {
                 HandleRouting(payload);
             }
-
-            HandleIdKeyMap(payload);
         }
 
         // Clear partial view cache when published content changes.

@@ -32,6 +32,13 @@ namespace Umbraco.Cms
             private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
             private readonly IProfilingLogger _profilingLogger;
             private readonly Lock _syncLock = new();
+            private int _isolatedCachesLastProcessedId;
+
+            private enum RefreshTarget
+            {
+                AllCaches,
+                IsolatedCachesOnly,
+            }
 
             /// <summary>
             /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
@@ -186,7 +193,7 @@ namespace Umbraco.Cms
             {
                 using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                 {
-                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
+                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.AllCaches, ref lastId);
                     return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
                 }
             }
@@ -201,10 +208,10 @@ namespace Umbraco.Cms
                 {
                     using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                     {
-                        _repositoryCacheVersionService.SetCachesSyncedAsync();
+                        _repositoryCacheVersionService.SetCachesSyncedAsync().GetAwaiter().GetResult();
                         var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
                         var previousLastId = lastId;
-                        var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
+                        var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.AllCaches, ref lastId);
 
                         if (lastId > 0 && lastId != previousLastId)
                         {
@@ -218,28 +225,50 @@ namespace Umbraco.Cms
             }
 
             /// <inheritdoc />
+            /// <remarks>
+            ///     Runs inline in repository reads, inside a scope that may hold distributed locks such as ContentTree, while
+            ///     <see cref="ProcessAllInstructions" /> holds <c>_syncLock</c> and takes those same locks. So this must never
+            ///     wait for <c>_syncLock</c> or take distributed locks: only the in-memory
+            ///     <see cref="IJsonCacheRefresher.RefreshInternal(string)" /> runs. The internal last-synced id is saved inside
+            ///     the caller's transaction, which holds the umbracoLastSynced row until the caller commits, so overlapping calls
+            ///     that processed the same instructions leave the write to a single one of them.
+            /// </remarks>
             public ProcessInstructionsResult ProcessInternalInstructions(
                 CacheRefresherCollection cacheRefreshers,
                 CancellationToken cancellationToken,
                 string localIdentity)
             {
-                lock (_syncLock)
+                using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing isolated caches from database..."))
                 {
-                    using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
+                    _repositoryCacheVersionService.SetCachesSyncedAsync().GetAwaiter().GetResult();
+                    var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
+                    var previousLastId = lastId;
+                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.IsolatedCachesOnly, ref lastId);
+
+                    if (lastId > 0 && lastId != previousLastId && TryRaiseIsolatedCachesLastProcessedId(lastId))
                     {
-                        _repositoryCacheVersionService.SetCachesSyncedAsync();
-                        var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
-                        var previousLastId = lastId;
-                        var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
-
-                        if (lastId > 0 && lastId != previousLastId)
-                        {
-                            _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
-                        }
-
-                        return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                        _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
                     }
+
+                    return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
                 }
+            }
+
+            private bool TryRaiseIsolatedCachesLastProcessedId(int lastId)
+            {
+                var current = Volatile.Read(ref _isolatedCachesLastProcessedId);
+                while (current < lastId)
+                {
+                    var previous = Interlocked.CompareExchange(ref _isolatedCachesLastProcessedId, lastId, current);
+                    if (previous == current)
+                    {
+                        return true;
+                    }
+
+                    current = previous;
+                }
+
+                return false;
             }
 
             private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity)
@@ -258,10 +287,10 @@ namespace Umbraco.Cms
             ///     Process instructions from the database.
             /// </summary>
             /// <remarks>
-            ///     Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
+            ///     All state is per call; concurrent calls re-run the same idempotent refreshes.
             /// </remarks>
             /// <returns>Number of instructions processed.</returns>
-            private int ProcessDatabaseInstructions(CacheRefresherCollection cacheRefreshers, CancellationToken cancellationToken, string localIdentity, ref int lastId)
+            private int ProcessDatabaseInstructions(CacheRefresherCollection cacheRefreshers, CancellationToken cancellationToken, string localIdentity, RefreshTarget target, ref int lastId)
             {
                 // NOTE:
                 // We 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that
@@ -334,7 +363,7 @@ namespace Umbraco.Cms
                     }
 
                     // Process as per-normal.
-                    var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, ref lastId);
+                    var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, target, ref lastId);
 
                     // If they couldn't be all processed (i.e. we're shutting down) then exit.
                     if (success == false)
@@ -417,6 +446,7 @@ namespace Umbraco.Cms
             ///     Tracks which instructions have already been processed to avoid duplicates
             /// </param>
             /// <param name="cancellationToken">Cancellation token.</param>
+            /// <param name="target">Which caches the refreshers should refresh.</param>
             /// <param name="lastId">The last processed instruction ID, updated when processing completes.</param>
             /// <returns>
             /// Returns true if all instructions in the batch were processed, otherwise false if they could not be due to the app being shut down
@@ -427,12 +457,13 @@ namespace Umbraco.Cms
                 CacheInstruction instruction,
                 HashSet<RefreshInstruction> processed,
                 CancellationToken cancellationToken,
+                RefreshTarget target,
                 ref int lastId)
             {
                 // Execute remote instructions & update lastId.
                 try
                 {
-                    var result = NotifyRefreshers(cacheRefreshers, instructionBatch, processed, cancellationToken);
+                    var result = NotifyRefreshers(cacheRefreshers, instructionBatch, processed, target, cancellationToken);
                     if (result)
                     {
                         // If all instructions were processed, set the last id.
@@ -467,6 +498,7 @@ namespace Umbraco.Cms
                 CacheRefresherCollection cacheRefreshers,
                 IEnumerable<RefreshInstruction> instructions,
                 HashSet<RefreshInstruction> processed,
+                RefreshTarget target,
                 CancellationToken cancellationToken)
             {
                 foreach (RefreshInstruction instruction in instructions)
@@ -498,7 +530,7 @@ namespace Umbraco.Cms
                             RefreshByIds(cacheRefreshers, instruction.RefresherId, instruction.JsonIds);
                             break;
                         case RefreshMethodType.RefreshByJson:
-                            RefreshByJson(cacheRefreshers, instruction.RefresherId, instruction.JsonPayload);
+                            RefreshByJson(cacheRefreshers, instruction.RefresherId, instruction.JsonPayload, target);
                             break;
                         case RefreshMethodType.RemoveById:
                             RemoveById(cacheRefreshers, instruction.RefresherId, instruction.IntId);
@@ -547,12 +579,17 @@ namespace Umbraco.Cms
                 }
             }
 
-            private void RefreshByJson(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string? jsonPayload)
+            private void RefreshByJson(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string? jsonPayload, RefreshTarget target)
             {
                 IJsonCacheRefresher refresher = GetJsonRefresher(cacheRefreshers, uniqueIdentifier);
-                if (jsonPayload is not null)
+                if (jsonPayload is null)
                 {
-                    refresher.RefreshInternal(jsonPayload);
+                    return;
+                }
+
+                refresher.RefreshInternal(jsonPayload);
+                if (target == RefreshTarget.AllCaches)
+                {
                     refresher.Refresh(jsonPayload);
                 }
             }

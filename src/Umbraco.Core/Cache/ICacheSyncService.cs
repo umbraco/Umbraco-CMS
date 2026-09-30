@@ -26,8 +26,10 @@ public interface ICacheSyncService
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <remarks>
     /// This method clears only the isolated caches used by repositories and services, leaving the
-    /// published content cache layer intact. During synchronization, repositories reload data from
-    /// the database while temporarily bypassing version checking to prevent recursive sync attempts.
+    /// published content cache layer to <see cref="SyncAll" />. Only the in-memory
+    /// <see cref="IJsonCacheRefresher.RefreshInternal(string)" /> runs for each pending instruction, so no in-process
+    /// or distributed locks are taken and it is safe to call while holding distributed locks; the caller's next
+    /// repository read reloads the cleared entries from the database.
     /// </remarks>
     void SyncInternal(CancellationToken cancellationToken);
 }
