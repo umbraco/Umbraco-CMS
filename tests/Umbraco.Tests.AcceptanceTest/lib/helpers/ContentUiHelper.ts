@@ -2266,12 +2266,12 @@ export class ContentUiHelper extends UiBaseLocators {
   // Toggles the variant-selector popover to the given open/closed state, retrying via :popover-open
   // (not isVisible(), which can read stale mid-animation and flip the non-idempotent toggle the wrong way).
   private async setVariantSelectorPopoverOpen(open: boolean) {
+    const isPopoverOpen = () => this.contentVariantPopover.evaluate(el => el.matches(':popover-open'));
     await expect(async () => {
-      const isOpen = await this.contentVariantPopover.evaluate(el => el.matches(':popover-open'));
-      if (isOpen !== open) {
+      if ((await isPopoverOpen()) !== open) {
         await this.click(this.languageToggle);
       }
-      expect(await this.contentVariantPopover.evaluate(el => el.matches(':popover-open'))).toBe(open);
+      expect(await isPopoverOpen()).toBe(open);
     }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
