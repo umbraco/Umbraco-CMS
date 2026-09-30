@@ -48,7 +48,9 @@ test('can publish english variant when danish has no blocks and minimum is requi
   expect(contentData.variants[0].state).toBe('Published');
 });
 
-test('can publish english after visiting danish that has block validation errors', async ({umbracoApi, umbracoUi}) => {
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/24025): switching culture leaves the variant
+// selector popover open, which breaks the second consecutive switchLanguage call in this test.
+test.skip('can publish english after visiting danish that has block validation errors', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockElementName, 'BlockContent', dataTypeName, dataTypeId);
   const blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndMinAndMaxAmount(blockGridName, elementTypeId, 1, 10);

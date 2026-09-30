@@ -1209,7 +1209,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickExpandSegmentButton(contentName: string) {
-    await this.page.locator('.variant.culture-variant').filter({hasText: contentName}).locator(this.expandSegmentBtn).click();
+    await this.variantRow.filter({hasText: contentName}).locator(this.expandSegmentBtn).click();
   }
 
   async clickSegmentVariantButton(segmentName: string) {

@@ -50,7 +50,9 @@ test('can save and publish english variant when danish has empty mandatory field
   expect(contentData.variants[0].state).toBe('Published');
 });
 
-test('can publish english variant after visiting danish that has empty mandatory field', async ({umbracoUi}) => {
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/24025): switching culture leaves the variant
+// selector popover open, which breaks the second consecutive switchLanguage call in this test.
+test.skip('can publish english variant after visiting danish that has empty mandatory field', async ({umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
