@@ -56,6 +56,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: [
 					[
 						[
+							'Umb.Tiptap.Toolbar.SourceEditor',
 							'Umb.Tiptap.Toolbar.StyleSelect',
 							'Umb.Tiptap.Toolbar.Bold',
 							'Umb.Tiptap.Toolbar.Italic',
@@ -66,10 +67,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 							'Umb.Tiptap.Toolbar.OrderedList',
 							'Umb.Tiptap.Toolbar.TextOutdent',
 							'Umb.Tiptap.Toolbar.TextIndent',
-							'Umb.Tiptap.Toolbar.SourceEditor',
 							'Umb.Tiptap.Toolbar.Link',
 							'Umb.Tiptap.Toolbar.MediaPicker',
 							'Umb.Tiptap.Toolbar.EmbeddedMedia',
+							'Umb.Tiptap.Toolbar.BlockPicker',
 						],
 					],
 				],

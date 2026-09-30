@@ -278,8 +278,11 @@ export const data: Array<UmbMockDocumentModel> = [
 				culture: null,
 				segment: null,
 				value: {
-					markup:
-						'<p>This Rich Text Editor allows inserting blocks:</p><umb-rte-block data-content-key="f3a1c8d4-5b2e-4a97-8d6f-3c9e7b2a5d10"></umb-rte-block><p>...and continues after the block.</p>',
+					markup: `<p>This Rich Text Editor allows inserting blocks:</p>
+<umb-rte-block data-content-key="f3a1c8d4-5b2e-4a97-8d6f-3c9e7b2a5d10"></umb-rte-block>
+<p>...and continues after the block.</p>
+<umb-rte-block data-key="rich-text-editor-library-element-two" data-content-key="library-element-two-id"></umb-rte-block>
+<p>...and can include a block from the library.</p>`,
 					blocks: {
 						contentData: [
 							{
@@ -310,6 +313,12 @@ export const data: Array<UmbMockDocumentModel> = [
 									key: 'f3a1c8d4-5b2e-4a97-8d6f-3c9e7b2a5d10',
 									contentKey: 'f3a1c8d4-5b2e-4a97-8d6f-3c9e7b2a5d10',
 									settingsKey: null,
+								},
+								{
+									key: 'rich-text-editor-library-element-two',
+									contentKey: 'library-element-two-id',
+									settingsKey: null,
+									isExternalContent: true,
 								},
 							],
 						},
