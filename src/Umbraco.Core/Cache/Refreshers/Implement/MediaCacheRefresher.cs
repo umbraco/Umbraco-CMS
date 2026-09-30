@@ -287,7 +287,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         // First creation
         if (ExistsInNavigation(media.Key) is false && ExistsInNavigationBin(media.Key) is false)
         {
-            _mediaNavigationManagementService.Add(media.Key, media.ContentType.Key, GetParentKey(media), media.SortOrder);
+            AddToNavigation(media);
             if (media.Trashed)
             {
                 // If created as trashed, move to bin
@@ -328,6 +328,29 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
                 _mediaNavigationManagementService.RestoreFromBin(media.Key, GetParentKey(media));
             }
         }
+    }
+
+    private void AddToNavigation(IMedia media)
+    {
+        Guid? parentKey = GetParentKey(media);
+        if (_mediaNavigationManagementService.Add(media.Key, media.ContentType.Key, parentKey, media.SortOrder)
+            || parentKey is null
+            || media.Trashed
+            || ExistsInNavigation(parentKey.Value))
+        {
+            return;
+        }
+
+        // The parent was created on another server and its instruction has not been processed here yet.
+        foreach (IMedia ancestor in _mediaService.GetAncestors(media).OrderBy(x => x.Level))
+        {
+            if (ExistsInNavigation(ancestor.Key) is false)
+            {
+                _mediaNavigationManagementService.Add(ancestor.Key, ancestor.ContentType.Key, GetParentKey(ancestor), ancestor.SortOrder);
+            }
+        }
+
+        _mediaNavigationManagementService.Add(media.Key, media.ContentType.Key, parentKey, media.SortOrder);
     }
 
     private Guid? GetParentKey(IMedia media) => (media.ParentId == -1) ? null : _idKeyMap.GetKeyForId(media.ParentId, UmbracoObjectTypes.Media).Result;
