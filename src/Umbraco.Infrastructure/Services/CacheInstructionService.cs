@@ -227,8 +227,9 @@ namespace Umbraco.Cms
             /// <remarks>
             ///     Runs inline in repository reads, inside a scope that may hold distributed locks such as ContentTree, while
             ///     <see cref="ProcessAllInstructions" /> holds <c>_syncLock</c> and takes those same locks. So this must never
-            ///     wait for <c>_syncLock</c> or take distributed locks: only the in-memory
-            ///     <see cref="IJsonCacheRefresher.RefreshInternal(string)" /> runs. The internal last-synced id is saved inside
+            ///     wait for <c>_syncLock</c> or take distributed locks: payload instructions run only the in-memory
+            ///     <see cref="IJsonCacheRefresher.RefreshInternal(string)" />, and id-based instructions run their in-memory
+            ///     refresh. The internal last-synced id is saved inside
             ///     the caller's transaction, which holds the umbracoLastSynced row until the caller commits;
             ///     <see cref="ILastSyncedManager" /> only moves that id forward, so overlapping calls that processed the same
             ///     instructions write it once.
