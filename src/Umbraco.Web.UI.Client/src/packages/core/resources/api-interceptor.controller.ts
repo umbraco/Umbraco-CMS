@@ -7,8 +7,6 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 
-const MAX_RETRIES = 3;
-
 /**
  * HTTP statuses used by proxies/gateways (nginx, ALB, IIS ARR, Cloudflare's 524/598, etc.) to report that
  * the origin server *received* the request but didn't respond before the proxy gave up waiting. The action
@@ -25,18 +23,56 @@ const GATEWAY_TIMEOUT_STATUSES = new Set([504, 524, 598]);
  */
 const GATEWAY_UNREACHABLE_STATUSES = new Set([521, 522, 523, 525, 526, 530, 599]);
 
+/** The backoffice login page, which the server's auth challenge redirects to. */
+const LOGIN_PATH = '/umbraco/login';
+
+/**
+ * Whether a request was redirected to the login page by an auth challenge. The client follows
+ * redirects and the login page answers 200, so where the request ended up is the only sign of it.
+ * @param {Response} response The response to check.
+ * @returns {boolean} True if the response is the login page reached through a redirect.
+ */
+function isRedirectToLogin(response: Response): boolean {
+	if (!response.redirected) return false;
+	// Matched as a suffix, so a server hosted under a path base is recognised too.
+	return new URL(response.url).pathname.replace(/\/$/, '').endsWith(LOGIN_PATH);
+}
+
+/**
+ * Marks the options of a request retried after re-authentication. The client hands its interceptors a
+ * copy of the options it was called with, so the mark travels with the retry where the options object
+ * itself does not.
+ */
+const RETRIED_AFTER_REAUTHENTICATION = Symbol('RetriedAfterReauthentication');
+
+/**
+ * Builds the problem details for a request the user is not allowed to make.
+ * @param {string} [title] The title to use instead of the default one.
+ * @returns {UmbProblemDetails} The problem details of a 403 Forbidden response.
+ */
+function createForbiddenProblemDetails(title?: string): UmbProblemDetails {
+	return {
+		status: 403,
+		title:
+			title ||
+			'You do not have the necessary permissions to complete the requested action. If you believe this is in error, please reach out to your administrator.',
+		detail: undefined,
+		errors: undefined,
+		type: 'Unauthorized',
+		stack: undefined,
+	};
+}
+
 export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
 	 * Store pending requests that received a 401 response and are waiting for re-authentication.
 	 * This is used to retry the requests after re-authentication.
 	 */
 	#pending401Requests: Array<{
-		request: Request;
 		requestConfig: unknown;
 		retry: () => Promise<Response>;
 		resolve: (value: Response) => void;
 		reject: (reason?: unknown) => void;
-		retries: number;
 	}> = [];
 
 	/**
@@ -83,7 +119,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			// the session lives in a cookie it cannot read. The proxy is optimistic in one direction —
 			// a request to an endpoint that does not require a session succeeds without renewing one —
 			// so it can report activity the server did not act on, never miss activity it did.
-			if (response.ok) {
+			if (response.ok && !isRedirectToLogin(response)) {
 				this.#signaler.signalActivity();
 			}
 
@@ -92,25 +128,36 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Interceptor which checks responses for 401 errors and signals the auth layer to show the login UI.
+	 * Interceptor which checks responses for 401 errors, or a redirect to the login page, and signals the auth layer to show the login UI.
+	 * A GET request is retried once after re-authentication; what the retry gets is final.
 	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 * @internal
 	 */
 	addAuthResponseInterceptor(client: typeof umbHttpClient) {
 		client.interceptors.response.use(async (response, request, requestConfig): Promise<Response> => {
-			if (response.status !== 401) return response;
+			const redirectedToLogin = isRedirectToLogin(response);
+			if (response.status !== 401 && !redirectedToLogin) return response;
+
+			// A retry already carries the re-established session, so asking for re-authentication again
+			// would only loop. Ending up on the login page now means the user is signed in but not allowed.
+			if (RETRIED_AFTER_REAUTHENTICATION in requestConfig) {
+				return redirectedToLogin ? this.#createResponse(createForbiddenProblemDetails(), undefined, 403) : response;
+			}
+
+			// The login page's 200 is not the API's answer, so nothing of it is carried over.
+			const unauthorizedResponse = redirectedToLogin ? undefined : response;
 
 			// Build a plain ProblemDetails object for the response body
 			const problemDetails: UmbProblemDetails = {
-				status: response.status,
-				title: response.statusText || 'Unauthorized request, waiting for re-authentication.',
+				status: 401,
+				title: unauthorizedResponse?.statusText || 'Unauthorized request, waiting for re-authentication.',
 				detail: undefined,
 				errors: undefined,
 				type: 'Unauthorized',
 				stack: undefined,
 			};
 
-			const newResponse = this.#createResponse(problemDetails, response);
+			const newResponse = this.#createResponse(problemDetails, unauthorizedResponse, 401);
 
 			const signaler = this.#signaler;
 
@@ -124,26 +171,15 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				return newResponse;
 			}
 
-			// Find if this request is already in the queue and increment retries
-			let retries = 1;
-			const existing = this.#pending401Requests.find(
-				(req) => req.request === request && req.requestConfig === requestConfig,
-			);
-			if (existing) {
-				retries = existing.retries + 1;
-				if (retries > MAX_RETRIES) {
-					return newResponse;
-				}
-				existing.retries = retries;
-			}
-
 			// Return a promise that will resolve when re-auth completes
 			return new Promise<Response>((resolve, reject) => {
 				this.#pending401Requests.push({
-					request,
 					requestConfig,
 					retry: async () => {
-						const { data, response: retryResponse } = await client.request(requestConfig as never);
+						const { data, response: retryResponse } = await client.request({
+							...requestConfig,
+							[RETRIED_AFTER_REAUTHENTICATION]: true,
+						} as never);
 
 						if (!retryResponse) {
 							throw new Error('The retried request did not produce a response.');
@@ -153,18 +189,12 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					},
 					resolve,
 					reject,
-					retries,
 				});
 
 				// Signal the auth layer to show the login UI
 				signaler.requestTimeout();
 
-				console.log(
-					'[Interceptor] 401 Unauthorized - queuing request for re-authentication and have tried',
-					retries - 1,
-					'times before',
-					requestConfig,
-				);
+				console.log('[Interceptor] 401 Unauthorized - queuing request for re-authentication', requestConfig);
 			});
 		});
 	}
@@ -178,19 +208,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		client.interceptors.response.use((response): Response => {
 			if (response.status !== 403) return response;
 
-			// Build a plain ProblemDetails object for the response body
-			const problemDetails: UmbProblemDetails = {
-				status: response.status,
-				title:
-					response.statusText ||
-					'You do not have the necessary permissions to complete the requested action. If you believe this is in error, please reach out to your administrator.',
-				detail: undefined,
-				errors: undefined,
-				type: 'Unauthorized',
-				stack: undefined,
-			};
-
-			return this.#createResponse(problemDetails, response);
+			return this.#createResponse(createForbiddenProblemDetails(response.statusText), response);
 		});
 	}
 
@@ -383,10 +401,14 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 * Helper to create a new Response with correct Content-Type.
 	 * @param {unknown} body The body of the response, can be a string or an object.
 	 * @param {Response} [originalResponse] The original response to copy status and headers from, if any.
-	 * @param {number} [fallbackStatus] Status to use when no upstream response is available. Defaults to 500.
+	 * @param {number} [fallbackStatus] Status to use when no upstream response is available, or its status is not a valid HTTP status. Defaults to 500.
 	 * @returns {Response} The new Response object with the correct Content-Type and body.
 	 */
 	#createResponse(body: unknown, originalResponse?: Response, fallbackStatus: number = 500): Response {
+		// `new Response()` throws outside 200-599; an opaque redirect or a network error reports 0.
+		const originalStatus = originalResponse?.status ?? 0;
+		const status = originalStatus >= 200 && originalStatus <= 599 ? originalStatus : fallbackStatus;
+
 		const isString = typeof body === 'string';
 		const contentType = isString ? 'text/plain' : 'application/json';
 		const responseBody = isString ? body : JSON.stringify(body);
@@ -400,7 +422,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		});
 
 		return new Response(responseBody, {
-			status: originalResponse?.status ?? fallbackStatus,
+			status,
 			statusText: originalResponse?.statusText ?? '',
 			headers: {
 				...headersOverride,
