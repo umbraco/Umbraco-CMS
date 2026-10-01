@@ -37,6 +37,8 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
     private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
+    private IKeyValueService KeyValueService => GetRequiredService<IKeyValueService>();
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
@@ -1447,6 +1449,34 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         ContentService.Unpublish(ContentService.GetById(pageAKey)!);
         await DocumentUrlAliasService.RebuildAllAliasesAsync();
 
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
+    }
+
+    [Test]
+    public async Task InitAsync_Rebuilds_And_Flushes_Rows_When_Persisted_Rebuild_Value_Is_Outdated()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var pageAKey = new Guid(PageWithSingleAliasKey);
+
+        ContentService.Unpublish(ContentService.GetById(pageAKey)!);
+
+        // An unpublished document's alias is a row the current rebuild rules would not produce.
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope())
+        {
+            DocumentUrlAliasRepository.Save([new PublishedDocumentUrlAlias { DocumentKey = pageAKey, LanguageId = null, Alias = "my-single-alias" }]);
+            KeyValueService.SetValue(global::Umbraco.Cms.Core.Services.DocumentUrlAliasService.RebuildKey, "outdated");
+            scope.Complete();
+        }
+
+        await DocumentUrlAliasService.InitAsync(false, CancellationToken.None);
+
+        List<PublishedDocumentUrlAlias> stored;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            stored = DocumentUrlAliasRepository.GetAll().Where(a => a.DocumentKey == pageAKey).ToList();
+        }
+
+        Assert.That(stored, Is.Empty);
         Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
     }
 
