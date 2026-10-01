@@ -65,7 +65,7 @@ public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintCo
 
         AuthorizationResult documentBlueprintAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            DocumentBlueprintPermissionResource.Root(),
+            DocumentBlueprintPermissionResource.WithKeys(fromDocumentRequestModel.Parent?.Id),
             AuthorizationPolicies.DocumentBlueprintPermissionByResource);
 
         if (documentBlueprintAuthorizationResult.Succeeded is false)
@@ -78,6 +78,7 @@ public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintCo
                 fromDocumentRequestModel.Document.Id,
                 fromDocumentRequestModel.Name,
                 fromDocumentRequestModel.Id,
+                fromDocumentRequestModel.Parent?.Id,
                 CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
