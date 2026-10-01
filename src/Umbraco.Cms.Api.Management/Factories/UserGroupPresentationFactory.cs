@@ -75,6 +75,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
+            HasAccessToInvariantForVariant = userGroup.HasAccessToInvariantForVariant,
             FallbackPermissions = userGroup.Permissions,
             Permissions = await _permissionPresentationFactory.CreateAsync(userGroup.GranularPermissions),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
@@ -109,6 +110,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
+            HasAccessToInvariantForVariant = userGroup.HasAccessToInvariantForVariant,
             FallbackPermissions = userGroup.Permissions,
             Permissions = await _permissionPresentationFactory.CreateAsync(userGroup.GranularPermissions),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
@@ -151,6 +153,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Description = requestModel.Description,
             Icon = requestModel.Icon,
             HasAccessToAllLanguages = requestModel.HasAccessToAllLanguages,
+            HasAccessToInvariantForVariant = requestModel.HasAccessToInvariantForVariant,
             Permissions = requestModel.FallbackPermissions,
             GranularPermissions = await _permissionPresentationFactory.CreatePermissionSetsAsync(requestModel.Permissions),
         };
@@ -217,6 +220,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         current.Description = request.Description;
         current.Icon = request.Icon;
         current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
+        current.HasAccessToInvariantForVariant = request.HasAccessToInvariantForVariant;
 
         current.Permissions = request.FallbackPermissions;
         current.GranularPermissions = await _permissionPresentationFactory.CreatePermissionSetsAsync(request.Permissions);

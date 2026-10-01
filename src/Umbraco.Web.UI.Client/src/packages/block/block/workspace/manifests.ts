@@ -63,6 +63,18 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
+		type: 'workspaceContext',
+		alias: 'Umb.WorkspaceContext.Block.InvariantForVariantGuard',
+		name: 'Block Invariant For Variant Guard Workspace Context',
+		api: () => import('./block-workspace-invariant-for-variant-guard.controller.js'),
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_BLOCK_WORKSPACE_ALIAS,
+			},
+		],
+	},
+	{
 		type: 'workspaceView',
 		alias: UMB_BLOCK_WORKSPACE_VIEW_CONTENT,
 		name: 'Block Workspace Content View',

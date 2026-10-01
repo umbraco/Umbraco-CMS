@@ -66,6 +66,7 @@ public class UpdateUserGroupControllerTests : ManagementApiUserGroupTestBase<Upd
             Description = "Updated test group description",
             FallbackPermissions = new HashSet<string>(),
             HasAccessToAllLanguages = true,
+            HasAccessToInvariantForVariant = true,
             Languages = [],
             Sections = ["Umb.Section.Content"],
             Permissions = new HashSet<IPermissionPresentationModel> { },

@@ -20,7 +20,7 @@ import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbReadOnlyVariantGuardManager, UmbVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import {
 	notifyWorkspaceActionStarting,
 	UmbEntityDetailWorkspaceContextBase,
@@ -130,6 +130,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
+	/**
+	 * Guards which variants may be written (saved, published, unpublished, scheduled).
+	 * A variant can be editable yet not writable, for example when only some of its properties may be edited.
+	 */
+	public readonly variantWriteGuard = new UmbVariantGuardManager(this);
+
 	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
 	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
 
@@ -218,6 +224,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
+		this.variantWriteGuard.fallbackToPermitted();
 
 		this.#serverValidation.addPathTranslator(UmbContentDetailValidationPathTranslator);
 
@@ -850,9 +857,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		const selectedVariantIds = [...activeAndChangedVariantIds, ...changedParentCultureVariantIds];
 
-		const writableSelectedVariantIds = selectedVariantIds.filter(
-			(x) => this.readOnlyGuard.getIsPermittedForVariant(x) === false,
-		);
+		const writableSelectedVariantIds = selectedVariantIds.filter((x) => this.getIsVariantWritable(x));
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
 		const selected = writableSelectedVariantIds
@@ -868,8 +873,28 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected _saveableVariantsFilter = (option: VariantOptionModelType) => {
-		return this.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(option)) === false;
+		return this.getIsVariantWritable(UmbVariantId.Create(option));
 	};
+
+	/**
+	 * Checks if the given variant may be written, i.e. it is neither read-only nor denied by the variant write guard.
+	 * @param {UmbVariantId} variantId - The variant to check
+	 * @returns {boolean} true if the variant may be written
+	 */
+	public getIsVariantWritable(variantId: UmbVariantId): boolean {
+		return (
+			this.readOnlyGuard.getIsPermittedForVariant(variantId) === false &&
+			this.variantWriteGuard.getIsPermittedForVariant(variantId)
+		);
+	}
+
+	/**
+	 * Checks if the invariant (shared) data of existing content may be saved on its own, without saving any culture variant.
+	 * @returns {boolean} true if the invariant data may be saved on its own
+	 */
+	public getIsInvariantDataWritable(): boolean {
+		return this.getIsNew() === false && this.getIsVariantWritable(UmbVariantId.CreateInvariant());
+	}
 
 	/* validation */
 
@@ -983,6 +1008,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// If there is only one variant, we don't need to open the modal.
 		if (options.length === 0) {
 			throw new Error('No variants are available');
+		} else if (
+			this.getVariesByCulture() &&
+			options.some(this._saveableVariantsFilter) === false &&
+			this.getIsInvariantDataWritable()
+		) {
+			// No culture may be saved, but the invariant data may. Saving the invariant variant alone stores the
+			// invariant data and leaves every culture as persisted.
+			variantIds.push(UmbVariantId.CreateInvariant());
 		} else if (options.length === 1) {
 			// If only one option we will skip ahead and save the content with the only variant available:
 			variantIds.push(UmbVariantId.Create(options[0]));
@@ -1209,9 +1242,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.readOnlyGuard.clearRules();
 		this.propertyViewGuard.clearRules();
 		this.propertyWriteGuard.clearRules();
+		this.variantWriteGuard.clearRules();
 		// default:
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
+		this.variantWriteGuard.fallbackToPermitted();
 	}
 
 	abstract getContentTypeUnique(): string | undefined;

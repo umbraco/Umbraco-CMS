@@ -393,6 +393,26 @@ export class UserGroupApiHelper {
     return await this.create(userGroup);
   }
 
+  async createUserGroupWithInvariantForVariantAccess(name: string, hasAccessToInvariantForVariant: boolean) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.content)
+      .withDocumentRootAccess(true)
+      .withHasAccessToAllLanguages(true)
+      .withHasAccessToInvariantForVariant(hasAccessToInvariantForVariant)
+      .addFallbackPermission()
+        .withUpdateDocumentPermission(true)
+        .withReadDocumentPermission(true)
+        .withWritePropertyValueDocumentPermission(true)
+        .withReadPropertyValueDocumentPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
   async createUserGroupWithDuplicateDocumentPermission(name: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 

@@ -574,12 +574,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
-		const variantId = UmbVariantId.Create(option);
-		// If the read only guard is permitted it means the variant is read only
-		const isReadOnly = this.#documentWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(variantId);
-		// If the variant is read only, we can't publish it
-		const isPublishable = !isReadOnly;
-		return isPublishable;
+		return this.#documentWorkspaceContext!.getIsVariantWritable(UmbVariantId.Create(option));
 	};
 
 	async #determineVariantOptions(): Promise<{
@@ -599,12 +594,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
 		selected = selected.filter((x) => options.some((o) => o.unique === x));
 
-		// Filter out read-only variants
+		// Filter out variants that cannot be written
 		// TODO: This would not work with segments, as the 'selected'-array is an array of strings, not UmbVariantId's. [NL]
 		// Please have a look at the implementation in the content-detail workspace context, as that one compares variantIds. [NL]
-		selected = selected.filter(
-			(x) => this.#documentWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(new UmbVariantId(x)) === false,
-		);
+		selected = selected.filter((x) => this.#documentWorkspaceContext!.getIsVariantWritable(new UmbVariantId(x)));
 
 		return {
 			options,

@@ -183,5 +183,6 @@ internal static class UserFactory
                     Context = granularPermission.Context,
                 };
             })),
-            group.HasAccessToAllLanguages);
+            group.HasAccessToAllLanguages,
+            group.HasAccessToInvariantForVariant);
 }

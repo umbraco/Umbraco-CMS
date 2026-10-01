@@ -28,13 +28,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 	userPermissionConditionManifest,
 	{
 		type: 'workspaceContext',
-		name: 'Document Language Access Workspace Context',
+		name: 'Content Language Access Workspace Context',
 		alias: 'Umb.WorkspaceContext.DocumentLanguageAccess',
 		api: () => import('./permissions/language-access.workspace.context.js'),
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: 'Umb.Workspace.Document',
+				oneOf: ['Umb.Workspace.Document', 'Umb.Workspace.Element'],
 			},
 		],
 	},

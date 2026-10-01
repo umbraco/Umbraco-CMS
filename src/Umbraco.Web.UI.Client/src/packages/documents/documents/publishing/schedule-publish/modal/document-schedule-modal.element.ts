@@ -140,6 +140,11 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		return this._selection.some((s) => s.unique === unique);
 	}
 
+	#hasSelectableOption() {
+		const isAllowed = this.#selectionManager.getAllowLimitation();
+		return this._options.some((option) => isAllowed(option.unique));
+	}
+
 	#onSelectAllChange(event: Event) {
 		const allUniques = this._options.map((o) => o.unique);
 		const filter = this.#selectionManager.getAllowLimitation();
@@ -184,7 +189,8 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 					<uui-checkbox
 						@change=${this.#onSelectAllChange}
 						label=${this.localize.term('general_selectAll')}
-						.checked=${this._isAllSelected}></uui-checkbox>
+						.checked=${this._isAllSelected}
+						?disabled=${!this.#hasSelectableOption()}></uui-checkbox>
 				`,
 			)}
 			${repeat(

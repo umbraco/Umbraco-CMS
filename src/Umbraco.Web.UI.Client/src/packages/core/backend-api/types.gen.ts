@@ -503,6 +503,7 @@ export type CreateUserGroupRequestModel = {
     sections: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    hasAccessToInvariantForVariant: boolean;
     documentStartNode?: null | ReferenceByIdModel;
     documentRootAccess: boolean;
     mediaStartNode?: null | ReferenceByIdModel;
@@ -565,6 +566,7 @@ export type CurrentUserResponseModel = {
     avatarUrls: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    hasAccessToInvariantForVariant: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<IPermissionPresentationModel>;
@@ -749,7 +751,6 @@ export type DocumentCollectionResponseModel = {
 export type DocumentConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
-    allowEditInvariantFromNonDefault: boolean;
 };
 
 export type DocumentItemResponseModel = {
@@ -1046,7 +1047,6 @@ export type DynamicRootResponseModel = {
 export type ElementConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
-    allowEditInvariantFromNonDefault: boolean;
 };
 
 export type ElementItemResponseModel = {
@@ -3304,6 +3304,7 @@ export type UpdateUserGroupRequestModel = {
     sections: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    hasAccessToInvariantForVariant: boolean;
     documentStartNode?: null | ReferenceByIdModel;
     documentRootAccess: boolean;
     mediaStartNode?: null | ReferenceByIdModel;
@@ -3407,6 +3408,7 @@ export type UserGroupResponseModel = {
     sections: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    hasAccessToInvariantForVariant: boolean;
     documentStartNode?: null | ReferenceByIdModel;
     documentRootAccess: boolean;
     mediaStartNode?: null | ReferenceByIdModel;

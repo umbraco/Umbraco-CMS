@@ -61,6 +61,15 @@ public interface IReadOnlyUserGroup
     bool HasAccessToAllLanguages => true;
 
     /// <summary>
+    ///     Gets a value indicating whether this user group can edit invariant (shared) property data
+    ///     on variant content. The permission is not consulted when editing invariant content types.
+    /// </summary>
+    /// <remarks>
+    ///     This is set to return true as default to avoid breaking changes.
+    /// </remarks>
+    bool HasAccessToInvariantForVariant => true;
+
+    /// <summary>
     ///     Gets the set of permissions assigned to this user group.
     /// </summary>
     ISet<string> Permissions { get; }

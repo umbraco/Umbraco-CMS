@@ -122,6 +122,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_19_0_0.AddIndexDocumentTable>("{8A5C1B2E-4F6D-4E1A-9C3B-D2E7F0A16C54}");
         To<V_19_0_0.RemoveLegacyExamineIndexFiles>("{6F1A9C3D-2B4E-4F7A-8C1D-9E3F5A7B2C60}");
         To<V_19_0_0.RemoveUserGroupDefaultPermissionsColumn>("{B7E3D2A1-6C4F-4A8E-9D2B-3F1C5E7A9B04}");
+        To<V_19_0_0.AddHasAccessToInvariantForVariantToUserGroup>("{B2C4E7A8-9F31-4D56-8E7B-C1A2F3D4E5F6}");
     }
 
     /// <summary>

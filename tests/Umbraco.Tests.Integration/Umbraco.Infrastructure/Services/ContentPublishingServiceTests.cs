@@ -171,7 +171,4 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         public void Handle(ContentUnpublishingNotification notification) => UnpublishingContent?.Invoke(notification);
     }
-
-    public static void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
-        => builder.Services.Configure<ContentSettings>(config => config.AllowEditInvariantFromNonDefault = true);
 }

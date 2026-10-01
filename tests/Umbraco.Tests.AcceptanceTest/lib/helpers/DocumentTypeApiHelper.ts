@@ -1312,7 +1312,7 @@ export class DocumentTypeApiHelper {
 
   /**
    * Creates a document type with a nested Block List structure for testing the
-   * AllowEditInvariantFromNonDefault matrix.
+   * invariant-for-variant access matrix.
    *
    * Structure created:
    * - Document Type (Vary by culture)

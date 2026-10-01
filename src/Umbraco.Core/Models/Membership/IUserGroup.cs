@@ -52,6 +52,20 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     }
 
     /// <summary>
+    ///     If this property is true it will allow the group to edit invariant (shared) property data
+    ///     on variant content. The permission is not consulted when editing invariant content types.
+    /// </summary>
+    /// <remarks>
+    ///     This is set to return true as default to avoid breaking changes.
+    /// </remarks>
+    // TODO (V20): Remove default implementation.
+    public bool HasAccessToInvariantForVariant
+    {
+        get => true;
+        set { /* This is NoOp to avoid breaking changes */ }
+    }
+
+    /// <summary>
     /// The set of permissions provided by the frontend.
     /// </summary>
     /// <remarks>

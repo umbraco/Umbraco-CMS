@@ -42175,6 +42175,7 @@
           "sections",
           "languages",
           "hasAccessToAllLanguages",
+          "hasAccessToInvariantForVariant",
           "fallbackPermissions",
           "permissions",
           "documentRootAccess",
@@ -42221,6 +42222,9 @@
             }
           },
           "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "hasAccessToInvariantForVariant": {
             "type": "boolean"
           },
           "documentStartNode": {
@@ -42448,6 +42452,7 @@
           "avatarUrls",
           "languages",
           "hasAccessToAllLanguages",
+          "hasAccessToInvariantForVariant",
           "hasAccessToSensitiveData",
           "fallbackPermissions",
           "permissions",
@@ -42510,6 +42515,9 @@
             }
           },
           "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "hasAccessToInvariantForVariant": {
             "type": "boolean"
           },
           "hasAccessToSensitiveData": {
@@ -43239,8 +43247,7 @@
       "DocumentConfigurationResponseModel": {
         "required": [
           "disableDeleteWhenReferenced",
-          "disableUnpublishWhenReferenced",
-          "allowEditInvariantFromNonDefault"
+          "disableUnpublishWhenReferenced"
         ],
         "type": "object",
         "properties": {
@@ -43248,9 +43255,6 @@
             "type": "boolean"
           },
           "disableUnpublishWhenReferenced": {
-            "type": "boolean"
-          },
-          "allowEditInvariantFromNonDefault": {
             "type": "boolean"
           }
         }
@@ -44492,8 +44496,7 @@
       "ElementConfigurationResponseModel": {
         "required": [
           "disableDeleteWhenReferenced",
-          "disableUnpublishWhenReferenced",
-          "allowEditInvariantFromNonDefault"
+          "disableUnpublishWhenReferenced"
         ],
         "type": "object",
         "properties": {
@@ -44501,9 +44504,6 @@
             "type": "boolean"
           },
           "disableUnpublishWhenReferenced": {
-            "type": "boolean"
-          },
-          "allowEditInvariantFromNonDefault": {
             "type": "boolean"
           }
         }
@@ -53065,6 +53065,7 @@
           "sections",
           "languages",
           "hasAccessToAllLanguages",
+          "hasAccessToInvariantForVariant",
           "fallbackPermissions",
           "permissions",
           "documentRootAccess",
@@ -53104,6 +53105,9 @@
             }
           },
           "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "hasAccessToInvariantForVariant": {
             "type": "boolean"
           },
           "documentStartNode": {
@@ -53469,6 +53473,7 @@
           "sections",
           "languages",
           "hasAccessToAllLanguages",
+          "hasAccessToInvariantForVariant",
           "fallbackPermissions",
           "permissions",
           "isDeletable",
@@ -53520,6 +53525,9 @@
             }
           },
           "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "hasAccessToInvariantForVariant": {
             "type": "boolean"
           },
           "documentStartNode": {

@@ -13,7 +13,6 @@ const UMB_SLUG = '/document';
 const configuration: UmbDocumentConfigurationModel = {
 	disableDeleteWhenReferenced: true,
 	disableUnpublishWhenReferenced: true,
-	allowEditInvariantFromNonDefault: false,
 };
 
 @customElement('umb-test-document-configuration-repository-host')

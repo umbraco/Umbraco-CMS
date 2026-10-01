@@ -349,20 +349,34 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(2, content.PublishedCultures.Count());
     }
 
-    [TestCase(true, "da-DK")]
-    [TestCase(false, "en-US")]
-    [TestCase(false, "en-US", "da-DK")]
-    public async Task Publish_Invalid_Invariant_Property_WithoutAllowEditInvariantFromNonDefault(bool expectedSuccess, params string[] culturesToRepublish)
-        => await Publish_Invalid_Invariant_Property(expectedSuccess, culturesToRepublish);
+    [TestCase("da-DK")]
+    [TestCase("en-US")]
+    [TestCase("en-US", "da-DK")]
+    public async Task Publish_Invalid_Invariant_Property_WithoutAccessToInvariantForVariant(params string[] culturesToRepublish)
+    {
+        var userGroupService = GetRequiredService<IUserGroupService>();
+        var userService = GetRequiredService<IUserService>();
 
-    [TestCase(false, "da-DK")]
-    [TestCase(false, "en-US")]
-    [TestCase(false, "en-US", "da-DK")]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
-    public async Task Publish_Invalid_Invariant_Property_WithAllowEditInvariantFromNonDefault(bool expectedSuccess, params string[] culturesToRepublish)
-        => await Publish_Invalid_Invariant_Property(expectedSuccess, culturesToRepublish);
+        var user = UserBuilder.CreateUser();
+        userService.Save(user);
 
-    private async Task Publish_Invalid_Invariant_Property(bool expectedSuccess, params string[] culturesToRepublish)
+        var group = UserGroupBuilder.CreateUserGroup();
+        group.HasAccessToAllLanguages = true;
+        group.HasAccessToInvariantForVariant = false;
+
+        var userGroupResult = await userGroupService.CreateAsync(group, Constants.Security.SuperUserKey, [user.Key]);
+        Assert.IsTrue(userGroupResult.Success);
+
+        await Publish_Invalid_Invariant_Property(true, user.Key, culturesToRepublish);
+    }
+
+    [TestCase("da-DK")]
+    [TestCase("en-US")]
+    [TestCase("en-US", "da-DK")]
+    public async Task Publish_Invalid_Invariant_Property_WithAccessToInvariantForVariant(params string[] culturesToRepublish)
+        => await Publish_Invalid_Invariant_Property(false, Constants.Security.SuperUserKey, culturesToRepublish);
+
+    private async Task Publish_Invalid_Invariant_Property(bool expectedSuccess, Guid userKeyForPublishing, params string[] culturesToRepublish)
     {
         var contentType = await SetupVariantInvariantTest();
 
@@ -395,7 +409,7 @@ public partial class ContentPublishingServiceTests
         result = await ContentPublishingService.PublishAsync(
             content.Key,
             culturesToRepublish.Select(culture => new CulturePublishScheduleModel { Culture = culture }).ToArray(),
-            Constants.Security.SuperUserKey);
+            userKeyForPublishing);
 
         content = ContentService.GetById(content.Key)!;
 

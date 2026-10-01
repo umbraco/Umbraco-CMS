@@ -2291,6 +2291,8 @@ export default {
 		searchAllChildren: 'Search all children',
 		languagesHelp: 'Limit the languages users have access to edit',
 		allowAccessToAllLanguages: 'Allow access to all languages',
+		allowAccessToInvariantForVariant: 'Allow editing shared content',
+		invariantForVariantHelp: 'Grants access to edit properties that are shared between languages on culture variant content. Does not apply to culture invariant content.',
 		allowAccessToAllDocuments: 'Allow access to all documents',
 		allowAccessToAllElements: 'Allow access to all elements',
 		allowAccessToAllMedia: 'Allow access to all media',

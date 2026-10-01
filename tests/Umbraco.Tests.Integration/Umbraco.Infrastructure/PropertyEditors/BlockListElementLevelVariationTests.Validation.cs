@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -172,16 +173,9 @@ internal partial class BlockListElementLevelVariationTests
         });
     }
 
-    [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
-    public async Task Can_Validate_Invalid_Properties_Specific_Culture_Only_With_AllowEditInvariantFromNonDefault()
-        => await Can_Validate_Invalid_Properties_Specific_Culture_Only();
-
-    [Test]
-    public async Task Can_Validate_Invalid_Properties_Specific_Culture_Only_Without_AllowEditInvariantFromNonDefault()
-        => await Can_Validate_Invalid_Properties_Specific_Culture_Only();
-
-    private async Task Can_Validate_Invalid_Properties_Specific_Culture_Only()
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Validate_Invalid_Properties_Specific_Culture_Only(bool includeInvariantValues)
     {
         var elementType = await CreateElementTypeWithValidationAsync();
         var blockListDataType = await CreateBlockListDataType(elementType);
@@ -206,32 +200,62 @@ internal partial class BlockListElementLevelVariationTests
                 null,
                 null));
 
-        var result = await ContentValidationService.ValidatePropertiesAsync(
-            new ContentCreateModel
-            {
-                ContentTypeKey = contentType.Key,
-                Variants =
-                [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
-                ],
-                Properties =
-                [
-                    new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
-                ]
-            },
-            contentType,
-            new[] { "en-US" });
+        var contentCreateModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            Variants =
+            [
+                new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
+                new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
+            ],
+        };
 
-        // NOTE: since the default culture is being validated, we expect the same result regardless
-        //       of the AllowEditInvariantFromNonDefault configuration
+        // Validate en-US (conditionally including invariant).
+        var result = await ContentValidationService.ValidatePropertiesAsync(
+            contentCreateModel,
+            contentType,
+            ["en-US"],
+            validateCultureInvariantProperties: includeInvariantValues);
+
         var errors = result.ValidationErrors.ToArray();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, errors.Length);
+            Assert.AreEqual(includeInvariantValues ? 2 : 1, errors.Length);
             Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
-            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value"));
+
+            // The "Invalid settings value in English" should be flagged for en-US.
             Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[1].value"));
+            if (includeInvariantValues)
+            {
+                // The "Invalid invariant content value" should also be flagged when including invariant values.
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value"));
+            }
+        });
+
+        // Validate da-DK (conditionally including invariant).
+        result = await ContentValidationService.ValidatePropertiesAsync(
+            contentCreateModel,
+            contentType,
+            ["da-DK"],
+            validateCultureInvariantProperties: includeInvariantValues);
+
+        errors = result.ValidationErrors.ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(includeInvariantValues ? 2 : 1, errors.Length);
+            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
+
+            // The "Invalid content value in Danish" should be flagged for da-DK.
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[2].value"));
+            if (includeInvariantValues)
+            {
+                // The "Invalid invariant content value" should also be flagged when including invariant values.
+                Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value"));
+            }
         });
     }
 
@@ -349,7 +373,6 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only_With_AllowEditInvariantFromNonDefault()
         => await Can_Validate_Missing_Properties_Nested_Blocks_Specific_Culture_Only(true);
 
@@ -464,7 +487,8 @@ internal partial class BlockListElementLevelVariationTests
                 ]
             },
             contentType,
-            new[] { "da-DK" });
+            culturesToValidate: ["da-DK"],
+            validateCultureInvariantProperties: expectedInvariantValidationErrors);
 
         var errors = result.ValidationErrors.ToArray();
 

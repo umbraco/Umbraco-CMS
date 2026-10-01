@@ -130,6 +130,9 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 		const hasAccessToAllLanguages = firstUser.userGroupIds?.length
 			? umbUserGroupMockDb.getHasAccessToAllLanguages(firstUser.userGroupIds)
 			: false;
+		const hasAccessToInvariantForVariant = firstUser.userGroupIds?.length
+			? umbUserGroupMockDb.getHasAccessToInvariantForVariant(firstUser.userGroupIds)
+			: true;
 		const languages = firstUser.userGroupIds?.length
 			? umbUserGroupMockDb.getAllowedLanguages(firstUser.userGroupIds)
 			: [];
@@ -142,6 +145,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			hasAccessToSensitiveData: true,
 			avatarUrls: [],
 			hasAccessToAllLanguages,
+			hasAccessToInvariantForVariant,
 			languageIsoCode: firstUser.languageIsoCode || null,
 			languages,
 			documentStartNodeIds: firstUser.documentStartNodeIds,

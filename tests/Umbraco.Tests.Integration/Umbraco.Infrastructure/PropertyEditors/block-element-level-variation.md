@@ -27,18 +27,22 @@ Most logic regarding this feature can be found in `BlockValuePropertyValueEditor
 
 ## Editing Data
 
-### Access to invariant data 
-- All Languages: The user has access to all languages
-- Default Language: The user has access to the language that is defined as the default
-- AllowEditInvariantFromNonDefault: Configuration setting
+### Access to invariant data
 
-| All Languages | Default Language | AllowEditInvariantFromNonDefault | Can Edit Invariant |
-|---------------|------------------|----------------------------------|--------------------|
-| True          | Inherits True    | N/A                              | True               |
-| False         | True             | N/A                              | True               |
-| False         | False            | True                             | True               |
-| False         | False            | False                            | False              |
+Editing invariant (shared) property data on **variant** content is gated by the
+`HasAccessToInvariantForVariant` permission on the user's groups (aggregated OR across groups
+via `IUser.HasAccessToInvariantForVariant()`). The permission is orthogonal to which specific
+languages the user has access to — a user may edit invariant data while having access to only
+a single non-default language, and a user with access to every language may still be denied
+invariant editing.
 
+| HasAccessToInvariantForVariant | Can Edit Invariant on Variant Content |
+|--------------------------------|---------------------------------------|
+| True                           | Yes                                   |
+| False                          | No                                    |
+
+On **invariant** content types the permission is not consulted — any user who can edit the
+document edits every property on it.
 
 ### Rules derived from the axioms
 - A user with access to invariant data is allowed to add or remove blocks even if those blocks hold language variant 

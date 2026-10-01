@@ -43,6 +43,7 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 					entityType: UMB_USER_GROUP_ENTITY_TYPE,
 					fallbackPermissions: item.fallbackPermissions,
 					hasAccessToAllLanguages: item.hasAccessToAllLanguages,
+					hasAccessToInvariantForVariant: item.hasAccessToInvariantForVariant,
 					icon: item.icon || null,
 					isDeletable: item.isDeletable,
 					languages: item.languages,
