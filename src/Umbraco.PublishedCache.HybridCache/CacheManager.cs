@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
+﻿using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -31,31 +29,6 @@ public class CacheManager : ICacheManager
         Members = members;
         Elements = elements;
         Domains = domains;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CacheManager"/> class.
-    /// </summary>
-    /// <param name="content">The published content cache.</param>
-    /// <param name="media">The published media cache.</param>
-    /// <param name="members">The published member cache.</param>
-    /// <param name="domains">The domain cache.</param>
-    /// <param name="elementsCache">The elements-level property value cache.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public CacheManager(
-        IPublishedContentCache content,
-        IPublishedMediaCache media,
-        IPublishedMemberCache members,
-        IDomainCache domains,
-        IElementsCache elementsCache)
-        : this(
-            content,
-            media,
-            members,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedElementCache>(),
-            domains,
-            elementsCache)
-    {
     }
 
     public IPublishedContentCache Content { get; }

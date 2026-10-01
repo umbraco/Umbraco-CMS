@@ -21,7 +21,7 @@ public abstract class FileSystemTreeServiceBase : IFileSystemTreeService
     /// <returns>
     /// An array of <see cref="FileSystemTreeItemPresentationModel"/> objects, each representing a directory in the ancestor chain of the specified path, ordered from the root to the specified path (if <paramref name="includeSelf"/> is <c>true</c>).
     /// </returns>
-    public FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
+    public virtual FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
     {
         var directories = path.Split(Path.DirectorySeparatorChar).Take(Range.EndAt(Index.FromEnd(1))).ToArray();
         var result = directories

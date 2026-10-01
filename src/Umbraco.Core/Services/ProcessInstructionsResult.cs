@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-///     Defines a result object for the <see cref="ICacheInstructionService.ProcessInstructions" />
+///     Defines a result object for the <see cref="ICacheInstructionService.ProcessAllInstructions" />
 ///     operation.
 /// </summary>
 public class ProcessInstructionsResult

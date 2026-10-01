@@ -33,10 +33,10 @@ public sealed class ContentSearchService : ContentSearchServiceBase<IContent>, I
     protected override string IndexAlias => Umbraco.Cms.Core.Constants.IndexAliases.DraftContent;
 
     /// <inheritdoc />
-    protected override IEnumerable<IContent> SearchChildrenFromDatabase(int parentId, Ordering? ordering, long pageNumber, int pageSize, out long total)
-        => _contentService.GetPagedChildren(parentId, pageNumber, pageSize, out total, null, ordering);
+    protected override IEnumerable<IContent> SearchChildrenFromDatabase(int parentId, string[]? propertyAliases, Ordering? ordering, long pageNumber, int pageSize, bool loadTemplates, out long total)
+        => _contentService.GetPagedChildren(parentId, pageNumber, pageSize, out total, propertyAliases, filter: null, ordering, loadTemplates);
 
     /// <inheritdoc />
-    protected override IEnumerable<IContent> GetItems(IEnumerable<Guid> keys)
-        => _contentService.GetByIds(keys);
+    protected override IEnumerable<IContent> GetItems(IEnumerable<Guid> keys, string[]? propertyAliases, bool loadTemplates)
+        => _contentService.GetByIds(keys, propertyAliases, loadTemplates);
 }

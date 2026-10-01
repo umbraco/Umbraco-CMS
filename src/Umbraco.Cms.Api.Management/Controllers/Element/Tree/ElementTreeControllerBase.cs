@@ -32,16 +32,20 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
     /// </summary>
     /// <param name="entityService">Service for retrieving entity data.</param>
     /// <param name="flagProviders">Collection of flag providers for tree item flags.</param>
+    /// <param name="entitySearchService">The entity search service.</param>
+    /// <param name="idKeyMap">The id/key map.</param>
     /// <param name="treeFilterService">Service for filtering element tree entities based on user start nodes.</param>
     /// <param name="elementPresentationFactory">Factory responsible for creating element presentation models.</param>
     /// <param name="elementPermissionFilterService">Service for filtering tree entities based on element permissions.</param>
     public ElementTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
         IElementStartNodeTreeFilterService treeFilterService,
         IElementPresentationFactory elementPresentationFactory,
         IElementPermissionFilterService elementPermissionFilterService)
-        : base(entityService, flagProviders, treeFilterService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, treeFilterService)
     {
         _elementPresentationFactory = elementPresentationFactory;
         _elementPermissionFilterService = elementPermissionFilterService;

@@ -4,11 +4,11 @@ pr: none
 trigger: none
 
 schedules:
-  - cron: '0 0 * * *'
-    displayName: Daily 0AM build (main)
+  - cron: '30 1 * * *'
+    displayName: Daily 1:30 AM build (v19/dev)
     branches:
       include:
-        - main
+        - v19/dev
 
 parameters:
   - name: skipIntegrationTests

@@ -12,7 +12,6 @@ const UMB_SLUG = '/media';
 
 const configuration: UmbMediaConfigurationModel = {
 	disableDeleteWhenReferenced: true,
-	disableUnpublishWhenReferenced: true,
 };
 
 @customElement('umb-test-media-configuration-repository-host')
