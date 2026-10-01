@@ -121,13 +121,14 @@ const richTextEditorWithBlocksDataType: UmbMockDataTypeModel = {
 			value: [
 				{
 					contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
-					label: '',
+					label: 'Element One: {umbValue:title}',
 					displayInline: false,
 					editorSize: 'medium',
 					forceHideContentEditorInOverlay: false,
 				},
 				{
 					contentElementTypeKey: 'f7f156a0-a3f3-42ec-8b9c-e788157bd84e',
+					label: 'Element Two: {umbContentName:link}',
 					displayInline: false,
 					editorSize: 'medium',
 					forceHideContentEditorInOverlay: false,
@@ -155,12 +156,13 @@ const blockListDefaultConfigDataType: UmbMockDataTypeModel = {
 			value: [
 				{
 					contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
-					label: '',
+					label: 'Element One: {umbValue:title}',
 					editorSize: 'medium',
 					forceHideContentEditorInOverlay: false,
 				},
 				{
 					contentElementTypeKey: 'f7f156a0-a3f3-42ec-8b9c-e788157bd84e',
+					label: 'Element Two: {umbContentName:link}',
 					editorSize: 'medium',
 					forceHideContentEditorInOverlay: false,
 				},
@@ -216,7 +218,7 @@ const blockGridDefaultConfigDataType: UmbMockDataTypeModel = {
 					allowInAreas: true,
 					areas: [],
 					contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
-					label: '',
+					label: 'Element One: {umbValue:title}',
 					editorSize: 'medium',
 					inlineEditing: false,
 					forceHideContentEditorInOverlay: false,
@@ -236,7 +238,7 @@ const blockGridDefaultConfigDataType: UmbMockDataTypeModel = {
 					allowInAreas: true,
 					areas: [],
 					contentElementTypeKey: 'f7f156a0-a3f3-42ec-8b9c-e788157bd84e',
-					label: '',
+					label: 'Element Two: {umbContentName:link}',
 					editorSize: 'medium',
 					inlineEditing: false,
 					forceHideContentEditorInOverlay: false,
@@ -272,7 +274,7 @@ const blockSingleDefaultConfigDataType: UmbMockDataTypeModel = {
 			value: [
 				{
 					contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
-					label: '',
+					label: 'Element One: {umbValue:title}',
 				},
 			],
 		},
@@ -297,18 +299,19 @@ const blockListVariantElementDataType: UmbMockDataTypeModel = {
 			value: [
 				{
 					contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
-					label: '',
+					label: 'Element One: {umbValue:title}',
 					editorSize: 'medium',
 					forceHideContentEditorInOverlay: false,
 				},
 				{
 					contentElementTypeKey: 'f7f156a0-a3f3-42ec-8b9c-e788157bd84e',
+					label: 'Element Two: {umbContentName:link}',
 					editorSize: 'medium',
 					forceHideContentEditorInOverlay: false,
 				},
 				{
 					contentElementTypeKey: 'a9c5e3f7-6b12-4d84-9e0f-2b7a4d1c8e65',
-					label: '',
+					label: 'Variant Element: {umbValue:title}',
 					editorSize: 'medium',
 					forceHideContentEditorInOverlay: false,
 				},
