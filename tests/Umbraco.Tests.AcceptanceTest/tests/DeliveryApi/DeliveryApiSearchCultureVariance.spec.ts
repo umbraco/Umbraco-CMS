@@ -1,9 +1,6 @@
 import {expect} from '@playwright/test';
 import {ApiHelpers, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
-// Raised from the 60s default - chained index polls would otherwise hit the test timeout first.
-test.describe.configure({timeout: 120000});
-
 const danishIsoCode = 'da';
 const englishIsoCode = 'en-US';
 const documentTypeName = 'DeliveryApiSearchCultureVarianceDocumentType';
@@ -12,13 +9,17 @@ const danishName = 'DeliveryApiSearchCultureVariance Danish';
 
 let documentTypeId = '';
 
-async function queryNamesForCulture(umbracoApi: ApiHelpers, culture: string, filter: string) {
+async function queryForCulture(umbracoApi: ApiHelpers, culture: string, filter: string) {
   const response = await umbracoApi.contentDeliveryApi.getContentItemsFromAQuery({'Accept-Language': culture}, undefined, filter);
-  const json = await response.json();
-  return json.items.map((item: {name: string}) => item.name);
+  return await response.json();
+}
+
+async function queryNamesForCulture(umbracoApi: ApiHelpers, culture: string, filter: string) {
+  return (await queryForCulture(umbracoApi, culture, filter)).items.map((item: {name: string}) => item.name);
 }
 
 test.beforeEach(async ({umbracoApi}) => {
+  test.slow();
   await umbracoApi.language.createDanishLanguage();
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithTextstringAndAllowAsRootAndAllowSelfAsChild(documentTypeName, true) ?? '';
 });
@@ -37,18 +38,22 @@ test('indexes each culture variant separately and returns only the requested cul
 
   // Act
   await expect
-    .poll(async () => queryNamesForCulture(umbracoApi, englishIsoCode, filter), {timeout: ConstantHelper.timeout.veryLong})
+    .poll(async () => queryNamesForCulture(umbracoApi, englishIsoCode, filter), {timeout: ConstantHelper.timeout.pageLoad})
     .toContain(englishName);
   await expect
-    .poll(async () => queryNamesForCulture(umbracoApi, danishIsoCode, filter), {timeout: ConstantHelper.timeout.veryLong})
+    .poll(async () => queryNamesForCulture(umbracoApi, danishIsoCode, filter), {timeout: ConstantHelper.timeout.pageLoad})
     .toContain(danishName);
 
-  // Assert - once both variants are confirmed indexed, neither culture's query may return the other's name
-  const englishScopedNames = await queryNamesForCulture(umbracoApi, englishIsoCode, filter);
-  expect(englishScopedNames).not.toContain(danishName);
+  // Assert - names are rendered in the requested culture regardless of what the index matched, so check the count
+  await expect
+    .poll(async () => (await queryForCulture(umbracoApi, englishIsoCode, filter)).total, {timeout: ConstantHelper.timeout.pageLoad})
+    .toBe(1);
+  expect(await queryNamesForCulture(umbracoApi, englishIsoCode, filter)).toEqual([englishName]);
 
-  const danishScopedNames = await queryNamesForCulture(umbracoApi, danishIsoCode, filter);
-  expect(danishScopedNames).not.toContain(englishName);
+  await expect
+    .poll(async () => (await queryForCulture(umbracoApi, danishIsoCode, filter)).total, {timeout: ConstantHelper.timeout.pageLoad})
+    .toBe(1);
+  expect(await queryNamesForCulture(umbracoApi, danishIsoCode, filter)).toEqual([danishName]);
 
   const englishItem = await umbracoApi.contentDeliveryApi.getContentItemWithId(documentId, {'Accept-Language': englishIsoCode});
   const englishItemJson = await englishItem.json();

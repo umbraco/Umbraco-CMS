@@ -1,11 +1,7 @@
-import {Page, Locator} from "@playwright/test";
+import {Page, Locator, Response, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
-/**
- * Page object for the Search section under Settings: the index collection, an index's stats box and
- * rebuild action, and the ad-hoc search box on an index.
- */
 export class SearchManagementUiHelper extends UiBaseLocators {
   private readonly indexTableRows: Locator;
   private readonly reloadIndexListBtn: Locator;
@@ -27,17 +23,12 @@ export class SearchManagementUiHelper extends UiBaseLocators {
     this.statsBox = page.locator('umb-search-index-stats-box');
     this.statsBoxHealthTag = this.statsBox.locator('uui-tag');
     this.rebuildConfirmBtn = page.locator('#confirm').getByLabel('Rebuild Index', {exact: true});
-    // The rebuild-started toast uses the 'warning' color (not 'positive' like other success toasts), since
-    // it's reporting an in-progress background operation rather than a completed one.
+    // The rebuild-started toast is a warning toast, not a success one.
     this.warningNotification = page.locator('uui-toast-notification[open][color="warning"]');
     this.searchBox = page.locator('umb-search-index-search-box');
     this.searchInputTxt = this.searchBox.locator('#search-input').locator('#input');
-    // uui-button sets its accessible name from the `label` attribute, not its visible text - the button
-    // reads "Search" on screen but is only reachable by role via its aria-label, "Execute search".
     this.searchSubmitBtn = this.searchBox.getByLabel('Execute search', {exact: true});
     this.searchResultsTable = this.searchBox.locator('umb-table');
-    // getByText doesn't match here - its content lives inside umb-localize's own shadow root, not as light-DOM
-    // text on this element - so target the wrapping element by its class instead.
     this.searchNoResultsMessage = this.searchBox.locator('.no-results');
     this.searchPagination = this.searchBox.locator('uui-pagination');
   }
@@ -52,7 +43,8 @@ export class SearchManagementUiHelper extends UiBaseLocators {
 
   async goToIndexWithAlias(indexAlias: string) {
     await this.click(this.indexRowByAlias(indexAlias).getByRole('link', {name: indexAlias, exact: true}));
-    await this.waitUntilUiLoaderIsNoLongerVisible();
+    // The workspace can show several loaders at once, which waitUntilUiLoaderIsNoLongerVisible rejects in strict mode.
+    await this.isVisible(this.statsBox);
   }
 
   async isIndexRowVisible(indexAlias: string, isVisible: boolean = true) {
@@ -67,6 +59,11 @@ export class SearchManagementUiHelper extends UiBaseLocators {
     for (const header of headers) {
       await this.isVisible(this.page.locator('umb-search-root-collection-view').getByText(header, {exact: true}));
     }
+  }
+
+  async clickRebuildIndexActionForIndex(indexAlias: string) {
+    // The slotted icon intercepts pointer events, so a plain click never fires.
+    await this.click(this.indexRowByAlias(indexAlias).getByRole('button', {name: 'Rebuild Index', exact: true}), {force: true});
   }
 
   async clickRefreshListButton() {
@@ -95,8 +92,6 @@ export class SearchManagementUiHelper extends UiBaseLocators {
   }
 
   async clickRebuildIndexEntityAction() {
-    // The workspace's entity-action dropdown (data-mark="workspace:action-menu-button") is the same
-    // control BasePage's actionBtn targets for a workspace's own action menu.
     await this.clickActionButton();
     await this.clickEntityActionWithName('RebuildIndex');
   }
@@ -127,24 +122,26 @@ export class SearchManagementUiHelper extends UiBaseLocators {
   }
 
   async clickSearchSubmitButton() {
-    // The button's slotted <umb-localize> text node sits on top of the click point and Playwright's
-    // actionability check never resolves against it, so a plain click retries indefinitely.
+    // The slotted label intercepts pointer events, so a plain click never fires.
     await this.click(this.searchSubmitBtn, {force: true});
-  }
-
-  async searchForQuery(query: string) {
-    await this.enterSearchQuery(query);
-    await this.clickSearchSubmitButton();
   }
 
   async searchForQueryAndWaitForResponse(query: string) {
     await this.enterSearchQuery(query);
-    await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.searchQuery,
-      this.clickSearchSubmitButton(),
-      ConstantHelper.statusCodes.ok,
-      ConstantHelper.httpMethods.post,
-    );
+    // The box ignores clicks while its own on-load search runs, so retry until this query's response arrives.
+    await expect(async () => {
+      const response = this.page.waitForResponse((resp) => this.isSearchResponseForQuery(resp, query), {timeout: ConstantHelper.timeout.medium});
+      await this.clickSearchSubmitButton();
+      await response;
+    }).toPass({timeout: ConstantHelper.timeout.veryLong});
+  }
+
+  private isSearchResponseForQuery(response: Response, query: string) {
+    const request = response.request();
+    return response.url().includes(ConstantHelper.apiEndpoints.searchQuery)
+      && request.method() === ConstantHelper.httpMethods.post
+      && response.status() === ConstantHelper.statusCodes.ok
+      && request.postDataJSON()?.query === query;
   }
 
   async isSearchResultsTableVisible(isVisible: boolean = true) {
@@ -161,5 +158,21 @@ export class SearchManagementUiHelper extends UiBaseLocators {
 
   async doesSearchResultsTableContainText(text: string) {
     await this.containsText(this.searchResultsTable, text);
+  }
+
+  async doesSearchResultsTableNotContainText(text: string) {
+    await this.doesNotContainText(this.searchResultsTable, text);
+  }
+
+  async doesSearchResultsCountHaveText(text: string) {
+    await this.containsText(this.searchBox, text);
+  }
+
+  async selectSearchCulture(cultureName: string) {
+    await this.searchBox.getByRole('combobox', {name: 'Culture', exact: true}).selectOption({label: cultureName});
+  }
+
+  async clickSearchResultForDocument(documentId: string) {
+    await this.click(this.searchResultsTable.getByRole('link', {name: `Open document with ID ${documentId}`, exact: true}));
   }
 }

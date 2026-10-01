@@ -1,31 +1,16 @@
 import {expect} from '@playwright/test';
 import {ApiHelpers, test} from '@umbraco/acceptance-test-helpers';
 
-// Raised from the 60s default - chained index polls would otherwise hit the test timeout first.
-test.describe.configure({timeout: 120000});
-
-// Exercises the new search stack through the Delivery API content query surface
-// (/umbraco/delivery/api/v2/content): name text-matching, skip/take pagination, and
-// content-lifecycle index updates (unpublish, recycle bin, edit + republish).
-//
-// The name filter ("name:value") runs as a text filter over the analyzed name field, so it
-// matches whole word tokens case-insensitively (with a trailing wildcard), not arbitrary
-// substrings. The test data therefore uses multi-word names so the query term is a real token.
-//
-// Not covered here, by design: facet aggregation and relevance ranking. The Delivery
-// API content query exposes only fetch/filter/sort/skip/take - it has no facet parameter
-// or response, and no relevance-scored sort - so those capabilities of the search stack
-// cannot be asserted through this endpoint. They live only against a search-consuming
-// front-end, which the acceptance project does not host.
+// The name filter matches whole words, not substrings, so each query term is a separate word in the names.
 
 // Document Type
 const documentTypeName = 'DeliveryApiSearchQueryDocumentType';
-// Text-matching content - "Zephyr" is a distinct word token shared by two names and absent from the third
+// Text-matching content
 const zephyrContentNameA = 'DeliveryApiSearchQuery Zephyr Chronicle';
 const zephyrContentNameB = 'DeliveryApiSearchQuery Zephyr Almanac';
 const mundaneContentName = 'DeliveryApiSearchQuery Mundane Record';
 const zephyrToken = 'Zephyr';
-// Pagination content - a shared token plus a sortable suffix so ordering is deterministic
+// Pagination content
 const pagingToken = 'DeliveryApiSearchQueryPagingItem';
 const pagingContentNames = [
   pagingToken + 'A',
@@ -34,7 +19,7 @@ const pagingContentNames = [
   pagingToken + 'D',
   pagingToken + 'E',
 ];
-// Lifecycle content - each name carries a distinct word token so a name filter isolates it
+// Lifecycle content
 const unpublishContentName = 'DeliveryApiSearchQuery Unpublishable Item';
 const unpublishToken = 'Unpublishable';
 const trashContentName = 'DeliveryApiSearchQuery Trashable Item';
@@ -58,6 +43,7 @@ async function queryContent(umbracoApi: ApiHelpers, filter?: string, sort?: stri
 }
 
 test.beforeEach(async ({umbracoApi}) => {
+  test.slow();
   documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName) ?? '';
 });
 
@@ -76,26 +62,25 @@ test.describe('name text-matching', () => {
   });
 
   test('can match content whose name contains the search term', async ({umbracoApi}) => {
-    // Act - the total is part of the wait, not a check after it: stale entries from the previous test's
-    // teardown leave the index asynchronously and would otherwise inflate the count
+    // Act - the expected total also waits out entries of the previous test's deleted documents
     const contentItemsJson = await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('name:' + zephyrToken, undefined, [zephyrContentNameA, zephyrContentNameB], 2, 0, 100);
 
-    // Assert - only the two names containing the token match; the mundane document must be excluded
+    // Assert
     const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
     expect(returnedNames).not.toContain(mundaneContentName);
   });
 
   test('can match a name case-insensitively', async ({umbracoApi}) => {
-    // Act - the token is stored capitalised ("Zephyr") but queried in lower case
+    // Act
     const contentItemsJson = await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('name:' + zephyrToken.toLowerCase(), undefined, [zephyrContentNameA, zephyrContentNameB], 2, 0, 100);
 
-    // Assert - matching case-insensitively must not broaden the match beyond the two Zephyr names
+    // Assert
     const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
     expect(returnedNames).not.toContain(mundaneContentName);
   });
 
   test('returns no items for a non-matching term', async ({umbracoApi}) => {
-    // Arrange - prove indexing has landed so an empty result can only mean "no match"
+    // Arrange - wait for indexing, so an empty result means no match rather than not indexed yet
     await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('name:' + zephyrToken, undefined, [zephyrContentNameA]);
 
     // Act
@@ -109,15 +94,13 @@ test.describe('name text-matching', () => {
 
 test.describe('skip and take pagination', () => {
   test('can paginate a filtered result set with skip and take', async ({umbracoApi}) => {
-    // Arrange
-    for (const name of pagingContentNames) {
-      await createAndPublishDocument(umbracoApi, name);
+    // Arrange - published out of name order, so only the sort can produce the expected order
+    for (const index of [2, 4, 0, 3, 1]) {
+      await createAndPublishDocument(umbracoApi, pagingContentNames[index]);
     }
     const filter = 'name:' + pagingToken;
     const sort = 'name:asc';
 
-    // Wait until every document is queryable - and only those - before paging, otherwise page boundaries
-    // shift under async indexing or stale entries from a previous test.
     await umbracoApi.contentDeliveryApi.queryUntilNamesPresent(filter, sort, pagingContentNames, pagingContentNames.length, 0, 100);
 
     // Act
@@ -125,17 +108,15 @@ test.describe('skip and take pagination', () => {
     const secondPage = await queryContent(umbracoApi, filter, sort, 2, 2);
     const thirdPage = await queryContent(umbracoApi, filter, sort, 4, 2);
 
-    // Assert - total reflects the full match count on every page, independent of take
+    // Assert
     expect(firstPage.total).toBe(pagingContentNames.length);
     expect(secondPage.total).toBe(pagingContentNames.length);
     expect(thirdPage.total).toBe(pagingContentNames.length);
 
-    // take caps the page length; the final page holds the remainder
     expect(firstPage.items.length).toBe(2);
     expect(secondPage.items.length).toBe(2);
     expect(thirdPage.items.length).toBe(1);
 
-    // Pages are disjoint and ordered, so concatenating them reproduces the sorted set exactly
     const pagedNames = [...firstPage.items, ...secondPage.items, ...thirdPage.items].map((item: {name: string}) => item.name);
     expect(pagedNames).toEqual([...pagingContentNames]);
   });
@@ -158,7 +139,7 @@ test.describe('content lifecycle updates the index', () => {
     // Act
     await umbracoApi.document.unpublish(contentId);
 
-    // Assert - the index must drop the now-unpublished document, not just the published content cache
+    // Assert
     await umbracoApi.contentDeliveryApi.queryUntilTotalIs(filter, 0);
   });
 
@@ -180,13 +161,13 @@ test.describe('content lifecycle updates the index', () => {
     const contentId = await createAndPublishDocument(umbracoApi, renameBeforeContentName);
     await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('name:' + renameBeforeToken, undefined, [renameBeforeContentName]);
 
-    // Act - rename and republish
+    // Act
     const document = await umbracoApi.document.getByName(renameBeforeContentName);
     document.variants[0].name = renameAfterContentName;
     await umbracoApi.document.update(contentId, document);
     await umbracoApi.document.publish(contentId);
 
-    // Assert - the index reflects the update: the old token no longer matches, the new token now does
+    // Assert
     await umbracoApi.contentDeliveryApi.queryUntilTotalIs('name:' + renameBeforeToken, 0);
     await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('name:' + renameAfterToken, undefined, [renameAfterContentName]);
   });

@@ -65,17 +65,7 @@ export class ContentDeliveryApiHelper {
     return await this.api.get(this.api.baseUrl + '/umbraco/delivery/api/v2/content' + query, undefined, extraHeaders);
   }
 
-  /**
-   * Polls the content query until every expected name is returned, and returns the last response body.
-   *
-   * Pass expectedTotal when the test asserts an exact match count: de-indexing is asynchronous, so entries
-   * for documents a previous test deleted can still be counted when the new ones arrive. `take` defaults
-   * well above the endpoint's own default of 10, since this decides from the page it fetched.
-   *
-   * The returned body is only authoritative for the page it fetched, so callers that go on to assert a name
-   * is *absent* from it need that page to hold every match - which this requires, for the same reason
-   * queryUntilNamesAbsent does.
-   */
+  // Pass expectedTotal to also wait out index entries of documents that were deleted but not yet de-indexed.
   async queryUntilNamesPresent(filter: string | undefined, sort: string | undefined, expectedNames: string[], expectedTotal?: number, skip = 0, take = 100) {
     expect(expectedNames.length, 'queryUntilNamesPresent needs at least one expected name, or it asserts nothing').toBeGreaterThan(0);
     let contentItemsJson;
@@ -83,9 +73,12 @@ export class ContentDeliveryApiHelper {
       .poll(
         async () => {
           const response = await this.getContentItemsFromAQuery(undefined, undefined, filter, sort, skip, take);
+          if (!response.ok()) {
+            return [`query failed with status ${response.status()}`];
+          }
           contentItemsJson = await response.json();
-          if (contentItemsJson.total > skip + take) {
-            return [`page does not hold every match: total ${contentItemsJson.total} exceeds skip ${skip} + take ${take}`];
+          if (skip > 0 || contentItemsJson.total > take) {
+            return [`page does not hold every match: total ${contentItemsJson.total} is not all on one page (skip ${skip}, take ${take})`];
           }
           const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
           const missing = expectedNames.filter((name) => !returnedNames.includes(name));
@@ -96,47 +89,37 @@ export class ContentDeliveryApiHelper {
             ? []
             : [`expected total ${expectedTotal}, got ${contentItemsJson.total}`];
         },
-        {timeout: ConstantHelper.timeout.veryLong},
+        {timeout: ConstantHelper.timeout.pageLoad},
       )
       .toEqual([]);
     return contentItemsJson;
   }
 
-  /**
-   * Polls the content query until none of the given names are returned, and returns the last response body.
-   *
-   * Makes the absence itself the wait condition, rather than a check taken after some unrelated write has
-   * landed. A name beyond the fetched page also reads as absent, which would pass silently instead of
-   * timing out - hence the `take` default and the requirement that the page hold every match.
-   */
+  // A name beyond the fetched page would read as absent, so the whole result must fit on one page.
   async queryUntilNamesAbsent(filter: string | undefined, sort: string | undefined, unexpectedNames: string[], skip = 0, take = 100) {
+    expect(unexpectedNames.length, 'queryUntilNamesAbsent needs at least one unexpected name, or it asserts nothing').toBeGreaterThan(0);
     let contentItemsJson;
-    // Polls to an empty array rather than to a boolean so a failure names what was still there, or says the
-    // page was too small, instead of reporting "expected true, received false".
     await expect
       .poll(
         async () => {
           const response = await this.getContentItemsFromAQuery(undefined, undefined, filter, sort, skip, take);
+          if (!response.ok()) {
+            return [`query failed with status ${response.status()}`];
+          }
           contentItemsJson = await response.json();
-          if (contentItemsJson.total > skip + take) {
-            return [`page too small to prove absence: total ${contentItemsJson.total} exceeds skip ${skip} + take ${take}`];
+          if (skip > 0 || contentItemsJson.total > take) {
+            return [`page too small to prove absence: total ${contentItemsJson.total} is not all on one page (skip ${skip}, take ${take})`];
           }
           const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
           return unexpectedNames.filter((name) => returnedNames.includes(name));
         },
-        {timeout: ConstantHelper.timeout.veryLong},
+        {timeout: ConstantHelper.timeout.pageLoad},
       )
       .toEqual([]);
     return contentItemsJson;
   }
 
-  /**
-   * Polls the content query until it reports the expected total.
-   *
-   * Assert on total, not on items: items are index hits mapped through the published content cache, which
-   * drops an unpublished document by itself - only total proves the document left the index. Paging does
-   * not affect total, so this takes no skip/take.
-   */
+  // Items are filtered through the published content cache, so only total shows what the index holds.
   async queryUntilTotalIs(filter: string | undefined, expectedTotal: number) {
     await expect
       .poll(
@@ -144,7 +127,7 @@ export class ContentDeliveryApiHelper {
           const response = await this.getContentItemsFromAQuery(undefined, undefined, filter);
           return (await response.json()).total;
         },
-        {timeout: ConstantHelper.timeout.veryLong},
+        {timeout: ConstantHelper.timeout.pageLoad},
       )
       .toBe(expectedTotal);
   }
