@@ -39,25 +39,14 @@ test('can rebuild the index', {tag: '@smoke'}, async ({umbracoUi}) => {
   await umbracoUi.searchManagement.clickRebuildIndexWorkspaceAction();
 
   // Assert
-  await umbracoUi.searchManagement.doesModalHaveText('Rebuild Search Index');
-  await umbracoUi.searchManagement.doesModalHaveText('Are you sure you want to rebuild the search index');
+  await umbracoUi.searchManagement.doesModalHaveText('Rebuild index');
+  await umbracoUi.searchManagement.doesModalHaveText('will be rebuilt from scratch');
 
   // Act
   await umbracoUi.searchManagement.clickConfirmRebuildButtonAndWaitForResponse();
 
   // Assert
-  await umbracoUi.searchManagement.doesRebuildStartedNotificationHaveText(`"${indexAlias}" has started`);
-});
-
-// TODO: link the issue and unskip once the back office receives the IndexRebuildCompleted server event [AZ]
-test.fixme('can see that the rebuild has completed', async ({umbracoUi}) => {
-  test.slow();
-
-  // Act
-  await umbracoUi.searchManagement.clickRebuildIndexWorkspaceAction();
-  await umbracoUi.searchManagement.clickConfirmRebuildButtonAndWaitForResponse();
-
-  // Assert
-  await umbracoUi.searchManagement.doesSuccessNotificationHaveText(`"${indexAlias}" has completed`, true, false, ConstantHelper.timeout.pageLoad);
+  await umbracoUi.searchManagement.doesRebuildStartedNotificationHaveText(`Rebuilding ${indexAlias} in the background`);
+  await umbracoUi.searchManagement.doesSuccessNotificationHaveText(`${indexAlias} has finished rebuilding`, true, false, ConstantHelper.timeout.pageLoad);
   await umbracoUi.searchManagement.isStatsBoxVisible();
 });

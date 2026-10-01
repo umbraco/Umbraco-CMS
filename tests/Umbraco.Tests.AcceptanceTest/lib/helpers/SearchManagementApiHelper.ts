@@ -11,11 +11,13 @@ export class SearchManagementApiHelper {
 
   async getAllIndexes() {
     const response = await this.api.get(this.api.baseUrl + ConstantHelper.apiEndpoints.searchIndexes);
+    expect(response.ok()).toBeTruthy();
     return await response.json();
   }
 
   async getIndex(indexAlias: string) {
     const response = await this.api.get(this.api.baseUrl + `${ConstantHelper.apiEndpoints.searchIndexes}/${encodeURIComponent(indexAlias)}`);
+    expect(response.ok()).toBeTruthy();
     return await response.json();
   }
 

@@ -22,10 +22,10 @@ export class SearchManagementUiHelper extends UiBaseLocators {
     super(page);
     this.indexCollectionView = page.locator('umb-search-root-collection-view');
     this.indexTableRows = this.indexCollectionView.locator('umb-table').locator('uui-table-row');
-    this.reloadIndexListBtn = page.getByTestId('collection-action:Umbraco.Search.CollectionAction.Reload');
+    this.reloadIndexListBtn = page.getByTestId('collection-action:Umb.CollectionAction.SearchIndex.Reload');
     this.statsBox = page.locator('umb-search-index-stats-box');
     this.statsBoxHealthTag = this.statsBox.locator('uui-tag');
-    this.rebuildConfirmBtn = page.locator('#confirm').getByLabel('Rebuild Index', {exact: true});
+    this.rebuildConfirmBtn = page.locator('#confirm').getByLabel('Rebuild', {exact: true});
     this.warningNotification = page.locator('uui-toast-notification[open][color="warning"]');
     this.searchBox = page.locator('umb-search-index-search-box');
     this.searchInputTxt = this.searchBox.locator('#search-input').locator('#input');
@@ -66,7 +66,7 @@ export class SearchManagementUiHelper extends UiBaseLocators {
 
   async clickRebuildActionForIndex(indexAlias: string) {
     // The slotted icon intercepts pointer events, so a plain click never fires.
-    await this.click(this.indexRowByAlias(indexAlias).getByRole('button', {name: 'Rebuild Index', exact: true}), {force: true});
+    await this.click(this.indexRowByAlias(indexAlias).getByRole('button', {name: 'Rebuild', exact: true}), {force: true});
   }
 
   async clickRefreshListButton() {

@@ -17,7 +17,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can see the index list with the expected columns and indexes', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Assert
-  await umbracoUi.searchManagement.doesIndexTableHaveColumnHeaders(['Alias', 'Health Status', 'Document Count']);
+  await umbracoUi.searchManagement.doesIndexTableHaveColumnHeaders(['Alias', 'Health status', 'Document count']);
 
   await expect(async () => {
     await umbracoUi.searchManagement.clickRefreshListButtonAndWaitForReload();
@@ -36,11 +36,12 @@ test('can rebuild an index from its row in the index list', async ({umbracoUi}) 
 
   // Act
   await umbracoUi.searchManagement.clickRebuildActionForIndex(indexAlias);
-  await umbracoUi.searchManagement.doesModalHaveText('Are you sure you want to rebuild the search index');
+  await umbracoUi.searchManagement.doesModalHaveText('will be rebuilt from scratch');
   await umbracoUi.searchManagement.clickConfirmRebuildButtonAndWaitForResponse();
 
   // Assert
-  await umbracoUi.searchManagement.doesRebuildStartedNotificationHaveText(`"${indexAlias}" has started`);
+  await umbracoUi.searchManagement.doesRebuildStartedNotificationHaveText(`Rebuilding ${indexAlias} in the background`);
+  await umbracoUi.searchManagement.doesSuccessNotificationHaveText(`${indexAlias} has finished rebuilding`, true, false, ConstantHelper.timeout.pageLoad);
 });
 
 test('can refresh the index list', async ({umbracoApi, umbracoUi}) => {
