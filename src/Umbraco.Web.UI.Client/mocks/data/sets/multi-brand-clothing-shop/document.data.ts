@@ -35,6 +35,7 @@ import {
 	type UmbMbcsValue,
 } from './document-values.js';
 import { AREA_KEYS, CULTURES, CULTURE_DA, CULTURE_EN, DATA_TYPE_IDS, DOCUMENT_TYPE_IDS, mbcsId } from './ids.js';
+import { getPageCopy } from './page-copy.js';
 import { littleOnesProducts, outdoorShopProducts, type UmbMbcsProductRow } from './products.data.js';
 import { littleOnesStores, outdoorShopStores, type UmbMbcsStoreRow } from './stores.data.js';
 
@@ -502,18 +503,24 @@ const homeBlocks = (site: UmbMbcsSiteCode): Array<UmbMbcsBlock> => [
 	oneColumn(HOME_ARTICLE_NUMBERS.map((number) => articleTeaser(site, number))),
 ];
 
-const landingBlocks = (site: UmbMbcsSiteCode, name: string, index: number, hidden: boolean): Array<UmbMbcsBlock> => [
-	heroBlock(site, name, `Everything you need to know about ${name.toLowerCase()}.`),
-	oneColumn([textBlock(`<h2>${name}</h2><p>This page is part of ${SITES[site].name}.</p>`)]),
-	...(hidden
-		? []
-		: [
-				twoColumn(
-					[imageBlock(productImageId(site, index % 10), name)],
-					[textBlock(`<p>Explore ${name.toLowerCase()} and find the right fit for you.</p>`)],
-				),
-			]),
-];
+const landingBlocks = (site: UmbMbcsSiteCode, name: string, index: number, hidden: boolean): Array<UmbMbcsBlock> => {
+	const copy = getPageCopy(site, name);
+	const headline = copy?.headline ?? name;
+	const paragraphs = copy?.paragraphs ?? [`This page is part of ${SITES[site].name}.`];
+
+	return [
+		heroBlock(site, name, `Everything you need to know about ${name.toLowerCase()}.`),
+		oneColumn([textBlock(`<h2>${headline}</h2>${paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join('')}`)]),
+		...(hidden
+			? []
+			: [
+					twoColumn(
+						[imageBlock(productImageId(site, index % 10), name)],
+						[textBlock(`<p>${copy?.aside ?? `Explore ${name.toLowerCase()}.`}</p>`)],
+					),
+				]),
+	];
+};
 
 const buildPages = (
 	site: UmbMbcsSiteCode,
