@@ -27,24 +27,47 @@ public class GrantDocumentBlueprintAccessToSettingsGroups : AsyncMigrationBase
     }
 
     /// <inheritdoc />
-    protected override Task MigrateAsync()
+    protected override async Task MigrateAsync()
     {
         // Blueprints were gated by the Settings section until they moved to Library, so the groups that
-        // held Settings are the ones that already managed them. Every other group is left without access
-        // rather than inheriting it from the Library section it now shares with elements. Groups that
-        // already have a start node are left alone, so re-running cannot widen a narrower scope.
-        Sql<ISqlContext> groupsWithSettingsAccess = Database.SqlContext.Sql()
-            .Select<UserGroup2AppDto>(x => x.UserGroupId)
-            .From<UserGroup2AppDto>()
-            .Where<UserGroup2AppDto>(x => x.AppAlias == Constants.Applications.Settings);
+        // held Settings are the ones that already managed them. Every other group is left alone.
+        Sql<ISqlContext> groupsWithSettingsAccess = GroupsWithAccessTo(Constants.Applications.Settings);
 
+        await GrantLibrarySectionAsync(groupsWithSettingsAccess);
+        await GrantBlueprintStartNodeAsync(groupsWithSettingsAccess);
+    }
+
+    private Sql<ISqlContext> GroupsWithAccessTo(string appAlias) => Database.SqlContext.Sql()
+        .Select<UserGroup2AppDto>(x => x.UserGroupId)
+        .From<UserGroup2AppDto>()
+        .Where<UserGroup2AppDto>(x => x.AppAlias == appAlias);
+
+    private async Task GrantLibrarySectionAsync(Sql<ISqlContext> userGroups)
+    {
+        // The blueprint tree is reached through the Library section.
+        Sql<ISqlContext> groupsWithoutLibraryAccess = Database.SqlContext.Sql()
+            .Select<UserGroupDto>(x => x.Id)
+            .From<UserGroupDto>()
+            .WhereIn<UserGroupDto>(x => x.Id, userGroups)
+            .WhereNotIn<UserGroupDto>(x => x.Id, GroupsWithAccessTo(Constants.Applications.Library));
+
+        List<int> userGroupIds = await Database.FetchAsync<int>(groupsWithoutLibraryAccess);
+
+        await Database.InsertBulkAsync(userGroupIds.Select(userGroupId => new UserGroup2AppDto
+        {
+            UserGroupId = userGroupId,
+            AppAlias = Constants.Applications.Library,
+        }));
+    }
+
+    private async Task GrantBlueprintStartNodeAsync(Sql<ISqlContext> userGroups)
+    {
+        // Groups that already have a start node keep it, so re-running cannot widen a narrower scope.
         Sql<ISqlContext> sql = Database.SqlContext.Sql()
             .Update<UserGroupDto>(u => u.Set(x => x.StartDocumentBlueprintId, Constants.System.Root))
-            .WhereIn<UserGroupDto>(x => x.Id, groupsWithSettingsAccess)
+            .WhereIn<UserGroupDto>(x => x.Id, userGroups)
             .Where<UserGroupDto>(x => x.StartDocumentBlueprintId == null);
 
-        Database.Execute(sql);
-
-        return Task.CompletedTask;
+        await Database.ExecuteAsync(sql);
     }
 }
