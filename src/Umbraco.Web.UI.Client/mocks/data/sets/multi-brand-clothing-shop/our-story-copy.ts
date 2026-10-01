@@ -54,7 +54,7 @@ const littleOnes: UmbMbcsOurStoryCopy = {
 			{ year: '2019', text: 'The first kids’ panel is formed, and testing becomes part of every design.' },
 			{ year: '2021', text: 'Our first store opens in Copenhagen.' },
 			{ year: '2023', text: 'The take-back programme launches, giving outgrown clothes a second life.' },
-			{ year: '2024', text: 'We open in Aarhus, followed by Odense a year later.' },
+			{ year: '2024', text: 'We open in Hamburg, followed by Odense a year later.' },
 			{ year: '2026', text: 'Ten years of Little Ones, and still just getting started.' },
 		],
 	},
@@ -85,7 +85,7 @@ const littleOnes: UmbMbcsOurStoryCopy = {
 	closing: {
 		headline: 'Come and say hello',
 		paragraphs: [
-			'The best way to get to know Little Ones is to pick something up and feel it. You can find us in our stores in Copenhagen, Aarhus and Odense, where the team is always happy to help with sizes, gifts and questions about care.',
+			'The best way to get to know Little Ones is to pick something up and feel it. You can find us in our stores in Copenhagen, Hamburg and Odense, where the team is always happy to help with sizes, gifts and questions about care.',
 			'Cannot make it in? Our customer service team is only a message away, and we answer every one.',
 		],
 	},
@@ -124,7 +124,7 @@ const outdoorShop: UmbMbcsOurStoryCopy = {
 			{ year: '2016', text: 'The Outdoor Shop is founded with a first collection of knitwear and outerwear.' },
 			{ year: '2018', text: 'Our repair studio opens, and the lifetime guarantee is introduced.' },
 			{ year: '2019', text: 'We start using recycled and certified materials across the range.' },
-			{ year: '2021', text: 'Our first store opens in Aarhus.' },
+			{ year: '2021', text: 'Our first store opens in Hamburg.' },
 			{ year: '2023', text: 'The first lookbook is shot on location along the Danish coast.' },
 			{ year: '2025', text: 'We open stores in Copenhagen and Aalborg.' },
 			{ year: '2026', text: 'Ten years in, with a repair studio that has mended thousands of garments.' },
@@ -157,7 +157,7 @@ const outdoorShop: UmbMbcsOurStoryCopy = {
 	closing: {
 		headline: 'Come and say hello',
 		paragraphs: [
-			'The best way to understand our clothes is to try them on. Visit us in Copenhagen, Aarhus or Aalborg, where the team can help you find the right fit, or tell you how to give an old favourite a longer life.',
+			'The best way to understand our clothes is to try them on. Visit us in Copenhagen, Hamburg or Aalborg, where the team can help you find the right fit, or tell you how to give an old favourite a longer life.',
 			'If you cannot visit, our customer service team is only a message away.',
 		],
 	},

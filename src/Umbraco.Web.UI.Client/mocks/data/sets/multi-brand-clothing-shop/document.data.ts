@@ -38,6 +38,7 @@ import {
 	type UmbMbcsValue,
 } from './document-values.js';
 import { AREA_KEYS, CULTURES, CULTURE_DA, CULTURE_EN, DATA_TYPE_IDS, DOCUMENT_TYPE_IDS, mbcsId } from './ids.js';
+import { BABY_SIZES_TEASER, babySizesMarkup } from './article-bodies.js';
 import { getProductMaterials } from './materials.js';
 import { getOurStoryCopy } from './our-story-copy.js';
 import { getPageCopy } from './page-copy.js';
@@ -289,6 +290,17 @@ const relatedProductNumbers = (
 		.map((candidate) => candidate.number);
 };
 
+const CUSTOM_ARTICLES: Record<
+	string,
+	{ teaser: string; markup: (blockKeys: Array<string>) => string; blocks: () => Array<UmbMbcsBlock> }
+> = {
+	'LO:2': {
+		teaser: BABY_SIZES_TEASER,
+		markup: babySizesMarkup,
+		blocks: () => [productTeaser('LO', 1, 'Related product'), productTeaser('LO', 11, 'Go Basic')],
+	},
+};
+
 const buildArticles = (
 	site: UmbMbcsSiteCode,
 	rows: Array<UmbMbcsArticleRow>,
@@ -301,9 +313,12 @@ const buildArticles = (
 		const tags = splitTags(tagList);
 		const siteName = SITES[site].name;
 		const publishDate = new Date(Date.UTC(2026, 8, 1) - number * 3 * DAY_IN_MS);
-		const teaser = `${title}: practical advice from the team at ${siteName} on ${tags.slice(0, 2).join(' and ').toLowerCase()}.`;
+		const custom = CUSTOM_ARTICLES[`${site}:${number}`];
+		const teaser =
+			custom?.teaser ??
+			`${title}: practical advice from the team at ${siteName} on ${tags.slice(0, 2).join(' and ').toLowerCase()}.`;
 		const relatedNumbers = relatedProductNumbers(site, productRows, tags, number);
-		const markup = ([teaserKey]: Array<string>) =>
+		const defaultMarkup = ([teaserKey]: Array<string>) =>
 			[
 				`<h2>${escapeMarkup(title)}</h2>`,
 				`<p>${escapeMarkup(teaser)}</p>`,
@@ -325,7 +340,11 @@ const buildArticles = (
 			values: [
 				...textareaValue('teaser', teaser),
 				...mediaPickerValue('heroImage', heroImageId),
-				...richTextValue('text', markup, [productTeaser(site, relatedNumbers[0], 'Related product')]),
+				...richTextValue(
+					'text',
+					custom?.markup ?? defaultMarkup,
+					custom?.blocks() ?? [productTeaser(site, relatedNumbers[0], 'Related product')],
+				),
 				...textValue('author', AUTHORS[site][number % AUTHORS[site].length]),
 				...dateValue('publishDate', isoDate(publishDate).slice(0, 10)),
 				...tagsValue('tags', tags),
@@ -469,13 +488,18 @@ const twoColumn = (left: Array<UmbMbcsBlock>, right: Array<UmbMbcsBlock>): UmbMb
 	],
 });
 
-const heroBlock = (site: UmbMbcsSiteCode, headline: string, subheadline: string): UmbMbcsBlock => ({
+const heroBlock = (
+	site: UmbMbcsSiteCode,
+	headline: string,
+	subheadline: string,
+	imageId = heroMediaId(site),
+): UmbMbcsBlock => ({
 	elementTypeId: DOCUMENT_TYPE_IDS.heroBlock,
 	columnSpan: 12,
 	values: [
 		blockText('headline', headline),
 		blockTextarea('subheadline', subheadline),
-		blockMediaPicker('image', heroMediaId(site)),
+		blockMediaPicker('image', imageId),
 		blockDocumentLink('link', productsNodeId(site), 'Shop now'),
 	],
 });
@@ -523,13 +547,22 @@ const homeBlocks = (site: UmbMbcsSiteCode): Array<UmbMbcsBlock> => [
 	oneColumn(HOME_ARTICLE_NUMBERS.map((number) => articleTeaser(site, number))),
 ];
 
+const LANDING_HERO_IMAGES: Record<string, string | undefined> = {
+	'LO:Customer Service': articleImageId('LO', 3),
+};
+
 const landingBlocks = (site: UmbMbcsSiteCode, name: string, index: number, hidden: boolean): Array<UmbMbcsBlock> => {
 	const copy = getPageCopy(site, name);
 	const headline = copy?.headline ?? name;
 	const paragraphs = copy?.paragraphs ?? [`This page is part of ${SITES[site].name}.`];
 
 	return [
-		heroBlock(site, name, `Everything you need to know about ${name.toLowerCase()}.`),
+		heroBlock(
+			site,
+			name,
+			`Everything you need to know about ${name.toLowerCase()}.`,
+			LANDING_HERO_IMAGES[`${site}:${name}`],
+		),
 		oneColumn([
 			textBlock(
 				`<h2>${escapeMarkup(headline)}</h2>${paragraphs.map((paragraph) => `<p>${escapeMarkup(paragraph)}</p>`).join('')}`,
