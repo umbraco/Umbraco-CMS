@@ -34,6 +34,10 @@ parameters:
     displayName: Upload API docs
     type: boolean
     default: false
+  - name: buildDependencyTrack
+    displayName: Generate BOMs for Dependency Track
+    type: boolean
+    default: false
   - name: uploadDependencyTrack
     displayName: Upload BOMs to Dependency Track
     type: boolean
@@ -720,8 +724,9 @@ stages:
   - stage: Dependency_Track
     displayName: Dependency Track
     dependsOn: Build
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadDependencyTrack}}))
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.buildDependencyTrack}}, ${{parameters.uploadDependencyTrack}}))
     variables:
+      uploadToDependencyTrack: $[ or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.uploadDependencyTrack }}', 'True')) ]
       # Determine Umbraco version based on whether it's a public release or not. If public release, use major version, else use full NuGet package version.
       umbracoVersion: $[ iif(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'], stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion']) ]
     jobs:
@@ -821,6 +826,7 @@ stages:
       - template: templates/dependency-track.yml
         parameters:
           dependsOn: [Dotnet_BOM, Backoffice_BOM, Login_BOM, E2E_BOM]
+          condition: and(succeeded(), eq(variables['uploadToDependencyTrack'], 'True'))
           projectName: "Umbraco-CMS"
           umbracoVersion: $(umbracoVersion)
           projects:
