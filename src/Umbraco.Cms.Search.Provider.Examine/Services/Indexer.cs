@@ -1,17 +1,17 @@
 ﻿using Examine;
 using Examine.Search;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Search.Core.Extensions;
-using Umbraco.Cms.Search.Core.Models.Indexing;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
-using CoreConstants = Umbraco.Cms.Search.Core.Constants;
+using CoreConstants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 
 /// <summary>
-/// Implements <see cref="Umbraco.Cms.Search.Core.Services.IIndexer"/> against Examine/Lucene, mapping core <see cref="IndexField"/> values to
+/// Implements <see cref="Umbraco.Cms.Core.Search.IIndexer"/> against Examine/Lucene, mapping core <see cref="IndexField"/> values to
 /// Examine field definitions and writing to whichever physical index slot (active or shadow) is currently the write target.
 /// </summary>
 public class Indexer : IExamineIndexer
@@ -125,17 +125,7 @@ public class Indexer : IExamineIndexer
     /// <param name="toMerge">The IndexValue to merge into the original.</param>
     /// <returns>A new IndexValue containing the merged values.</returns>
     protected virtual IndexValue MergeIndexValue(IndexValue original, IndexValue toMerge) =>
-        new()
-        {
-            Keywords = MergeValues(original.Keywords, toMerge.Keywords),
-            Integers = MergeValues(original.Integers, toMerge.Integers),
-            Decimals = MergeValues(original.Decimals, toMerge.Decimals),
-            DateTimeOffsets = MergeValues(original.DateTimeOffsets, toMerge.DateTimeOffsets),
-            Texts = MergeValues(original.Texts, toMerge.Texts),
-            TextsR1 = MergeValues(original.TextsR1, toMerge.TextsR1),
-            TextsR2 = MergeValues(original.TextsR2, toMerge.TextsR2),
-            TextsR3 = MergeValues(original.TextsR3, toMerge.TextsR3),
-        };
+        original.Merge(toMerge);
 
     /// <summary>
     /// Merges two value collections by concatenating and removing duplicates.
@@ -224,7 +214,7 @@ public class Indexer : IExamineIndexer
 
     private void DeleteSingleDoc(IIndex index, Guid id)
     {
-        ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.FieldNames.Id, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
+        ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.IndexFieldNames.Id, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
 
         var idsToDelete = new HashSet<string>();
 
@@ -247,7 +237,7 @@ public class Indexer : IExamineIndexer
 
         foreach (Guid id in ids)
         {
-            ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.FieldNames.PathIds, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
+            ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.IndexFieldNames.PathIds, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
             foreach (ISearchResult document in documents)
             {
                 idsToDelete.Add(document.Id);

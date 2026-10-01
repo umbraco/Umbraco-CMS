@@ -4,9 +4,9 @@ import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceContext',
+		kind: 'trashable',
 		name: 'Trashable Media Workspace Context',
 		alias: 'Umb.WorkspaceContext.Media.Trashable',
-		api: () => import('./trashable-media.workspace-context.js'),
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,

@@ -19,10 +19,12 @@ public class ChildrenDocumentBlueprintTreeController : DocumentBlueprintTreeCont
     /// Initializes a new instance of the <see cref="ChildrenDocumentBlueprintTreeController"/> class.
     /// </summary>
     /// <param name="entityService">Service used to manage and retrieve entities within the Umbraco CMS.</param>
+    /// <param name="entitySearchService">The <see cref="IEntitySearchService"/> used to search entities.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used to map between identifiers and keys.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for document blueprints.</param>
     /// <param name="documentPresentationFactory">Factory responsible for creating document presentation models.</param>
-    public ChildrenDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, flagProviders, documentPresentationFactory)
+    public ChildrenDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IDocumentPresentationFactory documentPresentationFactory)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, documentPresentationFactory)
     {
     }
 

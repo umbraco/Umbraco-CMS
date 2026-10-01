@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 
@@ -17,10 +16,9 @@ public class ChildrenStaticFileTreeController : StaticFileTreeControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="ChildrenStaticFileTreeController"/> class.
     /// </summary>
-    /// <param name="physicalFileSystem">Provides access to the physical file system.</param>
     /// <param name="fileSystemTreeService">Service for managing and interacting with the physical file system tree structure.</param>
-    public ChildrenStaticFileTreeController(IPhysicalFileSystem physicalFileSystem, IPhysicalFileSystemTreeService fileSystemTreeService)
-    : base(physicalFileSystem, fileSystemTreeService)
+    public ChildrenStaticFileTreeController(IPhysicalFileSystemTreeService fileSystemTreeService)
+    : base(fileSystemTreeService)
     {
     }
 
