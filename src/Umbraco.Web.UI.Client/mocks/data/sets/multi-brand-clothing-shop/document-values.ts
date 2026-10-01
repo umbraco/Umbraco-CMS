@@ -174,10 +174,10 @@ export const blockGridValue = (alias: string, blocks: Array<UmbMbcsBlock>): Arra
 	});
 };
 
-export const blockListValue = (alias: string, blocks: Array<UmbMbcsBlock>): Array<UmbMbcsValue> => {
+const toBlockListValue = (blocks: Array<UmbMbcsBlock>) => {
 	const instances = blocks.map(withKeys);
 
-	return invariant('Umbraco.BlockList', alias, {
+	return {
 		contentData: instances.map(toContentData),
 		settingsData: [],
 		expose: instances.flatMap(toExposeEntries),
@@ -189,8 +189,18 @@ export const blockListValue = (alias: string, blocks: Array<UmbMbcsBlock>): Arra
 				settingsKey: null,
 			})),
 		},
-	});
+	};
 };
+
+export const blockListValue = (alias: string, blocks: Array<UmbMbcsBlock>): Array<UmbMbcsValue> =>
+	invariant('Umbraco.BlockList', alias, toBlockListValue(blocks));
+
+/** A Block List nested as a property of another block. */
+export const blockBlockList = (alias: string, blocks: Array<UmbMbcsBlock>): UmbMbcsBlockPropertyValue => ({
+	alias,
+	editorAlias: 'Umbraco.BlockList',
+	value: toBlockListValue(blocks),
+});
 
 export const blockText = (alias: string, value: string): UmbMbcsBlockPropertyValue => ({
 	alias,

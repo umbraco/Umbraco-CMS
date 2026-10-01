@@ -13,6 +13,7 @@ import {
 	type UmbMbcsSiteCode,
 } from './catalog.js';
 import {
+	blockBlockList,
 	blockDocumentLink,
 	blockListValue,
 	blockDocumentPicker,
@@ -39,7 +40,9 @@ import {
 } from './document-values.js';
 import { AREA_KEYS, CULTURES, CULTURE_DA, CULTURE_EN, DATA_TYPE_IDS, DOCUMENT_TYPE_IDS, mbcsId } from './ids.js';
 import { BABY_SIZES_TEASER, babySizesMarkup } from './article-bodies.js';
-import { getProductMaterials } from './materials.js';
+import { getMaterial, getProductMaterials, type UmbMbcsMaterial } from './materials.js';
+import { getAboutUsCopy } from './about-us-copy.js';
+import { getSustainabilityCopy } from './sustainability-copy.js';
 import { getOurStoryCopy } from './our-story-copy.js';
 import { getPageCopy } from './page-copy.js';
 import { littleOnesProducts, outdoorShopProducts, type UmbMbcsProductRow } from './products.data.js';
@@ -243,14 +246,7 @@ const buildProducts = (
 				...decimalValue('price', price),
 				...invariantTextValue('sku', sku),
 				...tagsValue('tags', tags),
-				...blockListValue(
-					'materials',
-					getProductMaterials(site, categoryIndex, tags, number).map(({ name, imageKey }) => ({
-						elementTypeId: DOCUMENT_TYPE_IDS.productMaterial,
-						columnSpan: 12,
-						values: [blockText('material', name), blockMediaPicker('image', materialImageId(imageKey))],
-					})),
-				),
+				...blockListValue('materials', getProductMaterials(site, categoryIndex, tags, number).map(materialBlock)),
 				...checkboxListValue('sizes', productSizes(site, categoryIndex, tags)),
 				...textValue('colour', colour),
 				...textValue('material', material),
@@ -300,6 +296,12 @@ const CUSTOM_ARTICLES: Record<
 		blocks: () => [productTeaser('LO', 1, 'Related product'), productTeaser('LO', 11, 'Go Basic')],
 	},
 };
+
+const materialBlock = ({ name, imageKey }: UmbMbcsMaterial): UmbMbcsBlock => ({
+	elementTypeId: DOCUMENT_TYPE_IDS.productMaterial,
+	columnSpan: 12,
+	values: [blockText('material', name), blockMediaPicker('image', materialImageId(imageKey))],
+});
 
 const buildArticles = (
 	site: UmbMbcsSiteCode,
@@ -631,6 +633,57 @@ const ourStoryBlocks = (site: UmbMbcsSiteCode): Array<UmbMbcsBlock> => {
 	];
 };
 
+const materialShowcaseBlock = (headline: string, intro: string, materialNames: Array<string>): UmbMbcsBlock => ({
+	elementTypeId: DOCUMENT_TYPE_IDS.materialShowcaseBlock,
+	columnSpan: 12,
+	values: [
+		blockText('headline', headline),
+		blockTextarea('intro', intro),
+		blockBlockList('materials', materialNames.map(getMaterial).map(materialBlock)),
+	],
+});
+
+const sustainabilityBlocks = (site: UmbMbcsSiteCode): Array<UmbMbcsBlock> => {
+	const copy = getSustainabilityCopy(site);
+
+	return [
+		heroBlock(site, 'Sustainability', copy.heroSubheadline),
+		oneColumn([textBlock(richTextMarkup(copy.intro.headline, copy.intro.paragraphs))]),
+		oneColumn([materialShowcaseBlock(copy.showcase.headline, copy.showcase.intro, copy.showcase.materials)]),
+		twoColumn(
+			[textBlock(richTextMarkup(copy.goals.headline, copy.goals.paragraphs))],
+			[imageBlock(articleImageId(site, 1), copy.goals.caption)],
+		),
+		oneColumn([textBlock(richTextMarkup(copy.closing.headline, copy.closing.paragraphs))]),
+	];
+};
+
+const aboutUsBlocks = (site: UmbMbcsSiteCode): Array<UmbMbcsBlock> => {
+	const intro = getPageCopy(site, 'About Us');
+	const copy = getAboutUsCopy(site);
+
+	return [
+		heroBlock(site, 'About Us', 'Who we are, how we work and what we care about.'),
+		...(intro ? [oneColumn([textBlock(richTextMarkup(intro.headline, intro.paragraphs))])] : []),
+		oneColumn([textBlock(richTextMarkup(copy.lead.headline, copy.lead.paragraphs))]),
+		oneColumn([materialShowcaseBlock(copy.showcase.headline, copy.showcase.intro, copy.showcase.materials)]),
+		twoColumn(
+			[imageBlock(productImageId(site, 2), copy.criteria.caption)],
+			[textBlock(richTextMarkup(copy.criteria.headline, copy.criteria.paragraphs))],
+		),
+		oneColumn([textBlock(richTextMarkup(copy.closing.headline, copy.closing.paragraphs))]),
+	];
+};
+
+const FIRST_LEVEL_PAGE_BLOCKS: Record<string, (site: UmbMbcsSiteCode) => Array<UmbMbcsBlock>> = {
+	'About Us': aboutUsBlocks,
+};
+
+const CHILD_PAGE_BLOCKS: Record<string, (site: UmbMbcsSiteCode) => Array<UmbMbcsBlock>> = {
+	'Our Story': ourStoryBlocks,
+	Sustainability: sustainabilityBlocks,
+};
+
 const buildPages = (
 	site: UmbMbcsSiteCode,
 	pages: Array<UmbMbcsPage>,
@@ -717,9 +770,12 @@ const buildPages = (
 				updateDate: '2026-09-01T10:00:00.000Z',
 				values: [
 					...(isFirstLevel
-						? blockGridValue('content', landingBlocks(site, entry.name, index, hidden))
-						: entry.name === 'Our Story'
-							? blockGridValue('content', ourStoryBlocks(site))
+						? blockGridValue(
+								'content',
+								FIRST_LEVEL_PAGE_BLOCKS[entry.name]?.(site) ?? landingBlocks(site, entry.name, index, hidden),
+							)
+						: CHILD_PAGE_BLOCKS[entry.name]
+							? blockGridValue('content', CHILD_PAGE_BLOCKS[entry.name](site))
 							: []),
 					...seoValues(siteName, entry.name, `Everything you need to know about ${entry.name.toLowerCase()}.`, {
 						excludeFromSitemap: hidden,

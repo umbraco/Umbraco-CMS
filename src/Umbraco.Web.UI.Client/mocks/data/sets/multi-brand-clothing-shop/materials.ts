@@ -98,6 +98,8 @@ const POOLS: Record<UmbMbcsSiteCode, Array<Array<string>>> = {
 	],
 };
 
+export const getMaterial = (name: string): UmbMbcsMaterial => ({ name, imageKey: IMAGE_BY_MATERIAL[name] });
+
 const MAX_MATERIALS = 4;
 const SPECIFIC_WOOLS = ['Merino wool', 'Lambswool', 'Cashmere', 'Alpaca blend'];
 const GENERIC_WOOLS = ['Wool', 'Wool blend'];

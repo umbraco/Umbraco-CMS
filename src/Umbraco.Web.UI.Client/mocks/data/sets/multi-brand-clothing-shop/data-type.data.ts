@@ -344,6 +344,13 @@ export const data: Array<UmbMockDataTypeModel> = [
 						allowAtRoot: false,
 						allowInAreas: true,
 					}),
+					block({
+						elementTypeId: DOCUMENT_TYPE_IDS.materialShowcaseBlock,
+						columnSpans: [6, 12],
+						allowAtRoot: false,
+						allowInAreas: true,
+						label: '{=headline}',
+					}),
 				],
 			},
 			{ alias: 'gridColumns', value: 12 },

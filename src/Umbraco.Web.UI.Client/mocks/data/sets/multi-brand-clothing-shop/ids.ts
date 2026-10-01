@@ -67,6 +67,7 @@ export const DOCUMENT_TYPE_IDS = {
 	stores: mbcsId('documentType', 17),
 	store: mbcsId('documentType', 18),
 	productMaterial: mbcsId('documentType', 19),
+	materialShowcaseBlock: mbcsId('documentType', 20),
 	oneColumnLayout: mbcsId('documentType', 10),
 	twoColumnLayout: mbcsId('documentType', 11),
 	heroBlock: mbcsId('documentType', 12),

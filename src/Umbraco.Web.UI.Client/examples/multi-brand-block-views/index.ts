@@ -51,6 +51,14 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forBlockEditor: forBlockEditorWithRte,
 	},
 	{
+		type: 'blockEditorCustomView',
+		alias: 'Umb.BlockEditorCustomView.Example.MaterialShowcase',
+		name: 'Example Material Showcase Block View',
+		element: () => import('./material-showcase-block-view.element.js'),
+		forContentTypeAlias: 'materialShowcaseBlock',
+		forBlockEditor,
+	},
+	{
 		type: 'entryPoint',
 		alias: 'Umb.MultiBrand.EntryPoint',
 		name: 'Multi Brand Entry Point',

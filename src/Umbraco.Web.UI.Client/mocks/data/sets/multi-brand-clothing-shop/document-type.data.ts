@@ -103,6 +103,7 @@ const articlesTab = tab('Content');
 const storesTab = tab('Content');
 const storeTab = tab('Store');
 const productMaterialTab = tab('Content');
+const materialShowcaseTab = tab('Content');
 const productTab = tab('Product');
 const articleTab = tab('Article');
 const heroBlockTab = tab('Content');
@@ -359,6 +360,37 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				varies: true,
 			},
 			{ alias: 'image', name: 'Image', dataTypeId: mediaPicker, container: productMaterialTab.id },
+		],
+	}),
+	documentType({
+		id: DOCUMENT_TYPE_IDS.materialShowcaseBlock,
+		alias: 'materialShowcaseBlock',
+		name: 'Material Showcase',
+		icon: 'icon-palette',
+		isElement: true,
+		parent: DOCUMENT_TYPE_IDS.blocksFolder,
+		containers: [materialShowcaseTab],
+		properties: [
+			{
+				alias: 'headline',
+				name: 'Headline',
+				dataTypeId: textstring,
+				container: materialShowcaseTab.id,
+				varies: true,
+			},
+			{
+				alias: 'intro',
+				name: 'Intro',
+				dataTypeId: textarea,
+				container: materialShowcaseTab.id,
+				varies: true,
+			},
+			{
+				alias: 'materials',
+				name: 'Materials',
+				dataTypeId: DATA_TYPE_IDS.productMaterialsBlockList,
+				container: materialShowcaseTab.id,
+			},
 		],
 	}),
 	documentType({
