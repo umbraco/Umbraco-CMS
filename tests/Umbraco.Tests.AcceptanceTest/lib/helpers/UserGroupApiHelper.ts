@@ -675,6 +675,24 @@ export class UserGroupApiHelper {
     return await this.create(userGroup);
   }
 
+  async createUserGroupWithCreateDocumentBlueprintPermissionAndDocumentBlueprintStartNode(name: string, startNodeId: string) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.content)
+      .withDocumentRootAccess(true)
+      .withDocumentBlueprintRootAccess(false)
+      .withDocumentBlueprintStartNodeId(startNodeId)
+      .addFallbackPermission()
+        .withCreateDocumentBlueprintPermission(true)
+        .withReadDocumentPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
   async createUserGroupWithCreateDocumentBlueprintPermissionForSpecificDocument(name: string, documentId: string, enabled: boolean = true) {
     await this.ensureNameNotExists(name);
 
@@ -1331,6 +1349,44 @@ export class UserGroupApiHelper {
   async doesUserGroupContainElementRootAccess(userGroupName: string) {
     const userGroup = await this.getByName(userGroupName);
     return userGroup.elementRootAccess;
+  }
+
+  async doesUserGroupContainDocumentBlueprintStartNodeId(userGroupName: string, documentBlueprintStartNodeId: string) {
+    const userGroup = await this.getByName(userGroupName);
+    if (userGroup.documentBlueprintStartNode === null) {
+      return false;
+    }
+    return userGroup.documentBlueprintStartNode.id.includes(documentBlueprintStartNodeId);
+  }
+
+  async doesUserGroupContainDocumentBlueprintRootAccess(userGroupName: string) {
+    const userGroup = await this.getByName(userGroupName);
+    return userGroup.documentBlueprintRootAccess;
+  }
+
+  async createUserGroupWithDocumentBlueprintStartNode(name: string, startNodeId: string) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.library)
+      .withDocumentBlueprintRootAccess(false)
+      .withDocumentBlueprintStartNodeId(startNodeId)
+      .build();
+
+    return await this.create(userGroup);
+  }
+
+  async createUserGroupWithDocumentBlueprintRootAccess(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.library)
+      .withDocumentBlueprintRootAccess(true)
+      .build();
+
+    return await this.create(userGroup);
   }
 
   async createUserGroupWithElementStartNode(name: string, startNodeId: string) {

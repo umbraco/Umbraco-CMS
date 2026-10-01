@@ -26,6 +26,14 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
     await this.click(this.documentBlueprintSidebarHeader.getByTestId('open-dropdown'), {force: true});
   }
 
+  async isDocumentBlueprintSidebarHeaderVisible(isVisible: boolean = true) {
+    return this.isVisible(this.documentBlueprintSidebarHeader, isVisible);
+  }
+
+  async isChildDocumentBlueprintInTreeVisible(parentName: string, childName: string, isVisible: boolean = true) {
+    await this.isVisible(this.documentBlueprintTree.locator(`[label="${parentName}"]`).locator(`uui-menu-item[label="${childName}"]`), isVisible);
+  }
+
   async chooseDocumentTypeForDocumentBlueprint(documentTypeName: string) {
     await this.click(this.itemPickerModal.locator(`umb-ref-item[name="${documentTypeName}"]`));
   }
@@ -79,5 +87,20 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
 
   async clickConfirmToDeleteButtonAndWaitForDocumentBlueprintToBeDeleted() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, this.clickConfirmToDeleteButton(), ConstantHelper.statusCodes.ok);
+  }
+
+  async createDocumentBlueprintFolderAndWaitForFolderToBeCreated(folderName: string) {
+    await this.clickCreateActionMenuOption();
+    await this.clickFolderButton();
+    await this.enterFolderName(folderName);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprintFolder, this.clickConfirmCreateFolderButton(), ConstantHelper.statusCodes.created);
+  }
+
+  async clickConfirmRenameButtonAndWaitForFolderToBeRenamed() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprintFolder, this.clickConfirmRenameButton(), ConstantHelper.statusCodes.ok);
+  }
+
+  async clickConfirmToDeleteButtonAndWaitForFolderToBeDeleted() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprintFolder, this.clickConfirmToDeleteButton(), ConstantHelper.statusCodes.ok);
   }
 }

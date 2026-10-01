@@ -698,3 +698,93 @@ test.fixme('can allow access to all elements for a user', async ({umbracoApi, um
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   expect(userData.hasElementRootAccess).toBeTruthy();
 });
+
+test('can add a document blueprint folder as a document blueprint start node to a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const documentBlueprintFolderName = 'TestDocumentBlueprintFolder';
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
+  const documentBlueprintFolderId = await umbracoApi.documentBlueprint.createFolder(documentBlueprintFolderName);
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickChooseDocumentBlueprintStartNodeButton();
+  await umbracoUi.user.clickLabelWithName(documentBlueprintFolderName, true, true);
+  await umbracoUi.user.clickChooseContainerButton();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainDocumentBlueprintStartNodeIds(nameOfTheUser, [documentBlueprintFolderId])).toBeTruthy();
+
+  // Clean
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
+});
+
+test('can add multiple document blueprint start nodes for a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const firstFolderName = 'FirstDocumentBlueprintFolder';
+  const secondFolderName = 'SecondDocumentBlueprintFolder';
+  await umbracoApi.documentBlueprint.ensureNameNotExists(firstFolderName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(secondFolderName);
+  const firstFolderId = await umbracoApi.documentBlueprint.createFolder(firstFolderName);
+  const userData = await umbracoApi.user.getByName(nameOfTheUser);
+  userData.documentBlueprintStartNodeIds.push({id: firstFolderId});
+  await umbracoApi.user.update(userId, userData);
+  const secondFolderId = await umbracoApi.documentBlueprint.createFolder(secondFolderName);
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickChooseDocumentBlueprintStartNodeButton();
+  await umbracoUi.user.clickLabelWithName(secondFolderName, true, true);
+  await umbracoUi.user.clickChooseContainerButton();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainDocumentBlueprintStartNodeIds(nameOfTheUser, [firstFolderId, secondFolderId])).toBeTruthy();
+
+  // Clean
+  await umbracoApi.documentBlueprint.ensureNameNotExists(firstFolderName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(secondFolderName);
+});
+
+test('can remove a document blueprint start node from a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const documentBlueprintFolderName = 'TestDocumentBlueprintFolder';
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
+  const documentBlueprintFolderId = await umbracoApi.documentBlueprint.createFolder(documentBlueprintFolderName);
+  const userData = await umbracoApi.user.getByName(nameOfTheUser);
+  userData.documentBlueprintStartNodeIds.push({id: documentBlueprintFolderId});
+  await umbracoApi.user.update(userId, userData);
+  expect(await umbracoApi.user.doesUserContainDocumentBlueprintStartNodeIds(nameOfTheUser, [documentBlueprintFolderId])).toBeTruthy();
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickRemoveButtonForDocumentBlueprintNodeWithName(documentBlueprintFolderName);
+  await umbracoUi.user.clickConfirmRemoveButton();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainDocumentBlueprintStartNodeIds(nameOfTheUser, [documentBlueprintFolderId])).toBeFalsy();
+
+  // Clean
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
+});
+
+test('can allow access to all document blueprints for a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickAllowAccessToAllDocumentBlueprintsToggle();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainDocumentBlueprintRootAccess(nameOfTheUser)).toBeTruthy();
+});

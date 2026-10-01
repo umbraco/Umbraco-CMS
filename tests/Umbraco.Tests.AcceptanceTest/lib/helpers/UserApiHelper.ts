@@ -322,6 +322,20 @@ export class UserApiHelper {
     return elementStartNodeIdsArray.every(id => elementStartNodeIds.includes(id));
   }
 
+  async doesUserContainDocumentBlueprintStartNodeIds(userName: string, documentBlueprintStartNodeIds: string[]) {
+    const user = await this.getByName(userName);
+    if (!user.documentBlueprintStartNodeIds || user.documentBlueprintStartNodeIds.length === 0) {
+      return false;
+    }
+    const documentBlueprintStartNodeIdsArray = user.documentBlueprintStartNodeIds.map(documentBlueprintStartNode => documentBlueprintStartNode.id);
+    return documentBlueprintStartNodeIdsArray.every(id => documentBlueprintStartNodeIds.includes(id));
+  }
+
+  async doesUserContainDocumentBlueprintRootAccess(userName: string) {
+    const user = await this.getByName(userName);
+    return user.hasDocumentBlueprintRootAccess;
+  }
+
   async setUserPermissionsForElement(userName: string, userEmail: string, userPassword: string, userGroupId: string, elementStartNodeIds: string[] = [], hasElementRootAccess = false, uiCulture: string = 'en-us') {
     let user = await this.getByName(userName);
 
@@ -345,6 +359,34 @@ export class UserApiHelper {
 
     for (const elementStartNodeId of elementStartNodeIds) {
       userSetup.elementStartNodeIds.push({id: elementStartNodeId});
+    }
+
+    await this.update(user.id, userSetup);
+  }
+
+  async setUserPermissionsForDocumentBlueprint(userName: string, userEmail: string, userPassword: string, userGroupId: string, documentBlueprintStartNodeIds: string[] = [], hasDocumentBlueprintRootAccess = false, uiCulture: string = 'en-us') {
+    let user = await this.getByName(userName);
+
+    // If the user does not exist, create a default user and retrieve the newly created user
+    if (!user) {
+      await this.createDefaultUser(userName, userEmail, [userGroupId]);
+      user = await this.getByName(userName);
+    }
+
+    await this.updatePassword(user.id, userPassword);
+
+    let userSetup = {
+      documentBlueprintStartNodeIds: [] as { id: string }[],
+      email: user.email,
+      hasDocumentBlueprintRootAccess: hasDocumentBlueprintRootAccess,
+      languageIsoCode: uiCulture,
+      name: user.name,
+      userGroupIds: [{id: userGroupId}],
+      userName: user.userName,
+    };
+
+    for (const documentBlueprintStartNodeId of documentBlueprintStartNodeIds) {
+      userSetup.documentBlueprintStartNodeIds.push({id: documentBlueprintStartNodeId});
     }
 
     await this.update(user.id, userSetup);
