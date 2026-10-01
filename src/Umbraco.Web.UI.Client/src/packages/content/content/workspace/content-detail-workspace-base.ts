@@ -302,7 +302,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				// Only segment variation
 				if (!variesByCulture && variesBySegment) {
 					const invariantCulture = {
-						variant: undefined, // We do not store variant-data for segments. [NL]
+						// The default option is the entry itself, not a segment of it, so it carries the variant data.
+						variant: variants.find((x) => x.culture === null),
 						language: languages.find((x) => x.isDefault),
 						culture: null,
 						segment: null,
