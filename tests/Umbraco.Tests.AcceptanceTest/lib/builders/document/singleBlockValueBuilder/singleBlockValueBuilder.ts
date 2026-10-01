@@ -48,8 +48,6 @@ export class SingleBlockValueBuilder {
         return builder.getValue();
       }),
       layout: {
-        // The single block editor stores its layout as a one-item array under the 'Umbraco.SingleBlock' key
-        // (see SingleBlockValue.cs), unlike block list/grid which allow multiple layout items.
         'Umbraco.SingleBlock': this.singleBlockLayoutBuilder.map((builder) => {
           return builder.getValue();
         })

@@ -10,7 +10,6 @@ const singleBlockDocumentName = 'SearchIndexingEdgeCasesSingleBlockDocument';
 const singleBlockGroupName = 'SingleBlockGroup';
 const textstringDataTypeName = 'Textstring';
 const singleBlockInnerPropertyEditorAlias = 'Umbraco.TextBox';
-// A value distinctive enough that it is very unlikely to collide with other content indexed in this environment.
 const singleBlockSearchableValue = 'SingleBlockIndexingEdgeCaseSearchableValue1234567890';
 
 // Date/time editors
@@ -88,10 +87,7 @@ test.describe('SingleBlock property indexing', () => {
     );
     await umbracoApi.document.publish(documentId);
 
-    // Act & Assert
-    // SingleBlockPropertyValueHandler recursively indexes the block's inner content under the outer block
-    // property's own field name (not the inner "textstring" property alias) - a free-text search for the
-    // inner value must still find the document via the ad-hoc search box's query endpoint.
+    // Assert
     await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, singleBlockSearchableValue, documentId);
   });
 });
@@ -119,14 +115,6 @@ test.describe('date/time editor indexing', () => {
     await umbracoApi.template.ensureNameNotExists(dateEditorsTemplateName);
   });
 
-  // The Delivery API only exposes filter/sort support for a fixed set of system fields (contentType, name,
-  // createDate, updateDate, level, sortOrder) - there is no filter handler for arbitrary custom properties, so a
-  // custom date property cannot be queried via filter=. Instead, this verifies that DateTimeOffsetPropertyValueHandler
-  // does not break indexing for these previously-unindexed/mishandled editors: the document must still reach the
-  // index, leave it healthy, and remain fetchable via the Delivery API.
-  //
-  // Assert the document is findable rather than that the index count grew: a count delta races the previous
-  // test's teardown, whose de-index can cancel out the document added here (+1 -1 = 0).
   async function verifyDateEditorDocumentIsIndexed(umbracoApi: ApiHelpers, documentName: string, createDocument: () => Promise<string>) {
     const documentId = await createDocument();
 
@@ -184,18 +172,16 @@ test.describe('culture-scoped ad-hoc search', () => {
   });
 
   test('a search scoped to a culture only matches that culture\'s variant value', async ({umbracoApi}) => {
-    // Arrange - the property must vary by culture too, so Umb_Content indexes it per culture, not once shared.
+    // Arrange
     const textstringDataType = await umbracoApi.dataType.getByName(textstringDataTypeName);
     const cultureDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(cultureDocumentTypeName, textstringDataTypeName, textstringDataType.id, cultureGroupName, true, true) ?? '';
     const documentId = await umbracoApi.document.createDocumentWithTwoCultureSpecificValues(cultureDocumentName, cultureDocumentTypeId, textstringDataTypeName, englishIsoCode, englishSearchableValue, danishIsoCode, danishSearchableValue) ?? '';
     await umbracoApi.document.publishDocumentWithCultures(documentId, [englishIsoCode, danishIsoCode]);
 
-    // Wait for both culture variants to be indexed before asserting anything is absent below - otherwise
-    // "not found" could just mean "not indexed yet" rather than "correctly scoped by culture".
     await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, englishSearchableValue, documentId, englishIsoCode);
     await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, danishSearchableValue, documentId, danishIsoCode);
 
-    // Assert - each culture's value must not be visible when the search is scoped to the other culture
+    // Assert
     expect(await umbracoApi.searchManagement.isDocumentFound(indexAlias, danishSearchableValue, documentId, englishIsoCode)).toBe(false);
     expect(await umbracoApi.searchManagement.isDocumentFound(indexAlias, englishSearchableValue, documentId, danishIsoCode)).toBe(false);
   });
@@ -219,8 +205,7 @@ test.describe('media indexing', () => {
     // Arrange
     const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaFileName) ?? '';
 
-    // Act & Assert - media has no draft/published distinction, so unlike the document tests above there's no
-    // publish() call.
+    // Assert
     await umbracoApi.searchManagement.waitUntilDocumentIsFound(mediaIndexAlias, mediaFileName, mediaId);
   });
 });
@@ -245,7 +230,7 @@ test.describe('member indexing', () => {
     const memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName) ?? '';
     const memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, memberEmail, memberUsername, memberPassword) ?? '';
 
-    // Act & Assert
+    // Assert
     await umbracoApi.searchManagement.waitUntilDocumentIsFound(memberIndexAlias, memberName, memberId);
   });
 });
@@ -269,9 +254,7 @@ test.describe('published content indexing', () => {
     const publishedDocumentId = await umbracoApi.document.createDefaultDocument(publishedDocumentName, documentTypeId) ?? '';
     await umbracoApi.document.publish(publishedDocumentId);
 
-    // Act - index changes are processed one at a time in the order they were made, so once the later-published
-    // document is in the published index, the earlier draft save has been processed for that index too; the
-    // draft-index check proves the draft was indexed at all
+    // Act
     await umbracoApi.searchManagement.waitUntilDocumentIsFound(publishedIndexAlias, publishedDocumentName, publishedDocumentId);
     await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, draftOnlyDocumentName, draftOnlyDocumentId);
 

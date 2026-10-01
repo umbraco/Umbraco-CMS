@@ -10,15 +10,9 @@ test('can see the index list with the expected columns and indexes', {tag: '@smo
   // Assert
   await umbracoUi.searchManagement.doesIndexTableHaveColumnHeaders(['Alias', 'Health Status', 'Document Count']);
 
-  // The table renders once on navigation and never polls, so comparing it against a separately read API
-  // response compares two moments: a spec that ran earlier can still be changing index state, and the row
-  // then reports the status from before that change. Refresh and re-read together until the two agree,
-  // rather than sampling each once and requiring them to have agreed by luck.
   await expect(async () => {
     await umbracoUi.searchManagement.clickRefreshListButtonAndWaitForReload();
     const indexes = await umbracoApi.searchManagement.getAllIndexes();
-    // Without this the loop below is vacuous: if index registration broke entirely and the API returned no
-    // items, iterating none of them would assert nothing and the test would still pass.
     expect(indexes.items.length).toBeGreaterThan(0);
     for (const index of indexes.items) {
       await umbracoUi.searchManagement.isIndexRowVisible(index.indexAlias);
@@ -28,7 +22,7 @@ test('can see the index list with the expected columns and indexes', {tag: '@smo
 });
 
 test('can rebuild an index from its row in the index list', async ({umbracoApi, umbracoUi}) => {
-  // Arrange - a rebuild empties the index for a while, so use one fewer search specs depend on than Umb_Content
+  // Arrange
   const indexAlias = 'Umb_Members';
   const healthStatusBeforeRebuild = (await umbracoApi.searchManagement.getIndex(indexAlias)).healthStatus;
 
@@ -39,7 +33,6 @@ test('can rebuild an index from its row in the index list', async ({umbracoApi, 
 
   // Assert
   await umbracoUi.searchManagement.doesRebuildStartedNotificationHaveText(`"${indexAlias}" has started`);
-  // Let the rebuild settle, so the next spec does not find the index mid-rebuild
   await expect
     .poll(async () => (await umbracoApi.searchManagement.getIndex(indexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
     .toBe(healthStatusBeforeRebuild);
