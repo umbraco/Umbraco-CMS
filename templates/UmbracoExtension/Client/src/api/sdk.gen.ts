@@ -18,25 +18,25 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
     meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
 
-export const getPing = <ThrowOnError extends boolean = false>(options?: Options<GetPingData, ThrowOnError>): RequestResult<GetPingResponses, GetPingErrors, ThrowOnError> => (options?.client ?? client).get<GetPingResponses, GetPingErrors, ThrowOnError>({
+export const getPing = <ThrowOnError extends boolean = true>(options?: Options<GetPingData, ThrowOnError>): RequestResult<GetPingResponses, GetPingErrors, ThrowOnError> => (options?.client ?? client).get<GetPingResponses, GetPingErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/umbraco/umbracoextension/api/v1/ping',
     ...options
 });
 
-export const getWhatsMyName = <ThrowOnError extends boolean = false>(options?: Options<GetWhatsMyNameData, ThrowOnError>): RequestResult<GetWhatsMyNameResponses, GetWhatsMyNameErrors, ThrowOnError> => (options?.client ?? client).get<GetWhatsMyNameResponses, GetWhatsMyNameErrors, ThrowOnError>({
+export const getWhatsMyName = <ThrowOnError extends boolean = true>(options?: Options<GetWhatsMyNameData, ThrowOnError>): RequestResult<GetWhatsMyNameResponses, GetWhatsMyNameErrors, ThrowOnError> => (options?.client ?? client).get<GetWhatsMyNameResponses, GetWhatsMyNameErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/umbraco/umbracoextension/api/v1/whatsMyName',
     ...options
 });
 
-export const getWhatsTheTimeMrWolf = <ThrowOnError extends boolean = false>(options?: Options<GetWhatsTheTimeMrWolfData, ThrowOnError>): RequestResult<GetWhatsTheTimeMrWolfResponses, GetWhatsTheTimeMrWolfErrors, ThrowOnError> => (options?.client ?? client).get<GetWhatsTheTimeMrWolfResponses, GetWhatsTheTimeMrWolfErrors, ThrowOnError>({
+export const getWhatsTheTimeMrWolf = <ThrowOnError extends boolean = true>(options?: Options<GetWhatsTheTimeMrWolfData, ThrowOnError>): RequestResult<GetWhatsTheTimeMrWolfResponses, GetWhatsTheTimeMrWolfErrors, ThrowOnError> => (options?.client ?? client).get<GetWhatsTheTimeMrWolfResponses, GetWhatsTheTimeMrWolfErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/umbraco/umbracoextension/api/v1/whatsTheTimeMrWolf',
     ...options
 });
 
-export const getWhoAmI = <ThrowOnError extends boolean = false>(options?: Options<GetWhoAmIData, ThrowOnError>): RequestResult<GetWhoAmIResponses, GetWhoAmIErrors, ThrowOnError> => (options?.client ?? client).get<GetWhoAmIResponses, GetWhoAmIErrors, ThrowOnError>({
+export const getWhoAmI = <ThrowOnError extends boolean = true>(options?: Options<GetWhoAmIData, ThrowOnError>): RequestResult<GetWhoAmIResponses, GetWhoAmIErrors, ThrowOnError> => (options?.client ?? client).get<GetWhoAmIResponses, GetWhoAmIErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/umbraco/umbracoextension/api/v1/whoAmI',
     ...options
