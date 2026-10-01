@@ -41,7 +41,7 @@ export class UmbBlockGridEntryContext
 	readonly columnSpan = this._layout.asObservablePart((x) => (x ? (x.columnSpan ?? null) : undefined));
 	readonly rowSpan = this._layout.asObservablePart((x) => (x ? (x.rowSpan ?? null) : undefined));
 	readonly layoutAreas = this._layout.asObservablePart((x) => x?.areas);
-	readonly columnSpanOptions = this._blockType.asObservablePart((x) => (x ? (x.columnSpanOptions ?? []) : undefined));
+	readonly columnSpanOptions = this._blockType.asObservablePart((x) => x?.columnSpanOptions ?? []);
 	readonly areaTypeGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);
 	readonly areas = this._blockType.asObservablePart((x) => x?.areas ?? []);
 	readonly minMaxRowSpan = this._blockType.asObservablePart((x) =>
@@ -198,7 +198,7 @@ export class UmbBlockGridEntryContext
 		this.observe(
 			observeMultiple([this.minMaxRowSpan, this.columnSpanOptions, this._entries.layoutColumns]),
 			([minMaxRowSpan, columnSpanOptions, layoutColumns]) => {
-				if (!layoutColumns || !minMaxRowSpan || !columnSpanOptions) return;
+				if (!layoutColumns || !minMaxRowSpan) return;
 				const relevantColumnSpanOptions = this.#deriveRelevantColumnSpanOptions(columnSpanOptions, layoutColumns);
 				this.#relevantColumnSpanOptions.setValue(relevantColumnSpanOptions);
 				const hasRelevantColumnSpanOptions = relevantColumnSpanOptions.length > 1;
@@ -244,10 +244,11 @@ export class UmbBlockGridEntryContext
 
 		// Secure columnSpan fits options:
 		this.observe(
-			observeMultiple([this.columnSpan, this.columnSpanOptions, this._entries.layoutColumns]),
-			([columnSpan, columnSpanOptions, layoutColumns]) => {
-				// `undefined` means the block type has not loaded yet, which is distinct from "no options".
-				if (!layoutColumns || columnSpan === undefined || columnSpanOptions === undefined) return;
+			observeMultiple([this.columnSpan, this.columnSpanOptions, this.minMaxRowSpan, this._entries.layoutColumns]),
+			([columnSpan, columnSpanOptions, minMaxRowSpan, layoutColumns]) => {
+				// `minMaxRowSpan` is only defined once the block type has loaded. Until then, empty options means "not loaded".
+				if (!minMaxRowSpan) return;
+				if (!layoutColumns || columnSpan === undefined) return;
 				const relevantColumnSpanOptions = this.#deriveRelevantColumnSpanOptions(columnSpanOptions, layoutColumns);
 				const newColumnSpan = this.#calcColumnSpan(
 					columnSpan ?? layoutColumns,
@@ -300,7 +301,7 @@ export class UmbBlockGridEntryContext
 		return columnSpanOptions
 			.filter((x) => x.columnSpan <= layoutColumns)
 			.map((x) => x.columnSpan)
-			.sort((a, b) => (a > b ? 1 : b > a ? -1 : 0));
+			.sort((a, b) => a - b);
 	}
 
 	#calcColumnSpan(columnSpan: number, relevantColumnSpanOptions: number[], layoutColumns: number) {
