@@ -37,6 +37,23 @@ public class SearchElementItemController : ElementItemControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="SearchElementItemController"/> class, which handles search operations for element items.
     /// </summary>
+    /// <remarks>
+    /// This constructor exists only to give the dependency injection container an unambiguous (greediest) constructor
+    /// to select while the obsolete constructor remains. Use the constructor taking an <see cref="IIndexedEntitySearchService"/>.
+    /// </remarks>
+    [Obsolete("This constructor exists only to satisfy dependency injection. Please use the constructor taking an IIndexedEntitySearchService. Scheduled for removal in Umbraco 21.")]
+    public SearchElementItemController(
+        IEntitySearchService entitySearchService,
+        IEntityService entityService,
+        IIndexedEntitySearchService indexedEntitySearchService,
+        IElementPresentationFactory elementPresentationFactory)
+        : this(indexedEntitySearchService, elementPresentationFactory)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SearchElementItemController"/> class, which handles search operations for element items.
+    /// </summary>
     /// <param name="entitySearchService">Service used to perform entity search operations.</param>
     /// <param name="entityService">Service for retrieving entity data.</param>
     /// <param name="elementPresentationFactory">Factory responsible for creating element presentation models.</param>
