@@ -1,20 +1,20 @@
 import {
-	UMB_CONTENT_PICKER_DOCUMENT_ROOT_ORIGIN_PICKER_MODAL_ALIAS,
-	UMB_CONTENT_PICKER_DOCUMENT_ROOT_QUERY_STEP_PICKER_MODAL_ALIAS,
+	UMB_DOCUMENT_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL_ALIAS,
+	UMB_DOCUMENT_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL_ALIAS,
 } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
-		alias: UMB_CONTENT_PICKER_DOCUMENT_ROOT_ORIGIN_PICKER_MODAL_ALIAS,
+		alias: UMB_DOCUMENT_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL_ALIAS,
 		name: 'Choose an origin',
-		element: () => import('./dynamic-root-origin-picker-modal.element.js'),
+		element: () => import('./document-dynamic-root-origin-picker-modal.element.js'),
 	},
 	{
 		type: 'modal',
-		alias: UMB_CONTENT_PICKER_DOCUMENT_ROOT_QUERY_STEP_PICKER_MODAL_ALIAS,
+		alias: UMB_DOCUMENT_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL_ALIAS,
 		name: 'Append step to query',
-		element: () => import('./dynamic-root-query-step-picker-modal.element.js'),
+		element: () => import('./document-dynamic-root-query-step-picker-modal.element.js'),
 	},
 	{
 		type: 'dynamicRootOrigin',

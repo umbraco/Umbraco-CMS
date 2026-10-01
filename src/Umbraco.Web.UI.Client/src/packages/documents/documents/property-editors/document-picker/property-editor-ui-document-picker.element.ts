@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
-import { UmbContentDynamicRootResolver } from '@umbraco-cms/backoffice/content';
-import type { UmbContentPickerDynamicRoot } from '@umbraco-cms/backoffice/content';
+import { UmbDynamicRootResolver } from '../../dynamic-root/dynamic-root-resolver.controller.js';
+import type { UmbDynamicRoot } from '../../dynamic-root/types.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -32,7 +32,7 @@ export class UmbPropertyEditorUIDocumentPickerElement
 		}
 
 		this._startNodeId = config.getValueByAlias('startNodeId');
-		this.#dynamicRoot = config.getValueByAlias<UmbContentPickerDynamicRoot>('dynamicRoot');
+		this.#dynamicRoot = config.getValueByAlias<UmbDynamicRoot>('dynamicRoot');
 
 		const allowedContentTypes = config.getValueByAlias<string>('allowedContentTypes');
 		this._allowedContentTypes = allowedContentTypes ? allowedContentTypes.split(',').filter(Boolean) : undefined;
@@ -62,9 +62,9 @@ export class UmbPropertyEditorUIDocumentPickerElement
 	@state()
 	private _startNodeId?: string;
 
-	#dynamicRoot?: UmbContentPickerDynamicRoot;
+	#dynamicRoot?: UmbDynamicRoot;
 
-	#dynamicRootResolver = new UmbContentDynamicRootResolver(this);
+	#dynamicRootResolver = new UmbDynamicRootResolver(this);
 
 	@state()
 	private _allowedContentTypes?: string[];

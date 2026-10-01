@@ -1,5 +1,5 @@
-import type { UmbContentPickerDynamicRoot } from '../types.js';
-import { UmbContentPickerDynamicRootServerDataSource } from './dynamic-root.server.data.js';
+import type { UmbDynamicRoot } from '../types.js';
+import { UmbDynamicRootServerDataSource } from './dynamic-root.server.data.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DynamicRootRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -7,28 +7,28 @@ import type { DynamicRootRequestModel } from '@umbraco-cms/backoffice/external/b
 const GUID_EMPTY: string = '00000000-0000-0000-0000-000000000000';
 
 /**
- * UmbContentPickerDynamicRootRepository
- * @class UmbContentPickerDynamicRootRepository
+ * UmbDynamicRootRepository
+ * @class UmbDynamicRootRepository
  * @augments {UmbControllerBase}
  */
-export class UmbContentPickerDynamicRootRepository extends UmbControllerBase {
-	#dataSource: UmbContentPickerDynamicRootServerDataSource;
+export class UmbDynamicRootRepository extends UmbControllerBase {
+	#dataSource: UmbDynamicRootServerDataSource;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#dataSource = new UmbContentPickerDynamicRootServerDataSource(host);
+		this.#dataSource = new UmbDynamicRootServerDataSource(host);
 	}
 
 	/**
 	 * Request dynamic root
-	 * @param {UmbContentPickerDynamicRoot} query - The dynamic root query to resolve
+	 * @param {UmbDynamicRoot} query - The dynamic root query to resolve
 	 * @param {string} entityUnique - The unique identifier of the entity to resolve the root for
 	 * @param {string} [parentUnique] - The unique identifier of the parent to resolve the root for
 	 * @returns {Promise<Array<string> | undefined>} The resolved dynamic roots.
-	 * @memberof UmbContentPickerDynamicRootRepository
+	 * @memberof UmbDynamicRootRepository
 	 */
-	async requestRoot(query: UmbContentPickerDynamicRoot, entityUnique: string | null, parentUnique?: string | null) {
+	async requestRoot(query: UmbDynamicRoot, entityUnique: string | null, parentUnique?: string | null) {
 		const model: DynamicRootRequestModel = {
 			context: {
 				id: entityUnique ?? null,

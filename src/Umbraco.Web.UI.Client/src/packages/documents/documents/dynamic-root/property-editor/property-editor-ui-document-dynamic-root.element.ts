@@ -1,5 +1,5 @@
-import type { UmbInputContentPickerDocumentRootElement } from '../components/index.js';
-import type { UmbContentPickerDynamicRoot } from '@umbraco-cms/backoffice/content';
+import type { UmbInputDocumentDynamicRootElement } from '../components/index.js';
+import type { UmbDynamicRoot } from '../types.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -12,32 +12,32 @@ import '../components/index.js';
 
 /**
  * Configures the dynamic root a picker starts from, for the pickers that offer one alongside a fixed start node.
- * @element umb-property-editor-ui-dynamic-root
+ * @element umb-property-editor-ui-document-dynamic-root
  */
-@customElement('umb-property-editor-ui-dynamic-root')
-export class UmbDynamicRootPropertyEditorUIElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+@customElement('umb-property-editor-ui-document-dynamic-root')
+export class UmbDocumentDynamicRootPropertyEditorUIElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
-	value?: UmbContentPickerDynamicRoot;
+	value?: UmbDynamicRoot;
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
 	#onChange(event: CustomEvent) {
-		const target = event.target as UmbInputContentPickerDocumentRootElement;
+		const target = event.target as UmbInputDocumentDynamicRootElement;
 		this.value = target.data;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
-		return html`<umb-input-content-picker-document-root .data=${this.value} @change=${this.#onChange}>
-		</umb-input-content-picker-document-root>`;
+		return html`<umb-input-document-dynamic-root .data=${this.value} @change=${this.#onChange}>
+		</umb-input-document-dynamic-root>`;
 	}
 }
 
-export { UmbDynamicRootPropertyEditorUIElement as element };
+export { UmbDocumentDynamicRootPropertyEditorUIElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-dynamic-root': UmbDynamicRootPropertyEditorUIElement;
+		'umb-property-editor-ui-document-dynamic-root': UmbDocumentDynamicRootPropertyEditorUIElement;
 	}
 }

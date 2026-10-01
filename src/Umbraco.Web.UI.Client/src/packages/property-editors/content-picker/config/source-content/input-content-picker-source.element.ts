@@ -1,12 +1,12 @@
-import type { UmbContentPickerDynamicRoot, UmbContentPickerSourceType } from '../../types.js';
-import type { UmbInputContentPickerDocumentRootElement } from '../../dynamic-root/components/input-content-picker-document-root.element.js';
+import type { UmbContentPickerSourceType } from '../../types.js';
+import type { UmbDynamicRoot, UmbInputDocumentDynamicRootElement } from '@umbraco-cms/backoffice/document';
 import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-import '../../dynamic-root/components/input-content-picker-document-root.element.js';
+import '@umbraco-cms/backoffice/document';
 
 @customElement('umb-input-content-picker-source')
 export class UmbInputContentPickerSourceElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
@@ -40,7 +40,7 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlWithBasics
 	nodeId?: string;
 
 	@property({ attribute: false })
-	dynamicRoot?: UmbContentPickerDynamicRoot;
+	dynamicRoot?: UmbDynamicRoot;
 
 	@state()
 	private _options: Array<UUISelectOption> = [
@@ -69,7 +69,7 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlWithBasics
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onDocumentRootChange(event: CustomEvent & { target: UmbInputContentPickerDocumentRootElement }) {
+	#onDocumentRootChange(event: CustomEvent & { target: UmbInputDocumentDynamicRootElement }) {
 		switch (this.type) {
 			case 'content':
 				this.dynamicRoot = event.target.data;
@@ -115,8 +115,8 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlWithBasics
 
 	#renderDocumentSourcePicker() {
 		return html`
-			<umb-input-content-picker-document-root .data=${this.dynamicRoot} @change=${this.#onDocumentRootChange}>
-			</umb-input-content-picker-document-root>
+			<umb-input-document-dynamic-root .data=${this.dynamicRoot} @change=${this.#onDocumentRootChange}>
+			</umb-input-document-dynamic-root>
 		`;
 	}
 

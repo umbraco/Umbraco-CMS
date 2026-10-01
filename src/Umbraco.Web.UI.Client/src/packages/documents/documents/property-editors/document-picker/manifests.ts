@@ -1,6 +1,6 @@
+import { UMB_DOCUMENT_DYNAMIC_ROOT_PROPERTY_EDITOR_UI_ALIAS } from '../../dynamic-root/constants.js';
 import { manifest as schemaManifest } from './Umbraco.ContentPicker.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
-import { UMB_DYNAMIC_ROOT_PROPERTY_EDITOR_UI_ALIAS } from '@umbraco-cms/backoffice/content';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -43,7 +43,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 						alias: 'dynamicRoot',
 						label: 'Dynamic root',
 						description: 'Resolve the start node from the content being edited, when no start node is set',
-						propertyEditorUiAlias: UMB_DYNAMIC_ROOT_PROPERTY_EDITOR_UI_ALIAS,
+						propertyEditorUiAlias: UMB_DOCUMENT_DYNAMIC_ROOT_PROPERTY_EDITOR_UI_ALIAS,
 						weight: 30,
 					},
 				],

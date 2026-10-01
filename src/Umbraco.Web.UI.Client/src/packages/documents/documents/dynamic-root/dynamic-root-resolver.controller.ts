@@ -1,6 +1,6 @@
-import { UMB_CONTENT_WORKSPACE_CONTEXT } from '../workspace/content-workspace.context-token.js';
-import type { UmbContentPickerDynamicRoot } from './types.js';
-import { UmbContentPickerDynamicRootRepository } from './repository/index.js';
+import type { UmbDynamicRoot } from './types.js';
+import { UmbDynamicRootRepository } from './repository/index.js';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
@@ -12,15 +12,15 @@ import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/wor
  * needs the workspace and parent context a picker happens to be rendered in. Any picker that offers a dynamic root
  * needs exactly that, which is why this is a controller rather than part of one picker.
  */
-export class UmbContentDynamicRootResolver extends UmbControllerBase {
-	readonly #repository = new UmbContentPickerDynamicRootRepository(this);
+export class UmbDynamicRootResolver extends UmbControllerBase {
+	readonly #repository = new UmbDynamicRootRepository(this);
 
 	/**
 	 * Resolves the unique of the node the picker should start from.
-	 * @param {UmbContentPickerDynamicRoot | undefined} dynamicRoot - The configured dynamic root.
+	 * @param {UmbDynamicRoot | undefined} dynamicRoot - The configured dynamic root.
 	 * @returns {Promise<string | undefined>} The resolved start node unique, or undefined when there is nothing to resolve.
 	 */
-	async resolveStartNodeUnique(dynamicRoot: UmbContentPickerDynamicRoot | undefined): Promise<string | undefined> {
+	async resolveStartNodeUnique(dynamicRoot: UmbDynamicRoot | undefined): Promise<string | undefined> {
 		if (!dynamicRoot) return undefined;
 
 		// Use passContextAliasMatches to skip past block element workspaces and find the document workspace.

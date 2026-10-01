@@ -1,12 +1,12 @@
 import type { ManifestDynamicRootQueryStep } from '../dynamic-root.extension.js';
-import type { UmbContentPickerDocumentRootQueryStepModalData } from './index.js';
+import type { UmbDocumentDynamicRootQueryStepPickerModalData } from './index.js';
 import { customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypePickerInputContext } from '@umbraco-cms/backoffice/document-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-@customElement('umb-dynamic-root-query-step-picker-modal')
-export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBaseElement<UmbContentPickerDocumentRootQueryStepModalData> {
+@customElement('umb-document-dynamic-root-query-step-picker-modal')
+export class UmbDocumentDynamicRootQueryStepPickerModalElement extends UmbModalBaseElement<UmbDocumentDynamicRootQueryStepPickerModalData> {
 	@state()
 	private _querySteps: Array<ManifestDynamicRootQueryStep> = [];
 
@@ -70,10 +70,10 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 	}
 }
 
-export default UmbDynamicRootQueryStepPickerModalModalElement;
+export default UmbDocumentDynamicRootQueryStepPickerModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-dynamic-root-query-step-picker-modal': UmbDynamicRootQueryStepPickerModalModalElement;
+		'umb-document-dynamic-root-query-step-picker-modal': UmbDocumentDynamicRootQueryStepPickerModalElement;
 	}
 }

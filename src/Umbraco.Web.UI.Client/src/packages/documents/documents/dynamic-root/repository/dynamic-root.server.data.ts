@@ -4,10 +4,10 @@ import type { DynamicRootRequestModel, DynamicRootResponseModel } from '@umbraco
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- * UmbContentPickerDynamicRootServerDataSource
- * @class UmbContentPickerDynamicRootServerDataSource
+ * UmbDynamicRootServerDataSource
+ * @class UmbDynamicRootServerDataSource
  */
-export class UmbContentPickerDynamicRootServerDataSource {
+export class UmbDynamicRootServerDataSource {
 	#host: UmbControllerHost;
 
 	constructor(host: UmbControllerHost) {
@@ -18,7 +18,7 @@ export class UmbContentPickerDynamicRootServerDataSource {
 	 * Get dynamic root
 	 * @param {DynamicRootRequestModel} args - The dynamic root request arguments.
 	 * @returns {Promise<DynamicRootResponseModel | undefined>} The dynamic root response.
-	 * @memberof UmbContentPickerDynamicRootServerDataSource
+	 * @memberof UmbDynamicRootServerDataSource
 	 */
 	async getRoot(args: DynamicRootRequestModel): Promise<DynamicRootResponseModel | undefined> {
 		if (!args.context) throw new Error('Dynamic Root context is missing');
