@@ -54,4 +54,5 @@ const danishEditorUser: UmbMockUserModel = {
 	flags: [],
 };
 
+// The mock API treats the first user as the signed-in user, so reorder this array to switch between them.
 export const data: Array<UmbMockUserModel> = [adminUser, danishEditorUser];
