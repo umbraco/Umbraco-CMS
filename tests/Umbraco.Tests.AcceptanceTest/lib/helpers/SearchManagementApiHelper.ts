@@ -26,15 +26,19 @@ export class SearchManagementApiHelper {
 
   async isDocumentFound(indexAlias: string, query: string, id: string, culture?: string) {
     const response = await this.searchResponse(indexAlias, query, culture);
-    if (!response.ok()) {
-      return false;
-    }
-    const body = await response.json();
-    return body.documents?.some((document: {id: string}) => document.id === id) ?? false;
+    expect(response.ok(), `search returned ${response.status()}`).toBeTruthy();
+    return this.containsDocument(await response.json(), id);
   }
 
   async waitUntilDocumentIsFound(indexAlias: string, query: string, id: string, culture?: string, timeout: number = ConstantHelper.timeout.pageLoad) {
-    await expect.poll(async () => this.isDocumentFound(indexAlias, query, id, culture), {timeout: timeout}).toBeTruthy();
+    await expect.poll(async () => {
+      const response = await this.searchResponse(indexAlias, query, culture);
+      return response.ok() && this.containsDocument(await response.json(), id);
+    }, {timeout: timeout}).toBeTruthy();
+  }
+
+  private containsDocument(searchResult: any, id: string) {
+    return searchResult.documents?.some((document: {id: string}) => document.id === id) ?? false;
   }
 
   private async searchResponse(indexAlias: string, query?: string, culture?: string, skip = 0, take = 100) {

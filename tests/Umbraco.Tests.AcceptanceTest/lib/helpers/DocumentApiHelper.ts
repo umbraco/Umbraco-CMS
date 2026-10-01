@@ -211,6 +211,12 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createPublishedDefaultDocument(documentName: string, documentTypeId: string) {
+    const documentId = await this.createDefaultDocument(documentName, documentTypeId) ?? '';
+    await this.publish(documentId);
+    return documentId;
+  }
+
   async createDocumentWithTextContent(documentName: string, documentTypeId: string, textContent: string, dataTypeName: string) {
     await this.ensureNameNotExists(documentName);
 

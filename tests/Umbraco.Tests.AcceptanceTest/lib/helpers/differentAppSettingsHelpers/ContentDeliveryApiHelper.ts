@@ -65,19 +65,20 @@ export class ContentDeliveryApiHelper {
     return await this.api.get(this.api.baseUrl + '/umbraco/delivery/api/v2/content' + query, undefined, extraHeaders);
   }
 
-  async queryUntilNamesPresent(filter: string | undefined, sort: string | undefined, expectedNames: string[], expectedTotal?: number, skip = 0, take = 100) {
-    expect(expectedNames.length, 'queryUntilNamesPresent needs at least one expected name, or it asserts nothing').toBeGreaterThan(0);
+  async waitUntilContentQueryReturnsNames(filter: string | undefined, sort: string | undefined, expectedNames: string[], expectedTotal?: number, extraHeaders?: { [key: string]: string; }) {
+    const take = 100;
+    expect(expectedNames.length, 'waitUntilContentQueryReturnsNames needs at least one expected name, or it asserts nothing').toBeGreaterThan(0);
     let contentItemsJson;
     await expect
       .poll(
         async () => {
-          const response = await this.getContentItemsFromAQuery(undefined, undefined, filter, sort, skip, take);
+          const response = await this.getContentItemsFromAQuery(extraHeaders, undefined, filter, sort, 0, take);
           if (!response.ok()) {
             return [`query failed with status ${response.status()}`];
           }
           contentItemsJson = await response.json();
-          if (skip > 0 || contentItemsJson.total > take) {
-            return [`page does not hold every match: total ${contentItemsJson.total} is not all on one page (skip ${skip}, take ${take})`];
+          if (contentItemsJson.total > take) {
+            return [`page does not hold every match: total ${contentItemsJson.total} exceeds take ${take}`];
           }
           const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
           const missing = expectedNames.filter((name) => !returnedNames.includes(name));
@@ -94,19 +95,20 @@ export class ContentDeliveryApiHelper {
     return contentItemsJson;
   }
 
-  async queryUntilNamesAbsent(filter: string | undefined, sort: string | undefined, unexpectedNames: string[], skip = 0, take = 100) {
-    expect(unexpectedNames.length, 'queryUntilNamesAbsent needs at least one unexpected name, or it asserts nothing').toBeGreaterThan(0);
+  async waitUntilContentQueryExcludesNames(filter: string | undefined, sort: string | undefined, unexpectedNames: string[], extraHeaders?: { [key: string]: string; }) {
+    const take = 100;
+    expect(unexpectedNames.length, 'waitUntilContentQueryExcludesNames needs at least one unexpected name, or it asserts nothing').toBeGreaterThan(0);
     let contentItemsJson;
     await expect
       .poll(
         async () => {
-          const response = await this.getContentItemsFromAQuery(undefined, undefined, filter, sort, skip, take);
+          const response = await this.getContentItemsFromAQuery(extraHeaders, undefined, filter, sort, 0, take);
           if (!response.ok()) {
             return [`query failed with status ${response.status()}`];
           }
           contentItemsJson = await response.json();
-          if (skip > 0 || contentItemsJson.total > take) {
-            return [`page too small to prove absence: total ${contentItemsJson.total} is not all on one page (skip ${skip}, take ${take})`];
+          if (contentItemsJson.total > take) {
+            return [`page too small to prove absence: total ${contentItemsJson.total} exceeds take ${take}`];
           }
           const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
           return unexpectedNames.filter((name) => returnedNames.includes(name));
@@ -117,11 +119,11 @@ export class ContentDeliveryApiHelper {
     return contentItemsJson;
   }
 
-  async queryUntilTotalIs(filter: string | undefined, expectedTotal: number) {
+  async waitUntilContentQueryTotalIs(filter: string | undefined, expectedTotal: number, extraHeaders?: { [key: string]: string; }) {
     await expect
       .poll(
         async () => {
-          const response = await this.getContentItemsFromAQuery(undefined, undefined, filter);
+          const response = await this.getContentItemsFromAQuery(extraHeaders, undefined, filter);
           if (!response.ok()) {
             return `query failed with status ${response.status()}`;
           }

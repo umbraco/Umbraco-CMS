@@ -10,6 +10,13 @@ const protectedContentName = 'DeliveryApiSearchRegressionProtectedContent';
 const unprotectedContentName = 'DeliveryApiSearchRegressionUnprotectedContent';
 const excludedContentNamePrefix = 'DeliveryApiSearchRegressionExcluded';
 const includedContentNamePrefix = 'DeliveryApiSearchRegressionIncluded';
+const sortSecondTypeContentName = includedContentNamePrefix + 'SecondType';
+const sortContentNameA = includedContentNamePrefix + 'B';
+const sortContentNameB = includedContentNamePrefix + 'A';
+const isNotIncludedContentName = includedContentNamePrefix + 'ForIsNot';
+const isNotExcludedContentName = excludedContentNamePrefix + 'ForIsNot';
+const doesNotContainExcludedContentName = excludedContentNamePrefix + 'DoesNotContain';
+const doesNotContainIncludedContentName = includedContentNamePrefix + 'DoesNotContain';
 // Member Group
 const memberGroupName = 'DeliveryApiSearchRegressionMemberGroup';
 
@@ -18,114 +25,91 @@ let secondDocumentTypeId = '';
 let loginPageContentId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
-  test.slow();
   documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName) ?? '';
   secondDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(secondDocumentTypeName) ?? '';
-  loginPageContentId = await umbracoApi.document.createDefaultDocument(loginPageContentName, secondDocumentTypeId) ?? '';
-  await umbracoApi.document.publish(loginPageContentId);
+  loginPageContentId = await umbracoApi.document.createPublishedDefaultDocument(loginPageContentName, secondDocumentTypeId);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(protectedContentName);
-  await umbracoApi.document.ensureNameNotExists(unprotectedContentName);
-  await umbracoApi.document.ensureNameNotExists(loginPageContentName);
+  for (const name of [protectedContentName, unprotectedContentName, sortSecondTypeContentName, sortContentNameA, sortContentNameB, isNotIncludedContentName, isNotExcludedContentName, doesNotContainExcludedContentName, doesNotContainIncludedContentName, loginPageContentName]) {
+    await umbracoApi.document.ensureNameNotExists(name);
+  }
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(secondDocumentTypeName);
   await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
 });
 
-test.describe('filter and sort content items', () => {
-  test('can combine a contentType filter with a sort', async ({umbracoApi}) => {
-    // Arrange
-    const secondTypeContentName = includedContentNamePrefix + 'SecondType';
-    const firstTypeContentNameA = includedContentNamePrefix + 'B';
-    const firstTypeContentNameB = includedContentNamePrefix + 'A';
+test('can combine a contentType filter with a sort', async ({umbracoApi}) => {
+  // Arrange
+  await umbracoApi.document.createPublishedDefaultDocument(sortSecondTypeContentName, secondDocumentTypeId);
+  await umbracoApi.document.createPublishedDefaultDocument(sortContentNameA, documentTypeId);
+  await umbracoApi.document.createPublishedDefaultDocument(sortContentNameB, documentTypeId);
+  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  const filter = 'contentType:' + documentTypeData.alias;
+  const sort = 'name:asc';
 
-    const secondTypeContentId = await umbracoApi.document.createDefaultDocument(secondTypeContentName, secondDocumentTypeId);
-    await umbracoApi.document.publish(secondTypeContentId);
-    const firstTypeContentIdA = await umbracoApi.document.createDefaultDocument(firstTypeContentNameA, documentTypeId);
-    await umbracoApi.document.publish(firstTypeContentIdA);
-    const firstTypeContentIdB = await umbracoApi.document.createDefaultDocument(firstTypeContentNameB, documentTypeId);
-    await umbracoApi.document.publish(firstTypeContentIdB);
+  // Act
+  const contentItemsJson = await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames(filter, sort, [sortContentNameA, sortContentNameB], 2);
 
-    const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-    const filter = 'contentType:' + documentTypeData.alias;
-    const sort = 'name:asc';
-
-    // Act
-    const contentItemsJson = await umbracoApi.contentDeliveryApi.queryUntilNamesPresent(filter, sort, [firstTypeContentNameA, firstTypeContentNameB], 2);
-
-    // Assert
-    expect(contentItemsJson.items[0].name).toBe(firstTypeContentNameB);
-    expect(contentItemsJson.items[1].name).toBe(firstTypeContentNameA);
-  });
-
-  test('can exclude content items using the contentType IsNot filter operator', async ({umbracoApi}) => {
-    // Arrange
-    const secondTypeContentName = includedContentNamePrefix + 'ForIsNot';
-    const secondTypeContentId = await umbracoApi.document.createDefaultDocument(secondTypeContentName, secondDocumentTypeId);
-    await umbracoApi.document.publish(secondTypeContentId);
-    const firstTypeContentName = excludedContentNamePrefix + 'ForIsNot';
-    const firstTypeContentId = await umbracoApi.document.createDefaultDocument(firstTypeContentName, documentTypeId);
-    await umbracoApi.document.publish(firstTypeContentId);
-
-    const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-    const filter = 'contentType:!' + documentTypeData.alias;
-
-    await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('contentType:' + documentTypeData.alias, undefined, [firstTypeContentName]);
-
-    // Act
-    const contentItemsJson = await umbracoApi.contentDeliveryApi.queryUntilNamesPresent(filter, undefined, [secondTypeContentName, loginPageContentName]);
-
-    // Assert
-    const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
-    expect(returnedNames).not.toContain(firstTypeContentName);
-  });
-
-  test('can exclude content items using the name DoesNotContain filter operator', async ({umbracoApi}) => {
-    // Arrange
-    const excludedContentName = excludedContentNamePrefix + 'DoesNotContain';
-    const includedContentName = includedContentNamePrefix + 'DoesNotContain';
-    const excludedContentId = await umbracoApi.document.createDefaultDocument(excludedContentName, documentTypeId);
-    await umbracoApi.document.publish(excludedContentId);
-    const includedContentId = await umbracoApi.document.createDefaultDocument(includedContentName, documentTypeId);
-    await umbracoApi.document.publish(includedContentId);
-
-    const filter = 'name:!' + excludedContentNamePrefix;
-
-    await umbracoApi.contentDeliveryApi.queryUntilNamesPresent('contentType:' + (await umbracoApi.documentType.getByName(documentTypeName)).alias, undefined, [excludedContentName, includedContentName]);
-
-    // Act
-    const contentItemsJson = await umbracoApi.contentDeliveryApi.queryUntilNamesPresent(filter, undefined, [includedContentName]);
-
-    // Assert
-    const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
-    expect(returnedNames).not.toContain(excludedContentName);
-  });
+  // Assert
+  expect(contentItemsJson.items[0].name).toBe(sortContentNameB);
+  expect(contentItemsJson.items[1].name).toBe(sortContentNameA);
 });
 
-test.describe('member-protected content is excluded from anonymous requests', () => {
-  test('excludes a member-protected content item from filter query results and direct-by-id fetch for anonymous requests', async ({umbracoApi}) => {
-    // Arrange
-    await umbracoApi.memberGroup.createDefaultMemberGroup(memberGroupName);
-    const protectedContentId = await umbracoApi.document.createDefaultDocument(protectedContentName, documentTypeId) ?? '';
-    await umbracoApi.document.publish(protectedContentId);
-    const unprotectedContentId = await umbracoApi.document.createDefaultDocument(unprotectedContentName, documentTypeId) ?? '';
-    await umbracoApi.document.publish(unprotectedContentId);
-    const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-    const filter = 'contentType:' + documentTypeData.alias;
+test('can exclude content items using the contentType IsNot filter operator', async ({umbracoApi}) => {
+  test.slow();
 
-    await umbracoApi.contentDeliveryApi.queryUntilNamesPresent(filter, undefined, [protectedContentName, unprotectedContentName]);
-    await umbracoApi.document.setPublicAccessForDocument(protectedContentId, [memberGroupName], loginPageContentId, loginPageContentId);
+  // Arrange
+  await umbracoApi.document.createPublishedDefaultDocument(isNotIncludedContentName, secondDocumentTypeId);
+  await umbracoApi.document.createPublishedDefaultDocument(isNotExcludedContentName, documentTypeId);
+  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  const filter = 'contentType:!' + documentTypeData.alias;
+  await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames('contentType:' + documentTypeData.alias, undefined, [isNotExcludedContentName]);
 
-    // Act
-    const contentItemsJson = await umbracoApi.contentDeliveryApi.queryUntilNamesAbsent(filter, undefined, [protectedContentName]);
-    const directItem = await umbracoApi.contentDeliveryApi.getContentItemWithId(protectedContentId);
+  // Act
+  const contentItemsJson = await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames(filter, undefined, [isNotIncludedContentName, loginPageContentName]);
 
-    // Assert
-    const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
-    expect(returnedNames).toContain(unprotectedContentName);
+  // Assert
+  const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
+  expect(returnedNames).not.toContain(isNotExcludedContentName);
+});
 
-    expect(directItem.status()).toBe(401);
-  });
+test('can exclude content items using the name DoesNotContain filter operator', async ({umbracoApi}) => {
+  test.slow();
+
+  // Arrange
+  await umbracoApi.document.createPublishedDefaultDocument(doesNotContainExcludedContentName, documentTypeId);
+  await umbracoApi.document.createPublishedDefaultDocument(doesNotContainIncludedContentName, documentTypeId);
+  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  const filter = 'name:!' + excludedContentNamePrefix;
+  await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames('contentType:' + documentTypeData.alias, undefined, [doesNotContainExcludedContentName, doesNotContainIncludedContentName]);
+
+  // Act
+  const contentItemsJson = await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames(filter, undefined, [doesNotContainIncludedContentName]);
+
+  // Assert
+  const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
+  expect(returnedNames).not.toContain(doesNotContainExcludedContentName);
+});
+
+test('cannot get member-protected content anonymously from a filter query or by id', async ({umbracoApi}) => {
+  test.slow();
+
+  // Arrange
+  await umbracoApi.memberGroup.createDefaultMemberGroup(memberGroupName);
+  const protectedContentId = await umbracoApi.document.createPublishedDefaultDocument(protectedContentName, documentTypeId);
+  await umbracoApi.document.createPublishedDefaultDocument(unprotectedContentName, documentTypeId);
+  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  const filter = 'contentType:' + documentTypeData.alias;
+  await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames(filter, undefined, [protectedContentName, unprotectedContentName]);
+  await umbracoApi.document.setPublicAccessForDocument(protectedContentId, [memberGroupName], loginPageContentId, loginPageContentId);
+
+  // Act
+  const contentItemsJson = await umbracoApi.contentDeliveryApi.waitUntilContentQueryExcludesNames(filter, undefined, [protectedContentName]);
+  const directItem = await umbracoApi.contentDeliveryApi.getContentItemWithId(protectedContentId);
+
+  // Assert
+  const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
+  expect(returnedNames).toContain(unprotectedContentName);
+  expect(directItem.status()).toBe(401);
 });

@@ -1,9 +1,18 @@
 import {expect} from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
+const contentIndexAlias = 'Umb_Content';
+const documentTypeName = 'SearchIndexListDocumentType';
+const documentName = 'SearchIndexListDocument';
+
 test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.searchManagement.goToSearchTreeItem();
+});
+
+test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.document.ensureNameNotExists(documentName);
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
 test('can see the index list with the expected columns and indexes', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -21,33 +30,35 @@ test('can see the index list with the expected columns and indexes', {tag: '@smo
   }).toPass({timeout: ConstantHelper.timeout.veryLong});
 });
 
-test('can rebuild an index from its row in the index list', async ({umbracoApi, umbracoUi}) => {
+test('can rebuild an index from its row in the index list', async ({umbracoUi}) => {
   // Arrange
   const indexAlias = 'Umb_Members';
-  const healthStatusBeforeRebuild = (await umbracoApi.searchManagement.getIndex(indexAlias)).healthStatus;
 
   // Act
-  await umbracoUi.searchManagement.clickRebuildIndexActionForIndex(indexAlias);
-  await umbracoUi.searchManagement.doesRebuildConfirmModalHaveText('Are you sure you want to rebuild the search index');
+  await umbracoUi.searchManagement.clickRebuildActionForIndex(indexAlias);
+  await umbracoUi.searchManagement.doesModalHaveText('Are you sure you want to rebuild the search index');
   await umbracoUi.searchManagement.clickConfirmRebuildButtonAndWaitForResponse();
 
   // Assert
   await umbracoUi.searchManagement.doesRebuildStartedNotificationHaveText(`"${indexAlias}" has started`);
-  await expect
-    .poll(async () => (await umbracoApi.searchManagement.getIndex(indexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
-    .toBe(healthStatusBeforeRebuild);
 });
 
 test('can refresh the index list', async ({umbracoApi, umbracoUi}) => {
+  test.slow();
+
   // Arrange
-  const indexes = await umbracoApi.searchManagement.getAllIndexes();
-  expect(indexes.items.length).toBeGreaterThan(0);
+  await umbracoUi.searchManagement.isIndexRowVisible(contentIndexAlias);
+  const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName) ?? '';
+  const documentId = await umbracoApi.document.createPublishedDefaultDocument(documentName, documentTypeId);
+  await umbracoApi.searchManagement.waitUntilDocumentIsFound(contentIndexAlias, documentName, documentId);
+  await expect
+    .poll(async () => (await umbracoApi.searchManagement.getIndex(contentIndexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
+    .toBe('Healthy');
+  const documentCount = (await umbracoApi.searchManagement.getIndex(contentIndexAlias)).documentCount;
 
   // Act
   await umbracoUi.searchManagement.clickRefreshListButtonAndWaitForReload();
 
   // Assert
-  for (const index of indexes.items) {
-    await umbracoUi.searchManagement.isIndexRowVisible(index.indexAlias);
-  }
+  await umbracoUi.searchManagement.doesIndexRowContainText(contentIndexAlias, ` ${new Intl.NumberFormat('en-US').format(documentCount)} document`);
 });

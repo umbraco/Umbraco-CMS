@@ -5,20 +5,16 @@ const indexAlias = 'Umb_Content';
 const documentTypeName = 'SearchIndexDetailDocumentType';
 const documentName = 'SearchIndexDetailDocument';
 
-let documentId = '';
-
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  test.slow();
   await umbracoApi.document.ensureNameNotExists(documentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 
-  const indexes = await umbracoApi.searchManagement.getAllIndexes();
-  expect(indexes.items.some((index) => index.indexAlias === indexAlias), `the ${indexAlias} index must exist`).toBeTruthy();
-
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
-  documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId) ?? '';
-  await umbracoApi.document.publish(documentId);
+  const documentId = await umbracoApi.document.createPublishedDefaultDocument(documentName, documentTypeId);
   await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, documentName, documentId);
+  await expect
+    .poll(async () => (await umbracoApi.searchManagement.getIndex(indexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
+    .toBe('Healthy');
 
   await umbracoUi.goToBackOffice();
   await umbracoUi.searchManagement.goToSearchTreeItem();
@@ -38,33 +34,30 @@ test('can see the index statistics', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.searchManagement.isStatsBoxVisible();
   await umbracoUi.searchManagement.doesStatsBoxContainText(indexAlias);
   await umbracoUi.searchManagement.doesStatsBoxContainText(providerName);
-  expect(await umbracoUi.searchManagement.getStatsBoxHealthStatusText()).toContain('Healthy');
+  await umbracoUi.searchManagement.doesStatsBoxHealthStatusHaveText('Healthy');
 });
 
-test('can rebuild the index', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can rebuild the index', {tag: '@smoke'}, async ({umbracoUi}) => {
   // Act
-  await umbracoUi.searchManagement.clickRebuildIndexEntityAction();
+  await umbracoUi.searchManagement.clickRebuildIndexWorkspaceAction();
 
   // Assert
-  await umbracoUi.searchManagement.doesRebuildConfirmModalHaveText('Rebuild Search Index');
-  await umbracoUi.searchManagement.doesRebuildConfirmModalHaveText('Are you sure you want to rebuild the search index');
+  await umbracoUi.searchManagement.doesModalHaveText('Rebuild Search Index');
+  await umbracoUi.searchManagement.doesModalHaveText('Are you sure you want to rebuild the search index');
 
   // Act
   await umbracoUi.searchManagement.clickConfirmRebuildButtonAndWaitForResponse();
 
+  // Assert
   await umbracoUi.searchManagement.doesRebuildStartedNotificationHaveText(`"${indexAlias}" has started`);
-
-  await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, documentName, documentId);
-
-  await expect
-    .poll(async () => (await umbracoApi.searchManagement.getIndex(indexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
-    .toBe('Healthy');
 });
 
 // TODO: link the issue and unskip once the back office receives the IndexRebuildCompleted server event [AZ]
-test.fixme('shows the rebuild as completed when it finishes', async ({umbracoUi}) => {
+test.fixme('can see that the rebuild has completed', async ({umbracoUi}) => {
+  test.slow();
+
   // Act
-  await umbracoUi.searchManagement.clickRebuildIndexEntityAction();
+  await umbracoUi.searchManagement.clickRebuildIndexWorkspaceAction();
   await umbracoUi.searchManagement.clickConfirmRebuildButtonAndWaitForResponse();
 
   // Assert

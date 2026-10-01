@@ -16,17 +16,11 @@ const pagingToken = 'SearchIndexSearchBoxPaging';
 const pagingDocumentNames = Array.from({length: searchResultsPageSize + 1}, (_, i) => `${pagingToken} Item${i + 1}`);
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  test.slow();
   await umbracoApi.document.ensureNameNotExists(documentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
-  const documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
-  await umbracoApi.document.publish(documentId);
-
-  const indexes = await umbracoApi.searchManagement.getAllIndexes();
-  const contentIndex = indexes.items.find((index) => index.indexAlias === indexAlias);
-  expect(contentIndex, `the ${indexAlias} index must exist`).toBeTruthy();
+  const documentId = await umbracoApi.document.createPublishedDefaultDocument(documentName, documentTypeId);
 
   await expect
     .poll(async () => (await umbracoApi.searchManagement.getIndex(indexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
@@ -39,11 +33,16 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(documentName);
+  for (const name of [documentName, decoyDocumentName, ...pagingDocumentNames]) {
+    await umbracoApi.document.ensureNameNotExists(name);
+  }
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.document.ensureNameNotExists(cultureDocumentName);
+  await umbracoApi.documentType.ensureNameNotExists(cultureDocumentTypeName);
+  await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
 });
 
-test('shows no results message for a query with no matches', {tag: '@smoke'}, async ({umbracoUi}) => {
+test('can see a no results message for a query with no matches', {tag: '@smoke'}, async ({umbracoUi}) => {
   // Act
   await umbracoUi.searchManagement.searchForQueryAndWaitForResponse('ThisQueryShouldNotMatchAnyIndexedDocument1234567890');
 
@@ -52,31 +51,26 @@ test('shows no results message for a query with no matches', {tag: '@smoke'}, as
   await umbracoUi.searchManagement.isSearchResultsTableVisible(false);
 });
 
-test.describe('results', () => {
-  test.afterEach(async ({umbracoApi}) => {
-    await umbracoApi.document.ensureNameNotExists(decoyDocumentName);
-  });
+test('can see only the documents that match the query', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const documentTypeId = (await umbracoApi.documentType.getByName(documentTypeName)).id;
+  const decoyDocumentId = await umbracoApi.document.createPublishedDefaultDocument(decoyDocumentName, documentTypeId);
+  await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, decoyDocumentName, decoyDocumentId);
+  await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(decoyDocumentName);
+  await umbracoUi.searchManagement.doesSearchResultsTableContainText(decoyDocumentName);
 
-  test('shows only the documents that match the query', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    const documentTypeId = (await umbracoApi.documentType.getByName(documentTypeName)).id;
-    const decoyDocumentId = await umbracoApi.document.createDefaultDocument(decoyDocumentName, documentTypeId);
-    await umbracoApi.document.publish(decoyDocumentId);
-    await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, decoyDocumentName, decoyDocumentId);
+  // Act
+  await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(documentName);
 
-    // Act
-    await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(documentName);
-
-    // Assert
-    await umbracoUi.searchManagement.isSearchResultsTableVisible();
-    await umbracoUi.searchManagement.isSearchNoResultsMessageVisible(false);
-    await umbracoUi.searchManagement.doesSearchResultsTableContainText(documentName);
-    await umbracoUi.searchManagement.doesSearchResultsTableNotContainText(decoyDocumentName);
-    await umbracoUi.searchManagement.isSearchPaginationVisible(false);
-  });
+  // Assert
+  await umbracoUi.searchManagement.isSearchResultsTableVisible();
+  await umbracoUi.searchManagement.isSearchNoResultsMessageVisible(false);
+  await umbracoUi.searchManagement.doesSearchResultsTableContainText(documentName);
+  await umbracoUi.searchManagement.doesSearchResultsTableNotContainText(decoyDocumentName);
+  await umbracoUi.searchManagement.isSearchPaginationVisible(false);
 });
 
-test('opens the document from its search result', async ({umbracoApi, umbracoUi}) => {
+test('can open a document from its search result', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentId = (await umbracoApi.document.getByName(documentName)).id;
   await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(documentName);
@@ -88,65 +82,52 @@ test('opens the document from its search result', async ({umbracoApi, umbracoUi}
   await expect(umbracoUi.page).toHaveURL(new RegExp(`/document/edit/${documentId}`));
 });
 
-test.describe('culture', () => {
-  test.afterEach(async ({umbracoApi}) => {
-    await umbracoApi.document.ensureNameNotExists(cultureDocumentName);
-    await umbracoApi.documentType.ensureNameNotExists(cultureDocumentTypeName);
-    await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
-  });
+test('can only find a culture\'s value when that culture is selected', async ({umbracoApi, umbracoUi}) => {
+  test.slow();
 
-  test('only finds a culture\'s value when that culture is selected', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    await umbracoApi.language.createDanishLanguage();
-    const textstringDataType = await umbracoApi.dataType.getByName('Textstring');
-    const cultureDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(cultureDocumentTypeName, 'Textstring', textstringDataType.id, 'CultureGroup', true, true) ?? '';
-    const cultureDocumentId = await umbracoApi.document.createDocumentWithTwoCultureSpecificValues(cultureDocumentName, cultureDocumentTypeId, 'Textstring', englishIsoCode, englishSearchableValue, danishIsoCode, danishSearchableValue) ?? '';
-    await umbracoApi.document.publishDocumentWithCultures(cultureDocumentId, [englishIsoCode, danishIsoCode]);
-    await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, danishSearchableValue, cultureDocumentId, danishIsoCode);
-    await umbracoUi.goToBackOffice();
-    await umbracoUi.searchManagement.goToSearchTreeItem();
-    await umbracoUi.searchManagement.goToIndexWithAlias(indexAlias);
+  // Arrange
+  await umbracoApi.language.createDanishLanguage();
+  const textstringDataType = await umbracoApi.dataType.getByName('Textstring');
+  const cultureDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(cultureDocumentTypeName, 'Textstring', textstringDataType.id, 'CultureGroup', true, true) ?? '';
+  const cultureDocumentId = await umbracoApi.document.createDocumentWithTwoCultureSpecificValues(cultureDocumentName, cultureDocumentTypeId, 'Textstring', englishIsoCode, englishSearchableValue, danishIsoCode, danishSearchableValue) ?? '';
+  await umbracoApi.document.publishDocumentWithCultures(cultureDocumentId, [englishIsoCode, danishIsoCode]);
+  await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, danishSearchableValue, cultureDocumentId, danishIsoCode);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.searchManagement.goToSearchTreeItem();
+  await umbracoUi.searchManagement.goToIndexWithAlias(indexAlias);
 
-    // Act
-    await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(danishSearchableValue);
+  // Act
+  await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(danishSearchableValue);
 
-    // Assert
-    await umbracoUi.searchManagement.isSearchNoResultsMessageVisible();
+  // Assert
+  await umbracoUi.searchManagement.isSearchNoResultsMessageVisible();
 
-    // Act
-    await umbracoUi.searchManagement.selectSearchCulture('Danish');
-    await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(danishSearchableValue);
+  // Act
+  await umbracoUi.searchManagement.selectSearchCulture('Danish');
+  await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(danishSearchableValue);
 
-    // Assert
-    await umbracoUi.searchManagement.isSearchResultsTableVisible();
-    await umbracoUi.searchManagement.doesSearchResultsTableContainText(cultureDocumentId);
-  });
+  // Assert
+  await umbracoUi.searchManagement.isSearchResultsTableVisible();
+  await umbracoUi.searchManagement.doesSearchResultsTableContainText(cultureDocumentId);
 });
 
-test.describe('pagination', () => {
-  test.afterEach(async ({umbracoApi}) => {
-    for (const name of pagingDocumentNames) {
-      await umbracoApi.document.ensureNameNotExists(name);
-    }
-  });
+test('can see pagination when the results span more than one page', async ({umbracoApi, umbracoUi}) => {
+  test.slow();
 
-  test('shows pagination when the results span more than one page', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    const documentTypeId = (await umbracoApi.documentType.getByName(documentTypeName)).id;
-    for (const name of pagingDocumentNames) {
-      const pagingDocumentId = await umbracoApi.document.createDefaultDocument(name, documentTypeId);
-      await umbracoApi.document.publish(pagingDocumentId);
-    }
-    await expect
-      .poll(async () => (await umbracoApi.searchManagement.search(indexAlias, pagingToken)).total, {timeout: ConstantHelper.timeout.pageLoad})
-      .toBe(pagingDocumentNames.length);
+  // Arrange
+  const documentTypeId = (await umbracoApi.documentType.getByName(documentTypeName)).id;
+  for (const name of pagingDocumentNames) {
+    await umbracoApi.document.createPublishedDefaultDocument(name, documentTypeId);
+  }
+  await expect
+    .poll(async () => (await umbracoApi.searchManagement.search(indexAlias, pagingToken)).total, {timeout: ConstantHelper.timeout.pageLoad})
+    .toBe(pagingDocumentNames.length);
 
-    // Act
-    await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(pagingToken);
+  // Act
+  await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(pagingToken);
 
-    // Assert
-    await umbracoUi.searchManagement.isSearchResultsTableVisible();
-    await umbracoUi.searchManagement.doesSearchResultsCountHaveText(`Found ${pagingDocumentNames.length} results`);
-    await umbracoUi.searchManagement.isSearchPaginationVisible();
-  });
+  // Assert
+  await umbracoUi.searchManagement.isSearchResultsTableVisible();
+  await umbracoUi.searchManagement.doesSearchResultsCountHaveText(`Found ${pagingDocumentNames.length} results`);
+  await umbracoUi.searchManagement.isSearchPaginationVisible();
 });

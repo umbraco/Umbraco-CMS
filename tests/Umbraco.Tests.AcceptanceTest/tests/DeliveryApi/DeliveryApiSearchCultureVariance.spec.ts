@@ -1,61 +1,54 @@
-import {expect} from '@playwright/test';
-import {ApiHelpers, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {test} from '@umbraco/acceptance-test-helpers';
 
 const danishIsoCode = 'da';
 const englishIsoCode = 'en-US';
 const documentTypeName = 'DeliveryApiSearchCultureVarianceDocumentType';
 const englishName = 'DeliveryApiSearchCultureVariance English';
 const danishName = 'DeliveryApiSearchCultureVariance Danish';
+const englishOnlyDocumentTypeName = 'DeliveryApiSearchCultureVarianceEnglishOnlyDocumentType';
+const englishOnlyDocumentName = 'DeliveryApiSearchCultureVariance EnglishOnly';
+const textstringDataTypeName = 'Textstring';
 
 let documentTypeId = '';
 
-async function queryForCulture(umbracoApi: ApiHelpers, culture: string, filter: string) {
-  const response = await umbracoApi.contentDeliveryApi.getContentItemsFromAQuery({'Accept-Language': culture}, undefined, filter);
-  return await response.json();
-}
-
-async function queryNamesForCulture(umbracoApi: ApiHelpers, culture: string, filter: string) {
-  return (await queryForCulture(umbracoApi, culture, filter)).items.map((item: {name: string}) => item.name);
-}
-
 test.beforeEach(async ({umbracoApi}) => {
-  test.slow();
   await umbracoApi.language.createDanishLanguage();
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithTextstringAndAllowAsRootAndAllowSelfAsChild(documentTypeName, true) ?? '';
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(englishName);
+  await umbracoApi.document.ensureNameNotExists(englishOnlyDocumentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(englishOnlyDocumentTypeName);
   await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
 });
 
-test('indexes each culture variant separately and returns only the requested culture\'s name', async ({umbracoApi}) => {
-  // Arrange
-  const documentIds = await umbracoApi.document.createPublishedVariantChain(documentTypeId, [{[englishIsoCode]: englishName, [danishIsoCode]: danishName}]);
-  const documentId = documentIds[0];
-  const filter = 'contentType:' + (await umbracoApi.documentType.getByName(documentTypeName)).alias;
+test('can query each culture variant separately', async ({umbracoApi}) => {
+  test.slow();
 
-  // Act
-  await expect
-    .poll(async () => queryNamesForCulture(umbracoApi, englishIsoCode, filter), {timeout: ConstantHelper.timeout.pageLoad})
-    .toContain(englishName);
-  await expect
-    .poll(async () => queryNamesForCulture(umbracoApi, danishIsoCode, filter), {timeout: ConstantHelper.timeout.pageLoad})
-    .toContain(danishName);
+  // Arrange
+  await umbracoApi.document.createPublishedVariantChain(documentTypeId, [{[englishIsoCode]: englishName, [danishIsoCode]: danishName}]);
+  const filter = 'contentType:' + (await umbracoApi.documentType.getByName(documentTypeName)).alias;
+  await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames(filter, undefined, [englishName], undefined, {'Accept-Language': englishIsoCode});
+  await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames(filter, undefined, [danishName], undefined, {'Accept-Language': danishIsoCode});
 
   // Assert
-  await expect
-    .poll(async () => (await queryForCulture(umbracoApi, englishIsoCode, filter)).total, {timeout: ConstantHelper.timeout.pageLoad})
-    .toBe(1);
-  expect(await queryNamesForCulture(umbracoApi, englishIsoCode, filter)).toEqual([englishName]);
+  await umbracoApi.contentDeliveryApi.waitUntilContentQueryTotalIs(filter, 1, {'Accept-Language': englishIsoCode});
+  await umbracoApi.contentDeliveryApi.waitUntilContentQueryTotalIs(filter, 1, {'Accept-Language': danishIsoCode});
+});
 
-  await expect
-    .poll(async () => (await queryForCulture(umbracoApi, danishIsoCode, filter)).total, {timeout: ConstantHelper.timeout.pageLoad})
-    .toBe(1);
-  expect(await queryNamesForCulture(umbracoApi, danishIsoCode, filter)).toEqual([danishName]);
+test('cannot find a culture variant that is not published', async ({umbracoApi}) => {
+  test.slow();
 
-  const englishItem = await umbracoApi.contentDeliveryApi.getContentItemWithId(documentId, {'Accept-Language': englishIsoCode});
-  const englishItemJson = await englishItem.json();
-  expect(englishItemJson.name).toBe(englishName);
+  // Arrange
+  const textstringDataType = await umbracoApi.dataType.getByName(textstringDataTypeName);
+  const englishOnlyDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(englishOnlyDocumentTypeName, textstringDataTypeName, textstringDataType.id, 'CultureGroup', true, true) ?? '';
+  const documentId = await umbracoApi.document.createDocumentWithTwoCultureSpecificValues(englishOnlyDocumentName, englishOnlyDocumentTypeId, textstringDataTypeName, englishIsoCode, 'English value', danishIsoCode, 'Danish value') ?? '';
+  await umbracoApi.document.publishDocumentWithCulture(documentId, englishIsoCode);
+  const filter = 'contentType:' + (await umbracoApi.documentType.getByName(englishOnlyDocumentTypeName)).alias;
+  await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames(filter, undefined, [englishOnlyDocumentName], 1, {'Accept-Language': englishIsoCode});
+
+  // Assert
+  await umbracoApi.contentDeliveryApi.waitUntilContentQueryTotalIs(filter, 0, {'Accept-Language': danishIsoCode});
 });

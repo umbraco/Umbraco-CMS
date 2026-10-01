@@ -64,7 +64,7 @@ export class SearchManagementUiHelper extends UiBaseLocators {
     }
   }
 
-  async clickRebuildIndexActionForIndex(indexAlias: string) {
+  async clickRebuildActionForIndex(indexAlias: string) {
     // The slotted icon intercepts pointer events, so a plain click never fires.
     await this.click(this.indexRowByAlias(indexAlias).getByRole('button', {name: 'Rebuild Index', exact: true}), {force: true});
   }
@@ -90,17 +90,13 @@ export class SearchManagementUiHelper extends UiBaseLocators {
     await this.containsText(this.statsBox, text);
   }
 
-  async getStatsBoxHealthStatusText() {
-    return await this.getText(this.statsBoxHealthTag);
+  async doesStatsBoxHealthStatusHaveText(text: string) {
+    await this.containsText(this.statsBoxHealthTag, text);
   }
 
-  async clickRebuildIndexEntityAction() {
+  async clickRebuildIndexWorkspaceAction() {
     await this.clickActionButton();
     await this.clickEntityActionWithName('RebuildIndex');
-  }
-
-  async doesRebuildConfirmModalHaveText(text: string) {
-    await this.doesModalHaveText(text);
   }
 
   async clickConfirmRebuildButton() {
@@ -117,7 +113,7 @@ export class SearchManagementUiHelper extends UiBaseLocators {
   }
 
   async doesRebuildStartedNotificationHaveText(text: string) {
-    await this.containsText(this.warningNotification, text);
+    await this.isVisible(this.warningNotification.filter({hasText: text}));
   }
 
   async enterSearchQuery(query: string) {
@@ -125,7 +121,7 @@ export class SearchManagementUiHelper extends UiBaseLocators {
   }
 
   async selectSearchCulture(cultureName: string) {
-    await this.searchCultureSelect.selectOption({label: cultureName});
+    await this.selectByText(this.searchCultureSelect, cultureName);
   }
 
   async clickSearchSubmitButton() {
