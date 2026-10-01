@@ -16,7 +16,11 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import type {
+	UmbEntityVariantModel,
+	UmbEntityVariantOptionModel,
+	UmbObjectWithVariantProperties,
+} from '@umbraco-cms/backoffice/variant';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_HINT_CONTEXT } from '@umbraco-cms/backoffice/hint';
 import type { UmbHint, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
@@ -268,8 +272,23 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		return this.#isCreated(variantOption) || this.#isVariantActive(variantId);
 	}
 
+	/**
+	 * Checks whether the workspace holds value data for a given segment of a given culture.
+	 * A property that varies by segment but not by culture stores its values without a culture,
+	 * so a culture-invariant entry counts as data for every culture.
+	 * @param {UmbObjectWithVariantProperties} variant - The culture and segment to look for.
+	 * @returns {boolean} True if the data holds a value for that culture and segment.
+	 */
+	protected _hasDataForSegment(variant: UmbObjectWithVariantProperties): boolean {
+		return (
+			this._variantsWithData?.some(
+				(v) => (v.culture === variant.culture || v.culture === null) && v.segment === variant.segment,
+			) ?? false
+		);
+	}
+
 	#isSegmentCreateMode(variantId: UmbVariantId) {
-		if (this._variantsWithData?.some((v) => v.segment === variantId.segment)) {
+		if (this._hasDataForSegment(variantId)) {
 			return true;
 		}
 		// Is this already created or is it active/in process to be created.
