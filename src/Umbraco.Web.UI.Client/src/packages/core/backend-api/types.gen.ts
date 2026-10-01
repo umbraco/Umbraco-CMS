@@ -9461,8 +9461,12 @@ export type GetItemElementSearchData = {
     path?: never;
     query?: {
         query?: string;
+        trashed?: boolean;
+        culture?: string;
         skip?: number;
         take?: number;
+        parentId?: string;
+        allowedElementTypes?: Array<string>;
     };
     url: '/umbraco/management/api/v1/item/element/search';
 };

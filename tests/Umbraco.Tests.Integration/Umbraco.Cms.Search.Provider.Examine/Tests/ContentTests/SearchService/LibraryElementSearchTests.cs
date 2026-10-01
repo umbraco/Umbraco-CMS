@@ -197,6 +197,86 @@ public class LibraryElementSearchTests : SearcherTestBase
         });
     }
 
+    [TestCase("en-US", "englishname", true)]
+    [TestCase("en-US", "danishname", false)]
+    [TestCase("da-DK", "danishname", true)]
+    [TestCase("da-DK", "englishname", false)]
+    [TestCase(null, "englishname", false)]
+    public async Task Culture_Variant_LibraryElement_Is_Searched_In_The_Requested_Culture(string? culture, string query, bool expectFound)
+    {
+        await LanguageService.CreateAsync(new LanguageBuilder().WithCultureInfo("da-DK").Build(), Constants.Security.SuperUserKey);
+        IContentType variantElementType = new ContentTypeBuilder()
+            .WithAlias("variantLibraryElementType")
+            .WithName("Variant library element type")
+            .WithIsElement(true)
+            .WithAllowedInLibrary(true)
+            .WithAllowAsRoot(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .Build();
+        await ContentTypeService.CreateAsync(variantElementType, Constants.Security.SuperUserKey);
+
+        IElement? element = null;
+        await WaitForIndexing(ElementsIndexAlias, async () =>
+        {
+            Attempt<ElementCreateResult, ContentEditingOperationStatus> result = await ElementEditingService.CreateAsync(
+                new ElementCreateModel
+                {
+                    ContentTypeKey = variantElementType.Key,
+                    Variants =
+                    [
+                        new VariantModel { Culture = "en-US", Name = "Englishname element" },
+                        new VariantModel { Culture = "da-DK", Name = "Danishname element" },
+                    ],
+                },
+                Constants.Security.SuperUserKey);
+            Assert.That(result.Success, Is.True);
+            element = result.Result.Content;
+        });
+
+        PagedModel<IEntitySlim> searchResult = await IndexedEntitySearchService.SearchAsync(
+            UmbracoObjectTypes.Element,
+            query,
+            parentId: null,
+            contentTypeIds: null,
+            trashed: null,
+            culture: culture);
+
+        Assert.That(
+            searchResult.Items.Select(item => item.Key),
+            expectFound ? Is.EquivalentTo(new[] { element!.Key }) : Is.Empty);
+    }
+
+    [TestCase(null, true, true)]
+    [TestCase(true, true, false)]
+    [TestCase(false, false, true)]
+    public async Task Search_Filters_LibraryElements_By_Trashed_State(bool? trashed, bool expectTrashed, bool expectActive)
+    {
+        IElement trashedElement = await CreateElementAsync(null, "Trashed element", "trashfilter text");
+        IElement activeElement = await CreateElementAsync(null, "Active element", "trashfilter text");
+        await WaitForIndexing(ElementsIndexAlias, async () =>
+            Assert.That((await ElementEditingService.MoveToRecycleBinAsync(trashedElement.Key, Constants.Security.SuperUserKey)).Success, Is.True));
+
+        PagedModel<IEntitySlim> searchResult = await IndexedEntitySearchService.SearchAsync(
+            UmbracoObjectTypes.Element,
+            "trashfilter",
+            parentId: null,
+            contentTypeIds: null,
+            trashed: trashed);
+
+        var expected = new List<Guid>();
+        if (expectTrashed)
+        {
+            expected.Add(trashedElement.Key);
+        }
+
+        if (expectActive)
+        {
+            expected.Add(activeElement.Key);
+        }
+
+        Assert.That(searchResult.Items.Select(item => item.Key), Is.EquivalentTo(expected));
+    }
+
     private async Task<IElement> CreateElementAsync(Guid? containerKey, string name, string title)
     {
         IElement? element = null;

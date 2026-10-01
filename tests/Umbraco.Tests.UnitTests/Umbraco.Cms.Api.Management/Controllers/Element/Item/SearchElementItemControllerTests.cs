@@ -59,7 +59,7 @@ public class SearchElementItemControllerTests
             .Setup(x => x.CreateItemResponseModelAsync(It.IsAny<IElementEntitySlim>()))
             .ReturnsAsync((IElementEntitySlim entity) => new ElementItemResponseModel { Id = entity.Key });
 
-        IActionResult result = await _controller.Search(CancellationToken.None, "test");
+        IActionResult result = await _controller.SearchWithFilters(CancellationToken.None, "test");
 
         OkObjectResult? okResult = result as OkObjectResult;
         Assert.That(okResult, Is.Not.Null);
@@ -71,5 +71,49 @@ public class SearchElementItemControllerTests
             Assert.That(pagedModel.Total, Is.EqualTo(42));
             Assert.That(items.Select(item => item.Id), Is.EqualTo(new[] { keyC, keyA, keyB }));
         });
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    [TestCase(null)]
+    public async Task Search_Element_Forwards_All_Filters_To_The_Search_Service(bool? trashed)
+    {
+        var parentId = Guid.NewGuid();
+        Guid[] allowedElementTypes = [Guid.NewGuid(), Guid.NewGuid()];
+        _indexedEntitySearchService
+            .Setup(x => x.SearchAsync(
+                It.IsAny<UmbracoObjectTypes>(),
+                It.IsAny<string>(),
+                It.IsAny<Guid?>(),
+                It.IsAny<IEnumerable<Guid>?>(),
+                It.IsAny<bool?>(),
+                It.IsAny<string?>(),
+                It.IsAny<int>(),
+                It.IsAny<int>(),
+                It.IsAny<bool>()))
+            .ReturnsAsync(new PagedModel<IEntitySlim>());
+
+        await _controller.SearchWithFilters(
+            CancellationToken.None,
+            "test",
+            trashed,
+            "da-DK",
+            skip: 10,
+            take: 20,
+            parentId,
+            allowedElementTypes);
+
+        _indexedEntitySearchService.Verify(
+            x => x.SearchAsync(
+                UmbracoObjectTypes.Element,
+                "test",
+                parentId,
+                allowedElementTypes,
+                trashed,
+                "da-DK",
+                10,
+                20,
+                It.IsAny<bool>()),
+            Times.Once);
     }
 }
