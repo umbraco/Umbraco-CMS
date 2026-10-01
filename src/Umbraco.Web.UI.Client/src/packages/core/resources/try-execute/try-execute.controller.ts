@@ -20,16 +20,10 @@ const IGNORED_ERROR_CODES = [401, 403, 404];
 const IGNORED_OPERATION_STATUSES = ['CancelledByNotification'];
 
 export class UmbTryExecuteController<T> extends UmbResourceController<T> {
-	#abortSignal?: AbortSignal;
-
 	async tryExecute(opts?: UmbTryExecuteOptions): Promise<UmbApiResponse<T>> {
 		try {
-			if (opts?.abortSignal) {
-				this.#abortSignal = opts.abortSignal;
-				this.#abortSignal.addEventListener('abort', () => this.cancel(), { once: true });
-			}
-
-			return (await this._promise) as UmbApiResponse<T>;
+			const promise = opts?.abortSignal ? this.#abortable(opts.abortSignal) : this._promise;
+			return (await promise) as UmbApiResponse<T>;
 		} catch (error) {
 			// Error might be a legacy error, so we need to check if it is an UmbError
 			const umbError = this.mapToUmbError(error);
@@ -44,11 +38,28 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 		}
 	}
 
-	override destroy(): void {
-		if (this.#abortSignal) {
-			this.#abortSignal.removeEventListener('abort', this.cancel);
-		}
-		super.destroy();
+	/**
+	 * Settles with an UmbCancelError as soon as the signal aborts, also for a promise that cannot be cancelled.
+	 * @param {AbortSignal} signal The signal to listen to.
+	 * @returns {Promise<T>} The promise, or a rejection with an UmbCancelError once the signal aborts.
+	 */
+	#abortable(signal: AbortSignal): Promise<T> {
+		return new Promise<T>((resolve, reject) => {
+			const abort = () => {
+				this.cancel();
+				reject(new UmbCancelError('Request aborted'));
+			};
+
+			Promise.resolve(this._promise)
+				.then(resolve, reject)
+				.finally(() => signal.removeEventListener('abort', abort));
+
+			if (signal.aborted) {
+				abort();
+			} else {
+				signal.addEventListener('abort', abort, { once: true });
+			}
+		});
 	}
 
 	#notifyOnError(error: UmbApiError | UmbCancelError): void {
