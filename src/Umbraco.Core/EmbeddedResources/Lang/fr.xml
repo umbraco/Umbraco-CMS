@@ -58,8 +58,12 @@
     <key alias="parentCultureNotPublished">Cette culture est publiée mais n'est pas visible car elle n'est pas publiée pour le parent '%0%'</key>
     <key alias="parentNotPublishedAnomaly">Ce document est publié mais n'est pas présent dans le cache</key>
     <key alias="getUrlException">Oups: impossible d'obtenir cet URL (erreur interne - voir fichier log)</key>
-    <key alias="routeError">Ce document est publié mais son URL entrerait en collision avec le contenu %0%</key>
+    <key alias="routeError">Ce document est publié mais son URL entrerait en collision avec le contenu '%0%'</key>
     <key alias="routeErrorCannotRoute">Ce document est publié mais son URL ne peut pas être routé</key>
+    <key alias="unroutableContentWarningHeader">Contenu publié</key>
+    <key alias="unroutableContentWarning">Le document n'a pas d'URL. Plus de détails sont disponibles sous "Info".</key>
+    <key alias="unroutableContentWarningWithReason">Le document n'a pas d'URL. %0% Plus de détails sont disponibles sous "Info".</key>
+    <key alias="routeErrorNoDomainForCulture">Ce document est publié en '%0%' mais n'a pas d'URL car ce n'est pas la langue par défaut et aucun nom d'hôte ne lui est attribué</key>
   </area>
   <area alias="member">
   </area>
