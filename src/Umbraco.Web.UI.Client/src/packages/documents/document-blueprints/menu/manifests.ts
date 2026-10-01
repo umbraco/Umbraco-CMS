@@ -6,6 +6,7 @@ import {
 	UMB_DOCUMENT_BLUEPRINT_MENU_ITEM_ALIAS,
 	UMB_DOCUMENT_BLUEPRINT_SIDEBAR_APP_ALIAS,
 } from './constants.js';
+import { UMB_CURRENT_USER_DOCUMENT_BLUEPRINT_ACCESS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/current-user';
 import { UMB_LIBRARY_SECTION_ALIAS } from '@umbraco-cms/backoffice/library';
 import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
@@ -47,6 +48,9 @@ const sectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind = {
 		{
 			alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
 			match: UMB_LIBRARY_SECTION_ALIAS,
+		},
+		{
+			alias: UMB_CURRENT_USER_DOCUMENT_BLUEPRINT_ACCESS_CONDITION_ALIAS,
 		},
 	],
 };

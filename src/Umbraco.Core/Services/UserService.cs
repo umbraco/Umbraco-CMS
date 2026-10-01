@@ -927,6 +927,14 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.ElementStartNodeNotFound, existingUser);
         }
 
+        List<int>? startDocumentBlueprintIds = GetIdsFromKeys(model.DocumentBlueprintStartNodeKeys, UmbracoObjectTypes.DocumentBlueprintContainer);
+
+        if (startDocumentBlueprintIds is null || startDocumentBlueprintIds.Count != model.DocumentBlueprintStartNodeKeys.Count)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.DocumentBlueprintStartNodeNotFound, existingUser);
+        }
+
         if (model.HasContentRootAccess)
         {
             startContentIds.Add(Constants.System.Root);
@@ -940,6 +948,11 @@ internal partial class UserService : RepositoryService, IUserService
         if (model.HasElementRootAccess)
         {
             startElementIds.Add(Constants.System.Root);
+        }
+
+        if (model.HasDocumentBlueprintRootAccess)
+        {
+            startDocumentBlueprintIds.Add(Constants.System.Root);
         }
 
         Attempt<string?> isAuthorized = _userEditorAuthorizationHelper.IsAuthorized(
@@ -966,7 +979,7 @@ internal partial class UserService : RepositoryService, IUserService
         // TODO: This probably shouldn't live here, once we have user content start nodes as keys this can be moved to a mapper
         // Alternatively it should be a map definition, but then we need to use entity service to resolve the IDs
         // TODO: Add auditing
-        IUser updated = MapUserUpdate(model, userGroups, existingUser, startContentIds, startMediaIds, startElementIds);
+        IUser updated = MapUserUpdate(model, userGroups, existingUser, startContentIds, startMediaIds, startElementIds, startDocumentBlueprintIds);
         UserOperationStatus saveStatus = await userStore.SaveAsync(updated);
 
         if (saveStatus is not UserOperationStatus.Success)
@@ -1063,6 +1076,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="startContentIds">The content start node IDs.</param>
     /// <param name="startMediaIds">The media start node IDs.</param>
     /// <param name="startElementIds">The element start node IDs.</param>
+    /// <param name="startDocumentBlueprintIds">The document blueprint start node IDs.</param>
     /// <returns>The updated <see cref="IUser" />.</returns>
     private IUser MapUserUpdate(
         UserUpdateModel source,
@@ -1070,7 +1084,8 @@ internal partial class UserService : RepositoryService, IUserService
         IUser target,
         List<int> startContentIds,
         List<int> startMediaIds,
-        List<int> startElementIds)
+        List<int> startElementIds,
+        List<int> startDocumentBlueprintIds)
     {
         target.Name = source.Name;
         target.Language = source.LanguageIsoCode;
@@ -1079,6 +1094,7 @@ internal partial class UserService : RepositoryService, IUserService
         target.StartContentIds = startContentIds.ToArray();
         target.StartMediaIds = startMediaIds.ToArray();
         target.StartElementIds = startElementIds.ToArray();
+        target.StartDocumentBlueprintIds = startDocumentBlueprintIds.ToArray();
 
         target.ClearGroups();
         foreach (IUserGroup group in sourceUserGroups)

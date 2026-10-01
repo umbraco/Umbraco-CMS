@@ -36,6 +36,12 @@ export class UmbUserWorkspaceContext
 	readonly hasDocumentRootAccess = this._data.createObservablePartOfCurrent(
 		(data) => data?.hasDocumentRootAccess || false,
 	);
+	readonly documentBlueprintStartNodeUniques = this._data.createObservablePartOfCurrent(
+		(data) => data?.documentBlueprintStartNodeUniques || [],
+	);
+	readonly hasDocumentBlueprintRootAccess = this._data.createObservablePartOfCurrent(
+		(data) => data?.hasDocumentBlueprintRootAccess || false,
+	);
 	readonly elementStartNodeUniques = this._data.createObservablePartOfCurrent(
 		(data) => data?.elementStartNodeUniques || [],
 	);
@@ -144,6 +150,13 @@ export class UmbUserWorkspaceContext
 		this._data.updateCurrent({
 			hasElementRootAccess: value.rootAccess,
 			elementStartNodeUniques: value.startNodes,
+		});
+	}
+
+	setDocumentBlueprintAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			hasDocumentBlueprintRootAccess: value.rootAccess,
+			documentBlueprintStartNodeUniques: value.startNodes,
 		});
 	}
 
