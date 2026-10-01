@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Code Editor Property Editor UI',
 	element: () => import('./property-editor-ui-code-editor.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Code Editor',
 		propertyEditorSchemaAlias: 'Umbraco.Plain.String',
 		icon: 'icon-brackets',

@@ -1,10 +1,8 @@
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Text.Json;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
-using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.Security;
 
@@ -22,18 +20,6 @@ public abstract class OpenIdDictApplicationManagerBase
     /// Gets the OpenIddict application manager used to read and write application registrations.
     /// </summary>
     protected IOpenIddictApplicationManager ApplicationManager { get; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="OpenIdDictApplicationManagerBase"/> class.
-    /// </summary>
-    /// <param name="applicationManager">The OpenIddict application manager.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    protected OpenIdDictApplicationManagerBase(IOpenIddictApplicationManager applicationManager)
-        : this(
-            applicationManager,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<OpenIdDictApplicationManagerBase>>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OpenIdDictApplicationManagerBase"/> class.

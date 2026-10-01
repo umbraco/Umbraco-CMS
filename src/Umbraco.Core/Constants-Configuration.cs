@@ -121,15 +121,6 @@ public static partial class Constants
         public const string ConfigDebug = ConfigPrefix + "Debug";
 
         /// <summary>
-        ///     The legacy configuration key for debug settings.
-        /// </summary>
-        /// <remarks>
-        ///     Retained so existing configuration under this section keeps working; new configuration should
-        ///     use <see cref="ConfigDebug" />. TODO (V19): remove once the legacy binding is dropped.
-        /// </remarks>
-        public const string ConfigCoreDebug = ConfigCorePrefix + "Debug";
-
-        /// <summary>
         ///     The configuration key for exception filter settings.
         /// </summary>
         public const string ConfigExceptionFilter = ConfigPrefix + "ExceptionFilter";
@@ -253,17 +244,6 @@ public static partial class Constants
         ///     The configuration key for package migration settings.
         /// </summary>
         public const string ConfigPackageMigration = ConfigPrefix + "PackageMigration";
-
-        /// <summary>
-        ///     The configuration key for content dashboard settings.
-        /// </summary>
-        [Obsolete("No longer used in Umbraco. Scheduled to be removed in Umbraco 19.")]
-        public const string ConfigContentDashboard = ConfigPrefix + "ContentDashboard";
-
-        /// <summary>
-        ///     The configuration key for help page settings.
-        /// </summary>
-        public const string ConfigHelpPage = ConfigPrefix + "HelpPage";
 
         /// <summary>
         ///     The configuration key for install default data settings.

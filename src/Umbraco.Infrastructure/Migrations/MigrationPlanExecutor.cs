@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -58,46 +57,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private bool _invalidateBackofficeUserAccess;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MigrationPlanExecutor"/> class, responsible for executing migration plans within the Umbraco CMS infrastructure.
-    /// </summary>
-    /// <param name="scopeProvider">Provides access to the core scope for database operations.</param>
-    /// <param name="scopeAccessor">Accesses the current scope context.</param>
-    /// <param name="loggerFactory">Factory for creating logger instances used for logging migration activities.</param>
-    /// <param name="migrationBuilder">Builds and manages migration steps and plans.</param>
-    /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
-    /// <param name="databaseCacheRebuilder">Handles rebuilding of database-level caches after migrations.</param>
-    /// <param name="distributedCache">Manages distributed cache invalidation and synchronization.</param>
-    /// <param name="keyValueService">Service for storing and retrieving key-value pairs, often used for migration state.</param>
-    /// <param name="serviceScopeFactory">Factory for creating service scopes, enabling dependency injection within migration execution.</param>
-    /// <param name="appCaches">Provides access to application-level caches.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MigrationPlanExecutor(
-        ICoreScopeProvider scopeProvider,
-        IScopeAccessor scopeAccessor,
-        ILoggerFactory loggerFactory,
-        IMigrationBuilder migrationBuilder,
-        IUmbracoDatabaseFactory databaseFactory,
-        IDatabaseCacheRebuilder databaseCacheRebuilder,
-        DistributedCache distributedCache,
-        IKeyValueService keyValueService,
-        IServiceScopeFactory serviceScopeFactory,
-        AppCaches appCaches)
-        : this(
-            scopeProvider,
-            scopeAccessor,
-            loggerFactory,
-            migrationBuilder,
-            databaseFactory,
-            databaseCacheRebuilder,
-            distributedCache,
-            keyValueService,
-            serviceScopeFactory,
-            appCaches,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentTypeFactory>())
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.MigrationPlanExecutor"/> class, responsible for executing migration plans within the Umbraco CMS infrastructure.
     /// </summary>
     /// <param name="scopeProvider">Provides access to core database transaction scopes.</param>
@@ -137,10 +96,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _publishedContentTypeFactory = publishedContentTypeFactory;
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
     }
-
-    /// <inheritdoc/>
-    [Obsolete("Use ExecutePlanAsync instead. Scheduled for removal in Umbraco 18.")]
-    public ExecutedMigrationPlan ExecutePlan(MigrationPlan plan, string fromState) => ExecutePlanAsync(plan, fromState).GetAwaiter().GetResult();
 
     /// <inheritdoc/>
     public async Task<ExecutedMigrationPlan> ExecutePlanAsync(MigrationPlan plan, string fromState)
@@ -228,7 +183,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                     FinalState = transition.SourceState,
                     CompletedTransitions = completedTransitions,
                     Plan = plan,
-                    ExecutedMigrationContexts = executedMigrationContexts
                 };
             }
 
@@ -283,7 +237,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             FinalState = finalState,
             CompletedTransitions = completedTransitions,
             Plan = plan,
-            ExecutedMigrationContexts = executedMigrationContexts
         };
     }
 

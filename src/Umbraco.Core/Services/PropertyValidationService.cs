@@ -1,9 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Validation;
@@ -55,30 +53,6 @@ public class PropertyValidationService : IPropertyValidationService
         _languageService = languageService;
         _contentSettings = contentSettings.Value;
         _idKeyMap = idKeyMap;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PropertyValidationService" /> class.
-    /// </summary>
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public PropertyValidationService(
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
-        ILocalizedTextService textService,
-        IValueEditorCache valueEditorCache,
-        ICultureDictionary cultureDictionary,
-        ILanguageService languageService,
-        IOptions<ContentSettings> contentSettings)
-        : this(
-            propertyEditors,
-            dataTypeService,
-            textService,
-            valueEditorCache,
-            cultureDictionary,
-            languageService,
-            contentSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
     }
 
     /// <inheritdoc />

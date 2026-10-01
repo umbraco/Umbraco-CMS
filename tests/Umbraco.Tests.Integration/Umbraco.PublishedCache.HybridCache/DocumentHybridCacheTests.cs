@@ -148,7 +148,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         // Arrange - Initialize the publish status service to simulate production state
         // (in production, this runs at startup via PostRuntimePremigrationsUpgradeNotification)
-        var publishStatusManagementService = GetRequiredService<IPublishStatusManagementService>();
+        var publishStatusManagementService = GetRequiredService<IDocumentPublishStatusManagementService>();
         await publishStatusManagementService.InitializeAsync(CancellationToken.None);
 
         // PublishedTextPage is published, Textpage is draft-only (from base class setup)

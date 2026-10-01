@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Json.More;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Patching;
 using Umbraco.Cms.Api.Management.ViewModels.Patching;
@@ -22,7 +21,7 @@ public class PatchEngineTests
 
         var result = PatchEngine.ApplyOperation(JsonNode.Parse(json)!, PatchOperationType.Replace, "/name", "Updated Name");
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         Assert.That(doc.RootElement.GetProperty("name").GetString(), Is.EqualTo("Updated Name"));
         Assert.That(doc.RootElement.GetProperty("title").GetString(), Is.EqualTo("Original Title"));
     }
@@ -45,7 +44,7 @@ public class PatchEngineTests
             "/values[alias=title]/value",
             "Updated Value");
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         var values = doc.RootElement.GetProperty("values").EnumerateArray().ToList();
         Assert.That(values[0].GetProperty("value").GetString(), Is.EqualTo("Updated Value"));
         Assert.That(values[1].GetProperty("value").GetString(), Is.EqualTo("Description Value"));
@@ -76,7 +75,7 @@ public class PatchEngineTests
             "/values[alias=contentBlocks]/value/contentData[key=block-2]/values[alias=headline]/value",
             "Updated Block 2 Headline");
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         var contentBlocks = doc.RootElement.GetProperty("values").EnumerateArray().First();
         var contentData = contentBlocks.GetProperty("value").GetProperty("contentData").EnumerateArray().ToList();
         var block2 = contentData.First(b => b.GetProperty("key").GetString() == "block-2");
@@ -116,7 +115,7 @@ public class PatchEngineTests
             "/values[alias=contentBlocks,culture=null,segment=null]/value/contentData[key=block-2]/values[alias=headline]/value",
             "Updated Block 2 Headline");
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         var contentBlocks = doc.RootElement.GetProperty("values").EnumerateArray().First();
         var contentData = contentBlocks.GetProperty("value").GetProperty("contentData").EnumerateArray().ToList();
 
@@ -197,7 +196,7 @@ public class PatchEngineTests
 
         var result = PatchEngine.ApplyOperation(JsonNode.Parse(json)!, PatchOperationType.Replace, path, "Updated Block 2 Headline");
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         var values = doc.RootElement.GetProperty("values").EnumerateArray().First();
         var contentData = values.GetProperty("value").GetProperty("contentData").EnumerateArray().ToList();
 
@@ -226,7 +225,7 @@ public class PatchEngineTests
 
         var result = PatchEngine.ApplyOperation(JsonNode.Parse(json)!, PatchOperationType.Add, "/contentData/-", newBlock);
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         var contentData = doc.RootElement.GetProperty("contentData").EnumerateArray().ToList();
         Assert.That(contentData, Has.Count.EqualTo(2));
         Assert.That(contentData[0].GetProperty("key").GetString(), Is.EqualTo("block-1"));
@@ -244,7 +243,7 @@ public class PatchEngineTests
 
         var result = PatchEngine.ApplyOperation(JsonNode.Parse(json)!, PatchOperationType.Add, "/items/1", "inserted");
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         var items = doc.RootElement.GetProperty("items").EnumerateArray().Select(e => e.GetString()).ToList();
         Assert.That(items, Is.EqualTo(new[] { "a", "inserted", "b", "c" }));
     }
@@ -260,7 +259,7 @@ public class PatchEngineTests
 
         var result = PatchEngine.ApplyOperation(JsonNode.Parse(json)!, PatchOperationType.Add, "/description", "New Description");
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         Assert.That(doc.RootElement.GetProperty("name").GetString(), Is.EqualTo("Test"));
         Assert.That(doc.RootElement.GetProperty("description").GetString(), Is.EqualTo("New Description"));
     }
@@ -293,7 +292,7 @@ public class PatchEngineTests
             "/values[alias=contentBlocks,culture=null,segment=null]/value/contentData/-",
             newBlock);
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         var contentData = doc.RootElement
             .GetProperty("values").EnumerateArray().First()
             .GetProperty("value")
@@ -316,7 +315,7 @@ public class PatchEngineTests
 
         var result = PatchEngine.ApplyOperation(JsonNode.Parse(json)!, PatchOperationType.Remove, "/values[alias=title]", null);
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         var values = doc.RootElement.GetProperty("values").EnumerateArray().ToList();
         Assert.That(values, Has.Count.EqualTo(1));
         Assert.That(values[0].GetProperty("alias").GetString(), Is.EqualTo("description"));
@@ -333,7 +332,7 @@ public class PatchEngineTests
 
         var result = PatchEngine.ApplyOperation(JsonNode.Parse(json)!, PatchOperationType.Remove, "/items/1", null);
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         var items = doc.RootElement.GetProperty("items").EnumerateArray().Select(e => e.GetString()).ToList();
         Assert.That(items, Is.EqualTo(new[] { "a", "c" }));
     }
@@ -350,7 +349,7 @@ public class PatchEngineTests
 
         var result = PatchEngine.ApplyOperation(JsonNode.Parse(json)!, PatchOperationType.Remove, "/description", null);
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         Assert.That(doc.RootElement.GetProperty("name").GetString(), Is.EqualTo("Test"));
         Assert.That(doc.RootElement.TryGetProperty("description", out _), Is.False);
     }
@@ -427,7 +426,7 @@ public class PatchEngineTests
             "/values[alias=contentBlocks,culture=null,segment=null]/value/contentData[key=block-2]/values[alias=headline]/value",
             "Updated Block 2");
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
 
         // Extract the value property (simulates what JsonObjectConverter returns)
         var valueElement = doc.RootElement.GetProperty("values").EnumerateArray().First().GetProperty("value");
@@ -465,7 +464,7 @@ public class PatchEngineTests
             "/values[alias=price,culture=en-US,segment=premium]/value",
             "200");
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         var values = doc.RootElement.GetProperty("values").EnumerateArray().ToList();
         Assert.That(values[0].GetProperty("value").GetString(), Is.EqualTo("100"));
         Assert.That(values[1].GetProperty("value").GetString(), Is.EqualTo("200"));
@@ -485,7 +484,7 @@ public class PatchEngineTests
 
         var result = PatchEngine.ApplyOperation(JsonNode.Parse(json)!, PatchOperationType.Replace, "/a~1b", "updated");
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         Assert.That(doc.RootElement.GetProperty("a/b").GetString(), Is.EqualTo("updated"));
     }
 
@@ -500,7 +499,7 @@ public class PatchEngineTests
 
         var result = PatchEngine.ApplyOperation(JsonNode.Parse(json)!, PatchOperationType.Replace, "/a~0b", "updated");
 
-        var doc = result.ToJsonDocument();
+        var doc = JsonDocument.Parse(result.ToJsonString());
         Assert.That(doc.RootElement.GetProperty("a~b").GetString(), Is.EqualTo("updated"));
     }
 }

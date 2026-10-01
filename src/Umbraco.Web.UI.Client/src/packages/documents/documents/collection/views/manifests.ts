@@ -22,7 +22,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./table/document-table-collection-view.element.js'),
 		weight: 300,
 		meta: {
-			label: 'Table',
+			label: '#collection_tableViewLabel',
 			icon: 'icon-table',
 			pathName: 'table',
 		},

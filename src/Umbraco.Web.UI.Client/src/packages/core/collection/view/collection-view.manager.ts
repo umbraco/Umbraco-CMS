@@ -1,12 +1,12 @@
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
 import type { ManifestCollectionView } from './collection-view.extension.js';
-import type { UmbCollectionViewElementBase } from './umb-collection-view-element-base.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type {
 	UmbInteractionMemoryManager,
 	UmbInteractionMemoryModel,
@@ -38,17 +38,42 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 	public readonly currentView = this.#currentView.asObservable();
 
 	#routes = new UmbArrayState<UmbRoute>([], (x) => x.path);
-	public readonly routes = this.#routes.asObservable();
-
 	#rootPathName = new UmbStringState('');
-	public readonly rootPathName = this.#rootPathName.asObservable();
 
 	#defaultViewAlias?: string;
 	#viewsOverride?: Array<UmbCollectionLayoutConfiguration>;
 
 	#interactionMemoryManager?: UmbInteractionMemoryManager;
-	#muteMemoryObservation = false;
-	#fallbackViewAlias?: string;
+
+	/**
+	 * A route per view.
+	 * @returns {Observable<Array<UmbRoute>>} An always empty observable.
+	 * @deprecated Deprecated since v18. The views of a collection are no longer routed, so this observable is always
+	 * empty. Observe `currentView` and switch view with `setCurrentView` instead. Scheduled for removal in Umbraco 20.
+	 */
+	public get routes() {
+		new UmbDeprecation({
+			removeInVersion: '20.0.0',
+			deprecated: 'UmbCollectionViewManager.routes',
+			solution: 'The views of a collection are no longer routed. Observe `currentView` instead.',
+		}).warn();
+		return this.#routes.asObservable();
+	}
+
+	/**
+	 * The path the view routes were resolved against.
+	 * @returns {Observable<string>} An always empty observable.
+	 * @deprecated Deprecated since v18. The views of a collection are no longer routed, so this observable is always
+	 * empty. Scheduled for removal in Umbraco 20.
+	 */
+	public get rootPathName() {
+		new UmbDeprecation({
+			removeInVersion: '20.0.0',
+			deprecated: 'UmbCollectionViewManager.rootPathName',
+			solution: 'The views of a collection are no longer routed, so there is no root path to resolve them against.',
+		}).warn();
+		return this.#rootPathName.asObservable();
+	}
 
 	/**
 	 * @param {UmbControllerHost} host - The controller host this manager is bound to.
@@ -61,12 +86,6 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 		if (this.#interactionMemoryManager) {
 			this.#observeInteractionMemory();
 		}
-
-		// TODO: hack - we need to figure out how to get the "parent path" from the router
-		setTimeout(() => {
-			const currentUrl = new URL(window.location.href);
-			this.#rootPathName.setValue(currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/')));
-		}, 100);
 	}
 
 	public setConfig(config: UmbCollectionViewManagerConfig) {
@@ -112,55 +131,32 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 				}
 
 				this.#views.setValue(manifests);
-				this.#createRoutes(manifests);
+				this.#setLandingView(manifests);
 			},
 		);
 	}
 
-	#setupViewComponent(component: PageComponent, view: ManifestCollectionView) {
-		(component as HTMLElement).setAttribute('data-mark', `collection-view:${view.alias}`);
-		(component as UmbCollectionViewElementBase).manifest = view;
-		this.setCurrentView(view);
-	}
+	/**
+	 * Lands on the view the user left the collection in, falling back to the configured default and then the first
+	 * available view. The view currently shown is kept when it is still available, so views appearing or disappearing
+	 * does not move the user.
+	 * @param {Array<ManifestCollectionView>} views - The available views.
+	 */
+	#setLandingView(views: Array<ManifestCollectionView>) {
+		if (!views.length) return;
 
-	#createRoutes(views: ManifestCollectionView[] | null) {
-		let routes: Array<UmbRoute> = [];
+		const currentViewAlias = this.getCurrentView()?.alias;
+		if (currentViewAlias && views.some((view) => view.alias === currentViewAlias)) return;
 
-		if (views && views.length > 0) {
-			// find the default view from the config. If it doesn't exist, use the first view
-			const firstOverrideView = this.#viewsOverride?.length
-				? views.find((view) => view.alias === this.#viewsOverride![0].collectionView)
-				: null;
-			const defaultView = firstOverrideView ?? views.find((view) => view.alias === this.#defaultViewAlias);
-			// The remembered view wins over the configured default, as it is the view the user left the collection in.
-			const rememberedView = views.find((view) => view.alias === this.#getMemorizedViewAlias());
-			const fallbackView = rememberedView ?? defaultView ?? views[0];
-			this.#fallbackViewAlias = fallbackView.alias;
+		// find the default view from the config. If it doesn't exist, use the first view
+		const firstOverrideView = this.#viewsOverride?.length
+			? views.find((view) => view.alias === this.#viewsOverride![0].collectionView)
+			: undefined;
+		const defaultView = firstOverrideView ?? views.find((view) => view.alias === this.#defaultViewAlias);
+		// The remembered view wins over the configured default, as it is the view the user left the collection in.
+		const rememberedView = views.find((view) => view.alias === this.#getMemorizedViewAlias());
 
-			routes = views.map((view) => {
-				return {
-					path: `${view.meta.pathName}`,
-					component: () => createExtensionElement(view),
-					setup: (component) => this.#setupViewComponent(component, view),
-				};
-			});
-
-			if (routes.length > 0) {
-				routes.push({
-					unique: fallbackView.alias,
-					path: '',
-					component: () => createExtensionElement(fallbackView),
-					setup: (component) => this.#setupViewComponent(component, fallbackView),
-				});
-
-				routes.push({
-					path: `**`,
-					component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-				});
-			}
-		}
-
-		this.#routes.setValue(routes);
+		this.setCurrentView(rememberedView ?? defaultView ?? views[0]);
 	}
 
 	#getMemorizedViewAlias(): string | undefined {
@@ -173,22 +169,18 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 			unique: CURRENT_VIEW_MEMORY_UNIQUE,
 			value: { alias: view.alias },
 		};
-		this.#muteMemoryObservation = true;
 		this.#interactionMemoryManager.setMemory(memory);
-		this.#muteMemoryObservation = false;
 	}
 
 	#observeInteractionMemory() {
 		this.observe(
 			this.#interactionMemoryManager!.memory(CURRENT_VIEW_MEMORY_UNIQUE),
 			(memory) => {
-				if (this.#muteMemoryObservation) return;
 				if (!memory) return;
-				const views = this.#views.getValue();
-				if (!views.length) return; // extensions not loaded yet; the initializer callback will handle it
-				if (memory.value?.alias === this.#fallbackViewAlias) return;
-				// Rebuild the routes so the collection lands on the remembered view when no view is requested by the URL.
-				this.#createRoutes(views);
+				const view = this.#views.getValue().find((x) => x.alias === memory.value?.alias);
+				// The views have not loaded yet; the extensions initializer lands on the remembered view itself.
+				if (!view) return;
+				this.#currentView.setValue(view);
 			},
 			'umbCollectionViewMemoryObserver',
 		);

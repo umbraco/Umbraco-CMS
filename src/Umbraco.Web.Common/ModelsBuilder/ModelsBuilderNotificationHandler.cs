@@ -5,9 +5,11 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder;
 
@@ -22,18 +24,21 @@ internal sealed class ModelsBuilderNotificationHandler :
     private readonly ModelsBuilderSettings _config;
     private readonly IDefaultViewContentProvider _defaultViewContentProvider;
     private readonly IModelsBuilderDashboardProvider _modelsBuilderDashboardProvider;
+    private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IShortStringHelper _shortStringHelper;
 
     public ModelsBuilderNotificationHandler(
         IOptions<ModelsBuilderSettings> config,
         IShortStringHelper shortStringHelper,
         IModelsBuilderDashboardProvider modelsBuilderDashboardProvider,
-        IDefaultViewContentProvider defaultViewContentProvider)
+        IDefaultViewContentProvider defaultViewContentProvider,
+        IPublishedModelFactory publishedModelFactory)
     {
         _config = config.Value;
         _shortStringHelper = shortStringHelper;
         _modelsBuilderDashboardProvider = modelsBuilderDashboardProvider;
         _defaultViewContentProvider = defaultViewContentProvider;
+        _publishedModelFactory = publishedModelFactory;
     }
 
     /// <summary>
@@ -79,6 +84,14 @@ internal sealed class ModelsBuilderNotificationHandler :
     public void Handle(TemplateSavingNotification notification)
     {
         if (_config.ModelsMode == Core.Constants.ModelsBuilder.ModelsModes.Nothing)
+        {
+            return;
+        }
+
+        // A mode that generates models only at runtime relies on a factory that may not be present, in which
+        // case no model type will ever exist for the template to inherit from. Leaving the template untyped
+        // keeps it renderable; a typed template would fail to compile.
+        if (_config.ModelsMode == Core.Constants.ModelsBuilder.InMemoryAutoModelsMode && _publishedModelFactory.IsLiveFactoryEnabled() is false)
         {
             return;
         }
