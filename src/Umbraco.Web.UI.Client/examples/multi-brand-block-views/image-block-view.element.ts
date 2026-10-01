@@ -30,7 +30,7 @@ export class ExampleImageBlockView extends ExampleBlockViewBase {
 			}
 
 			.caption {
-				padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				padding: var(--uui-size-space-1) var(--uui-size-space-3);
 				border-top: 1px solid var(--uui-color-border);
 			}
 		`,

@@ -36,6 +36,7 @@ import {
 	type UmbMbcsValue,
 } from './document-values.js';
 import { AREA_KEYS, CULTURES, CULTURE_DA, CULTURE_EN, DATA_TYPE_IDS, DOCUMENT_TYPE_IDS, mbcsId } from './ids.js';
+import { getOurStoryCopy } from './our-story-copy.js';
 import { getPageCopy } from './page-copy.js';
 import { littleOnesProducts, outdoorShopProducts, type UmbMbcsProductRow } from './products.data.js';
 import { littleOnesStores, outdoorShopStores, type UmbMbcsStoreRow } from './stores.data.js';
@@ -534,6 +535,58 @@ const landingBlocks = (site: UmbMbcsSiteCode, name: string, index: number, hidde
 	];
 };
 
+const OUR_STORY_PRODUCT_NUMBERS: Record<UmbMbcsSiteCode, Array<number>> = {
+	LO: [21, 52, 71, 91],
+	GU: [21, 51, 61, 81],
+};
+const OUR_STORY_PRODUCT_LABELS = ['Made to last', 'Bestseller', 'Staff pick', 'Customer favourite'];
+const OUR_STORY_ARTICLE_NUMBERS: Record<UmbMbcsSiteCode, Array<number>> = { LO: [95, 82, 94], GU: [98, 83, 81] };
+const BEHIND_THE_SEAMS_CATEGORY_INDEX = 4;
+
+const richTextMarkup = (headline: string, paragraphs: Array<string>) =>
+	`<h2>${escapeMarkup(headline)}</h2>${paragraphs.map((paragraph) => `<p>${escapeMarkup(paragraph)}</p>`).join('')}`;
+
+const ourStoryBlocks = (site: UmbMbcsSiteCode): Array<UmbMbcsBlock> => {
+	const copy = getOurStoryCopy(site);
+	const storyImage = articleImageId(site, BEHIND_THE_SEAMS_CATEGORY_INDEX);
+
+	return [
+		heroBlock(site, 'Our Story', copy.heroSubheadline),
+		oneColumn([textBlock(richTextMarkup(copy.intro.headline, copy.intro.paragraphs))]),
+		twoColumn(
+			[imageBlock(storyImage, copy.beginning.caption)],
+			[textBlock(richTextMarkup(copy.beginning.headline, copy.beginning.paragraphs))],
+		),
+		twoColumn(
+			[textBlock(richTextMarkup(copy.design.headline, copy.design.paragraphs))],
+			[imageBlock(productImageId(site, 2), copy.design.caption)],
+		),
+		oneColumn([
+			textBlock(
+				`<h2>${escapeMarkup(copy.timeline.headline)}</h2><p>${escapeMarkup(copy.timeline.lead)}</p>${copy.timeline.entries
+					.map((entry) => `<p><strong>${entry.year}</strong> ${escapeMarkup(entry.text)}</p>`)
+					.join('')}`,
+			),
+		]),
+		twoColumn(
+			[imageBlock(heroMediaId(site), copy.makers.caption)],
+			[textBlock(richTextMarkup(copy.makers.headline, copy.makers.paragraphs))],
+		),
+		oneColumn([textBlock(richTextMarkup(copy.values.headline, copy.values.paragraphs))]),
+		oneColumn([
+			textBlock(richTextMarkup(copy.productsLead.headline, [copy.productsLead.text])),
+			...OUR_STORY_PRODUCT_NUMBERS[site].map((number, index) =>
+				productTeaser(site, number, OUR_STORY_PRODUCT_LABELS[index]),
+			),
+		]),
+		oneColumn([
+			textBlock(richTextMarkup(copy.articlesLead.headline, [copy.articlesLead.text])),
+			...OUR_STORY_ARTICLE_NUMBERS[site].map((number) => articleTeaser(site, number)),
+		]),
+		oneColumn([textBlock(richTextMarkup(copy.closing.headline, copy.closing.paragraphs))]),
+	];
+};
+
 const buildPages = (
 	site: UmbMbcsSiteCode,
 	pages: Array<UmbMbcsPage>,
@@ -619,7 +672,11 @@ const buildPages = (
 				hasChildren: (entry.children?.length ?? 0) > 0,
 				updateDate: '2026-09-01T10:00:00.000Z',
 				values: [
-					...(isFirstLevel ? blockGridValue('content', landingBlocks(site, entry.name, index, hidden)) : []),
+					...(isFirstLevel
+						? blockGridValue('content', landingBlocks(site, entry.name, index, hidden))
+						: entry.name === 'Our Story'
+							? blockGridValue('content', ourStoryBlocks(site))
+							: []),
 					...seoValues(siteName, entry.name, `Everything you need to know about ${entry.name.toLowerCase()}.`, {
 						excludeFromSitemap: hidden,
 					}),

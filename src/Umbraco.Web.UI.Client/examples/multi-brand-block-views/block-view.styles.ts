@@ -37,10 +37,6 @@ export const exampleBlockViewStyles = css`
 		transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
 	}
 
-	:host(:hover) img {
-		transform: scale(1.04);
-	}
-
 	.media {
 		overflow: hidden;
 		background-color: var(--uui-color-surface-alt);
@@ -56,9 +52,7 @@ export const exampleBlockViewStyles = css`
 
 	.eyebrow {
 		font-size: 0.6875rem;
-		font-weight: 700;
 		letter-spacing: 0.14em;
-		text-transform: uppercase;
 		color: var(--uui-color-text-alt);
 	}
 
