@@ -269,8 +269,9 @@ test.describe('published content indexing', () => {
     const publishedDocumentId = await umbracoApi.document.createDefaultDocument(publishedDocumentName, documentTypeId) ?? '';
     await umbracoApi.document.publish(publishedDocumentId);
 
-    // Act - the published document is indexed after the draft one, so once it is findable the draft has been
-    // processed too; the draft-index check proves it was indexed at all
+    // Act - index changes are processed one at a time in the order they were made, so once the later-published
+    // document is in the published index, the earlier draft save has been processed for that index too; the
+    // draft-index check proves the draft was indexed at all
     await umbracoApi.searchManagement.waitUntilDocumentIsFound(publishedIndexAlias, publishedDocumentName, publishedDocumentId);
     await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, draftOnlyDocumentName, draftOnlyDocumentId);
 

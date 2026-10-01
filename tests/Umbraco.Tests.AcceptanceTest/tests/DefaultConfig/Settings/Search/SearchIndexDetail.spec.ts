@@ -70,7 +70,7 @@ test('can rebuild the index', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
 });
 
 // TODO: link the issue and unskip once the back office receives the IndexRebuildCompleted server event - today
-// the workspace stays on its "Rebuilding index..." state after the rebuild finishes.
+// the workspace stays on its "Rebuilding index..." state after the rebuild finishes. [AZ]
 test.fixme('shows the rebuild as completed when it finishes', async ({umbracoUi}) => {
   // Act
   await umbracoUi.searchManagement.clickRebuildIndexEntityAction();

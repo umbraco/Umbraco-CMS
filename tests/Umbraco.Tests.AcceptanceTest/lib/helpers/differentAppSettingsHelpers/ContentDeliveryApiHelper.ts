@@ -149,6 +149,9 @@ export class ContentDeliveryApiHelper {
       .poll(
         async () => {
           const response = await this.getContentItemsFromAQuery(undefined, undefined, filter);
+          if (!response.ok()) {
+            return `query failed with status ${response.status()}`;
+          }
           return (await response.json()).total;
         },
         {timeout: ConstantHelper.timeout.pageLoad},

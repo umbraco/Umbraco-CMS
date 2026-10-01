@@ -27,9 +27,10 @@ test('can see the index list with the expected columns and indexes', {tag: '@smo
   }).toPass({timeout: ConstantHelper.timeout.veryLong});
 });
 
-test('can rebuild an index from its row in the index list', async ({umbracoUi}) => {
-  // Arrange - a rebuild empties the index for a while, so use one the other search specs do not depend on
+test('can rebuild an index from its row in the index list', async ({umbracoApi, umbracoUi}) => {
+  // Arrange - a rebuild empties the index for a while, so use one fewer search specs depend on than Umb_Content
   const indexAlias = 'Umb_Members';
+  const healthStatusBeforeRebuild = (await umbracoApi.searchManagement.getIndex(indexAlias)).healthStatus;
 
   // Act
   await umbracoUi.searchManagement.clickRebuildIndexActionForIndex(indexAlias);
@@ -38,6 +39,10 @@ test('can rebuild an index from its row in the index list', async ({umbracoUi}) 
 
   // Assert
   await umbracoUi.searchManagement.doesRebuildStartedNotificationHaveText(`"${indexAlias}" has started`);
+  // Let the rebuild settle, so the next spec does not find the index mid-rebuild
+  await expect
+    .poll(async () => (await umbracoApi.searchManagement.getIndex(indexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
+    .toBe(healthStatusBeforeRebuild);
 });
 
 test('can refresh the index list', async ({umbracoApi, umbracoUi}) => {
