@@ -26,6 +26,7 @@ import {
 	invariantTextValue,
 	mediaPickerValue,
 	richTextValue,
+	escapeMarkup,
 	rteInlineBlockTag,
 	tagsValue,
 	textValue,
@@ -292,11 +293,11 @@ const buildArticles = (
 		const relatedNumbers = relatedProductNumbers(site, productRows, tags, number);
 		const markup = ([teaserKey]: Array<string>) =>
 			[
-				`<h2>${title}</h2>`,
-				`<p>${teaser}</p>`,
+				`<h2>${escapeMarkup(title)}</h2>`,
+				`<p>${escapeMarkup(teaser)}</p>`,
 				`<p>${rteInlineBlockTag(teaserKey)}</p>`,
 				`<p>This guide covers ${tags.join(', ').toLowerCase()}, with tips you can put to use straight away.</p>`,
-				'<ul><li>Start with what you already own</li><li>Choose quality over quantity</li><li>Look after your clothes so they last</li></ul>',
+				'<ul><li><p>Start with what you already own</p></li><li><p>Choose quality over quantity</p></li><li><p>Look after your clothes so they last</p></li></ul>',
 			].join('');
 		const heroImageId = articleImageId(site, articleCategoryIndex(number));
 
@@ -440,12 +441,19 @@ const oneColumn = (items: Array<UmbMbcsBlock>): UmbMbcsBlock => ({
 	areas: [{ key: AREA_KEYS.oneColumnMain, items }],
 });
 
+const TWO_COLUMN_AREA_SPAN = 6;
+
+const fitToArea = (block: UmbMbcsBlock): UmbMbcsBlock => ({
+	...block,
+	columnSpan: Math.min(block.columnSpan, TWO_COLUMN_AREA_SPAN),
+});
+
 const twoColumn = (left: Array<UmbMbcsBlock>, right: Array<UmbMbcsBlock>): UmbMbcsBlock => ({
 	elementTypeId: DOCUMENT_TYPE_IDS.twoColumnLayout,
 	columnSpan: 12,
 	areas: [
-		{ key: AREA_KEYS.twoColumnLeft, items: left },
-		{ key: AREA_KEYS.twoColumnRight, items: right },
+		{ key: AREA_KEYS.twoColumnLeft, items: left.map(fitToArea) },
+		{ key: AREA_KEYS.twoColumnRight, items: right.map(fitToArea) },
 	],
 });
 
@@ -510,13 +518,17 @@ const landingBlocks = (site: UmbMbcsSiteCode, name: string, index: number, hidde
 
 	return [
 		heroBlock(site, name, `Everything you need to know about ${name.toLowerCase()}.`),
-		oneColumn([textBlock(`<h2>${headline}</h2>${paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join('')}`)]),
+		oneColumn([
+			textBlock(
+				`<h2>${escapeMarkup(headline)}</h2>${paragraphs.map((paragraph) => `<p>${escapeMarkup(paragraph)}</p>`).join('')}`,
+			),
+		]),
 		...(hidden
 			? []
 			: [
 					twoColumn(
 						[imageBlock(productImageId(site, index % 10), name)],
-						[textBlock(`<p>${copy?.aside ?? `Explore ${name.toLowerCase()}.`}</p>`)],
+						[textBlock(`<p>${escapeMarkup(copy?.aside ?? `Explore ${name.toLowerCase()}.`)}</p>`)],
 					),
 				]),
 	];

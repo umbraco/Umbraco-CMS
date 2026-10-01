@@ -17,6 +17,8 @@ export const textValue = (alias: string, value: string) => varying('Umbraco.Text
 
 export const textareaValue = (alias: string, value: string) => varying('Umbraco.TextArea', alias, value);
 
+export const escapeMarkup = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 export const rteInlineBlockTag = (key: string) =>
 	`<umb-rte-block-inline data-content-key="${key}"></umb-rte-block-inline>`;
 
@@ -35,9 +37,6 @@ export const richTextValue = (
 	return varying('Umbraco.RichText', alias, {
 		markup: typeof markup === 'function' ? markup(instances.map((block) => block.key)) : markup,
 		blocks: {
-			contentData: instances.map(toContentData),
-			settingsData: [],
-			expose: instances.flatMap(toExposeEntries),
 			layout: instances.length
 				? {
 						'Umbraco.RichText': instances.map((block) => ({
@@ -48,6 +47,9 @@ export const richTextValue = (
 						})),
 					}
 				: {},
+			contentData: instances.map(toContentData),
+			settingsData: [],
+			expose: instances.flatMap(toExposeEntries),
 		},
 	});
 };
@@ -189,7 +191,7 @@ export const blockTextarea = (alias: string, value: string): UmbMbcsBlockPropert
 export const blockRichText = (alias: string, markup: string): UmbMbcsBlockPropertyValue => ({
 	alias,
 	editorAlias: 'Umbraco.RichText',
-	value: { markup, blocks: { contentData: [], settingsData: [], expose: [], layout: {} } },
+	value: { markup, blocks: { layout: {}, contentData: [], settingsData: [], expose: [] } },
 	varies: true,
 });
 
