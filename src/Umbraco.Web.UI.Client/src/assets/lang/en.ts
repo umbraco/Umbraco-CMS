@@ -256,6 +256,8 @@ export default {
 		noItemsTitle: 'No items',
 		addCollectionConfiguration: 'Add collection',
 		cardViewLabel: 'Cards',
+		gridViewLabel: 'Grid',
+		listViewLabel: 'List',
 		tableViewLabel: 'Table',
 	},
 	content: {
@@ -3250,8 +3252,6 @@ export default {
 		resultsCount: (count: number) => `Found ${count} result${count !== 1 ? 's' : ''}`,
 		tableColumnName: 'Name',
 		tableColumnEntityType: 'Type',
-		statsBoxLabel: 'Statistics',
-		searchBoxLabel: 'Search',
 		// Accessibility labels
 		searching: 'Searching...',
 		searchFailed: 'Search failed',

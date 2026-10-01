@@ -7,6 +7,7 @@ import type {
 } from '../types.js';
 import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
 import { UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL } from '../modals/transfer-to-element-library/transfer-to-element-library-modal.token.js';
+import { UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME, UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME } from '../constants.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -34,6 +35,14 @@ import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_VALIDATION_CONTEXT,
+	UmbValidationCleanUpByUniqueManager,
+	type UmbValidationController,
+} from '@umbraco-cms/backoffice/validation';
+
+const UMB_CONTENT_VALIDATION_CLEAN_UP_ALIAS = Symbol();
+const UMB_SETTINGS_VALIDATION_CLEAN_UP_ALIAS = Symbol();
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -81,8 +90,10 @@ export abstract class UmbBlockManagerContext<
 	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.key);
 	public readonly layouts = this._layouts.asObservable();
 
-	readonly #contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
-	public readonly contents = this.#contents.asObservable();
+	readonly #contents = new UmbArrayState<UmbBlockDataModel, string, undefined>(undefined, (x) => x.key);
+	// TODO: Remove ?? [] fallback in v.19 (or v.20)
+	public readonly contents = this.#contents.asObservablePart((x) => x ?? []);
+	readonly #contentKeys = this.#contents.asObservablePart((x) => (x ? x.map((y) => y.key) : undefined));
 
 	readonly #externalContentValues = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 
@@ -103,8 +114,10 @@ export abstract class UmbBlockManagerContext<
 	#elementRepository = new UmbElementDetailRepository(this);
 	#pendingElementFetches = new Set<string>();
 
-	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
-	public readonly settings = this.#settings.asObservable();
+	readonly #settings = new UmbArrayState<UmbBlockDataModel, string, undefined>(undefined, (x) => x.key);
+	// TODO: Remove ?? [] fallback in v.19 (or v.20)
+	public readonly settings = this.#settings.asObservablePart((x) => x ?? []);
+	readonly #settingsKeys = this.#settings.asObservablePart((x) => (x ? x.map((y) => y.key) : undefined));
 
 	// TODO: This is a bad seperation of concerns, this should be self initializing, not defined from the outside. [NL]
 	public readonly readOnlyState = new UmbReadOnlyVariantGuardManager(this);
@@ -153,32 +166,34 @@ export abstract class UmbBlockManagerContext<
 	 * Set all contents.
 	 * @param {Array<UmbBlockDataModel>} contents - All contents.
 	 */
-	setContents(contents: Array<UmbBlockDataModel>) {
+	setContents(contents: Array<UmbBlockDataModel> | undefined) {
 		this.#contents.setValue(contents);
 	}
 
+	// TODO: make return undefined when undefined in v.19
 	/**
 	 * Get all contents.
 	 * @returns {Array<UmbBlockDataModel>} - All contents.
 	 */
 	getContents(): Array<UmbBlockDataModel> {
-		return this.#contents.value;
+		return this.#contents.value ?? [];
 	}
 
 	/**
 	 * Set all settings.
 	 * @param {Array<UmbBlockDataModel>} settings - All settings.
 	 */
-	setSettings(settings: Array<UmbBlockDataModel>) {
+	setSettings(settings: Array<UmbBlockDataModel> | undefined) {
 		this.#settings.setValue(settings);
 	}
 
+	// TODO: make return undefined when undefined in v.19
 	/**
 	 * Get all settings.
 	 * @returns {Array<UmbBlockDataModel>} - All settings.
 	 */
 	getSettings(): Array<UmbBlockDataModel> {
-		return this.#settings.value;
+		return this.#settings.value ?? [];
 	}
 
 	/**
@@ -218,6 +233,37 @@ export abstract class UmbBlockManagerContext<
 				if (keys.length) this.#fetchExternalContent(keys);
 			},
 			null,
+		);
+		// Clean up validation messages for Block content/settings that are no longer part of this Block
+		// Editor's data. Deliberately does not skip the host: we want the Validation Context of the
+		// Property Editor hosting this Block Manager, which is provided on this very same element. [NL]
+		this.consumeContext(UMB_VALIDATION_CONTEXT, (context) => this.#gotValidationContext(context));
+	}
+
+	#gotValidationContext(context: UmbValidationController | undefined) {
+		// Only accept a Validation Context that is actually ours — a Block Manager can legitimately be
+		// hosted without one, in which case no clean up happens (silent no-op, not an error). [NL]
+		if (!context || context.getHostElement() !== this.getHostElement()) {
+			this.removeUmbControllerByAlias(UMB_CONTENT_VALIDATION_CLEAN_UP_ALIAS);
+			this.removeUmbControllerByAlias(UMB_SETTINGS_VALIDATION_CLEAN_UP_ALIAS);
+			return;
+		}
+
+		new UmbValidationCleanUpByUniqueManager(
+			this,
+			context,
+			`$.${UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME}`,
+			this.#contentKeys,
+			(queryParams) => queryParams.key,
+			UMB_CONTENT_VALIDATION_CLEAN_UP_ALIAS,
+		);
+		new UmbValidationCleanUpByUniqueManager(
+			this,
+			context,
+			`$.${UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME}`,
+			this.#settingsKeys,
+			(queryParams) => queryParams.key,
+			UMB_SETTINGS_VALIDATION_CLEAN_UP_ALIAS,
 		);
 	}
 
@@ -333,7 +379,7 @@ export abstract class UmbBlockManagerContext<
 	contentOf(key: string) {
 		return mergeObservables(
 			[
-				this.#contents.asObservablePart((source) => source.find((x) => x.key === key)),
+				this.#contents.asObservablePart((source) => source?.find((x) => x.key === key)),
 				this.#externalContentValues.asObservablePart((source) => source.find((x) => x.key === key)),
 			],
 			([localContent, externalContent]) => localContent ?? externalContent ?? undefined,
@@ -406,7 +452,7 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	settingsOf(key: string) {
-		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
+		return this.#settings.asObservablePart((source) => source?.find((x) => x.key === key));
 	}
 
 	currentExposeOf(contentKey: string) {
@@ -465,12 +511,12 @@ export abstract class UmbBlockManagerContext<
 	}
 	getContentOf(contentKey: string) {
 		return (
-			this.#contents.value.find((x) => x.key === contentKey) ??
+			this.#contents.value?.find((x) => x.key === contentKey) ??
 			this.#externalContentValues.value.find((x) => x.key === contentKey)
 		);
 	}
 	getSettingsOf(settingsKey: string) {
-		return this.#settings.value.find((x) => x.key === settingsKey);
+		return this.#settings.value?.find((x) => x.key === settingsKey);
 	}
 	// originData param is used by some implementations. [NL] should be here, do not remove it.
 
@@ -621,21 +667,37 @@ export abstract class UmbBlockManagerContext<
 		}
 	}
 
+	/**
+	 * @deprecated this is not working, use the Property Dataset instead.
+	 */
+	// TODO: Deprecate and remove this.
 	setOneContentProperty(key: string, propertyAlias: string, value: unknown) {
 		this.#contents.updateOne(key, { [propertyAlias]: value });
 	}
+	/**
+	 * @deprecated this is not working, use the Property Dataset instead.
+	 */
+	// TODO: Deprecate and remove this.
 	setOneSettingsProperty(key: string, propertyAlias: string, value: unknown) {
 		this.#settings.updateOne(key, { [propertyAlias]: value });
 	}
 
+	/**
+	 * @deprecated this is not working, use the Property Dataset instead.
+	 */
+	// TODO: Deprecate and remove this.
 	contentProperty(key: string, propertyAlias: string) {
 		this.#contents.asObservablePart(
-			(source) => source.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
+			(source) => source?.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
 		);
 	}
+	/**
+	 * @deprecated this is not working, use the Property Dataset instead.
+	 */
+	// TODO: Deprecate and remove this.
 	settingsProperty(key: string, propertyAlias: string) {
 		this.#settings.asObservablePart(
-			(source) => source.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
+			(source) => source?.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
 		);
 	}
 
