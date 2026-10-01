@@ -23,8 +23,8 @@ export class UmbDynamicRootRepository extends UmbControllerBase {
 	/**
 	 * Request dynamic root
 	 * @param {UmbDynamicRoot} query - The dynamic root query to resolve
-	 * @param {string} entityUnique - The unique identifier of the entity to resolve the root for
-	 * @param {string} [parentUnique] - The unique identifier of the parent to resolve the root for
+	 * @param {string | null} entityUnique - The unique of the entity being edited, or null when it is new
+	 * @param {string | null} [parentUnique] - The unique of the parent of the entity being edited
 	 * @returns {Promise<Array<string> | undefined>} The resolved dynamic roots.
 	 * @memberof UmbDynamicRootRepository
 	 */

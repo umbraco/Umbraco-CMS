@@ -6,17 +6,16 @@ import { UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 /**
- * Resolves a configured dynamic root to the node a picker should start from.
+ * Resolves a configured dynamic root to the document a document picker should start from.
  *
- * A dynamic root is resolved against the content being edited rather than against the data type, so resolving it
- * needs the workspace and parent context a picker happens to be rendered in. Any picker that offers a dynamic root
- * needs exactly that, which is why this is a controller rather than part of one picker.
+ * A dynamic root is resolved against the content being edited rather than against the data type, so the resolver
+ * reads the surrounding content workspace and the parent entity the picker is rendered in.
  */
 export class UmbDocumentDynamicRootResolver extends UmbControllerBase {
 	readonly #repository = new UmbDynamicRootRepository(this);
 
 	/**
-	 * Resolves the unique of the node the picker should start from.
+	 * Resolves the unique of the document the picker should start from.
 	 * @param {UmbDynamicRoot | undefined} dynamicRoot - The configured dynamic root.
 	 * @returns {Promise<string | undefined>} The resolved start node unique, or undefined when there is nothing to resolve.
 	 */

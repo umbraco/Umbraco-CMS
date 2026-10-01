@@ -11,7 +11,7 @@ import type {
 import '../components/index.js';
 
 /**
- * Configures the dynamic root a picker starts from, for the pickers that offer one alongside a fixed start node.
+ * Configures the dynamic root a document picker starts from, for the pickers that offer one alongside a fixed start node.
  * @element umb-property-editor-ui-document-dynamic-root
  */
 @customElement('umb-property-editor-ui-document-dynamic-root')

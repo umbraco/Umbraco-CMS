@@ -7,6 +7,9 @@ export interface UmbDynamicRoot {
 	querySteps?: Array<UmbDynamicRootQueryStep>;
 }
 
+/**
+ * A query step applied to the resolved origin. `anyOfDocTypeKeys` limits the step to nodes of the listed content types.
+ */
 export interface UmbDynamicRootQueryStep {
 	unique: string;
 	alias: string;
