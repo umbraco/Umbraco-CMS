@@ -4,13 +4,13 @@ export interface UmbSearchIndexProviderNameConditionConfig extends UmbConditionC
 	/**
 	 * Define the provider name that this extension should be available for
 	 * @example
-	 * "Examine"
+	 * "search-examine-provider"
 	 */
 	match?: string;
 	/**
 	 * Define one or more provider names that this extension should be available for
 	 * @example
-	 * ["Examine"]
+	 * ["search-examine-provider"]
 	 */
 	oneOf?: Array<string>;
 }

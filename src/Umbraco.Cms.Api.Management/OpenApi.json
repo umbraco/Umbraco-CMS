@@ -43311,6 +43311,7 @@
       },
       "DocumentBlueprintTreeItemResponseModel": {
         "required": [
+          "variants",
           "isFolder",
           "noAccess",
           "name",
@@ -43329,6 +43330,12 @@
                 "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
               }
             ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
+            }
           },
           "isFolder": {
             "type": "boolean"
