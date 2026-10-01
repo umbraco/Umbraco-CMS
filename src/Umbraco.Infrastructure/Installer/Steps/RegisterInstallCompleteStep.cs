@@ -1,7 +1,6 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Installer;
 using Umbraco.Cms.Core.Models.Installer;
-using Umbraco.Cms.Infrastructure.Install;
 
 namespace Umbraco.Cms.Infrastructure.Installer.Steps;
 
@@ -10,16 +9,6 @@ namespace Umbraco.Cms.Infrastructure.Installer.Steps;
 /// </summary>
 public class RegisterInstallCompleteStep : StepBase, IInstallStep, IUpgradeStep
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RegisterInstallCompleteStep"/> class.
-    /// </summary>
-    /// <param name="installHelper">An <see cref="InstallHelper"/> instance used to assist with installation steps.</param>
-    [Obsolete("Please use the constructor without parameters. Scheduled for removal in Umbraco 19.")]
-    public RegisterInstallCompleteStep(InstallHelper installHelper)
-        : this()
-    {
-    }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="RegisterInstallCompleteStep"/> class.
     /// This is the default constructor.

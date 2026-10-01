@@ -5,12 +5,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -99,40 +97,6 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         globalSettings.OnChange(x => _globalSettings = x);
         _urlService = urlService;
         _contentRoutingReadiness = contentRoutingReadiness;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbracoRouteValueTransformer" /> class.
-    /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public UmbracoRouteValueTransformer(
-        ILogger<UmbracoRouteValueTransformer> logger,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedRouter publishedRouter,
-        IRuntimeState runtime,
-        IUmbracoRouteValuesFactory routeValuesFactory,
-        IRoutableDocumentFilter routableDocumentFilter,
-        IDataProtectionProvider dataProtectionProvider,
-        IControllerActionSearcher controllerActionSearcher,
-        IPublicAccessRequestHandler publicAccessRequestHandler,
-        IUmbracoVirtualPageRoute umbracoVirtualPageRoute,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IDocumentUrlService urlService)
-    : this(
-        logger,
-        umbracoContextAccessor,
-        publishedRouter,
-        runtime,
-        routeValuesFactory,
-        routableDocumentFilter,
-        dataProtectionProvider,
-        controllerActionSearcher,
-        publicAccessRequestHandler,
-        umbracoVirtualPageRoute,
-        globalSettings,
-        urlService,
-        StaticServiceProvider.Instance.GetRequiredService<IContentRoutingReadiness>())
-    {
     }
 
     /// <inheritdoc />

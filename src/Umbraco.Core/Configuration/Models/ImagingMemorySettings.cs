@@ -24,9 +24,7 @@ public class ImagingMemorySettings
     /// <summary>
     /// Whether image processing memory is managed by default.
     /// </summary>
-    // TODO (V19): Default to true, and update the remarks on Enabled and the imaging package's
-    // CLAUDE.md to match.
-    internal const bool StaticEnabled = false;
+    internal const bool StaticEnabled = true;
 
     /// <summary>
     /// The default maximum pool size, in megabytes. Zero means it is derived from the available memory.
@@ -64,8 +62,8 @@ public class ImagingMemorySettings
     /// <remarks>
     /// When enabled, the pool the imaging library retains between requests is capped, the number of
     /// images decoded at the same time is bounded and the size of a single decoded image is capped,
-    /// on hosts where the memory available to the process is limited. Defaults to <c>false</c>,
-    /// which leaves the imaging library's own memory behavior untouched.
+    /// on hosts where the memory available to the process is limited. Defaults to <c>true</c>; set to
+    /// <c>false</c> to leave the imaging library's own memory behavior untouched.
     /// </remarks>
     [DefaultValue(StaticEnabled)]
     public bool Enabled { get; set; } = StaticEnabled;

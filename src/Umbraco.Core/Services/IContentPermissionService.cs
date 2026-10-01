@@ -1,10 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
-using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -13,8 +9,6 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IContentPermissionService
 {
-    // TODO (V19): Remove the default implementations from this interface.
-
     /// <summary>
     ///     Authorize that a user has access to a content item.
     /// </summary>
@@ -22,8 +16,7 @@ public interface IContentPermissionService
     /// <param name="contentKey">The identifier of the content item to check for access.</param>
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid contentKey, string permissionToCheck)
-        => AuthorizeAccessAsync(user, contentKey.Yield(), new HashSet<string> { permissionToCheck });
+    Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid contentKey, string permissionToCheck);
 
     /// <summary>
     ///     Authorize that a user has access to content items.
@@ -110,18 +103,7 @@ public interface IContentPermissionService
     /// <param name="user"><see cref="IUser" /> to get permissions for.</param>
     /// <param name="contentKeys">The identifiers of the content items to get permissions for.</param>
     /// <returns>A task resolving into the effective permissions for each content item.</returns>
-    // TODO (V19): Remove the default implementation.
-    async Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> contentKeys)
-    {
-        // This default delegates to IUserService.GetDocumentPermissionsAsync, which resolves permissions using the same
-        // underlying algorithm as the optimised implementation in ContentPermissionService.
-        // The results are functionally equivalent; this default simply takes a less direct route.
-        // It exists for backward compatibility: custom IContentPermissionService implementations that predate this method
-        // will fall back here and retain the pre-existing IUserService behaviour without breaking.
-        IUserService userService = StaticServiceProvider.Instance.GetRequiredService<IUserService>();
-        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> result = await userService.GetDocumentPermissionsAsync(user.Key, contentKeys);
-        return result.Success ? result.Result : [];
-    }
+    Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> contentKeys);
 
     /// <summary>
     ///     Filters the fallback permissions for a user. Fallback permissions are the user group default permissions
@@ -142,9 +124,5 @@ public interface IContentPermissionService
     ///         therefore only remove verbs it owns.
     ///     </para>
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    // Default passes through unchanged for backward compatibility with custom implementations
-    // that predate this method.
-    Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions)
-        => Task.FromResult(fallbackPermissions);
+    Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions);
 }
