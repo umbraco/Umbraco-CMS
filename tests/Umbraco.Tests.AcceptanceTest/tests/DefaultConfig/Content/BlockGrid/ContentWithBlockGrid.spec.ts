@@ -4,6 +4,8 @@ import {expect} from "@playwright/test";
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const customDataTypeName = 'Custom Block Grid';
+const customRTEDataTypeName = 'TestRTETiptap';
+const customElementTypeName = 'BlockGridWithRTEElement';
 const elementTypeName = 'BlockGridElement';
 const propertyInBlock = 'Textstring';
 const groupName = 'testGroup';
@@ -21,6 +23,9 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
+  await umbracoApi.language.ensureNameNotExists('Danish');
 });
 
 test('can create content with an empty block grid', async ({umbracoApi, umbracoUi}) => {
@@ -328,8 +333,6 @@ test('can add a block element with inline editing mode enabled', async ({umbraco
 test('can add an invariant block element with an invariant RTE Tiptap in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const inputText = 'This is block test';
-  const customRTEDataTypeName = 'TestRTETiptap';
-  const customElementTypeName = 'BlockGridWithRTEElement';
   const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
   const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
   const customDataTypeId = await umbracoApi.dataType.createBlockGridWithPermissions(customDataTypeName, customElementTypeId, true, true);
@@ -353,16 +356,11 @@ test('can add an invariant block element with an invariant RTE Tiptap in the con
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockGridValue).toBeTruthy();
 
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
 });
 
 test('can add a variant block element with variant RTE Tiptap in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const inputText = 'This is block test';
-  const customRTEDataTypeName = 'TestRTETiptap';
-  const customElementTypeName = 'BlockGridWithRTEElement';
   await umbracoApi.language.createDanishLanguage();
   const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
   const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
@@ -387,17 +385,11 @@ test('can add a variant block element with variant RTE Tiptap in the content', a
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockGridValue).toBeTruthy();
 
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
-  await umbracoApi.language.ensureNameNotExists('Danish');
 });
 
 test('can add a variant block element with invariant RTE Tiptap in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const inputText = 'This is block test';
-  const customRTEDataTypeName = 'TestRTETiptap';
-  const customElementTypeName = 'BlockGridWithRTEElement';
   await umbracoApi.language.createDanishLanguage();
   const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
   const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
@@ -422,10 +414,6 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockGridValue).toBeTruthy();
 
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
-  await umbracoApi.language.ensureNameNotExists('Danish');
 });
 
 // Tests regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20680

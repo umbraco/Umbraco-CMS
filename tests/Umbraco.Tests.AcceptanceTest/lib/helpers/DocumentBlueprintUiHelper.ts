@@ -48,7 +48,7 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
     if (toReload) {
       await this.reloadDocumentBlueprintsTree();
     }
-    await this.isVisible(this.documentBlueprintTree.getByText(blueprintName, {exact: true}), isVisible);
+    await this.isAnyVisible(this.documentBlueprintTree.getByText(blueprintName, {exact: true}), isVisible);
   }
 
   async clickCreateDocumentBlueprintButton() {

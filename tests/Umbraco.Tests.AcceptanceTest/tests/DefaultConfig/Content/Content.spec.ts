@@ -206,8 +206,7 @@ test('can publish variant content node', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  await expect.poll(async () => (await umbracoApi.document.getByName(contentName)).variants[0].state).toBe('Published');
 });
 
 test('can duplicate a content node to root', async ({umbracoApi, umbracoUi}) => {
