@@ -19,7 +19,6 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(cultureDocumentTypeName);
   await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
-
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   const documentId = await umbracoApi.document.createPublishedDefaultDocument(documentName, documentTypeId);
 

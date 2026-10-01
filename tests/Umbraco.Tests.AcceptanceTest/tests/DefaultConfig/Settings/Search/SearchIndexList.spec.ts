@@ -7,7 +7,6 @@ const documentName = 'SearchIndexListDocument';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-
   await umbracoUi.goToBackOffice();
   await umbracoUi.searchManagement.goToSearchTreeItem();
 });

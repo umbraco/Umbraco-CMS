@@ -28,7 +28,6 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(secondDocumentTypeName);
   await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
-
   documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName) ?? '';
   secondDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(secondDocumentTypeName) ?? '';
   loginPageContentId = await umbracoApi.document.createPublishedDefaultDocument(loginPageContentName, secondDocumentTypeId);

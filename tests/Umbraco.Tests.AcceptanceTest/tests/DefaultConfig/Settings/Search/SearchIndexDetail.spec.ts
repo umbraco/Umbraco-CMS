@@ -7,7 +7,6 @@ const documentName = 'SearchIndexDetailDocument';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   const documentId = await umbracoApi.document.createPublishedDefaultDocument(documentName, documentTypeId);
   await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, documentName, documentId);

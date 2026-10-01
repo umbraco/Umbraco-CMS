@@ -28,7 +28,6 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dateTimeUnspecifiedDataTypeName);
   await umbracoApi.dataType.ensureNameNotExists(dateTimeWithTimeZoneDataTypeName);
   await umbracoApi.template.ensureNameNotExists(templateName);
-
   templateId = await umbracoApi.template.createDefaultTemplate(templateName) ?? '';
 });
 
