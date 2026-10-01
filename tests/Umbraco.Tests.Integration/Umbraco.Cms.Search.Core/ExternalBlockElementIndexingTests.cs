@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -268,6 +269,7 @@ public class ExternalBlockElementIndexingTests : PropertyValueHandlerTestsBase
 
     // once armed, blocks the first caller until opened, so a test can hold an indexing flow at a known point while
     // another flow runs. Only handles its own dedicated property alias, so it is inert for every other property.
+    [HideFromTypeFinder]
     public sealed class GatedPropertyValueHandler : IPropertyValueHandler
     {
         public const string PropertyAlias = "gatedText";
