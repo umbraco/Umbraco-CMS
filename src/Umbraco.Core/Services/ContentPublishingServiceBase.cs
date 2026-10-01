@@ -101,8 +101,6 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         return await PublishAsync(key, cultureAndSchedule, userKey);
     }
 
-    // TODO - Integrate this implementation into the one above.
-    [Obsolete("Use non obsoleted version instead. Scheduled for removal in v17")]
     private async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
         Guid key,
         CultureAndScheduleModel cultureAndSchedule,

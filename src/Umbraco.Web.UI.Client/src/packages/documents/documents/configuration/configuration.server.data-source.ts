@@ -17,8 +17,6 @@ export class UmbDocumentConfigurationServerDataSource extends UmbControllerBase 
 			const mappedData: UmbDocumentConfigurationModel = {
 				disableDeleteWhenReferenced: data.disableDeleteWhenReferenced,
 				disableUnpublishWhenReferenced: data.disableUnpublishWhenReferenced,
-
-				allowNonExistingSegmentsCreation: data.allowNonExistingSegmentsCreation,
 			};
 
 			return { data: mappedData };

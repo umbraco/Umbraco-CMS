@@ -1,8 +1,4 @@
 export interface UmbDocumentConfigurationModel {
 	disableDeleteWhenReferenced: boolean;
 	disableUnpublishWhenReferenced: boolean;
-	/**
-	 * @deprecated Will be removed in Umbraco 19. [NL]
-	 */
-	allowNonExistingSegmentsCreation: boolean;
 }

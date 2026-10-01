@@ -6,8 +6,7 @@ namespace Umbraco.Extensions;
 /// <summary>
 /// <see cref="IUmbracoEndpointBuilderContext" /> extensions for the Umbraco Delivery API.
 /// </summary>
-// TODO (V19): Rename this class and its file to UmbracoEndpointBuilderContextExtensions, matching what it actually extends.
-public static class DeliveryApiApplicationBuilderExtensions
+public static class UmbracoEndpointBuilderContextExtensions
 {
     /// <summary>
     /// Sets up routes for the Umbraco Delivery API.

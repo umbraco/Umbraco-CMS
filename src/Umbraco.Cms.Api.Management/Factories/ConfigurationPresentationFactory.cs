@@ -53,7 +53,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         {
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-            AllowNonExistingSegmentsCreation = _segmentSettings.AllowCreation,
         };
 
     /// <summary>
@@ -88,7 +87,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
     public MediaConfigurationResponseModel CreateMediaConfigurationResponseModel() => new()
     {
         DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
-        DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
     };
 
     /// <summary>
@@ -108,6 +106,5 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         {
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-            AllowNonExistingSegmentsCreation = _segmentSettings.AllowCreation,
         };
 }

@@ -6,14 +6,10 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Events;
@@ -183,16 +179,7 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandlerTests
             umbracoContextAccessor.Object,
             localizedTextService.Object,
             eventMessagesFactory.Object,
-            Options.Create(new ContentSettings { ShowUnroutableContentWarnings = showWarnings }),
-            Mock.Of<IPublishedRouter>(),
-            Mock.Of<ILanguageService>(),
-            Mock.Of<IContentService>(),
-            Mock.Of<IVariationContextAccessor>(),
-            NullLoggerFactory.Instance,
-            new UriUtility(Mock.Of<IHostingEnvironment>()),
-            Mock.Of<IPublishedUrlProvider>(),
-            Mock.Of<IDocumentNavigationQueryService>(),
-            Mock.Of<IPublishedContentStatusFilteringService>());
+            Options.Create(new ContentSettings { ShowUnroutableContentWarnings = showWarnings }));
     }
 
     private void SetupUrls(IContent content, params UrlInfo[] urls)

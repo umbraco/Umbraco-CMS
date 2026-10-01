@@ -557,6 +557,32 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
+    /// <inheritdoc/>
+    public IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases, bool loadTemplates = true)
+    {
+        Guid[] idsA = ids.Distinct().ToArray();
+        if (idsA.Length == 0)
+        {
+            return Enumerable.Empty<TContent>();
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds);
+
+        var index = new Dictionary<Guid, TContent>(idsA.Length);
+        foreach (IEnumerable<Guid> group in idsA.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            List<Guid> groupKeys = group.ToList();
+            IQuery<TContent>? query = Query<TContent>()?.Where(x => groupKeys.Contains(x.Key));
+            foreach (TContent item in _contentRepository.GetPage(query, 0, groupKeys.Count, out _, propertyAliases, null, Ordering.By("sortOrder"), loadTemplates))
+            {
+                index[item.Key] = item;
+            }
+        }
+
+        return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+    }
+
     /// <inheritdoc />
     public IEnumerable<TContent> GetPagedOfType(
         int contentTypeId,

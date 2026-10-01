@@ -8,10 +8,8 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// <summary>
 ///     Typed configuration options for debug settings.
 /// </summary>
-// TODO (V19): Rename to DebugSettings to match the "Umbraco:CMS:Debug" section (the "Core" prefix
-// dates from the legacy "Umbraco:CMS:Core:Debug" section, which is deprecated).
 [UmbracoOptions(Constants.Configuration.ConfigDebug)]
-public class CoreDebugSettings
+public class DebugSettings
 {
     /// <summary>
     ///     The default value for logging incompleted scopes.

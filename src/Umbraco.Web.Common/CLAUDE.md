@@ -311,7 +311,7 @@ Implement `IVirtualPageController` for URL-to-content mapping without physical c
 Multiple analyzer warnings suppressed:
 - SA1117, SA1401, SA1134 - StyleCop formatting
 - ASP0019 - Header dictionary usage
-- CS0618/SYSLIB0051 - Obsolete references
+- CS0618 - Obsolete references
 - IDE0040/SA1400 - Access modifiers
 - SA1649 - File name matching
 

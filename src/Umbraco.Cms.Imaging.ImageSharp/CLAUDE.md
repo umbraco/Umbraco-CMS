@@ -129,7 +129,7 @@ if (_options.HMACSecretKey.Length != 0 && _requestAuthorizationUtilities is not 
           "MaxHeight": 5000
         },
         "Memory": {
-          "Enabled": false,
+          "Enabled": true,
           "MaximumPoolSizeMegabytes": 0,
           "MaximumConcurrentProcessing": 0,
           "MaximumDecodedImageMegabytes": 0
@@ -147,7 +147,7 @@ Each numeric value defaults to `0`, meaning "derive from the memory available to
 
 | Setting | Purpose | Default |
 |---------|---------|---------|
-| `Enabled` | Master switch for imaging memory management. When `false`, none of the three bounds is applied and ImageSharp's own memory behaviour is left untouched. | `false` in v17/v18, `true` from v19 |
+| `Enabled` | Master switch for imaging memory management. When `false`, none of the three bounds is applied and ImageSharp's own memory behaviour is left untouched. | `true` |
 | `MaximumPoolSizeMegabytes` | Caps the unmanaged buffer pool ImageSharp retains between requests | available / 32, clamped to 16-64 MB |
 | `MaximumConcurrentProcessing` | Caps how many images are processed at once | (available / 2) / 64 MB, capped at processor count |
 | `MaximumDecodedImageMegabytes` | Caps any single buffer allocated while decoding an image | available / 4, clamped to 256-1024 MB |
@@ -202,8 +202,8 @@ turned away with `503` and a `Retry-After`, logged as a warning. It must not be 
 unthrottled on expiry instead — concurrent decodes are the thing being bounded, so that reinstates
 the OOM under sustained load.
 
-`Enabled: false` is the one-setting escape hatch that restores stock ImageSharp behaviour — and,
-until v19, the default. `Configure` reports two independent facts about it, each once at startup:
+`Enabled: false` is the one-setting escape hatch that restores stock ImageSharp behaviour.
+`Configure` reports two independent facts about it, each once at startup:
 
 - On a host a bound *would* have engaged on (under the 4 GB threshold), it says so at
   **Information**, naming the available memory, the threshold and the switch
