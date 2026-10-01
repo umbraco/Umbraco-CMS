@@ -1,4 +1,7 @@
 parameters:
+  - name: dependsOn
+    type: object
+    default: []
   - name: projectName
     type: string
   - name: umbracoVersion
@@ -9,6 +12,7 @@ parameters:
 jobs:
 - job: Create_DT_Project
   displayName: Create Dependency Track Project
+  dependsOn: ${{ parameters.dependsOn }}
   steps:
     - checkout: none
 
