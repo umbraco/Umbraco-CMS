@@ -115,6 +115,8 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
     /// Aliases are routing data for the published site, so this reads the published version's property
     /// data (joined via <see cref="DocumentVersionDto"/>) rather than the current/draft version - a draft
     /// edit to an alias must not affect routing until the document is actually published.
+    /// The document itself must also be published (<see cref="DocumentDto"/>): unpublishing leaves the last
+    /// published version flagged as published, so the version flag alone would still return its former aliases.
     /// </remarks>
     public IEnumerable<DocumentUrlAliasRaw> GetAllDocumentUrlAliases()
     {
@@ -129,7 +131,7 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
             .InnerJoin<DocumentDto>("d").On<NodeDto, DocumentDto>((n, d) => n.NodeId == d.NodeId, "n", "d")
             .Where<PropertyTypeDto>(pt => pt.Alias == Constants.Conventions.Content.UrlAlias, "pt")
             .Where<DocumentVersionDto>(dv => dv.Published == true, "dv")
-            .Where<DocumentDto>(d => d.Published == true, "d") // Unpublishing keeps the last published version flagged
+            .Where<DocumentDto>(d => d.Published == true, "d")
             .Where<NodeDto>(n => n.Trashed == false, "n")
             .Where<NodeDto>(n => n.NodeObjectType == Constants.ObjectTypes.Document, "n") // Exclude blueprints
             .Append($"AND (pd.{QuotedColName("textValue")} IS NOT NULL OR pd.{QuotedColName("varcharValue")} IS NOT NULL)");
