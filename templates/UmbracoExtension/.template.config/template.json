@@ -152,7 +152,8 @@
         {
           "condition": "(!IncludeExample)",
           "exclude": [
-            "[Cc]lient/src/dashboards/**"
+            "[Cc]lient/src/dashboards/**",
+            "ViewModels/**"
           ]
         },
         {
