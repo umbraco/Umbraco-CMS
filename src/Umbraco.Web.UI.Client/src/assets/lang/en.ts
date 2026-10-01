@@ -327,6 +327,8 @@ export default {
 		unpublish: 'Unpublish',
 		unpublished: 'Unpublished',
 		notCreated: 'Not created',
+		segmentHasContent: 'Has segmented content',
+		segmentNoContent: 'No content',
 		updateDate: 'Last edited',
 		updateDateDesc: 'Date/time this document was edited',
 		uploadClear: 'Clear file(s)',

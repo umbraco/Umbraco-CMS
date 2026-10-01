@@ -562,6 +562,8 @@ declare global {
 		content_scheduledPublishing: string;
 		content_scheduledPublishServerTime: string;
 		content_schedulePublishHelp: string;
+		content_segmentHasContent: string;
+		content_segmentNoContent: string;
 		content_selectAllVariants: string;
 		content_sendForApproval: string;
 		content_setDate: string;
