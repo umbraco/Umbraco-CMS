@@ -1,4 +1,4 @@
-import type { UmbConfirmActionModalEntityReferencesConfig } from '../../../global-components/types.js';
+import type { UmbEntityReferencesConfig } from '../../../global-components/types.js';
 import type {
 	UmbDeleteWithRelationConfirmModalData,
 	UmbDeleteWithRelationConfirmModalValue,
@@ -19,7 +19,7 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 	private _name?: string;
 
 	@state()
-	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbEntityReferencesConfig;
 
 	#itemRepository?: UmbItemRepository<any>;
 
@@ -56,8 +56,7 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 			<uui-dialog-layout class="uui-text" headline=${headline}>
 				<p>${this.localize.htmlString('#defaultdialogs_confirmdelete', this._name)}</p>
 				${this._referencesConfig
-					? html`<umb-confirm-action-modal-entity-references
-							.config=${this._referencesConfig}></umb-confirm-action-modal-entity-references>`
+					? html`<umb-entity-references-summary .config=${this._referencesConfig}></umb-entity-references-summary>`
 					: nothing}
 
 				<uui-button

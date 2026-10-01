@@ -1759,6 +1759,7 @@ declare global {
 		profiling_profilerEnabledDescription: string;
 		profiling_reminder: string;
 		profiling_reminderDescription: string;
+		prompt_cannotUnpublishWhenReferenced: string;
 		prompt_confirmListViewPublish: string;
 		prompt_confirmListViewUnpublish: string;
 		prompt_confirmPublish: string;
@@ -1857,6 +1858,8 @@ declare global {
 		references_itemHasNoReferences: string;
 		references_labelDependentDescendants: string;
 		references_labelDependsOnThis: string;
+		references_labelDescendantsWithReferences: string;
+		references_labelElementsWithPendingChanges: string;
 		references_labelMoreReferences: (count: number) => string;
 		references_labelUsedByDocuments: string;
 		references_labelUsedByDocumentTypes: string;
@@ -1872,6 +1875,9 @@ declare global {
 		references_tabName: string;
 		references_unpublishWarning: string;
 		references_usedByProperties: string;
+		references_viewDependentItemsAction: string;
+		references_viewDescendantsWithReferencesAction: string;
+		references_viewEntitiesNeedingAttentionAction: string;
 		relatedlinks_caption: string;
 		relatedlinks_captionPlaceholder: string;
 		relatedlinks_chooseInternal: string;
