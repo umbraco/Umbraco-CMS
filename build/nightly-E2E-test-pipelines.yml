@@ -609,6 +609,23 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
+            # AllowEditInvariantConfig
+            WindowsAllowEditInvariantConfig:
+              vmImage: "windows-latest"
+              testFolder: "AllowEditInvariantConfig"
+              port: ''
+              testCommand: "npx playwright test --project=allowEditInvariantConfig"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxAllowEditInvariantConfig:
+              vmImage: "ubuntu-latest"
+              testFolder: "AllowEditInvariantConfig"
+              port: ''
+              testCommand: "npx playwright test --project=allowEditInvariantConfig"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
             # SMTP
             LinuxSMTP:
               vmImage: "ubuntu-latest"
