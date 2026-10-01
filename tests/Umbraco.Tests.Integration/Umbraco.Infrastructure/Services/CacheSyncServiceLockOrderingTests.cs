@@ -4,15 +4,12 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
-using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -39,45 +36,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTestWithContent
+internal sealed class CacheSyncServiceLockOrderingTests : CacheSyncIntegrationTestBase
 {
-    private const string RemoteIdentity = "remote-server";
-    private static readonly string _contentCacheKey = typeof(IContent).FullName!;
-
     private static readonly FieldInfo _syncLockField =
         typeof(CacheInstructionService).GetField("_syncLock", BindingFlags.Instance | BindingFlags.NonPublic)
         ?? throw new InvalidOperationException("CacheInstructionService._syncLock not found; update the test.");
 
-    private ICacheSyncService CacheSyncService => GetRequiredService<ICacheSyncService>();
-
-    private ICacheInstructionService CacheInstructionService => GetRequiredService<ICacheInstructionService>();
-
-    private IRepositoryCacheVersionRepository CacheVersionRepository => GetRequiredService<IRepositoryCacheVersionRepository>();
-
-    private ILastSyncedRepository LastSyncedRepository => GetRequiredService<ILastSyncedRepository>();
-
-    private ILastSyncedManager LastSyncedManager => GetRequiredService<ILastSyncedManager>();
-
     private LockRecorder Recorder => GetRequiredService<LockRecorder>();
-
-    private RefreshRecorder Refreshes => GetRequiredService<RefreshRecorder>();
-
-    private string LocalIdentity => GetRequiredService<IMachineInfoFactory>().GetLocalIdentity();
-
-    // Repositories only use (and sync) their cache policies with real app caches; the test host defaults to NoCache.
-    // The request cache is a mock so the version is not cached across the whole test.
-    protected override void ConfigureTestServices(IServiceCollection services)
-        => services.AddSingleton(AppCaches.Create(Mock.Of<IRequestCache>()));
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         base.CustomTestSetup(builder);
 
-        builder.LoadBalanceIsolatedCaches();
-
         builder.Services.AddSingleton<LockRecorder>();
-        builder.Services.AddSingleton<RefreshRecorder>();
-        builder.CacheRefreshers().Add<RecordingCacheRefresher>();
 
         builder.Services.AddUnique<IDistributedLockingMechanismFactory>(sp => new RecordingLockingMechanismFactory(
             ActivatorUtilities.CreateInstance<DefaultDistributedLockingMechanismFactory>(sp),
@@ -90,11 +61,7 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
     }
 
     [SetUp]
-    public void ResetRecorders()
-    {
-        Recorder.Clear();
-        Refreshes.Reset();
-    }
+    public void ResetLockRecorder() => Recorder.Clear();
 
     [Test]
     public void SyncInternal_Completes_While_Another_Thread_Holds_The_Full_Sync_Lock()
@@ -472,58 +439,6 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
 
     private SyncLockHolder HoldSyncLockOnAnotherThread() => new(GetSyncLock());
 
-    // Dedicated threads: the callers block on synchronous waits, which starves the pool when many fixtures run together.
-    private static Task RunDetached(Action action)
-    {
-        using (ExecutionContext.SuppressFlow())
-        {
-            return Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-        }
-    }
-
-    /// <summary>Writes a cache version the way another server would: to the database only.</summary>
-    private void WriteRemoteCacheVersion(string cacheKey)
-    {
-        using IScope scope = ScopeProvider.CreateScope();
-        CacheVersionRepository.SaveAsync(new RepositoryCacheVersion
-        {
-            Identifier = cacheKey,
-            Version = Guid.NewGuid().ToString(),
-        }).GetAwaiter().GetResult();
-        scope.Complete();
-    }
-
-    /// <summary>
-    ///     Makes this server aware of the current IContent cache version and populates the isolated cache with Textpage.
-    ///     Creating content does not write a version row, and without one a read adopts whatever remote version it finds
-    ///     later instead of syncing.
-    /// </summary>
-    private void InitialiseLocalContentCacheVersion()
-    {
-        WriteRemoteCacheVersion(_contentCacheKey);
-        ContentService.GetById(Textpage.Key);
-    }
-
-    private void DeliverRemoteInstructions(params RefreshInstruction[] instructions)
-        => CacheInstructionService.DeliverInstructions(instructions, RemoteIdentity);
-
-    private RefreshInstruction ContentInstruction(IContent content, TreeChangeTypes changeTypes)
-        => new(
-            ContentCacheRefresher.UniqueId,
-            RefreshMethodType.RefreshByJson,
-            Guid.Empty,
-            0,
-            null!,
-            GetRequiredService<ContentCacheRefresher>().Serialize(new ContentCacheRefresher.JsonPayload
-            {
-                Id = content.Id,
-                Key = content.Key,
-                ChangeTypes = changeTypes,
-            }));
-
-    private RefreshInstruction ContentRefreshNodeInstruction(IContent content)
-        => ContentInstruction(content, TreeChangeTypes.RefreshNode);
-
     private RefreshInstruction DomainRefreshAllInstruction()
         => new(
             DomainCacheRefresher.UniqueId,
@@ -532,10 +447,6 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
             0,
             null!,
             GetRequiredService<DomainCacheRefresher>().Serialize(new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll)));
-
-    // Identical instructions are processed once per run, so give each one a distinct payload where several are needed.
-    private static RefreshInstruction RecordingInstruction(int marker = 0)
-        => new(RecordingCacheRefresher.UniqueId, RefreshMethodType.RefreshByJson, Guid.Empty, 0, null!, $"[{marker}]");
 
     /// <summary>
     ///     Saves as another server would: the write bypasses this server's isolated cache, then the remote server's new
@@ -552,7 +463,7 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        WriteRemoteCacheVersion(_contentCacheKey);
+        WriteRemoteCacheVersion(ContentCacheKey);
         DeliverRemoteInstructions(ContentRefreshNodeInstruction(remote));
     }
 
@@ -567,17 +478,8 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        WriteRemoteCacheVersion(_contentCacheKey);
+        WriteRemoteCacheVersion(ContentCacheKey);
         DeliverRemoteInstructions(ContentInstruction(remote, TreeChangeTypes.Remove));
-    }
-
-    private IContent? CachedContent(Guid key)
-        => AppCaches.IsolatedCaches.GetOrCreate<IContent>().GetCacheItem<IContent>(RepositoryCacheKeys.GetGuidKey<IContent>(key));
-
-    private int? LastSyncedInternalIdInDatabase()
-    {
-        using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
-        return LastSyncedRepository.GetInternalIdAsync().GetAwaiter().GetResult();
     }
 
     /// <summary>Holds <c>CacheInstructionService._syncLock</c> on another thread until disposed, as the full sync would.</summary>
@@ -615,55 +517,6 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
             _holder.Wait();
             _release.Dispose();
         }
-    }
-
-    internal sealed class RefreshRecorder
-    {
-        private int _refresh;
-        private int _refreshInternal;
-
-        public int RefreshCount => Volatile.Read(ref _refresh);
-
-        public int RefreshInternalCount => Volatile.Read(ref _refreshInternal);
-
-        public void Refreshed() => Interlocked.Increment(ref _refresh);
-
-        public void RefreshedInternal() => Interlocked.Increment(ref _refreshInternal);
-
-        public void Reset()
-        {
-            Interlocked.Exchange(ref _refresh, 0);
-            Interlocked.Exchange(ref _refreshInternal, 0);
-        }
-    }
-
-    private sealed class RecordingCacheRefresher(RefreshRecorder recorder) : IJsonCacheRefresher
-    {
-        public static readonly Guid UniqueId = new("6D3F2D1E-4C0B-4C7A-9B1E-6F0E1F2A3B4C");
-
-        public Guid RefresherUniqueId => UniqueId;
-
-        public string Name => "Recording cache refresher";
-
-        public void RefreshAll()
-        {
-        }
-
-        public void Refresh(int id)
-        {
-        }
-
-        public void Remove(int id)
-        {
-        }
-
-        public void Refresh(Guid id)
-        {
-        }
-
-        public void Refresh(string json) => recorder.Refreshed();
-
-        public void RefreshInternal(string json) => recorder.RefreshedInternal();
     }
 
     /// <summary>Records lock acquisitions and whether <c>CacheInstructionService._syncLock</c> was held.</summary>

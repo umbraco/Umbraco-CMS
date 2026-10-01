@@ -1,7 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -20,6 +22,25 @@ public sealed class DatabaseServerMessengerNotificationHandler :
     private readonly ILogger<DatabaseServerMessengerNotificationHandler> _logger;
     private readonly IServerMessenger _messenger;
     private readonly IRuntimeState _runtimeState;
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DatabaseServerMessengerNotificationHandler" /> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public DatabaseServerMessengerNotificationHandler(
+        IServerMessenger serverMessenger,
+        IUmbracoDatabaseFactory databaseFactory,
+        ILogger<DatabaseServerMessengerNotificationHandler> logger,
+        IRuntimeState runtimeState)
+        : this(
+            serverMessenger,
+            databaseFactory,
+            logger,
+            runtimeState,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+    {
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DatabaseServerMessengerNotificationHandler" /> class.
@@ -28,12 +49,14 @@ public sealed class DatabaseServerMessengerNotificationHandler :
         IServerMessenger serverMessenger,
         IUmbracoDatabaseFactory databaseFactory,
         ILogger<DatabaseServerMessengerNotificationHandler> logger,
-        IRuntimeState runtimeState)
+        IRuntimeState runtimeState,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
     {
         _databaseFactory = databaseFactory;
         _logger = logger;
         _messenger = serverMessenger;
         _runtimeState = runtimeState;
+        _repositoryCacheVersionService = repositoryCacheVersionService;
     }
 
     /// <inheritdoc />
@@ -56,8 +79,17 @@ public sealed class DatabaseServerMessengerNotificationHandler :
     }
 
     /// <summary>
-    /// Handles the end of an Umbraco request by clearing the batch of distributed cache instructions.
+    /// Handles the end of an Umbraco request: writes the batched distributed cache instructions, then publishes the
+    /// repository cache versions deferred during the request.
     /// </summary>
     /// <param name="notification">The notification instance signaling the end of an Umbraco request.</param>
-    public void Handle(UmbracoRequestEndNotification notification) => _messenger?.SendMessages();
+    /// <remarks>
+    /// The order matters. A server that sees a new cache version before the matching instruction syncs, finds
+    /// nothing to refresh and keeps its stale entries until the next periodic sync.
+    /// </remarks>
+    public void Handle(UmbracoRequestEndNotification notification)
+    {
+        _messenger?.SendMessages();
+        _repositoryCacheVersionService.FlushCacheUpdatesAsync().GetAwaiter().GetResult();
+    }
 }

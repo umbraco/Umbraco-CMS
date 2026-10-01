@@ -21,6 +21,7 @@ public class RepositoryCacheVersionServiceTests
     private Mock<IRepositoryCacheVersionAccessor> _accessor = null!;
     private FakeScopeContext _defaultScopeContext = null!;
     private RepositoryCacheVersionService _sut = null!;
+    private RepositoryCacheVersionService _deferringSut = null!;
 
     [SetUp]
     public void SetUp()
@@ -42,11 +43,23 @@ public class RepositoryCacheVersionServiceTests
                 It.IsAny<bool>()))
             .Returns(Mock.Of<ICoreScope>());
 
+        // No request cache: versions are written as soon as they are registered.
         _sut = new RepositoryCacheVersionService(
             _scopeProvider.Object,
             _repository.Object,
             NullLogger<RepositoryCacheVersionService>.Instance,
-            _accessor.Object);
+            _accessor.Object,
+            Mock.Of<IRequestCache>());
+
+        // A request cache: versions are deferred until FlushCacheUpdatesAsync.
+        _deferringSut = new RepositoryCacheVersionService(
+            _scopeProvider.Object,
+            _repository.Object,
+            NullLogger<RepositoryCacheVersionService>.Instance,
+            _accessor.Object,
+            new DictionaryAppCache());
+
+        _repository.Setup(x => x.SaveAsync(It.IsAny<RepositoryCacheVersion>())).Returns(Task.CompletedTask);
     }
 
     [Test]
@@ -100,8 +113,6 @@ public class RepositoryCacheVersionServiceTests
     public async Task SetCacheUpdatedAsync_WritesOnlyOncePerScopeForSameEntityType()
     {
         var cacheKey = _sut.GetCacheKey<IContent>();
-        _repository.Setup(x => x.SaveAsync(It.IsAny<RepositoryCacheVersion>())).Returns(Task.CompletedTask);
-
         await _sut.SetCacheUpdatedAsync<IContent>();
         await _sut.SetCacheUpdatedAsync<IContent>();
 
@@ -115,7 +126,6 @@ public class RepositoryCacheVersionServiceTests
     public async Task SetCacheUpdatedAsync_WritesAgain_AfterScopeExit()
     {
         var cacheKey = _sut.GetCacheKey<IContent>();
-        _repository.Setup(x => x.SaveAsync(It.IsAny<RepositoryCacheVersion>())).Returns(Task.CompletedTask);
 
         // First scope: one write.
         await _sut.SetCacheUpdatedAsync<IContent>();
@@ -140,8 +150,6 @@ public class RepositoryCacheVersionServiceTests
         _scopeProvider.Setup(x => x.Context).Returns((IScopeContext?)null);
 
         var cacheKey = _sut.GetCacheKey<IContent>();
-        _repository.Setup(x => x.SaveAsync(It.IsAny<RepositoryCacheVersion>())).Returns(Task.CompletedTask);
-
         await _sut.SetCacheUpdatedAsync<IContent>();
         await _sut.SetCacheUpdatedAsync<IContent>();
 
@@ -149,6 +157,121 @@ public class RepositoryCacheVersionServiceTests
             x => x.SaveAsync(It.Is<RepositoryCacheVersion>(v => v.Identifier == cacheKey)),
             Times.Exactly(2),
             "Without a scope context every call must write a new version.");
+    }
+
+    [Test]
+    public async Task SetCacheUpdatedAsync_DoesNotPublishTheVersion_WhileARequestCacheIsAvailable()
+    {
+        await _deferringSut.SetCacheUpdatedAsync<IContent>();
+        _defaultScopeContext.ScopeExit(completed: true);
+
+        _repository.Verify(x => x.SaveAsync(It.IsAny<RepositoryCacheVersion>()), Times.Never);
+        _accessor.Verify(x => x.VersionChanged(It.IsAny<string>(), It.IsAny<Guid>()), Times.Never);
+    }
+
+    [Test]
+    public async Task FlushCacheUpdatesAsync_PublishesOneVersionPerPendingEntityType()
+    {
+        var contentKey = _deferringSut.GetCacheKey<IContent>();
+        var mediaKey = _deferringSut.GetCacheKey<IMedia>();
+
+        await _deferringSut.SetCacheUpdatedAsync<IContent>();
+        await _deferringSut.SetCacheUpdatedAsync<IContent>();
+        await _deferringSut.SetCacheUpdatedAsync<IMedia>();
+        _defaultScopeContext.ScopeExit(completed: true);
+
+        await _deferringSut.FlushCacheUpdatesAsync();
+
+        _repository.Verify(x => x.SaveAsync(It.Is<RepositoryCacheVersion>(v => v.Identifier == contentKey)), Times.Once);
+        _repository.Verify(x => x.SaveAsync(It.Is<RepositoryCacheVersion>(v => v.Identifier == mediaKey)), Times.Once);
+        _accessor.Verify(x => x.VersionChanged(contentKey, It.IsAny<Guid>()), Times.Once);
+        _accessor.Verify(x => x.VersionChanged(mediaKey, It.IsAny<Guid>()), Times.Once);
+    }
+
+    [Test]
+    public async Task FlushCacheUpdatesAsync_PublishesTheVersionTheLocalCacheThenMatches()
+    {
+        var cacheKey = _deferringSut.GetCacheKey<IContent>();
+        RepositoryCacheVersion? published = null;
+        _repository
+            .Setup(x => x.SaveAsync(It.IsAny<RepositoryCacheVersion>()))
+            .Callback<RepositoryCacheVersion>(v => published = v)
+            .Returns(Task.CompletedTask);
+
+        await _deferringSut.SetCacheUpdatedAsync<IContent>();
+        _defaultScopeContext.ScopeExit(completed: true);
+        await _deferringSut.FlushCacheUpdatesAsync();
+
+        Assert.That(published, Is.Not.Null);
+        _accessor.Setup(x => x.GetAsync(cacheKey)).ReturnsAsync(published);
+
+        Assert.That(await _deferringSut.IsCacheSyncedAsync<IContent>(), Is.True, "The published version is not the one adopted locally.");
+    }
+
+    [Test]
+    public async Task SetCacheUpdatedAsync_DropsThePendingVersion_WhenTheScopeDoesNotComplete()
+    {
+        await _deferringSut.SetCacheUpdatedAsync<IContent>();
+        _defaultScopeContext.ScopeExit(completed: false);
+
+        await _deferringSut.FlushCacheUpdatesAsync();
+
+        _repository.Verify(x => x.SaveAsync(It.IsAny<RepositoryCacheVersion>()), Times.Never);
+    }
+
+    [Test]
+    public async Task SetCacheUpdatedAsync_PendsImmediately_WithoutAScopeContext()
+    {
+        _scopeProvider.Setup(x => x.Context).Returns((IScopeContext?)null);
+
+        await _deferringSut.SetCacheUpdatedAsync<IContent>();
+        _repository.Verify(x => x.SaveAsync(It.IsAny<RepositoryCacheVersion>()), Times.Never);
+
+        await _deferringSut.FlushCacheUpdatesAsync();
+
+        _repository.Verify(x => x.SaveAsync(It.IsAny<RepositoryCacheVersion>()), Times.Once);
+    }
+
+    [Test]
+    public async Task FlushCacheUpdatesAsync_IsIdempotent()
+    {
+        await _deferringSut.SetCacheUpdatedAsync<IContent>();
+        _defaultScopeContext.ScopeExit(completed: true);
+
+        await _deferringSut.FlushCacheUpdatesAsync();
+        await _deferringSut.FlushCacheUpdatesAsync();
+
+        _repository.Verify(x => x.SaveAsync(It.IsAny<RepositoryCacheVersion>()), Times.Once);
+    }
+
+    [Test]
+    public async Task SetCachesSyncedAsync_WithVersions_AdoptsThemWithoutReadingTheDatabase()
+    {
+        var cacheKey = _sut.GetCacheKey<IContent>();
+        var version = new RepositoryCacheVersion { Identifier = cacheKey, Version = Guid.NewGuid().ToString() };
+
+        await _sut.SetCachesSyncedAsync(new[] { version });
+
+        _accessor.Setup(x => x.GetAsync(cacheKey)).ReturnsAsync(version);
+        Assert.That(await _sut.IsCacheSyncedAsync<IContent>(), Is.True);
+        _repository.Verify(x => x.GetAllAsync(), Times.Never);
+        _accessor.Verify(x => x.CachesSynced(), Times.Once);
+    }
+
+    [Test]
+    public async Task GetCacheVersionsAsync_ReturnsThePublishedVersions()
+    {
+        _repository
+            .Setup(x => x.GetAllAsync())
+            .ReturnsAsync(new[]
+            {
+                new RepositoryCacheVersion { Identifier = "a", Version = Guid.NewGuid().ToString() },
+                new RepositoryCacheVersion { Identifier = "b", Version = null },
+            });
+
+        IReadOnlyCollection<RepositoryCacheVersion> versions = await _sut.GetCacheVersionsAsync();
+
+        Assert.That(versions.Select(x => x.Identifier), Is.EquivalentTo(new[] { "a", "b" }));
     }
 
     private sealed class FakeScopeContext : IScopeContext
