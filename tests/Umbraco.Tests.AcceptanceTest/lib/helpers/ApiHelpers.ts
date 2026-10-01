@@ -37,7 +37,7 @@ import {MediaDeliveryApiHelper} from './differentAppSettingsHelpers/MediaDeliver
 import {ContentDeliveryApiHelper} from "./differentAppSettingsHelpers/ContentDeliveryApiHelper";
 import {SmtpApiHelper} from './SmtpApiHelper';
 import {ElementApiHelper} from "./ElementApiHelper";
-import {SearchManagementApiHelper} from "./SearchManagementApiHelper";
+import {SearchManagementApiHelper} from './SearchManagementApiHelper';
 
 export class ApiHelpers {
   baseUrl: string = umbracoConfig.environment.baseUrl;

@@ -44,7 +44,8 @@ test('indexes each culture variant separately and returns only the requested cul
     .poll(async () => queryNamesForCulture(umbracoApi, danishIsoCode, filter), {timeout: ConstantHelper.timeout.pageLoad})
     .toContain(danishName);
 
-  // Assert - names are rendered in the requested culture regardless of what the index matched, so check the count
+  // Assert - item names are rendered in the requested culture whatever the index matched, so only the count
+  // shows the query was scoped: matching both cultures' index entries would return this document twice
   await expect
     .poll(async () => (await queryForCulture(umbracoApi, englishIsoCode, filter)).total, {timeout: ConstantHelper.timeout.pageLoad})
     .toBe(1);

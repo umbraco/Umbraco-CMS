@@ -39,7 +39,7 @@ import {ExternalLoginUiHelpers} from "./differentAppSettingsHelpers/ExternalLogi
 import {LibraryUiHelper} from "./LibraryUiHelper";
 import {PreviewUiHelper} from "./PreviewUiHelper";
 import {BackofficeSearchUiHelper} from "./BackofficeSearchUiHelper";
-import {SearchManagementUiHelper} from "./SearchManagementUiHelper";
+import {SearchManagementUiHelper} from './SearchManagementUiHelper';
 
 export class UiHelpers {
   page: Page;

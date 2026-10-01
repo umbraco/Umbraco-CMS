@@ -11,8 +11,10 @@ const danishIsoCode = 'da';
 const englishSearchableValue = 'SearchBoxCultureEnglishValue1234567890';
 const danishSearchableValue = 'SearchBoxCultureDanishValue1234567890';
 const indexAlias = 'Umb_Content';
-// Matches the search box's page size
+// Mirrors PAGE_SIZE in search-index-search-box.element.ts - the search box only renders its pagination once
+// the result set spans more than one page.
 const searchResultsPageSize = 10;
+// A shared word token so one query matches every paging document, enough to need a second page.
 const pagingToken = 'SearchIndexSearchBoxPaging';
 const pagingDocumentNames = Array.from({length: searchResultsPageSize + 1}, (_, i) => `${pagingToken} Item${i + 1}`);
 
@@ -21,7 +23,8 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.document.ensureNameNotExists(documentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 
-  // The search box is disabled until the index is Healthy, which needs at least one document
+  // The search box is disabled unless its index is Healthy, and a freshly installed instance indexes as
+  // Empty - publish a document so Umb_Content has at least one document to search for.
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   const documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
   await umbracoApi.document.publish(documentId);
@@ -30,6 +33,8 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   const contentIndex = indexes.items.find((index) => index.indexAlias === indexAlias);
   expect(contentIndex, `the ${indexAlias} index must exist`).toBeTruthy();
 
+  // A healthy index does not imply the document just published has been indexed - indexing is asynchronous -
+  // so wait for the document itself to be findable, which is what every test below depends on.
   await expect
     .poll(async () => (await umbracoApi.searchManagement.getIndex(indexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
     .toBe('Healthy');
@@ -60,7 +65,7 @@ test.describe('results', () => {
   });
 
   test('shows only the documents that match the query', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
+    // Arrange - an indexed document the query must not match, so a search that ignores the query cannot pass
     const documentTypeId = (await umbracoApi.documentType.getByName(documentTypeName)).id;
     const decoyDocumentId = await umbracoApi.document.createDefaultDocument(decoyDocumentName, documentTypeId);
     await umbracoApi.document.publish(decoyDocumentId);
@@ -69,7 +74,7 @@ test.describe('results', () => {
     // Act
     await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(documentName);
 
-    // Assert
+    // Assert - a single match fits on one page
     await umbracoUi.searchManagement.isSearchResultsTableVisible();
     await umbracoUi.searchManagement.isSearchNoResultsMessageVisible(false);
     await umbracoUi.searchManagement.doesSearchResultsTableContainText(documentName);
@@ -98,7 +103,7 @@ test.describe('culture', () => {
   });
 
   test('only finds a culture\'s value when that culture is selected', async ({umbracoApi, umbracoUi}) => {
-    // Arrange - the culture selector only renders once a second language exists, so reopen the page
+    // Arrange - a second language makes the culture selector render, so the page is opened again afterwards
     await umbracoApi.language.createDanishLanguage();
     const textstringDataType = await umbracoApi.dataType.getByName('Textstring');
     const cultureDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(cultureDocumentTypeName, 'Textstring', textstringDataType.id, 'CultureGroup', true, true) ?? '';
@@ -109,11 +114,11 @@ test.describe('culture', () => {
     await umbracoUi.searchManagement.goToSearchTreeItem();
     await umbracoUi.searchManagement.goToIndexWithAlias(indexAlias);
 
-    // Act & Assert
+    // Act & Assert - the default (English) culture must not see the Danish value
     await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(danishSearchableValue);
     await umbracoUi.searchManagement.isSearchNoResultsMessageVisible();
 
-    // Act & Assert
+    // Act & Assert - with Danish selected it is found
     await umbracoUi.searchManagement.selectSearchCulture('Danish');
     await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(danishSearchableValue);
     await umbracoUi.searchManagement.isSearchResultsTableVisible();
@@ -142,7 +147,8 @@ test.describe('pagination', () => {
     // Act
     await umbracoUi.searchManagement.searchForQueryAndWaitForResponse(pagingToken);
 
-    // Assert - an unfiltered search would also count the document from beforeEach
+    // Assert - the exact count proves the query was applied; the document from beforeEach also exists and
+    // would make an unfiltered search report more
     await umbracoUi.searchManagement.isSearchResultsTableVisible();
     await umbracoUi.searchManagement.doesSearchResultsCountHaveText(`Found ${pagingDocumentNames.length} results`);
     await umbracoUi.searchManagement.isSearchPaginationVisible();
