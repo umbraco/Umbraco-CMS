@@ -230,8 +230,11 @@ docs(web): update routing documentation
 Whenever you finish a task that edited C# files, remove unused `using` directives (IDE0005) from the `.cs` files the branch adds or modifies — and **only** those files. Do this as the last step of the change itself, before handing back, whether or not you are the one committing; the user may commit your changes themselves. Never sweep the solution or files the change doesn't otherwise touch; unrelated churn bloats the diff and causes merge-up conflicts.
 
 ```bash
-# .cs files added/modified on this branch (committed + uncommitted), excluding deletions
-files=$( { git diff --name-only --diff-filter=d origin/main...HEAD; git diff --name-only --diff-filter=d HEAD; } | grep '\.cs$' | sort -u )
+# Base = the PR's target branch; without a PR, origin/main (set it yourself if the branch was cut from e.g. v17/dev)
+base=$(gh pr view --json baseRefName --jq .baseRefName 2>/dev/null); base=origin/${base:-main}
+
+# .cs files added/modified on this branch (committed, uncommitted and untracked), excluding deletions
+files=$( { git diff --name-only --diff-filter=d "$base"...HEAD; git diff --name-only --diff-filter=d HEAD; git ls-files --others --exclude-standard; } | grep '\.cs$' | sort -u )
 
 [ -n "$files" ] && dotnet format style umbraco.sln --diagnostics IDE0005 --severity info --include $files
 ```
