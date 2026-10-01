@@ -7,12 +7,14 @@ import {
 	articleImageId,
 	heroMediaId,
 	logoMediaId,
+	materialImageId,
 	productCategoryIndex,
 	productImageId,
 	type UmbMbcsSiteCode,
 } from './catalog.js';
 import {
 	blockDocumentLink,
+	blockListValue,
 	blockDocumentPicker,
 	blockGridValue,
 	blockMediaPicker,
@@ -36,6 +38,7 @@ import {
 	type UmbMbcsValue,
 } from './document-values.js';
 import { AREA_KEYS, CULTURES, CULTURE_DA, CULTURE_EN, DATA_TYPE_IDS, DOCUMENT_TYPE_IDS, mbcsId } from './ids.js';
+import { getProductMaterials } from './materials.js';
 import { getOurStoryCopy } from './our-story-copy.js';
 import { getPageCopy } from './page-copy.js';
 import { littleOnesProducts, outdoorShopProducts, type UmbMbcsProductRow } from './products.data.js';
@@ -239,6 +242,14 @@ const buildProducts = (
 				...decimalValue('price', price),
 				...invariantTextValue('sku', sku),
 				...tagsValue('tags', tags),
+				...blockListValue(
+					'materials',
+					getProductMaterials(site, categoryIndex, tags, number).map(({ name, imageKey }) => ({
+						elementTypeId: DOCUMENT_TYPE_IDS.productMaterial,
+						columnSpan: 12,
+						values: [blockText('material', name), blockMediaPicker('image', materialImageId(imageKey))],
+					})),
+				),
 				...checkboxListValue('sizes', productSizes(site, categoryIndex, tags)),
 				...textValue('colour', colour),
 				...textValue('material', material),

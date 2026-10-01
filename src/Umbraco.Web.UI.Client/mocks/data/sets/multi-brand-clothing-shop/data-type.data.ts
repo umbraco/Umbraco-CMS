@@ -154,6 +154,7 @@ const richTextEditor = (id: string, name: string, blockElementTypeIds: Array<str
 					},
 				]
 			: []),
+		...(blockElementTypeIds.length ? [{ alias: 'useLiveEditing', value: true }] : []),
 	]);
 
 const SIZES = [
@@ -347,7 +348,30 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{ alias: 'gridColumns', value: 12 },
 			{ alias: 'validationLimit', value: {} },
-			{ alias: 'useLiveEditing', value: false },
+			{ alias: 'useLiveEditing', value: true },
+		],
+	),
+	dataType(
+		DATA_TYPE_IDS.productMaterialsBlockList,
+		'Product Materials – Block List',
+		'Umbraco.BlockList',
+		'Umb.PropertyEditorUi.BlockList',
+		[
+			{
+				alias: 'blocks',
+				value: [
+					{
+						contentElementTypeKey: DOCUMENT_TYPE_IDS.productMaterial,
+						label: '{=material}',
+						editorSize: 'medium',
+						forceHideContentEditorInOverlay: false,
+					},
+				],
+			},
+			{ alias: 'validationLimit', value: {} },
+			{ alias: 'useSingleBlockMode', value: false },
+			{ alias: 'useLiveEditing', value: true },
+			{ alias: 'useInlineEditingAsDefault', value: true },
 		],
 	),
 	dataType(DATA_TYPE_IDS.imageCropper, 'Image Cropper', 'Umbraco.ImageCropper', 'Umb.PropertyEditorUi.ImageCropper', [

@@ -50,4 +50,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forContentTypeAlias: 'articleTeaserBlock',
 		forBlockEditor: forBlockEditorWithRte,
 	},
+	{
+		type: 'entryPoint',
+		alias: 'Umb.MultiBrand.EntryPoint',
+		name: 'Multi Brand Entry Point',
+		js: () => import('./entry-point.js'),
+	},
 ];

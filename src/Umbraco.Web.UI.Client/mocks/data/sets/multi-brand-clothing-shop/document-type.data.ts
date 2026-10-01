@@ -12,6 +12,7 @@ interface UmbMbcsPropertyOptions {
 	container: string | null;
 	varies?: boolean;
 	mandatory?: boolean;
+	labelOnTop?: boolean;
 }
 
 let propertyCounter = 0;
@@ -42,7 +43,7 @@ const toProperties = (options: Array<UmbMbcsPropertyOptions>): Array<UmbMbcsProp
 			regEx: null,
 			regExMessage: null,
 		},
-		appearance: { labelOnTop: false },
+		appearance: { labelOnTop: option.labelOnTop ?? false },
 	}));
 
 interface UmbMbcsDocumentTypeOptions {
@@ -101,6 +102,7 @@ const productsTab = tab('Content');
 const articlesTab = tab('Content');
 const storesTab = tab('Content');
 const storeTab = tab('Store');
+const productMaterialTab = tab('Content');
 const productTab = tab('Product');
 const articleTab = tab('Article');
 const heroBlockTab = tab('Content');
@@ -168,6 +170,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				name: 'Content',
 				dataTypeId: DATA_TYPE_IDS.pageContentBlockGrid,
 				container: pageContentTab.id,
+				labelOnTop: true,
 			},
 		],
 	}),
@@ -243,6 +246,12 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{ alias: 'sku', name: 'SKU', dataTypeId: textstring, container: productTab.id },
 			{ alias: 'tags', name: 'Tags', dataTypeId: DATA_TYPE_IDS.productTags, container: productTab.id },
+			{
+				alias: 'materials',
+				name: 'Materials',
+				dataTypeId: DATA_TYPE_IDS.productMaterialsBlockList,
+				container: productTab.id,
+			},
 			{ alias: 'sizes', name: 'Sizes', dataTypeId: DATA_TYPE_IDS.sizes, container: productTab.id },
 			{ alias: 'colour', name: 'Colour', dataTypeId: textstring, container: productTab.id, varies: true },
 			{ alias: 'material', name: 'Material', dataTypeId: textstring, container: productTab.id, varies: true },
@@ -269,7 +278,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		id: DOCUMENT_TYPE_IDS.article,
 		alias: 'article',
 		name: 'Article',
-		icon: 'icon-article',
+		icon: 'icon-notepad',
 		containers: [articleTab],
 		properties: [
 			{ alias: 'teaser', name: 'Teaser', dataTypeId: textarea, container: articleTab.id, varies: true },
@@ -332,6 +341,25 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 		],
 		compositions: [DOCUMENT_TYPE_IDS.seoComposition],
+	}),
+	documentType({
+		id: DOCUMENT_TYPE_IDS.productMaterial,
+		alias: 'productMaterial',
+		name: 'Product Material',
+		icon: 'icon-palette',
+		isElement: true,
+		parent: DOCUMENT_TYPE_IDS.blocksFolder,
+		containers: [productMaterialTab],
+		properties: [
+			{
+				alias: 'material',
+				name: 'Material',
+				dataTypeId: textstring,
+				container: productMaterialTab.id,
+				varies: true,
+			},
+			{ alias: 'image', name: 'Image', dataTypeId: mediaPicker, container: productMaterialTab.id },
+		],
 	}),
 	documentType({
 		id: DOCUMENT_TYPE_IDS.oneColumnLayout,

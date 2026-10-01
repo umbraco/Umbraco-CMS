@@ -51,6 +51,7 @@ export const DATA_TYPE_IDS = {
 	pageContentBlockGrid: mbcsId('dataType', 20),
 	imageCropper: mbcsId('dataType', 21),
 	articleRichTextEditor: mbcsId('dataType', 23),
+	productMaterialsBlockList: mbcsId('dataType', 24),
 } as const;
 
 export const DOCUMENT_TYPE_IDS = {
@@ -65,6 +66,7 @@ export const DOCUMENT_TYPE_IDS = {
 	pageContentComposition: mbcsId('documentType', 9),
 	stores: mbcsId('documentType', 17),
 	store: mbcsId('documentType', 18),
+	productMaterial: mbcsId('documentType', 19),
 	oneColumnLayout: mbcsId('documentType', 10),
 	twoColumnLayout: mbcsId('documentType', 11),
 	heroBlock: mbcsId('documentType', 12),

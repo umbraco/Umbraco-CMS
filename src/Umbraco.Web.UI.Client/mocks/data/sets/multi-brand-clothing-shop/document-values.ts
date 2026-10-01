@@ -174,6 +174,24 @@ export const blockGridValue = (alias: string, blocks: Array<UmbMbcsBlock>): Arra
 	});
 };
 
+export const blockListValue = (alias: string, blocks: Array<UmbMbcsBlock>): Array<UmbMbcsValue> => {
+	const instances = blocks.map(withKeys);
+
+	return invariant('Umbraco.BlockList', alias, {
+		contentData: instances.map(toContentData),
+		settingsData: [],
+		expose: instances.flatMap(toExposeEntries),
+		layout: {
+			'Umbraco.BlockList': instances.map((block) => ({
+				contentUdi: mbcsElementUdi(block.key),
+				settingsUdi: null,
+				contentKey: block.key,
+				settingsKey: null,
+			})),
+		},
+	});
+};
+
 export const blockText = (alias: string, value: string): UmbMbcsBlockPropertyValue => ({
 	alias,
 	editorAlias: 'Umbraco.TextBox',

@@ -80,6 +80,7 @@ export const MEDIA_FOLDER_IDS = {
 	littleOnesArticles: mbcsId('media', 3),
 	outdoorShopProducts: mbcsId('media', 4),
 	outdoorShopArticles: mbcsId('media', 5),
+	materials: mbcsId('media', 6),
 } as const;
 
 export const BRANDING_MEDIA_IDS = {
@@ -104,3 +105,18 @@ export const articleImageId = (site: UmbMbcsSiteCode, categoryIndex: number) =>
 export const productCategoryIndex = (productNumber: number) => Math.floor((productNumber - 1) / PRODUCTS_PER_CATEGORY);
 
 export const articleCategoryIndex = (articleNumber: number) => Math.floor((articleNumber - 1) / ARTICLES_PER_CATEGORY);
+
+export const MATERIAL_IMAGES = [
+	{ key: 'red-gold', name: 'Red and gold printed cotton' },
+	{ key: 'dark-geometric', name: 'Dark geometric ripstop' },
+	{ key: 'paper-pastel', name: 'Pink velour and tulle' },
+	{ key: 'fabric-texture', name: 'Flecked wool fabric' },
+	{ key: 'water-droplets', name: 'Water droplets on waterproof fabric' },
+	{ key: 'linen-fabric', name: 'Dark linen' },
+	{ key: 'shimmering-red', name: 'Shimmering red glitter' },
+] as const;
+
+export type UmbMbcsMaterialImageKey = (typeof MATERIAL_IMAGES)[number]['key'];
+
+export const materialImageId = (key: UmbMbcsMaterialImageKey) =>
+	mbcsId('media', 300 + MATERIAL_IMAGES.findIndex((image) => image.key === key));
