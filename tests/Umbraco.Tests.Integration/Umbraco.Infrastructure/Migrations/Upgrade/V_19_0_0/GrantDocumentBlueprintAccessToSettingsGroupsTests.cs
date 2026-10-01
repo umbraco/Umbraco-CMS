@@ -68,6 +68,45 @@ internal sealed class GrantDocumentBlueprintAccessToSettingsGroupsTests : Umbrac
         Assert.AreEqual(Constants.System.Root, administrators?.StartDocumentBlueprintId);
     }
 
+    [Test]
+    public async Task Grants_The_Library_Section_To_A_Group_With_Settings_Access()
+    {
+        IUserGroup group = await CreateUserGroupAsync("settingsOnly", Constants.Applications.Settings);
+
+        await ExecuteMigrationAsync();
+
+        // The blueprint tree is reached through the Library section, so the start node is only usable
+        // once the group can open that section.
+        IUserGroup? migrated = await UserGroupService.GetAsync(group.Key);
+        Assert.AreEqual(Constants.System.Root, migrated?.StartDocumentBlueprintId);
+        CollectionAssert.Contains(migrated?.AllowedSections, Constants.Applications.Library);
+    }
+
+    [Test]
+    public async Task Succeeds_For_A_Group_That_Already_Has_The_Library_Section()
+    {
+        IUserGroup group = await CreateUserGroupAsync(
+            "settingsAndLibrary",
+            Constants.Applications.Settings,
+            Constants.Applications.Library);
+
+        await ExecuteMigrationAsync();
+
+        IUserGroup? migrated = await UserGroupService.GetAsync(group.Key);
+        CollectionAssert.Contains(migrated?.AllowedSections, Constants.Applications.Library);
+    }
+
+    [Test]
+    public async Task Does_Not_Grant_The_Library_Section_To_A_Group_Without_Settings_Access()
+    {
+        IUserGroup group = await CreateUserGroupAsync("contentOnly", Constants.Applications.Content);
+
+        await ExecuteMigrationAsync();
+
+        IUserGroup? migrated = await UserGroupService.GetAsync(group.Key);
+        CollectionAssert.DoesNotContain(migrated?.AllowedSections, Constants.Applications.Library);
+    }
+
     private async Task<IUserGroup> CreateUserGroupAsync(string alias, params string[] allowedSections)
     {
         var userGroup = new UserGroup(ShortStringHelper)
