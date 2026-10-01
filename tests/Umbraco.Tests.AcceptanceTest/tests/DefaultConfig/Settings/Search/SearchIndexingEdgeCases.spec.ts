@@ -42,20 +42,28 @@ const publishedDocumentTypeName = 'SearchIndexingEdgeCasesPublishedDocumentType'
 const draftOnlyDocumentName = 'SearchIndexingEdgeCasesDraftOnlyDocument';
 const publishedDocumentName = 'SearchIndexingEdgeCasesPublishedDocument';
 
-test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(singleBlockDocumentName);
+test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(singleBlockDocumentTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(singleBlockElementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(singleBlockDataTypeName);
-  await umbracoApi.document.ensureNameNotExists(cultureDocumentName);
+  await umbracoApi.documentType.ensureNameNotExists(singleBlockElementTypeName);
   await umbracoApi.documentType.ensureNameNotExists(cultureDocumentTypeName);
   await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
+  await umbracoApi.documentType.ensureNameNotExists(publishedDocumentTypeName);
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
   await umbracoApi.member.ensureNameNotExists(memberName);
   await umbracoApi.memberType.ensureNameNotExists(memberTypeName);
-  await umbracoApi.document.ensureNameNotExists(draftOnlyDocumentName);
-  await umbracoApi.document.ensureNameNotExists(publishedDocumentName);
+});
+
+test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.documentType.ensureNameNotExists(singleBlockDocumentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(singleBlockDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(singleBlockElementTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(cultureDocumentTypeName);
+  await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
   await umbracoApi.documentType.ensureNameNotExists(publishedDocumentTypeName);
+  await umbracoApi.media.ensureNameNotExists(mediaFileName);
+  await umbracoApi.member.ensureNameNotExists(memberName);
+  await umbracoApi.memberType.ensureNameNotExists(memberTypeName);
 });
 
 test('can find a text value inside a SingleBlock property', async ({umbracoApi}) => {

@@ -6,7 +6,6 @@ const documentTypeName = 'SearchIndexDetailDocumentType';
 const documentName = 'SearchIndexDetailDocument';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.document.ensureNameNotExists(documentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
@@ -22,7 +21,6 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(documentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 

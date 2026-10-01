@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {AliasHelper, test} from '@umbraco/acceptance-test-helpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const publishedIndexAlias = 'Umb_PublishedContent';
 const dateOnlyDataTypeName = 'DeliveryApiSearchDateEditorsDateOnly';
@@ -19,14 +19,20 @@ const templateName = 'DeliveryApiSearchDateEditorsTemplate';
 let templateId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
+  await umbracoApi.documentType.ensureNameNotExists(dateOnlyDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(timeOnlyDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(dateTimeUnspecifiedDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(dateTimeWithTimeZoneDocumentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(dateOnlyDataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(timeOnlyDataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(dateTimeUnspecifiedDataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(dateTimeWithTimeZoneDataTypeName);
+  await umbracoApi.template.ensureNameNotExists(templateName);
+
   templateId = await umbracoApi.template.createDefaultTemplate(templateName) ?? '';
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(dateOnlyDocumentName);
-  await umbracoApi.document.ensureNameNotExists(timeOnlyDocumentName);
-  await umbracoApi.document.ensureNameNotExists(dateTimeUnspecifiedDocumentName);
-  await umbracoApi.document.ensureNameNotExists(dateTimeWithTimeZoneDocumentName);
   await umbracoApi.documentType.ensureNameNotExists(dateOnlyDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(timeOnlyDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(dateTimeUnspecifiedDocumentTypeName);
@@ -48,7 +54,9 @@ test('can index and fetch a document with a DateOnly property', async ({umbracoA
   await umbracoApi.searchManagement.waitUntilDocumentIsFound(publishedIndexAlias, dateOnlyDocumentName, documentId);
   const documentTypeAlias = (await umbracoApi.documentType.getByName(dateOnlyDocumentTypeName)).alias;
   await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames('contentType:' + documentTypeAlias, undefined, [dateOnlyDocumentName], 1);
-  expect((await umbracoApi.searchManagement.getIndex(publishedIndexAlias)).healthStatus).toBe('Healthy');
+  await expect
+    .poll(async () => (await umbracoApi.searchManagement.getIndex(publishedIndexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
+    .toBe('Healthy');
   const contentItem = await umbracoApi.contentDeliveryApi.getContentItemWithId(documentId);
   expect(contentItem.status()).toBe(200);
   expect((await contentItem.json()).properties[AliasHelper.toAlias(dateOnlyDataTypeName)]).toBe('2026-01-01');
@@ -64,7 +72,9 @@ test('can index and fetch a document with a TimeOnly property', async ({umbracoA
   await umbracoApi.searchManagement.waitUntilDocumentIsFound(publishedIndexAlias, timeOnlyDocumentName, documentId);
   const documentTypeAlias = (await umbracoApi.documentType.getByName(timeOnlyDocumentTypeName)).alias;
   await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames('contentType:' + documentTypeAlias, undefined, [timeOnlyDocumentName], 1);
-  expect((await umbracoApi.searchManagement.getIndex(publishedIndexAlias)).healthStatus).toBe('Healthy');
+  await expect
+    .poll(async () => (await umbracoApi.searchManagement.getIndex(publishedIndexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
+    .toBe('Healthy');
   const contentItem = await umbracoApi.contentDeliveryApi.getContentItemWithId(documentId);
   expect(contentItem.status()).toBe(200);
   expect((await contentItem.json()).properties[AliasHelper.toAlias(timeOnlyDataTypeName)]).toBe('12:30:00');
@@ -80,7 +90,9 @@ test('can index and fetch a document with a DateTimeUnspecified property', async
   await umbracoApi.searchManagement.waitUntilDocumentIsFound(publishedIndexAlias, dateTimeUnspecifiedDocumentName, documentId);
   const documentTypeAlias = (await umbracoApi.documentType.getByName(dateTimeUnspecifiedDocumentTypeName)).alias;
   await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames('contentType:' + documentTypeAlias, undefined, [dateTimeUnspecifiedDocumentName], 1);
-  expect((await umbracoApi.searchManagement.getIndex(publishedIndexAlias)).healthStatus).toBe('Healthy');
+  await expect
+    .poll(async () => (await umbracoApi.searchManagement.getIndex(publishedIndexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
+    .toBe('Healthy');
   const contentItem = await umbracoApi.contentDeliveryApi.getContentItemWithId(documentId);
   expect(contentItem.status()).toBe(200);
   expect((await contentItem.json()).properties[AliasHelper.toAlias(dateTimeUnspecifiedDataTypeName)]).toBe('2026-01-01T12:30:00');
@@ -96,7 +108,9 @@ test('can index and fetch a document with a DateTimeWithTimeZone property', asyn
   await umbracoApi.searchManagement.waitUntilDocumentIsFound(publishedIndexAlias, dateTimeWithTimeZoneDocumentName, documentId);
   const documentTypeAlias = (await umbracoApi.documentType.getByName(dateTimeWithTimeZoneDocumentTypeName)).alias;
   await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames('contentType:' + documentTypeAlias, undefined, [dateTimeWithTimeZoneDocumentName], 1);
-  expect((await umbracoApi.searchManagement.getIndex(publishedIndexAlias)).healthStatus).toBe('Healthy');
+  await expect
+    .poll(async () => (await umbracoApi.searchManagement.getIndex(publishedIndexAlias)).healthStatus, {timeout: ConstantHelper.timeout.pageLoad})
+    .toBe('Healthy');
   const contentItem = await umbracoApi.contentDeliveryApi.getContentItemWithId(documentId);
   expect(contentItem.status()).toBe(200);
   expect((await contentItem.json()).properties[AliasHelper.toAlias(dateTimeWithTimeZoneDataTypeName)]).toBe('2026-01-01T12:30:00+00:00');

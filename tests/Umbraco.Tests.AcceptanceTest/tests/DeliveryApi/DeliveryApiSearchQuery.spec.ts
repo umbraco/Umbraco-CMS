@@ -31,14 +31,12 @@ const renameAfterToken = 'Updatedword';
 let documentTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+
   documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName) ?? '';
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  for (const name of [zephyrContentNameA, zephyrContentNameB, mundaneContentName, ...pagingContentNames, unpublishContentName, trashContentName, renameBeforeContentName, renameAfterContentName]) {
-    await umbracoApi.document.ensureNameNotExists(name);
-  }
-  await umbracoApi.document.emptyRecycleBin();
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 

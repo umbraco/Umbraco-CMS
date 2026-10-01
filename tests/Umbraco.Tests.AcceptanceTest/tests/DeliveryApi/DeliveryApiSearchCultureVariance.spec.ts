@@ -12,13 +12,15 @@ const textstringDataTypeName = 'Textstring';
 let documentTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(englishOnlyDocumentTypeName);
+  await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
+
   await umbracoApi.language.createDanishLanguage();
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithTextstringAndAllowAsRootAndAllowSelfAsChild(documentTypeName, true) ?? '';
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(englishName);
-  await umbracoApi.document.ensureNameNotExists(englishOnlyDocumentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(englishOnlyDocumentTypeName);
   await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);

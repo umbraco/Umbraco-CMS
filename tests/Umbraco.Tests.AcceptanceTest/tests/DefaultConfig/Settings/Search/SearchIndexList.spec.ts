@@ -5,13 +5,14 @@ const contentIndexAlias = 'Umb_Content';
 const documentTypeName = 'SearchIndexListDocumentType';
 const documentName = 'SearchIndexListDocument';
 
-test.beforeEach(async ({umbracoUi}) => {
+test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+
   await umbracoUi.goToBackOffice();
   await umbracoUi.searchManagement.goToSearchTreeItem();
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(documentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 

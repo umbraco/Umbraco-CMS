@@ -16,8 +16,9 @@ const pagingToken = 'SearchIndexSearchBoxPaging';
 const pagingDocumentNames = Array.from({length: searchResultsPageSize + 1}, (_, i) => `${pagingToken} Item${i + 1}`);
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.document.ensureNameNotExists(documentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(cultureDocumentTypeName);
+  await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
 
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   const documentId = await umbracoApi.document.createPublishedDefaultDocument(documentName, documentTypeId);
@@ -33,11 +34,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  for (const name of [documentName, decoyDocumentName, ...pagingDocumentNames]) {
-    await umbracoApi.document.ensureNameNotExists(name);
-  }
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(cultureDocumentName);
   await umbracoApi.documentType.ensureNameNotExists(cultureDocumentTypeName);
   await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
 });

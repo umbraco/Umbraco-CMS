@@ -25,15 +25,16 @@ let secondDocumentTypeId = '';
 let loginPageContentId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(secondDocumentTypeName);
+  await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
+
   documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName) ?? '';
   secondDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(secondDocumentTypeName) ?? '';
   loginPageContentId = await umbracoApi.document.createPublishedDefaultDocument(loginPageContentName, secondDocumentTypeId);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  for (const name of [protectedContentName, unprotectedContentName, sortSecondTypeContentName, sortContentNameA, sortContentNameB, isNotIncludedContentName, isNotExcludedContentName, doesNotContainExcludedContentName, doesNotContainIncludedContentName, loginPageContentName]) {
-    await umbracoApi.document.ensureNameNotExists(name);
-  }
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(secondDocumentTypeName);
   await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);

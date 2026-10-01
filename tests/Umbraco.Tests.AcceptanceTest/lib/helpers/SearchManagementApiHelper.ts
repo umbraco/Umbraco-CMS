@@ -21,6 +21,7 @@ export class SearchManagementApiHelper {
 
   async search(indexAlias: string, query?: string, culture?: string, skip = 0, take = 100) {
     const response = await this.searchResponse(indexAlias, query, culture, skip, take);
+    expect(response.ok()).toBeTruthy();
     return await response.json();
   }
 
