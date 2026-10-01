@@ -16625,8 +16625,7 @@
             "name": "baseUrl",
             "in": "query",
             "schema": {
-              "type": "string",
-              "default": "https://our.umbraco.com"
+              "type": "string"
             }
           }
         ],

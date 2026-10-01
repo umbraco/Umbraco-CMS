@@ -163,7 +163,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {

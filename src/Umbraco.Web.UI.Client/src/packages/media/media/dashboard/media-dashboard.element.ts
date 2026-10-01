@@ -81,8 +81,9 @@ export class UmbMediaDashboardElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this._routes) return;
-		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
+		return html`<umb-router-slot id="router-slot" .routes=${this._routes}
+			><umb-view-loader></umb-view-loader
+		></umb-router-slot>`;
 	}
 
 	static override styles = [

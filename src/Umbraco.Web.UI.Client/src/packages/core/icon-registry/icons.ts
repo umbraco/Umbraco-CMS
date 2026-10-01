@@ -517,7 +517,7 @@ groups: ["shapes","gaming"],
 path: () => import("./icons/icon-clubs.js"),
 },{
 name: "icon-cocktail",
-keywords: ["cocktail","alcohol","beverage","bar","drink","glass"],
+keywords: ["cocktail","alcohol","beverage","bar","drink","glass","spirit","party","celebration","mixer"],
 groups: ["food-beverage"],
 path: () => import("./icons/icon-cocktail.js"),
 },{
@@ -650,7 +650,7 @@ groups: ["files"],
 path: () => import("./icons/icon-compress.js"),
 },{
 name: "icon-connection",
-keywords: ["flash","camera","lightning","electricity","energy"],
+keywords: ["flash","camera","lightning","electricity","energy","power","quick"],
 groups: ["connectivity","devices","photography","weather"],
 path: () => import("./icons/icon-connection.js"),
 },{
@@ -1011,7 +1011,7 @@ groups: ["development","navigation"],
 path: () => import("./icons/icon-flag.js"),
 },{
 name: "icon-flash",
-keywords: ["flash","camera","lightning","electricity","energy"],
+keywords: ["flash","camera","lightning","electricity","energy","power","quick"],
 groups: ["connectivity","devices","photography","weather"],
 path: () => import("./icons/icon-flash.js"),
 },{
@@ -1276,8 +1276,7 @@ groups: ["accessibility","medical"],
 path: () => import("./icons/icon-help.js"),
 },{
 name: "icon-history",
-keywords: ["time","redo","undo","rewind","timeline","version","time machine","backup","rotate","ccw"],
-groups: ["arrows","time"],
+keywords: ["history","time","redo","undo","rewind","timeline","version","time machine","backup","ccw"],
 path: () => import("./icons/icon-history.js"),
 },{
 name: "icon-home",
@@ -1425,7 +1424,7 @@ groups: ["item","photography"],
 path: () => import("./icons/icon-lense.js"),
 },{
 name: "icon-library",
-keywords: ["temple","institution","government","bank","building","capitol","finance","money","museum","art gallery","hall","institute","pediment","portico","columns","pillars","classical","architecture"],
+keywords: ["temple","institution","government","bank","building","capitol","finance","money","museum","art gallery","hall","institute","pediment","portico","doric","columns","pillars","classical","architecture","monument","site","history","historic","library","ancient","structure"],
 groups: ["building","finance","navigation","buildings"],
 related: ["icon-school"],
 path: () => import("./icons/icon-library.js"),
@@ -1457,8 +1456,9 @@ groups: ["weather","cloud"],
 path: () => import("./icons/icon-lightning.js"),
 },{
 name: "icon-link",
-keywords: ["chains","links","hyperlinks","chain","url"],
+keywords: ["chains","links","hyperlinks","reference","relation","chain","url"],
 groups: ["item","technology","text","account"],
+related: ["icon-unlink"],
 path: () => import("./icons/icon-link.js"),
 },{
 name: "icon-list",
@@ -1648,7 +1648,7 @@ groups: ["item","photography","multimedia"],
 path: () => import("./icons/icon-movie.js"),
 },{
 name: "icon-multiple-credit-cards",
-keywords: ["payments","debit cards","credit cards","contactless","cashless","loyalty cards","store cards","business cards","money","finance","pocket","credit","purchase","payment","shopping","retail","consumer","cc"],
+keywords: ["payments","debit cards","credit cards","contactless","cashless","loyalty cards","store cards","business cards","wallet","cards","banking","cash","debit","transport","money","finance","pocket","credit","purchase","payment","shopping","retail","consumer","cc"],
 groups: ["item","money","card","account","finance"],
 related: ["icon-credit-card","icon-credit-card-alt","icon-multiple-credit-cards"],
 path: () => import("./icons/icon-multiple-credit-cards.js"),
@@ -2056,7 +2056,7 @@ groups: ["misc","game","development","layout","shapes"],
 path: () => import("./icons/icon-plugin.js"),
 },{
 name: "icon-podcast",
-keywords: ["person","users","people","audio","music","mic","talk","voice","subscribe","subscription","stream"],
+keywords: ["person","users","people"],
 groups: ["user","special","multimedia","social"],
 path: () => import("./icons/icon-podcast.js"),
 },{
@@ -2352,7 +2352,7 @@ related: ["icon-piracy"],
 path: () => import("./icons/icon-scull.js"),
 },{
 name: "icon-search",
-keywords: ["magnifying glass","find","scan","magnifier","lens"],
+keywords: ["magnifying glass","find","scan","magnifier","lens","locate","explore","discover","enlarge","zoom"],
 groups: ["item","household","text","social"],
 path: () => import("./icons/icon-search.js"),
 },{
@@ -2412,7 +2412,7 @@ groups: ["action","key","arrows","text","development","gaming"],
 path: () => import("./icons/icon-shift.js"),
 },{
 name: "icon-shipping-box",
-keywords: ["grid","grill","lines","storage","shipping","freight","supply chain","docker","environment","devops","code","coding"],
+keywords: ["grid","grill","lines","storage","shipping","freight","supply chain","environment","devops","code","coding"],
 groups: ["shape","box","development","transport","mail"],
 path: () => import("./icons/icon-shipping-box.js"),
 },{
@@ -2529,7 +2529,7 @@ related: ["icon-sound-medium","icon-sound-low","icon-sound","icon-sound-waves","
 path: () => import("./icons/icon-sound-off.js"),
 },{
 name: "icon-sound-waves",
-keywords: ["sounds","audio","music","water","sea","sound","hertz","wavelength","vibrate"],
+keywords: ["sounds","audio","music"],
 groups: ["item","media","weather","navigation","multimedia","sustainability"],
 path: () => import("./icons/icon-sound-waves.js"),
 },{
@@ -2858,7 +2858,7 @@ groups: ["charts","arrows"],
 path: () => import("./icons/icon-trending-up-down.js"),
 },{
 name: "icon-trophy",
-keywords: ["awards","cups","winnings","rewards","prize","sports","winner","achievement","award","champion","celebration","victory"],
+keywords: ["awards","cups","winnings","rewards","prize","sports","winner","achievement","award","champion","celebration","victory","competition","tournament","leaderboard","ranking","success","reward","cup","first","gold"],
 groups: ["item","award","sports","gaming"],
 related: ["icon-medal","icon-diploma","icon-diploma-alt"],
 path: () => import("./icons/icon-trophy.js"),
@@ -2931,11 +2931,6 @@ name: "icon-underline",
 keywords: ["text","format"],
 groups: ["text"],
 path: () => import("./icons/icon-underline.js"),
-},{
-name: "icon-unlink",
-keywords: ["url","unchain"],
-groups: ["text"],
-path: () => import("./icons/icon-unlink.js"),
 },{
 name: "icon-unlocked",
 keywords: ["padlock","insecure","security"],
@@ -3620,6 +3615,12 @@ path: () => import("./icons/icon-trash-empty.js"),
 },{
 name: "icon-umbraco",
 path: () => import("./icons/icon-umbraco.js"),
+},{
+name: "icon-unlink",
+keywords: ["url","unchain","reference","relation","break"],
+groups: ["text"],
+related: ["icon-link"],
+path: () => import("./icons/icon-unlink.js"),
 },{
 name: "icon-azure",
 hidden: true,

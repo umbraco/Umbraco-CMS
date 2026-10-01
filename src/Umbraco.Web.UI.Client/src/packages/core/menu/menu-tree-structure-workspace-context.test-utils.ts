@@ -127,3 +127,31 @@ export function createTestAncestorItem(entity: UmbEntityModel, name = entity.uni
 		parent: { unique: null, entityType: 'test-root-entity-type' },
 	} as unknown as UmbTreeItemModel;
 }
+
+/**
+ * A minimal `UmbSectionSidebarMenuSectionContext` stand-in. It only implements `expansion.expandItems`,
+ * recording each call so a test can check whether — and how often — the parent tree item was expanded.
+ */
+export class UmbTestSectionSidebarMenuContext {
+	static expandItemsCalls: Array<unknown> = [];
+
+	static reset() {
+		UmbTestSectionSidebarMenuContext.expandItemsCalls = [];
+	}
+
+	#host: UmbControllerHost;
+
+	readonly expansion = {
+		expandItems: (entries: unknown) => {
+			UmbTestSectionSidebarMenuContext.expandItemsCalls.push(entries);
+		},
+	};
+
+	constructor(host: UmbControllerHost) {
+		this.#host = host;
+	}
+
+	getHostElement() {
+		return this.#host.getHostElement();
+	}
+}

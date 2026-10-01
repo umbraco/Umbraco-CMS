@@ -252,6 +252,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this._editor = new Editor({
 			element: element,
 			editable: !this.readonly,
+			enableCoreExtensions: { textDirection: false }, // Umbraco provides its own `TextDirection` extension. [LK]
 			editorProps: {
 				attributes: {
 					'aria-label': this.label || this.localize.term('rte_label'),

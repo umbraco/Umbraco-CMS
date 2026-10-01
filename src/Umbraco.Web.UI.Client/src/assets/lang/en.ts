@@ -59,6 +59,7 @@ export default {
 		remove: 'Remove',
 		rename: 'Rename',
 		republish: 'Republish entire site',
+		replace: 'Replace',
 		resendInvite: 'Resend Invitation',
 		restore: 'Restore',
 		rights: 'Permissions',
@@ -821,6 +822,8 @@ export default {
 		externalLoginError: 'External login',
 		unauthorized: 'You were not authorized before performing this action',
 		userNotFound: 'The local user was not found in the database',
+		lockedOut: 'The user is locked, and needs to be unlocked before more login attempts can be made',
+		notAllowed: 'The operation is not allowed on the user',
 		externalInfoNotFound: 'The server did not succeed in communicating with the external login provider',
 		externalLoginFailed:
 			'The server failed to authorize you against the external login provider. Please close the window and try again.',
@@ -1571,6 +1574,17 @@ export default {
 			'Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items',
 		sortPleaseWait: 'Please wait. Items are being sorted, this can take a while.',
 		sortEmptyState: 'This node has no child nodes to sort',
+		sortByFieldHeadline: 'Sort by field',
+		sortByFieldSentence: 'Sort all children by',
+		sortByFieldDirectionLabel: 'Direction',
+		sortByFieldAscending: 'Ascending',
+		sortByFieldDescending: 'Descending',
+		sortByFieldNameOption: 'Name',
+		sortByFieldCreateDateOption: 'Created',
+		sortByFieldUpdateDateOption: 'Last edited',
+		sortIndividuallyHeadline: 'Sort individually',
+		sortByFieldCultureSentence: 'in',
+		sortByFieldCultureLabel: 'Language',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validation',
@@ -2664,6 +2678,7 @@ export default {
 		labelUsedByItems: 'Referenced by',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
+		labelUsedByOtherContent: 'The following items are used by other content',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
@@ -2687,10 +2702,12 @@ export default {
 		searchThisMessageWithGoogle: 'Search this message with Google',
 		searchWithBing: 'Search With Bing',
 		searchThisMessageWithBing: 'Search this message with Bing',
-		searchOurUmbraco: 'Search Our Umbraco',
-		searchThisMessageOnOurUmbracoForumsAndDocs: 'Search this message on Our Umbraco forums and docs',
-		searchOurUmbracoWithGoogle: 'Search Our Umbraco with Google',
-		searchOurUmbracoForumsUsingGoogle: 'Search Our Umbraco forums using Google',
+		searchOurUmbraco: 'Search Umbraco forum',
+		searchThisMessageOnOurUmbracoForumsAndDocs: 'Search this message in the Umbraco forum',
+		searchOurUmbracoWithGoogle: 'Search Umbraco forum with Google',
+		searchOurUmbracoForumsUsingGoogle: 'Search Umbraco forum using Google',
+		searchUmbracoDocs: 'Search Umbraco documentation',
+		searchThisMessageInUmbracoDocs: 'Search this message in the Umbraco documentation',
 		searchUmbracoSource: 'Search Umbraco Source',
 		searchWithinUmbracoSourceCodeOnGithub: 'Search within Umbraco source code on GitHub',
 		searchUmbracoIssues: 'Search Umbraco Issues',
@@ -2742,6 +2759,7 @@ export default {
 		confirmPasteOverwriteMessage: (name: string) =>
 			`The property already contains a value. Paste from the property action will overwrite the current value. Do you want to replace the current value with <strong>${name}</strong>?`,
 		copySuccessHeadline: 'Copied to clipboard',
+		noItemsMessage: 'There are no items in the clipboard.',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',
