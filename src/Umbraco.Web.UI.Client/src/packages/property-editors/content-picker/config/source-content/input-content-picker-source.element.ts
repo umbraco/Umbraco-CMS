@@ -1,5 +1,6 @@
 import type { UmbContentPickerSourceType } from '../../types.js';
-import type { UmbDynamicRoot, UmbInputDocumentDynamicRootElement } from '@umbraco-cms/backoffice/document';
+import type { UmbInputDocumentDynamicRootElement } from '@umbraco-cms/backoffice/document';
+import type { UmbDynamicRoot } from '@umbraco-cms/backoffice/dynamic-root';
 import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';

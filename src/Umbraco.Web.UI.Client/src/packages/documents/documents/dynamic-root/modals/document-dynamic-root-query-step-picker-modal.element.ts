@@ -1,5 +1,5 @@
-import type { ManifestDynamicRootQueryStep } from '../dynamic-root.extension.js';
 import type { UmbDocumentDynamicRootQueryStepPickerModalData } from './index.js';
+import type { ManifestDynamicRootQueryStep } from '@umbraco-cms/backoffice/dynamic-root';
 import { customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypePickerInputContext } from '@umbraco-cms/backoffice/document-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';

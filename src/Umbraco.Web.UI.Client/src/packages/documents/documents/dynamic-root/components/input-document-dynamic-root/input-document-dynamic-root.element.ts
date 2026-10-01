@@ -2,10 +2,14 @@ import {
 	UMB_DOCUMENT_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL,
 	UMB_DOCUMENT_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL,
 } from '../../modals/index.js';
-import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from '../../dynamic-root.extension.js';
-import type { UmbDynamicRoot, UmbDynamicRootQueryStep } from '../../types.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../../item/repository/constants.js';
 import type { UmbDocumentItemModel } from '../../../item/repository/types.js';
+import type {
+	ManifestDynamicRootOrigin,
+	ManifestDynamicRootQueryStep,
+	UmbDynamicRoot,
+	UmbDynamicRootQueryStep,
+} from '@umbraco-cms/backoffice/dynamic-root';
 import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

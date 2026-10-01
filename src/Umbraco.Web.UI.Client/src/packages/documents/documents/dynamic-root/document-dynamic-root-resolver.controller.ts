@@ -1,5 +1,5 @@
-import type { UmbDynamicRoot } from './types.js';
-import { UmbDynamicRootRepository } from './repository/index.js';
+import { UmbDynamicRootRepository } from '@umbraco-cms/backoffice/dynamic-root';
+import type { UmbDynamicRoot } from '@umbraco-cms/backoffice/dynamic-root';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
@@ -12,7 +12,7 @@ import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/wor
  * needs the workspace and parent context a picker happens to be rendered in. Any picker that offers a dynamic root
  * needs exactly that, which is why this is a controller rather than part of one picker.
  */
-export class UmbDynamicRootResolver extends UmbControllerBase {
+export class UmbDocumentDynamicRootResolver extends UmbControllerBase {
 	readonly #repository = new UmbDynamicRootRepository(this);
 
 	/**

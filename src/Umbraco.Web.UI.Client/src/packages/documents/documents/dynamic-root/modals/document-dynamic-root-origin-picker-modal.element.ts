@@ -1,7 +1,6 @@
-import type { ManifestDynamicRootOrigin } from '../dynamic-root.extension.js';
-import type { UmbDynamicRoot } from '../types.js';
 import { UmbDocumentPickerInputContext } from '../../components/input-document/input-document.context.js';
 import type { UmbDocumentDynamicRootOriginPickerModalData } from './index.js';
+import type { ManifestDynamicRootOrigin, UmbDynamicRoot } from '@umbraco-cms/backoffice/dynamic-root';
 import { customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 

@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
-import { UmbDynamicRootResolver } from '../../dynamic-root/dynamic-root-resolver.controller.js';
-import type { UmbDynamicRoot } from '../../dynamic-root/types.js';
+import { UmbDocumentDynamicRootResolver } from '../../dynamic-root/document-dynamic-root-resolver.controller.js';
+import type { UmbDynamicRoot } from '@umbraco-cms/backoffice/dynamic-root';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -67,7 +67,7 @@ export class UmbMultipleDocumentPickerPropertyEditorUIElement
 
 	#dynamicRoot?: UmbDynamicRoot;
 
-	#dynamicRootResolver = new UmbDynamicRootResolver(this);
+	#dynamicRootResolver = new UmbDocumentDynamicRootResolver(this);
 
 	@state()
 	private _allowedContentTypes?: Array<string>;

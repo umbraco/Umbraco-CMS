@@ -1,7 +1,5 @@
 /**
  * A start node resolved against the content being edited, rather than fixed on the data type.
- *
- * Any picker of content can offer a dynamic root; resolving it is done by `UmbDynamicRootResolver`.
  */
 export interface UmbDynamicRoot {
 	originAlias: string;

@@ -3,8 +3,8 @@ import {
 	UMB_DOCUMENT_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL_ALIAS,
 	UMB_DOCUMENT_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL,
 	UMB_DOCUMENT_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL_ALIAS,
-	UmbDynamicRootRepository,
 } from '@umbraco-cms/backoffice/document';
+import { UmbDynamicRootRepository } from '@umbraco-cms/backoffice/dynamic-root';
 
 export * from './components/index.js';
 export * from './config/source-content/index.js';
@@ -12,12 +12,12 @@ export * from './constants.js';
 export type * from './types.js';
 
 /**
- * @deprecated Deprecated since v19. Import `UmbDynamicRootRepository` from `@umbraco-cms/backoffice/document` instead. Scheduled for removal in Umbraco 21.
+ * @deprecated Deprecated since v19. Import `UmbDynamicRootRepository` from `@umbraco-cms/backoffice/dynamic-root` instead. Scheduled for removal in Umbraco 21.
  */
 export const UmbContentPickerDynamicRootRepository = UmbDynamicRootRepository;
 
 /**
- * @deprecated Deprecated since v19. Import `UmbDynamicRootRepository` from `@umbraco-cms/backoffice/document` instead. Scheduled for removal in Umbraco 21.
+ * @deprecated Deprecated since v19. Import `UmbDynamicRootRepository` from `@umbraco-cms/backoffice/dynamic-root` instead. Scheduled for removal in Umbraco 21.
  */
 export type UmbContentPickerDynamicRootRepository = UmbDynamicRootRepository;
 

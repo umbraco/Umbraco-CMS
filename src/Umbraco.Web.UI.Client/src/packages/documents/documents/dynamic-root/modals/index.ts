@@ -1,8 +1,8 @@
-import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from '../dynamic-root.extension.js';
 import {
 	UMB_DOCUMENT_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL_ALIAS,
 	UMB_DOCUMENT_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL_ALIAS,
 } from './constants.js';
+import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from '@umbraco-cms/backoffice/dynamic-root';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDocumentDynamicRootOriginPickerModalData {

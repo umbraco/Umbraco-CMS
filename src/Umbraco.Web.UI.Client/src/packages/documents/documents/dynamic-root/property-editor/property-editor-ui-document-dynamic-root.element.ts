@@ -1,5 +1,5 @@
 import type { UmbInputDocumentDynamicRootElement } from '../components/index.js';
-import type { UmbDynamicRoot } from '../types.js';
+import type { UmbDynamicRoot } from '@umbraco-cms/backoffice/dynamic-root';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

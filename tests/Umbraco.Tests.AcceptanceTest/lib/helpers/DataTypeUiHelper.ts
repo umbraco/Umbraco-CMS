@@ -337,10 +337,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.dataSourceChooseBtn = page.locator('[label="Data Source"]').locator(this.chooseBtn);
 
     // Dynamic Root
-    this.dynamicRootComponent = page.locator('umb-input-content-picker-document-root');
+    this.dynamicRootComponent = page.locator('umb-input-document-dynamic-root');
     this.dynamicRootPlaceholderBtn = this.dynamicRootComponent.locator('uui-button[look="placeholder"]');
-    this.dynamicRootOriginPickerModal = page.locator('umb-dynamic-root-origin-picker-modal');
-    this.dynamicRootQueryStepPickerModal = page.locator('umb-dynamic-root-query-step-picker-modal');
+    this.dynamicRootOriginPickerModal = page.locator('umb-document-dynamic-root-origin-picker-modal');
+    this.dynamicRootQueryStepPickerModal = page.locator('umb-document-dynamic-root-query-step-picker-modal');
     this.closeDynamicRootOriginPickerModalBtn = this.dynamicRootOriginPickerModal.getByLabel('Close');
   }
 
