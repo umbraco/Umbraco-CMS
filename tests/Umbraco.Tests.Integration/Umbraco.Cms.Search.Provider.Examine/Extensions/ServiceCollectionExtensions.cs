@@ -17,6 +17,7 @@ internal static class ServiceCollectionExtensions
         Constants.IndexAliases.PublishedContent,
         Constants.IndexAliases.DraftMedia,
         Constants.IndexAliases.DraftMembers,
+        Constants.IndexAliases.DraftElements,
     ];
 
     public static IServiceCollection AddExamineSearchProviderServicesForTest<TIndex, TDirectoryFactory>(this IServiceCollection services)

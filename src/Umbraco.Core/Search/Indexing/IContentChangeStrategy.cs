@@ -4,8 +4,9 @@
 /// Tracks content changes and translates them into index updates for the indexes that use this strategy.
 /// </summary>
 /// <remarks>
-/// Umbraco Search ships two strategies: <see cref="IPublishedContentChangeStrategy"/> (for the published content
-/// index) and <see cref="IDraftContentChangeStrategy"/> (for the draft content, media and member indexes).
+/// Umbraco Search ships three strategies: <see cref="IPublishedContentChangeStrategy"/> (for the published content
+/// index), <see cref="IDraftContentChangeStrategy"/> (for the draft content, media and member indexes) and
+/// <see cref="IDraftElementChangeStrategy"/> (for the draft library elements index).
 /// </remarks>
 public interface IContentChangeStrategy
 {

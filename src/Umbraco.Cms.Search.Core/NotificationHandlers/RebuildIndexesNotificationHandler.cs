@@ -47,7 +47,7 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
     }
 
     /// <summary>
-    /// Rebuilds every document index when a language is deleted.
+    /// Rebuilds every document and element index when a language is deleted.
     /// </summary>
     /// <param name="notification">The notification describing the language change to react to.</param>
     public void Handle(LanguageCacheRefresherNotification notification)
@@ -60,7 +60,8 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
 
         foreach (ContentIndexRegistration indexRegistration in _options.GetContentIndexRegistrations())
         {
-            if (indexRegistration.ContainedObjectTypes.Contains(UmbracoObjectTypes.Document))
+            if (indexRegistration.ContainedObjectTypes.Contains(UmbracoObjectTypes.Document)
+                || indexRegistration.ContainedObjectTypes.Contains(UmbracoObjectTypes.Element))
             {
                 _contentIndexingService.Rebuild(indexRegistration.IndexAlias, origin);
             }

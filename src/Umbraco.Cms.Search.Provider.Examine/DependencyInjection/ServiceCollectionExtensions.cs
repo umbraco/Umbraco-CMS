@@ -17,7 +17,7 @@ internal static class ServiceCollectionExtensions
 {
     /// <summary>
     /// Registers Examine itself, the Examine-backed <see cref="IIndexer"/>/<see cref="ISearcher"/> implementations,
-    /// and the content index registrations for the built-in document, media, and member indexes.
+    /// and the content index registrations for the built-in document, media, member, and element indexes.
     /// </summary>
     /// <param name="services">The service collection to register the Examine search provider's services on.</param>
     public static void AddExamineSearchProviderServices(this IServiceCollection services)
@@ -43,6 +43,7 @@ internal static class ServiceCollectionExtensions
             options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IPublishedContentChangeStrategy>(Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, UmbracoObjectTypes.Document);
             options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia, UmbracoObjectTypes.Media);
             options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers, UmbracoObjectTypes.Member);
+            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftElementChangeStrategy>(Umbraco.Cms.Core.Constants.IndexAliases.DraftElements, UmbracoObjectTypes.Element);
         });
     }
 }
