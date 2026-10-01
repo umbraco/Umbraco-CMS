@@ -19,7 +19,7 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 export class UmbracoExtensionService {
-    public static ping<ThrowOnError extends boolean = false>(options?: Options<PingData, ThrowOnError>): RequestResult<PingResponses, PingErrors, ThrowOnError> {
+    public static ping<ThrowOnError extends boolean = true>(options?: Options<PingData, ThrowOnError>): RequestResult<PingResponses, PingErrors, ThrowOnError> {
         return (options?.client ?? client).get<PingResponses, PingErrors, ThrowOnError>({
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/umbraco/umbracoextension/api/v1/ping',
@@ -27,7 +27,7 @@ export class UmbracoExtensionService {
         });
     }
     
-    public static whatsMyName<ThrowOnError extends boolean = false>(options?: Options<WhatsMyNameData, ThrowOnError>): RequestResult<WhatsMyNameResponses, WhatsMyNameErrors, ThrowOnError> {
+    public static whatsMyName<ThrowOnError extends boolean = true>(options?: Options<WhatsMyNameData, ThrowOnError>): RequestResult<WhatsMyNameResponses, WhatsMyNameErrors, ThrowOnError> {
         return (options?.client ?? client).get<WhatsMyNameResponses, WhatsMyNameErrors, ThrowOnError>({
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/umbraco/umbracoextension/api/v1/whatsMyName',
@@ -35,7 +35,7 @@ export class UmbracoExtensionService {
         });
     }
     
-    public static whatsTheTimeMrWolf<ThrowOnError extends boolean = false>(options?: Options<WhatsTheTimeMrWolfData, ThrowOnError>): RequestResult<WhatsTheTimeMrWolfResponses, WhatsTheTimeMrWolfErrors, ThrowOnError> {
+    public static whatsTheTimeMrWolf<ThrowOnError extends boolean = true>(options?: Options<WhatsTheTimeMrWolfData, ThrowOnError>): RequestResult<WhatsTheTimeMrWolfResponses, WhatsTheTimeMrWolfErrors, ThrowOnError> {
         return (options?.client ?? client).get<WhatsTheTimeMrWolfResponses, WhatsTheTimeMrWolfErrors, ThrowOnError>({
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/umbraco/umbracoextension/api/v1/whatsTheTimeMrWolf',
@@ -43,7 +43,7 @@ export class UmbracoExtensionService {
         });
     }
     
-    public static whoAmI<ThrowOnError extends boolean = false>(options?: Options<WhoAmIData, ThrowOnError>): RequestResult<WhoAmIResponses, WhoAmIErrors, ThrowOnError> {
+    public static whoAmI<ThrowOnError extends boolean = true>(options?: Options<WhoAmIData, ThrowOnError>): RequestResult<WhoAmIResponses, WhoAmIErrors, ThrowOnError> {
         return (options?.client ?? client).get<WhoAmIResponses, WhoAmIErrors, ThrowOnError>({
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/umbraco/umbracoextension/api/v1/whoAmI',
