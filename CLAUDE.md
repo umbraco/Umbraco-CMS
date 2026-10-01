@@ -225,6 +225,20 @@ fix(api): resolve null reference in schema handler
 docs(web): update routing documentation
 ```
 
+### Remove Unused Usings — Touched Files Only
+
+Whenever you finish a task that edited C# files, remove unused `using` directives (IDE0005) from the `.cs` files the branch adds or modifies — and **only** those files. Do this as the last step of the change itself, before handing back, whether or not you are the one committing; the user may commit your changes themselves. Never sweep the solution or files the change doesn't otherwise touch; unrelated churn bloats the diff and causes merge-up conflicts.
+
+```bash
+# .cs files added/modified on this branch (committed + uncommitted), excluding deletions
+files=$( { git diff --name-only --diff-filter=d origin/main...HEAD; git diff --name-only --diff-filter=d HEAD; } | grep '\.cs$' | sort -u )
+
+[ -n "$files" ] && dotnet format style umbraco.sln --diagnostics IDE0005 --severity info --include $files
+```
+
+- Then rebuild to confirm nothing broke (e.g. a using only needed under an `#if` symbol).
+- TypeScript is covered separately: `@typescript-eslint/no-unused-vars` in the backoffice ESLint config already flags unused imports.
+
 ### Code Owners
 
 Project ownership is distributed across teams. Check individual project directories for ownership.
