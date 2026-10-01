@@ -26,7 +26,7 @@ export class SearchManagementApiHelper {
 
   async isDocumentFound(indexAlias: string, query: string, id: string, culture?: string) {
     const response = await this.searchResponse(indexAlias, query, culture);
-    expect(response.ok(), `search returned ${response.status()}`).toBeTruthy();
+    expect(response.ok()).toBeTruthy();
     return this.containsDocument(await response.json(), id);
   }
 

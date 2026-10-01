@@ -67,7 +67,7 @@ export class ContentDeliveryApiHelper {
 
   async waitUntilContentQueryReturnsNames(filter: string | undefined, sort: string | undefined, expectedNames: string[], expectedTotal?: number, extraHeaders?: { [key: string]: string; }) {
     const take = 100;
-    expect(expectedNames.length, 'waitUntilContentQueryReturnsNames needs at least one expected name, or it asserts nothing').toBeGreaterThan(0);
+    expect(expectedNames.length).toBeGreaterThan(0);
     let contentItemsJson;
     await expect
       .poll(
@@ -97,7 +97,7 @@ export class ContentDeliveryApiHelper {
 
   async waitUntilContentQueryExcludesNames(filter: string | undefined, sort: string | undefined, unexpectedNames: string[], extraHeaders?: { [key: string]: string; }) {
     const take = 100;
-    expect(unexpectedNames.length, 'waitUntilContentQueryExcludesNames needs at least one unexpected name, or it asserts nothing').toBeGreaterThan(0);
+    expect(unexpectedNames.length).toBeGreaterThan(0);
     let contentItemsJson;
     await expect
       .poll(
