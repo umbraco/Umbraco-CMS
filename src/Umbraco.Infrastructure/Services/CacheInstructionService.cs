@@ -32,6 +32,7 @@ namespace Umbraco.Cms
             private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
             private readonly IProfilingLogger _profilingLogger;
             private readonly Lock _syncLock = new();
+            private int _inlineCheckpoint;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
@@ -227,12 +228,13 @@ namespace Umbraco.Cms
             /// <remarks>
             ///     Runs inline in repository reads, inside a scope that may hold distributed locks such as ContentTree, while
             ///     <see cref="ProcessAllInstructions" /> holds <c>_syncLock</c> and takes those same locks. So this must never
-            ///     wait for <c>_syncLock</c> or take distributed locks: payload instructions run only the in-memory
-            ///     <see cref="IJsonCacheRefresher.RefreshInternal(string)" />, and id-based instructions run their in-memory
-            ///     refresh. The internal last-synced id is saved inside
-            ///     the caller's transaction, which holds the umbracoLastSynced row until the caller commits;
-            ///     <see cref="ILastSyncedManager" /> only moves that id forward, so overlapping calls that processed the same
-            ///     instructions write it once.
+            ///     wait for <c>_syncLock</c>, take distributed locks or write to the database: payload instructions run only
+            ///     the in-memory <see cref="IJsonCacheRefresher.RefreshInternal(string)" />, id-based instructions run their
+            ///     in-memory refresh, and the checkpoint reached is kept in memory only. A write would join the caller's
+            ///     transaction and hold this server's umbracoLastSynced row until that transaction commits, which couples
+            ///     every concurrent inline sync on the server to it. The in-memory checkpoint starts from the one
+            ///     <see cref="ProcessAllInstructions" /> persisted, so after a restart the inline sync re-runs at most one
+            ///     sync interval of idempotent in-memory refreshes.
             /// </remarks>
             public ProcessInstructionsResult ProcessInternalInstructions(
                 CacheRefresherCollection cacheRefreshers,
@@ -242,16 +244,29 @@ namespace Umbraco.Cms
                 using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing isolated caches from database..."))
                 {
                     _repositoryCacheVersionService.SetCachesSyncedAsync().GetAwaiter().GetResult();
-                    var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
-                    var previousLastId = lastId;
+                    var lastId = Math.Max(
+                        Volatile.Read(ref _inlineCheckpoint),
+                        _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0);
                     var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.IsolatedCachesOnly, ref lastId);
 
-                    if (lastId > 0 && lastId != previousLastId)
-                    {
-                        _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
-                    }
+                    RaiseInlineCheckpoint(lastId);
 
                     return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                }
+            }
+
+            private void RaiseInlineCheckpoint(int lastId)
+            {
+                var current = Volatile.Read(ref _inlineCheckpoint);
+                while (lastId > current)
+                {
+                    var seen = Interlocked.CompareExchange(ref _inlineCheckpoint, lastId, current);
+                    if (seen == current)
+                    {
+                        return;
+                    }
+
+                    current = seen;
                 }
             }
 

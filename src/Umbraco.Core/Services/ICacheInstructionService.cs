@@ -81,8 +81,8 @@ public interface ICacheInstructionService
     /// <param name="localIdentity">The local identity of the executing AppDomain.</param>
     /// <returns>The result of processing the internal instructions.</returns>
     /// <remarks>
-    ///     Safe to call while holding distributed locks: it does not wait for a full synchronization and takes no
-    ///     distributed locks of its own.
+    ///     Safe to call while holding distributed locks: it does not wait for a full synchronization, takes no
+    ///     distributed locks of its own and writes nothing to the database.
     /// </remarks>
     ProcessInstructionsResult ProcessInternalInstructions(
         CacheRefresherCollection cacheRefreshers,

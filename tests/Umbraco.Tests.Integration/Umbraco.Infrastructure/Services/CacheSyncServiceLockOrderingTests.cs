@@ -245,8 +245,6 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
         DeliverRemoteInstructions(ContentRefreshNodeInstruction(Textpage), RecordingInstruction());
         Assume.That(CachedContent(Textpage.Key), Is.Not.Null, "Textpage was not cached, so this test proves nothing.");
         Assume.That(LastSyncedInternalIdInDatabase(), Is.Null, "A last-synced row already exists, so this test proves nothing.");
-        var maxInstructionId = CacheInstructionService.GetMaxInstructionId();
-
         const int callers = 8;
         using var start = new ManualResetEventSlim();
         var exceptions = new ConcurrentQueue<Exception>();
@@ -279,7 +277,7 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
             Assert.That(CachedContent(Textpage.Key), Is.Null, "The isolated cache entry was not cleared.");
             Assert.That(Refreshes.RefreshCount, Is.EqualTo(0), "An inline sync ran the published-cache refresh.");
             Assert.That(Refreshes.RefreshInternalCount, Is.GreaterThanOrEqualTo(1));
-            Assert.That(LastSyncedInternalIdInDatabase(), Is.EqualTo(maxInstructionId), "The internal last-synced id was not persisted.");
+            Assert.That(LastSyncedInternalIdInDatabase(), Is.Null, "An inline sync persisted its checkpoint.");
             Assert.That(afterConvergence.NumberOfInstructionsProcessed, Is.EqualTo(0), "Already processed instructions were processed again.");
         });
     }
@@ -333,7 +331,6 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
         DeliverRemoteInstructions(RecordingInstruction(3));
         CacheSyncService.SyncInternal(CancellationToken.None);
         Assume.That(Refreshes.RefreshInternalCount, Is.EqualTo(3));
-        var checkpoint = CacheInstructionService.GetMaxInstructionId();
 
         // A full sync that started from an older external id saves the lower id it reached.
         LastSyncedManager.SaveLastSyncedInternalAsync(1).GetAwaiter().GetResult();
@@ -343,9 +340,72 @@ internal sealed class CacheSyncServiceLockOrderingTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.That(LastSyncedInternalIdInDatabase(), Is.EqualTo(checkpoint + 1), "The internal last-synced id did not move forward.");
             Assert.That(Refreshes.RefreshInternalCount, Is.EqualTo(4), "Already processed instructions were processed again.");
+            Assert.That(LastSyncedInternalIdInDatabase(), Is.EqualTo(1), "The inline sync persisted its checkpoint.");
         });
+    }
+
+    [Test]
+    public void SyncInternal_Writes_Nothing_To_The_Database()
+    {
+        var persistedBefore = LastSyncedInternalIdInDatabase();
+        DeliverRemoteInstructions(RecordingInstruction(1), RecordingInstruction(2));
+
+        using (IScope scope = ScopeProvider.CreateScope())
+        {
+            CacheSyncService.SyncInternal(CancellationToken.None);
+            scope.Complete();
+        }
+
+        Assume.That(Refreshes.RefreshInternalCount, Is.EqualTo(2), "The instructions were not processed, so this test proves nothing.");
+
+        CacheSyncService.SyncInternal(CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(LastSyncedInternalIdInDatabase(), Is.EqualTo(persistedBefore), "The inline sync persisted its checkpoint.");
+            Assert.That(Refreshes.RefreshInternalCount, Is.EqualTo(2), "The in-memory checkpoint did not advance.");
+        });
+    }
+
+    [Test]
+    public void SyncInternal_Starts_From_The_Periodic_Checkpoint_After_A_Restart()
+    {
+        DeliverRemoteInstructions(RecordingInstruction(1));
+        var firstRowId = CacheInstructionService.GetMaxInstructionId();
+        DeliverRemoteInstructions(RecordingInstruction(2));
+        DeliverRemoteInstructions(RecordingInstruction(3));
+        CacheSyncService.SyncInternal(CancellationToken.None);
+        Assume.That(Refreshes.RefreshInternalCount, Is.EqualTo(3), "The instructions were not processed, so this test proves nothing.");
+
+        // The periodic sync persisted a checkpoint behind the inline one.
+        LastSyncedManager.SaveLastSyncedInternalAsync(firstRowId).GetAwaiter().GetResult();
+
+        // A new instance has no in-memory checkpoint, as after a restart.
+        ICacheInstructionService restarted = ActivatorUtilities.CreateInstance<CacheInstructionService>(Services);
+        restarted.ProcessInternalInstructions(GetRequiredService<CacheRefresherCollection>(), CancellationToken.None, LocalIdentity);
+
+        Assert.That(Refreshes.RefreshInternalCount, Is.EqualTo(5), "Only the instructions after the persisted checkpoint are re-run.");
+    }
+
+    [Test]
+    public void SyncAll_Is_Not_Blocked_By_An_Inline_Sync_Inside_An_Open_Transaction()
+    {
+        if (BaseTestDatabase.IsSqlite())
+        {
+            Assert.Ignore("SQLite allows a single writer, so an open transaction stalls the full sync regardless of what the inline sync does; this scenario is verified on SQL Server.");
+        }
+
+        DeliverRemoteInstructions(RecordingInstruction());
+
+        using IScope scope = ScopeProvider.CreateScope();
+        CacheSyncService.SyncInternal(CancellationToken.None);
+
+        // The request that ran the inline sync is still in its transaction when the periodic sync persists its checkpoint.
+        Task fullSync = RunDetached(() => CacheSyncService.SyncAll(CancellationToken.None));
+
+        Assert.That(fullSync.Wait(TimeSpan.FromSeconds(10)), Is.True, "The full sync waited for the inline sync's transaction to commit.");
+        scope.Complete();
     }
 
     [Test]

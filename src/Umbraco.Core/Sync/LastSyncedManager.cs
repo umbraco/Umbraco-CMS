@@ -124,9 +124,8 @@ internal sealed class LastSyncedManager : ILastSyncedManager
         _lastSyncedExternalId = null;
     }
 
-    // The internal id is saved by the periodic sync and by inline syncs on request threads, which can process the same
-    // instructions concurrently or in a different order. Only ever moving it forward keeps the checkpoint consistent
-    // and lets one writer stand in for the others.
+    // The periodic sync is the only caller that persists the internal id; inline syncs keep their checkpoint in memory.
+    // Only ever moving the id forward keeps the checkpoint consistent should a caller pass an id it reached earlier.
     private bool TryRaiseInternalId(int id)
     {
         lock (_internalIdLock)
