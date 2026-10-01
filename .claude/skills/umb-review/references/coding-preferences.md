@@ -157,6 +157,7 @@ When parallel model types have inconsistent relationships to a shared base type:
 - Prefer early returns
 - Small functions
 - No nested ternaries
+- **No unused `using` directives** in C# files the PR adds or modifies — see [Remove Unused Usings](../../../../CLAUDE.md#remove-unused-usings--touched-files-only). Files the PR doesn't touch are out of scope.
 
 ---
 
