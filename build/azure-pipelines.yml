@@ -725,6 +725,8 @@ stages:
       uploadToDependencyTrack: $[ or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.uploadDependencyTrack }}', 'True')) ]
       # Determine Umbraco version based on whether it's a public release or not. If public release, use major version, else use full NuGet package version.
       umbracoVersion: $[ iif(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'], stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion']) ]
+      # A stable public release may become the latest version; the template confirms it is a release of main's major.
+      isStableRelease: $[ and(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), eq(stageDependencies.Build.A.outputs['build.NBGV_PrereleaseVersionNoLeadingHyphen'], '')) ]
     jobs:
       - job: Dotnet_BOM
         displayName: Generate Backend BOM
@@ -740,9 +742,17 @@ stages:
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
-          - bash: |
-              dotnet tool install --global CycloneDX --version 6.2.0
-              dotnet-CycloneDX $(solution) --spec-version 1.5 --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
+          - powershell: |
+              dotnet tool install --global Umbraco.Internal.Sbom
+              # umbraco-sbom scans every project in the solution and requires each to be restored.
+              # These two are excluded from the solution build configuration, so the solution restore
+              # skips them; restore them explicitly to avoid a failure.
+              dotnet restore $(solution)
+              dotnet restore $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/Umbraco.Tests.AcceptanceTest.UmbracoProject.csproj
+              dotnet restore $(Build.SourcesDirectory)/tools/Umbraco.JsonSchema/Umbraco.JsonSchema.csproj
+              umbraco-sbom $(solution) --output-file $(Build.ArtifactStagingDirectory)/bom/bom-dotnet.xml --allow-package nuget:SixLabors.*
+              if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }
+              exit 0
             displayName: Generate Backend BOM
           - publish: $(Build.ArtifactStagingDirectory)/bom
             artifact: bom-backend
@@ -759,11 +769,16 @@ stages:
             fetchDepth: 1
             fetchFilter: tree:0
           - template: templates/backoffice-install.yml
-          - bash: |
-              npm install --global --ignore-scripts @cyclonedx/cyclonedx-npm@6.0.1
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml --ignore-npm-errors --verbose
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+          - powershell: |
+              dotnet tool install --global Umbraco.Internal.Sbom
+              umbraco-sbom $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client --output-file $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml
+              if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }
+              exit 0
             displayName: Generate Backoffice UI BOM
-            workingDirectory: src/Umbraco.Web.UI.Client
           - publish: $(Build.ArtifactStagingDirectory)/bom
             artifact: bom-backoffice
             displayName: Publish Backoffice UI BOM
@@ -787,11 +802,16 @@ stages:
           - script: npm ci --no-fund --no-audit --ignore-scripts
             displayName: Run npm ci (Login)
             workingDirectory: src/Umbraco.Web.UI.Login
-          - bash: |
-              npm install --global --ignore-scripts @cyclonedx/cyclonedx-npm@6.0.1
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-login.xml --ignore-npm-errors --verbose
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+          - powershell: |
+              dotnet tool install --global Umbraco.Internal.Sbom
+              umbraco-sbom $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Login --output-file $(Build.ArtifactStagingDirectory)/bom/bom-login.xml
+              if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }
+              exit 0
             displayName: Generate Login UI BOM
-            workingDirectory: src/Umbraco.Web.UI.Login
           - publish: $(Build.ArtifactStagingDirectory)/bom
             artifact: bom-login
             displayName: Publish Login UI BOM
@@ -809,11 +829,16 @@ stages:
           - template: templates/e2e-install.yml
             parameters:
               npm_config_cache: ${{ variables.npm_config_cache }}
-          - bash: |
-              npm install --global --ignore-scripts @cyclonedx/cyclonedx-npm@6.0.1
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-e2e.xml --ignore-npm-errors --verbose
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+          - powershell: |
+              dotnet tool install --global Umbraco.Internal.Sbom
+              umbraco-sbom $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest --output-file $(Build.ArtifactStagingDirectory)/bom/bom-e2e.xml
+              if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }
+              exit 0
             displayName: Generate E2E Tests BOM
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
           - publish: $(Build.ArtifactStagingDirectory)/bom
             artifact: bom-e2e
             displayName: Publish E2E BOM
@@ -824,6 +849,8 @@ stages:
           condition: and(succeeded(), eq(variables['uploadToDependencyTrack'], 'True'))
           projectName: "Umbraco-CMS"
           umbracoVersion: $(umbracoVersion)
+          isLatestCandidate: $(isStableRelease)
+          latestVersionFileUrl: "https://raw.githubusercontent.com/umbraco/Umbraco-CMS/main/version.json"
           projects:
             - name: "Backend"
               artifact: "bom-backend"

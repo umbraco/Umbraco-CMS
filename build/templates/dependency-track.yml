@@ -9,6 +9,14 @@ parameters:
     type: string
   - name: umbracoVersion
     type: string
+  # When true, the upload is marked as the project's latest version if its major matches the
+  # major of the version.json at latestVersionFileUrl. Dependency-Track keeps one latest version per project name.
+  - name: isLatestCandidate
+    type: string
+    default: 'false'
+  - name: latestVersionFileUrl
+    type: string
+    default: ''
   - name: projects
     type: object
 
@@ -21,15 +29,36 @@ jobs:
     - checkout: none
 
     - bash: |
+        is_latest=false
+        if [ "$(echo '${{ parameters.isLatestCandidate }}' | tr '[:upper:]' '[:lower:]')" == "true" ]; then
+          latest_major=$(curl --fail --no-progress-meter "${{ parameters.latestVersionFileUrl }}" | jq -r '.version' | cut -d. -f1)
+          this_major=$(echo "${{ parameters.umbracoVersion }}" | cut -d. -f1)
+          if [ -z "$latest_major" ] || [ "$latest_major" == "null" ]; then
+            echo "##vso[task.logissue type=warning]Could not read the latest major from ${{ parameters.latestVersionFileUrl }}; not marking as latest."
+          elif [ "$this_major" == "$latest_major" ]; then
+            is_latest=true
+          fi
+        fi
+        echo "Marking as latest version: $is_latest"
+        echo "##vso[task.setvariable variable=isLatest;isOutput=true]$is_latest"
+
         project_id=$(curl --no-progress-meter -H "X-Api-Key: $(DT_API_KEY)" "$(DT_API_URI)/api/v1/project/lookup?name=${{ parameters.projectName }}&version=${{ parameters.umbracoVersion }}" | jq -r '.uuid')
         if [ "$project_id" != "null" ] && [ -n "$project_id" ]; then
           echo "Project '${{ parameters.projectName }}' with version '${{ parameters.umbracoVersion }}' already exists (ID: $project_id)."
+          if [ "$is_latest" == "true" ]; then
+            curl --fail --no-progress-meter \
+              -X PATCH "$(DT_API_URI)/api/v1/project/$project_id" \
+              -H "X-Api-Key: $(DT_API_KEY)" \
+              -H "Content-Type: application/json" \
+              -d '{"isLatest": true}' > /dev/null
+            echo "Marked existing project '${{ parameters.projectName }}' version '${{ parameters.umbracoVersion }}' as latest."
+          fi
         else
           project_id=$(curl --no-progress-meter \
             -X PUT "$(DT_API_URI)/api/v1/project" \
             -H "X-Api-Key: $(DT_API_KEY)" \
             -H "Content-Type: application/json" \
-            -d '{"name": "${{ parameters.projectName }}", "version": "${{ parameters.umbracoVersion }}", "collectionLogic": "AGGREGATE_DIRECT_CHILDREN"}' \
+            -d '{"name": "${{ parameters.projectName }}", "version": "${{ parameters.umbracoVersion }}", "collectionLogic": "AGGREGATE_DIRECT_CHILDREN", "isLatest": '"$is_latest"'}' \
             | jq -r '.uuid')
           if [ -z "$project_id" ] || [ "$project_id" == "null" ]; then
             echo "Failed to create project '${{ parameters.projectName }}' version '${{ parameters.umbracoVersion }}'."
@@ -37,6 +66,7 @@ jobs:
           fi
           echo "Created project '${{ parameters.projectName }}' with version '${{ parameters.umbracoVersion }}' (ID: $project_id)."
         fi
+      name: project
       displayName: Ensure main project exists in Dependency Track
 
 - ${{ each project in parameters.projects }}:
@@ -44,6 +74,8 @@ jobs:
     displayName: Upload ${{ project.name }} BOM
     dependsOn: Create_DT_Project
     condition: ${{ parameters.condition }}
+    variables:
+      isLatest: $[ dependencies.Create_DT_Project.outputs['project.isLatest'] ]
     steps:
       - checkout: none
 
@@ -60,5 +92,6 @@ jobs:
           dtrackProjVersion: ${{ parameters.umbracoVersion }}
           dtrackParentProjName: ${{ parameters.projectName }}
           dtrackParentProjVersion: ${{ parameters.umbracoVersion }}
+          dtrackIsLatest: $(isLatest)
           bomFilePath: '$(Pipeline.Workspace)/${{ project.artifact }}/${{ project.bomFilePath }}'
         displayName: Upload ${{ project.name }} BOM to Dependency Track

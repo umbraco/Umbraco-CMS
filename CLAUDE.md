@@ -392,6 +392,20 @@ public interface IMyService
 - `.editorconfig` - Code style rules
 - `.globalconfig` - Roslyn analyzer rules
 
+### SBOM Generation & License Policy (Azure Pipelines)
+
+`build/azure-pipelines.yml` generates a CycloneDX SBOM per project (Backend/NuGet, Login UI, Backoffice, E2E), each in its own job in the `Dependency_Track` stage, via **`umbraco-sbom`** (the `Umbraco.Internal.Sbom` .NET 10 global tool), not plain `dotnet CycloneDX` / `@cyclonedx/cyclonedx-npm`. It adds license-policy enforcement over CycloneDX. Repo (private): https://github.com/umbraco/Umbraco.Internal.Sbom — README has the full flag/exit-code/policy reference.
+
+When editing those steps:
+
+- **Output filenames and artifacts** (`bom-dotnet.xml`, `bom-login.xml`, `bom-backoffice.xml`, `bom-e2e.xml`) are mapped to Dependency-Track projects in the stage's `build/templates/dependency-track.yml` parameters — keep them in step.
+- **Usage**: `umbraco-sbom <path> --output-file <full-path> [policy flags]`. Only `--output-file` plus policy flags (`--allow-package`, `--allow-commercial`, `--allow-copyleft`, `--fail-on-unknown`, `--policy-allow-file`) exist.
+- **Commercial packages** need `--allow-package`, else **exit 50**. Backend uses `nuget:SixLabors.*` (covers both `SixLabors.ImageSharp` and `.ImageSharp.Web`).
+- **`isLatest`**: DT allows one latest version per project name, and projects are `Umbraco-CMS` (children `Umbraco-CMS-Backend` etc.) versioned by major. Only a stable public release of `main`'s major (read from `main`'s `version.json` at upload time) is marked latest; older-major releases upload with `false`.
+- **Exit 10** = success-with-warnings (unresolved licenses; SBOM still written). Each step tolerates it: `if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }; exit 0`.
+- **Every BOM job** needs a `UseDotNet@2` (`useGlobalJson: true`) step before the tool install (the .NET 10 tool needs the SDK, including in the otherwise Node-only frontend jobs).
+- **Backend** must restore before scanning: `umbraco-sbom` needs every project in the solution restored, including the two the solution restore skips (`Umbraco.Tests.AcceptanceTest.UmbracoProject`, `Umbraco.JsonSchema`).
+
 ### Persistence Layer - NPoco and EF Core
 
 The repository contains BOTH (actively supported):
