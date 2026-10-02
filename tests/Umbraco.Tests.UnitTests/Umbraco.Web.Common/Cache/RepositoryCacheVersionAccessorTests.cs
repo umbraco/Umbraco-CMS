@@ -270,14 +270,60 @@ public class RepositoryCacheVersionAccessorTests
     }
 
     [Test]
-    public async Task CachesSynced_ClearsBothScopeCacheAndRequestCache()
+    public async Task CachesSynced_WithAdoptedVersions_MovesScopeCacheToTheSnapshotAndClearsRequestCache()
+    {
+        const string OtherKey = "other-cache-key";
+        var before = Guid.NewGuid();
+        var adopted = Guid.NewGuid();
+        _sut.VersionChanged(CacheKey, before);
+        _sut.VersionChanged(OtherKey, before);
+        _requestCache.Set(CacheKey, new RepositoryCacheVersion { Identifier = CacheKey, Version = before.ToString() });
+
+        _sut.CachesSynced(new[] { new RepositoryCacheVersion { Identifier = CacheKey, Version = adopted.ToString() } });
+
+        // The scope cache now holds the adopted version: no database read, and the adopted value comes back.
+        var result = await _sut.GetAsync(CacheKey);
+        Assert.That(result?.Version, Is.EqualTo(adopted.ToString()));
+        _repository.Verify(x => x.GetAsync(CacheKey), Times.Never);
+
+        // The request cache was cleared.
+        Assert.That(_requestCache.Get(CacheKey), Is.Null);
+
+        // A key that is not in the snapshot is dropped from the scope cache and read from the database again.
+        _repository
+            .Setup(x => x.GetAsync(OtherKey))
+            .ReturnsAsync(new RepositoryCacheVersion { Identifier = OtherKey, Version = Guid.NewGuid().ToString() });
+        await _sut.GetAsync(OtherKey);
+        _repository.Verify(x => x.GetAsync(OtherKey), Times.Once);
+    }
+
+    [Test]
+    public async Task CachesSynced_WithAdoptedVersions_IgnoresVersionsWithoutAValue()
+    {
+        var before = Guid.NewGuid();
+        _sut.VersionChanged(CacheKey, before);
+
+        _sut.CachesSynced(new[] { new RepositoryCacheVersion { Identifier = CacheKey, Version = null } });
+
+        // Nothing adopted for the key, so it is no longer cached and the next read goes to the database.
+        _repository
+            .Setup(x => x.GetAsync(CacheKey))
+            .ReturnsAsync(new RepositoryCacheVersion { Identifier = CacheKey, Version = Guid.NewGuid().ToString() });
+        await _sut.GetAsync(CacheKey);
+        _repository.Verify(x => x.GetAsync(CacheKey), Times.Once);
+    }
+
+    [Test]
+    public async Task CachesSynced_Obsolete_ClearsBothScopeCacheAndRequestCache()
     {
         var guid1 = Guid.NewGuid();
         _sut.VersionChanged(CacheKey, guid1);
         // VersionChanged removed the request cache key, so Set succeeds.
         _requestCache.Set(CacheKey, new RepositoryCacheVersion { Identifier = CacheKey, Version = guid1.ToString() });
 
+#pragma warning disable CS0618 // Type or member is obsolete
         _sut.CachesSynced();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         // Both caches cleared: next GetAsync must fall through to the DB.
         _repository
