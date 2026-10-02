@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.DynamicRoot;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.Context;
@@ -51,11 +52,12 @@ public class GetRootsController : DynamicRootControllerBase
 
         DynamicRootNodeQuery dynamicRootNodeQuery = _umbracoMapper.Map<DynamicRootNodeQuery>(model)!;
 
-        IEnumerable<Guid> roots = await _dynamicRootService.GetDynamicRootsAsync(dynamicRootNodeQuery);
+        Guid[] roots = (await _dynamicRootService.GetDynamicRootsAsync(dynamicRootNodeQuery)).ToArray();
 
+        // The content root is not an item the API exposes; a query that reaches it leaves the whole tree in scope.
         return Ok(new DynamicRootResponseModel()
         {
-            Roots = roots
+            Roots = roots.Contains(Constants.System.RootSystemKey) ? [] : roots
         });
     }
 }
