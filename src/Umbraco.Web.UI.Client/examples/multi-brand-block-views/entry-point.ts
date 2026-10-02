@@ -1,16 +1,17 @@
-import { umbMockManager } from '../../mocks/mock-manager.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-const MOCK_SET = 'multiBrandClothingShop';
-const MOCK_SET_STORAGE_KEY = 'umb:mockSet';
+/**
+ * Switches the mock server to the "Multi Brand Clothing Shop" data set and hides the mock set switcher.
+ */
+export async function onInit() {
+	if (import.meta.env.VITE_UMBRACO_USE_MSW !== 'on') return;
 
-export function onInit() {
+	const { useMockSet } = await import('@umbraco-cms/internal/mock-manager');
+	await useMockSet('multiBrandClothingShop');
 	umbExtensionsRegistry.exclude('Mock.HeaderApp.MockSetSwitcher');
-
-	if (umbMockManager.currentSetName !== MOCK_SET) {
-		localStorage.setItem(MOCK_SET_STORAGE_KEY, MOCK_SET);
-		window.location.reload();
-	}
 }
 
+/**
+ *
+ */
 export function onUnload() {}

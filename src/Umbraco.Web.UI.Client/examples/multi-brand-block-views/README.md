@@ -22,6 +22,6 @@ The two teaser views also apply when the teasers are inserted into a Rich Text E
 
 ## Run it
 
-1. `npm run example` and pick `multi-brand-block-views`.
-2. Switch the mock data set to "Multi Brand Clothing Shop" in the header.
+1. `npm run example:mock` and pick `multi-brand-block-views`.
+2. The example switches the mock data set to "Multi Brand Clothing Shop" for you and hides the mock set switcher.
 3. Open "Little Ones Clothing Shop" or "The Outdoor Shop" in the Content section.
