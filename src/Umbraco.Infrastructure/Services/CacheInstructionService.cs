@@ -31,6 +31,7 @@ namespace Umbraco.Cms
             private readonly ILastSyncedManager _lastSyncedManager;
             private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
             private readonly IProfilingLogger _profilingLogger;
+            private readonly Infrastructure.Scoping.IScopeAccessor _scopeAccessor;
             private readonly Lock _syncLock = new();
 
             /// <summary>
@@ -61,7 +62,8 @@ namespace Umbraco.Cms
                      logger,
                      globalSettings,
                      StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>(),
-                     StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+                     StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+                     StaticServiceProvider.Instance.GetRequiredService<Infrastructure.Scoping.IScopeAccessor>())
             {
             }
 
@@ -77,6 +79,7 @@ namespace Umbraco.Cms
             /// <param name="globalSettings">The global settings for the application.</param>
             /// <param name="lastSyncedManager">Manages the last synchronization state.</param>
             /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+            [Obsolete("Use the overload that requires IScopeAccessor. Scheduled for removal in Umbraco 19.")]
             public CacheInstructionService(
                 ICoreScopeProvider provider,
                 ILoggerFactory loggerFactory,
@@ -87,6 +90,44 @@ namespace Umbraco.Cms
                 IOptions<GlobalSettings> globalSettings,
                 ILastSyncedManager lastSyncedManager,
                 IRepositoryCacheVersionService repositoryCacheVersionService)
+                : this(
+                    provider,
+                    loggerFactory,
+                    eventMessagesFactory,
+                    cacheInstructionRepository,
+                    profilingLogger,
+                    logger,
+                    globalSettings,
+                    lastSyncedManager,
+                    repositoryCacheVersionService,
+                    StaticServiceProvider.Instance.GetRequiredService<Infrastructure.Scoping.IScopeAccessor>())
+            {
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
+            /// </summary>
+            /// <param name="provider">Provides access to core database scopes.</param>
+            /// <param name="loggerFactory">The factory used to create logger instances.</param>
+            /// <param name="eventMessagesFactory">Factory for creating event message collections.</param>
+            /// <param name="cacheInstructionRepository">Repository for managing cache instructions.</param>
+            /// <param name="profilingLogger">Logger used for profiling and diagnostics.</param>
+            /// <param name="logger">The typed logger instance for this service.</param>
+            /// <param name="globalSettings">The global settings for the application.</param>
+            /// <param name="lastSyncedManager">Manages the last synchronization state.</param>
+            /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+            /// <param name="scopeAccessor">Gives access to the caller's ambient scope, to see which locks it holds.</param>
+            public CacheInstructionService(
+                ICoreScopeProvider provider,
+                ILoggerFactory loggerFactory,
+                IEventMessagesFactory eventMessagesFactory,
+                ICacheInstructionRepository cacheInstructionRepository,
+                IProfilingLogger profilingLogger,
+                ILogger<CacheInstructionService> logger,
+                IOptions<GlobalSettings> globalSettings,
+                ILastSyncedManager lastSyncedManager,
+                IRepositoryCacheVersionService repositoryCacheVersionService,
+                Infrastructure.Scoping.IScopeAccessor scopeAccessor)
                 : base(provider, loggerFactory, eventMessagesFactory)
             {
                 _cacheInstructionRepository = cacheInstructionRepository;
@@ -94,6 +135,7 @@ namespace Umbraco.Cms
                 _logger = logger;
                 _lastSyncedManager = lastSyncedManager;
                 _repositoryCacheVersionService = repositoryCacheVersionService;
+                _scopeAccessor = scopeAccessor;
                 _globalSettings = globalSettings.Value;
             }
 
@@ -201,7 +243,8 @@ namespace Umbraco.Cms
                 {
                     using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                     {
-                        _repositoryCacheVersionService.SetCachesSyncedAsync();
+                        // Awaited, so its scope completes before _syncLock is released.
+                        _repositoryCacheVersionService.SetCachesSyncedAsync().GetAwaiter().GetResult();
                         var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
                         var previousLastId = lastId;
                         var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
@@ -218,29 +261,101 @@ namespace Umbraco.Cms
             }
 
             /// <inheritdoc />
+            /// <remarks>
+            ///     <para>
+            ///         This is called inline from repository reads (<c>RepositoryCachePolicyBase.EnsureCacheIsSynced</c>),
+            ///         i.e. inside the caller's scope, possibly while that scope holds or has queued distributed locks
+            ///         such as the ContentTree write lock of a save or publish. <see cref="ProcessAllInstructions" /> (run by
+            ///         <c>InstructionProcessJob</c>) takes <c>_syncLock</c> and then ContentTree (refreshers such as
+            ///         <c>DocumentCacheService.RefreshMemoryCacheAsync</c> take a read lock), so this method must never
+            ///         take them the other way round:
+            ///     </para>
+            ///     <list type="bullet">
+            ///         <item>
+            ///             If the caller has acquired distributed locks, it must not wait for <c>_syncLock</c>: the thread
+            ///             holding it may be waiting for those locks, which is a deadlock SQL Server cannot detect. The
+            ///             sync only runs if <c>_syncLock</c> is free, nested in the caller's scope so the refreshers' reads
+            ///             are compatible with the caller's own locks. Otherwise it is skipped and the read is served from
+            ///             the isolated cache as it is; the sync that is already running (or the next one) brings it up to date.
+            ///         </item>
+            ///         <item>
+            ///             Otherwise the sync runs in a detached root scope. Nested in the caller's scope, its first database
+            ///             access would acquire the caller's queued (lazy) locks while holding <c>_syncLock</c>, and keep them
+            ///             for the rest of the caller's operation.
+            ///         </item>
+            ///     </list>
+            /// </remarks>
             public ProcessInstructionsResult ProcessInternalInstructions(
                 CacheRefresherCollection cacheRefreshers,
                 CancellationToken cancellationToken,
                 string localIdentity)
             {
-                lock (_syncLock)
+                Infrastructure.Scoping.IScope? ambientScope = _scopeAccessor.AmbientScope;
+
+                if (ambientScope is not null && HoldsDistributedLocks(ambientScope))
                 {
-                    using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
+                    if (_syncLock.TryEnter() is false)
                     {
-                        _repositoryCacheVersionService.SetCachesSyncedAsync();
-                        var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
-                        var previousLastId = lastId;
-                        var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
+                        _logger.LogDebug("Skipping inline cache sync: the current scope holds distributed locks and another sync is in progress.");
+                        return ProcessInstructionsResult.AsCompleted(0, 0);
+                    }
 
-                        if (lastId > 0 && lastId != previousLastId)
-                        {
-                            _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
-                        }
-
-                        return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                    try
+                    {
+                        return ProcessInternalInstructionsInCurrentScope(cacheRefreshers, cancellationToken, localIdentity);
+                    }
+                    finally
+                    {
+                        _syncLock.Exit();
                     }
                 }
+
+                lock (_syncLock)
+                {
+                    if (ambientScope is null || ScopeProvider is not Infrastructure.Scoping.IScopeProvider scopeProvider)
+                    {
+                        return ProcessInternalInstructionsInCurrentScope(cacheRefreshers, cancellationToken, localIdentity);
+                    }
+
+                    using Infrastructure.Scoping.IScope detachedScope = scopeProvider.CreateDetachedScope();
+                    scopeProvider.AttachScope(detachedScope);
+
+                    // Disposing the attached detached scope restores the caller's scope as the ambient scope.
+                    ProcessInstructionsResult result = ProcessInternalInstructionsInCurrentScope(cacheRefreshers, cancellationToken, localIdentity);
+                    detachedScope.Complete();
+                    return result;
+                }
             }
+
+            private ProcessInstructionsResult ProcessInternalInstructionsInCurrentScope(
+                CacheRefresherCollection cacheRefreshers,
+                CancellationToken cancellationToken,
+                string localIdentity)
+            {
+                using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
+                {
+                    // Awaited, so its scope completes within the scope this sync runs in.
+                    _repositoryCacheVersionService.SetCachesSyncedAsync().GetAwaiter().GetResult();
+                    var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
+                    var previousLastId = lastId;
+                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
+
+                    if (lastId > 0 && lastId != previousLastId)
+                    {
+                        _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                    }
+
+                    return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                }
+            }
+
+            // Child scopes share the root scope's locking mechanism, so this covers the whole scope chain.
+            // Only acquired locks are visible here; queued (lazy) locks are handled by the detached scope.
+            private static bool HoldsDistributedLocks(Infrastructure.Scoping.IScope scope)
+                => HasAny(scope.Locks.GetWriteLocks()) || HasAny(scope.Locks.GetReadLocks());
+
+            private static bool HasAny(Dictionary<Guid, Dictionary<int, int>>? locksByScope)
+                => locksByScope?.Values.Any(byLockId => byLockId.Values.Any(count => count > 0)) ?? false;
 
             private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity)
                 => new(
