@@ -225,23 +225,6 @@ fix(api): resolve null reference in schema handler
 docs(web): update routing documentation
 ```
 
-### Remove Unused Usings — Touched Files Only
-
-Whenever you finish a task that edited C# files, remove unused `using` directives (IDE0005) from the `.cs` files the branch adds or modifies — and **only** those files. Do this as the last step of the change itself, before handing back, whether or not you are the one committing; the user may commit your changes themselves. Never sweep the solution or files the change doesn't otherwise touch; unrelated churn bloats the diff and causes merge-up conflicts.
-
-```bash
-# Base = the PR's target branch; without a PR, origin/main (set it yourself if the branch was cut from e.g. v17/dev)
-base=$(gh pr view --json baseRefName --jq .baseRefName 2>/dev/null); base=origin/${base:-main}
-
-# .cs files added/modified on this branch (committed, uncommitted and untracked), excluding deletions
-files=$( { git diff --name-only --diff-filter=d "$base"...HEAD; git diff --name-only --diff-filter=d HEAD; git ls-files --others --exclude-standard; } | grep '\.cs$' | sort -u )
-
-[ -n "$files" ] && dotnet format style umbraco.sln --diagnostics IDE0005 --severity info --include $files
-```
-
-- Then rebuild to confirm nothing broke (e.g. a using only needed under an `#if` symbol).
-- TypeScript is covered separately: `@typescript-eslint/no-unused-vars` in the backoffice ESLint config already flags unused imports.
-
 ### Code Owners
 
 Project ownership is distributed across teams. Check individual project directories for ownership.
@@ -579,6 +562,7 @@ For integration tests that exercise caching or cache refreshers, see `tests/Umbr
 
 - **Fresh build before trusting a green.** Never treat `--no-build` or cached/incremental output as proof a change compiles or passes — a stale run can mask a compile error. Rebuild before reporting build or test state. (Integration tests have a related false-green trap — see `tests/Umbraco.Tests.Integration/CLAUDE.md`.)
 - **Grep the branch you think you're on.** A search only supports a claim against the branch actually checked out, so confirm HEAD is where you expect before drawing a conclusion from a grep. Easy to get wrong whenever the tree moves under you — reviewing a PR head, switching worktrees, or mid merge-up/rebase.
+- **Remove unused usings — touched files only.** Before handing back C# changes, remove unused `using` directives (IDE0005) from the `.cs` files the change adds or modifies, and never sweep other files (unrelated churn causes merge-up conflicts). Run it per affected project, not the solution, which is slow to load: `dotnet format style <project>.csproj --diagnostics IDE0005 --severity info --include <files>`, then rebuild (a using may only be needed under an `#if` symbol).
 
 ---
 
