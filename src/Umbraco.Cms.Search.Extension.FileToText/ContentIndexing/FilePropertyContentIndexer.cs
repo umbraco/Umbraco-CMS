@@ -107,7 +107,11 @@ internal sealed class FilePropertyContentIndexer : IContentIndexer
                         )
                     );
                 }
-                catch (Exception ex) when (ex is not OperationCanceledException || cancellationToken.IsCancellationRequested is false)
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    throw;
+                }
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, "Unable to extract text from content with ID: {contentId} (file value handler: {fileValueHandler})", content.Key, fileValueHandler.GetType().FullName);
                 }
