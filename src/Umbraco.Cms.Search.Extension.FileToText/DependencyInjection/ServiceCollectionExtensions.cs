@@ -9,8 +9,8 @@ internal static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddFileToText(this IServiceCollection services)
         => services
-            .AddSingleton<IContentIndexer, FilePropertyContentIndexer>()
-            .AddSingleton<IFileValueHandler, PdfFileValueHandler>()
-            .AddSingleton<IFileValueHandler, MarkdownFileValueHandler>()
-            .AddSingleton<IFileValueHandler, TextFileValueHandler>();
+            .AddTransient<IContentIndexer, FilePropertyContentIndexer>()
+            .AddTransient<IFileValueHandler, PdfFileValueHandler>()
+            .AddTransient<IFileValueHandler, MarkdownFileValueHandler>()
+            .AddTransient<IFileValueHandler, TextFileValueHandler>();
 }
