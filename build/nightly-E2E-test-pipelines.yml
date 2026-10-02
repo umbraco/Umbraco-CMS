@@ -69,7 +69,7 @@ stages:
             inputs:
               command: restore
               projects: $(solution)
-          - script: dotnet build $(solution) --configuration $(buildConfiguration) --no-restore -clp:ErrorsOnly --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
+          - script: dotnet build $(solution) --configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
             name: build
             displayName: Run dotnet build and generate NuGet packages
           - task: PublishPipelineArtifact@1
