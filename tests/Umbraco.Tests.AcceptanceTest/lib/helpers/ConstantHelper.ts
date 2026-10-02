@@ -348,7 +348,10 @@
     treeElementRoot: '/umbraco/management/api/v1/tree/element/root',
     treeElementChildren: '/umbraco/management/api/v1/tree/element/children',
     currentUserProfile: '/umbraco/management/api/v1/user/current/profile',
-    currentUserAvatar: '/umbraco/management/api/v1/user/current/avatar'
+    currentUserAvatar: '/umbraco/management/api/v1/user/current/avatar',
+    searchIndexes: '/umbraco/management/api/v1/search/indexes',
+    searchRebuild: '/umbraco/management/api/v1/search/rebuild',
+    searchQuery: '/umbraco/management/api/v1/search/search'
   }
 
   public static readonly userGroupDescriptionValues = {

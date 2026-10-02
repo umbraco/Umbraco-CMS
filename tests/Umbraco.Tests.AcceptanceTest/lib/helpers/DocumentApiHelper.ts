@@ -211,6 +211,12 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createPublishedDefaultDocument(documentName: string, documentTypeId: string) {
+    const documentId = await this.createDefaultDocument(documentName, documentTypeId) ?? '';
+    await this.publish(documentId);
+    return documentId;
+  }
+
   async createDocumentWithTextContent(documentName: string, documentTypeId: string, textContent: string, dataTypeName: string) {
     await this.ensureNameNotExists(documentName);
 
@@ -1151,6 +1157,44 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createDefaultDocumentWithASingleBlockEditorAndBlockWithValue(documentName: string, documentTypeName: string, singleBlockDataTypeName: string, elementTypeId: string, elementTypePropertyAlias: string, elementTypePropertyValue: string, elementTypePropertyEditorAlias: string, groupName: string) {
+    const crypto = require('crypto');
+    const blockContentKey = crypto.randomUUID();
+    const singleBlockDataTypeId = await this.api.dataType.createSingleBlockDataTypeWithABlock(singleBlockDataTypeName, elementTypeId) || '';
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, singleBlockDataTypeName, singleBlockDataTypeId, groupName) || '';
+
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentName)
+        .done()
+      .addValue()
+        .withAlias(AliasHelper.toAlias(singleBlockDataTypeName))
+        .addSingleBlockValue()
+          .addContentData()
+            .withContentTypeKey(elementTypeId)
+            .withKey(blockContentKey)
+            .addContentDataValue()
+              .withAlias(elementTypePropertyAlias)
+              .withEditorAlias(elementTypePropertyEditorAlias)
+              .withValue(elementTypePropertyValue)
+              .done()
+            .done()
+          .addExpose()
+            .withContentKey(blockContentKey)
+            .done()
+          .addLayout()
+            .withContentKey(blockContentKey)
+            .done()
+          .done()
+        .done()
+      .build();
+
+    return await this.create(document);
+  }
+
   async createDefaultDocumentWithABlockListEditor(documentName: string, elementTypeId: string, documentTypeName: string, blockListDataTypeName: string) {
     const crypto = require('crypto');
     const blockContentKey = crypto.randomUUID();
@@ -1712,6 +1756,34 @@ export class DocumentApiHelper {
       .build();
     await this.updateDomains(contentId, domainData);
     return contentId;
+  }
+
+  async createDocumentWithTwoCultureSpecificValues(documentName: string, documentTypeId: string, dataTypeName: string, firstCulture: string, firstValue: string, secondCulture: string, secondValue: string) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentName)
+        .withCulture(firstCulture)
+        .done()
+      .addVariant()
+        .withName(documentName)
+        .withCulture(secondCulture)
+        .done()
+      .addValue()
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withValue(firstValue)
+        .withCulture(firstCulture)
+        .done()
+      .addValue()
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withValue(secondValue)
+        .withCulture(secondCulture)
+        .done()
+      .build();
+
+    return await this.create(document);
   }
 
   async createDefaultDocumentWithOneDocumentLink(documentName: string, linkedDocumentName: string, linkedDocumentId: string, documentTypeName: string = 'Test Document Type') {
