@@ -3,6 +3,7 @@ import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbDocumentUrlModel } from '../repository/types.js';
 import { UmbDocumentUrlsDataResolver } from '../document-urls-data-resolver.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import {
 	css,
 	customElement,
@@ -18,7 +19,6 @@ import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UmbDocumentVariantState } from '../../variant-state.js';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -100,21 +100,21 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		});
 
 		// Re-request when the displayed culture changes, so switching language fetches that culture.
-		this.observe(
-			this.#documentUrlsDataResolver?.requestCulture,
-			() => this.#scheduleRequestUrls(),
-			'observeRequestCulture',
-		);
+		this.observe(this.#documentUrlsDataResolver?.requestCulture, () => this.#scheduleRequestUrls(), null);
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#propertyDataSetVariantId = context?.getVariantId();
 			this.#setLinks();
 		});
 
-		this.observe(this.#documentUrlsDataResolver?.urls, (urls) => {
-			this.#urls = urls ?? [];
-			this.#setLinks();
-		});
+		this.observe(
+			this.#documentUrlsDataResolver?.urls,
+			(urls) => {
+				this.#urls = urls ?? [];
+				this.#setLinks();
+			},
+			null,
+		);
 	}
 
 	#setLinks() {

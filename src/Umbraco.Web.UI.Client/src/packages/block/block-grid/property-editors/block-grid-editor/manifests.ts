@@ -8,6 +8,7 @@ const propertyEditorUi: UmbExtensionManifest = {
 	name: 'Block Grid Property Editor UI',
 	element: () => import('./property-editor-ui-block-grid.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Block Grid',
 		propertyEditorSchemaAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-layout',
@@ -31,8 +32,9 @@ const propertyEditorUi: UmbExtensionManifest = {
 				{
 					alias: 'maxPropertyWidth',
 					label: 'Editor width',
-					description: 'Optional css overwrite. (example: 1200px or 100%)',
+					description: 'Example: `1200px`',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					config: [{ alias: 'placeholder', value: '100%' }],
 				},
 				{
 					alias: 'createLabel',

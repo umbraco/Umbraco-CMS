@@ -13,6 +13,7 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -41,6 +42,42 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         builder.AddNotificationHandler<ContentMovedToRecycleBinNotification, ContentNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeDeletedNotification, ContentTypeNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeDeletingNotification, ContentTypeDeletingNotificationHandler>();
+    }
+
+    [Test]
+    public void GetComposedOf_Distinguishes_Composition_From_Inheritance()
+    {
+        var parent = ContentTypeBuilder.CreateBasicContentType("parent", "Parent");
+        ContentTypeService.Save(parent);
+
+        // child inherits from parent (tree inheritance stores the parent in the child's ContentTypeComposition)
+        var child = ContentTypeBuilder.CreateBasicContentType("child", "Child", parent);
+        ContentTypeService.Save(child);
+
+        // composer uses parent as a true composition
+        var composer = ContentTypeBuilder.CreateBasicContentType("composer", "Composer");
+        composer.AddContentType(parent);
+        ContentTypeService.Save(composer);
+
+        var composedOfIds = ContentTypeService.GetComposedOf(parent.Id).Select(x => x.Id).ToArray();
+        var compositionIds = ContentTypeService.GetComposedOf(parent.Id, ComposedOfType.Composition).Select(x => x.Id).ToArray();
+        var inheritanceIds = ContentTypeService.GetComposedOf(parent.Id, ComposedOfType.Inheritance).Select(x => x.Id).ToArray();
+        var allIds = ContentTypeService.GetComposedOf(parent.Id, ComposedOfType.All).Select(x => x.Id).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            // the parameterless overload returns both axes
+            Assert.That(composedOfIds, Is.EquivalentTo(new[] { child.Id, composer.Id }));
+
+            // the composition axis excludes the inheriting child
+            Assert.That(compositionIds, Is.EquivalentTo(new[] { composer.Id }));
+
+            // the inheritance axis returns only the inheriting child
+            Assert.That(inheritanceIds, Is.EquivalentTo(new[] { child.Id }));
+
+            // All is equivalent to the parameterless overload
+            Assert.That(allIds, Is.EquivalentTo(new[] { child.Id, composer.Id }));
+        });
     }
 
     [Test]
@@ -2086,6 +2123,112 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         Assert.AreEqual(count, basePage.PropertyTypes.Count());
     }
+
+    [Test]
+    public void Can_Move_PropertyType_To_No_Group()
+    {
+        IContentType basePage = CreateContentTypeWithSingleGroupedProperty();
+
+        Assert.IsTrue(basePage.MovePropertyType("title", null));
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, basePage.PropertyTypes.Count(), "the property type should not be orphaned in memory");
+            Assert.AreEqual("title", basePage.NoGroupPropertyTypes.SingleOrDefault()?.Alias);
+            Assert.IsEmpty(basePage.PropertyGroups["content"].PropertyTypes!);
+        });
+
+        ContentTypeService.Save(basePage);
+        basePage = ContentTypeService.Get(basePage.Id);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, basePage.PropertyTypes.Count(), "the property type should not be deleted on save");
+            Assert.AreEqual("title", basePage.NoGroupPropertyTypes.SingleOrDefault()?.Alias);
+            Assert.IsNull(basePage.NoGroupPropertyTypes.Single().PropertyGroupId);
+            Assert.IsEmpty(basePage.PropertyGroups["content"].PropertyTypes!);
+        });
+    }
+
+    [Test]
+    public void Can_Move_PropertyType_To_No_Group_Without_Losing_Content_Values()
+    {
+        IContentType basePage = CreateContentTypeWithSingleGroupedProperty();
+
+        IContent contentItem = ContentBuilder.CreateBasicContent(basePage);
+        contentItem.SetValue("title", "The title");
+        ContentService.Save(contentItem);
+
+        basePage.MovePropertyType("title", null);
+        ContentTypeService.Save(basePage);
+
+        contentItem = ContentService.GetById(contentItem.Id);
+
+        Assert.AreEqual("The title", contentItem.GetValue<string>("title"));
+    }
+
+    [Test]
+    public void Can_Move_PropertyType_From_No_Group_Into_Group()
+    {
+        IContentType basePage = CreateContentTypeWithSingleUngroupedProperty();
+        Assert.AreEqual("title", basePage.NoGroupPropertyTypes.SingleOrDefault()?.Alias, "the property type should start un-grouped");
+
+        Assert.IsTrue(basePage.MovePropertyType("title", "content"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsEmpty(basePage.NoGroupPropertyTypes, "the property type should no longer be un-grouped in memory");
+            Assert.AreEqual("title", basePage.PropertyGroups["content"].PropertyTypes!.SingleOrDefault()?.Alias);
+        });
+
+        ContentTypeService.Save(basePage);
+        basePage = ContentTypeService.Get(basePage.Id);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, basePage.PropertyTypes.Count());
+            Assert.IsEmpty(basePage.NoGroupPropertyTypes);
+            Assert.AreEqual("title", basePage.PropertyGroups["content"].PropertyTypes!.SingleOrDefault()?.Alias);
+        });
+    }
+
+    private IContentType CreateContentTypeWithSingleGroupedProperty()
+    {
+        ContentType basePage = ContentTypeBuilder.CreateBasicContentType();
+        basePage.AddPropertyGroup("content", "Content");
+        Assert.IsTrue(basePage.AddPropertyType(CreateTitlePropertyType(), "content", "Content"));
+
+        ContentTypeService.Save(basePage);
+
+        return ContentTypeService.Get(basePage.Id);
+    }
+
+    private IContentType CreateContentTypeWithSingleUngroupedProperty()
+    {
+        ContentType basePage = ContentTypeBuilder.CreateBasicContentType();
+        basePage.AddPropertyGroup("content", "Content");
+
+        // the single argument overload adds the property type without a group
+        Assert.IsTrue(basePage.AddPropertyType(CreateTitlePropertyType()));
+
+        ContentTypeService.Save(basePage);
+
+        return ContentTypeService.Get(basePage.Id);
+    }
+
+    private PropertyType CreateTitlePropertyType() =>
+        new(
+            ShortStringHelper,
+            Constants.PropertyEditors.Aliases.TextBox,
+            ValueStorageType.Nvarchar,
+            "title")
+        {
+            Name = "Title",
+            Description = string.Empty,
+            Mandatory = false,
+            SortOrder = 1,
+            DataTypeId = Constants.DataTypes.Textbox,
+        };
 
     [Test]
     public void Can_Add_PropertyGroup_With_Same_Name_On_Parent_and_Child()

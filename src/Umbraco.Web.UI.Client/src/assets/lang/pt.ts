@@ -325,6 +325,8 @@ export default {
 		isSensitiveValue:
 			'Este valor está oculto. Se precisar de acesso para visualizar este valor, entre em contacto com o administrador do seu site.',
 		isSensitiveValue_short: 'Este valor está oculto.',
+		isSensitiveValueNotice:
+			'Se precisar de acesso para visualizar os valores ocultos, entre em contacto com o administrador do seu site.',
 		languagesToPublish: 'Que idiomas gostaria de publicar?',
 		languagesToSendForApproval: 'Que idiomas gostaria de enviar para aprovação?',
 		languagesToSchedule: 'Que idiomas gostaria de agendar?',
@@ -351,6 +353,8 @@ export default {
 		selectAllVariants: 'Selecionar todas as variantes',
 		saveModalTitle: 'Guardar',
 		saveAndPublishModalTitle: 'Guardar e publicar',
+		saveAndPublishDescendantsModalTitle: 'Guardar e publicar com descendentes',
+		saveAndScheduleModalTitle: 'Guardar e agendar publicação',
 		publishModalTitle: 'Publicar',
 	},
 	blueprints: {
@@ -377,6 +381,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Clique para carregar',
+		browseFilesAction: 'Procurar ficheiros',
+		dropFilesOr: 'Arraste e solte ficheiros multimédia aqui<br />ou',
 		orClickHereToUpload: 'ou clique aqui para escolher ficheiros',
 		disallowedFileType: 'Não é possível carregar este ficheiro, não tem um tipo de ficheiro aprovado',
 		disallowedMediaType:
@@ -527,7 +533,8 @@ export default {
 		confirmremoveusageof: 'Tem a certeza que quer remover o uso de <strong>%0%</strong>',
 		confirmlogout: 'Tem a certeza?',
 		confirmSure: 'Tem a certeza?',
-		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> não pode ser movido para a Reciclagem porque é referenciado por outros itens.`,
+		cannotTrashWhenReferenced: (name: string) =>
+			`<strong>${name}</strong> não pode ser movido para a Reciclagem porque é referenciado por outros itens.`,
 		confirmTrash: (name: string) => `Tem a certeza que quer mover <strong>${name}</strong> para a Reciclagem?`,
 		cannotBulkTrashWhenReferenced: (total: number) =>
 			`Os <strong>${total} ${total === 1 ? 'item selecionado' : 'itens selecionados'}</strong> não podem ser movidos para a Reciclagem porque pelo menos um item é referenciado por outro conteúdo.`,
@@ -898,6 +905,8 @@ export default {
 		no: 'Não',
 		nodeName: 'Nome do Nó',
 		notFound: 'Não encontrado',
+		noResults: 'Sem resultados',
+		noResultsFor: (query: string) => `Nenhum resultado para "${query}".`,
 		of: 'de',
 		off: 'Desligado',
 		ok: 'OK',
@@ -1439,6 +1448,17 @@ export default {
 			'Arraste os diferentes itens para cima ou para baixo abaixo para definir como devem ser organizados. Ou clique nos cabeçalhos das colunas para ordenar toda a coleção de itens',
 		sortPleaseWait: 'Por favor, aguarde. Os itens estão a ser ordenados, isto pode demorar um pouco.',
 		sortEmptyState: 'Este nó não tem nós filhos para ordenar',
+		sortByFieldHeadline: 'Ordenar por campo',
+		sortByFieldSentence: 'Ordenar todos os itens filhos por',
+		sortByFieldDirectionLabel: 'Direção',
+		sortByFieldAscending: 'Ascendente',
+		sortByFieldDescending: 'Descendente',
+		sortByFieldNameOption: 'Nome',
+		sortByFieldCreateDateOption: 'Criado',
+		sortByFieldUpdateDateOption: 'Última edição',
+		sortIndividuallyHeadline: 'Ordenar individualmente',
+		sortByFieldCultureSentence: 'em',
+		sortByFieldCultureLabel: 'Idioma',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validação',
@@ -1733,8 +1753,10 @@ export default {
 		compositionsDescriptionMemberType:
 			'Herde separadores e propriedades de um Tipo de Membro existente. Novos separadores serão adicionados ao Tipo de Membro atual ou fundidos se existir um separador com um nome idêntico.',
 		compositionInUse: 'Este Tipo de Conteúdo é usado numa composição e, portanto, não pode ser composto ele próprio.',
-		compositionInUseMediaType: 'Este Tipo de Multimédia é usado numa composição e, portanto, não pode ser composto ele próprio.',
-		compositionInUseMemberType: 'Este Tipo de Membro é usado numa composição e, portanto, não pode ser composto ele próprio.',
+		compositionInUseMediaType:
+			'Este Tipo de Multimédia é usado numa composição e, portanto, não pode ser composto ele próprio.',
+		compositionInUseMemberType:
+			'Este Tipo de Membro é usado numa composição e, portanto, não pode ser composto ele próprio.',
 		noAvailableCompositions: 'Não existem Tipos de Conteúdo disponíveis para usar como composição.',
 		noAvailableCompositionsMediaType: 'Não existem Tipos de Multimédia disponíveis para usar como composição.',
 		noAvailableCompositionsMemberType: 'Não existem Tipos de Membro disponíveis para usar como composição.',
@@ -1774,8 +1796,10 @@ export default {
 		tabHasNoSortOrder: 'o separador não tem ordem',
 		compositionUsageHeading: 'Onde é usada esta composição?',
 		compositionUsageSpecification: 'Esta composição é atualmente usada na composição dos seguintes Tipos de Conteúdo:',
-		compositionUsageSpecificationMediaType: 'Esta composição é atualmente usada na composição dos seguintes Tipos de Multimédia:',
-		compositionUsageSpecificationMemberType: 'Esta composição é atualmente usada na composição dos seguintes Tipos de Membro:',
+		compositionUsageSpecificationMediaType:
+			'Esta composição é atualmente usada na composição dos seguintes Tipos de Multimédia:',
+		compositionUsageSpecificationMemberType:
+			'Esta composição é atualmente usada na composição dos seguintes Tipos de Membro:',
 		variantsHeading: 'Variação',
 		cultureVariantHeading: 'Permitir variar por cultura',
 		segmentVariantHeading: 'Permitir segmentação',
@@ -2465,10 +2489,10 @@ export default {
 		searchThisMessageWithGoogle: 'Pesquisar esta mensagem com Google',
 		searchWithBing: 'Pesquisar Com Bing',
 		searchThisMessageWithBing: 'Pesquisar esta mensagem com Bing',
-		searchOurUmbraco: 'Pesquisar Our Umbraco',
-		searchThisMessageOnOurUmbracoForumsAndDocs: 'Pesquisar esta mensagem nos fóruns e docs do Our Umbraco',
-		searchOurUmbracoWithGoogle: 'Pesquisar Our Umbraco com Google',
-		searchOurUmbracoForumsUsingGoogle: 'Pesquisar nos fóruns do Our Umbraco usando Google',
+		searchOurUmbraco: 'Pesquisar Umbraco',
+		searchThisMessageOnOurUmbracoForumsAndDocs: 'Pesquisar esta mensagem nos fóruns e docs do Umbraco',
+		searchOurUmbracoWithGoogle: 'Pesquisar Umbraco com Google',
+		searchOurUmbracoForumsUsingGoogle: 'Pesquisar nos fóruns do Umbraco usando Google',
 		searchUmbracoSource: 'Pesquisar Código Fonte Umbraco',
 		searchWithinUmbracoSourceCodeOnGithub: 'Pesquisar no código fonte do Umbraco no GitHub',
 		searchUmbracoIssues: 'Pesquisar Problemas Umbraco',
@@ -2546,10 +2570,6 @@ export default {
 			'Obrigado por escolher o Umbraco - achamos que isto pode ser o início de algo bonito. Embora possa parecer esmagador no início, fizemos muito para tornar a curva de aprendizagem o mais suave e rápida possível.',
 	},
 	welcomeDashboard: {
-		ourUmbracoHeadline: 'Our Umbraco - A Comunidade Mais Amigável',
-		ourUmbracoDescription:
-			'Our Umbraco, o site oficial da comunidade, é o seu balcão único para tudo relacionado com o Umbraco. Quer precise de uma resposta a uma pergunta, plugins interessantes ou um guia de como fazer algo no Umbraco, a melhor e mais amigável comunidade do mundo está apenas a um clique de distância.',
-		ourUmbracoButton: 'Visitar Our Umbraco',
 		documentationHeadline: 'Documentação',
 		documentationDescription: 'Encontre as respostas para todas as suas perguntas sobre o Umbraco',
 		communityHeadline: 'Comunidade',
@@ -2857,5 +2877,10 @@ export default {
 		emptyDate: 'Por favor, selecione uma data',
 		emptyTimeZone: 'Por favor, selecione um fuso horário',
 		invalidTimeZone: 'O fuso horário selecionado não é válido',
+	},
+	picker: {
+		browseTab: 'Procurar',
+		searchTab: 'Pesquisar',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
 	},
 } as UmbLocalizationDictionary;

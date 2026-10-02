@@ -24,8 +24,7 @@ import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 import '@umbraco-cms/backoffice/imaging';
 
-const elementName = 'umb-input-media';
-@customElement(elementName)
+@customElement('umb-input-media')
 export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(UmbLitElement) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
@@ -183,14 +182,18 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				this._editMediaPath = routeBuilder({});
 			});
 
-		this.observe(this.#pickerInputContext.selection, (selection) => (this.value = selection.join(',')));
+		this.observe(this.#pickerInputContext.selection, (selection) => (this.value = selection.join(',')), null);
 
-		this.observe(this.#pickerInputContext.selectedItems, async (selectedItems) => {
-			const missingCards = selectedItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
-			if (selectedItems?.length && !missingCards.length) return;
+		this.observe(
+			this.#pickerInputContext.selectedItems,
+			async (selectedItems) => {
+				const missingCards = selectedItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
+				if (selectedItems?.length && !missingCards.length) return;
 
-			this._cards = selectedItems ?? [];
-		});
+				this._cards = selectedItems ?? [];
+			},
+			null,
+		);
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -279,9 +282,13 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				href="${ifDefined(href)}"
 				?readonly=${this.readonly}
 				?disabled=${!this._editMediaPath}>
-				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
+				<umb-media-thumbnail
+					unique=${item.unique}
+					alt=${item.name}
+					icon=${item.mediaType.icon}
+					file-ext=${ifDefined(item.extension)}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
-				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(item)}</uui-action-bar>
+				<uui-action-bar slot="actions">${this.#renderRemoveAction(item)}</uui-action-bar>
 			</uui-card-media>
 		`;
 	}
@@ -346,6 +353,6 @@ export { UmbInputMediaElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputMediaElement;
+		'umb-input-media': UmbInputMediaElement;
 	}
 }

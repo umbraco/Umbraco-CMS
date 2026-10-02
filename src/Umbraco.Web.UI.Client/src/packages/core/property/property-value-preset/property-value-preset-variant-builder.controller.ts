@@ -1,4 +1,3 @@
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbPropertyValuePresetBuilderController } from './property-value-preset-builder.controller.js';
 import type {
 	UmbPropertyTypePresetModel,
@@ -6,6 +5,7 @@ import type {
 	UmbPropertyValuePreset,
 	UmbPropertyValuePresetApiCallArgs,
 } from './types.js';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 

@@ -64,6 +64,32 @@ describe('UmbAuthClient', () => {
 		});
 	});
 
+	describe('PKCE generation in insecure contexts', () => {
+		it('derives the same S256 code challenge when crypto.subtle is unavailable', async () => {
+			// http://<ip> origins are insecure contexts where the browser removes crypto.subtle;
+			// simulate that by shadowing the prototype getter on the crypto instance.
+			const subtle = crypto.subtle;
+			let url: string;
+			Object.defineProperty(crypto, 'subtle', { value: undefined, configurable: true });
+			try {
+				expect(crypto.subtle, 'crypto.subtle should be shadowed for this test').to.be.undefined;
+				url = await client.buildAuthorizationUrl('Umbraco');
+			} finally {
+				// Deleting the own property restores the prototype getter.
+				delete (crypto as { subtle?: SubtleCrypto }).subtle;
+			}
+
+			const challenge = new URL(url).searchParams.get('code_challenge');
+			const expectedHash = await subtle.digest('SHA-256', new TextEncoder().encode(client.codeVerifier!));
+			const expectedChallenge = btoa(String.fromCharCode(...new Uint8Array(expectedHash)))
+				.replace(/\+/g, '-')
+				.replace(/\//g, '_')
+				.replace(/=/g, '');
+
+			expect(challenge).to.equal(expectedChallenge);
+		});
+	});
+
 	describe('clearPkceState', () => {
 		it('clears the stored PKCE state', async () => {
 			await client.buildAuthorizationUrl('Umbraco');

@@ -289,7 +289,7 @@ public class ContentService : RepositoryService, IContentService
             {
                 // Log the error/warning
                 _logger.LogError(
-                    "User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    "User '{UserId}' was unable to rollback content '{ContentId}' (key '{ContentKey}') to version '{VersionId}'", userId, id, content.Key, versionId);
             }
             else
             {
@@ -297,7 +297,7 @@ public class ContentService : RepositoryService, IContentService
                     new ContentRolledBackNotification(content, evtMsgs).WithStateFrom(rollingBackNotification));
 
                 // Logging & Audit message
-                _logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                _logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' (key '{ContentKey}') to version '{VersionId}'", userId, id, content.Key, versionId);
                 Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
             }
 
@@ -1512,7 +1512,7 @@ public class ContentService : RepositoryService, IContentService
             content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
         }
 
-        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseSavedNotification: true);
         scope.Complete();
         return result;
     }
@@ -1566,7 +1566,7 @@ public class ContentService : RepositoryService, IContentService
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
         content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
 
-        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseSavedNotification: true);
         scope.Complete();
         return result;
     }
@@ -1722,6 +1722,10 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId"></param>
     /// <param name="branchOne"></param>
     /// <param name="branchRoot"></param>
+    /// <param name="raiseSavedNotification">
+    ///     Whether to raise a <see cref="ContentSavedNotification" /> once the document is persisted. Enabled by the
+    ///     save-and-publish entry points, which combine a save and a publish, so the paired Saved notification still fires.
+    /// </param>
     /// <param name="eventMessages"></param>
     /// <returns></returns>
     /// <remarks>
@@ -1740,7 +1744,8 @@ public class ContentService : RepositoryService, IContentService
         IDictionary<string, object?>? notificationState,
         int userId,
         bool branchOne = false,
-        bool branchRoot = false)
+        bool branchRoot = false,
+        bool raiseSavedNotification = false)
     {
         if (scope == null)
         {
@@ -1780,6 +1785,22 @@ public class ContentService : RepositoryService, IContentService
         IReadOnlyList<string>? culturesChanging = variesByCulture
             ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
             : null;
+
+        // For a save-and-publish, capture the saved cultures the same way (and at the same point) as the standalone
+        // Save path - before persistence resets change tracking - so the Saved notification honours the same
+        // SavedCultures contract: the changed cultures for variant content, or the "*" marker for changed invariant content.
+        IReadOnlyCollection<string>? savedCultures = null;
+        if (raiseSavedNotification)
+        {
+            if (variesByCulture)
+            {
+                savedCultures = culturesChanging;
+            }
+            else
+            {
+                savedCultures = content.IsDirty() ? ["*"] : [];
+            }
+        }
 
         var isNew = !content.HasIdentity;
         TreeChangeTypes changeType = isNew ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
@@ -1823,7 +1844,7 @@ public class ContentService : RepositoryService, IContentService
                 if (scope.Notifications.PublishCancelable(
                         new ContentPublishingNotification(content, eventMessages).WithState(notificationState)))
                 {
-                    _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
+                    _logger.LogInformation("Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}", content.Name, content.Id, content.Key, "publishing was cancelled");
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
                 }
 
@@ -1920,6 +1941,19 @@ public class ContentService : RepositoryService, IContentService
 
         // Persist the document
         SaveDocument(content);
+
+        // A save-and-publish is also a save, so raise the paired Saved notification (https://github.com/umbraco/Umbraco-CMS/issues/23523).
+        // Positioned here, after the document is actually persisted, so it does not fire on the cancelled-publishing or
+        // concurrency-violation paths above, which return before reaching this point.
+        if (raiseSavedNotification)
+        {
+            scope.Notifications.Publish(
+                new ContentSavedNotification(
+                    content,
+                    eventMessages,
+                    BuildCultureMap(content, savedCultures))
+                .WithState(notificationState));
+        }
 
         // we have tried to unpublish - won't happen in a branch
         if (unpublishing)
@@ -2133,7 +2167,7 @@ public class ContentService : RepositoryService, IContentService
                     PublishResult result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
                     if (result.Success == false)
                     {
-                        _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        _logger.LogError(null, "Failed to publish document id={DocumentId}, key={DocumentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -2146,7 +2180,7 @@ public class ContentService : RepositoryService, IContentService
                     PublishResult result = Unpublish(d, userId: d.WriterId);
                     if (result.Success == false)
                     {
-                        _logger.LogError(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        _logger.LogError(null, "Failed to unpublish document id={DocumentId}, key={DocumentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -2211,8 +2245,9 @@ public class ContentService : RepositoryService, IContentService
                         if (invalidProperties != null && invalidProperties.Length > 0)
                         {
                             _logger.LogWarning(
-                                "Scheduled publishing will fail for document {DocumentId} and culture {Culture} because of invalid properties {InvalidProperties}",
+                                "Scheduled publishing will fail for document {DocumentId} (key {DocumentKey}) and culture {Culture} because of invalid properties {InvalidProperties}",
                                 d.Id,
+                                d.Key,
                                 culture,
                                 string.Join(",", invalidProperties.Select(x => x.Alias)));
                         }
@@ -2241,7 +2276,7 @@ public class ContentService : RepositoryService, IContentService
 
                     if (result.Success == false)
                     {
-                        _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        _logger.LogError(null, "Failed to publish document id={DocumentId}, key={DocumentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -2265,7 +2300,7 @@ public class ContentService : RepositoryService, IContentService
 
                     if (result.Success == false)
                     {
-                        _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        _logger.LogError(null, "Failed to publish document id={DocumentId}, key={DocumentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -2841,7 +2876,31 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="content">The <see cref="IContent" /> to move</param>
     /// <param name="parentId">Id of the Content's new Parent</param>
     /// <param name="userId">Optional Id of the User moving the Content</param>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
     public OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
+        => Move(content, parentId, true, userId);
+
+    /// <summary>
+    ///     Moves an <see cref="IContent" /> object to a new location by changing its parent id.
+    /// </summary>
+    /// <remarks>
+    ///     If the <see cref="IContent" /> object is already published it will be
+    ///     published after being moved to its new location. Otherwise it'll just
+    ///     be saved with a new parent id.
+    /// </remarks>
+    /// <param name="content">The <see cref="IContent" /> to move.</param>
+    /// <param name="parentId">Id of the Content's new Parent.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the content along with it. When restoring an item out of the recycle bin
+    ///     this can be set to <c>false</c> to restore only the item itself, leaving its descendants in the recycle bin
+    ///     as top-level bin items.
+    /// </param>
+    /// <param name="userId">Optional Id of the User moving the Content.</param>
+    /// <returns>The operation result.</returns>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
+    public OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -2883,6 +2942,10 @@ public class ContentService : RepositoryService, IContentService
             // leave it unchanged
             var trashed = content.Trashed ? false : (bool?)null;
 
+            // when restoring a single item out of the recycle bin without its descendants, those descendants stay
+            // trashed and are re-homed under the recycle bin root - see PerformMoveLocked
+            var leaveDescendantsInRecycleBin = includeDescendants is false && content.Trashed && parentId != Constants.System.RecycleBinContent;
+
             // if the content was trashed under another content, and so has a published version,
             // it cannot move back as published but has to be unpublished first - that's for the
             // root content, everything underneath will retain its published status
@@ -2893,10 +2956,25 @@ public class ContentService : RepositoryService, IContentService
                 content.PublishedState = PublishedState.Unpublishing;
             }
 
-            PerformMoveLocked(content, parentId, parent, userId, moves, trashed);
+            PerformMoveLocked(content, parentId, parent, userId, moves, trashed, includeDescendants);
 
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+            if (leaveDescendantsInRecycleBin)
+            {
+                // The single RefreshBranch above cannot reconcile the descendants left in the bin (they are no longer
+                // descendants of the restored item), so also refresh the re-homed direct children. The navigation
+                // reconciler then moves them - and their sub-trees - back under the recycle bin root.
+                IContent[] rehomedChildren = moves
+                    .Select(x => x.Item1)
+                    .Where(x => x.ParentId == Constants.System.RecycleBinContent)
+                    .ToArray();
+                scope.Notifications.Publish(
+                    new ContentTreeChangeNotification(content.Yield().Concat(rehomedChildren), TreeChangeTypes.RefreshBranch, eventMessages));
+            }
+            else
+            {
+                scope.Notifications.Publish(
+                    new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+            }
 
             // changes
             MoveEventInfo<IContent>[] moveInfo = moves
@@ -2919,7 +2997,7 @@ public class ContentService : RepositoryService, IContentService
 
     // MUST be called from within WriteLock
     // trash indicates whether we are trashing, un-trashing, or not changing anything
-    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash)
+    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, List<(IContent Content, string OriginalPath)> moves, bool? trash, bool includeDescendants = true)
     {
         content.WriterId = userId;
         content.ParentId = parentId;
@@ -2927,6 +3005,7 @@ public class ContentService : RepositoryService, IContentService
         // get the level delta (old pos to new pos)
         // note that recycle bin (id:-20) level is 0!
         var levelDelta = 1 - content.Level + (parent?.Level ?? 0);
+        var originalLevel = content.Level;
 
         var paths = new Dictionary<int, string>();
 
@@ -2949,6 +3028,13 @@ public class ContentService : RepositoryService, IContentService
                 ? parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString
                 : parent.Path) + "," + content.Id;
 
+        // When restoring a single item out of the recycle bin without its descendants, the descendants must stay
+        // trashed: the item's direct children are re-homed to the recycle bin root (and the rest of the subtree keeps
+        // its relative structure), so nothing is orphaned and it can still be restored on its own later.
+        var leaveDescendantsInRecycleBin = includeDescendants is false
+            && parentId != Constants.System.RecycleBinContent
+            && originalPath.Contains(Constants.System.RecycleBinContentString);
+
         const int pageSize = 500;
         IQuery<IContent>? query = GetPagedDescendantQuery(originalPath);
         long total;
@@ -2962,13 +3048,43 @@ public class ContentService : RepositoryService, IContentService
             {
                 moves.Add((descendant, descendant.Path)); // capture original path
 
-                // update path and level since we do not update parentId
-                descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                descendant.Level += levelDelta;
-                PerformMoveContentLocked(descendant, userId, trash);
+                if (leaveDescendantsInRecycleBin)
+                {
+                    LeaveDescendantInRecycleBinLocked(descendant, content.Id, originalLevel, userId, paths);
+                }
+                else
+                {
+                    PerformMoveDescendantLocked(descendant, levelDelta, userId, trash, paths);
+                }
             }
         }
         while (total > pageSize);
+    }
+
+    // Re-homes a descendant of a restored item within the recycle bin: the restored item's direct children become
+    // top-level recycle bin items, while deeper descendants keep their relative structure below their (now re-homed)
+    // ancestor. The trashed state is left untouched so these items remain in the recycle bin.
+    private void LeaveDescendantInRecycleBinLocked(IContent descendant, int restoredItemId, int originalLevel, int userId, Dictionary<int, string> paths)
+    {
+        var isDirectChild = descendant.ParentId == restoredItemId;
+        descendant.Path = paths[descendant.Id] = isDirectChild
+            ? Constants.System.RecycleBinContentPathPrefix + descendant.Id
+            : paths[descendant.ParentId] + "," + descendant.Id;
+        descendant.Level -= originalLevel;
+        if (isDirectChild)
+        {
+            descendant.ParentId = Constants.System.RecycleBinContent;
+        }
+
+        PerformMoveContentLocked(descendant, userId, null);
+    }
+
+    // Moves a descendant along with the item being moved, updating its path and level (parentId is unchanged).
+    private void PerformMoveDescendantLocked(IContent descendant, int levelDelta, int userId, bool? trash, Dictionary<int, string> paths)
+    {
+        descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+        descendant.Level += levelDelta;
+        PerformMoveContentLocked(descendant, userId, trash);
     }
 
     private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
@@ -3713,9 +3829,10 @@ public class ContentService : RepositoryService, IContentService
         if (content.PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
         {
             _logger.LogInformation(
-                "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                "Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                 content.Name,
                 content.Id,
+                content.Key,
                 "document does not have published values");
             return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
         }
@@ -3733,12 +3850,12 @@ public class ContentService : RepositoryService, IContentService
                     if (!variesByCulture)
                     {
                         _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document has expired");
+                            "Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}", content.Name, content.Id, content.Key, "document has expired");
                     }
                     else
                     {
                         _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "document culture has expired");
+                            "Document {ContentName} (id={ContentId}, key={ContentKey}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, content.Key, culture, "document culture has expired");
                     }
 
                     return new PublishResult(
@@ -3751,17 +3868,19 @@ public class ContentService : RepositoryService, IContentService
                     if (!variesByCulture)
                     {
                         _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                            "Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                             content.Name,
                             content.Id,
+                            content.Key,
                             "document is awaiting release");
                     }
                     else
                     {
                         _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}",
+                            "Document {ContentName} (id={ContentId}, key={ContentKey}) culture {Culture} cannot be published: {Reason}",
                             content.Name,
                             content.Id,
+                            content.Key,
                             culture,
                             "document has culture awaiting release");
                     }
@@ -3775,9 +3894,10 @@ public class ContentService : RepositoryService, IContentService
 
                 case ContentStatus.Trashed:
                     _logger.LogInformation(
-                        "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                        "Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                         content.Name,
                         content.Id,
+                        content.Key,
                         "document is trashed");
                     return new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, content);
             }
@@ -3792,9 +3912,10 @@ public class ContentService : RepositoryService, IContentService
             if (!pathIsOk)
             {
                 _logger.LogInformation(
-                    "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                    "Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                     content.Name,
                     content.Id,
+                    content.Key,
                     "parent is not published");
                 return new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, content);
             }
@@ -3841,18 +3962,20 @@ public class ContentService : RepositoryService, IContentService
             if (culturesUnpublishing?.Count > 0)
             {
                 _logger.LogInformation(
-                    "Document {ContentName} (id={ContentId}) cultures: {Cultures} have been unpublished.",
+                    "Document {ContentName} (id={ContentId}, key={ContentKey}) cultures: {Cultures} have been unpublished.",
                     content.Name,
                     content.Id,
+                    content.Key,
                     string.Join(",", culturesUnpublishing));
             }
 
             if (culturesPublishing?.Count > 0)
             {
                 _logger.LogInformation(
-                    "Document {ContentName} (id={ContentId}) cultures: {Cultures} have been published.",
+                    "Document {ContentName} (id={ContentId}, key={ContentKey}) cultures: {Cultures} have been published.",
                     content.Name,
                     content.Id,
+                    content.Key,
                     string.Join(",", culturesPublishing));
             }
 
@@ -3869,7 +3992,7 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.SuccessPublishCulture, evtMsgs, content);
         }
 
-        _logger.LogInformation("Document {ContentName} (id={ContentId}) has been published.", content.Name, content.Id);
+        _logger.LogInformation("Document {ContentName} (id={ContentId}, key={ContentKey}) has been published.", content.Name, content.Id, content.Key);
         return new PublishResult(evtMsgs, content);
     }
 
@@ -3894,7 +4017,7 @@ public class ContentService : RepositoryService, IContentService
         if (notificationResult)
         {
             _logger.LogInformation(
-                "Document {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
+                "Document {ContentName} (id={ContentId}, key={ContentKey}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id, content.Key);
             return new PublishResult(PublishResultType.FailedUnpublishCancelledByEvent, evtMsgs, content);
         }
 
@@ -3935,7 +4058,7 @@ public class ContentService : RepositoryService, IContentService
         if (pastReleases.Count > 0)
         {
             _logger.LogInformation(
-                "Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
+                "Document {ContentName} (id={ContentId}, key={ContentKey}) had its release date removed, because it was unpublished.", content.Name, content.Id, content.Key);
         }
 
         _documentRepository.PersistContentSchedule(content, contentSchedule);
@@ -3943,7 +4066,7 @@ public class ContentService : RepositoryService, IContentService
         // change state to unpublishing
         content.PublishedState = PublishedState.Unpublishing;
 
-        _logger.LogInformation("Document {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
+        _logger.LogInformation("Document {ContentName} (id={ContentId}, key={ContentKey}) has been unpublished.", content.Name, content.Id, content.Key);
         return attempt;
     }
 

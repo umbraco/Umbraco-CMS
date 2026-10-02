@@ -1,5 +1,11 @@
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 
+/**
+ * Parses the numeric value of the given config alias.
+ * @param {UmbPropertyEditorConfig} config - The property editor configuration.
+ * @param {string} alias - The config alias to look up.
+ * @returns {number | undefined} The parsed number, or `undefined` if not set or not a valid number.
+ */
 function parseNumberConfig(config: UmbPropertyEditorConfig, alias: string): number | undefined {
 	const value = config.find((x) => x.alias === alias)?.value;
 	if (value === undefined || value === null || value === '') {

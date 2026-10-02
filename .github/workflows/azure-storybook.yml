@@ -27,6 +27,25 @@ jobs:
     name: Build and Deploy Job
     steps:
       - uses: actions/checkout@v6
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: src/Umbraco.Web.UI.Client/.nvmrc
+          cache: npm
+          cache-dependency-path: ./src/Umbraco.Web.UI.Client/package-lock.json
+      # Build here rather than letting Oryx do it: Oryx runs `npm install`, which drops
+      # rollup's platform-specific optional dependencies (npm/cli#4828). `npm ci` installs
+      # the lockfile verbatim, so the native binaries are always present.
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund --prefer-offline
+        working-directory: src/Umbraco.Web.UI.Client
+      - name: Build Storybook
+        run: npm run storybook:build
+        working-directory: src/Umbraco.Web.UI.Client
+      # Static Web Apps reads this from the uploaded directory, so it has to travel with the build output.
+      - name: Copy Static Web Apps routing config
+        run: cp staticwebapp.config.json storybook-static/
+        working-directory: src/Umbraco.Web.UI.Client
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -37,9 +56,9 @@ jobs:
           action: "upload"
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "src/Umbraco.Web.UI.Client" # App source code path
-          app_build_command: "npm run storybook:build"
-          output_location: "/storybook-static" # Built app content directory - optional
+          app_location: "src/Umbraco.Web.UI.Client/storybook-static" # Pre-built app content directory
+          output_location: "" # Must be empty when skip_app_build is set
+          skip_app_build: true # The build already ran above
           skip_api_build: true # Set to true if you do not have an Azure Functions API in your repo
           ###### End of Repository/Build Configurations ######
 

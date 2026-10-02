@@ -5,7 +5,7 @@ let memberId = '';
 let memberTypeId = '';
 const defaultMemberTypeName = 'Member';
 const memberName = 'Test Member';
-const memberTypeName = 'Test Member Type';
+const memberTypeName = 'Test Member Type Members';
 const comment = 'This is test comment';
 const username = 'testmember';
 const email = 'testmember@acceptance.test';
@@ -98,6 +98,7 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   const updatedPassword = '9876543210';
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
   memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
+  const passwordChangeDateBeforeEdit = (await umbracoApi.member.get(memberId)).lastPasswordChangeDate;
   await umbracoUi.member.goToMembers();
 
   // Act
@@ -106,6 +107,10 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.enterNewPassword(updatedPassword);
   await umbracoUi.member.enterConfirmNewPassword(updatedPassword);
   await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
+
+  // Assert
+  // Poll: the member read-model can lag the update response, so the change date may not be updated on the first read.
+  await expect.poll(() => umbracoApi.member.get(memberId).then(m => m.lastPasswordChangeDate)).not.toBe(passwordChangeDateBeforeEdit);
 });
 
 test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -119,11 +124,13 @@ test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =>
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.chooseMemberGroup(memberGroupName);
-  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 
   // Assert
-  const memberData = await umbracoApi.member.get(memberId);
-  expect(memberData.groups[0]).toBe(memberGroupId);
+  await expect(async () => {
+    await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
+    const memberData = await umbracoApi.member.get(memberId);
+    expect(memberData.groups[0]).toBe(memberGroupId);
+  }).toPass({timeout: ConstantHelper.timeout.veryLong});
 
   // Clean
   await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);

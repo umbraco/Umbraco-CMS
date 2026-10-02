@@ -38,7 +38,6 @@ test('can add a composition to a document type', {tag: '@smoke'}, async ({umbrac
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickModalMenuItemWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
@@ -62,7 +61,6 @@ test('can add multiple compositions to a document type', async ({umbracoApi, umb
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickModalMenuItemWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickModalMenuItemWithName(secondCompositionDocumentTypeName);
@@ -85,7 +83,6 @@ test('can remove a composition from a document type', {tag: '@smoke'}, async ({u
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickModalMenuItemWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
@@ -107,7 +104,6 @@ test('can add a composition with properties in a tab to a document type', async 
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickModalMenuItemWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
@@ -128,7 +124,6 @@ test('can add a composition to a document type that already has properties', asy
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickModalMenuItemWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
@@ -152,7 +147,6 @@ test('cannot add a composition with conflicting property aliases to a document t
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.documentType.clickCompositionsButton();
 
   // Assert
@@ -170,7 +164,6 @@ test('can remove one composition when multiple exist in a document type', async 
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickModalMenuItemWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
@@ -228,7 +221,6 @@ test('composed properties are visible and read-only in the document type editor'
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
 
   // Assert
   await umbracoUi.documentType.isInheritedGroupVisible(groupName, compositionDocumentTypeName);
@@ -266,7 +258,6 @@ test('cannot use a document type with compositions as a composition', async ({um
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.documentType.clickCompositionsButton();
 
   // Assert

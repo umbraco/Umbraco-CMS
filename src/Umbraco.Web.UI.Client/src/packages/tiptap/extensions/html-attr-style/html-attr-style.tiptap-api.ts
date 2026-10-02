@@ -10,6 +10,7 @@ export default class UmbTiptapHtmlAttributeStyleExtensionApi extends UmbTiptapEx
 				'bulletList',
 				'codeBlock',
 				'div',
+				'divContainer',
 				'figcaption',
 				'figure',
 				'heading',

@@ -24,6 +24,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 				this.#workspaces = workspaceExtensions;
 				this._createRoutes();
 			},
+			null,
 		);
 	}
 

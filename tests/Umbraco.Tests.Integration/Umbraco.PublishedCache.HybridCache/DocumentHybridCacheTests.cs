@@ -631,7 +631,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         Assert.IsNull(trashedPage, "Trashed content should not be in cache");
 
         // Act - Restore to root (original location)
-        var restoreResult = await ContentEditingService.RestoreAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey);
+        var restoreResult = await ContentEditingService.RestoreAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey, includeDescendants: true);
         Assert.IsTrue(restoreResult.Success);
 
         // Assert - Restored content should be back in the draft cache, but not republished automatically
