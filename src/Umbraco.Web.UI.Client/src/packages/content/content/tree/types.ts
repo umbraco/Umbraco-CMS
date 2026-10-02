@@ -2,6 +2,7 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 export type * from './sort-children-of-content/types.js';
+export type * from './tree-item/types.js';
 
 export interface UmbContentTreeItemModel extends UmbTreeItemModel {
 	ancestors: Array<UmbEntityModel>;
