@@ -1,13 +1,13 @@
-import { UmbHookController } from './hook.controller.js';
+import { UmbSequentialHookController } from './sequential-hook.controller.js';
 import { expect } from '@open-wc/testing';
 
-describe('UmbHookController', () => {
+describe('UmbSequentialHookController', () => {
 	type TestData = { value: number; log?: Array<string> };
 
-	let hook: UmbHookController<TestData>;
+	let hook: UmbSequentialHookController<TestData>;
 
 	beforeEach(() => {
-		hook = new UmbHookController<TestData>();
+		hook = new UmbSequentialHookController<TestData>();
 	});
 
 	it('returns initial data when no hooks are registered', async () => {

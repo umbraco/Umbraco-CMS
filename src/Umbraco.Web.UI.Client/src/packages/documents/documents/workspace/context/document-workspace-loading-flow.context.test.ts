@@ -43,6 +43,7 @@ const TEST_CONDITION_ALIAS = 'Test.Condition.LoadingFlow';
 interface UmbTestExtensionOptions {
 	name: string;
 	registerLoadingHook?: boolean;
+	loadingDelay?: number;
 	incomingWeight?: number;
 	throwOnIncomingData?: boolean;
 }
@@ -53,7 +54,8 @@ function createTestExtensionClass(options: UmbTestExtensionOptions) {
 			log.push(`${options.name}:created`);
 
 			if (options.registerLoadingHook) {
-				workspace.loadingHook.add(() => {
+				workspace.loadingHook.add(async () => {
+					await wait(options.loadingDelay ?? 0);
 					log.push(`${options.name}:loading`);
 				});
 			}
@@ -361,6 +363,21 @@ describe('Document workspace loading flow, with extensions taking part in the lo
 			await context.load(INVARIANT_DOCUMENT_ID);
 
 			expect(log).to.deep.equal(['A:created', 'A:loading', 'A:incoming']);
+		});
+	});
+	describe('with several extensions that add loading hook methods of their own', () => {
+		it('runs those at the same time, so the load takes as long as the slowest', async () => {
+			registerExtension('Test.Ext.A', { name: 'A', registerLoadingHook: true, loadingDelay: 400 });
+			registerExtension('Test.Ext.B', { name: 'B', registerLoadingHook: true, loadingDelay: 400 });
+			const context = await openWorkspace();
+			const start = performance.now();
+
+			await context.load(INVARIANT_DOCUMENT_ID);
+
+			// The extensions load their APIs at the same time as well, so one API delay and one loading delay.
+			expect(performance.now() - start).to.be.lessThan(API_LOAD_DELAY + 400 + 250);
+			expect(log.filter((x) => x.endsWith(':loading')).sort()).to.deep.equal(['A:loading', 'B:loading']);
+			expect(log.indexOf('A:incoming')).to.be.greaterThan(log.indexOf('B:loading'));
 		});
 	});
 });

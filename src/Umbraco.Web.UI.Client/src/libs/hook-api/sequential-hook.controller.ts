@@ -4,7 +4,10 @@ type UmbHookEntryWithOrder<ValueType, MetaType extends Record<string, unknown>> 
 	order: number;
 };
 
-export class UmbHookController<ValueType, MetaType extends Record<string, unknown> = Record<string, unknown>> {
+export class UmbSequentialHookController<
+	ValueType,
+	MetaType extends Record<string, unknown> = Record<string, unknown>,
+> {
 	// Always sorted: highest weight first, and in the order of adding for the same weight.
 	#entries: Array<UmbHookEntryWithOrder<ValueType, MetaType>> = [];
 	#nextOrder = 0;

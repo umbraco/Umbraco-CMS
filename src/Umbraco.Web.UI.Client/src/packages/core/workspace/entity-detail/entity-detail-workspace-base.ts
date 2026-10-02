@@ -25,7 +25,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbHookController } from '@umbraco-cms/backoffice/hook-api';
+import { UmbParallelHookController, UmbSequentialHookController } from '@umbraco-cms/backoffice/hook-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	UmbDetailRepository,
@@ -76,15 +76,19 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	/**
 	 * Awaited while an entity is being loaded or scaffolded, in parallel with the request for its data.
-	 * Anything the incoming data depends on being in place can be made ready here.
+	 * Anything the incoming data depends on being in place can be made ready here. All methods run at the same time,
+	 * so they must not depend on each other.
 	 */
-	public readonly loadingHook = new UmbHookController<void, UmbEntityDetailLoadingHookMeta>();
+	public readonly loadingHook = new UmbParallelHookController<UmbEntityDetailLoadingHookMeta>();
 
 	/**
 	 * Runs on all incoming entity data before it is applied to the workspace, regardless of how it arrived.
 	 * Hook methods are awaited in order of weight and return the data, optionally changed.
 	 */
-	public readonly incomingDataHook = new UmbHookController<DetailModelType, UmbEntityDetailIncomingDataHookMeta>();
+	public readonly incomingDataHook = new UmbSequentialHookController<
+		DetailModelType,
+		UmbEntityDetailIncomingDataHookMeta
+	>();
 
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
@@ -265,7 +269,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
 		try {
 			await this.#init;
-			const loading = this.loadingHook.execute(undefined, {
+			const loading = this.loadingHook.execute({
 				entityType: this.getEntityType(),
 				unique,
 				isNew: false,
@@ -361,7 +365,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			// Set before the loading hook runs, as extensions with an is-new condition cannot answer before this is known. [NL]
 			this.setIsNew(true);
 
-			const loading = this.loadingHook.execute(undefined, {
+			const loading = this.loadingHook.execute({
 				entityType: this.getEntityType(),
 				unique: undefined,
 				isNew: true,

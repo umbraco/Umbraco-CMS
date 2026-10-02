@@ -2,7 +2,7 @@ import type { ManifestWorkspace } from './extensions/types.js';
 import { UmbDefaultWorkspaceContext } from './kinds/default/default-workspace.context.js';
 import { customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbHookController } from '@umbraco-cms/backoffice/hook-api';
+import { UmbParallelHookController } from '@umbraco-cms/backoffice/hook-api';
 import {
 	UmbExtensionsApiInitializer,
 	UmbExtensionsElementAndApiInitializer,
@@ -54,7 +54,7 @@ export class UmbWorkspaceElement extends UmbLitElement {
 						api,
 					]);
 					// Let a workspace that loads entities wait for its additional workspace contexts to be ready, before processing the incoming data. [NL]
-					if ('loadingHook' in api && api.loadingHook instanceof UmbHookController) {
+					if ('loadingHook' in api && api.loadingHook instanceof UmbParallelHookController) {
 						api.loadingHook.add(async () => {
 							let timer: ReturnType<typeof setTimeout> | undefined;
 							const timeout = new Promise<void>((resolve) => {
