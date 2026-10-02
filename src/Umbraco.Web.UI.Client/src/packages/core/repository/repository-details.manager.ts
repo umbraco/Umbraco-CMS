@@ -215,10 +215,16 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 
 		const { data, error, asObservable } = await this.repository.requestByUniques(uniques);
 
+		// Requesting in bulk is an optimisation over requesting one at a time, and the individual requests still
+		// succeed when the bulk one fails for a reason unrelated to the uniques it carries. It costs one request per
+		// entry, hence the warning.
 		if (error) {
-			for (const unique of uniques) {
-				this.#setError(unique);
-			}
+			console.warn(
+				`[UmbRepositoryDetailsManager] Bulk request for ${uniques.length} entries failed; falling back to individual requests. This is slower - see the failing request for the cause.`,
+				error,
+			);
+
+			await Promise.all(uniques.map((unique) => this.#requestDetails(unique)));
 			return;
 		}
 

@@ -222,7 +222,19 @@ export class UmbContentTypeStructureManager<
 			this.contentTypeDataTypeUniques,
 			async (dataTypeUniques) => {
 				if (dataTypeUniques && dataTypeUniques.length > 0) {
-					const { asObservable } = await this.#dataTypeDetailRepository.requestByUniques(dataTypeUniques);
+					const { asObservable, error } = await this.#dataTypeDetailRepository.requestByUniques(dataTypeUniques);
+
+					// Individual requests populate the same store that asObservable reads from, so falling back to them
+					// keeps the observation below working. It costs one request per data type, hence the warning.
+					if (error) {
+						console.warn(
+							`[UmbContentTypeStructureManager] Bulk request for ${dataTypeUniques.length} data types failed; falling back to individual requests. This is slower - see the failing request for the cause.`,
+							error,
+						);
+
+						await Promise.all(dataTypeUniques.map((unique) => this.#dataTypeDetailRepository.requestByUnique(unique)));
+					}
+
 					// TODO: We should avoid this check, but architecturally, we currently lack a way to cancel previous requests. [NL]
 					// This is unlikely to happen, but we keep this check to avoid potential race conditions. [NL]
 					const currentDataTypeUniques = this.getContentTypeDataTypeUniques();
