@@ -1,4 +1,4 @@
-﻿export {DataTypeBuilder} from './dataTypeBuilder';
+export {DataTypeBuilder} from './dataTypeBuilder';
 export {SliderDataTypeBuilder} from './sliderDataTypeBuilder';
 export {TextAreaDataTypeBuilder} from './textAreaDataTypeBuilder';
 export {NumericDataTypeBuilder} from './numericDataTypeBuilder';
@@ -7,6 +7,7 @@ export {BlockListDataTypeBuilder} from './blockListDataTypeBuilder';
 export {CheckboxListDataTypeBuilder} from './checkboxListDataTypeBuilder';
 export {ContentPickerDataTypeBuilder} from './contentPickerDataTypeBuilder';
 export {BlockGridDataTypeBuilder} from './blockGridDataTypeBuilder';
+export {SingleBlockDataTypeBuilder} from './singleBlockDataTypeBuilder';
 export {DropdownDataTypeBuilder} from './dropdownDataTypeBuilder';
 export {ImageCropperDataTypeBuilder} from './imageCropperDataTypeBuilder';
 export {MediaPickerDataTypeBuilder} from './mediaPickerDataTypeBuilder';
