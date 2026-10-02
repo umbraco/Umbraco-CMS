@@ -34,6 +34,8 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 {
 	manifest?: ManifestWorkspaceContextMenuStructureKind;
 
+	#treeRepository?: Promise<UmbTreeRepository<any, UmbTreeRootModel>>;
+
 	#workspaceContext?: typeof UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
 	readonly #args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs;
 
@@ -224,10 +226,12 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 		}
 
 		// TODO: introduce variant tree item model
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any, UmbTreeRootModel>>(
-			this,
-			this.#args.treeRepositoryAlias,
-		);
+		const treeRepository = await (this.#treeRepository ??= createExtensionApiByAlias<
+			UmbTreeRepository<any, UmbTreeRootModel>
+		>(this, this.#args.treeRepositoryAlias).catch((error) => {
+			this.#treeRepository = undefined;
+			throw error;
+		}));
 
 		const { data: root } = await treeRepository.requestTreeRoot();
 
