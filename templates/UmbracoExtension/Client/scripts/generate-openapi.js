@@ -35,15 +35,20 @@ fetch(swaggerUrl).then(async (response) => {
     input: swaggerUrl,
     output: 'src/api',
     plugins: [
-      ...defaultPlugins,
+      // Spread defaults so future @hey-api/openapi-ts additions come along automatically,
+      // but filter out @hey-api/sdk because we override its options below.
+      ...defaultPlugins.filter((plugin) => (typeof plugin === 'string' ? plugin : plugin.name) !== '@hey-api/sdk'),
       {
+        // Throw on error responses, like the backoffice's own HTTP client, so tryExecute can report them
         name: '@hey-api/client-fetch',
-        runtimeConfigPath: '../hey-api',
+        throwOnError: true,
       },
       {
         name: '@hey-api/sdk',
-        asClass: true,
-        classNameBuilder: '{{name}}Service',
+        operations: {
+          strategy: 'byTags',
+          containerName: '{{name}}Service',
+        },
       }
     ],
   });
