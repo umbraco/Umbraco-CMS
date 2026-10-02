@@ -16,6 +16,18 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
+		type: 'workspaceContext',
+		name: 'Test Engage Segment Provider Workspace Context',
+		alias: 'Umb.WorkspaceContext.Document.EngageSegmentProviderTest',
+		api: () => import('./context/temp-engage-segment-provider-context-test.js'),
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
+			},
+		],
+	},
+	{
 		type: 'workspaceView',
 		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.Document.Edit',
