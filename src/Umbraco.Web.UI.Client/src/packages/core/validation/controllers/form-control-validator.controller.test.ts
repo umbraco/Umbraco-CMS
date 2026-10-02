@@ -101,6 +101,41 @@ describe('UmbFormControlValidator', () => {
 		});
 	});
 
+	describe('client messages added to the dataPath after construction', () => {
+		it('is invalid, revealing it by un-pristining the control', async () => {
+			const validator = new UmbFormControlValidator(host, control, 'A');
+			await Promise.resolve();
+
+			context.messages.addMessage('client', 'A', 'Value cannot be empty');
+
+			expect(validator.isValid).to.be.false;
+			expect(control.pristine).to.be.false;
+		});
+
+		it('removes the message once the control becomes valid, so the context validates', async () => {
+			const validator = new UmbFormControlValidator(host, control, 'A');
+			await Promise.resolve();
+			context.messages.addMessage('client', 'A', 'Value cannot be empty');
+
+			control.setValid(true);
+			control.checkValidity();
+
+			expect(validator.isValid).to.be.true;
+			expect(context.messages.getHasMessagesOfPathAndDescendant('A')).to.be.false;
+			await context.validate();
+		});
+
+		it('is unaffected by a client message on another dataPath', async () => {
+			const validator = new UmbFormControlValidator(host, control, 'A');
+			await Promise.resolve();
+
+			context.messages.addMessage('client', 'B', 'Value cannot be empty');
+
+			expect(validator.isValid).to.be.true;
+			expect(control.pristine).to.be.true;
+		});
+	});
+
 	describe('seeding #isValid on construction, without a dataPath', () => {
 		// A validator with no dataPath (e.g. a group/container-level validator) falls back to the control's own validity state.
 		it('is valid when the control itself already reports valid', async () => {
