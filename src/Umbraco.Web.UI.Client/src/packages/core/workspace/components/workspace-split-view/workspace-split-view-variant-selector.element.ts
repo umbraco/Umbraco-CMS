@@ -239,10 +239,12 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	}
 
 	#switchVariant(variant: VariantOptionModelType) {
+		this._popoverElement?.hidePopover();
 		this.#splitViewContext?.switchVariant(UmbVariantId.Create(variant));
 	}
 
 	#openSplitView(variant: VariantOptionModelType) {
+		this._popoverElement?.hidePopover();
 		this.#splitViewContext?.openSplitView(UmbVariantId.Create(variant));
 	}
 
