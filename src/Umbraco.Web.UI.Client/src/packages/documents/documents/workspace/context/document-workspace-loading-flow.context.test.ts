@@ -354,13 +354,13 @@ describe('Document workspace loading flow, with extensions taking part in the lo
 	});
 
 	describe('with an extension that adds a loading hook method of its own', () => {
-		it('is too late for the loading hook that is already running, as the extension only exists because of it', async () => {
+		it('runs it, after the wait for the extensions and before the incoming data hook', async () => {
 			registerExtension('Test.Ext.A', { name: 'A', registerLoadingHook: true });
 			const context = await openWorkspace();
 
 			await context.load(INVARIANT_DOCUMENT_ID);
 
-			expect(log).to.deep.equal(['A:created', 'A:incoming']);
+			expect(log).to.deep.equal(['A:created', 'A:loading', 'A:incoming']);
 		});
 	});
 });
