@@ -159,6 +159,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     /// <inheritdoc />
     public Task SetCachesSyncedAsync(IEnumerable<RepositoryCacheVersion> cacheVersions)
     {
+        var adopted = new List<RepositoryCacheVersion>();
         foreach (RepositoryCacheVersion version in cacheVersions)
         {
             if (version.Version is null)
@@ -167,9 +168,10 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
             }
 
             _cacheVersions[version.Identifier] = Guid.Parse(version.Version);
+            adopted.Add(version);
         }
 
-        _repositoryCacheVersionAccessor.CachesSynced();
+        _repositoryCacheVersionAccessor.CachesSynced(adopted);
         return Task.CompletedTask;
     }
 

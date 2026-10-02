@@ -255,7 +255,9 @@ public class RepositoryCacheVersionServiceTests
         _accessor.Setup(x => x.GetAsync(cacheKey)).ReturnsAsync(version);
         Assert.That(await _sut.IsCacheSyncedAsync<IContent>(), Is.True);
         _repository.Verify(x => x.GetAllAsync(), Times.Never);
-        _accessor.Verify(x => x.CachesSynced(), Times.Once);
+        _accessor.Verify(
+            x => x.CachesSynced(It.Is<IEnumerable<RepositoryCacheVersion>>(v => v.Single().Identifier == cacheKey && v.Single().Version == version.Version)),
+            Times.Once);
     }
 
     [Test]
