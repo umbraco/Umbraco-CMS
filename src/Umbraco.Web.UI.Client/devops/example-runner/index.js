@@ -10,36 +10,70 @@ const getDirectories = async (source) =>
     .filter(dirent => dirent.isDirectory())
     .map(dirent => dirent.name)
 
+const filterNames = (names, query) => {
+	const text = query.toLowerCase();
+	return names.filter(name => name.toLowerCase().includes(text));
+};
+
+const dim = (text) => `\x1b[2m${text}\x1b[0m`;
+const cyan = (text) => `\x1b[36m${text}\x1b[0m`;
+const hiddenRows = (arrow, count) => (count ? dim(`  ${arrow} ${count} more`) : '');
+
 function pickInteractive(names) {
 	return new Promise((resolve) => {
 		const { stdin, stdout } = process;
+		let filter = '';
+		let matches = names;
 		let index = 0;
+		let top = 0;
 		let digits = '';
 		let digitTimer;
-		let hasRendered = false;
+		let renderedHeight = 0;
+		let done = false;
+
+		// Header, two indicator lines and one spare row, so the frame never scrolls the terminal.
+		const viewportHeight = () => Math.max(1, Math.min(names.length, (stdout.rows ?? 24) - 4));
 
 		const clear = () => {
-			if (hasRendered) stdout.write(`\x1b[${names.length + 1}A\x1b[0J`);
+			if (renderedHeight) stdout.write(`\x1b[${renderedHeight}A\x1b[0J`);
 		};
 
 		const render = () => {
-			const rows = names.map((name, i) => {
-				const number = String(i + 1).padStart(2);
-				return i === index
-					? `\x1b[36m ❯ ${number}  ${name}\x1b[0m`
-					: `   ${number}  ${name}`;
+			const height = viewportHeight();
+			if (index < top) top = index;
+			if (index >= top + height) top = index - height + 1;
+			top = Math.max(0, Math.min(top, matches.length - height));
+
+			const rows = Array.from({ length: height }, (_, i) => {
+				const name = matches[top + i];
+				if (!name) return i === 0 && !matches.length ? dim('  No matches') : '';
+				const number = String(top + i + 1).padStart(2);
+				return top + i === index ? cyan(` ❯ ${number}  ${name}`) : `   ${number}  ${name}`;
 			});
-			const lines = [`\x1b[36m?\x1b[0m Select an example (↑/↓, number, Enter)`, ...rows];
+
+			const header = filter
+				? `${cyan('?')} Select an example: ${filter}`
+				: `${cyan('?')} Select an example (↑/↓, number, type to filter, Enter)`;
+			const lines = [
+				header,
+				hiddenRows('↑', top),
+				...rows,
+				hiddenRows('↓', Math.max(0, matches.length - top - height))
+			];
 
 			// Overwrite the previous frame in place, in a single write, so the list is never blanked between frames.
-			const moveUp = hasRendered ? `\x1b[${lines.length}A` : '';
+			const moveUp = renderedHeight
+				? `\x1b[${renderedHeight}A${lines.length === renderedHeight ? '' : '\x1b[0J'}`
+				: '';
 			stdout.write(moveUp + lines.map(line => `${line}\x1b[K\n`).join(''));
-			hasRendered = true;
+			renderedHeight = lines.length;
 		};
 
 		const finish = (name) => {
+			done = true;
 			clearTimeout(digitTimer);
 			stdin.off('keypress', onKeypress);
+			stdout.off('resize', render);
 			stdin.setRawMode(false);
 			stdin.pause();
 			clear();
@@ -48,10 +82,24 @@ function pickInteractive(names) {
 			resolve(name);
 		};
 
+		const move = (to) => {
+			if (!matches.length) return;
+			index = to;
+			digits = '';
+		};
+
+		const setFilter = (value) => {
+			filter = value;
+			matches = filterNames(names, value);
+			index = 0;
+			top = 0;
+			digits = '';
+		};
+
 		const onDigit = (digit) => {
 			const next = [digits + digit, digit].find(candidate => {
 				const number = parseInt(candidate);
-				return number >= 1 && number <= names.length;
+				return number >= 1 && number <= matches.length;
 			});
 			if (!next) return;
 			digits = next;
@@ -60,44 +108,35 @@ function pickInteractive(names) {
 			digitTimer = setTimeout(() => (digits = ''), digitTimeoutMs);
 		};
 
+		const keyActions = {
+			up: () => move((index - 1 + matches.length) % matches.length),
+			down: () => move((index + 1) % matches.length),
+			home: () => move(0),
+			end: () => move(matches.length - 1),
+			backspace: () => setFilter(filter.slice(0, -1)),
+			escape: () => (filter ? setFilter('') : finish(undefined)),
+			return: () => matches[index] && finish(matches[index])
+		};
+
 		const onKeypress = (_, key) => {
 			if (!key) return;
 
 			if (key.ctrl && key.name === 'c') return finish(undefined);
 
-			switch (key.name) {
-				case 'escape':
-					return finish(undefined);
-				case 'return':
-					return finish(names[index]);
-				case 'up':
-					index = (index - 1 + names.length) % names.length;
-					digits = '';
-					break;
-				case 'down':
-					index = (index + 1) % names.length;
-					digits = '';
-					break;
-				case 'home':
-					index = 0;
-					digits = '';
-					break;
-				case 'end':
-					index = names.length - 1;
-					digits = '';
-					break;
-				default:
-					if (/^[0-9]$/.test(key.sequence)) onDigit(key.sequence);
-					else return;
-			}
+			const action = keyActions[key.name];
+			if (action) action();
+			else if (/^[0-9]$/.test(key.sequence)) onDigit(key.sequence);
+			else if (/^[a-z_-]$/i.test(key.sequence)) setFilter(filter + key.sequence);
+			else return;
 
-			render();
+			if (!done) render();
 		};
 
 		readline.emitKeypressEvents(stdin);
 		stdin.setRawMode(true);
 		stdin.resume();
 		stdin.on('keypress', onKeypress);
+		stdout.on('resize', render);
 		stdout.write('\x1b[?25l');
 		render();
 	});
