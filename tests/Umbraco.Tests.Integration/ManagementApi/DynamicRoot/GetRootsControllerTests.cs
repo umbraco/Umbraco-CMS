@@ -72,7 +72,7 @@ public class GetRootsControllerTests : ManagementApiTest<GetRootsController>
 
         IContentType contentType = ContentTypeBuilder.CreateSimpleContentType(alias, alias, defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent root = ContentBuilder.CreateSimpleContent(contentType, "Root");
         ContentService.Save(root);

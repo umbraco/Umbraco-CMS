@@ -57,7 +57,7 @@ public class GetRootsController : DynamicRootControllerBase
         // The content root is not an item the API exposes; a query that reaches it leaves the whole tree in scope.
         return Ok(new DynamicRootResponseModel()
         {
-            Roots = roots.Contains(Constants.System.RootSystemKey) ? [] : roots
+            Roots = roots.Contains(Constants.System.RootSystemKey) ? [] : roots,
         });
     }
 }
