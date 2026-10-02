@@ -6,18 +6,36 @@ const exampleDirectory = 'examples';
 const digitTimeoutMs = 1000;
 
 const getDirectories = async (source) =>
-  (await readdir(source, { withFileTypes: true }))
-    .filter(dirent => dirent.isDirectory())
-    .map(dirent => dirent.name)
+	(await readdir(source, { withFileTypes: true }))
+		.filter((dirent) => dirent.isDirectory())
+		.map((dirent) => dirent.name);
 
 const filterNames = (names, query) => {
 	const text = query.toLowerCase();
-	return names.filter(name => name.toLowerCase().includes(text));
+	return names.filter((name) => name.toLowerCase().includes(text));
 };
 
 const dim = (text) => `\x1b[2m${text}\x1b[0m`;
 const cyan = (text) => `\x1b[36m${text}\x1b[0m`;
 const hiddenRows = (arrow, count) => (count ? dim(`  ${arrow} ${count} more`) : '');
+
+const logo = [
+	'  ▄▄████▄▄  ',
+	' ██████████ ',
+	'███ ████ ███',
+	'███ ████ ███',
+	' ██▄▄▄▄▄▄██ ',
+	'  ▀▀████▀▀  '
+];
+const title = ['Umbraco', 'Backoffice Client Examples'];
+const titleRow = 2;
+const banner = [
+	...logo.map((line, i) => {
+		const text = title[i - titleRow];
+		return text ? `${line}   \x1b[1m${text}\x1b[0m` : line;
+	}),
+	'',
+];
 
 function pickInteractive(names) {
 	return new Promise((resolve) => {
@@ -31,8 +49,8 @@ function pickInteractive(names) {
 		let renderedHeight = 0;
 		let done = false;
 
-		// Header, two indicator lines and one spare row, so the frame never scrolls the terminal.
-		const viewportHeight = () => Math.max(1, Math.min(names.length, (stdout.rows ?? 24) - 4));
+		// Banner, header, two indicator lines and one spare row, so the frame never scrolls the terminal.
+		const viewportHeight = () => Math.max(1, Math.min(names.length, (stdout.rows ?? 24) - 4 - banner.length));
 
 		const clear = () => {
 			if (renderedHeight) stdout.write(`\x1b[${renderedHeight}A\x1b[0J`);
@@ -55,17 +73,16 @@ function pickInteractive(names) {
 				? `${cyan('?')} Select an example: ${filter}`
 				: `${cyan('?')} Select an example (↑/↓, number, type to filter, Enter)`;
 			const lines = [
+				...banner,
 				header,
 				hiddenRows('↑', top),
 				...rows,
-				hiddenRows('↓', Math.max(0, matches.length - top - height))
+				hiddenRows('↓', Math.max(0, matches.length - top - height)),
 			];
 
 			// Overwrite the previous frame in place, in a single write, so the list is never blanked between frames.
-			const moveUp = renderedHeight
-				? `\x1b[${renderedHeight}A${lines.length === renderedHeight ? '' : '\x1b[0J'}`
-				: '';
-			stdout.write(moveUp + lines.map(line => `${line}\x1b[K\n`).join(''));
+			const moveUp = renderedHeight ? `\x1b[${renderedHeight}A${lines.length === renderedHeight ? '' : '\x1b[0J'}` : '';
+			stdout.write(moveUp + lines.map((line) => `${line}\x1b[K\n`).join(''));
 			renderedHeight = lines.length;
 		};
 
@@ -97,7 +114,7 @@ function pickInteractive(names) {
 		};
 
 		const onDigit = (digit) => {
-			const next = [digits + digit, digit].find(candidate => {
+			const next = [digits + digit, digit].find((candidate) => {
 				const number = parseInt(candidate);
 				return number >= 1 && number <= matches.length;
 			});
@@ -115,7 +132,7 @@ function pickInteractive(names) {
 			end: () => move(matches.length - 1),
 			backspace: () => setFilter(filter.slice(0, -1)),
 			escape: () => (filter ? setFilter('') : finish(undefined)),
-			return: () => matches[index] && finish(matches[index])
+			return: () => matches[index] && finish(matches[index]),
 		};
 
 		const onKeypress = (_, key) => {
@@ -146,7 +163,7 @@ function pickByNumber(names) {
 	return new Promise((resolve) => {
 		const rl = readline.createInterface({
 			input: process.stdin,
-			output: process.stdout
+			output: process.stdout,
 		});
 
 		console.log('Please select an example by entering the corresponding number:');
@@ -171,15 +188,14 @@ function startExample(name) {
 
 	// Start vite server:
 	try {
-		execSync('npm run dev', {stdio: 'inherit'});
+		execSync('npm run dev', { stdio: 'inherit' });
 	} catch (error) {
 		// Nothing, cause this is most likely just the server being stopped.
 		//console.log(error);
 	}
 }
 
-async function pickExampleUI(){
-
+async function pickExampleUI() {
 	// Find sub folder:
 	const exampleFolderNames = await getDirectories(`${exampleDirectory}`);
 
@@ -197,6 +213,6 @@ async function pickExampleUI(){
 	const selectedFolder = await pick(exampleFolderNames);
 
 	if (selectedFolder) startExample(selectedFolder);
-};
+}
 
 pickExampleUI();
