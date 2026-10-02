@@ -1,6 +1,5 @@
-import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { isNotPublishedMandatory } from '../../utils.js';
+import { isNotPublishedMandatory, isSelectableForPublishing } from '../../utils.js';
 import type {
 	UmbDocumentPublishWithDescendantsModalData,
 	UmbDocumentPublishWithDescendantsModalValue,
@@ -42,11 +41,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes:
-		this._options =
-			this.data?.options.filter(
-				(option) => isNotPublishedMandatory(option) || option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
-			) ?? [];
+		this._options = this.data?.options.filter(isSelectableForPublishing) ?? [];
 
 		let selected = this.value?.selection ?? [];
 

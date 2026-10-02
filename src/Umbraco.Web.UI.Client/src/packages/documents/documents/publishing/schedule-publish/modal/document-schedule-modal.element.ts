@@ -1,6 +1,6 @@
 import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { isNotPublishedMandatory } from '../../utils.js';
+import { isNotPublishedMandatory, isSelectableForPublishing } from '../../utils.js';
 import { UmbDocumentVariantLanguagePickerElement } from '../../../modals/index.js';
 import type {
 	UmbDocumentScheduleModalData,
@@ -94,20 +94,10 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			return option ? this.#pickableFilter(option) : true;
 		});
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
-		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
-		this._options =
-			this.data?.options.filter(
-				(option) =>
-					(option.variant && option.variant.state === null) ||
-					isNotPublishedMandatory(option) ||
-					option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
-			) ?? [];
+		this._options = this.data?.options.filter(isSelectableForPublishing) ?? [];
 
 		let selected = this.data?.activeVariants ?? [];
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
-		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
 		const validOptions = this._options.filter((option) => this.#pickableFilter(option));
 
 		// Filter selection based on options:
