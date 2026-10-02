@@ -44,6 +44,7 @@ const collection = (
 		columns: Array<{ alias: string; header: string; isSystem: boolean }>;
 		layouts: Array<'table' | 'grid'>;
 		tabName: string;
+		showContentFirst: boolean;
 	},
 ) =>
 	dataType(id, name, 'Umbraco.ListView', 'Umb.PropertyEditorUi.Collection', [
@@ -72,7 +73,7 @@ const collection = (
 		},
 		{ alias: 'icon', value: 'icon-layers' },
 		{ alias: 'tabName', value: options.tabName },
-		{ alias: 'showContentFirst', value: false },
+		{ alias: 'showContentFirst', value: options.showContentFirst },
 	]);
 
 interface UmbMbcsBlockOptions {
@@ -301,6 +302,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 		layouts: ['table', 'grid'],
 		tabName: 'Documents',
+		showContentFirst: true,
 	}),
 	dataType(
 		DATA_TYPE_IDS.productDocumentFile,
