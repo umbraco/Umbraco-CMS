@@ -50,7 +50,9 @@ test('can save and publish english variant when danish has empty mandatory field
   expect(contentData.variants[0].state).toBe('Published');
 });
 
-test('can publish english variant after visiting danish that has empty mandatory field', async ({umbracoUi}) => {
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/24025): switching culture leaves the variant
+// selector popover open, which breaks the second consecutive switchLanguage call in this test.
+test.skip('can publish english variant after visiting danish that has empty mandatory field', async ({umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -103,6 +105,24 @@ test('cannot publish both cultures when danish has empty mandatory field', async
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
+test('shows a hint on the variant selector for a culture with a validation error', async ({umbracoUi}) => {
+  // Arrange
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  // Select both english and danish in the publish dialog; danish fails due to its empty mandatory field.
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickButtonWithName(danishContentName);
+  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  await umbracoUi.content.clickSelectVariantButton();
+
+  // Assert
+  await umbracoUi.content.isVariantErrorHintBadgeVisibleForLanguageName('Danish');
+});
+
 test('can publish english variant from actions menu when danish has empty mandatory field', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();
@@ -118,4 +138,23 @@ test('can publish english variant from actions menu when danish has empty mandat
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
+});
+
+test('can unpublish english variant while danish still has an empty mandatory field', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const contentData = await umbracoApi.document.getByName(contentName);
+  await umbracoApi.document.publish(contentData.id, {publishSchedules: [{culture: 'en-US'}]});
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickUnpublishActionMenuOption();
+  await umbracoUi.content.clickConfirmToUnpublishButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
+  await umbracoUi.content.isErrorNotificationVisible(false);
+  const updatedContentData = await umbracoApi.document.getByName(contentName);
+  expect(updatedContentData.variants.find(variant => variant.culture === 'en-US')?.state).toBe('Draft');
 });

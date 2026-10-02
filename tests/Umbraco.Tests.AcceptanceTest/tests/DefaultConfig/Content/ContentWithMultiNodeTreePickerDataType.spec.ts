@@ -1056,3 +1056,22 @@ test('can only select allowed types in the tree table view within the picker', a
   await umbracoApi.documentType.ensureNameNotExists(allowedItemDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(notAllowedItemDocumentTypeName);
 });
+
+test('can not publish a mandatory multi node tree picker with an empty value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'Test Group', false, false, true);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Draft');
+});
