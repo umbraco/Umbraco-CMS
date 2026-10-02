@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
@@ -25,7 +26,11 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.AddNotificationAsyncHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>();
+    {
+        builder.AddNotificationAsyncHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>();
+        builder.Services.AddSingleton<CopyCancellationCoordinator>();
+        builder.AddNotificationHandler<ContentCopyingNotification, CopyCancellationNotificationHandler>();
+    }
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 

@@ -15,8 +15,11 @@ export class UmbDocumentRecycleBinServerDataSource implements UmbRecycleBinDataS
 		this.#host = host;
 	}
 
-	trash(args: UmbRecycleBinTrashRequestArgs) {
-		return tryExecute(this.#host, DocumentService.putDocumentByIdMoveToRecycleBin({ path: { id: args.unique } }));
+	trash(args: UmbRecycleBinTrashRequestArgs, abortSignal?: AbortSignal) {
+		return tryExecute(
+			this.#host,
+			DocumentService.putDocumentByIdMoveToRecycleBin({ path: { id: args.unique }, signal: abortSignal }),
+		);
 	}
 
 	restore(args: UmbRecycleBinRestoreRequestArgs) {

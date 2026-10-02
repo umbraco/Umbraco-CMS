@@ -6,8 +6,8 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 export class UmbDuplicateDocumentRepository extends UmbRepositoryBase {
 	#duplicateSource = new UmbDuplicateDocumentServerDataSource(this);
 
-	async requestDuplicate(args: UmbDuplicateDocumentRequestArgs) {
-		const { error } = await this.#duplicateSource.duplicate(args);
+	async requestDuplicate(args: UmbDuplicateDocumentRequestArgs, abortSignal?: AbortSignal) {
+		const { error } = await this.#duplicateSource.duplicate(args, abortSignal);
 
 		if (!error) {
 			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);

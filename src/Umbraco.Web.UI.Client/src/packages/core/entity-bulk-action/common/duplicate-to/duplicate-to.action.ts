@@ -15,17 +15,20 @@ export class UmbDuplicateToEntityBulkAction extends UmbEntityBulkActionBase<Meta
 			hideTreeRoot: this.args.meta.hideTreeRoot,
 			treeAlias: this.args.meta.treeAlias,
 			searchProviderAlias: this.args.meta.searchProviderAlias,
-			perform: async (destinationUnique) => {
+			perform: async (destinationUnique, abortSignal) => {
 				const bulkDuplicateRepository = await createExtensionApiByAlias<UmbBulkDuplicateToRepository>(
 					this,
 					this.args.meta.bulkDuplicateRepositoryAlias,
 				);
 				if (!bulkDuplicateRepository) throw new Error('Bulk Duplicate Repository is not available');
 
-				return bulkDuplicateRepository.requestBulkDuplicateTo({
-					uniques: this.selection,
-					destination: { unique: destinationUnique },
-				});
+				return bulkDuplicateRepository.requestBulkDuplicateTo(
+					{
+						uniques: this.selection,
+						destination: { unique: destinationUnique },
+					},
+					abortSignal,
+				);
 			},
 		});
 	}

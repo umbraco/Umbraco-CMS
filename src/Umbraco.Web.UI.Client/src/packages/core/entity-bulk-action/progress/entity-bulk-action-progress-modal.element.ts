@@ -2,7 +2,7 @@ import type {
 	UmbEntityBulkActionProgressModalData,
 	UmbEntityBulkActionProgressModalValue,
 } from './entity-bulk-action-progress-modal.token.js';
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -26,7 +26,15 @@ export class UmbEntityBulkActionProgressModalElement extends UmbModalBaseElement
 
 	#renderIndeterminate() {
 		// Leaving progress unset makes uui-loader-bar run its looped (indeterminate) animation.
-		return html`<uui-loader-bar></uui-loader-bar>`;
+		return html`
+			<uui-loader-bar></uui-loader-bar>
+			${this.data?.cancellable
+				? html`<uui-button
+						slot="actions"
+						label=${this.localize.term('general_cancel')}
+						@click=${this.#onCancel}></uui-button>`
+				: nothing}
+		`;
 	}
 
 	#renderDeterminate() {

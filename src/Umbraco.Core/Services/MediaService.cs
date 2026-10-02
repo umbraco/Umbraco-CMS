@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -1151,8 +1152,17 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
+        [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
         public Attempt<OperationResult?> MoveToRecycleBin(IMedia media, int userId = Constants.Security.SuperUserId)
+#pragma warning disable CS0618 // Type or member is obsolete
+            => MoveToRecycleBin(media, CancellationToken.None, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        /// <inheritdoc />
+        public Attempt<OperationResult?> MoveToRecycleBin(IMedia media, CancellationToken cancellationToken, int userId = Constants.Security.SuperUserId)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             EventMessages messages = EventMessagesFactory.Get();
             var moves = new List<(IMedia, string)>();
 
@@ -1174,7 +1184,7 @@ namespace Umbraco.Cms.Core.Services
                     return OperationResult.Attempt.Cancel(messages);
                 }
 
-                PerformMoveLocked(media, Constants.System.RecycleBinMedia, null, userId, moves, true);
+                PerformMoveLocked(media, Constants.System.RecycleBinMedia, null, userId, moves, true, cancellationToken: cancellationToken);
 
                 scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
                 MoveToRecycleBinEventInfo<IMedia>[] moveInfo = moves.Select(x => new MoveToRecycleBinEventInfo<IMedia>(x.Item1, x.Item2)).ToArray();
@@ -1194,8 +1204,8 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Id of the User moving the Media</param>
 #pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
         public Attempt<OperationResult?> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId)
+            => Move(media, parentId, true, CancellationToken.None, userId);
 #pragma warning restore CS0618 // Type or member is obsolete
-            => Move(media, parentId, true, userId);
 
         /// <summary>
         /// Moves an <see cref="IMedia"/> object to a new location.
@@ -1209,16 +1219,23 @@ namespace Umbraco.Cms.Core.Services
         /// </param>
         /// <param name="userId">Id of the User moving the Media.</param>
         /// <returns>The operation result.</returns>
-#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
+        [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
         public Attempt<OperationResult?> Move(IMedia media, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+#pragma warning disable CS0618 // Type or member is obsolete
+            => Move(media, parentId, includeDescendants, CancellationToken.None, userId);
 #pragma warning restore CS0618 // Type or member is obsolete
+
+        /// <inheritdoc />
+        public Attempt<OperationResult?> Move(IMedia media, int parentId, bool includeDescendants, CancellationToken cancellationToken, int userId = Constants.Security.SuperUserId)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             EventMessages messages = EventMessagesFactory.Get();
 
             // if moving to the recycle bin then use the proper method
             if (parentId == Constants.System.RecycleBinMedia)
             {
-                MoveToRecycleBin(media, userId);
+                MoveToRecycleBin(media, cancellationToken, userId);
                 return OperationResult.Attempt.Succeed(messages);
             }
 
@@ -1252,7 +1269,7 @@ namespace Umbraco.Cms.Core.Services
                 // trashed and are re-homed under the recycle bin root - see PerformMoveLocked
                 var leaveDescendantsInRecycleBin = includeDescendants is false && media.Trashed && parentId != Constants.System.RecycleBinMedia;
 
-                PerformMoveLocked(media, parentId, parent, userId, moves, trashed, includeDescendants);
+                PerformMoveLocked(media, parentId, parent, userId, moves, trashed, includeDescendants, cancellationToken);
 
                 if (leaveDescendantsInRecycleBin)
                 {
@@ -1297,11 +1314,12 @@ namespace Umbraco.Cms.Core.Services
         ///     Whether to move the descendants along with the media. When <c>false</c> during a restore out of the recycle
         ///     bin, the descendants are left trashed - the item's direct children are re-homed to the recycle bin root.
         /// </param>
+        /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
         /// <remarks>
         ///     MUST be called from within WriteLock.
         ///     The trash parameter indicates whether we are trashing, un-trashing, or not changing anything.
         /// </remarks>
-        private void PerformMoveLocked(IMedia media, int parentId, IMedia? parent, int userId, List<(IMedia Media, string OriginalPath)> moves, bool? trash, bool includeDescendants = true)
+        private void PerformMoveLocked(IMedia media, int parentId, IMedia? parent, int userId, List<(IMedia Media, string OriginalPath)> moves, bool? trash, bool includeDescendants = true, CancellationToken cancellationToken = default)
         {
             // Needed to update the in-memory navigation structure
             var cameFromRecycleBin = media.ParentId == Constants.System.RecycleBinMedia;
@@ -1347,6 +1365,12 @@ namespace Umbraco.Cms.Core.Services
 
                 foreach (IMedia descendant in descendants)
                 {
+                    // Checked per descendant, not just at the boundary: the write lock is held and the scope stays
+                    // open for the whole recursion, so this is the only point that can interrupt a long move before
+                    // it commits. A break here would leave the already-moved descendants committed; throwing exits
+                    // the using-scope without Complete(), rolling back everything moved so far.
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     moves.Add((descendant, descendant.Path)); // capture original path
 
                     if (leaveDescendantsInRecycleBin)
