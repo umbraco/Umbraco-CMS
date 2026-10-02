@@ -151,6 +151,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 			const onOpen = item.hasChildren
 				? () => this.dispatchEvent(new UmbTreeItemOpenEvent({ unique: item.unique, entityType: item.entityType }))
 				: undefined;
+			const isCollection = !!item.contentType?.collection;
 
 			const data =
 				this._tableColumns?.map((column) => {
@@ -172,7 +173,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 				id: item.unique,
 				icon: item.documentType.icon,
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
-				childrenIndicator: item.hasChildren ? { href, onOpen } : undefined,
+				childrenIndicator: item.hasChildren ? { href, onOpen, isCollection } : undefined,
 				selectable: this._isSelectableItem(item),
 				// select-only disables all row interaction, which would leave no way to open an item with
 				// children while a selection is in progress.

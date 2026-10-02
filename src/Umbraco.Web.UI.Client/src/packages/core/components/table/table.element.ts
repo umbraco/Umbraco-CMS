@@ -35,6 +35,8 @@ export interface UmbTableItem {
 		href?: string;
 		/** When set (and no `href` is provided), the indicator becomes a button invoking this callback. */
 		onOpen?: () => void;
+		/** When set, the children indicator represents a collection. */
+		isCollection?: boolean;
 	};
 }
 
@@ -461,15 +463,17 @@ export class UmbTableElement extends UmbLitElement {
 		const indicator = item.childrenIndicator;
 		if (!indicator) return nothing;
 
-		const symbol = html`<uui-symbol-expand></uui-symbol-expand>`;
+		const isCollection = indicator.isCollection;
+
+		const symbol = isCollection
+			? html`<uui-icon name="icon-list" style="font-size: 0.7em;"></uui-icon>`
+			: html`<uui-symbol-expand></uui-symbol-expand>`;
 
 		if (indicator.href) {
+			const href = isCollection ? indicator.href + '?openCollection' : indicator.href;
+
 			return html`
-				<uui-button
-					compact
-					label=${this.localize.term('general_open')}
-					href=${indicator.href}
-					data-mark="table-row:open">
+				<uui-button compact label=${this.localize.term('general_open')} href=${href} data-mark="table-row:open">
 					${symbol}
 				</uui-button>
 			`;
