@@ -59,6 +59,13 @@ stages:
             lfs: false,
             fetchDepth: 500
           - template: templates/backoffice-install.yml
+          - script: npm run build:for:cms
+            displayName: Build Backoffice
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - template: templates/login-install.yml
+          - script: npm run build
+            displayName: Build Login
+            workingDirectory: src/Umbraco.Web.UI.Login
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
