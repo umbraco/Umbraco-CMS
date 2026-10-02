@@ -3,8 +3,8 @@ import {
 	catchError,
 	distinctUntilChanged,
 	filter,
-	from,
 	map,
+	Observable,
 	of,
 	switchMap,
 	tap,
@@ -145,29 +145,40 @@ export class UmbLocalizationRegistry {
 					const currAliases = curr.map((ext) => ext.alias).sort();
 					return this.#arraysEqual(prevAliases, currAliases);
 				}),
-				// With switchMap, if a new language is selected before the previous translations finish loading,
-				// the previous promise is canceled (unsubscribed), and only the latest one is processed.
-				// This prevents race conditions and stale state.
-				switchMap((extensions) =>
-					from(
-						(async () => {
-							// Load all localizations
-							const translations = await Promise.all(extensions.map(this.#loadExtension));
+				// With switchMap, selecting a new language before the previous translations finish loading
+				// unsubscribes from the previous load. Unsubscribing cannot stop a promise that is already
+				// running, so the teardown marks the load as superseded and its result is dropped. This also
+				// applies when the registry is destroyed, so a late load never overwrites newer state.
+				switchMap(
+					(extensions) =>
+						new Observable<void>((subscriber) => {
+							let superseded = false;
 
-							// If there are no translations, return early
-							if (!translations.length) return;
+							(async () => {
+								// Load all localizations
+								const translations = await Promise.all(extensions.map(this.#loadExtension));
 
-							// Sort translations by their original extension weight (highest-to-lowest)
-							// This ensures that the translations with the lowest weight override the others
-							translations.sort((a, b) => b.$weight - a.$weight);
+								// If a newer language was selected, or there are no translations, return early
+								if (superseded || !translations.length) return;
 
-							// Load the translations into the localization manager
-							umbLocalizationManager.registerManyLocalizations(translations);
+								// Sort translations by their original extension weight (highest-to-lowest)
+								// This ensures that the translations with the lowest weight override the others
+								translations.sort((a, b) => b.$weight - a.$weight);
 
-							// Set the browser language and direction based on the translations
-							this.#setBrowserLanguage(locale!, translations);
-						})(),
-					),
+								// Load the translations into the localization manager
+								umbLocalizationManager.registerManyLocalizations(translations);
+
+								// Set the browser language and direction based on the translations
+								this.#setBrowserLanguage(locale!, translations);
+							})().then(
+								() => subscriber.complete(),
+								(error) => subscriber.error(error),
+							);
+
+							return () => {
+								superseded = true;
+							};
+						}),
 				),
 				// Catch any errors that occur while loading the translations
 				// This is important to ensure that the observable does not error out and stop the subscription

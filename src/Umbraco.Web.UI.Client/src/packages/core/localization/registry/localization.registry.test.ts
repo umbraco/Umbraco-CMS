@@ -355,3 +355,73 @@ describe('UmbLocalizationRegistry formatting locale', () => {
 		expect(umbLocalizationManager.documentLanguage).to.equal('en-gb');
 	});
 });
+
+describe('UmbLocalizationRegistry superseded loads', () => {
+	const slowAlias = 'Umb.Test.Localization.Slow.Finnish';
+	const rtlAlias = 'Umb.Test.Localization.Hebrew';
+	const registries: Array<UmbLocalizationRegistry> = [];
+	let releaseSlowLoad: () => void;
+
+	beforeEach(() => {
+		const slowLoad = new Promise<void>((resolve) => (releaseSlowLoad = resolve));
+		umbExtensionsRegistry.register({
+			type: 'localization',
+			alias: slowAlias,
+			name: 'Test Finnish (slow to load)',
+			meta: { culture: 'fi' },
+			js: () => slowLoad.then(() => ({ default: { general: { color: 'Väri' } } })),
+		} as ManifestLocalization);
+		umbExtensionsRegistry.register({
+			type: 'localization',
+			alias: rtlAlias,
+			name: 'Test Hebrew',
+			meta: { culture: 'he', direction: 'rtl', localizations: { general: { color: 'צבע' } } },
+		} as ManifestLocalization);
+	});
+
+	afterEach(() => {
+		releaseSlowLoad();
+		registries.forEach((registry) => registry.destroy());
+		registries.length = 0;
+		umbExtensionsRegistry.unregister(slowAlias);
+		umbExtensionsRegistry.unregister(rtlAlias);
+		umbLocalizationManager.localizations.clear();
+		document.documentElement.dir = 'ltr';
+	});
+
+	function createRegistry() {
+		const registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+		registries.push(registry);
+		return registry;
+	}
+
+	it('does not apply a load that finishes after the registry was destroyed', async () => {
+		const destroyed = createRegistry();
+		destroyed.loadLanguage('fi');
+		await aTimeout(0);
+		destroyed.destroy();
+
+		createRegistry().loadLanguage('en');
+		await aTimeout(0);
+
+		releaseSlowLoad();
+		await aTimeout(0);
+
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-gb');
+	});
+
+	it('does not apply a load that finishes after a newer language was selected', async () => {
+		const registry = createRegistry();
+		registry.loadLanguage('fi');
+		await aTimeout(0);
+		registry.loadLanguage('he');
+		await aTimeout(0);
+		expect(document.documentElement.dir, 'the newer language is applied').to.equal('rtl');
+
+		releaseSlowLoad();
+		await aTimeout(0);
+
+		expect(document.documentElement.dir).to.equal('rtl');
+		expect(umbLocalizationManager.documentLanguage).to.equal('he');
+	});
+});
