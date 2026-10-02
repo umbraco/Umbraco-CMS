@@ -24,7 +24,17 @@ export class UmbEntityBulkActionDefaultElement<
 	async #onClick(event: PointerEvent) {
 		if (!this.api) return;
 		event.stopPropagation();
-		await this.api.execute().catch(() => {});
+
+		try {
+			await this.api.execute();
+		} catch (error) {
+			// The action did not complete, so it must not be announced as executed: consumers treat that
+			// event as "done" and tear down the selection — and with it this element — which would cut short
+			// any notification the failure is still presenting.
+			console.error('Error executing action:', error);
+			return;
+		}
+
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
