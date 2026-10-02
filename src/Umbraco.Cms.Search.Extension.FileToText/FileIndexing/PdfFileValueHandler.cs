@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.Content;
+using Umbraco.Cms.Search.Extension.FileToText.Extensions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Extension.FileToText.FileIndexing;
@@ -20,6 +21,6 @@ internal sealed class PdfFileValueHandler : IFileValueHandler, IDefaultFileValue
             text.AppendLine(string.Join(" ", page.GetWords()));
         }
 
-        return Task.FromResult(text.ToString());
+        return Task.FromResult(text.ToString().TrimWhitespaceAndNewlines());
     }
 }
