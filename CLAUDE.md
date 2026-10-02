@@ -401,6 +401,7 @@ When editing those steps:
 - **Output filenames and artifacts** (`bom-dotnet.xml`, `bom-login.xml`, `bom-backoffice.xml`, `bom-e2e.xml`) are mapped to Dependency-Track projects in the stage's `build/templates/dependency-track.yml` parameters — keep them in step.
 - **Usage**: `umbraco-sbom <path> --output-file <full-path> [policy flags]`. Only `--output-file` plus policy flags (`--allow-package`, `--allow-commercial`, `--allow-copyleft`, `--fail-on-unknown`, `--policy-allow-file`) exist.
 - **Commercial packages** need `--allow-package`, else **exit 50**. Backend uses `nuget:SixLabors.*` (covers both `SixLabors.ImageSharp` and `.ImageSharp.Web`).
+- **`isLatest`**: DT allows one latest version per project name, and projects are `Umbraco-CMS` (children `Umbraco-CMS-Backend` etc.) versioned by major. Only a stable public release of `main`'s major (read from `main`'s `version.json` at upload time) is marked latest; older-major releases upload with `false`.
 - **Exit 10** = success-with-warnings (unresolved licenses; SBOM still written). Each step tolerates it: `if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }; exit 0`.
 - **Every BOM job** needs a `UseDotNet@2` (`useGlobalJson: true`) step before the tool install (the .NET 10 tool needs the SDK, including in the otherwise Node-only frontend jobs).
 - **Backend** must restore before scanning: `umbraco-sbom` needs every project in the solution restored, including the two the solution restore skips (`Umbraco.Tests.AcceptanceTest.UmbracoProject`, `Umbraco.JsonSchema`).

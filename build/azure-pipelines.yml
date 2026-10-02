@@ -729,6 +729,8 @@ stages:
       uploadToDependencyTrack: $[ or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.uploadDependencyTrack }}', 'True')) ]
       # Determine Umbraco version based on whether it's a public release or not. If public release, use major version, else use full NuGet package version.
       umbracoVersion: $[ iif(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'], stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion']) ]
+      # A stable public release may become the latest version; the template confirms it is a release of main's major.
+      isStableRelease: $[ and(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), eq(stageDependencies.Build.A.outputs['build.NBGV_PrereleaseVersionNoLeadingHyphen'], '')) ]
     jobs:
       - job: Dotnet_BOM
         displayName: Generate Backend BOM
@@ -852,6 +854,8 @@ stages:
           condition: and(succeeded(), eq(variables['uploadToDependencyTrack'], 'True'))
           projectName: "Umbraco-CMS"
           umbracoVersion: $(umbracoVersion)
+          isLatestCandidate: $(isStableRelease)
+          latestVersionFileUrl: "https://raw.githubusercontent.com/umbraco/Umbraco-CMS/main/version.json"
           projects:
             - name: "Backend"
               artifact: "bom-backend"
