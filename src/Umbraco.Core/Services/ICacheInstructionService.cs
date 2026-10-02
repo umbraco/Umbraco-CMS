@@ -80,6 +80,10 @@ public interface ICacheInstructionService
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <param name="localIdentity">The local identity of the executing AppDomain.</param>
     /// <returns>The result of processing the internal instructions.</returns>
+    /// <remarks>
+    ///     Safe to call while holding distributed locks: it does not wait for a full synchronization, takes no
+    ///     distributed locks of its own and writes nothing to the database.
+    /// </remarks>
     ProcessInstructionsResult ProcessInternalInstructions(
         CacheRefresherCollection cacheRefreshers,
         CancellationToken cancellationToken,

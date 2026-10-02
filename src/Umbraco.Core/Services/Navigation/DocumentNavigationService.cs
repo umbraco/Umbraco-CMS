@@ -37,10 +37,16 @@ internal sealed class DocumentNavigationService : ContentNavigationServiceBase<I
     }
 
     /// <inheritdoc />
+    protected override int TreeLockId => Constants.Locks.ContentTree;
+
+    /// <inheritdoc />
+    protected override Guid ObjectTypeKey => Constants.ObjectTypes.Document;
+
+    /// <inheritdoc />
     public override async Task RebuildAsync()
-        => await HandleRebuildAsync(Constants.Locks.ContentTree, Constants.ObjectTypes.Document, false);
+        => await HandleRebuildAsync(TreeLockId, ObjectTypeKey, false);
 
     /// <inheritdoc />
     public override async Task RebuildBinAsync()
-        => await HandleRebuildAsync(Constants.Locks.ContentTree, Constants.ObjectTypes.Document, true);
+        => await HandleRebuildAsync(TreeLockId, ObjectTypeKey, true);
 }
