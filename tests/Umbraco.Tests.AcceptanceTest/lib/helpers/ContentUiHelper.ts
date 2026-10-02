@@ -2,7 +2,7 @@ import { Page, Locator, expect } from "@playwright/test";
 import { UiBaseLocators } from "./UiBaseLocators";
 import { ConstantHelper } from "./ConstantHelper";
 
-export type BlockFamily = "list" | "grid" | "rte" | "single";
+export type BlockFamily = 'list' | 'grid' | 'rte' | 'single';
 
 export class ContentUiHelper extends UiBaseLocators {
   private readonly contentNameTxt: Locator;
@@ -426,7 +426,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.blockGridEntry = page.locator('umb-block-grid-entry');
     this.blockGridBlock = page.locator('umb-block-grid-block');
     this.blockListEntry = page.locator('umb-block-list-entry');
-    this.blockSingleEntry = page.locator("umb-block-single-entry");
+    this.blockSingleEntry = page.locator('umb-block-single-entry');
     this.pasteFromClipboardBtn = page.getByLabel('Paste from clipboard');
     this.pasteBtn = page.getByRole('button', {name: 'Paste', exact: true});
     this.workspaceEditTab = page.locator('umb-content-workspace-view-edit-tab');
@@ -442,27 +442,20 @@ export class ContentUiHelper extends UiBaseLocators {
     this.blockGridEntries = page.locator('umb-block-grid-entries');
     this.inlineCreateBtn = page.locator('uui-button-inline-create');
     this.refListBlock = page.locator('umb-ref-list-block');
-    // Reusable content of blocks (Library)
-    this.blockCatalogueModal = page.locator("umb-block-catalogue-modal");
-    this.transferToLibraryModal = page.locator(
-      "umb-block-transfer-to-element-library-modal",
-    );
-    this.transferToLibraryBlockActionBtn = page.getByTestId(
-      "block-action:Umb.BlockAction.TransferToElementLibrary",
-    );
-    this.disconnectFromLibraryBlockActionBtn = page.getByTestId(
-      "block-action:Umb.BlockAction.DisconnectFromElementLibrary",
-    );
+    this.blockCatalogueModal = page.locator('umb-block-catalogue-modal');
+    this.transferToLibraryModal = page.locator('umb-block-transfer-to-element-library-modal');
+    this.transferToLibraryBlockActionBtn = page.getByTestId('block-action:Umb.BlockAction.TransferToElementLibrary');
+    this.disconnectFromLibraryBlockActionBtn = page.getByTestId('block-action:Umb.BlockAction.DisconnectFromElementLibrary');
     this.blockCatalogueLibraryTab = this.blockCatalogueModal
-      .locator("uui-tab")
+      .locator('uui-tab')
       .filter({has: page.locator('umb-localize[key="blockEditor_tabLibrary"]')});
-    this.blockCatalogueSubmitBtn = this.blockCatalogueModal.getByLabel("Submit");
-    this.elementWorkspaceSaveBtn = page.getByTestId("workspace-action:Umb.WorkspaceAction.Element.Save");
-    this.transferToLibraryNameTxt = this.transferToLibraryModal.getByLabel("Name", {exact: true});
-    this.transferToLibraryExpandElementsBtn = this.transferToLibraryModal.getByLabel("Expand child items for Elements");
-    this.transferToLibraryElementsRoot = this.transferToLibraryModal.getByLabel("Elements", {exact: true});
-    this.transferToLibraryConfirmBtn = this.transferToLibraryModal.getByRole("button", {name: "Transfer to Library"});
-    this.confirmDisconnectFromLibraryBtn = this.page.locator("#confirm").getByLabel("Disconnect from Library");
+    this.blockCatalogueSubmitBtn = this.blockCatalogueModal.getByLabel('Submit');
+    this.elementWorkspaceSaveBtn = page.getByTestId('workspace-action:Umb.WorkspaceAction.Element.Save');
+    this.transferToLibraryNameTxt = this.transferToLibraryModal.getByLabel('Name', {exact: true});
+    this.transferToLibraryExpandElementsBtn = this.transferToLibraryModal.getByLabel('Expand child items for Elements');
+    this.transferToLibraryElementsRoot = this.transferToLibraryModal.getByLabel('Elements', {exact: true});
+    this.transferToLibraryConfirmBtn = this.transferToLibraryModal.getByRole('button', {name: 'Transfer to Library'});
+    this.confirmDisconnectFromLibraryBtn = this.page.locator('#confirm').getByLabel('Disconnect from Library');
     // TipTap
     this.tipTapPropertyEditor = page.locator("umb-property-editor-ui-tiptap");
     this.tipTapEditor = this.tipTapPropertyEditor.locator("#editor .tiptap");
@@ -1657,12 +1650,14 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.hoverAndClick(this.blockListEntry, this.deleteBlockEntryBtn);
   }
 
-  // Reusable content of blocks (Library)
   async clickLibraryTabInBlockCatalogue() {
     await this.click(this.blockCatalogueLibraryTab);
   }
 
   async isLibraryTabInBlockCatalogueVisible(isVisible: boolean = true) {
+    if (!isVisible) {
+      await this.isVisible(this.blockCatalogueModal);
+    }
     await this.isVisible(this.blockCatalogueLibraryTab, isVisible);
   }
 
@@ -1675,53 +1670,45 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.waitForHidden(this.blockCatalogueModal);
   }
 
-  // `family` only selects the "add block" entry point here (RTE uses the tiptap picker, everything
-  // else uses the shared add-block button); the library catalogue steps that follow are identical.
-  async insertBlockFromLibraryWithName(elementName: string, family: BlockFamily = "list") {
-    if (family === "rte") {
-      // The tiptap block picker inserts at the current cursor position, so focus the editor first.
-      await this.tipTapEditor.click();
-      await this.clickInsertBlockButton();
+  async insertBlockFromLibraryWithName(elementName: string, family: BlockFamily = 'list') {
+    if (family === 'rte') {
+      await this.clickInsertBlockButtonInRte();
     } else {
       await this.clickAddBlockElementButton();
     }
     await this.clickLibraryTabInBlockCatalogue();
     await this.selectElementInLibraryTab(elementName);
     await this.clickSubmitInBlockCatalogue();
+    // A Library block only renders once its element has been fetched, so wait for it before callers save.
+    await this.isBlockMarkedAsReference(true, family);
   }
 
-  // The block catalogue modal and the hover action bar are shared across the block-list,
-  // block-grid and RTE editors, so these reusable-content helpers are family-agnostic apart
-  // from the entry element they hover. Pass the family to target the right entry.
   private blockEntryForFamily(family: BlockFamily) {
     switch (family) {
-      case "grid":
+      case 'grid':
         return this.blockGridEntry;
-      case "rte":
+      case 'rte':
         return this.rteBlock;
-      case "single":
+      case 'single':
         return this.blockSingleEntry;
       default:
         return this.blockListEntry;
     }
   }
 
-  async clickEditBlockButton(family: BlockFamily = "list") {
-    await this.hoverAndClick(this.blockEntryForFamily(family).first(), this.editBlockEntryBtn);
+  async clickEditBlockButton(family: BlockFamily = 'list') {
+    const entry = this.blockEntryForFamily(family).first();
+    await this.hoverAndClick(entry, entry.locator(this.editBlockEntryBtn));
   }
 
-  async clickTransferToLibraryBlockButton(family: BlockFamily = "list") {
-    await this.hoverAndClick(
-      this.blockEntryForFamily(family).first(),
-      this.transferToLibraryBlockActionBtn.first(),
-    );
+  async clickTransferToLibraryBlockButton(family: BlockFamily = 'list') {
+    const entry = this.blockEntryForFamily(family).first();
+    await this.hoverAndClick(entry, entry.locator(this.transferToLibraryBlockActionBtn));
   }
 
-  async clickDisconnectFromLibraryBlockButton(family: BlockFamily = "list") {
-    await this.hoverAndClick(
-      this.blockEntryForFamily(family).first(),
-      this.disconnectFromLibraryBlockActionBtn.first(),
-    );
+  async clickDisconnectFromLibraryBlockButton(family: BlockFamily = 'list') {
+    const entry = this.blockEntryForFamily(family).first();
+    await this.hoverAndClick(entry, entry.locator(this.disconnectFromLibraryBlockActionBtn));
   }
 
   async enterNameInTransferToLibraryModal(name: string) {
@@ -1730,7 +1717,7 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async selectFolderInTransferToLibraryModal(folderName: string) {
     await this.click(this.transferToLibraryExpandElementsBtn);
-    await this.click(this.transferToLibraryModal.getByLabel(folderName));
+    await this.click(this.transferToLibraryModal.getByLabel(folderName, {exact: true}));
   }
 
   async selectRootInTransferToLibraryModal() {
@@ -1766,40 +1753,45 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.waitForHidden(this.transferToLibraryModal);
   }
 
-  async clickConfirmDisconnectFromLibraryButton(family: BlockFamily = "list") {
+  async clickConfirmDisconnectFromLibraryButton(family: BlockFamily = 'list') {
     await this.click(this.confirmDisconnectFromLibraryBtn);
     // Disconnecting fetches the element and swaps the layout to local content asynchronously, so
     // wait until the block has actually dropped its reference marker before letting callers save.
     await this.isBlockMarkedAsReference(false, family);
   }
 
-  async isBlockLinkIconVisible(isVisible: boolean = true, family: BlockFamily = "list") {
+  async isBlockLinkIconVisible(isVisible: boolean = true, family: BlockFamily = 'list') {
     await this.isVisible(
       this.blockEntryForFamily(family).first().locator('uui-icon[name="link"]'),
       isVisible,
     );
   }
 
-  async isBlockMarkedAsReference(isReference: boolean = true, family: BlockFamily = "list") {
+  async isBlockMarkedAsReference(isReference: boolean = true, family: BlockFamily = 'list') {
     // Referenced (external) blocks get the dedicated reference colour via the reflected is-reference attribute.
     const entry = this.blockEntryForFamily(family).first();
     if (isReference) {
-      await expect(entry).toHaveAttribute("is-reference");
+      await expect(entry).toHaveAttribute('is-reference');
     } else {
-      await expect(entry).not.toHaveAttribute("is-reference");
+      await expect(entry).not.toHaveAttribute('is-reference');
     }
   }
 
-  async isBlockEntryVisible(isVisible: boolean = true, family: BlockFamily = "list") {
+  async isBlockEntryVisible(isVisible: boolean = true, family: BlockFamily = 'list') {
     await this.isVisible(this.blockEntryForFamily(family).first(), isVisible);
   }
 
-  async doesBlockHaveDraftTag(isVisible: boolean = true, family: BlockFamily = "list") {
+  async doesBlockHaveDraftTag(isVisible: boolean = true, family: BlockFamily = 'list') {
+    if (!isVisible) {
+      // An empty grid entry already has a minimum row height, so wait for its rendered block instead.
+      const entry = this.blockEntryForFamily(family).first();
+      await this.isVisible(family === 'grid' ? entry.locator(this.blockGridBlock) : entry);
+    }
     await this.isVisible(
       this.blockEntryForFamily(family)
         .first()
-        .locator("uui-tag")
-        .filter({ hasText: "Draft" }),
+        .locator('uui-tag')
+        .filter({ hasText: 'Draft' }),
       isVisible,
     );
   }
@@ -2083,6 +2075,12 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickInsertBlockButton() {
     await this.click(this.insertBlockBtn);
+  }
+
+  async clickInsertBlockButtonInRte() {
+    // The tiptap block picker inserts at the current cursor position, so focus the editor first.
+    await this.click(this.tipTapEditor);
+    await this.clickInsertBlockButton();
   }
 
   // TipTap

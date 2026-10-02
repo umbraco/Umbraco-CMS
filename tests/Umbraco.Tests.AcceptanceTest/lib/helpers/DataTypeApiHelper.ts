@@ -371,7 +371,6 @@ export class DataTypeApiHelper {
     return await this.save(singleBlock);
   }
 
-
   async createBlockListDataTypeWithContentAndSettingsElementType(name: string, contentElementTypeId: string, settingsElementTypeId: string) {
     await this.ensureNameNotExists(name);
 

@@ -213,6 +213,10 @@ test('cannot confirm a transfer until both a name and a location are provided', 
   await umbracoUi.content.isConfirmTransferToLibraryButtonEnabled(false);
   await umbracoUi.content.selectFolderInTransferToLibraryModal(libraryFolderName);
   await umbracoUi.content.isConfirmTransferToLibraryButtonEnabled(true);
+  await umbracoUi.content.enterNameInTransferToLibraryModal('');
+  await umbracoUi.content.isConfirmTransferToLibraryButtonEnabled(false);
+  await umbracoUi.content.enterNameInTransferToLibraryModal(transferElementName);
+  await umbracoUi.content.isConfirmTransferToLibraryButtonEnabled(true);
 });
 
 test('can transfer a local block to the Library', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -260,6 +264,7 @@ test('removes the block from the editor when the referenced Library element is d
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Assert
+  await umbracoUi.content.isAddBlockElementButtonVisible();
   await umbracoUi.content.isBlockEntryVisible(false);
 });
 

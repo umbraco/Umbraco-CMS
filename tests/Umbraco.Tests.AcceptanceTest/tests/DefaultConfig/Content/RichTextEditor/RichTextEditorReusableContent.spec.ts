@@ -56,12 +56,13 @@ test('can transfer a local block to the Library', {tag: '@smoke'}, async ({umbra
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickInsertBlockButton();
+  await umbracoUi.content.clickInsertBlockButtonInRte();
   await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(localBlockText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickTransferToLibraryBlockButton('rte');
   await umbracoUi.content.transferBlockToLibraryRoot(transferElementName);
+  await umbracoUi.content.isBlockMarkedAsReference(true, 'rte');
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
