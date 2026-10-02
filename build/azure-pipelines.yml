@@ -745,7 +745,7 @@ stages:
             inputs:
               useGlobalJson: true
           - bash: |
-              dotnet tool install --global CycloneDX
+              dotnet tool install --global CycloneDX --version 6.2.0
               dotnet-CycloneDX $(solution) --spec-version 1.5 --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
             displayName: Generate Backend BOM
           - publish: $(Build.ArtifactStagingDirectory)/bom
@@ -764,7 +764,7 @@ stages:
             fetchFilter: tree:0
           - template: templates/backoffice-install.yml
           - bash: |
-              npm install --global @cyclonedx/cyclonedx-npm
+              npm install --global --ignore-scripts @cyclonedx/cyclonedx-npm@6.0.1
               cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml --ignore-npm-errors --verbose
             displayName: Generate Backoffice UI BOM
             workingDirectory: src/Umbraco.Web.UI.Client
@@ -788,11 +788,11 @@ stages:
             inputs:
               versionSource: 'fromFile'
               versionFilePath: src/Umbraco.Web.UI.Login/.nvmrc
-          - script: npm ci --no-fund --no-audit
+          - script: npm ci --no-fund --no-audit --ignore-scripts
             displayName: Run npm ci (Login)
             workingDirectory: src/Umbraco.Web.UI.Login
           - bash: |
-              npm install --global @cyclonedx/cyclonedx-npm
+              npm install --global --ignore-scripts @cyclonedx/cyclonedx-npm@6.0.1
               cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-login.xml --ignore-npm-errors --verbose
             displayName: Generate Login UI BOM
             workingDirectory: src/Umbraco.Web.UI.Login
@@ -815,7 +815,7 @@ stages:
               nodeVersion: ${{ variables.nodeVersion }}
               npm_config_cache: ${{ variables.npm_config_cache }}
           - bash: |
-              npm install --global @cyclonedx/cyclonedx-npm
+              npm install --global --ignore-scripts @cyclonedx/cyclonedx-npm@6.0.1
               cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-e2e.xml --ignore-npm-errors --verbose
             displayName: Generate E2E Tests BOM
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
