@@ -1,7 +1,7 @@
 import { UmbDocumentTypeDetailRepository } from '../../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDatasetContext } from '../../property-dataset-context/document-property-dataset.context.js';
 import type { UmbDocumentDetailRepository } from '../../repository/index.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UmbDocumentSegmentRepository } from '../../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../../types.js';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
