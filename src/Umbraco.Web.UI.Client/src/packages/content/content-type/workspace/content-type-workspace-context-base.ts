@@ -3,6 +3,7 @@ import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbCont
 import type { UmbContentTypeWorkspaceContext } from './content-type-workspace-context.interface.js';
 import { UmbEntityDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import {
+	UmbEntityCreatedEvent,
 	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -186,6 +187,16 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
+
+			const unique = this.getUnique();
+			if (unique) {
+				const createdEvent = new UmbEntityCreatedEvent({
+					unique,
+					entityType: this.getEntityType(),
+					eventUnique: this._workspaceEventUnique,
+				});
+				eventContext.dispatchEvent(createdEvent);
+			}
 
 			this.setIsNew(false);
 		} catch (error) {
