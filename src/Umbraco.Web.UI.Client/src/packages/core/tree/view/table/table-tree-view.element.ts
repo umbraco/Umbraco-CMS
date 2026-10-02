@@ -38,6 +38,11 @@ type UmbTableTreeViewResolverContext = {
 	currentIcon?: string | null;
 };
 
+/**
+ * Renders the items of the tree as rows of a table, with a column for the name, any columns declared by the
+ * `treeView` manifest, and the entity actions.
+ * @augments {UmbTreeViewElementBase<UmbTreeItemModel>}
+ */
 @customElement('umb-table-tree-view')
 export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemModel> {
 	private _items: Array<UmbTreeItemModel> = [];
