@@ -1,5 +1,6 @@
 import type { UmbMockDataTypeModel } from '../../mock-data-set.types.js';
 import { AREA_KEYS, DATA_TYPE_IDS, DOCUMENT_TYPE_IDS, MEDIA_TYPE_IDS } from './ids.js';
+import { PRODUCT_DOCUMENT_CATEGORIES } from './product-documents.js';
 
 type UmbMbcsDataTypeValues = UmbMockDataTypeModel['values'];
 
@@ -285,6 +286,50 @@ export const data: Array<UmbMockDataTypeModel> = [
 		layouts: ['table', 'grid'],
 		tabName: 'Stores',
 	}),
+	collection(DATA_TYPE_IDS.productDocumentsCollection, 'Product Documents Collection', {
+		pageSize: 25,
+		orderBy: 'name',
+		orderDirection: 'asc',
+		columns: [
+			{ alias: 'documentCategory', header: 'Type', isSystem: false },
+			{ alias: 'languages', header: 'Languages', isSystem: false },
+			{ alias: 'version', header: 'Version', isSystem: false },
+			{ alias: 'pageCount', header: 'Pages', isSystem: false },
+			{ alias: 'revisionDate', header: 'Revision date', isSystem: false },
+			{ alias: 'showOnProductPage', header: 'Public', isSystem: false },
+			{ alias: 'updateDate', header: 'Last edited', isSystem: true },
+		],
+		layouts: ['table', 'grid'],
+		tabName: 'Documents',
+	}),
+	dataType(
+		DATA_TYPE_IDS.productDocumentFile,
+		'Product Document – File Upload',
+		'Umbraco.UploadField',
+		'Umb.PropertyEditorUi.UploadField',
+		[{ alias: 'fileExtensions', value: ['pdf'] }],
+	),
+	dataType(
+		DATA_TYPE_IDS.productDocumentCategory,
+		'Product Document Category',
+		'Umbraco.DropDown.Flexible',
+		'Umb.PropertyEditorUi.Dropdown',
+		[
+			{ alias: 'multiple', value: false },
+			{ alias: 'items', value: [...PRODUCT_DOCUMENT_CATEGORIES] },
+		],
+	),
+	dataType(DATA_TYPE_IDS.integer, 'Integer', 'Umbraco.Integer', 'Umb.PropertyEditorUi.Integer'),
+	dataType(
+		DATA_TYPE_IDS.productDocumentLanguages,
+		'Tags (documentLanguages)',
+		'Umbraco.Tags',
+		'Umb.PropertyEditorUi.Tags',
+		[
+			{ alias: 'group', value: 'documentLanguages' },
+			{ alias: 'storageType', value: 'Json' },
+		],
+	),
 	dataType(
 		DATA_TYPE_IDS.pageContentBlockGrid,
 		'Page Content – Block Grid',

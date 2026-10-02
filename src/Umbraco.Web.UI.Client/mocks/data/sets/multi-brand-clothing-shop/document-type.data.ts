@@ -105,6 +105,7 @@ const storeTab = tab('Store');
 const productMaterialTab = tab('Content');
 const materialShowcaseTab = tab('Content');
 const productTab = tab('Product');
+const productDocumentTab = tab('Document');
 const articleTab = tab('Article');
 const heroBlockTab = tab('Content');
 const imageBlockTab = tab('Content');
@@ -258,7 +259,52 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			{ alias: 'material', name: 'Material', dataTypeId: textstring, container: productTab.id, varies: true },
 			{ alias: 'inStock', name: 'In stock', dataTypeId: DATA_TYPE_IDS.toggleDefaultOn, container: productTab.id },
 		],
+		allowedChildren: [DOCUMENT_TYPE_IDS.productDocument],
 		compositions: [DOCUMENT_TYPE_IDS.seoComposition],
+		collection: DATA_TYPE_IDS.productDocumentsCollection,
+	}),
+	documentType({
+		id: DOCUMENT_TYPE_IDS.productDocument,
+		alias: 'productDocument',
+		name: 'Product Document',
+		icon: 'icon-document',
+		containers: [productDocumentTab],
+		properties: [
+			{
+				alias: 'documentCategory',
+				name: 'Type',
+				dataTypeId: DATA_TYPE_IDS.productDocumentCategory,
+				container: productDocumentTab.id,
+				mandatory: true,
+			},
+			{
+				alias: 'file',
+				name: 'File',
+				dataTypeId: DATA_TYPE_IDS.productDocumentFile,
+				container: productDocumentTab.id,
+			},
+			{ alias: 'summary', name: 'Summary', dataTypeId: textarea, container: productDocumentTab.id, varies: true },
+			{
+				alias: 'languages',
+				name: 'Languages',
+				dataTypeId: DATA_TYPE_IDS.productDocumentLanguages,
+				container: productDocumentTab.id,
+			},
+			{ alias: 'version', name: 'Version', dataTypeId: textstring, container: productDocumentTab.id },
+			{ alias: 'pageCount', name: 'Pages', dataTypeId: DATA_TYPE_IDS.integer, container: productDocumentTab.id },
+			{
+				alias: 'revisionDate',
+				name: 'Revision date',
+				dataTypeId: DATA_TYPE_IDS.datePicker,
+				container: productDocumentTab.id,
+			},
+			{
+				alias: 'showOnProductPage',
+				name: 'Show on product page',
+				dataTypeId: DATA_TYPE_IDS.toggleDefaultOn,
+				container: productDocumentTab.id,
+			},
+		],
 	}),
 	documentType({
 		id: DOCUMENT_TYPE_IDS.articles,

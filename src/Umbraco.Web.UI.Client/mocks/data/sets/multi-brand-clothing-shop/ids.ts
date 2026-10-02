@@ -52,6 +52,11 @@ export const DATA_TYPE_IDS = {
 	imageCropper: mbcsId('dataType', 21),
 	articleRichTextEditor: mbcsId('dataType', 23),
 	productMaterialsBlockList: mbcsId('dataType', 24),
+	productDocumentsCollection: mbcsId('dataType', 25),
+	productDocumentFile: mbcsId('dataType', 26),
+	productDocumentCategory: mbcsId('dataType', 27),
+	integer: mbcsId('dataType', 28),
+	productDocumentLanguages: mbcsId('dataType', 29),
 } as const;
 
 export const DOCUMENT_TYPE_IDS = {
@@ -68,6 +73,7 @@ export const DOCUMENT_TYPE_IDS = {
 	store: mbcsId('documentType', 18),
 	productMaterial: mbcsId('documentType', 19),
 	materialShowcaseBlock: mbcsId('documentType', 20),
+	productDocument: mbcsId('documentType', 21),
 	oneColumnLayout: mbcsId('documentType', 10),
 	twoColumnLayout: mbcsId('documentType', 11),
 	heroBlock: mbcsId('documentType', 12),

@@ -26,6 +26,8 @@ import {
 	dateValue,
 	decimalValue,
 	documentPickerValue,
+	dropdownValue,
+	integerValue,
 	invariantTextValue,
 	mediaPickerValue,
 	richTextValue,
@@ -45,6 +47,7 @@ import { getAboutUsCopy } from './about-us-copy.js';
 import { getSustainabilityCopy } from './sustainability-copy.js';
 import { getOurStoryCopy } from './our-story-copy.js';
 import { getPageCopy } from './page-copy.js';
+import { getProductDocuments } from './product-documents.js';
 import { littleOnesProducts, outdoorShopProducts, type UmbMbcsProductRow } from './products.data.js';
 import { littleOnesStores, outdoorShopStores, type UmbMbcsStoreRow } from './stores.data.js';
 
@@ -58,6 +61,7 @@ const DOCUMENT_TYPE_ICONS = {
 	stores: 'icon-store',
 	store: 'icon-pin-location',
 	product: 'icon-tag',
+	productDocument: 'icon-document',
 	articles: 'icon-newspaper-alt',
 	article: 'icon-article',
 } as const;
@@ -71,6 +75,8 @@ const articlesNodeId = (site: UmbMbcsSiteCode) => mbcsId('document', site === 'L
 const storesNodeId = (site: UmbMbcsSiteCode) => mbcsId('document', site === 'LO' ? 7 : 8);
 const productId = (site: UmbMbcsSiteCode, number: number) =>
 	mbcsId('document', (site === 'LO' ? 10000 : 20000) + number);
+const productDocumentId = (site: UmbMbcsSiteCode, productNumber: number, index: number) =>
+	mbcsId('document', (site === 'LO' ? 100000 : 200000) + productNumber * 10 + index + 1);
 const articleId = (site: UmbMbcsSiteCode, number: number) =>
 	mbcsId('document', (site === 'LO' ? 30000 : 40000) + number);
 
@@ -222,7 +228,7 @@ const buildProducts = (
 	parentId: string,
 	ancestorIds: Array<string>,
 ): Array<UmbMockDocumentModel> =>
-	rows.map(([sku, name, tagList, price], index) => {
+	rows.flatMap(([sku, name, tagList, price], index) => {
 		const number = index + 1;
 		const tags = splitTags(tagList);
 		const categoryIndex = productCategoryIndex(number);
@@ -230,15 +236,20 @@ const buildProducts = (
 		const material = productMaterial(tags);
 		const description = `${name} from ${site === 'LO' ? 'Little Ones' : 'The Outdoor Shop'}, made from ${material.toLowerCase()} and designed for everyday wear. Shown in ${colour.toLowerCase()}.`;
 
-		return createDocument({
-			id: productId(site, number),
+		const id = productId(site, number);
+		const documents = getProductDocuments(site, categoryIndex, tags, name, number);
+		const updateDate = isoDate(new Date(Date.UTC(2026, 5, 1) + number * DAY_IN_MS));
+
+		const product = createDocument({
+			id,
 			parentId,
 			ancestorIds,
 			documentTypeId: DOCUMENT_TYPE_IDS.product,
 			icon: DOCUMENT_TYPE_ICONS.product,
+			collectionDataTypeId: DATA_TYPE_IDS.productDocumentsCollection,
 			name,
-			hasChildren: false,
-			updateDate: isoDate(new Date(Date.UTC(2026, 5, 1) + number * DAY_IN_MS)),
+			hasChildren: documents.length > 0,
+			updateDate,
 			daState: number % 17 === 0 ? DocumentVariantStateModel.DRAFT : DocumentVariantStateModel.PUBLISHED,
 			values: [
 				...textareaValue('description', description),
@@ -254,6 +265,31 @@ const buildProducts = (
 				...seoValues(SITES[site].name, name, description, { ogImageId: productImageId(site, categoryIndex) }),
 			],
 		});
+
+		const documentNodes = documents.map((productDocument, documentIndex) =>
+			createDocument({
+				id: productDocumentId(site, number, documentIndex),
+				parentId: id,
+				ancestorIds: [...ancestorIds, id],
+				documentTypeId: DOCUMENT_TYPE_IDS.productDocument,
+				icon: DOCUMENT_TYPE_ICONS.productDocument,
+				name: productDocument.title,
+				hasChildren: false,
+				updateDate: `${productDocument.revisionDate}T10:00:00.000Z`,
+				daState: productDocument.isDraft ? DocumentVariantStateModel.DRAFT : DocumentVariantStateModel.PUBLISHED,
+				values: [
+					...dropdownValue('documentCategory', productDocument.category),
+					...textareaValue('summary', productDocument.summary),
+					...tagsValue('languages', productDocument.languages),
+					...invariantTextValue('version', productDocument.version),
+					...integerValue('pageCount', productDocument.pageCount),
+					...dateValue('revisionDate', productDocument.revisionDate),
+					...toggleValue('showOnProductPage', productDocument.showOnProductPage),
+				],
+			}),
+		);
+
+		return [product, ...documentNodes];
 	});
 
 // ---------------------------------------------------------------------------------------------------------------------

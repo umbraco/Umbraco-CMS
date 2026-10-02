@@ -60,6 +60,10 @@ export const toggleValue = (alias: string, value: boolean) => invariant('Umbraco
 
 export const decimalValue = (alias: string, value: number) => invariant('Umbraco.Decimal', alias, value);
 
+export const integerValue = (alias: string, value: number) => invariant('Umbraco.Integer', alias, value);
+
+export const dropdownValue = (alias: string, item: string) => invariant('Umbraco.DropDown.Flexible', alias, [item]);
+
 export const dateValue = (alias: string, value: string) => invariant('Umbraco.DateTime', alias, value);
 
 export const tagsValue = (alias: string, tags: Array<string>) => invariant('Umbraco.Tags', alias, tags);
