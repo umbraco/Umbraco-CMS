@@ -61,6 +61,21 @@ public class PhysicalFileSystemTreeServiceTests : FileSystemTreeServiceTestsBase
     }
 
     [Test]
+    public void Can_Get_Ancestors_Of_Rooted_Path_Starting_At_Top_Level_Item()
+    {
+        var service = CreateService();
+
+        var path = $"{Path.DirectorySeparatorChar}{Path.Join("wwwroot", "css", "test.css")}";
+        FileSystemTreeItemPresentationModel[] treeModels = service.GetAncestorModels(path, true);
+
+        Assert.AreEqual(3, treeModels.Length);
+        Assert.AreEqual("wwwroot", treeModels[0].Name);
+        Assert.IsNull(treeModels[0].Parent);
+        Assert.AreEqual("/wwwroot", treeModels[1].Parent?.Path);
+        Assert.AreEqual("/wwwroot/css", treeModels[2].Parent?.Path);
+    }
+
+    [Test]
     public void Can_Get_Root_PathViewModels()
     {
         var service = CreateService();
@@ -72,6 +87,7 @@ public class PhysicalFileSystemTreeServiceTests : FileSystemTreeServiceTestsBase
         Assert.AreEqual(treeModels.Length, totalItems);
         Assert.AreEqual(treeModels[0].Name, "App_Plugins");
         Assert.AreEqual(treeModels[1].Name, "wwwroot");
+        Assert.IsTrue(treeModels.All(model => model.Parent is null));
     }
 
     [Test]
