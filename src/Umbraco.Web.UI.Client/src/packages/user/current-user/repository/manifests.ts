@@ -3,6 +3,7 @@ import {
 	UMB_CURRENT_USER_REPOSITORY_ALIAS,
 	UMB_CURRENT_USER_CONFIG_REPOSITORY_ALIAS,
 	UMB_CURRENT_USER_CONFIG_STORE_ALIAS,
+	UMB_CURRENT_USER_DATA_REPOSITORY_ALIAS,
 } from './constants.js';
 import { UmbCurrentUserStore } from './current-user.store.js';
 import { UmbCurrentUserConfigStore } from './current-user-config.store.js';
@@ -31,5 +32,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_CURRENT_USER_CONFIG_REPOSITORY_ALIAS,
 		name: 'Current User Config Repository',
 		api: () => import('./current-user-config.repository.js'),
+	},
+	{
+		type: 'repository',
+		alias: UMB_CURRENT_USER_DATA_REPOSITORY_ALIAS,
+		name: 'Current User Data Repository',
+		api: () => import('./current-user-data.repository.js'),
 	},
 ];
