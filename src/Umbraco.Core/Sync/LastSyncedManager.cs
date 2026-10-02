@@ -7,6 +7,12 @@ namespace Umbraco.Cms.Core.Sync;
 /// <summary>
 /// Default implementation of <see cref="ILastSyncedManager"/> that manages last synced IDs with caching.
 /// </summary>
+/// <remarks>
+/// The external id is persisted. The internal id is kept in memory only: it is recorded by the periodic sync and by
+/// inline syncs on request threads, and writing it would join the caller's transaction and hold this server's
+/// umbracoLastSynced row until that transaction commits. Before any internal id has been recorded, it starts at the
+/// persisted external id, which the periodic sync only moves past instructions it has fully processed.
+/// </remarks>
 internal sealed class LastSyncedManager : ILastSyncedManager
 {
     private readonly ILastSyncedRepository _lastSyncedRepository;
@@ -37,16 +43,11 @@ internal sealed class LastSyncedManager : ILastSyncedManager
             }
         }
 
-        int? persistedId;
-        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
-        {
-            persistedId = await _lastSyncedRepository.GetInternalIdAsync();
-            scope.Complete();
-        }
+        int? persistedExternalId = await GetLastSyncedExternalAsync();
 
         lock (_internalIdLock)
         {
-            _lastSyncedInternalId ??= persistedId;
+            _lastSyncedInternalId ??= persistedExternalId;
             return _lastSyncedInternalId;
         }
     }
@@ -75,14 +76,7 @@ internal sealed class LastSyncedManager : ILastSyncedManager
         }
 
         await GetLastSyncedInternalAsync();
-        if (TryRaiseInternalId(id) is false)
-        {
-            return;
-        }
-
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        await _lastSyncedRepository.SaveInternalIdAsync(id);
-        scope.Complete();
+        RaiseInternalId(id);
     }
 
     /// <inheritdoc/>
@@ -124,19 +118,16 @@ internal sealed class LastSyncedManager : ILastSyncedManager
         _lastSyncedExternalId = null;
     }
 
-    // The periodic sync is the only caller that persists the internal id; inline syncs keep their checkpoint in memory.
-    // Only ever moving the id forward keeps the checkpoint consistent should a caller pass an id it reached earlier.
-    private bool TryRaiseInternalId(int id)
+    // The periodic sync and inline syncs can record the same instructions concurrently or in a different order;
+    // only ever moving the id forward keeps the checkpoint consistent.
+    private void RaiseInternalId(int id)
     {
         lock (_internalIdLock)
         {
-            if (_lastSyncedInternalId >= id)
+            if (_lastSyncedInternalId is null || _lastSyncedInternalId < id)
             {
-                return false;
+                _lastSyncedInternalId = id;
             }
-
-            _lastSyncedInternalId = id;
-            return true;
         }
     }
 }

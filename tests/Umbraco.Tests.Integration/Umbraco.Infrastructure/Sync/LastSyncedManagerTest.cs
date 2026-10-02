@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -60,8 +61,42 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
         await manager.SaveLastSyncedInternalAsync(3);
 
         Assert.AreEqual(5, await manager.GetLastSyncedInternalAsync());
+    }
+
+    [Test]
+    public async Task Last_Synced_Internal_Id_Is_Kept_In_Memory_Only()
+    {
+        await manager.SaveLastSyncedInternalAsync(5);
+        Assume.That(await manager.GetLastSyncedInternalAsync(), Is.EqualTo(5));
+
         manager.ClearLocalCache();
-        Assert.AreEqual(5, await manager.GetLastSyncedInternalAsync(), "The lower id was persisted.");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(manager.GetLastSyncedInternalAsync().GetAwaiter().GetResult(), Is.Null, "The internal id was persisted.");
+            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
+            Assert.That(GetRequiredService<ILastSyncedRepository>().GetInternalIdAsync().GetAwaiter().GetResult(), Is.Null, "The internal id was written to the database.");
+        });
+    }
+
+    [Test]
+    public async Task Last_Synced_Internal_Id_Starts_From_The_Persisted_External_Id()
+    {
+        await manager.SaveLastSyncedExternalAsync(7);
+        manager.ClearLocalCache();
+
+        Assert.AreEqual(7, await manager.GetLastSyncedInternalAsync());
+    }
+
+    [Test]
+    public async Task Last_Synced_Internal_Id_Does_Not_Fall_Behind_The_Persisted_External_Id()
+    {
+        await manager.SaveLastSyncedExternalAsync(7);
+        manager.ClearLocalCache();
+
+        await manager.SaveLastSyncedInternalAsync(3);
+
+        Assert.AreEqual(7, await manager.GetLastSyncedInternalAsync());
     }
 
     [Test]
@@ -92,26 +127,6 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
         // Make sure to delete if too old.
         await manager.DeleteOlderThanAsync(DateTime.Now + TimeSpan.FromDays(1));
         lastSynced = await manager.GetLastSyncedExternalAsync();
-        Assert.Null(lastSynced);
-    }
-
-    [Test]
-    public async Task Delete_Old_Synced_Internal_Id()
-    {
-        Random random = new Random();
-        int testId = random.Next();
-        await manager.SaveLastSyncedInternalAsync(testId);
-        manager.ClearLocalCache();
-
-        // Make sure not to delete if not too old.
-        await manager.DeleteOlderThanAsync(DateTime.Now - TimeSpan.FromDays(1));
-        int? lastSynced = await manager.GetLastSyncedInternalAsync();
-        Assert.NotNull(lastSynced);
-        manager.ClearLocalCache();
-
-        // Make sure to delete if too old.
-        await manager.DeleteOlderThanAsync(DateTime.Now + TimeSpan.FromDays(1));
-        lastSynced = await manager.GetLastSyncedInternalAsync();
         Assert.Null(lastSynced);
     }
 
