@@ -12,5 +12,5 @@ export interface UmbContentRollbackVersionItemModel {
 export interface UmbContentRollbackVersionDetailModel {
 	id: string;
 	variants: Array<Pick<UmbEntityVariantModel, 'culture' | 'name'>>;
-	values: Array<{ culture: string | null; alias: string; value: unknown }>;
+	values: Array<{ culture: string | null; segment?: string | null; alias: string; value: unknown }>;
 }

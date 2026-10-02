@@ -39,7 +39,7 @@ public class AllDocumentVersionController : DocumentVersionControllerBase
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <param name="documentId">The unique identifier of the document whose versions are to be retrieved.</param>
-    /// <param name="culture">An optional culture identifier to filter document versions by culture; if null, all cultures are included.</param>
+    /// <param name="culture">An optional culture identifier to filter document versions by culture; if null, the versions that carry no culture are returned.</param>
     /// <param name="skip">The number of items to skip before starting to collect the result set (used for pagination).</param>
     /// <param name="take">The maximum number of items to return in the result set (used for pagination).</param>
     /// <returns>
@@ -62,14 +62,17 @@ public class AllDocumentVersionController : DocumentVersionControllerBase
         Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus> attempt =
             await _contentVersionService.GetPagedContentVersionsAsync(documentId, culture, skip, take);
 
+        if (attempt.Success is false)
+        {
+            return MapFailure(attempt.Status);
+        }
+
         var pagedViewModel = new PagedViewModel<DocumentVersionItemResponseModel>
         {
             Total = attempt.Result!.Total,
             Items = await _documentVersionPresentationFactory.CreateMultipleAsync(attempt.Result!.Items),
         };
 
-        return attempt.Success
-            ? Ok(pagedViewModel)
-            : MapFailure(attempt.Status);
+        return Ok(pagedViewModel);
     }
 }
