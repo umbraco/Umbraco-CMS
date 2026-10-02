@@ -1,6 +1,6 @@
-import * as readline from 'readline';
-import { execSync } from 'child_process';
-import { readdir } from 'fs/promises';
+import * as readline from 'node:readline';
+import { execSync } from 'node:child_process';
+import { readdir } from 'node:fs/promises';
 
 const exampleDirectory = 'examples';
 const digitTimeoutMs = 1000;
@@ -37,6 +37,11 @@ const banner = [
 	'',
 ];
 
+/**
+ * Lets the user pick an example with the keyboard, filtering the list by typing.
+ * @param {string[]} names The example folder names.
+ * @returns {Promise<string | undefined>} The selected folder name, or undefined if cancelled.
+ */
 function pickInteractive(names) {
 	return new Promise((resolve) => {
 		const { stdin, stdout } = process;
@@ -81,7 +86,11 @@ function pickInteractive(names) {
 			];
 
 			// Overwrite the previous frame in place, in a single write, so the list is never blanked between frames.
-			const moveUp = renderedHeight ? `\x1b[${renderedHeight}A${lines.length === renderedHeight ? '' : '\x1b[0J'}` : '';
+			let moveUp = '';
+			if (renderedHeight) {
+				const clearBelow = lines.length === renderedHeight ? '' : '\x1b[0J';
+				moveUp = `\x1b[${renderedHeight}A${clearBelow}`;
+			}
 			stdout.write(moveUp + lines.map((line) => `${line}\x1b[K\n`).join(''));
 			renderedHeight = lines.length;
 		};
@@ -115,12 +124,12 @@ function pickInteractive(names) {
 
 		const onDigit = (digit) => {
 			const next = [digits + digit, digit].find((candidate) => {
-				const number = parseInt(candidate);
+				const number = Number.parseInt(candidate);
 				return number >= 1 && number <= matches.length;
 			});
 			if (!next) return;
 			digits = next;
-			index = parseInt(next) - 1;
+			index = Number.parseInt(next) - 1;
 			clearTimeout(digitTimer);
 			digitTimer = setTimeout(() => (digits = ''), digitTimeoutMs);
 		};
@@ -142,7 +151,7 @@ function pickInteractive(names) {
 
 			const action = keyActions[key.name];
 			if (action) action();
-			else if (/^[0-9]$/.test(key.sequence)) onDigit(key.sequence);
+			else if (/^\d$/.test(key.sequence)) onDigit(key.sequence);
 			else if (/^[a-z_-]$/i.test(key.sequence)) setFilter(filter + key.sequence);
 			else return;
 
@@ -159,6 +168,11 @@ function pickInteractive(names) {
 	});
 }
 
+/**
+ * Lets the user pick an example by entering its number, for when stdin is not a terminal.
+ * @param {string[]} names The example folder names.
+ * @returns {Promise<string | undefined>} The selected folder name, or undefined if the number is not valid.
+ */
 function pickByNumber(names) {
 	return new Promise((resolve) => {
 		const rl = readline.createInterface({
@@ -175,7 +189,7 @@ function pickByNumber(names) {
 			// Close readline before starting the dev server so Ctrl+C can terminate the process.
 			rl.close();
 
-			const selectedFolder = names[parseInt(answer) - 1];
+			const selectedFolder = names[Number.parseInt(answer) - 1];
 			if (selectedFolder) console.log(`You selected: ${selectedFolder}`);
 			else console.log('No valid example selected.');
 			resolve(selectedFolder);
@@ -183,18 +197,24 @@ function pickByNumber(names) {
 	});
 }
 
+/**
+ * Starts the Vite dev server for an example, and returns once the server has stopped.
+ * @param {string} name The example folder name.
+ */
 function startExample(name) {
 	process.env['VITE_EXAMPLE_PATH'] = `${exampleDirectory}/${name}`;
 
 	// Start vite server:
 	try {
 		execSync('npm run dev', { stdio: 'inherit' });
-	} catch (error) {
+	} catch {
 		// Nothing, cause this is most likely just the server being stopped.
-		//console.log(error);
 	}
 }
 
+/**
+ * Starts the example named on the command line, or otherwise asks the user to pick one.
+ */
 async function pickExampleUI() {
 	// Find sub folder:
 	const exampleFolderNames = await getDirectories(`${exampleDirectory}`);
@@ -215,4 +235,4 @@ async function pickExampleUI() {
 	if (selectedFolder) startExample(selectedFolder);
 }
 
-pickExampleUI();
+await pickExampleUI();
