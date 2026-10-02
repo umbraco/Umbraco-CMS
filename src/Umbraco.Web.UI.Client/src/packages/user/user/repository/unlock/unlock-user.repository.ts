@@ -3,7 +3,6 @@ import { UmbUserDetailRepository } from '../detail/user-detail.repository.js';
 import { UmbUnlockUserServerDataSource } from './unlock-user.server.data-source.js';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbUnlockUserRepository extends UmbUserRepositoryBase {
 	#source: UmbUnlockUserServerDataSource;
@@ -24,20 +23,16 @@ export class UmbUnlockUserRepository extends UmbUserRepositoryBase {
 			return { error };
 		}
 
-		ids.forEach((id) => {
-			this.detailStore?.updateItem(id, { state: UserStateModel.ACTIVE, failedLoginAttempts: 0 });
-		});
-
 		const { data } = await this.#detailRepository.requestByUniques(ids);
 		if (!data) throw new Error('Could not load users');
 
 		let message = this.#localize.term('speechBubbles_unlockUsersSuccess', data.length);
 
-		if (ids.length === 1) {
+		if (data.length === 1) {
 			const names = data.map((user) => user.name).join(', ');
 			message = this.#localize.term('speechBubbles_unlockUserSuccess', names);
 		}
-		
+
 		const notification = { data: { message } };
 		this.notificationContext?.peek('positive', notification);
 
