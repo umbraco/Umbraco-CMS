@@ -199,8 +199,10 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		const pickable = this.#pickableFilter(option);
 		const fromDate = this.#fromDate(option.unique);
 		const toDate = this.#toDate(option.unique);
-		const isChanged =
-			fromDate !== option.variant?.scheduledPublishDate || toDate !== option.variant?.scheduledUnpublishDate;
+		const persistedFromDate = option.variant?.scheduledPublishDate ?? null;
+		const persistedToDate = option.variant?.scheduledUnpublishDate ?? null;
+		const isChanged = fromDate !== persistedFromDate || toDate !== persistedToDate;
+		const showAncestorWarning = pickable && !this.#ancestorsCoverVariant(option);
 
 		return html`
 			<uui-menu-item
@@ -213,6 +215,18 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				<uui-icon slot="icon" name="icon-globe"></uui-icon>
 				${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
 			</uui-menu-item>
+			${when(
+				showAncestorWarning,
+				() => html`
+					<p class="ancestor-not-published">
+						<uui-icon name="icon-alert"></uui-icon>
+						<umb-localize
+							key=${option.culture
+								? 'content_ancestorCultureNotPublishedScheduleWarning'
+								: 'content_ancestorNotPublishedScheduleWarning'}></umb-localize>
+					</p>
+				`,
+			)}
 			${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option, fromDate, toDate))}
 			${when(
 				isChanged,
@@ -222,6 +236,18 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 					</p>`,
 			)}
 		`;
+	}
+
+	#ancestorsCoverVariant(option: UmbDocumentVariantOptionModel): boolean {
+		const ancestorPublishedCultures = this.data?.ancestorPublishedCultures;
+		// Undefined means root document or lookup unavailable — render no warning.
+		if (ancestorPublishedCultures === undefined) return true;
+		// `null` entry means every ancestor is published in the invariant variant — covers all child cultures.
+		if (ancestorPublishedCultures.includes(null)) return true;
+		// An invariant child option is served wherever its ancestors are published, so any
+		// non-empty culture coverage means the schedule will take effect somewhere.
+		if (option.culture === null) return ancestorPublishedCultures.length > 0;
+		return ancestorPublishedCultures.includes(option.culture);
 	}
 
 	#attachValidatorsToPublish(element: UmbInputDateElement | null) {
@@ -466,6 +492,18 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 			uui-menu-item {
 				--uui-menu-item-flat-structure: 1;
+			}
+
+			.ancestor-not-published {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-2);
+				margin: 0 0 var(--uui-size-space-2);
+				padding: var(--uui-size-space-2) var(--uui-size-space-3);
+				background-color: var(--uui-color-warning);
+				color: var(--uui-color-warning-contrast);
+				border: 1px solid var(--uui-color-warning-standalone);
+				border-radius: var(--uui-border-radius);
 			}
 		`,
 	];
