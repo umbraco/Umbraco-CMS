@@ -1,11 +1,10 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
 import { UmbUnlockUserServerDataSource } from './unlock-user.server.data-source.js';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbUnlockUserRepository extends UmbUserRepositoryBase {
 	#source: UmbUnlockUserServerDataSource;
-	#localize = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -16,15 +15,18 @@ export class UmbUnlockUserRepository extends UmbUserRepositoryBase {
 		if (ids.length === 0) throw new Error('User ids are missing');
 		await this.init;
 
-		const { error } = await this.#source.unlock(ids);
-		if (error) {
-			return { error };
+		const { data, error } = await this.#source.unlock(ids);
+
+		if (!error) {
+			ids.forEach((id) => {
+				this.detailStore?.updateItem(id, { state: UserStateModel.ACTIVE, failedLoginAttempts: 0 });
+			});
+
+			const notification = { data: { message: `User unlocked` } };
+			this.notificationContext?.peek('positive', notification);
 		}
 
-		const message = this.#localize.term('speechBubbles_unlockUsersSuccess', ids.length);
-		this.notificationContext?.peek('positive', { data: { message } });
-
-		return { error };
+		return { data, error };
 	}
 }
 
