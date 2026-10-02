@@ -1057,5 +1057,75 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 			// Cache should not be affected by undefined state
 			expect(dataCache.has('item-1')).to.be.true;
 		});
+
+		// A consumer rebuilt mid-session — e.g. a block manager after a workspace tab is
+		// remounted — constructs a fresh request manager and requests immediately. The
+		// connection is already established and the cache is already warm at that point,
+		// so the rebuild should cost nothing. (#23572)
+		it('reads from the cache when constructed while the connection is already established', async () => {
+			mockServerEventContext.setIsConnected(true);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			dataCache.set('item-1', { id: 'item-1', name: 'Cached Item 1' });
+			dataCache.set('item-2', { id: 'item-2', name: 'Cached Item 2' });
+
+			let readManyCalled = false;
+			mockReadMany = async (ids: Array<string>) => {
+				readManyCalled = true;
+				return { data: { items: ids.map((id) => ({ id, name: `Fresh Item ${id}` })) } };
+			};
+
+			const rebuiltManager = new UmbManagementApiDetailDataRequestManager<
+				TestDetailModel,
+				TestCreateModel,
+				TestUpdateModel
+			>(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			// Deliberately no wait: the production call path requests straight after construction.
+			const result = await rebuiltManager.readMany(['item-1', 'item-2']);
+
+			expect(readManyCalled, 'expected the warm cache to serve the request without a server call').to.be.false;
+			expect(result.data?.items).to.have.lengthOf(2);
+
+			rebuiltManager.destroy();
+		});
+
+		it('caches fetched data when constructed while the connection is already established', async () => {
+			mockServerEventContext.setIsConnected(true);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			mockReadMany = async (ids: Array<string>) => ({
+				data: { items: ids.map((id) => ({ id, name: `Fresh Item ${id}` })) },
+			});
+
+			const rebuiltManager = new UmbManagementApiDetailDataRequestManager<
+				TestDetailModel,
+				TestCreateModel,
+				TestUpdateModel
+			>(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			// Deliberately no wait, as above.
+			await rebuiltManager.readMany(['item-1']);
+
+			expect(dataCache.has('item-1'), 'expected the fetched item to be cached for later consumers').to.be.true;
+
+			rebuiltManager.destroy();
+		});
 	});
 });
