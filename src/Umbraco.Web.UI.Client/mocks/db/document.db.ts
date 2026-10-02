@@ -56,6 +56,17 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	}
 }
 
+const documentTypeReference = (model: UmbMockDocumentModel) => {
+	const documentType = umbDocumentTypeMockDb.read(model.documentType.id);
+
+	return {
+		id: model.documentType.id,
+		alias: documentType?.alias ?? '',
+		icon: documentType?.icon ?? model.documentType.icon,
+		collection: documentType ? documentType.collection : model.documentType.collection,
+	};
+};
+
 const treeItemMapper = (model: UmbMockDocumentModel): DocumentTreeItemResponseModel => {
 	const documentType = umbDocumentTypeMockDb.read(model.documentType.id);
 	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
@@ -104,7 +115,7 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 		documentType: {
 			id: documentType.id,
 			icon: documentType.icon,
-			collection: undefined, // TODO: get list from doc type when ready
+			collection: documentType.collection,
 		},
 		hasChildren: false,
 		id: request.id ? request.id : UmbId.new(),
@@ -133,8 +144,10 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 };
 
 const detailResponseMapper = (model: UmbMockDocumentModel): DocumentResponseModel => {
+	const { id, icon, collection } = documentTypeReference(model);
+
 	return {
-		documentType: model.documentType,
+		documentType: { id, icon, collection },
 		id: model.id,
 		isTrashed: model.isTrashed,
 		template: model.template,
@@ -145,12 +158,10 @@ const detailResponseMapper = (model: UmbMockDocumentModel): DocumentResponseMode
 };
 
 const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
+	const { id, icon, collection } = documentTypeReference(model);
+
 	return {
-		documentType: {
-			collection: model.documentType.collection,
-			icon: model.documentType.icon,
-			id: model.documentType.id,
-		},
+		documentType: { collection, icon, id },
 		hasChildren: model.hasChildren,
 		id: model.id,
 		isProtected: model.isProtected,
@@ -165,11 +176,7 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 	return {
 		ancestors: model.ancestors,
 		creator: null,
-		documentType: {
-			id: model.documentType.id,
-			alias: '',
-			icon: model.documentType.icon,
-		},
+		documentType: documentTypeReference(model),
 		id: model.id,
 		isProtected: model.isProtected,
 		isTrashed: model.isTrashed,
