@@ -11,7 +11,7 @@ import {
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/index.js';
 import type { UmbStructureItemModel } from './types.js';
 import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { aTimeout, expect } from '@open-wc/testing';
+import { aTimeout, expect, waitUntil } from '@open-wc/testing';
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -125,36 +125,59 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 		});
 
 		it('creates one tree repository when structure requests overlap while it is still being created', async () => {
+			let loaderCalls = 0;
+			let releaseLoader!: () => void;
+			const loaderReleased = new Promise<void>((resolve) => (releaseLoader = resolve));
 			umbExtensionsRegistry.register({
 				type: 'repository',
 				alias: SLOW_ALIAS,
 				name: 'Slow Test Tree Repository',
-				api: () => new Promise((resolve) => setTimeout(() => resolve({ default: UmbTestTreeRepository }), 250)),
+				api: async () => {
+					loaderCalls++;
+					await loaderReleased;
+					return { default: UmbTestTreeRepository };
+				},
 			});
 			UmbTestTreeRepository.reset();
 
-			extraContext = new TestMenuTreeStructureWorkspaceContext(host, SLOW_ALIAS);
-			await aTimeout(150);
-			dispatchReloadStructure();
-			await aTimeout(600);
+			try {
+				extraContext = new TestMenuTreeStructureWorkspaceContext(host, SLOW_ALIAS);
+				await waitUntil(() => loaderCalls === 1);
 
-			expect(UmbTestTreeRepository.createdCount).to.equal(1);
+				dispatchReloadStructure();
+				// Gives the debounced second request time to start while the first is still creating the repository.
+				await aTimeout(150);
+				expect(loaderCalls).to.equal(1);
+
+				releaseLoader();
+				await waitUntil(() => UmbTestTreeRepository.createdCount === 1);
+			} finally {
+				releaseLoader();
+			}
 		});
 
 		it('retries creating the tree repository after a failed attempt', async () => {
+			let onFailedAttempt!: () => void;
+			const failedAttempt = new Promise<void>((resolve) => (onFailedAttempt = resolve));
 			// The first attempt fails because the manifest is not registered yet, which surfaces as an unhandled rejection.
-			const ignoreRejection = (event: PromiseRejectionEvent) => event.preventDefault();
+			const ignoreRejection = (event: PromiseRejectionEvent) => {
+				if (!String(event.reason?.message).includes(LATE_ALIAS)) return;
+				event.preventDefault();
+				onFailedAttempt();
+			};
 			window.addEventListener('unhandledrejection', ignoreRejection);
 			UmbTestTreeRepository.reset();
 
-			extraContext = new TestMenuTreeStructureWorkspaceContext(host, LATE_ALIAS);
-			await aTimeout(250);
-			umbExtensionsRegistry.register(createTestTreeRepositoryManifest(LATE_ALIAS));
-			dispatchReloadStructure();
-			await aTimeout(250);
-			window.removeEventListener('unhandledrejection', ignoreRejection);
+			try {
+				extraContext = new TestMenuTreeStructureWorkspaceContext(host, LATE_ALIAS);
+				await failedAttempt;
 
-			expect(UmbTestTreeRepository.createdCount).to.equal(1);
+				umbExtensionsRegistry.register(createTestTreeRepositoryManifest(LATE_ALIAS));
+				dispatchReloadStructure();
+				await waitUntil(() => UmbTestTreeRepository.createdCount === 1);
+			} finally {
+				window.removeEventListener('unhandledrejection', ignoreRejection);
+			}
 		});
 	});
 
