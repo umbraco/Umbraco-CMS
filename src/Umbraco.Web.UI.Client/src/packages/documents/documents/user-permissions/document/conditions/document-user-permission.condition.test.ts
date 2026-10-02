@@ -174,21 +174,18 @@ describe('UmbDocumentUserPermissionCondition', () => {
 			});
 			hostElement.setEntityAncestors([{ unique: 'permissions-document-id', entityType: UMB_DOCUMENT_ENTITY_TYPE }]);
 
-			let callbackCount = 0;
-
 			condition = new UmbDocumentUserPermissionCondition(hostElement, {
 				host: hostElement,
 				config: {
 					alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 					allOf: [UMB_USER_PERMISSION_DOCUMENT_READ],
 				},
-				onChange: () => {
-					callbackCount++;
-					if (callbackCount === 1) {
-						expect(condition.permitted).to.be.true;
-						condition.hostDisconnected();
-						done();
-					}
+				// The condition can report not permitted first, while the context it depends on is still arriving.
+				onChange: (permitted) => {
+					if (!permitted) return;
+					expect(condition.permitted).to.be.true;
+					condition.hostDisconnected();
+					done();
 				},
 			});
 		});
@@ -215,7 +212,7 @@ describe('UmbDocumentUserPermissionCondition', () => {
 				onChange: () => {},
 			});
 
-			// The onChange callback is not called when the condition is false, so we need to wait and check manually
+			// The condition may never report anything else than not permitted, so we need to wait and check manually
 			setTimeout(() => {
 				expect(condition.permitted).to.be.false;
 				condition.hostDisconnected();

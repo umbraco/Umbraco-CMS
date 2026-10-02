@@ -7,11 +7,11 @@ export class UmbConditionBase<ConditionConfigType extends UmbConditionConfigBase
 	implements UmbExtensionCondition
 {
 	public readonly config: ConditionConfigType;
-	#permitted = false;
-	public get permitted() {
+	#permitted?: boolean;
+	public get permitted(): boolean | undefined {
 		return this.#permitted;
 	}
-	public set permitted(value) {
+	public set permitted(value: boolean) {
 		if (value === this.#permitted) return;
 		this.#permitted = value;
 		this.#onChange?.(value);

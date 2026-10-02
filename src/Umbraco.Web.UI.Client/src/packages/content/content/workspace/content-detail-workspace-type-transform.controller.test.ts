@@ -33,9 +33,9 @@ class UmbTestWorkspaceHostElement extends UmbControllerHostElementMixin(HTMLElem
 		this.#data = data;
 	}
 
-	getLanguages(): Array<UmbLanguageDetailModel> {
-		return this.#languages;
-	}
+	variantOptionsManager = {
+		getLanguages: (): Array<UmbLanguageDetailModel> => this.#languages,
+	};
 
 	setPropertyTypes(propertyTypes: Array<UmbPropertyTypeModel>): void {
 		this.#propertyTypesState.setValue(propertyTypes);
