@@ -41,6 +41,22 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 			} else {
 				formControl.pristine = false;
 			}
+			if (dataPath) {
+				// Code other than this validator can add client messages to this dataPath after construction, for example a
+				// workspace that checks its data before saving and reports a missing value directly on the validation context.
+				// This validator owns client messages of its dataPath, so it must become invalid to be able to remove them
+				// again once the control is valid.
+				this.observe(
+					context?.messages?.messagesOfTypeAndPath('client', dataPath),
+					(messages) => {
+						if (messages && messages.length > 0 && this.#isValid) {
+							this.#isValid = false;
+							formControl.pristine = false;
+						}
+					},
+					'observeClientMessagesOfDataPath',
+				);
+			}
 		});
 		this.#control = formControl;
 	}
