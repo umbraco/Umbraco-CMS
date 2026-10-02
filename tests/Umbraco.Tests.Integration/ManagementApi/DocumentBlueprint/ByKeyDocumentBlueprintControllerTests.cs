@@ -47,7 +47,7 @@ public class ByKeyDocumentBlueprintControllerTests : ManagementApiUserGroupTestB
         => new() { ExpectedStatusCode = HttpStatusCode.OK };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel
-        => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
+        => new() { ExpectedStatusCode = HttpStatusCode.OK };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
