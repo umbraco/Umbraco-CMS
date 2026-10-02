@@ -100,6 +100,8 @@ internal static class HybridCacheExtensions
     /// <summary>
     /// Gets whether a lock is currently held or awaited for the provided key. Internal for test purposes.
     /// </summary>
+    /// <param name="key">The cache key.</param>
+    /// <returns>True if a lock exists for the key; otherwise false.</returns>
     internal static bool HasKeyLock(string key)
     {
         lock (_keyLocks)

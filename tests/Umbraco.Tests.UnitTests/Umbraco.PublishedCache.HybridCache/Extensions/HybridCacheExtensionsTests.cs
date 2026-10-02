@@ -195,6 +195,7 @@ public class HybridCacheExtensionsTests
     /// for a key that exists, and skip the database. That would make published content resolve to nothing (see
     /// https://github.com/umbraco/Umbraco-CMS/issues/23405 and https://github.com/umbraco/Umbraco-CMS/issues/24066).
     /// </remarks>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     [Test]
     public async Task TryGetValueAsync_ShouldNotWriteProbeEntryToDistributedCache()
     {
@@ -248,6 +249,7 @@ public class HybridCacheExtensionsTests
     /// deterministic: A holds the lock, B waits, A completes, and C arrives while B is in flight.
     /// </para>
     /// </remarks>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     [Test]
     public async Task TryGetValueAsync_WhenProbedConcurrently_ShouldNeverOverlapProbesForTheSameKey()
     {
@@ -288,6 +290,7 @@ public class HybridCacheExtensionsTests
     /// A lock is only removed once no caller holds or waits on it. A cancelled wait that kept its reference would leave
     /// the lock in place for the lifetime of the process, so one lock would leak for each such key.
     /// </remarks>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     [Test]
     public async Task TryGetValueAsync_WhenCancelledWhileWaitingForLock_ShouldReleaseTheLock()
     {
@@ -365,11 +368,16 @@ public class HybridCacheExtensionsTests
             }
 
             _entered.Release();
-            await gate.Task.WaitAsync(_timeout);
-
-            lock (_sync)
+            try
             {
-                _inFlight--;
+                await gate.Task.WaitAsync(_timeout, cancellationToken);
+            }
+            finally
+            {
+                lock (_sync)
+                {
+                    _inFlight--;
+                }
             }
 
             return await factory(state, cancellationToken);
