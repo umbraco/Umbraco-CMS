@@ -4025,6 +4025,70 @@ rawData.push({
 	flags: [],
 });
 
+export const COLLECTION_DOCUMENT_TYPE_ID = 'c4d8a1e7-3b95-4f62-a0d1-7e9b5c2f8a36';
+export const COLLECTION_ITEM_DOCUMENT_TYPE_ID = 'd5e9b2f8-4ca6-4073-b1e2-8fac6d3a9b47';
+const LIST_VIEW_CONTENT_DATA_TYPE_ID = 'c0808dd3-8133-4e4b-8ce8-e2bea84a96a4';
+
+// A document type that lists its children as a collection, and may nest further collections, see collection-tree.data.ts.
+rawData.push(
+	{
+		allowedTemplates: [],
+		defaultTemplate: null,
+		id: COLLECTION_DOCUMENT_TYPE_ID,
+		alias: 'documentCollection',
+		name: 'Document Collection',
+		description: null,
+		icon: 'icon-folder',
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: null,
+		isFolder: false,
+		properties: [],
+		containers: [],
+		allowedDocumentTypes: [
+			{ documentType: { id: COLLECTION_DOCUMENT_TYPE_ID }, sortOrder: 0 },
+			{ documentType: { id: COLLECTION_ITEM_DOCUMENT_TYPE_ID }, sortOrder: 1 },
+		],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		collection: { id: LIST_VIEW_CONTENT_DATA_TYPE_ID },
+		flags: [],
+	},
+	{
+		allowedTemplates: [],
+		defaultTemplate: null,
+		id: COLLECTION_ITEM_DOCUMENT_TYPE_ID,
+		alias: 'collectionItem',
+		name: 'Collection Item',
+		description: null,
+		icon: 'icon-document',
+		allowedAsRoot: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: null,
+		isFolder: false,
+		properties: [],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+);
+
 export const data: Array<UmbMockDocumentTypeModel> = rawData.map((dt) => ({
 	...dt,
 	compositions: dt.compositions.map((c) => ({
