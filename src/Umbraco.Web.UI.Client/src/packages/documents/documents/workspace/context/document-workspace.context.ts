@@ -122,6 +122,7 @@ export class UmbDocumentWorkspaceContext
 		this.observe(
 			this.isNew,
 			(isNew) => {
+				// TODO: we are missing a reactive clean up of these enforcements [NL]
 				if (isNew === undefined) return;
 				if (isNew) {
 					this.#enforceUserPermission(
@@ -198,7 +199,12 @@ export class UmbDocumentWorkspaceContext
 		return UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
+	#enforcedVerbs = new Set<string>();
+
 	#enforceUserPermission(verb: string, message: string) {
+		if (this.#enforcedVerbs.has(verb)) return;
+
+		this.#enforcedVerbs.add(verb);
 		// We set the initial permission state to false because the condition is false by default and only execute the callback if it changes.
 		this.#handleUserPermissionChange(verb, false, message);
 

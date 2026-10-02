@@ -27,8 +27,8 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 const TEST_TREE_REPOSITORY_ALIAS = 'Umb.Test.MenuTreeStructureWorkspaceContextBase.TreeRepository';
 
 class TestMenuTreeStructureWorkspaceContext extends UmbMenuTreeStructureWorkspaceContextBase {
-	constructor(host: UmbControllerHost) {
-		super(host, { treeRepositoryAlias: TEST_TREE_REPOSITORY_ALIAS });
+	constructor(host: UmbControllerHost, treeRepositoryAlias = TEST_TREE_REPOSITORY_ALIAS) {
+		super(host, { treeRepositoryAlias });
 	}
 }
 
@@ -98,6 +98,64 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 		expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.deep.equal([
 			{ unique: 'test-unique', entityType: 'test-entity-type' },
 		]);
+	});
+
+	it('reuses a single tree repository across structure requests', async () => {
+		const requestsBefore = UmbTestTreeRepository.requestTreeItemAncestorsCalls.length;
+
+		dispatchReloadStructure();
+		await aTimeout(150);
+		dispatchReloadStructure();
+		await aTimeout(150);
+
+		expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls.length).to.be.greaterThan(requestsBefore);
+		expect(UmbTestTreeRepository.createdCount).to.equal(1);
+	});
+
+	describe('creating the tree repository', () => {
+		const SLOW_ALIAS = `${TEST_TREE_REPOSITORY_ALIAS}.Slow`;
+		const LATE_ALIAS = `${TEST_TREE_REPOSITORY_ALIAS}.Late`;
+		let extraContext: TestMenuTreeStructureWorkspaceContext | undefined;
+
+		afterEach(() => {
+			extraContext?.destroy();
+			extraContext = undefined;
+			umbExtensionsRegistry.unregister(SLOW_ALIAS);
+			umbExtensionsRegistry.unregister(LATE_ALIAS);
+		});
+
+		it('creates one tree repository when structure requests overlap while it is still being created', async () => {
+			umbExtensionsRegistry.register({
+				type: 'repository',
+				alias: SLOW_ALIAS,
+				name: 'Slow Test Tree Repository',
+				api: () => new Promise((resolve) => setTimeout(() => resolve({ default: UmbTestTreeRepository }), 250)),
+			});
+			UmbTestTreeRepository.reset();
+
+			extraContext = new TestMenuTreeStructureWorkspaceContext(host, SLOW_ALIAS);
+			await aTimeout(150);
+			dispatchReloadStructure();
+			await aTimeout(600);
+
+			expect(UmbTestTreeRepository.createdCount).to.equal(1);
+		});
+
+		it('retries creating the tree repository after a failed attempt', async () => {
+			// The first attempt fails because the manifest is not registered yet, which surfaces as an unhandled rejection.
+			const ignoreRejection = (event: PromiseRejectionEvent) => event.preventDefault();
+			window.addEventListener('unhandledrejection', ignoreRejection);
+			UmbTestTreeRepository.reset();
+
+			extraContext = new TestMenuTreeStructureWorkspaceContext(host, LATE_ALIAS);
+			await aTimeout(250);
+			umbExtensionsRegistry.register(createTestTreeRepositoryManifest(LATE_ALIAS));
+			dispatchReloadStructure();
+			await aTimeout(250);
+			window.removeEventListener('unhandledrejection', ignoreRejection);
+
+			expect(UmbTestTreeRepository.createdCount).to.equal(1);
+		});
 	});
 
 	it('sets UMB_PARENT_ENTITY_CONTEXT from the resolved ancestors', async () => {
@@ -434,7 +492,9 @@ describe('UmbMenuTreeStructureWorkspaceContextBase (creating a new item directly
 
 	it('re-fetches the structure once the item has been saved, so the root stays in the breadcrumb', async () => {
 		// The real ancestors endpoint, once the item exists, returns the item itself as the trailing entry.
-		UmbTestTreeRepository.ancestors = [createTestAncestorItem({ unique: 'new-item-unique', entityType: 'test-entity-type' })];
+		UmbTestTreeRepository.ancestors = [
+			createTestAncestorItem({ unique: 'new-item-unique', entityType: 'test-entity-type' }),
+		];
 
 		workspaceContext.setIsNew(false);
 		await aTimeout(150);

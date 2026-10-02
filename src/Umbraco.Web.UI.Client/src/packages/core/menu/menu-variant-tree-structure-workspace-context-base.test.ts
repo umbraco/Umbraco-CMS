@@ -27,8 +27,8 @@ import {
 const TEST_TREE_REPOSITORY_ALIAS = 'Umb.Test.MenuVariantTreeStructureWorkspaceContextBase.TreeRepository';
 
 class TestMenuVariantTreeStructureWorkspaceContext extends UmbMenuVariantTreeStructureWorkspaceContextBase {
-	constructor(host: UmbControllerHost) {
-		super(host, { treeRepositoryAlias: TEST_TREE_REPOSITORY_ALIAS });
+	constructor(host: UmbControllerHost, treeRepositoryAlias = TEST_TREE_REPOSITORY_ALIAS) {
+		super(host, { treeRepositoryAlias });
 	}
 }
 
@@ -100,6 +100,64 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 		]);
 	});
 
+	it('reuses a single tree repository across structure requests', async () => {
+		const requestsBefore = UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls.length;
+
+		dispatchReloadStructure();
+		await aTimeout(150);
+		dispatchReloadStructure();
+		await aTimeout(150);
+
+		expect(UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls.length).to.be.greaterThan(requestsBefore);
+		expect(UmbTestVariantTreeRepository.createdCount).to.equal(1);
+	});
+
+	describe('creating the tree repository', () => {
+		const SLOW_ALIAS = `${TEST_TREE_REPOSITORY_ALIAS}.Slow`;
+		const LATE_ALIAS = `${TEST_TREE_REPOSITORY_ALIAS}.Late`;
+		let extraContext: TestMenuVariantTreeStructureWorkspaceContext | undefined;
+
+		afterEach(() => {
+			extraContext?.destroy();
+			extraContext = undefined;
+			umbExtensionsRegistry.unregister(SLOW_ALIAS);
+			umbExtensionsRegistry.unregister(LATE_ALIAS);
+		});
+
+		it('creates one tree repository when structure requests overlap while it is still being created', async () => {
+			umbExtensionsRegistry.register({
+				type: 'repository',
+				alias: SLOW_ALIAS,
+				name: 'Slow Test Tree Repository',
+				api: () => new Promise((resolve) => setTimeout(() => resolve({ default: UmbTestVariantTreeRepository }), 250)),
+			});
+			UmbTestVariantTreeRepository.reset();
+
+			extraContext = new TestMenuVariantTreeStructureWorkspaceContext(host, SLOW_ALIAS);
+			await aTimeout(150);
+			dispatchReloadStructure();
+			await aTimeout(600);
+
+			expect(UmbTestVariantTreeRepository.createdCount).to.equal(1);
+		});
+
+		it('retries creating the tree repository after a failed attempt', async () => {
+			// The first attempt fails because the manifest is not registered yet, which surfaces as an unhandled rejection.
+			const ignoreRejection = (event: PromiseRejectionEvent) => event.preventDefault();
+			window.addEventListener('unhandledrejection', ignoreRejection);
+			UmbTestVariantTreeRepository.reset();
+
+			extraContext = new TestMenuVariantTreeStructureWorkspaceContext(host, LATE_ALIAS);
+			await aTimeout(250);
+			umbExtensionsRegistry.register(createTestVariantTreeRepositoryManifest(LATE_ALIAS));
+			dispatchReloadStructure();
+			await aTimeout(250);
+			window.removeEventListener('unhandledrejection', ignoreRejection);
+
+			expect(UmbTestVariantTreeRepository.createdCount).to.equal(1);
+		});
+	});
+
 	it('sets UMB_PARENT_ENTITY_CONTEXT from the resolved ancestors', async () => {
 		UmbTestVariantTreeRepository.ancestors = [
 			createTestVariantAncestorItem({ unique: 'parent-unique', entityType: 'test-entity-type' }),
@@ -114,7 +172,11 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 
 	it('propagates name and isFolder onto each ancestor in the structure', async () => {
 		UmbTestVariantTreeRepository.ancestors = [
-			createTestVariantAncestorItem({ unique: 'folder-unique', entityType: 'test-folder-entity-type' }, 'My Folder', true),
+			createTestVariantAncestorItem(
+				{ unique: 'folder-unique', entityType: 'test-folder-entity-type' },
+				'My Folder',
+				true,
+			),
 			createTestVariantAncestorItem({ unique: 'parent-unique', entityType: 'test-entity-type' }, 'My Item'),
 		];
 
@@ -451,6 +513,8 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase (isNew resolves after 
 		await aTimeout(150);
 
 		expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(1);
-		expect(UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(requestCountBeforeIsNewResolves);
+		expect(UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(
+			requestCountBeforeIsNewResolves,
+		);
 	});
 });
