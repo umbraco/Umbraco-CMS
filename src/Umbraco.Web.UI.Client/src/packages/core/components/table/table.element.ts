@@ -603,10 +603,10 @@ export class UmbTableElement extends UmbLitElement {
 				display: none;
 			}
 
-			uui-table-row[selectable]:focus umb-icon,
-			uui-table-row[selectable]:focus-within umb-icon,
-			uui-table-row[selectable]:hover umb-icon,
-			uui-table-row[data-selection-mode] umb-icon {
+			uui-table-row[selectable]:focus uui-table-cell:not(.children-indicator-cell) umb-icon,
+			uui-table-row[selectable]:focus-within uui-table-cell:not(.children-indicator-cell) umb-icon,
+			uui-table-row[selectable]:hover uui-table-cell:not(.children-indicator-cell) umb-icon,
+			uui-table-row[data-selection-mode] uui-table-cell:not(.children-indicator-cell) umb-icon {
 				display: none;
 			}
 
