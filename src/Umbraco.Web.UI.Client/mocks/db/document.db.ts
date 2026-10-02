@@ -161,13 +161,17 @@ const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
 };
 
 const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionResponseModel => {
+	const documentType = umbDocumentTypeMockDb.read(model.documentType.id);
+	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
+
 	return {
 		ancestors: model.ancestors,
 		creator: null,
 		documentType: {
-			id: model.documentType.id,
-			alias: '',
-			icon: model.documentType.icon,
+			id: documentType.id,
+			alias: documentType.alias,
+			icon: documentType.icon,
+			collection: documentType.collection,
 		},
 		id: model.id,
 		isProtected: model.isProtected,
