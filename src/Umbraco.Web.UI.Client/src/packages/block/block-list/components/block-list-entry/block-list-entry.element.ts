@@ -5,7 +5,7 @@ import { css, customElement, html, nothing, property, state, when } from '@umbra
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
-import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
+import { renderHiddenUfm, renderUfm } from '@umbraco-cms/backoffice/ufm';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type {
@@ -53,7 +53,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	public get contentKey(): string | undefined {
 		return this._contentKey;
 	}
-	private _contentKey?: string | undefined;
+	private _contentKey: string | undefined;
 
 	#context = new UmbBlockListEntryContext(this);
 
@@ -333,15 +333,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderUfm() {
-		return html`
-			<umb-ufm-render
-				slot="name"
-				inline
-				.markdown=${this._label}
-				.value=${this.#blockValue}
-				@umb-ufm-resolved=${this.#onUfmResolved}>
-			</umb-ufm-render>
-		`;
+		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved);
 	}
 
 	#renderHiddenUfm() {
@@ -420,9 +412,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 						`,
 					)}
 					${this.#renderActionBar()}
-					${!this._showContentEdit && this._contentInvalid
-						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-						: nothing}
+					${when(
+						!this._showContentEdit && this._contentInvalid,
+						() => html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`,
+					)}
 				</div>
 			`,
 		);

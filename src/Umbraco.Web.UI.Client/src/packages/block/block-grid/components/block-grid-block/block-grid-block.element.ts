@@ -1,30 +1,17 @@
-import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../block-grid-entry/constants.js';
 import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
-import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '@umbraco-cms/backoffice/ufm';
 
+/**
+ * @element umb-block-grid-block
+ * @slot name - Content rendered in the block's primary label area (the `name` slot of the inner `umb-ref-grid-block`). The expected projection is a `<umb-ufm-render>` element owned by the parent block-grid entry.
+ */
 @customElement('umb-block-grid-block')
-export class UmbBlockGridBlockElement extends UmbLitElement {
-	#blockContext?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockContext) => {
-			this.#blockContext = blockContext;
-		});
-	}
-
-	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
-		this.#blockContext?.setName(event.detail.text);
-	};
-
-	@property({ attribute: false })
-	label?: string;
-
+export class UmbBlockGridBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElement) {
 	@property({ type: String, reflect: false })
 	icon?: string;
 
@@ -51,13 +38,7 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 				.readonly=${!(this.config?.showContentEdit ?? false)}
 				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-				<umb-ufm-render
-					slot="name"
-					inline
-					.markdown=${this.label}
-					.value=${blockValue}
-					@umb-ufm-resolved=${this.#onUfmResolved}>
-				</umb-ufm-render>
+				${this.renderNameSlot(blockValue, 'name')}
 				${when(
 					this.unpublished,
 					() => html`
@@ -71,7 +52,7 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: block;
@@ -82,7 +63,8 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 				margin: var(--uui-size-2);
 			}
 
-			umb-ufm-render {
+			umb-ufm-render,
+			::slotted([slot='name']) {
 				user-select: none;
 			}
 
@@ -94,7 +76,8 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 			}
 
 			:host([unpublished]) umb-icon,
-			:host([unpublished]) umb-ufm-render {
+			:host([unpublished]) umb-ufm-render,
+			:host([unpublished]) ::slotted([slot='name']) {
 				opacity: 0.6;
 			}
 
