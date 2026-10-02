@@ -1,5 +1,5 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
-import { COLLECTION_DOCUMENT_TYPE_ID, COLLECTION_ITEM_DOCUMENT_TYPE_ID } from './document-type.data.js';
+import { UMB_COLLECTION_DOCUMENT_TYPE_ID, UMB_COLLECTION_ITEM_DOCUMENT_TYPE_ID } from './document-type.data.js';
 import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
@@ -20,6 +20,7 @@ const addDocument = (
 	icon: string,
 	ancestorIds: Array<string>,
 	hasChildren: boolean,
+	values: UmbMockDocumentModel['values'] = [],
 ) => {
 	const parentId = ancestorIds[ancestorIds.length - 1];
 
@@ -47,24 +48,50 @@ const addDocument = (
 				flags: [],
 			},
 		],
-		values: [],
+		values,
 		flags: [],
 	});
 };
 
 const ROOT_ID = 'collection-root-1';
 
-addDocument(ROOT_ID, 'Collection 1', COLLECTION_DOCUMENT_TYPE_ID, 'icon-folder', [], true);
+const collectionValues = (title: string, description: string, featured: boolean): UmbMockDocumentModel['values'] => [
+	{ editorAlias: 'Umbraco.TextBox', alias: 'title', culture: null, segment: null, value: title },
+	{ editorAlias: 'Umbraco.TextArea', alias: 'description', culture: null, segment: null, value: description },
+	{ editorAlias: 'Umbraco.TrueFalse', alias: 'featured', culture: null, segment: null, value: featured },
+];
+
+addDocument(
+	ROOT_ID,
+	'Collection 1',
+	UMB_COLLECTION_DOCUMENT_TYPE_ID,
+	'icon-folder',
+	[],
+	true,
+	collectionValues('Collection 1', 'The root collection, holding two nested collections.', true),
+);
 
 for (let collection = 1; collection <= NESTED_COLLECTION_COUNT; collection++) {
 	const collectionId = `collection-1-${collection}`;
-	addDocument(collectionId, `Collection 1.${collection}`, COLLECTION_DOCUMENT_TYPE_ID, 'icon-folder', [ROOT_ID], true);
+	addDocument(
+		collectionId,
+		`Collection 1.${collection}`,
+		UMB_COLLECTION_DOCUMENT_TYPE_ID,
+		'icon-folder',
+		[ROOT_ID],
+		true,
+		collectionValues(
+			`Collection 1.${collection}`,
+			`Nested collection ${collection}, holding ${ITEMS_PER_COLLECTION} items.`,
+			false,
+		),
+	);
 
 	for (let item = 1; item <= ITEMS_PER_COLLECTION; item++) {
 		addDocument(
 			`collection-1-${collection}-item-${item}`,
 			`Item 1.${collection}.${item}`,
-			COLLECTION_ITEM_DOCUMENT_TYPE_ID,
+			UMB_COLLECTION_ITEM_DOCUMENT_TYPE_ID,
 			'icon-document',
 			[ROOT_ID, collectionId],
 			false,
