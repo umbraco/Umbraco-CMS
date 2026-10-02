@@ -1,4 +1,5 @@
 import type { UmbMockDocumentTypeModel } from '../../mock-data-set.types.js';
+import { UMB_LIST_VIEW_CONTENT_FIRST_DATA_TYPE_ID } from './data-type.data.js';
 import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 // Map string composition type to enum
@@ -4024,6 +4025,113 @@ rawData.push({
 	},
 	flags: [],
 });
+
+export const UMB_COLLECTION_DOCUMENT_TYPE_ID = 'c4d8a1e7-3b95-4f62-a0d1-7e9b5c2f8a36';
+export const UMB_COLLECTION_ITEM_DOCUMENT_TYPE_ID = 'd5e9b2f8-4ca6-4073-b1e2-8fac6d3a9b47';
+const TEXTSTRING_DATA_TYPE_ID = '0cc0eba1-9960-42c9-bf9b-60e150b429ae';
+const TEXTAREA_DATA_TYPE_ID = 'c6bac0dd-4ab9-45b1-8e30-e4b619ee5da3';
+const TRUE_FALSE_DATA_TYPE_ID = '92897bc6-a5f3-4ffe-ae27-f2e7e33dda49';
+const COLLECTION_CONTENT_TAB_ID = 'e6f0c3a9-5db7-4184-82f3-9a0d6e4b1c58';
+
+// A document type that lists its children as a collection, and may nest further collections, see collection-tree.data.ts.
+rawData.push(
+	{
+		allowedTemplates: [],
+		defaultTemplate: null,
+		id: UMB_COLLECTION_DOCUMENT_TYPE_ID,
+		alias: 'documentCollection',
+		name: 'Document Collection',
+		description: null,
+		icon: 'icon-folder',
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: null,
+		isFolder: false,
+		properties: [
+			{
+				id: 'pt-collection-title',
+				container: { id: COLLECTION_CONTENT_TAB_ID },
+				alias: 'title',
+				name: 'Title',
+				description: null,
+				dataType: { id: TEXTSTRING_DATA_TYPE_ID },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: { mandatory: false, mandatoryMessage: null, regEx: null, regExMessage: null },
+				appearance: { labelOnTop: false },
+			},
+			{
+				id: 'pt-collection-description',
+				container: { id: COLLECTION_CONTENT_TAB_ID },
+				alias: 'description',
+				name: 'Description',
+				description: null,
+				dataType: { id: TEXTAREA_DATA_TYPE_ID },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 1,
+				validation: { mandatory: false, mandatoryMessage: null, regEx: null, regExMessage: null },
+				appearance: { labelOnTop: false },
+			},
+			{
+				id: 'pt-collection-featured',
+				container: { id: COLLECTION_CONTENT_TAB_ID },
+				alias: 'featured',
+				name: 'Featured',
+				description: null,
+				dataType: { id: TRUE_FALSE_DATA_TYPE_ID },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 2,
+				validation: { mandatory: false, mandatoryMessage: null, regEx: null, regExMessage: null },
+				appearance: { labelOnTop: false },
+			},
+		],
+		containers: [{ id: COLLECTION_CONTENT_TAB_ID, parent: null, name: 'Content', type: 'Tab', sortOrder: 0 }],
+		allowedDocumentTypes: [
+			{ documentType: { id: UMB_COLLECTION_DOCUMENT_TYPE_ID }, sortOrder: 0 },
+			{ documentType: { id: UMB_COLLECTION_ITEM_DOCUMENT_TYPE_ID }, sortOrder: 1 },
+		],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		collection: { id: UMB_LIST_VIEW_CONTENT_FIRST_DATA_TYPE_ID },
+		flags: [],
+	},
+	{
+		allowedTemplates: [],
+		defaultTemplate: null,
+		id: UMB_COLLECTION_ITEM_DOCUMENT_TYPE_ID,
+		alias: 'collectionItem',
+		name: 'Collection Item',
+		description: null,
+		icon: 'icon-document',
+		allowedAsRoot: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: null,
+		isFolder: false,
+		properties: [],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+);
 
 export const data: Array<UmbMockDocumentTypeModel> = rawData.map((dt) => ({
 	...dt,

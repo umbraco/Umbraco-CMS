@@ -1,5 +1,6 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
 import { data as pageTree } from './page-tree.data.js';
+import { data as collectionTree } from './collection-tree.data.js';
 import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
@@ -2611,4 +2612,5 @@ export const data: Array<UmbMockDocumentModel> = [
 		flags: [],
 	},
 	...pageTree,
+	...collectionTree,
 ];
