@@ -10,6 +10,7 @@ import {
 	property,
 	state,
 	type PropertyValues,
+	type TemplateResult,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
@@ -184,13 +185,13 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		const nameData = rows[idx].data.find((d) => d.columnAlias === 'name');
 		if (nameData?.value?.href === href) return null;
 
-		const childrenIndicator = rows[idx].childrenIndicator;
+		const childrenIndicator = this.#getChildrenIndicator(treeItem, href);
 
 		return [
 			...rows.slice(0, idx),
 			{
 				...rows[idx],
-				childrenIndicator: childrenIndicator ? { ...childrenIndicator, href } : undefined,
+				childrenIndicator,
 				data: rows[idx].data.map((d) => (d.columnAlias === 'name' ? { ...d, value: { ...d.value, href } } : d)),
 			},
 			...rows.slice(idx + 1),
@@ -274,6 +275,44 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		);
 	}
 
+	/**
+	 * Whether the item shows an expand symbol, which leads further into the tree.
+	 * @param {UmbTreeItemModel} item - The tree item the row represents.
+	 * @returns {boolean} True when the item shows the expand symbol.
+	 */
+	protected _showExpandSymbol(item: UmbTreeItemModel): boolean {
+		return item.hasChildren;
+	}
+
+	/**
+	 * Where activating the expand symbol of the item leads. Without a path, it asks the tree to drill into the item.
+	 * @param {UmbTreeItemModel} _item - The tree item the row represents.
+	 * @param {string | undefined} path - The path of the item, when the row is not selectable.
+	 * @returns {string | undefined} The path to navigate to.
+	 */
+	protected _getExpandPath(_item: UmbTreeItemModel, path: string | undefined): string | undefined {
+		return path;
+	}
+
+	/**
+	 * Renders the expand symbol of the item, or `undefined` for the default.
+	 * @param {UmbTreeItemModel} _item - The tree item the row represents.
+	 * @returns {TemplateResult | undefined} The symbol to render.
+	 */
+	protected _renderExpandSymbol(_item: UmbTreeItemModel): TemplateResult | undefined {
+		return undefined;
+	}
+
+	#getChildrenIndicator(item: UmbTreeItemModel, path: string | undefined): UmbTableItem['childrenIndicator'] {
+		if (!this._showExpandSymbol(item)) return undefined;
+
+		return {
+			href: this._getExpandPath(item, path),
+			onOpen: () => this._treeContext?.open?.(item),
+			renderExpandSymbol: () => this._renderExpandSymbol(item) ?? html`<uui-symbol-expand></uui-symbol-expand>`,
+		};
+	}
+
 	#buildTableColumns(): Array<UmbTableColumn> {
 		const nameColumn: UmbTableColumn = {
 			name: this.localize.term('general_name'),
@@ -318,17 +357,18 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			return { columnAlias: col.field, value: rawValue };
 		});
 
-		const onOpen = item.hasChildren ? () => this._treeContext?.open?.(item as UmbTreeItemModel) : undefined;
+		const childrenIndicator = this.#getChildrenIndicator(item, href);
+		const onOpen = childrenIndicator?.onOpen;
 
 		return {
 			id,
 			icon,
 			entityType: item.entityType,
-			childrenIndicator: item.hasChildren ? { href, onOpen } : undefined,
+			childrenIndicator,
 			selectable: !noAccess && this._isSelectableItem(item as UmbTreeItemModel),
 			// select-only disables all row interaction, which would leave no way to drill into an item with
 			// children while a selection is in progress.
-			selectOnly: item.hasChildren ? false : undefined,
+			selectOnly: childrenIndicator ? false : undefined,
 			active: isActive,
 			data: [
 				{
