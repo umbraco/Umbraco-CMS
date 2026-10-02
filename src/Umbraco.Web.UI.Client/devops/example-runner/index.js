@@ -4,6 +4,9 @@ import { readdir } from 'node:fs/promises';
 
 const exampleDirectory = 'examples';
 const digitTimeoutMs = 1000;
+const minListRows = 8;
+// Header, two indicator lines and one spare row, so the frame never scrolls the terminal.
+const fixedRows = 4;
 
 const getDirectories = async (source) =>
 	(await readdir(source, { withFileTypes: true }))
@@ -18,6 +21,25 @@ const filterNames = (names, query) => {
 const dim = (text) => `\x1b[2m${text}\x1b[0m`;
 const cyan = (text) => `\x1b[36m${text}\x1b[0m`;
 const hiddenRows = (arrow, count) => (count ? dim(`  ${arrow} ${count} more`) : '');
+
+// Cuts a line to a number of visible characters, so it can't wrap. Colour codes don't count towards the width.
+const truncate = (line, width) => {
+	let remaining = width;
+	let result = '';
+	let i = 0;
+	while (i < line.length) {
+		if (line[i] === '\x1b') {
+			const end = line.indexOf('m', i) + 1;
+			result += line.slice(i, end);
+			i = end;
+		} else {
+			if (remaining > 0) result += line[i];
+			remaining--;
+			i++;
+		}
+	}
+	return `${result}\x1b[0m`;
+};
 
 const logo = [
 	'  ▄▄████▄▄  ',
@@ -54,15 +76,19 @@ function pickInteractive(names) {
 		let renderedHeight = 0;
 		let done = false;
 
-		// Banner, header, two indicator lines and one spare row, so the frame never scrolls the terminal.
-		const viewportHeight = () => Math.max(1, Math.min(names.length, (stdout.rows ?? 24) - 4 - banner.length));
+		const availableRows = () => (stdout.rows ?? 24) - fixedRows;
+
+		const visibleBanner = () => (availableRows() - banner.length >= Math.min(minListRows, names.length) ? banner : []);
+
+		const onSigterm = () => finish(undefined);
 
 		const clear = () => {
 			if (renderedHeight) stdout.write(`\x1b[${renderedHeight}A\x1b[0J`);
 		};
 
 		const render = () => {
-			const height = viewportHeight();
+			const shownBanner = visibleBanner();
+			const height = Math.max(1, Math.min(names.length, availableRows() - shownBanner.length));
 			if (index < top) top = index;
 			if (index >= top + height) top = index - height + 1;
 			top = Math.max(0, Math.min(top, matches.length - height));
@@ -78,7 +104,7 @@ function pickInteractive(names) {
 				? `${cyan('?')} Select an example: ${filter}`
 				: `${cyan('?')} Select an example (↑/↓, number, type to filter, Enter)`;
 			const lines = [
-				...banner,
+				...shownBanner,
 				header,
 				hiddenRows('↑', top),
 				...rows,
@@ -91,7 +117,8 @@ function pickInteractive(names) {
 				const clearBelow = lines.length === renderedHeight ? '' : '\x1b[0J';
 				moveUp = `\x1b[${renderedHeight}A${clearBelow}`;
 			}
-			stdout.write(moveUp + lines.map((line) => `${line}\x1b[K\n`).join(''));
+			const width = (stdout.columns ?? 80) - 1;
+			stdout.write(moveUp + lines.map((line) => `${truncate(line, width)}\x1b[K\n`).join(''));
 			renderedHeight = lines.length;
 		};
 
@@ -100,6 +127,7 @@ function pickInteractive(names) {
 			clearTimeout(digitTimer);
 			stdin.off('keypress', onKeypress);
 			stdout.off('resize', render);
+			process.off('SIGTERM', onSigterm);
 			stdin.setRawMode(false);
 			stdin.pause();
 			clear();
@@ -139,7 +167,7 @@ function pickInteractive(names) {
 			down: () => move((index + 1) % matches.length),
 			home: () => move(0),
 			end: () => move(matches.length - 1),
-			backspace: () => setFilter(filter.slice(0, -1)),
+			backspace: () => filter && setFilter(filter.slice(0, -1)),
 			escape: () => (filter ? setFilter('') : finish(undefined)),
 			return: () => matches[index] && finish(matches[index]),
 		};
@@ -149,6 +177,7 @@ function pickInteractive(names) {
 
 			if (key.ctrl && key.name === 'c') return finish(undefined);
 
+			// Digits jump to a row rather than extending the filter, so a number stays a quick way to pick.
 			const action = keyActions[key.name];
 			if (action) action();
 			else if (/^\d$/.test(key.sequence)) onDigit(key.sequence);
@@ -163,6 +192,7 @@ function pickInteractive(names) {
 		stdin.resume();
 		stdin.on('keypress', onKeypress);
 		stdout.on('resize', render);
+		process.on('SIGTERM', onSigterm);
 		stdout.write('\x1b[?25l');
 		render();
 	});
@@ -217,7 +247,15 @@ function startExample(name) {
  */
 async function pickExampleUI() {
 	// Find sub folder:
-	const exampleFolderNames = await getDirectories(`${exampleDirectory}`);
+	let exampleFolderNames;
+	try {
+		exampleFolderNames = await getDirectories(exampleDirectory);
+	} catch (error) {
+		if (error.code !== 'ENOENT') throw error;
+		console.error(`Could not find the "${exampleDirectory}" directory. Run this from src/Umbraco.Web.UI.Client.`);
+		process.exitCode = 1;
+		return;
+	}
 
 	// An example name passed on the command line skips the picker:
 	const requested = process.argv[2];
