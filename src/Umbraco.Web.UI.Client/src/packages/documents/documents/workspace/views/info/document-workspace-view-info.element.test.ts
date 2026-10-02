@@ -48,7 +48,7 @@ class UmbTestDocumentWorkspaceContext {
 		return UMB_DOCUMENT_ENTITY_TYPE;
 	}
 
-	getContentTypeId() {
+	getContentTypeUnique() {
 		return 'document-type-1';
 	}
 
