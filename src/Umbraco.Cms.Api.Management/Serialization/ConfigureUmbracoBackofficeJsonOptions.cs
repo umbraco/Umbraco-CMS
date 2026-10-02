@@ -51,6 +51,9 @@ public class ConfigureUmbracoBackofficeJsonOptions : IConfigureNamedOptions<Json
         options.JsonSerializerOptions.Converters.Add(new JsonUdiRangeConverter());
         options.JsonSerializerOptions.Converters.Add(new ValidationProblemDetailsConverter());
         options.JsonSerializerOptions.Converters.Add(new JsonObjectConverter());
+        options.JsonSerializerOptions.Converters.Add(new ContentModelBaseConverterFactory());
+        options.JsonSerializerOptions.Converters.Add(new BlockItemDataConverter());
+        options.JsonSerializerOptions.Converters.Add(new BlockItemVariationListConverter());
 
         options.JsonSerializerOptions.TypeInfoResolver = _umbracoJsonTypeInfoResolver;
 
