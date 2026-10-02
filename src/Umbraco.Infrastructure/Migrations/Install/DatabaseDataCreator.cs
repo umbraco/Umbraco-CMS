@@ -1450,6 +1450,7 @@ internal sealed class DatabaseDataCreator
                 StartMediaId = -1,
                 StartContentId = -1,
                 StartElementId = -1,
+                StartDocumentBlueprintId = -1,
                 Alias = EditorGroupAlias,
                 Name = "Editors",
                 Description = "Users with full permission to create, update and publish content",
