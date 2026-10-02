@@ -24,6 +24,10 @@ export class ContentRenderUiHelper extends UiBaseLocators {
     }
   }
 
+  async doesContentRenderValueNotContainText(text: string) {
+    await this.doesNotContainText(this.contentRenderValue, text);
+  }
+
   async doesContentRenderValueHaveImage(src: string, width: number, height: number) {
     const imageSrc = src + '?width=' + width.toString() + '&height=' + height.toString();
     const actualSrc = await this.contentRenderValue.locator('img').getAttribute('src');

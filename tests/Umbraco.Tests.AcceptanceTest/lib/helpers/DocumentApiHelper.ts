@@ -183,11 +183,37 @@ export class DocumentApiHelper {
     return await this.unpublish(id, [culture]);
   }
 
-  async getDocumentUrl(id: string) {
+  private async getDocumentUrlInfos(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/urls?id=' + id);
     const urls = await response.json();
+    return urls[0]?.urlInfos ?? [];
+  }
 
-    return urls[0].urlInfos[0].url;
+  /**
+   * Returns the document's URL. Throws if the document has no published URL yet.
+   */
+  async getDocumentUrl(id: string) {
+    const urlInfos = await this.getDocumentUrlInfos(id);
+
+    if (!urlInfos[0]?.url) {
+      throw new Error(`No URL found for document '${id}'.`);
+    }
+
+    return urlInfos[0].url;
+  }
+
+  /**
+   * Returns the document's URL for the given culture. Throws if that culture has no published URL yet.
+   */
+  async getDocumentUrlByCulture(id: string, culture: string) {
+    const urlInfos = await this.getDocumentUrlInfos(id);
+    const urlInfo = urlInfos.find(info => info.culture === culture);
+
+    if (!urlInfo?.url) {
+      throw new Error(`No URL found for document '${id}' and culture '${culture}'.`);
+    }
+
+    return urlInfo.url;
   }
 
   async moveToRecycleBin(id: string) {
@@ -1612,6 +1638,24 @@ export class DocumentApiHelper {
     };
 
     return await this.publish(id, publishScheduleData);
+  }
+
+  async createVariantDocumentWithTemplateAndParent(name: string, documentTypeId: string, templateId: string, cultures: string[], parentId?: string) {
+    await this.ensureNameNotExists(name);
+
+    const documentBuilder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .withTemplateId(templateId);
+
+    if (parentId) {
+      documentBuilder.withParentId(parentId);
+    }
+
+    for (const culture of cultures) {
+      documentBuilder.addVariant().withName(name).withCulture(culture).done();
+    }
+
+    return await this.create(documentBuilder.build());
   }
 
   async createDocumentWithTextContentAndParent(documentName: string, documentTypeId: string, textContent: string, dataTypeName: string, parentId: string) {
