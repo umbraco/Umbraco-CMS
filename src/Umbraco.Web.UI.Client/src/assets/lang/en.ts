@@ -256,6 +256,8 @@ export default {
 		noItemsTitle: 'No items',
 		addCollectionConfiguration: 'Add collection',
 		cardViewLabel: 'Cards',
+		gridViewLabel: 'Grid',
+		listViewLabel: 'List',
 		tableViewLabel: 'Table',
 	},
 	content: {
@@ -325,6 +327,8 @@ export default {
 		unpublish: 'Unpublish',
 		unpublished: 'Unpublished',
 		notCreated: 'Not created',
+		segmentHasContent: 'Has segmented content',
+		segmentNoContent: 'No content',
 		updateDate: 'Last edited',
 		updateDateDesc: 'Date/time this document was edited',
 		uploadClear: 'Clear file(s)',
@@ -3250,8 +3254,6 @@ export default {
 		resultsCount: (count: number) => `Found ${count} result${count !== 1 ? 's' : ''}`,
 		tableColumnName: 'Name',
 		tableColumnEntityType: 'Type',
-		statsBoxLabel: 'Statistics',
-		searchBoxLabel: 'Search',
 		// Accessibility labels
 		searching: 'Searching...',
 		searchFailed: 'Search failed',

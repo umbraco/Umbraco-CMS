@@ -34,7 +34,6 @@ export class UmbElementMockDB extends UmbEntityMockDbBase<UmbMockElementModel> {
 	getConfiguration(): ElementConfigurationResponseModel {
 		return {
 			allowEditInvariantFromNonDefault: true,
-			allowNonExistingSegmentsCreation: false,
 			disableDeleteWhenReferenced: true,
 			disableUnpublishWhenReferenced: true,
 		};

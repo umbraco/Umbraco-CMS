@@ -1,10 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Configuration.Models.Validation;
 
@@ -16,15 +14,6 @@ public class ContentSettingsValidator : ConfigurationValidatorBase, IValidateOpt
     private readonly ILogger<ContentSettingsValidator> _logger;
 
     private string? _lastCheckedPreviewBadge;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentSettingsValidator" /> class.
-    /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public ContentSettingsValidator()
-        : this(StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentSettingsValidator>>())
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentSettingsValidator" /> class.

@@ -1,11 +1,15 @@
 import { UMB_SEARCH_WORKSPACE_CONTEXT } from '../workspace/search-workspace.context-token.js';
 import type { UmbHealthStatusModel, UmbSearchIndexState } from '../types.js';
-import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { ManifestSearchIndexDetailBox } from './types.js';
+import { html, customElement, property, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-search-index-stats-box')
 export class UmbSearchIndexStatsBoxElement extends UmbLitElement {
+	@property({ type: Object, attribute: false })
+	public manifest?: ManifestSearchIndexDetailBox;
+
 	#workspaceContext?: typeof UMB_SEARCH_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
@@ -97,8 +101,11 @@ export class UmbSearchIndexStatsBoxElement extends UmbLitElement {
 	}
 
 	override render() {
+		const headline = this.manifest?.meta?.label
+			? this.localize.string(this.manifest.meta.label)
+			: (this.manifest?.name ?? '');
 		return html`
-			<uui-box headline=${this.localize.term('searchManagement_indexInfo')}>
+			<uui-box headline=${headline}>
 				<div class="stats-grid">
 					<div class="stat-item">
 						<strong><umb-localize key="searchManagement_indexAlias">Alias</umb-localize></strong>

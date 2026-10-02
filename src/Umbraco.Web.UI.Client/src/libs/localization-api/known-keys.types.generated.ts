@@ -448,6 +448,8 @@ declare global {
 		codefile_deleteItemFailed: string;
 		collection_addCollectionConfiguration: string;
 		collection_cardViewLabel: string;
+		collection_gridViewLabel: string;
+		collection_listViewLabel: string;
 		collection_noItemsTitle: string;
 		collection_tableViewLabel: string;
 		colorpicker_noColors: string;
@@ -560,6 +562,8 @@ declare global {
 		content_scheduledPublishing: string;
 		content_scheduledPublishServerTime: string;
 		content_schedulePublishHelp: string;
+		content_segmentHasContent: string;
+		content_segmentNoContent: string;
 		content_selectAllVariants: string;
 		content_sendForApproval: string;
 		content_setDate: string;
@@ -1971,7 +1975,6 @@ declare global {
 		searchManagement_resultsRegion: string;
 		searchManagement_resultsTable: string;
 		searchManagement_searchBox: string;
-		searchManagement_searchBoxLabel: string;
 		searchManagement_searchButton: string;
 		searchManagement_searchButtonAriaLabel: string;
 		searchManagement_searchComplete: (count: number) => string;
@@ -1984,7 +1987,6 @@ declare global {
 		searchManagement_searchInputAriaLabel: (indexAlias: string) => string;
 		searchManagement_searchInputLabel: string;
 		searchManagement_searchPlaceholder: string;
-		searchManagement_statsBoxLabel: string;
 		searchManagement_tableColumnAlias: string;
 		searchManagement_tableColumnDocumentCount: string;
 		searchManagement_tableColumnEntityType: string;

@@ -38,14 +38,14 @@ public class AncestorsDocumentItemController : DocumentItemControllerBase
             return Ok(Enumerable.Empty<ItemAncestorsResponseModel<DocumentItemResponseModel>>());
         }
 
-        IEnumerable<ItemAncestorsResponseModel<DocumentItemResponseModel>> result = await _itemAncestorService.GetAncestorsAsync(
+        IEnumerable<ItemAncestorsResponseModel<DocumentItemResponseModel>> result = await _itemAncestorService.GetAncestorsAsync<DocumentItemResponseModel>(
             UmbracoObjectTypes.Document,
             null,
             ids,
-            ancestors => Task.FromResult(
+            async ancestors => await Task.WhenAll(
                 ancestors
                     .OfType<IDocumentEntitySlim>()
-                    .Select(_documentPresentationFactory.CreateItemResponseModel)));
+                    .Select(_documentPresentationFactory.CreateItemResponseModelAsync)));
 
         return Ok(result);
     }

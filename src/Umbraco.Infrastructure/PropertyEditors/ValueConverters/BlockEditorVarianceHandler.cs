@@ -92,29 +92,6 @@ public sealed class BlockEditorVarianceHandler
     }
 
     /// <summary>
-    /// Aligns a block property value for variance changes.
-    /// </summary>
-    /// <param name="blockPropertyValue">The block property value to align.</param>
-    /// <param name="propertyType">The underlying property type.</param>
-    /// <param name="owner">The containing block element.</param>
-    /// <returns>A task representing the asynchronous operation. The task result contains the aligned <see cref="BlockPropertyValue"/>, or <c>null</c> if alignment is not applicable.</returns>
-    [Obsolete("Please use the overload that aligns all property values of a block element. Scheduled for removal in Umbraco 19.")]
-    public async Task<BlockPropertyValue?> AlignedPropertyVarianceAsync(BlockPropertyValue blockPropertyValue, IPublishedPropertyType propertyType, IPublishedElement owner)
-    {
-        var defaultCulture = await _languageService.GetDefaultIsoCodeAsync();
-
-        if (owner.ContentType.VariesByCulture() is false
-            && VariesByCulture(blockPropertyValue)
-            && blockPropertyValue.Culture.InvariantEquals(defaultCulture) is false)
-        {
-            // variant property for a non-default language in an invariant context - do not use
-            return null;
-        }
-
-        return Aligned(blockPropertyValue, propertyType, owner, blockPropertyValue.Culture, defaultCulture);
-    }
-
-    /// <summary>
     /// Aligns the property values of a block element for variance changes.
     /// </summary>
     /// <param name="blockPropertyValues">The block property values to align.</param>
@@ -195,17 +172,6 @@ public sealed class BlockEditorVarianceHandler
     /// <param name="blockValue">The block property value to align for variance.</param>
     /// <param name="owner">The owner element, which is either the content for block properties at the content level or the parent element for nested block properties.</param>
     /// <param name="element">The block element containing the property.</param>
-    /// <returns>A task representing the asynchronous operation, with a result containing the aligned <see cref="BlockItemVariation"/> instances for the specified block element.</returns>
-    [Obsolete("Please use the overload that takes the culture of the owning property value. Scheduled for removal in Umbraco 19.")]
-    public Task<IEnumerable<BlockItemVariation>> AlignedExposeVarianceAsync(BlockValue blockValue, IPublishedElement owner, IPublishedElement element)
-        => AlignedExposeVarianceAsync(blockValue, owner, element, culture: null);
-
-    /// <summary>
-    /// Aligns a block value for variance changes.
-    /// </summary>
-    /// <param name="blockValue">The block property value to align for variance.</param>
-    /// <param name="owner">The owner element, which is either the content for block properties at the content level or the parent element for nested block properties.</param>
-    /// <param name="element">The block element containing the property.</param>
     /// <param name="culture">The culture of the owning property value, or <c>null</c> when the owning property does not vary by culture.</param>
     /// <returns>A task representing the asynchronous operation, with a result containing the aligned <see cref="BlockItemVariation"/> instances for the specified block element.</returns>
     /// <remarks>
@@ -247,14 +213,6 @@ public sealed class BlockEditorVarianceHandler
 
         return blockVariations;
     }
-
-    /// <summary>
-    /// Aligns block value expose for variance changes.
-    /// </summary>
-    /// <param name="blockValue">The block value to align.</param>
-    [Obsolete("Please use the overload that takes the culture being aligned. Scheduled for removal in Umbraco 19.")]
-    public void AlignExposeVariance(BlockValue blockValue)
-        => AlignExposeVariance(blockValue, culture: null);
 
     /// <summary>
     /// Aligns block value expose for variance changes.
