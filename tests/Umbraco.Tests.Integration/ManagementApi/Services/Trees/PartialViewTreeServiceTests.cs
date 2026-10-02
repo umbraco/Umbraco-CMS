@@ -44,6 +44,37 @@ public class PartialViewTreeServiceTests : FileSystemTreeServiceTestsBase
     }
 
     [Test]
+    public void Can_Get_Ancestors_Of_Rooted_Path_Starting_At_Top_Level_Item()
+    {
+        using var stream = CreateStream();
+        TestFileSystem.AddFile(Path.Join("blockgrid", $"area{FileExtension}"), stream);
+        var service = new PartialViewTreeService(FileSystems);
+
+        var path = $"{Path.DirectorySeparatorChar}{Path.Join("blockgrid", $"area{FileExtension}")}";
+        FileSystemTreeItemPresentationModel[] treeModels = service.GetAncestorModels(path, true);
+
+        Assert.AreEqual(2, treeModels.Length);
+        Assert.AreEqual("blockgrid", treeModels[0].Name);
+        Assert.AreEqual("/blockgrid", treeModels[0].Path);
+        Assert.IsNull(treeModels[0].Parent);
+        Assert.AreEqual($"area{FileExtension}", treeModels[1].Name);
+        Assert.AreEqual("/blockgrid", treeModels[1].Parent?.Path);
+    }
+
+    [Test]
+    public void Can_Get_Ancestors_Of_Rooted_Top_Level_File_Without_Parent()
+    {
+        var service = new PartialViewTreeService(FileSystems);
+
+        var path = $"{Path.DirectorySeparatorChar}file5{FileExtension}";
+        FileSystemTreeItemPresentationModel[] treeModels = service.GetAncestorModels(path, true);
+
+        Assert.AreEqual(1, treeModels.Length);
+        Assert.AreEqual($"file5{FileExtension}", treeModels[0].Name);
+        Assert.IsNull(treeModels[0].Parent);
+    }
+
+    [Test]
     public void Can_Get_PathViewModels()
     {
         var service = new PartialViewTreeService(FileSystems);
