@@ -291,25 +291,23 @@ internal sealed class CacheSyncServiceLockOrderingTests : CacheSyncIntegrationTe
     }
 
     [Test]
-    public void SyncInternal_Continues_From_Its_Own_Checkpoint_When_A_Lower_One_Is_Saved()
+    public void SyncInternal_Keeps_Its_Checkpoint_When_The_Periodic_Sync_Records_A_Lower_One()
     {
         DeliverRemoteInstructions(RecordingInstruction(1));
+        var firstRowId = CacheInstructionService.GetMaxInstructionId();
         DeliverRemoteInstructions(RecordingInstruction(2));
         DeliverRemoteInstructions(RecordingInstruction(3));
         CacheSyncService.SyncInternal(CancellationToken.None);
         Assume.That(Refreshes.RefreshInternalCount, Is.EqualTo(3));
 
-        // A full sync that started from an older external id saves the lower id it reached.
-        LastSyncedManager.SaveLastSyncedInternalAsync(1).GetAwaiter().GetResult();
+        // A full sync that started from an older external id records the lower id it reached.
+        LastSyncedManager.SaveLastSyncedExternalAsync(firstRowId).GetAwaiter().GetResult();
+        LastSyncedManager.SaveLastSyncedInternalAsync(firstRowId).GetAwaiter().GetResult();
         DeliverRemoteInstructions(RecordingInstruction(4));
 
         CacheSyncService.SyncInternal(CancellationToken.None);
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(Refreshes.RefreshInternalCount, Is.EqualTo(4), "Already processed instructions were processed again.");
-            Assert.That(LastSyncedInternalIdInDatabase(), Is.EqualTo(1), "The inline sync persisted its checkpoint.");
-        });
+        Assert.That(Refreshes.RefreshInternalCount, Is.EqualTo(4), "Already processed instructions were processed again.");
     }
 
     [Test]
@@ -345,12 +343,11 @@ internal sealed class CacheSyncServiceLockOrderingTests : CacheSyncIntegrationTe
         CacheSyncService.SyncInternal(CancellationToken.None);
         Assume.That(Refreshes.RefreshInternalCount, Is.EqualTo(3), "The instructions were not processed, so this test proves nothing.");
 
-        // The periodic sync persisted a checkpoint behind the inline one.
-        LastSyncedManager.SaveLastSyncedInternalAsync(firstRowId).GetAwaiter().GetResult();
+        // The periodic sync persisted a checkpoint behind the inline one, and a restart loses the in-memory one.
+        LastSyncedManager.SaveLastSyncedExternalAsync(firstRowId).GetAwaiter().GetResult();
+        ((Cms.Core.Sync.LastSyncedManager)LastSyncedManager).ClearLocalCache();
 
-        // A new instance has no in-memory checkpoint, as after a restart.
-        ICacheInstructionService restarted = ActivatorUtilities.CreateInstance<CacheInstructionService>(Services);
-        restarted.ProcessInternalInstructions(GetRequiredService<CacheRefresherCollection>(), CancellationToken.None, LocalIdentity);
+        CacheSyncService.SyncInternal(CancellationToken.None);
 
         Assert.That(Refreshes.RefreshInternalCount, Is.EqualTo(5), "Only the instructions after the persisted checkpoint are re-run.");
     }

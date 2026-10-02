@@ -32,7 +32,6 @@ namespace Umbraco.Cms
             private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
             private readonly IProfilingLogger _profilingLogger;
             private readonly Lock _syncLock = new();
-            private int _inlineCheckpoint;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
@@ -235,11 +234,7 @@ namespace Umbraco.Cms
             ///     <see cref="ProcessAllInstructions" /> holds <c>_syncLock</c> and takes those same locks. So this must never
             ///     wait for <c>_syncLock</c>, take distributed locks or write to the database: payload instructions run only
             ///     the in-memory <see cref="IJsonCacheRefresher.RefreshInternal(string)" />, id-based instructions run their
-            ///     in-memory refresh, and the checkpoint reached is kept in memory only. A write would join the caller's
-            ///     transaction and hold this server's umbracoLastSynced row until that transaction commits, which couples
-            ///     every concurrent inline sync on the server to it. The in-memory checkpoint starts from the one
-            ///     <see cref="ProcessAllInstructions" /> persisted, so after a restart the inline sync re-runs at most one
-            ///     sync interval of idempotent in-memory refreshes. The cache versions are read before the instructions and
+            ///     in-memory refresh, and <see cref="ILastSyncedManager" /> keeps the internal checkpoint in memory. The cache versions are read before the instructions and
             ///     adopted only once every pending instruction has been processed, so a read arriving while instructions
             ///     are being processed still finds its cache out of date and syncs itself; a full page of pending
             ///     instructions leaves the versions unadopted until the remainder is processed.
@@ -253,12 +248,14 @@ namespace Umbraco.Cms
                 {
                     IReadOnlyCollection<RepositoryCacheVersion> cacheVersions = _repositoryCacheVersionService.GetCacheVersionsAsync().GetAwaiter().GetResult();
                     // TODO: Is this nececary? Or can we simply include it in LastSynced manager, it's already atomic, we can just make that not-persist.
-                    var lastId = Math.Max(
-                        Volatile.Read(ref _inlineCheckpoint),
-                        _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0);
+                    var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
+                    var previousLastId = lastId;
                     var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.IsolatedCachesOnly, ref lastId, out var processedAllPending);
 
-                    RaiseInlineCheckpoint(lastId);
+                    if (lastId > 0 && lastId != previousLastId)
+                    {
+                        _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                    }
 
                     if (processedAllPending)
                     {
@@ -266,21 +263,6 @@ namespace Umbraco.Cms
                     }
 
                     return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
-                }
-            }
-
-            private void RaiseInlineCheckpoint(int lastId)
-            {
-                var current = Volatile.Read(ref _inlineCheckpoint);
-                while (lastId > current)
-                {
-                    var seen = Interlocked.CompareExchange(ref _inlineCheckpoint, lastId, current);
-                    if (seen == current)
-                    {
-                        return;
-                    }
-
-                    current = seen;
                 }
             }
 
