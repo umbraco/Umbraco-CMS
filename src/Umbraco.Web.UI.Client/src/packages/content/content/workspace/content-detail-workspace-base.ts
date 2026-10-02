@@ -368,7 +368,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {
 			this.observe(
 				appLanguageContext?.languages,
-				(languages) => this.variantOptionsManager.setLanguages(languages ?? []),
+				(languages) => {
+					this.variantOptionsManager.setLanguages(languages);
+				},
 				null,
 			);
 		});

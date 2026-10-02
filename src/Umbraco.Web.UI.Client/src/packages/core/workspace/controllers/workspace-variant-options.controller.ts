@@ -7,14 +7,14 @@ import {
 } from '@umbraco-cms/backoffice/variant';
 import { mergeObservables, UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import { filter, map } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbWorkspaceVariantOptionsController<
 	VariantModelType extends UmbEntityVariantModel,
 	VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantModelType>,
 > extends UmbControllerBase {
 	/* Languages */
-	#languages = new UmbArrayState<UmbLanguageDetailModel, string, undefined>([], (x) => x.unique);
+	#languages = new UmbArrayState<UmbLanguageDetailModel, string, undefined>(undefined, (x) => x.unique);
 
 	/**
 	 * @private
@@ -29,17 +29,21 @@ export class UmbWorkspaceVariantOptionsController<
 		this.#languages.setValue(languages);
 	}
 
-	#variantOptions = new UmbArrayState<Omit<VariantOptionModelType, 'language'>>([], (x) => x.unique);
+	#variantOptions = new UmbArrayState<Omit<VariantOptionModelType, 'language'>, string, undefined>(
+		undefined,
+		(x) => x.unique,
+	);
 
 	public variantOptions = mergeObservables(
 		[this.#variantOptions.asObservable(), this.languages],
 		([option, languages]) => {
+			if (option === undefined || languages === undefined) return undefined;
 			return option.map((opt) => {
 				const lang = languages?.find((x) => x.unique === opt.culture);
 				return { ...opt, language: lang };
 			});
 		},
-	) as Observable<Array<VariantOptionModelType>>;
+	).pipe(filter((options) => options !== undefined)) as Observable<Array<VariantOptionModelType>>;
 
 	#currentCoreUniques?: Array<string>;
 
@@ -52,39 +56,41 @@ export class UmbWorkspaceVariantOptionsController<
 		super(host);
 
 		this.observe(
-			mergeObservables(
-				[varyByCulture, varyBySegment, variants, this.languages],
-				([varyByCulture, varyBySegment, variants, languages]) => {
-					this.#variantOptions.mute();
+			mergeObservables([varyByCulture, varyBySegment, variants, this.languages], (sources) => sources),
+			([varyByCulture, varyBySegment, variants, languages]) => {
+				const newVariantOptions = this.#processLanguageVariantOptions(
+					varyByCulture,
+					varyBySegment,
+					variants,
+					languages,
+				);
 
-					const newVariantOptions = this.#processLanguageVariantOptions(
-						varyByCulture,
-						varyBySegment,
-						variants,
-						languages,
+				// Still loading, keep what we have until the core options can be computed.
+				if (newVariantOptions === undefined) return;
+
+				this.#variantOptions.mute();
+
+				if (newVariantOptions) {
+					// Figure out which to be removed:
+					const removedVariantOptions = this.#currentCoreUniques?.filter(
+						(unique) => !newVariantOptions.some((newOption) => newOption.unique === unique),
 					);
 
-					if (newVariantOptions) {
-						// Figure out which to be removed:
-						const removedVariantOptions = this.#currentCoreUniques?.filter(
-							(unique) => !newVariantOptions.some((newOption) => newOption.unique === unique),
-						);
-
-						if (removedVariantOptions) {
-							this.#variantOptions.remove(removedVariantOptions);
-						}
-
-						this.#variantOptions.append(newVariantOptions);
-					} else if (this.#currentCoreUniques) {
-						// Since no options, then remove all previous ones:
-						this.#variantOptions.remove(this.#currentCoreUniques);
+					if (removedVariantOptions) {
+						this.#variantOptions.remove(removedVariantOptions);
 					}
 
-					this.#currentCoreUniques = newVariantOptions?.map((x) => x.unique) ?? [];
+					this.#variantOptions.append(newVariantOptions);
+				} else if (this.#currentCoreUniques) {
+					// Since no options, then remove all previous ones:
+					this.#variantOptions.remove(this.#currentCoreUniques);
+				}
 
-					this.#variantOptions.unmute();
-				},
-			),
+				this.#currentCoreUniques = newVariantOptions?.map((x) => x.unique) ?? [];
+
+				this.#variantOptions.unmute();
+			},
+			null,
 		);
 	}
 
@@ -96,7 +102,7 @@ export class UmbWorkspaceVariantOptionsController<
 	) {
 		// Are we in a loading phase?
 		if (languages === undefined || varyByCulture === undefined || varyBySegment === undefined) {
-			return [];
+			return undefined;
 		}
 
 		const varies = varyByCulture || varyBySegment;
