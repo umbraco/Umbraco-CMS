@@ -34,8 +34,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// a rebuild, and we have future-proofing in case the alias parsing logic changes in future versions.
     /// Bumped to "2" so that installs which persisted draft alias values (before aliases were restricted to the
     /// published property value, see #23206) rebuild once on startup and flush the stale entries.
+    /// Bumped to "3" so that installs which persisted aliases of unpublished documents (before aliases were
+    /// restricted to published documents, see #23948) rebuild once on startup and flush the stale entries.
     /// </remarks>
-    private const string CurrentRebuildValue = "2";
+    private const string CurrentRebuildValue = "3";
 
     private readonly ILogger<DocumentUrlAliasService> _logger;
     private readonly IDocumentUrlAliasRepository _documentUrlAliasRepository;
@@ -362,7 +364,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         List<PublishedDocumentUrlAlias> aliases = document.Trashed || document.PublishedState == PublishedState.Unpublishing
             ? []
-            : await ExtractAliasesFromDocumentAsync(document);
+            : document.PublishedState == PublishedState.Publishing
+                ? await ExtractPublishedAliasesAsync(document)
+                : await ExtractAliasesFromDocumentAsync(document);
 
         if (aliases.Count > 0)
         {
@@ -548,6 +552,26 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     }
 
     private async Task<List<PublishedDocumentUrlAlias>> ExtractAliasesFromDocumentAsync(IContent document)
+    {
+        // An unpublished document keeps the property values of its last published version,
+        // so GetValue(published: true) alone would still return its former alias.
+        if (document.Published is false)
+        {
+            return [];
+        }
+
+        return await ExtractPublishedAliasesAsync(document);
+    }
+
+    /// <summary>
+    /// Extracts the aliases from the published property values of a document, without checking whether the document
+    /// is published.
+    /// </summary>
+    /// <remarks>
+    /// Used directly for a document that is being published, whose published flag is only set once it has been
+    /// persisted, after the aliases are written.
+    /// </remarks>
+    private async Task<List<PublishedDocumentUrlAlias>> ExtractPublishedAliasesAsync(IContent document)
     {
         var aliases = new List<PublishedDocumentUrlAlias>();
 
