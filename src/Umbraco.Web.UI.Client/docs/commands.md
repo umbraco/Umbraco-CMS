@@ -47,6 +47,12 @@ npm run dev:server
 # Start dev server with MSW mocks (default)
 npm run dev:mock
 
+# Pick an example and start the dev server with it loaded
+npm run example
+
+# Same, but with MSW mocks
+npm run example:mock
+
 # Preview production build
 npm run preview
 ```

@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import { readdir } from 'fs/promises';
 
 const exampleDirectory = 'examples';
+const useMock = process.argv.includes('--mock');
 
 const getDirectories = async (source) =>
   (await readdir(source, { withFileTypes: true }))
@@ -40,7 +41,7 @@ async function pickExampleUI(){
 
 		// Start vite server:
 		try {
-			execSync('npm run dev', {stdio: 'inherit'});
+			execSync(useMock ? 'npm run dev:mock' : 'npm run dev', {stdio: 'inherit'});
 		} catch (error) {
 			// Nothing, cause this is most likely just the server being stopped.
 			//console.log(error);
