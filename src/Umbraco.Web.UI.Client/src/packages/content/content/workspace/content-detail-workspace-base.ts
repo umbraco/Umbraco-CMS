@@ -388,6 +388,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
+		data = await super._processIncomingData(data);
 		const contentTypeUnique: string | undefined = (data as any)[this.#contentTypePropertyName].unique;
 		if (!contentTypeUnique) {
 			throw new Error(`Could not find content type unique on property '${this.#contentTypePropertyName}'`);
