@@ -149,43 +149,43 @@ export class UmbLocalizationRegistry {
 				// unsubscribes from the previous load. Unsubscribing cannot stop a promise that is already
 				// running, so the teardown marks the load as superseded and its result is dropped. This also
 				// applies when the registry is destroyed, so a late load never overwrites newer state.
-				switchMap(
-					(extensions) =>
-						new Observable<void>((subscriber) => {
-							let superseded = false;
+				switchMap((extensions) =>
+					new Observable<void>((subscriber) => {
+						let superseded = false;
 
-							(async () => {
-								// Load all localizations
-								const translations = await Promise.all(extensions.map(this.#loadExtension));
+						(async () => {
+							// Load all localizations
+							const translations = await Promise.all(extensions.map(this.#loadExtension));
 
-								// If a newer language was selected, or there are no translations, return early
-								if (superseded || !translations.length) return;
+							// If a newer language was selected, or there are no translations, return early
+							if (superseded || !translations.length) return;
 
-								// Sort translations by their original extension weight (highest-to-lowest)
-								// This ensures that the translations with the lowest weight override the others
-								translations.sort((a, b) => b.$weight - a.$weight);
+							// Sort translations by their original extension weight (highest-to-lowest)
+							// This ensures that the translations with the lowest weight override the others
+							translations.sort((a, b) => b.$weight - a.$weight);
 
-								// Load the translations into the localization manager
-								umbLocalizationManager.registerManyLocalizations(translations);
+							// Load the translations into the localization manager
+							umbLocalizationManager.registerManyLocalizations(translations);
 
-								// Set the browser language and direction based on the translations
-								this.#setBrowserLanguage(locale!, translations);
-							})().then(
-								() => subscriber.complete(),
-								(error) => subscriber.error(error),
-							);
+							// Set the browser language and direction based on the translations
+							this.#setBrowserLanguage(locale!, translations);
+						})().then(
+							() => subscriber.complete(),
+							(error) => subscriber.error(error),
+						);
 
-							return () => {
-								superseded = true;
-							};
+						return () => {
+							superseded = true;
+						};
+					}).pipe(
+						// Caught on the inner observable so that an error only drops this load; caught on
+						// the outer pipe it would complete the subscription and stop all later language loads.
+						catchError((error) => {
+							console.error('Error loading translations:', error);
+							return of(undefined);
 						}),
+					),
 				),
-				// Catch any errors that occur while loading the translations
-				// This is important to ensure that the observable does not error out and stop the subscription
-				catchError((error) => {
-					console.error('Error loading translations:', error);
-					return of([]);
-				}),
 			)
 			// Subscribe to the observable to trigger the loading of translations
 			.subscribe();
@@ -202,13 +202,18 @@ export class UmbLocalizationRegistry {
 		}
 
 		// If extension contains a js file, load it and add the default dictionary to the inner dictionary.
+		// A failing file (e.g. a 404 on a stale chunk after a deploy) must not take down the other dictionaries.
 		if (extension.js) {
-			const loadedExtension = await loadManifestPlainJs(extension.js);
+			try {
+				const loadedExtension = await loadManifestPlainJs(extension.js);
 
-			if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
-				for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
-					addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
+				if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
+					for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
+						addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
+					}
 				}
+			} catch (error) {
+				console.error(`Localization extension "${extension.alias}" failed to load and was skipped:`, error);
 			}
 		}
 

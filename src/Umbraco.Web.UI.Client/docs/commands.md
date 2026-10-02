@@ -167,7 +167,7 @@ npm run storybook:preview
 ### Package Management
 
 ```bash
-# Validate package exports
+# Validate package exports and the extension template's @hey-api/openapi-ts version
 npm run package:validate
 
 # Prepare for npm publish

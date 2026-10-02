@@ -10,7 +10,7 @@ import { UUIButtonElement } from "@umbraco-cms/backoffice/external/uui";
 import { UMB_NOTIFICATION_CONTEXT } from "@umbraco-cms/backoffice/notification";
 import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from "@umbraco-cms/backoffice/current-user";
 import { tryExecute } from "@umbraco-cms/backoffice/resources";
-import { UmbracoExtensionService, UserModel } from "../api/index.js";
+import { getWhoAmI, getWhatsTheTimeMrWolf, getWhatsMyName, WhoAmIResponseModel } from "../api/index.js";
 
 @customElement("example-dashboard")
 export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
@@ -21,7 +21,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
   private _timeFromMrWolf?: Date;
 
   @state()
-  private _serverUserData?: UserModel;
+  private _serverUserData?: WhoAmIResponseModel;
 
   @state()
   private _contextCurrentUser?: UmbCurrentUserModel;
@@ -53,26 +53,22 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
     const buttonElement = ev.target as UUIButtonElement;
     buttonElement.state = "waiting";
 
-    const { data, error } = await tryExecute(this, UmbracoExtensionService.whoAmI());
+    const { data, error } = await tryExecute(this, getWhoAmI());
 
-    if (error) {
+    if (error || !data) {
       buttonElement.state = "failed";
       return;
     }
 
-    if (data !== undefined) {
-      this._serverUserData = data as UserModel;
-      buttonElement.state = "success";
-    }
+    this._serverUserData = data;
+    buttonElement.state = "success";
 
-    if (this.#notificationContext) {
-      this.#notificationContext.peek("warning", {
-        data: {
-          headline: `You are ${this._serverUserData?.name}`,
-          message: `Your email is ${this._serverUserData?.email}`,
-        },
-      });
-    }
+    this.#notificationContext?.peek("warning", {
+      data: {
+        headline: `You are ${data.name}`,
+        message: `Your email is ${data.email}`,
+      },
+    });
   };
 
   #onClickWhatsTheTimeMrWolf = async (ev: Event) => {
@@ -80,7 +76,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
     buttonElement.state = "waiting";
 
     // Getting a string - should I expect a datetime?!
-    const { data, error } = await tryExecute(this, UmbracoExtensionService.whatsTheTimeMrWolf());
+    const { data, error } = await tryExecute(this, getWhatsTheTimeMrWolf());
 
     if (error) {
       buttonElement.state = "failed";
@@ -97,7 +93,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
     const buttonElement = ev.target as UUIButtonElement;
     buttonElement.state = "waiting";
 
-    const { data, error } = await tryExecute(this, UmbracoExtensionService.whatsMyName());
+    const { data, error } = await tryExecute(this, getWhatsMyName());
 
     if (error) {
       buttonElement.state = "failed";
@@ -118,8 +114,8 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
             : "Press the button!"}
         </h2>
         <ul>
-          ${this._serverUserData?.groups.map(
-            (group) => html`<li>${group.name}</li>`
+          ${this._serverUserData?.groups?.map(
+            (group) => html`<li>${group}</li>`
           )}
         </ul>
         <uui-button
