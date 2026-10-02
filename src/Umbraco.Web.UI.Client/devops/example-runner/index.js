@@ -23,14 +23,17 @@ function pickInteractive(names) {
 		};
 
 		const render = () => {
-			clear();
 			const rows = names.map((name, i) => {
 				const number = String(i + 1).padStart(2);
 				return i === index
 					? `\x1b[36m ❯ ${number}  ${name}\x1b[0m`
 					: `   ${number}  ${name}`;
 			});
-			stdout.write(`\x1b[36m?\x1b[0m Select an example (↑/↓, number, Enter)\n${rows.join('\n')}\n`);
+			const lines = [`\x1b[36m?\x1b[0m Select an example (↑/↓, number, Enter)`, ...rows];
+
+			// Overwrite the previous frame in place, in a single write, so the list is never blanked between frames.
+			const moveUp = hasRendered ? `\x1b[${lines.length}A` : '';
+			stdout.write(moveUp + lines.map(line => `${line}\x1b[K\n`).join(''));
 			hasRendered = true;
 		};
 
