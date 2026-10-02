@@ -312,6 +312,11 @@ export class UserApiHelper {
     return await response.json();
   }
 
+  async filterByUserKinds(userKinds: string) {
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/filter/user?skip=0&take=100&userKinds=' + userKinds);
+    return await response.json();
+  }
+
   async doesUserContainElementStartNodeIds(userName: string, elementStartNodeIds: string[]) {
     const user = await this.getByName(userName);
     if (!user.elementStartNodeIds || user.elementStartNodeIds.length === 0) {
