@@ -2,11 +2,13 @@ import {
 	UMB_BLOCK_ENTRY_HAS_SETTINGS_CONDITION_ALIAS,
 	UMB_BLOCK_ENTRY_IS_EXPOSED_CONDITION_ALIAS,
 	UMB_BLOCK_ENTRY_IS_READ_ONLY_CONDITION_ALIAS,
+	UMB_BLOCK_WORKSPACE_CONTENT_HAS_PROPERTIES_CONDITION_ALIAS,
 } from './constants.js';
 import UmbBlockEntryHasSettingsCondition from './block-entry-has-settings.condition.js';
 import UmbBlockEntryIsExposedCondition from './block-entry-is-exposed.condition.js';
 import UmbBlockEntryIsReadOnlyCondition from './block-entry-is-read-only.condition.js';
 import UmbBlockEntryShowContentEditCondition from './block-entry-show-content-edit.condition.js';
+import UmbBlockWorkspaceContentHasPropertiesCondition from './block-workspace-content-has-properties.condition.js';
 import UmbBlockWorkspaceHasSettingsCondition from './block-workspace-has-settings.condition.js';
 import UmbBlockWorkspaceIsExposedCondition from './block-workspace-is-exposed.condition.js';
 import UmbBlockWorkspaceIsReadOnlyCondition from './block-workspace-is-readonly.condition.js';
@@ -18,6 +20,12 @@ export const manifests: Array<ManifestCondition> = [
 		name: 'Block Has Settings Condition',
 		alias: 'Umb.Condition.BlockWorkspaceHasSettings',
 		api: UmbBlockWorkspaceHasSettingsCondition,
+	},
+	{
+		type: 'condition',
+		name: 'Block Workspace Content Has Properties Condition',
+		alias: UMB_BLOCK_WORKSPACE_CONTENT_HAS_PROPERTIES_CONDITION_ALIAS,
+		api: UmbBlockWorkspaceContentHasPropertiesCondition,
 	},
 	{
 		type: 'condition',
