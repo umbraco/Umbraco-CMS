@@ -50,7 +50,7 @@ public class ExamineApiController : ExamineApiControllerBase
         ISearchResults results = index.Searcher
             .CreateQuery()
             .Field(
-                FieldNameHelper.FieldName(Umbraco.Cms.Core.Constants.IndexFieldNames.Id, Constants.FieldValues.Keywords),
+                FieldNameHelper.FieldName(Umbraco.Cms.Core.Constants.Search.FieldNames.Id, Constants.FieldValues.Keywords),
                 documentKey.AsKeyword())
             .Execute();
 

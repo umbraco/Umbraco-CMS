@@ -166,7 +166,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
         AssertDocumentFields(IndexAliases.PublishedContent);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
-        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.IndexFieldNames.Tags)?.Value;
+        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.Search.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
         CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
 
@@ -337,7 +337,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             CollectionAssert.AreEqual(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, indexValue.Keywords);
         });
 
-        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.IndexFieldNames.Tags)?.Value;
+        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.Search.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
         CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
     }

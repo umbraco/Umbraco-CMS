@@ -99,7 +99,7 @@ public class VariantDocumentTests : IndexTestBase
     {
         await CreateVariantDocument();
         var field = FieldNameHelper.FieldName(property, fieldValues);
-        IIndex index = GetIndex(CoreConstants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(CoreConstants.Search.IndexAliases.PublishedContent);
 
         IOrdering queryBuilder = index.Searcher.CreateQuery().All();
         queryBuilder.SelectField(field);
@@ -122,7 +122,7 @@ public class VariantDocumentTests : IndexTestBase
         await CreateVariantDocument();
         await UpdateProperty(propertyName, updatedValue, culture);
 
-        IIndex index = GetIndex(CoreConstants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(CoreConstants.Search.IndexAliases.PublishedContent);
 
         ISearchResults results = index.Searcher.Search(updatedValue);
         Assert.That(results, Is.Not.Empty);
@@ -249,7 +249,7 @@ public class VariantDocumentTests : IndexTestBase
         root.SetValue("body", "ボディ-segment-1", "ja-JP", "segment-1");
         root.SetValue("body", "ボディ-segment-2", "ja-JP", "segment-2");
 
-        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(CoreConstants.Search.IndexAliases.PublishedContent, () =>
         {
             ContentService.Save(root);
             ContentService.Publish(root, ["*"]);

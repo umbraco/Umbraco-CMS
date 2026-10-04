@@ -30,7 +30,7 @@ public sealed class MediaSearchService : ContentSearchServiceBase<IMedia>, IMedi
     protected override UmbracoObjectTypes ObjectType => UmbracoObjectTypes.Media;
 
     /// <inheritdoc />
-    protected override string IndexAlias => Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia;
+    protected override string IndexAlias => Constants.Search.IndexAliases.DraftMedia;
 
     /// <inheritdoc />
     protected override IEnumerable<IMedia> SearchChildrenFromDatabase(int parentId, string[]? propertyAliases, Ordering? ordering, long pageNumber, int pageSize, bool loadTemplates, out long total)
