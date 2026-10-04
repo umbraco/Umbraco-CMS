@@ -2607,7 +2607,7 @@ export default {
 		labelCustomViewDescription:
 			'Overskrift hvordan denne blok præsenteres i backoffice interfacet. Vælg en\n      .html fil der indeholder din præsensation.\n    ',
 		labelSettingsElementType: 'Indstillingsmodel',
-		labelEditorSize: 'Rederingslagets størrelse',
+		labelEditorSize: 'Redigeringslagets størrelse',
 		addCustomView: 'Tilføj speciel visning',
 		addSettingsElementType: 'Tilføj indstillinger',
 		confirmDeleteBlockTitle: 'Slet %0%?',
