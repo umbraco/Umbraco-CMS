@@ -44,7 +44,10 @@ public static class UmbracoBuilderDependencyInjectionExtensions
             builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
         }
 
+        // TODO (V19): Remove this registration along with IModelsBuilderDashboardProvider.
+#pragma warning disable CS0618 // Type or member is obsolete
         builder.Services.TryAddSingleton<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         // Register required services for ModelsBuilderDashboardController
         builder.Services.AddSingleton<IModelsGenerator, ModelsGenerator>();
