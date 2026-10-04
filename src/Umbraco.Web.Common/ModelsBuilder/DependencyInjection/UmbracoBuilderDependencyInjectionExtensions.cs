@@ -33,7 +33,6 @@ public static class UmbracoBuilderDependencyInjectionExtensions
         if (builder.Config.GetRuntimeMode() != RuntimeMode.Production)
         {
             // Configure service to allow models generation
-            builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
 
             builder.AddNotificationHandler<UmbracoApplicationStartingNotification, AutoModelsNotificationHandler>();
