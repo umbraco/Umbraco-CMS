@@ -32,8 +32,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// a rebuild, and we have future-proofing in case the alias parsing logic changes in future versions.
     /// Bumped to "2" so that installs which persisted draft alias values (before aliases were restricted to the
     /// published property value, see #23206) rebuild once on startup and flush the stale entries.
+    /// Bumped to "3" so that installs which persisted aliases of unpublished documents (before aliases were
+    /// restricted to published documents, see #23948) rebuild once on startup and flush the stale entries.
     /// </remarks>
-    private const string CurrentRebuildValue = "2";
+    private const string CurrentRebuildValue = "3";
 
     private readonly ILogger<DocumentUrlAliasService> _logger;
     private readonly IDocumentUrlAliasRepository _documentUrlAliasRepository;
@@ -117,17 +119,24 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     }
 
     /// <summary>
-    /// Indicates whether this instance should skip database writes for URL aliases.
+    /// Indicates whether this instance should skip the database writes that are not tied to a local content change,
+    /// i.e. the start-up rebuild of URL aliases.
     /// </summary>
     /// <remarks>
-    /// On a <see cref="ServerRole.Subscriber"/> the scheduling publisher has already persisted URL aliases to
-    /// the database before issuing the cache-refresh instruction that routed us here. Re-writing them locally is
-    /// redundant at best, and blows up when the subscriber is configured against a read-only database connection.
-    /// <see cref="ServerRole.Unknown"/> is deliberately NOT grouped with Subscriber here: every caller of the
-    /// database-writing methods below (<see cref="CreateOrUpdateAliasesAsync(Guid)"/> and friends) reacts to a
-    /// purely local, in-process notification fired on the server that made the edit - never something routed
-    /// from another server's cache-refresh instruction - so an unresolved role here almost always means "this
-    /// server originated the change and must persist it". Skipping would silently drop the write instead.
+    /// The server role says which instance runs the scheduled jobs; it says nothing about which instance serves the
+    /// backoffice. Under the default election the publisher flag goes to whichever instance touches the server
+    /// registration first and moves whenever the holder is away for the stale timeout, so a front-end instance can be
+    /// the publisher while the only backoffice instance is a <see cref="ServerRole.Subscriber"/> for as long as that
+    /// front-end keeps running. The two only line up when roles are configured explicitly.
+    /// An explicitly configured subscriber is a dedicated front-end server that may run on a read-only database
+    /// connection; it never makes content changes, and the publisher maintains the persisted aliases on its behalf,
+    /// so the rebuild is gated on the role. <see cref="CreateOrUpdateAliasesAsync(Guid)"/> and friends are not gated
+    /// when they run for a change made on this server: reaching them means a content write has already committed on
+    /// this connection, so the connection is writable whatever the role reads, and no other server persists the
+    /// aliases for that change (other servers receive a cache instruction and only refresh their in-memory cache).
+    /// Skipping the write there would lose the aliases on every server after its next restart.
+    /// <see cref="ServerRole.Unknown"/> is deliberately not grouped with Subscriber, so a server whose role is not
+    /// yet resolved still rebuilds.
     /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
     /// </remarks>
     private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
@@ -251,10 +260,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public async Task CreateOrUpdateAliasesAsync(Guid documentKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        if (SkipDatabaseWrites() is false)
-        {
-            scope.WriteLock(Constants.Locks.DocumentUrlAliases);
-        }
+        scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
         await CreateOrUpdateAliasesInternalAsync(documentKey);
 
@@ -265,10 +271,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public async Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        if (SkipDatabaseWrites() is false)
-        {
-            scope.WriteLock(Constants.Locks.DocumentUrlAliases);
-        }
+        scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
         // Get document and all descendants
         var documentKeys = new List<Guid> { documentKey };
@@ -315,8 +318,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <summary>
     /// Internal implementation that processes a single document without creating its own scope.
     /// Caller must ensure a scope is active. A write lock on <see cref="Constants.Locks.DocumentUrlAliases"/>
-    /// is required whenever this method may perform database writes — i.e. on all server roles except
-    /// <see cref="ServerRole.Subscriber"/>, where persistence is skipped and the write lock is not taken.
+    /// is required whenever this method may perform database writes, i.e. unless
+    /// <paramref name="forceSkipDatabaseWrite"/> is set.
     /// </summary>
     private async Task CreateOrUpdateAliasesInternalAsync(Guid documentKey, bool forceSkipDatabaseWrite = false)
     {
@@ -333,13 +336,12 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Remove old aliases from cache (deferred until scope completes)
         RemoveFromCacheDeferred(_coreScopeProvider.Context!, documentKey);
 
-        // Save to database (handles insert/update/delete via diff) and add to cache.
-        // On subscribers we skip the persistence — the publisher has already written the aliases — but the
-        // in-memory cache is still refreshed via the deferred enlistments so routing keeps working locally.
-        bool skipDatabaseWrites = forceSkipDatabaseWrite || SkipDatabaseWrites();
+        // Save to database (handles insert/update/delete via diff) and add to cache. When only the cache is being
+        // refreshed (a cache instruction from another server), the in-memory cache is still updated via the
+        // deferred enlistments so routing keeps working locally.
         if (aliases.Count > 0)
         {
-            if (skipDatabaseWrites is false)
+            if (forceSkipDatabaseWrite is false)
             {
                 _documentUrlAliasRepository.Save(aliases);
             }
@@ -349,7 +351,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                 AddToCacheDeferred(_coreScopeProvider.Context!, alias);
             }
         }
-        else if (skipDatabaseWrites is false)
+        else if (forceSkipDatabaseWrite is false)
         {
             // No aliases - delete any existing aliases for this document from the database
             _documentUrlAliasRepository.DeleteByDocumentKey(new[] { documentKey });
@@ -457,6 +459,13 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private async Task<List<PublishedDocumentUrlAlias>> ExtractAliasesFromDocumentAsync(IContent document)
     {
         var aliases = new List<PublishedDocumentUrlAlias>();
+
+        // An unpublished document keeps the property values of its last published version,
+        // so GetValue(published: true) alone would still return its former alias.
+        if (document.Published is false)
+        {
+            return aliases;
+        }
 
         // Check if the alias property itself varies by culture (not just the content type).
         // A variant content type can have a shared (invariant) alias property.
