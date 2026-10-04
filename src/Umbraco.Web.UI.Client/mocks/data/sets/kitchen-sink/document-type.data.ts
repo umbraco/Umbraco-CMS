@@ -574,6 +574,30 @@ const rawData: Array<
 					labelOnTop: false,
 				},
 			},
+			{
+				id: 'pt-not-existing-0',
+				container: {
+					id: '38c46685-f235-4584-b245-11553d500484',
+				},
+				alias: 'contentPickerNotExisting',
+				name: 'Content Picker - Not Existing',
+				description: null,
+				dataType: {
+					id: '1bd0d68f-8fe9-4906-bb5e-e33eafa83aa3',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 4,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
 		],
 		containers: [
 			{
@@ -1542,6 +1566,30 @@ const rawData: Array<
 					labelOnTop: false,
 				},
 			},
+			{
+				id: 'pt-not-existing-1',
+				container: {
+					id: 'a2114ac3-a87a-4c7d-a882-d55cefebbf2c',
+				},
+				alias: 'mediaPickerNotExisting',
+				name: 'Media Picker - Not Existing',
+				description: null,
+				dataType: {
+					id: '87543f25-f2dc-41b4-b861-75159b7baff9',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 10,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
 		],
 		containers: [
 			{
@@ -1603,6 +1651,30 @@ const rawData: Array<
 					labelOnTop: false,
 				},
 			},
+			{
+				id: 'pt-not-existing-3',
+				container: {
+					id: 'dc0c9e8c-e488-4a29-ae72-7e5791078719',
+				},
+				alias: 'memberGroupPickerNotExisting',
+				name: 'Member Group Picker - Not Existing',
+				description: null,
+				dataType: {
+					id: '2ac54465-7f8c-481e-926b-6fcc8bef1dc3',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 1,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
 		],
 		containers: [
 			{
@@ -1654,6 +1726,30 @@ const rawData: Array<
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: 'pt-not-existing-2',
+				container: {
+					id: 'f516f9ea-e299-4f9d-892e-46c39d93489c',
+				},
+				alias: 'memberPickerNotExisting',
+				name: 'Member Picker - Not Existing',
+				description: null,
+				dataType: {
+					id: '2555acc6-6adf-4cc3-b0bd-86a2dfdcc7b1',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 1,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -1835,6 +1931,30 @@ const rawData: Array<
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 5,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: 'pt-not-existing-8',
+				container: {
+					id: '5a327c88-8e0f-421b-abf0-01b07533685e',
+				},
+				alias: 'multiUrlPickerNotExisting',
+				name: 'Multi URL Picker - Not Existing',
+				description: null,
+				dataType: {
+					id: 'f455a80c-7f39-4fbb-b212-cf829dd28f7b',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 6,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -2112,6 +2232,78 @@ const rawData: Array<
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 9,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: 'pt-not-existing-5',
+				container: {
+					id: 'c697eddc-c31a-4886-b14c-22cd9718a477',
+				},
+				alias: 'multinodeTreepickerNotExisting',
+				name: 'Multinode Treepicker - Not Existing',
+				description: null,
+				dataType: {
+					id: 'fe2a2728-c6bc-450b-9e63-a68d60638b7e',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 10,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: 'pt-not-existing-6',
+				container: {
+					id: 'c697eddc-c31a-4886-b14c-22cd9718a477',
+				},
+				alias: 'multinodeTreepickerMediaNotExisting',
+				name: 'Multinode Treepicker - Media Not Existing',
+				description: null,
+				dataType: {
+					id: '52d20340-cf21-4256-a136-55f91dbf353a',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 11,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: 'pt-not-existing-7',
+				container: {
+					id: 'c697eddc-c31a-4886-b14c-22cd9718a477',
+				},
+				alias: 'multinodeTreepickerMembersNotExisting',
+				name: 'Multinode Treepicker - Members Not Existing',
+				description: null,
+				dataType: {
+					id: '9f1be990-9b28-4817-a662-841875071769',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 12,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -3263,6 +3455,30 @@ const rawData: Array<
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: 'pt-not-existing-4',
+				container: {
+					id: 'b439bb1f-215f-4dcc-9db5-d27354ad61ef',
+				},
+				alias: 'userPickerNotExisting',
+				name: 'User Picker - Not Existing',
+				description: null,
+				dataType: {
+					id: '3387e5da-4e32-43dc-b4dc-840fcbc468f9',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 1,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
