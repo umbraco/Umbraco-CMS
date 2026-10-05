@@ -1,10 +1,11 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Represents the configuration for the multinode picker value editor.
 /// </summary>
+[Obsolete("The multi node tree picker is replaced by the dedicated document, media, element and member pickers. Scheduled for removal in Umbraco 22.")]
 public class MultiNodePickerConfiguration : IIgnoreUserStartNodesConfig
 {
     /// <summary>
