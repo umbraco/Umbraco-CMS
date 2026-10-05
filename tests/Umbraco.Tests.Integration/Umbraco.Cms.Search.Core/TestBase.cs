@@ -23,10 +23,10 @@ public abstract class TestBase : UmbracoIntegrationTest
 
     internal static class IndexAliases
     {
-        public const string PublishedContent = global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
-        public const string DraftContent = global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent;
-        public const string Media = global::Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia;
-        public const string Member = global::Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers;
+        public const string PublishedContent = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent;
+        public const string DraftContent = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftContent;
+        public const string Media = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMedia;
+        public const string Member = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMembers;
     }
 
     protected TestIndexerAndSearcher IndexerAndSearcher { get; } = new();
