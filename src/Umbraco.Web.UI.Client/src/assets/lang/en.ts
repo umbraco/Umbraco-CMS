@@ -884,6 +884,7 @@ export default {
 		deleting: 'Deleting...',
 		description: 'Description',
 		design: 'Design',
+		destination: 'Destination',
 		details: 'Details',
 		dictionary: 'Dictionary',
 		dimensions: 'Dimensions',
