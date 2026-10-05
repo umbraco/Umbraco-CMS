@@ -233,11 +233,13 @@ namespace Umbraco.Cms
             ///     Runs inline in repository reads, inside a scope that may hold distributed locks such as ContentTree, while
             ///     <see cref="ProcessAllInstructions" /> holds <c>_syncLock</c> and takes those same locks. So this must never
             ///     wait for <c>_syncLock</c>, take distributed locks or write to the database: payload instructions run only
-            ///     the in-memory <see cref="IJsonCacheRefresher.RefreshInternal(string)" />, id-based instructions run their
-            ///     in-memory refresh, and <see cref="ILastSyncedManager" /> keeps the internal checkpoint in memory. The cache versions are read before the instructions and
-            ///     adopted only once every pending instruction has been processed, so a read arriving while instructions
-            ///     are being processed still finds its cache out of date and syncs itself; a full page of pending
-            ///     instructions leaves the versions unadopted until the remainder is processed.
+            ///     <see cref="IJsonCacheRefresher.RefreshInternal(string)" />, id-based instructions run their in-memory
+            ///     refresh, and <see cref="ILastSyncedManager" /> keeps the internal checkpoint in memory. Whether the whole
+            ///     call stays lock-free depends on each refresher honouring that contract in its own
+            ///     <c>RefreshInternal</c>; the in-tree refreshers do. The cache versions are read before the instructions
+            ///     and adopted only once every pending instruction has been processed, so a read arriving while
+            ///     instructions are being processed still finds its cache out of date and syncs itself; a full page of
+            ///     pending instructions leaves the versions unadopted until the remainder is processed.
             /// </remarks>
             public ProcessInstructionsResult ProcessInternalInstructions(
                 CacheRefresherCollection cacheRefreshers,

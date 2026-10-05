@@ -82,7 +82,8 @@ public interface ICacheInstructionService
     /// <returns>The result of processing the internal instructions.</returns>
     /// <remarks>
     ///     Safe to call while holding distributed locks: it does not wait for a full synchronization, takes no
-    ///     distributed locks of its own and writes nothing to the database.
+    ///     distributed locks of its own and writes nothing to the database. Payload instructions run only
+    ///     <see cref="IJsonCacheRefresher.RefreshInternal(string)" />, which is expected to uphold the same contract.
     /// </remarks>
     ProcessInstructionsResult ProcessInternalInstructions(
         CacheRefresherCollection cacheRefreshers,
