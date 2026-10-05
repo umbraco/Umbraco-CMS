@@ -834,22 +834,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     }
 
     /// <summary>
-    ///     Rebuilds the navigation structure based on the specified object type key and whether the items are trashed.
-    ///     Only relevant for items in the content and media trees (which have readLock values of -333 or -334).
+    ///     Rebuilds the main or recycle bin navigation structure for the tree this service navigates,
+    ///     under the read lock given by <see cref="TreeLockId"/> and for the nodes of <see cref="ObjectTypeKey"/>.
     /// </summary>
-    /// <param name="readLock">The read lock value, should be -333 or -334 for content and media trees.</param>
-    /// <param name="objectTypeKey">The key of the object type to rebuild.</param>
-    /// <param name="trashed">Indicates whether the items are in the recycle bin.</param>
-    protected Task HandleRebuildAsync(int readLock, Guid objectTypeKey, bool trashed)
+    /// <param name="trashed">Indicates whether to rebuild the recycle bin structure instead of the main one.</param>
+    protected Task HandleRebuildAsync(bool trashed)
     {
-        // This is only relevant for items in the content and media trees
-        if (readLock != Constants.Locks.ContentTree && readLock != Constants.Locks.MediaTree)
-        {
-            return Task.CompletedTask;
-        }
-
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
-        scope.ReadLock(readLock);
+        scope.ReadLock(TreeLockId);
 
         // Build into new structures, then swap the snapshot atomically so that concurrent
         // readers never observe a transiently empty navigation state or a mismatched pair
@@ -859,13 +851,13 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
         if (trashed)
         {
-            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
+            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(ObjectTypeKey);
             BuildNavigationDictionary(newStructure, newRoots, navigationModels);
             Interlocked.Exchange(ref _recycleBinNavigation, new NavigationSnapshot(newStructure, newRoots));
         }
         else
         {
-            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
+            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(ObjectTypeKey);
             BuildNavigationDictionary(newStructure, newRoots, navigationModels);
             Interlocked.Exchange(ref _navigation, new NavigationSnapshot(newStructure, newRoots));
         }

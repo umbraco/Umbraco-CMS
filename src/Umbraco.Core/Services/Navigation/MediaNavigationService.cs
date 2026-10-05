@@ -44,9 +44,9 @@ internal sealed class MediaNavigationService : ContentNavigationServiceBase<IMed
 
     /// <inheritdoc />
     public override async Task RebuildAsync()
-        => await HandleRebuildAsync(TreeLockId, ObjectTypeKey, false);
+        => await HandleRebuildAsync(trashed: false);
 
     /// <inheritdoc />
     public override async Task RebuildBinAsync()
-        => await HandleRebuildAsync(TreeLockId, ObjectTypeKey, true);
+        => await HandleRebuildAsync(trashed: true);
 }
