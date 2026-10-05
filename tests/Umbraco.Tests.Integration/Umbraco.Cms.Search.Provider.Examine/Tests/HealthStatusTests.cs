@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 [LongRunning]
 public class HealthStatusTests : SearcherTestBase
 {
-    private const string IndexAlias = global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
+    private const string IndexAlias = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent;
 
     [Test]
     [Order(1)]
