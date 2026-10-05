@@ -167,14 +167,15 @@ export class UmbLocalizationRegistry {
 							// Set the browser language and direction based on the translations
 							this.#setBrowserLanguage(locale!, translations);
 						})(),
+					).pipe(
+						// Caught on the inner observable so that an error only drops this load; caught on
+						// the outer pipe it would complete the subscription and stop all later language loads.
+						catchError((error) => {
+							console.error('Error loading translations:', error);
+							return of(undefined);
+						}),
 					),
 				),
-				// Catch any errors that occur while loading the translations
-				// This is important to ensure that the observable does not error out and stop the subscription
-				catchError((error) => {
-					console.error('Error loading translations:', error);
-					return of([]);
-				}),
 			)
 			// Subscribe to the observable to trigger the loading of translations
 			.subscribe();
@@ -191,13 +192,18 @@ export class UmbLocalizationRegistry {
 		}
 
 		// If extension contains a js file, load it and add the default dictionary to the inner dictionary.
+		// A failing file (e.g. a 404 on a stale chunk after a deploy) must not take down the other dictionaries.
 		if (extension.js) {
-			const loadedExtension = await loadManifestPlainJs(extension.js);
+			try {
+				const loadedExtension = await loadManifestPlainJs(extension.js);
 
-			if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
-				for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
-					addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
+				if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
+					for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
+						addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
+					}
 				}
+			} catch (error) {
+				console.error(`Localization extension "${extension.alias}" failed to load and was skipped:`, error);
 			}
 		}
 
