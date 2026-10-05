@@ -13,11 +13,11 @@ internal static class ServiceCollectionExtensions
 {
     private static readonly string[] IndexAliases =
     [
-        Constants.IndexAliases.DraftContent,
-        Constants.IndexAliases.PublishedContent,
-        Constants.IndexAliases.DraftMedia,
-        Constants.IndexAliases.DraftMembers,
-        Constants.IndexAliases.DraftElements,
+        Constants.Search.IndexAliases.DraftContent,
+        Constants.Search.IndexAliases.PublishedContent,
+        Constants.Search.IndexAliases.DraftMedia,
+        Constants.Search.IndexAliases.DraftMembers,
+        Constants.Search.IndexAliases.DraftElements,
     ];
 
     public static IServiceCollection AddExamineSearchProviderServicesForTest<TIndex, TDirectoryFactory>(this IServiceCollection services)

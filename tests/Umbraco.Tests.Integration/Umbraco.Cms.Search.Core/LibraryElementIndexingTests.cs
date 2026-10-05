@@ -289,7 +289,7 @@ public class LibraryElementIndexingTests : ContentBaseTestBase
             Assert.That(GetTitle(document, "en-US"), Is.EqualTo("English title"));
             Assert.That(GetTitle(document, "da-DK"), Is.EqualTo("Danish title"));
 
-            IndexField[] nameFields = document.Fields.Where(field => field.FieldName == Constants.IndexFieldNames.Name).ToArray();
+            IndexField[] nameFields = document.Fields.Where(field => field.FieldName == Constants.Search.FieldNames.Name).ToArray();
             Assert.That(nameFields.SingleOrDefault(field => field.Culture == "en-US")?.Value.TextsR1?.SingleOrDefault(), Is.EqualTo("English name"));
             Assert.That(nameFields.SingleOrDefault(field => field.Culture == "da-DK")?.Value.TextsR1?.SingleOrDefault(), Is.EqualTo("Danish name"));
         });

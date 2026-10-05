@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.Co
 [LongRunning]
 public class LibraryElementSearchTests : SearcherTestBase
 {
-    private const string ElementsIndexAlias = Constants.IndexAliases.DraftElements;
+    private const string ElementsIndexAlias = Constants.Search.IndexAliases.DraftElements;
 
     private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
 
@@ -94,7 +94,7 @@ public class LibraryElementSearchTests : SearcherTestBase
         SearchResult results = await Searcher.SearchAsync(
             ElementsIndexAlias,
             "shared",
-            filters: [new KeywordFilter(Constants.IndexFieldNames.PathIds, [containerKey.AsKeyword()], false)]);
+            filters: [new KeywordFilter(Constants.Search.FieldNames.PathIds, [containerKey.AsKeyword()], false)]);
 
         Assert.That(results.Documents.Select(document => document.Id), Is.EquivalentTo(new[] { nestedElement.Key }));
     }
@@ -146,8 +146,8 @@ public class LibraryElementSearchTests : SearcherTestBase
     {
         await CreateElementAsync(null, "Some element", "librarytext");
 
-        SearchResult draftResults = await Searcher.SearchAsync(Constants.IndexAliases.DraftContent, "librarytext");
-        SearchResult publishedResults = await Searcher.SearchAsync(Constants.IndexAliases.PublishedContent, "librarytext");
+        SearchResult draftResults = await Searcher.SearchAsync(Constants.Search.IndexAliases.DraftContent, "librarytext");
+        SearchResult publishedResults = await Searcher.SearchAsync(Constants.Search.IndexAliases.PublishedContent, "librarytext");
 
         Assert.Multiple(() =>
         {
@@ -162,7 +162,7 @@ public class LibraryElementSearchTests : SearcherTestBase
         IContent document = await CreateDocumentWithBlockAsync("blocktext");
         await CreateElementAsync(null, "Some element", "librarytext");
 
-        SearchResult contentResults = await Searcher.SearchAsync(Constants.IndexAliases.DraftContent, "blocktext");
+        SearchResult contentResults = await Searcher.SearchAsync(Constants.Search.IndexAliases.DraftContent, "blocktext");
         SearchResult elementResults = await Searcher.SearchAsync(ElementsIndexAlias, "blocktext");
 
         Assert.Multiple(() =>
@@ -344,7 +344,7 @@ public class LibraryElementSearchTests : SearcherTestBase
             .WithPropertyValues(new { blocks = JsonSerializer.Serialize(blockListValue) })
             .Build();
 
-        await WaitForIndexing(Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(Constants.Search.IndexAliases.DraftContent, () =>
         {
             ContentService.Save(document);
             return Task.CompletedTask;
