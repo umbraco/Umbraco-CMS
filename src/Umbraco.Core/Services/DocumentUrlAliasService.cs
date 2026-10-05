@@ -155,9 +155,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// front-end keeps running. The two only line up when roles are configured explicitly.
     /// An explicitly configured subscriber is a dedicated front-end server that may run on a read-only database
     /// connection; it never makes content changes, and the publisher maintains the persisted aliases on its behalf,
-    /// so the rebuild is gated on the role. <see cref="CreateOrUpdateAliasesAsync(Guid)"/> and friends are not gated
-    /// when they run for a change made on this server: reaching them means a content write has already committed on
-    /// this connection, so the connection is writable whatever the role reads, and no other server persists the
+    /// so the rebuild is gated on the role. <see cref="PersistAliasesAsync(IContent)"/>,
+    /// <see cref="CreateOrUpdateAliasesAsync(Guid)"/> and friends are not gated when they run for a change made on
+    /// this server: reaching them means a content write is being made, or has already committed, on this
+    /// connection, so the connection is writable whatever the role reads, and no other server persists the
     /// aliases for that change (other servers receive a cache instruction and only refresh their in-memory cache).
     /// Skipping the write there would lose the aliases on every server after its next restart.
     /// <see cref="ServerRole.Unknown"/> is deliberately not grouped with Subscriber, so a server whose role is not
@@ -165,6 +166,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
     /// </remarks>
     private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
+
+    /// <inheritdoc/>
+    public bool IsInitialized => _isInitialized;
 
     /// <inheritdoc/>
     public async Task InitAsync(bool forceEmpty, CancellationToken cancellationToken)
@@ -308,6 +312,48 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         foreach (Guid key in documentKeys)
         {
             await CreateOrUpdateAliasesInternalAsync(key);
+        }
+
+        scope.Complete();
+    }
+
+    /// <inheritdoc/>
+    public async Task PersistAliasesAsync(IContent document)
+    {
+        // Aliases are routing data for the published site, so only a change to the published state or to the
+        // trashed state can change them; a draft save cannot. Blueprints never have aliases.
+        if (document.Blueprint)
+        {
+            return;
+        }
+
+        var trashedChanged = document.IsPropertyDirty(nameof(document.Trashed));
+        var publishedStateChanged = document.PublishedState is PublishedState.Publishing or PublishedState.Unpublishing;
+        if (trashedChanged is false && publishedStateChanged is false)
+        {
+            return;
+        }
+
+        // Inside a content transaction the content tree write lock already orders this write with the content;
+        // a standalone call has to serialise against the rebuild itself.
+        var inAmbientScope = _coreScopeProvider.Context is not null;
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        if (inAmbientScope is false)
+        {
+            scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+        }
+
+        List<PublishedDocumentUrlAlias> aliases = document.Trashed || document.PublishedState == PublishedState.Unpublishing
+            ? []
+            : await ExtractAliasesFromDocumentAsync(document);
+
+        if (aliases.Count > 0)
+        {
+            _documentUrlAliasRepository.Save(aliases);
+        }
+        else
+        {
+            _documentUrlAliasRepository.DeleteByDocumentKey([document.Key]);
         }
 
         scope.Complete();

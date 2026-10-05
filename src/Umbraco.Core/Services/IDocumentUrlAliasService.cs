@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core.Models;
+
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
@@ -39,6 +41,28 @@ public interface IDocumentUrlAliasService
     /// </summary>
     /// <param name="documentKey">The document key.</param>
     Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey);
+
+    /// <summary>
+    /// Gets a value indicating whether the service has been initialized and may persist aliases.
+    /// </summary>
+    /// <remarks>
+    /// False while the application is upgrading, when the alias table may not exist yet.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    bool IsInitialized => true;
+
+    /// <summary>
+    /// Persists the aliases of a document as part of the save that persists the document.
+    /// </summary>
+    /// <param name="document">The document being persisted.</param>
+    /// <remarks>
+    /// Meant to run inside the transaction that persists <paramref name="document"/>, where the content tree lock
+    /// already orders the alias rows with the content they describe. Only a change to the document's published
+    /// state or trashed state can change its aliases, so any other save is a no-op.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    Task PersistAliasesAsync(IContent document)
+        => CreateOrUpdateAliasesAsync(document.Key);
 
     /// <summary>
     /// Deletes all aliases from the cache for a collection of document keys.
