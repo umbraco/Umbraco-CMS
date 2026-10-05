@@ -103,7 +103,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
             indexInfo,
             UmbracoObjectTypes.Document,
             () => _contentService.GetRootContent(),
-            (pageIndex, pageSize) => _contentService.GetPagedChildren(Cms.Core.Constants.System.RecycleBinContent, pageIndex, pageSize, out _),
+            (pageIndex, pageSize) => _contentService.GetPagedChildren(Cms.Core.Constants.System.RecycleBinContent, pageIndex, pageSize, out _, propertyAliases: null, filter: null, ordering: null),
             cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)

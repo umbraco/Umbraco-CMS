@@ -29,7 +29,7 @@ public static class PublishedContentSearchExtensions
         string? culture = null)
         // NOTE: PathIds contains ancestors-or-self, so the item itself is filtered from the results afterwards
         //       to retain the semantics of the legacy implementation.
-        => Search(term, culture, new KeywordFilter(Umbraco.Cms.Core.Constants.IndexFieldNames.PathIds, [content.Key.ToString("D")], Negate: false))
+        => Search(term, culture, new KeywordFilter(Cms.Core.Constants.Search.FieldNames.PathIds, [content.Key.ToString("D")], Negate: false))
             .Where(result => result.Content.Key != content.Key);
 
     /// <summary>
@@ -42,13 +42,13 @@ public static class PublishedContentSearchExtensions
         this IPublishedContent content,
         string term,
         string? culture = null)
-        => Search(term, culture, new KeywordFilter(Umbraco.Cms.Core.Constants.IndexFieldNames.ParentId, [content.Key.ToString("D")], Negate: false));
+        => Search(term, culture, new KeywordFilter(Cms.Core.Constants.Search.FieldNames.ParentId, [content.Key.ToString("D")], Negate: false));
 
     private static IEnumerable<PublishedSearchResult> Search(string term, string? culture, Filter filter)
     {
         IServiceProvider services = StaticServiceProvider.Instance;
-        ISearcher searcher = services.GetRequiredService<ISearcherResolver>().GetSearcher(Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent)
-                             ?? throw new InvalidOperationException($"No searcher could be resolved for the index alias {Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent}.");
+        ISearcher searcher = services.GetRequiredService<ISearcherResolver>().GetSearcher(Cms.Core.Constants.Search.IndexAliases.PublishedContent)
+                             ?? throw new InvalidOperationException($"No searcher could be resolved for the index alias {Cms.Core.Constants.Search.IndexAliases.PublishedContent}.");
 
         var searchCulture = culture
                             ?? services.GetRequiredService<IVariationContextAccessor>().VariationContext?.Culture;
@@ -56,7 +56,7 @@ public static class PublishedContentSearchExtensions
 
         SearchResult result = searcher
             .SearchAsync(
-                Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent,
+                Cms.Core.Constants.Search.IndexAliases.PublishedContent,
                 query: term,
                 filters: [filter],
                 culture: searchCulture,

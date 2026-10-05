@@ -751,7 +751,6 @@ export type DocumentConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
-    allowNonExistingSegmentsCreation: boolean;
 };
 
 export type DocumentItemResponseModel = {
@@ -966,7 +965,6 @@ export type DocumentVariantItemResponseModel = {
 
 export type DocumentVariantRequestModel = {
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -980,7 +978,6 @@ export type DocumentVariantResponseModel = {
     createDate: string;
     updateDate: string;
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1049,7 +1046,6 @@ export type ElementConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
-    allowNonExistingSegmentsCreation: boolean;
 };
 
 export type ElementItemResponseModel = {
@@ -1120,7 +1116,6 @@ export type ElementVariantItemResponseModel = {
 
 export type ElementVariantRequestModel = {
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1134,7 +1129,6 @@ export type ElementVariantResponseModel = {
     createDate: string;
     updateDate: string;
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1284,13 +1278,6 @@ export enum HealthStatusModel {
     EMPTY = 'Empty',
     UNKNOWN = 'Unknown'
 }
-
-export type HelpPageResponseModel = {
-    name?: null | string;
-    description?: null | string;
-    url?: null | string;
-    type?: null | string;
-};
 
 export enum ImageCropModeModel {
     CROP = 'Crop',
@@ -1590,7 +1577,6 @@ export type MediaCollectionResponseModel = {
 
 export type MediaConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
-    disableUnpublishWhenReferenced: boolean;
 };
 
 export type MediaItemResponseModel = {
@@ -1766,7 +1752,6 @@ export type MediaValueResponseModel = {
 
 export type MediaVariantRequestModel = {
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1774,7 +1759,6 @@ export type MediaVariantResponseModel = {
     createDate: string;
     updateDate: string;
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1931,7 +1915,6 @@ export type MemberValueResponseModel = {
 
 export type MemberVariantRequestModel = {
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1939,7 +1922,6 @@ export type MemberVariantResponseModel = {
     createDate: string;
     updateDate: string;
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -2184,11 +2166,6 @@ export type PagedFileSystemTreeItemPresentationModel = {
 export type PagedHealthCheckGroupResponseModel = {
     total: number;
     items: Array<HealthCheckGroupResponseModel>;
-};
-
-export type PagedHelpPageResponseModel = {
-    total: number;
-    items: Array<HelpPageResponseModel>;
 };
 
 export type PagedIndexResponseModel = {
@@ -3359,12 +3336,6 @@ export type UpdateWebhookRequestModel = {
     headers: {
         [key: string]: string;
     };
-};
-
-export type UpgradeCheckResponseModel = {
-    type: string;
-    comment: string;
-    url: string;
 };
 
 export type UpgradeSettingsResponseModel = {
@@ -10284,41 +10255,6 @@ export type PostHealthCheckExecuteActionResponses = {
 
 export type PostHealthCheckExecuteActionResponse = PostHealthCheckExecuteActionResponses[keyof PostHealthCheckExecuteActionResponses];
 
-export type GetHelpData = {
-    body?: never;
-    path?: never;
-    query?: {
-        section?: string;
-        tree?: string;
-        skip?: number;
-        take?: number;
-        baseUrl?: string;
-    };
-    url: '/umbraco/management/api/v1/help';
-};
-
-export type GetHelpErrors = {
-    /**
-     * Bad Request
-     */
-    400: ProblemDetails;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetHelpError = GetHelpErrors[keyof GetHelpErrors];
-
-export type GetHelpResponses = {
-    /**
-     * OK
-     */
-    200: PagedHelpPageResponseModel;
-};
-
-export type GetHelpResponse = GetHelpResponses[keyof GetHelpResponses];
-
 export type GetImagingResizeUrlsData = {
     body?: never;
     path?: never;
@@ -15919,33 +15855,6 @@ export type GetRedirectManagementStatusResponses = {
 
 export type GetRedirectManagementStatusResponse = GetRedirectManagementStatusResponses[keyof GetRedirectManagementStatusResponses];
 
-export type PostRedirectManagementStatusData = {
-    body?: never;
-    path?: never;
-    query?: {
-        status?: RedirectStatusModel;
-    };
-    url: '/umbraco/management/api/v1/redirect-management/status';
-};
-
-export type PostRedirectManagementStatusErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-};
-
-export type PostRedirectManagementStatusResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
 export type GetRelationByRelationTypeIdData = {
     body?: never;
     path: {
@@ -16887,33 +16796,6 @@ export type GetServerTroubleshootingResponses = {
 };
 
 export type GetServerTroubleshootingResponse = GetServerTroubleshootingResponses[keyof GetServerTroubleshootingResponses];
-
-export type GetServerUpgradeCheckData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/management/api/v1/server/upgrade-check';
-};
-
-export type GetServerUpgradeCheckErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-};
-
-export type GetServerUpgradeCheckResponses = {
-    /**
-     * OK
-     */
-    200: UpgradeCheckResponseModel;
-};
-
-export type GetServerUpgradeCheckResponse = GetServerUpgradeCheckResponses[keyof GetServerUpgradeCheckResponses];
 
 export type GetItemStaticFileData = {
     body?: never;

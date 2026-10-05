@@ -19,7 +19,7 @@ public abstract class SearcherTestBase
 {
     private ServiceProvider _serviceProvider;
 
-    private const string IndexAlias = Constants.IndexAliases.PublishedContent;
+    private const string IndexAlias = Constants.Search.IndexAliases.PublishedContent;
     protected const string FieldMultipleValues = "fieldMultipleValues";
     protected const string FieldSingleValue = "fieldSingleValues";
     protected const string FieldMultiSorting = "FieldThree";
@@ -59,7 +59,7 @@ public abstract class SearcherTestBase
                 [new Variation(Culture: null, Segment: null)],
                 [
                     new IndexField(
-                        Constants.IndexFieldNames.PathIds,
+                        Constants.Search.FieldNames.PathIds,
                         new IndexValue { Keywords = [id.AsKeyword()], },
                         Culture: null,
                         Segment: null),

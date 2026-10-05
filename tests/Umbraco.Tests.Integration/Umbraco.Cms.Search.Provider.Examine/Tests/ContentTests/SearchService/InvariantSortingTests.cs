@@ -181,7 +181,7 @@ public class InvariantSortingTests : SearcherTestBase
             null,
             null,
             null,
-            [new TextSorter(Constants.IndexFieldNames.Name, direction)],
+            [new TextSorter(Constants.Search.FieldNames.Name, direction)],
             null,
             null,
             null,

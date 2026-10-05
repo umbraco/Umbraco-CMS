@@ -17,7 +17,7 @@ public class MediaIndexServiceTests : IndexTestBase
     {
         await CreateMediaAsync();
 
-        IIndex index = GetIndex(Constants.IndexAliases.DraftMedia);
+        IIndex index = GetIndex(Constants.Search.IndexAliases.DraftMedia);
 
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results.TotalItemCount, Is.EqualTo(1));
@@ -37,7 +37,7 @@ public class MediaIndexServiceTests : IndexTestBase
             .Build();
         await GetRequiredService<IMediaTypeService>().CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
-        await WaitForIndexing(Constants.IndexAliases.DraftMedia, () =>
+        await WaitForIndexing(Constants.Search.IndexAliases.DraftMedia, () =>
         {
             GetRequiredService<IMediaService>().Save(
                 new MediaBuilder()

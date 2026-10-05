@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
@@ -31,44 +30,9 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     private readonly UriUtility _uriUtility;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IContentService _contentService;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PublishedUrlInfoProvider" /> class.
-    /// </summary>
-    /// <param name="publishedUrlProvider">The published URL provider.</param>
-    /// <param name="languageService">The language service.</param>
-    /// <param name="publishedRouter">The published router.</param>
-    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
-    /// <param name="localizedTextService">The localized text service.</param>
-    /// <param name="logger">The logger.</param>
-    /// <param name="uriUtility">The URI utility.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public PublishedUrlInfoProvider(
-        IPublishedUrlProvider publishedUrlProvider,
-        ILanguageService languageService,
-        IPublishedRouter publishedRouter,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        ILocalizedTextService localizedTextService,
-        ILogger<PublishedUrlInfoProvider> logger,
-        UriUtility uriUtility)
-        : this(
-            publishedUrlProvider,
-            languageService,
-            publishedRouter,
-            umbracoContextAccessor,
-            localizedTextService,
-            logger,
-            uriUtility,
-            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
-            StaticServiceProvider.Instance.GetRequiredService<IContentService>())
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedUrlInfoProvider" /> class.
@@ -95,7 +59,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         UriUtility uriUtility,
         IVariationContextAccessor variationContextAccessor,
         IDocumentNavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         IPublishedContentCache publishedContentCache,
         IContentService contentService)
     {

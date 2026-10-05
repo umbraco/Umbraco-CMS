@@ -69,8 +69,6 @@ public class PreviewServiceTests
     {
         var userKey = Guid.NewGuid();
 
-#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
-#pragma warning restore CS0618 // Type or member is obsolete
         var requestAccessorMock = new Mock<IRequestAccessor>();
         requestAccessorMock
             .Setup(x => x.GetRequestUrl())

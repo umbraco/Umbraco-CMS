@@ -23,8 +23,8 @@ public class ContentIndexingServiceSameOriginOnlyTests : ContentIndexingServiceT
 
         builder.Services.Configure<IndexOptions>(options =>
         {
-            options.RegisterContentIndex<TestIndexerAndSearcher, TestIndexerAndSearcher, TestContentChangeStrategy>(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, true, UmbracoObjectTypes.Document);
-            options.RegisterContentIndex<TestIndexerAndSearcher, TestIndexerAndSearcher, TestContentChangeStrategy>(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent, true, UmbracoObjectTypes.Document);
+            options.RegisterContentIndex<TestIndexerAndSearcher, TestIndexerAndSearcher, TestContentChangeStrategy>(global::Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent, true, UmbracoObjectTypes.Document);
+            options.RegisterContentIndex<TestIndexerAndSearcher, TestIndexerAndSearcher, TestContentChangeStrategy>(global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftContent, true, UmbracoObjectTypes.Document);
         });
     }
 
@@ -54,10 +54,10 @@ public class ContentIndexingServiceSameOriginOnlyTests : ContentIndexingServiceT
 
         Assert.Multiple(() =>
         {
-            Assert.That(Strategy.HandledIndexInfos[0][0].IndexAlias, Is.EqualTo(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent));
+            Assert.That(Strategy.HandledIndexInfos[0][0].IndexAlias, Is.EqualTo(global::Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent));
             Assert.That(Strategy.HandledIndexInfos[0][0].Indexer, Is.TypeOf<TestIndexerAndSearcher>());
 
-            Assert.That(Strategy.HandledIndexInfos[0][1].IndexAlias, Is.EqualTo(global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent));
+            Assert.That(Strategy.HandledIndexInfos[0][1].IndexAlias, Is.EqualTo(global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftContent));
             Assert.That(Strategy.HandledIndexInfos[0][1].Indexer, Is.TypeOf<TestIndexerAndSearcher>());
         });
     }
@@ -66,7 +66,7 @@ public class ContentIndexingServiceSameOriginOnlyTests : ContentIndexingServiceT
     public void IndexRebuildsAreIgnoredForOtherOrigin()
     {
         IContentIndexingService sut = GetRequiredService<IContentIndexingService>();
-        sut.Rebuild(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, "other-origin");
+        sut.Rebuild(global::Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent, "other-origin");
 
         // no changes handled because the origin differs
         Assert.That(Strategy.HandledIndexInfos, Has.Count.EqualTo(0));
@@ -76,7 +76,7 @@ public class ContentIndexingServiceSameOriginOnlyTests : ContentIndexingServiceT
     public void IndexRebuildsAreHandledForCurrentOrigin()
     {
         IContentIndexingService sut = GetRequiredService<IContentIndexingService>();
-        sut.Rebuild(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, "current-origin");
+        sut.Rebuild(global::Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent, "current-origin");
 
         // one change strategy registered (same for both indexes)
         Assert.That(Strategy.HandledIndexInfos, Has.Count.EqualTo(1));
@@ -85,7 +85,7 @@ public class ContentIndexingServiceSameOriginOnlyTests : ContentIndexingServiceT
 
         Assert.Multiple(() =>
         {
-            Assert.That(Strategy.HandledIndexInfos[0][0].IndexAlias, Is.EqualTo(global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent));
+            Assert.That(Strategy.HandledIndexInfos[0][0].IndexAlias, Is.EqualTo(global::Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent));
             Assert.That(Strategy.HandledIndexInfos[0][0].Indexer, Is.TypeOf<TestIndexerAndSearcher>());
         });
     }

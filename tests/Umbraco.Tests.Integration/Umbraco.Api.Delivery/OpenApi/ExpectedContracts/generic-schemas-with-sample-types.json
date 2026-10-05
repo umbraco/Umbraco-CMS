@@ -11,7 +11,7 @@
         "tags": [
           "Content"
         ],
-        "operationId": "GetContent2.0",
+        "operationId": "GetContent2_0",
         "parameters": [
           {
             "name": "fetch",
@@ -283,7 +283,7 @@
         "tags": [
           "Content"
         ],
-        "operationId": "GetContentItemById2.0",
+        "operationId": "GetContentItemById2_0",
         "parameters": [
           {
             "name": "id",
@@ -423,7 +423,7 @@
         "tags": [
           "Content"
         ],
-        "operationId": "GetContentItemByPath2.0",
+        "operationId": "GetContentItemByPath2_0",
         "parameters": [
           {
             "name": "path",
@@ -563,7 +563,7 @@
         "tags": [
           "Content"
         ],
-        "operationId": "GetContentItems2.0",
+        "operationId": "GetContentItems2_0",
         "parameters": [
           {
             "name": "id",
@@ -705,7 +705,7 @@
         "tags": [
           "Media"
         ],
-        "operationId": "GetMedia2.0",
+        "operationId": "GetMedia2_0",
         "parameters": [
           {
             "name": "fetch",
@@ -898,7 +898,7 @@
         "tags": [
           "Media"
         ],
-        "operationId": "GetMediaItemById2.0",
+        "operationId": "GetMediaItemById2_0",
         "parameters": [
           {
             "name": "id",
@@ -984,7 +984,7 @@
         "tags": [
           "Media"
         ],
-        "operationId": "GetMediaItemByPath2.0",
+        "operationId": "GetMediaItemByPath2_0",
         "parameters": [
           {
             "name": "path",
@@ -1069,7 +1069,7 @@
         "tags": [
           "Media"
         ],
-        "operationId": "GetMediaItems2.0",
+        "operationId": "GetMediaItems2_0",
         "parameters": [
           {
             "name": "id",
@@ -1173,12 +1173,6 @@
               "string"
             ]
           },
-          "name": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "createDate": {
             "type": "string",
             "format": "date-time"
@@ -1193,6 +1187,12 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "properties": {
             "type": [
