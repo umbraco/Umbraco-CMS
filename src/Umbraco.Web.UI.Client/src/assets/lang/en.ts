@@ -408,6 +408,8 @@ export default {
 		duplicateBlueprintMessage: 'Another Document Blueprint with the same name already exists',
 		blueprintDescription:
 			'A Document Blueprint is predefined content that an editor can select to use as the basis for creating new content',
+		noAccessToBlueprints:
+			'You do not have permission to manage Document Blueprints. Ask an administrator to give you access.',
 	},
 	entityDetail: {
 		notFoundTitle: (entityType: string) => {
