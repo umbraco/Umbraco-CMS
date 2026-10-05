@@ -249,7 +249,6 @@ namespace Umbraco.Cms
                 using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing isolated caches from database..."))
                 {
                     IReadOnlyCollection<RepositoryCacheVersion> cacheVersions = _repositoryCacheVersionService.GetCacheVersionsAsync().GetAwaiter().GetResult();
-                    // TODO: Is this nececary? Or can we simply include it in LastSynced manager, it's already atomic, we can just make that not-persist.
                     var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
                     var previousLastId = lastId;
                     var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.IsolatedCachesOnly, ref lastId, out var processedAllPending);
