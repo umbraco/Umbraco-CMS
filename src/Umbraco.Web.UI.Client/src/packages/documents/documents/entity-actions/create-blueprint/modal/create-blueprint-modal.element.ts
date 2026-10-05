@@ -1,6 +1,8 @@
 import { UmbDocumentDetailRepository } from '../../../repository/index.js';
 import type { UmbCreateBlueprintModalData, UmbCreateBlueprintModalValue } from './create-blueprint-modal.token.js';
-import { html, customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -19,6 +21,25 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _blueprintName = '';
+
+	@state()
+	private _hasBlueprintAccess?: boolean;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			if (!context) return;
+
+			this.observe(
+				observeMultiple([context.hasDocumentBlueprintRootAccess, context.documentBlueprintStartNodeUniques]),
+				([hasRootAccess, startNodeUniques]) => {
+					this._hasBlueprintAccess = hasRootAccess === true || (startNodeUniques?.length ?? 0) > 0;
+				},
+				'_observeDocumentBlueprintAccess',
+			);
+		});
+	}
 
 	override firstUpdated() {
 		this.#documentUnique = this.data?.unique ?? '';
@@ -42,16 +63,22 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_createblueprint')}>
 				<uui-box id="tree-box" headline=${this.localize.term('blueprints_createBlueprintFrom', this._documentName)}>
-					<umb-localize key="blueprints_blueprintDescription"></umb-localize>
-					<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical">
-						<div slot="editor">
-							<uui-input
-								id="name"
-								label="name"
-								.value=${this._blueprintName}
-								@input=${(e: UUIInputEvent) => (this._blueprintName = e.target.value as string)}></uui-input>
-						</div>
-					</umb-property-layout>
+					${when(
+						this._hasBlueprintAccess === false,
+						() => html`<umb-localize id="no-access" key="blueprints_noAccessToBlueprints"></umb-localize>`,
+						() => html`
+							<umb-localize key="blueprints_blueprintDescription"></umb-localize>
+							<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical">
+								<div slot="editor">
+									<uui-input
+										id="name"
+										label="name"
+										.value=${this._blueprintName}
+										@input=${(e: UUIInputEvent) => (this._blueprintName = e.target.value as string)}></uui-input>
+								</div>
+							</umb-property-layout>
+						`,
+					)}
 				</uui-box>
 				<uui-button
 					slot="actions"
@@ -63,6 +90,7 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 					id="save"
 					look="primary"
 					color="positive"
+					?disabled=${this._hasBlueprintAccess !== true}
 					label=${this.localize.term('buttons_save')}
 					@click="${this.#handleSave}"></uui-button>
 			</umb-body-layout>

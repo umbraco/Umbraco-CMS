@@ -323,6 +323,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'blueprints_createdBlueprintHeading',
 	'blueprints_createdBlueprintMessage',
 	'blueprints_duplicateBlueprintMessage',
+	'blueprints_noAccessToBlueprints',
 	'blueprints_selectBlueprint',
 	'bulk_copiedItem',
 	'bulk_copiedItemOfItem',

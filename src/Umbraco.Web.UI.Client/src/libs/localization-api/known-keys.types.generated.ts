@@ -350,6 +350,7 @@ declare global {
 		blueprints_createdBlueprintHeading: string;
 		blueprints_createdBlueprintMessage: string;
 		blueprints_duplicateBlueprintMessage: string;
+		blueprints_noAccessToBlueprints: string;
 		blueprints_selectBlueprint: string;
 		bulk_copiedItem: string;
 		bulk_copiedItemOfItem: string;
