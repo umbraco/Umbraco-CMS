@@ -16,7 +16,7 @@ public class ActiveIndexManagerTests
     private IActiveIndexManager _activeIndexManager;
     private IExamineManager _examineManager;
 
-    private const string IndexAlias = global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
+    private const string IndexAlias = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent;
 
     [SetUp]
     public void SetUp()
@@ -193,8 +193,8 @@ public class ActiveIndexManagerTests
     [Test]
     public void DifferentIndexAliases_HaveIndependentState()
     {
-        var publishedAlias = global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
-        var draftAlias = global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent;
+        var publishedAlias = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent;
+        var draftAlias = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftContent;
 
         _activeIndexManager.StartRebuilding(publishedAlias);
 
@@ -208,8 +208,8 @@ public class ActiveIndexManagerTests
     [Test]
     public void DifferentIndexAliases_SwapIndependently()
     {
-        var publishedAlias = global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
-        var draftAlias = global::Umbraco.Cms.Core.Constants.IndexAliases.DraftContent;
+        var publishedAlias = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent;
+        var draftAlias = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftContent;
 
         // Swap published only
         _activeIndexManager.StartRebuilding(publishedAlias);

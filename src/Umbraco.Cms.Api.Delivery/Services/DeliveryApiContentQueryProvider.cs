@@ -104,7 +104,7 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
 
         AccessContext? accessContext = GetAccessContextAsync().GetAwaiter().GetResult();
 
-        var indexAlias = preview ? Umbraco.Cms.Core.Constants.IndexAliases.DraftContent : Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
+        var indexAlias = preview ? Constants.Search.IndexAliases.DraftContent : Constants.Search.IndexAliases.PublishedContent;
         SearchResult result = _searcher
             .SearchAsync(indexAlias, null, filters, null, sorters, culture, null, accessContext, skip, take)
             .GetAwaiter()
@@ -218,7 +218,7 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
 
         fieldName = MapSystemFieldName(fieldName);
 
-        if (fieldName is Constants.IndexFieldNames.Level or Constants.IndexFieldNames.SortOrder)
+        if (fieldName is Constants.Search.FieldNames.Level or Constants.Search.FieldNames.SortOrder)
         {
             sorter = new IntegerSorter(fieldName, direction);
             return true;
@@ -241,24 +241,24 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
         => fieldName switch
         {
             // AncestorsSelectorIndexer:
-            "itemId" => Constants.IndexFieldNames.Id,
+            "itemId" => Constants.Search.FieldNames.Id,
             // ChildrenSelectorIndexer:
-            "parentId" => Constants.IndexFieldNames.ParentId,
+            "parentId" => Constants.Search.FieldNames.ParentId,
             // DescendantsSelectorIndexer:
             // TODO: this is somewhat wrong... PathIds equals ancestors-or-self, but the Delivery API queries for ancestors only
-            "ancestorIds" => Constants.IndexFieldNames.PathIds,
+            "ancestorIds" => Constants.Search.FieldNames.PathIds,
             // ContentTypeFilterIndexer:
-            "contentType" => Constants.IndexFieldNames.ContentTypeId,
+            "contentType" => Constants.Search.FieldNames.ContentTypeId,
             // NameFilterIndexer or NameSortIndexer:
-            "name" or "sortName" => Constants.IndexFieldNames.Name,
+            "name" or "sortName" => Constants.Search.FieldNames.Name,
             // CreateDateSortIndexer
-            "createDate" => Constants.IndexFieldNames.CreateDate,
+            "createDate" => Constants.Search.FieldNames.CreateDate,
             // UpdateDateSortIndexer
-            "updateDate" => Constants.IndexFieldNames.UpdateDate,
+            "updateDate" => Constants.Search.FieldNames.UpdateDate,
             // LevelSortIndexer
-            "level" => Constants.IndexFieldNames.Level,
+            "level" => Constants.Search.FieldNames.Level,
             // SortOrderSortIndexer
-            "sortOrder" => Constants.IndexFieldNames.SortOrder,
+            "sortOrder" => Constants.Search.FieldNames.SortOrder,
             _ => fieldName
         };
 
@@ -283,7 +283,7 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
 
     private string[] MapSystemFieldValues(string fieldName, string[] values)
     {
-        if (fieldName is not Constants.IndexFieldNames.ContentTypeId)
+        if (fieldName is not Constants.Search.FieldNames.ContentTypeId)
         {
             return values;
         }
