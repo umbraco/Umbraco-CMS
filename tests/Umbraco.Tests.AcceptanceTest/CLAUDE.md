@@ -6,10 +6,10 @@ Playwright end-to-end tests for Umbraco CMS. This file covers **how the suite is
 
 ## 1. Type-checking
 
-`npm run build` compiles `lib/` only (`tsconfig.build.json`), so it does **not** type-check the spec files under `tests/`. To catch a type error in a spec, run `tsc` against the root config yourself before committing — it needs no Umbraco instance:
+`npm run build` compiles `lib/` only (`tsconfig.build.json`), so it does **not** type-check the spec files under `tests/`. Run the type-check before committing — it needs no Umbraco instance, and CI runs it too:
 
 ```bash
-npx tsc -p tsconfig.json --noEmit   # type-checks lib/ AND tests/
+npm run typecheck   # tsc -p tsconfig.json --noEmit — lib/ AND tests/
 ```
 
 There is no lint step: the dropped-promise discipline in §3 is a convention you must apply by hand, not something a tool enforces.

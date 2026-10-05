@@ -42,12 +42,39 @@ You can watch a video following these instructions [here](https://www.youtube.co
 | `npm run test` | Execute DefaultConfig tests headlessly |
 | `npm run ui` | Open Playwright UI mode with browser |
 | `npm run smokeTest` | Run quick smoke tests (`@smoke` tagged) |
+| `npm run smokeTestSqlite` | Smoke tests excluding User tests (SQLite limitation) |
 | `npm run releaseTest` | Run comprehensive release tests (`@release` tagged) |
+| `npm run richTextEditorTest` | Rich text editor — Tiptap, TinyMCE, the RTE data types and their rendering |
+| `npm run blockEditorTest` | Block grid and block list, in both the data type and the content workspace |
+| `npm run documentTypeTest` | Document types and element types, plus the content specs driven by their settings |
+| `npm run dataTypeTest` | Specs whose path contains `DataType`: mostly data type configuration; most property editors used in content are under `Content/ContentWith*` |
+| `npm run mediaTest` | Media, media types, the media pickers and media start nodes |
+| `npm run memberTest` | Members, member groups, member types and the member pickers |
+| `npm run userTest` | Users, user groups and permissions |
+| `npm run languageTest` | Languages, cultures and variant content |
+| `npm run templatingTest` | Templates, partial views, stylesheets and scripts |
+| `npm run renderingTest` | Front-end rendering of content |
 | `npm run all` | Run all test suites |
 | `npm run testSqlite` | Run tests excluding User tests (SQLite limitation) |
 | `npm run testWindows` | Run tests excluding RelationType tests |
-| `npm run createTest <name>` | Generate a new test file template |
+| `npm run createTest <Name> [area]` | Generate a working spec under `tests/DefaultConfig/[area]` |
 | `npm run config` | Reconfigure environment settings |
+| `npm run build` | Compile `lib/` to `dist/` (does **not** type-check `tests/`) |
+| `npm run typecheck` | Type-check `lib/` **and** `tests/` |
+
+> Every `test`/`ui`/`smokeTest`/… script runs `npm run build` first, so `lib/` changes are picked up automatically.
+
+> **The area scripts** (`richTextEditorTest` … `renderingTest`) check one product area without running the whole suite. They overlap on purpose — a media picker spec is in both `mediaTest` and `dataTypeTest` — and together they do not cover every spec. Append `--list` to the underlying command to see what one covers.
+>
+> They filter on the spec file path, so a new spec in an area directory is picked up with no script change. A positional filter is a case-insensitive regex matched against the absolute path, so a bare `Users` matches every spec on a checkout under `C:\Users\…`. Anchor each fragment with `DefaultConfig.*`, use `.` rather than a path separator (`"DefaultConfig.*Settings.Script"`), and confirm a new fragment with `npx playwright test "<fragment>" --list`.
+
+### Before committing
+
+```bash
+npm run typecheck   # a type error in a spec does not surface from `npm run build`
+```
+
+It needs no running Umbraco instance, and CI runs it (`build/azure-pipelines.yml`, `Build` stage, job C), so a type error in a spec fails the build.
 
 ### Running Single Tests
 
@@ -113,18 +140,17 @@ test.afterEach(async ({ umbracoApi }) => {
 
 test('can create content', { tag: '@smoke' }, async ({ umbracoApi, umbracoUi }) => {
   // Arrange - Setup test data via API
-  const documentTypeId = await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
+  await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
 
   // Act - Perform UI actions
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert - Verify results
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 });
 ```
@@ -147,10 +173,11 @@ test('comprehensive test', { tag: '@release' }, async ({ umbracoApi, umbracoUi }
 
 Use the generator script:
 ```bash
-npm run createTest MyFeatureName
+npm run createTest MyFeatureName            # tests/DefaultConfig/MyFeatureName.spec.ts
+npm run createTest MyFeatureName Content    # tests/DefaultConfig/Content/MyFeatureName.spec.ts
 ```
 
-This creates `tests/MyFeatureName.spec.ts` with a template.
+The generated spec is a working create-content test with teardown; replace its body with your scenario. It refuses to overwrite an existing file.
 
 ### Test Conventions
 
