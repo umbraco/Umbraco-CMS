@@ -2702,8 +2702,8 @@ export default {
 		getSampleDescription:
 			'Dette tilføjer basale og hjælper dig til at komme igang med Block Grid Editor.<br/>Dette indeholder blokke for Overskrift, Beriget-Tekst, Billede og To-Koloners-Layout.',
 		getSampleButton: 'Installer',
-		actionEnterSortMode: 'Sortingstilstand',
-		actionExitSortMode: 'Afslut sortingstilstand',
+		actionEnterSortMode: 'Sorteringstilstand',
+		actionExitSortMode: 'Afslut sorteringstilstand',
 		areaAliasIsNotUnique: 'Dette område alias skal være unikt sammenlignet med andre områder af denne blok.',
 		configureArea: 'Konfigurer område',
 		deleteArea: 'Slet område',
