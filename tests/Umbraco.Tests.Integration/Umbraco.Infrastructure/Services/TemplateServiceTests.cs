@@ -1,9 +1,17 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -16,6 +24,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 internal sealed class TemplateServiceTests : UmbracoIntegrationTest
 {
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
+    private IFileSystem ViewsFileSystem => GetRequiredService<FileSystems>().MvcViewsFileSystem!;
 
     [SetUp]
     public void SetUp() => DeleteAllTemplateViewFiles();
@@ -296,4 +306,170 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         });
     }
 
+    [Test]
+    public async Task Create_Writes_View_File()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("View File", "viewFile", "view-content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        Assert.IsTrue(ViewsFileSystem.FileExists("viewFile.cshtml"));
+        Assert.AreEqual("view-content", ReadViewFile("viewFile.cshtml"));
+    }
+
+    [Test]
+    public async Task Create_Uses_Content_Of_Existing_View_File()
+    {
+        WriteViewFile("existingView.cshtml", "existing-content");
+
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Existing View", "existingView", "new-content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        Assert.AreEqual("existing-content", result.Result.Content);
+        Assert.AreEqual("existing-content", ReadViewFile("existingView.cshtml"));
+    }
+
+    [Test]
+    public async Task Update_Writes_Changed_Content_To_View_File()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Update View", "updateView", "original-content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        ITemplate template = (await TemplateService.GetAsync(result.Result.Key, CancellationToken.None))!;
+        template.Content = "updated-content";
+        result = await TemplateService.UpdateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        Assert.AreEqual("updated-content", ReadViewFile("updateView.cshtml"));
+    }
+
+    [Test]
+    public async Task Update_Renames_View_File_When_Alias_Changes()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Rename View", "renameView", "rename-content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        ITemplate template = (await TemplateService.GetAsync(result.Result.Key, CancellationToken.None))!;
+        template.Alias = "renamedView";
+        result = await TemplateService.UpdateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        Assert.IsFalse(ViewsFileSystem.FileExists("renameView.cshtml"));
+        Assert.IsTrue(ViewsFileSystem.FileExists("renamedView.cshtml"));
+        Assert.AreEqual("rename-content", ReadViewFile("renamedView.cshtml"));
+    }
+
+    [Test]
+    public async Task Delete_Removes_View_File()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Delete View", "deleteView", "content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+        Assert.IsTrue(ViewsFileSystem.FileExists("deleteView.cshtml"));
+
+        Attempt<ITemplate?, TemplateOperationStatus> deleteResult = await TemplateService.DeleteAsync(result.Result.Key, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(deleteResult.Success);
+
+        Assert.IsFalse(ViewsFileSystem.FileExists("deleteView.cshtml"));
+        Assert.IsNull(await TemplateService.GetAsync(result.Result.Key, CancellationToken.None));
+    }
+
+    [Test]
+    public async Task Read_Loads_Content_From_View_File()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Read View", "readView", "original-content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        WriteViewFile("readView.cshtml", "changed-on-disk");
+
+        ITemplate? byKey = await TemplateService.GetAsync(result.Result.Key, CancellationToken.None);
+        ITemplate? byAlias = await TemplateService.GetAsync("readView", CancellationToken.None);
+        ITemplate fromAll = (await TemplateService.GetAllAsync(CancellationToken.None)).Single(template => template.Key == result.Result.Key);
+
+        Assert.AreEqual("changed-on-disk", byKey!.Content);
+        Assert.AreEqual("changed-on-disk", byAlias!.Content);
+        Assert.AreEqual("changed-on-disk", fromAll.Content);
+    }
+
+    [TestCase(RuntimeMode.Development)]
+    [TestCase(RuntimeMode.BackofficeDevelopment)]
+    public async Task Create_Writes_View_File_Outside_Production_Mode(RuntimeMode runtimeMode)
+    {
+        ITemplateService templateService = CreateTemplateService(runtimeMode);
+
+        Attempt<ITemplate, TemplateOperationStatus> result = await templateService.CreateAsync("Mode View", "modeView", "mode-content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        Assert.IsTrue(ViewsFileSystem.FileExists("modeView.cshtml"));
+    }
+
+    [Test]
+    public async Task Create_In_Production_Mode_Does_Not_Write_View_File()
+    {
+        ITemplateService templateService = CreateTemplateService(RuntimeMode.Production);
+
+        Attempt<ITemplate, TemplateOperationStatus> result = await templateService.CreateAsync("Production View", "productionView", "content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        Assert.IsNotNull(await templateService.GetAsync(result.Result.Key, CancellationToken.None));
+        Assert.IsFalse(ViewsFileSystem.FileExists("productionView.cshtml"));
+    }
+
+    [Test]
+    public async Task Update_In_Production_Mode_Does_Not_Change_View_File()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Production Update", "productionUpdate", "original-content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        ITemplateService productionTemplateService = CreateTemplateService(RuntimeMode.Production);
+        ITemplate template = (await productionTemplateService.GetAsync(result.Result.Key, CancellationToken.None))!;
+        template.Content = "modified-content";
+        result = await productionTemplateService.UpdateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        Assert.AreEqual("original-content", ReadViewFile("productionUpdate.cshtml"));
+    }
+
+    [Test]
+    public async Task Delete_In_Production_Mode_Does_Not_Remove_View_File()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Production Delete", "productionDelete", "content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        ITemplateService productionTemplateService = CreateTemplateService(RuntimeMode.Production);
+        Attempt<ITemplate?, TemplateOperationStatus> deleteResult = await productionTemplateService.DeleteAsync(result.Result.Key, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(deleteResult.Success);
+
+        Assert.IsNull(await productionTemplateService.GetAsync(result.Result.Key, CancellationToken.None));
+        Assert.IsTrue(ViewsFileSystem.FileExists("productionDelete.cshtml"));
+    }
+
+    private ITemplateService CreateTemplateService(RuntimeMode runtimeMode)
+    {
+        var runtimeSettings = new Mock<IOptionsMonitor<RuntimeSettings>>();
+        runtimeSettings.Setup(x => x.CurrentValue).Returns(new RuntimeSettings { Mode = runtimeMode });
+
+        return new TemplateService(
+            GetRequiredService<global::Umbraco.Cms.Core.Scoping.EFCore.IScopeProvider>(),
+            GetRequiredService<ILoggerFactory>(),
+            GetRequiredService<IEventMessagesFactory>(),
+            ShortStringHelper,
+            GetRequiredService<ITemplateRepository>(),
+            GetRequiredService<IAuditService>(),
+            GetRequiredService<ITemplateContentParserService>(),
+            GetRequiredService<IViewHelper>(),
+            GetRequiredService<FileSystems>(),
+            runtimeSettings.Object);
+    }
+
+    private string ReadViewFile(string path)
+    {
+        using Stream stream = ViewsFileSystem.OpenFile(path);
+        using var reader = new StreamReader(stream, Encoding.UTF8, true);
+        return reader.ReadToEnd();
+    }
+
+    private void WriteViewFile(string path, string content)
+    {
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+        ViewsFileSystem.AddFile(path, stream, true);
+    }
 }

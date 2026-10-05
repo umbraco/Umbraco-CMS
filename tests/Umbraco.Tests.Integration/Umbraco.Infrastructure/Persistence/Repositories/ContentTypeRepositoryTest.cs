@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -76,147 +78,121 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task Retrieval_By_Id_After_Retrieval_By_Id_Is_Cached()
     {
-        var realCache = new AppCaches(
-            new ObjectCacheAppCache(),
-            new DictionaryAppCache(),
-            new IsolatedCaches(t => new ObjectCacheAppCache()));
+        var realCache = CreateRealAppCaches();
 
-        var provider = ScopeProvider;
-        var scopeAccessor = ScopeAccessor;
-
-        using var scope = provider.CreateScope();
-        var repository = CreateRepository((IScopeAccessor)provider, realCache);
-
-        var database = scopeAccessor.AmbientScope.Database;
-
+        using var scope = ScopeProvider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)ScopeProvider, realCache);
         var contentType = _simpleContentType;
-        database.EnableSqlCount = true;
-
-        // Clear the isolated cache for IContentType so the next retrieval hits the database
-        realCache.IsolatedCaches.ClearCache<IContentType>();
 
         // Initial request by Id should hit the database.
-        await repository.GetAsync(contentType.Id, CancellationToken.None);
-        Assert.Greater(database.SqlCount, 0);
-
-        // Reset counter.
-        database.EnableSqlCount = false;
-        database.EnableSqlCount = true;
+        var initialCount = await CountCommandsAsync(() => repository.GetAsync(contentType.Id, CancellationToken.None));
+        Assert.Greater(initialCount, 0);
 
         // Subsequent requests should use the cache.
-        await repository.GetAsync(contentType.Id, CancellationToken.None);
-        Assert.AreEqual(0, database.SqlCount);
+        var subsequentCount = await CountCommandsAsync(() => repository.GetAsync(contentType.Id, CancellationToken.None));
+        Assert.AreEqual(0, subsequentCount);
     }
 
     [Test]
     public async Task Retrieval_By_Key_After_Retrieval_By_Key_Is_Cached()
     {
-        var realCache = new AppCaches(
-            new ObjectCacheAppCache(),
-            new DictionaryAppCache(),
-            new IsolatedCaches(t => new ObjectCacheAppCache()));
+        var realCache = CreateRealAppCaches();
 
-        var provider = ScopeProvider;
-        var scopeAccessor = ScopeAccessor;
-
-        using var scope = provider.CreateScope();
-        var repository = CreateRepository((IScopeAccessor)provider, realCache);
-
-        var database = scopeAccessor.AmbientScope.Database;
-
+        using var scope = ScopeProvider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)ScopeProvider, realCache);
         var contentType = _simpleContentType;
-        database.EnableSqlCount = true;
-
-        // Clear the isolated cache for IContentType so the next retrieval hits the database
-        realCache.IsolatedCaches.ClearCache<IContentType>();
 
         // Initial request by key should hit the database.
-        await repository.GetAsync(contentType.Key, CancellationToken.None);
-        Assert.Greater(database.SqlCount, 0);
-
-        // Reset counter.
-        database.EnableSqlCount = false;
-        database.EnableSqlCount = true;
+        var initialCount = await CountCommandsAsync(() => repository.GetAsync(contentType.Key, CancellationToken.None));
+        Assert.Greater(initialCount, 0);
 
         // Subsequent requests should use the cache.
-        await repository.GetAsync(contentType.Key, CancellationToken.None);
-        Assert.AreEqual(0, database.SqlCount);
+        var subsequentCount = await CountCommandsAsync(() => repository.GetAsync(contentType.Key, CancellationToken.None));
+        Assert.AreEqual(0, subsequentCount);
     }
 
     [Test]
     public async Task Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
     {
-        var realCache = new AppCaches(
-            new ObjectCacheAppCache(),
-            new DictionaryAppCache(),
-            new IsolatedCaches(t => new ObjectCacheAppCache()));
+        var realCache = CreateRealAppCaches();
 
-        var provider = ScopeProvider;
-        var scopeAccessor = ScopeAccessor;
-
-        using var scope = provider.CreateScope();
-        var repository = CreateRepository((IScopeAccessor)provider, realCache);
-
-        var database = scopeAccessor.AmbientScope.Database;
-
+        using var scope = ScopeProvider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)ScopeProvider, realCache);
         var contentType = _simpleContentType;
-        database.EnableSqlCount = true;
 
-        // Clear the isolated cache for IContentType so the next retrieval hits the database
-        realCache.IsolatedCaches.ClearCache<IContentType>();
-
-        // Initial request by ID should hit the database.
-        await repository.GetAsync(contentType.Id, CancellationToken.None);
-        Assert.Greater(database.SqlCount, 0);
-
-        // Reset counter.
-        database.EnableSqlCount = false;
-        database.EnableSqlCount = true;
+        // Initial request by Id should hit the database.
+        var initialCount = await CountCommandsAsync(() => repository.GetAsync(contentType.Id, CancellationToken.None));
+        Assert.Greater(initialCount, 0);
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
-        await repository.GetAsync(contentType.Id, CancellationToken.None);
-        Assert.AreEqual(0, database.SqlCount);
+        var byIdCount = await CountCommandsAsync(() => repository.GetAsync(contentType.Id, CancellationToken.None));
+        Assert.AreEqual(0, byIdCount);
 
-        await repository.GetAsync(contentType.Key, CancellationToken.None);
-        Assert.AreEqual(0, database.SqlCount);
+        var byKeyCount = await CountCommandsAsync(() => repository.GetAsync(contentType.Key, CancellationToken.None));
+        Assert.AreEqual(0, byKeyCount);
     }
 
     [Test]
     public async Task Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
     {
-        var realCache = new AppCaches(
-            new ObjectCacheAppCache(),
-            new DictionaryAppCache(),
-            new IsolatedCaches(t => new ObjectCacheAppCache()));
+        var realCache = CreateRealAppCaches();
 
-        var provider = ScopeProvider;
-        var scopeAccessor = ScopeAccessor;
-
-        using var scope = provider.CreateScope();
-        var repository = CreateRepository((IScopeAccessor)provider, realCache);
-
-        var database = scopeAccessor.AmbientScope.Database;
-
+        using var scope = ScopeProvider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)ScopeProvider, realCache);
         var contentType = _simpleContentType;
-        database.EnableSqlCount = true;
-
-        // Clear the isolated cache for IContentType so the next retrieval hits the database
-        realCache.IsolatedCaches.ClearCache<IContentType>();
 
         // Initial request by key should hit the database.
-        await repository.GetAsync(contentType.Key, CancellationToken.None);
-        Assert.Greater(database.SqlCount, 0);
-
-        // Reset counter.
-        database.EnableSqlCount = false;
-        database.EnableSqlCount = true;
+        var initialCount = await CountCommandsAsync(() => repository.GetAsync(contentType.Key, CancellationToken.None));
+        Assert.Greater(initialCount, 0);
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
-        await repository.GetAsync(contentType.Key, CancellationToken.None);
-        Assert.AreEqual(0, database.SqlCount);
+        var byKeyCount = await CountCommandsAsync(() => repository.GetAsync(contentType.Key, CancellationToken.None));
+        Assert.AreEqual(0, byKeyCount);
 
-        await repository.GetAsync(contentType.Id, CancellationToken.None);
-        Assert.AreEqual(0, database.SqlCount);
+        var byIdCount = await CountCommandsAsync(() => repository.GetAsync(contentType.Id, CancellationToken.None));
+        Assert.AreEqual(0, byIdCount);
+    }
+
+    private CountingDbCommandInterceptor CommandCounter => GetRequiredService<CountingDbCommandInterceptor>();
+
+    /// <summary>
+    ///     Attaches the command counter so the caching tests can assert on query cost. The repository reads through
+    ///     EF Core, so the NPoco SQL count does not see its queries.
+    /// </summary>
+    protected override void ConfigureTestServices(IServiceCollection services)
+    {
+        services.AddSingleton<CountingDbCommandInterceptor>();
+
+        ServiceDescriptor descriptor = services.Single(d => d.ServiceType == typeof(DbContextOptions<UmbracoDbContext>));
+        Func<IServiceProvider, object> originalFactory = descriptor.ImplementationFactory!;
+        services.Remove(descriptor);
+        services.AddSingleton<DbContextOptions<UmbracoDbContext>>(serviceProvider =>
+        {
+            var options = (DbContextOptions<UmbracoDbContext>)originalFactory(serviceProvider);
+            return new DbContextOptionsBuilder<UmbracoDbContext>(options)
+                .AddInterceptors(serviceProvider.GetRequiredService<CountingDbCommandInterceptor>())
+                .Options;
+        });
+    }
+
+    private static AppCaches CreateRealAppCaches() => new(
+        new DeepCloneAppCache(new ObjectCacheAppCache()),
+        new DictionaryAppCache(),
+        new IsolatedCaches(_ => new DeepCloneAppCache(new ObjectCacheAppCache())));
+
+    private async Task<int> CountCommandsAsync(Func<Task> action)
+    {
+        CommandCounter.Enabled = true;
+        CommandCounter.Reset();
+        try
+        {
+            await action();
+            return CommandCounter.Count;
+        }
+        finally
+        {
+            CommandCounter.Enabled = false;
+        }
     }
 
     private ContentTypeRepository CreateRepository(IScopeAccessor scopeAccessor, AppCaches? appCaches = null)
