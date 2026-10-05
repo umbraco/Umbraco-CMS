@@ -2,6 +2,7 @@ using Umbraco.Cms.Api.Management.Patching;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Patching;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -17,22 +18,22 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
-    private readonly ITemplateService _templateService;
+    private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentEditingPresentationFactory"/> class.
     /// </summary>
     /// <param name="propertyEditorCollection">The collection of available property editors.</param>
     /// <param name="dataValueEditorFactory">The factory for creating data value editors.</param>
-    /// <param name="templateService">The service for retrieving templates.</param>
+    /// <param name="idKeyMap">Maps template ids to keys.</param>
     public DocumentEditingPresentationFactory(
         PropertyEditorCollection propertyEditorCollection,
         IDataValueEditorFactory dataValueEditorFactory,
-        ITemplateService templateService)
+        IIdKeyMap idKeyMap)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataValueEditorFactory = dataValueEditorFactory;
-        _templateService = templateService;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc/>
@@ -58,9 +59,12 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
 
         DocumentVariantRequestModel[] variants = MapVariantsToRequestModel(content);
 
-        Guid? templateKey = content.TemplateId.HasValue
-            ? (await _templateService.GetAsync(content.TemplateId.Value))?.Key
-            : null;
+        Guid? templateKey = null;
+        if (content.TemplateId.HasValue)
+        {
+            Attempt<Guid> templateKeyAttempt = await _idKeyMap.GetKeyForIdAsync(content.TemplateId.Value, UmbracoObjectTypes.Template);
+            templateKey = templateKeyAttempt.Success ? templateKeyAttempt.Result : null;
+        }
 
         return new UpdateDocumentRequestModel
         {

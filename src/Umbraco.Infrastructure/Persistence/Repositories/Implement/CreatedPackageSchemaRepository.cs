@@ -658,7 +658,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            ITemplate? template = _templateService.GetAsync(templateKey).GetAwaiter().GetResult();
+            ITemplate? template = _templateService.GetAsync(templateKey, CancellationToken.None).GetAwaiter().GetResult();
             if (template == null)
             {
                 continue;

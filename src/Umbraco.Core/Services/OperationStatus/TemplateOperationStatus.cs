@@ -54,16 +54,4 @@ public enum TemplateOperationStatus
     ///     The operation failed because changing template content is not allowed in production mode.
     /// </summary>
     ContentChangeNotAllowedInProductionMode,
-
-    /// <inheritdoc cref="LayoutTemplateNotFound" />
-    [Obsolete("Use LayoutTemplateNotFound instead. Scheduled for removal in Umbraco 20.")]
-    MasterTemplateNotFound = LayoutTemplateNotFound,
-
-    /// <inheritdoc cref="CircularLayoutTemplateReference" />
-    [Obsolete("Use CircularLayoutTemplateReference instead. Scheduled for removal in Umbraco 20.")]
-    CircularMasterTemplateReference = CircularLayoutTemplateReference,
-
-    /// <inheritdoc cref="LayoutTemplateCannotBeDeleted" />
-    [Obsolete("Use LayoutTemplateCannotBeDeleted instead. Scheduled for removal in Umbraco 20.")]
-    MasterTemplateCannotBeDeleted = LayoutTemplateCannotBeDeleted,
 }

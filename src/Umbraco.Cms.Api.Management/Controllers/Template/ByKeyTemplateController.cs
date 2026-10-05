@@ -42,7 +42,7 @@ public class ByKeyTemplateController : TemplateControllerBase
     [EndpointDescription("Gets a template identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
-        ITemplate? template = await _templateService.GetAsync(id);
+        ITemplate? template = await _templateService.GetAsync(id, cancellationToken);
         return template == null
             ? TemplateNotFound()
             : Ok(await _templatePresentationFactory.CreateTemplateResponseModelAsync(template));

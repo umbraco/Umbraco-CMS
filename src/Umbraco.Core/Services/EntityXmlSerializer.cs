@@ -121,7 +121,10 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         ITemplate? assignedTemplate = null;
         if (content.TemplateId.HasValue && !templateCache.TryGetValue(content.TemplateId.Value, out assignedTemplate))
         {
-            assignedTemplate = _templateService.GetAsync(content.TemplateId.Value).GetAwaiter().GetResult();
+            Attempt<Guid> templateKeyAttempt = _idKeyMap.GetKeyForIdAsync(content.TemplateId.Value, UmbracoObjectTypes.Template).GetAwaiter().GetResult();
+            assignedTemplate = templateKeyAttempt.Success
+                ? _templateService.GetAsync(templateKeyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+                : null;
             templateCache[content.TemplateId.Value] = assignedTemplate;
         }
 

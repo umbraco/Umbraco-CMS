@@ -1598,24 +1598,29 @@ internal class DocumentRepository
             return await AssembleEntitiesAsync(rows, db);
         });
 
-    private HashSet<int> ResolveValidTemplateIds(IReadOnlyList<DocumentRow> rows)
+    private async Task<HashSet<int>> ResolveValidTemplateIdsAsync(IReadOnlyList<DocumentRow> rows)
     {
-        int[] templateIds = [.. rows
+        var templateIds = rows
             .SelectMany(row => new[] { row.DocumentVersion.TemplateId, row.PublishedDocumentVersion?.TemplateId })
             .Where(id => id.HasValue)
             .Select(id => id!.Value)
-            .Distinct()];
+            .ToHashSet();
 
-        return templateIds.Length > 0
-            ? [.. _templateRepository.GetMany(templateIds).Select(template => template.Id)]
-            : [];
+        if (templateIds.Count == 0)
+        {
+            return [];
+        }
+
+        // Templates are fully cached, so validating against all of them avoids a query per batch.
+        IEnumerable<ITemplate> allTemplates = await _templateRepository.GetAllAsync(CancellationToken.None);
+        return [.. allTemplates.Select(template => template.Id).Where(templateIds.Contains)];
     }
 
     private async Task<List<IContent>> AssembleEntitiesAsync(IReadOnlyList<DocumentRow> rows, UmbracoDbContext db, string[]? propertyAliases = null, bool loadTemplates = true)
     {
         // Resolve valid template IDs once for the whole batch (mirrors NPoco AddAdditionalTempContentMapping).
         // null means "skip template assignment entirely".
-        HashSet<int>? validTemplateIds = loadTemplates ? ResolveValidTemplateIds(rows) : null;
+        HashSet<int>? validTemplateIds = loadTemplates ? await ResolveValidTemplateIdsAsync(rows) : null;
 
         int[] nodeIds = [.. rows.Select(row => row.Node.NodeId)];
 

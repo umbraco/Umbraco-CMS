@@ -9,144 +9,94 @@ namespace Umbraco.Cms.Core.Services;
 public interface ITemplateService : IService
 {
     /// <summary>
-    ///     Gets a list of all <see cref="ITemplate" /> objects
+    ///     Gets a template by its key.
     /// </summary>
-    /// <returns>An enumerable list of <see cref="ITemplate" />.</returns>
-    Task<IEnumerable<ITemplate>> GetAllAsync(params string[] aliases);
+    /// <param name="key">The key of the template.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The template, or <c>null</c> if not found.</returns>
+    Task<ITemplate?> GetAsync(Guid key, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a list of all <see cref="ITemplate" /> objects
-    /// </summary>
-    /// <returns>An enumerable list of <see cref="ITemplate" />.</returns>
-    Task<IEnumerable<ITemplate>> GetAllAsync(Guid[] keys);
-
-    /// <summary>
-    ///     Gets the child templates of a layout template.
-    /// </summary>
-    /// <param name="layoutTemplateId">The identifier of the layout template.</param>
-    /// <returns>An enumerable list of <see cref="ITemplate" /> objects.</returns>
-    Task<IEnumerable<ITemplate>> GetChildrenAsync(int layoutTemplateId);
-
-    /// <summary>
-    ///     Gets a <see cref="ITemplate" /> object by its alias.
+    ///     Gets a template by its alias.
     /// </summary>
     /// <param name="alias">The alias of the template.</param>
-    /// <returns>The <see cref="ITemplate" /> object matching the alias, or null.</returns>
-    Task<ITemplate?> GetAsync(string? alias);
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The template, or <c>null</c> if not found.</returns>
+    Task<ITemplate?> GetAsync(string alias, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a <see cref="ITemplate" /> object by its identifier.
+    ///     Gets all templates.
     /// </summary>
-    /// <param name="id">The identifier of the template.</param>
-    /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
-    Task<ITemplate?> GetAsync(int id);
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>All templates.</returns>
+    Task<IEnumerable<ITemplate>> GetAllAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a <see cref="ITemplate" /> object by its guid identifier.
+    ///     Gets the templates with the specified keys.
     /// </summary>
-    /// <param name="id">The guid identifier of the template.</param>
-    /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
-    Task<ITemplate?> GetAsync(Guid id);
+    /// <param name="keys">The keys of the templates.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The templates found; keys that do not match a template are ignored.</returns>
+    Task<IEnumerable<ITemplate>> GetManyAsync(IEnumerable<Guid> keys, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets all descendant templates of a layout template.
+    ///     Creates a template.
     /// </summary>
-    /// <param name="layoutTemplateId">The identifier of the layout template.</param>
-    /// <returns>An enumerable list of descendant <see cref="ITemplate" /> objects.</returns>
-    Task<IEnumerable<ITemplate>> GetDescendantsAsync(int layoutTemplateId);
+    /// <param name="name">The name of the template.</param>
+    /// <param name="alias">The alias of the template.</param>
+    /// <param name="content">The view content of the template.</param>
+    /// <param name="templateKey">The key of the template, or <c>null</c> to generate one.</param>
+    /// <param name="userKey">The key of the user creating the template.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt holding the created template and the operation status.</returns>
+    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(
+        string name,
+        string alias,
+        string? content,
+        Guid? templateKey,
+        Guid userKey,
+        CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Updates a <see cref="ITemplate" />
+    ///     Creates a template.
     /// </summary>
-    /// <param name="template"><see cref="ITemplate" /> to update</param>
-    /// <param name="userKey">Key of the user saving the template</param>
-    /// <returns></returns>
-    Task<Attempt<ITemplate, TemplateOperationStatus>> UpdateAsync(ITemplate template, Guid userKey);
+    /// <param name="template">The template to create.</param>
+    /// <param name="userKey">The key of the user creating the template.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt holding the created template and the operation status.</returns>
+    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Creates a template for a content type
+    ///     Creates a template for a content type.
     /// </summary>
-    /// <param name="contentTypeAlias"></param>
-    /// <param name="contentTypeName"></param>
-    /// <param name="userKey">Key of the user performing the Create.</param>
-    /// <returns>
-    ///     The template created
-    /// </returns>
-    [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in Umbraco 19.")]
-    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
-        string contentTypeAlias,
-        string? contentTypeName,
-        Guid userKey);
-
-    /// <summary>
-    ///     Creates a template for a content type
-    /// </summary>
-    /// <param name="name">Name of the new template</param>
-    /// <param name="alias">Alias of the template</param>
-    /// <param name="contentTypeAlias">The content type alias</param>
-    /// <param name="userKey">Key of the user performing the Create.</param>
-    /// <returns>
-    ///     The template created
-    /// </returns>
+    /// <param name="name">The name of the template.</param>
+    /// <param name="alias">The alias of the template.</param>
+    /// <param name="contentTypeAlias">The alias of the content type the template is created for.</param>
+    /// <param name="userKey">The key of the user creating the template.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt holding the created template and the operation status.</returns>
     Task<Attempt<ITemplate?, TemplateOperationStatus>> CreateForContentTypeAsync(
         string name,
         string alias,
         string contentTypeAlias,
-        Guid userKey);
+        Guid userKey,
+        CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Creates a new template
+    ///     Updates a template.
     /// </summary>
-    /// <param name="templateKey"></param>
-    /// <param name="name">Name of the new template</param>
-    /// <param name="alias">Alias of the template</param>
-    /// <param name="content">View content for the new template</param>
-    /// <param name="userKey">Key of the user performing the Create.</param>
-    /// <returns></returns>
-    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(string name, string alias, string? content, Guid userKey, Guid? templateKey = null);
+    /// <param name="template">The template to update.</param>
+    /// <param name="userKey">The key of the user updating the template.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt holding the updated template and the operation status.</returns>
+    Task<Attempt<ITemplate, TemplateOperationStatus>> UpdateAsync(ITemplate template, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Creates a new template
+    ///     Deletes a template.
     /// </summary>
-    /// <param name="template">The new template</param>
-    /// <param name="userKey">Key of the user performing the Create.</param>
-    /// <returns></returns>
-    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey);
-
-    /// <summary>
-    ///     Deletes a template by its alias
-    /// </summary>
-    /// <param name="alias">Alias of the <see cref="ITemplate" /> to delete</param>
-    /// <param name="userKey">Key of the user performing the Delete.</param>
-    /// <returns>True if the template was deleted, false otherwise</returns>
-    Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(string alias, Guid userKey);
-
-    /// <summary>
-    ///     Deletes a template by its key
-    /// </summary>
-    /// <param name="key">Key of the <see cref="ITemplate" /> to delete</param>
-    /// <param name="userKey">Key of the user performing the Delete.</param>
-    /// <returns>True if the template was deleted, false otherwise</returns>
-    Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Guid key, Guid userKey);
-
-    /// <summary>
-    ///     Gets the content of a template as a stream.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the template.</param>
-    /// <returns>The content of the template.</returns>
-    Task<Stream> GetFileContentStreamAsync(string filepath);
-
-    /// <summary>
-    ///     Sets the content of a template.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the template.</param>
-    /// <param name="content">The content of the template.</param>
-    Task SetFileContentAsync(string filepath, Stream content);
-
-    /// <summary>
-    ///     Gets the size of a template.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the template.</param>
-    /// <returns>The size of the template.</returns>
-    Task<long> GetFileSizeAsync(string filepath);
+    /// <param name="key">The key of the template to delete.</param>
+    /// <param name="userKey">The key of the user deleting the template.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt holding the deleted template and the operation status.</returns>
+    Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Guid key, Guid userKey, CancellationToken cancellationToken);
 }

@@ -146,7 +146,7 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
             }
 
             MapAllowedContentTypes(contentTypes, allowedDtos);
-            MapTemplates(contentTypes, templateDtos);
+            await MapTemplatesAsync(contentTypes, templateDtos);
             MapCompositions(contentTypes, compositionDtos);
             MapGroupsAndProperties(contentTypes, groupDtos, propertyDtos);
             MapHistoryCleanup(contentTypes, cleanupDtos);
@@ -189,11 +189,11 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
         }
     }
 
-    private void MapTemplates(
+    private async Task MapTemplatesAsync(
         Dictionary<int, IContentTypeComposition> contentTypes,
         List<ContentTypeTemplateDto> templateDtos)
     {
-        IEnumerable<ITemplate>? allTemplates = _templateRepository.GetMany((int[]?)null);
+        IEnumerable<ITemplate> allTemplates = await _templateRepository.GetAllAsync(CancellationToken.None);
         Dictionary<int, ITemplate> templates = allTemplates.ToDictionary(x => x.Id, x => x);
 
         Dictionary<int, List<ContentTypeTemplateDto>> templatesByContentTypeId = templateDtos

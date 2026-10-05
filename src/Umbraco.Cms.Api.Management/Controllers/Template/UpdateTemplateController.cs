@@ -81,7 +81,7 @@ public class UpdateTemplateController : TemplateControllerBase
         Guid id,
         UpdateTemplateRequestModel requestModel)
     {
-        ITemplate? template = await _templateService.GetAsync(id);
+        ITemplate? template = await _templateService.GetAsync(id, cancellationToken);
         if (template == null)
         {
             return TemplateNotFound();
@@ -95,7 +95,7 @@ public class UpdateTemplateController : TemplateControllerBase
             return TemplateOperationStatusResult(TemplateOperationStatus.ContentChangeNotAllowedInProductionMode);
         }
 
-        Attempt<ITemplate, TemplateOperationStatus> result = await _templateService.UpdateAsync(template, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<ITemplate, TemplateOperationStatus> result = await _templateService.UpdateAsync(template, CurrentUserKey(_backOfficeSecurityAccessor), cancellationToken);
 
         return result.Success ?
             Ok()

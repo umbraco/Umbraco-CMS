@@ -1,57 +1,38 @@
-using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Persistence;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Cache;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Factories.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <summary>
-///     Represents the Template Repository
+///     Represents the template repository.
 /// </summary>
-internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITemplateRepository
+internal sealed class TemplateRepository : AsyncEntityRepositoryBase<Guid, ITemplate>, ITemplateRepository
 {
+    private const int MaxAliasLength = 100;
+    private const int TruncatedAliasLength = 95;
+
     private readonly IShortStringHelper _shortStringHelper;
-    private readonly IFileSystem? _viewsFileSystem;
-    private readonly IViewHelper _viewHelper;
-    private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TemplateRepository"/> class, which manages persistence and retrieval of template entities.
+    ///     Initializes a new instance of the <see cref="TemplateRepository" /> class.
     /// </summary>
-    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
-    /// <param name="cache">The application-level caches used for optimizing data retrieval.</param>
-    /// <param name="logger">The logger instance for logging repository operations.</param>
-    /// <param name="loggerFactory">Factory for creating logger instances.</param>
-    /// <param name="fileSystems">Abstraction for accessing file system resources related to templates.</param>
-    /// <param name="shortStringHelper">Helper for generating and manipulating short strings, such as aliases.</param>
-    /// <param name="viewHelper">Helper for working with template views.</param>
-    /// <param name="runtimeSettings">Monitors and provides access to runtime configuration settings.</param>
-    /// <param name="repositoryCacheVersionService">Service for managing cache versioning in the repository.</param>
-    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public TemplateRepository(
-        IScopeAccessor scopeAccessor,
+        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches cache,
         ILogger<TemplateRepository> logger,
-        ILoggerFactory loggerFactory,
-        FileSystems fileSystems,
         IShortStringHelper shortStringHelper,
-        IViewHelper viewHelper,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService)
         : base(
@@ -60,753 +41,256 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             logger,
             repositoryCacheVersionService,
             cacheSyncService)
+        => _shortStringHelper = shortStringHelper;
+
+    /// <inheritdoc />
+    public async Task<ITemplate?> GetByAliasAsync(string alias, CancellationToken cancellationToken)
     {
-        _shortStringHelper = shortStringHelper;
-        _viewsFileSystem = fileSystems.MvcViewsFileSystem;
-        _viewHelper = viewHelper;
-        _runtimeSettings = runtimeSettings;
+        IEnumerable<ITemplate> all = await GetAllAsync(cancellationToken);
+        return all.FirstOrDefault(template => template.Alias.InvariantEquals(alias));
     }
 
-    /// <summary>
-    /// Gets the cache policy as <see cref="FullDataSetRepositoryCachePolicy{TEntity, TId}"/> for predicate-based lookups.
-    /// Returns null when caching is disabled (e.g. <see cref="AppCaches.NoCache"/>).
-    /// </summary>
-    private FullDataSetRepositoryCachePolicy<ITemplate, int>? TypedCachePolicy
-        => CachePolicy as FullDataSetRepositoryCachePolicy<ITemplate, int>;
-
-    /// <summary>
-    /// Gets the template with the specified unique identifier.
-    /// </summary>
-    /// <param name="key">The unique identifier of the template.</param>
-    /// <returns>The template if found; otherwise, null.</returns>
-    public ITemplate? Get(Guid key)
-        => TypedCachePolicy?.FindCached(x => x.Key == key, PerformGetAll)
-           ?? GetMany().FirstOrDefault(x => x.Key == key);
-
-    IEnumerable<ITemplate> IReadRepository<Guid, ITemplate>.GetMany(params Guid[]? keys)
+    /// <inheritdoc />
+    public async Task<IEnumerable<ITemplate>> GetDescendantsAsync(Guid? layoutTemplateKey, CancellationToken cancellationToken)
     {
-        if (keys?.Length > 0)
+        ITemplate[] all = (await GetAllAsync(cancellationToken)).ToArray();
+        var descendants = new List<ITemplate>();
+
+        if (layoutTemplateKey.HasValue)
         {
-            var keySet = keys.ToHashSet();
-            return TypedCachePolicy?.FindAllCached(x => keySet.Contains(x.Key), PerformGetAll)
-                   ?? GetMany().Where(x => keySet.Contains(x.Key)).ToArray();
+            ITemplate? layoutTemplate = all.FirstOrDefault(template => template.Key == layoutTemplateKey.Value);
+            if (layoutTemplate is null)
+            {
+                return [];
+            }
+
+            AddDescendants(all, descendants, layoutTemplate.Alias);
+            return descendants;
         }
 
-        return GetMany();
+        ITemplate[] rootTemplates = all.Where(template => template.LayoutTemplateAlias.IsNullOrWhiteSpace()).ToArray();
+        descendants.AddRange(rootTemplates);
+        foreach (ITemplate rootTemplate in rootTemplates)
+        {
+            AddDescendants(all, descendants, rootTemplate.Alias);
+        }
+
+        return descendants;
     }
 
-    /// <summary>
-    /// Determines whether a template with the specified identifier exists.
-    /// </summary>
-    /// <param name="id">The unique identifier of the template.</param>
-    /// <returns>True if the template exists; otherwise, false.</returns>
-    public bool Exists(Guid id)
-        => TypedCachePolicy?.ExistsCached(x => x.Key == id, PerformGetAll)
-           ?? GetMany().Any(x => x.Key == id);
-
-    /// <summary>
-    /// Saves the specified template entity to the repository.
-    /// After saving, this method also ensures that the full dataset cache and the GUID cache are populated
-    /// to optimize subsequent lookups and reduce database access.
-    /// </summary>
-    /// <param name="entity">The template entity to save.</param>
-    public override void Save(ITemplate entity)
-    {
-        base.Save(entity);
-
-        // Force population of the full dataset cache so subsequent lookups don't hit the database.
-        // TemplateRepository uses FullDataSetRepositoryCachePolicy which caches all templates together.
-        // GUID-based lookups also use this cache via GetMany().
-        GetMany();
-    }
-
-    /// <summary>
-    /// Deletes the specified template entity and clears the related GUID cache to prevent stale data on subsequent lookups.
-    /// </summary>
-    /// <param name="entity">The template entity to delete.</param>
-    public override void Delete(ITemplate entity)
-    {
-        base.Delete(entity);
-    }
-
-    /// <summary>
-    /// Returns a stream for reading the content of the file at the specified path.
-    /// </summary>
-    /// <param name="filepath">The path of the file to retrieve.</param>
-    /// <returns>
-    /// A <see cref="Stream"/> for the file content, or <see cref="Stream.Null"/> if the file does not exist or cannot be opened.
-    /// </returns>
-    public Stream GetFileContentStream(string filepath)
-    {
-        IFileSystem? fileSystem = GetFileSystem(filepath);
-        if (fileSystem?.FileExists(filepath) == false)
-        {
-            return Stream.Null;
-        }
-
-        try
-        {
-            return fileSystem!.OpenFile(filepath);
-        }
-        catch
-        {
-            return Stream.Null; // deal with race conds
-        }
-    }
-
-    /// <summary>
-    /// Writes the provided content stream to the file at the specified filepath, overwriting any existing content.
-    /// </summary>
-    /// <param name="filepath">The path of the file to which the content will be written.</param>
-    /// <param name="content">A stream containing the content to write to the file.</param>
-    /// <remarks>
-    /// If the file already exists, its content will be replaced.
-    /// </remarks>
-    public void SetFileContent(string filepath, Stream content) =>
-        GetFileSystem(filepath)?.AddFile(filepath, content, true);
-
-    /// <summary>
-    /// Returns the size of the specified file in bytes.
-    /// </summary>
-    /// <param name="filename">The name of the file whose size is to be retrieved.</param>
-    /// <returns>
-    /// The size of the file in bytes, or -1 if the file does not exist or an error occurs while retrieving the size.
-    /// </returns>
-    public long GetFileSize(string filename)
-    {
-        IFileSystem? fileSystem = GetFileSystem(filename);
-        if (fileSystem?.FileExists(filename) == false)
-        {
-            return -1;
-        }
-
-        try
-        {
-            return fileSystem!.GetSize(filename);
-        }
-        catch
-        {
-            return -1; // deal with race conds
-        }
-    }
-
-    protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ITemplate, int>(
+    /// <inheritdoc />
+    protected override IAsyncRepositoryCachePolicy<ITemplate, Guid> CreateCachePolicy()
+        => new AsyncFullDataSetRepositoryCachePolicy<ITemplate, Guid>(
             GlobalIsolatedCache,
             ScopeAccessor,
             RepositoryCacheVersionService,
             CacheSyncService,
-            GetEntityId,
-            /*expires:*/ false);
+            GetEntityKey,
+            false);
 
-    private IEnumerable<IUmbracoEntity> GetAxisDefinitions(params TemplateDto[] templates)
+    /// <inheritdoc />
+    protected override async Task<ITemplate?> PerformGetAsync(Guid key)
     {
-        // look up the simple template definitions that have a layout template assigned, this is used
-        // later to populate the template item's properties
-        Sql<ISqlContext> childIdsSql = SqlContext.Sql()
-            .Select<TemplateDto>(t => t.NodeId, t => t.Alias)
-            .AndSelect<NodeDto>(n => n.ParentId)
-            .From<TemplateDto>()
-            .InnerJoin<NodeDto>()
-            .On<TemplateDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-
-            // lookup axis's
-            .WhereInOr<NodeDto, NodeDto>(
-                n => n.NodeId,
-                n2 => n2.ParentId,
-                templates.Select(x => x.NodeDto.ParentId),
-                templates.Select(x => x.NodeId));
-
-        IEnumerable<EntitySlim> childIds = Database.Fetch<AxisDefintionDto>(childIdsSql)
-            .Select(x => new EntitySlim { Id = x.NodeId, ParentId = x.ParentId, Name = x.Alias });
-
-        return childIds;
+        IEnumerable<ITemplate> all = await GetAllAsync(CancellationToken.None);
+        return all.FirstOrDefault(template => template.Key == key);
     }
 
-    /// <summary>
-    ///     Maps from a dto to an ITemplate
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <param name="axisDefinitions">
-    ///     This is a collection of template definitions ... either all templates, or the collection of child templates and
-    ///     it's parent template
-    /// </param>
-    /// <returns></returns>
-    private ITemplate MapFromDto(TemplateDto dto, IUmbracoEntity[] axisDefinitions)
-    {
-        Template template = TemplateFactory.BuildEntity(
-            _shortStringHelper,
-            dto,
-            axisDefinitions,
-            file => GetFileContent((Template)file, false));
-
-        if (dto.NodeDto.ParentId > 0)
+    /// <inheritdoc />
+    protected override async Task<IEnumerable<ITemplate>?> PerformGetAllAsync() =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            IUmbracoEntity? layoutTemplate = axisDefinitions.FirstOrDefault(x => x.Id == dto.NodeDto.ParentId);
-            if (layoutTemplate != null)
-            {
-                template.LayoutTemplateAlias = layoutTemplate.Name;
-                template.LayoutTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
-            }
+            List<TemplateDto> dtos = await db.Templates
+                .Include(template => template.NodeDto)
+                .Where(template => template.NodeDto.NodeObjectType == Constants.ObjectTypes.Template)
+                .OrderBy(template => template.NodeId)
+                .ToListAsync();
+
+            return BuildEntities(dtos);
+        });
+
+    /// <inheritdoc />
+    protected override async Task<IEnumerable<ITemplate>?> PerformGetManyAsync(Guid[] keys)
+    {
+        IEnumerable<ITemplate> all = await GetAllAsync(CancellationToken.None);
+        if (keys.Length == 0)
+        {
+            return all;
         }
 
-        // get the infos (update date and virtual path) that will change only if
-        // path changes - but do not get content, will get loaded only when required
-        GetFileContent(template, true);
-
-        // reset dirty initial properties (U4-1946)
-        template.ResetDirtyProperties(false);
-
-        return template;
+        var keySet = keys.ToHashSet();
+        return all.Where(template => keySet.Contains(template.Key));
     }
 
-    private void SetVirtualPath(ITemplate template)
-    {
-        var path = template.OriginalPath;
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            // we need to discover the path
-            path = string.Concat(template.Alias, ".cshtml");
-            if (_viewsFileSystem?.FileExists(path) ?? false)
-            {
-                template.VirtualPath = _viewsFileSystem.GetUrl(path);
-                return;
-            }
+    /// <inheritdoc />
+    protected override Task<bool> PerformExistsAsync(Guid key) =>
+        AmbientScope.ExecuteWithContextAsync(db => db.Nodes
+            .AnyAsync(node => node.UniqueId == key && node.NodeObjectType == Constants.ObjectTypes.Template));
 
-            path = string.Concat(template.Alias, ".vbhtml");
-            if (_viewsFileSystem?.FileExists(path) ?? false)
-            {
-                template.VirtualPath = _viewsFileSystem.GetUrl(path);
-                return;
-            }
-        }
-        else
+    /// <inheritdoc />
+    protected override async Task PersistNewItemAsync(ITemplate entity) =>
+        await AmbientScope.ExecuteWithContextAsync<TemplateDto>(async db =>
         {
-            // we know the path already
-            template.VirtualPath = _viewsFileSystem?.GetUrl(path);
-        }
+            await EnsureValidAliasAsync(db, entity);
 
-        template.VirtualPath = string.Empty; // file not found...
-    }
+            entity.AddingEntity();
 
-    private string? GetFileContent(ITemplate template, bool init)
-    {
-        var path = template.OriginalPath;
-        if (string.IsNullOrWhiteSpace(path))
+            NodeDto nodeDto = TemplateFactory.BuildNodeDto(entity);
+            var parentPath = await GetParentPathAsync(db, nodeDto.ParentId);
+
+            // The node id is only known once inserted, so the path is completed afterwards on the tracked node.
+            nodeDto.Path = parentPath;
+            db.Nodes.Add(nodeDto);
+            await db.SaveChangesAsync();
+
+            nodeDto.Path = string.Concat(parentPath, ",", nodeDto.NodeId);
+            await db.SaveChangesAsync();
+
+            db.Templates.Add(new TemplateDto { NodeId = nodeDto.NodeId, Alias = entity.Alias });
+            await db.SaveChangesAsync();
+
+            entity.Id = nodeDto.NodeId;
+            entity.Path = nodeDto.Path;
+            entity.ResetDirtyProperties();
+        });
+
+    /// <inheritdoc />
+    protected override async Task PersistUpdatedItemAsync(ITemplate entity) =>
+        await AmbientScope.ExecuteWithContextAsync<TemplateDto>(async db =>
         {
-            // we need to discover the path
-            path = string.Concat(template.Alias, ".cshtml");
-            if (_viewsFileSystem?.FileExists(path) ?? false)
+            await EnsureValidAliasAsync(db, entity);
+
+            entity.UpdatingEntity();
+
+            NodeDto nodeDto = TemplateFactory.BuildNodeDto(entity);
+
+            if (entity.IsPropertyDirty(nameof(Template.LayoutTemplateId)))
             {
-                return GetFileContent(template, _viewsFileSystem, path, init);
+                var parentPath = await GetParentPathAsync(db, nodeDto.ParentId);
+                entity.Path = string.Concat(parentPath, ",", entity.Id);
+                nodeDto.Path = entity.Path;
             }
 
-            path = string.Concat(template.Alias, ".vbhtml");
-            if (_viewsFileSystem?.FileExists(path) ?? false)
-            {
-                return GetFileContent(template, _viewsFileSystem, path, init);
-            }
-        }
-        else
-        {
-            // we know the path already
-            return GetFileContent(template, _viewsFileSystem, path, init);
-        }
+            await db.Nodes
+                .Where(node => node.NodeId == entity.Id)
+                .ExecuteUpdateAsync(setter => setter
+                    .SetProperty(node => node.ParentId, nodeDto.ParentId)
+                    .SetProperty(node => node.Path, nodeDto.Path)
+                    .SetProperty(node => node.Text, nodeDto.Text));
 
-        template.VirtualPath = string.Empty; // file not found...
+            await db.Templates
+                .Where(template => template.NodeId == entity.Id)
+                .ExecuteUpdateAsync(setter => setter
+                    .SetProperty(template => template.Alias, entity.Alias));
 
-        return string.Empty;
-    }
+            entity.IsLayoutTemplate = await db.Nodes
+                .AnyAsync(node => node.ParentId == entity.Id && node.NodeObjectType == Constants.ObjectTypes.Template);
 
-    private static string? GetFileContent(ITemplate template, IFileSystem? fs, string filename, bool init)
+            entity.ResetDirtyProperties();
+        });
+
+    /// <inheritdoc />
+    protected override async Task PersistDeletedItemAsync(ITemplate entity)
     {
-        // do not update .UpdateDate as that would make it dirty (side-effect)
-        // unless initializing, because we have to do it once
-        if (init && fs is not null)
+        IEnumerable<ITemplate> descendants = await GetDescendantsAsync(entity.Key, CancellationToken.None);
+        var nodeIds = descendants.Select(descendant => descendant.Id).Append(entity.Id).ToList();
+
+        await AmbientScope.ExecuteWithContextAsync<TemplateDto>(async db =>
         {
-            template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
-        }
-
-        // TODO: see if this could enable us to update UpdateDate without messing with change tracking
-        // and then we'd want to do it for scripts, stylesheets and partial views too (ie files)
-        // var xtemplate = template as Template;
-        // xtemplate.DisableChangeTracking();
-        // template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
-        // xtemplate.EnableChangeTracking();
-
-        template.VirtualPath = fs?.GetUrl(filename);
-
-        return init ? null : GetFileContent(fs, filename);
-    }
-
-    private static string? GetFileContent(IFileSystem? fs, string filename)
-    {
-        if (fs is null)
-        {
-            return null;
-        }
-
-        using Stream stream = fs.OpenFile(filename);
-        using var reader = new StreamReader(stream, Encoding.UTF8, true);
-        return reader.ReadToEnd();
-    }
-
-    private IFileSystem? GetFileSystem(string filepath)
-    {
-        var ext = Path.GetExtension(filepath);
-        IFileSystem? fs;
-        switch (ext)
-        {
-            case ".cshtml":
-            case ".vbhtml":
-                fs = _viewsFileSystem;
-                break;
-            default:
-                throw new Exception("Unsupported extension " + ext + ".");
-        }
-
-        return fs;
-    }
-
-    /// <summary>
-    ///     Ensures that there are not duplicate aliases and if so, changes it to be a numbered version and also verifies the
-    ///     length
-    /// </summary>
-    /// <param name="template"></param>
-    private void EnsureValidAlias(ITemplate template)
-    {
-        //ensure unique alias
-        template.Alias = template.Alias.ToCleanString(_shortStringHelper, CleanStringType.UnderscoreAlias);
-
-        if (template.Alias.Length > 100)
-        {
-            template.Alias = template.Alias.Substring(0, 95);
-        }
-
-        if (AliasAlreadExists(template))
-        {
-            template.Alias = EnsureUniqueAlias(template, 1);
-        }
-    }
-
-    private bool AliasAlreadExists(ITemplate template)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(true)
-            .Where<TemplateDto>(x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
-        var count = Database.ExecuteScalar<int>(sql);
-        return count > 0;
-    }
-
-    private string EnsureUniqueAlias(ITemplate template, int attempts)
-    {
-        // TODO: This is ported from the old data layer... pretty crap way of doing this but it works for now.
-        if (AliasAlreadExists(template))
-        {
-            return template.Alias + attempts;
-        }
-
-        attempts++;
-        return EnsureUniqueAlias(template, attempts);
-    }
-
-    #region Overrides of RepositoryBase<int,ITemplate>
-
-    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
-    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
-    // internally and clones only the matched entity. This override exists only as a required
-    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
-    protected override ITemplate? PerformGet(int id)
-        => GetMany().FirstOrDefault(x => x.Id == id);
-
-    protected override IEnumerable<ITemplate> PerformGetAll(params int[]? ids)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false);
-
-        if (ids?.Any() ?? false)
-        {
-            sql.Where($"{QuoteTableName("umbracoNode")}.id in (@ids)", new { ids });
-        }
-        else
-        {
-            sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-        }
-
-        List<TemplateDto> dtos = Database.Fetch<TemplateDto>(sql);
-
-        if (dtos.Count == 0)
-        {
-            return Enumerable.Empty<ITemplate>();
-        }
-
-        //look up the simple template definitions that have a layout template assigned, this is used
-        // later to populate the template item's properties
-        IUmbracoEntity[] childIds = (ids?.Any() ?? false
-                ? GetAxisDefinitions(dtos.ToArray())
-                : dtos.Select(x => new EntitySlim { Id = x.NodeId, ParentId = x.NodeDto.ParentId, Name = x.Alias }))
-            .ToArray();
-
-        ITemplate[] templates = dtos.Select(d => MapFromDto(d, childIds)).ToArray();
-
-        return templates;
-    }
-
-    protected override IEnumerable<ITemplate> PerformGetByQuery(IQuery<ITemplate> query)
-    {
-        Sql<ISqlContext> sqlClause = GetBaseQuery(false);
-        var translator = new SqlTranslator<ITemplate>(sqlClause, query);
-        Sql<ISqlContext> sql = translator.Translate();
-
-        List<TemplateDto> dtos = Database.Fetch<TemplateDto>(sql);
-
-        if (dtos.Count == 0)
-        {
-            return Enumerable.Empty<ITemplate>();
-        }
-
-        //look up the simple template definitions that have a layout template assigned, this is used
-        // later to populate the template item's properties
-        IUmbracoEntity[] childIds = GetAxisDefinitions(dtos.ToArray()).ToArray();
-
-        return dtos.Select(d => MapFromDto(d, childIds));
-    }
-
-    #endregion
-
-    #region Overrides of EntityRepositoryBase<int,ITemplate>
-
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-    {
-        Sql<ISqlContext> sql = SqlContext.Sql();
-
-        sql = isCount
-            ? sql.SelectCount()
-            : sql.Select<TemplateDto>(r => r.Select(x => x.NodeDto));
-
-        sql
-            .From<TemplateDto>()
-            .InnerJoin<NodeDto>()
-            .On<TemplateDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-            .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-
-        return sql;
-    }
-
-    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
-
-    protected override IEnumerable<string> GetDeleteClauses()
-    {
-        var nodeId = QuoteColumnName("nodeId");
-        var umbracoNode = QuoteTableName(NodeDto.TableName);
-        var list = new List<string>
-        {
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.User2NodeNotify)} WHERE {nodeId} = @id",
-            $@"UPDATE {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentVersion)}
-                SET {QuoteColumnName("templateId")} = NULL WHERE {QuoteColumnName("templateId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentType)} WHERE {QuoteColumnName("templateNodeId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Template)} WHERE {nodeId} = @id",
-            $"DELETE FROM {umbracoNode} WHERE id = @id",
-        };
-        return list;
-    }
-
-    private Guid NodeObjectTypeId => Constants.ObjectTypes.Template;
-
-    protected override void PersistNewItem(ITemplate entity)
-    {
-        EnsureValidAlias(entity);
-
-        //Save to db
-        var template = (Template)entity;
-        template.AddingEntity();
-
-        TemplateDto dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, template.Id);
-
-        //Create the (base) node data - umbracoNode
-        NodeDto nodeDto = dto.NodeDto;
-        nodeDto.Path = "-1," + dto.NodeDto.NodeId;
-        var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
-
-        //Update with new correct path
-        ITemplate? parent = Get(template.LayoutTemplateId!.Value);
-        if (parent != null)
-        {
-            nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
-        }
-        else
-        {
-            nodeDto.Path = "-1," + dto.NodeDto.NodeId;
-        }
-
-        Database.Update(nodeDto);
-
-        //Insert template dto
-        dto.NodeId = nodeDto.NodeId;
-        Database.Insert(dto);
-
-        //Update entity with correct values
-        template.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
-        template.Path = nodeDto.Path;
-
-        // Only save file when not in production runtime mode
-        if (_runtimeSettings.CurrentValue.Mode != RuntimeMode.Production)
-        {
-            //now do the file work
-            SaveFile(template);
-        }
-
-        template.ResetDirtyProperties();
-
-        // ensure that from now on, content is lazy-loaded
-        if (template.GetFileContent == null)
-        {
-            template.GetFileContent = file => GetFileContent((Template)file, false);
-        }
-    }
-
-    protected override void PersistUpdatedItem(ITemplate entity)
-    {
-        EnsureValidAlias(entity);
-
-        //store the changed alias if there is one for use with updating files later
-        var originalAlias = entity.Alias;
-        if (entity.IsPropertyDirty("Alias"))
-        {
-            //we need to check what it currently is before saving and remove that file
-            ITemplate? current = Get(entity.Id);
-            originalAlias = current?.Alias;
-        }
-
-        var template = (Template)entity;
-
-        if (entity.IsPropertyDirty("LayoutTemplateId"))
-        {
-            ITemplate? parent = Get(template.LayoutTemplateId!.Value);
-            if (parent != null)
-            {
-                entity.Path = string.Concat(parent.Path, ",", entity.Id);
-            }
-            else
-            {
-                //this means that the layout template has been removed, so we need to reset the template's
-                //path to be at the root
-                entity.Path = string.Concat("-1,", entity.Id);
-            }
-        }
-
-        //Get TemplateDto from db to get the Primary key of the entity
-        TemplateDto templateDto = Database.Single<TemplateDto>($"WHERE {QuoteColumnName("nodeId")} = @Id", new { entity.Id });
-
-        //Save updated entity to db
-        template.UpdateDate = DateTime.UtcNow;
-        TemplateDto dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, templateDto.PrimaryKey);
-        Database.Update(dto.NodeDto);
-        Database.Update(dto);
-
-        //re-update if this is a layout template, since it could have changed!
-        IEnumerable<IUmbracoEntity> axisDefs = GetAxisDefinitions(dto);
-        template.IsLayoutTemplate = axisDefs.Any(x => x.ParentId == dto.NodeId);
-
-        // Only save file when not in production runtime mode
-        if (_runtimeSettings.CurrentValue.Mode != RuntimeMode.Production)
-        {
-            //now do the file work
-            SaveFile((Template)entity, originalAlias);
-        }
-
-        entity.ResetDirtyProperties();
-
-        // ensure that from now on, content is lazy-loaded
-        if (template.GetFileContent == null)
-        {
-            template.GetFileContent = file => GetFileContent((Template)file, false);
-        }
-    }
-
-    private void SaveFile(Template template, string? originalAlias = null)
-    {
-        string? content;
-
-        if (template is TemplateOnDisk templateOnDisk && templateOnDisk.IsOnDisk)
-        {
-            // if "template on disk" load content from disk
-            content = _viewHelper.GetFileContents(template);
-        }
-        else
-        {
-            // else, create or write template.Content to disk
-            content = originalAlias == null
-                ? _viewHelper.CreateView(template, true)
-                : _viewHelper.UpdateViewFile(template, originalAlias);
-        }
-
-        // once content has been set, "template on disk" are not "on disk" anymore
-        template.Content = content;
-        SetVirtualPath(template);
-    }
-
-    protected override void PersistDeletedItem(ITemplate entity)
-    {
-        var deletes = GetDeleteClauses().ToArray();
-
-        var descendants = GetDescendants(entity.Id).ToList();
-
-        //change the order so it goes bottom up! (deepest level first)
-        descendants.Reverse();
-
-        //delete the hierarchy
-        foreach (ITemplate descendant in descendants)
-        {
-            foreach (var delete in deletes)
-            {
-                Database.Execute(delete, new { id = GetEntityId(descendant) });
-            }
-        }
-
-        //now we can delete this one
-        foreach (var delete in deletes)
-        {
-            Database.Execute(delete, new { id = GetEntityId(entity) });
-        }
-
-        // Only delete file when not in production runtime mode
-        if (_runtimeSettings.CurrentValue.Mode != RuntimeMode.Production)
-        {
-            var viewName = string.Concat(entity.Alias, ".cshtml");
-            _viewsFileSystem?.DeleteFile(viewName);
-        }
+            await db.User2NodeNotifies
+                .Where(notify => nodeIds.Contains(notify.NodeId))
+                .ExecuteDeleteAsync();
+
+            await db.DocumentVersions
+                .Where(documentVersion => documentVersion.TemplateId.HasValue && nodeIds.Contains(documentVersion.TemplateId.Value))
+                .ExecuteUpdateAsync(setter => setter.SetProperty(documentVersion => documentVersion.TemplateId, (int?)null));
+
+            await db.ContentTypeTemplates
+                .Where(contentTypeTemplate => nodeIds.Contains(contentTypeTemplate.TemplateNodeId))
+                .ExecuteDeleteAsync();
+
+            await db.Templates
+                .Where(template => nodeIds.Contains(template.NodeId))
+                .ExecuteDeleteAsync();
+
+            await db.Nodes
+                .Where(node => nodeIds.Contains(node.NodeId))
+                .ExecuteDeleteAsync();
+        });
 
         entity.DeleteDate = DateTime.UtcNow;
     }
 
-    #endregion
-
-    #region Implementation of ITemplateRepository
-
-    /// <summary>Retrieves a template by its alias.</summary>
-    /// <param name="alias">The alias of the template to retrieve.</param>
-    /// <returns>The template matching the specified alias, or null if not found.</returns>
-    public ITemplate? Get(string? alias)
+    private IEnumerable<ITemplate> BuildEntities(List<TemplateDto> dtos)
     {
-        if (alias is null)
+        Dictionary<int, string?> aliasesById = dtos.ToDictionary(dto => dto.NodeId, dto => dto.Alias);
+        var layoutTemplateIds = dtos.Select(dto => dto.NodeDto.ParentId).ToHashSet();
+
+        return dtos
+            .Select(dto => TemplateFactory.BuildEntity(
+                _shortStringHelper,
+                dto,
+                aliasesById.GetValueOrDefault(dto.NodeDto.ParentId),
+                layoutTemplateIds.Contains(dto.NodeId)))
+            .ToList();
+    }
+
+    private static async Task<string> GetParentPathAsync(UmbracoDbContext db, int parentId)
+    {
+        if (parentId <= 0)
         {
-            return null;
+            return Constants.System.RootString;
         }
 
-        return TypedCachePolicy?.FindCached(x => x.Alias.InvariantEquals(alias), PerformGetAll)
-               ?? GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+        return await db.Nodes
+            .Where(node => node.NodeId == parentId && node.NodeObjectType == Constants.ObjectTypes.Template)
+            .Select(node => node.Path)
+            .FirstOrDefaultAsync()
+            ?? Constants.System.RootString;
     }
 
     /// <summary>
-    /// Retrieves all templates, or filters them by the specified aliases if provided.
+    ///     Cleans and truncates the template alias, and makes it unique by appending a number if another template
+    ///     already uses it.
     /// </summary>
-    /// <param name="aliases">An optional array of template aliases to filter the results. If no aliases are specified, all templates are returned.</param>
-    /// <returns>An enumerable collection of <see cref="Umbraco.Cms.Core.Models.ITemplate"/> instances matching the specified aliases, or all templates if no aliases are given.</returns>
-    public IEnumerable<ITemplate> GetAll(params string?[] aliases)
+    private async Task EnsureValidAliasAsync(UmbracoDbContext db, ITemplate template)
     {
-        // We must call the base (normal) GetAll method which is cached.
-        // This is a specialized method and unfortunately with the params[] it
-        // overlaps with the normal GetAll method.
-        if (aliases.Any() == false)
+        var alias = template.Alias.ToCleanString(_shortStringHelper, CleanStringType.UnderscoreAlias);
+        if (alias.Length > MaxAliasLength)
         {
-            return GetMany();
+            alias = alias[..TruncatedAliasLength];
         }
 
-        var nonNullAliases = aliases.WhereNotNull().ToArray();
-        return TypedCachePolicy?.FindAllCached(x => nonNullAliases.InvariantContains(x.Alias), PerformGetAll)
-               ?? GetMany().Where(x => nonNullAliases.InvariantContains(x.Alias));
-    }
+        var templateId = template.Id;
+        List<string?> similarAliases = await db.Templates
+            .Where(existing => existing.NodeId != templateId && existing.Alias != null && existing.Alias.StartsWith(alias))
+            .Select(existing => existing.Alias)
+            .ToListAsync();
 
-    /// <summary>
-    /// Gets the child templates of the specified layout template.
-    /// </summary>
-    /// <param name="layoutTemplateId">The ID of the layout template to get children for. If less than or equal to zero, returns templates without a layout template.</param>
-    /// <returns>An enumerable collection of child templates. If the specified layout template does not exist, returns an empty collection.</returns>
-    public IEnumerable<ITemplate> GetChildren(int layoutTemplateId)
-    {
-        if (TypedCachePolicy is { } policy)
+        var takenAliases = new HashSet<string>(similarAliases.WhereNotNull(), StringComparer.InvariantCultureIgnoreCase);
+        if (takenAliases.Contains(alias))
         {
-            if (layoutTemplateId <= 0)
+            var suffix = 1;
+            while (takenAliases.Contains(alias + suffix))
             {
-                return policy.FindAllCached(x => x.LayoutTemplateAlias.IsNullOrWhiteSpace(), PerformGetAll);
+                suffix++;
             }
 
-            ITemplate? parent = policy.FindCached(x => x.Id == layoutTemplateId, PerformGetAll);
-            if (parent == null)
-            {
-                return Enumerable.Empty<ITemplate>();
-            }
-
-            return policy.FindAllCached(x => x.LayoutTemplateAlias.InvariantEquals(parent.Alias), PerformGetAll);
+            alias += suffix;
         }
 
-        // Fallback when caching is disabled.
-        ITemplate[] all = GetMany().ToArray();
-
-        if (layoutTemplateId <= 0)
-        {
-            return all.Where(x => x.LayoutTemplateAlias.IsNullOrWhiteSpace());
-        }
-
-        ITemplate? fallbackParent = all.FirstOrDefault(x => x.Id == layoutTemplateId);
-        if (fallbackParent == null)
-        {
-            return Enumerable.Empty<ITemplate>();
-        }
-
-        return all.Where(x => x.LayoutTemplateAlias.InvariantEquals(fallbackParent.Alias));
+        template.Alias = alias;
     }
 
-    /// <summary>
-    /// Retrieves all descendant templates of the specified layout template.
-    /// </summary>
-    /// <param name="layoutTemplateId">The ID of the layout template whose descendants will be returned. If less than or equal to zero, all root templates and their descendants are returned.</param>
-    /// <returns>An <see cref="IEnumerable{ITemplate}"/> containing all descendant templates, ordered by their hierarchy level. Returns an empty collection if the specified layout template does not exist.</returns>
-    public IEnumerable<ITemplate> GetDescendants(int layoutTemplateId)
+    private static void AddDescendants(ITemplate[] all, List<ITemplate> descendants, string layoutTemplateAlias)
     {
-        //return from base.GetAll, this is all cached
-        ITemplate[] all = GetMany().ToArray();
-        var descendants = new List<ITemplate>();
-        if (layoutTemplateId > 0)
+        ITemplate[] children = all
+            .Where(template => template.LayoutTemplateAlias.InvariantEquals(layoutTemplateAlias))
+            .ToArray();
+
+        descendants.AddRange(children);
+        foreach (ITemplate child in children)
         {
-            ITemplate? parent = all.FirstOrDefault(x => x.Id == layoutTemplateId);
-            if (parent == null)
-            {
-                return Enumerable.Empty<ITemplate>();
-            }
-
-            //recursively add all children with a level
-            AddChildren(all, descendants, parent.Alias);
-        }
-        else
-        {
-            descendants.AddRange(all.Where(x => x.LayoutTemplateAlias.IsNullOrWhiteSpace()));
-            foreach (ITemplate parent in descendants)
-            {
-                //recursively add all children with a level
-                AddChildren(all, descendants, parent.Alias);
-            }
-        }
-
-        //return the list - it will be naturally ordered by level
-        return descendants;
-    }
-
-    private static void AddChildren(ITemplate[]? all, List<ITemplate> descendants, string layoutAlias)
-    {
-        ITemplate[]? c = all?.Where(x => x.LayoutTemplateAlias.InvariantEquals(layoutAlias)).ToArray();
-        if (c is null || c.Any() == false)
-        {
-            return;
-        }
-
-        descendants.AddRange(c);
-
-        //recurse through all children
-        foreach (ITemplate child in c)
-        {
-            AddChildren(all, descendants, child.Alias);
+            AddDescendants(all, descendants, child.Alias);
         }
     }
-
-    #endregion
 }

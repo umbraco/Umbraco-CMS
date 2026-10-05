@@ -5,33 +5,28 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// <summary>
 ///     Represents a repository for <see cref="ITemplate" /> entities.
 /// </summary>
-public interface ITemplateRepository : IReadWriteQueryRepository<int, ITemplate>, IFileRepository, IReadRepository<Guid, ITemplate>
+/// <remarks>
+///     The repository persists template data only. Reading and writing the template view files is the responsibility of
+///     the caller.
+/// </remarks>
+public interface ITemplateRepository : IAsyncReadWriteRepository<Guid, ITemplate>
 {
     /// <summary>
     ///     Gets a template by its alias.
     /// </summary>
     /// <param name="alias">The alias of the template.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The template if found; otherwise, <c>null</c>.</returns>
-    ITemplate? Get(string? alias);
+    Task<ITemplate?> GetByAliasAsync(string alias, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets templates by their aliases.
+    ///     Gets all descendant templates of a layout template, ordered by level.
     /// </summary>
-    /// <param name="aliases">The aliases of the templates.</param>
-    /// <returns>A collection of templates.</returns>
-    IEnumerable<ITemplate> GetAll(params string[] aliases);
-
-    /// <summary>
-    ///     Gets all child templates of a layout template.
-    /// </summary>
-    /// <param name="layoutTemplateId">The identifier of the layout template.</param>
-    /// <returns>A collection of child templates.</returns>
-    IEnumerable<ITemplate> GetChildren(int layoutTemplateId);
-
-    /// <summary>
-    ///     Gets all descendant templates of a layout template.
-    /// </summary>
-    /// <param name="layoutTemplateId">The identifier of the layout template.</param>
-    /// <returns>A collection of descendant templates.</returns>
-    IEnumerable<ITemplate> GetDescendants(int layoutTemplateId);
+    /// <param name="layoutTemplateKey">
+    ///     The key of the layout template, or <c>null</c> to get all templates, starting with those that have no layout
+    ///     template.
+    /// </param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The descendant templates, or an empty collection if the layout template does not exist.</returns>
+    Task<IEnumerable<ITemplate>> GetDescendantsAsync(Guid? layoutTemplateKey, CancellationToken cancellationToken);
 }

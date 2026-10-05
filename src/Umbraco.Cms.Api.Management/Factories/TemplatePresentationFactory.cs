@@ -47,7 +47,7 @@ public class TemplatePresentationFactory : ITemplatePresentationFactory
 
         if (template.LayoutTemplateAlias is not null)
         {
-            ITemplate? parentTemplate = await _templateService.GetAsync(template.LayoutTemplateAlias);
+            ITemplate? parentTemplate = await _templateService.GetAsync(template.LayoutTemplateAlias, CancellationToken.None);
             responseModel.LayoutTemplate = ReferenceByIdModel.ReferenceOrNull(parentTemplate?.Key);
         }
 

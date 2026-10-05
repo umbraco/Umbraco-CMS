@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -37,6 +38,7 @@ internal sealed class TemplateRenderer : ITemplateRenderer
     private readonly ICompositeViewEngine _viewEngine;
     private WebRoutingSettings _webRoutingSettings;
     private readonly ILanguageService _languageService;
+    private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TemplateRenderer"/> class.
@@ -50,6 +52,7 @@ internal sealed class TemplateRenderer : ITemplateRenderer
     /// <param name="modelMetadataProvider"></param>
     /// <param name="tempDataDictionaryFactory"></param>
     /// <param name="languageService"></param>
+    /// <param name="idKeyMap">Maps template ids to keys.</param>
     /// <exception cref="ArgumentNullException"></exception>
     public TemplateRenderer(
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -60,7 +63,8 @@ internal sealed class TemplateRenderer : ITemplateRenderer
         ICompositeViewEngine viewEngine,
         IModelMetadataProvider modelMetadataProvider,
         ITempDataDictionaryFactory tempDataDictionaryFactory,
-        ILanguageService languageService)
+        ILanguageService languageService,
+        IIdKeyMap idKeyMap)
     {
         _umbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -75,6 +79,7 @@ internal sealed class TemplateRenderer : ITemplateRenderer
 
         webRoutingSettings.OnChange(x => _webRoutingSettings = x);
         _languageService = languageService;
+        _idKeyMap = idKeyMap;
     }
 
     public async Task RenderAsync(int pageId, int? altTemplateId, StringWriter writer)
@@ -127,7 +132,11 @@ internal sealed class TemplateRenderer : ITemplateRenderer
 
         if (templateId.HasValue)
         {
-            requestBuilder.SetTemplate(await _templateService.GetAsync(templateId.Value));
+            Attempt<Guid> templateKeyAttempt = await _idKeyMap.GetKeyForIdAsync(templateId.Value, UmbracoObjectTypes.Template);
+            if (templateKeyAttempt.Success)
+            {
+                requestBuilder.SetTemplate(await _templateService.GetAsync(templateKeyAttempt.Result, CancellationToken.None));
+            }
         }
 
         // if there is not template then exit

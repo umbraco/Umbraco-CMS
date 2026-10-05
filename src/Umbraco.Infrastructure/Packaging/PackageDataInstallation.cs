@@ -628,11 +628,14 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             ITemplate? template = null;
             if (!string.IsNullOrEmpty(templateAlias))
             {
-                template = _templateService.GetAsync(templateAlias).GetAwaiter().GetResult();
+                template = _templateService.GetAsync(templateAlias, CancellationToken.None).GetAwaiter().GetResult();
             }
             else if (templateId.HasValue)
             {
-                template = _templateService.GetAsync(templateId.Value).GetAwaiter().GetResult();
+                Attempt<Guid> templateKeyAttempt = _entityService.GetKey(templateId.Value, UmbracoObjectTypes.Template);
+                template = templateKeyAttempt.Success
+                    ? _templateService.GetAsync(templateKeyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+                    : null;
             }
 
             //now double check this is correct since its an INT it could very well be pointing to an invalid template :/
@@ -1460,7 +1463,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 foreach (XElement templateElement in allowedTemplatesElement.Elements("Template"))
                 {
                     var alias = templateElement.Value;
-                    ITemplate? template = _templateService.GetAsync(alias.ToSafeAlias(_shortStringHelper)).GetAwaiter().GetResult();
+                    ITemplate? template = _templateService.GetAsync(alias.ToSafeAlias(_shortStringHelper), CancellationToken.None).GetAwaiter().GetResult();
                     if (template != null)
                     {
                         if (allowedTemplates?.Any(x => x.Id == template.Id) ?? true)
@@ -1484,7 +1487,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             if (string.IsNullOrEmpty((string?)defaultTemplateElement) == false)
             {
                 ITemplate? defaultTemplate =
-                    _templateService.GetAsync(defaultTemplateElement.Value.ToSafeAlias(_shortStringHelper)).GetAwaiter().GetResult();
+                    _templateService.GetAsync(defaultTemplateElement.Value.ToSafeAlias(_shortStringHelper), CancellationToken.None).GetAwaiter().GetResult();
                 if (defaultTemplate != null)
                 {
                     contentType.SetDefaultTemplate(defaultTemplate);
@@ -2395,7 +2398,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var alias = templateElement.Element("Alias")!.Value;
                 var design = templateElement.Element("Design")?.Value;
 
-                var existingTemplate = await _templateService.GetAsync(alias) as Template;
+                var existingTemplate = await _templateService.GetAsync(alias, CancellationToken.None) as Template;
 
                 Template template = existingTemplate ?? new Template(_shortStringHelper, templateName, alias);
 
@@ -2414,11 +2417,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 if (template.Id > 0)
                 {
-                    await _templateService.UpdateAsync(template, Constants.Security.SuperUserKey);
+                    await _templateService.UpdateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
                 }
                 else
                 {
-                    await _templateService.CreateAsync(template, Constants.Security.SuperUserKey);
+                    await _templateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
                 }
             }
 

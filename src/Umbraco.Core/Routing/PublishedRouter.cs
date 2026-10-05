@@ -25,6 +25,7 @@ public class PublishedRouter : IPublishedRouter
     private readonly IContentTypeService _contentTypeService;
     private readonly IEventAggregator _eventAggregator;
     private readonly IDomainCache _domainCache;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly ITemplateService _templateService;
     private readonly ILogger<PublishedRouter> _logger;
     private readonly IProfilingLogger _profilingLogger;
@@ -52,7 +53,8 @@ public class PublishedRouter : IPublishedRouter
         IContentTypeService contentTypeService,
         IUmbracoContextAccessor umbracoContextAccessor,
         IEventAggregator eventAggregator,
-        IDomainCache domainCache)
+        IDomainCache domainCache,
+        IIdKeyMap idKeyMap)
     {
         _webRoutingSettings = webRoutingSettings.CurrentValue ??
                               throw new ArgumentNullException(nameof(webRoutingSettings));
@@ -71,6 +73,7 @@ public class PublishedRouter : IPublishedRouter
         _umbracoContextAccessor = umbracoContextAccessor;
         _eventAggregator = eventAggregator;
         _domainCache = domainCache;
+        _idKeyMap = idKeyMap;
         webRoutingSettings.OnChange(x => _webRoutingSettings = x);
     }
 
@@ -794,7 +797,7 @@ public class PublishedRouter : IPublishedRouter
 
             // Resolve once and reuse: combines existence check with the alt-template policy gate
             // (DisableAlternativeTemplates / ValidateAlternativeTemplates).
-            ITemplate? altTemplateModel = await _templateService.GetAsync(altTemplate);
+            ITemplate? altTemplateModel = await _templateService.GetAsync(altTemplate, CancellationToken.None);
             var altTemplateAllowed = altTemplateModel != null
                                      && request.PublishedContent.IsAllowedTemplate(
                                          _contentTypeService,
@@ -881,7 +884,10 @@ public class PublishedRouter : IPublishedRouter
             _logger.LogDebug("GetTemplateModel: Get template id={TemplateId}", templateId);
         }
 
-        ITemplate? template = await _templateService.GetAsync(templateId.Value);
+        Attempt<Guid> templateKeyAttempt = await _idKeyMap.GetKeyForIdAsync(templateId.Value, UmbracoObjectTypes.Template);
+        ITemplate? template = templateKeyAttempt.Success
+            ? await _templateService.GetAsync(templateKeyAttempt.Result, CancellationToken.None)
+            : null;
         if (template == null)
         {
             throw new InvalidOperationException("The template with Id " + templateId +

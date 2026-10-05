@@ -147,7 +147,7 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
         }
 
         Attempt<ITemplate?, TemplateOperationStatus> templateResult =
-            await _templateService.CreateForContentTypeAsync(templateName, templateAlias, contentType.Alias, userKey);
+            await _templateService.CreateForContentTypeAsync(templateName, templateAlias, contentType.Alias, userKey, CancellationToken.None);
         if (templateResult.Success is false)
         {
             return Attempt<Guid?, ContentTypeOperationStatus>.Fail(
