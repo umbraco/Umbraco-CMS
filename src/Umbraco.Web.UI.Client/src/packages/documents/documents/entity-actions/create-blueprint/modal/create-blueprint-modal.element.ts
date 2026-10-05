@@ -96,7 +96,7 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 						() => html`<umb-localize id="no-access" key="blueprints_noAccessToBlueprints"></umb-localize>`,
 						() => html`
 							<umb-localize key="blueprints_blueprintDescription"></umb-localize>
-							<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical">
+							<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical" mandatory>
 								<div slot="editor">
 									<uui-input
 										id="name"
@@ -105,7 +105,7 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 										@input=${(e: UUIInputEvent) => (this._blueprintName = e.target.value as string)}></uui-input>
 								</div>
 							</umb-property-layout>
-							<umb-property-layout label=${this.localize.term('general_choose')} orientation="vertical" mandatory>
+							<umb-property-layout label=${this.localize.term('general_destination')} orientation="vertical" mandatory>
 								${when(
 									this._hasRootAccess !== undefined,
 									() => html`

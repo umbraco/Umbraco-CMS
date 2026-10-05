@@ -1068,6 +1068,7 @@ declare global {
 		general_deleting: string;
 		general_description: string;
 		general_design: string;
+		general_destination: string;
 		general_details: string;
 		general_dictionary: string;
 		general_dimensions: string;
