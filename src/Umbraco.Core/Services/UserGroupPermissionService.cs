@@ -1,6 +1,8 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Extensions;
 
@@ -102,6 +104,12 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
             return UserGroupAuthorizationStatus.UnauthorizedMissingMediaStartNodeAccess;
         }
 
+        var hasDocumentBlueprintStartNodeAccess = HasAccessToDocumentBlueprintStartNode(user, userGroup);
+        if (hasDocumentBlueprintStartNodeAccess is false)
+        {
+            return UserGroupAuthorizationStatus.UnauthorizedMissingDocumentBlueprintStartNodeAccess;
+        }
+
         return UserGroupAuthorizationStatus.Success;
     }
 
@@ -174,5 +182,36 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
         }
 
         return user.HasPathAccess(media, _entityService, _appCaches);
+    }
+
+    /// <summary>
+    ///     Check that a user has access to the document blueprint start node.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to check for access.</param>
+    /// <param name="userGroup">The user group being created or updated.</param>
+    /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
+    private bool HasAccessToDocumentBlueprintStartNode(IUser user, IUserGroup userGroup)
+    {
+        if (userGroup.StartDocumentBlueprintId is null)
+        {
+            return true;
+        }
+
+        // The root has no container to resolve a path from.
+        if (userGroup.StartDocumentBlueprintId == Constants.System.Root)
+        {
+            return user.HasDocumentBlueprintRootAccess(_entityService, _appCaches);
+        }
+
+        IEntitySlim? container = _entityService.Get(userGroup.StartDocumentBlueprintId.Value, UmbracoObjectTypes.DocumentBlueprintContainer);
+
+        if (container is null)
+        {
+            return true;
+        }
+
+        return ContentPermissions.HasPathAccessWithoutRecycleBin(
+            container.Path,
+            user.CalculateDocumentBlueprintStartNodeIds(_entityService, _appCaches));
     }
 }
