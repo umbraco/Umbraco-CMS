@@ -52,7 +52,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     public async Task TagsCanBeInvariant()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -104,7 +104,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -175,7 +175,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         var enId = (await LanguageService.GetAsync("en-US"))!.Id;
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -263,7 +263,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -338,7 +338,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -412,7 +412,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -490,7 +490,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -537,7 +537,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     public async Task TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_One()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -582,7 +582,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     public async Task TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_All()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -629,7 +629,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     public async Task TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_Tree()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -719,7 +719,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     public async Task TagsAreUpdatedWhenContentIsUnpublishedAndRePublished()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -760,7 +760,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     public async Task TagsAreUpdatedWhenContentIsUnpublishedAndRePublished_Tree()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -829,7 +829,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await DataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -893,7 +893,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     public async Task Does_Not_Create_Tag_Data_For_Non_Published_Version()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // create content type with a tag property
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
@@ -945,7 +945,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     public async Task Can_Replace_Tag_Data_To_Published_Content()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Arrange
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
@@ -986,7 +986,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     public async Task Can_Append_Tag_Data_To_Published_Content()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Arrange
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
@@ -1036,7 +1036,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     public async Task Can_Remove_Tag_Data_To_Published_Content()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Arrange
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
@@ -1091,7 +1091,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await DataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -1144,7 +1144,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await DataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",

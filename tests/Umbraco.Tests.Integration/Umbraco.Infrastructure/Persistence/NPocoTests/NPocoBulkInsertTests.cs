@@ -223,7 +223,7 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
         var templateService = Services.GetRequiredService<ITemplateService>();
 
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await templateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await templateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("testPage", "Test Page", defaultTemplateId: template.Id);
         await contentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);

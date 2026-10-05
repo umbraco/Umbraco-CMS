@@ -272,7 +272,7 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
 
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var def = new PackageDefinition { Name = "test", Templates = new[] { template.Id.ToString() } };
         var result = PackageBuilder.SavePackage(def);

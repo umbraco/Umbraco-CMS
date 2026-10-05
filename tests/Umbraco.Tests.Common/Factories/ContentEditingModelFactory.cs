@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
@@ -9,19 +10,23 @@ namespace Umbraco.Cms.Tests.Common.Factories;
 // Most likely not complete, but the logic looks sound.
 public class ContentEditingModelFactory : IContentEditingModelFactory
 {
-    private readonly ITemplateService _templateService;
+    private readonly IIdKeyMap _idKeyMap;
 
-    public ContentEditingModelFactory(ITemplateService templateService)
+    public ContentEditingModelFactory(IIdKeyMap idKeyMap)
     {
-        _templateService = templateService;
+        _idKeyMap = idKeyMap;
     }
 
     public async Task<ContentUpdateModel> CreateFromAsync(IContent content)
     {
         {
-            var templateKey = content.TemplateId.HasValue
-                ? (await _templateService.GetAsync(content.TemplateId.Value))?.Key
-                : null;
+            Guid? templateKey = null;
+            if (content.TemplateId.HasValue)
+            {
+                Attempt<Guid> templateKeyAttempt = await _idKeyMap.GetKeyForIdAsync(content.TemplateId.Value, UmbracoObjectTypes.Template);
+                templateKey = templateKeyAttempt.Success ? templateKeyAttempt.Result : null;
+            }
+
             var model = new ContentUpdateModel { TemplateKey = templateKey };
             var properties = new List<PropertyValueModel>();
             var variants = new List<VariantModel>();

@@ -41,7 +41,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
     {
         // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
-        var templateResponse = await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        var templateResponse = await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         _templateKey = templateResponse.Result.Key;
 
         // Content Type

@@ -61,7 +61,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         // ... NOPE, made even more nice changes, it is now...
         // 4452ms !!!!!!!
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType1 = ContentTypeBuilder.CreateTextPageContentType("test1", "test1", template.Id);
         var contentType2 = ContentTypeBuilder.CreateTextPageContentType("test2", "test2", template.Id);
@@ -275,7 +275,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
     public async Task CreateTestDataAsync()
     {
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Create and Save ContentType "textpage" -> ContentType.Id
         ContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);

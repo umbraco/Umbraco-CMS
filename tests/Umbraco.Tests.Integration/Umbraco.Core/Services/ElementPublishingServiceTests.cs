@@ -50,7 +50,7 @@ public partial class ElementPublishingServiceTests : UmbracoIntegrationTest
         await LanguageService.CreateAsync(langBe, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("variantContent")
@@ -143,7 +143,7 @@ public partial class ElementPublishingServiceTests : UmbracoIntegrationTest
     private async Task<IContentType> SetupInvariantElementTypeAsync()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("invariantContent")

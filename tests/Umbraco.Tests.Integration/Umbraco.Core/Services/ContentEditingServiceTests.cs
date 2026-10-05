@@ -91,7 +91,7 @@ internal sealed class ContentEditingServiceTests : UmbracoIntegrationTestWithCon
         await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("variantContent")

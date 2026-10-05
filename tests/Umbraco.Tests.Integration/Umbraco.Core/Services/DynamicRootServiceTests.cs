@@ -101,7 +101,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         //          - Stages
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // DocTypes
         ContentTypeAct = ContentTypeBuilder.CreateSimpleContentType("act", "Act", defaultTemplateId: template.Id);

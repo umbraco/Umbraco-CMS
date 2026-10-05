@@ -3,14 +3,11 @@
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -74,12 +71,9 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     {
         appCaches ??= AppCaches;
 
-        var runtimeSettingsMock = new Mock<IOptionsMonitor<RuntimeSettings>>();
-        runtimeSettingsMock.Setup(x => x.CurrentValue).Returns(new RuntimeSettings());
-
-        var templateRepository = new TemplateRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TemplateRepository>(), LoggerFactory, GetRequiredService<FileSystems>(), ShortStringHelper, Mock.Of<IViewHelper>(), runtimeSettingsMock.Object,  Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
-        var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var efCoreScopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        var templateRepository = new TemplateRepository(efCoreScopeAccessor, appCaches, LoggerFactory.CreateLogger<TemplateRepository>(), ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var commonRepository =
             new ContentTypeCommonRepository(efCoreScopeAccessor, templateRepository, appCaches, ShortStringHelper);
         var languageRepository =

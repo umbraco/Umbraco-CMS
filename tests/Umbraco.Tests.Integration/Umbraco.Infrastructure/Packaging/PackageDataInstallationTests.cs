@@ -182,12 +182,12 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         var xml = XElement.Parse(strXml);
         var element = xml.Descendants("Templates").First();
 
-        var init = (await TemplateService.GetAllAsync()).Count();
+        var init = (await TemplateService.GetAllAsync(CancellationToken.None)).Count();
 
         // Act
         var templates = await PackageDataInstallation.ImportTemplatesAsync(element.Elements("Template").ToList(), -1);
         var numberOfTemplates = (from doc in element.Elements("Template") select doc).Count();
-        var allTemplates = await TemplateService.GetAllAsync();
+        var allTemplates = await TemplateService.GetAllAsync(CancellationToken.None);
 
         // Assert
         Assert.That(templates, Is.Not.Null);
@@ -526,14 +526,18 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         var templateElementUpdated = updatedPackageXml.Descendants("Templates").First();
 
         // kill default test data
-        await TemplateService.DeleteAsync("defaultTemplate", Constants.Security.SuperUserKey);
+        ITemplate? defaultTemplate = await TemplateService.GetAsync("defaultTemplate", CancellationToken.None);
+        if (defaultTemplate is not null)
+        {
+            await TemplateService.DeleteAsync(defaultTemplate.Key, Constants.Security.SuperUserKey, CancellationToken.None);
+        }
 
         // Act
         var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
         var templates = await PackageDataInstallation.ImportTemplatesAsync(templateElement.Elements("Template").ToList(), -1);
         var templatesAfterUpdate =
             await PackageDataInstallation.ImportTemplatesAsync(templateElementUpdated.Elements("Template").ToList(), -1);
-        var allTemplates = await TemplateService.GetAllAsync();
+        var allTemplates = await TemplateService.GetAllAsync(CancellationToken.None);
 
         // Assert
         Assert.That(templates.Any(), Is.True);
@@ -883,7 +887,7 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
 
         // Assert - content should have nonDefaultTemplate assigned (resolved by templateAlias, not bogus int 99999)
         var templateService = GetRequiredService<ITemplateService>();
-        var expectedTemplate = await templateService.GetAsync("nonDefaultTemplate");
+        var expectedTemplate = await templateService.GetAsync("nonDefaultTemplate", CancellationToken.None);
         Assert.IsNotNull(expectedTemplate);
         Assert.AreEqual(1, contents.Count);
         Assert.AreEqual(expectedTemplate.Id, contents.Single().TemplateId);

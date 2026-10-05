@@ -18,7 +18,7 @@ public class ItemTemplateItemControllerTests : ManagementApiUserGroupTestBase<It
     public async Task SetUp()
     {
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
-        var response = await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        var response = await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         _templateKey = response.Result.Key;
     }
 

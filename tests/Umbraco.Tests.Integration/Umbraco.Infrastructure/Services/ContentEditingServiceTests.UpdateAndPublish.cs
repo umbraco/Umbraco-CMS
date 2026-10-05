@@ -182,10 +182,10 @@ public partial class ContentEditingServiceTests
     public async Task Can_UpdateAndPublish_Template()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var template2 = TemplateBuilder.CreateTextPageTemplate("altTemplate");
-        await TemplateService.CreateAsync(template2, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template2, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         contentType.AllowedTemplates = new[] { template, template2 };

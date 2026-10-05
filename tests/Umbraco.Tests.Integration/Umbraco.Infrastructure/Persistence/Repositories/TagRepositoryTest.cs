@@ -79,7 +79,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -109,7 +109,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -146,7 +146,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -185,7 +185,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -223,7 +223,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -259,7 +259,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -302,7 +302,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -346,7 +346,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -391,7 +391,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -428,7 +428,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -469,7 +469,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -513,7 +513,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -557,7 +557,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -602,7 +602,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -647,7 +647,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
             await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
@@ -732,7 +732,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -789,7 +789,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -840,7 +840,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -878,7 +878,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -972,7 +972,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -1128,7 +1128,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     private async Task<(IContentType ContentType, IContent Content1, IContent Content2)> CreateContentForCreateTagTests()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
         await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);

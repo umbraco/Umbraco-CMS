@@ -46,7 +46,7 @@ internal sealed class DatabaseServerMessengerMainDomTests : UmbracoIntegrationTe
         var maxInstructionIdBeforePublish = CacheInstructionService.GetMaxInstructionId();
 
         var template = TemplateBuilder.CreateTextPageTemplate("testPageTemplate");
-        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("testPage", "Test Page", defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);

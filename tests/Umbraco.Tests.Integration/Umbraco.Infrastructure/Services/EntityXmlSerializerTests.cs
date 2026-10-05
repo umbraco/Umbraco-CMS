@@ -85,7 +85,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None); // else, FK violation on contentType!
         var contentType = ContentTypeBuilder.CreateTextPageContentType(
             defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
@@ -214,7 +214,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None); // else, FK violation on contentType!
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
 
@@ -250,7 +250,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None); // else, FK violation on contentType!
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
 

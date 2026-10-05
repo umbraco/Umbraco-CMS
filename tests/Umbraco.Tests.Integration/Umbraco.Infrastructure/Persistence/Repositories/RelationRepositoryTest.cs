@@ -536,7 +536,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 
             var templateService = GetRequiredService<ITemplateService>();
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await templateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await templateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             // Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
             _contentType =

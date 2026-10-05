@@ -2,13 +2,10 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -37,8 +34,6 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
     private ContentType _simpleContentType;
     private ContentType _textpageContentType;
-
-    private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -250,18 +245,11 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var runtimeSettingsMock = new Mock<IOptionsMonitor<RuntimeSettings>>();
-            runtimeSettingsMock.Setup(x => x.CurrentValue).Returns(new RuntimeSettings());
-
             var templateRepo = new TemplateRepository(
-                (IScopeAccessor)provider,
+                GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
                 AppCaches.Disabled,
                 LoggerFactory.CreateLogger<TemplateRepository>(),
-                LoggerFactory,
-                FileSystems,
                 ShortStringHelper,
-                Mock.Of<IViewHelper>(),
-                runtimeSettingsMock.Object,
                 Mock.Of<IRepositoryCacheVersionService>(),
                 Mock.Of<ICacheSyncService>());
             var repository = ContentTypeRepository;
@@ -272,7 +260,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             };
             foreach (var template in templates)
             {
-                templateRepo.Save(template);
+                await templateRepo.SaveAsync(template, CancellationToken.None);
             }
 
             var contentType = ContentTypeBuilder.CreateSimpleContentType();

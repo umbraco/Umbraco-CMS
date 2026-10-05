@@ -61,7 +61,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     private async Task CreateTestData()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None); // else, FK violation on contentType!
 
         _contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);

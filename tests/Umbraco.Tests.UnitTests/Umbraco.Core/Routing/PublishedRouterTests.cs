@@ -37,8 +37,8 @@ public class PublishedRouterTests
             Mock.Of<IContentTypeService>(),
             umbracoContextAccessor,
             Mock.Of<IEventAggregator>(),
-            Mock.Of<IDomainCache>()
-            );
+            Mock.Of<IDomainCache>(),
+            Mock.Of<IIdKeyMap>());
 
     private IUmbracoContextAccessor GetUmbracoContextAccessor()
     {
