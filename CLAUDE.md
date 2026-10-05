@@ -580,6 +580,7 @@ For integration tests that exercise caching or cache refreshers, see `tests/Umbr
 
 - **Fresh build before trusting a green.** Never treat `--no-build` or cached/incremental output as proof a change compiles or passes — a stale run can mask a compile error. Rebuild before reporting build or test state. (Integration tests have a related false-green trap — see `tests/Umbraco.Tests.Integration/CLAUDE.md`.)
 - **Grep the branch you think you're on.** A search only supports a claim against the branch actually checked out, so confirm HEAD is where you expect before drawing a conclusion from a grep. Easy to get wrong whenever the tree moves under you — reviewing a PR head, switching worktrees, or mid merge-up/rebase.
+- **Remove unused usings — touched files only.** Before handing back C# changes, remove unused `using` directives (IDE0005) from the `.cs` files the change adds or modifies, and never sweep other files (unrelated churn causes merge-up conflicts). Run it per affected project, not the solution, which is slow to load: `dotnet format style <project>.csproj --diagnostics IDE0005 --severity info --include <files>`, then rebuild (a using may only be needed under an `#if` symbol).
 
 ---
 
