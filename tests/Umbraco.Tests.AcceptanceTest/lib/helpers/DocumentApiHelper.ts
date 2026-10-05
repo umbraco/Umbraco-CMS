@@ -577,6 +577,42 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createDocumentWithMultipleVariantsAndVaryingAndSharedValues(documentName: string, documentTypeId: string, varyingPropertyName: string, sharedPropertyName: string, cultureVariants: {isoCode: string, name: string, value: string}[], sharedValue: string) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .build();
+
+    for (const variant of cultureVariants) {
+      document.variants.push({
+        name: variant.name,
+        culture: variant.isoCode,
+        segment: null
+      });
+
+      document.values.push({
+        alias: AliasHelper.toAlias(varyingPropertyName),
+        value: variant.value,
+        culture: variant.isoCode,
+        segment: null,
+        editorAlias: 'Umbraco.TextBox',
+        entityType: 'document-property-value'
+      });
+    }
+
+    document.values.push({
+      alias: AliasHelper.toAlias(sharedPropertyName),
+      value: sharedValue,
+      culture: null,
+      segment: null,
+      editorAlias: 'Umbraco.TextBox',
+      entityType: 'document-property-value'
+    });
+
+    return await this.create(document);
+  }
+
   async createDocumentWithMultipleVariantsWithSharedProperty(documentName: string, documentTypeId: string, dataTypeAlias: string, dataTypeEditorAlias: string, cultureVariants: {isoCode: string, name: string}[], value) {
     await this.ensureNameNotExists(documentName);
 
