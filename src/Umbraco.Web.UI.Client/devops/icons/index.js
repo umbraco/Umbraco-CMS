@@ -125,9 +125,6 @@ const collectDictionaryIcons = async () => {
 				if (!pattern.test(svg)) {
 					svg = svg.replace(/<path/g, '<path fill="currentColor"');
 				}
-                
-                // Replace <title> elements (see #23752)
-                svg = svg.replace(/<title\b[^>]*>[\s\S]*?<\/title>/gi, '');
 
 				const icon = {
 					name: iconDef.name,
@@ -247,7 +244,8 @@ const collectDiskIcons = async (icons) => {
 
 const writeIconsToDisk = (icons) => {
 	icons.forEach((icon) => {
-		const optimizedResult = optimize(icon.svg);
+		const svg = icon.svg.replace(/<title\b[^>]*>[\s\S]*?<\/title>/gi, '');
+		const optimizedResult = optimize(svg);
 
 		const content = 'export default `' + optimizedResult.data + '`;';
 
