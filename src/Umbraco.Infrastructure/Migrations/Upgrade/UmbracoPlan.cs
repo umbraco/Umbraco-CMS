@@ -141,6 +141,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddMemberPropertyTypeDto>("{11905736-2BC5-492C-8DCA-17500E774855}");
         To<V_18_0_0.AddRedirectUrlDto>("{72B8BF0F-28C1-4FE3-ABD7-122D5E962C1C}");
         To<V_19_0_0.ReconcileDocumentRepositoryModel>("{740529F1-B2FF-44C6-B4F8-5EA30D400C8A}");
+        To<V_19_0_0.AddTemplateDto>("{F1A0FF0C-3BFB-462D-A387-99913767AF9E}");
     }
 
     /// <summary>

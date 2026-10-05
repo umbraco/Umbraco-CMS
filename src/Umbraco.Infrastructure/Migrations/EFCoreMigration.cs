@@ -27,4 +27,5 @@ public enum EFCoreMigration
     MemberPropertyTypeToEFCore = 19,
     AddRedirectUrlDto = 20,
     ReconcileDocumentRepositoryModel = 21,
+    AddTemplateDto = 22,
 }

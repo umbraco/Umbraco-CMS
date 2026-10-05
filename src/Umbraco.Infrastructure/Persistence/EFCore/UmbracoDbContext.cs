@@ -134,6 +134,8 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<RedirectUrlDto> RedirectUrls { get; set; }
 
+    public required DbSet<TemplateDto> Templates { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var coreExtensions = options.FindExtension<Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension>();

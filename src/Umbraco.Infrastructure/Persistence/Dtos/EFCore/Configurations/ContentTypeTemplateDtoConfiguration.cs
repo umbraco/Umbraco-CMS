@@ -22,9 +22,9 @@ public class ContentTypeTemplateDtoConfiguration : IEntityTypeConfiguration<Cont
             .HasColumnName(ContentTypeTemplateDto.IsDefaultColumnName)
             .HasDefaultValue(false);
 
-        // No EF Core navigation is declared for the content-type FK: it references the alternate key
-        // (nodeId) rather than the primary key.
-        // TODO (EF Core): the FKs to cmsContentType.nodeId, umbracoNode and cmsTemplate are currently created by
-        // NPoco's schema, and cmsTemplate has no EF Core DTO yet; revisit this comment once NPoco is removed.
+        // No EF Core navigations are declared for the content-type and template FKs: they reference the alternate
+        // key (nodeId) of cmsContentType and cmsTemplate rather than their primary keys.
+        // TODO (EF Core): the FKs to cmsContentType.nodeId, umbracoNode and cmsTemplate.nodeId are currently created
+        // by NPoco's schema; revisit this comment once NPoco is removed.
     }
 }
