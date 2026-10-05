@@ -1,4 +1,3 @@
-export * from './invariant-for-variant-guard/index.js';
 export * from './audit-log/index.js';
 export * from './collection/index.js';
 export * from './components/index.js';
