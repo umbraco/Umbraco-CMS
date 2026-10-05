@@ -112,6 +112,7 @@ declare global {
 		actions_refreshNode: string;
 		actions_remove: string;
 		actions_rename: string;
+		actions_replace: string;
 		actions_republish: string;
 		actions_resendInvite: string;
 		actions_restore: string;
@@ -425,6 +426,7 @@ declare global {
 		clipboard_labelForCopyAllEntries: string;
 		clipboard_labelForCopyToClipboard: string;
 		clipboard_labelForRemoveAllEntries: string;
+		clipboard_noItemsMessage: string;
 		codeEditor_heightConfigDescription: string;
 		codeEditor_heightConfigLabel: string;
 		codeEditor_label: string;
@@ -440,6 +442,8 @@ declare global {
 		codefile_deleteItemFailed: string;
 		collection_addCollectionConfiguration: string;
 		collection_cardViewLabel: string;
+		collection_gridViewLabel: string;
+		collection_listViewLabel: string;
 		collection_noItemsTitle: string;
 		collection_tableViewLabel: string;
 		colorpicker_noColors: string;
@@ -483,6 +487,7 @@ declare global {
 		content_isPublished: string;
 		content_isSensitiveValue: string;
 		content_isSensitiveValue_short: string;
+		content_isSensitiveValueNotice: string;
 		content_itemChanged: string;
 		content_itemNotPublished: string;
 		content_languagesToPublish: string;
@@ -1211,6 +1216,7 @@ declare global {
 		general_status: string;
 		general_submit: string;
 		general_success: string;
+		general_switchView: string;
 		general_systemField: string;
 		general_to: string;
 		general_toggleFor: string;
@@ -1515,9 +1521,11 @@ declare global {
 		logViewer_searchOurUmbraco: string;
 		logViewer_searchOurUmbracoForumsUsingGoogle: string;
 		logViewer_searchOurUmbracoWithGoogle: string;
+		logViewer_searchThisMessageInUmbracoDocs: string;
 		logViewer_searchThisMessageOnOurUmbracoForumsAndDocs: string;
 		logViewer_searchThisMessageWithBing: string;
 		logViewer_searchThisMessageWithGoogle: string;
+		logViewer_searchUmbracoDocs: string;
 		logViewer_searchUmbracoIssues: string;
 		logViewer_searchUmbracoIssuesOnGithub: string;
 		logViewer_searchUmbracoSource: string;
@@ -1748,6 +1756,8 @@ declare global {
 		placeholders_usernameHint: string;
 		preview_connectionFailed: string;
 		preview_connectionLost: string;
+		preview_connectionReconnecting: string;
+		preview_connectionRestored: string;
 		preview_endLabel: string;
 		preview_endTitle: string;
 		preview_openWebsiteLabel: string;
@@ -1876,6 +1886,7 @@ declare global {
 		references_labelUsedByMediaTypes: string;
 		references_labelUsedByMembers: string;
 		references_labelUsedByMemberTypes: string;
+		references_labelUsedByOtherContent: string;
 		references_labelUsedDescendants: string;
 		references_labelUsedItems: string;
 		references_listViewDialogWarning: string;
@@ -1944,6 +1955,7 @@ declare global {
 		rte_config_overlaySize_description: string;
 		rte_label: string;
 		scripts_editscript: string;
+		scripts_tabCode: string;
 		sections_content: string;
 		sections_library: string;
 		sections_marketplace: string;
@@ -2006,10 +2018,21 @@ declare global {
 		shortcuts_toggleAllowAsRoot: string;
 		shortcuts_toggleAllowCultureVariants: string;
 		shortcuts_toggleListView: string;
+		sort_sortByFieldAscending: string;
+		sort_sortByFieldCreateDateOption: string;
+		sort_sortByFieldCultureLabel: string;
+		sort_sortByFieldCultureSentence: string;
+		sort_sortByFieldDescending: string;
+		sort_sortByFieldDirectionLabel: string;
+		sort_sortByFieldHeadline: string;
+		sort_sortByFieldNameOption: string;
+		sort_sortByFieldSentence: string;
+		sort_sortByFieldUpdateDateOption: string;
 		sort_sortCreationDate: string;
 		sort_sortDone: string;
 		sort_sortEmptyState: string;
 		sort_sortHelp: string;
+		sort_sortIndividuallyHeadline: string;
 		sort_sortOrder: string;
 		sort_sortPleaseWait: string;
 		speechBubbles_cannotCopyInformation: string;
@@ -2221,6 +2244,7 @@ declare global {
 		template_sectionMandatoryDesc: string;
 		template_sectionName: string;
 		template_systemFields: string;
+		template_tabCode: string;
 		template_template: string;
 		template_websiteRoot: string;
 		template_where: string;

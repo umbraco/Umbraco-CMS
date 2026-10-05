@@ -62,7 +62,7 @@ test('can create a saved search', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   // Checks if the saved search is visible in the UI (saved searches live in the "Saved searches" dropdown)
   await umbracoUi.logViewer.clickSavedSearchesButton();
   await expect(umbracoUi.logViewer.checkSavedSearch(searchName)).toBeVisible();
-  expect(umbracoApi.logViewer.doesSavedSearchExist(searchName)).toBeTruthy();
+  expect(await umbracoApi.logViewer.doesSavedSearchExist(searchName)).toBeTruthy();
 
   // Clean
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
@@ -94,7 +94,7 @@ test.skip('can create a complex saved search', async ({umbracoApi, umbracoUi}) =
   // Checks if the saved search is visible in the UI (saved searches live in the "Saved searches" dropdown)
   await umbracoUi.logViewer.clickSavedSearchesButton();
   await expect(umbracoUi.logViewer.checkSavedSearch(searchName)).toBeVisible();
-  expect(umbracoApi.logViewer.doesSavedSearchExist(searchName)).toBeTruthy();
+  expect(await umbracoApi.logViewer.doesSavedSearchExist(searchName)).toBeTruthy();
 
   // Clean
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
@@ -112,7 +112,7 @@ test('can delete a saved search', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
   await umbracoUi.logViewer.clickSavedSearchesButton();
   await umbracoUi.logViewer.removeSavedSearchByName(searchName + ' ' + search);
-  await umbracoUi.logViewer.clickDeleteButton();
+  await umbracoUi.logViewer.clickDeleteButtonAndWaitForSavedSearchToBeDeleted();
 
   // Assert
   // Checks if the saved search is visible in the UI

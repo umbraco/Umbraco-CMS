@@ -247,10 +247,10 @@ public class CoreScope : ICoreScope
     public void WriteLock(params int[] lockIds) => Locks.WriteLock(InstanceId, null, lockIds);
 
     /// <inheritdoc />
-    public void WriteLock(TimeSpan timeout, int lockId) => Locks.ReadLock(InstanceId, timeout, lockId);
+    public void WriteLock(TimeSpan timeout, int lockId) => Locks.WriteLock(InstanceId, timeout, lockId);
 
     /// <inheritdoc />
-    public void ReadLock(TimeSpan timeout, int lockId) => Locks.WriteLock(InstanceId, timeout, lockId);
+    public void ReadLock(TimeSpan timeout, int lockId) => Locks.ReadLock(InstanceId, timeout, lockId);
 
     /// <inheritdoc />
     public void EagerWriteLock(params int[] lockIds) => Locks.EagerWriteLock(InstanceId, null, lockIds);
@@ -262,7 +262,7 @@ public class CoreScope : ICoreScope
     public void EagerReadLock(TimeSpan timeout, int lockId) => Locks.EagerReadLock(InstanceId, timeout, lockId);
 
     /// <inheritdoc />
-    public void EagerReadLock(params int[] lockIds) => Locks.EagerReadLock(InstanceId, TimeSpan.Zero, lockIds);
+    public void EagerReadLock(params int[] lockIds) => Locks.EagerReadLock(InstanceId, null, lockIds);
 
     /// <summary>
     ///     Disposes the scope, handling file systems, notifications, and parent scope completion.

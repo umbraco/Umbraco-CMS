@@ -1,5 +1,5 @@
 import type { UmbContentDetailModel, UmbElementValueModel } from '../types.js';
-import { UmbContentCollectionManager } from '../collection/index.js';
+import { UmbContentCollectionConfigurationContext, UmbContentCollectionManager } from '../collection/index.js';
 import { UmbContentWorkspaceDataManager } from '../manager/index.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '../variant-picker/index.js';
@@ -47,10 +47,10 @@ import {
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
-	UMB_VALIDATION_CONTEXT,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbDataPathVariantQuery,
 	UmbServerModelValidatorContext,
+	UmbValidationCleanUpByUniqueManager,
 	UmbValidationController,
 } from '@umbraco-cms/backoffice/validation';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
@@ -164,6 +164,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	readonly collection: UmbContentCollectionManager;
 
+	readonly #collectionConfiguration = new UmbContentCollectionConfigurationContext(this);
+
 	/* Variant Options */
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	/**
@@ -233,6 +235,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.varies = this.structure.ownerContentTypeObservablePart((x) =>
 			x ? x.variesByCulture || x.variesBySegment : undefined,
 		);
+
+		this.#collectionConfiguration.setCollectionAlias(args.collectionAlias);
+		this.observe(
+			this.structure.ownerContentTypeObservablePart((x) => x?.collection?.unique),
+			(dataTypeUnique) => this.#collectionConfiguration.setDataTypeUnique(dataTypeUnique ?? undefined),
+			null,
+		);
+		this.observe(this.unique, (unique) => this.#collectionConfiguration.setUnique(unique ?? null), null);
 
 		this.collection = new UmbContentCollectionManager<ContentTypeDetailModelType>(
 			this,
@@ -361,6 +371,26 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				});
 			},
 			null,
+		);
+
+		// Clean up validation messages of properties that are no longer part of the content type structure
+		// (e.g. a composition removed, or the document type edited via infinite editing while this document is
+		// open) — messages for a property that no longer resolves have no UI left to fix them otherwise.
+		// Matches on alias only: removing a property clears its messages across every variant. Deliberately does
+		// not depend on variantOptions — a property's existence is a content-type concern, not a variant one,
+		// and enumerating every (property, variant) combination doesn't scale with variant-option count. [NL]
+		new UmbValidationCleanUpByUniqueManager(
+			this,
+			this.validationContext,
+			'$.values',
+			mergeObservables(
+				[this.structure.contentTypeLoaded, this.structure.contentTypePropertyAliases],
+				([loaded, aliases]) => {
+					if (!loaded || aliases.length === 0) return undefined;
+					return aliases;
+				},
+			),
+			(queryParams) => queryParams.alias,
 		);
 
 		this.observe(
@@ -863,12 +893,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Check variants have a name:
 		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
 		if (variantsWithoutAName.length > 0) {
-			const validationContext = await this.getContext(UMB_VALIDATION_CONTEXT);
-			if (!validationContext) {
-				throw new Error('Validation context is missing');
-			}
 			variantsWithoutAName.forEach((variant) => {
-				validationContext.messages.addMessage(
+				this.validationContext.messages.addMessage(
 					'client',
 					`$.variants[${UmbDataPathVariantQuery(variant)}].name`,
 					UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -996,6 +1022,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			);
 			if (valid || this.#ignoreValidationResultOnSubmit) {
 				await this.performCreateOrUpdate(variantIds, saveData);
+				this.evaluateValidationMode();
 			} else {
 				return Promise.reject('Validation issues prevent saving');
 			}

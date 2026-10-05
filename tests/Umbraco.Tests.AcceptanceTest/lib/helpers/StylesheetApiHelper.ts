@@ -154,6 +154,10 @@ export class StylesheetApiHelper {
   // Folder
   async getFolder(path: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/stylesheet/folder/' + encodeURIComponent(path));
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 
