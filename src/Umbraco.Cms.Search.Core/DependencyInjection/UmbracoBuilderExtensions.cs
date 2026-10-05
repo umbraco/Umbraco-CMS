@@ -88,6 +88,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<DraftMediaNotificationHandler>();
         builder.Services.AddTransient<DraftMemberNotificationHandler>();
         builder.Services.AddTransient<DraftElementNotificationHandler>();
+        builder.Services.AddTransient<PublishedElementNotificationHandler>();
 
         builder.Services.AddTransient<RebuildIndexNotificationHandler>();
         builder.Services.AddTransient<IDistributedContentIndexRefresher, DistributedContentIndexRefresher>();
@@ -106,6 +107,7 @@ public static class UmbracoBuilderExtensions
             .AddNotificationHandler<DraftMemberCacheRefresherNotification, ContentIndexingNotificationHandler>()
             .AddNotificationHandler<DraftElementCacheRefresherNotification, ContentIndexingNotificationHandler>()
             .AddNotificationHandler<PublishedContentCacheRefresherNotification, ContentIndexingNotificationHandler>()
+            .AddNotificationHandler<PublishedElementCacheRefresherNotification, ElementIndexingNotificationHandler>()
             .AddNotificationAsyncHandler<PublicAccessDetailedCacheRefresherNotification, PublicAccessIndexingNotificationHandler>();
 
         builder

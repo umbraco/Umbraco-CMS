@@ -1,3 +1,4 @@
+import { UMB_SEARCH_INDEX_PROVIDER_NAME_CONDITION_ALIAS } from '../search-index/conditions/constants.js';
 import { UMB_SEARCH_DOCUMENT_FIELDS_MODAL_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -16,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Search.Condition.IndexProviderName',
+				alias: UMB_SEARCH_INDEX_PROVIDER_NAME_CONDITION_ALIAS,
 				match: 'search-examine-provider',
 			},
 		],

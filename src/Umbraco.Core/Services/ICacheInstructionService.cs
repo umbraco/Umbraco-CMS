@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Services;
@@ -39,21 +37,6 @@ public interface ICacheInstructionService
     void DeliverInstructionsInBatches(IEnumerable<RefreshInstruction> instructions, string localIdentity);
 
     /// <summary>
-    ///     Processes pending database cache instructions.
-    /// </summary>
-    /// <param name="cacheRefreshers">Cache refreshers.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
-    /// <param name="localIdentity">Local identity of the executing AppDomain.</param>
-    /// <param name="lastId">Id of the latest processed instruction.</param>
-    /// <returns>The processing result.</returns>
-    [Obsolete("Please use ProcessAllInstructions instead. Scheduled for removal in Umbraco 19.")]
-    ProcessInstructionsResult ProcessInstructions(
-        CacheRefresherCollection cacheRefreshers,
-        CancellationToken cancellationToken,
-        string localIdentity,
-        int lastId);
-
-    /// <summary>
     /// Processes all pending database cache instructions using the provided cache refreshers.
     /// </summary>
     /// <param name="cacheRefreshers">The collection of cache refreshers to use for processing instructions.</param>
@@ -63,15 +46,7 @@ public interface ICacheInstructionService
     ProcessInstructionsResult ProcessAllInstructions(
         CacheRefresherCollection cacheRefreshers,
         CancellationToken cancellationToken,
-        string localIdentity)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => ProcessInstructions(
-            cacheRefreshers,
-            cancellationToken,
-            localIdentity,
-            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>().GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0);
-#pragma warning restore CS0618 // Type or member is obsolete
-
+        string localIdentity);
 
     /// <summary>
     ///     Processes pending cache instructions from the database for the internal (repository) caches.
@@ -83,12 +58,5 @@ public interface ICacheInstructionService
     ProcessInstructionsResult ProcessInternalInstructions(
         CacheRefresherCollection cacheRefreshers,
         CancellationToken cancellationToken,
-        string localIdentity)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => ProcessInstructions(
-            cacheRefreshers,
-            cancellationToken,
-            localIdentity,
-            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>().GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0);
-#pragma warning restore CS0618 // Type or member is obsolete
+        string localIdentity);
 }

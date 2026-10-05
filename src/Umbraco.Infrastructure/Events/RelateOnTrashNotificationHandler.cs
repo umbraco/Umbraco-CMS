@@ -2,13 +2,10 @@
 // See LICENSE for more details.
 
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -47,70 +44,6 @@ public sealed class RelateOnTrashNotificationHandler :
         _relationService = relationService;
         _entityService = entityService;
         _scopeProvider = scopeProvider;
-    }
-
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public RelateOnTrashNotificationHandler(
-        IRelationService relationService,
-        IEntityService entityService,
-        ICoreScopeProvider coreScopeProvider,
-        ILocalizedTextService textService,
-        IAuditService auditService,
-        IScopeProvider scopeProvider,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUserIdKeyResolver userIdKeyResolver)
-        : this(relationService, entityService, coreScopeProvider)
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public RelateOnTrashNotificationHandler(
-        IRelationService relationService,
-        IEntityService entityService,
-        ILocalizedTextService textService,
-        IAuditService auditService,
-        IScopeProvider scopeProvider,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUserIdKeyResolver userIdKeyResolver)
-        : this(
-            relationService,
-            entityService,
-            scopeProvider,
-            textService,
-            auditService,
-            scopeProvider,
-            backOfficeSecurityAccessor,
-            userIdKeyResolver)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.Events.RelateOnTrashNotificationHandler"/> class.
-    /// Handles the creation of relations when entities are moved to the recycle bin (trashed).
-    /// </summary>
-    /// <param name="relationService">Service used to manage relations between entities.</param>
-    /// <param name="entityService">Service for accessing and managing entities.</param>
-    /// <param name="textService">Service for retrieving localized text strings.</param>
-    /// <param name="auditService">Service for logging audit events.</param>
-    /// <param name="scopeProvider">Provides scope management for database operations.</param>
-    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public RelateOnTrashNotificationHandler(
-        IRelationService relationService,
-        IEntityService entityService,
-        ILocalizedTextService textService,
-        IAuditService auditService,
-        IScopeProvider scopeProvider,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(
-            relationService,
-            entityService,
-            textService,
-            auditService,
-            scopeProvider,
-            backOfficeSecurityAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
     }
 
     /// <inheritdoc />
