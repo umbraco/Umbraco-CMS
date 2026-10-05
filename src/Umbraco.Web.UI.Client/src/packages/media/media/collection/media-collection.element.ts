@@ -1,7 +1,7 @@
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.context-token.js';
 import type { UmbDropzoneMediaElement } from '../dropzone/index.js';
-import type { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
+import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
 import { customElement, html, ref, state, when, css, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -24,6 +24,11 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (context) => {
+			// TODO: stop consuming the context both in the default element and here. Instead make the default able to inform when the context is consumed. Or come up with a better system for the controllers to talk together. [NL]
+			this.#collectionContext = context;
+		});
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
 			this.observe(instance?.unique, (unique) => {
