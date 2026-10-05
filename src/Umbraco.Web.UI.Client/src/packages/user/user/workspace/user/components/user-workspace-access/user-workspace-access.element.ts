@@ -41,19 +41,25 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	}
 
 	#renderDocumentStartNodes() {
+		const uniques = this._calculatedStartNodes?.documentStartNodeUniques.map((reference) => reference.unique) || [];
+		const hasAccess = this._calculatedStartNodes?.hasDocumentRootAccess === true || uniques.length > 0;
 		return html` <b><umb-localize key="sections_content">Content</umb-localize></b>
-			<umb-user-document-start-node
-				readonly
-				.uniques=${this._calculatedStartNodes?.documentStartNodeUniques.map((reference) => reference.unique) ||
-				[]}></umb-user-document-start-node>`;
+			${hasAccess
+				? html`<umb-user-document-start-node readonly .uniques=${uniques}></umb-user-document-start-node>`
+				: this.#renderNoStartNodes()}`;
 	}
 
 	#renderMediaStartNodes() {
+		const uniques = this._calculatedStartNodes?.mediaStartNodeUniques.map((reference) => reference.unique) || [];
+		const hasAccess = this._calculatedStartNodes?.hasMediaRootAccess === true || uniques.length > 0;
 		return html` <b><umb-localize key="sections_media">Media</umb-localize></b>
-			<umb-user-media-start-node
-				readonly
-				.uniques=${this._calculatedStartNodes?.mediaStartNodeUniques.map((reference) => reference.unique) ||
-				[]}></umb-user-media-start-node>`;
+			${hasAccess
+				? html`<umb-user-media-start-node readonly .uniques=${uniques}></umb-user-media-start-node>`
+				: this.#renderNoStartNodes()}`;
+	}
+
+	#renderNoStartNodes() {
+		return html`<div><umb-localize key="user_noStartNodes">No start nodes selected</umb-localize></div>`;
 	}
 
 	static override styles = [
