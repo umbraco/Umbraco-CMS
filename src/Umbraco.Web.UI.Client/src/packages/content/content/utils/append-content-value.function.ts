@@ -1,5 +1,5 @@
 import type { UmbPotentialContentValueModel } from '../types.js';
-import { sortContentValuesByVariant } from './sort-content-values-by-variant.function.js';
+import { _sortContentValuesByVariant } from './sort-content-values-by-variant.function.js';
 
 /**
  * Inserts or replaces a content value in a frozen array of content values.
@@ -22,7 +22,7 @@ export function umbAppendContentValue<T extends UmbPotentialContentValueModel>(
 	const indexToReplace = data.findIndex((x) => getUniqueMethod(x) === unique);
 
 	if (indexToReplace === -1) {
-		return sortContentValuesByVariant([...data, entry]);
+		return _sortContentValuesByVariant([...data, entry]);
 	}
 
 	const values = [...data];

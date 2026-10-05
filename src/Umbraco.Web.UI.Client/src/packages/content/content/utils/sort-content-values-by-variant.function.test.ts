@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { sortContentValuesByVariant } from './sort-content-values-by-variant.function.js';
+import { _sortContentValuesByVariant } from './sort-content-values-by-variant.function.js';
 import type { UmbPotentialContentValueModel } from '../types.js';
 
 function makeValue(
@@ -14,7 +14,7 @@ describe('sortContentValuesByVariant', () => {
 	it('sorts invariant values first, then culture codes ordinally', () => {
 		const values = [makeValue('title', 'en-us'), makeValue('title', null), makeValue('title', 'da-dk')];
 
-		const result = sortContentValuesByVariant(values).map((v) => v.culture);
+		const result = _sortContentValuesByVariant(values).map((v) => v.culture);
 
 		expect(result).to.deep.equal([null, 'da-dk', 'en-us']);
 	});
@@ -24,7 +24,7 @@ describe('sortContentValuesByVariant', () => {
 		// even though it would sort after under a case-insensitive comparison. [NL]
 		const values = [makeValue('title', 'en-us'), makeValue('title', 'DA-DK')];
 
-		const result = sortContentValuesByVariant(values).map((v) => v.culture);
+		const result = _sortContentValuesByVariant(values).map((v) => v.culture);
 
 		expect(result).to.deep.equal(['DA-DK', 'en-us']);
 	});
@@ -36,7 +36,7 @@ describe('sortContentValuesByVariant', () => {
 			makeValue('title', 'en-us', 's1'),
 		];
 
-		const result = sortContentValuesByVariant(values).map((v) => v.segment);
+		const result = _sortContentValuesByVariant(values).map((v) => v.segment);
 
 		expect(result).to.deep.equal([null, 's1', 's2']);
 	});
@@ -44,7 +44,7 @@ describe('sortContentValuesByVariant', () => {
 	it('sorts by alias within the same culture and segment, ordinally', () => {
 		const values = [makeValue('zzz-alias', 'en-us', 's1'), makeValue('aaa-alias', 'en-us', 's1')];
 
-		const result = sortContentValuesByVariant(values).map((v) => v.alias);
+		const result = _sortContentValuesByVariant(values).map((v) => v.alias);
 
 		expect(result).to.deep.equal(['aaa-alias', 'zzz-alias']);
 	});
@@ -52,7 +52,7 @@ describe('sortContentValuesByVariant', () => {
 	it('groups by culture first, only falling back to alias within the same culture and segment', () => {
 		const values = [makeValue('subtitle', 'da-dk'), makeValue('title', 'da-dk'), makeValue('body', 'en-us')];
 
-		const result = sortContentValuesByVariant(values).map((v) => v.alias);
+		const result = _sortContentValuesByVariant(values).map((v) => v.alias);
 
 		expect(result).to.deep.equal(['subtitle', 'title', 'body']);
 	});
@@ -60,7 +60,7 @@ describe('sortContentValuesByVariant', () => {
 	it('does not mutate the input array', () => {
 		const values = [makeValue('title', 'en-us'), makeValue('title', null)];
 
-		sortContentValuesByVariant(values);
+		_sortContentValuesByVariant(values);
 
 		expect(values.map((v) => v.culture)).to.deep.equal(['en-us', null]);
 	});

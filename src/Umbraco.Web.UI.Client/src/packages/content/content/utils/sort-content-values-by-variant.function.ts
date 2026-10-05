@@ -9,7 +9,7 @@ import { umbVariantObjectSortCompare } from '@umbraco-cms/backoffice/variant';
  * @param {Array<UmbPotentialContentValueModel>} values - The values to sort.
  * @returns {Array<UmbPotentialContentValueModel>} A new, variant-sorted array.
  */
-export function sortContentValuesByVariant<T extends UmbPotentialContentValueModel>(values: Array<T>): Array<T> {
+export function _sortContentValuesByVariant<T extends UmbPotentialContentValueModel>(values: Array<T>): Array<T> {
 	return [...values].sort((a, b) => {
 		const variantCompare = umbVariantObjectSortCompare(a, b);
 		if (variantCompare !== 0) return variantCompare;
