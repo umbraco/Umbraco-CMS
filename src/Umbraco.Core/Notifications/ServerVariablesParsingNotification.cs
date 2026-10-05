@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Core.Notifications;
 /// <summary>
 ///     A notification for when server variables are parsing
 /// </summary>
-[Obsolete("No longer published, as the AngularJS backoffice and its server variables were removed, so handlers of this notification never run. Serve values the backoffice needs from a Management API endpoint instead. Scheduled for removal in Umbraco 19.")]
+[Obsolete("No longer published, as the AngularJS backoffice and its server variables were removed, so handlers of this notification never run. Serve values the backoffice needs from a Management API endpoint instead. Scheduled for removal in Umbraco 20.")]
 public class ServerVariablesParsingNotification : INotification
 {
     /// <summary>
