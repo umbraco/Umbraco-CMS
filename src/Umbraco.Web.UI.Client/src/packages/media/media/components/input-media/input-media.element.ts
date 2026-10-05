@@ -28,7 +28,7 @@ import '@umbraco-cms/backoffice/imaging';
 export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(UmbLitElement) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
-			return element.getAttribute('detail');
+			return element.getAttribute('data-unique');
 		},
 		getUniqueOfModel: (modelEntry) => {
 			return modelEntry;
@@ -279,6 +279,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				title=${ifDefined(item.name === null ? undefined : item.name)}
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				data-mark="${item.entityType}:${item.unique}"
+				data-unique="${item.unique}"
 				href="${ifDefined(href)}"
 				?readonly=${this.readonly}
 				?disabled=${!this._editMediaPath}>
