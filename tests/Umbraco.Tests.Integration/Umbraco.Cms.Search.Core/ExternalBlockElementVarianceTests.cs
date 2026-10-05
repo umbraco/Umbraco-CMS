@@ -178,9 +178,9 @@ public class ExternalBlockElementVarianceTests : ContentTestBase
             ],
             Expose =
             [
-                new BlockItemVariation(localMixedElementKey, "en-US", null),
-                new BlockItemVariation(localMixedElementKey, "da-DK", null),
-                new BlockItemVariation(localInvariantElementKey, null, null),
+                new BlockItemVariation(localMixedElementKey, "en-US"),
+                new BlockItemVariation(localMixedElementKey, "da-DK"),
+                new BlockItemVariation(localInvariantElementKey, null),
             ],
         };
 

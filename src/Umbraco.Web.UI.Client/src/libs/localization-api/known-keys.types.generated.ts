@@ -562,6 +562,8 @@ declare global {
 		content_scheduledPublishing: string;
 		content_scheduledPublishServerTime: string;
 		content_schedulePublishHelp: string;
+		content_segmentHasContent: string;
+		content_segmentNoContent: string;
 		content_selectAllVariants: string;
 		content_sendForApproval: string;
 		content_setDate: string;
@@ -675,6 +677,7 @@ declare global {
 		contentTypeEditor_elementDoesNotSupport: string;
 		contentTypeEditor_elementHeading: string;
 		contentTypeEditor_elementType: string;
+		contentTypeEditor_elementTypeOnlyAllowedInLibrarySupport: string;
 		contentTypeEditor_elementTypeOnlySupport: string;
 		contentTypeEditor_enableListViewDescription: string;
 		contentTypeEditor_enableListViewHeading: string;
