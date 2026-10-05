@@ -1,13 +1,12 @@
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from '../workspace/constants.js';
-import { UmbContentWorkspaceInvariantForVariantGuardController } from '@umbraco-cms/backoffice/content';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceContext',
-		alias: 'Umb.WorkspaceContext.Element.InvariantForVariantGuard',
-		name: 'Element Invariant For Variant Guard Workspace Context',
-		api: UmbContentWorkspaceInvariantForVariantGuardController,
+		kind: 'contentLanguageAccess',
+		name: 'Element Language Access Workspace Context',
+		alias: 'Umb.WorkspaceContext.Element.LanguageAccess',
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,

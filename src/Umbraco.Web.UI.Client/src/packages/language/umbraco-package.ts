@@ -11,7 +11,6 @@ import { manifests as propertyEditorManifests } from './property-editor/manifest
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import * as entryPointModule from './entry-point.js';
-import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...appLanguageSelect,
@@ -26,18 +25,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...workspaceManifests,
 	multiLanguageConditionManifest,
 	userPermissionConditionManifest,
-	{
-		type: 'workspaceContext',
-		name: 'Content Language Access Workspace Context',
-		alias: 'Umb.WorkspaceContext.DocumentLanguageAccess',
-		api: () => import('./permissions/language-access.workspace.context.js'),
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				oneOf: ['Umb.Workspace.Document', 'Umb.Workspace.Element'],
-			},
-		],
-	},
 	{
 		name: 'Language Backoffice Entry Point',
 		alias: 'Umb.EntryPoint.Language',
