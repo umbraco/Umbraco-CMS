@@ -59,7 +59,7 @@ public class CreateDocumentBlueprintControllerTests : ManagementApiUserGroupTest
             Parent = null,
             Id = Guid.NewGuid(),
             Values = [],
-            Variants = [new DocumentVariantRequestModel { Culture = null, Segment = null, Name = $"Blueprint {Guid.NewGuid()}" }],
+            Variants = [new DocumentVariantRequestModel { Culture = null, Name = $"Blueprint {Guid.NewGuid()}" }],
         };
 
         return await Client.PostAsync(Url, JsonContent.Create(createModel));
