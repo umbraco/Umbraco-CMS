@@ -1535,7 +1535,7 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Cannot_Update_Element_Type_With_Segment_Variation()
+    public async Task Can_Update_Element_Type_With_Segment_Variation()
     {
         var createModel = ContentTypeCreateModel("Test", "test", isElement: true);
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
@@ -1545,12 +1545,12 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidSegmentVariationForElementType, result.Status);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.Success, result.Status);
     }
 
     [Test]
-    public async Task Cannot_Switch_To_Element_Type_With_Existing_Segment_Variation()
+    public async Task Can_Switch_To_Element_Type_With_Existing_Segment_Variation()
     {
         var createModel = ContentTypeCreateModel("Test", "test");
         createModel.VariesBySegment = true;
@@ -1561,8 +1561,8 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidSegmentVariationForElementType, result.Status);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.Success, result.Status);
     }
 
     [Test]

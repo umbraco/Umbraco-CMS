@@ -129,6 +129,7 @@ public enum ContentTypeOperationStatus
     /// <summary>
     ///     Element types cannot vary by segment.
     /// </summary>
+    [Obsolete("Element types can now vary by segment. Scheduled for removal in V20.")]
     InvalidSegmentVariationForElementType,
 
     /// <summary>
