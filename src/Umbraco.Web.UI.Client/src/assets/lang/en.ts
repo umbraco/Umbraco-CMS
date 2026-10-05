@@ -2144,6 +2144,8 @@ export default {
 		changePassword: 'Change your password',
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure 2FA',
+		disableUserHeadline: (name: string) => `Disable ${name}`,
+		disableUserConfirmation: 'Are you sure you want to disable this user?',
 		emailRequired: 'Required - enter an email address for this user',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2322,6 +2324,10 @@ export default {
 		avatarDeleteSuccess: 'Avatar deleted',
 		unknownFailure: 'Unknown failure',
 		usersNotManagedFromGroup: 'not manageable from this screen.',
+		enableUserHeadline: (name: string) => `Enable ${name}`,
+		enableUserConfirmation: 'Are you sure you want to enable this user?',
+		unlockUserHeadline: (name: string) => `Unlock ${name}`,
+		unlockUserConfirmation: 'Are you sure you want to unlock this user?',
 	},
 	validation: {
 		validation: 'Validation',
