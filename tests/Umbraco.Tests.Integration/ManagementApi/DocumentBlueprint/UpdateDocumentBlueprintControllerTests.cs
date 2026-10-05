@@ -68,7 +68,7 @@ public class UpdateDocumentBlueprintControllerTests : ManagementApiUserGroupTest
         var updateModel = new UpdateDocumentBlueprintRequestModel
         {
             Values = [],
-            Variants = [new DocumentVariantRequestModel { Culture = null, Segment = null, Name = $"Blueprint {Guid.NewGuid()}" }],
+            Variants = [new DocumentVariantRequestModel { Culture = null, Name = $"Blueprint {Guid.NewGuid()}" }],
         };
 
         return await Client.PutAsync(Url, JsonContent.Create(updateModel));
