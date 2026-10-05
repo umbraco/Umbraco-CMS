@@ -59,12 +59,12 @@ public interface IRepositoryCacheVersionAccessor
     /// distributed locks for the rest of its transaction, so the data it reads cannot change under it and
     /// checking the database version again would only trigger another sync for a version published after
     /// its locks were taken. The request-level cache is cleared, so a later root scope in the same request
-    /// reads the current versions again.
+    /// reads the current versions again. Clearing the scope-level cache instead would let a version published
+    /// mid-scope change that scope's view, so the default implementation throws rather than fall back to
+    /// <see cref="CachesSynced()" />.
     /// </remarks>
+    /// <exception cref="NotImplementedException">Thrown when the implementation does not retain the adopted snapshot.</exception>
+    // TODO (V19): Remove the default implementation.
     void CachesSynced(IEnumerable<RepositoryCacheVersion> adoptedVersions)
-    {
-#pragma warning disable CS0618 // Type or member is obsolete
-        CachesSynced();
-#pragma warning restore CS0618 // Type or member is obsolete
-    }
+        => throw new NotImplementedException($"{GetType().FullName} must implement {nameof(CachesSynced)}({nameof(IEnumerable<RepositoryCacheVersion>)}).");
 }

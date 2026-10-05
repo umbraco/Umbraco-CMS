@@ -43,9 +43,15 @@ public interface IRepositoryCacheVersionService
     /// Gets the cache versions currently published for all entity types.
     /// </summary>
     /// <returns>The published cache versions; a version whose value is <see langword="null" /> has never been published.</returns>
+    /// <remarks>
+    /// The synchronization reads this snapshot before processing the cache instructions and adopts it afterwards
+    /// through <see cref="SetCachesSyncedAsync(IEnumerable{RepositoryCacheVersion})" />, so the two must be
+    /// implemented together. No snapshot can be derived from the other members, so the default implementation throws.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">Thrown when the implementation does not provide the snapshot.</exception>
     // TODO (V19): Remove the default implementation.
     Task<IReadOnlyCollection<RepositoryCacheVersion>> GetCacheVersionsAsync()
-        => Task.FromResult<IReadOnlyCollection<RepositoryCacheVersion>>(Array.Empty<RepositoryCacheVersion>());
+        => throw new NotImplementedException($"{GetType().FullName} must implement {nameof(GetCacheVersionsAsync)} and {nameof(SetCachesSyncedAsync)}({nameof(IEnumerable<RepositoryCacheVersion>)}).");
 
     /// <summary>
     /// Registers that the cache has been synced with the database.
@@ -67,7 +73,11 @@ public interface IRepositoryCacheVersionService
     /// Adopting the versions read before processing, rather than the versions published afterwards, means a version
     /// published while instructions were being processed is still seen as out of date and triggers another sync.
     /// Concurrent syncs may adopt an older set last; that costs one redundant sync and nothing more.
+    /// Delegating to <see cref="SetCachesSyncedAsync()" /> would discard the snapshot and reintroduce that race, so
+    /// the default implementation throws instead.
     /// </remarks>
+    /// <exception cref="NotImplementedException">Thrown when the implementation does not adopt the given snapshot.</exception>
     // TODO (V19): Remove the default implementation.
-    Task SetCachesSyncedAsync(IEnumerable<RepositoryCacheVersion> cacheVersions) => SetCachesSyncedAsync();
+    Task SetCachesSyncedAsync(IEnumerable<RepositoryCacheVersion> cacheVersions)
+        => throw new NotImplementedException($"{GetType().FullName} must implement {nameof(GetCacheVersionsAsync)} and {nameof(SetCachesSyncedAsync)}({nameof(IEnumerable<RepositoryCacheVersion>)}).");
 }
