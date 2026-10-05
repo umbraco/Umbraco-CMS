@@ -98,10 +98,10 @@ export { UmbTiptapTablePropertiesModalElement } from './table/modals/table-prope
 
 // Toolbar UI elements (referenced from kind manifests)
 export { UmbTiptapTableToolbarMenuElement } from './table/components/table-toolbar-menu.element.js';
-export { UmbTiptapToolbarButtonActionElement } from '../components/toolbar/tiptap-toolbar-button-action.element.js';
-export { UmbTiptapToolbarButtonElement } from '../components/toolbar/tiptap-toolbar-button.element.js';
-export { UmbTiptapToolbarColorPickerButtonElement } from '../components/toolbar/tiptap-toolbar-color-picker-button.element.js';
-export { UmbTiptapToolbarMenuElement } from '../components/toolbar/tiptap-toolbar-menu.element.js';
+export { UmbTiptapToolbarButtonActionElement } from '../components/toolbar/button/tiptap-toolbar-button-action.element.js';
+export { UmbTiptapToolbarButtonElement } from '../components/toolbar/button/tiptap-toolbar-button.element.js';
+export { UmbTiptapToolbarColorPickerButtonElement } from '../components/toolbar/color-picker/tiptap-toolbar-color-picker-button.element.js';
+export { UmbTiptapToolbarMenuElement } from '../components/toolbar/menu/tiptap-toolbar-menu.element.js';
 
 // Table menu-item action APIs
 export { default as UmbTableCellMergeAction } from './table/actions/table-cell-merge.action.js';

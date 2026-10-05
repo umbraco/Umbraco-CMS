@@ -389,9 +389,10 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
 
     private void LogFailedExternalLogin(ExternalLoginInfo loginInfo, MemberIdentityUser user) =>
         Logger.LogWarning(
-            "The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'",
+            "The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}', key: '{UserKey}'",
             loginInfo.LoginProvider,
-            user.Id);
+            user.Id,
+            user.Key);
 
     /// <inheritdoc />
     protected override async Task<SignInResult> HandleSignIn(MemberIdentityUser? user, string? username, SignInResult result)

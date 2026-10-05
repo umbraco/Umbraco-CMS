@@ -80,11 +80,6 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
     /// <param name="id">An identifier.</param>
     public void ClearContentType(int id)
     {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Clear content type w/id {ContentTypeId}", id);
-        }
-
         try
         {
             _lock.EnterUpgradeableReadLock();
@@ -92,6 +87,11 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             if (_typesById.TryGetValue(id, out IPublishedContentType? type) == false)
             {
                 return;
+            }
+
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Clear content type w/id {ContentTypeId}, key {ContentTypeKey}", id, type.Key);
             }
 
             try

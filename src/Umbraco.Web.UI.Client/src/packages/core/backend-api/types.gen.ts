@@ -706,6 +706,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     name: string;
     isFolder: boolean;
     documentType?: DocumentTypeReferenceResponseModel | null;
+    variants: Array<DocumentVariantItemResponseModel>;
 };
 
 export type DocumentCollectionResponseModel = {
@@ -715,6 +716,7 @@ export type DocumentCollectionResponseModel = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     documentType: DocumentTypeCollectionReferenceResponseModel;
     isTrashed: boolean;
     isProtected: boolean;
@@ -1348,7 +1350,9 @@ export type MediaCollectionResponseModel = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     mediaType: MediaTypeCollectionReferenceResponseModel;
+    extension?: string | null;
 };
 
 export type MediaConfigurationResponseModel = {
@@ -1366,6 +1370,7 @@ export type MediaItemResponseModel = {
     parent?: ReferenceByIdModel | null;
     hasChildren: boolean;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: string | null;
     variants: Array<VariantItemResponseModel>;
 };
 
@@ -1403,6 +1408,7 @@ export type MediaTreeItemResponseModel = {
     isTrashed: boolean;
     createDate: string;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: string | null;
     variants: Array<VariantItemResponseModel>;
 };
 
@@ -3317,6 +3323,17 @@ export type DocumentBlueprintResponseModelWritable = {
     documentType: DocumentTypeReferenceResponseModel;
 };
 
+export type DocumentBlueprintTreeItemResponseModelWritable = {
+    hasChildren: boolean;
+    id: string;
+    parent?: ReferenceByIdModel | null;
+    flags: Array<FlagModel>;
+    name: string;
+    isFolder: boolean;
+    documentType?: DocumentTypeReferenceResponseModel | null;
+    variants: Array<DocumentVariantItemResponseModelWritable>;
+};
+
 export type DocumentCollectionResponseModelWritable = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModelWritable>;
@@ -3324,6 +3341,7 @@ export type DocumentCollectionResponseModelWritable = {
     flags: Array<FlagModel>;
     creator?: string | null;
     sortOrder: number;
+    hasChildren: boolean;
     documentType: DocumentTypeCollectionReferenceResponseModel;
     isTrashed: boolean;
     isProtected: boolean;
@@ -3445,6 +3463,11 @@ export type PackageDefinitionResponseModelWritable = {
     id: string;
 };
 
+export type PagedDocumentBlueprintTreeItemResponseModelWritable = {
+    total: number;
+    items: Array<DocumentBlueprintTreeItemResponseModelWritable>;
+};
+
 export type PagedDocumentCollectionResponseModelWritable = {
     total: number;
     items: Array<DocumentCollectionResponseModelWritable>;
@@ -3504,6 +3527,12 @@ export type SearchResultResponseModelWritable = {
     id: string;
     score: number;
     fields: Array<FieldPresentationModel>;
+};
+
+export type SubsetDocumentBlueprintTreeItemResponseModelWritable = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentBlueprintTreeItemResponseModelWritable>;
 };
 
 export type SubsetDocumentRecycleBinItemResponseModelWritable = {

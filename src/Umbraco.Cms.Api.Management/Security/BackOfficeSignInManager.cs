@@ -347,7 +347,8 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
 
     private void LogFailedExternalLogin(ExternalLoginInfo loginInfo, BackOfficeIdentityUser user) =>
         Logger.LogWarning(
-            "The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'",
+            "The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}', key: '{UserKey}'",
             loginInfo.LoginProvider,
-            user.Id);
+            user.Id,
+            user.Key);
 }

@@ -105,6 +105,7 @@ The active language is driven by the shell elements `<umb-app>` and `<umb-auth>`
 - Razor sets `lang` on the shell element from `GlobalSettings.DefaultUILanguage`. The shell reads its own `lang` on connect and calls `umbLocalizationRegistry.loadLanguage(this.lang)`.
 - After login, `current-user.context` calls `loadLanguage(user.languageIsoCode)` and the shell mirrors the new value back onto its own `lang` attribute via `umbLocalizationRegistry.currentLanguage`.
 - `<html lang>` is the static `"en"` for the noscript fallback text. Don't conflate it with the dynamic UI language.
+- Locale-sensitive formatting can use a different locale from the requested one. `Intl` resolves a language-only tag to that language's default region, which is wrong where the dictionary we ship is written for another region — `en` is UK English but resolves to US conventions — so the registry corrects those cases. `umbLocalizationManager.documentLanguage` holds the corrected locale; `this.localize.date()` and `.number()` already use it.
 
 If you're adding a new shell-like element (rare — most code lives inside `<umb-app>`), give it a `lang` attribute and the same subscribe-and-mirror pattern. For everything else, just use `this.localize` and the inherited context resolves the rest.
 

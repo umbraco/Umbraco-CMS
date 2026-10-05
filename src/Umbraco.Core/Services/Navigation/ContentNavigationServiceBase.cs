@@ -119,6 +119,16 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     }
 
     /// <summary>
+    ///     Gets the distributed lock that guards the tree this service navigates.
+    /// </summary>
+    protected abstract int TreeLockId { get; }
+
+    /// <summary>
+    ///     Gets the object type of the nodes this service navigates.
+    /// </summary>
+    protected abstract Guid ObjectTypeKey { get; }
+
+    /// <summary>
     ///     Rebuilds the entire main navigation structure. Implementations should define how the structure is rebuilt.
     /// </summary>
     public abstract Task RebuildAsync();
@@ -194,6 +204,17 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// <returns><c>true</c> if the parent node exists in the structure; otherwise, <c>false</c>.</returns>
     public bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys)
         => TryGetChildrenKeysFromStructure(_navigation.Structure, parentKey, out childrenKeys);
+
+    /// <summary>
+    ///    Attempts to determine if a parent node has any children in the main navigation structure.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node.</param>
+    /// <param name="hasChildren">
+    ///     When this method returns, contains a value indicating whether the parent node has any children.
+    /// </param>
+    /// <returns><c>true</c> if the parent node exists in the structure; otherwise, <c>false</c>.</returns>
+    public bool TryGetHasChildren(Guid parentKey, out bool hasChildren)
+        => TryGetHasChildrenFromStructure(_navigation.Structure, parentKey, out hasChildren);
 
     /// <summary>
     ///     Attempts to get all child node keys of a specific content type under a parent node.
@@ -362,6 +383,17 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         => TryGetChildrenKeysFromStructure(_recycleBinNavigation.Structure, parentKey, out childrenKeys);
 
     /// <summary>
+    ///    Attempts to determine if a parent node has any children in the recycle bin navigation structure.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node in the recycle bin.</param>
+    /// <param name="hasChildren">
+    ///     When this method returns, contains a value indicating whether the parent node has any children.
+    /// </param>
+    /// <returns><c>true</c> if the parent node exists in the recycle bin; otherwise, <c>false</c>.</returns>
+    public bool TryGetHasChildrenInBin(Guid parentKey, out bool hasChildren)
+        => TryGetHasChildrenFromStructure(_recycleBinNavigation.Structure, parentKey, out hasChildren);
+
+    /// <summary>
     ///     Attempts to get all descendant node keys of a parent node in the recycle bin navigation structure.
     /// </summary>
     /// <param name="parentKey">The unique identifier of the parent node in the recycle bin.</param>
@@ -482,20 +514,18 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     ///     The sort order for the new node. Required when adding nodes at root level.
     /// </param>
     /// <returns>
-    ///     <c>true</c> if the node was successfully added; otherwise, <c>false</c> if the parent
-    ///     doesn't exist or a node with the same key already exists.
+    ///     <c>true</c> if the node was successfully added; otherwise, <c>false</c> if the parent does not exist in the
+    ///     structure and cannot be loaded from the database, is trashed, or a node with the same key already exists.
     /// </returns>
     public bool Add(Guid key, Guid contentTypeKey, Guid? parentKey = null, int? sortOrder = null)
     {
         NavigationSnapshot navigation = _navigation;
+        NavigationSnapshot recycleBinNavigation = _recycleBinNavigation;
 
         NavigationNode? parentNode = null;
-        if (parentKey.HasValue)
+        if (parentKey.HasValue && TryEnsureInStructure(navigation, recycleBinNavigation, parentKey.Value, out parentNode) is false)
         {
-            if (navigation.Structure.TryGetValue(parentKey.Value, out parentNode) is false)
-            {
-                return false; // Parent node doesn't exist
-            }
+            return false; // Parent node doesn't exist
         }
 
         // Note: sortOrder can't be automatically determined for items at root level, so it needs to be passed in
@@ -528,12 +558,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     ///     The unique identifier of the new parent node. If <c>null</c>, the node is moved to root level.
     /// </param>
     /// <returns>
-    ///     <c>true</c> if the node was successfully moved; otherwise, <c>false</c> if the node doesn't exist,
-    ///     the target parent doesn't exist, or the node is being moved to itself.
+    ///     <c>true</c> if the node was successfully moved; otherwise, <c>false</c> if the node doesn't exist, the target
+    ///     parent does not exist in the structure and cannot be loaded from the database or is trashed, or the node is
+    ///     being moved to itself.
     /// </returns>
     public bool Move(Guid key, Guid? targetParentKey = null)
     {
         NavigationSnapshot navigation = _navigation;
+        NavigationSnapshot recycleBinNavigation = _recycleBinNavigation;
 
         if (navigation.Structure.TryGetValue(key, out NavigationNode? nodeToMove) is false)
         {
@@ -546,12 +578,9 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
 
         NavigationNode? targetParentNode = null;
-        if (targetParentKey.HasValue)
+        if (targetParentKey.HasValue && TryEnsureInStructure(navigation, recycleBinNavigation, targetParentKey.Value, out targetParentNode) is false)
         {
-            if (navigation.Structure.TryGetValue(targetParentKey.Value, out targetParentNode) is false)
-            {
-                return false; // Target parent doesn't exist
-            }
+            return false; // Target parent doesn't exist
         }
 
         // Updated only once the move is known to go ahead, so a node that fails the checks above keeps
@@ -648,8 +677,9 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     ///     If <c>null</c>, the node is restored to root level.
     /// </param>
     /// <returns>
-    ///     <c>true</c> if the node and its descendants were successfully restored;
-    ///     otherwise, <c>false</c> if the node doesn't exist in the bin or the target parent doesn't exist.
+    ///     <c>true</c> if the node and its descendants were successfully restored; otherwise, <c>false</c> if the node
+    ///     doesn't exist in the bin, or the target parent does not exist in the structure and cannot be loaded from the
+    ///     database or is trashed.
     /// </returns>
     public bool RestoreFromBin(Guid key, Guid? targetParentKey = null)
     {
@@ -663,19 +693,19 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
         // If a target parent is specified, try to find it in the main structure
         NavigationNode? targetParentNode = null;
-        if (targetParentKey.HasValue && navigation.Structure.TryGetValue(targetParentKey.Value, out targetParentNode) is false)
+        if (targetParentKey.HasValue && TryEnsureInStructure(navigation, recycleBinNavigation, targetParentKey.Value, out targetParentNode) is false)
         {
             return false; // Target parent doesn't exist
         }
 
-        // Set the new parent for the node (if parent node is null - the node is moved to root)
-        targetParentNode?.AddChild(recycleBinNavigation.Structure, key);
+        // Restoring a target parent that was itself still in the bin has already restored this node along with it.
+        if (recycleBinNavigation.Structure.ContainsKey(key) is false)
+        {
+            return navigation.Structure.TryGetValue(key, out NavigationNode? restoredNode)
+                && (restoredNode.Parent == targetParentKey || Move(key, targetParentKey));
+        }
 
-        // Restore the node and its descendants from the recycle bin to the main structure
-        RestoreNodeAndDescendantsRecursively(navigation, recycleBinNavigation, nodeToRestore);
-
-        var restored = navigation.Structure.TryAdd(nodeToRestore.Key, nodeToRestore) &&
-                       recycleBinNavigation.Structure.TryRemove(key, out _);
+        var restored = RestoreCore(navigation, recycleBinNavigation, nodeToRestore, targetParentNode);
 
         // Both snapshots' descendant lists are now potentially stale.
         navigation.Invalidate();
@@ -684,23 +714,134 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return restored;
     }
 
-    /// <summary>
-    ///     Rebuilds the navigation structure based on the specified object type key and whether the items are trashed.
-    ///     Only relevant for items in the content and media trees (which have readLock values of -333 or -334).
-    /// </summary>
-    /// <param name="readLock">The read lock value, should be -333 or -334 for content and media trees.</param>
-    /// <param name="objectTypeKey">The key of the object type to rebuild.</param>
-    /// <param name="trashed">Indicates whether the items are in the recycle bin.</param>
-    protected Task HandleRebuildAsync(int readLock, Guid objectTypeKey, bool trashed)
+    private static bool RestoreCore(
+        NavigationSnapshot navigation,
+        NavigationSnapshot recycleBinNavigation,
+        NavigationNode nodeToRestore,
+        NavigationNode? targetParentNode)
     {
-        // This is only relevant for items in the content and media trees
-        if (readLock != Constants.Locks.ContentTree && readLock != Constants.Locks.MediaTree)
+        // Set the new parent for the node (if parent node is null - the node is moved to root)
+        targetParentNode?.AddChild(recycleBinNavigation.Structure, nodeToRestore.Key);
+
+        // Restore the node and its descendants from the recycle bin to the main structure
+        RestoreNodeAndDescendantsRecursively(navigation, recycleBinNavigation, nodeToRestore);
+
+        return navigation.Structure.TryAdd(nodeToRestore.Key, nodeToRestore) &&
+               recycleBinNavigation.Structure.TryRemove(nodeToRestore.Key, out _);
+    }
+
+    /// <summary>
+    ///     Finds a node in the main structure, loading it and any missing ancestors from the database when it is not
+    ///     there yet: it may have been created or restored on another server whose cache instruction has not been
+    ///     processed here.
+    /// </summary>
+    private bool TryEnsureInStructure(
+        NavigationSnapshot navigation,
+        NavigationSnapshot recycleBinNavigation,
+        Guid key,
+        out NavigationNode? node)
+    {
+        if (navigation.Structure.TryGetValue(key, out node))
         {
-            return Task.CompletedTask;
+            return true;
         }
 
+        List<INavigationModel> chain;
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            scope.ReadLock(TreeLockId);
+            chain = _navigationRepository.GetContentNodeWithAncestors(key, ObjectTypeKey).ToList();
+        }
+
+        if (IsChainInMainStructure(chain) is false)
+        {
+            return false;
+        }
+
+        var restored = false;
+        NavigationNode? parentNode = null;
+        foreach (INavigationModel model in chain)
+        {
+            if (navigation.Structure.TryGetValue(model.Key, out NavigationNode? existingNode))
+            {
+                parentNode = existingNode;
+                continue;
+            }
+
+            if (recycleBinNavigation.Structure.TryGetValue(model.Key, out NavigationNode? binNode))
+            {
+                RestoreCore(navigation, recycleBinNavigation, binNode, parentNode);
+                binNode.UpdateSortOrder(model.SortOrder);
+                parentNode?.InvalidateOrderedChildren();
+                restored = true;
+                parentNode = binNode;
+                continue;
+            }
+
+            var newNode = new NavigationNode(model.Key, model.ContentTypeKey, model.SortOrder);
+            if (navigation.Structure.TryAdd(model.Key, newNode))
+            {
+                if (parentNode is null)
+                {
+                    navigation.Roots.Add(model.Key);
+                }
+                else
+                {
+                    parentNode.AddChild(navigation.Structure, model.Key, appendAsLastItem: false);
+                }
+
+                parentNode = newNode;
+            }
+            else if (navigation.Structure.TryGetValue(model.Key, out NavigationNode? concurrentlyAddedNode))
+            {
+                parentNode = concurrentlyAddedNode;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        navigation.Invalidate();
+        if (restored)
+        {
+            recycleBinNavigation.Invalidate();
+        }
+
+        return navigation.Structure.TryGetValue(key, out node);
+    }
+
+    // A chain belongs in the main structure only when every node is untrashed and hangs off the root or an earlier node.
+    private static bool IsChainInMainStructure(List<INavigationModel> chain)
+    {
+        if (chain.Count == 0)
+        {
+            return false;
+        }
+
+        var ids = new HashSet<int>();
+        foreach (INavigationModel model in chain)
+        {
+            if (model.Trashed || (model.ParentId != Constants.System.Root && ids.Contains(model.ParentId) is false))
+            {
+                return false;
+            }
+
+            ids.Add(model.Id);
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Rebuilds the main or recycle bin navigation structure for the tree this service navigates,
+    ///     under the read lock given by <see cref="TreeLockId"/> and for the nodes of <see cref="ObjectTypeKey"/>.
+    /// </summary>
+    /// <param name="trashed">Indicates whether to rebuild the recycle bin structure instead of the main one.</param>
+    protected Task HandleRebuildAsync(bool trashed)
+    {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
-        scope.ReadLock(readLock);
+        scope.ReadLock(TreeLockId);
 
         // Build into new structures, then swap the snapshot atomically so that concurrent
         // readers never observe a transiently empty navigation state or a mismatched pair
@@ -710,13 +851,13 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
         if (trashed)
         {
-            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
+            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(ObjectTypeKey);
             BuildNavigationDictionary(newStructure, newRoots, navigationModels);
             Interlocked.Exchange(ref _recycleBinNavigation, new NavigationSnapshot(newStructure, newRoots));
         }
         else
         {
-            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
+            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(ObjectTypeKey);
             BuildNavigationDictionary(newStructure, newRoots, navigationModels);
             Interlocked.Exchange(ref _navigation, new NavigationSnapshot(newStructure, newRoots));
         }
@@ -764,6 +905,24 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         keysWithSortOrder.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
         rootKeys = keysWithSortOrder.ConvertAll(keyWithSortOrder => keyWithSortOrder.Key);
 
+        return true;
+    }
+
+    private static bool TryGetHasChildrenFromStructure(
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        Guid parentKey,
+        out bool hasChildren)
+    {
+        if (structure.TryGetValue(parentKey, out NavigationNode? parentNode) is false)
+        {
+            // Parent doesn't exist
+            hasChildren = false;
+            return false;
+        }
+
+        // Deliberately not via GetOrderedChildren, which builds and caches a sorted array of the
+        // child keys - needless work when only their existence matters.
+        hasChildren = parentNode.Children.Count > 0;
         return true;
     }
 

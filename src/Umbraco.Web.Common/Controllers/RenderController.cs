@@ -60,8 +60,9 @@ public class RenderController : UmbracoPageController, IRenderController
         if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
         {
             _logger.LogDebug(
-            "Response status: Content={Content}, StatusCode={ResponseStatusCode}, Culture={Culture}, Segment={Segment}",
+            "Response status: ContentId={ContentId}, ContentKey={ContentKey}, StatusCode={ResponseStatusCode}, Culture={Culture}, Segment={Segment}",
             pcr.PublishedContent?.Id ?? -1,
+            pcr.PublishedContent?.Key,
             pcr.ResponseStatusCode,
             pcr.Culture,
             pcr.Segment);

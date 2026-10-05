@@ -97,6 +97,9 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly publicAccessBtn: Locator;
   private readonly uuiCheckbox: Locator;
   private readonly sortBtn: Locator;
+  private readonly sortByFieldTab: Locator;
+  private readonly sortByFieldSelect: Locator;
+  private readonly sortByFieldDirectionSelect: Locator;
   private readonly containerSaveBtn: Locator
   private readonly groupBasedProtectionBtn: Locator;
   private readonly chooseMemberGroupBtn: Locator;
@@ -177,6 +180,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly cascadingMenuContainer: Locator;
   private readonly modalFormValidationMessage: Locator;
   private readonly treePickerSearchTxt: Locator;
+  private readonly searchTabInPickerModal: Locator;
   private readonly mediaPickerSearchTxt: Locator;
   private readonly memberPickerSearchTxt: Locator;
   private readonly documentCreateOptionsModal: Locator;
@@ -200,6 +204,14 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly manualLinkRemoveBtn: Locator;
   private readonly cardCollectionView: Locator;
   private readonly cardContentNode: Locator;
+  private readonly documentPickerModal: Locator;
+  private readonly collectionCardInDocumentPickerModal: Locator;
+  private readonly treeViewSwitchBtnInPickerModal: Locator;
+  private readonly treeViewClassicOptionBtnInPickerModal: Locator;
+  private readonly treeViewTableOptionBtnInPickerModal: Locator;
+  private readonly treeTableViewInPickerModal: Locator;
+  private readonly treeTableRowInPickerModal: Locator;
+  private readonly selectableTreeTableRowInPickerModal: Locator;
   private readonly containerSetupBtn: Locator;
   private readonly containerEditBtn: Locator;
   private readonly loginPageSelectedItem: Locator;
@@ -316,6 +328,9 @@ export class ContentUiHelper extends UiBaseLocators {
     this.publicAccessBtn = page.getByRole('button', {name: 'Public Access'});
     this.uuiCheckbox = page.locator('uui-checkbox');
     this.sortBtn = page.getByLabel('Sort', {exact: true});
+    this.sortByFieldTab = page.getByTestId('sort-children-of-modal:tab-by-field');
+    this.sortByFieldSelect = page.locator('umb-sort-children-of-document-modal [label="Sort by field"] select');
+    this.sortByFieldDirectionSelect = page.locator('umb-sort-children-of-document-modal [label="Direction"] select');
     this.containerSaveBtn = this.container.getByLabel('Save');
     this.groupBasedProtectionBtn = page.locator('span').filter({hasText: 'Group based protection'});
     this.chooseMemberGroupBtn = page.locator('umb-input-member-group').getByLabel('Choose');
@@ -407,7 +422,8 @@ export class ContentUiHelper extends UiBaseLocators {
     this.styleSelectBtn = page.locator('uui-button[label="Style Select"]');
     this.cascadingMenuContainer = page.locator('umb-cascading-menu-popover uui-scroll-container');
     this.modalFormValidationMessage = this.sidebarModal.locator('umb-form-validation-message #messages');
-    this.treePickerSearchTxt = this.page.locator('umb-tree-picker-modal #input');
+    this.treePickerSearchTxt = this.sidebarModal.locator('[data-mark="picker:search-input"] #input');
+    this.searchTabInPickerModal = this.sidebarModal.locator('[data-mark="picker:tab:search"]');
     this.mediaPickerSearchTxt = this.page.locator('umb-media-picker-modal #search #input');
     this.memberPickerSearchTxt = this.page.locator('umb-member-picker-modal #input');
     // Property Actions
@@ -431,6 +447,16 @@ export class ContentUiHelper extends UiBaseLocators {
     // Card Collection View
     this.cardCollectionView = page.locator('umb-card-collection-view');
     this.cardContentNode = this.cardCollectionView.locator('uui-card-content-node');
+    this.documentPickerModal = page.locator('umb-document-picker-modal');
+    this.collectionCardInDocumentPickerModal = this.documentPickerModal.locator('uui-card-content-node');
+    // Tree View (Browse tab of a picker, not a collection)
+    this.treeViewSwitchBtnInPickerModal = this.sidebarModal.locator('[data-mark="tree:switch-view"]');
+    // The alias suffix (Classic/Table) is stable across entity types, but the entity segment isn't, so match on suffix only.
+    this.treeViewClassicOptionBtnInPickerModal = this.sidebarModal.locator('[data-mark^="tree:switch-view:"][data-mark$=".Classic"]');
+    this.treeViewTableOptionBtnInPickerModal = this.sidebarModal.locator('[data-mark^="tree:switch-view:"][data-mark$=".Table"]');
+    this.treeTableViewInPickerModal = this.sidebarModal.locator('umb-table-tree-view');
+    this.treeTableRowInPickerModal = this.sidebarModal.locator('umb-table-tree-view uui-table-row');
+    this.selectableTreeTableRowInPickerModal = this.sidebarModal.locator('umb-table-tree-view uui-table-row[selectable]');
     // Public Access
     this.containerSetupBtn = this.container.getByLabel('Setup');
     this.containerEditBtn = this.container.getByLabel('Edit');
@@ -722,16 +748,17 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async changeTemplate(oldTemplate: string, newTemplate: string) {
     await this.clickEditTemplateByName(oldTemplate);
-    // The picker lists templates as buttons, so match by button role/name (getByLabel does not resolve
-    // a button reliably). The modal re-renders continuously so the button never reports "stable";
-    // force the click once it is visible rather than waiting out an animation that never settles.
-    await this.click(this.sidebarModal.getByRole('button', {name: newTemplate, exact: true}), {force: true});
-    await this.clickChooseModalButton();
+    // The picker submits as soon as a template is picked, so there is no Choose step.
+    await this.click(this.sidebarModal.locator(`umb-ref-item[name="${newTemplate}"]`));
   }
 
   async isTemplateNameDisabled(templateName: string) {
     await this.isVisible(this.sidebarModal.getByLabel(templateName));
     await this.isDisabled(this.sidebarModal.getByLabel(templateName));
+  }
+
+  async isTemplateNameVisibleInPicker(templateName: string, isVisible: boolean = true) {
+    await this.isVisible(this.sidebarModal.locator(`umb-ref-item[name="${templateName}"]`), isVisible);
   }
 
   // Culture and Hostnames
@@ -1118,6 +1145,17 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.listViewTableRow.filter({hasText: name}));
   }
 
+  async isListViewTableRowSelectableForName(name: string, isSelectable: boolean = true) {
+    await this.isVisible(this.listViewTableRow.filter({hasText: name}).locator('uui-checkbox'), isSelectable);
+  }
+
+  async selectCheckboxInListViewTableRowWithName(name: string) {
+    // An item with children renders its name as an "open" button rather than plain text, so clicking
+    // the row itself can land on that button and drill in instead of selecting. The checkbox is the
+    // only click target guaranteed to select such a row.
+    await this.click(this.listViewTableRow.filter({hasText: name}).locator('uui-checkbox'), {force: true});
+  }
+
   async clickPublishSelectedListItems() {
     await this.click(this.publishSelectedListItems);
   }
@@ -1366,6 +1404,24 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickSortButton() {
     await this.click(this.sortBtn);
+  }
+
+  async clickSortByFieldTab() {
+    await this.click(this.sortByFieldTab);
+  }
+
+  async selectSortByField(fieldName: string) {
+    await this.selectByText(this.sortByFieldSelect, fieldName);
+  }
+
+  async selectSortByFieldDirection(directionName: string) {
+    await this.selectByText(this.sortByFieldDirectionSelect, directionName);
+  }
+
+  async prepareSortByField(fieldName: string, directionName: string) {
+    await this.clickSortByFieldTab();
+    await this.selectSortByField(fieldName);
+    await this.selectSortByFieldDirection(directionName);
   }
 
   async doesIndexDocumentInTreeContainName(parentName: string, childName: string, index: number) {
@@ -1917,6 +1973,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async enterSearchKeywordInTreePickerModal(keyword: string) {
+    await this.click(this.searchTabInPickerModal);
     await this.enterText(this.treePickerSearchTxt, keyword);
     await this.pressKey(this.treePickerSearchTxt, 'Enter');
   }
@@ -2130,6 +2187,40 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickContentCardWithName(name: string) {
     await this.click(this.cardContentNode.filter({hasText: name}).locator('#name'));
+  }
+
+  async isContentCardSelectableForName(name: string, isSelectable: boolean = true) {
+    await this.isVisible(this.cardContentNode.filter({hasText: name}).locator('uui-checkbox'), isSelectable);
+  }
+
+  async clickCollectionCardInPickerModal(name: string) {
+    await this.click(this.collectionCardInDocumentPickerModal.filter({hasText: name}));
+  }
+
+  async changeTreeToTableView() {
+    await this.click(this.treeViewSwitchBtnInPickerModal);
+    await this.click(this.treeViewTableOptionBtnInPickerModal);
+  }
+
+  async changeTreeToTreeView() {
+    await this.click(this.treeViewSwitchBtnInPickerModal);
+    await this.click(this.treeViewClassicOptionBtnInPickerModal);
+  }
+
+  async isTreeTableViewVisible(isVisible: boolean = true) {
+    await this.isVisible(this.treeTableViewInPickerModal, isVisible);
+  }
+
+  async clickOpenButtonInTreeTableRowWithName(name: string) {
+    await this.click(this.treeTableRowInPickerModal.filter({hasText: name}).locator('[data-mark="table-row:open"]'));
+  }
+
+  async selectTreeTableRowWithName(name: string) {
+    await this.click(this.treeTableRowInPickerModal.filter({hasText: name}));
+  }
+
+  async isTreeTableRowSelectableForName(name: string, isSelectable: boolean = true) {
+    await this.hasCount(this.selectableTreeTableRowInPickerModal.filter({hasText: name}), isSelectable ? 1 : 0);
   }
 
   async selectContentCardWithName(contentName: string) {

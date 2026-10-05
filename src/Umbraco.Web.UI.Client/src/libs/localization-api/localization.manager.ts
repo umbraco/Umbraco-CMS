@@ -39,12 +39,22 @@ export class UmbLocalizationManager {
 	localizations: Map<string, UmbLocalizationSetBase> = new Map();
 
 	/**
-	 * The currently active language and direction. Read-only from a consumer perspective —
+	 * The direction of the currently active language. Read-only from a consumer perspective —
 	 * to change the active language, call `umbLocalizationRegistry.loadLanguage(locale)`.
-	 * The fields stay publicly writable for the registry's pipeline; consumers writing here
+	 * The field stays publicly writable for the registry's pipeline; consumers writing here
 	 * directly will only sync the field without loading the matching dictionaries.
 	 */
 	documentDirection: 'ltr' | 'rtl' = (document.documentElement.dir as 'ltr' | 'rtl') || 'ltr';
+
+	/**
+	 * The locale used for locale-sensitive formatting, such as dates and numbers.
+	 *
+	 * This is not necessarily the locale that was requested. Where the region `Intl` infers from
+	 * a language-only tag does not match the dictionary registered under that tag, the registry
+	 * corrects it — a bare `en`, for example, is served as `en-gb`.
+	 *
+	 * Read-only from a consumer perspective, as with {@link documentDirection}.
+	 */
 	documentLanguage = document.documentElement.lang || navigator.language;
 
 	get fallback(): UmbLocalizationSet | undefined {

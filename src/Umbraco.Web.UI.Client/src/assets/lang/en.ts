@@ -59,6 +59,7 @@ export default {
 		remove: 'Remove',
 		rename: 'Rename',
 		republish: 'Republish entire site',
+		replace: 'Replace',
 		resendInvite: 'Resend Invitation',
 		restore: 'Restore',
 		rights: 'Permissions',
@@ -240,6 +241,8 @@ export default {
 		noItemsTitle: 'No items',
 		addCollectionConfiguration: 'Add collection',
 		cardViewLabel: 'Cards',
+		gridViewLabel: 'Grid',
+		listViewLabel: 'List',
 		tableViewLabel: 'Table',
 	},
 	content: {
@@ -342,6 +345,7 @@ export default {
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your website administrator.',
 		isSensitiveValue_short: 'This value is hidden.',
+		isSensitiveValueNotice: 'If you need access to view the hidden values, contact your website administrator.',
 		languagesToPublish: 'What languages would you like to publish?',
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
@@ -996,6 +1000,7 @@ export default {
 		status: 'Status',
 		submit: 'Submit',
 		success: 'Success',
+		switchView: 'Switch view',
 		type: 'Type',
 		typeName: 'Type Name',
 		typeToSearch: 'Type to search...',
@@ -1492,6 +1497,7 @@ export default {
 	},
 	scripts: {
 		editscript: 'Edit script file',
+		tabCode: 'Code',
 	},
 	sections: {
 		content: 'Content',
@@ -1531,6 +1537,17 @@ export default {
 			'Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items',
 		sortPleaseWait: 'Please wait. Items are being sorted, this can take a while.',
 		sortEmptyState: 'This node has no child nodes to sort',
+		sortByFieldHeadline: 'Sort by field',
+		sortByFieldSentence: 'Sort all children by',
+		sortByFieldDirectionLabel: 'Direction',
+		sortByFieldAscending: 'Ascending',
+		sortByFieldDescending: 'Descending',
+		sortByFieldNameOption: 'Name',
+		sortByFieldCreateDateOption: 'Created',
+		sortByFieldUpdateDateOption: 'Last edited',
+		sortIndividuallyHeadline: 'Sort individually',
+		sortByFieldCultureSentence: 'in',
+		sortByFieldCultureLabel: 'Language',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validation',
@@ -1682,6 +1699,7 @@ export default {
 		notAllowed: 'The selected template is no longer allowed on this document type.',
 		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
+		tabCode: 'Code',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
 		edittemplate: 'Edit template',
 		insertSections: 'Sections',
@@ -2126,6 +2144,8 @@ export default {
 		changePassword: 'Change your password',
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure 2FA',
+		disableUserHeadline: (name: string) => `Disable ${name}`,
+		disableUserConfirmation: 'Are you sure you want to disable this user?',
 		emailRequired: 'Required - enter an email address for this user',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2304,6 +2324,10 @@ export default {
 		avatarDeleteSuccess: 'Avatar deleted',
 		unknownFailure: 'Unknown failure',
 		usersNotManagedFromGroup: 'not manageable from this screen.',
+		enableUserHeadline: (name: string) => `Enable ${name}`,
+		enableUserConfirmation: 'Are you sure you want to enable this user?',
+		unlockUserHeadline: (name: string) => `Unlock ${name}`,
+		unlockUserConfirmation: 'Are you sure you want to unlock this user?',
 	},
 	validation: {
 		validation: 'Validation',
@@ -2577,6 +2601,7 @@ export default {
 		labelUsedByItems: 'Referenced by',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
+		labelUsedByOtherContent: 'The following items are used by other content',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
@@ -2600,10 +2625,12 @@ export default {
 		searchThisMessageWithGoogle: 'Search this message with Google',
 		searchWithBing: 'Search With Bing',
 		searchThisMessageWithBing: 'Search this message with Bing',
-		searchOurUmbraco: 'Search Our Umbraco',
-		searchThisMessageOnOurUmbracoForumsAndDocs: 'Search this message on Our Umbraco forums and docs',
-		searchOurUmbracoWithGoogle: 'Search Our Umbraco with Google',
-		searchOurUmbracoForumsUsingGoogle: 'Search Our Umbraco forums using Google',
+		searchOurUmbraco: 'Search Umbraco forum',
+		searchThisMessageOnOurUmbracoForumsAndDocs: 'Search this message in the Umbraco forum',
+		searchOurUmbracoWithGoogle: 'Search Umbraco forum with Google',
+		searchOurUmbracoForumsUsingGoogle: 'Search Umbraco forum using Google',
+		searchUmbracoDocs: 'Search Umbraco documentation',
+		searchThisMessageInUmbracoDocs: 'Search this message in the Umbraco documentation',
 		searchUmbracoSource: 'Search Umbraco Source',
 		searchWithinUmbracoSourceCodeOnGithub: 'Search within Umbraco source code on GitHub',
 		searchUmbracoIssues: 'Search Umbraco Issues',
@@ -2655,6 +2682,7 @@ export default {
 		confirmPasteOverwriteMessage: (name: string) =>
 			`The property already contains a value. Paste from the property action will overwrite the current value. Do you want to replace the current value with <strong>${name}</strong>?`,
 		copySuccessHeadline: 'Copied to clipboard',
+		noItemsMessage: 'There are no items in the clipboard.',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',
@@ -2903,6 +2931,8 @@ export default {
 		viewPublishedContentDeclineButton: 'Stay in preview mode',
 		connectionFailed: 'Could not establish a connection to the server, preview live updates will not work.',
 		connectionLost: 'Connection to the server lost, preview live updates will not work.',
+		connectionReconnecting: 'Connection to the server lost, trying to reconnect…',
+		connectionRestored: 'Connection to the server restored, preview live updates are working again.',
 	},
 	permissions: {
 		FolderCreation: 'Folder creation',
