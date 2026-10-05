@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_PICKER_PROPERTY_EDITOR_VALUE_TYPE } from '../value-type/constants.js';
+import { UMB_MULTIPLE_DOCUMENT_PICKER_PROPERTY_EDITOR_VALUE_TYPE } from '../../multiple-document-picker/value-type/constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,6 +8,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.ValueSummary.PropertyEditor.DocumentPicker',
 		name: 'Document Picker Property Editor Value Summary',
 		forValueType: UMB_DOCUMENT_PICKER_PROPERTY_EDITOR_VALUE_TYPE,
+		element: () => import('./value-summary.js'),
+		valueResolver: () => import('./value-summary.js'),
+	},
+	{
+		type: 'valueSummary',
+		kind: 'default',
+		alias: 'Umb.ValueSummary.PropertyEditor.MultipleDocumentPicker',
+		name: 'Multiple Document Picker Property Editor Value Summary',
+		forValueType: UMB_MULTIPLE_DOCUMENT_PICKER_PROPERTY_EDITOR_VALUE_TYPE,
 		element: () => import('./value-summary.js'),
 		valueResolver: () => import('./value-summary.js'),
 	},
