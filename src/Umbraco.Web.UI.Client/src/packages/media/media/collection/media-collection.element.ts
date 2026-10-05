@@ -1,12 +1,14 @@
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.context-token.js';
 import type { UmbDropzoneMediaElement } from '../dropzone/index.js';
-import type { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
+import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
+import type { UmbMediaCollectionOrderByOption } from './sort-preference/types.js';
 import { customElement, html, ref, state, when, css, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbDropzoneSubmittedEvent } from '@umbraco-cms/backoffice/dropzone';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import '../components/empty-media-state/index.js';
 
 @customElement('umb-media-collection')
@@ -19,6 +21,12 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	@state()
 	private _unique: string | null = null;
 
+	@state()
+	private _orderByOptions: Array<UmbMediaCollectionOrderByOption> = [];
+
+	@state()
+	private _activeOrderByOption?: UmbMediaCollectionOrderByOption;
+
 	@query('#dropzone')
 	private _dropzone?: UmbDropzoneMediaElement;
 
@@ -30,6 +38,29 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 				this._unique = unique ?? null;
 			});
 		});
+
+		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (instance) => {
+			this.#collectionContext = instance;
+			this.#observeOrderByOptions();
+		});
+	}
+
+	#observeOrderByOptions() {
+		if (!this.#collectionContext) return;
+
+		this.observe(
+			observeMultiple([this.#collectionContext.orderByOptions, this.#collectionContext.activeOrderByOption]),
+			([options, activeOption]) => {
+				if (this._orderByOptions.length !== options.length) {
+					this._orderByOptions = options;
+				}
+
+				if (activeOption && activeOption !== this._activeOrderByOption?.unique) {
+					this._activeOrderByOption = this._orderByOptions.find((option) => option.unique === activeOption);
+				}
+			},
+			'_umbObserveMediaOrderByOptions',
+		);
 	}
 
 	#observeProgressItems(dropzone?: Element) {
@@ -38,7 +69,6 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 			(dropzone as UmbDropzoneMediaElement).progressItems(),
 			(progressItems) => {
 				progressItems.forEach((item) => {
-					// We do not update folders as it may have children still being uploaded.
 					if (item.folder?.name) return;
 
 					this.#collectionContext?.updatePlaceholderStatus(item.unique, item.status);
@@ -81,10 +111,58 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		}
 	}
 
+	#onOrderByChange(option: UmbMediaCollectionOrderByOption) {
+		this.#collectionContext?.setActiveOrderByOption(option.unique);
+	}
+
+	#getOrderByIcon() {
+		if (!this._activeOrderByOption) return 'icon-sort';
+
+		return this._activeOrderByOption.config.orderDirection === 'desc' ? 'icon-arrow-down' : 'icon-arrow-up';
+	}
+
+	#getOrderByButtonLabel() {
+		const orderBy = this.localize.term('general_orderBy');
+		const activeOption = this._activeOrderByOption
+			? this.localize.string(this._activeOrderByOption.label)
+			: undefined;
+
+		return activeOption ? `${orderBy}: ${activeOption}` : orderBy;
+	}
+
+	#renderOrderBy() {
+		return html`
+			<uui-button
+				popovertarget="popover-media-order-by"
+				label=${this.#getOrderByButtonLabel()}
+				look="outline"
+				compact>
+				<uui-icon name=${this.#getOrderByIcon()}></uui-icon>
+			</uui-button>
+			<uui-popover-container id="popover-media-order-by" placement="bottom">
+				<umb-popover-layout>
+					<div class="filter-dropdown">
+						${this._orderByOptions.map(
+							(option) => html`
+								<uui-menu-item
+									label=${this.localize.string(option.label)}
+									@click-label=${() => this.#onOrderByChange(option)}
+									?active=${this._activeOrderByOption?.unique === option.unique}></uui-menu-item>
+							`,
+						)}
+					</div>
+				</umb-popover-layout>
+			</uui-popover-container>
+		`;
+	}
+
 	protected override renderToolbar() {
 		return html`
 			<umb-collection-toolbar slot="header">
-				<umb-collection-filter-field></umb-collection-filter-field>
+				<div id="toolbar">
+					<umb-collection-filter-field></umb-collection-filter-field>
+					${this.#renderOrderBy()}
+				</div>
 			</umb-collection-toolbar>
 			${when(this._progress >= 0, () => html`<uui-loader-bar progress=${this._progress}></uui-loader-bar>`)}
 			<umb-dropzone-media
@@ -106,6 +184,25 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	static override styles = [
 		...UmbCollectionDefaultElement.styles,
 		css`
+			#toolbar {
+				flex: 1;
+				display: flex;
+				gap: var(--uui-size-space-4);
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			umb-collection-filter-field {
+				width: 100%;
+			}
+
+			.filter-dropdown {
+				display: flex;
+				gap: var(--uui-size-space-3);
+				flex-direction: column;
+				padding: var(--uui-size-space-3);
+			}
+
 			umb-dropzone-media {
 				top: var(--uui-size-layout-4);
 				left: 0;
