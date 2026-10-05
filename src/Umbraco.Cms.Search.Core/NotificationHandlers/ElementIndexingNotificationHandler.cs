@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
@@ -20,14 +21,21 @@ namespace Umbraco.Cms.Search.Core.NotificationHandlers;
 /// an element is actually published, unpublished or trashed (see <see cref="PublishedElementNotificationHandler"/>)
 /// - so a plain draft save of a reusable element never triggers a reindex of the documents referencing it, since
 /// only a published change is ever reflected in the published index.
+/// <para>
+/// Also reacts to <see cref="ElementDeletingNotification"/>: a permanent delete removes the element's relations along
+/// with the element itself, so the referencing documents can only be found before the delete happens.
+/// </para>
 /// </remarks>
 internal sealed class ElementIndexingNotificationHandler : IndexingNotificationHandlerBase,
-    INotificationHandler<PublishedElementCacheRefresherNotification>
+    INotificationHandler<PublishedElementCacheRefresherNotification>,
+    INotificationHandler<ElementDeletingNotification>
 {
     private readonly IContentIndexingService _contentIndexingService;
     private readonly IRelationService _relationService;
     private readonly IOptions<IndexingSettings> _indexingSettings;
     private readonly IIndexDocumentService _indexDocumentService;
+    private readonly IContentService _contentService;
+    private readonly IDistributedContentIndexRefresher _distributedContentIndexRefresher;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementIndexingNotificationHandler"/> class.
@@ -37,18 +45,24 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
     /// <param name="relationService">The service used to traverse element-to-document and element-to-element references.</param>
     /// <param name="indexingSettings">The indexing settings, used to determine whether external element content is indexed at all.</param>
     /// <param name="indexDocumentService">The service used to flush the change-detection cache for affected documents.</param>
+    /// <param name="contentService">The service used to load the documents referencing a deleted element.</param>
+    /// <param name="distributedContentIndexRefresher">The refresher used to re-index the documents referencing a deleted element on all servers.</param>
     public ElementIndexingNotificationHandler(
         ICoreScopeProvider coreScopeProvider,
         IContentIndexingService contentIndexingService,
         IRelationService relationService,
         IOptions<IndexingSettings> indexingSettings,
-        IIndexDocumentService indexDocumentService)
+        IIndexDocumentService indexDocumentService,
+        IContentService contentService,
+        IDistributedContentIndexRefresher distributedContentIndexRefresher)
         : base(coreScopeProvider)
     {
         _contentIndexingService = contentIndexingService;
         _relationService = relationService;
         _indexingSettings = indexingSettings;
         _indexDocumentService = indexDocumentService;
+        _contentService = contentService;
+        _distributedContentIndexRefresher = distributedContentIndexRefresher;
     }
 
     /// <summary>
@@ -67,6 +81,47 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
         PublishedElementCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<PublishedElementCacheRefresher.JsonPayload>(notification, out var origin);
 
         ReindexDocumentsReferencing(payloads.Select(payload => payload.Id).Distinct().ToArray(), origin);
+    }
+
+    /// <summary>
+    /// Re-indexes the documents that reference the published elements about to be permanently deleted, once the delete has completed.
+    /// </summary>
+    /// <param name="notification">The notification describing the elements about to be deleted.</param>
+    /// <remarks>
+    /// This notification is only raised on the server performing the delete, so unlike the other re-indexing in this
+    /// handler, the re-index is broadcast to all servers.
+    /// </remarks>
+    public void Handle(ElementDeletingNotification notification)
+    {
+        if (_indexingSettings.Value.IndexExternalBlockElements is false)
+        {
+            return;
+        }
+
+        // a trashed or unpublished element is already absent from every published index entry
+        var deletedElementIds = notification.DeletedEntities
+            .Where(element => element is { Published: true, Trashed: false })
+            .Select(element => element.Id)
+            .ToArray();
+        if (deletedElementIds.Length == 0)
+        {
+            return;
+        }
+
+        Guid[] documentKeys = FindDocumentKeysReferencingElements(deletedElementIds);
+        if (documentKeys.Length == 0)
+        {
+            return;
+        }
+
+        ExecuteDeferred(() =>
+        {
+            IContent[] documents = documentKeys
+                .InGroupsOf(Umbraco.Cms.Core.Constants.Sql.MaxParameterCount)
+                .SelectMany(batch => _contentService.GetByIds(batch))
+                .ToArray();
+            _distributedContentIndexRefresher.RefreshContent(documents, ContentState.Published);
+        });
     }
 
     /// <summary>
