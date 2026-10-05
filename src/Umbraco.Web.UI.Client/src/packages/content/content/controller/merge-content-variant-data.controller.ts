@@ -3,7 +3,7 @@ import { sortContentValuesByVariant } from '../utils/sort-content-values-by-vari
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbVariantId, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbVariantObjectSortCompare, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 
 /**
  * @function defaultCompareVariantMethod
@@ -47,7 +47,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 				currentData.variants,
 				selectedVariants,
 				defaultCompareVariantMethod,
-			);
+			).sort(umbVariantObjectSortCompare);
 		}
 
 		this.destroy();

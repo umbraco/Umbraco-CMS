@@ -5,7 +5,7 @@ import type {
 	UmbPropertyValueData,
 	UmbPropertyValueResolver,
 } from '@umbraco-cms/backoffice/property';
-import { UmbVariantId, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, type UmbEntityVariantModel, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 import { UmbMergeContentVariantDataController } from './merge-content-variant-data.controller.js';
 import type { UmbContentLikeDetailModel, UmbElementValueModel, UmbPotentialContentValueModel } from '../types.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -297,6 +297,40 @@ describe('UmbMergeContentVariantDataController', () => {
 			expect((result.values[0].value as TestPropertyValueNestedType).nestedValue.value).to.be.equal(
 				'saved-nested-value-invariant',
 			);
+		});
+	});
+
+	describe('Variant ordering', () => {
+		const variant = (culture: string | null, segment: string | null = null) =>
+			({ culture, segment, name: `${culture}-${segment}` }) as unknown as UmbEntityVariantModel;
+
+		it('places a draft-only culture by culture, not at the end', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const persistedData = { values: [], variants: [variant('da-dk'), variant('zz-zz')] };
+			const runtimeData = { values: [], variants: [variant('da-dk'), variant('zz-zz'), variant('en-us')] };
+
+			const variants = [new UmbVariantId('da-dk'), new UmbVariantId('en-us'), new UmbVariantId('zz-zz')];
+			const result = await ctrl.process(persistedData, runtimeData, variants, variants);
+
+			expect(result.variants!.map((v) => v.culture)).to.deep.equal(['da-dk', 'en-us', 'zz-zz']);
+		});
+
+		it('sorts segments of a culture with the unsegmented variant first', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const data = { values: [], variants: [variant('en-us', 's1'), variant('en-us'), variant('da-dk')] };
+
+			const variants = [new UmbVariantId('en-us', 's1'), new UmbVariantId('en-us'), new UmbVariantId('da-dk')];
+			const result = await ctrl.process(data, data, variants, variants);
+
+			expect(result.variants!.map((v) => `${v.culture}|${v.segment}`)).to.deep.equal([
+				'da-dk|null',
+				'en-us|null',
+				'en-us|s1',
+			]);
 		});
 	});
 

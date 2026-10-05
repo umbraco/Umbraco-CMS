@@ -1,21 +1,5 @@
 import type { UmbPotentialContentValueModel } from '../types.js';
-
-/**
- * Compares two culture or segment codes, invariant (nullish) first, then ordinally, case-sensitively —
- * matching .NET's `StringComparer.Ordinal`, which the Management API uses to order property values for
- * serialization.
- * @param {string | null | undefined} a - The first code to compare.
- * @param {string | null | undefined} b - The second code to compare.
- * @returns {number} A negative number if `a` sorts before `b`, positive if after, zero if equal.
- */
-function compareVariantPart(a: string | null | undefined, b: string | null | undefined): number {
-	const normalizedA = a ?? null;
-	const normalizedB = b ?? null;
-	if (normalizedA === normalizedB) return 0;
-	if (normalizedA === null) return -1;
-	if (normalizedB === null) return 1;
-	return normalizedA < normalizedB ? -1 : 1;
-}
+import { umbVariantObjectSortCompare } from '@umbraco-cms/backoffice/variant';
 
 /**
  * Sorts content values by culture, then by segment, then by alias, matching the ordinal order the
@@ -27,10 +11,8 @@ function compareVariantPart(a: string | null | undefined, b: string | null | und
  */
 export function sortContentValuesByVariant<T extends UmbPotentialContentValueModel>(values: Array<T>): Array<T> {
 	return [...values].sort((a, b) => {
-		const cultureCompare = compareVariantPart(a.culture, b.culture);
-		if (cultureCompare !== 0) return cultureCompare;
-		const segmentCompare = compareVariantPart(a.segment, b.segment);
-		if (segmentCompare !== 0) return segmentCompare;
+		const variantCompare = umbVariantObjectSortCompare(a, b);
+		if (variantCompare !== 0) return variantCompare;
 		if (a.alias === b.alias) return 0;
 		return a.alias < b.alias ? -1 : 1;
 	});
