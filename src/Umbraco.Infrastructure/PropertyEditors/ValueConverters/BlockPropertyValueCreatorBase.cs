@@ -183,15 +183,12 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
             var expectedBlockVariationCulture = owner.ContentType.VariesByCulture() && element.ContentType.VariesByCulture()
                 ? variationContext.Culture.NullOrWhiteSpaceAsNull()
                 : null;
-            var expectedBlockVariationSegment = owner.ContentType.VariesBySegment() && element.ContentType.VariesBySegment()
-                ? variationContext.Segment.NullOrWhiteSpaceAsNull()
-                : null;
 
             string? resolvedCulture = null;
             if (layout.IsExternalContent is false)
             {
                 Fallback fallback = _propertyRenderingContextAccessor.PropertyRenderingContext?.Fallback ?? default;
-                if (BlockExposeFallbackHelper.IsBlockExposed(expose, element.Key, expectedBlockVariationCulture, expectedBlockVariationSegment, fallback, languagesByIsoCode, defaultIsoCode, out resolvedCulture) is false)
+                if (BlockExposeFallbackHelper.IsBlockExposed(expose, element.Key, expectedBlockVariationCulture, fallback, languagesByIsoCode, defaultIsoCode, out resolvedCulture) is false)
                 {
                     continue;
                 }

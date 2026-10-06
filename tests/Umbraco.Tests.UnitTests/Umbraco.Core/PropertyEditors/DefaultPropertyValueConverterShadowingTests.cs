@@ -57,7 +57,67 @@ public class DefaultPropertyValueConverterShadowingTests
             Constants.PropertyEditors.Aliases.MediaPicker3,
             jsonConverterFirst ? [jsonConverter, mediaPickerConverter] : [mediaPickerConverter, jsonConverter]);
 
+        // The media picker holds any number of items, whatever its configuration says.
+        Assert.AreEqual(typeof(IEnumerable<MediaWithCrops>), propertyType.ModelClrType);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void SingleMediaPicker_ResolvesSingleMediaPickerValueConverterOverJsonValueConverter(bool jsonConverterFirst)
+    {
+        IPropertyValueConverter jsonConverter = new JsonValueConverter(
+            PropertyEditors(Constants.PropertyEditors.Aliases.SingleMediaPicker, ValueTypes.Json),
+            Mock.Of<ILogger<JsonValueConverter>>());
+        IPropertyValueConverter mediaPickerConverter = new SingleMediaPickerValueConverter(
+            Mock.Of<IPublishedMediaCache>(),
+            Mock.Of<IPublishedUrlProvider>(),
+            Mock.Of<IPublishedValueFallback>(),
+            Mock.Of<IJsonSerializer>(),
+            Mock.Of<IApiMediaWithCropsBuilder>());
+
+        IPublishedPropertyType propertyType = PublishedPropertyType(
+            Constants.PropertyEditors.Aliases.SingleMediaPicker,
+            jsonConverterFirst ? [jsonConverter, mediaPickerConverter] : [mediaPickerConverter, jsonConverter]);
+
         Assert.AreEqual(typeof(MediaWithCrops), propertyType.ModelClrType);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void MultipleDocumentPicker_ResolvesMultipleDocumentPickerValueConverterOverJsonValueConverter(bool jsonConverterFirst)
+    {
+        IPropertyValueConverter jsonConverter = new JsonValueConverter(
+            PropertyEditors(Constants.PropertyEditors.Aliases.MultipleDocumentPicker, ValueTypes.Json),
+            Mock.Of<ILogger<JsonValueConverter>>());
+        IPropertyValueConverter pickerConverter = new MultipleDocumentPickerValueConverter(
+            Mock.Of<IJsonSerializer>(),
+            Mock.Of<IPublishedContentCache>(),
+            Mock.Of<IApiContentBuilder>());
+
+        IPublishedPropertyType propertyType = PublishedPropertyType(
+            Constants.PropertyEditors.Aliases.MultipleDocumentPicker,
+            jsonConverterFirst ? [jsonConverter, pickerConverter] : [pickerConverter, jsonConverter]);
+
+        Assert.AreEqual(typeof(IEnumerable<IPublishedContent>), propertyType.ModelClrType);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void MultipleMemberPicker_ResolvesMultipleMemberPickerValueConverterOverJsonValueConverter(bool jsonConverterFirst)
+    {
+        IPropertyValueConverter jsonConverter = new JsonValueConverter(
+            PropertyEditors(Constants.PropertyEditors.Aliases.MultipleMemberPicker, ValueTypes.Json),
+            Mock.Of<ILogger<JsonValueConverter>>());
+        IPropertyValueConverter pickerConverter = new MultipleMemberPickerValueConverter(
+            Mock.Of<IJsonSerializer>(),
+            Mock.Of<IMemberService>(),
+            Mock.Of<IPublishedMemberCache>());
+
+        IPublishedPropertyType propertyType = PublishedPropertyType(
+            Constants.PropertyEditors.Aliases.MultipleMemberPicker,
+            jsonConverterFirst ? [jsonConverter, pickerConverter] : [pickerConverter, jsonConverter]);
+
+        Assert.AreEqual(typeof(IEnumerable<IPublishedContent>), propertyType.ModelClrType);
     }
 
     [TestCase(true)]

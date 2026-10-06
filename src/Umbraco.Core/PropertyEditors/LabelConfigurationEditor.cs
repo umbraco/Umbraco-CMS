@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.IO;
@@ -8,7 +8,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     Represents the configuration for the label value editor.
 /// </summary>
+[Obsolete("The label editors no longer take configuration: there is one editor per type of value a label can hold. Scheduled for removal in Umbraco 21.")]
+#pragma warning disable CS0618 // Type or member is obsolete
 public class LabelConfigurationEditor : ConfigurationEditor<LabelConfiguration>
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="LabelConfigurationEditor"/> class.
