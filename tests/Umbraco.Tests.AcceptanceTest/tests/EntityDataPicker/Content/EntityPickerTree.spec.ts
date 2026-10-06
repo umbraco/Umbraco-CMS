@@ -106,7 +106,7 @@ test('can not create content with an entity picker using the tree data source th
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.chooseTreeMenuItemWithName('Example 1');
-  await umbracoUi.content.isTextWithExactNameVisible('This field needs more items');
+  await umbracoUi.content.isTextWithExactNameVisible(ConstantHelper.validationMessages.needMoreItems);
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.chooseTreeMenuItemWithName('Example 5', ['Example Folder 1']);

@@ -441,7 +441,7 @@ export class DocumentApiHelper {
     const contentData = await this.getByName(id);
     return contentData.values.some(value =>
       value.alias === propertyAlias && value.value.some(item =>
-        item.mediaKey === mediaKey && item.crops?.some(crop => crop.alias === cropAlias)
+        item.mediaKey === mediaKey && item.crops?.some(crop => crop.alias === cropAlias && crop.coordinates)
       )
     );
   }

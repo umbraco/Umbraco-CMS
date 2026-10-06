@@ -199,9 +199,8 @@ test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, 
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-// Test tooling limitation, not a product bug. Dragging a block card between groups never registers
-// under Playwright automation (mouse-move sequence or dragTo()), but works fine with a genuine
-// unrecorded manual drag. Only the Inspector's record-mode overlay interferes with it.
+// Test tooling limitation, not a product bug: the block card sorter does not register Playwright's synthetic
+// drag (mouse-move sequence or dragTo()), while a manual drag between groups works.
 test.skip('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);

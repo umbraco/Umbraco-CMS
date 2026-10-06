@@ -156,6 +156,10 @@ export class MediaUiHelper extends UiBaseLocators {
     await this.isVisible(this.mediaListView, isVisible);
   }
 
+  async isMediaWorkspaceVisible(isVisible: boolean = true) {
+    await this.isVisible(this.mediaWorkspace, isVisible);
+  }
+
   async doesMediaWorkspaceHaveText(text: string) {
     await this.containsText(this.mediaWorkspace, text);
   }

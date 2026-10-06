@@ -523,7 +523,6 @@ test('can remove granular permission to a specific document for a user group', a
   await umbracoApi.document.ensureNameNotExists(documentTypeName);
 });
 
-// Currently element start nodes are not working correctly
 test('can add an element start node to a user group', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
@@ -545,7 +544,6 @@ test('can add an element start node to a user group', async ({umbracoApi, umbrac
   await umbracoApi.element.ensureNameNotExists(elementFolderName);
 });
 
-// Currently element start nodes are not working correctly
 test('can remove an element start node from a user group', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementFolderName = 'TestElementFolder';

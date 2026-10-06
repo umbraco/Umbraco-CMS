@@ -153,15 +153,17 @@ test('can sort logs by timestamp', async ({umbracoUi}) => {
 test('can use pagination', async ({umbracoUi, page}) => {
   // Act
   await umbracoUi.logViewer.clickSearchButton();
-  // The instance keeps writing log entries, so comparing against an API snapshot races with the UI.
-  // Reading both pages from the UI keeps the assertion stable whatever the log volume is.
-  const firstLogOnFirstPage = await umbracoUi.logViewer.getFirstLogMessage();
+  const newestOnFirstPage = Math.max(...(await umbracoUi.logViewer.getLogTimestamps()).map((timestamp) => new Date(timestamp).getTime()));
   await umbracoUi.logViewer.clickPageNumber(2);
 
   // Assert
-  // Poll rather than read once: the message element can re-render in place, so a plain visibility
-  // wait can be satisfied by the still-stale page-1 content before the page-2 fetch resolves.
-  await expect.poll(() => umbracoUi.logViewer.getFirstLogMessage()).not.toEqual(firstLogOnFirstPage);
+  // Logs are newest-first and the instance keeps writing entries, which can shift page 1's tail onto page 2,
+  // so the only stable rule is that page 2 holds nothing as new as page 1's newest entry.
+  // Poll because the rows re-render in place and can still show page 1 before the page-2 fetch resolves.
+  await expect.poll(async () => {
+    const timestamps = (await umbracoUi.logViewer.getLogTimestamps()).map((timestamp) => new Date(timestamp).getTime());
+    return Math.max(...timestamps) < newestOnFirstPage;
+  }).toBe(true);
   await expect(page.getByLabel('Pagination navigation. Current page: 2.', {exact: true})).toBeVisible();
 });
 

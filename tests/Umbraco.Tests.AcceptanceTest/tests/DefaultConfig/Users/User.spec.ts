@@ -598,7 +598,7 @@ test('can change from grid to table view', async ({umbracoUi}) => {
   await umbracoUi.user.goToUsers();
 
   // Act
-  await umbracoUi.user.changeToTableView();
+  await umbracoUi.user.changeToListView();
 
   // Assert
   await umbracoUi.user.isUserTableViewVisible();
@@ -643,7 +643,6 @@ test('cannot remove all user group from a user', {tag: '@release'}, async ({umbr
   await umbracoUi.user.isErrorNotificationVisible();
 });
 
-// Currently user cannot add a element folder as start node
 test('can add an element start node to a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
@@ -665,7 +664,6 @@ test('can add an element start node to a user', async ({umbracoApi, umbracoUi}) 
   await umbracoApi.element.ensureNameNotExists(elementFolderName);
 });
 
-// Currently user cannot add a element folder as start node
 test('can remove an element start node from a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
@@ -691,7 +689,6 @@ test('can remove an element start node from a user', async ({umbracoApi, umbraco
   await umbracoApi.element.ensureNameNotExists(elementFolderName);
 });
 
-// Currently element start node configuration is not saved after updating
 test('can allow access to all elements for a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);

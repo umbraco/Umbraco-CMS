@@ -128,7 +128,7 @@ test('image count can not be less than min amount set in image media picker', as
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.needMoreItems);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.minimumTwoEntriesRequiresOneMore);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
@@ -172,7 +172,7 @@ test.describe('image count exceeds max amount', () => {
 
     // Assert
     await umbracoUi.content.isErrorNotificationVisible();
-    await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.exceedsAllowedAmount);
+    await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.maximumTwoEntriesOneTooMany);
   });
 });
 
@@ -278,6 +278,7 @@ test('can add an image from the image media picker with a image crop', async ({u
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickExactLinkWithName(mediaName);
   await umbracoUi.content.clickCropWithName(cropLabel);
+  await umbracoUi.content.clickSaveCropButton();
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 

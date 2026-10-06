@@ -67,11 +67,13 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
 
   // Assert
   await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
-  // A node the user cannot access is rendered disabled and without an href, so clicking it must not navigate.
-  await umbracoUi.content.isUrlUnchangedAfter(() => umbracoUi.content.goToContentWithName(rootDocumentName, false));
+  // A node the user cannot access is rendered disabled, so clicking it must not open its workspace.
+  await umbracoUi.content.goToContentWithName(rootDocumentName, false);
   await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentOneName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentTwoName, false);
+  // Checked after the tree interaction so a navigation triggered by the click would already have landed.
+  await umbracoUi.content.isDocumentWorkspaceVisible(false);
 });
 
 test('see no-access view when deep-linking to restricted document', async ({umbracoApi, umbracoUi}) => {

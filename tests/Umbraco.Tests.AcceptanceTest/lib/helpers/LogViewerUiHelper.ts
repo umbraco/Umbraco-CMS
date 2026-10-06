@@ -12,7 +12,7 @@ export class LogViewerUiHelper extends UiBaseLocators {
   private readonly overviewBtn: Locator;
   private readonly sortLogByTimestampBtn: Locator;
   private readonly firstLogLevelTimestamp: Locator;
-  private readonly logTimestamps: Locator;
+  private readonly logMessages: Locator;
   private readonly firstLogLevelMessage: Locator;
   private readonly firstLogSearchResult: Locator;
   private readonly savedSearchesBtn: Locator;
@@ -29,7 +29,7 @@ export class LogViewerUiHelper extends UiBaseLocators {
     this.overviewBtn = page.getByRole('tab', {name: 'Overview'});
     this.sortLogByTimestampBtn = page.getByLabel('Sort logs');
     this.firstLogLevelTimestamp = page.locator('umb-log-viewer-message #timestamp').first();
-    this.logTimestamps = page.locator('umb-log-viewer-message #timestamp');
+    this.logMessages = page.locator('umb-log-viewer-message');
     this.firstLogLevelMessage = page.locator('umb-log-viewer-message #message').first();
     this.firstLogSearchResult = page.getByRole('group').locator('#message').first();
     this.savedSearchesBtn = page.getByLabel('Saved searches');
@@ -92,9 +92,10 @@ export class LogViewerUiHelper extends UiBaseLocators {
     await this.containsText(this.firstLogLevelTimestamp, timestamp);
   }
 
+  // Reads the raw timestamp property rather than the rendered text, which is formatted in the user's locale.
   async getLogTimestamps() {
     await this.waitForVisible(this.firstLogLevelTimestamp);
-    return await this.logTimestamps.allInnerTexts();
+    return await this.logMessages.evaluateAll((messages) => messages.map((message) => (message as HTMLElement & {timestamp: string}).timestamp));
   }
 
   async clickPageNumber(pageNumber: number) {
@@ -103,11 +104,6 @@ export class LogViewerUiHelper extends UiBaseLocators {
 
   async doesFirstLogHaveMessage(message: string) {
     await this.containsText(this.firstLogLevelMessage, message, 10000);
-  }
-
-  async getFirstLogMessage() {
-    await this.waitForVisible(this.firstLogLevelMessage);
-    return await this.firstLogLevelMessage.innerText();
   }
 
   async clickSavedSearchByName(name: string) {

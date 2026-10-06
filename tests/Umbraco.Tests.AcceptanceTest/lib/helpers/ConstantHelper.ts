@@ -45,7 +45,7 @@
     invalidEmail: 'Invalid email',
     emptyManualLinkPicker: 'Please enter an URL or Anchor.',
     needMoreItems: 'This field needs more items',
-    exceedsAllowedAmount: 'This field exceeds the allowed amount of items',
+    maximumTwoEntriesOneTooMany: 'Maximum 2 entries, you have entered 1 too many.',
     minimumTwoEntriesRequiresOneMore: 'Minimum 2 entries, requires 1 more.',
   }
 

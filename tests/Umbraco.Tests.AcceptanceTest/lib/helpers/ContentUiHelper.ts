@@ -43,6 +43,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly numericTxt: Locator;
   private readonly decimalTxt: Locator;
   private readonly resetFocalPointBtn: Locator;
+  private readonly saveCropBtn: Locator;
   private readonly addMultiURLPickerBtn: Locator;
   private readonly linkTxt: Locator;
   private readonly anchorQuerystringTxt: Locator;
@@ -313,6 +314,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.saveModalBtn = this.saveModal.getByLabel('Save', {exact: true});
     this.blockModal = page.getByTestId('workspace:block');
     this.resetFocalPointBtn = page.getByLabel('Reset focal point');
+    this.saveCropBtn = page.locator('umb-image-cropper').getByLabel('Save', {exact: true});
     this.addNewHostnameBtn = page.locator('umb-property-layout[label="Hostnames"]').locator('[label="Add new hostname"]');
     // List View
     this.enterNameInContainerTxt = this.container.getByTestId('input:entity-name').locator('#input');
@@ -982,6 +984,10 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.page.getByText(name, {exact: true}));
   }
 
+  async clickSaveCropButton() {
+    await this.click(this.saveCropBtn);
+  }
+
   async setFocalPoint(widthPercentage: number = 50, heightPercentage: number = 50) {
     await expect(this.focalPointImg).toBeVisible();
     // The drag uses the rendered box, so wait for layout to settle rather than for the image to load.
@@ -1378,6 +1384,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async doesDocumentWorkspaceContainName(name: string) {
     await expect(this.documentWorkspaceEditor.locator('#input')).toHaveValue(name);
+  }
+
+  async isDocumentWorkspaceVisible(isVisible: boolean = true) {
+    await this.isVisible(this.documentWorkspace, isVisible);
   }
 
   async doesDocumentWorkspaceHaveText(text: string) {

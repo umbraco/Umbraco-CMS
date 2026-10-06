@@ -62,11 +62,13 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
-  // A folder the user cannot access is rendered disabled and without an href, so clicking it must not navigate.
-  await umbracoUi.media.isUrlUnchangedAfter(() => umbracoUi.media.goToMediaWithName(rootFolderName));
+  // A folder the user cannot access is rendered disabled, so clicking it must not open its workspace.
+  await umbracoUi.media.goToMediaWithName(rootFolderName);
   await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName, false);
+  // Checked after the tree interaction so a navigation triggered by the click would already have landed.
+  await umbracoUi.media.isMediaWorkspaceVisible(false);
 });
 
 test('can not see any media when no media start nodes specified', async ({umbracoApi, umbracoUi}) => {

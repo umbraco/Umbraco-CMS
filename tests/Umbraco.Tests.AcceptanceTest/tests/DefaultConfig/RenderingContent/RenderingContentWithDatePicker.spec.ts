@@ -12,16 +12,19 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 const dateTimes = [
-  {type: 'with AM time', value: '2024-10-29 09:09:09', expectedValue: '10/29/2024 9:09:09 AM', dataTypeName: 'Date Picker with time'},
-  {type: 'with PM time', value: '2024-10-29 21:09:09', expectedValue: '10/29/2024 9:09:09 PM', dataTypeName: 'Date Picker with time'},
-  // Date-only picker still stores a DateTime, which the template renders unformatted.
-  {type: 'without time', value: '2024-10-29 00:00:00', expectedValue: '10/29/2024 12:00:00 AM', dataTypeName: 'Date Picker'}
+  {type: 'with AM time', value: '2024-10-29 09:09:09', expectedValue: '10/29/2024 9:09:09 AM', dataTypeName: 'Date Picker with time', isDateOnly: false},
+  {type: 'with PM time', value: '2024-10-29 21:09:09', expectedValue: '10/29/2024 9:09:09 PM', dataTypeName: 'Date Picker with time', isDateOnly: false},
+  // The date-only picker still publishes a DateTime, so the template formats it as a date.
+  {type: 'without time', value: '2024-10-29 00:00:00', expectedValue: '10/29/2024', dataTypeName: 'Date Picker', isDateOnly: true}
 ];
 
 for (const dateTime of dateTimes) {
   test(`can render content with a date ${dateTime.type}`, async ({umbracoApi, umbracoUi}) => {
     const dataTypeData = await umbracoApi.dataType.getByName(dateTime.dataTypeName);
-    const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
+    const propertyAlias = AliasHelper.toAlias(propertyName);
+    const templateId = dateTime.isDateOnly
+      ? await umbracoApi.template.createTemplateWithDisplayingDateValue(templateName, propertyAlias)
+      : await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, propertyAlias);
     const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, dateTime.value, dataTypeData.id, templateId, propertyName, documentTypeName);
     const contentURL= await umbracoApi.document.getDocumentUrl(contentKey);
 
