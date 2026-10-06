@@ -6,8 +6,8 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbDocumentServerDataSource } from '../../repository/detail/document-detail.server.data-source.js';
 import { UmbDocumentPublishingServerDataSource } from './document-publishing.server.data-source.js';
-import { useServerAssignedDocumentKey } from '../../workspace/context/document-workspace-context.test-utils.js';
 import { resetMockHandlers } from '../../../../../../mocks/index.js';
+import { useServerAssignedDocumentKey } from '../../../../../../mocks/msw-handlers/document/server-assigned-key.js';
 
 const SERVER_ASSIGNED_KEY = 'a0000000-0000-4000-8000-000000000001';
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';

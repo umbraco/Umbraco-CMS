@@ -3,12 +3,9 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
-import {
-	TEST_MANIFESTS,
-	UmbTestDocumentWorkspaceHostElement,
-	useServerAssignedDocumentKey,
-} from './document-workspace-context.test-utils.js';
+import { TEST_MANIFESTS, UmbTestDocumentWorkspaceHostElement } from './document-workspace-context.test-utils.js';
 import { resetMockHandlers } from '../../../../../../mocks/index.js';
+import { useServerAssignedDocumentKey } from '../../../../../../mocks/msw-handlers/document/server-assigned-key.js';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 const SERVER_ASSIGNED_KEY = 'a0000000-0000-4000-8000-000000000001';

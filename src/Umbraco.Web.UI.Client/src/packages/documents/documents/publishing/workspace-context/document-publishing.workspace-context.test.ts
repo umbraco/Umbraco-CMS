@@ -7,9 +7,9 @@ import { UmbDocumentWorkspaceContext } from '../../workspace/context/document-wo
 import {
 	TEST_MANIFESTS,
 	UmbTestDocumentWorkspaceHostElement,
-	useServerAssignedDocumentKey,
 } from '../../workspace/context/document-workspace-context.test-utils.js';
 import { resetMockHandlers } from '../../../../../../mocks/index.js';
+import { useServerAssignedDocumentKey } from '../../../../../../mocks/msw-handlers/document/server-assigned-key.js';
 import { UMB_DISCARD_CHANGES_MODAL, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbDocumentPublishingServerDataSource } from '../repository/document-publishing.server.data-source.js';
 import { UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';

@@ -5,8 +5,6 @@ import { UmbDataTypeDetailStore } from '../../../../data-type/repository/detail/
 import { UmbDataTypeItemStore } from '../../../../data-type/repository/item/data-type-item.store.js';
 import { manifests as userPermissionConditionManifests } from '../../user-permissions/document/conditions/manifests.js';
 import { manifests as dataTypeItemManifests } from '../../../../data-type/repository/item/manifests.js';
-import { useMockHandlers } from '../../../../../../mocks/index.js';
-import { umbDocumentMockDb } from '../../../../../../mocks/db/document.db.js';
 import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
 import type { UmbModalContextClassArgs, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
@@ -19,43 +17,12 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import type {
-	CreateAndPublishDocumentRequestModel,
-	CreateDocumentRequestModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
 
 export const TEST_MANIFESTS = [
 	...documentDetailRepositoryManifests,
 	...userPermissionConditionManifests,
 	...dataTypeItemManifests,
 ];
-
-/**
- * Makes the server store a newly created document under `key` instead of the key the client sent, as a
- * Saving notification handler assigning its own key would. Reset with `resetMockHandlers()`.
- * @param {string} key - The key the server assigns.
- */
-export function useServerAssignedDocumentKey(key: string) {
-	const { http, HttpResponse } = window.MockServiceWorker;
-
-	const createdResponse = (request: Request, id: string) =>
-		HttpResponse.json(null, {
-			status: 201,
-			headers: { Location: request.url + '/' + id, 'Umb-Generated-Resource': id },
-		});
-
-	useMockHandlers(
-		http.post(umbracoPath('/document'), async ({ request }) => {
-			const body = (await request.json()) as CreateDocumentRequestModel;
-			return createdResponse(request, umbDocumentMockDb.detail.create({ ...body, id: key }));
-		}),
-		http.post(umbracoPath('/document/create-and-publish'), async ({ request }) => {
-			const body = (await request.json()) as CreateAndPublishDocumentRequestModel;
-			return createdResponse(request, umbDocumentMockDb.publishing.createAndPublish({ ...body, id: key }));
-		}),
-	);
-}
 
 // Immediately submits every modal with its initial value so requestSave() works without UI infrastructure.
 class UmbMockModalManagerContext extends UmbModalManagerContext {
