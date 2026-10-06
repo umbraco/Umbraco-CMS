@@ -106,6 +106,7 @@ test('cannot see the document blueprint menu without document blueprint access',
   await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
 
   // Assert
+  await umbracoUi.library.isElementSidebarHeaderVisible();
   await umbracoUi.documentBlueprint.isDocumentBlueprintSidebarHeaderVisible(false);
 });
 
