@@ -260,7 +260,7 @@ internal sealed class ContentBlueprintEditingService
             return Attempt.Fail(ContentEditingOperationStatus.ContentTypeNotFound);
         }
 
-        if (await IsAllowedForBlueprintsByContentTypeFilters(contentType, targetContainerKey) is false)
+        if (contentType.IsElement || await IsAllowedForBlueprintsByContentTypeFilters(contentType, targetContainerKey) is false)
         {
             return Attempt.Fail(ContentEditingOperationStatus.NotAllowed);
         }
