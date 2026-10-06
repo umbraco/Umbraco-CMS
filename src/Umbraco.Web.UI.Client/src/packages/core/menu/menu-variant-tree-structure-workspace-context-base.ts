@@ -248,6 +248,8 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 				return {
 					unique: treeItem.unique,
 					entityType: treeItem.entityType,
+					name: treeItem.name,
+					isFolder: treeItem.isFolder,
 					variants: treeItem.variants.map((variant: any) => {
 						return {
 							name: variant.name,

@@ -748,16 +748,17 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async changeTemplate(oldTemplate: string, newTemplate: string) {
     await this.clickEditTemplateByName(oldTemplate);
-    // The picker lists templates as buttons, so match by button role/name (getByLabel does not resolve
-    // a button reliably). The modal re-renders continuously so the button never reports "stable";
-    // force the click once it is visible rather than waiting out an animation that never settles.
-    await this.click(this.sidebarModal.getByRole('button', {name: newTemplate, exact: true}), {force: true});
-    await this.clickChooseModalButton();
+    // The picker submits as soon as a template is picked, so there is no Choose step.
+    await this.click(this.sidebarModal.locator(`umb-ref-item[name="${newTemplate}"]`));
   }
 
   async isTemplateNameDisabled(templateName: string) {
     await this.isVisible(this.sidebarModal.getByLabel(templateName));
     await this.isDisabled(this.sidebarModal.getByLabel(templateName));
+  }
+
+  async isTemplateNameVisibleInPicker(templateName: string, isVisible: boolean = true) {
+    await this.isVisible(this.sidebarModal.locator(`umb-ref-item[name="${templateName}"]`), isVisible);
   }
 
   // Culture and Hostnames
