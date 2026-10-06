@@ -20,10 +20,16 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandler
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentUrlServiceContentTreeChangeNotificationHandler"/> class.
     /// </summary>
+    /// <param name="documentUrlService">The document URL service.</param>
+    /// <param name="documentUrlAliasService">
+    /// No longer used: aliases are persisted inside the content transaction by
+    /// <see cref="DocumentUrlAliasContentRefreshNotificationHandler"/>. Kept for binary compatibility.
+    /// </param>
     public DocumentUrlServiceContentTreeChangeNotificationHandler(
         IDocumentUrlService documentUrlService,
         IDocumentUrlAliasService documentUrlAliasService)
     {
+        // TODO (V19): remove the unused parameter.
         _documentUrlService = documentUrlService;
     }
 

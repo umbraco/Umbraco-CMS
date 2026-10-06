@@ -59,6 +59,11 @@ public interface IDocumentUrlAliasService
     /// Meant to run inside the transaction that persists <paramref name="document"/>, where the content tree lock
     /// already orders the alias rows with the content they describe. Only a change to the document's published
     /// state or trashed state can change its aliases, so any other save is a no-op.
+    /// Implementations must work from <paramref name="document"/> itself: inside the transaction the repository
+    /// caches still hold the document as it was before the save, so loading it through <see cref="IContentService"/>
+    /// would persist the previous aliases. The default implementation only keeps implementations written before
+    /// this member compiling; it loads the document and runs the standalone path, so implementations should
+    /// override it.
     /// </remarks>
     // TODO (V19): Remove the default implementation.
     Task PersistAliasesAsync(IContent document)
