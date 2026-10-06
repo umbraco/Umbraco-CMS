@@ -19,6 +19,7 @@ const rteDocumentTypeName = 'TestDocumentTypeForRenderReusableRte';
 const rteCustomDataTypeName = 'Custom RichText Render Reusable';
 const rteTemplateName = 'ReusableRichTextTemplate';
 const rteSecondElementTypeName = 'RenderReusableSecondElement';
+const rteTransferElementName = 'TransferredRenderRichTextElement';
 const propertyInBlock = 'Textstring';
 const groupName = 'testGroup';
 let elementTypeId = '';
@@ -46,6 +47,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.template.ensureNameNotExists(singleTemplateName);
   await umbracoApi.document.ensureNameNotExists(rteContentName);
   await umbracoApi.documentType.ensureNameNotExists(rteDocumentTypeName);
+  await umbracoApi.element.ensureNameNotExists(rteTransferElementName);
   await umbracoApi.documentType.ensureNameNotExists(rteSecondElementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(rteCustomDataTypeName);
   await umbracoApi.template.ensureNameNotExists(rteTemplateName);
@@ -142,6 +144,67 @@ test('can render the referenced Library element content on the published page fo
   // Act
   await umbracoUi.content.goToContentWithName(rteContentName);
   await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName, 'rte');
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
+  await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
+
+  // Assert
+  await umbracoUi.contentRender.doesContentRenderValueContainText(libraryText);
+});
+
+// The rich text markup keeps the block's old content key after a transfer, so the block is not rendered: #ISSUE
+test.fixme('can render a Rich Text Editor block after transferring it to the Library', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const blockText = 'Rich text block content transferred to the Library';
+  rteBlockPartialView = await umbracoApi.partialView.createRichTextBlockPartialView(elementTypeName, propertyInBlock);
+  const templateId = await umbracoApi.template.createTemplateWithDisplayingRichTextValue(rteTemplateName, rteCustomDataTypeName);
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(rteSecondElementTypeName);
+  const customDataTypeId = await umbracoApi.dataType.createRichTextEditorWithBlocks(rteCustomDataTypeName, [elementTypeId, secondElementTypeId]);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(rteDocumentTypeName, customDataTypeId, rteCustomDataTypeName, templateId);
+  const documentId = await umbracoApi.document.createDefaultDocument(rteContentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(rteContentName);
+  await umbracoUi.content.clickInsertBlockButtonInRte();
+  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
+  await umbracoUi.content.enterTextstring(blockText);
+  await umbracoUi.content.clickCreateModalButton();
+
+  // Act
+  await umbracoUi.content.clickTransferToLibraryBlockButton('rte');
+  await umbracoUi.content.transferBlockToLibraryRoot(rteTransferElementName);
+  await umbracoUi.content.isBlockMarkedAsReference(true, 'rte');
+  const transferredElement = await umbracoApi.element.getByName(rteTransferElementName);
+  await umbracoApi.element.publish(transferredElement.id);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
+  await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
+
+  // Assert
+  await umbracoUi.contentRender.doesContentRenderValueContainText(blockText);
+});
+
+// The rich text markup keeps the block's old content key after a disconnect, so the block is not rendered: #ISSUE
+test.fixme('can render a Rich Text Editor block after disconnecting it from the Library', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const libraryText = 'Rich text block content disconnected from the Library';
+  const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, libraryText, propertyInBlock);
+  await umbracoApi.element.publish(libraryElementId);
+  rteBlockPartialView = await umbracoApi.partialView.createRichTextBlockPartialView(elementTypeName, propertyInBlock);
+  const templateId = await umbracoApi.template.createTemplateWithDisplayingRichTextValue(rteTemplateName, rteCustomDataTypeName);
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(rteSecondElementTypeName);
+  const customDataTypeId = await umbracoApi.dataType.createRichTextEditorWithBlocks(rteCustomDataTypeName, [elementTypeId, secondElementTypeId]);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(rteDocumentTypeName, customDataTypeId, rteCustomDataTypeName, templateId);
+  const documentId = await umbracoApi.document.createDefaultDocument(rteContentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(rteContentName);
+  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName, 'rte');
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Act
+  await umbracoUi.content.clickDisconnectFromLibraryBlockButton('rte');
+  await umbracoUi.content.clickConfirmDisconnectFromLibraryButton('rte');
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
   const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
