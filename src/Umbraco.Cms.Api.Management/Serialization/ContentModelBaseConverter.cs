@@ -25,8 +25,8 @@ internal sealed class ContentModelBaseConverter<TConcrete, TValueModel, TVariant
 
     public override void Write(Utf8JsonWriter writer, TConcrete value, JsonSerializerOptions options)
     {
-        IEnumerable<TVariantModel> originalVariants = value.Variants as TVariantModel[] ?? value.Variants.ToArray();
-        IEnumerable<TValueModel> originalValues = value.Values as TValueModel[] ?? value.Values.ToArray();
+        IEnumerable<TVariantModel> originalVariants = value.Variants;
+        IEnumerable<TValueModel> originalValues = value.Values;
 
         try
         {
