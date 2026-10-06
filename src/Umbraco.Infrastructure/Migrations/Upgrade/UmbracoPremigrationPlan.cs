@@ -62,5 +62,9 @@ public class UmbracoPremigrationPlan : MigrationPlan
         // To 18.0.0
         To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
         To<V_18_0_0.AddAllowedInLibraryToContentType>("{31C0D92A-49DD-47EC-B2A7-932A58FF224E}");
+
+        // Languages are read through EF Core before the main plan runs (e.g. to initialize the publish status cache),
+        // and the EF Core model maps the language key, so the column must exist first.
+        To<V_18_0_0.AddLanguageKeyColumn>("{350AD6F2-B64F-46FF-BE9F-0991B196EBBF}");
     }
 }
