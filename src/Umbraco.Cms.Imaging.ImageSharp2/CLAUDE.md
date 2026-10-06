@@ -9,7 +9,7 @@ Image processing library using **ImageSharp 2.x** for backwards compatibility wi
 ## 1. Architecture
 
 **Type**: Class Library (NuGet Package)
-**Target Framework**: .NET 10.0
+**Target Framework**: .NET 11.0
 **Purpose**: ImageSharp 2.x compatibility layer
 
 ### Package Versions (Pinned)
