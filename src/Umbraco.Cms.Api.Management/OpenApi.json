@@ -42678,7 +42678,8 @@
         "required": [
           "canBeChanged",
           "documentListViewId",
-          "mediaListViewId"
+          "mediaListViewId",
+          "offerDeprecatedPropertyEditors"
         ],
         "type": "object",
         "properties": {
@@ -42692,6 +42693,9 @@
           "mediaListViewId": {
             "type": "string",
             "format": "uuid"
+          },
+          "offerDeprecatedPropertyEditors": {
+            "type": "boolean"
           }
         }
       },
@@ -44170,12 +44174,6 @@
               "string"
             ]
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "name": {
             "type": "string"
           }
@@ -44235,12 +44233,6 @@
             "format": "date-time"
           },
           "culture": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "segment": {
             "type": [
               "null",
               "string"
@@ -44817,12 +44809,6 @@
               "string"
             ]
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "name": {
             "type": "string"
           }
@@ -44882,12 +44868,6 @@
             "format": "date-time"
           },
           "culture": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "segment": {
             "type": [
               "null",
               "string"
@@ -47226,12 +47206,6 @@
               "string"
             ]
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "name": {
             "type": "string"
           }
@@ -47254,12 +47228,6 @@
             "format": "date-time"
           },
           "culture": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "segment": {
             "type": [
               "null",
               "string"
@@ -47899,12 +47867,6 @@
               "string"
             ]
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "name": {
             "type": "string"
           }
@@ -47927,12 +47889,6 @@
             "format": "date-time"
           },
           "culture": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "segment": {
             "type": [
               "null",
               "string"

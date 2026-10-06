@@ -294,7 +294,7 @@ test('can browse into a collection and pick an item from it', async ({umbracoApi
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
   // The caret drills into the node (its name would select it instead).
-  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
   await umbracoUi.content.clickCollectionCardInPickerModal(firstCollectionItemName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
@@ -343,7 +343,7 @@ test('can drill into a nested collection within the picker', async ({umbracoApi,
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
   // The caret drills into the node (its name would select it instead).
-  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
   // The nested collection item has children, so clicking its card drills into its own collection
   // view instead of selecting it.
   await umbracoUi.content.clickCollectionCardInPickerModal(nestedCollectionContentName);
@@ -395,7 +395,7 @@ test('can drill into a nested collection using the table view within the picker'
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
-  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
   await umbracoUi.content.changeToListView();
   // In table view, an item with children renders its name as an "open" button rather than a plain
   // label, so clicking the name drills into it instead of picking it.
@@ -446,7 +446,7 @@ test('can select an item with children from a collection within the picker', asy
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
-  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
 
   // Assert
   // The item has children, so clicking its card body would drill into it instead of selecting it -
@@ -498,7 +498,7 @@ test('can select an item with children from a collection table view within the p
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
-  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
   await umbracoUi.content.changeToListView();
 
   // Assert
@@ -575,7 +575,7 @@ test.describe('can pick multiple items from a collection within the picker', () 
     // Act
     await umbracoUi.content.goToContentWithName(contentName);
     await umbracoUi.content.clickChooseButton();
-    await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+    await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
     await umbracoUi.content.clickCollectionCardInPickerModal(firstCollectionItemName);
     await umbracoUi.content.clickCollectionCardInPickerModal(secondCollectionItemName);
     await umbracoUi.content.clickChooseModalButton();
@@ -600,7 +600,7 @@ test.describe('can pick multiple items from a collection within the picker', () 
     // Act
     await umbracoUi.content.goToContentWithName(contentName);
     await umbracoUi.content.clickChooseButton();
-    await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+    await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
     await umbracoUi.content.changeToListView();
     await umbracoUi.content.selectContentWithNameInListView(firstCollectionItemName);
     await umbracoUi.content.selectContentWithNameInListView(secondCollectionItemName);
@@ -638,7 +638,7 @@ test('can switch a collection to table view within the picker', async ({umbracoA
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
-  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
   await umbracoUi.content.changeToListView();
 
   // Assert
@@ -677,7 +677,7 @@ test('can sort a collection by name within the picker', async ({umbracoApi, umbr
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
-  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
   await umbracoUi.content.changeToListView();
   await umbracoUi.content.clickNameButtonInListView();
 
@@ -717,7 +717,7 @@ test('can filter a collection within the picker', async ({umbracoApi, umbracoUi}
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
-  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
   await umbracoUi.content.changeToListView();
   await umbracoUi.content.searchByKeywordInCollection(firstCollectionItemName);
 
@@ -757,7 +757,7 @@ test('can select an item from a collection table view within the picker', async 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
-  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
   await umbracoUi.content.changeToListView();
   await umbracoUi.content.selectContentWithNameInListView(firstCollectionItemName);
   await umbracoUi.content.clickChooseModalButton();
@@ -803,7 +803,7 @@ test('can only pick allowed types from a collection grid view within the picker'
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
-  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
 
   // Assert
   await umbracoUi.content.isContentCardSelectableForName(notAllowedCollectionItemName, false);
@@ -855,7 +855,7 @@ test('can only pick allowed types from a collection table view within the picker
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickChooseButton();
-  await umbracoUi.content.openCaretButtonForName(collectionContentName, true);
+  await umbracoUi.content.clickModalCaretButtonForName(collectionContentName);
   await umbracoUi.content.changeToListView();
 
   // Assert

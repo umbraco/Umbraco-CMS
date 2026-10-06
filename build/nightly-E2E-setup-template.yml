@@ -1,8 +1,4 @@
 parameters:
-  - name: nodeVersion
-    type: string
-    default: ''
-
   - name: PlaywrightUserEmail
     type: string
     default: ''
@@ -33,7 +29,6 @@ steps:
 
   - template: templates/e2e-install.yml
     parameters:
-      nodeVersion: ${{ parameters.nodeVersion }}
       npm_config_cache: ${{ parameters.npm_config_cache }}
       PlaywrightUserEmail: ${{ parameters.PlaywrightUserEmail }}
       PlaywrightPassword: ${{ parameters.PlaywrightPassword }}
