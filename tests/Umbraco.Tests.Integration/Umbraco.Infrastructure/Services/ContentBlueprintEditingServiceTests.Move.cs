@@ -138,6 +138,31 @@ public partial class ContentBlueprintEditingServiceTests
     }
 
     [Test]
+    public async Task Cannot_Move_Blueprint_Of_An_Element_Type()
+    {
+        var containerKey = Guid.NewGuid();
+        await ContentBlueprintContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey);
+
+        var blueprintKey = Guid.NewGuid();
+        await ContentBlueprintEditingService.CreateAsync(SimpleContentBlueprintCreateModel(blueprintKey, null), Constants.Security.SuperUserKey);
+
+        // Blueprints of element types can no longer be created, so convert the type after the fact.
+        ContentType.IsElement = true;
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+
+        var result = await ContentBlueprintEditingService.MoveAsync(blueprintKey, containerKey, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Result);
+        });
+
+        var blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
+        Assert.NotNull(blueprint);
+        Assert.AreEqual(Constants.System.Root, blueprint.ParentId);
+    }
+
+    [Test]
     public async Task Cannot_Move_Blueprint_To_Root_When_The_Content_Type_Is_Not_Allowed_There_By_Content_Type_Filters()
     {
         var containerKey = Guid.NewGuid();
