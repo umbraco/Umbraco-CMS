@@ -139,7 +139,8 @@ test('cannot change to a template that is not allowed in the document type', asy
   await umbracoUi.content.clickEditTemplateByName(firstTemplateName);
 
   // Assert
-  await umbracoUi.content.isTemplateNameDisabled(secondTemplateName);
+  await umbracoUi.content.isTemplateNameVisibleInPicker(firstTemplateName);
+  await umbracoUi.content.isTemplateNameVisibleInPicker(secondTemplateName, false);
 
   // Clean
   await umbracoApi.template.ensureNameNotExists(firstTemplateName);
