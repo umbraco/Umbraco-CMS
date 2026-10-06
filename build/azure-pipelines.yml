@@ -405,13 +405,13 @@ stages:
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: '--filter "$(testFilter) & ${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter) & ${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
               ${{ else }}:
-                arguments: '--filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
       # Search Integration Tests (SQLite)
       - job:
         timeoutInMinutes: 60
@@ -555,13 +555,13 @@ stages:
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: '--filter "$(testFilter) & ${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter) & ${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
               ${{ else }}:
-                arguments: '--filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
 
           # Stop SQL Server
           - pwsh: docker stop mssql
