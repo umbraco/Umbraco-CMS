@@ -16,43 +16,68 @@ public class InMemoryModelsBuilderModeValidatorTests
 {
     private const string InMemoryAuto = "InMemoryAuto";
 
-    [TestCase(RuntimeMode.BackofficeDevelopment, true)]
-    [TestCase(RuntimeMode.BackofficeDevelopment, false)]
-    [TestCase(RuntimeMode.Development, true)]
-    [TestCase(RuntimeMode.Development, false)]
-    [TestCase(RuntimeMode.Production, true)]
-    [TestCase(RuntimeMode.Production, false)]
-    public void Validate_WhenRuntimeGeneratedModeIsInForce_Fails(RuntimeMode runtimeMode, bool liveFactoryEnabled)
+    public enum ModelFactory
     {
-        var sut = CreateSut(InMemoryAuto, liveFactoryEnabled);
+        /// <summary>
+        /// A factory that cannot generate at runtime at all, as supplied when nothing provides a live one.
+        /// </summary>
+        NotLive,
+
+        /// <summary>
+        /// A factory able to generate at runtime, but not currently doing so.
+        /// </summary>
+        LiveButDisabled,
+
+        /// <summary>
+        /// A factory generating at runtime, whichever component supplied it.
+        /// </summary>
+        Live,
+    }
+
+    [TestCase(RuntimeMode.BackofficeDevelopment, ModelFactory.NotLive)]
+    [TestCase(RuntimeMode.BackofficeDevelopment, ModelFactory.LiveButDisabled)]
+    [TestCase(RuntimeMode.Development, ModelFactory.NotLive)]
+    [TestCase(RuntimeMode.Development, ModelFactory.LiveButDisabled)]
+    [TestCase(RuntimeMode.Production, ModelFactory.NotLive)]
+    [TestCase(RuntimeMode.Production, ModelFactory.LiveButDisabled)]
+    public void Validate_WhenRuntimeGeneratedModeIsInForceWithoutALiveFactory_Fails(RuntimeMode runtimeMode, ModelFactory modelFactory)
+    {
+        var sut = CreateSut(InMemoryAuto, modelFactory);
 
         var result = sut.Validate(runtimeMode, out var validationErrorMessage);
 
-        if (liveFactoryEnabled)
+        Assert.Multiple(() =>
         {
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.True);
-                Assert.That(validationErrorMessage, Is.Null);
-            });
-        }
-        else
-        {
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.False);
-                Assert.That(validationErrorMessage, Is.Not.Null.And.Not.Empty);
-            });
-        }
+            Assert.That(result, Is.False);
+            Assert.That(validationErrorMessage, Is.Not.Null.And.Not.Empty);
+        });
     }
 
-    [TestCase(true)]
-    [TestCase(false)]
-    public void Validate_WhenModeIsLeftAtItsDefault_Succeeds(bool liveFactoryEnabled)
+    [TestCase(RuntimeMode.BackofficeDevelopment)]
+    [TestCase(RuntimeMode.Development)]
+    [TestCase(RuntimeMode.Production)]
+    public void Validate_WhenRuntimeGeneratedModeIsInForceWithALiveFactory_Succeeds(RuntimeMode runtimeMode)
     {
-        // The default is a mode that needs no runtime generation, and the package that can generate at runtime
-        // removes this validator, so a site that configured nothing must never fail here.
-        var sut = CreateSut(new ModelsBuilderSettings().ModelsMode, liveFactoryEnabled);
+        // The mode is satisfied by whatever supplies the factory, so the validator has nothing to object to.
+        var sut = CreateSut(InMemoryAuto, ModelFactory.Live);
+
+        var result = sut.Validate(runtimeMode, out var validationErrorMessage);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.True);
+            Assert.That(validationErrorMessage, Is.Null);
+        });
+    }
+
+    [TestCase(ModelFactory.NotLive)]
+    [TestCase(ModelFactory.LiveButDisabled)]
+    [TestCase(ModelFactory.Live)]
+    public void Validate_WhenModeIsLeftAtItsDefault_Succeeds(ModelFactory modelFactory)
+    {
+        // The default is a mode that needs no runtime generation, so a site that configured nothing must never
+        // fail here, whatever factory is in force.
+        var sut = CreateSut(new ModelsBuilderSettings().ModelsMode, modelFactory);
 
         var result = sut.Validate(RuntimeMode.BackofficeDevelopment, out var validationErrorMessage);
 
@@ -63,15 +88,15 @@ public class InMemoryModelsBuilderModeValidatorTests
         });
     }
 
-    [TestCase(Constants.ModelsBuilder.ModelsModes.Nothing, true)]
-    [TestCase(Constants.ModelsBuilder.ModelsModes.Nothing, false)]
-    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeAuto, true)]
-    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeAuto, false)]
-    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeManual, true)]
-    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeManual, false)]
-    public void Validate_WhenModeDoesNotGenerateAtRuntime_Succeeds(string modelsMode, bool liveFactoryEnabled)
+    [TestCase(Constants.ModelsBuilder.ModelsModes.Nothing, ModelFactory.NotLive)]
+    [TestCase(Constants.ModelsBuilder.ModelsModes.Nothing, ModelFactory.Live)]
+    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeAuto, ModelFactory.NotLive)]
+    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeAuto, ModelFactory.Live)]
+    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeManual, ModelFactory.NotLive)]
+    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeManual, ModelFactory.Live)]
+    public void Validate_WhenModeDoesNotGenerateAtRuntime_Succeeds(string modelsMode, ModelFactory modelFactory)
     {
-        var sut = CreateSut(modelsMode, liveFactoryEnabled);
+        var sut = CreateSut(modelsMode, modelFactory);
 
         var result = sut.Validate(RuntimeMode.BackofficeDevelopment, out var validationErrorMessage);
 
@@ -82,7 +107,35 @@ public class InMemoryModelsBuilderModeValidatorTests
         });
     }
 
-    private static InMemoryModelsBuilderModeValidator CreateSut(string modelsMode, bool liveFactoryEnabled)
+    [Test]
+    public void Validate_WhenModeDoesNotGenerateAtRuntime_DoesNotBuildTheModelFactory()
+    {
+        var built = false;
+        var sut = CreateSut(
+            Constants.ModelsBuilder.ModelsModes.Nothing,
+            new Lazy<IPublishedModelFactory>(() =>
+            {
+                built = true;
+                return Mock.Of<IPublishedModelFactory>();
+            }));
+
+        sut.Validate(RuntimeMode.BackofficeDevelopment, out _);
+
+        // Validation runs while the runtime level is being determined, so a mode that cannot need a factory
+        // must not be what causes one to be built that early in the boot.
+        Assert.That(built, Is.False);
+    }
+
+    private static InMemoryModelsBuilderModeValidator CreateSut(string modelsMode, ModelFactory modelFactory)
+        => CreateSut(modelsMode, new Lazy<IPublishedModelFactory>(() => modelFactory switch
+        {
+            ModelFactory.NotLive => Mock.Of<IPublishedModelFactory>(),
+            ModelFactory.LiveButDisabled => Mock.Of<IAutoPublishedModelFactory>(m => m.Enabled == false),
+            ModelFactory.Live => Mock.Of<IAutoPublishedModelFactory>(m => m.Enabled == true),
+            _ => throw new ArgumentOutOfRangeException(nameof(modelFactory)),
+        }));
+
+    private static InMemoryModelsBuilderModeValidator CreateSut(string modelsMode, Lazy<IPublishedModelFactory> publishedModelFactory)
     {
         // Reading the mode in force, rather than the configured one, is what lets a mode set in code be
         // validated the same as one set in configuration.
@@ -90,6 +143,6 @@ public class InMemoryModelsBuilderModeValidatorTests
 
         return new InMemoryModelsBuilderModeValidator(
             Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(m => m.CurrentValue == settings),
-            Mock.Of<IAutoPublishedModelFactory>(m => m.Enabled == liveFactoryEnabled));
+            publishedModelFactory);
     }
 }

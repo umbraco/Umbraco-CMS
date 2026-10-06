@@ -137,8 +137,6 @@ Reports detailed error messages including assembly versions.
 
 ## 4. Security
 
-**Runtime Mode Validation**: lives in `Umbraco.Infrastructure` (`Runtime/RuntimeModeValidators/InMemoryModelsBuilderModeValidator.cs`), which fails the boot when `InMemoryAuto` is in force with no factory able to generate models at runtime. This package removes that validator when it registers such a factory — which it only does in `BackofficeDevelopment` runtime mode — so the component that can satisfy the mode is the one that withdraws the objection.
-
 **Temp File Location**: Models compiled to `~/umbraco/Data/TEMP/InMemoryAuto/` - ensure this directory isn't web-accessible.
 
 ---
@@ -184,9 +182,6 @@ Action<RazorViewEngine>? clearCacheMethod = ReflectionUtilities.EmitMethod<Actio
     "CMS": {
       "Runtime": {
         "Mode": "BackofficeDevelopment"
-      },
-      "ModelsBuilder": {
-        "ModelsMode": "InMemoryAuto"
       }
     }
   }
@@ -194,8 +189,10 @@ Action<RazorViewEngine>? clearCacheMethod = ReflectionUtilities.EmitMethod<Actio
 ```
 
 **Requirements**:
-- `RuntimeMode` must be `BackofficeDevelopment`
-- `ModelsMode` must be `InMemoryAuto`
+- `RuntimeMode` must be `BackofficeDevelopment` — this package registers nothing outside it
+- `ModelsMode` needs no entry: this package raises an unconfigured mode to `InMemoryAuto`, since core defaults to the `Nothing` it can satisfy alone. Configuring any other mode is honoured and leaves models to whatever provides that mode
+
+**Runtime mode validation**: `InMemoryAuto` in force with no factory able to generate models at runtime fails the boot, from `InMemoryModelsBuilderModeValidator` in `Umbraco.Infrastructure`. It asks the `IPublishedModelFactory` in force, so registering one here is what satisfies it — as would any other component supplying one.
 
 ---
 

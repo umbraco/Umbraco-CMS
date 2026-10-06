@@ -8,12 +8,12 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 
 /// <summary>
-/// Validates that a ModelsBuilder mode generating models only at runtime is not in force unless a package
-/// supplying a model factory capable of it is available.
+/// Validates that a ModelsBuilder mode generating models only at runtime is not in force unless a model factory
+/// able to generate them is available.
 /// </summary>
 /// <remarks>
-/// The package that supplies such a factory removes this validator, so it only fails for a mode that cannot be
-/// met. The default is a mode that needs no such factory, so a site that configured nothing never fails here.
+/// Whichever component supplies that factory satisfies the mode, so only a mode that nothing can meet fails. The
+/// default is a mode that needs no such factory, so a site that configured nothing never fails here.
 /// </remarks>
 /// <seealso cref="IRuntimeModeValidator" />
 public class InMemoryModelsBuilderModeValidator : IRuntimeModeValidator
@@ -25,16 +25,20 @@ public class InMemoryModelsBuilderModeValidator : IRuntimeModeValidator
     private const string InMemoryAutoModelsMode = "InMemoryAuto";
 
     private readonly IOptionsMonitor<ModelsBuilderSettings> _modelsBuilderSettings;
-    private readonly IPublishedModelFactory _publishedModelFactory;
+    private readonly Lazy<IPublishedModelFactory> _publishedModelFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InMemoryModelsBuilderModeValidator" /> class.
     /// </summary>
     /// <param name="modelsBuilderSettings">The ModelsBuilder settings.</param>
     /// <param name="publishedModelFactory">The factory for creating published models.</param>
+    /// <remarks>
+    /// The factory is resolved lazily because validation runs while the runtime level is being determined, which
+    /// is earlier in the boot than a model factory is otherwise built. It is read only for a mode that needs one.
+    /// </remarks>
     public InMemoryModelsBuilderModeValidator(
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
-        IPublishedModelFactory publishedModelFactory)
+        Lazy<IPublishedModelFactory> publishedModelFactory)
     {
         _modelsBuilderSettings = modelsBuilderSettings;
         _publishedModelFactory = publishedModelFactory;
@@ -46,7 +50,7 @@ public class InMemoryModelsBuilderModeValidator : IRuntimeModeValidator
         // Read the mode in force rather than the configured one, so that a mode set in code is validated the
         // same as one set in configuration.
         if (_modelsBuilderSettings.CurrentValue.ModelsMode != InMemoryAutoModelsMode
-            || _publishedModelFactory.IsLiveFactoryEnabled())
+            || _publishedModelFactory.Value.IsLiveFactoryEnabled())
         {
             validationErrorMessage = null;
             return true;
