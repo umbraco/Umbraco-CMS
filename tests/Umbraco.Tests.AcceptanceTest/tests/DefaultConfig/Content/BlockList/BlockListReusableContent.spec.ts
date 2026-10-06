@@ -379,7 +379,6 @@ test('disconnecting a block in one document leaves the reference intact in anoth
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(secondContentName);
-  await umbracoUi.reloadPage();
   await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
@@ -422,7 +421,6 @@ test('shares a Library element across two documents and reflects updates in both
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(secondContentName);
-  await umbracoUi.reloadPage();
   await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 

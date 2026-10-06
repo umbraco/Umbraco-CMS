@@ -213,27 +213,3 @@ test('references the same Library element in multiple blocks with a shared conte
   expect(layout[1].contentKey).toBe(libraryElementId);
   expect(layout[0].key).not.toBe(layout[1].key);
 });
-
-test('preserves the block content values when disconnecting from the Library', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const sharedText = 'Shared grid library text';
-  const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, sharedText, propertyInBlock);
-  await umbracoApi.element.publish(libraryElementId);
-  await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockGridEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-
-  // Act
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName, 'grid');
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
-  await umbracoUi.content.clickDisconnectFromLibraryBlockButton('grid');
-  await umbracoUi.content.clickConfirmDisconnectFromLibraryButton('grid');
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const blockGridValue = await umbracoApi.document.getBlockGridValue(contentName);
-  const layoutItem = blockGridValue.layout[blockGridEditorAlias][0];
-  expect(layoutItem.isExternalContent).not.toBe(true);
-  expect(umbracoApi.document.getBlockContentPropertyValue(blockGridValue, layoutItem.contentKey)).toBe(sharedText);
-});

@@ -172,3 +172,19 @@ test('cannot see element type not applicable message in Structure tab for a Docu
   await umbracoUi.documentType.isAllowedChildNodesButtonVisible();
   await umbracoUi.documentType.isAddCollectionButtonVisible();
 });
+
+test('can enable allow in library for an element type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createEmptyElementType(documentTypeName, false);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.documentType.clickStructureTab();
+  await umbracoUi.documentType.clickAllowInLibraryButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
+
+  // Assert
+  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  expect(documentTypeData.allowedInLibrary).toBeTruthy();
+});

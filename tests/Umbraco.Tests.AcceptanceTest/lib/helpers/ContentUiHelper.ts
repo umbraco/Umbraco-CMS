@@ -1696,7 +1696,7 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.clickLibraryTabInBlockCatalogue();
     await this.selectElementInLibraryTab(elementName);
     await this.clickSubmitInBlockCatalogue();
-    // A Library block only renders once its element has been fetched, so wait for it before callers save.
+    // The reference marker reflects the layout entry, not the element fetch, so this confirms the insert only.
     await this.isBlockMarkedAsReference(true, family);
   }
 
