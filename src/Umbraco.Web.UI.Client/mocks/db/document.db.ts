@@ -27,19 +27,13 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	tree = new UmbMockEntityTreeManager<UmbMockDocumentModel>(this, treeItemMapper);
 	item = new UmbMockEntityVariantItemManager<UmbMockDocumentModel>(this, itemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockDocumentModel>(this, createMockDocumentMapper, detailResponseMapper);
-	recycleBin = new UmbEntityRecycleBin<UmbMockDocumentModel>(this.data, treeItemMapper);
+	recycleBin = new UmbEntityRecycleBin<UmbMockDocumentModel>(this, treeItemMapper);
 	publishing = new UmbMockDocumentPublishingManager(this);
 	collection = new UmbMockDocumentCollectionManager(this, collectionMapper);
 	url = new UmbMockEntityVariantUrlManager<UmbMockDocumentModel>(this);
 
 	constructor(data: Array<UmbMockDocumentModel>) {
 		super('document', data);
-	}
-
-	override setData(data: Array<UmbMockDocumentModel>) {
-		super.setData(data);
-		// Update recycleBin's data to match - it has its own data array
-		this.recycleBin.setData(data);
 	}
 
 	// permissions
@@ -150,11 +144,14 @@ const detailResponseMapper = (model: UmbMockDocumentModel): DocumentResponseMode
 };
 
 const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
+	const documentType = umbDocumentTypeMockDb.read(model.documentType.id);
+	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
+
 	return {
 		documentType: {
-			collection: model.documentType.collection,
-			icon: model.documentType.icon,
-			id: model.documentType.id,
+			collection: documentType.collection,
+			icon: documentType.icon,
+			id: documentType.id,
 		},
 		hasChildren: model.hasChildren,
 		id: model.id,
@@ -167,13 +164,17 @@ const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
 };
 
 const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionResponseModel => {
+	const documentType = umbDocumentTypeMockDb.read(model.documentType.id);
+	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
+
 	return {
 		ancestors: model.ancestors,
 		creator: null,
 		documentType: {
-			id: model.documentType.id,
-			alias: '',
-			icon: model.documentType.icon,
+			id: documentType.id,
+			alias: documentType.alias,
+			icon: documentType.icon,
+			collection: documentType.collection,
 		},
 		id: model.id,
 		isProtected: model.isProtected,
@@ -183,6 +184,7 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 		values: model.values,
 		variants: model.variants,
 		flags: model.flags,
+		hasChildren: model.hasChildren,
 	};
 };
 

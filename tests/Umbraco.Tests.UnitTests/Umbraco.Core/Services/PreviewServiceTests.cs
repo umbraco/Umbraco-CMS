@@ -72,7 +72,9 @@ public class PreviewServiceTests
     {
         var userKey = Guid.NewGuid();
 
+#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
         var previewTokenGeneratorMock = new Mock<IPreviewTokenGenerator>();
+#pragma warning restore CS0618 // Type or member is obsolete
         previewTokenGeneratorMock
             .Setup(x => x.GenerateTokenAsync(It.Is<Guid>(y => y == userKey)))
             .ReturnsAsync(Attempt<string?>.Succeed(Token));

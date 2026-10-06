@@ -73,6 +73,27 @@ internal sealed class MigrationPlanExecutorTests : UmbracoIntegrationTest
         Assert.That(_databaseCacheRebuilder.RebuildCount, Is.EqualTo(2));
     }
 
+    // A rebuild depends on infrastructure that migrations part way through the plan put in place, so a plan that
+    // stopped before reaching it should not attempt one (it will fail, and mask the migration failure, #23612).
+    [Test]
+    public async Task Cannot_Rebuild_Cache_For_Plan_That_Did_Not_Complete()
+    {
+        MigrationPlanExecutor executor = CreateExecutor();
+
+        MigrationPlan plan = new MigrationPlan("failing")
+            .From(string.Empty)
+            .To<RebuildCacheMigration>("rebuild-requested")
+            .To<FailingMigration>("done");
+
+        ExecutedMigrationPlan result = await executor.ExecutePlanAsync(plan, string.Empty);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Successful, Is.False);
+            Assert.That(_databaseCacheRebuilder.RebuildCount, Is.EqualTo(0));
+        });
+    }
+
     private static async Task ExecutePlanAsync<TMigration>(MigrationPlanExecutor executor, string name)
         where TMigration : AsyncMigrationBase
     {
@@ -126,6 +147,16 @@ internal sealed class MigrationPlanExecutorTests : UmbracoIntegrationTest
         }
 
         protected override Task MigrateAsync() => Task.CompletedTask;
+    }
+
+    public class FailingMigration : AsyncMigrationBase
+    {
+        public FailingMigration(IMigrationContext context)
+            : base(context)
+        {
+        }
+
+        protected override Task MigrateAsync() => throw new InvalidOperationException("Migration failed.");
     }
 
     private sealed class CountingDatabaseCacheRebuilder : IDatabaseCacheRebuilder

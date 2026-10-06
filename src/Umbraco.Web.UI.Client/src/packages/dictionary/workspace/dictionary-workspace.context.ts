@@ -1,6 +1,7 @@
 import type { UmbDictionaryDetailModel } from '../types.js';
 import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, type UmbDictionaryDetailRepository } from '../repository/index.js';
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
+import { UMB_EDIT_DICTIONARY_WORKSPACE_PATH_PATTERN } from './paths.js';
 import { UmbDictionaryWorkspaceEditorElement } from './dictionary-workspace-editor.element.js';
 import { UMB_DICTIONARY_WORKSPACE_ALIAS } from './constants.js';
 import {
@@ -10,6 +11,8 @@ import {
 	UmbEntityNamedDetailWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_TRANSLATION_SECTION_PATH } from '@umbraco-cms/backoffice/translation';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbDictionaryWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbDictionaryDetailModel, UmbDictionaryDetailRepository>
@@ -49,6 +52,11 @@ export class UmbDictionaryWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_TRANSLATION_SECTION_PATH;
+		return UMB_EDIT_DICTIONARY_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	setPropertyValue(isoCode: string, translation: string) {

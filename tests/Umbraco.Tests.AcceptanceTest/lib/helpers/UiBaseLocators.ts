@@ -494,11 +494,11 @@ export class UiBaseLocators extends BasePage {
       .locator("#caret-button");
 
     // View Options
-    this.gridBtn = page.getByLabel("Grid");
-    this.listBtn = page.getByLabel("List");
-    this.viewBundleBtn = page.locator(
-      "umb-collection-view-bundle uui-button svg",
-    );
+    // The alias suffix (Grid/Table) is stable across entity types, but the entity segment isn't
+    // (e.g. Umb.CollectionView.Document.Grid vs Umb.CollectionView.Media.Grid), so match on suffix only.
+    this.gridBtn = page.locator('[data-mark^="collection:switch-view:"][data-mark$=".Grid"]');
+    this.listBtn = page.locator('[data-mark^="collection:switch-view:"][data-mark$=".Table"]');
+    this.viewBundleBtn = page.locator('[data-mark="collection:switch-view"]');
 
     // Media
     this.mediaCardItems = page.locator("uui-card-media");
@@ -690,7 +690,9 @@ export class UiBaseLocators extends BasePage {
     await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
     const isCaretButtonOpen = await menuItem.getAttribute("show-children");
     if (isCaretButtonOpen === null) {
-      await this.clickCaretButtonForName(name);
+      // Click through menuItem (already scoped above), not clickCaretButtonForName - that resolves
+      // the item page-wide, which finds a same-named item's caret behind an open modal instead.
+      await this.click(menuItem.locator("#caret-button").first());
     }
   }
 
@@ -701,6 +703,21 @@ export class UiBaseLocators extends BasePage {
     await this.clickActionsMenuForName(treeName);
     await this.clickReloadChildrenActionMenuOption();
     await this.openCaretButtonForName(treeName);
+  }
+
+  /**
+   * Expands a tree root and makes sure it stays expanded.
+   * After a save, the Backoffice expands the tree by itself to reveal the saved item. If that happens between
+   * reading `show-children` and clicking the caret, the click collapses the tree again, so retry until it is open.
+   * @param treeRoot - The `uui-menu-item` of the tree root
+   */
+  async expandTreeRoot(treeRoot: Locator) {
+    await expect(async () => {
+      if ((await treeRoot.getAttribute('show-children')) === null) {
+        await treeRoot.locator(this.caretBtn).first().click();
+      }
+      await expect(treeRoot).toHaveAttribute('show-children', {timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
   async isTreeItemVisible(name: string, isVisible = true) {
@@ -1396,6 +1413,10 @@ export class UiBaseLocators extends BasePage {
       this.validationMessage.filter({ hasText: message }),
       isVisible,
     );
+  }
+
+  async doesSelectedValidationOptionHaveValue(value: string) {
+    await this.hasValue(this.validation, value);
   }
 
   // Composition & Structure Methods
