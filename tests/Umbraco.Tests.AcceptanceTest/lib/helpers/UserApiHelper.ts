@@ -333,7 +333,7 @@ export class UserApiHelper {
       return false;
     }
     const documentBlueprintStartNodeIdsArray = user.documentBlueprintStartNodeIds.map(documentBlueprintStartNode => documentBlueprintStartNode.id);
-    return documentBlueprintStartNodeIdsArray.every(id => documentBlueprintStartNodeIds.includes(id));
+    return documentBlueprintStartNodeIds.every(id => documentBlueprintStartNodeIdsArray.includes(id));
   }
 
   async doesUserContainDocumentBlueprintRootAccess(userName: string) {
