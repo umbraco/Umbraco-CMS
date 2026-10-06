@@ -146,3 +146,21 @@ test('can see discard changes when navigating away from content with a changed m
   // Assert
   await umbracoUi.content.isDiscardChangesModalVisible();
 });
+
+test('can see discard changes when navigating away from content with reordered media picker items', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDocumentWithTwoMediaPicker(contentName, documentTypeId, firstMediaFileId, secondMediaFileId, AliasHelper.toAlias(dataTypeName));
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.doesMediaPickerHaveItemsInOrder([firstMediaFileId, secondMediaFileId]);
+  await umbracoUi.content.dragMediaPickerItemBefore(secondMediaFileId, firstMediaFileId);
+  await umbracoUi.content.doesMediaPickerHaveItemsInOrder([secondMediaFileId, firstMediaFileId]);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});

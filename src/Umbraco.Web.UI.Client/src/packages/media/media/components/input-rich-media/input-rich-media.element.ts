@@ -1,6 +1,7 @@
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL } from '../../modals/index.js';
 import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry } from '../../types.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { UmbMediaPickerInputContext } from '../input-media/input-media.context.js';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
@@ -22,6 +23,7 @@ import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
 type UmbRichMediaCardModel = {
+	entityType: string;
 	unique: string;
 	media: string;
 	name: string;
@@ -296,6 +298,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				const media = mediaItems.find((x) => x.unique === item.mediaKey);
 				const isNotFound = this._statuses.find((x) => x.unique === item.mediaKey)?.state.type === 'error';
 				return {
+					entityType: media?.entityType ?? UMB_MEDIA_ENTITY_TYPE,
 					unique: item.key,
 					media: item.mediaKey,
 					name: media?.name ?? '',
@@ -430,7 +433,13 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
 
 		return html`
-			<uui-card-media id=${item.unique} title=${item.name} name=${item.name} .href=${href} ?readonly=${this.readonly}>
+			<uui-card-media
+				id=${item.unique}
+				data-mark="${item.entityType}:${item.media}"
+				title=${item.name}
+				name=${item.name}
+				.href=${href}
+				?readonly=${this.readonly}>
 				<umb-media-thumbnail
 					.unique=${item.media}
 					.alt=${item.name}
