@@ -82,6 +82,16 @@ describe('linkFromAttributes', () => {
 		expect(link.unique).to.equal('7e21a725-b905-4c5f-86dc-8c41ec116e39');
 	});
 
+	it('carries the unique of a local link stored with URL-encoded braces', () => {
+		const link = linkFromAttributes({
+			href: '/%7BlocalLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f%7D',
+			type: 'document',
+		});
+
+		expect(link.type).to.equal('document');
+		expect(link.unique).to.equal('eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f');
+	});
+
 	it('separates the query string from the URL of a local link', () => {
 		const link = linkFromAttributes({
 			href: '/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}#section',

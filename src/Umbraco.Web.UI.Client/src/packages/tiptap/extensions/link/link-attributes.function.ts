@@ -15,7 +15,7 @@ export type UmbLinkAttributes = {
 // The stored form of a local link, as recognised by the server when it resolves one to a URL: the leading
 // slash is optional and the braces may be URL-encoded. Anchored, so a URL that merely contains the token
 // somewhere in its path or query string is not taken for a local link.
-const LOCAL_LINK_HREF_PATTERN = /^\/?(?:\{|%7B)localLink:/i;
+const LOCAL_LINK_HREF_PATTERN = /^\/?(?:\{|%7B)localLink:(?<id>[^}%]+)(?:\}|%7D)/i;
 
 /**
  * Determines whether an href addresses an entity in this Umbraco installation rather than an arbitrary URL.
@@ -34,7 +34,7 @@ export function isLocalLinkHref(href: string | null | undefined): boolean {
 export function linkFromAttributes(attrs: UmbLinkAttributes): UmbLinkPickerLink {
 	const queryString = attrs['data-anchor'];
 	const url = attrs.href?.substring(0, attrs.href.length - (queryString?.length ?? 0));
-	const unique = isLocalLinkHref(url) ? url!.substring(url!.indexOf(':') + 1, url!.indexOf('}')) : null;
+	const unique = (url && LOCAL_LINK_HREF_PATTERN.exec(url)?.groups?.id) || null;
 
 	return {
 		name: attrs.title,
