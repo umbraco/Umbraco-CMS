@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 					{
 						alias: 'validationLimit',
 						label: 'Amount',
-						description: '#validation_minimumOnlyWhenInUse',
+						description: '{#validation_minimumOnlyWhenInUse}',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
 						config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
 						weight: 100,

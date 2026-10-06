@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 					{
 						alias: 'min',
 						label: 'Minimum',
-						description: '#validation_minimumOnlyWhenInUse',
+						description: '{#validation_minimumOnlyWhenInUse}',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 						config: [{ alias: 'min', value: 0 }],
 					},
