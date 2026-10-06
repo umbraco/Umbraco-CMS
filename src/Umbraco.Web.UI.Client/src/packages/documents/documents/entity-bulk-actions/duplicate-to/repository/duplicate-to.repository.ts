@@ -8,18 +8,30 @@ import type { UmbRepositoryErrorResponse } from '@umbraco-cms/backoffice/reposit
 export class UmbBulkDuplicateToDocumentRepository extends UmbRepositoryBase implements UmbBulkDuplicateToRepository {
 	#duplicateSource = new UmbDuplicateDocumentServerDataSource(this);
 
-	async requestBulkDuplicateTo(args: UmbBulkDuplicateToDocumentRequestArgs): Promise<UmbRepositoryErrorResponse> {
+	async requestBulkDuplicateTo(
+		args: UmbBulkDuplicateToDocumentRequestArgs,
+		abortSignal?: AbortSignal,
+	): Promise<UmbRepositoryErrorResponse> {
 		let count = 0;
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 
 		for (const unique of args.uniques) {
-			const { error } = await this.#duplicateSource.duplicate({
-				unique,
-				destination: args.destination,
-				relateToOriginal: args.relateToOriginal,
-				includeDescendants: args.includeDescendants,
-			});
+			if (abortSignal?.aborted) break;
+
+			const { error } = await this.#duplicateSource.duplicate(
+				{
+					unique,
+					destination: args.destination,
+					relateToOriginal: args.relateToOriginal,
+					includeDescendants: args.includeDescendants,
+				},
+				abortSignal,
+			);
+
+			// Cancelling aborts the in-flight request, which surfaces as an error here - do not report that as a
+			// failed duplicate, and stop before starting the next item.
+			if (abortSignal?.aborted) break;
 
 			if (error) {
 				const notification = { data: { message: error.message } };

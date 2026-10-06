@@ -47,8 +47,11 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the trash request
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
-	async requestTrash(args: UmbRecycleBinTrashRequestArgs): Promise<UmbRepositoryErrorResponse> {
-		return this.#recycleBinSource.trash(args);
+	async requestTrash(
+		args: UmbRecycleBinTrashRequestArgs,
+		abortSignal?: AbortSignal,
+	): Promise<UmbRepositoryErrorResponse> {
+		return this.#recycleBinSource.trash(args, abortSignal);
 	}
 
 	/**

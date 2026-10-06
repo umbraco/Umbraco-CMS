@@ -8,6 +8,7 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
+import { UmbEntityBulkActionProgressController } from '@umbraco-cms/backoffice/entity-bulk-action';
 
 export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionMoveToKind> {
 	protected async _getPickableFilter(unique: string): Promise<((item: UmbTreeItemModel) => boolean) | undefined> {
@@ -52,9 +53,13 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		const moveRepository = await createExtensionApiByAlias<UmbMoveRepository>(this, this.args.meta.moveRepositoryAlias);
 		if (!moveRepository) throw new Error('Move Repository is not available');
 
-		const { error } = await moveRepository.requestMoveTo({
-			unique: this.args.unique,
-			destination: { unique: destinationUnique },
+		const { error } = await new UmbEntityBulkActionProgressController(this).runIndeterminate({
+			headline: '#actions_moveInProgress',
+			operation: (abortSignal) =>
+				moveRepository.requestMoveTo(
+					{ unique: this.args.unique!, destination: { unique: destinationUnique } },
+					abortSignal,
+				),
 		});
 
 		if (error) {

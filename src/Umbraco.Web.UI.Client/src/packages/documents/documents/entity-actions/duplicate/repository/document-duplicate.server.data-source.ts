@@ -23,10 +23,14 @@ export class UmbDuplicateDocumentServerDataSource {
 	/**
 	 * Duplicate an item for the given id to the destination unique
 	 * @param {UmbDuplicateDocumentRequestArgs} args - The duplicate request arguments
+	 * @param {AbortSignal} [abortSignal] - Aborts the request.
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the duplicate request
 	 * @memberof UmbDuplicateDocumentServerDataSource
 	 */
-	async duplicate(args: UmbDuplicateDocumentRequestArgs): Promise<UmbDataSourceErrorResponse> {
+	async duplicate(
+		args: UmbDuplicateDocumentRequestArgs,
+		abortSignal?: AbortSignal,
+	): Promise<UmbDataSourceErrorResponse> {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 
@@ -39,6 +43,7 @@ export class UmbDuplicateDocumentServerDataSource {
 					relateToOriginal: args.relateToOriginal,
 					includeDescendants: args.includeDescendants,
 				},
+				signal: abortSignal,
 			}),
 			{ disableNotifications: true },
 		);

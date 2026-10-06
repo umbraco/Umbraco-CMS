@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -110,19 +111,19 @@ internal sealed class MemberContentEditingService
         => throw new NotSupportedException("Member creation is not supported by this service. This should never be called.");
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IMember member, int newParentId, bool includeDescendants, int userId)
+    protected override OperationResult? Move(IMember member, int newParentId, bool includeDescendants, int userId, CancellationToken cancellationToken)
         => throw new InvalidOperationException("Move is not supported for members");
 
     /// <inheritdoc />
-    protected override IMember? Copy(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override IMember? Copy(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, int userId, CancellationToken cancellationToken)
         => throw new NotSupportedException("Copy is not supported for Member");
 
     /// <inheritdoc />
-    protected override OperationResult? MoveToRecycleBin(IMember member, int userId)
+    protected override OperationResult? MoveToRecycleBin(IMember member, int userId, CancellationToken cancellationToken)
         => throw new InvalidOperationException("Recycle bin is not supported for members");
 
     /// <inheritdoc />
-    protected override OperationResult? Delete(IMember member, int userId)
+    protected override OperationResult? Delete(IMember member, int userId, CancellationToken cancellationToken)
         => ContentService.Delete(member, userId).Result;
 
     /// <summary>

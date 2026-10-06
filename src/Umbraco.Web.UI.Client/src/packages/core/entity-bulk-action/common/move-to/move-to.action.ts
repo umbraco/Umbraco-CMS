@@ -15,17 +15,20 @@ export class UmbMoveToEntityBulkAction extends UmbEntityBulkActionBase<MetaEntit
 			hideTreeRoot: this.args.meta.hideTreeRoot,
 			treeAlias: this.args.meta.treeAlias,
 			searchProviderAlias: this.args.meta.searchProviderAlias,
-			perform: async (destinationUnique) => {
+			perform: async (destinationUnique, abortSignal) => {
 				const bulkMoveRepository = await createExtensionApiByAlias<UmbBulkMoveToRepository>(
 					this,
 					this.args.meta.bulkMoveRepositoryAlias,
 				);
 				if (!bulkMoveRepository) throw new Error('Bulk Move Repository is not available');
 
-				return bulkMoveRepository.requestBulkMoveTo({
-					uniques: this.selection,
-					destination: { unique: destinationUnique },
-				});
+				return bulkMoveRepository.requestBulkMoveTo(
+					{
+						uniques: this.selection,
+						destination: { unique: destinationUnique },
+					},
+					abortSignal,
+				);
 			},
 		});
 	}
