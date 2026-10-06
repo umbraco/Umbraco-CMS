@@ -1,4 +1,3 @@
-using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.IO;
 
@@ -38,7 +37,7 @@ public class PhysicalFileSystemTreeService : FileSystemTreeServiceBase, IPhysica
 
     /// <inheritdoc/>
     public override FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
-        => IsAllowedPath(path.VirtualPathToSystemPath())
+        => IsAllowedPath(path)
             ? base.GetAncestorModels(path, includeSelf)
             : [];
 
