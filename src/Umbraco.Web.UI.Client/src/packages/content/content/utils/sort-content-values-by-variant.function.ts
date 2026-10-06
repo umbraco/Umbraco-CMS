@@ -8,6 +8,7 @@ import { umbVariantObjectSortCompare } from '@umbraco-cms/backoffice/variant';
  * same order the backend returns after a save and reload, so unchanged values don't register as changed.
  * @param {Array<UmbPotentialContentValueModel>} values - The values to sort.
  * @returns {Array<UmbPotentialContentValueModel>} A new, variant-sorted array.
+ * @internal
  */
 export function _sortContentValuesByVariant<T extends UmbPotentialContentValueModel>(values: Array<T>): Array<T> {
 	return [...values].sort((a, b) => {
