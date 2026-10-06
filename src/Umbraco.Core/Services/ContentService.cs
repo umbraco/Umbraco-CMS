@@ -3592,13 +3592,11 @@ public class ContentService : RepositoryService, IContentService
 
     private static bool HasUnsavedChanges(IContent content) => content.HasIdentity is false || content.IsDirty();
 
-    private const int MaxContentNameLength = 255;
-
     private static void EnsureNameLengthIsValid(IContent content)
     {
-        if (content.Name?.Length > MaxContentNameLength)
+        if (content.Name?.Length > Constants.Validation.MaxNameLength)
         {
-            throw new InvalidOperationException($"Name cannot be more than {MaxContentNameLength} characters in length.");
+            throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
     }
 

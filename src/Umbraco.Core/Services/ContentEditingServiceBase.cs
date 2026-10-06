@@ -35,11 +35,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly ContentTypeFilterCollection _contentTypeFilters;
 
     /// <summary>
-    /// The maximum length of a content name, matching the length of the backing database column.
-    /// </summary>
-    private const int MaxNameLength = 255;
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="ContentEditingServiceBase{TContent, TContentType, TContentService, TContentTypeService}"/> class.
     /// </summary>
     /// <param name="contentService">The content service.</param>
@@ -251,7 +246,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// culture carries it.
     /// </remarks>
     private static bool HasValidNames(ContentEditingModelBase contentEditingModelBase)
-        => contentEditingModelBase.Variants.All(variant => variant.Name.Length <= MaxNameLength);
+        => contentEditingModelBase.Variants.All(variant => variant.Name.Length <= Constants.Validation.MaxNameLength);
 
     /// <summary>
     /// Validates the cultures in the content editing model.
