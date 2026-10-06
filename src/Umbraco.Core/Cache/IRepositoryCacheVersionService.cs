@@ -49,7 +49,7 @@ public interface IRepositoryCacheVersionService
     /// implemented together. No snapshot can be derived from the other members, so the default implementation throws.
     /// </remarks>
     /// <exception cref="NotImplementedException">Thrown when the implementation does not provide the snapshot.</exception>
-    // TODO (V19): Remove the default implementation.
+    // TODO (V19): Remove the default implementation, along with the comment above describing it.
     Task<IReadOnlyCollection<RepositoryCacheVersion>> GetCacheVersionsAsync()
         => throw new NotImplementedException($"{GetType().FullName} must implement {nameof(GetCacheVersionsAsync)} and {nameof(SetCachesSyncedAsync)}({nameof(IEnumerable<RepositoryCacheVersion>)}).");
 
@@ -77,7 +77,7 @@ public interface IRepositoryCacheVersionService
     /// the default implementation throws instead.
     /// </remarks>
     /// <exception cref="NotImplementedException">Thrown when the implementation does not adopt the given snapshot.</exception>
-    // TODO (V19): Remove the default implementation.
+    // TODO (V19): Remove the default implementation, along with the comment above describing it.
     Task SetCachesSyncedAsync(IEnumerable<RepositoryCacheVersion> cacheVersions)
         => throw new NotImplementedException($"{GetType().FullName} must implement {nameof(GetCacheVersionsAsync)} and {nameof(SetCachesSyncedAsync)}({nameof(IEnumerable<RepositoryCacheVersion>)}).");
 }
