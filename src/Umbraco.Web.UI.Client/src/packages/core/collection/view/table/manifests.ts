@@ -13,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			element: UmbTableCollectionViewElement,
 			weight: 1000,
 			meta: {
-				label: 'Table',
+				label: '#collection_tableViewLabel',
 				icon: 'icon-table',
 				pathName: 'table',
 			},
