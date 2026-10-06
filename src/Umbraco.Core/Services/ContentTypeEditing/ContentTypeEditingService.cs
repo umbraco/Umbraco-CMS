@@ -133,7 +133,7 @@ internal sealed class ContentTypeEditingService : AsyncContentTypeEditingService
     private async Task UpdateTemplatesAsync(IContentType contentType, ContentTypeModelBase model)
     {
         Guid[] allowedTemplateKeys = model.AllowedTemplateKeys.ToArray();
-        Dictionary<Guid, ITemplate> templatesByKey = (await _templateService.GetManyAsync(allowedTemplateKeys, CancellationToken.None))
+        var templatesByKey = (await _templateService.GetManyAsync(allowedTemplateKeys, CancellationToken.None))
             .ToDictionary(template => template.Key);
         ITemplate[] allowedTemplates = allowedTemplateKeys
             .Select(templateKey => templatesByKey.GetValueOrDefault(templateKey))

@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -440,6 +441,27 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
 
         Assert.IsNull(await productionTemplateService.GetAsync(result.Result.Key, CancellationToken.None));
         Assert.IsTrue(ViewsFileSystem.FileExists("productionDelete.cshtml"));
+    }
+
+    [Test]
+    public async Task Templates_Read_Through_A_Content_Type_Do_Not_Load_View_Content()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Content Type View", "contentTypeView", "view-content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType("viewContentType", "View Content Type");
+        contentType.AllowedTemplates = [result.Result];
+        contentType.SetDefaultTemplate(result.Result);
+        await GetRequiredService<IContentTypeService>().CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        IContentType? persistedContentType = await GetRequiredService<IContentTypeService>().GetAsync(contentType.Key);
+        ITemplate templateViaContentType = persistedContentType!.AllowedTemplates!.Single();
+        ITemplate? templateViaService = await TemplateService.GetAsync(result.Result.Key, CancellationToken.None);
+
+        // Template content lives in the view file, which only the template service reads.
+        Assert.AreEqual(result.Result.Key, templateViaContentType.Key);
+        Assert.That(templateViaContentType.Content, Is.Null.Or.Empty);
+        Assert.AreEqual("view-content", templateViaService!.Content);
     }
 
     private ITemplateService CreateTemplateService(RuntimeMode runtimeMode)
