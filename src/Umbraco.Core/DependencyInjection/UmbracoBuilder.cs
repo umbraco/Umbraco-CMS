@@ -468,7 +468,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlAliasServiceInitializerNotificationHandler>();
             Services.AddNotificationAsyncHandler<ContentTypeChangedNotification, DocumentUrlServiceContentTypeChangedNotificationHandler>();
             Services.AddNotificationAsyncHandler<ContentTreeChangeNotification, DocumentUrlServiceContentTreeChangeNotificationHandler>();
+#pragma warning disable CS0618 // Type or member is obsolete
             Services.AddNotificationAsyncHandler<ContentRefreshNotification, DocumentUrlAliasContentRefreshNotificationHandler>();
+#pragma warning restore CS0618 // Type or member is obsolete
         }
     }
 }

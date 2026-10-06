@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 [TestFixture]
 public class DocumentUrlAliasContentRefreshNotificationHandlerTests
 {
@@ -43,3 +44,4 @@ public class DocumentUrlAliasContentRefreshNotificationHandlerTests
         aliasService.Verify(x => x.CreateOrUpdateAliasesAsync(It.IsAny<Guid>()), Times.Never);
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete

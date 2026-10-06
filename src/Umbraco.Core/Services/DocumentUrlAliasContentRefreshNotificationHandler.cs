@@ -12,6 +12,7 @@ namespace Umbraco.Cms.Core.Services;
 /// content they describe. The in-memory alias cache is updated afterwards by the content cache refresher on every
 /// server, including the one that made the change.
 /// </remarks>
+#pragma warning disable CS0618 // Type or member is obsolete
 public sealed class DocumentUrlAliasContentRefreshNotificationHandler : IDistributedCacheAsyncNotificationHandler<ContentRefreshNotification>
 {
     private readonly IDocumentUrlAliasService _documentUrlAliasService;
@@ -29,3 +30,4 @@ public sealed class DocumentUrlAliasContentRefreshNotificationHandler : IDistrib
             ? _documentUrlAliasService.PersistAliasesAsync(notification.Entity)
             : Task.CompletedTask;
 }
+#pragma warning restore CS0618 // Type or member is obsolete
