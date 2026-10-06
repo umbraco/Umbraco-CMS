@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
@@ -52,6 +53,52 @@ public class TemplateTests
         {
             Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(template, null));
         }
+    }
+
+    [Test]
+    public void Content_Is_Empty_For_A_New_Template()
+    {
+        var template = new Template(TestHelper.ShortStringHelper, "Test", "test");
+
+        Assert.AreEqual(string.Empty, template.Content);
+    }
+
+    [Test]
+    public void Content_Is_Null_When_Not_Loaded()
+    {
+        var template = new Template(TestHelper.ShortStringHelper, "Test", "test", contentLoaded: false);
+
+        Assert.IsNull(template.Content);
+    }
+
+    [Test]
+    public void Content_Is_Read_By_The_Loader_When_Not_Loaded()
+    {
+        var template = new Template(TestHelper.ShortStringHelper, "Test", "test", contentLoaded: false);
+
+        template.GetFileContent = _ => "loaded content";
+
+        Assert.AreEqual("loaded content", template.Content);
+    }
+
+    [Test]
+    public void Content_Is_Returned_When_Set_After_Not_Loaded()
+    {
+        var template = new Template(TestHelper.ShortStringHelper, "Test", "test", contentLoaded: false);
+
+        template.Content = "new content";
+
+        Assert.AreEqual("new content", template.Content);
+    }
+
+    [Test]
+    public void Content_Not_Loaded_Is_Kept_By_Deep_Clone()
+    {
+        var template = new Template(TestHelper.ShortStringHelper, "Test", "test", contentLoaded: false);
+
+        var clone = (Template)template.DeepClone();
+
+        Assert.IsNull(clone.Content);
     }
 
     [Test]

@@ -283,6 +283,14 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
                 return Attempt.FailWithStatus(scopeValidatorStatus, template);
             }
 
+            // A template without loaded content (e.g. one reached through a content type) keeps its existing view,
+            // which is read using the persisted alias in case the alias has changed.
+            if (template.HasIdentity && template.Content is null)
+            {
+                ITemplate? persistedTemplate = await _templateRepository.GetAsync(template.Key, cancellationToken);
+                SetContentLoader(template, persistedTemplate?.Alias ?? template.Alias);
+            }
+
             var layoutTemplateAlias = _templateContentParserService.LayoutTemplateAlias(template.Content);
             ITemplate? layoutTemplate = layoutTemplateAlias.IsNullOrWhiteSpace()
                 ? null
@@ -454,13 +462,20 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
     /// </remarks>
     private ITemplate? WithContentLoader(ITemplate? template)
     {
-        if (template is File file)
+        if (template is not null)
         {
-            var alias = template.Alias;
-            file.GetFileContent = _ => ReadViewFile(alias);
+            SetContentLoader(template, template.Alias);
         }
 
         return template;
+    }
+
+    private void SetContentLoader(ITemplate template, string alias)
+    {
+        if (template is File file)
+        {
+            file.GetFileContent = _ => ReadViewFile(alias);
+        }
     }
 
     private string? ReadViewFile(string alias)

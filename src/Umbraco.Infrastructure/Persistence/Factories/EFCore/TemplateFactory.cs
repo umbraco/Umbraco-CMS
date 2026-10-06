@@ -25,9 +25,8 @@ internal static class TemplateFactory
         string? layoutTemplateAlias,
         bool isLayoutTemplate)
     {
-        // The content isn't persisted with the template. Providing a loader leaves it unloaded, so that a caller
-        // with access to the template's view file can supply one that reads it.
-        var template = new Template(shortStringHelper, dto.NodeDto.Text, dto.Alias, _ => null);
+        // The content isn't persisted with the template; it is read from the template's view file.
+        var template = new Template(shortStringHelper, dto.NodeDto.Text, dto.Alias, contentLoaded: false);
 
         try
         {

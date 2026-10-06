@@ -410,7 +410,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         xml.Add(new XElement("Name", template.Name));
         xml.Add(new XElement("Key", template.Key));
         xml.Add(new XElement("Alias", template.Alias));
-        xml.Add(new XElement("Design", new XCData(template.Content!)));
+        xml.Add(new XElement("Design", new XCData(template.Content ?? string.Empty)));
 
         return xml;
     }

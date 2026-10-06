@@ -460,8 +460,49 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
 
         // Template content lives in the view file, which only the template service reads.
         Assert.AreEqual(result.Result.Key, templateViaContentType.Key);
-        Assert.That(templateViaContentType.Content, Is.Null.Or.Empty);
+        Assert.IsNull(templateViaContentType.Content);
         Assert.AreEqual("view-content", templateViaService!.Content);
+    }
+
+    [Test]
+    public async Task Saving_A_Template_Read_Through_A_Content_Type_Keeps_Its_View()
+    {
+        ITemplate templateViaContentType = await CreateTemplateReadThroughContentType("keepView", "kept-content");
+
+        templateViaContentType.Name = "Renamed Name";
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.UpdateAsync(templateViaContentType, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual("kept-content", ReadViewFile("keepView.cshtml"));
+        Assert.AreEqual("kept-content", (await TemplateService.GetAsync(templateViaContentType.Key, CancellationToken.None))!.Content);
+    }
+
+    [Test]
+    public async Task Renaming_A_Template_Read_Through_A_Content_Type_Moves_Its_View()
+    {
+        ITemplate templateViaContentType = await CreateTemplateReadThroughContentType("moveView", "moved-content");
+
+        templateViaContentType.Alias = "movedView";
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.UpdateAsync(templateViaContentType, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.IsTrue(result.Success);
+        Assert.IsFalse(ViewsFileSystem.FileExists("moveView.cshtml"));
+        Assert.AreEqual("moved-content", ReadViewFile("movedView.cshtml"));
+    }
+
+    private async Task<ITemplate> CreateTemplateReadThroughContentType(string alias, string content)
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync(alias, alias, content, null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType(alias + "Type", alias + " Type");
+        contentType.AllowedTemplates = [result.Result];
+        await GetRequiredService<IContentTypeService>().CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        IContentType? persistedContentType = await GetRequiredService<IContentTypeService>().GetAsync(contentType.Key);
+        ITemplate templateViaContentType = persistedContentType!.AllowedTemplates!.Single();
+        Assert.IsNull(templateViaContentType.Content);
+        return templateViaContentType;
     }
 
     private ITemplateService CreateTemplateService(RuntimeMode runtimeMode)
