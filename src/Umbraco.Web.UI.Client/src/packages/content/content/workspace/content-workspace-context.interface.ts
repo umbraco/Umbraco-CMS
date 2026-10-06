@@ -3,9 +3,12 @@ import type { UmbElementPropertyDataOwner } from '../property-dataset-context/in
 import type { UmbContentTypeModel, UmbPropertyStructureWorkspaceContext } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId, UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
-import type { UmbRoutableWorkspaceContext, UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbRoutableWorkspaceContext,
+	UmbVariantDatasetWorkspaceContext,
+	UmbVariantNameWriteGuardManager,
+} from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
-import type { UmbVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbContentWorkspaceContext<
 	ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
@@ -24,6 +27,6 @@ export interface UmbContentWorkspaceContext<
 
 	readonly propertyViewGuard: UmbVariantPropertyGuardManager;
 	readonly propertyWriteGuard: UmbVariantPropertyGuardManager;
-	readonly variantWriteGuard: UmbVariantGuardManager;
+	readonly nameWriteGuard: UmbVariantNameWriteGuardManager;
 	getIsVariantWritable(variantId: UmbVariantId): boolean;
 }

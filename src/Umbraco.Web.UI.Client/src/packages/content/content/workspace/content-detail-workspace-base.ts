@@ -20,10 +20,11 @@ import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import { UmbDeprecation, UmbReadOnlyVariantGuardManager, UmbVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import {
 	notifyWorkspaceActionStarting,
 	UmbEntityDetailWorkspaceContextBase,
+	UmbVariantNameWriteGuardManager,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import type {
@@ -130,11 +131,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
-	/**
-	 * Guards which variants may be written (saved, published, unpublished, scheduled).
-	 * A variant can be editable yet not writable, for example when only some of its properties may be edited.
-	 */
-	public readonly variantWriteGuard = new UmbVariantGuardManager(this);
+	public readonly nameWriteGuard = new UmbVariantNameWriteGuardManager(this);
 
 	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
 	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
@@ -224,7 +221,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
-		this.variantWriteGuard.fallbackToPermitted();
+		this.nameWriteGuard.fallbackToPermitted();
 
 		this.#serverValidation.addPathTranslator(UmbContentDetailValidationPathTranslator);
 
@@ -877,15 +874,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	};
 
 	/**
-	 * Checks if the given variant may be written, i.e. it is neither read-only nor denied by the variant write guard.
+	 * Checks if the given variant may be written, i.e. it is not read-only.
 	 * @param {UmbVariantId} variantId - The variant to check
 	 * @returns {boolean} true if the variant may be written
 	 */
 	public getIsVariantWritable(variantId: UmbVariantId): boolean {
-		return (
-			this.readOnlyGuard.getIsPermittedForVariant(variantId) === false &&
-			this.variantWriteGuard.getIsPermittedForVariant(variantId)
-		);
+		// TODO (V19): derive language access for saving and publishing from the current user
+		return this.readOnlyGuard.getIsPermittedForVariant(variantId) === false;
 	}
 
 	/**
@@ -1242,11 +1237,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.readOnlyGuard.clearRules();
 		this.propertyViewGuard.clearRules();
 		this.propertyWriteGuard.clearRules();
-		this.variantWriteGuard.clearRules();
+		this.nameWriteGuard.clearRules();
 		// default:
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
-		this.variantWriteGuard.fallbackToPermitted();
+		this.nameWriteGuard.fallbackToPermitted();
 	}
 
 	abstract getContentTypeUnique(): string | undefined;

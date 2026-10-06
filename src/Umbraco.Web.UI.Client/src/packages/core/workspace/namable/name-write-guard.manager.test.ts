@@ -16,6 +16,24 @@ describe('UmbNameWriteGuardManager', () => {
 		manager = new UmbNameWriteGuardManager(hostElement);
 	});
 
+	describe('Synchronous outcome', () => {
+		it('is not permitted when there are no rules and the fallback is not permitted', () => {
+			expect(manager.getIsPermittedForName()).to.be.false;
+		});
+
+		it('is permitted when there are no rules and the fallback is permitted', () => {
+			manager.fallbackToPermitted();
+
+			expect(manager.getIsPermittedForName()).to.be.true;
+		});
+
+		it('is denied by a negative rule even next to a positive one', () => {
+			manager.addRules([rulePositive, ruleNegative]);
+
+			expect(manager.getIsPermittedForName()).to.be.false;
+		});
+	});
+
 	describe('Rule based outcomes', () => {
 		it('is not permitted when there are no rules and the fallback is not permitted', (done) => {
 			manager

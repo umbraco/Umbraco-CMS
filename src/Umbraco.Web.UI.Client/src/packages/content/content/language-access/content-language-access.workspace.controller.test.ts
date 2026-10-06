@@ -8,7 +8,8 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
-import { UmbReadOnlyVariantGuardManager, UmbVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbVariantNameWriteGuardManager } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId, type UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -24,12 +25,12 @@ class UmbContentWorkspaceContextStub extends UmbContextBase {
 	};
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
-	public readonly variantWriteGuard = new UmbVariantGuardManager(this);
+	public readonly nameWriteGuard = new UmbVariantNameWriteGuardManager(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CONTENT_WORKSPACE_CONTEXT.toString());
 		this.propertyWriteGuard.fallbackToPermitted();
-		this.variantWriteGuard.fallbackToPermitted();
+		this.nameWriteGuard.fallbackToPermitted();
 	}
 
 	setCultures(cultures: Array<string>) {
@@ -130,10 +131,10 @@ describe('UmbContentLanguageAccessWorkspaceController', () => {
 	describe('with invariant-for-variant access', () => {
 		beforeEach(() => host.currentUserContext.setHasAccessToInvariantForVariant(true));
 
-		it('denies writing a culture the user has no access to', async () => {
+		it('makes the name of a culture the user has no access to read-only', async () => {
 			await createContext();
 
-			expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(enUS)).to.be.false;
+			expect(host.workspaceContext.nameWriteGuard.getIsPermittedForName(enUS)).to.be.false;
 		});
 
 		it('keeps a culture the user has no access to editable, so invariant properties can be edited', async () => {
@@ -142,20 +143,20 @@ describe('UmbContentLanguageAccessWorkspaceController', () => {
 			expect(host.workspaceContext.readOnlyGuard.getIsPermittedForVariant(enUS)).to.be.false;
 		});
 
-		it('permits writing a culture the user has access to', async () => {
+		it('keeps the name of a culture the user has access to editable', async () => {
 			await createContext();
 
-			expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(daDK)).to.be.true;
+			expect(host.workspaceContext.nameWriteGuard.getIsPermittedForName(daDK)).to.be.true;
 		});
 	});
 
 	describe('without invariant-for-variant access', () => {
 		beforeEach(() => host.currentUserContext.setHasAccessToInvariantForVariant(false));
 
-		it('denies writing a culture the user has no access to', async () => {
+		it('makes the name of a culture the user has no access to read-only', async () => {
 			await createContext();
 
-			expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(enUS)).to.be.false;
+			expect(host.workspaceContext.nameWriteGuard.getIsPermittedForName(enUS)).to.be.false;
 		});
 
 		it('makes a culture the user has no access to read-only', async () => {
@@ -164,10 +165,10 @@ describe('UmbContentLanguageAccessWorkspaceController', () => {
 			expect(host.workspaceContext.readOnlyGuard.getIsPermittedForVariant(enUS)).to.be.true;
 		});
 
-		it('permits writing a culture the user has access to', async () => {
+		it('keeps the name of a culture the user has access to editable', async () => {
 			await createContext();
 
-			expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(daDK)).to.be.true;
+			expect(host.workspaceContext.nameWriteGuard.getIsPermittedForName(daDK)).to.be.true;
 		});
 	});
 
@@ -192,6 +193,15 @@ describe('UmbContentLanguageAccessWorkspaceController', () => {
 			expect(
 				propertyWriteGuard.getIsPermittedForVariantAndProperty(enUS, { unique: 'variant-property' }, enUSSegment),
 			).to.be.false;
+		});
+
+		it('makes the name of every segment of the culture read-only with invariant-for-variant access', async () => {
+			host.currentUserContext.setHasAccessToInvariantForVariant(true);
+			await createContext();
+
+			expect(host.workspaceContext.nameWriteGuard.getIsPermittedForName(enUS)).to.be.false;
+			expect(host.workspaceContext.nameWriteGuard.getIsPermittedForName(enUSSegment)).to.be.false;
+			expect(host.workspaceContext.nameWriteGuard.getIsPermittedForName(daDK)).to.be.true;
 		});
 
 		it('makes every segment of the culture read-only without invariant-for-variant access', async () => {
@@ -281,20 +291,6 @@ describe('UmbContentLanguageAccessWorkspaceController', () => {
 
 		beforeEach(() => host.workspaceContext.setVariesByCulture(true));
 
-		it('denies writing the invariant variant without invariant-for-variant access', async () => {
-			host.currentUserContext.setHasAccessToInvariantForVariant(false);
-			await createContext();
-
-			expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(invariant)).to.be.false;
-		});
-
-		it('permits writing the invariant variant with invariant-for-variant access', async () => {
-			host.currentUserContext.setHasAccessToInvariantForVariant(true);
-			await createContext();
-
-			expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(invariant)).to.be.true;
-		});
-
 		it('denies writing shared properties in every variant without invariant-for-variant access, including variants the user can edit', async () => {
 			host.currentUserContext.setHasAccessToInvariantForVariant(false);
 			await createContext();
@@ -316,7 +312,6 @@ describe('UmbContentLanguageAccessWorkspaceController', () => {
 			host.currentUserContext.setHasAccessToInvariantForVariant(false);
 			await createContext();
 
-			expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(invariant)).to.be.true;
 			expect(isSharedPropertyWritable(daDK)).to.be.true;
 		});
 
@@ -324,13 +319,11 @@ describe('UmbContentLanguageAccessWorkspaceController', () => {
 			host.currentUserContext.setHasAccessToInvariantForVariant(false);
 			await createContext();
 			expect(isSharedPropertyWritable(daDK)).to.be.false;
-			expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(invariant)).to.be.false;
 
 			host.currentUserContext.setHasAccessToInvariantForVariant(true);
 			await flushMicrotasks();
 
 			expect(isSharedPropertyWritable(daDK)).to.be.true;
-			expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(invariant)).to.be.true;
 		});
 
 		it('does not restrict variants added after the user gains invariant-for-variant access', async () => {
@@ -356,17 +349,17 @@ describe('UmbContentLanguageAccessWorkspaceController', () => {
 			await flushMicrotasks();
 
 			expect(isSharedPropertyWritable(daDK)).to.be.false;
-			expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(invariant)).to.be.false;
 		});
 	});
 
-	it('removes the write restriction when the user gains access to all languages', async () => {
+	it('makes the name of a culture editable when the user gains access to all languages', async () => {
 		host.currentUserContext.setHasAccessToInvariantForVariant(true);
 		await createContext();
+		expect(host.workspaceContext.nameWriteGuard.getIsPermittedForName(enUS)).to.be.false;
 
 		host.currentUserContext.setHasAccessToAllLanguages(true);
 		await flushMicrotasks();
 
-		expect(host.workspaceContext.variantWriteGuard.getIsPermittedForVariant(enUS)).to.be.true;
+		expect(host.workspaceContext.nameWriteGuard.getIsPermittedForName(enUS)).to.be.true;
 	});
 });

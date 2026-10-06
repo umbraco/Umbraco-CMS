@@ -3,7 +3,6 @@ import type UmbDocumentWorkspaceContext from '../context/document-workspace.cont
 import type { UmbDocumentVariantModel } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbSaveWorkspaceAction,
 	type MetaWorkspaceAction,
@@ -53,9 +52,7 @@ export class UmbDocumentSaveWorkspaceAction
 
 	#observeGuardRules() {
 		this.observe(
-			this._workspaceContext
-				? observeMultiple([this._workspaceContext.readOnlyGuard.rules, this._workspaceContext.variantWriteGuard.rules])
-				: undefined,
+			this._workspaceContext?.readOnlyGuard.rules,
 			() => this.#checkWritableVariants(),
 			'umbObserveReadOnlyGuardRules',
 		);
