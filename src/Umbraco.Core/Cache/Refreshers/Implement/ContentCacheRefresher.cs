@@ -183,6 +183,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 var pathid = "," + payload.Id + ",";
                 isolatedCache.ClearOfType<IContent>((k, v) => v.Path?.Contains(pathid) ?? false);
             }
+
+            HandleIdKeyMap(payload);
         }
 
         base.RefreshInternal(payloads);
@@ -219,8 +221,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             {
                 HandleRouting(payload);
             }
-
-            HandleIdKeyMap(payload);
         }
 
         // Clear partial view cache when published content changes.
@@ -571,6 +571,11 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         /// <summary>
         /// Gets the unique GUID key associated with the entity, or null if no key is assigned.
         /// </summary>
+        /// <remarks>
+        /// Required when <see cref="ChangeTypes"/> includes <see cref="TreeChangeTypes.Remove"/>: the refresher clears the
+        /// id/key map for a removed entity before the published-cache refresh runs, and the removed entity can no longer be
+        /// looked up in the database, so the key cannot be resolved from <see cref="Id"/> alone.
+        /// </remarks>
         public Guid? Key { get; init; }
 
         /// <summary>
