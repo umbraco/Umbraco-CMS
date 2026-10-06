@@ -223,7 +223,7 @@ public class BlockAndLibraryElementIndexingTests : ContentTestBase
                     Values = [new() { Alias = "title", Value = text }],
                 },
             ],
-            Expose = [new(contentElementKey, null, null)],
+            Expose = [new() { ContentKey = contentElementKey }],
         };
         return JsonSerializer.Serialize(blockListValue);
     }

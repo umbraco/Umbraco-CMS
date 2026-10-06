@@ -335,7 +335,7 @@ public class LibraryElementSearchTests : SearcherTestBase
                     Values = [new BlockPropertyValue { Alias = "title", Value = blockText }],
                 },
             ],
-            Expose = [new BlockItemVariation(contentElementKey, null, null)],
+            Expose = [new BlockItemVariation { ContentKey = contentElementKey }],
         };
 
         Content document = new ContentBuilder()
