@@ -21,6 +21,7 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentBlueprint.ensureNameNotExists(firstFolderName);
   await umbracoApi.documentBlueprint.ensureNameNotExists(secondFolderName);
   await umbracoApi.documentBlueprint.ensureNameNotExists(rootBlueprintName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(childBlueprintName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(documentName);
   documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
@@ -38,6 +39,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentBlueprint.ensureNameNotExists(firstFolderName);
   await umbracoApi.documentBlueprint.ensureNameNotExists(secondFolderName);
   await umbracoApi.documentBlueprint.ensureNameNotExists(rootBlueprintName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(childBlueprintName);
   await umbracoApi.document.ensureNameNotExists(documentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
