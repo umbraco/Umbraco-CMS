@@ -36,12 +36,16 @@ public class AddLanguageKeyColumn : AsyncMigrationBase
         AddColumn<LanguageDto>(tableName, columnName);
 
         // Populate each existing row with a new Guid
-        var languages = await Database.FetchAsync<LanguageDto>($"SELECT * FROM {tableName}");
+        var quotedTableName = SqlSyntax.GetQuotedTableName(tableName);
+        var quotedColumnName = SqlSyntax.GetQuotedColumnName(columnName);
+        var quotedPrimaryKeyColumnName = SqlSyntax.GetQuotedColumnName(LanguageDto.PrimaryKeyColumnName);
+
+        var languages = await Database.FetchAsync<LanguageDto>($"SELECT * FROM {quotedTableName}");
         foreach (LanguageDto language in languages)
         {
             language.LanguageKey = Guid.NewGuid();
             await Database.ExecuteAsync(
-                $"UPDATE {tableName} SET {columnName} = @0 WHERE {LanguageDto.PrimaryKeyColumnName} = @1",
+                $"UPDATE {quotedTableName} SET {quotedColumnName} = @0 WHERE {quotedPrimaryKeyColumnName} = @1",
                 [language.LanguageKey, language.Id]);
         }
     }
