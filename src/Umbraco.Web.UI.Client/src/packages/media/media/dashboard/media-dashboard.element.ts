@@ -5,10 +5,9 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbCollectionElement } from '@umbraco-cms/backoffice/collection';
+import { umbMapDataTypeToCollectionConfiguration } from '@umbraco-cms/backoffice/content';
 import type { UmbCollectionConfiguration } from '@umbraco-cms/backoffice/collection';
-import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-media-dashboard')
@@ -39,7 +38,10 @@ export class UmbMediaDashboardElement extends UmbLitElement {
 			(dataType) => {
 				if (!dataType) return;
 
-				const dataTypeConfig = this.#mapDataTypeConfigToCollectionConfig(dataType);
+				const dataTypeConfig: UmbCollectionConfiguration = {
+					unique: '',
+					...umbMapDataTypeToCollectionConfiguration(dataType),
+				};
 
 				this._routes = [
 					{
@@ -66,23 +68,10 @@ export class UmbMediaDashboardElement extends UmbLitElement {
 		);
 	}
 
-	#mapDataTypeConfigToCollectionConfig(dataType: UmbDataTypeDetailModel): UmbCollectionConfiguration {
-		const config = new UmbPropertyEditorConfigCollection(dataType.values);
-		const pageSize = Number(config.getValueByAlias('pageSize'));
-		return {
-			unique: '',
-			dataTypeId: '',
-			layouts: config?.getValueByAlias('layouts'),
-			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
-			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
-			pageSize: isNaN(pageSize) ? 50 : pageSize,
-			userDefinedProperties: config?.getValueByAlias('includeProperties'),
-		};
-	}
-
 	override render() {
-		if (!this._routes) return;
-		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
+		return html`<umb-router-slot id="router-slot" .routes=${this._routes}
+			><umb-view-loader></umb-view-loader
+		></umb-router-slot>`;
 	}
 
 	static override styles = [

@@ -247,7 +247,7 @@ export class UserUiHelper extends UiBaseLocators {
     await this.clickUsersMenu();
     await this.searchInUserSection(name);
     await this.clickUserWithName(name);
-    await this.hasValue(this.nameOfUserInput, name);
+    await this.hasValue(this.nameOfUserInput, name, ConstantHelper.timeout.navigation);
   }
 
   async clickUserButton() {

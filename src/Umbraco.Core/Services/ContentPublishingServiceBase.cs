@@ -97,8 +97,6 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         return await PublishAsync(key, cultureAndSchedule, userKey);
     }
 
-    // TODO - Integrate this implementation into the one above.
-    [Obsolete("Use non obsoleted version instead. Scheduled for removal in v17")]
     private async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
         Guid key,
         CultureAndScheduleModel cultureAndSchedule,
@@ -255,8 +253,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             Variants = cultures.Select(culture => new VariantModel()
             {
                 Name = content.GetPublishName(culture) ?? string.Empty,
-                Culture = culture,
-                Segment = null
+                Culture = culture
             }).ToArray()
         };
 

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -52,6 +53,7 @@ using Umbraco.Cms.Web.Common.Mvc;
 using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Cms.Web.Common.Repositories;
 using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Cms.Web.Common.TagHelpers;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -237,15 +239,6 @@ public static partial class UmbracoBuilderExtensions
     private static IUmbracoBuilder AddHttpClients(this IUmbracoBuilder builder)
     {
         builder.Services.AddHttpClient();
-        // TODO (V19): Remove this registration along with Constants.HttpClients.IgnoreCertificateErrors.
-        #pragma warning disable CS0618 // Type or member is obsolete
-        builder.Services.AddHttpClient(Constants.HttpClients.IgnoreCertificateErrors)
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback =
-                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
-            });
-        #pragma warning restore CS0618 // Type or member is obsolete
         builder.Services.AddHttpClient(Constants.HttpClients.WebhookFiring, (services, client) =>
         {
             var productVersion = services.GetRequiredService<IUmbracoVersion>().SemanticVersion.ToSemanticStringWithoutBuild();
@@ -323,6 +316,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IMarchal, AspNetCoreMarchal>();
 
         builder.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
+
+        builder.Services.AddTransient<ITagHelperComponent, PreviewBadgeTagHelperComponent>();
 
         builder.Services.AddSingleton<IPartialViewBlockEngine, PartialViewBlockEngine>();
 

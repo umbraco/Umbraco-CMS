@@ -145,8 +145,14 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 	async #closeTimeoutModal() {
 		const contextToken = (await import('@umbraco-cms/backoffice/modal')).UMB_MODAL_MANAGER_CONTEXT;
-		const modalManager = await this.getContext(contextToken);
-		modalManager?.close('auth-timeout');
+
+		try {
+			const modalManager = await this.getContext(contextToken);
+			modalManager?.close('auth-timeout');
+		} catch {
+			// A session can be established before anything provides a modal manager — a peer tab
+			// broadcasting one while this tab is still booting. There is no modal to dismiss then.
+		}
 	}
 
 	async #openTimeoutModal(remainingTimeInSeconds: number): Promise<void> {

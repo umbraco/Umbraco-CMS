@@ -139,6 +139,10 @@ export class DocumentTypeApiHelper {
   // FOLDER
   async getFolder(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document-type/folder/' + id);
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 
@@ -939,6 +943,20 @@ export class DocumentTypeApiHelper {
         .done()
       .withCollectionId(collectionId)
       .build();
+    return await this.create(documentType);
+  }
+
+  async createDocumentTypeWithAllowedChildNodesAndCollectionId(documentTypeName: string, allowedChildNodeIds: string[], collectionId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const builder = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true);
+    for (const allowedChildNodeId of allowedChildNodeIds) {
+      builder.addAllowedDocumentType().withId(allowedChildNodeId).done();
+    }
+    const documentType = builder.withCollectionId(collectionId).build();
     return await this.create(documentType);
   }
 

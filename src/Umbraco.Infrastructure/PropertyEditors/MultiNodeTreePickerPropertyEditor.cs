@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Represents a multi-node tree picker property editor.
 /// </summary>
+[Obsolete("The multi node tree picker is replaced by the dedicated document, media, element and member pickers. Scheduled for removal in Umbraco 22.")]
 [DataEditor(
     Constants.PropertyEditors.Aliases.MultiNodeTreePicker,
     ValueType = ValueTypes.Text,
@@ -58,8 +59,11 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                     ["type"] = new JsonObject
                     {
                         ["type"] = "string",
-                        ["enum"] = new JsonArray("content", "media", "member"),
-                        ["description"] = "Entity type (content, media, or member)",
+                        ["enum"] = new JsonArray(
+                            Constants.UdiEntityType.Document,
+                            Constants.UdiEntityType.Media,
+                            Constants.UdiEntityType.Member),
+                        ["description"] = "UDI entity type of the selected entity",
                     },
                     ["unique"] = new JsonObject
                     {

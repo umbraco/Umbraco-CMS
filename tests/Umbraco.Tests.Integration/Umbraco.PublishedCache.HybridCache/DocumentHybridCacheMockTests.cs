@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -98,7 +97,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
 
         _mockDatabaseCacheRepository.Setup(r => r.DeleteContentItemAsync(It.IsAny<int>()));
 
-        var mockedPublishedStatusService = new Mock<IPublishStatusQueryService>();
+        var mockedPublishedStatusService = new Mock<IDocumentPublishStatusQueryService>();
         mockedPublishedStatusService.Setup(x => x.IsPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
         mockedPublishedStatusService.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>())).Returns(true);
 
@@ -117,17 +116,12 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
 
-        _mockedCache = new DocumentCache(
-            _documentCacheService,
-            GetRequiredService<IPublishedContentTypeCache>(),
-            GetRequiredService<IDocumentNavigationQueryService>(),
-            GetRequiredService<IDocumentUrlService>(),
-            new Lazy<IPublishedUrlProvider>(GetRequiredService<IPublishedUrlProvider>));
+        _mockedCache = new DocumentCache(_documentCacheService);
     }
 
     // We want to be able to alter the settings for the providers AFTER the test has started
     // So we'll manually create them with a magic options mock.
-    private IEnumerable<IDocumentSeedKeyProvider> GetSeedProviders(IPublishStatusQueryService publishStatusQueryService)
+    private IEnumerable<IDocumentSeedKeyProvider> GetSeedProviders(IDocumentPublishStatusQueryService publishStatusQueryService)
     {
         _cacheSettings = new CacheSettings
         {
@@ -241,6 +235,131 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    public async Task GetByKeysAsync_BatchesDatabaseRead_AndNeverCallsSinglePerItem()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        // A set of cold keys (only Textpage resolves against the mocked batch).
+        var keys = new[] { Textpage.Key, Guid.NewGuid(), Guid.NewGuid() };
+
+        IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync(keys, false);
+
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(Textpage.Key, result[0].Key);
+
+        // The single batched query is used; the per-item single query is never called.
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false), Times.Once);
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_PopulatesMemoryCache_SoSubsequentReadsDoNotHitDatabase()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        _ = await _documentCacheService.GetByKeysAsync([Textpage.Key], false);
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false), Times.Once);
+
+        // Now served from the in-memory (L0) cache — the sync fast path hits.
+        Assert.IsTrue(_documentCacheService.TryGetCached(Textpage.Key, false, out IPublishedContent? cached));
+        Assert.IsNotNull(cached);
+
+        // And a further retrieval makes no additional database call.
+        var again = await _mockedCache.GetByIdAsync(Textpage.Key, false);
+        Assert.IsNotNull(again);
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false), Times.Once);
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_HonoursCachedNull_WithoutQueryingDatabase()
+    {
+        Guid missingKey = Guid.NewGuid();
+
+        // Nothing in the database for this key, so the per-key read-through caches a null against it.
+        _mockDatabaseCacheRepository.Setup(x => x.GetDocumentSourceAsync(missingKey, false)).ReturnsAsync((ContentCacheNode?)null);
+        _mockDatabaseCacheRepository
+            .Setup(x => x.GetDocumentSourcesAsync(It.Is<IEnumerable<Guid>>(keys => keys.Contains(missingKey)), false))
+            .ReturnsAsync(Array.Empty<ContentCacheNode>());
+
+        Assert.IsNull(await _documentCacheService.GetByKeyAsync(missingKey, false));
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourceAsync(missingKey, false), Times.Once);
+
+        IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync([missingKey], false);
+
+        // A cached null means "already known to resolve to nothing", so the batched path has to serve it
+        // from the cache as the per-key path does. Re-reading such a key on every request is the
+        // regression reported in #18869.
+        Assert.IsEmpty(result);
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_EmptyInput_ReturnsEmpty()
+    {
+        IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync(Array.Empty<Guid>(), false);
+
+        Assert.IsEmpty(result);
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()), Times.Never);
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_DuplicateKeys_ResolveToSameItemAtEveryOccurrence()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        // A batched lookup preserves input multiplicity rather than collapsing duplicates, while only
+        // looking the key up once against the database.
+        var keys = new[] { Textpage.Key, Textpage.Key };
+
+        IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync(keys, false);
+
+        Assert.AreEqual(2, result.Count);
+        Assert.AreEqual(Textpage.Key, result[0].Key);
+        Assert.AreEqual(Textpage.Key, result[1].Key);
+
+        _mockDatabaseCacheRepository.Verify(
+            x => x.GetDocumentSourcesAsync(It.Is<IEnumerable<Guid>>(k => k.Count() == 1 && k.Contains(Textpage.Key)), false),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_PreservesInputOrder_AcrossMixedCacheHits()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+        await hybridCache.RemoveAsync($"{Subpage.Key}");
+        await hybridCache.RemoveAsync($"{Subpage2.Key}");
+
+        var nodesByKey = new Dictionary<Guid, ContentCacheNode>
+        {
+            [Textpage.Key] = BuildCacheNode(Textpage),
+            [Subpage.Key] = BuildCacheNode(Subpage),
+            [Subpage2.Key] = BuildCacheNode(Subpage2),
+        };
+
+        _mockDatabaseCacheRepository
+            .Setup(x => x.GetDocumentSourceAsync(It.IsAny<Guid>(), false))
+            .ReturnsAsync((Guid key, bool _) => nodesByKey.GetValueOrDefault(key));
+        _mockDatabaseCacheRepository
+            .Setup(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false))
+            .ReturnsAsync((IEnumerable<Guid> keys, bool _) => keys.Where(nodesByKey.ContainsKey).Select(k => nodesByKey[k]));
+
+        // Warm Subpage into L0 ahead of time; Textpage and Subpage2 stay cold, so the batched call below
+        // resolves a mix of tiers in one go.
+        _ = await _documentCacheService.GetByKeyAsync(Subpage.Key, false);
+
+        Guid[] requestOrder = [Subpage2.Key, Subpage.Key, Textpage.Key];
+        IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync(requestOrder, false);
+
+        CollectionAssert.AreEqual(requestOrder, result.Select(x => x.Key));
+    }
+
+    [Test]
     public async Task RefreshMemoryCache_Fetches_Draft_And_Published()
     {
         // Arrange
@@ -287,8 +406,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         // Arrange - create a new DocumentCacheService with a controllable HasPublishedAncestorPath mock.
         var ancestorCheckReturnsTrue = false;
 
-        var controllableMock = new Mock<IPublishStatusQueryService>();
-        controllableMock.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
+        var controllableMock = new Mock<IDocumentPublishStatusQueryService>();
+        controllableMock.Setup(x => x.IsPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
         controllableMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>()))
             .Returns(() => ancestorCheckReturnsTrue);
 
@@ -307,12 +426,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
 
-        var controlledCache = new DocumentCache(
-            controlledCacheService,
-            GetRequiredService<IPublishedContentTypeCache>(),
-            GetRequiredService<IDocumentNavigationQueryService>(),
-            GetRequiredService<IDocumentUrlService>(),
-            new Lazy<IPublishedUrlProvider>(GetRequiredService<IPublishedUrlProvider>));
+        var controlledCache = new DocumentCache(controlledCacheService);
 
         // Clear any existing cache entry for this key.
         var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
@@ -330,6 +444,28 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         // hit the database again and return the content.
         Assert.IsNotNull(secondResult, "Second call should return content because null should not have been cached when ancestor check failed");
     }
+
+    private static ContentCacheNode BuildCacheNode(Content content) =>
+        new()
+        {
+            ContentTypeId = content.ContentTypeId,
+            CreatorId = content.CreatorId,
+            CreateDate = content.CreateDate,
+            Id = content.Id,
+            Key = content.Key,
+            SortOrder = content.SortOrder,
+            Data = new ContentData(
+                content.Name,
+                null,
+                1,
+                content.UpdateDate,
+                content.CreatorId,
+                -1,
+                false,
+                new Dictionary<string, PropertyData[]>(),
+                null),
+            IsDraft = false,
+        };
 
     private void AssertTextPage(IPublishedContent textPage)
     {

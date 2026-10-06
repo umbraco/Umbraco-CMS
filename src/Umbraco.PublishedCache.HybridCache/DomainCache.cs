@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -39,20 +37,6 @@ public class DomainCache : IDomainCache
         _defaultCultureAccessor = defaultCultureAccessor;
         _domainCacheService = domainCacheService;
         _runtimeState = runtimeState;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DomainCache" /> class.
-    /// </summary>
-    /// <param name="defaultCultureAccessor">The accessor used to resolve the site's default culture.</param>
-    /// <param name="domainCacheService">The service providing the configured domains.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public DomainCache(IDefaultCultureAccessor defaultCultureAccessor, IDomainCacheService domainCacheService)
-        : this(
-            defaultCultureAccessor,
-            domainCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<IRuntimeState>())
-    {
     }
 
     /// <inheritdoc />

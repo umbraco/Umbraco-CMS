@@ -28,15 +28,6 @@ public class PublishedValueFallback : IPublishedValueFallback
         _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PublishedValueFallback" /> class.
-    /// </summary>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor)
-        : this(serviceContext, variationContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IPropertyRenderingContextAccessor>())
-    {
-    }
-
     /// <inheritdoc />
     public bool TryGetValue(IPublishedProperty property, string? culture, string? segment, Fallback fallback, object? defaultValue, out object? value) =>
         TryGetValue<object>(property, culture, segment, fallback, defaultValue, out value);
@@ -101,7 +92,7 @@ public class PublishedValueFallback : IPublishedValueFallback
             return false;
         }
 
-        _variationContextAccessor.ContextualizeVariation(propertyType.Variations, alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.OwningContentId ?? content.Id, alias, ref culture, ref segment);
 
         if (TryGetValueForDefaultSegment(content, alias, culture, segment, out value))
         {

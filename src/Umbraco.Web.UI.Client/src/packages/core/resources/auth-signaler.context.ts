@@ -3,7 +3,7 @@ import type { UmbApiInterceptorController } from './api-interceptor.controller.j
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
 
 export const UMB_AUTH_SIGNALER_CONTEXT = new UmbContextToken<UmbAuthSignalerContext>('UmbAuthSignalerContext');
@@ -21,6 +21,15 @@ export class UmbAuthSignalerContext extends UmbContextBase {
 	/** Emits when an HTTP interceptor detects a 401 and needs the auth layer to show the login UI. */
 	readonly timeoutRequest = this.#timeoutRequest.asObservable();
 
+	#activityDetectedAt = new UmbNumberState<undefined>(undefined);
+	/**
+	 * The timestamp (ms) of the latest successful response an HTTP interceptor saw, or undefined
+	 * while no request has succeeded yet.
+	 * @remarks A state rather than a subject, so a consumer that attaches after the first successful
+	 * response still learns that activity happened.
+	 */
+	readonly activityDetectedAt = this.#activityDetectedAt.asObservable();
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_AUTH_SIGNALER_CONTEXT);
 	}
@@ -36,5 +45,10 @@ export class UmbAuthSignalerContext extends UmbContextBase {
 	/** Called by HTTP interceptors when a 401 response is received. */
 	requestTimeout() {
 		this.#timeoutRequest.next();
+	}
+
+	/** Called by HTTP interceptors when a request completed successfully. */
+	signalActivity() {
+		this.#activityDetectedAt.setValue(Date.now());
 	}
 }

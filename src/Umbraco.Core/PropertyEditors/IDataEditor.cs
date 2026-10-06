@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -28,7 +28,8 @@ public interface IDataEditor : IDiscoverable
     ///     Gets a value indicating whether the editor is deprecated.
     /// </summary>
     /// <remarks>Deprecated editors are supported but not proposed in the UI.</remarks>
-    bool IsDeprecated { get; }
+    [Obsolete("Nothing reads this value. Declare \"deprecated\" on the property editor UI manifest instead, which is what the backoffice reads. Scheduled for removal in Umbraco 21.")]
+    bool IsDeprecated => false;
 
     /// <summary>
     ///     Gets the configuration for the value editor.
@@ -80,4 +81,21 @@ public interface IDataEditor : IDiscoverable
         object? targetValue,
         bool canUpdateInvariantData,
         HashSet<string> allowedCultures) => sourceValue;
+
+    /// <summary>
+    ///     Determines the specific cultures that contain an actual content change within an otherwise
+    ///     culture-invariant property's value, for editors that support partial per-culture publishing
+    ///     (see <see cref="CanMergePartialPropertyValues"/>).
+    /// </summary>
+    /// <param name="sourceValue">The source (edited) property value.</param>
+    /// <param name="targetValue">The target (published) property value.</param>
+    /// <param name="defaultCulture">
+    ///     The default culture to attribute a change to when it cannot be tied to one specific culture
+    ///     (e.g. a genuinely invariant nested value, or a purely structural change).
+    /// </param>
+    /// <returns>
+    ///     The set of cultures containing an actual edit. Empty if the editor is unable to determine this,
+    ///     in which case the caller should fall back to flagging <paramref name="defaultCulture"/> as edited.
+    /// </returns>
+    IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture) => [];
 }

@@ -504,11 +504,11 @@ export class UiBaseLocators extends BasePage {
       .locator("#caret-button");
 
     // View Options
-    this.gridBtn = page.getByLabel("Grid");
-    this.listBtn = page.getByLabel("List");
-    this.viewBundleBtn = page.locator(
-      "umb-collection-view-bundle uui-button svg",
-    );
+    // The alias suffix (Grid/Table) is stable across entity types, but the entity segment isn't
+    // (e.g. Umb.CollectionView.Document.Grid vs Umb.CollectionView.Media.Grid), so match on suffix only.
+    this.gridBtn = page.locator('[data-mark^="collection:switch-view:"][data-mark$=".Grid"]');
+    this.listBtn = page.locator('[data-mark^="collection:switch-view:"][data-mark$=".Table"]');
+    this.viewBundleBtn = page.locator('[data-mark="collection:switch-view"]');
 
     // Media
     this.mediaCardItems = page.locator("uui-card-media");
@@ -664,9 +664,9 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isActionsMenuForNameVisible(name: string, isVisible = true) {
-    const menuItem = this.getMenuItemByLabel(name);
-    await this.click(menuItem);
-    await this.isVisible(menuItem.locator("#action-modal").first(), isVisible);
+    const menuItems = this.getMenuItemByLabel(name);
+    await this.click(menuItems.first());
+    await this.isAnyVisible(menuItems.locator("#action-modal"), isVisible);
   }
 
   // Caret Button Methods
@@ -688,17 +688,31 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.caretBtn);
   }
 
+  /** @param isInModal - @deprecated use {@link clickModalCaretButtonForName} instead; kept for backwards compatibility. */
   async openCaretButtonForName(name: string, isInModal: boolean = false) {
-    let menuItem: Locator;
     if (isInModal) {
-      menuItem = this.sidebarModal.locator(`uui-menu-item[label="${name}"]`);
-    } else {
-      menuItem = this.getMenuItemByLabel(name);
+      await this.clickModalCaretButtonForName(name);
+      return;
     }
+    const menuItem = this.getMenuItemByLabel(name).first();
     await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
-    const isCaretButtonOpen = await menuItem.getAttribute("show-children");
-    if (isCaretButtonOpen === null) {
-      await this.clickCaretButtonForName(name);
+    // The caret toggles, so acting on a single read can collapse a node that was still expanding.
+    await expect(async () => {
+      await this.clickCaretButtonIfCollapsed(menuItem);
+      expect(await menuItem.getAttribute("show-children")).not.toBeNull();
+    }).toPass({timeout: ConstantHelper.timeout.medium});
+  }
+
+  // A picker browses into the node rather than expanding it in place, so there is no expanded state to assert.
+  async clickModalCaretButtonForName(name: string) {
+    const menuItem = this.sidebarModal.locator(`uui-menu-item[label="${name}"]`).first();
+    await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
+    await this.clickCaretButtonIfCollapsed(menuItem);
+  }
+
+  private async clickCaretButtonIfCollapsed(menuItem: Locator) {
+    if (await menuItem.getAttribute("show-children") === null) {
+      await this.click(menuItem.locator("#caret-button").first());
     }
   }
 
@@ -712,18 +726,21 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isTreeItemVisible(name: string, isVisible = true) {
-    await this.isVisible(
+    await this.isAnyVisible(
       this.treeItem.locator('[label="' + name + '"]'),
       isVisible,
     );
   }
 
   async doesTreeItemHaveTheCorrectIcon(name: string, icon: string) {
+    // Exact-label match, unlike a text-content filter which would also match ancestors.
+    // Scoped to #icon-container so the item's own icon is checked, not one rendered by its children.
     return await this.isVisible(
-      this.treeItem
-        .filter({ hasText: name })
-        .locator("umb-icon")
-        .locator('[name="' + icon + '"]'),
+      this.getMenuItemByLabel(name)
+        .first()
+        .locator("#icon-container umb-icon")
+        .first()
+        .and(this.page.locator(`[name="${icon}"]`)),
     );
   }
 
@@ -1143,7 +1160,7 @@ export class UiBaseLocators extends BasePage {
   // the click keeps working regardless of how the tree item renders its label HTML. Scope defaults to the
   // section sidebar; pass a modal/other root for trees rendered elsewhere (e.g. pickers).
   async clickTreeItemWithName(name: string, scope?: Locator | Page) {
-    await this.click((scope ?? this.sectionSidebar).getByText(name, { exact: true }));
+    await this.click((scope ?? this.sectionSidebar).getByText(name, { exact: true }).first());
   }
 
   async clickButtonWithName(name: string, isExact: boolean = false) {
@@ -1208,7 +1225,9 @@ export class UiBaseLocators extends BasePage {
   async updateIcon(iconName: string) {
     await this.click(this.iconBtn, { force: true });
     await this.searchForTypeToFilterValue(iconName);
-    await this.clickLabelWithName(iconName, true, true);
+    const iconOption = this.page.getByLabel(iconName, {exact: true});
+    await iconOption.scrollIntoViewIfNeeded();
+    await this.click(iconOption, {force: true});
     await this.clickSubmitButton();
   }
 
@@ -1412,6 +1431,10 @@ export class UiBaseLocators extends BasePage {
       this.validationMessage.filter({ hasText: message }),
       isVisible,
     );
+  }
+
+  async doesSelectedValidationOptionHaveValue(value: string) {
+    await this.hasValue(this.validation, value);
   }
 
   // Composition & Structure Methods
@@ -1812,11 +1835,11 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
-  async doesCollectionTreeItemTableRowHaveIcon(name: string, icon: string) {
+  async doesCollectionTreeItemTableRowHaveIcon(name: string, icon: string, exact: boolean = false) {
     await this.waitForVisible(this.collectionTreeItemTableRow.first());
     await this.isVisible(
       this.collectionTreeItemTableRow
-        .filter({ hasText: name })
+        .filter(exact ? { has: this.page.getByText(name, { exact: true }) } : { hasText: name })
         .locator("umb-icon")
         .locator('[name="' + icon + '"]'),
     );
@@ -1970,7 +1993,7 @@ export class UiBaseLocators extends BasePage {
 
   // Loader Methods
   async waitUntilUiLoaderIsNoLongerVisible() {
-    await this.waitForHidden(this.uiLoader, ConstantHelper.timeout.navigation);
+    await this.isAnyVisible(this.uiLoader, false, ConstantHelper.timeout.navigation);
   }
 
   // Dashboard Methods
@@ -2039,16 +2062,15 @@ export class UiBaseLocators extends BasePage {
    */
   async waitForResponseAfterExecutingPromise(
     url: string,
-    promise: Promise<void>,
+    action: Promise<void> | (() => Promise<void>),
     statusCode: number,
     method?: string,
   ) {
-    const [response] = await Promise.all([
-      this.page.waitForResponse(
-        (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
-      ),
-      promise,
-    ]);
+    // Prefer the callback form: an already-started promise can complete before the listener attaches.
+    const responsePromise = this.page.waitForResponse(
+      (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
+    );
+    const [response] = await Promise.all([responsePromise, typeof action === "function" ? action() : action]);
 
     if (statusCode === 201) {
       return response.headers()["location"]?.split("/").pop();

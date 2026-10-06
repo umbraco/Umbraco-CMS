@@ -68,6 +68,30 @@ declare global {
 
 Each sub-feature exports its own `manifests` array from its local `manifests.ts`. These bubble up to `umbraco-package.ts`, which assembles them and registers the bundle — there is no separate root-level `manifests.ts`. See [Manifests & Aliases — Package Bundles](./manifests.md#package-bundles-internal-packages) for the full pattern.
 
+### Coalescing a Package's Lazy Modules
+
+Rollup emits one chunk per dynamic import, which is cheap on a fast connection and expensive on a slow one: entering a feature can cost a dozen small requests. A package can opt into coalescing them into a single chunk by passing `lazyChunk` to `getDefaultConfig` in its `vite.config.ts`.
+
+```ts
+lazyChunk: {
+	eagerModules: ['umbraco-package', 'manifests', 'constants', 'global-context', '.store.'],
+},
+```
+
+`eagerModules` lists the modules that must **not** end up in that chunk: everything the application touches at startup. Get this list wrong and the package gets slower, not faster, in a way nothing reports:
+
+- **Anything a manifest references by value belongs here.** `manualChunks` assigns a module to a chunk regardless of who imports it, so a `globalContext` or `store` registered as `api: TheClass` and left off this list still lands in the lazy chunk — and the eager chunk then reaches it with a static import, pulling the whole chunk in at boot.
+- **Core instantiates `globalContext`, `store` and `itemStore` at startup** (see `core/entry-point.ts`), so those are always eager whichever way they are registered.
+- **Patterns are substring matches against absolute module ids**, so they over-match easily in a large package and drag more into boot than intended.
+
+Verify rather than assume — the build succeeds either way. After building, no chunk loaded at boot may statically import the lazy one:
+
+```bash
+grep -E 'from *"\./lazy-[A-Za-z0-9_-]+\.js"' <dist>/umbraco-package.js <dist>/lazy-eager-*.js
+```
+
+Any hit means the lazy chunk loads at boot. Confirm in the browser too, on a section that does **not** use the package: seeing the entry and the lazy chunk load together on the feature's own page proves nothing.
+
 ---
 
 ## The Package's Public API (index.ts)
@@ -119,6 +143,7 @@ The active language is driven by the shell elements `<umb-app>` and `<umb-auth>`
 - Razor sets `lang` on the shell element from `GlobalSettings.DefaultUILanguage`. The shell reads its own `lang` on connect and calls `umbLocalizationRegistry.loadLanguage(this.lang)`.
 - After login, `current-user.context` calls `loadLanguage(user.languageIsoCode)` and the shell mirrors the new value back onto its own `lang` attribute via `umbLocalizationRegistry.currentLanguage`.
 - `<html lang>` is the static `"en"` for the noscript fallback text. Don't conflate it with the dynamic UI language.
+- Locale-sensitive formatting can use a different locale from the requested one. `Intl` resolves a language-only tag to that language's default region, which is wrong where the dictionary we ship is written for another region — `en` is UK English but resolves to US conventions — so the registry corrects those cases. `umbLocalizationManager.documentLanguage` holds the corrected locale; `this.localize.date()` and `.number()` already use it.
 
 If you're adding a new shell-like element (rare — most code lives inside `<umb-app>`), give it a `lang` attribute and the same subscribe-and-mirror pattern. For everything else, just use `this.localize` and the inherited context resolves the rest.
 

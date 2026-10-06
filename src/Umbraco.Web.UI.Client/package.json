@@ -46,6 +46,7 @@
 		"./document-type": "./dist-cms/packages/documents/document-types/index.js",
 		"./document": "./dist-cms/packages/documents/documents/index.js",
 		"./dropzone": "./dist-cms/packages/media/dropzone/index.js",
+		"./dynamic-root": "./dist-cms/packages/dynamic-root/dynamic-root/index.js",
 		"./entity-action": "./dist-cms/packages/core/entity-action/index.js",
 		"./entity-bulk-action": "./dist-cms/packages/core/entity-bulk-action/index.js",
 		"./entity-create-option-action": "./dist-cms/packages/core/entity-create-option-action/index.js",
@@ -81,6 +82,7 @@
 		"./modal": "./dist-cms/packages/core/modal/index.js",
 		"./models": "./dist-cms/packages/core/models/index.js",
 		"./search": "./dist-cms/packages/core/search/index.js",
+		"./search-management": "./dist-cms/packages/search-management/index.js",
 		"./multi-url-picker": "./dist-cms/packages/multi-url-picker/index.js",
 		"./notification": "./dist-cms/packages/core/notification/index.js",
 		"./object-type": "./dist-cms/packages/core/object-type/index.js",
@@ -228,7 +230,7 @@
 		"wc-analyze": "wca **/*.element.ts --outFile ./custom-elements.json",
 		"generate:tsconfig": "node ./devops/tsconfig/index.js",
 		"generate:manifest": "node ./devops/build/create-umbraco-package.js",
-		"package:validate": "node ./devops/package/validate-exports.js",
+		"package:validate": "node ./devops/package/validate-exports.js && node ./devops/package/validate-hey-api-version.js",
 		"generate:ui-api-docs": "npm run test:prepare && typedoc --options typedoc.config.js"
 	},
 	"engines": {
@@ -236,6 +238,7 @@
 		"npm": ">=11"
 	},
 	"dependencies": {
+		"@hey-api/openapi-ts": "^0.99.0",
 		"element-internals-polyfill": "^3.0.2"
 	},
 	"devDependencies": {

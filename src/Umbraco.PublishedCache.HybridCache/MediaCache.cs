@@ -13,19 +13,13 @@ public sealed class MediaCache : IPublishedMediaCache
     private readonly IMediaCacheService _mediaCacheService;
     private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
 
-    // TODO (V19): Remove the unused parameters from the constructor.
-
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaCache"/> class.
     /// </summary>
     /// <param name="mediaCacheService">The service that retrieves and caches published media nodes.</param>
-    /// <param name="publishedContentTypeCache">The cache of published content types.</param>
     /// <param name="mediaNavigationQueryService">The service used to query the media navigation structure.</param>
     public MediaCache(
         IMediaCacheService mediaCacheService,
-#pragma warning disable IDE0060 // Remove unused parameter
-        IPublishedContentTypeCache publishedContentTypeCache,
-#pragma warning restore IDE0060 // Remove unused parameter
         IMediaNavigationQueryService mediaNavigationQueryService)
     {
         _mediaCacheService = mediaCacheService;
@@ -54,10 +48,9 @@ public sealed class MediaCache : IPublishedMediaCache
     /// <inheritdoc/>
     public IPublishedContent? GetById(Guid contentId)
     {
-        // Sync fast path: when the converted-content L0 cache already holds the item we can
-        // return it without spinning up an async state machine. This is the dominant case on
-        // a warm site and is hit per-key by the FilterAvailable lazy chain. On a miss we fall
-        // through to the async path which handles HybridCache (L1/L2) and database lookups.
+        // Sync fast path: when the converted-content L0 cache already holds the item we can return it
+        // without spinning up an async state machine — the dominant case on a warm site. On a miss we
+        // fall through to the async path which handles HybridCache (L1/L2) and database lookups.
         if (_mediaCacheService.TryGetCached(contentId, out IPublishedContent? cached))
         {
             return cached;

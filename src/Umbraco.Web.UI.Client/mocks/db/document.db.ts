@@ -27,19 +27,13 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	tree = new UmbMockEntityTreeManager<UmbMockDocumentModel>(this, treeItemMapper);
 	item = new UmbMockEntityVariantItemManager<UmbMockDocumentModel>(this, itemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockDocumentModel>(this, createMockDocumentMapper, detailResponseMapper);
-	recycleBin = new UmbEntityRecycleBin<UmbMockDocumentModel>(this.data, treeItemMapper);
+	recycleBin = new UmbEntityRecycleBin<UmbMockDocumentModel>(this, treeItemMapper);
 	publishing = new UmbMockDocumentPublishingManager(this);
 	collection = new UmbMockDocumentCollectionManager(this, collectionMapper);
 	url = new UmbMockEntityVariantUrlManager<UmbMockDocumentModel>(this);
 
 	constructor(data: Array<UmbMockDocumentModel>) {
 		super('document', data);
-	}
-
-	override setData(data: Array<UmbMockDocumentModel>) {
-		super.setData(data);
-		// Update recycleBin's data to match - it has its own data array
-		this.recycleBin.setData(data);
 	}
 
 	// permissions
@@ -54,7 +48,6 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	getConfiguration(): DocumentConfigurationResponseModel {
 		return {
 			allowEditInvariantFromNonDefault: true,
-			allowNonExistingSegmentsCreation: true,
 			disableDeleteWhenReferenced: true,
 			disableUnpublishWhenReferenced: true,
 		};
@@ -123,7 +116,6 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 		variants: request.variants.map((variantRequest) => {
 			return {
 				culture: variantRequest.culture,
-				segment: variantRequest.segment,
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
@@ -183,6 +175,7 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 		values: model.values,
 		variants: model.variants,
 		flags: model.flags,
+		hasChildren: model.hasChildren,
 	};
 };
 

@@ -34,27 +34,11 @@ public interface IDocumentPresentationFactory
     Task<DocumentResponseModel> CreateResponseModelAsync(IContent content, ContentScheduleCollection schedule);
 
     /// <summary>
-    /// Creates a response model for a document item based on the provided entity.
-    /// </summary>
-    /// <param name="entity">The document entity to create the response model from.</param>
-    /// <returns>A <see cref="DocumentItemResponseModel"/> representing the document item.</returns>
-    [Obsolete("Use CreateItemResponseModelAsync instead. Scheduled for removal in Umbraco 19.")]
-    DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity);
-
-    /// <summary>
     /// Creates a <see cref="DocumentBlueprintItemResponseModel"/> from the specified document entity.
     /// </summary>
     /// <param name="entity">The slim document entity to convert.</param>
     /// <returns>A blueprint item response model representing the document.</returns>
     DocumentBlueprintItemResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity);
-
-    /// <summary>
-    /// Creates a collection of <see cref="DocumentVariantItemResponseModel"/> instances representing the variants of the specified document entity.
-    /// </summary>
-    /// <param name="entity">The document entity to create variant response models for.</param>
-    /// <returns>An enumerable of <see cref="DocumentVariantItemResponseModel"/> representing the document variants.</returns>
-    [Obsolete("Use CreateVariantsItemResponseModelsAsync instead. Scheduled for removal in Umbraco 19.")]
-    IEnumerable<DocumentVariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity);
 
     /// <summary>
     /// Creates a <see cref="DocumentTypeReferenceResponseModel"/> from the given <see cref="IDocumentEntitySlim"/> entity.
@@ -124,20 +108,12 @@ public interface IDocumentPresentationFactory
     /// </summary>
     /// <param name="entity">The document entity to create the response model from.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="DocumentItemResponseModel"/> representing the document item.</returns>
-    // TODO (V19): Remove the default implementation when CreateItemResponseModel is removed.
-    Task<DocumentItemResponseModel> CreateItemResponseModelAsync(IDocumentEntitySlim entity)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => Task.FromResult(CreateItemResponseModel(entity));
-#pragma warning restore CS0618 // Type or member is obsolete
+    Task<DocumentItemResponseModel> CreateItemResponseModelAsync(IDocumentEntitySlim entity);
 
     /// <summary>
     /// Asynchronously creates a collection of <see cref="DocumentVariantItemResponseModel"/> instances representing the variants of the specified document entity.
     /// </summary>
     /// <param name="entity">The document entity to create variant response models for.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable of <see cref="DocumentVariantItemResponseModel"/> representing the document variants.</returns>
-    // TODO (V19): Remove the default implementation when CreateVariantsItemResponseModels is removed.
-    Task<IEnumerable<DocumentVariantItemResponseModel>> CreateVariantsItemResponseModelsAsync(IDocumentEntitySlim entity)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => Task.FromResult(CreateVariantsItemResponseModels(entity));
-#pragma warning restore CS0618 // Type or member is obsolete
+    Task<IEnumerable<DocumentVariantItemResponseModel>> CreateVariantsItemResponseModelsAsync(IDocumentEntitySlim entity);
 }

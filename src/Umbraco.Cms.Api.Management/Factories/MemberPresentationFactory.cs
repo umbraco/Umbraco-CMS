@@ -99,11 +99,6 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         => CreateItemResponseModel<IMember>(entity);
 
     /// <inheritdoc/>
-    [Obsolete("Please use the overload taking the current user. Scheduled for removal in Umbraco 19.")]
-    public Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member)
-        => BuildExternalMemberResponseModelAsync(member);
-
-    /// <inheritdoc/>
     public async Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member, IUser currentUser)
     {
         MemberResponseModel responseModel = await BuildExternalMemberResponseModelAsync(member);
@@ -161,11 +156,6 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         };
 
     /// <inheritdoc/>
-    [Obsolete("Please use the overload taking the current user. Scheduled for removal in Umbraco 19.")]
-    public MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item)
-        => BuildFilterItemResponseModel(item);
-
-    /// <inheritdoc/>
     public MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item, IUser currentUser)
     {
         MemberResponseModel responseModel = BuildFilterItemResponseModel(item);
@@ -194,6 +184,7 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
                 Id = item.MemberTypeKey ?? Guid.Empty,
                 Icon = item.MemberTypeIcon ?? string.Empty,
             },
+            Groups = item.Groups,
         };
 
     private MemberItemResponseModel CreateItemResponseModel<T>(T entity)

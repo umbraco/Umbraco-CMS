@@ -2,8 +2,8 @@ using System.Collections.Concurrent;
 using Examine;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Search.Core.Models.Configuration;
-using IndexOptions = Umbraco.Cms.Search.Core.Configuration.IndexOptions;
+using Umbraco.Cms.Core.Search.Configuration;
+using IndexOptions = Umbraco.Cms.Core.Search.Configuration.IndexOptions;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 

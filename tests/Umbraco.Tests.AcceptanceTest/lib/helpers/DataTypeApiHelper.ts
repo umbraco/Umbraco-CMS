@@ -5,6 +5,12 @@ import {
   DatePickerDataTypeBuilder,
   BlockListDataTypeBuilder,
   DropdownDataTypeBuilder,
+  SingleDropdownDataTypeBuilder,
+  SingleMediaPickerDataTypeBuilder,
+  SingleUrlPickerDataTypeBuilder,
+  RangeSliderDataTypeBuilder,
+  MultipleDocumentPickerDataTypeBuilder,
+  MultipleMemberPickerDataTypeBuilder,
   ContentPickerDataTypeBuilder,
   BlockGridDataTypeBuilder,
   ImageCropperDataTypeBuilder,
@@ -157,6 +163,10 @@ export class DataTypeApiHelper {
   // FOLDER
   async getFolder(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/data-type/folder/' + id);
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 
@@ -305,9 +315,9 @@ export class DataTypeApiHelper {
   async createDropdownDataType(name: string, isMultiple: boolean, options: string[]) {
     await this.ensureNameNotExists(name);
 
-    const dataType = new DropdownDataTypeBuilder()
+    const builder = isMultiple ? new DropdownDataTypeBuilder() : new SingleDropdownDataTypeBuilder();
+    const dataType = builder
       .withName(name)
-      .withMultiple(isMultiple)
       .withItems(options)
       .build();
     return await this.save(dataType);
@@ -1155,7 +1165,6 @@ export class DataTypeApiHelper {
     const dataType = new MediaPickerDataTypeBuilder()
       .withName(name)
       .withFilter(mediaType.id)
-      .withMultiple(false)
       .withMinValue(minValue)
       .withMaxValue(maxValue)
       .withEnableLocalFocalPoint(enableLocalFocalPoint)
@@ -1483,6 +1492,17 @@ export class DataTypeApiHelper {
       .build();
 
     return await this.save(dataType);
+  }
+
+  async updateApprovedColorItemLabel(dataTypeName: string, color: string, label: string) {
+    const dataTypeData = await this.getByName(dataTypeName);
+    const itemsValue = dataTypeData.values.find(item => item.alias === 'items');
+    const colorItem = itemsValue?.value?.find(item => item.value === color);
+    if (!colorItem) {
+      throw new Error(`No item with color '${color}' found on data type '${dataTypeName}'.`);
+    }
+    colorItem.label = label;
+    return await this.update(dataTypeData.id, dataTypeData);
   }
 
   async getTiptapExtensionsCount(tipTapName: string) {
@@ -1860,11 +1880,78 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async createSingleMediaPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new SingleMediaPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createSingleUrlPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new SingleUrlPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createSingleDropdownDataType(name: string, options: string[] = []) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new SingleDropdownDataTypeBuilder()
+      .withName(name)
+      .withItems(options)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createRangeSliderDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new RangeSliderDataTypeBuilder()
+      .withName(name)
+      .withMaxValue(100)
+      .withStep(1)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createMultipleDocumentPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultipleDocumentPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createMultipleMemberPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultipleMemberPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
   async createDefaultDropdownDataType(name: string) {
     await this.ensureNameNotExists(name);
 
     const dataType = new DropdownDataTypeBuilder()
       .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createTypedLabelDataType(name: string, editorAlias: string, editorUiAlias: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new LabelDataTypeBuilder()
+      .withName(name)
+      .withEditor(editorAlias, editorUiAlias)
       .build();
     return await this.save(dataType);
   }
@@ -2102,6 +2189,17 @@ export class DataTypeApiHelper {
       .addStartNode()
         .withType(startNodeType)
         .done()
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createMultiNodeTreePickerDataTypeWithMinNumberOfItems(name: string, minNumber: number) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
+      .withName(name)
+      .withMinNumber(minNumber)
       .build();
 
     return await this.save(dataType);
