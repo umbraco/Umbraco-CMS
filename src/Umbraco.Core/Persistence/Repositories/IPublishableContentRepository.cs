@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
@@ -10,6 +12,35 @@ public interface IPublishableContentRepository<TContent> : IContentRepository<in
     IReadRepository<Guid, TContent>
     where TContent : IPublishableContentBase
 {
+    /// <summary>
+    ///     Gets paged content items, loading only the requested properties and, optionally, templates.
+    /// </summary>
+    /// <param name="query">The base query for content items.</param>
+    /// <param name="pageIndex">The page index (zero-based).</param>
+    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="totalRecords">Output parameter with total record count.</param>
+    /// <param name="propertyAliases">
+    ///     Optional array of property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded (only system properties).
+    /// </param>
+    /// <param name="filter">Optional filter query.</param>
+    /// <param name="ordering">The ordering specification.</param>
+    /// <param name="loadTemplates">
+    ///     Whether to load templates. Set to false for performance optimization when templates are not needed
+    ///     (e.g., collection views). Ignored for content that has no templates.
+    /// </param>
+    /// <returns>A collection of content items for the specified page.</returns>
+    /// <remarks>Here, <paramref name="filter" /> can be null but <paramref name="ordering" /> cannot.</remarks>
+    IEnumerable<TContent> GetPage(
+        IQuery<TContent>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string[]? propertyAliases,
+        IQuery<TContent>? filter,
+        Ordering? ordering,
+        bool loadTemplates);
+
     /// <summary>
     ///     Gets publish/unpublish schedule for a content node.
     /// </summary>

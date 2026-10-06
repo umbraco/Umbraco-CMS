@@ -1,0 +1,10 @@
+﻿namespace Umbraco.Cms.Core.Search.Querying.Faceting;
+
+/// <summary>
+/// An exact-value facet on a decimal field.
+/// </summary>
+/// <param name="FieldName">The name of the index field to facet on.</param>
+public record DecimalExactFacet(string FieldName)
+    : ExactFacet(FieldName)
+{
+}

@@ -545,7 +545,6 @@ public class JsonBlockValueConverterTests
         Assert.AreEqual(1, deserialized.Expose.Count);
         Assert.AreEqual(Guid.Parse("6ad18441631140d48515ea0fc5b00425"), deserialized.Expose[0].ContentKey);
         Assert.IsNull(deserialized.Expose[0].Culture);
-        Assert.IsNull(deserialized.Expose[0].Segment);
     }
 
     [Test]

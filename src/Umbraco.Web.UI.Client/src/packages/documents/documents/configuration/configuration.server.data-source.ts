@@ -18,8 +18,6 @@ export class UmbDocumentConfigurationServerDataSource extends UmbControllerBase 
 				disableDeleteWhenReferenced: data.disableDeleteWhenReferenced,
 				disableUnpublishWhenReferenced: data.disableUnpublishWhenReferenced,
 				allowEditInvariantFromNonDefault: data.allowEditInvariantFromNonDefault,
-
-				allowNonExistingSegmentsCreation: data.allowNonExistingSegmentsCreation,
 			};
 
 			return { data: mappedData };

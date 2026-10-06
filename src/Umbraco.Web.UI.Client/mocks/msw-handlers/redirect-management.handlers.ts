@@ -55,15 +55,6 @@ export const handlers = [
 		return HttpResponse.json<any>(PagedRedirectUrlObject);
 	}),
 
-	/*http.get(umbracoPath('/redirect-management/status'), () => {
-		return HttpResponse.json<RedirectUrlStatus>(UrlTracker);
-	}),*/
-
-	http.post(umbracoPath('/redirect-management/status'), async () => {
-		UrlTracker.status =
-			UrlTracker.status === RedirectStatusModel.ENABLED ? RedirectStatusModel.DISABLED : RedirectStatusModel.ENABLED;
-		return HttpResponse.json<any>(UrlTracker.status);
-	}),
 ];
 
 // Mock Data

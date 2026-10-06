@@ -729,7 +729,6 @@ using (var outer = ScopeProvider.CreateCoreScope())
    - SA1134: own line attributes
    - CA2017: match parameters number
    - CS0108: hidden inherited member
-   - SYSLIB0051: formatter-based serialization
    - SA1649: filename match type name
    - CS1998: remove async or make method synchronous
    - CS0169: unused field

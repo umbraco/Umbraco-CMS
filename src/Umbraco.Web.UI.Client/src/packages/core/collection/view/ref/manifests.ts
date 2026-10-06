@@ -13,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			element: UmbRefCollectionViewElement,
 			weight: 800,
 			meta: {
-				label: 'List',
+				label: '#collection_listViewLabel',
 				icon: 'icon-list',
 				pathName: 'refs',
 			},

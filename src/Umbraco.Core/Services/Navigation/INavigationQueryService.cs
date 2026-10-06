@@ -71,18 +71,7 @@ public interface INavigationQueryService
     ///     Prefer this over <see cref="TryGetChildrenKeys" /> when only the existence of children is
     ///     needed, as it avoids building and caching the ordered set of child keys.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    bool TryGetHasChildren(Guid parentKey, out bool hasChildren)
-    {
-        if (TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys))
-        {
-            hasChildren = childrenKeys.Any();
-            return true;
-        }
-
-        hasChildren = false;
-        return false;
-    }
+    bool TryGetHasChildren(Guid parentKey, out bool hasChildren);
 
     /// <summary>
     ///     Attempts to get all child node keys of a specific content type under a parent node.

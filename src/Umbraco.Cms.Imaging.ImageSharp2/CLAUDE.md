@@ -22,20 +22,24 @@ Image processing library using **ImageSharp 2.x** for backwards compatibility wi
 
 Version constraint `[2.1.13, 3)` means: minimum 2.1.13, below 3.0.
 
-### Project Structure (7 source files)
+### Project Structure (7 source files, plus 5 linked from the 3.x package)
 
 ```
 Umbraco.Cms.Imaging.ImageSharp2/
 ├── ImageSharpComposer.cs                    # Auto-registration via IComposer
-├── UmbracoBuilderExtensions.cs              # DI setup and middleware configuration
-├── ConfigureImageSharpMiddlewareOptions.cs  # Middleware options (caching, size limits)
-├── ConfigurePhysicalFileSystemCacheOptions.cs # File cache location
+├── UmbracoBuilderExtensions.cs              # DI setup, memory bounds and middleware configuration
+├── ConfigureImageSharpMiddlewareOptions.cs  # Middleware options (caching, size limits, decode slot release)
+├── ImageProcessingThrottleMiddleware.cs     # Bounds concurrent processing (2.x variant: waits before the pipeline)
 ├── ImageProcessors/
 │   └── CropWebProcessor.cs                  # Custom crop processor with EXIF awareness
 └── Media/
     ├── ImageSharpDimensionExtractor.cs      # Extract image dimensions (EXIF-aware)
     └── ImageSharpImageUrlGenerator.cs       # Generate query string URLs
 ```
+
+Five more files are compiled in from the 3.x package as linked sources rather than copied, because
+nothing in them touches an API that differs between the two majors. The linked-source group in the
+csproj is the list. Edit them in the 3.x project; both packages pick up the change.
 
 ---
 
@@ -49,6 +53,7 @@ Umbraco.Cms.Imaging.ImageSharp2/
 | **Cache buster param** | `rnd` only | `rnd` or `v` |
 | **API differences** | `Image.Identify(config, stream)` | `Image.Identify(options, stream)` |
 | **Size property** | `image.Image.Size()` method | `image.Image.Size` property |
+| **Decode throttle** | Waits before the pipeline, cache hits included | Waits in `OnBeforeLoadAsync`, cache misses only |
 
 ### API Differences in Code
 
@@ -75,6 +80,25 @@ Size size = image.Image.Size;
 1. **No HMAC request authorization** - `HMACSecretKey` setting is ignored
 2. **No `v` cache buster** - Only `rnd` parameter triggers immutable headers
 3. **No WebP encoder override** - Uses default Lossy encoding (no configuration needed)
+4. **No `OnBeforeLoadAsync` hook** - The decode throttle waits before the pipeline instead (see below)
+
+### Image Processing Memory
+
+Both packages bound image processing memory the same way, from the linked `ImageProcessingMemory`:
+a pool cap, a single-image ceiling and a concurrency limit, all off by default until v19 and all
+governed by `Umbraco:CMS:Imaging:Memory`. The derivation, the engagement tests and the startup
+logging are documented once, in the 3.x package's CLAUDE.md under "Memory Settings".
+
+The one difference is where a gated request **waits**. ImageSharp.Web 2.0.2 has no
+`OnBeforeLoadAsync`, so this package's `ImageProcessingThrottleMiddleware` takes its place before
+the downstream pipeline runs - a cache hit, or a missing source falling through to a 404, waits as
+much as a decode does. The **release** is shared: `OnProcessedAsync` exists in 2.x, so
+`ConfigureImageSharpMiddlewareOptions` gives the place back as soon as the decoded image is
+disposed, with the end of the request as the backstop.
+
+One consequence of having no decode hook: if ImageSharp.Web retries a request because a freshly
+cached result could not be read back, the second decode runs after the place has been released and
+nothing takes it again. The 3.x package re-enters its decode hook on a retry and re-acquires.
 
 ---
 
@@ -118,7 +142,8 @@ dotnet test tests/Umbraco.Tests.UnitTests/ --filter "FullyQualifiedName~ImageSha
 | File | Purpose |
 |------|---------|
 | `Umbraco.Cms.Imaging.ImageSharp2.csproj` | Version constraints (lines 7-8) |
-| `ConfigureImageSharpMiddlewareOptions.cs` | Size limit enforcement |
+| `ConfigureImageSharpMiddlewareOptions.cs` | Size limit enforcement; releases the decode slot |
+| `ImageProcessingThrottleMiddleware.cs` | Concurrency gate (waits before the pipeline) |
 | `Media/ImageSharpImageUrlGenerator.cs` | URL generation (no HMAC) |
 
 ### Switching Between Packages

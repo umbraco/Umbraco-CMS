@@ -28,17 +28,6 @@ public class ObjectExtensionsTests
     private CultureInfo _savedCulture;
 
     [Test]
-    public void Can_Create_Enumerable_Of_One()
-    {
-        var input = "hello";
-#pragma warning disable CS0618 // Type or member is obsolete
-        var result = input.AsEnumerableOfOne<string>();
-#pragma warning restore CS0618 // Type or member is obsolete
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("hello", result.First());
-    }
-
-    [Test]
     public void Can_Convert_List_To_Enumerable()
     {
         var list = new List<string> { "hello", "world", "awesome" };

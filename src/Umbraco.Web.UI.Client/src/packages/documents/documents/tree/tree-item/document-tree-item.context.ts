@@ -39,7 +39,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	// A collection is only browsed via its Collection view when the user can actually access it.
 	// When the node is a "no access" ancestor of the user's start node, it must remain expandable
 	// in the tree so the user can browse down to their start node.
-	readonly #collapsibleCollection = mergeObservables(
+	public readonly collapsibleCollection = mergeObservables(
 		[this.hasCollection, this.noAccess],
 		([hasCollection, noAccess]) => hasCollection && !noAccess,
 	);
@@ -52,7 +52,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	 * expand caret and its children — the subtree would otherwise be unreachable.
 	 */
 	public readonly drillableCollection = mergeObservables(
-		[this.#collapsibleCollection, this.isMenu, this.drillable],
+		[this.collapsibleCollection, this.isMenu, this.drillable],
 		([collapsibleCollection, isMenu, drillable]) => collapsibleCollection && (isMenu || drillable),
 	);
 
@@ -60,10 +60,10 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		super.setIsMenu(isMenu);
 		if (isMenu) {
 			this.observe(
-				this.#collapsibleCollection,
+				this.collapsibleCollection,
 				(collapsibleCollection) => {
 					if (collapsibleCollection) {
-						this._treeItemChildrenManager.setTargetTakeSize(1, 1);
+						this._treeItemChildrenManager.setTargetTakeSize(0, 0);
 
 						this.observe(
 							this.hasActiveDescendant,
@@ -107,7 +107,9 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		super.setTreeItem(treeItem);
 		this.#item.setData(treeItem);
 
-		const documentTypeUnique = treeItem?.documentType.unique;
+		// TODO (V20): drop the `documentType` fallback when the deprecated field is removed.
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		const documentTypeUnique = (treeItem?.contentType ?? treeItem?.documentType)?.unique;
 
 		this.#entityContentTypeContext.setEntityType(documentTypeUnique ? UMB_DOCUMENT_TYPE_ENTITY_TYPE : undefined);
 		this.#entityContentTypeContext.setUnique(documentTypeUnique);

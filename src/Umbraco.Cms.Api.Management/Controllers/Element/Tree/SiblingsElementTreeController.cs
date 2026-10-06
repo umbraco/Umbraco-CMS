@@ -21,10 +21,12 @@ public class SiblingsElementTreeController : ElementTreeControllerBase
     public SiblingsElementTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
         IElementStartNodeTreeFilterService treeFilterService,
         IElementPresentationFactory elementPresentationFactory,
         IElementPermissionFilterService elementPermissionFilterService)
-        : base(entityService, flagProviders, treeFilterService, elementPresentationFactory, elementPermissionFilterService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, treeFilterService, elementPresentationFactory, elementPermissionFilterService)
     {
     }
 

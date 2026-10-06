@@ -24,9 +24,7 @@ public interface IUserConnectionManager
     /// an implementation must also override <see cref="GetConnectionsAuthorizedFor"/> for entity-scoped
     /// events to be delivered.
     /// </remarks>
-    // TODO (V19): Remove this default implementation.
-    void SetAuthorizedEventSources(Guid userKey, IEnumerable<string> eventSources)
-        => throw new NotImplementedException($"Implementations of {nameof(IUserConnectionManager)} must override {nameof(SetAuthorizedEventSources)}.");
+    void SetAuthorizedEventSources(Guid userKey, IEnumerable<string> eventSources);
 
     /// <summary>
     /// Gets the connections whose user is authorized for the given event source, keyed by user.
@@ -38,9 +36,7 @@ public interface IUserConnectionManager
     /// entity-scoped server events, so this default throws instead — implementations of
     /// <see cref="IUserConnectionManager"/> must override it.
     /// </remarks>
-    // TODO (V19): Remove this default implementation.
-    IReadOnlyDictionary<Guid, IReadOnlyCollection<string>> GetConnectionsAuthorizedFor(string eventSource)
-        => throw new NotImplementedException($"Implementations of {nameof(IUserConnectionManager)} must override {nameof(GetConnectionsAuthorizedFor)}.");
+    IReadOnlyDictionary<Guid, IReadOnlyCollection<string>> GetConnectionsAuthorizedFor(string eventSource);
 
     /// <summary>
     /// Add a connection to a user.
