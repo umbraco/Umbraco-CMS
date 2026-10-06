@@ -536,7 +536,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				return await this.#documentWorkspaceContext!.loadWithoutPersist();
 			} catch {
 				reloadAfterPublishFailed = true;
-				return saveData;
+				return { ...saveData, unique: this.#documentWorkspaceContext!.getUnique() ?? saveData.unique };
 			}
 		};
 
@@ -556,11 +556,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					this.#documentWorkspaceContext!.setUnique(createdUnique);
 				}
 
-				const result = await loadAfterPublish();
-
-				// If the reload above failed, loadAfterPublish falls back to the pre-save `saveData`, which
-				// still carries the pre-save unique. That must not clobber the server-assigned unique set above.
-				return createdUnique ? { ...result, unique: createdUnique } : result;
+				return loadAfterPublish();
 			},
 			update: async (data, ids) => {
 				const { error } = await this.#publishingRepository.updateAndPublish(data, ids);

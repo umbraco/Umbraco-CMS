@@ -7,12 +7,17 @@ import { UmbDocumentWorkspaceContext } from '../../workspace/context/document-wo
 import {
 	TEST_MANIFESTS,
 	UmbTestDocumentWorkspaceHostElement,
+	useServerAssignedDocumentKey,
 } from '../../workspace/context/document-workspace-context.test-utils.js';
+import { resetMockHandlers } from '../../../../../../mocks/index.js';
 import { UMB_DISCARD_CHANGES_MODAL, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbDocumentPublishingServerDataSource } from '../repository/document-publishing.server.data-source.js';
 import { UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 
+const SERVER_ASSIGNED_KEY = 'a0000000-0000-4000-8000-000000000001';
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
+const INVARIANT_DOCUMENT_TYPE_ID = 'variant-documents-invariant-document-type-id';
+const PARENT_ENTITY = { entityType: 'document', unique: null } as const;
 const EN_US = UmbVariantId.Create({ culture: 'en-US', segment: null });
 const DA = UmbVariantId.Create({ culture: 'da', segment: null });
 
@@ -107,6 +112,7 @@ describe('UmbDocumentPublishingWorkspaceContext', function () {
 
 	afterEach(() => {
 		document.body.innerHTML = '';
+		resetMockHandlers();
 	});
 
 	describe('publish with descendants', () => {
@@ -186,6 +192,40 @@ describe('UmbDocumentPublishingWorkspaceContext', function () {
 			);
 
 			expect(publishCalls, 'descendants were not published').to.equal(0);
+		});
+	});
+
+	describe('save and publish a new document', () => {
+		let createContext: UmbDocumentWorkspaceContext;
+		let createPublishingContext: UmbDocumentPublishingWorkspaceContext;
+
+		beforeEach(async () => {
+			createContext = new UmbDocumentWorkspaceContext(hostElement);
+			createPublishingContext = new UmbDocumentPublishingWorkspaceContext(createContext);
+			await createContext.create(PARENT_ENTITY, INVARIANT_DOCUMENT_TYPE_ID);
+			createContext.setName('New Test Document');
+			await aTimeout(0);
+			useServerAssignedDocumentKey(SERVER_ASSIGNED_KEY);
+		});
+
+		it('adopts the unique the server assigned', async () => {
+			await createPublishingContext.saveAndPublish();
+
+			expect(createContext.getIsNew(), 'workspace is no longer new').to.be.false;
+			expect(createContext.getUnique()).to.equal(SERVER_ASSIGNED_KEY);
+			expect(createContext.getName(), 'the document was read back by the assigned unique').to.equal(
+				'New Test Document',
+			);
+		});
+
+		it('keeps the unique the server assigned when the read-back fails', async () => {
+			createContext.loadWithoutPersist = async () => {
+				throw new Error('Simulated read-back failure');
+			};
+
+			await createPublishingContext.saveAndPublish();
+
+			expect(createContext.getUnique()).to.equal(SERVER_ASSIGNED_KEY);
 		});
 	});
 

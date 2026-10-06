@@ -6,7 +6,10 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbDocumentServerDataSource } from '../../repository/detail/document-detail.server.data-source.js';
 import { UmbDocumentPublishingServerDataSource } from './document-publishing.server.data-source.js';
+import { useServerAssignedDocumentKey } from '../../workspace/context/document-workspace-context.test-utils.js';
+import { resetMockHandlers } from '../../../../../../mocks/index.js';
 
+const SERVER_ASSIGNED_KEY = 'a0000000-0000-4000-8000-000000000001';
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
 const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 
@@ -30,6 +33,7 @@ describe('UmbDocumentPublishingServerDataSource (create/update-and-publish)', ()
 
 	afterEach(() => {
 		document.body.innerHTML = '';
+		resetMockHandlers();
 	});
 
 	describe('createAndPublish', () => {
@@ -47,6 +51,26 @@ describe('UmbDocumentPublishingServerDataSource (create/update-and-publish)', ()
 			const { data: created } = await detailDataSource.read(newId);
 			const daVariant = created!.variants.find((v) => v.culture === 'da');
 			expect(daVariant?.state, 'the requested culture (da) is Published').to.equal('Published');
+		});
+
+		it('returns the key of the created document', async () => {
+			const { data: template } = await detailDataSource.read(VARIANT_DOCUMENT_ID);
+			const newId = UmbId.new();
+			const da = UmbVariantId.Create({ culture: 'da', segment: null });
+
+			const { data } = await publishingDataSource.createAndPublish({ ...template!, unique: newId }, [da], null);
+
+			expect(data).to.equal(newId);
+		});
+
+		it('returns the key the server assigned when it differs from the requested one', async () => {
+			useServerAssignedDocumentKey(SERVER_ASSIGNED_KEY);
+			const { data: template } = await detailDataSource.read(VARIANT_DOCUMENT_ID);
+			const da = UmbVariantId.Create({ culture: 'da', segment: null });
+
+			const { data } = await publishingDataSource.createAndPublish({ ...template!, unique: UmbId.new() }, [da], null);
+
+			expect(data).to.equal(SERVER_ASSIGNED_KEY);
 		});
 	});
 

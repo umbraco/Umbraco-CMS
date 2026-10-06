@@ -3,9 +3,15 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
-import { TEST_MANIFESTS, UmbTestDocumentWorkspaceHostElement } from './document-workspace-context.test-utils.js';
+import {
+	TEST_MANIFESTS,
+	UmbTestDocumentWorkspaceHostElement,
+	useServerAssignedDocumentKey,
+} from './document-workspace-context.test-utils.js';
+import { resetMockHandlers } from '../../../../../../mocks/index.js';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
+const SERVER_ASSIGNED_KEY = 'a0000000-0000-4000-8000-000000000001';
 const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 const INVARIANT_DOCUMENT_TYPE_ID = 'variant-documents-invariant-document-type-id';
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
@@ -34,6 +40,7 @@ describe('UmbDocumentWorkspaceContext (CRUD)', () => {
 
 	afterEach(() => {
 		document.body.innerHTML = '';
+		resetMockHandlers();
 	});
 
 	describe('before any load or create', () => {
@@ -100,6 +107,21 @@ describe('UmbDocumentWorkspaceContext (CRUD)', () => {
 			const newContext = new UmbDocumentWorkspaceContext(hostElement);
 			await newContext.load(unique);
 			expect(newContext.getData()?.documentType.unique).to.equal(INVARIANT_DOCUMENT_TYPE_ID);
+		});
+	});
+
+	describe('create (server assigns a different key)', () => {
+		it('adopts the unique the server assigned', async () => {
+			useServerAssignedDocumentKey(SERVER_ASSIGNED_KEY);
+			await context.create(PARENT_ENTITY, INVARIANT_DOCUMENT_TYPE_ID);
+			context.setName('New Test Document');
+			const uniqueBeforeSave = context.getUnique();
+
+			await context.requestSave();
+
+			expect(uniqueBeforeSave, 'precondition: scaffolded with a different unique').to.not.equal(SERVER_ASSIGNED_KEY);
+			expect(context.getUnique()).to.equal(SERVER_ASSIGNED_KEY);
+			expect(context.getIsNew()).to.be.false;
 		});
 	});
 
