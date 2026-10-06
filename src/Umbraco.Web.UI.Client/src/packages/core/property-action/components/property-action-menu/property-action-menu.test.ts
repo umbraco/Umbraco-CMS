@@ -1,7 +1,7 @@
 import { UmbPropertyActionMenuElement } from './property-action-menu.element.js';
 import type { ManifestPropertyAction } from '../../property-action.extension.js';
 import { UmbPropertyActionBase } from '../../property-action-base.js';
-import { expect, fixture, html } from '@open-wc/testing';
+import { expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
@@ -14,10 +14,6 @@ class UmbTestPropertyActionApi extends UmbPropertyActionBase {
 }
 
 const PROPERTY_EDITOR_UI_ALIAS = 'Umb.Test.PropertyActionMenu';
-
-function sleep(timeMs: number) {
-	return new Promise((resolve) => setTimeout(resolve, timeMs));
-}
 
 describe('UmbPropertyActionMenuElement', () => {
 	let aliases: Array<string> = [];
@@ -42,15 +38,16 @@ describe('UmbPropertyActionMenuElement', () => {
 		const element = await fixture<UmbPropertyActionMenuElement>(
 			html`<umb-property-action-menu .propertyEditorUiAlias=${PROPERTY_EDITOR_UI_ALIAS}></umb-property-action-menu>`,
 		);
-		await sleep(100);
-		const layout = element.shadowRoot!.querySelector('umb-popover-layout')!;
-		return Array.from(layout.children).map((child) =>
-			child.getAttribute('role') === 'separator'
-				? '|'
-				: child instanceof UmbTestPropertyActionElement
-					? (child as any).manifest.alias
-					: child.tagName,
-		);
+		const read = () =>
+			Array.from(element.shadowRoot?.querySelector('umb-popover-layout')?.children ?? []).map((child) =>
+				child.getAttribute('role') === 'separator'
+					? '|'
+					: child instanceof UmbTestPropertyActionElement
+						? (child as any).manifest.alias
+						: child.tagName,
+			);
+		await waitUntil(() => read().filter((entry) => entry !== '|').length === actions.length);
+		return read();
 	}
 
 	afterEach(() => {

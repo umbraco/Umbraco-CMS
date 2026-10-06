@@ -1,7 +1,7 @@
 import { UmbEntityActionListElement } from './entity-action-list.element.js';
 import type { ManifestEntityAction } from './entity-action.extension.js';
 import { UmbEntityActionBase } from './entity-action-base.js';
-import { expect, fixture, html } from '@open-wc/testing';
+import { expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { customElement, html as litHtml } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -33,10 +33,6 @@ class UmbTestEntityActionListHostElement extends UmbLitElement {
 
 type TestAction = { alias: string; weight: number; separatorBefore?: boolean };
 
-function sleep(timeMs: number) {
-	return new Promise((resolve) => setTimeout(resolve, timeMs));
-}
-
 function registerActions(actions: Array<TestAction>) {
 	umbExtensionsRegistry.registerMany(
 		actions.map(
@@ -61,14 +57,24 @@ function registerActions(actions: Array<TestAction>) {
  * @returns {Array<string>} The sequence.
  */
 function readSequence(element: UmbEntityActionListElement): Array<string> {
-	const slot = element.shadowRoot!.querySelector('umb-extension-with-api-slot')!;
-	return Array.from(slot.shadowRoot!.children).map((child) =>
+	const slot = element.shadowRoot?.querySelector('umb-extension-with-api-slot');
+	return Array.from(slot?.shadowRoot?.children ?? []).map((child) =>
 		child.getAttribute('role') === 'separator'
 			? '|'
 			: child instanceof UmbTestEntityActionElement
 				? (child as any).manifest.alias
 				: child.tagName,
 	);
+}
+
+/**
+ * Waits for the list to render the expected sequence, then asserts it so a mismatch shows a diff.
+ * @param {UmbEntityActionListElement} element - The rendered entity action list.
+ * @param {Array<string>} expected - The expected sequence, with '|' marking a separator.
+ */
+async function expectSequence(element: UmbEntityActionListElement, expected: Array<string>) {
+	await waitUntil(() => readSequence(element).join() === expected.join()).catch(() => {});
+	expect(readSequence(element)).to.deep.equal(expected);
 }
 
 describe('UmbEntityActionListElement', () => {
@@ -80,7 +86,7 @@ describe('UmbEntityActionListElement', () => {
 		const host = await fixture<UmbTestEntityActionListHostElement>(
 			html`<umb-test-entity-action-list-host></umb-test-entity-action-list-host>`,
 		);
-		await sleep(100);
+		await waitUntil(() => host.shadowRoot?.querySelector('umb-entity-action-list'));
 		return host.shadowRoot!.querySelector('umb-entity-action-list') as UmbEntityActionListElement;
 	}
 
@@ -95,6 +101,7 @@ describe('UmbEntityActionListElement', () => {
 
 	it('renders the test action element', async () => {
 		const element = await renderList([{ alias: 'a', weight: 1 }]);
+		await expectSequence(element, ['a']);
 		const slot = element.shadowRoot!.querySelector('umb-extension-with-api-slot')!;
 		expect(slot.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestEntityActionElement);
 	});
@@ -105,7 +112,7 @@ describe('UmbEntityActionListElement', () => {
 			{ alias: 'b', weight: 2 },
 			{ alias: 'c', weight: 1 },
 		]);
-		expect(readSequence(element)).to.deep.equal(['a', 'b', 'c']);
+		await expectSequence(element, ['a', 'b', 'c']);
 	});
 
 	it('renders a separator above each action that sets separatorBefore', async () => {
@@ -115,7 +122,7 @@ describe('UmbEntityActionListElement', () => {
 			{ alias: 'c', weight: 2 },
 			{ alias: 'd', weight: 1, separatorBefore: true },
 		]);
-		expect(readSequence(element)).to.deep.equal(['a', '|', 'b', 'c', '|', 'd']);
+		await expectSequence(element, ['a', '|', 'b', 'c', '|', 'd']);
 	});
 
 	it('never renders a separator above the first action', async () => {
@@ -123,7 +130,7 @@ describe('UmbEntityActionListElement', () => {
 			{ alias: 'a', weight: 2, separatorBefore: true },
 			{ alias: 'b', weight: 1 },
 		]);
-		expect(readSequence(element)).to.deep.equal(['a', 'b']);
+		await expectSequence(element, ['a', 'b']);
 	});
 
 	it('renders a separator only while its action is rendered', async () => {
@@ -131,15 +138,13 @@ describe('UmbEntityActionListElement', () => {
 			{ alias: 'a', weight: 3 },
 			{ alias: 'c', weight: 1 },
 		]);
-		expect(readSequence(element)).to.deep.equal(['a', 'c']);
+		await expectSequence(element, ['a', 'c']);
 
 		aliases.push('b');
 		registerActions([{ alias: 'b', weight: 2, separatorBefore: true }]);
-		await sleep(100);
-		expect(readSequence(element)).to.deep.equal(['a', '|', 'b', 'c']);
+		await expectSequence(element, ['a', '|', 'b', 'c']);
 
 		umbExtensionsRegistry.unregister('b');
-		await sleep(100);
-		expect(readSequence(element)).to.deep.equal(['a', 'c']);
+		await expectSequence(element, ['a', 'c']);
 	});
 });
