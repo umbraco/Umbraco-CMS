@@ -39,7 +39,7 @@ internal sealed class RepositoryCacheVersionRequestEndTests : UmbracoIntegration
     private ICacheInstructionService CacheInstructionService => GetRequiredService<ICacheInstructionService>();
 
     // Real caches with a request cache that is always available: the whole test is one request, which ends when the
-    // test calls EndRequest().
+    // test calls EndRequestAsync().
     protected override void ConfigureTestServices(IServiceCollection services)
         => services.AddSingleton(AppCaches.Create(new DictionaryAppCache()));
 
@@ -57,11 +57,11 @@ internal sealed class RepositoryCacheVersionRequestEndTests : UmbracoIntegration
         base.CreateTestData();
 
         // The fixture's own saves batched instructions and deferred versions; start each test from a quiet request.
-        EndRequest();
+        EndRequestAsync().GetAwaiter().GetResult();
     }
 
     [Test]
-    public void Save_PublishesTheCacheVersion_OnlyAfterTheCacheInstruction()
+    public async Task Save_PublishesTheCacheVersion_OnlyAfterTheCacheInstruction()
     {
         var versionBefore = VersionInDatabase(_contentCacheKey);
         var maxInstructionIdBefore = CacheInstructionService.GetMaxInstructionId();
@@ -75,7 +75,7 @@ internal sealed class RepositoryCacheVersionRequestEndTests : UmbracoIntegration
             Assert.That(CacheInstructionService.GetMaxInstructionId(), Is.EqualTo(maxInstructionIdBefore), "The cache instruction was written before the request ended.");
         });
 
-        EndRequest();
+        await EndRequestAsync();
 
         Assert.Multiple(() =>
         {
@@ -86,7 +86,7 @@ internal sealed class RepositoryCacheVersionRequestEndTests : UmbracoIntegration
     }
 
     [Test]
-    public void RequestEnd_PublishesTheCacheVersion_WhenNoInstructionWasBatched()
+    public async Task RequestEnd_PublishesTheCacheVersion_WhenNoInstructionWasBatched()
     {
         var versionBefore = VersionInDatabase(_mediaCacheKey);
 
@@ -98,13 +98,13 @@ internal sealed class RepositoryCacheVersionRequestEndTests : UmbracoIntegration
 
         Assume.That(VersionInDatabase(_mediaCacheKey), Is.EqualTo(versionBefore), "The cache version was published before the request ended, so this test proves nothing.");
 
-        EndRequest();
+        await EndRequestAsync();
 
         Assert.That(VersionInDatabase(_mediaCacheKey), Is.Not.EqualTo(versionBefore).And.Not.Null, "A deferred cache version without a cache instruction was not published.");
     }
 
     [Test]
-    public void RolledBackSave_DoesNotPublishACacheVersion()
+    public async Task RolledBackSave_DoesNotPublishACacheVersion()
     {
         var versionBefore = VersionInDatabase(_contentCacheKey);
 
@@ -114,15 +114,15 @@ internal sealed class RepositoryCacheVersionRequestEndTests : UmbracoIntegration
             ContentService.Save(Textpage);
         }
 
-        EndRequest();
+        await EndRequestAsync();
 
         Assert.That(VersionInDatabase(_contentCacheKey), Is.EqualTo(versionBefore), "A rolled-back change published a cache version.");
     }
 
     /// <summary>Runs the request-end handler directly, so no other request-end handler runs.</summary>
-    private void EndRequest()
+    private Task EndRequestAsync()
         => ActivatorUtilities.CreateInstance<DatabaseServerMessengerNotificationHandler>(Services)
-            .Handle(new UmbracoRequestEndNotification(Mock.Of<IUmbracoContext>()));
+            .HandleAsync(new UmbracoRequestEndNotification(Mock.Of<IUmbracoContext>()), CancellationToken.None);
 
     // Read from the database rather than through the accessor, whose request cache would hide the change.
     private string? VersionInDatabase(string cacheKey)
