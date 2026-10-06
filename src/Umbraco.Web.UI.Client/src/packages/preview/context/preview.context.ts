@@ -5,6 +5,7 @@ import { HubConnectionBuilder, HttpTransportType } from '@umbraco-cms/backoffice
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { HubConnection, IHttpConnectionOptions } from '@umbraco-cms/backoffice/external/signalr';
@@ -27,10 +28,12 @@ interface UmbPreviewUrlArgs {
 }
 
 export class UmbPreviewContext extends UmbContextBase {
+	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#connection?: HubConnection;
 	#currentArgs: UmbPreviewIframeArgs = {};
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#resizeController?: AbortController;
+	#serverContext?: typeof UMB_SERVER_CONTEXT.TYPE;
 	#serverUrl: string = '';
 
 	#previewRepository = new UmbPreviewRepository(this);
@@ -78,10 +81,16 @@ export class UmbPreviewContext extends UmbContextBase {
 			}
 
 			this.#serverUrl = serverUrl;
+			this.#serverContext = serverContext;
 
 			this.#setPreviewUrl({ serverUrl });
 
-			this.#initHubConnection(serverUrl, serverContext);
+			this.#initHubConnection();
+		});
+
+		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+			this.#authContext = authContext;
+			this.#initHubConnection();
 		});
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
@@ -102,8 +111,11 @@ export class UmbPreviewContext extends UmbContextBase {
 		}
 	}
 
-	async #initHubConnection(serverUrl: string, serverContext?: typeof UMB_SERVER_CONTEXT.TYPE) {
-		const previewHubUrl = `${serverUrl}/umbraco/PreviewHub`;
+	async #initHubConnection() {
+		const authContext = this.#authContext;
+		if (!authContext || !this.#serverUrl) return;
+
+		const previewHubUrl = `${this.#serverUrl}/umbraco/PreviewHub`;
 
 		// Make sure that no previous connection exists.
 		if (this.#connection) {
@@ -111,9 +123,11 @@ export class UmbPreviewContext extends UmbContextBase {
 			this.#connection = undefined;
 		}
 
-		const skipNegotiation = serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
+		const skipNegotiation = this.#serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
 
-		const hubOptions: IHttpConnectionOptions = {};
+		const hubOptions: IHttpConnectionOptions = {
+			accessTokenFactory: () => authContext.getLatestToken(),
+		};
 
 		if (skipNegotiation) {
 			hubOptions.skipNegotiation = true;
