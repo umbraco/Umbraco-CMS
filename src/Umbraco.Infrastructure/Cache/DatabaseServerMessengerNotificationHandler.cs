@@ -16,7 +16,9 @@ namespace Umbraco.Cms.Core.Cache;
 ///     Ensures that distributed cache events are setup and the <see cref="IServerMessenger" /> is initialized
 /// </summary>
 public sealed class DatabaseServerMessengerNotificationHandler :
-    INotificationHandler<UmbracoApplicationStartingNotification>, INotificationHandler<UmbracoRequestEndNotification>
+    INotificationHandler<UmbracoApplicationStartingNotification>,
+    INotificationHandler<UmbracoRequestEndNotification>,
+    INotificationAsyncHandler<UmbracoRequestEndNotification>
 {
     private readonly IUmbracoDatabaseFactory _databaseFactory;
     private readonly ILogger<DatabaseServerMessengerNotificationHandler> _logger;
@@ -78,18 +80,25 @@ public sealed class DatabaseServerMessengerNotificationHandler :
         _messenger?.Sync();
     }
 
+    /// <inheritdoc />
+    [Obsolete("Please use HandleAsync. Scheduled for removal in Umbraco 19.")]
+    public void Handle(UmbracoRequestEndNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+
     /// <summary>
     /// Handles the end of an Umbraco request: writes the batched distributed cache instructions, then publishes the
     /// repository cache versions deferred during the request.
     /// </summary>
     /// <param name="notification">The notification instance signaling the end of an Umbraco request.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     /// <remarks>
     /// The order matters. A server that sees a new cache version before the matching instruction syncs, finds
     /// nothing to refresh and keeps its stale entries until the next periodic sync.
     /// </remarks>
-    public void Handle(UmbracoRequestEndNotification notification)
+    public async Task HandleAsync(UmbracoRequestEndNotification notification, CancellationToken cancellationToken)
     {
         _messenger?.SendMessages();
-        _repositoryCacheVersionService.FlushCacheUpdatesAsync().GetAwaiter().GetResult();
+        await _repositoryCacheVersionService.FlushCacheUpdatesAsync();
     }
 }

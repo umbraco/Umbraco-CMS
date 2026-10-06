@@ -42,9 +42,9 @@ public class DatabaseServerMessengerNotificationHandlerTests
     }
 
     [Test]
-    public void Handle_RequestEnd_WritesInstructionsBeforePublishingCacheVersions()
+    public async Task HandleAsync_RequestEnd_WritesInstructionsBeforePublishingCacheVersions()
     {
-        _sut.Handle(new UmbracoRequestEndNotification(Mock.Of<IUmbracoContext>()));
+        await _sut.HandleAsync(new UmbracoRequestEndNotification(Mock.Of<IUmbracoContext>()), CancellationToken.None);
 
         Assert.That(
             _calls,
@@ -52,11 +52,11 @@ public class DatabaseServerMessengerNotificationHandlerTests
     }
 
     [Test]
-    public void Handle_RequestEnd_PublishesCacheVersions_WhenNoInstructionsWereBatched()
+    public async Task HandleAsync_RequestEnd_PublishesCacheVersions_WhenNoInstructionsWereBatched()
     {
         _messenger.Setup(x => x.SendMessages());
 
-        _sut.Handle(new UmbracoRequestEndNotification(Mock.Of<IUmbracoContext>()));
+        await _sut.HandleAsync(new UmbracoRequestEndNotification(Mock.Of<IUmbracoContext>()), CancellationToken.None);
 
         _cacheVersionService.Verify(x => x.FlushCacheUpdatesAsync(), Times.Once);
     }
