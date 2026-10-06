@@ -32,7 +32,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.template.ensureNameNotExists(gridTemplateName);
 });
 
-test('renders the referenced Library element content on the published page', async ({umbracoApi, umbracoUi}) => {
+test('can render the referenced Library element content on the published page', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryText = 'Reusable content rendered on the front-end';
   const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, libraryText, propertyInBlock);
@@ -55,7 +55,7 @@ test('renders the referenced Library element content on the published page', asy
   await umbracoUi.contentRender.doesContentRenderValueContainText(libraryText);
 });
 
-test('renders the referenced Library element content on the published page for a Block Grid', async ({umbracoApi, umbracoUi}) => {
+test('can render the referenced Library element content on the published page for a Block Grid', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryText = 'Reusable grid content rendered on the front-end';
   const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, libraryText, propertyInBlock);

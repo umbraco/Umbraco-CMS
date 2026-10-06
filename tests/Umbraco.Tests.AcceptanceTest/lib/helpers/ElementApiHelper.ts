@@ -301,11 +301,17 @@ export class ElementApiHelper {
     await expect.poll(() => this.getFirstPropertyValue(id), {timeout: ConstantHelper.timeout.veryLong}).toBe(expectedValue);
   }
 
+  async deleteAndVerifyElementIsDeleted(id: string) {
+    expect(await this.delete(id)).toBe(ConstantHelper.statusCodes.ok);
+    expect(await this.doesExist(id)).toBeFalsy();
+  }
+
   async updateFirstPropertyValueAndPublish(id: string, value: string) {
     const element = await this.get(id);
     element.values[0].value = value;
-    await this.update(id, element);
-    await this.publish(id);
+    const updateResponse = await this.update(id, element);
+    expect(updateResponse?.status()).toBe(ConstantHelper.statusCodes.ok);
+    expect(await this.publish(id)).toBe(ConstantHelper.statusCodes.ok);
   }
 
   async isElementPublished(id: string) {

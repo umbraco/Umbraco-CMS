@@ -1195,8 +1195,8 @@ export class DocumentApiHelper {
     return await this.createDefaultDocument(documentName, documentTypeId);
   }
 
-  async createDefaultDocumentWithAnEmptyRichTextEditor(documentName: string, elementTypeId: string, documentTypeName: string, richTextDataTypeName: string) {
-    const richTextDataTypeId = await this.api.dataType.createRichTextEditorWithABlock(richTextDataTypeName, elementTypeId);
+  async createDefaultDocumentWithAnEmptyRichTextEditor(documentName: string, elementTypeIds: string[], documentTypeName: string, richTextDataTypeName: string) {
+    const richTextDataTypeId = await this.api.dataType.createRichTextEditorWithBlocks(richTextDataTypeName, elementTypeIds);
     const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, richTextDataTypeName, richTextDataTypeId);
     return await this.createDefaultDocument(documentName, documentTypeId);
   }
@@ -1228,7 +1228,35 @@ export class DocumentApiHelper {
   }
 
   getBlockContentPropertyValue(blockValue: any, contentKey: string) {
-    return blockValue?.contentData.find(contentData => contentData.key === contentKey)?.values[0]?.value;
+    return blockValue?.contentData?.find(contentData => contentData.key === contentKey)?.values[0]?.value;
+  }
+
+  getBlockSettingsPropertyValue(blockValue: any, settingsKey: string) {
+    return blockValue?.settingsData?.find(settingsData => settingsData.key === settingsKey)?.values[0]?.value;
+  }
+
+  async createDefaultDocumentWithAnEmptyBlockListEditorWithSettings(documentName: string, elementTypeId: string, settingsElementTypeId: string, documentTypeName: string, blockListDataTypeName: string) {
+    const blockListDataTypeId = await this.api.dataType.createBlockListDataTypeWithContentAndSettingsElementType(blockListDataTypeName, elementTypeId, settingsElementTypeId);
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListDataTypeName, blockListDataTypeId);
+    return await this.createDefaultDocument(documentName, documentTypeId);
+  }
+
+  async createDefaultDocumentWithAnEmptyBlockGridEditorWithSettings(documentName: string, elementTypeId: string, settingsElementTypeId: string, documentTypeName: string, blockGridDataTypeName: string) {
+    const blockGridDataTypeId = await this.api.dataType.createBlockGridWithContentAndSettingsElementType(blockGridDataTypeName, elementTypeId, settingsElementTypeId);
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+    return await this.createDefaultDocument(documentName, documentTypeId);
+  }
+
+  async createDefaultDocumentWithAnEmptySingleBlockEditorWithSettings(documentName: string, elementTypeId: string, settingsElementTypeId: string, documentTypeName: string, singleBlockDataTypeName: string) {
+    const singleBlockDataTypeId = await this.api.dataType.createSingleBlockDataTypeWithContentAndSettingsElementType(singleBlockDataTypeName, elementTypeId, settingsElementTypeId);
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, singleBlockDataTypeName, singleBlockDataTypeId);
+    return await this.createDefaultDocument(documentName, documentTypeId);
+  }
+
+  async createDefaultDocumentWithAnEmptyRichTextEditorWithSettings(documentName: string, elementTypeIds: string[], settingsElementTypeId: string, documentTypeName: string, richTextDataTypeName: string) {
+    const richTextDataTypeId = await this.api.dataType.createRichTextEditorWithBlocks(richTextDataTypeName, elementTypeIds, settingsElementTypeId);
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, richTextDataTypeName, richTextDataTypeId);
+    return await this.createDefaultDocument(documentName, documentTypeId);
   }
 
   async createDefaultDocumentWithABlockListEditorAndBlockWithValueAndTwoGroups(documentName: string, documentTypeName: string, blockListDataTypeName: string, elementTypeId: string, elementTypePropertyAlias: string, elementTypePropertyValue: string, elementTypePropertyEditorAlias: string, groupName: string = 'TestGroup', secondPropertyName: string, secondGroupName: string = 'GroupTwoName') {

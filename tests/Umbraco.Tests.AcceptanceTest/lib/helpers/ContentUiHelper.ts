@@ -226,6 +226,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly transferToLibraryModal: Locator;
   private readonly transferToLibraryBlockActionBtn: Locator;
   private readonly disconnectFromLibraryBlockActionBtn: Locator;
+  private readonly editSettingsBlockActionBtn: Locator;
   private readonly blockCatalogueLibraryTab: Locator;
   private readonly blockCatalogueSubmitBtn: Locator;
   private readonly elementWorkspaceSaveBtn: Locator;
@@ -450,6 +451,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.transferToLibraryModal = page.locator('umb-block-transfer-to-element-library-modal');
     this.transferToLibraryBlockActionBtn = page.getByTestId('block-action:Umb.BlockAction.TransferToElementLibrary');
     this.disconnectFromLibraryBlockActionBtn = page.getByTestId('block-action:Umb.BlockAction.DisconnectFromElementLibrary');
+    this.editSettingsBlockActionBtn = page.getByTestId('block-action:Umb.BlockAction.EditSettings');
     this.blockCatalogueLibraryTab = this.blockCatalogueModal
       .locator('uui-tab')
       .filter({has: page.locator('umb-localize[key="blockEditor_tabLibrary"]')});
@@ -1693,11 +1695,14 @@ export class ContentUiHelper extends UiBaseLocators {
     } else {
       await this.clickAddBlockElementButton();
     }
+    // Count after the editor's own insert button was clicked, so blocks already in it have rendered.
+    const referencedEntries = this.blockEntryForFamily(family).and(this.page.locator('[is-reference]'));
+    const referencedCountBefore = await referencedEntries.count();
     await this.clickLibraryTabInBlockCatalogue();
     await this.selectElementInLibraryTab(elementName);
     await this.clickSubmitInBlockCatalogue();
     // The reference marker reflects the layout entry, not the element fetch, so this confirms the insert only.
-    await this.isBlockMarkedAsReference(true, family);
+    await expect(referencedEntries).toHaveCount(referencedCountBefore + 1);
   }
 
   private blockEntryForFamily(family: BlockFamily) {
@@ -1721,6 +1726,11 @@ export class ContentUiHelper extends UiBaseLocators {
   async clickTransferToLibraryBlockButton(family: BlockFamily = 'list') {
     const entry = this.blockEntryForFamily(family).first();
     await this.hoverAndClick(entry, entry.locator(this.transferToLibraryBlockActionBtn));
+  }
+
+  async clickEditSettingsBlockButton(family: BlockFamily = 'list') {
+    const entry = this.blockEntryForFamily(family).first();
+    await this.hoverAndClick(entry, entry.locator(this.editSettingsBlockActionBtn));
   }
 
   async clickDisconnectFromLibraryBlockButton(family: BlockFamily = 'list') {
@@ -1751,6 +1761,13 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.enterNameInTransferToLibraryModal(name);
     await this.selectFolderInTransferToLibraryModal(folderName);
     await this.clickConfirmTransferToLibraryButton();
+  }
+
+  async enterTextstringInReferencedElementWorkspace(text: string) {
+    // The workspace focuses its name input shortly after opening; wait for that so it cannot take the typed text.
+    const nameInput = this.page.locator('umb-workspace-modal').last().getByTestId('input:entity-name').locator('input');
+    await expect(nameInput).toBeFocused();
+    await this.enterTextstring(text);
   }
 
   async clickSaveInReferencedElementWorkspace() {
@@ -1792,6 +1809,15 @@ export class ContentUiHelper extends UiBaseLocators {
     } else {
       await expect(entry).not.toHaveAttribute('is-reference');
     }
+  }
+
+  async goToContentWithNameAndWaitForReferencedElementResponse(contentName: string, elementId: string, statusCode: number) {
+    await this.waitForResponseAfterExecutingPromise(
+      `${ConstantHelper.apiEndpoints.element}/${elementId}`,
+      () => this.goToContentWithName(contentName),
+      statusCode,
+      ConstantHelper.httpMethods.get,
+    );
   }
 
   async isBlockEntryVisible(isVisible: boolean = true, family: BlockFamily = 'list') {

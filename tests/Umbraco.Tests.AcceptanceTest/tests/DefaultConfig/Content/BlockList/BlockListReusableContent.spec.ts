@@ -6,21 +6,22 @@ const secondContentName = 'TestContentReusableSecond';
 const documentTypeName = 'TestDocumentTypeForReusableContent';
 const customDataTypeName = 'Custom Block List Reusable';
 const elementTypeName = 'BlockListReusableElement';
+const settingsElementTypeName = 'BlockListReusableSettings';
 const libraryElementName = 'MyLibraryElement';
 const transferElementName = 'TransferredLibraryElement';
 const libraryFolderName = 'TestReusableFolder';
 const propertyInBlock = 'Textstring';
+const settingsPropertyName = 'Textarea';
 const groupName = 'testGroup';
 const blockListEditorAlias = 'Umbraco.BlockList';
-const elementPickerDataTypeName = 'Element Picker For Reusable Usage';
-const pickerContentName = 'PickerReferencingContent';
-const pickerDocumentTypeName = 'PickerReferencingDocumentType';
 const templateName = 'ReusableBlockCrossDocTemplate';
 let elementTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
   const textStringData = await umbracoApi.dataType.getByName(propertyInBlock);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, propertyInBlock, textStringData.id);
+  await umbracoApi.element.ensureNameNotExists(transferElementName);
+  await umbracoApi.document.ensureNameNotExists(contentName + ' (1)');
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -30,12 +31,10 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.element.ensureNameNotExists(libraryElementName);
   await umbracoApi.element.ensureNameNotExists(transferElementName);
   await umbracoApi.element.ensureNameNotExists(libraryFolderName);
-  await umbracoApi.document.ensureNameNotExists(pickerContentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(pickerDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(settingsElementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
-  await umbracoApi.dataType.ensureNameNotExists(elementPickerDataTypeName);
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
 
@@ -51,7 +50,6 @@ test('can insert a block from the Library', {tag: '@smoke'}, async ({umbracoApi,
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
   await umbracoUi.content.isBlockLinkIconVisible(true);
-  await umbracoUi.content.isBlockMarkedAsReference(true);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
@@ -63,7 +61,8 @@ test('can insert a block from the Library', {tag: '@smoke'}, async ({umbracoApi,
 
 test('can disconnect a block from the Library', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, 'Shared library text', propertyInBlock);
+  const sharedText = 'Shared library text';
+  const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, sharedText, propertyInBlock);
   await umbracoApi.element.publish(libraryElementId);
   await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockListEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
   await umbracoUi.goToBackOffice();
@@ -82,11 +81,12 @@ test('can disconnect a block from the Library', async ({umbracoApi, umbracoUi}) 
   const layoutItem = blockListValue.layout[blockListEditorAlias][0];
   expect(layoutItem.isExternalContent).not.toBe(true);
   expect(layoutItem.contentKey).not.toBe(libraryElementId);
+  expect(umbracoApi.document.getBlockContentPropertyValue(blockListValue, layoutItem.contentKey)).toBe(sharedText);
   // The Library element still exists
   expect(await umbracoApi.element.doesNameExist(libraryElementName)).toBeTruthy();
 });
 
-test('can edit the shared Library elements content from a referenced block', async ({umbracoApi, umbracoUi}) => {
+test('can edit the shared Library element content from a referenced block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const editedText = 'Edited in place';
   const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, 'Initial library text', propertyInBlock);
@@ -99,15 +99,107 @@ test('can edit the shared Library elements content from a referenced block', asy
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
-  await umbracoUi.content.clickEditBlockListBlockButton();
-  await umbracoUi.content.enterTextstring(editedText);
+  await umbracoUi.content.clickEditBlockButton();
+  await umbracoUi.content.enterTextstringInReferencedElementWorkspace(editedText);
   await umbracoUi.content.clickSaveInReferencedElementWorkspace();
 
   // Assert
   await umbracoApi.element.waitUntilFirstPropertyValueEquals(libraryElementId, editedText);
 });
 
-test('shows a draft indicator on a block referencing an unpublished Library element', async ({umbracoApi, umbracoUi}) => {
+test('can edit the settings of a referenced block without changing the Library element', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const sharedText = 'Shared library text';
+  const settingsText = 'Local settings value';
+  const textAreaData = await umbracoApi.dataType.getByName(settingsPropertyName);
+  const settingsElementTypeId = await umbracoApi.documentType.createDefaultElementType(settingsElementTypeName, groupName, settingsPropertyName, textAreaData.id);
+  const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, sharedText, propertyInBlock);
+  await umbracoApi.element.publish(libraryElementId);
+  await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockListEditorWithSettings(contentName, elementTypeId, settingsElementTypeId, documentTypeName, customDataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
+  await umbracoUi.content.clickEditSettingsBlockButton();
+  await umbracoUi.content.enterTextArea(settingsText);
+  await umbracoUi.content.clickUpdateBlockModalButtonAndWaitForModalToClose();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const blockListValue = await umbracoApi.document.getBlockListValue(contentName);
+  const layoutItem = blockListValue.layout[blockListEditorAlias][0];
+  expect(layoutItem.isExternalContent).toBe(true);
+  expect(layoutItem.contentKey).toBe(libraryElementId);
+  expect(umbracoApi.document.getBlockSettingsPropertyValue(blockListValue, layoutItem.settingsKey)).toBe(settingsText);
+  expect(await umbracoApi.element.getFirstPropertyValue(libraryElementId)).toBe(sharedText);
+});
+
+test('can disconnect a block from the Library and keep its local settings', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const settingsText = 'Local settings value';
+  const textAreaData = await umbracoApi.dataType.getByName(settingsPropertyName);
+  const settingsElementTypeId = await umbracoApi.documentType.createDefaultElementType(settingsElementTypeName, groupName, settingsPropertyName, textAreaData.id);
+  const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
+  await umbracoApi.element.publish(libraryElementId);
+  await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockListEditorWithSettings(contentName, elementTypeId, settingsElementTypeId, documentTypeName, customDataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
+  await umbracoUi.content.clickEditSettingsBlockButton();
+  await umbracoUi.content.enterTextArea(settingsText);
+  await umbracoUi.content.clickUpdateBlockModalButtonAndWaitForModalToClose();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Act
+  await umbracoUi.content.clickDisconnectFromLibraryBlockButton();
+  await umbracoUi.content.clickConfirmDisconnectFromLibraryButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const blockListValue = await umbracoApi.document.getBlockListValue(contentName);
+  const layoutItem = blockListValue.layout[blockListEditorAlias][0];
+  expect(layoutItem.isExternalContent).not.toBe(true);
+  expect(umbracoApi.document.getBlockSettingsPropertyValue(blockListValue, layoutItem.settingsKey)).toBe(settingsText);
+});
+
+test('can duplicate content and keep the local settings of a referenced block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const settingsText = 'Local settings value';
+  const duplicatedContentName = contentName + ' (1)';
+  const textAreaData = await umbracoApi.dataType.getByName(settingsPropertyName);
+  const settingsElementTypeId = await umbracoApi.documentType.createDefaultElementType(settingsElementTypeName, groupName, settingsPropertyName, textAreaData.id);
+  const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
+  await umbracoApi.element.publish(libraryElementId);
+  await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockListEditorWithSettings(contentName, elementTypeId, settingsElementTypeId, documentTypeName, customDataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
+  await umbracoUi.content.clickEditSettingsBlockButton();
+  await umbracoUi.content.enterTextArea(settingsText);
+  await umbracoUi.content.clickUpdateBlockModalButtonAndWaitForModalToClose();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickDuplicateToActionMenuOption();
+  await umbracoUi.content.clickLabelWithName('Content');
+  await umbracoUi.content.clickCopyModalButton();
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
+
+  // Assert
+  const blockListValue = await umbracoApi.document.getBlockListValue(duplicatedContentName);
+  const layoutItem = blockListValue.layout[blockListEditorAlias][0];
+  expect(layoutItem.isExternalContent).toBe(true);
+  expect(layoutItem.contentKey).toBe(libraryElementId);
+  expect(umbracoApi.document.getBlockSettingsPropertyValue(blockListValue, layoutItem.settingsKey)).toBe(settingsText);
+});
+
+test('can see a draft indicator on a block referencing an unpublished Library element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
   await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockListEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
@@ -123,7 +215,7 @@ test('shows a draft indicator on a block referencing an unpublished Library elem
   await umbracoUi.content.doesBlockHaveDraftTag(true);
 });
 
-test('references the same Library element in multiple blocks with a shared content key', async ({umbracoApi, umbracoUi}) => {
+test('can reference the same Library element in multiple blocks with a shared content key', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
   await umbracoApi.element.publish(libraryElementId);
@@ -148,31 +240,7 @@ test('references the same Library element in multiple blocks with a shared conte
   expect(layout[0].key).not.toBe(layout[1].key);
 });
 
-test('preserves the block content values when disconnecting from the Library', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const sharedText = 'Shared library text';
-  const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, sharedText, propertyInBlock);
-  await umbracoApi.element.publish(libraryElementId);
-  await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockListEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-
-  // Act
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
-  await umbracoUi.content.clickDisconnectFromLibraryBlockButton();
-  await umbracoUi.content.clickConfirmDisconnectFromLibraryButton();
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
-
-  // Assert
-  const blockListValue = await umbracoApi.document.getBlockListValue(contentName);
-  const layoutItem = blockListValue.layout[blockListEditorAlias][0];
-  expect(layoutItem.isExternalContent).not.toBe(true);
-  expect(umbracoApi.document.getBlockContentPropertyValue(blockListValue, layoutItem.contentKey)).toBe(sharedText);
-});
-
-test('updates the draft indicator when the referenced Library element is published', async ({umbracoApi, umbracoUi}) => {
+test('can see the draft indicator disappear when the referenced Library element is published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
   await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockListEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
@@ -246,7 +314,7 @@ test('can transfer a local block to the Library', {tag: '@smoke'}, async ({umbra
   expect(layoutItem.contentKey).toBe(transferredElement.id);
 });
 
-test('removes the block from the editor when the referenced Library element is deleted', async ({umbracoApi, umbracoUi}) => {
+test('cannot see a block whose referenced Library element was deleted', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
   await umbracoApi.element.publish(libraryElementId);
@@ -259,16 +327,16 @@ test('removes the block from the editor when the referenced Library element is d
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Act
-  await umbracoApi.element.delete(libraryElementId);
+  await umbracoApi.element.deleteAndVerifyElementIsDeleted(libraryElementId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.goToContentWithNameAndWaitForReferencedElementResponse(contentName, libraryElementId, ConstantHelper.statusCodes.notFound);
 
   // Assert
   await umbracoUi.content.isAddBlockElementButtonVisible();
   await umbracoUi.content.isBlockEntryVisible(false);
 });
 
-test('keeps the Library reference when the content is duplicated', async ({umbracoApi, umbracoUi}) => {
+test('can duplicate content and keep the Library reference', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedContentName = contentName + ' (1)';
   const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
@@ -296,25 +364,7 @@ test('keeps the Library reference when the content is duplicated', async ({umbra
   expect(layoutItem.contentKey).toBe(libraryElementId);
 });
 
-test('shows the referencing content in the Element info tab when referenced via an Element Picker', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
-  await umbracoApi.element.publish(libraryElementId);
-  const pickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerDataType(elementPickerDataTypeName);
-  const pickerDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(pickerDocumentTypeName, elementPickerDataTypeName, pickerDataTypeId);
-  await umbracoApi.document.createDocumentWithElementPickers(pickerContentName, pickerDocumentTypeId, elementPickerDataTypeName, [libraryElementId]);
-  await umbracoUi.goToBackOffice();
-
-  // Act
-  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
-  await umbracoUi.library.goToElementWithName(libraryElementName);
-  await umbracoUi.library.clickInfoTab();
-
-  // Assert
-  await umbracoUi.library.doesReferencesItemsInInfoTabHaveCount(1);
-});
-
-test('shows the referencing content in the Element info tab when referenced via a block', async ({umbracoApi, umbracoUi}) => {
+test('can see the referencing content in the Element info tab when referenced via a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
   await umbracoApi.element.publish(libraryElementId);
@@ -332,6 +382,7 @@ test('shows the referencing content in the Element info tab when referenced via 
 
   // Assert
   await umbracoUi.library.doesReferencesItemsInInfoTabHaveCount(1);
+  await umbracoUi.library.isReferenceItemNameVisible(contentName);
 });
 
 test('can transfer a local block to a Library folder', async ({umbracoApi, umbracoUi}) => {
@@ -364,7 +415,7 @@ test('can transfer a local block to a Library folder', async ({umbracoApi, umbra
   expect(layoutItem.contentKey).toBe(transferredElement.id);
 });
 
-test('disconnecting a block in one document leaves the reference intact in another document', async ({umbracoApi, umbracoUi}) => {
+test('can disconnect a block in one document and leave the reference intact in another document', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
   await umbracoApi.element.publish(libraryElementId);
@@ -401,7 +452,7 @@ test('disconnecting a block in one document leaves the reference intact in anoth
   expect(await umbracoApi.element.doesNameExist(libraryElementName)).toBeTruthy();
 });
 
-test('shares a Library element across two documents and reflects updates in both', async ({umbracoApi, umbracoUi}) => {
+test('can share a Library element across two documents and reflect updates in both', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const initialText = 'Shared reusable text';
   const updatedText = 'Shared reusable text (updated)';
@@ -433,6 +484,8 @@ test('shares a Library element across two documents and reflects updates in both
   await umbracoUi.library.goToElementWithName(libraryElementName);
   await umbracoUi.library.clickInfoTab();
   await umbracoUi.library.doesReferencesItemsInInfoTabHaveCount(2);
+  await umbracoUi.library.isReferenceItemNameVisible(contentName);
+  await umbracoUi.library.isReferenceItemNameVisible(secondContentName);
 
   // Act
   await umbracoApi.element.updateFirstPropertyValueAndPublish(libraryElementId, updatedText);

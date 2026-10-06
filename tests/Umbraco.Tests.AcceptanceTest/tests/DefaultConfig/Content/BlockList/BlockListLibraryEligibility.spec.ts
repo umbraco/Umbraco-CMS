@@ -12,7 +12,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('shows the Library tab in the block catalogue when the element type is allowed in the Library', async ({umbracoApi, umbracoUi}) => {
+test('can see the Library tab in the block catalogue when the element type is allowed in the Library', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockListEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
@@ -27,7 +27,7 @@ test('shows the Library tab in the block catalogue when the element type is allo
   await umbracoUi.content.isLibraryTabInBlockCatalogueVisible(true);
 });
 
-test('hides the Library tab in the block catalogue when the element type is not allowed in the Library', async ({umbracoApi, umbracoUi}) => {
+test('cannot see the Library tab in the block catalogue when the element type is not allowed in the Library', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, false);
   await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockListEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
