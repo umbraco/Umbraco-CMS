@@ -4,10 +4,12 @@ import {expect} from "@playwright/test";
 const documentBlueprintName = 'TestDocumentBlueprint';
 const documentTypeName = 'DocumentTypeForBlueprint';
 const documentBlueprintFolderName = 'TestBlueprintFolder';
+const wrongDocumentBlueprintFolderName = 'Wrong Blueprint Folder';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(wrongDocumentBlueprintFolderName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.documentBlueprint.goToSection(ConstantHelper.sections.library);
@@ -16,6 +18,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(wrongDocumentBlueprintFolderName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
@@ -31,8 +34,6 @@ test('can create a document blueprint folder', {tag: '@release'}, async ({umbrac
 
 test('can rename a document blueprint folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const wrongDocumentBlueprintFolderName = 'Wrong Blueprint Folder';
-  await umbracoApi.documentBlueprint.ensureNameNotExists(wrongDocumentBlueprintFolderName);
   await umbracoApi.documentBlueprint.createFolder(wrongDocumentBlueprintFolderName);
   await umbracoUi.documentBlueprint.reloadDocumentBlueprintsTree();
 
@@ -45,9 +46,6 @@ test('can rename a document blueprint folder', async ({umbracoApi, umbracoUi}) =
   // Assert
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintFolderName)).toBeTruthy();
   expect(await umbracoApi.documentBlueprint.doesNameExist(wrongDocumentBlueprintFolderName)).toBeFalsy();
-
-  // Clean
-  await umbracoApi.documentBlueprint.ensureNameNotExists(wrongDocumentBlueprintFolderName);
 });
 
 test('can delete a document blueprint folder', async ({umbracoApi, umbracoUi}) => {
