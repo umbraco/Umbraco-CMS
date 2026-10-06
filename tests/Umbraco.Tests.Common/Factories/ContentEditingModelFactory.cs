@@ -12,10 +12,7 @@ public class ContentEditingModelFactory : IContentEditingModelFactory
 {
     private readonly IIdKeyMap _idKeyMap;
 
-    public ContentEditingModelFactory(IIdKeyMap idKeyMap)
-    {
-        _idKeyMap = idKeyMap;
-    }
+    public ContentEditingModelFactory(IIdKeyMap idKeyMap) => _idKeyMap = idKeyMap;
 
     public async Task<ContentUpdateModel> CreateFromAsync(IContent content)
     {

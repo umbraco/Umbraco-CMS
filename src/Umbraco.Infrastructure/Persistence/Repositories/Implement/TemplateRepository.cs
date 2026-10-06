@@ -117,7 +117,7 @@ internal sealed class TemplateRepository : AsyncEntityRepositoryBase<Guid, ITemp
             return all;
         }
 
-        var keySet = keys.ToHashSet();
+        HashSet<Guid> keySet = keys.ToHashSet();
         return all.Where(template => keySet.Contains(template.Key));
     }
 
@@ -222,7 +222,7 @@ internal sealed class TemplateRepository : AsyncEntityRepositoryBase<Guid, ITemp
 
     private IEnumerable<ITemplate> BuildEntities(List<TemplateDto> dtos)
     {
-        Dictionary<int, string?> aliasesById = dtos.ToDictionary(dto => dto.NodeId, dto => dto.Alias);
+        var aliasesById = dtos.ToDictionary(dto => dto.NodeId, dto => dto.Alias);
         var layoutTemplateIds = dtos.Select(dto => dto.NodeDto.ParentId).ToHashSet();
 
         return dtos
