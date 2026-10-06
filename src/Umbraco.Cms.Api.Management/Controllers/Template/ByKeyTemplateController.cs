@@ -45,6 +45,6 @@ public class ByKeyTemplateController : TemplateControllerBase
         ITemplate? template = await _templateService.GetAsync(id, cancellationToken);
         return template == null
             ? TemplateNotFound()
-            : Ok(await _templatePresentationFactory.CreateTemplateResponseModelAsync(template));
+            : Ok(await _templatePresentationFactory.CreateTemplateResponseModelAsync(template, cancellationToken));
     }
 }

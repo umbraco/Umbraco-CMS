@@ -12,6 +12,7 @@ public interface ITemplatePresentationFactory
     /// Creates a <see cref="TemplateResponseModel"/> asynchronously from the given <see cref="ITemplate"/>.
     /// </summary>
     /// <param name="template">The template to create the response model from.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created <see cref="TemplateResponseModel"/>.</returns>
-    Task<TemplateResponseModel> CreateTemplateResponseModelAsync(ITemplate template);
+    Task<TemplateResponseModel> CreateTemplateResponseModelAsync(ITemplate template, CancellationToken cancellationToken);
 }
