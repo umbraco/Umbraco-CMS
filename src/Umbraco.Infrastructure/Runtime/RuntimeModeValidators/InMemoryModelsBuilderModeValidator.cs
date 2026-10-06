@@ -2,6 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 
@@ -23,27 +25,35 @@ public class InMemoryModelsBuilderModeValidator : IRuntimeModeValidator
     private const string InMemoryAutoModelsMode = "InMemoryAuto";
 
     private readonly IOptionsMonitor<ModelsBuilderSettings> _modelsBuilderSettings;
+    private readonly IPublishedModelFactory _publishedModelFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InMemoryModelsBuilderModeValidator" /> class.
     /// </summary>
     /// <param name="modelsBuilderSettings">The ModelsBuilder settings.</param>
-    public InMemoryModelsBuilderModeValidator(IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings)
-        => _modelsBuilderSettings = modelsBuilderSettings;
+    /// <param name="publishedModelFactory">The factory for creating published models.</param>
+    public InMemoryModelsBuilderModeValidator(
+        IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
+        IPublishedModelFactory publishedModelFactory)
+    {
+        _modelsBuilderSettings = modelsBuilderSettings;
+        _publishedModelFactory = publishedModelFactory;
+    }
 
     /// <inheritdoc />
     public bool Validate(RuntimeMode runtimeMode, [NotNullWhen(false)] out string? validationErrorMessage)
     {
         // Read the mode in force rather than the configured one, so that a mode set in code is validated the
         // same as one set in configuration.
-        if (_modelsBuilderSettings.CurrentValue.ModelsMode == InMemoryAutoModelsMode)
+        if (_modelsBuilderSettings.CurrentValue.ModelsMode != InMemoryAutoModelsMode
+            || _publishedModelFactory.IsLiveFactoryEnabled())
         {
-            validationErrorMessage =
-                $"ModelsBuilder mode cannot be set to {InMemoryAutoModelsMode} without a model factory that can generate models at runtime. Install the Umbraco.Cms.DevelopmentMode.Backoffice package and set the runtime mode to {RuntimeMode.BackofficeDevelopment}, or configure a different ModelsBuilder mode.";
-            return false;
+            validationErrorMessage = null;
+            return true;
         }
 
-        validationErrorMessage = null;
-        return true;
+        validationErrorMessage =
+            $"ModelsBuilder mode cannot be set to {InMemoryAutoModelsMode} without a model factory that can generate models at runtime. Install the Umbraco.Cms.DevelopmentMode.Backoffice package and set the runtime mode to {RuntimeMode.BackofficeDevelopment}, or configure a different ModelsBuilder mode.";
+        return false;
     }
 }

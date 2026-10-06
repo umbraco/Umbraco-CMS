@@ -142,10 +142,6 @@ public static class UmbracoBuilderExtensions
                 });
             }
 
-            // Nothing else needs to object to the mode now that it can be satisfied.
-            builder.RuntimeModeValidators()
-                .Remove<InMemoryModelsBuilderModeValidator>();
-
             // Ensure ModelsBuilder services (including UmbracoServices) are registered.
             // This is normally done by AddWebsite(), but in a delivery-API-only setup
             // it may not have been called. AddModelsBuilder() is idempotent.
