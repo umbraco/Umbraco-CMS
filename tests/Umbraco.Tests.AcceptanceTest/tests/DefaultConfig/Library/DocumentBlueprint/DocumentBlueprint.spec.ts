@@ -150,6 +150,7 @@ test('can create a document blueprint from the content menu in a folder', {tag: 
 test('can create a document blueprint from the content menu in a nested folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childFolderName = 'ChildBlueprintFolder';
+  await umbracoApi.documentBlueprint.ensureNameNotExists(childFolderName);
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   await umbracoApi.document.createDefaultDocument(documentBlueprintName, documentTypeId);
   const parentFolderId = await umbracoApi.documentBlueprint.createFolder(documentBlueprintFolderName);
