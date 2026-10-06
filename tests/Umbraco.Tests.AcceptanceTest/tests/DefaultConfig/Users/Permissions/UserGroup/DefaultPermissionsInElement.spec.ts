@@ -73,28 +73,6 @@ test('can not see element in tree with read permission disabled', async ({umbrac
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
 });
 
-// Design question: Umb.WorkspaceAction.Element.Save is gated on UMB_USER_PERMISSION_ELEMENT_UPDATE while this
-// grants create only, so the Save button is correctly absent.
-test.skip('can create element with create permission enabled', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateElementPermission(userGroupName);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
-
-  // Act
-  await umbracoUi.library.clickActionsMenuAtRoot();
-  await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.chooseElementType(elementTypeName);
-  await umbracoUi.library.enterElementName(newElementName);
-  await umbracoUi.library.clickSaveButtonAndWaitForElementToBeCreated();
-
-  // Assert
-  expect(await umbracoApi.element.doesNameExist(newElementName)).toBeTruthy();
-  await umbracoUi.library.isElementReadOnly(true);
-});
-
 test('can not see create action menu with create permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateElementPermission(userGroupName, false);

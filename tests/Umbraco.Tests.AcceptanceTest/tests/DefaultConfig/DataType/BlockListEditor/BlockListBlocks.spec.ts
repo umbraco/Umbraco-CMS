@@ -100,24 +100,6 @@ test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.isElementWorkspaceOpenInBlock(elementTypeName);
 });
 
-// Product gap: the content model row has no remove affordance in the front-end, unlike the settings
-// model, which shows an addable/removable "Choose" placeholder.
-test.skip('can remove a content model from a block', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
-
-  // Act
-  await umbracoUi.dataType.goToDataType(blockListEditorName);
-  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.removeBlockContentModel();
-  await umbracoUi.dataType.clickConfirmRemoveButton();
-  await umbracoUi.dataType.clickSubmitButton();
-  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
-
-  // Assert
-  // TODO: missing check that the content model is removed
-});
-
 test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementName = 'SecondElementTest';
@@ -270,68 +252,6 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   // Assert
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].iconColor).toEqual('');
-});
-
-// Product gap: there is no custom stylesheet editor on a block; the block-type package never references one.
-test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const stylesheetName = 'TestStylesheet.css';
-  const stylesheetPath = '/wwwroot/css/' + stylesheetName;
-  const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath);
-  const secondStylesheetName = 'SecondStylesheet.css';
-  const secondStylesheetPath = '/wwwroot/css/' + secondStylesheetName;
-  const encodedSecondStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(secondStylesheetPath);
-  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
-  await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
-  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
-  await umbracoApi.stylesheet.createDefaultStylesheet(secondStylesheetName);
-
-  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', '', encodedStylesheetPath);
-  let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-
-  // Act
-  await umbracoUi.dataType.goToDataType(blockListEditorName);
-  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  // Removes first stylesheet
-  await umbracoUi.dataType.clickRemoveCustomStylesheetWithName(stylesheetName);
-  await umbracoUi.dataType.clickSubmitButton();
-  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
-
-  // Assert
-  blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedSecondStylesheetPath);
-
-  // Clean
-  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
-  await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
-});
-
-// Product gap: there is no custom stylesheet editor on a block; the block-type package never references one.
-test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const stylesheetName = 'TestStylesheet.css';
-  const stylesheetPath = '/wwwroot/css/' + stylesheetName;
-  const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath);
-  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
-  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
-
-  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', '', encodedStylesheetPath);
-  let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedStylesheetPath);
-
-  // Act
-  await umbracoUi.dataType.goToDataType(blockListEditorName);
-  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.clickRemoveCustomStylesheetWithName(stylesheetName);
-  await umbracoUi.dataType.clickSubmitButton();
-  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
-
-  // Assert
-  blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-  expect(blockData.values[0].value[0].stylesheet[0]).toBeUndefined();
-
-  // Clean
-  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });
 
 test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {

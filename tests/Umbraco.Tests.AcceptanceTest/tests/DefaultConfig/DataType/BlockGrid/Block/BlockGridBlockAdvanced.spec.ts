@@ -19,47 +19,6 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
 });
 
-// Product gap: a custom view comes from a blockEditorCustomView manifest, not the Advanced tab, which only lists the registered ones.
-test.skip('can add a custom view to a block', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
-
-  // Act
-  await umbracoUi.dataType.goToDataType(blockGridEditorName);
-  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.goToBlockAdvancedTab();
-  // TODO: Implement it later
-});
-
-// Product gap: a custom view comes from a blockEditorCustomView manifest, not the Advanced tab, which only lists the registered ones.
-test.skip('can remove a custom view from a block', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
-
-  // Act
-  await umbracoUi.dataType.goToDataType(blockGridEditorName);
-  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.goToBlockAdvancedTab();
-  // TODO: Implement it later
-});
-
-// Product gap: there is no custom stylesheet editor on a block; the block-type package never references one.
-test.skip('can remove a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const stylesheetName = 'TestStylesheet.css'
-  const stylesheetPath = '/wwwroot/css/' + stylesheetName;
-  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
-  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
-  await umbracoApi.dataType.createBlockGridWithAdvancedSettingsInBlock(blockGridEditorName, contentElementTypeId, undefined, stylesheetPath, undefined, undefined, undefined);
-  expect(await umbracoApi.dataType.doesBlockEditorBlockContainStylesheet(blockGridEditorName, contentElementTypeId, stylesheetPath)).toBeTruthy();
-
-  // Act
-  await umbracoUi.dataType.goToDataType(blockGridEditorName);
-  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.dataType.goToBlockAdvancedTab();
-  // TODO: Implement it later
-});
-
 test('can update overlay size in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const overlaySize = 'medium';

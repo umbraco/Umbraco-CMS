@@ -226,31 +226,6 @@ test('can schedule the publishing of variant published child content', async ({u
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
-// Design question rather than a bug (https://github.com/umbraco/Umbraco-CMS/issues/18554): scheduling succeeds
-// and reports success; the parent-not-published constraint is enforced at release time.
-test.skip('cannot schedule the publishing of child content if parent not published', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
-  const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  const childContentId = await umbracoApi.document.createDocumentWithTextContentAndParent(childContentName, childDocumentTypeId, contentText, dataTypeName, contentId);
-  await umbracoApi.document.publish(childContentId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-
-  // Act
-  await umbracoUi.content.clickCaretButtonForContentName(contentName);
-  await umbracoUi.content.goToContentWithName(childContentName);
-  await umbracoUi.content.clickViewMoreOptionsButton();
-  await umbracoUi.content.clickSchedulePublishButton();
-  const publishDateTime = await umbracoApi.getCurrentTimePlusMinute();
-  await umbracoUi.content.enterPublishTime(publishDateTime);
-  await umbracoUi.content.clickSchedulePublishModalButton();
-
-  // Assert
-  await umbracoUi.content.isErrorNotificationVisible();
-});
-
 test('can schedule the publishing of multiple culture variants content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const firstCulture = 'en-US';
