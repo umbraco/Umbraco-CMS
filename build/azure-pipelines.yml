@@ -405,33 +405,26 @@ stages:
               vmImage: "ubuntu-latest"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
-              extraTestArguments: ""
             LinuxPart2Of3:
               vmImage: "ubuntu-latest"
               # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-              extraTestArguments: ""
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
               # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
               testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
-              extraTestArguments: ""
             macOSPart1Of3:
               vmImage: "macOS-latest"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
-              extraTestArguments: ""
             macOSPart2Of3:
               vmImage: "macOS-latest"
               # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-              extraTestArguments: ""
             macOSPart3Of3:
               vmImage: "macOS-latest"
               # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
               testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
-              # TODO: remove once the macOS part 3 timeout is diagnosed - collects a dump of a test that stalls for 10 minutes
-              extraTestArguments: "--blame-hang --blame-hang-timeout 10m --blame-hang-dump-type mini"
         pool:
           vmImage: $(vmImage)
         variables:
@@ -462,31 +455,13 @@ stages:
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build $(extraTestArguments)'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: '--filter "$(testFilter) & ${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build $(extraTestArguments)'
+                arguments: '--filter "$(testFilter) & ${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build $(extraTestArguments)'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
               ${{ else }}:
-                arguments: '--filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build $(extraTestArguments)'
-          # TODO: remove together with extraTestArguments - a hang dump can only be analysed on the OS that produced it
-          - bash: |
-              dotnet tool install --global dotnet-dump
-              export PATH="$PATH:$HOME/.dotnet/tools"
-              find "$(Agent.TempDirectory)" -name '*_hangdump.dmp' | sort -u | while read -r dump; do
-                echo "##[group]$dump"
-                dotnet-dump analyze "$dump" -c "clrthreads" -c "syncblk" -c "clrstack -all" -c "dumpasync" -c "exit"
-                echo "##[endgroup]"
-              done
-            displayName: Print hang dump stacks
-            condition: and(always(), ne(variables['extraTestArguments'], ''))
-          # TODO: remove together with extraTestArguments - the job may be cancelled at its timeout before test results (and their blame attachments) are published
-          - task: PublishPipelineArtifact@1
-            displayName: Publish hang dumps
-            condition: and(always(), ne(variables['extraTestArguments'], ''))
-            inputs:
-              targetPath: $(Agent.TempDirectory)
-              artifact: "Integration Test Hang Dumps - $(System.JobDisplayName) - Attempt #$(System.JobAttempt)"
+                arguments: '--filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
       # Search Integration Tests (SQLite)
       - job:
         timeoutInMinutes: 60
