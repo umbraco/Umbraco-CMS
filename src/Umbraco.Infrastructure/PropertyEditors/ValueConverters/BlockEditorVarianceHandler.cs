@@ -325,9 +325,6 @@ public sealed class BlockEditorVarianceHandler
     private static bool VariesByCulture(BlockPropertyValue blockPropertyValue)
         => blockPropertyValue.Culture.IsNullOrWhiteSpace() is false;
 
-    private static bool VariesBySegment(BlockPropertyValue blockPropertyValue)
-        => blockPropertyValue.Segment.IsNullOrWhiteSpace() is false;
-
     /// <summary>
     /// Determines which of a property's culture specific values survives the property type becoming culture invariant.
     /// </summary>
