@@ -539,14 +539,26 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				return await this.#documentWorkspaceContext!.loadWithoutPersist();
 			} catch {
 				reloadAfterPublishFailed = true;
-				return saveData;
+				return { ...saveData, unique: this.#documentWorkspaceContext!.getUnique() ?? saveData.unique };
 			}
 		};
 
 		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData, {
 			create: async (data, ids, parent) => {
-				const { error } = await this.#publishingRepository.createAndPublish(data, ids, parent.unique);
+				const { data: createdUnique, error } = await this.#publishingRepository.createAndPublish(
+					data,
+					ids,
+					parent.unique,
+				);
 				if (error) throw new Error('Error creating and publishing document', { cause: error });
+
+				// The server may have assigned a different unique than the one this workspace scaffolded with
+				// (e.g. a Saving notification handler assigning its own key). The reload below reads by the
+				// workspace's current unique, so it must be updated to the actual persisted one first.
+				if (createdUnique) {
+					this.#documentWorkspaceContext!.setUnique(createdUnique);
+				}
+
 				return loadAfterPublish();
 			},
 			update: async (data, ids) => {
@@ -572,7 +584,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		await this.#loadAndProcessLastPublished();
 
-		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		// Re-read the unique: for a new document, the server may have assigned a different one than the
+		// workspace scaffolded with, and `performCreateOrUpdate` above will have re-synced it if so.
+		const persistedUnique = this.#documentWorkspaceContext.getUnique() ?? unique;
+		const event = new UmbRequestReloadStructureForEntityEvent({ unique: persistedUnique, entityType });
 		this.#eventContext?.dispatchEvent(event);
 	}
 
