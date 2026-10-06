@@ -289,6 +289,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public async Task CreateOrUpdateAliasesAsync(Guid documentKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        // A save persists its own alias rows under the content tree write lock, so the read lock keeps this
+        // write from overlapping one for the same document. Same lock order as RebuildAllAliasesAsync.
+        scope.ReadLock(Constants.Locks.ContentTree);
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
         await CreateOrUpdateAliasesInternalAsync(documentKey);
@@ -300,6 +304,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public async Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        // A save persists its own alias rows under the content tree write lock, so the read lock keeps this
+        // write from overlapping one for the same document. Same lock order as RebuildAllAliasesAsync.
+        scope.ReadLock(Constants.Locks.ContentTree);
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
         // Get document and all descendants
@@ -390,7 +398,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// Internal implementation that processes a single document without creating its own scope.
     /// Caller must ensure a scope is active. A write lock on <see cref="Constants.Locks.DocumentUrlAliases"/>
     /// is required whenever this method may perform database writes, i.e. unless
-    /// <paramref name="forceSkipDatabaseWrite"/> is set.
+    /// <paramref name="forceSkipDatabaseWrite"/> is set, and the caller takes the
+    /// <see cref="Constants.Locks.ContentTree"/> read lock first: a save persists its own alias rows under the
+    /// content tree write lock, so the read lock keeps this write from overlapping it. That is the order
+    /// <see cref="RebuildAllAliasesAsync"/> uses as well.
     /// </summary>
     private async Task CreateOrUpdateAliasesInternalAsync(Guid documentKey, bool forceSkipDatabaseWrite = false)
     {

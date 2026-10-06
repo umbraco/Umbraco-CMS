@@ -136,6 +136,32 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task CreateOrUpdateAliasesAsync_TakesTheContentTreeReadLock_BeforeTheAliasWriteLock()
+    {
+        Content page = CreatePage("Page", "my-alias");
+        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+        Locks.Clear();
+
+        await AliasService.CreateOrUpdateAliasesAsync(page.Key);
+
+        AssertContentTreeReadLockPrecedesAliasWriteLock();
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+    }
+
+    [Test]
+    public async Task CreateOrUpdateAliasesWithDescendantsAsync_TakesTheContentTreeReadLock_BeforeTheAliasWriteLock()
+    {
+        Content page = CreatePage("Page", "my-alias");
+        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+        Locks.Clear();
+
+        await AliasService.CreateOrUpdateAliasesWithDescendantsAsync(page.Key);
+
+        AssertContentTreeReadLockPrecedesAliasWriteLock();
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+    }
+
+    [Test]
     public void RepublishWithChangedAlias_ReplacesTheRows_AndClearingItRemovesThem()
     {
         Content page = CreatePage("Page", "first, /Second/, first");
@@ -456,6 +482,23 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
         {
             return AliasRepository.GetAll().Select(x => (x.DocumentKey, x.NullableLanguageId, x.Alias)).ToList();
         }
+    }
+
+    /// <summary>
+    /// The standalone alias path must take the content tree read lock before the alias write lock, the order the
+    /// rebuild uses, so it cannot overlap a save's in-transaction alias write for the same document.
+    /// </summary>
+    private void AssertContentTreeReadLockPrecedesAliasWriteLock()
+    {
+        var obtained = Locks.Obtained.ToList();
+        var contentTreeRead = obtained.FindIndex(x => x.LockId == Constants.Locks.ContentTree && x.Type == DistributedLockType.ReadLock);
+        var aliasWrite = obtained.FindIndex(x => x.LockId == Constants.Locks.DocumentUrlAliases && x.Type == DistributedLockType.WriteLock);
+        Assert.Multiple(() =>
+        {
+            Assert.That(aliasWrite, Is.GreaterThanOrEqualTo(0), "The standalone alias path must take the DocumentUrlAliases write lock.");
+            Assert.That(contentTreeRead, Is.GreaterThanOrEqualTo(0), "The standalone alias path must take the ContentTree read lock.");
+            Assert.That(contentTreeRead, Is.LessThan(aliasWrite), $"The ContentTree read lock must be acquired before the DocumentUrlAliases write lock; locks in order: {string.Join(", ", obtained)}");
+        });
     }
 
     /// <summary>
