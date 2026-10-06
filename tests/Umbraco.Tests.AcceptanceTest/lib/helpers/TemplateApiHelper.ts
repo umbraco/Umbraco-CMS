@@ -520,6 +520,28 @@ export class TemplateApiHelper {
     return this.createTemplateWithDisplayingValue(name, templateContent);
   }
 
+  async createTemplateWithDisplayingSingleBlockItem(name: string, singleBlockPropertyName: string, elementPropertyAlias: string, noBlockMessage: string = 'No block available') {
+    const templateContent =
+      '\n@using Umbraco.Cms.Core.Models.Blocks' +
+      '\n@{' +
+      '\n\tvar block = Model.Value<BlockListItem>("' + AliasHelper.toAlias(singleBlockPropertyName) + '");' +
+      '\n\tif (block != null)' +
+      '\n\t{' +
+      '\n\t\t<p>@block.Content.Value("' + AliasHelper.toAlias(elementPropertyAlias) + '")</p>' +
+      '\n\t}' +
+      '\n\telse' +
+      '\n\t{' +
+      '\n\t\t<p>' + noBlockMessage + '</p>' +
+      '\n\t}' +
+      '\n}';
+    return this.createTemplateWithDisplayingValue(name, templateContent);
+  }
+
+  async createTemplateWithDisplayingRichTextValue(name: string, richTextPropertyName: string) {
+    const templateContent = '\n@Model.Value("' + AliasHelper.toAlias(richTextPropertyName) + '")';
+    return this.createTemplateWithDisplayingValue(name, templateContent);
+  }
+
   private buildElementPickerLoopTemplate(elementPickerPropertyName: string, perElementLines: string[], options: {captureFirst?: boolean; afterLoopLines?: string[]} = {}) {
     const propertyAlias = AliasHelper.toAlias(elementPickerPropertyName);
     const {captureFirst = false, afterLoopLines = []} = options;
