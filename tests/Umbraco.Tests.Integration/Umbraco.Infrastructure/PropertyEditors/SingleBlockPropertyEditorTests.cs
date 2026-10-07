@@ -605,7 +605,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             ],
             Expose =
             [
-                new BlockItemVariation(contentElementKey, null, null)
+                new BlockItemVariation(contentElementKey, null)
             ],
         };
         var blockPropertyValue = JsonSerializer.Serialize(blockValue);
@@ -688,7 +688,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             ],
             Expose =
             [
-                new BlockItemVariation(contentElementKey, "en-US", null)
+                new BlockItemVariation(contentElementKey, "en-US")
             ],
         };
         var blockPropertyValue = JsonSerializer.Serialize(blockValue);

@@ -18,7 +18,6 @@ const elementOneLibraryElement: UmbMockElementModel = {
 		{
 			state: UmbElementVariantState.PUBLISHED,
 			culture: null,
-			segment: null,
 			name: 'Element One (Library)',
 			createDate: '2024-01-15T10:00:00.000Z',
 			updateDate: '2024-01-15T10:00:00.000Z',
@@ -57,7 +56,6 @@ const elementTwoLibraryElement: UmbMockElementModel = {
 		{
 			state: UmbElementVariantState.PUBLISHED,
 			culture: null,
-			segment: null,
 			name: 'Element Two (Library)',
 			createDate: '2024-01-15T10:00:00.000Z',
 			updateDate: '2024-01-15T10:00:00.000Z',
@@ -96,7 +94,6 @@ const variantLibraryElement: UmbMockElementModel = {
 		{
 			state: UmbElementVariantState.PUBLISHED,
 			culture: 'en-US',
-			segment: null,
 			name: 'Variant Element (Library)',
 			createDate: '2024-01-15T10:00:00.000Z',
 			updateDate: '2024-01-15T10:00:00.000Z',
@@ -107,7 +104,6 @@ const variantLibraryElement: UmbMockElementModel = {
 		{
 			state: UmbElementVariantState.NOT_CREATED,
 			culture: 'da',
-			segment: null,
 			name: 'Variant Element (Library)',
 			createDate: '2024-01-15T10:00:00.000Z',
 			updateDate: '2024-01-15T10:00:00.000Z',
@@ -146,7 +142,6 @@ const draftLibraryElement: UmbMockElementModel = {
 		{
 			state: UmbElementVariantState.DRAFT,
 			culture: 'en-US',
-			segment: null,
 			name: 'Draft Variant Element (Library)',
 			createDate: '2024-01-15T10:00:00.000Z',
 			updateDate: '2024-01-15T10:00:00.000Z',
@@ -157,7 +152,6 @@ const draftLibraryElement: UmbMockElementModel = {
 		{
 			state: UmbElementVariantState.DRAFT,
 			culture: 'da',
-			segment: null,
 			name: 'Draft Variant Element (Library)',
 			createDate: '2024-01-15T10:00:00.000Z',
 			updateDate: '2024-01-15T10:00:00.000Z',
@@ -196,7 +190,6 @@ const pendingChangesLibraryElement: UmbMockElementModel = {
 		{
 			state: UmbElementVariantState.PUBLISHED_PENDING_CHANGES,
 			culture: 'en-US',
-			segment: null,
 			name: 'Pending Changes Variant Element (Library)',
 			createDate: '2024-01-15T10:00:00.000Z',
 			updateDate: '2024-01-15T10:00:00.000Z',
@@ -207,7 +200,6 @@ const pendingChangesLibraryElement: UmbMockElementModel = {
 		{
 			state: UmbElementVariantState.PUBLISHED_PENDING_CHANGES,
 			culture: 'da',
-			segment: null,
 			name: 'Pending Changes Variant Element (Library)',
 			createDate: '2024-01-15T10:00:00.000Z',
 			updateDate: '2024-01-15T10:00:00.000Z',
@@ -253,7 +245,6 @@ const publishedBothLibraryElement: UmbMockElementModel = {
 		{
 			state: UmbElementVariantState.PUBLISHED,
 			culture: 'en-US',
-			segment: null,
 			name: 'Published Variant Element (Library)',
 			createDate: '2024-01-15T10:00:00.000Z',
 			updateDate: '2024-01-15T10:00:00.000Z',
@@ -264,7 +255,6 @@ const publishedBothLibraryElement: UmbMockElementModel = {
 		{
 			state: UmbElementVariantState.PUBLISHED,
 			culture: 'da',
-			segment: null,
 			name: 'Published Variant Element (Library)',
 			createDate: '2024-01-15T10:00:00.000Z',
 			updateDate: '2024-01-15T10:00:00.000Z',
@@ -310,7 +300,6 @@ const missingDaLibraryElement: UmbMockElementModel = {
 		{
 			state: UmbElementVariantState.PUBLISHED,
 			culture: 'en-US',
-			segment: null,
 			name: 'Missing Danish Variant Element (Library)',
 			createDate: '2024-01-15T10:00:00.000Z',
 			updateDate: '2024-01-15T10:00:00.000Z',
