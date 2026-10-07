@@ -514,6 +514,7 @@ public class User : EntityBase, IUser, IProfile
         clonedEntity._startContentIds = _startContentIds?.ToArray();
         clonedEntity._startMediaIds = _startMediaIds?.ToArray();
         clonedEntity._startElementIds = _startElementIds?.ToArray();
+        clonedEntity._startDocumentBlueprintIds = _startDocumentBlueprintIds?.ToArray();
 
         // need to create new collections otherwise they'll get copied by ref
         clonedEntity._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);
