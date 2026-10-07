@@ -32,6 +32,7 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null) =>
         builder
             .AddCore(configureMvc)                   // All core services
+            .AddModelsBuilder()
             .AddBackOfficeSignIn()                   // Identity + Cookie authentication
             .AddBackOfficeCore()                     // IBackOfficePathGenerator, IBackOfficeEnabledMarker
             .AddBackOfficeOpenIddictServices()       // OpenIddict, application manager, middleware
