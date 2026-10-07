@@ -43,7 +43,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor also taking IPublishedContentTypeCache. Scheduled for removal in Umbraco 19.")]
     public ContentCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -82,7 +82,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor also taking IPublishedContentTypeCache. Scheduled for removal in Umbraco 19.")]
     public ContentCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,

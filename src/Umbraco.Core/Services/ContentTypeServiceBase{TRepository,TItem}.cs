@@ -462,11 +462,12 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
             }
 
-            // Any change to the set of property types a content type exposes changes it for every content type
-            // that derives from it, through composition or inheritance, at any depth. Those types resolve their
-            // published content type from the full composed property set, so they have to be refreshed too - or
-            // they keep projecting content through a property set the content type no longer has.
-            if (hasPropertyMainImpact || hasAnyPropertyBeenAdded)
+            // A content type that derives from this one - through composition or inheritance, at any depth -
+            // resolves its published content type from this one's alias and property types, so any change to
+            // either has to refresh the whole closure beneath it. Left stale, a deriving type keeps projecting
+            // content through a property set the content type no longer has, and keeps reporting the old alias
+            // from its composition aliases (which IPublishedContent.IsComposedOf reads).
+            if (hasPropertyMainImpact || hasAnyPropertyBeenAdded || hasAliasChanged)
             {
                 foreach (TItem c in GetComposedOfTransitive(contentType.Id))
                 {
@@ -478,8 +479,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                     }
                     else
                     {
-                        // A pure addition introduces an alias that has no stored value, so the deriving types
-                        // only need their content type and converted content caches cleared, not a rebuild.
+                        // Neither a property addition nor a content type alias change re-keys anything the
+                        // deriving types have stored - the added alias has no value yet, and the stored blob is
+                        // keyed by property alias, not content type alias. They only need their content type and
+                        // converted content caches cleared, not a rebuild.
                         AddChange(changes, c, ContentTypeChangeTypes.RefreshOther);
                     }
                 }
@@ -730,32 +733,44 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <returns>The content types deriving from the specified content type.</returns>
     /// <remarks>
     /// Inheritance is stored as composition, so a single traversal of the composition graph covers both axes.
-    /// It has to be transitive because a content type also exposes the property types of its compositions'
-    /// compositions (see <see cref="IContentTypeComposition.CompositionPropertyTypes" />), so a change to one
-    /// content type's property set changes it for everything deriving from it, not just its direct consumers.
+    /// It has to be transitive because a content type resolves both its property types and its composition
+    /// aliases recursively through its compositions (see
+    /// <see cref="IContentTypeComposition.CompositionPropertyTypes" /> and
+    /// <see cref="IContentTypeComposition.CompositionAliases()" />), so a change to one content type is a change
+    /// to everything deriving from it, not just to its direct consumers.
     /// </remarks>
-    private IEnumerable<TItem> GetComposedOfTransitive(int id)
+    private TItem[] GetComposedOfTransitive(int id)
     {
         // GetAll is cheap, repository has a full dataset cache policy
-        TItem[] allContentTypes = GetAll().ToArray();
+        IEnumerable<TItem> allContentTypes = GetAll();
+
+        // build a "referenced id -> types that directly reference it" lookup once, so the traversal is O(n + d)
+        // rather than rescanning every content type for each type found
+        ILookup<int, TItem> directReferencingTypes = allContentTypes
+            .SelectMany(
+                contentType => contentType.ContentTypeComposition,
+                (contentType, referenced) => (ReferencedId: referenced.Id, ContentType: contentType))
+            .ToLookup(x => x.ReferencedId, x => x.ContentType);
 
         var composedOf = new Dictionary<int, TItem>();
-        var remaining = new Queue<int>();
-        remaining.Enqueue(id);
+        var remaining = new Stack<int>();
+        remaining.Push(id);
 
         while (remaining.Count > 0)
         {
-            foreach (TItem contentType in GetComposedOf(remaining.Dequeue(), allContentTypes))
+            foreach (TItem contentType in directReferencingTypes[remaining.Pop()])
             {
                 // TryAdd doubles as the guard against cycles in the composition graph
-                if (composedOf.TryAdd(contentType.Id, contentType))
+                if (composedOf.TryAdd(contentType.Id, contentType) is false)
                 {
-                    remaining.Enqueue(contentType.Id);
+                    continue;
                 }
+
+                remaining.Push(contentType.Id);
             }
         }
 
-        return composedOf.Values;
+        return [.. composedOf.Values];
     }
 
     /// <inheritdoc />

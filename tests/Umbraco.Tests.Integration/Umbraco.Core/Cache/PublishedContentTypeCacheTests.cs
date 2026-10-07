@@ -251,6 +251,38 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
             "leaf published content type should pick up the property added to the root of its inheritance chain");
     }
 
+    [Test]
+    public async Task Published_Composing_Type_Reflects_Alias_Changed_On_Composition_After_Caching()
+    {
+        // A composition, applied to a composing content type.
+        var composition = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType("composition", "Composition"),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var composingModel = ContentTypeEditingBuilder.CreateBasicContentType("composing", "Composing");
+        composingModel.Compositions = [new Composition { CompositionType = CompositionType.Composition, Key = composition.Key }];
+        var composing = (await ContentTypeEditingService.CreateAsync(composingModel, Constants.Security.SuperUserKey)).Result!;
+
+        // Prime the published content type cache for the composing type; it reports the composition's current alias.
+        var before = PublishedContentTypeCache.Get(PublishedItemType.Content, composing.Key);
+        Assert.IsTrue(before.CompositionAliases.Contains("composition"), "precondition: composing type should report the original composition alias");
+
+        // Rename the composition.
+        var updateModel = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(composition);
+        updateModel.Alias = "renamedComposition";
+        var result = await ContentTypeEditingService.UpdateAsync(composition, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, result.Status.ToString());
+
+        // A published content type's composition aliases are resolved recursively from its compositions, so the
+        // composing type has to be refreshed for IPublishedContent.IsComposedOf to report the new alias.
+        var after = PublishedContentTypeCache.Get(PublishedItemType.Content, composing.Key);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(after.CompositionAliases.Contains("renamedComposition"), "composing published content type should report the new composition alias");
+            Assert.IsFalse(after.CompositionAliases.Contains("composition"), "composing published content type should no longer report the old composition alias");
+        });
+    }
+
     private async Task<IContentType> CreateElementTypeAsync(string alias)
     {
         ContentTypeCreateModel createModel = ContentTypeEditingBuilder.CreateElementType(alias, alias);

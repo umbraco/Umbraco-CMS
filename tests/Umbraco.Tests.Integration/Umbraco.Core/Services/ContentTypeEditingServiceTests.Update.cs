@@ -872,7 +872,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         var createModel = ContentTypeCreateModel("Test", "test");
         createModel.Compositions = new[]
         {
-            new Composition { Key = compositionContentType.Key, CompositionType = CompositionType.Composition }
+            new Composition { Key = compositionContentType.Key, CompositionType = CompositionType.Composition },
         };
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 

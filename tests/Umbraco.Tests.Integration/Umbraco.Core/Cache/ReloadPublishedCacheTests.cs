@@ -34,12 +34,16 @@ internal sealed class ReloadPublishedCacheTests : UmbracoIntegrationTestWithCont
         IPublishedContentType primed = PublishedContentTypeCache.Get(PublishedItemType.Content, ContentType.Key);
         Assert.IsNotNull(primed);
 
+        // Establish that a cache hit really does hand back the same instance, so the assertion after the reload
+        // is testing the clear rather than an implementation that happens to build a new instance every time.
+        Assert.AreSame(primed, PublishedContentTypeCache.Get(PublishedItemType.Content, ContentType.Key), "precondition: a cache hit should re-serve the same instance");
+
         // This is what the "Reload Memory Cache" backoffice action triggers. Reloading the published caches from
         // the database cache is only meaningful if the content types the content is projected through are
         // reloaded too, so the cached published content types have to go as well.
         DistributedCache.RefreshAllPublishedSnapshot();
 
         IPublishedContentType after = PublishedContentTypeCache.Get(PublishedItemType.Content, ContentType.Key);
-        Assert.IsFalse(ReferenceEquals(primed, after), "the published content type should have been rebuilt, not re-served from the cache");
+        Assert.AreNotSame(primed, after, "the published content type should have been rebuilt, not re-served from the cache");
     }
 }
