@@ -32,10 +32,10 @@ export class UmbFolderWorkspaceEditorElement extends UmbLitElement {
 				entity-type=${ifDefined(this._entityType)}></umb-entity-detail-forbidden>`;
 		}
 
-		return html`<umb-workspace-editor>
+		return html`<umb-entity-detail-workspace-editor>
 			<umb-icon id="icon" slot="header" name="icon-folder"></umb-icon>
 			<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>
-		</umb-workspace-editor>`;
+		</umb-entity-detail-workspace-editor>`;
 	}
 
 	static override styles = [

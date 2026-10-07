@@ -3,14 +3,16 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbGuardRule, UmbReadOnlyGuardManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbNameWriteGuardManager } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-test-recycle-bin-controller-host')
 export class UmbTestRecycleBinControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-export interface UmbTestReadOnlyGuardRuleCall {
+export interface UmbTestGuardRuleCall {
 	action: 'add' | 'remove';
 	unique: string;
+	permitted?: boolean;
 }
 
 /**
@@ -23,18 +25,28 @@ export class UmbTestTrashableEntityWorkspaceContext implements UmbTrashableEntit
 	#entityType = 'test-entity-type';
 	#isTrashed = new UmbBooleanState(undefined);
 	#isNew = new UmbBooleanState(undefined);
+	#navigationParentItemPath = new UmbObjectState<string | undefined>(undefined);
 
 	readonly workspaceAlias = 'Umb.Test.Workspace';
 	readonly unique = this.#unique.asObservable();
 	readonly isTrashed = this.#isTrashed.asObservable();
 	readonly isNew = this.#isNew.asObservable();
+	readonly navigationParentItemPath = this.#navigationParentItemPath.asObservable();
 	modalContext: unknown;
 
-	readonly readOnlyGuardRuleCalls: Array<UmbTestReadOnlyGuardRuleCall> = [];
+	readonly readOnlyGuardRuleCalls: Array<UmbTestGuardRuleCall> = [];
 	readonly readOnlyGuard = {
-		addRule: (rule: { unique: string }) => this.readOnlyGuardRuleCalls.push({ action: 'add', unique: rule.unique }),
+		addRule: (rule: { unique: string; permitted: boolean }) =>
+			this.readOnlyGuardRuleCalls.push({ action: 'add', unique: rule.unique, permitted: rule.permitted }),
 		removeRule: (unique: string) => this.readOnlyGuardRuleCalls.push({ action: 'remove', unique }),
-	} as unknown as UmbReadOnlyVariantGuardManager;
+	} as unknown as UmbReadOnlyGuardManager<UmbGuardRule>;
+
+	readonly nameWriteGuardRuleCalls: Array<UmbTestGuardRuleCall> = [];
+	readonly nameWriteGuard = {
+		addRule: (rule: { unique: string; permitted: boolean }) =>
+			this.nameWriteGuardRuleCalls.push({ action: 'add', unique: rule.unique, permitted: rule.permitted }),
+		removeRule: (unique: string) => this.nameWriteGuardRuleCalls.push({ action: 'remove', unique }),
+	} as unknown as UmbNameWriteGuardManager;
 
 	reloadCallCount = 0;
 	resetDataCallCount = 0;
@@ -69,6 +81,10 @@ export class UmbTestTrashableEntityWorkspaceContext implements UmbTrashableEntit
 
 	setIsNew(value: boolean | undefined) {
 		this.#isNew.setValue(value);
+	}
+
+	setNavigationParentItemPath(path: string | undefined) {
+		this.#navigationParentItemPath.setValue(path);
 	}
 
 	resetData(): void {
