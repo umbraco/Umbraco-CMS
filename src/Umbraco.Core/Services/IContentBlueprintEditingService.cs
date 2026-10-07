@@ -69,9 +69,18 @@ public interface IContentBlueprintEditingService
     /// <returns>An attempt containing the creation result or an error status.</returns>
     // TODO (V21): Remove the default implementation when the obsolete CreateFromContentAsync overload is removed.
     Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateFromContentAsync(Guid contentKey, string name, Guid? key, Guid? parentKey, Guid userKey)
+    {
+        // Only creating at the root can be satisfied by delegating to the existing method, so fail fast rather than
+        // silently create the blueprint somewhere other than the requested container.
+        if (parentKey.HasValue)
+        {
+            throw new NotImplementedException("This IContentBlueprintEditingService implementation does not support creating a blueprint in a container. Override the CreateFromContentAsync overload that takes a parentKey parameter to support it.");
+        }
+
 #pragma warning disable CS0618 // Type or member is obsolete
-        => CreateFromContentAsync(contentKey, name, key, userKey);
+        return CreateFromContentAsync(contentKey, name, key, userKey);
 #pragma warning restore CS0618 // Type or member is obsolete
+    }
 
     /// <summary>
     ///     Updates an existing content blueprint.
