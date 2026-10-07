@@ -24,6 +24,9 @@ const rteTransferElementName = 'TransferredRenderRichTextElement';
 const rteBlockPartialViewFileName = AliasHelper.toAlias(elementTypeName) + '.cshtml';
 const propertyInBlock = 'Textstring';
 const groupName = 'testGroup';
+const blockListEditorAlias = 'Umbraco.BlockList';
+const blockGridEditorAlias = 'Umbraco.BlockGrid';
+const singleBlockEditorAlias = 'Umbraco.SingleBlock';
 const richTextBlockEditorAlias = 'Umbraco.RichText';
 let elementTypeId = '';
 
@@ -64,16 +67,10 @@ test('can render the referenced Library element content on the published page', 
   await umbracoApi.element.publish(libraryElementId);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingBlockListItems(templateName, customDataTypeName, propertyInBlock);
   const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, elementTypeId);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, customDataTypeId, customDataTypeName, templateId);
-  const documentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(contentName, blockListEditorAlias, libraryElementId, customDataTypeId, templateId, customDataTypeName, documentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
 
   // Act
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
-  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
   // Assert
@@ -87,16 +84,10 @@ test('can render the referenced Library element content on the published page fo
   await umbracoApi.element.publish(libraryElementId);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingBlockGridItems(gridTemplateName, gridCustomDataTypeName, propertyInBlock);
   const customDataTypeId = await umbracoApi.dataType.createBlockGridWithABlock(gridCustomDataTypeName, elementTypeId);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(gridDocumentTypeName, customDataTypeId, gridCustomDataTypeName, templateId);
-  const documentId = await umbracoApi.document.createDefaultDocument(gridContentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(gridContentName, blockGridEditorAlias, libraryElementId, customDataTypeId, templateId, gridCustomDataTypeName, gridDocumentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
 
   // Act
-  await umbracoUi.content.goToContentWithName(gridContentName);
-  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName, 'grid');
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
-  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
   // Assert
@@ -110,16 +101,10 @@ test('can render the referenced Library element content on the published page fo
   await umbracoApi.element.publish(libraryElementId);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingSingleBlockItem(singleTemplateName, singleCustomDataTypeName, propertyInBlock);
   const customDataTypeId = await umbracoApi.dataType.createSingleBlockDataTypeWithABlock(singleCustomDataTypeName, elementTypeId);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(singleDocumentTypeName, customDataTypeId, singleCustomDataTypeName, templateId);
-  const documentId = await umbracoApi.document.createDefaultDocument(singleContentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(singleContentName, singleBlockEditorAlias, libraryElementId, customDataTypeId, templateId, singleCustomDataTypeName, singleDocumentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
 
   // Act
-  await umbracoUi.content.goToContentWithName(singleContentName);
-  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName, 'single');
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
-  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
   // Assert
@@ -133,19 +118,11 @@ test('can render the referenced Library element content on the published page fo
   await umbracoApi.element.publish(libraryElementId);
   await umbracoApi.partialView.createRichTextBlockPartialView(elementTypeName, propertyInBlock);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(rteTemplateName, AliasHelper.toAlias(rteCustomDataTypeName));
-  // A second block type keeps the toolbar's Insert Block on the catalogue rather than the create workspace.
-  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(rteSecondElementTypeName);
-  const customDataTypeId = await umbracoApi.dataType.createRichTextEditorWithBlocks(rteCustomDataTypeName, [elementTypeId, secondElementTypeId]);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(rteDocumentTypeName, customDataTypeId, rteCustomDataTypeName, templateId);
-  const documentId = await umbracoApi.document.createDefaultDocument(rteContentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  const customDataTypeId = await umbracoApi.dataType.createRichTextEditorWithBlocks(rteCustomDataTypeName, [elementTypeId]);
+  const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(rteContentName, richTextBlockEditorAlias, libraryElementId, customDataTypeId, templateId, rteCustomDataTypeName, rteDocumentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
 
   // Act
-  await umbracoUi.content.goToContentWithName(rteContentName);
-  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName, 'rte');
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
-  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
   // Assert
@@ -160,13 +137,7 @@ test('can render the updated Library element content on the published page witho
   await umbracoApi.element.publish(libraryElementId);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingBlockListItems(templateName, customDataTypeName, propertyInBlock);
   const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, elementTypeId);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, customDataTypeId, customDataTypeName, templateId);
-  const documentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+  const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(contentName, blockListEditorAlias, libraryElementId, customDataTypeId, templateId, customDataTypeName, documentTypeName);
   const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
   await umbracoUi.contentRender.doesContentRenderValueContainText(libraryText);
@@ -189,15 +160,8 @@ test.skip('can render the updated Library element content on the published page 
   await umbracoApi.element.publish(libraryElementId);
   await umbracoApi.partialView.createRichTextBlockPartialView(elementTypeName, propertyInBlock);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(rteTemplateName, AliasHelper.toAlias(rteCustomDataTypeName));
-  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(rteSecondElementTypeName);
-  const customDataTypeId = await umbracoApi.dataType.createRichTextEditorWithBlocks(rteCustomDataTypeName, [elementTypeId, secondElementTypeId]);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(rteDocumentTypeName, customDataTypeId, rteCustomDataTypeName, templateId);
-  const documentId = await umbracoApi.document.createDefaultDocument(rteContentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  await umbracoUi.content.goToContentWithName(rteContentName);
-  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName, 'rte');
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+  const customDataTypeId = await umbracoApi.dataType.createRichTextEditorWithBlocks(rteCustomDataTypeName, [elementTypeId]);
+  const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(rteContentName, richTextBlockEditorAlias, libraryElementId, customDataTypeId, templateId, rteCustomDataTypeName, rteDocumentTypeName);
   const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
   await umbracoUi.contentRender.doesContentRenderValueContainText(libraryText);
@@ -218,17 +182,11 @@ test('cannot render unpublished Library element changes on the published page', 
   await umbracoApi.element.publish(libraryElementId);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingBlockListItems(templateName, customDataTypeName, propertyInBlock);
   const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, elementTypeId);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, customDataTypeId, customDataTypeName, templateId);
-  const documentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+  const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(contentName, blockListEditorAlias, libraryElementId, customDataTypeId, templateId, customDataTypeName, documentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
 
   // Act
   await umbracoApi.element.updateFirstPropertyValue(libraryElementId, draftLibraryText);
-  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
   // Assert
@@ -243,19 +201,12 @@ test('cannot render unpublished Library element changes on the published page fo
   await umbracoApi.element.publish(libraryElementId);
   await umbracoApi.partialView.createRichTextBlockPartialView(elementTypeName, propertyInBlock);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(rteTemplateName, AliasHelper.toAlias(rteCustomDataTypeName));
-  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(rteSecondElementTypeName);
-  const customDataTypeId = await umbracoApi.dataType.createRichTextEditorWithBlocks(rteCustomDataTypeName, [elementTypeId, secondElementTypeId]);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(rteDocumentTypeName, customDataTypeId, rteCustomDataTypeName, templateId);
-  const documentId = await umbracoApi.document.createDefaultDocument(rteContentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  await umbracoUi.content.goToContentWithName(rteContentName);
-  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName, 'rte');
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+  const customDataTypeId = await umbracoApi.dataType.createRichTextEditorWithBlocks(rteCustomDataTypeName, [elementTypeId]);
+  const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(rteContentName, richTextBlockEditorAlias, libraryElementId, customDataTypeId, templateId, rteCustomDataTypeName, rteDocumentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
 
   // Act
   await umbracoApi.element.updateFirstPropertyValue(libraryElementId, draftLibraryText);
-  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
   // Assert
@@ -269,6 +220,7 @@ test.skip('can render a Rich Text Editor block after transferring it to the Libr
   const blockText = 'Rich text block content transferred to the Library';
   await umbracoApi.partialView.createRichTextBlockPartialView(elementTypeName, propertyInBlock);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(rteTemplateName, AliasHelper.toAlias(rteCustomDataTypeName));
+  // A second block type keeps the toolbar's Insert Block on the catalogue rather than the create workspace.
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(rteSecondElementTypeName);
   const customDataTypeId = await umbracoApi.dataType.createRichTextEditorWithBlocks(rteCustomDataTypeName, [elementTypeId, secondElementTypeId]);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(rteDocumentTypeName, customDataTypeId, rteCustomDataTypeName, templateId);
@@ -304,15 +256,11 @@ test.skip('can render a Rich Text Editor block after disconnecting it from the L
   await umbracoApi.element.publish(libraryElementId);
   await umbracoApi.partialView.createRichTextBlockPartialView(elementTypeName, propertyInBlock);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(rteTemplateName, AliasHelper.toAlias(rteCustomDataTypeName));
-  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(rteSecondElementTypeName);
-  const customDataTypeId = await umbracoApi.dataType.createRichTextEditorWithBlocks(rteCustomDataTypeName, [elementTypeId, secondElementTypeId]);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(rteDocumentTypeName, customDataTypeId, rteCustomDataTypeName, templateId);
-  const documentId = await umbracoApi.document.createDefaultDocument(rteContentName, documentTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createRichTextEditorWithBlocks(rteCustomDataTypeName, [elementTypeId]);
+  const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(rteContentName, richTextBlockEditorAlias, libraryElementId, customDataTypeId, templateId, rteCustomDataTypeName, rteDocumentTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(rteContentName);
-  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName, 'rte');
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Act
   await umbracoUi.content.clickDisconnectFromLibraryBlockButton('rte');
