@@ -95,6 +95,8 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 			null,
 			this._parentUnique ?? null,
 		);
+		if (!this.#createPermitted) return;
+
 		this._allowedElementTypes = data?.items ?? [];
 		this._loaded = true;
 	}

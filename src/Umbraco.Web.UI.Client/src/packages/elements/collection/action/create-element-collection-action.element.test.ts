@@ -93,7 +93,7 @@ describe('UmbCreateElementCollectionActionElement', () => {
 			await renderForFolder('permissions-element-read-only-id');
 		});
 
-		it('renders no button at all, not even a disabled one', () => {
+		it('offers no element types, so renders no button at all, not even a disabled one', () => {
 			expect(anyButton()).to.not.exist;
 		});
 	});
