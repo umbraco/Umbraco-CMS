@@ -102,7 +102,7 @@ public class DocumentUrlAliasServicePersistAliasesTests
         return contentMock;
     }
 
-    private static Mock<IContent> CreateVariantContent(IReadOnlyDictionary<string, string?> aliasesByCulture, PublishedState publishedState)
+    private static Mock<IContent> CreateVariantContent(Dictionary<string, string?> aliasesByCulture, PublishedState publishedState)
     {
         var contentTypeMock = new Mock<ISimpleContentType>();
         contentTypeMock.Setup(x => x.Variations).Returns(ContentVariation.Culture);

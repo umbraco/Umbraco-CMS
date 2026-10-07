@@ -8,6 +8,15 @@ namespace Umbraco.Cms.Core.Services;
 public interface IDocumentUrlAliasService
 {
     /// <summary>
+    /// Gets a value indicating whether the service has been initialized and may persist aliases.
+    /// </summary>
+    /// <remarks>
+    /// False while the application is upgrading, when the alias table may not exist yet.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    bool IsInitialized => true;
+
+    /// <summary>
     /// Initializes the service and ensures the alias cache is populated from the database.
     /// </summary>
     /// <param name="forceEmpty">Forces an early return when we know there are no aliases (i.e. on install).</param>
@@ -41,15 +50,6 @@ public interface IDocumentUrlAliasService
     /// </summary>
     /// <param name="documentKey">The document key.</param>
     Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey);
-
-    /// <summary>
-    /// Gets a value indicating whether the service has been initialized and may persist aliases.
-    /// </summary>
-    /// <remarks>
-    /// False while the application is upgrading, when the alias table may not exist yet.
-    /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    bool IsInitialized => true;
 
     /// <summary>
     /// Persists the aliases of a document as part of the save that persists the document.

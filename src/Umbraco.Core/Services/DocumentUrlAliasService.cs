@@ -143,6 +143,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         _serverRoleAccessor = serverRoleAccessor;
     }
 
+    /// <inheritdoc/>
+    public bool IsInitialized => _isInitialized;
+
     /// <summary>
     /// Indicates whether this instance should skip the database writes that are not tied to a local content change,
     /// i.e. the start-up rebuild of URL aliases.
@@ -166,9 +169,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
     /// </remarks>
     private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
-
-    /// <inheritdoc/>
-    public bool IsInitialized => _isInitialized;
 
     /// <inheritdoc/>
     public async Task InitAsync(bool forceEmpty, CancellationToken cancellationToken)
@@ -337,7 +337,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         var trashedChanged = document.IsPropertyDirty(nameof(document.Trashed));
         var publishedStateChanged = document.PublishedState is PublishedState.Publishing or PublishedState.Unpublishing;
-        if (trashedChanged is false && publishedStateChanged is false)
+        if (!trashedChanged && !publishedStateChanged)
         {
             return;
         }
@@ -350,7 +350,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // DocumentUrlAliases lock, which keeps it from overlapping the rebuild, in the order the rebuild uses.
         var inAmbientScope = _coreScopeProvider.Context is not null;
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        if (inAmbientScope is false)
+        if (!inAmbientScope)
         {
             scope.ReadLock(Constants.Locks.ContentTree);
             scope.WriteLock(Constants.Locks.DocumentUrlAliases);

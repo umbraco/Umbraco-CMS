@@ -35,6 +35,15 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     private const string EnglishIsoCode = "en-US";
     private const string FrenchIsoCode = "fr-FR";
 
+    private static readonly string[] AllCultures = ["*"];
+    private static readonly string[] BothCultures = [EnglishIsoCode, FrenchIsoCode];
+    private static readonly string[] MyAlias = ["my-alias"];
+    private static readonly string[] FirstAndSecond = ["first", "second"];
+    private static readonly string[] SecondAndThird = ["second", "third"];
+    private static readonly string[] ScheduledAlias = ["scheduled-alias"];
+    private static readonly string[] ParentAlias = ["parent-alias"];
+    private static readonly string[] KeptAlias = ["kept-alias"];
+
     private IDocumentUrlAliasService AliasService => GetRequiredService<IDocumentUrlAliasService>();
 
     private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
@@ -92,7 +101,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
 
         RootPage = ContentBuilder.CreateSimpleContent(ContentType, "Root");
         ContentService.Save(RootPage, -1);
-        Assert.That(ContentService.Publish(RootPage, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(RootPage, AllCultures).Success, Is.True);
 
         Locks.Clear();
         FailableRepository.FailWrites = false;
@@ -104,10 +113,10 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
         Content page = CreatePage("Page", "my-alias");
         Locks.Clear();
 
-        PublishResult result = ContentService.Publish(page, ["*"]);
+        PublishResult result = ContentService.Publish(page, AllCultures);
 
         Assert.That(result.Success, Is.True, result.Result.ToString());
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(MyAlias));
         Assert.That(
             Locks.Obtained.Any(x => x.LockId == Constants.Locks.ContentTree && x.Type == DistributedLockType.WriteLock),
             Is.True,
@@ -123,7 +132,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     public void DraftSave_TakesNoAliasLock_AndLeavesTheRowsAlone()
     {
         Content page = CreatePage("Page", "my-alias");
-        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
 
         IContent draft = ContentService.GetById(page.Id)!;
         draft.SetValue(Constants.Conventions.Content.UrlAlias, "draft-alias");
@@ -131,7 +140,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
         ContentService.Save(draft, -1);
 
         Assert.That(Locks.Obtained.Where(x => x.LockId == Constants.Locks.DocumentUrlAliases), Is.Empty);
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }), "A draft edit must not change the published alias rows.");
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(MyAlias), "A draft edit must not change the published alias rows.");
         AssertAliasTableMatchesRebuildQuery("after draft save");
     }
 
@@ -139,7 +148,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     public async Task PersistAliasesAsync_OutsideAContentTransaction_TakesTheContentTreeReadLock_BeforeTheAliasWriteLock()
     {
         Content page = CreatePage("Page", "my-alias");
-        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
         IContent document = ContentService.GetById(page.Id)!;
         document.PublishedState = PublishedState.Publishing;
         Locks.Clear();
@@ -147,54 +156,54 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
         await AliasService.PersistAliasesAsync(document);
 
         AssertContentTreeReadLockPrecedesAliasWriteLock();
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(MyAlias));
     }
 
     [Test]
     public async Task CreateOrUpdateAliasesAsync_TakesTheContentTreeReadLock_BeforeTheAliasWriteLock()
     {
         Content page = CreatePage("Page", "my-alias");
-        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
         Locks.Clear();
 
         await AliasService.CreateOrUpdateAliasesAsync(page.Key);
 
         AssertContentTreeReadLockPrecedesAliasWriteLock();
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(MyAlias));
     }
 
     [Test]
     public async Task CreateOrUpdateAliasesWithDescendantsAsync_TakesTheContentTreeReadLock_BeforeTheAliasWriteLock()
     {
         Content page = CreatePage("Page", "my-alias");
-        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
         Locks.Clear();
 
         await AliasService.CreateOrUpdateAliasesWithDescendantsAsync(page.Key);
 
         AssertContentTreeReadLockPrecedesAliasWriteLock();
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(MyAlias));
     }
 
     [Test]
     public void RepublishWithChangedAlias_ReplacesTheRows_AndClearingItRemovesThem()
     {
         Content page = CreatePage("Page", "first, /Second/, first");
-        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "first", "second" }));
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(FirstAndSecond));
         AssertAliasTableMatchesRebuildQuery("after first publish");
 
         IContent edit = ContentService.GetById(page.Id)!;
         edit.SetValue(Constants.Conventions.Content.UrlAlias, "second, third");
         ContentService.Save(edit, -1);
-        Assert.That(ContentService.Publish(edit, ["*"]).Success, Is.True);
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "second", "third" }));
+        Assert.That(ContentService.Publish(edit, AllCultures).Success, Is.True);
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(SecondAndThird));
         AssertAliasTableMatchesRebuildQuery("after republish with a changed alias");
 
         edit = ContentService.GetById(page.Id)!;
         edit.SetValue(Constants.Conventions.Content.UrlAlias, string.Empty);
         ContentService.Save(edit, -1);
-        Assert.That(ContentService.Publish(edit, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(edit, AllCultures).Success, Is.True);
         Assert.That(AliasesFor(page.Key), Is.Empty);
         AssertAliasTableMatchesRebuildQuery("after republish with the alias cleared");
     }
@@ -203,14 +212,14 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     public void Unpublish_RemovesTheRows_AndPublishingAgainRestoresThem()
     {
         Content page = CreatePage("Page", "my-alias");
-        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
 
         Assert.That(ContentService.Unpublish(page).Success, Is.True);
         Assert.That(AliasesFor(page.Key), Is.Empty);
         AssertAliasTableMatchesRebuildQuery("after unpublish");
 
-        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(MyAlias));
         AssertAliasTableMatchesRebuildQuery("after publishing again");
     }
 
@@ -218,7 +227,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     public void MoveToRecycleBin_RemovesTheRows_AndARestoredDocumentGetsThemBackWhenPublishedAgain()
     {
         Content page = CreatePage("Page", "my-alias");
-        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
 
         Assert.That(ContentService.MoveToRecycleBin(page).Success, Is.True);
         Assert.That(AliasesFor(page.Key), Is.Empty, "A trashed document is not routable, so its alias rows must go.");
@@ -231,8 +240,8 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
         Assert.That(AliasesFor(page.Key), Is.Empty);
         AssertAliasTableMatchesRebuildQuery("after restore");
 
-        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(MyAlias));
         AssertAliasTableMatchesRebuildQuery("after publishing the restored document");
     }
 
@@ -240,7 +249,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     public async Task RebuildAllAliasesAsync_DoesNotResurrectTheAliasesOfAnUnpublishedDocument()
     {
         Content page = CreatePage("Page", "my-alias");
-        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
         Assert.That(ContentService.Unpublish(page).Success, Is.True);
         Assert.That(AliasesFor(page.Key), Is.Empty);
 
@@ -256,16 +265,16 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     public void Move_Sort_Rollback_AndCopy_DoNotChangeTheRows()
     {
         Content otherParent = CreatePage("Other parent", null);
-        Assert.That(ContentService.Publish(otherParent, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(otherParent, AllCultures).Success, Is.True);
         Content page = CreatePage("Page", "my-alias");
-        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
 
         Assert.That(ContentService.Move(page, otherParent.Id).Success, Is.True);
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(MyAlias));
         AssertAliasTableMatchesRebuildQuery("after move");
 
         Assert.That(ContentService.Sort(new[] { page }).Success, Is.True);
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(MyAlias));
         AssertAliasTableMatchesRebuildQuery("after sort");
 
         IContent draft = ContentService.GetById(page.Id)!;
@@ -273,16 +282,16 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
         ContentService.Save(draft, -1);
         var oldestVersionId = ContentService.GetVersionIds(page.Id, int.MaxValue).Min();
         Assert.That(ContentService.Rollback(page.Id, oldestVersionId).Success, Is.True);
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(MyAlias));
         AssertAliasTableMatchesRebuildQuery("after rollback");
 
         IContent copy = ContentService.Copy(page, RootPage.Id, relateToOriginal: false)!;
         Assert.That(AliasesFor(copy.Key), Is.Empty, "An unpublished copy has no published alias.");
         AssertAliasTableMatchesRebuildQuery("after copy");
 
-        Assert.That(ContentService.Publish(copy, ["*"]).Success, Is.True);
-        Assert.That(AliasesFor(copy.Key), Is.EqualTo(new[] { "my-alias" }));
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+        Assert.That(ContentService.Publish(copy, AllCultures).Success, Is.True);
+        Assert.That(AliasesFor(copy.Key), Is.EqualTo(MyAlias));
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(MyAlias));
         AssertAliasTableMatchesRebuildQuery("after publishing the copy");
     }
 
@@ -329,7 +338,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
         {
             using (scope.Notifications.Suppress())
             {
-                Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+                Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
             }
 
             scope.Complete();
@@ -337,7 +346,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
 
         Assert.That(
             AliasesFor(page.Key),
-            Is.EqualTo(new[] { "my-alias" }),
+            Is.EqualTo(MyAlias),
             "The alias rows are part of the content transaction, so suppressing the scoped notifications must not lose them.");
         AssertAliasTableMatchesRebuildQuery("after a publish with suppressed notifications");
     }
@@ -350,7 +359,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
 
         try
         {
-            Assert.That(() => ContentService.Publish(page, ["*"]), Throws.Exception);
+            Assert.That(() => ContentService.Publish(page, AllCultures), Throws.Exception);
         }
         finally
         {
@@ -369,7 +378,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
         Content blueprint = ContentBuilder.CreateSimpleContent(ContentType, "Blueprint");
         blueprint.SetValue(Constants.Conventions.Content.UrlAlias, "blueprint-alias");
 
-        ContentService.SaveBlueprint(blueprint, -1);
+        ContentService.SaveBlueprint(blueprint, null, -1);
 
         Assert.That(RowsFor(blueprint.Key), Is.Empty);
         AssertAliasTableMatchesRebuildQuery("after saving a blueprint");
@@ -379,7 +388,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     public async Task Publish_UpdatesTheInMemoryCache_AndTrashRemovesItAgain()
     {
         Content page = CreatePage("Page", "my-alias");
-        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
 
         Assert.That(await AliasService.GetDocumentKeysByAliasAsync("my-alias", null), Is.EqualTo(new[] { page.Key }));
 
@@ -400,7 +409,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
         List<PublishResult> released = ContentService.PerformScheduledPublish(now).ToList();
 
         Assert.That(released.Any(x => x.Entity.Id == page.Id && x.Success), Is.True);
-        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "scheduled-alias" }));
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(ScheduledAlias));
         AssertAliasTableMatchesRebuildQuery("after a scheduled publish");
 
         ContentService.PersistContentSchedule(page, ContentScheduleCollection.CreateWithEntry(null, now.AddMinutes(-1)));
@@ -421,9 +430,9 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
             children.Add(CreatePage($"Child {i}", i % 2 == 0 ? $"child-{i}" : null, parent.Id));
         }
 
-        ContentService.PublishBranch(parent, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        ContentService.PublishBranch(parent, PublishBranchFilter.IncludeUnpublished, AllCultures);
 
-        Assert.That(AliasesFor(parent.Key), Is.EqualTo(new[] { "parent-alias" }));
+        Assert.That(AliasesFor(parent.Key), Is.EqualTo(ParentAlias));
         Assert.That(children.Count(c => AliasesFor(c.Key).Count > 0), Is.EqualTo(3));
         AssertAliasTableMatchesRebuildQuery("after publishing a branch");
     }
@@ -432,19 +441,19 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     public async Task RebuildAllAliasesAsync_AfterTheWrites_ChangesNothing()
     {
         Content kept = CreatePage("Kept", "kept-alias");
-        Assert.That(ContentService.Publish(kept, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(kept, AllCultures).Success, Is.True);
         Content unpublished = CreatePage("Unpublished", "gone-alias");
-        Assert.That(ContentService.Publish(unpublished, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(unpublished, AllCultures).Success, Is.True);
         Assert.That(ContentService.Unpublish(unpublished).Success, Is.True);
         Content trashed = CreatePage("Trashed", "trashed-alias");
-        Assert.That(ContentService.Publish(trashed, ["*"]).Success, Is.True);
+        Assert.That(ContentService.Publish(trashed, AllCultures).Success, Is.True);
         Assert.That(ContentService.MoveToRecycleBin(trashed).Success, Is.True);
-        List<(Guid, int?, string)> before = AllRows();
+        List<(Guid DocumentKey, int? LanguageId, string Alias)> before = AllRows();
 
         await AliasService.RebuildAllAliasesAsync();
 
         Assert.That(AllRows(), Is.EquivalentTo(before));
-        Assert.That(before.Select(x => x.Item3), Is.EquivalentTo(new[] { "kept-alias" }));
+        Assert.That(before.Select(x => x.Item3), Is.EquivalentTo(KeptAlias));
     }
 
     private Content CreatePage(string name, string? alias, int? parentId = null)
@@ -469,12 +478,12 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
         ContentType variantType = CreateContentTypeWithUrlAlias("pageWithAliasVariant", ContentVariation.Culture);
         Assert.That((await ContentTypeService.CreateAsync(variantType, Constants.Security.SuperUserKey)).Success, Is.True);
 
-        var page = new Content("Variant", RootPage.Id, variantType, Constants.Security.SuperUserId, EnglishIsoCode);
+        var page = new Content("Variant", RootPage.Id, variantType, -1, EnglishIsoCode);
         page.SetCultureName("Variante", FrenchIsoCode);
         page.SetValue(Constants.Conventions.Content.UrlAlias, "english-alias", EnglishIsoCode);
         page.SetValue(Constants.Conventions.Content.UrlAlias, "french-alias", FrenchIsoCode);
         ContentService.Save(page, -1);
-        PublishResult result = ContentService.Publish(page, [EnglishIsoCode, FrenchIsoCode]);
+        PublishResult result = ContentService.Publish(page, BothCultures);
         Assert.That(result.Success, Is.True, result.Result.ToString());
 
         return (english, french, page);
@@ -491,7 +500,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     private List<string> AliasesFor(Guid documentKey)
         => RowsFor(documentKey).Select(x => x.Alias).OrderBy(x => x, StringComparer.Ordinal).ToList();
 
-    private List<(Guid, int?, string)> AllRows()
+    private List<(Guid DocumentKey, int? LanguageId, string Alias)> AllRows()
     {
         using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -522,8 +531,8 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     /// </summary>
     private void AssertAliasTableMatchesRebuildQuery(string step)
     {
-        List<(Guid, int?, string)> rows;
-        List<(Guid, int?, string)> expected;
+        List<(Guid DocumentKey, int? LanguageId, string Alias)> rows;
+        List<(Guid DocumentKey, int? LanguageId, string Alias)> expected;
         using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             rows = AliasRepository.GetAll().Select(x => (x.DocumentKey, x.NullableLanguageId, x.Alias)).ToList();
