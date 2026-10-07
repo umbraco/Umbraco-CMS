@@ -229,7 +229,10 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             });
     }
 
-    private async Task<ContentValidationResult> ValidateCurrentContentAsync(TContent content, string[] cultures)
+    /// <summary>
+    /// Validates the current (draft) property values of the content for the specified cultures, including all segment values.
+    /// </summary>
+    protected async Task<ContentValidationResult> ValidateCurrentContentAsync(TContent content, string[] cultures)
     {
         IEnumerable<string?> effectiveCultures = content.ContentType.VariesByCulture()
             ? cultures.Union([null])
