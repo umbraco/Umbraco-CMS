@@ -1,12 +1,6 @@
-import type { UmbMockDataSet } from './data/mock-data-set.types.js';
+import type { UmbMockDataSet, UmbMockSetManifest } from './data/mock-data-set.types.js';
+import { manifests } from './data/sets/manifests.js';
 import { umbMockDbRegistry } from './db/mock-db-registry.js';
-
-interface UmbMockSetEntry {
-	label: string;
-	loader: () => Promise<UmbMockDataSet>;
-	/** Whether the set appears in the header app dropdown. Defaults to false. */
-	visible?: boolean;
-}
 
 /**
  * Central manager for mock data sets.
@@ -16,34 +10,9 @@ class UmbMockManager {
 	#currentSetName: string = 'default';
 	#currentDataSet: UmbMockDataSet | null = null;
 
-	// Lazy loaders for mock sets
-	#mockSetLoaders: Record<string, UmbMockSetEntry> = {
-		default: {
-			label: 'Default',
-			loader: () => import('./data/sets/default/index.js') as Promise<UmbMockDataSet>,
-			visible: true,
-		},
-		kitchenSink: {
-			label: 'Kitchen Sink',
-			loader: () => import('./data/sets/kitchen-sink/index.js') as Promise<UmbMockDataSet>,
-			visible: true,
-		},
-		userPermissions: {
-			label: 'User Permissions',
-			loader: () => import('./data/sets/user-permissions/index.js') as Promise<UmbMockDataSet>,
-			visible: false,
-		},
-		documents: {
-			label: 'Documents',
-			loader: () => import('./data/sets/documents/index.js') as Promise<UmbMockDataSet>,
-			visible: true,
-		},
-		blocks: {
-			label: 'Blocks',
-			loader: () => import('./data/sets/blocks/index.js') as Promise<UmbMockDataSet>,
-			visible: true,
-		},
-	};
+	#mockSetLoaders: Record<string, UmbMockSetManifest> = Object.fromEntries(
+		manifests.map((manifest) => [manifest.alias, manifest]),
+	);
 
 	/**
 	 * Get current mock set name.
@@ -60,13 +29,13 @@ class UmbMockManager {
 	}
 
 	/**
-	 * Get all visible mock sets as alias/label pairs.
+	 * Get all visible mock sets, without their loaders.
 	 * Only sets with `visible: true` are included.
 	 */
-	get availableSets(): Array<{ alias: string; label: string }> {
-		return Object.entries(this.#mockSetLoaders)
-			.filter(([, { visible }]) => visible === true)
-			.map(([alias, { label }]) => ({ alias, label }));
+	get availableSets(): Array<Omit<UmbMockSetManifest, 'loader' | 'visible'>> {
+		return Object.values(this.#mockSetLoaders)
+			.filter(({ visible }) => visible === true)
+			.map(({ alias, label, icon }) => ({ alias, label, icon }));
 	}
 
 	/**
