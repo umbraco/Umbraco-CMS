@@ -28,5 +28,6 @@ export interface UmbContentWorkspaceContext<
 	readonly propertyViewGuard: UmbVariantPropertyGuardManager;
 	readonly propertyWriteGuard: UmbVariantPropertyGuardManager;
 	readonly nameWriteGuard: UmbVariantNameWriteGuardManager;
-	getIsVariantWritable(variantId: UmbVariantId): boolean;
+	isWritableVariant(variantId: UmbVariantId): Observable<boolean>;
+	getIsWritableVariant(variantId: UmbVariantId): boolean;
 }

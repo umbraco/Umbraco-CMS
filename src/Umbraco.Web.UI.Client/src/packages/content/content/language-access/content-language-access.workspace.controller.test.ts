@@ -299,6 +299,20 @@ describe('UmbContentLanguageAccessWorkspaceController', () => {
 			expect(isSharedPropertyWritable(daDK), 'da-DK').to.be.false;
 		});
 
+		it('denies writing shared properties in the invariant dataset without invariant-for-variant access', async () => {
+			host.currentUserContext.setHasAccessToInvariantForVariant(false);
+			await createContext();
+
+			expect(isSharedPropertyWritable(invariant)).to.be.false;
+		});
+
+		it('permits writing shared properties in the invariant dataset with invariant-for-variant access', async () => {
+			host.currentUserContext.setHasAccessToInvariantForVariant(true);
+			await createContext();
+
+			expect(isSharedPropertyWritable(invariant)).to.be.true;
+		});
+
 		it('permits writing shared properties in every variant with invariant-for-variant access', async () => {
 			host.currentUserContext.setHasAccessToInvariantForVariant(true);
 			await createContext();

@@ -3,6 +3,7 @@ import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context
 import { css, customElement, html, nothing, query, ref, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
@@ -261,7 +262,17 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	}
 
 	#observeReadOnlyCultures(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
-		if (workspaceContext) {
+		if (workspaceContext?.isWritableVariant) {
+			this.observe(
+				createObservablePart(workspaceContext.variantOptions, (options) =>
+					options.map((option) => UmbVariantId.Create(option)),
+				),
+				(variantIds) => {
+					this.#observeWritableVariants(workspaceContext, variantIds);
+				},
+				'_observeReadOnlyCultures',
+			);
+		} else if (workspaceContext) {
 			this.observe(
 				workspaceContext.readOnlyGuard.isPermittedForObservableVariants(
 					createObservablePart(workspaceContext.variantOptions, (options) =>
@@ -277,6 +288,23 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			this._readOnlyCultures = [];
 			this.removeUmbControllerByAlias('_observeReadOnlyCultures');
 		}
+	}
+
+	#observeWritableVariants(workspaceContext: UmbVariantDatasetWorkspaceContext, variantIds: Array<UmbVariantId>) {
+		if (variantIds.length === 0) {
+			this._readOnlyCultures = [];
+			this.removeUmbControllerByAlias('_observeWritableVariants');
+			return;
+		}
+		this.observe(
+			combineLatest(variantIds.map((variantId) => workspaceContext.isWritableVariant!(variantId))),
+			(writable) => {
+				this._readOnlyCultures = variantIds
+					.filter((_, index) => !writable[index])
+					.map((variantId) => variantId.culture);
+			},
+			'_observeWritableVariants',
+		);
 	}
 
 	#observeNameReadOnlyCultures(workspaceContext?: UmbVariantDatasetWorkspaceContext) {

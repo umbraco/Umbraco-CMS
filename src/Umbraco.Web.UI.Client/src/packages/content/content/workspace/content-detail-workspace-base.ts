@@ -7,6 +7,7 @@ import type { UmbContentPropertyDatasetContext } from '../property-dataset-conte
 import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
 import type { UmbContentCollectionWorkspaceContext } from '../collection/content-collection-workspace-context.interface.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
+import { _resolveIsWritableVariant } from './content-writable-variant.function.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
 import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
@@ -16,7 +17,7 @@ import {
 	observeMultiple,
 	UmbArrayState,
 } from '@umbraco-cms/backoffice/observable-api';
-import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { combineLatest, distinctUntilChanged, firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
@@ -355,6 +356,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				return [] as Array<VariantOptionModelType>;
 			},
 		).pipe(map((options) => options.filter((option) => this._variantOptionsFilter(option))));
+
+		this.observe(this.variantOptions, (variantOptions) => (this.#writableVariantOptions = variantOptions), null);
+		this.observe(
+			this.structure.contentTypeProperties,
+			(properties) => (this.#writableVariantProperties = properties),
+			null,
+		);
 
 		this.observe(
 			this.variantOptions,
@@ -854,7 +862,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		const selectedVariantIds = [...activeAndChangedVariantIds, ...changedParentCultureVariantIds];
 
-		const writableSelectedVariantIds = selectedVariantIds.filter((x) => this.getIsVariantWritable(x));
+		const writableSelectedVariantIds = selectedVariantIds.filter((x) => this.getIsWritableVariant(x));
 
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
 		const selected = writableSelectedVariantIds
@@ -870,25 +878,59 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected _saveableVariantsFilter = (option: VariantOptionModelType) => {
-		return this.getIsVariantWritable(UmbVariantId.Create(option));
+		return this.getIsWritableVariant(UmbVariantId.Create(option));
 	};
 
-	/**
-	 * Checks if the given variant may be written, i.e. it is not read-only.
-	 * @param {UmbVariantId} variantId - The variant to check
-	 * @returns {boolean} true if the variant may be written
-	 */
-	public getIsVariantWritable(variantId: UmbVariantId): boolean {
-		// TODO (V19): derive language access for saving and publishing from the current user
-		return this.readOnlyGuard.getIsPermittedForVariant(variantId) === false;
+	#writableVariantProperties: Array<UmbPropertyTypeModel> = [];
+	#writableVariantOptions: Array<VariantOptionModelType> = [];
+
+	#resolveIsWritableVariant(
+		variantId: UmbVariantId,
+		properties: Array<UmbPropertyTypeModel>,
+		variantOptions: Array<VariantOptionModelType>,
+	): boolean {
+		return _resolveIsWritableVariant({
+			variantId,
+			variantOptions,
+			properties,
+			readOnlyGuard: this.readOnlyGuard,
+			nameWriteGuard: this.nameWriteGuard,
+			propertyWriteGuard: this.propertyWriteGuard,
+		});
 	}
 
 	/**
-	 * Checks if the invariant (shared) data of existing content may be saved on its own, without saving any culture variant.
-	 * @returns {boolean} true if the invariant data may be saved on its own
+	 * Observes if the given variant is writable: it is not read-only, and its own name or one of its own properties may
+	 * be written. Invariant (shared) data is the invariant variant: `UmbVariantId.CreateInvariant()`.
+	 * @param {UmbVariantId} variantId - The variant to check
+	 * @returns {Observable<boolean>} emits true if the variant is writable, and again when the answer changes
 	 */
-	public getIsInvariantDataWritable(): boolean {
-		return this.getIsNew() === false && this.getIsVariantWritable(UmbVariantId.CreateInvariant());
+	public isWritableVariant(variantId: UmbVariantId): Observable<boolean> {
+		return combineLatest([
+			this.readOnlyGuard.rules,
+			this.readOnlyGuard.fallbackPermitted,
+			this.nameWriteGuard.rules,
+			this.nameWriteGuard.fallbackPermitted,
+			this.propertyWriteGuard.rules,
+			this.propertyWriteGuard.fallbackPermitted,
+			this.structure.contentTypeProperties,
+			this.variantOptions as Observable<Array<VariantOptionModelType>>,
+		]).pipe(
+			map(([, , , , , , properties, variantOptions]) =>
+				this.#resolveIsWritableVariant(variantId, properties, variantOptions),
+			),
+			distinctUntilChanged(),
+		);
+	}
+
+	/**
+	 * Checks if the given variant is writable. See {@link UmbContentDetailWorkspaceContextBase.isWritableVariant}.
+	 * Answers false until the content type structure and the variant options are loaded.
+	 * @param {UmbVariantId} variantId - The variant to check
+	 * @returns {boolean} true if the variant is writable
+	 */
+	public getIsWritableVariant(variantId: UmbVariantId): boolean {
+		return this.#resolveIsWritableVariant(variantId, this.#writableVariantProperties, this.#writableVariantOptions);
 	}
 
 	/* validation */
@@ -1006,7 +1048,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		} else if (
 			this.getVariesByCulture() &&
 			options.some(this._saveableVariantsFilter) === false &&
-			this.getIsInvariantDataWritable()
+			this.getIsNew() === false &&
+			this.getIsWritableVariant(UmbVariantId.CreateInvariant())
 		) {
 			// No culture may be saved, but the invariant data may. Saving the invariant variant alone stores the
 			// invariant data and leaves every culture as persisted.

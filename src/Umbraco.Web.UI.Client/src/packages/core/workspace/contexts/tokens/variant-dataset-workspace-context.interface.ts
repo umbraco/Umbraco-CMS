@@ -23,6 +23,7 @@ export interface UmbVariantDatasetWorkspaceContext<
 	getVariant(variantId: UmbVariantId): VariantType | undefined;
 	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;
 	readonly nameWriteGuard?: UmbVariantNameWriteGuardManager;
+	isWritableVariant?(variantId: UmbVariantId): Observable<boolean>;
 	varies: Observable<boolean | undefined>;
 	variesByCulture: Observable<boolean | undefined>;
 	variesBySegment: Observable<boolean | undefined>;

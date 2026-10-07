@@ -68,8 +68,10 @@ To reach the text, open the outer block and then the inner block. Every scenario
 - **Name and Text per language** are editable only in a language the user may edit. In any other language they are read-only.
 - **Shared text** is editable in every language when the user *can edit shared data*, including languages the user may not edit. When the user *cannot edit shared data* it is read-only in every language, the default language included.
 - **Page that does not vary by language** is always editable.
-- The language picker and the app language mark languages the user may not edit as read-only.
+- The language picker of the document and the app language mark a language the user may not edit as **Read-only**, also when the user can edit shared data. Shared text on that language can still be edited by a user who can edit shared data.
 - Saving and publishing only offer the languages the user may edit.
+- A user who may not edit any language but can edit shared data can still save the shared data on its own, but can publish no language.
+- A user who may not edit any language and cannot edit shared data cannot save.
 
 **Blocks** follow the same idea. Block content that belongs to a language is editable only in a language the user may edit.
 Shared block content, which is anything that is not inside a list that varies by language, is editable in every language when the user *can edit shared data*.
@@ -95,5 +97,4 @@ Per user, the languages in which Name and Text per language are editable:
 
 ## Known gaps
 
-- The save and publish dialogs for users who can edit shared data are being reworked, so they may still offer languages the user may not edit.
 - The mock backend does not enforce permissions. It shows what the backoffice does in the browser, not what the server accepts.

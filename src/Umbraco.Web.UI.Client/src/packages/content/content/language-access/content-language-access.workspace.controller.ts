@@ -156,8 +156,11 @@ export class UmbContentLanguageAccessWorkspaceController extends UmbControllerBa
 
 		const invariantVariantId = UmbVariantId.CreateInvariant();
 
-		const propertyRules = (this.#variantOptions ?? []).map((variantOption) => {
-			const datasetVariantId = UmbVariantId.CreateFromPartial(variantOption);
+		const datasetVariantIds = [
+			...(this.#variantOptions ?? []).map((variantOption) => UmbVariantId.CreateFromPartial(variantOption)),
+			invariantVariantId,
+		];
+		const propertyRules = datasetVariantIds.map((datasetVariantId) => {
 			return {
 				unique: INVARIANT_PROPERTY_WRITE_RULE_PREFIX + datasetVariantId.toString(),
 				variantId: invariantVariantId,
