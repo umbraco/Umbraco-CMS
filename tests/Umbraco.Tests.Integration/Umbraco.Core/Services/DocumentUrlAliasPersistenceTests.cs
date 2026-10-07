@@ -136,6 +136,21 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task PersistAliasesAsync_OutsideAContentTransaction_TakesTheContentTreeReadLock_BeforeTheAliasWriteLock()
+    {
+        Content page = CreatePage("Page", "my-alias");
+        Assert.That(ContentService.Publish(page, ["*"]).Success, Is.True);
+        IContent document = ContentService.GetById(page.Id)!;
+        document.PublishedState = PublishedState.Publishing;
+        Locks.Clear();
+
+        await AliasService.PersistAliasesAsync(document);
+
+        AssertContentTreeReadLockPrecedesAliasWriteLock();
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(new[] { "my-alias" }));
+    }
+
+    [Test]
     public async Task CreateOrUpdateAliasesAsync_TakesTheContentTreeReadLock_BeforeTheAliasWriteLock()
     {
         Content page = CreatePage("Page", "my-alias");

@@ -342,12 +342,17 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return;
         }
 
-        // Inside a content transaction the content tree write lock already orders this write with the content;
-        // a standalone call has to serialise against the rebuild itself.
+        // Every writer of the alias table is ordered by the content tree lock. Inside a content transaction that lock
+        // is already held exclusively, so no two of these writes can overlap and the DocumentUrlAliases lock is not
+        // needed; taking it here would add a global lock to every publish and order it after the content tree lock,
+        // which deadlocks against callers that take the two the other way round. A standalone call holds neither
+        // lock, so it takes the content tree lock shared, which keeps it from overlapping a save, and the
+        // DocumentUrlAliases lock, which keeps it from overlapping the rebuild, in the order the rebuild uses.
         var inAmbientScope = _coreScopeProvider.Context is not null;
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         if (inAmbientScope is false)
         {
+            scope.ReadLock(Constants.Locks.ContentTree);
             scope.WriteLock(Constants.Locks.DocumentUrlAliases);
         }
 

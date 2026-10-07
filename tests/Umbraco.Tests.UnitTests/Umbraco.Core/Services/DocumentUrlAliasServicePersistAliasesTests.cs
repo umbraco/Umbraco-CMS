@@ -282,16 +282,23 @@ public class DocumentUrlAliasServicePersistAliasesTests
     }
 
     [Test]
-    public async Task PersistAliasesAsync_WithoutAnAmbientScope_TakesTheDocumentUrlAliasesWriteLock()
+    public async Task PersistAliasesAsync_WithoutAnAmbientScope_TakesTheContentTreeReadLock_ThenTheDocumentUrlAliasesWriteLock()
     {
         ServiceUnderTest sut = CreateService(hasAmbientScope: false);
         Mock<IContent> content = CreateInvariantContent("my-alias", PublishedState.Publishing);
+        var locks = new List<(string Type, int LockId)>();
+        sut.Scope.Setup(x => x.ReadLock(It.IsAny<int[]>()))
+            .Callback<int[]>(lockIds => locks.AddRange(lockIds.Select(id => ("read", id))));
+        sut.Scope.Setup(x => x.WriteLock(It.IsAny<int[]>()))
+            .Callback<int[]>(lockIds => locks.AddRange(lockIds.Select(id => ("write", id))));
 
         await sut.Service.PersistAliasesAsync(content.Object);
 
-        sut.Scope.Verify(
-            x => x.WriteLock(It.Is<int[]>(lockIds => lockIds.Single() == Constants.Locks.DocumentUrlAliases)),
-            Times.Once);
+        // Shared on the content tree so the write cannot overlap a save, exclusive on the alias table so it cannot
+        // overlap the rebuild, in the order the rebuild uses.
+        Assert.That(
+            locks,
+            Is.EqualTo(new[] { ("read", Constants.Locks.ContentTree), ("write", Constants.Locks.DocumentUrlAliases) }));
         sut.Scope.Verify(x => x.Complete(), Times.Once);
     }
 
