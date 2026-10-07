@@ -104,6 +104,86 @@ public class JsonBlockValueConverterIntegrationTests
         });
     }
 
+    [Test]
+    public void Write_Sorts_Nested_Block_Expose_And_ContentData_Without_Throwing()
+    {
+        // Reproduces a reported crash: a block whose own property value is itself another block (e.g. Block
+        // List nested inside Block List). JsonBlockValueConverter writes ContentData before Expose, so the
+        // nested block's Expose is reached - via BlockItemDataConverter's already-stripped options clone for
+        // the outer ContentData - *before* the outer block's own Expose is written with the pristine top-level
+        // options. BlockItemVariationListConverter is a long-lived singleton, so seeing those two different
+        // options instances within one serialize call used to be misread as unsupported reuse and threw.
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters =
+            {
+                new JsonObjectConverter(),
+                new JsonBlockValueConverter(),
+                new BlockItemDataConverter(),
+                new BlockItemVariationListConverter(),
+            },
+        };
+
+        var innerContentKey = Guid.NewGuid();
+        var innerBlockValue = new BlockListValue([new BlockListLayoutItem(innerContentKey)])
+        {
+            ContentData =
+            [
+                new BlockItemData(innerContentKey, Guid.NewGuid(), "innerElementType")
+                {
+                    Values =
+                    [
+                        new BlockPropertyValue { Culture = "en-us", Alias = "title", Value = "inner-en" },
+                        new BlockPropertyValue { Culture = "da-dk", Alias = "title", Value = "inner-da" },
+                    ],
+                },
+            ],
+            Expose =
+            [
+                new BlockItemVariation(innerContentKey, "en-us", null),
+                new BlockItemVariation(innerContentKey, "da-dk", null),
+            ],
+        };
+
+        var outerContentKey = Guid.NewGuid();
+        var outerBlockValue = new BlockListValue([new BlockListLayoutItem(outerContentKey)])
+        {
+            ContentData =
+            [
+                new BlockItemData(outerContentKey, Guid.NewGuid(), "outerElementType")
+                {
+                    Values = [new BlockPropertyValue { Culture = "en-us", Alias = "nestedBlocks", Value = innerBlockValue }],
+                },
+            ],
+            Expose =
+            [
+                new BlockItemVariation(outerContentKey, "en-us", null),
+                new BlockItemVariation(outerContentKey, "da-dk", null),
+            ],
+        };
+
+        string json = null;
+        Assert.DoesNotThrow(() => json = JsonSerializer.Serialize(outerBlockValue, options));
+
+        using JsonDocument document = JsonDocument.Parse(json);
+        var outerExposeCultures = document.RootElement.GetProperty("expose")
+            .EnumerateArray().Select(v => v.GetProperty("culture").GetString()).ToArray();
+
+        JsonElement nestedBlockValue = document.RootElement.GetProperty("contentData")[0].GetProperty("values")[0].GetProperty("value");
+        var innerExposeCultures = nestedBlockValue.GetProperty("expose")
+            .EnumerateArray().Select(v => v.GetProperty("culture").GetString()).ToArray();
+        var innerContentDataValueCultures = nestedBlockValue.GetProperty("contentData")[0].GetProperty("values")
+            .EnumerateArray().Select(v => v.GetProperty("culture").GetString()).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            CollectionAssert.AreEqual(new[] { "da-dk", "en-us" }, outerExposeCultures);
+            CollectionAssert.AreEqual(new[] { "da-dk", "en-us" }, innerExposeCultures);
+            CollectionAssert.AreEqual(new[] { "da-dk", "en-us" }, innerContentDataValueCultures);
+        });
+    }
+
     private static JsonSerializerOptions CreateOptions(bool includeBlockItemDataConverter, bool includeBlockItemVariationListConverter)
     {
         var options = new JsonSerializerOptions

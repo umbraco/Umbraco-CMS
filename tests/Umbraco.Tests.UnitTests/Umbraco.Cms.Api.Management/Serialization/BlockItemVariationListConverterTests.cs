@@ -78,19 +78,26 @@ public class BlockItemVariationListConverterTests
     }
 
     [Test]
-    public void Write_Throws_When_Converter_Instance_Is_Reused_With_Different_Options()
+    public void Write_Reused_With_Different_Options_Produces_Independently_Correct_Output()
     {
-        // The two options must be configurably distinct: System.Text.Json shares a single cached JsonTypeInfo
-        // across JsonSerializerOptions instances with equivalent settings, so options that are "equal enough"
-        // would never actually surface as different instances to the converter.
+        // A converter instance is a long-lived singleton in production (registered once at startup), so the
+        // same instance can end up handling more than one JsonSerializerOptions instance - not just when
+        // literally registered twice, but also when a block nests another block of the same property type
+        // (see JsonBlockValueConverterIntegrationTests.Write_Sorts_Nested_Block_Expose_And_ContentData_Without_Throwing).
+        // Each options instance must get its own correctly-derived clone rather than the first one seen.
         var converter = new BlockItemVariationListConverter();
         var firstOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, Converters = { converter } };
         var secondOptions = new JsonSerializerOptions { PropertyNamingPolicy = null, Converters = { converter } };
 
         IList<BlockItemVariation> model = [new BlockItemVariation(Guid.NewGuid(), null, null)];
 
-        JsonSerializer.Serialize(model, firstOptions);
+        var firstJson = JsonSerializer.Serialize(model, firstOptions);
+        var secondJson = JsonSerializer.Serialize(model, secondOptions);
 
-        Assert.Throws<InvalidOperationException>(() => JsonSerializer.Serialize(model, secondOptions));
+        Assert.Multiple(() =>
+        {
+            Assert.That(firstJson, Does.Contain("\"contentKey\""));
+            Assert.That(secondJson, Does.Contain("\"ContentKey\""));
+        });
     }
 }
