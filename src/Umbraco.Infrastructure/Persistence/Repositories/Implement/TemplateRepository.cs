@@ -122,8 +122,8 @@ internal sealed class TemplateRepository : AsyncEntityRepositoryBase<Guid, ITemp
     }
 
     /// <inheritdoc />
-    protected override Task<bool> PerformExistsAsync(Guid key) =>
-        AmbientScope.ExecuteWithContextAsync(db => db.Nodes
+    protected override async Task<bool> PerformExistsAsync(Guid key) =>
+        await AmbientScope.ExecuteWithContextAsync(async db => await db.Nodes
             .AnyAsync(node => node.UniqueId == key && node.NodeObjectType == Constants.ObjectTypes.Template));
 
     /// <inheritdoc />
@@ -143,8 +143,6 @@ internal sealed class TemplateRepository : AsyncEntityRepositoryBase<Guid, ITemp
             await db.SaveChangesAsync();
 
             nodeDto.Path = string.Concat(parentPath, ",", nodeDto.NodeId);
-            await db.SaveChangesAsync();
-
             db.Templates.Add(new TemplateDto { NodeId = nodeDto.NodeId, Alias = entity.Alias });
             await db.SaveChangesAsync();
 
@@ -260,9 +258,11 @@ internal sealed class TemplateRepository : AsyncEntityRepositoryBase<Guid, ITemp
             alias = alias[..TruncatedAliasLength];
         }
 
+        // Compared case-insensitively, so the result doesn't depend on the database collation.
         var templateId = template.Id;
+        var lowerCaseAlias = alias.ToLowerInvariant();
         List<string?> similarAliases = await db.Templates
-            .Where(existing => existing.NodeId != templateId && existing.Alias != null && existing.Alias.StartsWith(alias))
+            .Where(existing => existing.NodeId != templateId && existing.Alias != null && existing.Alias.ToLower().StartsWith(lowerCaseAlias))
             .Select(existing => existing.Alias)
             .ToListAsync();
 

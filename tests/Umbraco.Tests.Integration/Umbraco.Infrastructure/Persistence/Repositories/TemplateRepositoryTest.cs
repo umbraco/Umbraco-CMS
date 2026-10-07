@@ -153,6 +153,21 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Unique_Alias_Ignores_Case()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(new Template(ShortStringHelper, "test", "test"), CancellationToken.None);
+
+        var template = new Template(ShortStringHelper, "Test", "Test");
+        await repository.SaveAsync(template, CancellationToken.None);
+
+        Assert.That(template.Alias, Is.EqualTo("test1").IgnoreCase);
+        scope.Complete();
+    }
+
+    [Test]
     public async Task Unique_Alias_Skips_Suffixes_Already_Taken()
     {
         using var scope = NewScopeProvider.CreateScope();
