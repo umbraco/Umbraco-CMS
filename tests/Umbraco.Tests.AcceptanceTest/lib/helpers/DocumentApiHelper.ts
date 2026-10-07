@@ -650,6 +650,22 @@ export class DocumentApiHelper {
     return documentId;
   }
 
+  async createPublishedDocumentWithLibraryElementBlock(documentName: string, blockEditorAlias: 'Umbraco.BlockList' | 'Umbraco.BlockGrid' | 'Umbraco.SingleBlock' | 'Umbraco.RichText', elementId: string, dataTypeId: string, templateId: string, propertyName: string, documentTypeName: string) {
+    const crypto = require('crypto');
+    const layoutKey = crypto.randomUUID();
+    const layoutItem = {key: layoutKey, contentKey: elementId, isExternalContent: true};
+    const blocks = {
+      layout: {[blockEditorAlias]: [blockEditorAlias === 'Umbraco.BlockGrid' ? {...layoutItem, columnSpan: 12, rowSpan: 1, areas: []} : layoutItem]},
+      contentData: [],
+      settingsData: [],
+      expose: []
+    };
+    const value = blockEditorAlias === 'Umbraco.RichText'
+      ? {markup: '<umb-rte-block data-key="' + layoutKey + '" data-content-key="' + elementId + '"></umb-rte-block>', blocks: blocks}
+      : blocks;
+    return await this.createPublishedDocumentWithValue(documentName, value, dataTypeId, templateId, propertyName, documentTypeName);
+  }
+
   async isDocumentPublished(id: string) {
     const document = await this.get(id);
     return document.variants[0].state === 'Published';

@@ -306,11 +306,15 @@ export class ElementApiHelper {
     expect(await this.doesExist(id)).toBeFalsy();
   }
 
-  async updateFirstPropertyValueAndPublish(id: string, value: string) {
+  async updateFirstPropertyValue(id: string, value: string) {
     const element = await this.get(id);
     element.values[0].value = value;
     const updateResponse = await this.update(id, element);
     expect(updateResponse?.status()).toBe(ConstantHelper.statusCodes.ok);
+  }
+
+  async updateFirstPropertyValueAndPublish(id: string, value: string) {
+    await this.updateFirstPropertyValue(id, value);
     expect(await this.publish(id)).toBe(ConstantHelper.statusCodes.ok);
   }
 
