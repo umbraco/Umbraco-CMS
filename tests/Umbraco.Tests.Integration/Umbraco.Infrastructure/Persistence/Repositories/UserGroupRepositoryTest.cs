@@ -8,6 +8,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -459,8 +460,13 @@ internal sealed class UserGroupRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Persist_Document_Blueprint_Start_Node_Of_A_Folder_On_UserGroupRepository()
+    public async Task Can_Persist_Document_Blueprint_Start_Node_Of_A_Folder_On_UserGroupRepository()
     {
+        var folderAttempt = await GetRequiredService<IContentBlueprintContainerService>()
+            .CreateAsync(null, "Test Folder", null, Constants.Security.SuperUserKey);
+        Assert.That(folderAttempt.Success, Is.True, $"Failed to create the folder: {folderAttempt.Status}");
+        var folderId = folderAttempt.Result!.Id;
+
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
@@ -473,13 +479,13 @@ internal sealed class UserGroupRepositoryTest : UmbracoIntegrationTest
             var resolved = repository.Get(userGroup.Id);
             Assert.That(resolved.StartDocumentBlueprintId, Is.Null);
 
-            resolved.StartDocumentBlueprintId = Constants.System.Root;
+            resolved.StartDocumentBlueprintId = folderId;
             repository.Save(resolved);
             scope.Complete();
 
             var updated = repository.Get(userGroup.Id);
 
-            Assert.That(updated.StartDocumentBlueprintId, Is.EqualTo(Constants.System.Root));
+            Assert.That(updated.StartDocumentBlueprintId, Is.EqualTo(folderId));
         }
     }
 
