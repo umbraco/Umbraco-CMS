@@ -13,6 +13,7 @@ export class LogViewerUiHelper extends UiBaseLocators {
   private readonly sortLogByTimestampBtn: Locator;
   private readonly firstLogLevelTimestamp: Locator;
   private readonly logMessages: Locator;
+  private readonly logLevelTags: Locator;
   private readonly firstLogLevelMessage: Locator;
   private readonly firstLogSearchResult: Locator;
   private readonly savedSearchesBtn: Locator;
@@ -30,6 +31,9 @@ export class LogViewerUiHelper extends UiBaseLocators {
     this.sortLogByTimestampBtn = page.getByLabel('Sort logs');
     this.firstLogLevelTimestamp = page.locator('umb-log-viewer-message #timestamp').first();
     this.logMessages = page.locator('umb-log-viewer-message');
+    // The level text is templated inside umb-log-viewer-level-tag's own shadow root (nested in a uui-tag), so
+    // textContent/innerText on the host tag itself is always empty; read it off the inner uui-tag instead.
+    this.logLevelTags = page.locator('umb-log-viewer-message').locator('umb-log-viewer-level-tag').locator('uui-tag');
     this.firstLogLevelMessage = page.locator('umb-log-viewer-message #message').first();
     this.firstLogSearchResult = page.getByRole('group').locator('#message').first();
     this.savedSearchesBtn = page.getByLabel('Saved searches');
@@ -96,6 +100,11 @@ export class LogViewerUiHelper extends UiBaseLocators {
   async getLogTimestamps() {
     await this.waitForVisible(this.firstLogLevelTimestamp);
     return await this.logMessages.evaluateAll((messages) => messages.map((message) => (message as HTMLElement & {timestamp: string}).timestamp));
+  }
+
+  async getRenderedLogLevels() {
+    await this.waitForVisible(this.firstLogLevelTimestamp);
+    return await this.logLevelTags.allTextContents();
   }
 
   async clickPageNumber(pageNumber: number) {

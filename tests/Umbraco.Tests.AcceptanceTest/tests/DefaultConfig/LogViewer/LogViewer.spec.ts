@@ -68,27 +68,23 @@ test('can create a saved search', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
 });
 
-// Needs redesigning: it compares rendered rows against whole-log API totals, but the viewer pages at 100 and
-// mixes levels on one page. Assert on the level filter totals instead.
-test.skip('can create a complex saved search', async ({umbracoApi, umbracoUi}) => {
+test('can create a complex saved search', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const searchName = 'ComplexTest';
   const search = "@Level='Fatal' or @Level='Error' or @Level='Warning'";
+  const allowedLevels = ['Fatal', 'Error', 'Warning'];
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
-  const logInformation = await umbracoApi.logViewer.getLevelCount();
-  const expectedLogCountFatal = logInformation.fatal;
-  const expectedLogCountError = logInformation.error;
-  const expectedLogCountWarning = logInformation.warning;
 
   // Act
   await umbracoUi.logViewer.clickSearchButton();
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
   await umbracoUi.logViewer.enterSearchKeyword(search);
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
-  // Checks if the complex search works before saving it.
-  await umbracoUi.logViewer.doesLogLevelCountMatch('Fatal', expectedLogCountFatal);
-  await umbracoUi.logViewer.doesLogLevelCountMatch('Error', expectedLogCountError);
-  await umbracoUi.logViewer.doesLogLevelCountMatch('Warning', expectedLogCountWarning);
+  // The viewer pages at 100 rows and a long-running instance can have far more than 100 matches, so the
+  // filter is verified by level membership rather than an exact count against an unbounded log total.
+  const renderedLevels = await umbracoUi.logViewer.getRenderedLogLevels();
+  expect(renderedLevels.length).toBeGreaterThan(0);
+  expect(renderedLevels.every(level => allowedLevels.includes(level.trim()))).toBeTruthy();
   await umbracoUi.logViewer.saveSearch(searchName);
 
   // Assert
