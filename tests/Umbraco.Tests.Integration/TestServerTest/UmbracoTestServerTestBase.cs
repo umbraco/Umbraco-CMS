@@ -170,7 +170,11 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
             // Remove the CancellationToken from the method params, this is automatically added by the framework
             // So we do not want to add this to the query string
-            methodParams.Remove(methodParams.FirstOrDefault(x => x.Value is CancellationToken).Key);
+            var cancellationTokenParam = methodParams.FirstOrDefault(x => x.Value is CancellationToken).Key;
+            if (cancellationTokenParam is not null)
+            {
+                methodParams.Remove(cancellationTokenParam);
+            }
             methodParams["version"] = method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions[0].MajorVersion.ToString();
 
             // Rename keys if [FromQuery(Name = "...")] specifies a different name
