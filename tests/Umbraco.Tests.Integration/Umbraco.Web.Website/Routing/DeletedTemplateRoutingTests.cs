@@ -46,7 +46,12 @@ internal sealed class DeletedTemplateRoutingTests : UmbracoIntegrationTest
         builder.AddUmbracoHybridCache();
         builder.Services.Configure<WebRoutingSettings>(settings => settings.ValidateAlternativeTemplates = true);
 
-        // Ensure cache refreshers run, so the caches behave as they do when a template is deleted in a running site.
+        // Use real caches and run the cache refreshers, so the caches behave as they do when a template is deleted in a
+        // running site.
+        builder.Services.AddUnique(_ => new AppCaches(
+            new DeepCloneAppCache(new ObjectCacheAppCache()),
+            NoAppCache.Instance,
+            new IsolatedCaches(_ => new DeepCloneAppCache(new ObjectCacheAppCache()))));
         builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<TemplateDeletedNotification, TemplateDeletedDistributedCacheNotificationHandler>();
