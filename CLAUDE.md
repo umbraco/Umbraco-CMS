@@ -419,8 +419,11 @@ The repository contains BOTH (actively supported):
 **Back office (v19+)**: a single HTTP-only authentication cookie — no client-side tokens and no
 OpenIddict flow. The back-office authorization policies accept both the cookie scheme
 (`Constants.Security.BackOfficeAuthenticationType`) and the OpenIddict validation scheme; see
-`BackOfficeAuthPolicyBuilderExtensions`. Cookie behaviour (expiry, renewal, SameSite,
-401-instead-of-302 for API requests) is configured in `ConfigureBackOfficeCookieOptions`.
+`BackOfficeAuthPolicyBuilderExtensions`. Cookie behaviour (expiry, renewal, SameSite) is
+configured in `ConfigureBackOfficeCookieOptions`. Whether an unauthenticated request gets a
+401/403 or a 302 to the login page follows ASP.NET Core's endpoint metadata: `[ApiController]` on
+`ManagementApiControllerBase` disables the redirect, and `[AllowCookieRedirect]` opts an endpoint
+back in (the OAuth `authorize` action).
 
 **API users / external clients**: **OpenIddict** (OAuth 2.0/OpenID Connect) with reference tokens
 (not JWT), configured in `Umbraco.Cms.Api.Common`.
