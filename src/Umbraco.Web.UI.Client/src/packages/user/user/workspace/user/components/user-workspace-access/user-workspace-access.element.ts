@@ -1,6 +1,6 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserStartNodesModel } from '../../../../types.js';
-import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -41,8 +41,9 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	}
 
 	#renderDocumentStartNodes() {
-		const uniques = this._calculatedStartNodes?.documentStartNodeUniques.map((reference) => reference.unique) || [];
-		const hasAccess = this._calculatedStartNodes?.hasDocumentRootAccess === true || uniques.length > 0;
+		if (!this._calculatedStartNodes) return nothing;
+		const uniques = this._calculatedStartNodes.documentStartNodeUniques.map((reference) => reference.unique);
+		const hasAccess = this._calculatedStartNodes.hasDocumentRootAccess || uniques.length > 0;
 		return html` <b><umb-localize key="sections_content">Content</umb-localize></b>
 			${hasAccess
 				? html`<umb-user-document-start-node readonly .uniques=${uniques}></umb-user-document-start-node>`
@@ -50,8 +51,9 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	}
 
 	#renderMediaStartNodes() {
-		const uniques = this._calculatedStartNodes?.mediaStartNodeUniques.map((reference) => reference.unique) || [];
-		const hasAccess = this._calculatedStartNodes?.hasMediaRootAccess === true || uniques.length > 0;
+		if (!this._calculatedStartNodes) return nothing;
+		const uniques = this._calculatedStartNodes.mediaStartNodeUniques.map((reference) => reference.unique);
+		const hasAccess = this._calculatedStartNodes.hasMediaRootAccess || uniques.length > 0;
 		return html` <b><umb-localize key="sections_media">Media</umb-localize></b>
 			${hasAccess
 				? html`<umb-user-media-start-node readonly .uniques=${uniques}></umb-user-media-start-node>`
