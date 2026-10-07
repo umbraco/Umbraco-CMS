@@ -11,11 +11,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 [TestFixture]
 public class DocumentUrlAliasContentRefreshNotificationHandlerTests
 {
-    private static (DocumentUrlAliasContentRefreshNotificationHandler Handler, Mock<IDocumentUrlAliasService> AliasService) CreateHandler(bool isInitialized)
+    private static (DocumentUrlAliasContentRefreshNotificationHandler Handler, Mock<IDocumentUrlAliasService> AliasService) CreateHandler(bool isInitialized, bool persistsInTransaction = true)
     {
         var aliasServiceMock = new Mock<IDocumentUrlAliasService>();
         aliasServiceMock.Setup(x => x.IsInitialized).Returns(isInitialized);
-        aliasServiceMock.Setup(x => x.PersistAliasesAsync(It.IsAny<IContent>())).Returns(Task.CompletedTask);
+        aliasServiceMock.Setup(x => x.PersistsAliasesInContentTransaction).Returns(persistsInTransaction);
+        aliasServiceMock.Setup(x => x.PersistAliasesAsync(It.IsAny<IContent>(), It.IsAny<bool>())).Returns(Task.CompletedTask);
 
         return (new DocumentUrlAliasContentRefreshNotificationHandler(aliasServiceMock.Object), aliasServiceMock);
     }
@@ -28,9 +29,22 @@ public class DocumentUrlAliasContentRefreshNotificationHandlerTests
 
         await handler.HandleAsync(new ContentRefreshNotification(content, new EventMessages()), CancellationToken.None);
 
-        aliasService.Verify(x => x.PersistAliasesAsync(content), Times.Once);
+        // The repository publishes the notification under the content tree write lock, which the service is told.
+        aliasService.Verify(x => x.PersistAliasesAsync(content, true), Times.Once);
+        aliasService.Verify(x => x.PersistAliasesAsync(It.IsAny<IContent>(), false), Times.Never);
         aliasService.Verify(x => x.CreateOrUpdateAliasesAsync(It.IsAny<Guid>()), Times.Never);
         aliasService.Verify(x => x.CreateOrUpdateAliasesWithDescendantsAsync(It.IsAny<Guid>()), Times.Never);
+    }
+
+    [Test]
+    public async Task HandleAsync_WhenTheServiceDoesNotPersistInTheTransaction_LeavesItToThePostCommitHandler()
+    {
+        var (handler, aliasService) = CreateHandler(isInitialized: true, persistsInTransaction: false);
+
+        await handler.HandleAsync(new ContentRefreshNotification(Mock.Of<IContent>(), new EventMessages()), CancellationToken.None);
+
+        aliasService.Verify(x => x.PersistAliasesAsync(It.IsAny<IContent>(), It.IsAny<bool>()), Times.Never);
+        aliasService.Verify(x => x.CreateOrUpdateAliasesAsync(It.IsAny<Guid>()), Times.Never);
     }
 
     [Test]
@@ -40,7 +54,7 @@ public class DocumentUrlAliasContentRefreshNotificationHandlerTests
 
         await handler.HandleAsync(new ContentRefreshNotification(Mock.Of<IContent>(), new EventMessages()), CancellationToken.None);
 
-        aliasService.Verify(x => x.PersistAliasesAsync(It.IsAny<IContent>()), Times.Never);
+        aliasService.Verify(x => x.PersistAliasesAsync(It.IsAny<IContent>(), It.IsAny<bool>()), Times.Never);
         aliasService.Verify(x => x.CreateOrUpdateAliasesAsync(It.IsAny<Guid>()), Times.Never);
     }
 }

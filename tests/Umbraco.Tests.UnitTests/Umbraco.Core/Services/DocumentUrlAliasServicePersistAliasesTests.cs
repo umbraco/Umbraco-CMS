@@ -268,12 +268,12 @@ public class DocumentUrlAliasServicePersistAliasesTests
     }
 
     [Test]
-    public async Task PersistAliasesAsync_InsideAnAmbientScope_TakesNoDistributedLock()
+    public async Task PersistAliasesAsync_WhenTheCallerHoldsTheContentTreeWriteLock_TakesNoLockOfItsOwn()
     {
         ServiceUnderTest sut = CreateService(hasAmbientScope: true);
         Mock<IContent> content = CreateInvariantContent("my-alias", PublishedState.Publishing);
 
-        await sut.Service.PersistAliasesAsync(content.Object);
+        await sut.Service.PersistAliasesAsync(content.Object, contentTreeWriteLockHeld: true);
 
         sut.Scope.Verify(x => x.WriteLock(It.IsAny<int[]>()), Times.Never);
         sut.Scope.Verify(x => x.WriteLock(It.IsAny<TimeSpan>(), It.IsAny<int>()), Times.Never);
@@ -281,10 +281,12 @@ public class DocumentUrlAliasServicePersistAliasesTests
         sut.Scope.Verify(x => x.Complete(), Times.Once);
     }
 
-    [Test]
-    public async Task PersistAliasesAsync_WithoutAnAmbientScope_TakesTheContentTreeReadLock_ThenTheDocumentUrlAliasesWriteLock()
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task PersistAliasesAsync_WhenTheCallerDoesNotHoldTheContentTreeWriteLock_TakesContentTreeRead_ThenAliasWrite(bool hasAmbientScope)
     {
-        ServiceUnderTest sut = CreateService(hasAmbientScope: false);
+        // An ambient scope says nothing about the locks it holds, so the locks are taken either way.
+        ServiceUnderTest sut = CreateService(hasAmbientScope);
         Mock<IContent> content = CreateInvariantContent("my-alias", PublishedState.Publishing);
         var locks = new List<(string Type, int LockId)>();
         sut.Scope.Setup(x => x.ReadLock(It.IsAny<int[]>()))
@@ -292,7 +294,7 @@ public class DocumentUrlAliasServicePersistAliasesTests
         sut.Scope.Setup(x => x.WriteLock(It.IsAny<int[]>()))
             .Callback<int[]>(lockIds => locks.AddRange(lockIds.Select(id => ("write", id))));
 
-        await sut.Service.PersistAliasesAsync(content.Object);
+        await sut.Service.PersistAliasesAsync(content.Object, contentTreeWriteLockHeld: false);
 
         // Shared on the content tree so the write cannot overlap a save, exclusive on the alias table so it cannot
         // overlap the rebuild, in the order the rebuild uses.
@@ -301,6 +303,22 @@ public class DocumentUrlAliasServicePersistAliasesTests
             Is.EqualTo(new[] { ("read", Constants.Locks.ContentTree), ("write", Constants.Locks.DocumentUrlAliases) }));
         sut.Scope.Verify(x => x.Complete(), Times.Once);
     }
+
+    [Test]
+    public async Task PersistAliasesAsync_WithoutTheLockArgument_DoesNotAssumeTheContentTreeWriteLock()
+    {
+        ServiceUnderTest sut = CreateService(hasAmbientScope: true);
+        Mock<IContent> content = CreateInvariantContent("my-alias", PublishedState.Publishing);
+
+        await sut.Service.PersistAliasesAsync(content.Object);
+
+        sut.Scope.Verify(x => x.ReadLock(It.Is<int[]>(ids => ids.Single() == Constants.Locks.ContentTree)), Times.Once);
+        sut.Scope.Verify(x => x.WriteLock(It.Is<int[]>(ids => ids.Single() == Constants.Locks.DocumentUrlAliases)), Times.Once);
+    }
+
+    [Test]
+    public void PersistsAliasesInContentTransaction_IsTrue()
+        => Assert.That(CreateService().Service.PersistsAliasesInContentTransaction, Is.True);
 
     [Test]
     public void IsInitialized_IsFalseUntilInitAsyncCompletes()
@@ -319,9 +337,14 @@ public class DocumentUrlAliasServicePersistAliasesTests
         IContent content = CreateInvariantContent("my-alias", PublishedState.Publishing).Object;
 
         await ((IDocumentUrlAliasService)implementation).PersistAliasesAsync(content);
+        await ((IDocumentUrlAliasService)implementation).PersistAliasesAsync(content, contentTreeWriteLockHeld: true);
 
         Assert.That(((IDocumentUrlAliasService)implementation).IsInitialized, Is.True);
-        Assert.That(implementation.CreatedOrUpdatedKeys, Is.EqualTo(new[] { content.Key }));
+        Assert.That(
+            ((IDocumentUrlAliasService)implementation).PersistsAliasesInContentTransaction,
+            Is.False,
+            "An implementation written before this member must keep the post-commit path, because the default PersistAliasesAsync loads by key.");
+        Assert.That(implementation.CreatedOrUpdatedKeys, Is.EqualTo(new[] { content.Key, content.Key }));
     }
 
     /// <summary>

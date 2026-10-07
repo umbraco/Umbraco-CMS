@@ -146,6 +146,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <inheritdoc/>
     public bool IsInitialized => _isInitialized;
 
+    /// <inheritdoc/>
+    public bool PersistsAliasesInContentTransaction => true;
+
     /// <summary>
     /// Indicates whether this instance should skip the database writes that are not tied to a local content change,
     /// i.e. the start-up rebuild of URL aliases.
@@ -326,7 +329,11 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     }
 
     /// <inheritdoc/>
-    public async Task PersistAliasesAsync(IContent document)
+    public Task PersistAliasesAsync(IContent document)
+        => PersistAliasesAsync(document, contentTreeWriteLockHeld: false);
+
+    /// <inheritdoc/>
+    public async Task PersistAliasesAsync(IContent document, bool contentTreeWriteLockHeld)
     {
         // Aliases are routing data for the published site, so only a change to the published state or to the
         // trashed state can change them; a draft save cannot. Blueprints never have aliases.
@@ -342,15 +349,15 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return;
         }
 
-        // Every writer of the alias table is ordered by the content tree lock. Inside a content transaction that lock
-        // is already held exclusively, so no two of these writes can overlap and the DocumentUrlAliases lock is not
-        // needed; taking it here would add a global lock to every publish and order it after the content tree lock,
-        // which deadlocks against callers that take the two the other way round. A standalone call holds neither
-        // lock, so it takes the content tree lock shared, which keeps it from overlapping a save, and the
-        // DocumentUrlAliases lock, which keeps it from overlapping the rebuild, in the order the rebuild uses.
-        var inAmbientScope = _coreScopeProvider.Context is not null;
+        // Every writer of the alias table is ordered by the content tree lock. A caller that holds it exclusively
+        // (the transaction persisting the document) cannot overlap any other writer, so its write needs no lock of
+        // its own; taking the DocumentUrlAliases lock there would add a global lock to every publish and order it
+        // after the content tree lock, the reverse of the order the rebuild uses. Every other caller takes the
+        // content tree lock shared, which keeps the write from overlapping a save, and the DocumentUrlAliases lock,
+        // which keeps it from overlapping the rebuild, in the rebuild's order. An ambient scope says nothing about
+        // which locks are held, so only the caller's word is trusted.
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        if (!inAmbientScope)
+        if (!contentTreeWriteLockHeld)
         {
             scope.ReadLock(Constants.Locks.ContentTree);
             scope.WriteLock(Constants.Locks.DocumentUrlAliases);

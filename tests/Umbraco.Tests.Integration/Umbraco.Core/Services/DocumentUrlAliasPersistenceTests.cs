@@ -64,6 +64,8 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
 
     private FailableAliasRepository FailableRepository => GetRequiredService<FailableAliasRepository>();
 
+    private SwitchableAliasService AliasServiceSwitch => GetRequiredService<SwitchableAliasService>();
+
     private ContentType ContentType { get; set; } = null!;
 
     private Content RootPage { get; set; } = null!;
@@ -84,6 +86,9 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
 
         builder.Services.AddSingleton(sp => new FailableAliasRepository(ActivatorUtilities.CreateInstance<DocumentUrlAliasRepository>(sp)));
         builder.Services.AddUnique<IDocumentUrlAliasRepository>(sp => sp.GetRequiredService<FailableAliasRepository>());
+
+        builder.Services.AddSingleton(sp => new SwitchableAliasService(ActivatorUtilities.CreateInstance<DocumentUrlAliasService>(sp)));
+        builder.Services.AddUnique<IDocumentUrlAliasService>(sp => sp.GetRequiredService<SwitchableAliasService>());
     }
 
     [SetUp]
@@ -105,6 +110,26 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
 
         Locks.Clear();
         FailableRepository.FailWrites = false;
+        AliasServiceSwitch.BehaveAsLegacyImplementation = false;
+    }
+
+    [Test]
+    public void Publish_WithAnAliasServiceThatDoesNotPersistInTheTransaction_StillWritesTheRowsAfterTheCommit()
+    {
+        // An implementation written before PersistAliasesAsync existed reports no in-transaction support, so the
+        // CMS must keep calling it after the commit, as it did before, and must not run the default
+        // PersistAliasesAsync inside the transaction, where a reload by key sees the pre-save document.
+        AliasServiceSwitch.BehaveAsLegacyImplementation = true;
+        Content page = CreatePage("Page", "my-alias");
+        AliasServiceSwitch.Calls.Clear();
+
+        Assert.That(ContentService.Publish(page, AllCultures).Success, Is.True);
+
+        // A first publish of an existing document is a RefreshBranch, which the post-commit handler serves through the
+        // descendants variant.
+        Assert.That(AliasServiceSwitch.Calls, Is.EqualTo(new[] { $"CreateOrUpdateAliasesWithDescendantsAsync({page.Key})" }));
+        Assert.That(AliasesFor(page.Key), Is.EqualTo(MyAlias));
+        AssertAliasTableMatchesRebuildQuery("after a publish with a legacy alias service");
     }
 
     [Test]
@@ -636,6 +661,57 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
             recorder.Record(lockId, DistributedLockType.WriteLock);
             return obtained;
         }
+    }
+
+    /// <summary>
+    /// Delegates to the real service, and while <see cref="BehaveAsLegacyImplementation"/> is set reports no support
+    /// for persisting inside the content transaction and records which persistence members the CMS calls.
+    /// </summary>
+    internal sealed class SwitchableAliasService(DocumentUrlAliasService inner) : IDocumentUrlAliasService
+    {
+        public bool BehaveAsLegacyImplementation { get; set; }
+
+        public List<string> Calls { get; } = [];
+
+        public bool IsInitialized => inner.IsInitialized;
+
+        public bool PersistsAliasesInContentTransaction => !BehaveAsLegacyImplementation && inner.PersistsAliasesInContentTransaction;
+
+        public Task InitAsync(bool forceEmpty, CancellationToken cancellationToken) => inner.InitAsync(forceEmpty, cancellationToken);
+
+        public Task<IEnumerable<Guid>> GetDocumentKeysByAliasAsync(string alias, string? culture) => inner.GetDocumentKeysByAliasAsync(alias, culture);
+
+        public Task<IEnumerable<string>> GetAliasesAsync(Guid documentKey, string? culture) => inner.GetAliasesAsync(documentKey, culture);
+
+        public Task CreateOrUpdateAliasesAsync(Guid documentKey)
+        {
+            Calls.Add($"CreateOrUpdateAliasesAsync({documentKey})");
+            return inner.CreateOrUpdateAliasesAsync(documentKey);
+        }
+
+        public Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey)
+        {
+            Calls.Add($"CreateOrUpdateAliasesWithDescendantsAsync({documentKey})");
+            return inner.CreateOrUpdateAliasesWithDescendantsAsync(documentKey);
+        }
+
+        public Task PersistAliasesAsync(IContent document) => PersistAliasesAsync(document, contentTreeWriteLockHeld: false);
+
+        public Task PersistAliasesAsync(IContent document, bool contentTreeWriteLockHeld)
+        {
+            Calls.Add($"PersistAliasesAsync({document.Key}, {contentTreeWriteLockHeld})");
+            return inner.PersistAliasesAsync(document, contentTreeWriteLockHeld);
+        }
+
+        public Task DeleteAliasesFromCacheAsync(IEnumerable<Guid> documentKeys) => inner.DeleteAliasesFromCacheAsync(documentKeys);
+
+        public Task RebuildAllAliasesAsync() => inner.RebuildAllAliasesAsync();
+
+        public bool HasAny() => inner.HasAny();
+
+        public Task UpdateAliasCacheAsync(Guid documentKey) => inner.UpdateAliasCacheAsync(documentKey);
+
+        public Task UpdateAliasCacheWithDescendantsAsync(Guid documentKey) => inner.UpdateAliasCacheWithDescendantsAsync(documentKey);
     }
 
     /// <summary>Delegates to the real repository, and fails every write while <see cref="FailWrites"/> is set.</summary>
