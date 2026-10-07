@@ -341,7 +341,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         var trashedChanged = document.IsPropertyDirty(nameof(document.Trashed));
         var publishedStateChanged = document.PublishedState is PublishedState.Publishing or PublishedState.Unpublishing;
-        if (!trashedChanged && !publishedStateChanged)
+        if (trashedChanged is false && publishedStateChanged is false)
         {
             return;
         }
@@ -354,7 +354,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // which keeps it from overlapping the rebuild, in the rebuild's order. An ambient scope says nothing about
         // which locks are held, so only the caller's word is trusted.
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        if (!contentTreeWriteLockHeld)
+        if (contentTreeWriteLockHeld is false)
         {
             scope.ReadLock(Constants.Locks.ContentTree);
             scope.WriteLock(Constants.Locks.DocumentUrlAliases);
