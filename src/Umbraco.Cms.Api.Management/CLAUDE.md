@@ -11,7 +11,7 @@ RESTful API for Umbraco backoffice operations. Manages content, media, users, an
 ## 1. Architecture
 
 ### Target Framework
-- **.NET 10.0** (`net10.0`)
+- **.NET 11.0** (`net11.0`)
 - **C# 12** with nullable reference types enabled
 - **ASP.NET Core** Web API
 
@@ -200,7 +200,7 @@ dotnet list src/Umbraco.Cms.Api.Management package --vulnerable
 ```
 
 ### Environment Setup
-1. **Prerequisites**: .NET 10 SDK
+1. **Prerequisites**: .NET 11 SDK
 2. **IDE**: Visual Studio 2022 or Rider (with .editorconfig support)
 3. **Configuration**: Inherits from `Umbraco.Web.UI` appsettings (no app settings in this library)
 
