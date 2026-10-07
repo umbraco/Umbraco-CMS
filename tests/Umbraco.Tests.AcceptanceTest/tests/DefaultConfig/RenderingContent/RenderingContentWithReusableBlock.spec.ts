@@ -226,6 +226,8 @@ test('cannot render unpublished Library element changes on the published page', 
   const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, elementTypeId);
   const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(contentName, blockListEditorAlias, libraryElementId, customDataTypeId, templateId, customDataTypeName, documentTypeName);
   const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
+  await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(libraryText);
 
   // Act
   await umbracoApi.element.updateFirstPropertyValue(libraryElementId, draftLibraryText);
@@ -246,6 +248,8 @@ test('cannot render unpublished Library element changes on the published page fo
   const customDataTypeId = await umbracoApi.dataType.createRichTextEditorWithBlocks(rteCustomDataTypeName, [elementTypeId]);
   const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(rteContentName, richTextBlockEditorAlias, libraryElementId, customDataTypeId, templateId, rteCustomDataTypeName, rteDocumentTypeName);
   const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
+  await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(libraryText);
 
   // Act
   await umbracoApi.element.updateFirstPropertyValue(libraryElementId, draftLibraryText);

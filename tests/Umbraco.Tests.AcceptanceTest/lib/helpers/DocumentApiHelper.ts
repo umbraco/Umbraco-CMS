@@ -650,7 +650,7 @@ export class DocumentApiHelper {
     return documentId;
   }
 
-  async createPublishedDocumentWithLibraryElementBlock(documentName: string, blockEditorAlias: string, elementId: string, dataTypeId: string, templateId: string, propertyName: string, documentTypeName: string) {
+  async createPublishedDocumentWithLibraryElementBlock(documentName: string, blockEditorAlias: 'Umbraco.BlockList' | 'Umbraco.BlockGrid' | 'Umbraco.SingleBlock' | 'Umbraco.RichText', elementId: string, dataTypeId: string, templateId: string, propertyName: string, documentTypeName: string) {
     const crypto = require('crypto');
     const layoutKey = crypto.randomUUID();
     const layoutItem = {key: layoutKey, contentKey: elementId, isExternalContent: true};
