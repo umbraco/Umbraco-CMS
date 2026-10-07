@@ -22,6 +22,11 @@ public static partial class UmbracoBuilderExtensions
     /// to register core services, identity, and cookie authentication, then adds backoffice-specific
     /// services on top (OpenIddict, backoffice SPA infrastructure, token management).
     /// <para>
+    /// The ModelsBuilder services the backoffice depends on are also registered here, so website rendering
+    /// is optional. Combine with <c>AddDeliveryApi()</c> and omit <c>AddWebsite()</c> to run the backoffice
+    /// against an external frontend.
+    /// </para>
+    /// <para>
     /// For frontend-only deployments that only need basic authentication with backoffice credentials
     /// (no backoffice UI), use <see cref="AddBackOfficeSignIn"/> instead.
     /// </para>
@@ -32,7 +37,7 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null) =>
         builder
             .AddCore(configureMvc)                   // All core services
-            .AddModelsBuilder()
+            .AddModelsBuilder()                      // ModelsBuilder services (shared with AddWebsite(), idempotent)
             .AddBackOfficeSignIn()                   // Identity + Cookie authentication
             .AddBackOfficeCore()                     // IBackOfficePathGenerator, IBackOfficeEnabledMarker
             .AddBackOfficeOpenIddictServices()       // OpenIddict, application manager, middleware
