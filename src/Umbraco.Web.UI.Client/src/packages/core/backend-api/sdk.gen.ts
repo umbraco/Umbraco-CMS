@@ -651,6 +651,8 @@ export class DocumentService {
      * Gets available segments.
      *
      * Gets a collection of available content segments for the system.
+     *
+     * @deprecated
      */
     public static getDocumentByIdAvailableSegmentOptions<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdAvailableSegmentOptionsData, ThrowOnError>): RequestResult<GetDocumentByIdAvailableSegmentOptionsResponses, GetDocumentByIdAvailableSegmentOptionsErrors, ThrowOnError> {
         return (options.client ?? client).get<GetDocumentByIdAvailableSegmentOptionsResponses, GetDocumentByIdAvailableSegmentOptionsErrors, ThrowOnError>({

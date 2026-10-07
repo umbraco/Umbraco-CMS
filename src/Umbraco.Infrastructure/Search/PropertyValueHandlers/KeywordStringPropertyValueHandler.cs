@@ -21,7 +21,8 @@ internal sealed class KeywordStringPropertyValueHandler : IPropertyValueHandler,
 
     /// <inheritdoc />
     public bool CanHandle(IPropertyType propertyType)
-        => propertyType.PropertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.DropDownListFlexible
+        => propertyType.PropertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.MultipleDropDown
+            or Cms.Core.Constants.PropertyEditors.Aliases.SingleDropDown
             or Cms.Core.Constants.PropertyEditors.Aliases.RadioButtonList
             or Cms.Core.Constants.PropertyEditors.Aliases.CheckBoxList;
 

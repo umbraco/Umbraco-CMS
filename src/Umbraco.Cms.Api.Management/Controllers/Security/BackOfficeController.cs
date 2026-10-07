@@ -261,6 +261,7 @@ public class BackOfficeController : SecurityControllerBase
     /// A task representing the asynchronous operation. The result contains an <see cref="IActionResult"/> indicating the outcome of the authorization request, including possible error responses for invalid contexts or unauthorized clients.
     /// </returns>
     [AllowAnonymous]
+    [AllowCookieRedirect]
     [HttpGet("authorize")]
     [EndpointSummary("Authorizes the current request.")]
     [EndpointDescription("Validates and authorizes the OAuth authorization request.")]

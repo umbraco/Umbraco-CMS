@@ -1,9 +1,9 @@
 import type { UmbBlockExposeModel, UmbBlockValueType } from '../types.js';
 import { UmbBlockValueResolver, type UmbBlockValuesCallback } from './block-value-resolver.api.js';
-import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbEntryValueModel } from '@umbraco-cms/backoffice/content';
 
 export class UmbStandardBlockValueResolver extends UmbBlockValueResolver<UmbBlockValueType> {
-	async processValues(property: UmbElementValueModel<UmbBlockValueType>, valuesCallback: UmbBlockValuesCallback) {
+	async processValues(property: UmbEntryValueModel<UmbBlockValueType>, valuesCallback: UmbBlockValuesCallback) {
 		if (property.value) {
 			return {
 				...property,
@@ -14,7 +14,7 @@ export class UmbStandardBlockValueResolver extends UmbBlockValueResolver<UmbBloc
 	}
 
 	async processVariants(
-		property: UmbElementValueModel<UmbBlockValueType>,
+		property: UmbEntryValueModel<UmbBlockValueType>,
 		variantsCallback: (values: Array<UmbBlockExposeModel>) => Promise<Array<UmbBlockExposeModel> | undefined>,
 	) {
 		if (property.value) {

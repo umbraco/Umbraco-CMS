@@ -3,7 +3,7 @@ export * from './audit-log/index.js';
 export * from './collection/index.js';
 export * from './components/index.js';
 export * from './constants.js';
-export * from './controller/merge-content-variant-data.controller.js';
+export * from './controller/index.js';
 export * from './global-components/index.js';
 export * from './manager/index.js';
 export * from './property-dataset-context/index.js';
@@ -11,6 +11,7 @@ export * from './publishing/index.js';
 export * from './rollback/index.js';
 export * from './tree/index.js';
 export * from './workspace/index.js';
+export * from './utils/index.js';
 
 export type * from './configuration/index.js';
 export type * from './repository/index.js';

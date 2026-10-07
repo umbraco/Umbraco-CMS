@@ -143,7 +143,7 @@ public class SingleBlockPropertyValueHandlerTests : PropertyValueHandlerTestsBas
             ],
             Expose =
             [
-                new BlockItemVariation(contentElementKey, null, null)
+                new BlockItemVariation(contentElementKey, null)
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(singleBlockValue);
@@ -243,7 +243,7 @@ public class SingleBlockPropertyValueHandlerTests : PropertyValueHandlerTestsBas
                                     ],
                                     Expose =
                                     [
-                                        new BlockItemVariation(nestedElementKey, null, null)
+                                        new BlockItemVariation(nestedElementKey, null)
                                     ]
                                 })
                         }
@@ -252,7 +252,7 @@ public class SingleBlockPropertyValueHandlerTests : PropertyValueHandlerTestsBas
             ],
             Expose =
             [
-                new BlockItemVariation(rootElementKey, null, null)
+                new BlockItemVariation(rootElementKey, null)
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(singleBlockValue);

@@ -49,6 +49,11 @@ export interface MetaPropertyEditorUi {
 	 * @example ["text", "input", "string"]
 	 */
 	keywords?: string[];
+	/**
+	 * Mark a Property Editor as `deprecated` when it should no longer be possible to create new DataTypes that use it.
+	 * @default false
+	 */
+	deprecated?: boolean;
 	// TODO: Remove supportsVariantChange in v.19. And make it the default. [NL]
 	/**
 	 * @deprecated Will be removed in a future version, as this will be enforced on all Property Editor UIs from v.19.

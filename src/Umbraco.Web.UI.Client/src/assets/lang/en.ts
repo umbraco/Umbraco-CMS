@@ -327,6 +327,8 @@ export default {
 		unpublish: 'Unpublish',
 		unpublished: 'Unpublished',
 		notCreated: 'Not created',
+		segmentHasContent: 'Has segmented content',
+		segmentNoContent: 'No content',
 		updateDate: 'Last edited',
 		updateDateDesc: 'Date/time this document was edited',
 		uploadClear: 'Clear file(s)',
@@ -1487,6 +1489,7 @@ export default {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
 		selectAction: 'Select Property Editor',
+		deprecatedLabel: 'Deprecated',
 	},
 	propertyEditorUIGroups: {
 		advanced: 'Advanced',
@@ -1537,6 +1540,7 @@ export default {
 	},
 	scripts: {
 		editscript: 'Edit script file',
+		tabCode: 'Code',
 	},
 	sections: {
 		content: 'Content',
@@ -1748,6 +1752,7 @@ export default {
 		notAllowed: 'The selected template is no longer allowed on this document type.',
 		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
+		tabCode: 'Code',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
 		edittemplate: 'Edit template',
 		insertSections: 'Sections',
@@ -1960,11 +1965,13 @@ export default {
 		allowVaryBySegment: 'Allow segmentation',
 		elementType: 'Element Type',
 		elementHeading: 'Is an Element Type',
-		elementDescription: 'An Element Type is meant to be used within other Document Types, and not in the Content tree.',
+		elementDescription: 'Use for Blocks or Reusable Elements in the Library section.',
 		elementCannotToggle:
 			'A Document Type cannot be changed to an Element Type once it has been used to create one or more content items.',
 		elementDoesNotSupport: 'This is not applicable for an Element Type.',
 		elementTypeOnlySupport: 'This is only applicable for an Element Type.',
+		elementTypeOnlyAllowedInLibrarySupport:
+			'This is only applicable for an Element Type that is allowed in the Library.',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
 		displaySettingsHeadline: 'Appearance',
 		displaySettingsLabelOnLeft: 'Label to the left',
@@ -2197,6 +2204,8 @@ export default {
 		changePassword: 'Change your password',
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure 2FA',
+		disableUserHeadline: (name: string) => `Disable ${name}`,
+		disableUserConfirmation: 'Are you sure you want to disable this user?',
 		emailRequired: 'Required - enter an email address for this user',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2383,6 +2392,10 @@ export default {
 		usersNotManagedFromGroup: 'not manageable from this screen.',
 		selectElementStartNode: 'Select element start node',
 		selectElementStartNodeDescription: 'Limit the element library to a specific start node',
+		enableUserHeadline: (name: string) => `Enable ${name}`,
+		enableUserConfirmation: 'Are you sure you want to enable this user?',
+		unlockUserHeadline: (name: string) => `Unlock ${name}`,
+		unlockUserConfirmation: 'Are you sure you want to unlock this user?',
 	},
 	userPermissions: {
 		create: 'Create',
@@ -3023,6 +3036,8 @@ export default {
 		viewPublishedContentDeclineButton: 'Stay in preview mode',
 		connectionFailed: 'Could not establish a connection to the server, preview live updates will not work.',
 		connectionLost: 'Connection to the server lost, preview live updates will not work.',
+		connectionReconnecting: 'Connection to the server lost, trying to reconnect…',
+		connectionRestored: 'Connection to the server restored, preview live updates are working again.',
 	},
 	permissions: {
 		FolderCreation: 'Folder creation',

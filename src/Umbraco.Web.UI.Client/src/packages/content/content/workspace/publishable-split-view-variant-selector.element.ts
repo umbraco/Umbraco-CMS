@@ -1,11 +1,15 @@
 import type { UmbPublishedVariantWithPendingChanges } from '../publishing/index.js';
+import type { UmbEntryWithVariantsWorkspaceContext } from './entry-with-variants-workspace-context.interface.js';
 import { html, state } from '@umbraco-cms/backoffice/external/lit';
-import { sortVariants, UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
+import { sortVariants, UmbPublishableVariantState, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbWorkspaceSplitViewVariantSelectorElement } from '@umbraco-cms/backoffice/workspace';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
-import type { UmbPublishableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbPublishableWorkspaceContext,
+	UmbVariantDatasetWorkspaceContext,
+} from '@umbraco-cms/backoffice/workspace';
 
 /**
  * Minimal interface that publishable workspace contexts must satisfy
@@ -63,6 +67,28 @@ export abstract class UmbPublishableSplitViewVariantSelectorElement<
 		});
 	}
 
+	protected override _gotWorkspaceContext(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
+		if (!this.#isEntryWithVariantsWorkspaceContext(workspaceContext)) {
+			this._variantsWithData = undefined;
+			this.removeUmbControllerByAlias('_observeValueVariants');
+			return;
+		}
+
+		this.observe(
+			workspaceContext.valueVariants.variants,
+			(variants) => {
+				this._variantsWithData = variants?.map((variant) => UmbVariantId.Create(variant)) ?? [];
+			},
+			'_observeValueVariants',
+		);
+	}
+
+	#isEntryWithVariantsWorkspaceContext(
+		context?: UmbVariantDatasetWorkspaceContext,
+	): context is UmbEntryWithVariantsWorkspaceContext {
+		return !!context && 'valueVariants' in context;
+	}
+
 	#observePendingChanges() {
 		this.observe(
 			this.#publishingContext?.publishedPendingChanges.variantsWithChanges,
@@ -96,6 +122,12 @@ export abstract class UmbPublishableSplitViewVariantSelectorElement<
 	}
 
 	protected override _renderVariantDetails(variantOption: VariantOptionModelType) {
+		if (variantOption.segment) {
+			if (this._hasDataForSegment(variantOption)) {
+				return html`${this.localize.term('content_segmentHasContent')}`;
+			}
+			return html`${this.localize.term('content_segmentNoContent')}`;
+		}
 		return html`${this.#getVariantState(variantOption)}`;
 	}
 }
