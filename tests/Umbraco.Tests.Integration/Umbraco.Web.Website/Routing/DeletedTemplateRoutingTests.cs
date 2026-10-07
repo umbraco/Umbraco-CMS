@@ -36,6 +36,8 @@ internal sealed class DeletedTemplateRoutingTests : UmbracoIntegrationTest
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
     private IContentService ContentService => GetRequiredService<IContentService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -50,33 +52,26 @@ internal sealed class DeletedTemplateRoutingTests : UmbracoIntegrationTest
         builder.AddNotificationHandler<TemplateDeletedNotification, TemplateDeletedDistributedCacheNotificationHandler>();
     }
 
-    // This SetUp must remain synchronous. EnsureUmbracoContext() writes to an AsyncLocal, and AsyncLocal mutations
-    // made inside an awaited Task do not flow back to the test method's execution context.
     [SetUp]
-    public void SetUp()
+    public async Task SetUp()
     {
         DeleteAllTemplateViewFiles();
 
-        _template = CreateTemplate("Routed Page", "routedPage");
+        _template = await CreateTemplateAsync("Routed Page", "routedPage");
 
         ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("routedPageType", "Routed Page Type");
         contentType.AllowedTemplates = [_template];
         contentType.SetDefaultTemplate(_template);
-        GetRequiredService<IContentTypeService>().Save(contentType);
+        var contentTypeResult = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        Assert.That(contentTypeResult.Success, Is.True, $"Creating the content type failed with {contentTypeResult.Result}.");
 
         _page = ContentBuilder.CreateSimpleContent(contentType, "Routed Page");
         _page.TemplateId = _template.Id;
         ContentService.Save(_page);
         ContentService.Publish(_page, ["*"]);
 
-        GetRequiredService<IHttpContextAccessor>().HttpContext = new DefaultHttpContext
-        {
-            Request = { Scheme = "https", Host = new HostString("localhost"), Path = "/" },
-        };
-
         _variationContextAccessor.VariationContext = new VariationContext(
-            GetRequiredService<ILanguageService>().GetDefaultIsoCodeAsync().GetAwaiter().GetResult());
-        GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
+            await GetRequiredService<ILanguageService>().GetDefaultIsoCodeAsync());
     }
 
     [TearDown]
@@ -96,7 +91,7 @@ internal sealed class DeletedTemplateRoutingTests : UmbracoIntegrationTest
     [Test]
     public async Task Routing_Resolves_No_Template_When_Falling_Back_From_A_Disallowed_Alternative_Template_To_A_Deleted_Template()
     {
-        CreateTemplate("Not Allowed", "notAllowed");
+        await CreateTemplateAsync("Not Allowed", "notAllowed");
         await DeleteTemplateAsync();
 
         IPublishedRequest request = await RouteAsync("?altTemplate=notAllowed");
@@ -105,12 +100,9 @@ internal sealed class DeletedTemplateRoutingTests : UmbracoIntegrationTest
         Assert.That(request.Template, Is.Null);
     }
 
-    private ITemplate CreateTemplate(string name, string alias)
+    private async Task<ITemplate> CreateTemplateAsync(string name, string alias)
     {
-        var result = TemplateService
-            .CreateAsync(name, alias, "@{ Layout = null; }", Constants.Security.SuperUserKey)
-            .GetAwaiter()
-            .GetResult();
+        var result = await TemplateService.CreateAsync(name, alias, "@{ Layout = null; }", Constants.Security.SuperUserKey);
         Assert.That(result.Success, Is.True, $"Creating template {alias} failed with {result.Status}.");
         return result.Result;
     }
@@ -127,8 +119,19 @@ internal sealed class DeletedTemplateRoutingTests : UmbracoIntegrationTest
 
     private async Task<IPublishedRequest> RouteAsync(string queryString)
     {
-        HttpContext httpContext = GetRequiredService<IHttpContextAccessor>().HttpContext!;
-        httpContext.Request.QueryString = new QueryString(queryString);
+        // The HTTP and Umbraco contexts are held in AsyncLocals, so they are established here, in the same
+        // execution context as the routing calls, rather than in an awaited SetUp whose values would not flow back.
+        GetRequiredService<IHttpContextAccessor>().HttpContext = new DefaultHttpContext
+        {
+            Request =
+            {
+                Scheme = "https",
+                Host = new HostString("localhost"),
+                Path = "/",
+                QueryString = new QueryString(queryString),
+            },
+        };
+        GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
 
         var router = GetRequiredService<IPublishedRouter>();
         IPublishedRequestBuilder builder = await router.CreateRequestAsync(new Uri("https://localhost/" + queryString));
