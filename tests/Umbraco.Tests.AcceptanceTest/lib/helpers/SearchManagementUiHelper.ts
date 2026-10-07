@@ -17,6 +17,7 @@ export class SearchManagementUiHelper extends UiBaseLocators {
   private readonly searchResultsTable: Locator;
   private readonly searchNoResultsMessage: Locator;
   private readonly searchPagination: Locator;
+  private readonly searchResultsSummary: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -34,6 +35,7 @@ export class SearchManagementUiHelper extends UiBaseLocators {
     this.searchResultsTable = this.searchBox.locator('umb-table');
     this.searchNoResultsMessage = this.searchBox.locator('.no-results');
     this.searchPagination = this.searchBox.locator('uui-pagination');
+    this.searchResultsSummary = this.searchBox.locator('#results-summary');
   }
 
   async goToSearchTreeItem() {
@@ -167,7 +169,7 @@ export class SearchManagementUiHelper extends UiBaseLocators {
   }
 
   async doesSearchResultsCountHaveText(text: string) {
-    await this.containsText(this.searchBox, text);
+    await this.containsText(this.searchResultsSummary, text);
   }
 
   async clickSearchResultForDocument(documentId: string) {

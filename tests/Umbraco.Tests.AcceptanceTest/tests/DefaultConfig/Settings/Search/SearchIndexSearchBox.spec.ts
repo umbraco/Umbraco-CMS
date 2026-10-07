@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const documentTypeName = 'SearchIndexSearchBoxDocumentType';
 const documentName = 'SearchIndexSearchBoxDocument';
@@ -85,7 +85,13 @@ test('can only find a culture\'s value when that culture is selected', async ({u
   await umbracoApi.language.createDanishLanguage();
   const textstringDataType = await umbracoApi.dataType.getByName('Textstring');
   const cultureDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(cultureDocumentTypeName, 'Textstring', textstringDataType.id, 'CultureGroup', true, true) ?? '';
-  const cultureDocumentId = await umbracoApi.document.createDocumentWithTwoCultureSpecificValues(cultureDocumentName, cultureDocumentTypeId, 'Textstring', englishIsoCode, englishSearchableValue, danishIsoCode, danishSearchableValue) ?? '';
+  const cultureDocumentId = await umbracoApi.document.createDocumentWithMultipleVariants(
+    cultureDocumentName, cultureDocumentTypeId, AliasHelper.toAlias('Textstring'),
+    [
+      {isoCode: englishIsoCode, name: cultureDocumentName, value: englishSearchableValue},
+      {isoCode: danishIsoCode, name: cultureDocumentName, value: danishSearchableValue},
+    ]
+  ) ?? '';
   await umbracoApi.document.publishDocumentWithCultures(cultureDocumentId, [englishIsoCode, danishIsoCode]);
   await umbracoApi.searchManagement.waitUntilDocumentIsFound(indexAlias, danishSearchableValue, cultureDocumentId, danishIsoCode);
   await umbracoUi.goToBackOffice();

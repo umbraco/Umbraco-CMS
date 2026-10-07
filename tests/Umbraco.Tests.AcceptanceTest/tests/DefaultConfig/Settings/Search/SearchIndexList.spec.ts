@@ -31,6 +31,8 @@ test('can see the index list with the expected columns and indexes', {tag: '@smo
 });
 
 test('can rebuild an index from its row in the index list', async ({umbracoUi}) => {
+  test.slow();
+
   // Arrange
   const indexAlias = 'Umb_Members';
 

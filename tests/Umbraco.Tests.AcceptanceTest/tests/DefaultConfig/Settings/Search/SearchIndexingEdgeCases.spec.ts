@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {test} from '@umbraco/acceptance-test-helpers';
+import {AliasHelper, test} from '@umbraco/acceptance-test-helpers';
 
 // Indexes
 const contentIndexAlias = 'Umb_Content';
@@ -93,7 +93,13 @@ test('can only find a culture\'s value when searching in that culture', async ({
   await umbracoApi.language.createDanishLanguage();
   const textstringDataType = await umbracoApi.dataType.getByName(textstringDataTypeName);
   const cultureDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(cultureDocumentTypeName, textstringDataTypeName, textstringDataType.id, cultureGroupName, true, true) ?? '';
-  const documentId = await umbracoApi.document.createDocumentWithTwoCultureSpecificValues(cultureDocumentName, cultureDocumentTypeId, textstringDataTypeName, englishIsoCode, englishSearchableValue, danishIsoCode, danishSearchableValue) ?? '';
+  const documentId = await umbracoApi.document.createDocumentWithMultipleVariants(
+    cultureDocumentName, cultureDocumentTypeId, AliasHelper.toAlias(textstringDataTypeName),
+    [
+      {isoCode: englishIsoCode, name: cultureDocumentName, value: englishSearchableValue},
+      {isoCode: danishIsoCode, name: cultureDocumentName, value: danishSearchableValue},
+    ]
+  ) ?? '';
   await umbracoApi.document.publishDocumentWithCultures(documentId, [englishIsoCode, danishIsoCode]);
   await umbracoApi.searchManagement.waitUntilDocumentIsFound(contentIndexAlias, englishSearchableValue, documentId, englishIsoCode);
   await umbracoApi.searchManagement.waitUntilDocumentIsFound(contentIndexAlias, danishSearchableValue, documentId, danishIsoCode);

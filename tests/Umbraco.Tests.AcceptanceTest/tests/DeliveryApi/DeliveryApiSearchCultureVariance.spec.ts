@@ -1,4 +1,4 @@
-import {test} from '@umbraco/acceptance-test-helpers';
+import {AliasHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const danishIsoCode = 'da';
 const englishIsoCode = 'en-US';
@@ -45,7 +45,13 @@ test('cannot find a culture variant that is not published', async ({umbracoApi})
   // Arrange
   const textstringDataType = await umbracoApi.dataType.getByName(textstringDataTypeName);
   const englishOnlyDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(englishOnlyDocumentTypeName, textstringDataTypeName, textstringDataType.id, 'CultureGroup', true, true) ?? '';
-  const documentId = await umbracoApi.document.createDocumentWithTwoCultureSpecificValues(englishOnlyDocumentName, englishOnlyDocumentTypeId, textstringDataTypeName, englishIsoCode, 'English value', danishIsoCode, 'Danish value') ?? '';
+  const documentId = await umbracoApi.document.createDocumentWithMultipleVariants(
+    englishOnlyDocumentName, englishOnlyDocumentTypeId, AliasHelper.toAlias(textstringDataTypeName),
+    [
+      {isoCode: englishIsoCode, name: englishOnlyDocumentName, value: 'English value'},
+      {isoCode: danishIsoCode, name: englishOnlyDocumentName, value: 'Danish value'},
+    ]
+  ) ?? '';
   await umbracoApi.document.publishDocumentWithCulture(documentId, englishIsoCode);
   const filter = 'contentType:' + (await umbracoApi.documentType.getByName(englishOnlyDocumentTypeName)).alias;
   await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames(filter, undefined, [englishOnlyDocumentName], 1, {'Accept-Language': englishIsoCode});

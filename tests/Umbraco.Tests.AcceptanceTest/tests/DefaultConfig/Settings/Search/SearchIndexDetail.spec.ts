@@ -35,6 +35,8 @@ test('can see the index statistics', async ({umbracoApi, umbracoUi}) => {
 });
 
 test('can rebuild the index', {tag: '@smoke'}, async ({umbracoUi}) => {
+  test.slow();
+
   // Act
   await umbracoUi.searchManagement.clickRebuildIndexWorkspaceAction();
 
@@ -48,5 +50,5 @@ test('can rebuild the index', {tag: '@smoke'}, async ({umbracoUi}) => {
   // Assert
   await umbracoUi.searchManagement.doesRebuildStartedNotificationHaveText(`Rebuilding ${indexAlias} in the background`);
   await umbracoUi.searchManagement.doesSuccessNotificationHaveText(`${indexAlias} has finished rebuilding`, true, false, ConstantHelper.timeout.pageLoad);
-  await umbracoUi.searchManagement.isStatsBoxVisible();
+  await umbracoUi.searchManagement.doesStatsBoxHealthStatusHaveText('Healthy');
 });

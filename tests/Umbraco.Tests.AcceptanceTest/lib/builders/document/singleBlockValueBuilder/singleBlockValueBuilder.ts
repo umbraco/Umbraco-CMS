@@ -1,16 +1,15 @@
-import {DocumentBlueprintsValueBuilder} from '../../documentBlueprints';
 import {DocumentValueBuilder} from '../documentValueBuilder';
 import {SingleBlockContentDataBuilder} from './singleBlockContentDataBuilder';
 import {SingleBlockExposeBuilder} from './singleBlockExposeBuilder';
 import {SingleBlockLayoutBuilder} from './singleBlockLayoutBuilder';
 
 export class SingleBlockValueBuilder {
-  parentBuilder: DocumentValueBuilder | DocumentBlueprintsValueBuilder;
+  parentBuilder: DocumentValueBuilder;
   singleBlockContentDataBuilder: SingleBlockContentDataBuilder[];
   singleBlockExposeBuilder: SingleBlockExposeBuilder[];
   singleBlockLayoutBuilder: SingleBlockLayoutBuilder[];
 
-  constructor(parentBuilder: DocumentValueBuilder | DocumentBlueprintsValueBuilder) {
+  constructor(parentBuilder: DocumentValueBuilder) {
     this.parentBuilder = parentBuilder;
     this.singleBlockContentDataBuilder = [];
     this.singleBlockExposeBuilder = [];
