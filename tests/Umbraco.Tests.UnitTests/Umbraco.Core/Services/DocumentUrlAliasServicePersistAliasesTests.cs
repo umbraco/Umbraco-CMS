@@ -14,7 +14,7 @@ using Umbraco.Cms.Core.Sync;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
 /// <summary>
-/// <see cref="DocumentUrlAliasService.PersistAliasesAsync"/> runs inside the transaction that persists the document,
+/// <see cref="DocumentUrlAliasService.PersistAliasesAsync(IContent, bool)"/> runs inside the transaction that persists the document,
 /// so these tests pin what it may and may not do there: write only when the published or trashed state changed,
 /// never load the document, and never take a distributed lock while an ambient scope already holds one.
 /// </summary>
@@ -340,7 +340,7 @@ public class DocumentUrlAliasServicePersistAliasesTests
     }
 
     /// <summary>
-    /// Implements only the members that existed before <see cref="IDocumentUrlAliasService.PersistAliasesAsync"/> was
+    /// Implements only the members that existed before <see cref="IDocumentUrlAliasService.PersistAliasesAsync(IContent, bool)"/> was
     /// added, as an external implementation compiled against the previous interface would.
     /// </summary>
     private sealed class MinimalAliasService : IDocumentUrlAliasService

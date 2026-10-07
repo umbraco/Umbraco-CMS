@@ -453,7 +453,7 @@ internal sealed class DocumentUrlAliasPersistenceTests : UmbracoIntegrationTest
         await AliasService.RebuildAllAliasesAsync();
 
         Assert.That(AllRows(), Is.EquivalentTo(before));
-        Assert.That(before.Select(x => x.Item3), Is.EquivalentTo(KeptAlias));
+        Assert.That(before.Select(x => x.Alias), Is.EquivalentTo(KeptAlias));
     }
 
     private Content CreatePage(string name, string? alias, int? parentId = null)

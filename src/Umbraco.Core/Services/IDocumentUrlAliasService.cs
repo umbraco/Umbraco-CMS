@@ -56,6 +56,7 @@ public interface IDocumentUrlAliasService
     /// saves and against <see cref="RebuildAllAliasesAsync"/>.
     /// </summary>
     /// <param name="document">The document whose aliases to persist.</param>
+    /// <returns>A task that completes when the aliases are persisted.</returns>
     // TODO (V19): Remove the default implementation.
     Task PersistAliasesAsync(IContent document)
         => PersistAliasesAsync(document, contentTreeWriteLockHeld: false);
@@ -77,6 +78,7 @@ public interface IDocumentUrlAliasService
     /// loading it by key would persist the previous aliases. The default implementation only keeps implementations
     /// written before this member compiling; it is not a correct implementation of the contract.
     /// </remarks>
+    /// <returns>A task that completes when the aliases are persisted.</returns>
     // TODO (V19): Remove the default implementation.
     Task PersistAliasesAsync(IContent document, bool contentTreeWriteLockHeld)
         => CreateOrUpdateAliasesAsync(document.Key);
