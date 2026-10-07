@@ -192,7 +192,7 @@ test('can render the updated Library element content on the published page witho
   await umbracoUi.contentRender.doesContentRenderValueContainText(updatedLibraryText);
 });
 
-// Product bug (#ISSUE): the rich text blocks are cached with the page, so a published change to a referenced
+// Product bug (#24132): the rich text blocks are cached with the page, so a published change to a referenced
 // Library element is only rendered after the page itself is republished.
 test.skip('can render the updated Library element content on the published page without republishing the page for a Rich Text Editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
