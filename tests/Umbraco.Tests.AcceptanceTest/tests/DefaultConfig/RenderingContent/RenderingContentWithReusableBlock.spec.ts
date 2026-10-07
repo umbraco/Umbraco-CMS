@@ -150,6 +150,48 @@ test('can render the updated Library element content on the published page witho
   await umbracoUi.contentRender.doesContentRenderValueContainText(updatedLibraryText);
 });
 
+test('can render the updated Library element content on the published page without republishing the page for a Block Grid', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const libraryText = 'Reusable content before the update';
+  const updatedLibraryText = 'Reusable content after the update';
+  const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, libraryText, propertyInBlock);
+  await umbracoApi.element.publish(libraryElementId);
+  const templateId = await umbracoApi.template.createTemplateWithDisplayingBlockGridItems(gridTemplateName, gridCustomDataTypeName, propertyInBlock);
+  const customDataTypeId = await umbracoApi.dataType.createBlockGridWithABlock(gridCustomDataTypeName, elementTypeId);
+  const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(gridContentName, blockGridEditorAlias, libraryElementId, customDataTypeId, templateId, gridCustomDataTypeName, gridDocumentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
+  await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(libraryText);
+
+  // Act
+  await umbracoApi.element.updateFirstPropertyValueAndPublish(libraryElementId, updatedLibraryText);
+  await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
+
+  // Assert
+  await umbracoUi.contentRender.doesContentRenderValueContainText(updatedLibraryText);
+});
+
+test('can render the updated Library element content on the published page without republishing the page for a Single Block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const libraryText = 'Reusable content before the update';
+  const updatedLibraryText = 'Reusable content after the update';
+  const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, libraryText, propertyInBlock);
+  await umbracoApi.element.publish(libraryElementId);
+  const templateId = await umbracoApi.template.createTemplateWithDisplayingSingleBlockItem(singleTemplateName, singleCustomDataTypeName, propertyInBlock);
+  const customDataTypeId = await umbracoApi.dataType.createSingleBlockDataTypeWithABlock(singleCustomDataTypeName, elementTypeId);
+  const documentId = await umbracoApi.document.createPublishedDocumentWithLibraryElementBlock(singleContentName, singleBlockEditorAlias, libraryElementId, customDataTypeId, templateId, singleCustomDataTypeName, singleDocumentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(documentId);
+  await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(libraryText);
+
+  // Act
+  await umbracoApi.element.updateFirstPropertyValueAndPublish(libraryElementId, updatedLibraryText);
+  await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
+
+  // Assert
+  await umbracoUi.contentRender.doesContentRenderValueContainText(updatedLibraryText);
+});
+
 // Product bug (#ISSUE): the rich text blocks are cached with the page, so a published change to a referenced
 // Library element is only rendered after the page itself is republished.
 test.skip('can render the updated Library element content on the published page without republishing the page for a Rich Text Editor', async ({umbracoApi, umbracoUi}) => {
