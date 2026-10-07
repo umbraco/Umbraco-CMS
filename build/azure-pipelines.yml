@@ -774,7 +774,7 @@ stages:
             lfs: false
             fetchDepth: 1
             fetchFilter: tree:0
-          - task: NodeTool@0
+          - task: UseNode@1
             displayName: Use Node.js
             retryCountOnTaskFailure: 3
             inputs:
@@ -904,7 +904,7 @@ stages:
         displayName: Wait for manual approval
         pool: server
         steps:
-          - task: ManualValidation@0
+          - task: ManualValidation@1
             displayName: Manual approval to push to NuGet
             timeoutInMinutes: 4320 # 3 days
             inputs:

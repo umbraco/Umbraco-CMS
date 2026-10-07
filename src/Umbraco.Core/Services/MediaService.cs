@@ -201,9 +201,9 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media with that id.", nameof(parentId));
             }
 
-            if (name.Length > 255)
+            if (name.Length > Constants.Validation.MaxNameLength)
             {
-                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
             }
 
             var media = new Core.Models.Media(name, parentId, mediaType);
@@ -237,9 +237,9 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias));
             }
 
-            if (name.Length > 255)
+            if (name.Length > Constants.Validation.MaxNameLength)
             {
-                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
             }
 
             var media = new Core.Models.Media(name, -1, mediaType);
@@ -280,9 +280,9 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
             }
 
-            if (name.Length > 255)
+            if (name.Length > Constants.Validation.MaxNameLength)
             {
-                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
             }
 
             var media = new Core.Models.Media(name, parent, mediaType);
@@ -799,9 +799,9 @@ namespace Umbraco.Cms.Core.Services
                     throw new ArgumentException("Media has no name.", nameof(media));
                 }
 
-                if (media.Name != null && media.Name.Length > 255)
+                if (media.Name != null && media.Name.Length > Constants.Validation.MaxNameLength)
                 {
-                    throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                    throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
                 }
 
                 if (media.Key.Version == 7 && _mediaPathScheme.SupportsGuid7 is false)

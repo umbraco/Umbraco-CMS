@@ -229,8 +229,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     // accounts for its key and is not passed on to the database read — re-reading such a key on every
     // request is the regression reported in #18869. Keys are probed one at a time, and the probe is not
     // free even on a hit: TryGetValueAsync takes a per-key lock and goes through GetOrCreateAsync, which
-    // on a miss creates and then removes an entry. With a distributed L2 (e.g. Redis) configured that is
-    // a serial round-trip per key, plus a write and a delete for each miss.
+    // on a miss creates and then removes a local entry. With a distributed L2 (e.g. Redis) configured that
+    // is a serial round-trip per key, plus a delete for each miss.
     private async Task<List<Guid>> ProbeHybridCacheAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved)
     {
         var pending = new List<Guid>(keys.Count);
