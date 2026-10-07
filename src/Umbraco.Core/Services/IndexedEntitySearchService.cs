@@ -72,9 +72,9 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
 
         var indexAlias = objectType switch
         {
-            UmbracoObjectTypes.Document => Umbraco.Cms.Core.Constants.IndexAliases.DraftContent,
-            UmbracoObjectTypes.Media => Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia,
-            UmbracoObjectTypes.Member => Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers,
+            UmbracoObjectTypes.Document => Constants.Search.IndexAliases.DraftContent,
+            UmbracoObjectTypes.Media => Constants.Search.IndexAliases.DraftMedia,
+            UmbracoObjectTypes.Member => Constants.Search.IndexAliases.DraftMembers,
             _ => throw new ArgumentOutOfRangeException(nameof(objectType), objectType, null)
         };
 
@@ -85,7 +85,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
         {
             filters.Add(
                 new KeywordFilter(
-                    FieldName: Constants.IndexFieldNames.ContentTypeId,
+                    FieldName: Constants.Search.FieldNames.ContentTypeId,
                     Values: contentTypeIdsAsArray.Select(contentTypeId => contentTypeId.AsKeyword()).ToArray(),
                     Negate: false));
         }
@@ -94,7 +94,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
         {
             filters.Add(
                 new KeywordFilter(
-                    FieldName: Constants.IndexFieldNames.PathIds,
+                    FieldName: Constants.Search.FieldNames.PathIds,
                     Values: startNodeKeys.Select(key => key.AsKeyword()).ToArray(),
                     Negate: false));
         }
@@ -111,7 +111,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
             {
                 filters.Add(
                     new KeywordFilter(
-                        FieldName: Constants.IndexFieldNames.PathIds,
+                        FieldName: Constants.Search.FieldNames.PathIds,
                         Values: [recycleBinId.Value.AsKeyword()],
                         Negate: trashed.Value is false));
             }

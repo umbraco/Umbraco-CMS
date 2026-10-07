@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./property-editor-ui-user-picker.element.js'),
 		meta: {
 			supportsVariantChange: true,
-			label: 'User Picker',
+			label: 'Single User Picker',
 			propertyEditorSchemaAlias: 'Umbraco.UserPicker',
 			icon: 'icon-user',
 			group: '#propertyEditorUIGroups_people',

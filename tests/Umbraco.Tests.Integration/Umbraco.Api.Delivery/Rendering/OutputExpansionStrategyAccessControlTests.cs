@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Text.Json.Nodes;
@@ -375,7 +375,9 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
         {
             ConfigurationData = new Dictionary<string, object>
             {
+#pragma warning disable CS0618 // the multi node tree picker is obsolete, but still under test
                 { "startNode", new MultiNodePickerConfigurationTreeSource { ObjectType = "content" } },
+#pragma warning restore CS0618
             },
             Name = "Test Multi Node Tree Picker",
             DatabaseType = ValueStorageType.Ntext,

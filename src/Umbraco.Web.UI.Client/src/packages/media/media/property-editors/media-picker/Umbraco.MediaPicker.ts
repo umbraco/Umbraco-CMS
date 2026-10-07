@@ -15,12 +15,6 @@ export const manifest: ManifestPropertyEditorSchema = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaTypePicker',
 				},
 				{
-					alias: 'multiple',
-					label: 'Pick multiple items',
-					description: 'Outputs a IEnumerable',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-				},
-				{
 					alias: 'validationLimit',
 					label: 'Amount',
 					description: 'Set a required range of medias',
