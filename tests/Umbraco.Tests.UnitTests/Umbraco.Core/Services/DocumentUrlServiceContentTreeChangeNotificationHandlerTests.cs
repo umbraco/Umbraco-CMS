@@ -13,7 +13,7 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
 {
     private static (DocumentUrlServiceContentTreeChangeNotificationHandler Handler,
         Mock<IDocumentUrlService> UrlService,
-        Mock<IDocumentUrlAliasService> AliasService) CreateHandler(bool isInitialized = true, bool aliasesPersistInTransaction = true)
+        Mock<IDocumentUrlAliasService> AliasService) CreateHandler(bool isInitialized = true)
     {
         var urlServiceMock = new Mock<IDocumentUrlService>();
         urlServiceMock.Setup(x => x.IsInitialized).Returns(isInitialized);
@@ -23,7 +23,6 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
             .Returns(Task.CompletedTask);
 
         var aliasServiceMock = new Mock<IDocumentUrlAliasService>();
-        aliasServiceMock.Setup(x => x.PersistsAliasesInContentTransaction).Returns(aliasesPersistInTransaction);
         aliasServiceMock.Setup(x => x.CreateOrUpdateAliasesAsync(It.IsAny<Guid>()))
             .Returns(Task.CompletedTask);
         aliasServiceMock.Setup(x => x.CreateOrUpdateAliasesWithDescendantsAsync(It.IsAny<Guid>()))
@@ -53,27 +52,6 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
     {
         aliasService.Verify(x => x.CreateOrUpdateAliasesAsync(It.IsAny<Guid>()), Times.Never);
         aliasService.Verify(x => x.CreateOrUpdateAliasesWithDescendantsAsync(It.IsAny<Guid>()), Times.Never);
-        aliasService.Verify(x => x.PersistAliasesAsync(It.IsAny<IContent>(), It.IsAny<bool>()), Times.Never);
-    }
-
-    [Test]
-    public async Task HandleAsync_WhenTheAliasServiceDoesNotPersistInTheTransaction_CallsItAfterTheCommitAsBefore()
-    {
-        var (handler, _, aliasService) = CreateHandler(aliasesPersistInTransaction: false);
-        var nodeContent = MakeContent();
-        var branchContent = MakeContent();
-        var notification = new ContentTreeChangeNotification(
-            new[]
-            {
-                new TreeChange<IContent>(nodeContent.Object, TreeChangeTypes.RefreshNode),
-                new TreeChange<IContent>(branchContent.Object, TreeChangeTypes.RefreshBranch),
-            },
-            new EventMessages());
-
-        await handler.HandleAsync(notification, CancellationToken.None);
-
-        aliasService.Verify(x => x.CreateOrUpdateAliasesAsync(nodeContent.Object.Key), Times.Once);
-        aliasService.Verify(x => x.CreateOrUpdateAliasesWithDescendantsAsync(branchContent.Object.Key), Times.Once);
         aliasService.Verify(x => x.PersistAliasesAsync(It.IsAny<IContent>(), It.IsAny<bool>()), Times.Never);
     }
 

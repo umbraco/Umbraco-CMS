@@ -17,20 +17,6 @@ public interface IDocumentUrlAliasService
     bool IsInitialized => true;
 
     /// <summary>
-    /// Gets a value indicating whether the service persists a document's aliases inside the transaction that
-    /// persists the document, through <see cref="PersistAliasesAsync(IContent, bool)"/>.
-    /// </summary>
-    /// <remarks>
-    /// When true, the CMS calls <see cref="PersistAliasesAsync(IContent, bool)"/> from the document repository's
-    /// refresh notification, inside the content transaction, and no longer calls
-    /// <see cref="CreateOrUpdateAliasesAsync(Guid)"/> after the commit. When false, which is what an implementation
-    /// written before this member reports, the CMS keeps calling <see cref="CreateOrUpdateAliasesAsync(Guid)"/> and
-    /// <see cref="CreateOrUpdateAliasesWithDescendantsAsync(Guid)"/> after the commit, as it did before.
-    /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    bool PersistsAliasesInContentTransaction => false;
-
-    /// <summary>
     /// Initializes the service and ensures the alias cache is populated from the database.
     /// </summary>
     /// <param name="forceEmpty">Forces an early return when we know there are no aliases (i.e. on install).</param>
@@ -84,11 +70,12 @@ public interface IDocumentUrlAliasService
     /// and the implementation takes the content tree read lock and the alias write lock itself.
     /// </param>
     /// <remarks>
-    /// Only a change to the document's published state or trashed state can change its aliases, so any other save
-    /// is a no-op. Implementations must work from <paramref name="document"/> itself: inside the content transaction
-    /// the repository caches still hold the document as it was before the save, so loading it by key would persist
-    /// the previous aliases. The default implementation does exactly that, which is why the CMS only calls this
-    /// member inside the transaction when <see cref="PersistsAliasesInContentTransaction"/> is true.
+    /// The CMS calls this from the document repository's refresh notification, inside the transaction that persists
+    /// <paramref name="document"/>. Only a change to the document's published state or trashed state can change its
+    /// aliases, so any other save is a no-op. Implementations must work from <paramref name="document"/> itself:
+    /// inside the content transaction the repository caches still hold the document as it was before the save, so
+    /// loading it by key would persist the previous aliases. The default implementation only keeps implementations
+    /// written before this member compiling; it is not a correct implementation of the contract.
     /// </remarks>
     // TODO (V19): Remove the default implementation.
     Task PersistAliasesAsync(IContent document, bool contentTreeWriteLockHeld)

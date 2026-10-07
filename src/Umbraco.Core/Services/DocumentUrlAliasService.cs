@@ -146,9 +146,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <inheritdoc/>
     public bool IsInitialized => _isInitialized;
 
-    /// <inheritdoc/>
-    public bool PersistsAliasesInContentTransaction => true;
-
     /// <summary>
     /// Indicates whether this instance should skip the database writes that are not tied to a local content change,
     /// i.e. the start-up rebuild of URL aliases.

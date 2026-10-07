@@ -10,9 +10,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <see cref="ContentRefreshNotification"/> is published by the document repository inside the content transaction,
 /// under the content tree write lock and before the entity's published state is reset, so the aliases are written
 /// under the same lock and commit as the content they describe. The in-memory alias cache is updated afterwards by
-/// the content cache refresher on every server, including the one that made the change. An alias service that does
-/// not persist inside the transaction (<see cref="IDocumentUrlAliasService.PersistsAliasesInContentTransaction"/>)
-/// is left to <see cref="DocumentUrlServiceContentTreeChangeNotificationHandler"/>, which calls it after the commit.
+/// the content cache refresher on every server, including the one that made the change.
 /// </remarks>
 #pragma warning disable CS0618 // Type or member is obsolete
 public sealed class DocumentUrlAliasContentRefreshNotificationHandler : IDistributedCacheAsyncNotificationHandler<ContentRefreshNotification>
@@ -28,7 +26,7 @@ public sealed class DocumentUrlAliasContentRefreshNotificationHandler : IDistrib
 
     /// <inheritdoc/>
     public Task HandleAsync(ContentRefreshNotification notification, CancellationToken cancellationToken)
-        => _documentUrlAliasService.IsInitialized && _documentUrlAliasService.PersistsAliasesInContentTransaction
+        => _documentUrlAliasService.IsInitialized
             ? _documentUrlAliasService.PersistAliasesAsync(notification.Entity, contentTreeWriteLockHeld: true)
             : Task.CompletedTask;
 }

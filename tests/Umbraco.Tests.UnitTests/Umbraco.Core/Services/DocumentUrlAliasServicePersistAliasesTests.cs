@@ -317,10 +317,6 @@ public class DocumentUrlAliasServicePersistAliasesTests
     }
 
     [Test]
-    public void PersistsAliasesInContentTransaction_IsTrue()
-        => Assert.That(CreateService().Service.PersistsAliasesInContentTransaction, Is.True);
-
-    [Test]
     public void IsInitialized_IsFalseUntilInitAsyncCompletes()
     {
         ServiceUnderTest sut = CreateService();
@@ -340,10 +336,6 @@ public class DocumentUrlAliasServicePersistAliasesTests
         await ((IDocumentUrlAliasService)implementation).PersistAliasesAsync(content, contentTreeWriteLockHeld: true);
 
         Assert.That(((IDocumentUrlAliasService)implementation).IsInitialized, Is.True);
-        Assert.That(
-            ((IDocumentUrlAliasService)implementation).PersistsAliasesInContentTransaction,
-            Is.False,
-            "An implementation written before this member must keep the post-commit path, because the default PersistAliasesAsync loads by key.");
         Assert.That(implementation.CreatedOrUpdatedKeys, Is.EqualTo(new[] { content.Key, content.Key }));
     }
 
