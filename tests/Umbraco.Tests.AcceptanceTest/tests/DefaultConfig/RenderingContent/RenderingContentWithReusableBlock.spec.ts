@@ -152,8 +152,9 @@ test('can render the referenced Library element content on the published page fo
   await umbracoUi.contentRender.doesContentRenderValueContainText(libraryText);
 });
 
-// The rich text markup keeps the block's old content key after a transfer, so the block is not rendered: #ISSUE
-test.fixme('can render a Rich Text Editor block after transferring it to the Library', async ({umbracoApi, umbracoUi}) => {
+// Product bug (#24129): after a transfer to the Library, the rich text markup keeps the block's old
+// data-content-key, so the block is not rendered on the published page.
+test.skip('can render a Rich Text Editor block after transferring it to the Library', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const blockText = 'Rich text block content transferred to the Library';
   rteBlockPartialView = await umbracoApi.partialView.createRichTextBlockPartialView(elementTypeName, propertyInBlock);
@@ -184,8 +185,9 @@ test.fixme('can render a Rich Text Editor block after transferring it to the Lib
   await umbracoUi.contentRender.doesContentRenderValueContainText(blockText);
 });
 
-// The rich text markup keeps the block's old content key after a disconnect, so the block is not rendered: #ISSUE
-test.fixme('can render a Rich Text Editor block after disconnecting it from the Library', async ({umbracoApi, umbracoUi}) => {
+// Product bug (#24129): after a disconnect from the Library, the rich text markup keeps the block's old
+// data-content-key, so the block is not rendered on the published page.
+test.skip('can render a Rich Text Editor block after disconnecting it from the Library', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryText = 'Rich text block content disconnected from the Library';
   const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, libraryText, propertyInBlock);
