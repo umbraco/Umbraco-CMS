@@ -218,7 +218,7 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
 
         try
         {
-            // file might already be on disk, if so grab the content to avoid overwriting
+            // File might already be on disk, if so grab the content to avoid overwriting.
             template.Content = GetViewContent(template.Alias) ?? template.Content;
             return await SaveAsync(
                 template,
@@ -296,13 +296,13 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
                 ? null
                 : await _templateRepository.GetByAliasAsync(layoutTemplateAlias!, cancellationToken);
 
-            // fail if the template content specifies a layout template but said template does not exist
+            // Fail if the template content specifies a layout template but said template does not exist
             if (layoutTemplateAlias.IsNullOrWhiteSpace() == false && layoutTemplate == null)
             {
                 return Attempt.FailWithStatus(TemplateOperationStatus.LayoutTemplateNotFound, template);
             }
 
-            // detect circular references
+            // Detect circular references.
             if (layoutTemplateAlias is not null
                 && layoutTemplate is not null
                 && await HasCircularReferenceAsync(layoutTemplateAlias, template, layoutTemplate, cancellationToken))
@@ -375,14 +375,14 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
                 concreteTemplate.LayoutTemplateId = new Lazy<int>(() => layoutTemplate.Id);
                 concreteTemplate.LayoutTemplateAlias = layoutTemplate.Alias;
 
-                //After updating the layout - ensure we update the path property if it has any children already assigned
+                // After updating the layout - ensure we update the path property if it has any children already assigned.
                 if (template.HasIdentity)
                 {
                     IEnumerable<ITemplate> templateHasChildren = await _templateRepository.GetDescendantsAsync(template.Key, cancellationToken);
 
                     foreach (ITemplate childTemplate in templateHasChildren)
                     {
-                        //template ID to find
+                        // Template ID to find.
                         var templateIdInPath = "," + template.Id + ",";
 
                         if (string.IsNullOrEmpty(childTemplate.Path))
@@ -390,17 +390,17 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
                             continue;
                         }
 
-                        //Find position in current comma separate string path (so we get the correct children path)
+                        // Find position in current comma separate string path (so we get the correct children path).
                         var positionInPath = childTemplate.Path.IndexOf(templateIdInPath) + templateIdInPath.Length;
 
-                        //Get the substring of the child & any children (descendants it may have too)
+                        // Get the substring of the child & any children (descendants it may have too).
                         var childTemplatePath = childTemplate.Path.Substring(positionInPath);
 
-                        //As we are updating the template to be a child of a layout
-                        //Set the path to the layout's path + its current template id + the current child path substring
+                        // As we are updating the template to be a child of a layout set the path to the layout's path and
+                        // its current template id + the current child path substring.
                         childTemplate.Path = layoutTemplate.Path + "," + template.Id + "," + childTemplatePath;
 
-                        //Save the children with the updated path
+                        // Save the children with the updated path.
                         await UpdateAsync(WithContentLoader(childTemplate)!, userKey, cancellationToken);
                     }
                 }
@@ -520,7 +520,7 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
         }
         catch (IOException)
         {
-            // the file may have been removed between the existence check and opening it
+            // The file may have been removed between the existence check and opening it.
             return null;
         }
     }
@@ -573,7 +573,7 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
         ITemplate? layoutTemplate = await _templateRepository.GetByAliasAsync(layoutTemplateAlias, cancellationToken);
         if (layoutTemplate is null)
         {
-            // this should not happen unless somebody manipulated the data by hand as this function is only called between persisted items
+            // This should not happen unless somebody manipulated the data by hand as this function is only called between persisted items.
             return false;
         }
 
