@@ -663,6 +663,28 @@ export type DataTypeTreeItemResponseModel = {
     hasChildren: boolean;
 };
 
+export type DateTimeOffsetRangeFacetRangeRequestModel = {
+    key: string;
+    minValue?: null | string;
+    maxValue?: null | string;
+};
+
+export type DateTimeOffsetRangeFilterRangeRequestModel = {
+    minValue?: null | string;
+    maxValue?: null | string;
+};
+
+export type DecimalRangeFacetRangeRequestModel = {
+    key: string;
+    minValue?: null | number;
+    maxValue?: null | number;
+};
+
+export type DecimalRangeFilterRangeRequestModel = {
+    minValue?: null | number;
+    maxValue?: null | number;
+};
+
 export type DeleteUserGroupsRequestModel = {
     userGroupIds: Array<ReferenceByIdModel>;
 };
@@ -1178,17 +1200,9 @@ export enum EventMessageTypeModel {
     WARNING = 'Warning'
 }
 
-export type FacetModel = {
-    fieldName: string;
-};
-
 export type FacetResultResponseModel = {
     fieldName: string;
-    values: Array<FacetValueModel>;
-};
-
-export type FacetValueModel = {
-    count: number;
+    values: Array<IFacetValueResponseModel>;
 };
 
 export type FetchResponseModelDataTypeSchemaItemResponseModel = {
@@ -1206,11 +1220,6 @@ export type FileSystemTreeItemPresentationModel = {
     parent?: null | FileSystemFolderModel;
     isFolder: boolean;
     hasChildren: boolean;
-};
-
-export type FilterModel = {
-    fieldName: string;
-    negate: boolean;
 };
 
 export type FlagModel = {
@@ -1282,6 +1291,198 @@ export enum HealthStatusModel {
     UNKNOWN = 'Unknown'
 }
 
+export type IFacetRequestModel = ({
+    $type: 'DateTimeOffsetExactFacetRequestModel';
+} & IFacetRequestModelDateTimeOffsetExactFacetRequestModel) | ({
+    $type: 'DateTimeOffsetRangeFacetRequestModel';
+} & IFacetRequestModelDateTimeOffsetRangeFacetRequestModel) | ({
+    $type: 'DecimalExactFacetRequestModel';
+} & IFacetRequestModelDecimalExactFacetRequestModel) | ({
+    $type: 'DecimalRangeFacetRequestModel';
+} & IFacetRequestModelDecimalRangeFacetRequestModel) | ({
+    $type: 'IntegerExactFacetRequestModel';
+} & IFacetRequestModelIntegerExactFacetRequestModel) | ({
+    $type: 'IntegerRangeFacetRequestModel';
+} & IFacetRequestModelIntegerRangeFacetRequestModel) | ({
+    $type: 'KeywordFacetRequestModel';
+} & IFacetRequestModelKeywordFacetRequestModel);
+
+export type IFacetRequestModelDateTimeOffsetExactFacetRequestModel = {
+    $type: 'DateTimeOffsetExactFacetRequestModel';
+    fieldName: string;
+};
+
+export type IFacetRequestModelDateTimeOffsetRangeFacetRequestModel = {
+    $type: 'DateTimeOffsetRangeFacetRequestModel';
+    fieldName: string;
+    ranges: Array<DateTimeOffsetRangeFacetRangeRequestModel>;
+};
+
+export type IFacetRequestModelDecimalExactFacetRequestModel = {
+    $type: 'DecimalExactFacetRequestModel';
+    fieldName: string;
+};
+
+export type IFacetRequestModelDecimalRangeFacetRequestModel = {
+    $type: 'DecimalRangeFacetRequestModel';
+    fieldName: string;
+    ranges: Array<DecimalRangeFacetRangeRequestModel>;
+};
+
+export type IFacetRequestModelIntegerExactFacetRequestModel = {
+    $type: 'IntegerExactFacetRequestModel';
+    fieldName: string;
+};
+
+export type IFacetRequestModelIntegerRangeFacetRequestModel = {
+    $type: 'IntegerRangeFacetRequestModel';
+    fieldName: string;
+    ranges: Array<IntegerRangeFacetRangeRequestModel>;
+};
+
+export type IFacetRequestModelKeywordFacetRequestModel = {
+    $type: 'KeywordFacetRequestModel';
+    fieldName: string;
+};
+
+export type IFacetValueResponseModel = ({
+    $type: 'DateTimeOffsetExactFacetValueResponseModel';
+} & IFacetValueResponseModelDateTimeOffsetExactFacetValueResponseModel) | ({
+    $type: 'DateTimeOffsetRangeFacetValueResponseModel';
+} & IFacetValueResponseModelDateTimeOffsetRangeFacetValueResponseModel) | ({
+    $type: 'DecimalExactFacetValueResponseModel';
+} & IFacetValueResponseModelDecimalExactFacetValueResponseModel) | ({
+    $type: 'DecimalRangeFacetValueResponseModel';
+} & IFacetValueResponseModelDecimalRangeFacetValueResponseModel) | ({
+    $type: 'IntegerExactFacetValueResponseModel';
+} & IFacetValueResponseModelIntegerExactFacetValueResponseModel) | ({
+    $type: 'IntegerRangeFacetValueResponseModel';
+} & IFacetValueResponseModelIntegerRangeFacetValueResponseModel) | ({
+    $type: 'KeywordFacetValueResponseModel';
+} & IFacetValueResponseModelKeywordFacetValueResponseModel);
+
+export type IFacetValueResponseModelDateTimeOffsetExactFacetValueResponseModel = {
+    $type: 'DateTimeOffsetExactFacetValueResponseModel';
+    key: string;
+    count: number;
+};
+
+export type IFacetValueResponseModelDateTimeOffsetRangeFacetValueResponseModel = {
+    $type: 'DateTimeOffsetRangeFacetValueResponseModel';
+    key: string;
+    min?: null | string;
+    max?: null | string;
+    count: number;
+};
+
+export type IFacetValueResponseModelDecimalExactFacetValueResponseModel = {
+    $type: 'DecimalExactFacetValueResponseModel';
+    key: number;
+    count: number;
+};
+
+export type IFacetValueResponseModelDecimalRangeFacetValueResponseModel = {
+    $type: 'DecimalRangeFacetValueResponseModel';
+    key: string;
+    min?: null | number;
+    max?: null | number;
+    count: number;
+};
+
+export type IFacetValueResponseModelIntegerExactFacetValueResponseModel = {
+    $type: 'IntegerExactFacetValueResponseModel';
+    key: number;
+    count: number;
+};
+
+export type IFacetValueResponseModelIntegerRangeFacetValueResponseModel = {
+    $type: 'IntegerRangeFacetValueResponseModel';
+    key: string;
+    min?: null | number;
+    max?: null | number;
+    count: number;
+};
+
+export type IFacetValueResponseModelKeywordFacetValueResponseModel = {
+    $type: 'KeywordFacetValueResponseModel';
+    key: string;
+    count: number;
+};
+
+export type IFilterRequestModel = ({
+    $type: 'DateTimeOffsetExactFilterRequestModel';
+} & IFilterRequestModelDateTimeOffsetExactFilterRequestModel) | ({
+    $type: 'DateTimeOffsetRangeFilterRequestModel';
+} & IFilterRequestModelDateTimeOffsetRangeFilterRequestModel) | ({
+    $type: 'DecimalExactFilterRequestModel';
+} & IFilterRequestModelDecimalExactFilterRequestModel) | ({
+    $type: 'DecimalRangeFilterRequestModel';
+} & IFilterRequestModelDecimalRangeFilterRequestModel) | ({
+    $type: 'IntegerExactFilterRequestModel';
+} & IFilterRequestModelIntegerExactFilterRequestModel) | ({
+    $type: 'IntegerRangeFilterRequestModel';
+} & IFilterRequestModelIntegerRangeFilterRequestModel) | ({
+    $type: 'KeywordFilterRequestModel';
+} & IFilterRequestModelKeywordFilterRequestModel) | ({
+    $type: 'TextFilterRequestModel';
+} & IFilterRequestModelTextFilterRequestModel);
+
+export type IFilterRequestModelDateTimeOffsetExactFilterRequestModel = {
+    $type: 'DateTimeOffsetExactFilterRequestModel';
+    fieldName: string;
+    values: Array<string>;
+    negate: boolean;
+};
+
+export type IFilterRequestModelDateTimeOffsetRangeFilterRequestModel = {
+    $type: 'DateTimeOffsetRangeFilterRequestModel';
+    fieldName: string;
+    ranges: Array<DateTimeOffsetRangeFilterRangeRequestModel>;
+    negate: boolean;
+};
+
+export type IFilterRequestModelDecimalExactFilterRequestModel = {
+    $type: 'DecimalExactFilterRequestModel';
+    fieldName: string;
+    values: Array<number>;
+    negate: boolean;
+};
+
+export type IFilterRequestModelDecimalRangeFilterRequestModel = {
+    $type: 'DecimalRangeFilterRequestModel';
+    fieldName: string;
+    ranges: Array<DecimalRangeFilterRangeRequestModel>;
+    negate: boolean;
+};
+
+export type IFilterRequestModelIntegerExactFilterRequestModel = {
+    $type: 'IntegerExactFilterRequestModel';
+    fieldName: string;
+    values: Array<number>;
+    negate: boolean;
+};
+
+export type IFilterRequestModelIntegerRangeFilterRequestModel = {
+    $type: 'IntegerRangeFilterRequestModel';
+    fieldName: string;
+    ranges: Array<IntegerRangeFilterRangeRequestModel>;
+    negate: boolean;
+};
+
+export type IFilterRequestModelKeywordFilterRequestModel = {
+    $type: 'KeywordFilterRequestModel';
+    fieldName: string;
+    values: Array<string>;
+    negate: boolean;
+};
+
+export type IFilterRequestModelTextFilterRequestModel = {
+    $type: 'TextFilterRequestModel';
+    fieldName: string;
+    values: Array<string>;
+    negate: boolean;
+};
+
 export enum ImageCropModeModel {
     CROP = 'Crop',
     MAX = 'Max',
@@ -1324,6 +1525,17 @@ export type InstallRequestModel = {
 export type InstallSettingsResponseModel = {
     user: UserSettingsPresentationModel;
     databases: Array<DatabaseSettingsPresentationModel>;
+};
+
+export type IntegerRangeFacetRangeRequestModel = {
+    key: string;
+    minValue?: null | number;
+    maxValue?: null | number;
+};
+
+export type IntegerRangeFilterRangeRequestModel = {
+    minValue?: null | number;
+    maxValue?: null | number;
 };
 
 export type InviteUserRequestModel = {
@@ -1464,6 +1676,55 @@ export type ISetupTwoFactorModel = ISetupTwoFactorModelNoopSetupTwoFactorModel;
 
 export type ISetupTwoFactorModelNoopSetupTwoFactorModel = {
     $type: 'NoopSetupTwoFactorModel';
+};
+
+export type ISorterRequestModel = ({
+    $type: 'DateTimeOffsetSorterRequestModel';
+} & ISorterRequestModelDateTimeOffsetSorterRequestModel) | ({
+    $type: 'DecimalSorterRequestModel';
+} & ISorterRequestModelDecimalSorterRequestModel) | ({
+    $type: 'IntegerSorterRequestModel';
+} & ISorterRequestModelIntegerSorterRequestModel) | ({
+    $type: 'KeywordSorterRequestModel';
+} & ISorterRequestModelKeywordSorterRequestModel) | ({
+    $type: 'ScoreSorterRequestModel';
+} & ISorterRequestModelScoreSorterRequestModel) | ({
+    $type: 'TextSorterRequestModel';
+} & ISorterRequestModelTextSorterRequestModel);
+
+export type ISorterRequestModelDateTimeOffsetSorterRequestModel = {
+    $type: 'DateTimeOffsetSorterRequestModel';
+    fieldName: string;
+    direction: DirectionModel;
+};
+
+export type ISorterRequestModelDecimalSorterRequestModel = {
+    $type: 'DecimalSorterRequestModel';
+    fieldName: string;
+    direction: DirectionModel;
+};
+
+export type ISorterRequestModelIntegerSorterRequestModel = {
+    $type: 'IntegerSorterRequestModel';
+    fieldName: string;
+    direction: DirectionModel;
+};
+
+export type ISorterRequestModelKeywordSorterRequestModel = {
+    $type: 'KeywordSorterRequestModel';
+    fieldName: string;
+    direction: DirectionModel;
+};
+
+export type ISorterRequestModelScoreSorterRequestModel = {
+    $type: 'ScoreSorterRequestModel';
+    direction: DirectionModel;
+};
+
+export type ISorterRequestModelTextSorterRequestModel = {
+    $type: 'TextSorterRequestModel';
+    fieldName: string;
+    direction: DirectionModel;
 };
 
 export type ItemAncestorsResponseModelDocumentItemResponseModel = {
@@ -2680,9 +2941,9 @@ export type SearchDocumentResponseModel = {
 export type SearchRequestModel = {
     indexAlias: string;
     query?: null | string;
-    filters?: null | Array<FilterModel>;
-    facets?: null | Array<FacetModel>;
-    sorters?: null | Array<SorterModel>;
+    filters?: null | Array<IFilterRequestModel>;
+    facets?: null | Array<IFacetRequestModel>;
+    sorters?: null | Array<ISorterRequestModel>;
     culture?: null | string;
     segment?: null | string;
 };
@@ -2742,11 +3003,6 @@ export type SignalRClientSettingsResponseModel = {
 export type SortDocumentChildrenByFieldRequestModel = {
     culture?: null | string;
     field: ContentSortFieldModel;
-    direction: DirectionModel;
-};
-
-export type SorterModel = {
-    fieldName: string;
     direction: DirectionModel;
 };
 

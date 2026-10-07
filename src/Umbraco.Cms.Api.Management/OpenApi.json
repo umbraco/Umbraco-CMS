@@ -42893,6 +42893,94 @@
           }
         }
       },
+      "DateTimeOffsetRangeFacetRangeRequestModel": {
+        "required": [
+          "key"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "minValue": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "maxValue": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "DateTimeOffsetRangeFilterRangeRequestModel": {
+        "type": "object",
+        "properties": {
+          "minValue": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "maxValue": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "DecimalRangeFacetRangeRequestModel": {
+        "required": [
+          "key"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "minValue": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "maxValue": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "DecimalRangeFilterRangeRequestModel": {
+        "type": "object",
+        "properties": {
+          "minValue": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "maxValue": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          }
+        }
+      },
       "DeleteUserGroupsRequestModel": {
         "required": [
           "userGroupIds"
@@ -45048,17 +45136,6 @@
           "Warning"
         ]
       },
-      "FacetModel": {
-        "required": [
-          "fieldName"
-        ],
-        "type": "object",
-        "properties": {
-          "fieldName": {
-            "type": "string"
-          }
-        }
-      },
       "FacetResultResponseModel": {
         "required": [
           "fieldName",
@@ -45072,20 +45149,8 @@
           "values": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/FacetValueModel"
+              "$ref": "#/components/schemas/IFacetValueResponseModel"
             }
-          }
-        }
-      },
-      "FacetValueModel": {
-        "required": [
-          "count"
-        ],
-        "type": "object",
-        "properties": {
-          "count": {
-            "type": "integer",
-            "format": "int64"
           }
         }
       },
@@ -45148,21 +45213,6 @@
             "type": "boolean"
           },
           "hasChildren": {
-            "type": "boolean"
-          }
-        }
-      },
-      "FilterModel": {
-        "required": [
-          "fieldName",
-          "negate"
-        ],
-        "type": "object",
-        "properties": {
-          "fieldName": {
-            "type": "string"
-          },
-          "negate": {
             "type": "boolean"
           }
         }
@@ -45403,6 +45453,699 @@
           "Unknown"
         ]
       },
+      "IFacetRequestModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/IFacetRequestModelDateTimeOffsetExactFacetRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFacetRequestModelDateTimeOffsetRangeFacetRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFacetRequestModelDecimalExactFacetRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFacetRequestModelDecimalRangeFacetRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFacetRequestModelIntegerExactFacetRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFacetRequestModelIntegerRangeFacetRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFacetRequestModelKeywordFacetRequestModel"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DateTimeOffsetExactFacetRequestModel": "#/components/schemas/IFacetRequestModelDateTimeOffsetExactFacetRequestModel",
+            "DateTimeOffsetRangeFacetRequestModel": "#/components/schemas/IFacetRequestModelDateTimeOffsetRangeFacetRequestModel",
+            "DecimalExactFacetRequestModel": "#/components/schemas/IFacetRequestModelDecimalExactFacetRequestModel",
+            "DecimalRangeFacetRequestModel": "#/components/schemas/IFacetRequestModelDecimalRangeFacetRequestModel",
+            "IntegerExactFacetRequestModel": "#/components/schemas/IFacetRequestModelIntegerExactFacetRequestModel",
+            "IntegerRangeFacetRequestModel": "#/components/schemas/IFacetRequestModelIntegerRangeFacetRequestModel",
+            "KeywordFacetRequestModel": "#/components/schemas/IFacetRequestModelKeywordFacetRequestModel"
+          }
+        }
+      },
+      "IFacetRequestModelDateTimeOffsetExactFacetRequestModel": {
+        "required": [
+          "fieldName",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DateTimeOffsetExactFacetRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          }
+        }
+      },
+      "IFacetRequestModelDateTimeOffsetRangeFacetRequestModel": {
+        "required": [
+          "fieldName",
+          "ranges",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DateTimeOffsetRangeFacetRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "ranges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DateTimeOffsetRangeFacetRangeRequestModel"
+            }
+          }
+        }
+      },
+      "IFacetRequestModelDecimalExactFacetRequestModel": {
+        "required": [
+          "fieldName",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DecimalExactFacetRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          }
+        }
+      },
+      "IFacetRequestModelDecimalRangeFacetRequestModel": {
+        "required": [
+          "fieldName",
+          "ranges",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DecimalRangeFacetRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "ranges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DecimalRangeFacetRangeRequestModel"
+            }
+          }
+        }
+      },
+      "IFacetRequestModelIntegerExactFacetRequestModel": {
+        "required": [
+          "fieldName",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "IntegerExactFacetRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          }
+        }
+      },
+      "IFacetRequestModelIntegerRangeFacetRequestModel": {
+        "required": [
+          "fieldName",
+          "ranges",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "IntegerRangeFacetRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "ranges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntegerRangeFacetRangeRequestModel"
+            }
+          }
+        }
+      },
+      "IFacetRequestModelKeywordFacetRequestModel": {
+        "required": [
+          "fieldName",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "KeywordFacetRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          }
+        }
+      },
+      "IFacetValueResponseModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/IFacetValueResponseModelDateTimeOffsetExactFacetValueResponseModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFacetValueResponseModelDateTimeOffsetRangeFacetValueResponseModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFacetValueResponseModelDecimalExactFacetValueResponseModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFacetValueResponseModelDecimalRangeFacetValueResponseModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFacetValueResponseModelIntegerExactFacetValueResponseModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFacetValueResponseModelIntegerRangeFacetValueResponseModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFacetValueResponseModelKeywordFacetValueResponseModel"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DateTimeOffsetExactFacetValueResponseModel": "#/components/schemas/IFacetValueResponseModelDateTimeOffsetExactFacetValueResponseModel",
+            "DateTimeOffsetRangeFacetValueResponseModel": "#/components/schemas/IFacetValueResponseModelDateTimeOffsetRangeFacetValueResponseModel",
+            "DecimalExactFacetValueResponseModel": "#/components/schemas/IFacetValueResponseModelDecimalExactFacetValueResponseModel",
+            "DecimalRangeFacetValueResponseModel": "#/components/schemas/IFacetValueResponseModelDecimalRangeFacetValueResponseModel",
+            "IntegerExactFacetValueResponseModel": "#/components/schemas/IFacetValueResponseModelIntegerExactFacetValueResponseModel",
+            "IntegerRangeFacetValueResponseModel": "#/components/schemas/IFacetValueResponseModelIntegerRangeFacetValueResponseModel",
+            "KeywordFacetValueResponseModel": "#/components/schemas/IFacetValueResponseModelKeywordFacetValueResponseModel"
+          }
+        }
+      },
+      "IFacetValueResponseModelDateTimeOffsetExactFacetValueResponseModel": {
+        "required": [
+          "key",
+          "count",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DateTimeOffsetExactFacetValueResponseModel"
+            ],
+            "type": "string"
+          },
+          "key": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "IFacetValueResponseModelDateTimeOffsetRangeFacetValueResponseModel": {
+        "required": [
+          "key",
+          "count",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DateTimeOffsetRangeFacetValueResponseModel"
+            ],
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "min": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "max": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "IFacetValueResponseModelDecimalExactFacetValueResponseModel": {
+        "required": [
+          "key",
+          "count",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DecimalExactFacetValueResponseModel"
+            ],
+            "type": "string"
+          },
+          "key": {
+            "type": "number",
+            "format": "double"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "IFacetValueResponseModelDecimalRangeFacetValueResponseModel": {
+        "required": [
+          "key",
+          "count",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DecimalRangeFacetValueResponseModel"
+            ],
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "min": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "max": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "IFacetValueResponseModelIntegerExactFacetValueResponseModel": {
+        "required": [
+          "key",
+          "count",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "IntegerExactFacetValueResponseModel"
+            ],
+            "type": "string"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "IFacetValueResponseModelIntegerRangeFacetValueResponseModel": {
+        "required": [
+          "key",
+          "count",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "IntegerRangeFacetValueResponseModel"
+            ],
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "min": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "max": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "IFacetValueResponseModelKeywordFacetValueResponseModel": {
+        "required": [
+          "key",
+          "count",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "KeywordFacetValueResponseModel"
+            ],
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "IFilterRequestModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/IFilterRequestModelDateTimeOffsetExactFilterRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFilterRequestModelDateTimeOffsetRangeFilterRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFilterRequestModelDecimalExactFilterRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFilterRequestModelDecimalRangeFilterRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFilterRequestModelIntegerExactFilterRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFilterRequestModelIntegerRangeFilterRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFilterRequestModelKeywordFilterRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/IFilterRequestModelTextFilterRequestModel"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DateTimeOffsetExactFilterRequestModel": "#/components/schemas/IFilterRequestModelDateTimeOffsetExactFilterRequestModel",
+            "DateTimeOffsetRangeFilterRequestModel": "#/components/schemas/IFilterRequestModelDateTimeOffsetRangeFilterRequestModel",
+            "DecimalExactFilterRequestModel": "#/components/schemas/IFilterRequestModelDecimalExactFilterRequestModel",
+            "DecimalRangeFilterRequestModel": "#/components/schemas/IFilterRequestModelDecimalRangeFilterRequestModel",
+            "IntegerExactFilterRequestModel": "#/components/schemas/IFilterRequestModelIntegerExactFilterRequestModel",
+            "IntegerRangeFilterRequestModel": "#/components/schemas/IFilterRequestModelIntegerRangeFilterRequestModel",
+            "KeywordFilterRequestModel": "#/components/schemas/IFilterRequestModelKeywordFilterRequestModel",
+            "TextFilterRequestModel": "#/components/schemas/IFilterRequestModelTextFilterRequestModel"
+          }
+        }
+      },
+      "IFilterRequestModelDateTimeOffsetExactFilterRequestModel": {
+        "required": [
+          "fieldName",
+          "values",
+          "negate",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DateTimeOffsetExactFilterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "negate": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IFilterRequestModelDateTimeOffsetRangeFilterRequestModel": {
+        "required": [
+          "fieldName",
+          "ranges",
+          "negate",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DateTimeOffsetRangeFilterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "ranges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DateTimeOffsetRangeFilterRangeRequestModel"
+            }
+          },
+          "negate": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IFilterRequestModelDecimalExactFilterRequestModel": {
+        "required": [
+          "fieldName",
+          "values",
+          "negate",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DecimalExactFilterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "negate": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IFilterRequestModelDecimalRangeFilterRequestModel": {
+        "required": [
+          "fieldName",
+          "ranges",
+          "negate",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DecimalRangeFilterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "ranges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DecimalRangeFilterRangeRequestModel"
+            }
+          },
+          "negate": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IFilterRequestModelIntegerExactFilterRequestModel": {
+        "required": [
+          "fieldName",
+          "values",
+          "negate",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "IntegerExactFilterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "negate": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IFilterRequestModelIntegerRangeFilterRequestModel": {
+        "required": [
+          "fieldName",
+          "ranges",
+          "negate",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "IntegerRangeFilterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "ranges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntegerRangeFilterRangeRequestModel"
+            }
+          },
+          "negate": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IFilterRequestModelKeywordFilterRequestModel": {
+        "required": [
+          "fieldName",
+          "values",
+          "negate",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "KeywordFilterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "negate": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IFilterRequestModelTextFilterRequestModel": {
+        "required": [
+          "fieldName",
+          "values",
+          "negate",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "TextFilterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "negate": {
+            "type": "boolean"
+          }
+        }
+      },
       "ImageCropModeModel": {
         "enum": [
           "Crop",
@@ -45526,6 +46269,50 @@
             "items": {
               "$ref": "#/components/schemas/DatabaseSettingsPresentationModel"
             }
+          }
+        }
+      },
+      "IntegerRangeFacetRangeRequestModel": {
+        "required": [
+          "key"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "minValue": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "maxValue": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "IntegerRangeFilterRangeRequestModel": {
+        "type": "object",
+        "properties": {
+          "minValue": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "maxValue": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -46073,6 +46860,165 @@
               "NoopSetupTwoFactorModel"
             ],
             "type": "string"
+          }
+        }
+      },
+      "ISorterRequestModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/ISorterRequestModelDateTimeOffsetSorterRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/ISorterRequestModelDecimalSorterRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/ISorterRequestModelIntegerSorterRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/ISorterRequestModelKeywordSorterRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/ISorterRequestModelScoreSorterRequestModel"
+          },
+          {
+            "$ref": "#/components/schemas/ISorterRequestModelTextSorterRequestModel"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DateTimeOffsetSorterRequestModel": "#/components/schemas/ISorterRequestModelDateTimeOffsetSorterRequestModel",
+            "DecimalSorterRequestModel": "#/components/schemas/ISorterRequestModelDecimalSorterRequestModel",
+            "IntegerSorterRequestModel": "#/components/schemas/ISorterRequestModelIntegerSorterRequestModel",
+            "KeywordSorterRequestModel": "#/components/schemas/ISorterRequestModelKeywordSorterRequestModel",
+            "ScoreSorterRequestModel": "#/components/schemas/ISorterRequestModelScoreSorterRequestModel",
+            "TextSorterRequestModel": "#/components/schemas/ISorterRequestModelTextSorterRequestModel"
+          }
+        }
+      },
+      "ISorterRequestModelDateTimeOffsetSorterRequestModel": {
+        "required": [
+          "fieldName",
+          "direction",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DateTimeOffsetSorterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/DirectionModel"
+          }
+        }
+      },
+      "ISorterRequestModelDecimalSorterRequestModel": {
+        "required": [
+          "fieldName",
+          "direction",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "DecimalSorterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/DirectionModel"
+          }
+        }
+      },
+      "ISorterRequestModelIntegerSorterRequestModel": {
+        "required": [
+          "fieldName",
+          "direction",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "IntegerSorterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/DirectionModel"
+          }
+        }
+      },
+      "ISorterRequestModelKeywordSorterRequestModel": {
+        "required": [
+          "fieldName",
+          "direction",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "KeywordSorterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/DirectionModel"
+          }
+        }
+      },
+      "ISorterRequestModelScoreSorterRequestModel": {
+        "required": [
+          "direction",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "ScoreSorterRequestModel"
+            ],
+            "type": "string"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/DirectionModel"
+          }
+        }
+      },
+      "ISorterRequestModelTextSorterRequestModel": {
+        "required": [
+          "fieldName",
+          "direction",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "TextSorterRequestModel"
+            ],
+            "type": "string"
+          },
+          "fieldName": {
+            "type": "string"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/DirectionModel"
           }
         }
       },
@@ -50670,7 +51616,7 @@
               "array"
             ],
             "items": {
-              "$ref": "#/components/schemas/FilterModel"
+              "$ref": "#/components/schemas/IFilterRequestModel"
             }
           },
           "facets": {
@@ -50679,7 +51625,7 @@
               "array"
             ],
             "items": {
-              "$ref": "#/components/schemas/FacetModel"
+              "$ref": "#/components/schemas/IFacetRequestModel"
             }
           },
           "sorters": {
@@ -50688,7 +51634,7 @@
               "array"
             ],
             "items": {
-              "$ref": "#/components/schemas/SorterModel"
+              "$ref": "#/components/schemas/ISorterRequestModel"
             }
           },
           "culture": {
@@ -50894,21 +51840,6 @@
           },
           "field": {
             "$ref": "#/components/schemas/ContentSortFieldModel"
-          },
-          "direction": {
-            "$ref": "#/components/schemas/DirectionModel"
-          }
-        }
-      },
-      "SorterModel": {
-        "required": [
-          "fieldName",
-          "direction"
-        ],
-        "type": "object",
-        "properties": {
-          "fieldName": {
-            "type": "string"
           },
           "direction": {
             "$ref": "#/components/schemas/DirectionModel"
