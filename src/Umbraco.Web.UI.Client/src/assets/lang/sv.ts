@@ -14,6 +14,9 @@ export default {
 		umbContent: 'Innehåll',
 	},
 	actions: {
+		enable: 'Aktivera',
+		resendInvite: 'Skicka inbjudan igen',
+		unlock: 'Lås upp',
 		copyInProgress: 'Kopiering pågår - vänligen vänta...',
 		deleteInProgress: 'Borttagning pågår - vänligen vänta...',
 		moveInProgress: 'Flyttning pågår - vänligen vänta...',
@@ -42,6 +45,7 @@ export default {
 		notify: 'Meddelanden',
 		protect: 'Lösenordsskydd',
 		publish: 'Publicera',
+		read: 'Läsa',
 		refreshNode: 'Ladda om noder',
 		republish: 'Publicera hela webbplatsen',
 		replace: 'Ersätt',
@@ -197,6 +201,7 @@ export default {
 		saveToPublish: 'Spara och skicka för godkännande',
 		schedulePublish: 'Schemaläggning',
 		select: 'Välj',
+		choose: 'Välj',
 		saveAndPreview: 'Spara och förhandsgranska',
 		showPageDisabled: 'Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad',
 		somethingElse: 'Gör något annat',
@@ -531,6 +536,7 @@ export default {
 		tableSplitNotSplittable: 'Du kan inte dela en cell som inte är ihopslagen.',
 	},
 	general: {
+		message: 'Meddelande',
 		about: 'Om',
 		action: 'Åtgärd',
 		actions: 'Händelser',
@@ -639,6 +645,7 @@ export default {
 		upload: 'Ladda upp',
 		url: 'URL',
 		user: 'Användare',
+		users: 'Användare',
 		username: 'Användarnamn',
 		value: 'Värde',
 		welcome: 'Välkommen...',
@@ -1037,6 +1044,9 @@ export default {
 		sortByFieldCultureLabel: 'Språk',
 	},
 	speechBubbles: {
+		enableUserSuccess: '%0% är nu aktiverad',
+		unlockUsersSuccess: 'Låste upp %0% användare',
+		unlockUserSuccess: '%0% är nu upplåst',
 		editMultiContentPublishedPartialText: '%0% av %1% dokument publicerade.',
 		editMultiContentUnpublishedPartialText: '%0% av %1% dokument avpublicerade.',
 		contentPublishedFailedByEvent: 'Publiceringen avbröts av ett tredjepartstillägg',
@@ -1225,6 +1235,21 @@ export default {
 		updateNoServerError: 'Fel vid kontroll av uppdatering. Se trace-stack för mer information.',
 	},
 	user: {
+		createUserHeadline: (kind: string) => {
+			return kind === 'Api' ? 'Skapa API-användare' : 'Skapa användare';
+		},
+		createUserDescription: (kind: string) => {
+			const defaultUserText = `Skapa en användare för att ge dem åtkomst till Umbraco. När en användare skapas genereras ett lösenord som du kan dela med dem.`;
+			const apiUserText = `Skapa en API-användare för att låta externa tjänster autentisera sig mot Umbraco Management API.`;
+			return kind === 'Api' ? apiUserText : defaultUserText;
+		},
+		disableUserHeadline: (name: string) => `Avaktivera ${name}`,
+		disableUserConfirmation: 'Är du säker på att du vill avaktivera den här användaren?',
+		enableUserHeadline: (name: string) => `Aktivera ${name}`,
+		enableUserConfirmation: 'Är du säker på att du vill aktivera den här användaren?',
+		inviteUser: 'Bjud in användare',
+		unlockUserHeadline: (name: string) => `Lås upp ${name}`,
+		unlockUserConfirmation: 'Är du säker på att du vill låsa upp den här användaren?',
 		access: 'Åtkomst',
 		accessHelp: 'Baserat på tilldelade grupper och startnod så har användaren åtkomst till följande noder',
 		assignAccess: 'Tilldela åtkomst',
@@ -1242,6 +1267,7 @@ export default {
 		createUserHelp:
 			'Skapa nya användare för att ge dom åtkomst till Umbraco. När en ny användare skapas kommer ett lösenord genereras som du kan dela med användaren.',
 		createUser: 'Skapa användare',
+		sendInvite: 'Skicka inbjudan',
 		deleteUser: 'Ta bort användare User',
 		deleteUserConfirmation: 'Är du säker på att du vill ta bort användarens konto?',
 		descriptionField: 'Fält för beskrivning',
@@ -1252,6 +1278,7 @@ export default {
 		failedPasswordAttempts: 'Misslyckade inloggningsförsök',
 		goToProfile: 'Gå till användarens profil',
 		groupsHelp: 'Lägg till grupper för att tilldela åtkomst och rättigheter',
+		invite: 'Bjud in',
 		inviteAnotherUser: 'Bjud in en till användare',
 		inviteUserHelp:
 			'Bjud in nya användare för att ge dom åtkomst till Umbraco. Ett e-postmeddelande kommer skikcas till användaren med information om hur man loggar in i Umbraco. Inbjudningar är giltiga i 72 timmar.',
@@ -1266,6 +1293,7 @@ export default {
 		mediastartnodes: 'Media startnoder',
 		mediastartnodeshelp: 'Begränsa media sectionen till specifika startnoder',
 		modules: 'Sektioner',
+		kind: 'Typ',
 		newPassword: 'Byt ditt lösenord',
 		noLockouts: 'har inte blivit utlåst',
 		noLogin: 'har inte loggat in ännu',
@@ -1297,6 +1325,7 @@ export default {
 		sectionsHelp: 'Välj sektioner för användaråtkomst',
 		stateAll: 'Alla',
 		stateActive: 'Aktiv',
+		stateDisabled: 'Avaktiverad',
 		stateLockedOut: 'Utlåst',
 		stateInvited: 'Inbjuden',
 		stateInactive: 'Inaktiv',
@@ -1310,6 +1339,7 @@ export default {
 		username: 'Användarens namn',
 		userManagement: 'Användarhantering',
 		userPermissions: 'Användarrättigheter',
+		usergroups: 'Användargrupper',
 		usertype: 'Användartyp',
 		userTypes: 'Användartyper',
 		writer: 'Skribent',
@@ -1318,6 +1348,14 @@ export default {
 		sortCreateDateAscending: 'Äldst',
 		sortCreateDateDescending: 'Nyast',
 		sortLastLoginDateDescending: 'Senaste login',
+		userKindDefault: 'Användare',
+		userKindApi: 'API-användare',
+		selectUserGroup: (multiple: boolean) => {
+			return multiple ? 'Välj användargrupper' : 'Välj användargrupp';
+		},
+		chooseUserGroup: (multiple: boolean) => {
+			return multiple ? 'Välj användargrupper' : 'Välj användargrupp';
+		},
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Välj alla',

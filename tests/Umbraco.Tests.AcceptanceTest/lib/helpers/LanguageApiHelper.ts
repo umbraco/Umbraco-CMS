@@ -88,6 +88,19 @@ export class LanguageApiHelper {
     return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/language?skip=0&take=10000');
   }
 
+  /**
+   * Removes every language except the default one. With more than one language the UI differs - notably
+   * Save and publish becomes a variant picker - so a leaked language changes behaviour, not just state.
+   */
+  async ensureOnlyDefaultLanguageExists() {
+    const languages = await (await this.getAll()).json();
+    for (const language of languages.items) {
+      if (!language.isDefault) {
+        await this.delete(language.isoCode);
+      }
+    }
+  }
+
   async createDanishLanguage() {
     await this.ensureNameNotExists('Danish');
     return await this.create('Danish', false, false, 'da');
