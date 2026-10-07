@@ -643,7 +643,7 @@ public partial class ContentEditingServiceTests
             [
                 new VariantModel { Culture = "en-US", Name = "The English Name" },
                 new VariantModel { Culture = "da-DK", Name = "The Danish Name" },
-                new VariantModel { Culture = null, Segment = null, Name = string.Empty }
+                new VariantModel { Culture = null, Name = string.Empty }
             ]
         };
 

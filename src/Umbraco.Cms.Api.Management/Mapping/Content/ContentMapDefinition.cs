@@ -110,7 +110,7 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                 ? source.UpdateDate
                 : source.GetUpdateDate(culture) ?? source.UpdateDate,
         };
-        additionalVariantMapping?.Invoke(culture, segment, variantViewModel);
+        additionalVariantMapping?.Invoke(culture, variantViewModel);
         return variantViewModel;
     }
 
