@@ -157,6 +157,45 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
         });
     }
 
+    /// <summary>
+    ///     Adding a property to a composition changes the property set of every content type composed of it, so
+    ///     their published content has to expose the new property too. The added alias has no stored value yet,
+    ///     so this must not rebuild the stored database cache.
+    /// </summary>
+    [Test]
+    public async Task Adding_Property_To_A_Composition_Exposes_It_On_Composed_Content()
+    {
+        // Arrange - compose the Textpage's content type, then read the published content so both its published
+        // content type and its converted instance are cached against the property set as it stands now.
+        var composition = await CreateContentType("compositionType", "compProp");
+        ContentType.AddContentType(composition);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+
+        var before = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
+        Assert.That(before!.HasProperty("addedProp"), Is.False, "precondition: the property does not exist yet");
+        var blobBefore = ReadDraftBlobSignature(TextpageId);
+
+        // Act - add a property to the composition, and only to the composition.
+        composition.AddPropertyType(
+            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "addedProp")
+            {
+                Name = "addedProp",
+                DataTypeId = Constants.DataTypes.Textbox,
+            },
+            "content",
+            "Content");
+        await ContentTypeService.UpdateAsync(composition, Constants.Security.SuperUserKey);
+
+        // Assert - the composing type's published content exposes the property it gains through the composition.
+        // Left stale, it keeps serving an instance built against the old property set, and Value() returns null
+        // no matter how the property is populated and published.
+        var after = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
+        Assert.That(after!.HasProperty("addedProp"), Is.True, "Templates must be able to read the property added to the composition.");
+
+        // Assert - the stored cmsContentNu blob was NOT rebuilt; the added alias has no stored value to re-key.
+        Assert.That(ReadDraftBlobSignature(TextpageId), Is.EqualTo(blobBefore), "Adding a property must not rebuild the stored blob.");
+    }
+
     private IReadOnlyList<ContentTypeChangeTypes> ChangeTypesFor(int contentTypeId) =>
         _capturedContentTypeChanges.Where(c => c.Item.Id == contentTypeId).Select(c => c.ChangeTypes).ToList();
 

@@ -38,6 +38,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly ICacheManager _cacheManager;
     private readonly IPublishStatusManagementService _publishStatusManagementService;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly IPublishedContentTypeCache _publishedContentTypeCache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
@@ -73,7 +74,48 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             contentService,
             publishStatusManagementService,
             documentCacheService,
-            cacheManager)
+            cacheManager,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentTypeCache>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public ContentCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IIdKeyMap idKeyMap,
+        IDomainService domainService,
+        IEventAggregator eventAggregator,
+        ICacheRefresherNotificationFactory factory,
+        IDocumentUrlService documentUrlService,
+        IDocumentUrlAliasService documentUrlAliasService,
+        IDomainCacheService domainCacheService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDocumentNavigationManagementService documentNavigationManagementService,
+        IContentService contentService,
+        IPublishStatusManagementService publishStatusManagementService,
+        IDocumentCacheService documentCacheService,
+        ICacheManager cacheManager)
+        : this(
+            appCaches,
+            serializer,
+            idKeyMap,
+            domainService,
+            eventAggregator,
+            factory,
+            documentUrlService,
+            documentUrlAliasService,
+            domainCacheService,
+            documentNavigationQueryService,
+            documentNavigationManagementService,
+            contentService,
+            publishStatusManagementService,
+            documentCacheService,
+            cacheManager,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentTypeCache>())
     {
     }
 
@@ -95,7 +137,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         IContentService contentService,
         IPublishStatusManagementService publishStatusManagementService,
         IDocumentCacheService documentCacheService,
-        ICacheManager cacheManager)
+        ICacheManager cacheManager,
+        IPublishedContentTypeCache publishedContentTypeCache)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -108,6 +151,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         _contentService = contentService;
         _documentCacheService = documentCacheService;
         _publishStatusManagementService = publishStatusManagementService;
+        _publishedContentTypeCache = publishedContentTypeCache;
 
         // TODO: Ideally we should inject IElementsCache
         // this interface is in infrastructure, and changing this is very breaking
@@ -193,6 +237,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     /// <inheritdoc/>
     public override void Refresh(JsonPayload[] payloads)
     {
+        // A "refresh all" is the signal that the in-memory published caches are being rebuilt from the database
+        // cache. Published content types are cached independently of the content they describe, so they have to
+        // be dropped here too - otherwise the rebuilt content is projected through the same definitions as
+        // before and the reload has no effect on anything the content type governs.
+        if (payloads.Any(x => x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)))
+        {
+            _publishedContentTypeCache.ClearAll();
+        }
+
         var idsRemoved = new HashSet<int>();
 
         foreach (JsonPayload payload in payloads)

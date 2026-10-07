@@ -863,6 +863,42 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
     [Test]
+    public async Task Adding_A_Property_Refreshes_The_Content_Types_Composed_Of_It()
+    {
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel("Composition", "composition"),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var createModel = ContentTypeCreateModel("Test", "test");
+        createModel.Compositions = new[]
+        {
+            new Composition { Key = compositionContentType.Key, CompositionType = CompositionType.Composition }
+        };
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel("Composition", "composition");
+        updateModel.Properties = new[] { ContentTypePropertyTypeModel("Test Property", "testProperty") };
+
+        var result = await ContentTypeEditingService.UpdateAsync(compositionContentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // The composing content type now exposes the added property, so it has to be refreshed alongside the
+        // content type the property was added to. The new alias has no stored value, so neither needs a rebuild.
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, refreshedPayloads!.Length);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, compositionContentType.Id, ContentTypeChangeTypes.RefreshOther);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
+            Assert.IsFalse(refreshedPayloads.Any(x => x.ChangeTypes.RequiresRawDataRebuild()), "no payload should require a raw data rebuild");
+        });
+    }
+
+    [Test]
     public async Task Can_Remove_Compositions()
     {
         var propertyType1 = ContentTypePropertyTypeModel("Test Property 1", "testProperty1");
@@ -1521,13 +1557,15 @@ internal sealed partial class ContentTypeEditingServiceTests
     {
         Assert.IsNotNull(refreshedPayloads);
         Assert.AreEqual(1, refreshedPayloads.Length);
-        Assert.Multiple(() =>
-        {
-            var payload = refreshedPayloads.First();
-            Assert.AreEqual(expectedContentTypeId, payload.Id);
-            Assert.AreEqual(expectedChangeTypes, payload.ChangeTypes);
-            Assert.AreEqual(nameof(IContentType), payload.ItemType);
-        });
+        Assert.Multiple(() => AssertContentTypeRefreshPayloadFor(refreshedPayloads, expectedContentTypeId, expectedChangeTypes));
+    }
+
+    private static void AssertContentTypeRefreshPayloadFor(ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads, int expectedContentTypeId, ContentTypeChangeTypes expectedChangeTypes)
+    {
+        ContentTypeCacheRefresher.JsonPayload? payload = refreshedPayloads.SingleOrDefault(x => x.Id == expectedContentTypeId);
+        Assert.IsNotNull(payload, $"expected a single payload for content type {expectedContentTypeId}");
+        Assert.AreEqual(expectedChangeTypes, payload!.ChangeTypes);
+        Assert.AreEqual(nameof(IContentType), payload.ItemType);
     }
 
     [Test]

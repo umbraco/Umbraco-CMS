@@ -68,6 +68,7 @@ public class ContentCacheRefresherIdKeyMapTests
             Mock.Of<IContentService>(),
             Mock.Of<IPublishStatusManagementService>(),
             Mock.Of<IDocumentCacheService>(),
-            Mock.Of<ICacheManager>(x => x.ElementsCache == Mock.Of<IAppCache>()));
+            Mock.Of<ICacheManager>(x => x.ElementsCache == Mock.Of<IAppCache>()),
+            Mock.Of<IPublishedContentTypeCache>());
     }
 }
