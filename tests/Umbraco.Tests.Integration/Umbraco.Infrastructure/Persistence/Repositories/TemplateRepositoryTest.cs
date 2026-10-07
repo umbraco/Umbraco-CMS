@@ -34,7 +34,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     public void SetUp() => DeleteAllTemplateViewFiles();
 
     [TearDown]
-    public void TearDown() => DeleteAllTemplateViewFiles();
+    public void TearDownTemplateFiles() => DeleteAllTemplateViewFiles();
 
     /// <summary>
     ///     Attaches the command counter so tests can assert on query cost. Registered here rather than in
@@ -571,6 +571,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     /// <remarks>
     ///     Regression test for https://github.com/umbraco/Umbraco-CMS/issues/21756.
     /// </remarks>
+    /// <returns>A <see cref="Task" /> representing the asynchronous test.</returns>
     [Test]
     public async Task GetMany_By_Key_With_Warm_Cache_Returns_All()
     {
@@ -667,13 +668,13 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    private static void SetLayout(Template template, ITemplate layoutTemplate)
+    private static void SetLayout(Template template, Template layoutTemplate)
     {
         template.LayoutTemplateAlias = layoutTemplate.Alias;
         template.LayoutTemplateId = new Lazy<int>(() => layoutTemplate.Id);
     }
 
-    private static async Task<ITemplate> CreateTemplateAsync(ITemplateRepository repository)
+    private static async Task<ITemplate> CreateTemplateAsync(TemplateRepository repository)
     {
         ITemplate template = new TemplateBuilder()
             .WithId(0)
@@ -688,7 +689,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     /// <summary>
     ///     Creates parent → (child1 → (toddler1, toddler2 → baby1), child2 → (toddler3, toddler4 → baby2)).
     /// </summary>
-    private async Task<ITemplate[]> CreateHierarchyAsync(ITemplateRepository repository)
+    private async Task<ITemplate[]> CreateHierarchyAsync(TemplateRepository repository)
     {
         var parent = new Template(ShortStringHelper, "parent", "parent");
         var child1 = new Template(ShortStringHelper, "child1", "child1");

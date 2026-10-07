@@ -42,7 +42,7 @@ internal sealed class TemplateResolutionTests : UmbracoIntegrationTest
 
     private ITemplate _pageTemplate = null!;
     private ITemplate _alternativeTemplate = null!;
-    private IContent _page = null!;
+    private Content _page = null!;
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 

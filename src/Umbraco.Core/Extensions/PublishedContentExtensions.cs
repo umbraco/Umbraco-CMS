@@ -196,6 +196,9 @@ public static class PublishedContentExtensions
     /// <summary>
     ///     Returns the current template Alias
     /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="templateService">The template service.</param>
+    /// <param name="idKeyMap">The map used to resolve the template's key from its identifier.</param>
     /// <returns>Empty string if none is set.</returns>
     public static string GetTemplateAlias(this IPublishedContent content, ITemplateService templateService, IIdKeyMap idKeyMap)
     {

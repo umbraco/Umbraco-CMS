@@ -294,7 +294,7 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
             var layoutTemplateAlias = _templateContentParserService.LayoutTemplateAlias(template.Content);
             ITemplate? layoutTemplate = layoutTemplateAlias.IsNullOrWhiteSpace()
                 ? null
-                : await _templateRepository.GetByAliasAsync(layoutTemplateAlias!, cancellationToken);
+                : await _templateRepository.GetByAliasAsync(layoutTemplateAlias, cancellationToken);
 
             // Fail if the template content specifies a layout template but said template does not exist
             if (layoutTemplateAlias.IsNullOrWhiteSpace() == false && layoutTemplate == null)
@@ -378,31 +378,7 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
                 // After updating the layout - ensure we update the path property if it has any children already assigned.
                 if (template.HasIdentity)
                 {
-                    IEnumerable<ITemplate> templateHasChildren = await _templateRepository.GetDescendantsAsync(template.Key, cancellationToken);
-
-                    foreach (ITemplate childTemplate in templateHasChildren)
-                    {
-                        // Template ID to find.
-                        var templateIdInPath = "," + template.Id + ",";
-
-                        if (string.IsNullOrEmpty(childTemplate.Path))
-                        {
-                            continue;
-                        }
-
-                        // Find position in current comma separate string path (so we get the correct children path).
-                        var positionInPath = childTemplate.Path.IndexOf(templateIdInPath) + templateIdInPath.Length;
-
-                        // Get the substring of the child & any children (descendants it may have too).
-                        var childTemplatePath = childTemplate.Path.Substring(positionInPath);
-
-                        // As we are updating the template to be a child of a layout set the path to the layout's path and
-                        // its current template id + the current child path substring.
-                        childTemplate.Path = layoutTemplate.Path + "," + template.Id + "," + childTemplatePath;
-
-                        // Save the children with the updated path.
-                        await UpdateAsync(WithContentLoader(childTemplate)!, userKey, cancellationToken);
-                    }
+                    await UpdateDescendantPathsAsync(template, layoutTemplate, userKey, cancellationToken);
                 }
             }
         }
@@ -411,6 +387,38 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
             //remove the layout
             concreteTemplate.LayoutTemplateId = new Lazy<int>(() => -1);
             concreteTemplate.LayoutTemplateAlias = null;
+        }
+    }
+
+    /// <summary>
+    ///     Re-roots the paths of a template's descendants under its new layout template, and saves each descendant.
+    /// </summary>
+    private async Task UpdateDescendantPathsAsync(ITemplate template, ITemplate layoutTemplate, Guid userKey, CancellationToken cancellationToken)
+    {
+        IEnumerable<ITemplate> templateHasChildren = await _templateRepository.GetDescendantsAsync(template.Key, cancellationToken);
+
+        foreach (ITemplate childTemplate in templateHasChildren)
+        {
+            // Template ID to find.
+            var templateIdInPath = "," + template.Id + ",";
+
+            if (string.IsNullOrEmpty(childTemplate.Path))
+            {
+                continue;
+            }
+
+            // Find position in current comma separate string path (so we get the correct children path).
+            var positionInPath = childTemplate.Path.IndexOf(templateIdInPath) + templateIdInPath.Length;
+
+            // Get the substring of the child & any children (descendants it may have too).
+            var childTemplatePath = childTemplate.Path.Substring(positionInPath);
+
+            // As we are updating the template to be a child of a layout set the path to the layout's path and
+            // its current template id + the current child path substring.
+            childTemplate.Path = layoutTemplate.Path + "," + template.Id + "," + childTemplatePath;
+
+            // Save the children with the updated path.
+            await UpdateAsync(WithContentLoader(childTemplate)!, userKey, cancellationToken);
         }
     }
 
@@ -450,7 +458,7 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
         }
     }
 
-    private IEnumerable<ITemplate> WithContentLoader(IEnumerable<ITemplate> templates)
+    private ITemplate[] WithContentLoader(IEnumerable<ITemplate> templates)
         => templates.Select(template => WithContentLoader(template)!).ToArray();
 
     /// <summary>

@@ -674,7 +674,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         return templateViaContentType;
     }
 
-    private ITemplateService CreateTemplateService(RuntimeMode runtimeMode)
+    private TemplateService CreateTemplateService(RuntimeMode runtimeMode)
     {
         var runtimeSettings = new Mock<IOptionsMonitor<RuntimeSettings>>();
         runtimeSettings.Setup(x => x.CurrentValue).Returns(new RuntimeSettings { Mode = runtimeMode });

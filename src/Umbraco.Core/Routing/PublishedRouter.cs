@@ -39,6 +39,21 @@ public class PublishedRouter : IPublishedRouter
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedRouter" /> class.
     /// </summary>
+    /// <param name="webRoutingSettings">The web routing settings.</param>
+    /// <param name="contentFinders">The content finders.</param>
+    /// <param name="contentLastChanceFinder">The content finder used when no other finder finds content.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
+    /// <param name="proflog">The profiling logger.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="publishedUrlProvider">The published URL provider.</param>
+    /// <param name="requestAccessor">The request accessor.</param>
+    /// <param name="publishedValueFallback">The published value fallback.</param>
+    /// <param name="templateService">The template service.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="domainCache">The domain cache.</param>
+    /// <param name="idKeyMap">The map used to resolve template keys from their identifiers.</param>
     public PublishedRouter(
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
         ContentFinderCollection contentFinders,

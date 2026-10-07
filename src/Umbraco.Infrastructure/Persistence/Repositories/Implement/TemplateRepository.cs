@@ -28,6 +28,12 @@ internal sealed class TemplateRepository : AsyncEntityRepositoryBase<Guid, ITemp
     /// <summary>
     ///     Initializes a new instance of the <see cref="TemplateRepository" /> class.
     /// </summary>
+    /// <param name="scopeAccessor">The Entity Framework Core scope accessor.</param>
+    /// <param name="cache">The application caches.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="shortStringHelper">The short string helper used to clean template aliases.</param>
+    /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
+    /// <param name="cacheSyncService">The cache synchronization service.</param>
     public TemplateRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches cache,
@@ -218,7 +224,7 @@ internal sealed class TemplateRepository : AsyncEntityRepositoryBase<Guid, ITemp
         entity.DeleteDate = DateTime.UtcNow;
     }
 
-    private IEnumerable<ITemplate> BuildEntities(List<TemplateDto> dtos)
+    private List<Template> BuildEntities(List<TemplateDto> dtos)
     {
         var aliasesById = dtos.ToDictionary(dto => dto.NodeId, dto => dto.Alias);
         var layoutTemplateIds = dtos.Select(dto => dto.NodeDto.ParentId).ToHashSet();

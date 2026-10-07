@@ -207,30 +207,36 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
                 continue;
             }
 
-            var allowedTemplates = new List<ITemplate>();
-            var defaultTemplateId = 0;
+            templatesByContentTypeId.TryGetValue(contentType.Id, out List<ContentTypeTemplateDto>? contentTypeTemplateDtos);
+            MapTemplates(contentType, contentTypeTemplateDtos, templates);
+        }
+    }
 
-            if (templatesByContentTypeId.TryGetValue(contentType.Id, out List<ContentTypeTemplateDto>? contentTypeTemplateDtos))
+    private static void MapTemplates(
+        IContentType contentType,
+        List<ContentTypeTemplateDto>? contentTypeTemplateDtos,
+        Dictionary<int, ITemplate> templates)
+    {
+        var allowedTemplates = new List<ITemplate>();
+        var defaultTemplateId = 0;
+
+        foreach (ContentTypeTemplateDto templateDto in contentTypeTemplateDtos ?? [])
+        {
+            if (!templates.TryGetValue(templateDto.TemplateNodeId, out ITemplate? template))
             {
-                foreach (ContentTypeTemplateDto templateDto in contentTypeTemplateDtos)
-                {
-                    if (!templates.TryGetValue(templateDto.TemplateNodeId, out ITemplate? template))
-                    {
-                        continue;
-                    }
-
-                    allowedTemplates.Add(template);
-
-                    if (templateDto.IsDefault)
-                    {
-                        defaultTemplateId = template.Id;
-                    }
-                }
+                continue;
             }
 
-            contentType.AllowedTemplates = allowedTemplates;
-            contentType.DefaultTemplateId = defaultTemplateId;
+            allowedTemplates.Add(template);
+
+            if (templateDto.IsDefault)
+            {
+                defaultTemplateId = template.Id;
+            }
         }
+
+        contentType.AllowedTemplates = allowedTemplates;
+        contentType.DefaultTemplateId = defaultTemplateId;
     }
 
     private static void MapCompositions(

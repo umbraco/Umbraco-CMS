@@ -105,7 +105,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var userGroup = await CreateTestUserGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None); 
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
