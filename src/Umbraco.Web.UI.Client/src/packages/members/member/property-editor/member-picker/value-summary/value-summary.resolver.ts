@@ -4,16 +4,25 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
+/**
+ * The value of a member picker property: a comma-separated string of member uniques for a picker holding one
+ * member, or an array of member uniques for a picker holding several.
+ */
+export type UmbMemberPickerValueSummaryValue = string | Array<string> | undefined;
+
+/**
+ * Batch-resolves member picker values to the picked members' item models, whichever shape the value takes.
+ */
 export class UmbMemberPickerValueSummaryResolver
 	extends UmbControllerBase
-	implements UmbValueSummaryResolver<string | undefined, Array<UmbMemberItemModel>>
+	implements UmbValueSummaryResolver<UmbMemberPickerValueSummaryValue, Array<UmbMemberItemModel>>
 {
-	#repo = new UmbMemberItemRepository(this);
+	readonly #repo = new UmbMemberItemRepository(this);
 
 	async resolveValues(
-		values: ReadonlyArray<string | undefined>,
+		values: ReadonlyArray<UmbMemberPickerValueSummaryValue>,
 	): Promise<UmbValueSummaryResolveResult<Array<UmbMemberItemModel>>> {
-		const allKeys = [...new Set(values.flatMap((v) => splitStringToArray(v)))];
+		const allKeys = [...new Set(values.flatMap((v) => this.#toKeys(v)))];
 		if (!allKeys.length) return { data: values.map(() => []) };
 
 		const { data, asObservable } = await this.#repo.requestItems(allKeys);
@@ -27,13 +36,17 @@ export class UmbMemberPickerValueSummaryResolver
 		};
 	}
 
+	#toKeys(value: UmbMemberPickerValueSummaryValue): Array<string> {
+		return Array.isArray(value) ? value : splitStringToArray(value);
+	}
+
 	#map(
-		values: ReadonlyArray<string | undefined>,
+		values: ReadonlyArray<UmbMemberPickerValueSummaryValue>,
 		items: ReadonlyArray<UmbMemberItemModel>,
 	): ReadonlyArray<Array<UmbMemberItemModel>> {
 		const itemByKey = new Map(items.map((item) => [item.unique, item]));
 		return values.map((v) =>
-			splitStringToArray(v)
+			this.#toKeys(v)
 				.map((key) => itemByKey.get(key))
 				.filter((item): item is UmbMemberItemModel => !!item),
 		);

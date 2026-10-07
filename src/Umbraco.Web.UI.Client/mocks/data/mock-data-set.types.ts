@@ -3,6 +3,7 @@ import type {
 	DataTypeItemResponseModel,
 	DataTypeResponseModel,
 	DataTypeTreeItemResponseModel,
+	DatatypeConfigurationResponseModel,
 	// Dictionary
 	DictionaryItemItemResponseModel,
 	DictionaryItemResponseModel,
@@ -222,6 +223,7 @@ export interface UmbMockLogLevelsModel {
 export interface UmbMockDataSet {
 	// Core entity data arrays (all optional, defaults to empty array)
 	dataType?: Array<UmbMockDataTypeModel>;
+	dataTypeConfiguration?: DatatypeConfigurationResponseModel;
 	dictionary?: Array<UmbMockDictionaryModel>;
 	document?: Array<UmbMockDocumentModel>;
 	documentBlueprint?: Array<UmbMockDocumentBlueprintModel>;
