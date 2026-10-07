@@ -13,6 +13,18 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids);
 
     /// <summary>
+    ///     Gets content, loading only the requested properties and, optionally, templates.
+    /// </summary>
+    /// <param name="ids">The unique identifiers of the content.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded.
+    /// </param>
+    /// <param name="loadTemplates">Whether to load templates. Ignored for content that has no templates.</param>
+    /// <returns>The content, in the order of <paramref name="ids" />.</returns>
+    IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases, bool loadTemplates = true);
+
+    /// <summary>
     ///     Saves content.
     /// </summary>
     /// <param name="content">The content to save.</param>
@@ -109,20 +121,7 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     /// <param name="culturesToPublish">The cultures to publish, or an empty array for invariant content.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
     /// <returns>The result of the publish operation, or a failure result if saving failed.</returns>
-    // TODO (V19): Remove the default implementation when the method is no longer new.
-    PublishResult SaveAndPublish(TContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
-    {
-        OperationResult saveResult = Save(content, userId);
-        if (saveResult.Success)
-        {
-            return Publish(content, culturesToPublish, userId);
-        }
-
-        PublishResultType resultType = saveResult.Result == OperationResultType.FailedCancelledByEvent
-            ? PublishResultType.FailedPublishCancelledByEvent
-            : PublishResultType.FailedPublish;
-        return new PublishResult(resultType, saveResult.EventMessages, content);
-    }
+    PublishResult SaveAndPublish(TContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Unpublishes content.

@@ -195,52 +195,6 @@ public class UserPresentationFactory : IUserPresentationFactory
     {
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UserPresentationFactory"/> class.
-    /// </summary>
-    /// <param name="entityService">Service for accessing and managing entities.</param>
-    /// <param name="appCaches">Provides application-level caching functionality.</param>
-    /// <param name="mediaFileManager">Manages media file storage and retrieval.</param>
-    /// <param name="imageUrlGenerator">Generates URLs for images.</param>
-    /// <param name="userGroupPresentationFactory">Factory for creating user group presentation models.</param>
-    /// <param name="absoluteUrlBuilder">Builds absolute URLs for resources.</param>
-    /// <param name="emailSender">Handles sending emails.</param>
-    /// <param name="passwordConfigurationPresentationFactory">Factory for password configuration presentation models.</param>
-    /// <param name="securitySettings">Provides access to security-related configuration settings.</param>
-    /// <param name="externalLoginProviders">Manages back office external login providers.</param>
-    /// <param name="permissionPresentationMappers">Collection of mappers for permission presentation models.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public UserPresentationFactory(
-        IEntityService entityService,
-        AppCaches appCaches,
-        MediaFileManager mediaFileManager,
-        IImageUrlGenerator imageUrlGenerator,
-        IUserGroupPresentationFactory userGroupPresentationFactory,
-        IAbsoluteUrlBuilder absoluteUrlBuilder,
-        IEmailSender emailSender,
-        IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory,
-        IOptionsSnapshot<SecuritySettings> securitySettings,
-        IBackOfficeExternalLoginProviders externalLoginProviders,
-        IEnumerable<IPermissionPresentationMapper> permissionPresentationMappers)
-        : this(
-            entityService,
-            appCaches,
-            mediaFileManager,
-            imageUrlGenerator,
-            userGroupPresentationFactory,
-            absoluteUrlBuilder,
-            emailSender,
-            passwordConfigurationPresentationFactory,
-            securitySettings,
-            externalLoginProviders,
-            permissionPresentationMappers,
-            StaticServiceProvider.Instance.GetRequiredService<IContentPermissionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IElementContainerPermissionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ISessionExpiryAccessor>())
-    {
-    }
-
     /// <inheritdoc/>
     public UserResponseModel CreateResponseModel(IUser user)
     {

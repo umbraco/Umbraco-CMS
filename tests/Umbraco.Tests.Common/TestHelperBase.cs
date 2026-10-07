@@ -132,7 +132,7 @@ public abstract class TestHelperBase
                 lockingMechanismFactory.Object,
                 databaseFactory.Object,
                 fileSystems,
-                new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
+                new TestOptionsMonitor<DebugSettings>(new DebugSettings()),
                 mediaFileManager,
                 loggerFactory,
                 Mock.Of<IEventAggregator>());
@@ -147,7 +147,7 @@ public abstract class TestHelperBase
 
     public abstract IMarchal Marchal { get; }
 
-    public CoreDebugSettings CoreDebugSettings { get; } = new();
+    public DebugSettings DebugSettings { get; } = new();
 
     public IIOHelper IOHelper
     {

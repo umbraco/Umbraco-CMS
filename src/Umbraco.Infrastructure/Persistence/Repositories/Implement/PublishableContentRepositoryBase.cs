@@ -1546,17 +1546,6 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
-    public override IEnumerable<TEntity> GetPage(
-        IQuery<TEntity>? query,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        IQuery<TEntity>? filter,
-        Ordering? ordering)
-        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: filter, ordering: ordering, loadTemplates: true);
-
-    /// <inheritdoc />
     public override IEnumerable<TEntity> GetPage(
         IQuery<TEntity>? query,
         long pageIndex,

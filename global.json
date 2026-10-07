@@ -1,7 +1,9 @@
 {
   "sdk": {
-    "version": "10.0.100",
-    "rollForward": "latestFeature",
+    "version": "11.0.100-rc.1.26425.128",
+    // TODO (V19): Restore "latestFeature" once the pinned SDK is a stable 11.0.100 release. UseDotNet@2 turns a
+    // roll-forward policy into a "latest 11.0.x" search that excludes prereleases, so CI cannot resolve an RC pin.
+    "rollForward": "disable",
     "allowPrerelease": false
   }
 }

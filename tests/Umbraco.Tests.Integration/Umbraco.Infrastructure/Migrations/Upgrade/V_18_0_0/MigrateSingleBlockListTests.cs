@@ -7,7 +7,6 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -25,7 +24,6 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Upgrade.V_18_0_0;
 
@@ -464,7 +462,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                         Constants.PropertyEditors.Aliases.BlockList,
                         new BlockListLayoutItem { ContentKey = outerBlockKey }),
                     ContentData = [outerBlock],
-                    Expose = [new BlockItemVariation(outerBlockKey, null, null)],
+                    Expose = [new BlockItemVariation(outerBlockKey, null)],
                 });
             case ContainerEditor.BlockGrid:
                 return JsonSerializer.Serialize(new BlockGridValue
@@ -473,7 +471,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                         Constants.PropertyEditors.Aliases.BlockGrid,
                         new BlockGridLayoutItem { ContentKey = outerBlockKey, ColumnSpan = 12, RowSpan = 1 }),
                     ContentData = [outerBlock],
-                    Expose = [new BlockItemVariation(outerBlockKey, null, null)],
+                    Expose = [new BlockItemVariation(outerBlockKey, null)],
                 });
             case ContainerEditor.RichText:
                 return JsonSerializer.Serialize(new RichTextEditorValue
@@ -485,7 +483,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                             Constants.PropertyEditors.Aliases.RichText,
                             new RichTextBlockLayoutItem { ContentKey = outerBlockKey }),
                         ContentData = [outerBlock],
-                        Expose = [new BlockItemVariation(outerBlockKey, null, null)],
+                        Expose = [new BlockItemVariation(outerBlockKey, null)],
                     },
                 });
             default:
@@ -504,7 +502,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                 Constants.PropertyEditors.Aliases.BlockList,
                 new BlockListLayoutItem { ContentKey = blockKey }),
             ContentData = [BuildBlockItemData(blockKey, elementType, propertyAlias, propertyValue)],
-            Expose = [new BlockItemVariation(blockKey, null, null)],
+            Expose = [new BlockItemVariation(blockKey, null)],
         };
 
     private static BlockItemData BuildBlockItemData(

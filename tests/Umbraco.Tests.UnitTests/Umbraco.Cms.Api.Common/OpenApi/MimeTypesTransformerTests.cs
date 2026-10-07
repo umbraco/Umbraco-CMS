@@ -26,12 +26,12 @@ public class MimeTypesTransformerTests
             {
                 ["200"] = new OpenApiResponse
                 {
-                    Content = new Dictionary<string, OpenApiMediaType>
+                    Content = new Dictionary<string, IOpenApiMediaType>
                     {
-                        ["application/json"] = new(),
-                        ["text/json"] = new(),
-                        ["application/*+json"] = new(),
-                        ["text/plain"] = new(),
+                        ["application/json"] = new OpenApiMediaType(),
+                        ["text/json"] = new OpenApiMediaType(),
+                        ["application/*+json"] = new OpenApiMediaType(),
+                        ["text/plain"] = new OpenApiMediaType(),
                     },
                 },
             },
@@ -58,11 +58,11 @@ public class MimeTypesTransformerTests
             {
                 ["200"] = new OpenApiResponse
                 {
-                    Content = new Dictionary<string, OpenApiMediaType>
+                    Content = new Dictionary<string, IOpenApiMediaType>
                     {
-                        ["application/json"] = new(),
-                        ["application/xml"] = new(),
-                        ["text/plain"] = new(),
+                        ["application/json"] = new OpenApiMediaType(),
+                        ["application/xml"] = new OpenApiMediaType(),
+                        ["text/plain"] = new OpenApiMediaType(),
                     },
                 },
             },
@@ -88,11 +88,11 @@ public class MimeTypesTransformerTests
         {
             RequestBody = new OpenApiRequestBody
             {
-                Content = new Dictionary<string, OpenApiMediaType>
+                Content = new Dictionary<string, IOpenApiMediaType>
                 {
-                    ["application/json"] = new(),
-                    ["text/json"] = new(),
-                    ["application/*+json"] = new(),
+                    ["application/json"] = new OpenApiMediaType(),
+                    ["text/json"] = new OpenApiMediaType(),
+                    ["application/*+json"] = new OpenApiMediaType(),
                 },
             },
         };
@@ -118,10 +118,10 @@ public class MimeTypesTransformerTests
             {
                 ["200"] = new OpenApiResponse
                 {
-                    Content = new Dictionary<string, OpenApiMediaType>
+                    Content = new Dictionary<string, IOpenApiMediaType>
                     {
-                        ["application/xml"] = new(),
-                        ["text/plain"] = new(),
+                        ["application/xml"] = new OpenApiMediaType(),
+                        ["text/plain"] = new OpenApiMediaType(),
                     },
                 },
             },
@@ -189,11 +189,11 @@ public class MimeTypesTransformerTests
         {
             RequestBody = new OpenApiRequestBody
             {
-                Content = new Dictionary<string, OpenApiMediaType>
+                Content = new Dictionary<string, IOpenApiMediaType>
                 {
-                    ["application/json"] = new(),
-                    ["application/xml"] = new(),
-                    ["multipart/form-data"] = new(),
+                    ["application/json"] = new OpenApiMediaType(),
+                    ["application/xml"] = new OpenApiMediaType(),
+                    ["multipart/form-data"] = new OpenApiMediaType(),
                 },
             },
         };
@@ -217,11 +217,11 @@ public class MimeTypesTransformerTests
         {
             RequestBody = new OpenApiRequestBody
             {
-                Content = new Dictionary<string, OpenApiMediaType>
+                Content = new Dictionary<string, IOpenApiMediaType>
                 {
-                    ["application/json"] = new(),
-                    ["application/xml"] = new(),
-                    ["text/plain"] = new(),
+                    ["application/json"] = new OpenApiMediaType(),
+                    ["application/xml"] = new OpenApiMediaType(),
+                    ["text/plain"] = new OpenApiMediaType(),
                 },
             },
         };
@@ -248,9 +248,9 @@ public class MimeTypesTransformerTests
         {
             RequestBody = new OpenApiRequestBody
             {
-                Content = new Dictionary<string, OpenApiMediaType>
+                Content = new Dictionary<string, IOpenApiMediaType>
                 {
-                    ["application/json"] = new() { Schema = existingSchema },
+                    ["application/json"] = new OpenApiMediaType { Schema = existingSchema },
                 },
             },
         };

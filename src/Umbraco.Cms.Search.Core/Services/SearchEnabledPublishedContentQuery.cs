@@ -1,8 +1,9 @@
 ﻿using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure;
-using Umbraco.Cms.Search.Core.Models.Searching;
 
 namespace Umbraco.Cms.Search.Core.Services;
 
@@ -52,7 +53,7 @@ internal sealed class SearchEnabledPublishedContentQuery : PublishedContentQuery
         int take,
         out long totalRecords,
         string culture = "*",
-        string indexName = Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent)
+        string indexName = Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(skip);
         ArgumentOutOfRangeException.ThrowIfNegative(take);

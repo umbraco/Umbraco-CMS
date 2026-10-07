@@ -28,17 +28,6 @@ public class ObjectExtensionsTests
     private CultureInfo _savedCulture;
 
     [Test]
-    public void Can_Create_Enumerable_Of_One()
-    {
-        var input = "hello";
-#pragma warning disable CS0618 // Type or member is obsolete
-        var result = input.AsEnumerableOfOne<string>();
-#pragma warning restore CS0618 // Type or member is obsolete
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("hello", result.First());
-    }
-
-    [Test]
     public void Can_Convert_List_To_Enumerable()
     {
         var list = new List<string> { "hello", "world", "awesome" };
@@ -218,6 +207,26 @@ public class ObjectExtensionsTests
         conv = 100.TryConvertTo<decimal>();
         Assert.IsTrue(conv);
         Assert.AreEqual(100m, conv.Result);
+    }
+
+    [Test]
+    public void ConvertToDecimalFromFloatingPointUsesShortestRepresentation()
+    {
+        var conv = 56.78d.TryConvertTo<decimal>();
+        Assert.IsTrue(conv);
+        Assert.AreEqual(56.78m, conv.Result);
+
+        conv = 12.4552d.TryConvertTo<decimal>();
+        Assert.IsTrue(conv);
+        Assert.AreEqual(12.4552m, conv.Result);
+
+        conv = 1.65f.TryConvertTo<decimal>();
+        Assert.IsTrue(conv);
+        Assert.AreEqual(1.65m, conv.Result);
+
+        var nullableConv = 56.78d.TryConvertTo<decimal?>();
+        Assert.IsTrue(nullableConv);
+        Assert.AreEqual(56.78m, nullableConv.Result);
     }
 
     [Test]

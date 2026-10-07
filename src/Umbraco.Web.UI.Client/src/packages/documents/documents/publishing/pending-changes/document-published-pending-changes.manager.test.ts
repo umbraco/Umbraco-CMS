@@ -61,7 +61,6 @@ describe('UmbSelectionManager', () => {
 						state: UmbDocumentVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: null,
-						segment: null,
 						name: 'Document 1',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
@@ -133,7 +132,6 @@ describe('UmbSelectionManager', () => {
 						state: UmbDocumentVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: 'en-US',
-						segment: null,
 						name: 'Document 1 (en-US)',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
@@ -145,7 +143,6 @@ describe('UmbSelectionManager', () => {
 						state: UmbDocumentVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: 'da-DK',
-						segment: null,
 						name: 'Document 1 (da-DK)',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
@@ -154,18 +151,19 @@ describe('UmbSelectionManager', () => {
 						flags: [],
 					},
 				],
+				// Culture-sorted (da-DK before en-US), matching the order values settle into once merged. [NL]
 				values: [
 					{
 						editorAlias: 'Umbraco.TextBox',
 						alias: 'prop1',
-						culture: 'en-US',
+						culture: 'da-DK',
 						segment: null,
 						value: '',
 					},
 					{
 						editorAlias: 'Umbraco.TextBox',
 						alias: 'prop1',
-						culture: 'da-DK',
+						culture: 'en-US',
 						segment: null,
 						value: '',
 					},
@@ -183,7 +181,7 @@ describe('UmbSelectionManager', () => {
 			});
 
 			it('should have variants with changes when value is updated', async () => {
-				persistedDocument.values[0].value = 'value (en-US)';
+				persistedDocument.values[1].value = 'value (en-US)';
 				await manager.process({ persistedData: persistedDocument, publishedData: publishedDocument });
 				const variantsWithChanges = manager.getVariantsWithChanges();
 				expect(variantsWithChanges).to.have.lengthOf(1);
@@ -191,8 +189,8 @@ describe('UmbSelectionManager', () => {
 			});
 
 			it('should have variants with changes when multiple values are updated', async () => {
-				persistedDocument.values[0].value = 'value (en-US)';
-				persistedDocument.values[1].value = 'value (da-DK)';
+				persistedDocument.values[1].value = 'value (en-US)';
+				persistedDocument.values[0].value = 'value (da-DK)';
 				await manager.process({ persistedData: persistedDocument, publishedData: publishedDocument });
 				const variantsWithChanges = manager.getVariantsWithChanges();
 				expect(variantsWithChanges).to.have.lengthOf(2);

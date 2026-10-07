@@ -12,7 +12,6 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -70,7 +69,7 @@ public class ComponentTests
             IOHelper,
             Options.Create(globalSettings),
             Mock.Of<IHostingEnvironment>());
-        var coreDebug = new CoreDebugSettings();
+        var coreDebug = new DebugSettings();
         var mediaFileManager = new MediaFileManager(
             Mock.Of<IFileSystem>(),
             Mock.Of<IMediaPathScheme>(),
@@ -85,7 +84,7 @@ public class ComponentTests
             Mock.Of<IDistributedLockingMechanismFactory>(),
             f,
             fs,
-            new TestOptionsMonitor<CoreDebugSettings>(coreDebug),
+            new TestOptionsMonitor<DebugSettings>(coreDebug),
             mediaFileManager,
             loggerFactory,
 

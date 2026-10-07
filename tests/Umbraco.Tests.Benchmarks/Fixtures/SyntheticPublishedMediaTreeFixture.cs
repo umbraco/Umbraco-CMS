@@ -180,7 +180,7 @@ internal sealed class SyntheticPublishedMediaTreeFixture
             }
         }
 
-        var mediaCache = new MediaCache(cacheService, contentTypeCache, navigationService);
+        var mediaCache = new MediaCache(cacheService, navigationService);
 
         NavigationQueryService = navigationService;
         StatusFilteringService = new PublishedMediaStatusFilteringService(mediaCache, cacheService);
