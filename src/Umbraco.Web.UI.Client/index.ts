@@ -1,23 +1,10 @@
+import { getSelectedExampleNames } from './mocks/examples.js';
 import { startMockServiceWorker } from './mocks/index.js';
 import { UmbAppElement } from '@umbraco-cms/backoffice/app';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 function getExamplePaths(): Array<string> {
-	let names = (import.meta.env.VITE_EXAMPLES ?? '')
-		.split(',')
-		.map((name) => name.trim())
-		.filter(Boolean);
-
-	try {
-		const stored = JSON.parse(localStorage.getItem('umb:examples') ?? 'null');
-		if (Array.isArray(stored) && stored.every((name) => typeof name === 'string')) {
-			names = stored;
-		}
-	} catch {
-		// Malformed JSON is treated as unset.
-	}
-
-	const paths = [import.meta.env.VITE_EXAMPLE_PATH, ...names.map((name) => `examples/${name}`)];
+	const paths = [import.meta.env.VITE_EXAMPLE_PATH, ...getSelectedExampleNames().map((name) => `examples/${name}`)];
 	return [...new Set(paths.filter(Boolean))];
 }
 
