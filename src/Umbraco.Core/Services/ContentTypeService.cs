@@ -156,6 +156,7 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
                     TemplateOperationStatus.CancelledByNotification => ContentTypeOperationStatus
                         .CancelledByNotification,
                     TemplateOperationStatus.InvalidAlias => ContentTypeOperationStatus.InvalidTemplateAlias,
+                    TemplateOperationStatus.DuplicateAlias => ContentTypeOperationStatus.DuplicateTemplateAlias,
                     _ => ContentTypeOperationStatus.Unknown,
                 });
         }

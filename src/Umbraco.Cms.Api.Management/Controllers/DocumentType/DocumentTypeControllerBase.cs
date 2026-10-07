@@ -49,6 +49,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Invalid template alias")
                     .WithDetail("The specified template alias is invalid")
                     .Build()),
+                ContentTypeOperationStatus.DuplicateTemplateAlias => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Duplicate template alias")
+                    .WithDetail("A template with the specified alias already exists")
+                    .Build()),
                 ContentTypeOperationStatus.PropertyTypeAliasCannotEqualContentTypeAlias => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid property type alias")
                     .WithDetail("The property type alias cannot be the same as the content type alias")

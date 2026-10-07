@@ -659,6 +659,23 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("templatedType", savingNotification.ContentTypeAlias);
     }
 
+    [Test]
+    public async Task Creating_A_Template_For_A_Content_Type_With_A_Taken_Alias_Reports_A_Duplicate_Template_Alias()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> existing = await TemplateService.CreateAsync("Taken", "taken", "test", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(existing.Success);
+
+        IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+        var contentType = ContentTypeBuilder.CreateSimpleContentType("takenType", "Taken Type");
+        await contentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        Attempt<Guid?, ContentTypeOperationStatus> result = await contentTypeService.CreateTemplateAsync(contentType.Key, "Taken", "taken", true, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.DuplicateTemplateAlias, result.Status);
+        Assert.AreEqual(1, (await TemplateService.GetAllAsync(CancellationToken.None)).Count());
+    }
+
     private async Task<ITemplate> CreateTemplateReadThroughContentType(string alias, string content)
     {
         Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync(alias, alias, content, null, Constants.Security.SuperUserKey, CancellationToken.None);

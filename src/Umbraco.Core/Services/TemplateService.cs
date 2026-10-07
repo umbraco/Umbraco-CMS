@@ -25,8 +25,6 @@ namespace Umbraco.Cms.Core.Services;
 /// </remarks>
 public class TemplateService : AsyncRepositoryService, ITemplateService
 {
-    private static readonly string[] _viewFileExtensions = [".cshtml", ".vbhtml"];
-
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ITemplateRepository _templateRepository;
     private readonly IAuditService _auditService;
@@ -190,7 +188,7 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
 
             if (CanWriteViewFiles)
             {
-                ViewsFileSystem?.DeleteFile(string.Concat(template.Alias, ".cshtml"));
+                ViewsFileSystem?.DeleteFile(ViewFileName(template.Alias));
             }
 
             scope.Notifications.Publish(
@@ -283,11 +281,15 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
                 return Attempt.FailWithStatus(scopeValidatorStatus, template);
             }
 
-            // A template without loaded content (e.g. one reached through a content type) keeps its existing view,
-            // which is read using the persisted alias in case the alias has changed.
+            // The persisted template holds the alias the view file is currently saved under, which differs from the
+            // template's own alias when it is being renamed.
+            ITemplate? persistedTemplate = template.HasIdentity
+                ? await _templateRepository.GetAsync(template.Key, cancellationToken)
+                : null;
+
+            // A template without loaded content (e.g. one reached through a content type) keeps its existing view.
             if (template.HasIdentity && template.Content is null)
             {
-                ITemplate? persistedTemplate = await _templateRepository.GetAsync(template.Key, cancellationToken);
                 SetContentLoader(template, persistedTemplate?.Alias ?? template.Alias);
             }
 
@@ -325,12 +327,9 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
             }
 
             // The view file is named after the alias, so a renamed template must move the file from its previous alias.
-            string? previousAlias = null;
-            if (template.HasIdentity && template.IsPropertyDirty(nameof(ITemplate.Alias)))
-            {
-                ITemplate? persistedTemplate = await _templateRepository.GetAsync(template.Key, cancellationToken);
-                previousAlias = persistedTemplate?.Alias;
-            }
+            var previousAlias = template.HasIdentity && template.IsPropertyDirty(nameof(ITemplate.Alias))
+                ? persistedTemplate?.Alias
+                : null;
 
             var isNew = template.HasIdentity is false;
             await _templateRepository.SaveAsync(template, cancellationToken);
@@ -486,45 +485,33 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
         }
     }
 
-    private string? ReadViewFile(string alias)
-    {
-        IFileSystem? viewsFileSystem = ViewsFileSystem;
-        if (viewsFileSystem is null)
-        {
-            return string.Empty;
-        }
-
-        var path = _viewFileExtensions
-            .Select(extension => string.Concat(alias, extension))
-            .FirstOrDefault(viewsFileSystem.FileExists);
-        if (path is null)
-        {
-            return string.Empty;
-        }
-
-        using Stream stream = viewsFileSystem.OpenFile(path);
-        using var reader = new StreamReader(stream, Encoding.UTF8, true);
-        return reader.ReadToEnd();
-    }
+    private string ReadViewFile(string alias) => ReadViewFileOrNull(alias) ?? string.Empty;
 
     /// <summary>
     ///     Gets the content of a view file from disk.
     /// </summary>
     /// <param name="alias">The alias of the template.</param>
     /// <returns>The content of the view file, or null if it doesn't exist or is empty.</returns>
-    private string? GetViewContent(string alias)
+    private string? GetViewContent(string alias) => ReadViewFileOrNull(alias)?.Trim().NullOrWhiteSpaceAsNull();
+
+    /// <summary>
+    ///     Reads the view file of the template with the specified alias.
+    /// </summary>
+    /// <returns>The content of the view file, or null if it doesn't exist.</returns>
+    private string? ReadViewFileOrNull(string alias)
     {
-        var fileName = alias.EndsWith(".cshtml") ? alias : $"{alias}.cshtml";
-        if (ViewsFileSystem is null || ViewsFileSystem.FileExists(fileName) is false)
+        IFileSystem? viewsFileSystem = ViewsFileSystem;
+        var fileName = ViewFileName(alias);
+        if (viewsFileSystem is null || viewsFileSystem.FileExists(fileName) is false)
         {
             return null;
         }
 
         try
         {
-            using Stream stream = ViewsFileSystem.OpenFile(fileName);
-            using var reader = new StreamReader(stream);
-            return reader.ReadToEnd().Trim().NullOrWhiteSpaceAsNull();
+            using Stream stream = viewsFileSystem.OpenFile(fileName);
+            using var reader = new StreamReader(stream, Encoding.UTF8, true);
+            return reader.ReadToEnd();
         }
         catch (IOException)
         {
@@ -532,6 +519,8 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
             return null;
         }
     }
+
+    private static string ViewFileName(string alias) => string.Concat(alias, ".cshtml");
 
     private Task Audit(AuditType type, Guid userKey, int objectId, string? entityType) =>
         _auditService.AddAsync(type, userKey, objectId, entityType);
