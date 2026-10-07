@@ -20,6 +20,11 @@
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
   </PropertyGroup>
 
+  <!-- Opt in to runtime-native async (preview in .NET 11): https://learn.microsoft.com/dotnet/core/whats-new/dotnet-11/runtime#runtime-async -->
+  <PropertyGroup>
+    <Features>$(Features);runtime-async=on</Features>
+  </PropertyGroup>
+
 
   <PropertyGroup>
     <!--
