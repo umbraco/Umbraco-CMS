@@ -96,7 +96,7 @@ public class TemplateService : AsyncRepositoryService, ITemplateService
         using ICoreScope scope = ScopeProvider.CreateScope();
         IEnumerable<ITemplate> templates = await _templateRepository.GetAllAsync(cancellationToken);
         scope.Complete();
-        return WithContentLoader(templates);
+        return WithContentLoader(templates.OrderBy(t => t.Name));
     }
 
     /// <inheritdoc />
