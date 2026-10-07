@@ -3,6 +3,7 @@ import type UmbDocumentWorkspaceContext from '../context/document-workspace.cont
 import type { UmbDocumentVariantModel } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbSaveWorkspaceAction,
 	type MetaWorkspaceAction,
@@ -36,7 +37,7 @@ export class UmbDocumentSaveWorkspaceAction
 	protected override _gotWorkspaceContext() {
 		super._gotWorkspaceContext();
 		this.#observeVariants();
-		this.#observeReadOnlyGuardRules();
+		this.#observeGuardRules();
 	}
 
 	#observeVariants() {
@@ -44,26 +45,28 @@ export class UmbDocumentSaveWorkspaceAction
 			this._workspaceContext?.variants,
 			(variants) => {
 				this.#variants = variants;
-				this.#checkReadOnlyGuardRules();
+				this.#checkWritableVariants();
 			},
 			'saveWorkspaceActionVariantsObserver',
 		);
 	}
 
-	#observeReadOnlyGuardRules() {
+	#observeGuardRules() {
 		this.observe(
-			this._workspaceContext?.readOnlyGuard.rules,
-			() => this.#checkReadOnlyGuardRules(),
+			this._workspaceContext
+				? observeMultiple([this._workspaceContext.readOnlyGuard.rules, this._workspaceContext.variantWriteGuard.rules])
+				: undefined,
+			() => this.#checkWritableVariants(),
 			'umbObserveReadOnlyGuardRules',
 		);
 	}
 
-	#checkReadOnlyGuardRules() {
-		const allVariantsAreReadOnly =
-			this.#variants?.filter((variant) =>
-				this._workspaceContext!.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.CreateFromPartial(variant)),
-			).length === this.#variants?.length;
-		if (allVariantsAreReadOnly) {
+	#checkWritableVariants() {
+		const hasWritableVariant =
+			this.#variants?.some((variant) =>
+				this._workspaceContext!.getIsVariantWritable(UmbVariantId.CreateFromPartial(variant)),
+			) || this._workspaceContext!.getIsInvariantDataWritable();
+		if (!hasWritableVariant) {
 			this.disable();
 		} else {
 			this.enable();

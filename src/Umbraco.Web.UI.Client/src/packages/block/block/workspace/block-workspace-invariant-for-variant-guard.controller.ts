@@ -1,5 +1,5 @@
 import { UMB_BLOCK_MANAGER_CONTEXT } from '../context/block-manager.context-token.js';
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from './context/block-workspace.context-token.js';
 import type { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT_FOR_CULTURE_VARIANT } from '@umbraco-cms/backoffice/property';
 import {
