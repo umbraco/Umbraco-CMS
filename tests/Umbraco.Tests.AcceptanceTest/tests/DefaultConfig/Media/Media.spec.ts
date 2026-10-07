@@ -26,7 +26,7 @@ test('can not create a empty media file', {tag: '@release'}, async ({umbracoApi,
 
   // Assert
   await umbracoUi.media.isFailedStateButtonVisible();
-  await umbracoUi.media.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.media.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   await umbracoUi.media.isMediaTreeItemVisible(mediaFileName, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
 });

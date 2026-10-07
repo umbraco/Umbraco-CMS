@@ -151,7 +151,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProv
         }
 
         /// <inheritdoc />
-        public override IValueRequiredValidator RequiredValidator => new BlockListValueRequiredValidator(JsonSerializer);
+        public override IValueRequiredValidator RequiredValidator => new BlockEditorValueRequiredValidator<BlockListValue>(JsonSerializer);
 
         /// <inheritdoc/>
         protected override BlockListValue CreateWithLayout(IEnumerable<BlockListLayoutItem> layout) => new(layout);

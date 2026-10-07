@@ -16,9 +16,10 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import {
+	isAboveZeroAndBelowMinimum,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbFormControlMixin,
 	UmbValidationContext,
-	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 } from '@umbraco-cms/backoffice/validation';
 import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -250,7 +251,7 @@ export class UmbPropertyEditorUIBlockListElement
 					this._limitMin,
 					(this._limitMin ?? 0) - this.#entriesContext.getLength(),
 				),
-			() => !!this._limitMin && this.#entriesContext.getLength() < this._limitMin,
+			() => isAboveZeroAndBelowMinimum(this.#entriesContext.getLength(), this._limitMin),
 		);
 
 		this.addValidator(
