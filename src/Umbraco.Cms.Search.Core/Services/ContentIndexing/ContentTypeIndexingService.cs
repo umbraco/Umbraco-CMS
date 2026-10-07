@@ -148,14 +148,14 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         IEntitySlim[] page;
         do
         {
-            page = _entityService.GetPagedDescendants(UmbracoObjectTypes.Element, pageIndex, 1000, out _, includeTrashed: true).ToArray();
+            page = _entityService.GetPagedDescendants(UmbracoObjectTypes.Element, pageIndex, ContentChangeStrategyBase.ContentEnumerationPageSize, out _, includeTrashed: true).ToArray();
             keys.AddRange(page
                 .OfType<IContentEntitySlim>()
                 .Where(element => allContentTypeKeys.Contains(element.ContentTypeKey))
                 .Select(element => element.Key));
             pageIndex++;
         }
-        while (page.Length == 1000);
+        while (page.Length == ContentChangeStrategyBase.ContentEnumerationPageSize);
 
         return keys.ToArray();
     }
