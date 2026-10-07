@@ -46,7 +46,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     private async Task<Content> CreateInvalidContent(IContent? parent = null)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // create a new content type and allow the default content type as child
         var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", mandatoryProperties: true, defaultTemplateId: template.Id);
@@ -82,7 +82,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var key = Guid.NewGuid();
         var contentType = new ContentTypeBuilder()

@@ -25,6 +25,7 @@ public static class FriendlyPublishedContentExtensions
     private static IUmbracoContextAccessor? _umbracoContextAccessor;
     private static ISiteDomainMapper? _siteDomainHelper;
     private static ITemplateService? _templateService;
+    private static IIdKeyMap? _idKeyMap;
     private static IOptions<WebRoutingSettings>? _webRoutingSettings;
     private static IContentTypeService? _contentTypeService;
     private static IPublishedValueFallback? _publishedValueFallback;
@@ -119,6 +120,15 @@ public static class FriendlyPublishedContentExtensions
         {
             _templateService ??= StaticServiceProvider.Instance.GetRequiredService<ITemplateService>();
             return _templateService;
+        }
+    }
+
+    private static IIdKeyMap IdKeyMap
+    {
+        get
+        {
+            _idKeyMap ??= StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>();
+            return _idKeyMap;
         }
     }
 
@@ -286,7 +296,7 @@ public static class FriendlyPublishedContentExtensions
     /// </summary>
     /// <returns>Empty string if none is set.</returns>
     public static string GetTemplateAlias(this IPublishedContent content)
-        => content.GetTemplateAlias(TemplateService);
+        => content.GetTemplateAlias(TemplateService, IdKeyMap);
 
     public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
         => content.IsAllowedTemplate(ContentTypeService, WebRoutingSettings.Value, templateId);

@@ -364,7 +364,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     {
         var templateService = GetRequiredService<ITemplateService>();
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await templateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+        await templateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None); // else, FK violation on contentType!
 
         var contentService = GetRequiredService<IContentService>();
         var contentTypeService = GetRequiredService<IContentTypeService>();

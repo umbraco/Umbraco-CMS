@@ -63,7 +63,7 @@ internal sealed class ContentTypeEditingService : AsyncContentTypeEditingService
         IContentType contentType = result.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForCreationAsync)} succeeded but did not yield any result");
 
         UpdateHistoryCleanup(contentType, model);
-        UpdateTemplates(contentType, model);
+        await UpdateTemplatesAsync(contentType, model);
 
         // save content type
         Attempt<ContentTypeOperationStatus> creationAttempt = await _contentTypeService.CreateAsync(contentType, userKey);
@@ -95,7 +95,7 @@ internal sealed class ContentTypeEditingService : AsyncContentTypeEditingService
         contentType = baseValidationAttempt.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForUpdateAsync)} succeeded but did not yield any result");
 
         UpdateHistoryCleanup(contentType, model);
-        UpdateTemplates(contentType, model);
+        await UpdateTemplatesAsync(contentType, model);
 
         Attempt<ContentTypeOperationStatus> attempt = await _contentTypeService.UpdateAsync(contentType, userKey);
 
@@ -130,11 +130,13 @@ internal sealed class ContentTypeEditingService : AsyncContentTypeEditingService
     }
 
     // update allowed templates and assign default template
-    private void UpdateTemplates(IContentType contentType, ContentTypeModelBase model)
+    private async Task UpdateTemplatesAsync(IContentType contentType, ContentTypeModelBase model)
     {
-        ITemplate[] allowedTemplates = model.AllowedTemplateKeys
-            .Select(async templateId => await _templateService.GetAsync(templateId))
-            .Select(t => t.Result)
+        Guid[] allowedTemplateKeys = model.AllowedTemplateKeys.ToArray();
+        var templatesByKey = (await _templateService.GetManyAsync(allowedTemplateKeys, CancellationToken.None))
+            .ToDictionary(template => template.Key);
+        ITemplate[] allowedTemplates = allowedTemplateKeys
+            .Select(templateKey => templatesByKey.GetValueOrDefault(templateKey))
             .WhereNotNull()
             .ToArray();
         contentType.AllowedTemplates = allowedTemplates;

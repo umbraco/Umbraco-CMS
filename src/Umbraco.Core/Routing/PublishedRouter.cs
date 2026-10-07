@@ -25,6 +25,7 @@ public class PublishedRouter : IPublishedRouter
     private readonly IContentTypeService _contentTypeService;
     private readonly IEventAggregator _eventAggregator;
     private readonly IDomainCache _domainCache;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly ITemplateService _templateService;
     private readonly ILogger<PublishedRouter> _logger;
     private readonly IProfilingLogger _profilingLogger;
@@ -38,6 +39,21 @@ public class PublishedRouter : IPublishedRouter
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedRouter" /> class.
     /// </summary>
+    /// <param name="webRoutingSettings">The web routing settings.</param>
+    /// <param name="contentFinders">The content finders.</param>
+    /// <param name="contentLastChanceFinder">The content finder used when no other finder finds content.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
+    /// <param name="proflog">The profiling logger.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="publishedUrlProvider">The published URL provider.</param>
+    /// <param name="requestAccessor">The request accessor.</param>
+    /// <param name="publishedValueFallback">The published value fallback.</param>
+    /// <param name="templateService">The template service.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="domainCache">The domain cache.</param>
+    /// <param name="idKeyMap">The map used to resolve template keys from their identifiers.</param>
     public PublishedRouter(
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
         ContentFinderCollection contentFinders,
@@ -52,7 +68,8 @@ public class PublishedRouter : IPublishedRouter
         IContentTypeService contentTypeService,
         IUmbracoContextAccessor umbracoContextAccessor,
         IEventAggregator eventAggregator,
-        IDomainCache domainCache)
+        IDomainCache domainCache,
+        IIdKeyMap idKeyMap)
     {
         _webRoutingSettings = webRoutingSettings.CurrentValue ??
                               throw new ArgumentNullException(nameof(webRoutingSettings));
@@ -71,6 +88,7 @@ public class PublishedRouter : IPublishedRouter
         _umbracoContextAccessor = umbracoContextAccessor;
         _eventAggregator = eventAggregator;
         _domainCache = domainCache;
+        _idKeyMap = idKeyMap;
         webRoutingSettings.OnChange(x => _webRoutingSettings = x);
     }
 
@@ -794,7 +812,7 @@ public class PublishedRouter : IPublishedRouter
 
             // Resolve once and reuse: combines existence check with the alt-template policy gate
             // (DisableAlternativeTemplates / ValidateAlternativeTemplates).
-            ITemplate? altTemplateModel = await _templateService.GetAsync(altTemplate);
+            ITemplate? altTemplateModel = await _templateService.GetAsync(altTemplate, CancellationToken.None);
             var altTemplateAllowed = altTemplateModel != null
                                      && request.PublishedContent.IsAllowedTemplate(
                                          _contentTypeService,
@@ -881,7 +899,10 @@ public class PublishedRouter : IPublishedRouter
             _logger.LogDebug("GetTemplateModel: Get template id={TemplateId}", templateId);
         }
 
-        ITemplate? template = await _templateService.GetAsync(templateId.Value);
+        Attempt<Guid> templateKeyAttempt = await _idKeyMap.GetKeyForIdAsync(templateId.Value, UmbracoObjectTypes.Template);
+        ITemplate? template = templateKeyAttempt.Success
+            ? await _templateService.GetAsync(templateKeyAttempt.Result, CancellationToken.None)
+            : null;
         if (template == null)
         {
             throw new InvalidOperationException("The template with Id " + templateId +

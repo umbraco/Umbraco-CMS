@@ -54,7 +54,7 @@ public class SearchTemplateItemController : TemplateItemControllerBase
         }
 
         Guid[] keys = searchResult.Items.Select(x => x.Key).ToArray();
-        IEnumerable<ITemplate> templates = await _templateService.GetAllAsync(keys);
+        IEnumerable<ITemplate> templates = await _templateService.GetManyAsync(keys, cancellationToken);
         IEnumerable<ITemplate> orderedTemplates = OrderByRequestedIds(templates, keys);
 
         var result = new PagedModel<TemplateItemResponseModel>

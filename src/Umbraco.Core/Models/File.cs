@@ -131,6 +131,11 @@ public abstract class File : EntityBase, IFile
     public void ResetOriginalPath() => OriginalPath = _path;
 
     /// <summary>
+    ///     Discards the content, so that it is read by <see cref="GetFileContent" /> when next accessed.
+    /// </summary>
+    protected void ClearContent() => _content = null;
+
+    /// <summary>
     ///     Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
     /// </summary>
     public string? VirtualPath { get; set; }

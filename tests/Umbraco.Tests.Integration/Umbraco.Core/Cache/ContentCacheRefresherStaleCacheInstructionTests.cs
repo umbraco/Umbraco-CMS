@@ -49,7 +49,7 @@ internal sealed class ContentCacheRefresherStaleCacheInstructionTests : UmbracoI
     private async Task<IContent> CreateAndDeleteContent(string alias)
     {
         var template = TemplateBuilder.CreateTextPageTemplate(alias + "Template");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(alias, alias, defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);

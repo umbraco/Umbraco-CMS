@@ -262,7 +262,7 @@ public class LoadTestController : Controller
     /// <returns>The created template.</returns>
     private async Task<ITemplate> ImportTemplateAsync(string name, string alias, string text)
     {
-        var result = await _templateService.CreateAsync(name, alias, text, Constants.Security.SuperUserKey);
+        var result = await _templateService.CreateAsync(name, alias, text, null, Constants.Security.SuperUserKey, CancellationToken.None);
         if (result.Success is false)
         {
             throw new InvalidOperationException($"Failed to create template '{name}' with alias '{alias}'.");

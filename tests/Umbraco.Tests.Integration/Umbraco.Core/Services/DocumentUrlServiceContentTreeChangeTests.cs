@@ -68,7 +68,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         await DocumentUrlAliasService.InitAsync(false, CancellationToken.None);
 
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         ContentType = CreateContentTypeWithUrlAlias(template.Id);
         await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
@@ -240,7 +240,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         // Arrange — a culture-variant content type with a published variant page, so the content-tree-change
         // handler persists URL segments and aliases to the database on publish.
         var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id);
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);

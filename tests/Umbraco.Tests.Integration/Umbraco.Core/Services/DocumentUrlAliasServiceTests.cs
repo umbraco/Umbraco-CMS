@@ -72,7 +72,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Create template
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Create content type with umbracoUrlAlias property
         ContentType = CreateContentTypeWithUrlAlias(template.Id);
@@ -329,7 +329,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Create a culture-variant content type
         var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id);
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
@@ -421,7 +421,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Create a culture-variant content type
         var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate2");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithAliasVariant2");
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
@@ -517,7 +517,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     {
         // Arrange - Create a culture-variant content type with a CULTURE-VARIED umbracoUrlAlias property.
         var template = TemplateBuilder.CreateTextPageTemplate("variantAliasTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithVariantAlias");
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
@@ -559,7 +559,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Arrange - Create a culture-variant content type with a SHARED (non-culture-varied) umbracoUrlAlias property.
         // This is the bug scenario: variant content type + shared alias property = no alias saved.
         var template = TemplateBuilder.CreateTextPageTemplate("sharedAliasTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var variantContentType = CreateCultureVariantContentTypeWithSharedUrlAlias(template.Id);
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
@@ -889,7 +889,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var defaultIsoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
         var template = TemplateBuilder.CreateTextPageTemplate("unpublishCultureTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithAliasUnpublishCulture");
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
@@ -1077,7 +1077,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     {
         // Arrange - create variant content type and content
         var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate3");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "variantType3");
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
@@ -1379,7 +1379,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Arrange - create a culture-variant content type with a CULTURE-VARIED umbracoUrlAlias property,
         // publish one culture with an alias, then edit that culture's alias as a draft without re-publishing.
         var template = TemplateBuilder.CreateTextPageTemplate("variantDraftEditTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithVariantAliasDraftEdit");
         await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);

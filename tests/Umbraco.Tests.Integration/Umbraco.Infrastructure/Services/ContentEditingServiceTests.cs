@@ -32,7 +32,7 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
     private async Task<IContentType> CreateTextPageContentTypeAsync()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = true;

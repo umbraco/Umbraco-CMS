@@ -590,7 +590,13 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            ITemplate? template = _templateService.GetAsync(outInt).GetAwaiter().GetResult();
+            Attempt<Guid> templateKeyAttempt = _idKeyMap.GetKeyForIdAsync(outInt, UmbracoObjectTypes.Template).GetAwaiter().GetResult();
+            if (templateKeyAttempt.Success is false)
+            {
+                continue;
+            }
+
+            ITemplate? template = _templateService.GetAsync(templateKeyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult();
             if (template == null)
             {
                 continue;

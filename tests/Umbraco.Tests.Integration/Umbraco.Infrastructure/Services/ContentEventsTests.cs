@@ -199,11 +199,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             // prepare content type
             Template template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             _contentType = ContentTypeBuilder.CreateSimpleContentType("whatever", "Whatever", defaultTemplateId: template.Id);
             _contentType.Key = Guid.NewGuid();
-            await TemplateService.CreateAsync(_contentType.DefaultTemplate, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(_contentType.DefaultTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
             await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
         }
 

@@ -69,7 +69,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         MemberService.Save(member);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
@@ -119,7 +119,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         MediaService.Save(m2);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
         await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
@@ -152,7 +152,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         MediaService.Save(m2);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
         await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
@@ -187,7 +187,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         MediaService.Save(m1);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
         await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
@@ -220,7 +220,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         MediaService.Save(m1);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
         await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);

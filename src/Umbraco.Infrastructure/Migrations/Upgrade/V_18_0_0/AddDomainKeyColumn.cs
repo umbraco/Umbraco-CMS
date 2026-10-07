@@ -38,12 +38,16 @@ public class AddDomainKeyColumn : AsyncMigrationBase
         AddColumn<DomainDto>(tableName, columnName);
 
         // Populate each existing row with a new Guid
-        var domains = await Database.FetchAsync<DomainDto>($"SELECT * FROM {tableName}");
+        var quotedTableName = SqlSyntax.GetQuotedTableName(tableName);
+        var quotedColumnName = SqlSyntax.GetQuotedColumnName(columnName);
+        var quotedPrimaryKeyColumnName = SqlSyntax.GetQuotedColumnName(DomainDto.PrimaryKeyColumnName);
+
+        var domains = await Database.FetchAsync<DomainDto>($"SELECT * FROM {quotedTableName}");
         foreach (DomainDto domain in domains)
         {
             domain.Key = Guid.NewGuid();
             await Database.ExecuteAsync(
-                $"UPDATE {tableName} SET {columnName} = @0 WHERE {DomainDto.PrimaryKeyColumnName} = @1",
+                $"UPDATE {quotedTableName} SET {quotedColumnName} = @0 WHERE {quotedPrimaryKeyColumnName} = @1",
                 [domain.Key, domain.Id]);
         }
 

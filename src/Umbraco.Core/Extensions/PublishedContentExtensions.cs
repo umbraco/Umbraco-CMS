@@ -3,6 +3,7 @@
 
 using System.Data;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -195,15 +196,24 @@ public static class PublishedContentExtensions
     /// <summary>
     ///     Returns the current template Alias
     /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="templateService">The template service.</param>
+    /// <param name="idKeyMap">The map used to resolve the template's key from its identifier.</param>
     /// <returns>Empty string if none is set.</returns>
-    public static string GetTemplateAlias(this IPublishedContent content, ITemplateService templateService)
+    public static string GetTemplateAlias(this IPublishedContent content, ITemplateService templateService, IIdKeyMap idKeyMap)
     {
         if (content.TemplateId.HasValue == false)
         {
             return string.Empty;
         }
 
-        ITemplate? template = templateService.GetAsync(content.TemplateId.Value).GetAwaiter().GetResult();
+        Attempt<Guid> templateKeyAttempt = idKeyMap.GetKeyForIdAsync(content.TemplateId.Value, UmbracoObjectTypes.Template).GetAwaiter().GetResult();
+        if (templateKeyAttempt.Success is false)
+        {
+            return string.Empty;
+        }
+
+        ITemplate? template = templateService.GetAsync(templateKeyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult();
         return template?.Alias ?? string.Empty;
     }
 
@@ -261,7 +271,7 @@ public static class PublishedContentExtensions
     /// <returns><c>true</c> if the template is allowed; otherwise, <c>false</c>.</returns>
     public static bool IsAllowedTemplate(this IPublishedContent content, ITemplateService templateService, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, string templateAlias)
     {
-        ITemplate? template = templateService.GetAsync(templateAlias).GetAwaiter().GetResult();
+        ITemplate? template = templateService.GetAsync(templateAlias, CancellationToken.None).GetAwaiter().GetResult();
         return template != null && content.IsAllowedTemplate(contentTypeService, disableAlternativeTemplates, validateAlternativeTemplates, template.Id);
     }
 

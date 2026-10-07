@@ -182,7 +182,7 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     public async Task Can_Create_Usergroup_With_Granular_Permissions_For_Document_PropertyValue()
     {
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = (await ContentTypeEditingService.CreateAsync(
             ContentTypeEditingBuilder.CreateSimpleContentType(defaultTemplateKey: template.Key),
@@ -236,7 +236,7 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     public async Task Can_Create_Usergroup_With_Granular_Permissions_For_Document_PropertyValue_Without_Verbs()
     {
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = (await ContentTypeEditingService.CreateAsync(
             ContentTypeEditingBuilder.CreateSimpleContentType(defaultTemplateKey: template.Key),
@@ -289,7 +289,7 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     public async Task Usergroup_Granular_Permissions_For_Document_PropertyValue_Are_Cleaned_Up_When_DocumentType_Is_Deleted()
     {
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType1 = (await ContentTypeEditingService.CreateAsync(
             ContentTypeEditingBuilder.CreateSimpleContentType(defaultTemplateKey: template.Key),
@@ -346,7 +346,7 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
     {
         // NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         // Create and Save ContentType "umbTextpage" -> 1051 (template), 1052 (content type)
         var contentTypeCreateModel = ContentTypeEditingBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateKey: template.Key);
         var contentTypeAttempt = await ContentTypeEditingService.CreateAsync(contentTypeCreateModel, Constants.Security.SuperUserKey);

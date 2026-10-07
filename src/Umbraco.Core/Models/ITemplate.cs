@@ -3,6 +3,11 @@ namespace Umbraco.Cms.Core.Models;
 /// <summary>
 ///     Defines a Template File (Mvc View)
 /// </summary>
+/// <remarks>
+///     The content of a template lives in its view file. Templates read through <c>ITemplateService</c> load it on
+///     demand; templates reached in other ways, for example through a content type's allowed templates, may not have
+///     it loaded, in which case <see cref="IFile.Content" /> is <c>null</c>.
+/// </remarks>
 public interface ITemplate : IFile
 {
     /// <summary>

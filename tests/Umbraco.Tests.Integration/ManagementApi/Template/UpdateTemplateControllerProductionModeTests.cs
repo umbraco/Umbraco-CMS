@@ -31,7 +31,7 @@ public class UpdateTemplateControllerProductionModeTests : ManagementApiTest<Upd
     {
         // Create template via the service layer (allowed in production mode).
         var alias = "test" + Guid.NewGuid().ToString("N");
-        var result = await TemplateService.CreateAsync(alias, alias, "<h1>Original</h1>", Constants.Security.SuperUserKey);
+        var result = await TemplateService.CreateAsync(alias, alias, "<h1>Original</h1>", null, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(result.Success);
         _template = result.Result;
 
@@ -59,7 +59,7 @@ public class UpdateTemplateControllerProductionModeTests : ManagementApiTest<Upd
     public async Task Metadata_Change_Returns_Ok()
     {
         // Re-fetch the template to get the actual resolved content (lazy-loaded from disk).
-        var current = await TemplateService.GetAsync(_template.Key);
+        var current = await TemplateService.GetAsync(_template.Key, CancellationToken.None);
 
         UpdateTemplateRequestModel updateModel = new()
         {

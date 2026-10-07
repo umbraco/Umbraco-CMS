@@ -32,10 +32,11 @@ public class TemplatePresentationFactory : ITemplatePresentationFactory
     /// If the template has a layout template, its reference will be included in the response model.
     /// </summary>
     /// <param name="template">The template from which to create the response model.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>
     /// A task representing the asynchronous operation. The task result contains the created <see cref="TemplateResponseModel" />.
     /// </returns>
-    public async Task<TemplateResponseModel> CreateTemplateResponseModelAsync(ITemplate template)
+    public async Task<TemplateResponseModel> CreateTemplateResponseModelAsync(ITemplate template, CancellationToken cancellationToken)
     {
         TemplateResponseModel responseModel = new()
         {
@@ -47,7 +48,7 @@ public class TemplatePresentationFactory : ITemplatePresentationFactory
 
         if (template.LayoutTemplateAlias is not null)
         {
-            ITemplate? parentTemplate = await _templateService.GetAsync(template.LayoutTemplateAlias);
+            ITemplate? parentTemplate = await _templateService.GetAsync(template.LayoutTemplateAlias, cancellationToken);
             responseModel.LayoutTemplate = ReferenceByIdModel.ReferenceOrNull(parentTemplate?.Key);
         }
 

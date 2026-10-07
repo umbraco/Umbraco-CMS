@@ -16,6 +16,7 @@ public class Template : File, ITemplate
     private string? _layoutTemplateAlias;
     private Lazy<int>? _layoutTemplateId;
     private string? _name;
+    private bool _contentNotLoaded;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Template" /> class.
@@ -42,6 +43,30 @@ public class Template : File, ITemplate
         _name = name;
         _alias = alias?.ToCleanString(shortStringHelper, CleanStringType.UnderscoreAlias) ?? string.Empty;
         _layoutTemplateId = new Lazy<int>(() => -1);
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Template" /> class, stating whether its content is loaded.
+    /// </summary>
+    /// <param name="shortStringHelper">The short string helper for alias cleaning.</param>
+    /// <param name="name">The name of the template.</param>
+    /// <param name="alias">The alias of the template.</param>
+    /// <param name="contentLoaded">
+    ///     Whether the template's content is loaded. When <c>false</c>, <see cref="Content" /> returns <c>null</c> until
+    ///     the content is set or <see cref="File.GetFileContent" /> is provided to read it.
+    /// </param>
+    /// <remarks>
+    ///     A template's content lives in its view file rather than with the template's data, so a template read without
+    ///     access to its view file has no content to expose.
+    /// </remarks>
+    public Template(IShortStringHelper shortStringHelper, string? name, string? alias, bool contentLoaded)
+        : this(shortStringHelper, name, alias, null)
+    {
+        if (contentLoaded is false)
+        {
+            ClearContent();
+            _contentNotLoaded = true;
+        }
     }
 
     /// <summary>
@@ -97,6 +122,23 @@ public class Template : File, ITemplate
     ///     Returns true if the template is used as a layout for other templates (i.e. it has 'children')
     /// </summary>
     public bool IsLayoutTemplate { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the content of the template's view.
+    /// </summary>
+    /// <remarks>
+    ///     Returns <c>null</c> when the template was created with its content not loaded and no
+    ///     <see cref="File.GetFileContent" /> is provided to read it.
+    /// </remarks>
+    public override string? Content
+    {
+        get => _contentNotLoaded && GetFileContent is null ? null : base.Content;
+        set
+        {
+            base.Content = value;
+            _contentNotLoaded = false;
+        }
+    }
 
     /// <inheritdoc cref="LayoutTemplateId" />
     [Obsolete("Use LayoutTemplateId instead. Scheduled for removal in Umbraco 20.")]

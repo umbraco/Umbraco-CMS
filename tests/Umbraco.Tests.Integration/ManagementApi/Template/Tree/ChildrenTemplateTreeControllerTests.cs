@@ -20,13 +20,13 @@ public class ChildrenTemplateTreeControllerTests : ManagementApiUserGroupTestBas
         // Parent Template
         var parentTemplate = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         parentTemplate.IsLayoutTemplate = true;
-        var responseParent = await TemplateService.CreateAsync(parentTemplate, Constants.Security.SuperUserKey);
+        var responseParent = await TemplateService.CreateAsync(parentTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
         _parentTemplateKey = responseParent.Result.Key;
 
         // Child Template
         var childTemplate = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         childTemplate.LayoutTemplateAlias = parentTemplate.Alias;
-        await TemplateService.CreateAsync(childTemplate, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(childTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
     }
 
     protected override Expression<Func<ChildrenTemplateTreeController, object>> MethodSelector => x => x.Children(CancellationToken.None, _parentTemplateKey, 0, 100);

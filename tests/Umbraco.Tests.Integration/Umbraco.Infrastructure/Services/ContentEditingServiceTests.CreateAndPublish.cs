@@ -135,7 +135,7 @@ public partial class ContentEditingServiceTests
     public async Task Can_CreateAndPublish_With_Template()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = true;
@@ -257,7 +257,7 @@ public partial class ContentEditingServiceTests
     public async Task Cannot_CreateAndPublish_With_Disallowed_Template()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // content type without allowed templates
         var contentType = ContentTypeBuilder.CreateBasicContentType();

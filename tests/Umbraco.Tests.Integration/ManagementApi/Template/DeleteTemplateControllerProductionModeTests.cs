@@ -28,7 +28,7 @@ public class DeleteTemplateControllerProductionModeTests : ManagementApiTest<Del
     private async Task CreateTemplate()
     {
         var alias = "test" + Guid.NewGuid().ToString("N");
-        var result = await TemplateService.CreateAsync(alias, alias, "<h1>Test</h1>", Constants.Security.SuperUserKey);
+        var result = await TemplateService.CreateAsync(alias, alias, "<h1>Test</h1>", null, Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.IsTrue(result.Success);
         _template = result.Result;
 

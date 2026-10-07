@@ -35,7 +35,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         // With 11M Property data
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentTypeA =
             ContentTypeBuilder.CreateSimpleContentType("contentTypeA", "contentTypeA", defaultTemplateId: template.Id);
@@ -77,7 +77,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
     public async Task PerformContentVersionCleanup_WithKeepAllNewerThanDays_RetainsRecentVersions()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("contentTypeA", "contentTypeA", defaultTemplateId: template.Id);
@@ -131,7 +131,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
     public async Task PerformContentVersionCleanup_WithKeepLatestPerDay_RetainsOnePerDay()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("contentTypeA", "contentTypeA", defaultTemplateId: template.Id);
@@ -190,7 +190,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
     public async Task PerformContentVersionCleanup_WithContentTypeOverride_RespectsPreventCleanup()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentTypeA =
             ContentTypeBuilder.CreateSimpleContentType("contentTypeA", "contentTypeA", defaultTemplateId: template.Id);
@@ -256,7 +256,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
     public async Task PerformContentVersionCleanup_MultipleCalls_IsIdempotent()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("contentTypeA", "contentTypeA", defaultTemplateId: template.Id);
@@ -305,7 +305,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
     public async Task PerformContentVersionCleanup_WithMaxVersionsPerRunCap_DeletesOnlyUpToCap()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("contentTypeA", "contentTypeA", defaultTemplateId: template.Id);
         contentType.HistoryCleanup.PreventCleanup = false;

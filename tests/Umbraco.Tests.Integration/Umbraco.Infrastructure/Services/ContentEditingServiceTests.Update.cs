@@ -249,8 +249,8 @@ public partial class ContentEditingServiceTests
     {
         var templateOne = new TemplateBuilder().WithAlias("textPageOne").WithName("Text page one").Build();
         var templateTwo = new TemplateBuilder().WithAlias("textPageTwo").WithName("Text page two").Build();
-        await TemplateService.CreateAsync(templateOne, Constants.Security.SuperUserKey);
-        await TemplateService.CreateAsync(templateTwo, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(templateOne, Constants.Security.SuperUserKey, CancellationToken.None);
+        await TemplateService.CreateAsync(templateTwo, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content = await CreateInvariantContent(templateOne, templateTwo);
         Assert.AreEqual(templateOne.Id, content.TemplateId);
@@ -282,7 +282,7 @@ public partial class ContentEditingServiceTests
     public async Task Can_Remove_Template()
     {
         var templateOne = new TemplateBuilder().WithAlias("textPageOne").WithName("Text page one").Build();
-        await TemplateService.CreateAsync(templateOne, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(templateOne, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var content = await CreateInvariantContent(templateOne);
         Assert.AreEqual(templateOne.Id, content.TemplateId);

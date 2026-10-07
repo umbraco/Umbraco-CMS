@@ -25,7 +25,7 @@ public class CreateDocumentControllerTests : ManagementApiUserGroupTestBase<Crea
     {
         // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         _templateKey = template.Key;
 
         // Content Type

@@ -52,7 +52,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         await LanguageService.CreateAsync(langBe, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("variantContent")
@@ -143,7 +143,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
     private async Task<IContentType> SetupInvariantDoctypeAsync()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("invariantContent")

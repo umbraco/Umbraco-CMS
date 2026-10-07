@@ -120,19 +120,19 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     public async Task Deleting_Content_Type_With_Hierarchy_Of_Content_Items_Moves_Orphaned_Content_To_Recycle_Bin()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContentType contentType1 =
             ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
-        await TemplateService.CreateAsync(contentType1.DefaultTemplate, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(contentType1.DefaultTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
         IContentType contentType2 =
             ContentTypeBuilder.CreateSimpleContentType("test2", "Test2", defaultTemplateId: template.Id);
-        await TemplateService.CreateAsync(contentType2.DefaultTemplate, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(contentType2.DefaultTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
         IContentType contentType3 =
             ContentTypeBuilder.CreateSimpleContentType("test3", "Test3", defaultTemplateId: template.Id);
-        await TemplateService.CreateAsync(contentType3.DefaultTemplate, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(contentType3.DefaultTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentTypeService.CreateAsync(contentType3, Constants.Security.SuperUserKey);
 
         IContentType[] contentTypes = { contentType1, contentType2, contentType3 };
@@ -176,19 +176,19 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         try
         {
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             IContentType contentType1 =
                 ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
-            await TemplateService.CreateAsync(contentType1.DefaultTemplate, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(contentType1.DefaultTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
             await ContentTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
             IContentType contentType2 =
                 ContentTypeBuilder.CreateSimpleContentType("test2", "Test2", defaultTemplateId: template.Id);
-            await TemplateService.CreateAsync(contentType2.DefaultTemplate, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(contentType2.DefaultTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
             await ContentTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
             IContentType contentType3 =
                 ContentTypeBuilder.CreateSimpleContentType("test3", "Test3", defaultTemplateId: template.Id);
-            await TemplateService.CreateAsync(contentType3.DefaultTemplate, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(contentType3.DefaultTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
             await ContentTypeService.CreateAsync(contentType3, Constants.Security.SuperUserKey);
 
             IContentType[] contentTypes = { contentType1, contentType2, contentType3 };
@@ -227,19 +227,19 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         try
         {
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
             IContentType contentType1 =
                 ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
-            await TemplateService.CreateAsync(contentType1.DefaultTemplate, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(contentType1.DefaultTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
             await ContentTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
             IContentType contentType2 =
                 ContentTypeBuilder.CreateSimpleContentType("test2", "Test2", defaultTemplateId: template.Id);
-            await TemplateService.CreateAsync(contentType2.DefaultTemplate, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(contentType2.DefaultTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
             await ContentTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
             IContentType contentType3 =
                 ContentTypeBuilder.CreateSimpleContentType("test3", "Test3", defaultTemplateId: template.Id);
-            await TemplateService.CreateAsync(contentType3.DefaultTemplate, Constants.Security.SuperUserKey);
+            await TemplateService.CreateAsync(contentType3.DefaultTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
             await ContentTypeService.CreateAsync(contentType3, Constants.Security.SuperUserKey);
 
             var root = ContentBuilder.CreateSimpleContent(contentType1, "Root");
@@ -282,10 +282,10 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     public async Task Deleting_PropertyType_Removes_The_Property_From_Content()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         IContentType contentType1 = ContentTypeBuilder.CreateTextPageContentType("test1", "Test1", template.Id);
-        await TemplateService.CreateAsync(contentType1.DefaultTemplate, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(contentType1.DefaultTemplate, Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
         IContent contentItem = ContentBuilder.CreateTextpageContent(contentType1, "Testing", -1);
         await ContentService.SaveAsync(contentItem, Constants.Security.SuperUserKey, null, CancellationToken.None);
@@ -471,7 +471,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
          * - Category
          */
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var global = ContentTypeBuilder.CreateSimpleContentType("global", "Global", defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(global, Constants.Security.SuperUserKey);
@@ -509,7 +509,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     public async Task Can_Delete_Parent_ContentType_When_Child_Has_Content()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "page",
@@ -551,7 +551,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     public async Task Delete_ContentType_Deletes_Its_Blueprints()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
@@ -598,7 +598,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         var deletedEntities = 0;
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
@@ -617,7 +617,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         var deletedEntities = 0;
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
@@ -640,7 +640,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         var deletedEntities = 0;
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
@@ -661,7 +661,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     public async Task DeleteAsync_Returns_CancelledByNotification_When_Notification_Handler_Cancels()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
@@ -809,7 +809,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(metaContentType, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var simpleContentType =
             ContentTypeBuilder.CreateSimpleContentType(
                 "category",
@@ -851,7 +851,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var parentContentType1 =
             ContentTypeBuilder.CreateSimpleContentType("parent1", "Parent1", defaultTemplateId: template.Id);
@@ -914,7 +914,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(metaContentType, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var simpleContentType = ContentTypeBuilder.CreateSimpleContentType(
             "category",
@@ -967,7 +967,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var parentContentType1 =
             ContentTypeBuilder.CreateSimpleContentType("parent1", "Parent1", defaultTemplateId: template.Id);
@@ -1030,7 +1030,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var parent = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(parent, Constants.Security.SuperUserKey);
@@ -1075,7 +1075,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var basePage = ContentTypeBuilder.CreateSimpleContentType(
             "basePage",
@@ -1497,7 +1497,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var page = ContentTypeBuilder.CreateSimpleContentType(
             "page",
@@ -1680,7 +1680,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
          */
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var basePage = ContentTypeBuilder.CreateSimpleContentType(
             "basePage",
             "Base Page",
@@ -1746,7 +1746,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         // create 'page' content type with a 'Content_' group
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var page = ContentTypeBuilder.CreateSimpleContentType(
             "page",
             "Page",
@@ -1855,7 +1855,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var page = ContentTypeBuilder.CreateSimpleContentType(
             "page",
             "Page",
@@ -2021,7 +2021,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var page = ContentTypeBuilder.CreateSimpleContentType(
             "page",
             "Page",
@@ -2456,7 +2456,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     public async Task Variations_In_Compositions()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var typeA = ContentTypeBuilder.CreateSimpleContentType("a", "A", defaultTemplateId: template.Id);
         typeA.Variations = ContentVariation.Culture; // make it variant
         typeA.PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations =
@@ -2878,7 +2878,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     private async Task<ContentType> CreateHomepage(ContentType parent)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         return ContentTypeBuilder.CreateSimpleContentType(
             "homepage",
             "Homepage",
@@ -2890,7 +2890,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // create the master type
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var masterContentType = ContentTypeBuilder.CreateSimpleContentType(
             "masterContentType",
             "MasterContentType",

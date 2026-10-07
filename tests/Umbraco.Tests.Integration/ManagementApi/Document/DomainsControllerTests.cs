@@ -31,7 +31,7 @@ public class DomainsControllerTests : ManagementApiUserGroupTestBase<DomainsCont
     {
         // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Content Type
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());

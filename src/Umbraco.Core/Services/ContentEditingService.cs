@@ -257,7 +257,7 @@ internal sealed class ContentEditingService
             return ContentEditingOperationStatus.Success;
         }
 
-        ITemplate? template = await _templateService.GetAsync(templateKey.Value);
+        ITemplate? template = await _templateService.GetAsync(templateKey.Value, CancellationToken.None);
         if (template == null)
         {
             return ContentEditingOperationStatus.TemplateNotFound;

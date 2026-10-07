@@ -199,7 +199,7 @@ public class PublishedRequestBuilder : IPublishedRequestBuilder
         // NOTE - can we still get it with whitespaces in it due to old legacy bugs?
         alias = alias.Replace(" ", string.Empty);
 
-        ITemplate? model = await _templateService.GetAsync(alias);
+        ITemplate? model = await _templateService.GetAsync(alias, CancellationToken.None);
         if (model == null)
         {
             return false;

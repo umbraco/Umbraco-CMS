@@ -16,7 +16,7 @@ public class RootTemplateTreeControllerTests : ManagementApiUserGroupTestBase<Ro
     public async Task SetUp()
     {
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
     }
 
     protected override Expression<Func<RootTemplateTreeController, object>> MethodSelector => x => x.Root(CancellationToken.None, 0, 100);

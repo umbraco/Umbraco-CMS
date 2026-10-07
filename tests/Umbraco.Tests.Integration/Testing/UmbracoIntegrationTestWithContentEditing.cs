@@ -57,7 +57,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
     {
         // NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         TemplateId = template.Id;
         // Create and Save ContentType "umbTextpage" -> 1051 (template), 1052 (content type)
         ContentTypeCreateModel = ContentTypeEditingBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateKey: template.Key);

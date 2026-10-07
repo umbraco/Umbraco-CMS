@@ -275,7 +275,7 @@ public partial class ContentEditingServiceTests
     private async Task<ContentCreateModel> BuildTextPageChildCreateModel(bool parentAllowsChild)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var childContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         childContentType.AllowedAsRoot = false;
@@ -325,7 +325,7 @@ public partial class ContentEditingServiceTests
     private async Task<ContentCreateModel> BuildTextPageRootCreateModel(bool allowedAsRoot)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = allowedAsRoot;

@@ -197,7 +197,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     private async Task<IContentType> CreateInvariantContentTypeWithUrlNameAsync(string alias)
     {
         var template = TemplateBuilder.CreateTextPageTemplate($"{alias}Template", $"{alias} Template");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias(alias)
@@ -269,7 +269,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     public async Task<string?> GetDocumentKeyByUri_With_Domains_Returns_Expected_DocumentKey(string path, string domain, string rootUrl)
     {
         var template = TemplateBuilder.CreateTextPageTemplate("variantPageTemplate", "Variant Page Template");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("variantPage")
@@ -502,7 +502,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         // Arrange - create a culture-variant content type with an invariant umbracoUrlName property
         // (simulates umbracoUrlName coming from a composition that does not vary by culture)
         var template = TemplateBuilder.CreateTextPageTemplate("variantWithUrlNameTemplate", "Variant With UrlName Template");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("variantWithUrlName")
@@ -552,7 +552,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         // Create a culture-variant content type with a culture-variant umbracoUrlName property
         var template = TemplateBuilder.CreateTextPageTemplate("variantPerCultureTemplate", "Variant Per Culture Template");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("variantPerCulture")
@@ -603,7 +603,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     {
         // Arrange - create a culture-variant content type with an invariant umbracoUrlName property
         var template = TemplateBuilder.CreateTextPageTemplate("emptyUrlNameTemplate", "Empty UrlName Template");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("emptyUrlName")

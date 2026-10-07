@@ -43,7 +43,7 @@ internal sealed class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var textPage = await CreateTextPageDocument(template.Key);
         var contentPickerDocument = await CreateContentPickerDocument(template.Key, textPage.Key);
 
@@ -63,7 +63,7 @@ internal sealed class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         var textPage = await CreateTextPageDocument(template.Key);
         var contentPickerDocument = await CreateContentPickerDocument(template.Key, textPage.Key);
 

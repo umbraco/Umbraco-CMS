@@ -55,7 +55,7 @@ public class SearchTemplateItemControllerTests
         ITemplate templateA = Mock.Of<ITemplate>(x => x.Key == keyA);
         ITemplate templateB = Mock.Of<ITemplate>(x => x.Key == keyB);
         _templateService
-            .Setup(x => x.GetAllAsync(It.IsAny<Guid[]>()))
+            .Setup(x => x.GetManyAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new[] { templateC, templateA, templateB });
 
         _mapper

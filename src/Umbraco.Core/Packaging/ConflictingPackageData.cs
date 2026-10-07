@@ -61,7 +61,7 @@ public class ConflictingPackageData
                     throw new FormatException("Missing \"Alias\" element");
                 }
 
-                return _templateService.GetAsync(xElement.Value).GetAwaiter().GetResult();
+                return _templateService.GetAsync(xElement.Value, CancellationToken.None).GetAwaiter().GetResult();
             })
             .WhereNotNull();
 }

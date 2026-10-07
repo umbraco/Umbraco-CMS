@@ -20,7 +20,6 @@ internal sealed class DocumentPresentationFactory
     : PublishableContentPresentationFactoryBase<IDocumentEntitySlim, DocumentVariantItemResponseModel>,
       IDocumentPresentationFactory
 {
-    private readonly ITemplateService _templateService;
     private readonly IPublicAccessService _publicAccessService;
     private readonly IIdKeyMap _idKeyMap;
 
@@ -28,21 +27,18 @@ internal sealed class DocumentPresentationFactory
     /// Initializes a new instance of the <see cref="DocumentPresentationFactory"/> class.
     /// </summary>
     /// <param name="umbracoMapper">The mapper used to map between Umbraco models.</param>
-    /// <param name="templateService">Service for managing and retrieving templates.</param>
     /// <param name="publicAccessService">Service for handling public access and permissions.</param>
     /// <param name="timeProvider">Provider for obtaining the current time.</param>
     /// <param name="idKeyMap">Service for mapping between IDs and keys.</param>
     /// <param name="flagProviderCollection">Collection of providers for document flags.</param>
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
-        ITemplateService templateService,
         IPublicAccessService publicAccessService,
         TimeProvider timeProvider,
         IIdKeyMap idKeyMap,
         FlagProviderCollection flagProviderCollection)
         : base(umbracoMapper, flagProviderCollection, timeProvider)
     {
-        _templateService = templateService;
         _publicAccessService = publicAccessService;
         _idKeyMap = idKeyMap;
     }
@@ -52,9 +48,7 @@ internal sealed class DocumentPresentationFactory
     {
         PublishedDocumentResponseModel responseModel = UmbracoMapper.Map<PublishedDocumentResponseModel>(content)!;
 
-        Guid? templateKey = content.PublishTemplateId.HasValue
-            ? (await _templateService.GetAsync(content.PublishTemplateId.Value))?.Key
-            : null;
+        Guid? templateKey = await GetTemplateKeyAsync(content.PublishTemplateId);
 
         responseModel.Template = templateKey.HasValue
             ? new ReferenceByIdModel { Id = templateKey.Value }
@@ -69,9 +63,7 @@ internal sealed class DocumentPresentationFactory
         DocumentResponseModel responseModel = UmbracoMapper.Map<DocumentResponseModel>(content)!;
         UmbracoMapper.Map(schedule, responseModel);
 
-        Guid? templateKey = content.TemplateId.HasValue
-            ? (await _templateService.GetAsync(content.TemplateId.Value))?.Key
-            : null;
+        Guid? templateKey = await GetTemplateKeyAsync(content.TemplateId);
 
         responseModel.Template = templateKey.HasValue
             ? new ReferenceByIdModel { Id = templateKey.Value }
@@ -127,4 +119,15 @@ internal sealed class DocumentPresentationFactory
         PublishableVariantState state,
         string? culture)
         => new() { Name = name, State = state, Culture = culture };
+
+    private async Task<Guid?> GetTemplateKeyAsync(int? templateId)
+    {
+        if (templateId.HasValue is false)
+        {
+            return null;
+        }
+
+        Attempt<Guid> templateKeyAttempt = await _idKeyMap.GetKeyForIdAsync(templateId.Value, UmbracoObjectTypes.Template);
+        return templateKeyAttempt.Success ? templateKeyAttempt.Result : null;
+    }
 }

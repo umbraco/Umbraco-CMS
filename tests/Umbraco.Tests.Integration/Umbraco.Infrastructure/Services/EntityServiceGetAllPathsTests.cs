@@ -119,7 +119,7 @@ internal sealed class EntityServiceGetAllPathsTests : UmbracoIntegrationTest
     private async Task<ContentType> CreateContentType()
     {
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);

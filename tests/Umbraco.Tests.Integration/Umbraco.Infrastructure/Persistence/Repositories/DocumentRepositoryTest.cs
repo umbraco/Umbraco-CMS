@@ -56,7 +56,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     private async Task CreateTestData()
     {
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
         _template = template;
 
         _contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);

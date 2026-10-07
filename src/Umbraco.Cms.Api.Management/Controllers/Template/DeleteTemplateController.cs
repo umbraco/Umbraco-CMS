@@ -74,7 +74,7 @@ public class DeleteTemplateController : TemplateControllerBase
             return TemplateOperationStatusResult(TemplateOperationStatus.NotAllowedInProductionMode);
         }
 
-        Attempt<ITemplate?, TemplateOperationStatus> result = await _templateService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<ITemplate?, TemplateOperationStatus> result = await _templateService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor), cancellationToken);
         return result.Success
             ? Ok()
             : TemplateOperationStatusResult(result.Status);

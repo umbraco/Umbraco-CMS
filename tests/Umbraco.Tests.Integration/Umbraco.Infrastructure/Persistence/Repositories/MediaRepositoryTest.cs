@@ -126,7 +126,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.ParentKey, Is.EqualTo(_testFolder.Key));
-        Assert.That(database.SqlCount, Is.EqualTo(4), "no separate query to resolve ParentKey on top of the usual content/property queries");
+        Assert.That(database.SqlCount, Is.EqualTo(3), "no separate query to resolve ParentKey on top of the usual content/property queries");
     }
 
     [Test]
