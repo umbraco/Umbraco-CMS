@@ -537,11 +537,6 @@ export class TemplateApiHelper {
     return this.createTemplateWithDisplayingValue(name, templateContent);
   }
 
-  async createTemplateWithDisplayingRichTextValue(name: string, richTextPropertyName: string) {
-    const templateContent = '\n@Model.Value("' + AliasHelper.toAlias(richTextPropertyName) + '")';
-    return this.createTemplateWithDisplayingValue(name, templateContent);
-  }
-
   private buildElementPickerLoopTemplate(elementPickerPropertyName: string, perElementLines: string[], options: {captureFirst?: boolean; afterLoopLines?: string[]} = {}) {
     const propertyAlias = AliasHelper.toAlias(elementPickerPropertyName);
     const {captureFirst = false, afterLoopLines = []} = options;

@@ -181,34 +181,18 @@ export class PartialViewApiHelper {
 
   async createRichTextBlockPartialView(elementTypeName: string, elementPropertyName: string) {
     // Rich text blocks are rendered by the partial view at richtext/Components/{element type alias}.cshtml.
-    const parentFolder = 'richtext';
-    const componentsFolder = parentFolder + '/Components';
-    const createdFolders: string[] = [];
-    if (!await this.doesFolderExist(parentFolder)) {
-      await this.createFolder(parentFolder);
-      createdFolders.push(parentFolder);
-    }
-    if (!await this.doesFolderExist(componentsFolder)) {
-      await this.createFolder('Components', parentFolder);
-      createdFolders.push(componentsFolder);
-    }
     const fileName = AliasHelper.toAlias(elementTypeName) + '.cshtml';
-    const filePath = componentsFolder + '/' + fileName;
-    if (await this.doesExist(filePath)) {
-      await this.delete(filePath);
+    await this.ensureNameNotExists(fileName);
+    if (!await this.doesFolderExist('richtext')) {
+      await this.createFolder('richtext');
+    }
+    if (!await this.doesFolderExist('richtext/Components')) {
+      await this.createFolder('Components', 'richtext');
     }
     const content =
       '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.RichTextBlockItem>' +
       '\n<p>@Model.Content.Value("' + AliasHelper.toAlias(elementPropertyName) + '")</p>\n';
-    const path = await this.create(fileName, content, componentsFolder);
-    return {path, createdFolders};
-  }
-
-  async deleteRichTextBlockPartialView(partialView: {path: string; createdFolders: string[]}) {
-    await this.delete(partialView.path);
-    for (const folder of [...partialView.createdFolders].reverse()) {
-      await this.deleteFolder(folder);
-    }
+    return await this.create(fileName, content, 'richtext/Components');
   }
 
   async createDefaultPartialView(name: string) {
