@@ -133,6 +133,43 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Over_Long_Alias_Is_Truncated_And_Kept_Unique()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        var longAlias = new string('a', 120);
+        var truncatedAlias = new string('a', 95);
+
+        var template = new Template(ShortStringHelper, "long", longAlias);
+        await repository.SaveAsync(template, CancellationToken.None);
+
+        var template2 = new Template(ShortStringHelper, "long", longAlias);
+        await repository.SaveAsync(template2, CancellationToken.None);
+
+        Assert.That(template.Alias, Is.EqualTo(truncatedAlias));
+        Assert.That(template2.Alias, Is.EqualTo(truncatedAlias + "1"));
+        Assert.That((await repository.GetAsync(template2.Key, CancellationToken.None))!.Alias, Is.EqualTo(truncatedAlias + "1"));
+        scope.Complete();
+    }
+
+    [Test]
+    public async Task Unique_Alias_Skips_Suffixes_Already_Taken()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(new Template(ShortStringHelper, "test", "test"), CancellationToken.None);
+        await repository.SaveAsync(new Template(ShortStringHelper, "test2", "test2"), CancellationToken.None);
+        await repository.SaveAsync(new Template(ShortStringHelper, "test1", "test1"), CancellationToken.None);
+
+        var template = new Template(ShortStringHelper, "test", "test");
+        await repository.SaveAsync(template, CancellationToken.None);
+
+        Assert.That(template.Alias, Is.EqualTo("test3"));
+        scope.Complete();
+    }
+
+    [Test]
     public async Task Can_Perform_Update()
     {
         using var scope = NewScopeProvider.CreateScope();
@@ -458,6 +495,27 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         Assert.That(aliasRetrievalCount, Is.EqualTo(0));
         Assert.That(descendantsRetrievalCount, Is.EqualTo(0));
+        scope.Complete();
+    }
+
+    [Test]
+    public async Task Retrieval_After_Save_Reloads_Once_Then_Is_Cached()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository(CreateRealAppCaches());
+        await CreateTemplateAsync(repository);
+        await repository.GetAllAsync(CancellationToken.None);
+
+        var template = new Template(ShortStringHelper, "added", "added");
+        await repository.SaveAsync(template, CancellationToken.None);
+
+        ITemplate? retrieved = null;
+        var firstRetrievalCount = await CountCommandsAsync(async () => retrieved = await repository.GetAsync(template.Key, CancellationToken.None));
+        var secondRetrievalCount = await CountCommandsAsync(() => repository.GetAsync(template.Key, CancellationToken.None));
+
+        Assert.That(retrieved, Is.Not.Null);
+        Assert.That(firstRetrievalCount, Is.GreaterThan(0));
+        Assert.That(secondRetrievalCount, Is.EqualTo(0));
         scope.Complete();
     }
 

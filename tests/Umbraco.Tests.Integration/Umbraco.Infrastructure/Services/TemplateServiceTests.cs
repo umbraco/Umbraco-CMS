@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -28,8 +29,18 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
 
     private IFileSystem ViewsFileSystem => GetRequiredService<FileSystems>().MvcViewsFileSystem!;
 
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        builder.AddNotificationHandler<TemplateSavingNotification, TemplateNotificationHandler>();
+        builder.AddNotificationHandler<TemplateDeletingNotification, TemplateNotificationHandler>();
+    }
+
     [SetUp]
-    public void SetUp() => DeleteAllTemplateViewFiles();
+    public void SetUp()
+    {
+        DeleteAllTemplateViewFiles();
+        TemplateNotificationHandler.Reset();
+    }
 
     [TearDown]
     public void TearDownTemplateFiles() => DeleteAllTemplateViewFiles();
@@ -384,10 +395,12 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         ITemplate? byKey = await TemplateService.GetAsync(result.Result.Key, CancellationToken.None);
         ITemplate? byAlias = await TemplateService.GetAsync("readView", CancellationToken.None);
         ITemplate fromAll = (await TemplateService.GetAllAsync(CancellationToken.None)).Single(template => template.Key == result.Result.Key);
+        ITemplate fromMany = (await TemplateService.GetManyAsync([result.Result.Key], CancellationToken.None)).Single();
 
         Assert.AreEqual("changed-on-disk", byKey!.Content);
         Assert.AreEqual("changed-on-disk", byAlias!.Content);
         Assert.AreEqual("changed-on-disk", fromAll.Content);
+        Assert.AreEqual("changed-on-disk", fromMany.Content);
     }
 
     [TestCase(RuntimeMode.Development)]
@@ -490,6 +503,162 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("moved-content", ReadViewFile("movedView.cshtml"));
     }
 
+    [Test]
+    public async Task Create_Without_Content_Writes_Default_View()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Default View", "defaultView", null, null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        var viewContent = ReadViewFile("defaultView.cshtml");
+        Assert.That(viewContent, Does.Contain("@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage"));
+        Assert.That(viewContent, Does.Contain("Layout = null;"));
+        Assert.AreEqual(viewContent, result.Result.Content);
+    }
+
+    [Test]
+    public async Task Create_With_Over_Long_Alias_Names_The_View_After_The_Truncated_Alias()
+    {
+        var longAlias = new string('a', 120);
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Long Alias", longAlias, "long-content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        var truncatedAlias = new string('a', 95);
+        Assert.AreEqual(truncatedAlias, result.Result.Alias);
+        Assert.IsFalse(ViewsFileSystem.FileExists($"{longAlias}.cshtml"));
+        Assert.AreEqual("long-content", ReadViewFile($"{truncatedAlias}.cshtml"));
+        Assert.AreEqual("long-content", (await TemplateService.GetAsync(truncatedAlias, CancellationToken.None))!.Content);
+    }
+
+    [Test]
+    public async Task Cannot_Create_Template_With_Duplicate_Alias()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Original", "duplicate", "test", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        result = await TemplateService.CreateAsync("Duplicate", "Duplicate", "test", null, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(TemplateOperationStatus.DuplicateAlias, result.Status);
+        Assert.AreEqual(1, (await TemplateService.GetAllAsync(CancellationToken.None)).Count());
+    }
+
+    [Test]
+    public async Task Cannot_Update_Template_To_Duplicate_Alias()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("First", "first", "test", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        result = await TemplateService.CreateAsync("Second", "second", "test", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        ITemplate second = result.Result;
+        second.Alias = "first";
+        result = await TemplateService.UpdateAsync(second, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(TemplateOperationStatus.DuplicateAlias, result.Status);
+        Assert.AreEqual("second", (await TemplateService.GetAsync(second.Key, CancellationToken.None))!.Alias);
+    }
+
+    [Test]
+    public async Task Cannot_Update_Template_To_Create_A_Circular_Layout_Reference()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+        ITemplate parent = result.Result;
+
+        result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        parent.Content = "Layout = \"Child.cshtml\";";
+        result = await TemplateService.UpdateAsync(parent, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(TemplateOperationStatus.CircularLayoutTemplateReference, result.Status);
+        Assert.IsNull((await TemplateService.GetAsync(parent.Key, CancellationToken.None))!.LayoutTemplateAlias);
+    }
+
+    [Test]
+    public async Task Create_Cancelled_By_Notification_Does_Not_Persist_The_Template()
+    {
+        TemplateNotificationHandler.CancelAlias = "cancelledCreate";
+
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Cancelled Create", "cancelledCreate", "test", null, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(TemplateOperationStatus.CancelledByNotification, result.Status);
+        Assert.IsNull(await TemplateService.GetAsync("cancelledCreate", CancellationToken.None));
+        Assert.IsFalse(ViewsFileSystem.FileExists("cancelledCreate.cshtml"));
+    }
+
+    [Test]
+    public async Task Update_Cancelled_By_Notification_Does_Not_Change_The_Template()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Cancelled Update", "cancelledUpdate", "original-content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        TemplateNotificationHandler.CancelAlias = "cancelledUpdate";
+        ITemplate template = (await TemplateService.GetAsync(result.Result.Key, CancellationToken.None))!;
+        template.Name = "Changed Name";
+        template.Content = "changed-content";
+        result = await TemplateService.UpdateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(TemplateOperationStatus.CancelledByNotification, result.Status);
+        Assert.AreEqual("Cancelled Update", (await TemplateService.GetAsync(template.Key, CancellationToken.None))!.Name);
+        Assert.AreEqual("original-content", ReadViewFile("cancelledUpdate.cshtml"));
+    }
+
+    [Test]
+    public async Task Delete_Cancelled_By_Notification_Keeps_The_Template_And_Its_View()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Cancelled Delete", "cancelledDelete", "content", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        TemplateNotificationHandler.CancelAlias = "cancelledDelete";
+        Attempt<ITemplate?, TemplateOperationStatus> deleteResult = await TemplateService.DeleteAsync(result.Result.Key, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.IsFalse(deleteResult.Success);
+        Assert.AreEqual(TemplateOperationStatus.CancelledByNotification, deleteResult.Status);
+        Assert.IsNotNull(await TemplateService.GetAsync(result.Result.Key, CancellationToken.None));
+        Assert.IsTrue(ViewsFileSystem.FileExists("cancelledDelete.cshtml"));
+    }
+
+    [Test]
+    public async Task Create_Publishes_Saving_Notification_Not_Flagged_For_A_Content_Type()
+    {
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Plain", "plain", "test", null, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.IsTrue(result.Success);
+
+        TemplateSavingNotification savingNotification = TemplateNotificationHandler.SavingNotifications.Single();
+        Assert.IsFalse(savingNotification.CreateTemplateForContentType);
+        Assert.AreEqual("plain", savingNotification.SavedEntities.Single().Alias);
+    }
+
+    [Test]
+    public async Task Creating_A_Template_For_A_Content_Type_Assigns_It_And_Flags_The_Saving_Notification()
+    {
+        IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+        var contentType = ContentTypeBuilder.CreateSimpleContentType("templatedType", "Templated Type");
+        await contentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        Attempt<Guid?, ContentTypeOperationStatus> result = await contentTypeService.CreateTemplateAsync(contentType.Key, "Templated", "templated", true, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        ITemplate? template = await TemplateService.GetAsync(result.Result!.Value, CancellationToken.None);
+        Assert.IsNotNull(template);
+        Assert.AreEqual("templated", template!.Alias);
+        Assert.IsTrue(ViewsFileSystem.FileExists("templated.cshtml"));
+
+        IContentType? persistedContentType = await contentTypeService.GetAsync(contentType.Key);
+        Assert.That(persistedContentType!.AllowedTemplates!.Select(allowed => allowed.Key), Does.Contain(template.Key));
+        Assert.AreEqual(template.Id, persistedContentType.DefaultTemplateId);
+
+        TemplateSavingNotification savingNotification = TemplateNotificationHandler.SavingNotifications.Single();
+        Assert.IsTrue(savingNotification.CreateTemplateForContentType);
+        Assert.AreEqual("templatedType", savingNotification.ContentTypeAlias);
+    }
+
     private async Task<ITemplate> CreateTemplateReadThroughContentType(string alias, string content)
     {
         Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync(alias, alias, content, null, Constants.Security.SuperUserKey, CancellationToken.None);
@@ -534,5 +703,37 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
         ViewsFileSystem.AddFile(path, stream, true);
+    }
+
+    private sealed class TemplateNotificationHandler :
+        INotificationHandler<TemplateSavingNotification>,
+        INotificationHandler<TemplateDeletingNotification>
+    {
+        public static string? CancelAlias { get; set; }
+
+        public static List<TemplateSavingNotification> SavingNotifications { get; } = [];
+
+        public static void Reset()
+        {
+            CancelAlias = null;
+            SavingNotifications.Clear();
+        }
+
+        public void Handle(TemplateSavingNotification notification)
+        {
+            SavingNotifications.Add(notification);
+            if (notification.SavedEntities.Any(template => template.Alias == CancelAlias))
+            {
+                notification.Cancel = true;
+            }
+        }
+
+        public void Handle(TemplateDeletingNotification notification)
+        {
+            if (notification.DeletedEntities.Any(template => template.Alias == CancelAlias))
+            {
+                notification.Cancel = true;
+            }
+        }
     }
 }
