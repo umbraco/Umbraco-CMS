@@ -153,7 +153,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
         var rootCulturesToValidate = await GetRootCulturesToValidateAsync(content, culturesToPublish, publishBranchFilter);
         if (rootCulturesToValidate.Length > 0)
         {
-            ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, rootCulturesToValidate);
+            ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, rootCulturesToValidate, userKey);
             if (validationResult.ValidationErrors.Any())
             {
                 scope.Complete();

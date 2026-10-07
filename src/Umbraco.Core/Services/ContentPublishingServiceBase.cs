@@ -236,7 +236,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     /// <summary>
     /// Validates the current (draft) property values of the content for the specified cultures, including all segment values.
     /// </summary>
-    private async Task<ContentValidationResult> ValidateCurrentContentAsync(TContent content, string[] cultures)
+    protected async Task<ContentValidationResult> ValidateCurrentContentAsync(TContent content, string[] cultures, Guid userKey)
     {
         IUser user = await _userService.GetRequiredUserAsync(userKey);
 
