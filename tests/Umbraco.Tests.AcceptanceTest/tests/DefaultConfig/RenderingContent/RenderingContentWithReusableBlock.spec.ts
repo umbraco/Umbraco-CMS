@@ -1,4 +1,5 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {expect} from "@playwright/test";
 
 const contentName = 'TestRenderReusable';
 const documentTypeName = 'TestDocumentTypeForRenderReusable';
@@ -22,10 +23,12 @@ const rteSecondElementTypeName = 'RenderReusableSecondElement';
 const rteTransferElementName = 'TransferredRenderRichTextElement';
 const propertyInBlock = 'Textstring';
 const groupName = 'testGroup';
+const richTextBlockEditorAlias = 'Umbraco.RichText';
 let elementTypeId = '';
 let rteBlockPartialView: {path: string; createdFolders: string[]} | undefined;
 
 test.beforeEach(async ({umbracoApi}) => {
+  await umbracoApi.element.ensureNameNotExists(rteTransferElementName);
   const textStringData = await umbracoApi.dataType.getByName(propertyInBlock);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, propertyInBlock, textStringData.id);
 });
@@ -34,6 +37,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.document.ensureNameNotExists(gridContentName);
   await umbracoApi.element.ensureNameNotExists(libraryElementName);
+  await umbracoApi.element.ensureNameNotExists(rteTransferElementName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(gridDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
@@ -47,7 +51,6 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.template.ensureNameNotExists(singleTemplateName);
   await umbracoApi.document.ensureNameNotExists(rteContentName);
   await umbracoApi.documentType.ensureNameNotExists(rteDocumentTypeName);
-  await umbracoApi.element.ensureNameNotExists(rteTransferElementName);
   await umbracoApi.documentType.ensureNameNotExists(rteSecondElementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(rteCustomDataTypeName);
   await umbracoApi.template.ensureNameNotExists(rteTemplateName);
@@ -212,5 +215,7 @@ test.skip('can render a Rich Text Editor block after disconnecting it from the L
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
   // Assert
+  const blocksValue = await umbracoApi.document.getRichTextBlocksValue(rteContentName);
+  expect(blocksValue.layout[richTextBlockEditorAlias][0].isExternalContent).not.toBe(true);
   await umbracoUi.contentRender.doesContentRenderValueContainText(libraryText);
 });
