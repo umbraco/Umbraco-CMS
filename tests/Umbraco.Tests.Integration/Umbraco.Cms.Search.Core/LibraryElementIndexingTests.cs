@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Search.Configuration;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Search.Core.Persistence;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
@@ -42,6 +43,10 @@ public class LibraryElementIndexingTests : ContentBaseTestBase
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         base.CustomTestSetup(builder);
+
+        // TestBase registers a no-op IIndexDocumentRepository, which bypasses the persisted change-detection
+        // cache - use the real, database-backed repository so stale cached snapshots surface in these tests.
+        builder.Services.AddUnique<IIndexDocumentRepository, IndexDocumentRepository>();
 
         builder.Services.Configure<IndexOptions>(options =>
         {

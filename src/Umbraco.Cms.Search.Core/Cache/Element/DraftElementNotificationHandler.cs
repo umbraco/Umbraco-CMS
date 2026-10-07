@@ -1,9 +1,10 @@
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
 namespace Umbraco.Cms.Search.Core.Cache.Element;
 
@@ -18,6 +19,8 @@ internal sealed class DraftElementNotificationHandler : ContentNotificationHandl
     IDistributedCacheNotificationHandler<EntityContainerMovedNotification>,
     IDistributedCacheNotificationHandler<EntityContainerMovedToRecycleBinNotification>
 {
+    private readonly IEntityService _entityService;
+
     /// <inheritdoc />
     protected override Guid CacheRefresherUniqueId => DraftElementCacheRefresher.UniqueId;
 
@@ -27,13 +30,14 @@ internal sealed class DraftElementNotificationHandler : ContentNotificationHandl
     /// <param name="distributedCache">The distributed cache used to broadcast the paired cache refresher notification.</param>
     /// <param name="originProvider">The provider of the current server origin.</param>
     /// <param name="indexDocumentService">The service used to flush the change-detection cache for affected documents.</param>
+    /// <param name="entityService">The service used to enumerate the elements beneath a moved element container.</param>
     public DraftElementNotificationHandler(
         DistributedCache distributedCache,
         IOriginProvider originProvider,
-        IIndexDocumentService indexDocumentService)
+        IIndexDocumentService indexDocumentService,
+        IEntityService entityService)
         : base(distributedCache, originProvider, indexDocumentService)
-    {
-    }
+        => _entityService = entityService;
 
     /// <summary>
     /// Flushes the change-detection cache for the given elements and broadcasts a refresh-node change for each.
@@ -97,17 +101,49 @@ internal sealed class DraftElementNotificationHandler : ContentNotificationHandl
     // moving a container changes the path of every element beneath it, without any element notifications
     private void HandleContainerMove(IEnumerable<EntityContainer> containers)
     {
-        DraftElementCacheRefresher.JsonPayload[] payloads = containers
+        Guid[] containerKeys = containers
             .Where(container => container.ContainedObjectType == Umbraco.Cms.Core.Constants.ObjectTypes.Element)
-            .Select(container => new DraftElementCacheRefresher.JsonPayload(container.Key, TreeChangeTypes.RefreshBranch))
+            .Select(container => container.Key)
             .ToArray();
 
-        if (payloads.Length is 0)
+        if (containerKeys.Length is 0)
         {
             return;
         }
 
+        foreach (Guid containerKey in containerKeys)
+        {
+            FlushDescendantElementsDocumentIndexCache(containerKey);
+        }
+
+        DraftElementCacheRefresher.JsonPayload[] payloads = containerKeys
+            .Select(containerKey => new DraftElementCacheRefresher.JsonPayload(containerKey, TreeChangeTypes.RefreshBranch))
+            .ToArray();
+
         HandlePayloads(payloads);
+    }
+
+    private void FlushDescendantElementsDocumentIndexCache(Guid containerKey)
+    {
+        const int pageSize = ContentChangeStrategyBase.ContentEnumerationPageSize;
+
+        var skip = 0;
+        Guid[] descendantKeys;
+        do
+        {
+            descendantKeys = _entityService
+                .GetPagedDescendants(containerKey, UmbracoObjectTypes.ElementContainer, [UmbracoObjectTypes.Element], skip, pageSize, out _, ordering: Ordering.By("Path"))
+                .Select(entity => entity.Key)
+                .ToArray();
+
+            if (descendantKeys.Length > 0)
+            {
+                FlushDocumentIndexCache(descendantKeys, false);
+            }
+
+            skip += pageSize;
+        }
+        while (descendantKeys.Length == pageSize);
     }
 
     private void FlushDocumentIndexCache(IEnumerable<IElement> entities)
