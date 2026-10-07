@@ -1,6 +1,7 @@
 import { UmbResourceController } from '../resource.controller.js';
 import type { UmbApiResponse, UmbTryExecuteOptions } from '../types.js';
-import type { UmbApiError, UmbCancelError } from '../umb-error.js';
+import { UmbCancelError } from '../umb-error.js';
+import type { UmbApiError } from '../umb-error.js';
 import { apiErrorWasNotified } from './api-error-was-notified.function.js';
 
 export class UmbTryExecuteController<T> extends UmbResourceController<T> {
