@@ -51,11 +51,14 @@ public class ConfigureUmbracoBackofficeJsonOptions : IConfigureNamedOptions<Json
         options.JsonSerializerOptions.Converters.Add(new JsonUdiRangeConverter());
         options.JsonSerializerOptions.Converters.Add(new ValidationProblemDetailsConverter());
         options.JsonSerializerOptions.Converters.Add(new JsonObjectConverter());
-        options.JsonSerializerOptions.Converters.Add(new ContentModelBaseConverterFactory());
-        options.JsonSerializerOptions.Converters.Add(new BlockItemDataConverter());
-        options.JsonSerializerOptions.Converters.Add(new BlockItemVariationListConverter());
 
-        options.JsonSerializerOptions.TypeInfoResolver = _umbracoJsonTypeInfoResolver;
+        options.JsonSerializerOptions.TypeInfoResolver = new ModifyingJsonTypeInfoResolver(
+            _umbracoJsonTypeInfoResolver,
+            typeInfo =>
+            {
+                BlockValueJsonTypeInfoModifiers.Apply(typeInfo);
+                ContentModelBaseJsonTypeInfoModifier.Apply(typeInfo);
+            });
 
         options.JsonSerializerOptions.MaxDepth = 64; // Ensures the maximum possible value is used, in particular to support handling as best we can levels of nested blocks.
     }

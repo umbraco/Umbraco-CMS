@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -9,17 +10,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Serialization;
 /// <summary>
 /// Verifies that <see cref="JsonBlockValueConverter"/> - which owns (de)serialization of the containing
 /// <see cref="BlockValue"/> - actually routes its <see cref="BlockValue.ContentData"/>/<see cref="BlockValue.SettingsData"/>
-/// and <see cref="BlockValue.Expose"/> through <see cref="BlockItemDataConverter"/> and
-/// <see cref="BlockItemVariationListConverter"/> respectively, rather than each converter only being exercised
-/// in isolation.
+/// and <see cref="BlockValue.Expose"/> through <see cref="BlockValueJsonTypeInfoModifiers"/>, rather than each
+/// modifier only being exercised in isolation.
 /// </summary>
 [TestFixture]
 public class JsonBlockValueConverterIntegrationTests
 {
     [Test]
-    public void Write_Sorts_ContentData_Values_When_BlockItemDataConverter_Is_Registered()
+    public void Write_Sorts_ContentData_Values_When_Modifier_Is_Wired_In()
     {
-        JsonSerializerOptions options = CreateOptions(includeBlockItemDataConverter: true, includeBlockItemVariationListConverter: false);
+        JsonSerializerOptions options = CreateOptions(includeBlockSortingModifier: true);
 
         var json = SerializeBlockListValueWithUnsortedContentDataValues(options);
 
@@ -28,22 +28,22 @@ public class JsonBlockValueConverterIntegrationTests
     }
 
     [Test]
-    public void Write_Does_Not_Sort_ContentData_Values_When_BlockItemDataConverter_Is_Not_Registered()
+    public void Write_Does_Not_Sort_ContentData_Values_When_Modifier_Is_Not_Wired_In()
     {
-        JsonSerializerOptions options = CreateOptions(includeBlockItemDataConverter: false, includeBlockItemVariationListConverter: false);
+        JsonSerializerOptions options = CreateOptions(includeBlockSortingModifier: false);
 
         var json = SerializeBlockListValueWithUnsortedContentDataValues(options);
 
-        // Unsorted input order survives when BlockItemDataConverter isn't wired in - proving the previous
-        // test's sorted output genuinely comes from that converter, not from JsonBlockValueConverter itself.
+        // Unsorted input order survives when the modifier isn't wired in - proving the previous test's
+        // sorted output genuinely comes from it, not from JsonBlockValueConverter itself.
         var order = GetContentDataValueCultures(json);
         CollectionAssert.AreEqual(new[] { "en-us", "da-dk" }, order);
     }
 
     [Test]
-    public void Write_Sorts_Expose_When_BlockItemVariationListConverter_Is_Registered()
+    public void Write_Sorts_Expose_When_Modifier_Is_Wired_In()
     {
-        JsonSerializerOptions options = CreateOptions(includeBlockItemDataConverter: false, includeBlockItemVariationListConverter: true);
+        JsonSerializerOptions options = CreateOptions(includeBlockSortingModifier: true);
 
         var json = SerializeBlockListValueWithUnsortedExpose(options);
 
@@ -52,22 +52,22 @@ public class JsonBlockValueConverterIntegrationTests
     }
 
     [Test]
-    public void Write_Does_Not_Sort_Expose_When_BlockItemVariationListConverter_Is_Not_Registered()
+    public void Write_Does_Not_Sort_Expose_When_Modifier_Is_Not_Wired_In()
     {
-        JsonSerializerOptions options = CreateOptions(includeBlockItemDataConverter: false, includeBlockItemVariationListConverter: false);
+        JsonSerializerOptions options = CreateOptions(includeBlockSortingModifier: false);
 
         var json = SerializeBlockListValueWithUnsortedExpose(options);
 
-        // Unsorted input order survives when BlockItemVariationListConverter isn't wired in - proving the
-        // previous test's sorted output genuinely comes from that converter.
+        // Unsorted input order survives when the modifier isn't wired in - proving the previous test's
+        // sorted output genuinely comes from it.
         var order = GetExposeCultures(json);
         CollectionAssert.AreEqual(new[] { "en-us", "da-dk" }, order);
     }
 
     [Test]
-    public void Read_Round_Trips_BlockValue_When_Both_Converters_Are_Registered()
+    public void Read_Round_Trips_BlockValue_When_Modifier_Is_Wired_In()
     {
-        JsonSerializerOptions options = CreateOptions(includeBlockItemDataConverter: true, includeBlockItemVariationListConverter: true);
+        JsonSerializerOptions options = CreateOptions(includeBlockSortingModifier: true);
 
         var contentKey = Guid.NewGuid();
         var elementTypeKey = Guid.NewGuid();
@@ -107,23 +107,13 @@ public class JsonBlockValueConverterIntegrationTests
     [Test]
     public void Write_Sorts_Nested_Block_Expose_And_ContentData_Without_Throwing()
     {
-        // Reproduces a reported crash: a block whose own property value is itself another block (e.g. Block
-        // List nested inside Block List). JsonBlockValueConverter writes ContentData before Expose, so the
-        // nested block's Expose is reached - via BlockItemDataConverter's already-stripped options clone for
-        // the outer ContentData - *before* the outer block's own Expose is written with the pristine top-level
-        // options. BlockItemVariationListConverter is a long-lived singleton, so seeing those two different
-        // options instances within one serialize call used to be misread as unsupported reuse and threw.
-        var options = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters =
-            {
-                new JsonObjectConverter(),
-                new JsonBlockValueConverter(),
-                new BlockItemDataConverter(),
-                new BlockItemVariationListConverter(),
-            },
-        };
+        // Reproduces a reported crash from an earlier, JsonConverter-based design: a block whose own property
+        // value is itself another block (e.g. Block List nested inside Block List) made a long-lived converter
+        // singleton see two different JsonSerializerOptions instances within one serialize call, which was
+        // misread as unsupported reuse and threw. A JsonTypeInfo.OnSerializing/OnSerialized modifier runs the
+        // DEFAULT serialization unchanged - it only mutates the value first - so a nested occurrence is just
+        // another instance it runs for, at any depth, with no options-cloning or reentrancy handling involved.
+        JsonSerializerOptions options = CreateOptions(includeBlockSortingModifier: true);
 
         var innerContentKey = Guid.NewGuid();
         var innerBlockValue = new BlockListValue([new BlockListLayoutItem(innerContentKey)])
@@ -184,25 +174,20 @@ public class JsonBlockValueConverterIntegrationTests
         });
     }
 
-    private static JsonSerializerOptions CreateOptions(bool includeBlockItemDataConverter, bool includeBlockItemVariationListConverter)
+    private static JsonSerializerOptions CreateOptions(bool includeBlockSortingModifier)
     {
-        var options = new JsonSerializerOptions
+        IJsonTypeInfoResolver typeInfoResolver = new DefaultJsonTypeInfoResolver();
+        if (includeBlockSortingModifier)
+        {
+            typeInfoResolver = new ModifyingJsonTypeInfoResolver(typeInfoResolver, BlockValueJsonTypeInfoModifiers.Apply);
+        }
+
+        return new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             Converters = { new JsonBlockValueConverter() },
+            TypeInfoResolver = typeInfoResolver,
         };
-
-        if (includeBlockItemDataConverter)
-        {
-            options.Converters.Add(new BlockItemDataConverter());
-        }
-
-        if (includeBlockItemVariationListConverter)
-        {
-            options.Converters.Add(new BlockItemVariationListConverter());
-        }
-
-        return options;
     }
 
     private static string SerializeBlockListValueWithUnsortedContentDataValues(JsonSerializerOptions options)

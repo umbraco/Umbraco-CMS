@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
@@ -8,7 +9,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Media;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Serialization;
 
 [TestFixture]
-public class ContentModelBaseConverterFactoryTests
+public class ContentModelBaseJsonTypeInfoModifierTests
 {
     private JsonSerializerOptions _jsonSerializerOptions;
 
@@ -17,22 +18,24 @@ public class ContentModelBaseConverterFactoryTests
         => _jsonSerializerOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters = { new ContentModelBaseConverterFactory() },
+            TypeInfoResolver = new ModifyingJsonTypeInfoResolver(new DefaultJsonTypeInfoResolver(), ContentModelBaseJsonTypeInfoModifier.Apply),
         };
 
     [TestCase(typeof(DocumentResponseModel))]
     [TestCase(typeof(MediaResponseModel))]
-    public void CanConvert_Returns_True_For_Types_Deriving_From_ContentModelBase_At_Any_Depth(Type type)
-        => Assert.That(new ContentModelBaseConverterFactory().CanConvert(type), Is.True);
+    public void Apply_Wires_OnSerializing_For_Types_Deriving_From_ContentModelBase_At_Any_Depth(Type type)
+    {
+        JsonTypeInfo typeInfo = _jsonSerializerOptions.TypeInfoResolver!.GetTypeInfo(type, _jsonSerializerOptions);
+        Assert.That(typeInfo!.OnSerializing, Is.Not.Null);
+    }
 
     [TestCase(typeof(string))]
     [TestCase(typeof(DocumentTypeReferenceResponseModel))]
-    public void CanConvert_Returns_False_For_Unrelated_Types(Type type)
-        => Assert.That(new ContentModelBaseConverterFactory().CanConvert(type), Is.False);
-
-    [Test]
-    public void CreateConverter_Throws_For_Unrelated_Type()
-        => Assert.Throws<NotSupportedException>(() => new ContentModelBaseConverterFactory().CreateConverter(typeof(string), _jsonSerializerOptions));
+    public void Apply_Does_Not_Wire_OnSerializing_For_Unrelated_Types(Type type)
+    {
+        JsonTypeInfo typeInfo = _jsonSerializerOptions.TypeInfoResolver!.GetTypeInfo(type, _jsonSerializerOptions);
+        Assert.That(typeInfo!.OnSerializing, Is.Null);
+    }
 
     [Test]
     public void Write_Orders_Variants_By_Culture_Then_Segment_For_DocumentResponseModel()
@@ -101,8 +104,8 @@ public class ContentModelBaseConverterFactoryTests
     [Test]
     public void Write_Orders_Values_By_Culture_Then_Segment_Then_Alias_For_MediaResponseModel()
     {
-        // MediaResponseModel has no converter of its own - this proves the factory generalizes
-        // ordering to any ContentModelBase<,> implementation, not just DocumentResponseModel.
+        // MediaResponseModel has no modifier logic of its own - this proves the reflection-based walk-up
+        // generalizes ordering to any ContentModelBase<,> implementation, not just DocumentResponseModel.
         var model = new MediaResponseModel
         {
             Id = Guid.NewGuid(),
@@ -133,8 +136,9 @@ public class ContentModelBaseConverterFactoryTests
     [Test]
     public void Write_Does_Not_Leave_Variants_Or_Values_Reordered_On_The_Original_Instance()
     {
-        // Culture order here is deliberately not the sorted order, so a leaked mutation from Write would
-        // be observable as a changed Variants/Values order on the original instance.
+        // Culture order here is deliberately not the sorted order, so a leaked mutation from
+        // OnSerializing/OnSerialized would be observable as a changed Variants/Values order on the
+        // original instance.
         var model = new DocumentResponseModel
         {
             Id = Guid.NewGuid(),
