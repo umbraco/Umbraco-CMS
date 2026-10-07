@@ -136,7 +136,7 @@ public class ContentIndexingNotificationTests : InvariantContentTestBase
         {
             CollectionAssert.AreEqual(titleField.Value.Keywords, new[] { "NotificationHandlerKeyword", document.Id.ToString("D") });
 
-            IndexField? nameField = document.Fields.SingleOrDefault(field => field.FieldName == Constants.IndexFieldNames.Name);
+            IndexField? nameField = document.Fields.SingleOrDefault(field => field.FieldName == Constants.Search.FieldNames.Name);
             Assert.That(nameField, Is.Not.Null);
             Assert.Multiple(() =>
             {
@@ -158,7 +158,7 @@ public class ContentIndexingNotificationTests : InvariantContentTestBase
             {
                 IndexField? titleField = notification.Fields.SingleOrDefault(field => field.FieldName == "title");
                 IndexField? countField = notification.Fields.SingleOrDefault(field => field.FieldName == "count");
-                IndexField? nameField = notification.Fields.SingleOrDefault(field => field.FieldName == Constants.IndexFieldNames.Name);
+                IndexField? nameField = notification.Fields.SingleOrDefault(field => field.FieldName == Constants.Search.FieldNames.Name);
                 Assert.Multiple(() =>
                 {
                     Assert.That(titleField, Is.Not.Null);

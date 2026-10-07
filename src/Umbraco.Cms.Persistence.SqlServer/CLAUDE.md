@@ -3,7 +3,7 @@
 SQL Server database provider for Umbraco CMS using NPoco ORM. Provides SQL Server-specific SQL syntax, bulk copy operations, distributed locking, and Azure SQL transient fault handling.
 
 **Project Type**: Class Library (NuGet package)
-**Target Framework**: net10.0
+**Target Framework**: net11.0
 **Dependencies**: Umbraco.Infrastructure, NPoco.SqlServer, Microsoft.Data.SqlClient
 
 **Note**: This is the **legacy NPoco-based** SQL Server provider. For EF Core SQL Server support, see `Umbraco.Cms.Persistence.EFCore.SqlServer`.

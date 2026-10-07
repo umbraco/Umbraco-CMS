@@ -17,17 +17,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 /// up. Individual files or folders that cannot be deleted (e.g. because they're locked) are skipped rather than
 /// failing the migration; anything left behind is safe to delete manually.
 /// Folders whose name matches one of the current search abstraction index aliases
-/// (<see cref="Core.Constants.IndexAliases"/>) are left untouched, since the Examine search provider still uses
+/// (<see cref="Core.Constants.Search.IndexAliases"/>) are left untouched, since the Examine search provider still uses
 /// those names for its active indexes.
 /// </remarks>
 public class RemoveLegacyExamineIndexFiles : UnscopedMigrationBase
 {
     private static readonly HashSet<string> CurrentIndexNames = new(StringComparer.OrdinalIgnoreCase)
     {
-        Core.Constants.IndexAliases.PublishedContent,
-        Core.Constants.IndexAliases.DraftContent,
-        Core.Constants.IndexAliases.DraftMedia,
-        Core.Constants.IndexAliases.DraftMembers,
+        Core.Constants.Search.IndexAliases.PublishedContent,
+        Core.Constants.Search.IndexAliases.DraftContent,
+        Core.Constants.Search.IndexAliases.DraftMedia,
+        Core.Constants.Search.IndexAliases.DraftMembers,
     };
 
     private readonly IHostingEnvironment _hostingEnvironment;

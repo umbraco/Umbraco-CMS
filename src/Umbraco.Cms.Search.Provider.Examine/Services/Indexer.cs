@@ -214,7 +214,7 @@ public class Indexer : IExamineIndexer
 
     private void DeleteSingleDoc(IIndex index, Guid id)
     {
-        ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.IndexFieldNames.Id, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
+        ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.Search.FieldNames.Id, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
 
         var idsToDelete = new HashSet<string>();
 
@@ -237,7 +237,7 @@ public class Indexer : IExamineIndexer
 
         foreach (Guid id in ids)
         {
-            ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.IndexFieldNames.PathIds, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
+            ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.Search.FieldNames.PathIds, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
             foreach (ISearchResult document in documents)
             {
                 idsToDelete.Add(document.Id);

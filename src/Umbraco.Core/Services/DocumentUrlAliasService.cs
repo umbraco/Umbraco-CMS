@@ -32,8 +32,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// a rebuild, and we have future-proofing in case the alias parsing logic changes in future versions.
     /// Bumped to "2" so that installs which persisted draft alias values (before aliases were restricted to the
     /// published property value, see #23206) rebuild once on startup and flush the stale entries.
+    /// Bumped to "3" so that installs which persisted aliases of unpublished documents (before aliases were
+    /// restricted to published documents, see #23948) rebuild once on startup and flush the stale entries.
     /// </remarks>
-    private const string CurrentRebuildValue = "2";
+    private const string CurrentRebuildValue = "3";
 
     private readonly ILogger<DocumentUrlAliasService> _logger;
     private readonly IDocumentUrlAliasRepository _documentUrlAliasRepository;
@@ -457,6 +459,13 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private async Task<List<PublishedDocumentUrlAlias>> ExtractAliasesFromDocumentAsync(IContent document)
     {
         var aliases = new List<PublishedDocumentUrlAlias>();
+
+        // An unpublished document keeps the property values of its last published version,
+        // so GetValue(published: true) alone would still return its former alias.
+        if (document.Published is false)
+        {
+            return aliases;
+        }
 
         // Check if the alias property itself varies by culture (not just the content type).
         // A variant content type can have a shared (invariant) alias property.

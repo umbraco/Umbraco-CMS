@@ -153,7 +153,7 @@ public class SingleBlockPropertyValueHandlerTests : PropertyValueHandlerTestsBas
             ],
             Expose =
             [
-                new BlockItemVariation(contentElementKey, null, null)
+                new BlockItemVariation(contentElementKey, null)
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(singleBlockValue);
@@ -170,7 +170,7 @@ public class SingleBlockPropertyValueHandlerTests : PropertyValueHandlerTestsBas
         AssertDocumentFields(IndexAliases.PublishedContent);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
-        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.IndexFieldNames.Tags)?.Value;
+        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.Search.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
         CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
 
@@ -253,7 +253,7 @@ public class SingleBlockPropertyValueHandlerTests : PropertyValueHandlerTestsBas
                                     ],
                                     Expose =
                                     [
-                                        new BlockItemVariation(nestedElementKey, null, null)
+                                        new BlockItemVariation(nestedElementKey, null)
                                     ]
                                 })
                         }
@@ -262,7 +262,7 @@ public class SingleBlockPropertyValueHandlerTests : PropertyValueHandlerTestsBas
             ],
             Expose =
             [
-                new BlockItemVariation(rootElementKey, null, null)
+                new BlockItemVariation(rootElementKey, null)
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(singleBlockValue);
@@ -290,7 +290,7 @@ public class SingleBlockPropertyValueHandlerTests : PropertyValueHandlerTestsBas
             CollectionAssert.AreEqual(new[] { "One", "Two", "Three" }, indexValue.Keywords);
         });
 
-        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.IndexFieldNames.Tags)?.Value;
+        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.Search.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
         CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three" }, tagsValue.Keywords);
     }
