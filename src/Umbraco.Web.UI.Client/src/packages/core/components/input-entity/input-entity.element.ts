@@ -74,6 +74,11 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 		if (this.#pickerContext) {
 			this.#pickerContext.max = value;
 		}
+		if (value === 1) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
 	}
 	public get max(): number {
 		return this.#max;

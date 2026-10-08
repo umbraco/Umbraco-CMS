@@ -754,9 +754,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             throw new ArgumentException("Cannot save item with empty name.");
         }
 
-        if (item.Name != null && item.Name.Length > 255)
+        if (item.Name != null && item.Name.Length > Constants.Validation.MaxNameLength)
         {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
 
         scope.WriteLock(WriteLockIds);
@@ -912,7 +912,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return Attempt.Fail(ContentTypeOperationStatus.NameCannotBeEmpty);
         }
 
-        if (item.Name.Length > 255)
+        if (item.Name.Length > Constants.Validation.MaxNameLength)
         {
             return Attempt.Fail(ContentTypeOperationStatus.NameTooLong);
         }
@@ -1497,7 +1497,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             TItem[] allowedChildren = GetMany(sortedKeys).ToArray();
             result = new PagedModel<TItem>
             {
-                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Take(take).Skip(skip),
+                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Skip(skip).Take(take),
                 Total = allowedChildren.Length,
             };
         }

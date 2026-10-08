@@ -148,10 +148,12 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 			// children still needs a way to be opened, so it drills further into it via an open event instead.
 			const editPath = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique });
 			const href = this._selectOnly ? undefined : editPath;
-			const onOpen = item.hasChildren
-				? () => this.dispatchEvent(new UmbTreeItemOpenEvent({ unique: item.unique, entityType: item.entityType }))
-				: undefined;
-			const isCollection = !!item.contentType?.collection;
+			const hasCollection = !!item.contentType?.collection;
+			const indicatorHref = href && hasCollection ? `${href}?openCollection=true` : href;
+			const onOpen =
+				item.hasChildren || hasCollection
+					? () => this.dispatchEvent(new UmbTreeItemOpenEvent({ unique: item.unique, entityType: item.entityType }))
+					: undefined;
 
 			const data =
 				this._tableColumns?.map((column) => {
@@ -173,11 +175,20 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 				id: item.unique,
 				icon: item.documentType.icon,
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
-				childrenIndicator: item.hasChildren ? { href, onOpen, isCollection } : undefined,
+				childrenIndicator:
+					item.hasChildren || hasCollection
+						? {
+								href: indicatorHref,
+								onOpen,
+								renderExpandSymbol: hasCollection
+									? () => html`<umb-icon name="icon-list" style="font-size: 8px;"></umb-icon>`
+									: undefined,
+							}
+						: undefined,
 				selectable: this._isSelectableItem(item),
 				// select-only disables all row interaction, which would leave no way to open an item with
 				// children while a selection is in progress.
-				selectOnly: item.hasChildren ? false : undefined,
+				selectOnly: item.hasChildren || hasCollection ? false : undefined,
 				data: data,
 			};
 		});

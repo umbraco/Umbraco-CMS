@@ -143,6 +143,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         _serverRoleAccessor = serverRoleAccessor;
     }
 
+    /// <inheritdoc/>
+    public bool IsInitialized => _isInitialized;
+
     /// <summary>
     /// Indicates whether this instance should skip the database writes that are not tied to a local content change,
     /// i.e. the start-up rebuild of URL aliases.
@@ -155,9 +158,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// front-end keeps running. The two only line up when roles are configured explicitly.
     /// An explicitly configured subscriber is a dedicated front-end server that may run on a read-only database
     /// connection; it never makes content changes, and the publisher maintains the persisted aliases on its behalf,
-    /// so the rebuild is gated on the role. <see cref="CreateOrUpdateAliasesAsync(Guid)"/> and friends are not gated
-    /// when they run for a change made on this server: reaching them means a content write has already committed on
-    /// this connection, so the connection is writable whatever the role reads, and no other server persists the
+    /// so the rebuild is gated on the role. <see cref="PersistAliasesAsync(IContent)"/>,
+    /// <see cref="CreateOrUpdateAliasesAsync(Guid)"/> and friends are not gated when they run for a change made on
+    /// this server: reaching them means a content write is being made, or has already committed, on this
+    /// connection, so the connection is writable whatever the role reads, and no other server persists the
     /// aliases for that change (other servers receive a cache instruction and only refresh their in-memory cache).
     /// Skipping the write there would lose the aliases on every server after its next restart.
     /// <see cref="ServerRole.Unknown"/> is deliberately not grouped with Subscriber, so a server whose role is not
@@ -285,6 +289,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public async Task CreateOrUpdateAliasesAsync(Guid documentKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        // A save persists its own alias rows under the content tree write lock, so the read lock keeps this
+        // write from overlapping one for the same document. Same lock order as RebuildAllAliasesAsync.
+        scope.ReadLock(Constants.Locks.ContentTree);
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
         await CreateOrUpdateAliasesInternalAsync(documentKey);
@@ -296,6 +304,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public async Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        // A save persists its own alias rows under the content tree write lock, so the read lock keeps this
+        // write from overlapping one for the same document. Same lock order as RebuildAllAliasesAsync.
+        scope.ReadLock(Constants.Locks.ContentTree);
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
         // Get document and all descendants
@@ -308,6 +320,57 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         foreach (Guid key in documentKeys)
         {
             await CreateOrUpdateAliasesInternalAsync(key);
+        }
+
+        scope.Complete();
+    }
+
+    /// <inheritdoc/>
+    public Task PersistAliasesAsync(IContent document)
+        => PersistAliasesAsync(document, contentTreeWriteLockHeld: false);
+
+    /// <inheritdoc/>
+    public async Task PersistAliasesAsync(IContent document, bool contentTreeWriteLockHeld)
+    {
+        // Aliases are routing data for the published site, so only a change to the published state or to the
+        // trashed state can change them; a draft save cannot. Blueprints never have aliases.
+        if (document.Blueprint)
+        {
+            return;
+        }
+
+        var trashedChanged = document.IsPropertyDirty(nameof(document.Trashed));
+        var publishedStateChanged = document.PublishedState is PublishedState.Publishing or PublishedState.Unpublishing;
+        if (trashedChanged is false && publishedStateChanged is false)
+        {
+            return;
+        }
+
+        // Every writer of the alias table is ordered by the content tree lock. A caller that holds it exclusively
+        // (the transaction persisting the document) cannot overlap any other writer, so its write needs no lock of
+        // its own; taking the DocumentUrlAliases lock there would add a global lock to every publish and order it
+        // after the content tree lock, the reverse of the order the rebuild uses. Every other caller takes the
+        // content tree lock shared, which keeps the write from overlapping a save, and the DocumentUrlAliases lock,
+        // which keeps it from overlapping the rebuild, in the rebuild's order. An ambient scope says nothing about
+        // which locks are held, so only the caller's word is trusted.
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        if (contentTreeWriteLockHeld is false)
+        {
+            scope.ReadLock(Constants.Locks.ContentTree);
+            scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+        }
+
+        List<PublishedDocumentUrlAlias> aliases = document.Trashed || document.PublishedState == PublishedState.Unpublishing
+            ? []
+            : await ExtractAliasesFromDocumentAsync(document);
+
+        if (aliases.Count > 0)
+        {
+            _documentUrlAliasRepository.Save(aliases);
+        }
+        else
+        {
+            _documentUrlAliasRepository.DeleteByDocumentKey([document.Key]);
         }
 
         scope.Complete();
@@ -344,7 +407,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// Internal implementation that processes a single document without creating its own scope.
     /// Caller must ensure a scope is active. A write lock on <see cref="Constants.Locks.DocumentUrlAliases"/>
     /// is required whenever this method may perform database writes, i.e. unless
-    /// <paramref name="forceSkipDatabaseWrite"/> is set.
+    /// <paramref name="forceSkipDatabaseWrite"/> is set, and the caller takes the
+    /// <see cref="Constants.Locks.ContentTree"/> read lock first: a save persists its own alias rows under the
+    /// content tree write lock, so the read lock keeps this write from overlapping it. That is the order
+    /// <see cref="RebuildAllAliasesAsync"/> uses as well.
     /// </summary>
     private async Task CreateOrUpdateAliasesInternalAsync(Guid documentKey, bool forceSkipDatabaseWrite = false)
     {
