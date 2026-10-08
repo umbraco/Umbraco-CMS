@@ -176,7 +176,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
         IEnumerable<PublishResult> result = _contentService.PublishBranch(content, publishBranchFilter, culturesToPublish, userId);
         scope.Complete();
 
-        var itemResults = result.ToDictionary(r => r.Content.Key, ToContentPublishingOperationStatus);
+        var itemResults = result.ToDictionary(r => r.Content.Key, r => r.ToContentPublishingOperationStatus());
         var branchResult = new ContentPublishingBranchInternalResult
         {
             ContentKey = content.Key,

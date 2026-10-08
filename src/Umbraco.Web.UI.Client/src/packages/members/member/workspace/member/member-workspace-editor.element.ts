@@ -1,5 +1,4 @@
 import type { UmbMemberVariantOptionModel } from '../../types.js';
-import { UmbMemberKind } from '../../utils/index.js';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context-token.js';
 import { UmbMemberWorkspaceSplitViewElement } from './member-workspace-split-view.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -25,9 +24,6 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _loading?: boolean = true;
 
-	@state()
-	private _isExternalOnly = false;
-
 	constructor() {
 		super();
 
@@ -35,17 +31,6 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 			this.#workspaceContext = instance;
 			this.#observeVariants();
 			this.#observeLoading();
-			this.observe(
-				this.#workspaceContext?.kind,
-				(kind) => {
-					this._isExternalOnly = kind === UmbMemberKind.EXTERNAL_ONLY;
-					if (this._isExternalOnly) {
-						this.#variants = [{ unique: 'invariant', culture: null, segment: null }];
-						this._generateRoutes();
-					}
-				},
-				'_observeKind',
-			);
 		});
 	}
 
@@ -54,7 +39,6 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 		this.observe(
 			this.#workspaceContext?.variantOptions,
 			(variants) => {
-				if (this._isExternalOnly) return;
 				this.#variants = variants;
 				this._generateRoutes();
 			},
