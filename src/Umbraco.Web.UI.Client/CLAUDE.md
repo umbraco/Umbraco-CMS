@@ -176,9 +176,10 @@ When using `@umbraco-cms/backoffice`:
 
 ### Key Files
 
-| File                            | Purpose                                                          |
-| ------------------------------- | ---------------------------------------------------------------- |
-| `package.json`                  | Root package with exports and workspace references               |
-| `devops/publish/cleanse-pkg.js` | Script that runs during `npm pack` to hoist and convert versions |
-| `src/external/*`                | Dependency wrapper packages                                      |
-| `src/packages/core`             | Contains `@hey-api/openapi-ts` and other utilities               |
+| File                                         | Purpose                                                                                                    |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `package.json`                               | Root package with exports and workspace references                                                         |
+| `devops/publish/cleanse-pkg.js`              | Script that runs during `npm pack` to hoist and convert versions                                           |
+| `devops/package/validate-hey-api-version.js` | Fails `package:validate` when the extension template's `@hey-api/openapi-ts` leaves the backoffice's range |
+| `src/external/*`                             | Dependency wrapper packages                                                                                |
+| `src/packages/core`                          | Contains `@hey-api/openapi-ts` and other utilities                                                         |
