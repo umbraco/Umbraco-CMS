@@ -313,6 +313,34 @@ test('can schedule the publishing of all selected languages at once', async ({um
   await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
 });
 
+test('keeps the schedule of each language when scheduling all selected languages at once is switched off', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const firstCulture = 'en-US';
+  const secondCulture = 'da';
+  await umbracoApi.language.createDanishLanguage();
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  await umbracoApi.document.createDocumentWithTwoCulturesAndTextContent(contentName, documentTypeId, contentText, dataTypeName, firstCulture, secondCulture);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickViewMoreOptionsButton();
+  await umbracoUi.content.clickSchedulePublishButton();
+  await umbracoUi.content.clickSelectAllCheckbox();
+  const secondPublishDateTime = await umbracoApi.getCurrentTimePlusMinute(2);
+  await umbracoUi.content.enterPublishTime(secondPublishDateTime, 1);
+
+  // Act
+  await umbracoUi.content.clickScheduleForAllLanguagesCheckbox();
+  await umbracoUi.content.doesPublishTimeHaveValue('', 1);
+  await umbracoUi.content.clickScheduleForAllLanguagesCheckbox();
+
+  // Assert
+  await umbracoUi.content.doesPublishTimeHaveValue(secondPublishDateTime, 1);
+
+  // Clean
+  await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
+});
+
 test('cannot schedule publishing with a publish time in the past', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const warningMessage = 'The release date cannot be in the past';

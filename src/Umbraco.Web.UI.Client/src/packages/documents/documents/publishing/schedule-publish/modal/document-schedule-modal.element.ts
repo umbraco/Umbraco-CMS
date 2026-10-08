@@ -1,8 +1,8 @@
 import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { isNotPublishedMandatory } from '../../utils.js';
-import { mirrorSchedule } from './mirror-schedules.function.js';
 import { UmbDocumentVariantLanguagePickerElement } from '../../../modals/index.js';
+import { mirrorSchedule } from './mirror-schedules.function.js';
 import type {
 	UmbDocumentScheduleModalData,
 	UmbDocumentScheduleModalValue,
@@ -74,14 +74,8 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				}
 				this._isAllSelected = this.#isAllSelected();
 
-				// "Schedule for all" requires the active (current) language selected; if it is deselected we
-				// leave the mode, otherwise every selected variant inherits the active language's dates.
-				if (this._scheduleForAll) {
-					if (this.#isActiveSelected()) {
-						this.#mirrorToSelection();
-					} else {
-						this._scheduleForAll = false;
-					}
+				if (this._scheduleForAll && !this.#isSourceSelected()) {
+					this._scheduleForAll = false;
 				}
 
 				//Getting not published mandatory options — the options that are mandatory and not currently published.
@@ -135,8 +129,9 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		try {
 			await this.#validation.validate();
 			this._submitButtonState = 'success';
+			const source = this.#sourceUnique();
 			this.value = {
-				selection: this._selection,
+				selection: this._scheduleForAll && source ? mirrorSchedule(this._selection, source) : this._selection,
 			};
 			this.modalContext?.submit();
 		} catch {
@@ -173,34 +168,23 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		return this._selection.length !== 0 && this._selection.length === allowedUniques.length;
 	}
 
-	// The "schedule for all" source is the first active variant. `activeVariants` is ordered with the
-	// split-view active variants first, so [0] is the one the editor is currently on.
-	#activeUnique(): string | undefined {
-		return this.data?.activeVariants?.[0];
+	#sourceUnique(): string | undefined {
+		return this.data?.currentVariant;
 	}
 
-	#isActiveSelected(): boolean {
-		const active = this.#activeUnique();
-		return !!active && this._selection.some((s) => s.unique === active);
+	#isSourceSelected(): boolean {
+		const source = this.#sourceUnique();
+		return !!source && this.#isSelected(source);
 	}
 
-	#onScheduleForAllChange(event: Event) {
+	#isMirrored(unique: string): boolean {
+		return this._scheduleForAll && unique !== this.#sourceUnique() && this.#isSelected(unique);
+	}
+
+	async #onScheduleForAllChange(event: Event) {
 		this._scheduleForAll = (event.target as UUIBooleanInputElement).checked;
-		if (this._scheduleForAll) {
-			this.#mirrorToSelection();
-			this.#validation.validate();
-		}
-		this.requestUpdate('_internalValues');
-	}
-
-	#mirrorToSelection() {
-		const active = this.#activeUnique();
-		if (!active) return;
-		mirrorSchedule(
-			this._internalValues,
-			this._selection.map((s) => s.unique),
-			active,
-		);
+		await this.updateComplete;
+		await this.#validation.validate().catch(() => undefined);
 	}
 
 	override render() {
@@ -233,7 +217,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 						<uui-checkbox
 							@change=${this.#onScheduleForAllChange}
 							label=${this.localize.term('content_scheduleForAllLanguages')}
-							?disabled=${!this.#isActiveSelected()}
+							?disabled=${!this.#isSourceSelected()}
 							.checked=${this._scheduleForAll}></uui-checkbox>
 					</div>
 				`,
@@ -253,8 +237,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		const isChanged =
 			fromDate !== option.variant?.scheduledPublishDate || toDate !== option.variant?.scheduledUnpublishDate;
 
-		// While "schedule for all" is on, every variant except the active language mirrors its dates and is not editable.
-		const mirrored = this._scheduleForAll && option.unique !== this.#activeUnique();
+		const mirrored = this.#isMirrored(option.unique);
 
 		return html`
 			<uui-menu-item
@@ -315,9 +298,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				if (!value) return false;
 
 				// Check if the unpublish date is before the publish date
-				const variant = this._internalValues.find((s) => s.unique === unique);
-				if (!variant) return false;
-				const publishTime = variant.schedule?.publishTime;
+				const publishTime = this.#fromDate(unique);
 				if (!publishTime) return false;
 
 				const date = new Date(value);
@@ -398,14 +379,19 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		`;
 	}
 
+	// Mirrored variants display the source variant's dates without overwriting their own, so switching
+	// "schedule for all" off again restores each variant's schedule.
+	#scheduleOf(unique: string) {
+		const effective = this.#isMirrored(unique) ? this.#sourceUnique() : unique;
+		return this._internalValues.find((s) => s.unique === effective)?.schedule;
+	}
+
 	#fromDate(unique: string): string | null {
-		const variant = this._internalValues.find((s) => s.unique === unique);
-		return variant?.schedule?.publishTime ?? null;
+		return this.#scheduleOf(unique)?.publishTime ?? null;
 	}
 
 	#toDate(unique: string): string | null {
-		const variant = this._internalValues.find((s) => s.unique === unique);
-		return variant?.schedule?.unpublishTime ?? null;
+		return this.#scheduleOf(unique)?.unpublishTime ?? null;
 	}
 
 	#removeFromDate(unique: string): void {
@@ -415,7 +401,6 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			...variant.schedule,
 			publishTime: null,
 		};
-		if (this._scheduleForAll) this.#mirrorToSelection();
 		this.#validation.validate();
 		this.requestUpdate('_internalValues');
 	}
@@ -427,7 +412,6 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			...variant.schedule,
 			unpublishTime: null,
 		};
-		if (this._scheduleForAll) this.#mirrorToSelection();
 		this.#validation.validate();
 		this.requestUpdate('_internalValues');
 	}
@@ -469,7 +453,6 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			...variant.schedule,
 			publishTime: this.#getDateValue(e),
 		};
-		if (this._scheduleForAll) this.#mirrorToSelection();
 		this.#validation.validate();
 		this.requestUpdate('_internalValues');
 	}
@@ -481,7 +464,6 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			...variant.schedule,
 			unpublishTime: this.#getDateValue(e),
 		};
-		if (this._scheduleForAll) this.#mirrorToSelection();
 		this.#validation.validate();
 		this.requestUpdate('_internalValues');
 	}
