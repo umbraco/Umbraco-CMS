@@ -97,10 +97,12 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	async #retrieveAllowedDocumentTypesOf(unique: string | null, parentContentUnique: string | null) {
-		const { data } = await this.#documentTypeStructureRepository.requestAllowedChildrenOf(unique, parentContentUnique);
+		const { data } = await this.#documentTypeStructureRepository.requestAllAllowedChildrenOf(
+			unique,
+			parentContentUnique,
+		);
 
 		if (data) {
-			// TODO: implement pagination, or get 1000?
 			this._allowedDocumentTypes = data.items;
 		}
 		this._loading = false;
