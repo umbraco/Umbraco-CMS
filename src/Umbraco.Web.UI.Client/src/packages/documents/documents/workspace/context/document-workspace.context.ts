@@ -16,16 +16,14 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../../constants.js';
 import { UmbDocumentValidationRepository } from '../../repository/validation/index.js';
-import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../index.js';
 import { UMB_DOCUMENTS_SECTION_PATH } from '../../../section/paths.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 import { UmbPreviewController } from '@umbraco-cms/backoffice/preview';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbExpandVariantIdsWithSegmentOptions } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
@@ -73,31 +71,6 @@ export class UmbDocumentWorkspaceContext
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
-		});
-
-		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
-			const config = await context?.getDocumentConfiguration();
-			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
-
-			// Deprecation warning for allowNonExistingSegmentsCreation (default from server is true, so we warn on false)
-			if (!allowSegmentCreation) {
-				new UmbDeprecation({
-					deprecated: 'The "AllowNonExistingSegmentsCreation" setting is deprecated.',
-					removeInVersion: '19.0.0',
-					solution: 'This functionality will be moved to a client-side extension.',
-				}).warn();
-			}
-
-			this._variantOptionsFilter = (variantOption) => {
-				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
-
-				// Do not allow creating a segment variant
-				if (!allowSegmentCreation && isNotCreatedSegmentVariant) {
-					return false;
-				}
-
-				return true;
-			};
 		});
 
 		this.observe(
@@ -296,7 +269,11 @@ export class UmbDocumentWorkspaceContext
 		const { selected } = await this._determineVariantOptions();
 		if (selected.length > 0) {
 			firstVariantId = UmbVariantId.FromString(selected[0]);
-			const variantIds = [firstVariantId];
+			let variantIds = [firstVariantId];
+
+			if (this.getVariesBySegment()) {
+				variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, await this.getVariantOptions());
+			}
 			const saveData = await this._data.constructData(variantIds);
 
 			// Run mandatory validation (checks for name, etc.)

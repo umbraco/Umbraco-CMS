@@ -540,10 +540,12 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
                 propertyEditors,
                 dataValueReferences,
                 dataTypeService,
+                IdKeyMap,
                 serializer,
                 Mock.Of<IEventAggregator>(),
                 Mock.Of<IRepositoryCacheVersionService>(),
-                Mock.Of<ICacheSyncService>());
+                Mock.Of<ICacheSyncService>(),
+                ShortStringHelper);
 
             var template = TemplateBuilder.CreateTextPageTemplate();
             await templateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!

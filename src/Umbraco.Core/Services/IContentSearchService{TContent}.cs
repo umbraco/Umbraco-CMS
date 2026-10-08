@@ -10,24 +10,6 @@ public interface IContentSearchService<TContent>
     where TContent : class, IContentBase
 {
     /// <summary>
-    ///     Searches for child content items under a specified parent.
-    /// </summary>
-    /// <param name="query">The search query.</param>
-    /// <param name="parentId">The parent content item key.</param>
-    /// <param name="ordering">The ordering.</param>
-    /// <param name="skip">The number of items to skip.</param>
-    /// <param name="take">The number of items to take.</param>
-    /// <returns>A paged model of content items.</returns>
-    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
-    Task<PagedModel<TContent>> SearchChildrenAsync(
-        string? query,
-        Guid? parentId,
-        Ordering? ordering,
-        int skip = 0,
-        int take = 100)
-        => SearchChildrenAsync(query, parentId, propertyAliases: null, ordering: ordering, skip: skip, take: take);
-
-    /// <summary>
     ///     Searches for children of a content item with optional property filtering.
     /// </summary>
     /// <param name="query">The search query.</param>
@@ -44,7 +26,6 @@ public interface IContentSearchService<TContent>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The number of items to take.</param>
     /// <returns>A paged model of content items.</returns>
-#pragma warning disable CS0618 // Type or member is obsolete
     Task<PagedModel<TContent>> SearchChildrenAsync(
         string? query,
         Guid? parentId,
@@ -52,7 +33,5 @@ public interface IContentSearchService<TContent>
         Ordering? ordering,
         bool loadTemplates = true,
         int skip = 0,
-        int take = 100)
-        => SearchChildrenAsync(query, parentId, ordering, skip, take);
-#pragma warning restore CS0618 // Type or member is obsolete
+        int take = 100);
 }

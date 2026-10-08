@@ -46,38 +46,48 @@ public abstract class ContentSearchServiceBase<TContent> : IndexedSearchServiceB
     /// Retrieves a page of children directly from the database, used when there is no search query.
     /// </summary>
     /// <param name="parentId">The numeric ID of the parent, or the root ID for top-level content.</param>
+    /// <param name="propertyAliases">The property aliases to load; null loads all properties, an empty array loads none.</param>
     /// <param name="ordering">The ordering to apply.</param>
     /// <param name="pageNumber">The zero-based page number.</param>
     /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="loadTemplates">Whether to load templates, where the content type has them.</param>
     /// <param name="total">The total number of children, regardless of paging.</param>
     /// <returns>The requested page of children.</returns>
     protected abstract IEnumerable<TContent> SearchChildrenFromDatabase(
         int parentId,
+        string[]? propertyAliases,
         Ordering? ordering,
         long pageNumber,
         int pageSize,
+        bool loadTemplates,
         out long total);
 
     /// <summary>
     /// Retrieves content items by key, used to hydrate search results with full items.
     /// </summary>
     /// <param name="keys">The keys of the items to retrieve.</param>
+    /// <param name="propertyAliases">The property aliases to load; null loads all properties, an empty array loads none.</param>
+    /// <param name="loadTemplates">Whether to load templates, where the content type has them.</param>
     /// <returns>The matching items, in no guaranteed order.</returns>
-    protected abstract IEnumerable<TContent> GetItems(IEnumerable<Guid> keys);
+    protected abstract IEnumerable<TContent> GetItems(IEnumerable<Guid> keys, string[]? propertyAliases, bool loadTemplates);
 
     /// <summary>
     /// Searches for children via the search index and hydrates the matching items, preserving result order.
     /// </summary>
     /// <param name="query">The search query.</param>
     /// <param name="parentId">The parent content item key, or null to search root-level content.</param>
+    /// <param name="propertyAliases">The property aliases to load; null loads all properties, an empty array loads none.</param>
     /// <param name="ordering">The ordering to apply.</param>
+    /// <param name="loadTemplates">Whether to load templates, where the content type has them.</param>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The number of items to take.</param>
     /// <returns>A paged model of content items.</returns>
     protected async Task<PagedModel<TContent>> SearchChildrenFromIndexAsync(
         string? query,
         Guid? parentId,
+        string[]? propertyAliases,
         Ordering? ordering,
+        bool loadTemplates,
         int skip,
         int take)
     {
@@ -86,7 +96,7 @@ public abstract class ContentSearchServiceBase<TContent> : IndexedSearchServiceB
         // this method only searches for children, not descendants; if there is no parent ID, explicitly match root level content
         if (parentId.HasValue is false)
         {
-            filters.Add(new IntegerExactFilter(Umbraco.Cms.Core.Constants.IndexFieldNames.Level, [1], false));
+            filters.Add(new IntegerExactFilter(Constants.Search.FieldNames.Level, [1], false));
         }
 
         Sorter sorter = GetSorter(ordering);
@@ -106,7 +116,7 @@ public abstract class ContentSearchServiceBase<TContent> : IndexedSearchServiceB
 
         Guid[] resultKeys = result.Documents.Select(d => d.Id).ToArray();
         TContent[] resultItems = resultKeys.Length > 0
-            ? GetItems(resultKeys)
+            ? GetItems(resultKeys, propertyAliases, loadTemplates)
                 // unfortunately we can't explicitly rely on the underlying services ordering the requested
                 // items correctly, so we need to enforce correct ordering here.
                 .OrderBy(item => resultKeys.IndexOf(item.Key))
@@ -120,27 +130,31 @@ public abstract class ContentSearchServiceBase<TContent> : IndexedSearchServiceB
     public async Task<PagedModel<TContent>> SearchChildrenAsync(
         string? query,
         Guid? parentId,
+        string[]? propertyAliases,
         Ordering? ordering,
+        bool loadTemplates = true,
         int skip = 0,
         int take = 100)
     {
         if (query.IsNullOrWhiteSpace())
         {
-            return SearchChildrenFromDatabase(parentId, ordering, skip, take);
+            return SearchChildrenFromDatabase(parentId, propertyAliases, ordering, loadTemplates, skip, take);
         }
 
-        return await SearchChildrenFromIndexAsync(query, parentId, ordering, skip, take);
+        return await SearchChildrenFromIndexAsync(query, parentId, propertyAliases, ordering, loadTemplates, skip, take);
     }
 
     /// <summary>
     /// Retrieves a page of children directly from the database, resolving <paramref name="parentId"/> to its numeric ID.
     /// </summary>
     /// <param name="parentId">The parent content item key, or null to search root-level content.</param>
+    /// <param name="propertyAliases">The property aliases to load; null loads all properties, an empty array loads none.</param>
     /// <param name="ordering">The ordering to apply.</param>
+    /// <param name="loadTemplates">Whether to load templates, where the content type has them.</param>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The number of items to take.</param>
     /// <returns>A paged model of content items, empty if <paramref name="parentId"/> could not be resolved.</returns>
-    private PagedModel<TContent> SearchChildrenFromDatabase(Guid? parentId, Ordering? ordering, int skip, int take)
+    private PagedModel<TContent> SearchChildrenFromDatabase(Guid? parentId, string[]? propertyAliases, Ordering? ordering, bool loadTemplates, int skip, int take)
     {
         var parentIdAsInt = Constants.System.Root;
         if (parentId.HasValue)
@@ -157,7 +171,7 @@ public abstract class ContentSearchServiceBase<TContent> : IndexedSearchServiceB
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
-        IEnumerable<TContent> items = SearchChildrenFromDatabase(parentIdAsInt, ordering, pageNumber, pageSize, out var total);
+        IEnumerable<TContent> items = SearchChildrenFromDatabase(parentIdAsInt, propertyAliases, ordering, pageNumber, pageSize, loadTemplates, out var total);
         return new PagedModel<TContent>
         {
             Items = items,
@@ -186,9 +200,9 @@ public abstract class ContentSearchServiceBase<TContent> : IndexedSearchServiceB
         switch (ordering.OrderBy)
         {
             case "name":
-                return new TextSorter(Umbraco.Cms.Core.Constants.IndexFieldNames.Name, ordering.Direction);
+                return new TextSorter(Constants.Search.FieldNames.Name, ordering.Direction);
             case "updateDate":
-                return new DateTimeOffsetSorter(Umbraco.Cms.Core.Constants.IndexFieldNames.UpdateDate, ordering.Direction);
+                return new DateTimeOffsetSorter(Constants.Search.FieldNames.UpdateDate, ordering.Direction);
             case "creator":
             case "owner":
                 // NOTE: "creator" / "owner" is configurable for list view but not supported here,

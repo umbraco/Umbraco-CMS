@@ -2,12 +2,10 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.Template;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -36,7 +34,6 @@ public class UpdateTemplateController : TemplateControllerBase
     /// <param name="umbracoMapper">Mapper used to convert between domain models and API models.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     /// <param name="runtimeSettings">The runtime configuration settings.</param>
-    [ActivatorUtilitiesConstructor]
     public UpdateTemplateController(
         ITemplateService templateService,
         IUmbracoMapper umbracoMapper,
@@ -47,19 +44,6 @@ public class UpdateTemplateController : TemplateControllerBase
         _umbracoMapper = umbracoMapper;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _runtimeSettings = runtimeSettings;
-    }
-
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public UpdateTemplateController(
-        ITemplateService templateService,
-        IUmbracoMapper umbracoMapper,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(
-            templateService,
-            umbracoMapper,
-            backOfficeSecurityAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
-    {
     }
 
     /// <summary>

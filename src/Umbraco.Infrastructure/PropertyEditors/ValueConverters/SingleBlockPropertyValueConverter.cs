@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -76,20 +76,6 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
         _elementCacheService = elementCacheService;
     }
 
-    /// <inheritdoc cref="SingleBlockPropertyValueConverter(IProfilingLogger, BlockEditorConverter, IApiElementBuilder, IJsonSerializer, BlockListPropertyValueConstructorCache, IVariationContextAccessor, BlockEditorVarianceHandler, ILanguageService, IPropertyRenderingContextAccessor)"/>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public SingleBlockPropertyValueConverter(
-        IProfilingLogger proflog,
-        BlockEditorConverter blockConverter,
-        IApiElementBuilder apiElementBuilder,
-        IJsonSerializer jsonSerializer,
-        BlockListPropertyValueConstructorCache constructorCache,
-        IVariationContextAccessor variationContextAccessor,
-        BlockEditorVarianceHandler blockEditorVarianceHandler)
-        : this(proflog, blockConverter, apiElementBuilder, jsonSerializer, constructorCache, variationContextAccessor, blockEditorVarianceHandler, StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(), StaticServiceProvider.Instance.GetRequiredService<IPropertyRenderingContextAccessor>())
-    {
-    }
-
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V20.")]
     public SingleBlockPropertyValueConverter(
         IProfilingLogger proflog,
@@ -110,7 +96,11 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
         => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.SingleBlock);
 
     /// <inheritdoc />
-    public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof( BlockListItem);
+    /// <remarks>
+    /// The model is untyped because the editor holds one block chosen from all the element types its data type
+    /// allows, so which element type a property holds is not known from its configuration.
+    /// </remarks>
+    public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(BlockListItem);
 
     /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)

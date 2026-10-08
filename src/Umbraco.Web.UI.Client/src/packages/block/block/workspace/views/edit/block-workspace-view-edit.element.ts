@@ -1,6 +1,6 @@
-import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
-import type UmbBlockElementManager from '../../block-element-manager.js';
+import type { UmbBlockWorkspaceElementManagerNames } from '../../context/block-workspace.context.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../context/block-workspace.context-token.js';
+import type UmbBlockElementManager from '../../context/block-element-manager.js';
 import type { UmbBlockLayoutBaseModel } from '../../../types.js';
 import type { UmbBlockWorkspaceViewEditTabElement } from './block-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, property, nothing } from '@umbraco-cms/backoffice/external/lit';

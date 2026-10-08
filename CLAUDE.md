@@ -1,6 +1,6 @@
 # Umbraco CMS - Multi-Project Repository
 
-Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
+Enterprise-grade CMS built on .NET 11.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
 
 **Repository**: https://github.com/umbraco/Umbraco-CMS
 **License**: MIT
@@ -42,7 +42,7 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 
 ### Key Technologies
 
-- **.NET 10.0** - Target framework for all projects
+- **.NET 11.0** - Target framework for all projects
 - **ASP.NET Core** - Web framework
 - **Entity Framework Core** - Modern ORM
 - **OpenIddict** - OAuth 2.0/OpenID Connect authentication
@@ -419,8 +419,11 @@ The repository contains BOTH (actively supported):
 **Back office (v19+)**: a single HTTP-only authentication cookie — no client-side tokens and no
 OpenIddict flow. The back-office authorization policies accept both the cookie scheme
 (`Constants.Security.BackOfficeAuthenticationType`) and the OpenIddict validation scheme; see
-`BackOfficeAuthPolicyBuilderExtensions`. Cookie behaviour (expiry, renewal, SameSite,
-401-instead-of-302 for API requests) is configured in `ConfigureBackOfficeCookieOptions`.
+`BackOfficeAuthPolicyBuilderExtensions`. Cookie behaviour (expiry, renewal, SameSite) is
+configured in `ConfigureBackOfficeCookieOptions`. Whether an unauthenticated request gets a
+401/403 or a 302 to the login page follows ASP.NET Core's endpoint metadata: `[ApiController]` on
+`ManagementApiControllerBase` disables the redirect, and `[AllowCookieRedirect]` opts an endpoint
+back in (the OAuth `authorize` action).
 
 **API users / external clients**: **OpenIddict** (OAuth 2.0/OpenID Connect) with reference tokens
 (not JWT), configured in `Umbraco.Cms.Api.Common`.
@@ -580,6 +583,7 @@ For integration tests that exercise caching or cache refreshers, see `tests/Umbr
 
 - **Fresh build before trusting a green.** Never treat `--no-build` or cached/incremental output as proof a change compiles or passes — a stale run can mask a compile error. Rebuild before reporting build or test state. (Integration tests have a related false-green trap — see `tests/Umbraco.Tests.Integration/CLAUDE.md`.)
 - **Grep the branch you think you're on.** A search only supports a claim against the branch actually checked out, so confirm HEAD is where you expect before drawing a conclusion from a grep. Easy to get wrong whenever the tree moves under you — reviewing a PR head, switching worktrees, or mid merge-up/rebase.
+- **Remove unused usings — touched files only.** Before handing back C# changes, remove unused `using` directives (IDE0005) from the `.cs` files the change adds or modifies, and never sweep other files (unrelated churn causes merge-up conflicts). Run it per affected project, not the solution, which is slow to load: `dotnet format style <project>.csproj --diagnostics IDE0005 --severity info --include <files>`, then rebuild (a using may only be needed under an `#if` symbol).
 
 ---
 
