@@ -1,5 +1,6 @@
 import { UmbDocumentVariantState } from '../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../types.js';
+import type { UmbDocumentAncestorPublishCoverageModel } from './schedule-publish/modal/document-schedule-modal.token.js';
 
 /**
  * @function isNotPublishedMandatory
@@ -15,9 +16,9 @@ export function isNotPublishedMandatory(option: UmbDocumentVariantOptionModel): 
 }
 
 /**
- * Minimal shape required by {@link computeAncestorPublishedCultures}.
- * Picks out only the fields needed for the intersection so the helper can be
- * unit-tested without binding to the full API model.
+ * Minimal shape required by {@link computeAncestorPublishCoverage}.
+ * Picks out only the fields needed so the helper can be unit-tested without
+ * binding to the full API model.
  */
 export interface UmbAncestorVariantForCoverage {
 	culture: string | null;
@@ -28,27 +29,25 @@ export interface UmbAncestorForCoverage {
 }
 
 /**
- * Computes which cultures are published across every ancestor in the supplied chain.
+ * Computes how well the supplied ancestor chain covers a document that is being published.
  *
- * For a scheduled publish to take effect on a child variant, every ancestor must be
- * published in that culture. A variant counts as "published" if its state is
- * `Published` or `PublishedPendingChanges`. An ancestor with the invariant variant
- * published (culture === null) covers every child culture and adds no constraint.
- * @param {ReadonlyArray<UmbAncestorForCoverage>} ancestors The ordered list of ancestors (any order works — the result is an intersection).
- * @returns {Array<string | null> | undefined}
- *  - `undefined` when there are no ancestors (root document) — the caller renders no warning;
- *  - `[null]` when no ancestor adds a constraint (every ancestor is invariant-published) — covers all child cultures;
- *  - otherwise the cultures published in every ancestor.
+ * A variant counts as published if its state is `Published` or `PublishedPendingChanges`.
+ * Publishing requires every ancestor to be published in at least one culture, whereas a
+ * culture is only visible when every ancestor is published in that culture. An ancestor
+ * with its invariant variant published covers every culture.
+ * @param {ReadonlyArray<UmbAncestorForCoverage>} ancestors The ancestors, in any order.
+ * @returns {UmbDocumentAncestorPublishCoverageModel | undefined} The coverage, or `undefined` when there are no ancestors.
  */
-export function computeAncestorPublishedCultures(
+export function computeAncestorPublishCoverage(
 	ancestors: ReadonlyArray<UmbAncestorForCoverage>,
-): Array<string | null> | undefined {
+): UmbDocumentAncestorPublishCoverageModel | undefined {
 	if (ancestors.length === 0) return undefined;
 
-	let covered: Set<string | null> | undefined;
+	let isPathPublished = true;
+	let publishedCultures: Set<string> | null = null;
 
 	for (const ancestor of ancestors) {
-		const ancestorPublished: Array<string | null> = ancestor.variants
+		const ancestorPublished = ancestor.variants
 			.filter(
 				(variant) =>
 					variant.state === UmbDocumentVariantState.PUBLISHED ||
@@ -56,20 +55,15 @@ export function computeAncestorPublishedCultures(
 			)
 			.map((variant) => variant.culture);
 
-		// An invariant-published ancestor (null entry) covers every child culture — no constraint added.
+		if (ancestorPublished.length === 0) isPathPublished = false;
 		if (ancestorPublished.includes(null)) continue;
 
-		const ancestorSet = new Set<string | null>(ancestorPublished);
-		if (covered === undefined) {
-			covered = ancestorSet;
-		} else {
-			const intersection = new Set<string | null>();
-			for (const culture of covered) {
-				if (ancestorSet.has(culture)) intersection.add(culture);
-			}
-			covered = intersection;
-		}
+		const ancestorCultures = new Set(ancestorPublished.filter((culture): culture is string => culture !== null));
+		publishedCultures =
+			publishedCultures === null
+				? ancestorCultures
+				: new Set([...publishedCultures].filter((culture: string) => ancestorCultures.has(culture)));
 	}
 
-	return covered === undefined ? [null] : Array.from(covered);
+	return { isPathPublished, publishedCultures: publishedCultures === null ? null : Array.from(publishedCultures) };
 }

@@ -282,9 +282,9 @@ export default {
 		parentNotPublished: "This document is published but is not visible because the parent '%0%' is unpublished",
 		parentCultureNotPublished: "This culture is published but is not visible because it is unpublished on parent '%0%'",
 		ancestorNotPublishedScheduleWarning:
-			"An ancestor isn't published. The scheduled publish won't take effect until every ancestor is also published.",
+			"An ancestor isn't published. The scheduled publish will fail unless every ancestor is published by then.",
 		ancestorCultureNotPublishedScheduleWarning:
-			"An ancestor isn't published in this language. The scheduled publish won't take effect until every ancestor is also published in this language.",
+			"An ancestor isn't published in this language. This language won't be visible until every ancestor is published in it.",
 		parentNotPublishedAnomaly: 'This document is published but is not in the cache',
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',

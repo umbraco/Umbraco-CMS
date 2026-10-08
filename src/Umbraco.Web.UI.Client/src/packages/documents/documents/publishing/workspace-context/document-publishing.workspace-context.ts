@@ -6,8 +6,9 @@ import type {
 } from '../../types.js';
 import { UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
-import { computeAncestorPublishedCultures } from '../utils.js';
+import { computeAncestorPublishCoverage } from '../utils.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
+import type { UmbDocumentAncestorPublishCoverageModel } from '../schedule-publish/types.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
 import { UmbDocumentUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../constants.js';
@@ -144,9 +145,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		const [{ options, selected }, ancestorPublishedCultures] = await Promise.all([
+		const [{ options, selected }, ancestorPublishCoverage] = await Promise.all([
 			this.#determineVariantOptions(),
-			this.#getAncestorPublishedCultures(unique),
+			this.#getAncestorPublishCoverage(unique),
 		]);
 
 		const result = await umbOpenModal(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
@@ -161,7 +162,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 						unpublishTime: option.variant?.scheduledUnpublishDate,
 					},
 				})),
-				ancestorPublishedCultures,
+				ancestorPublishCoverage,
 			},
 		}).catch(() => undefined);
 
@@ -596,10 +597,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		this.#eventContext?.dispatchEvent(event);
 	}
 
-	async #getAncestorPublishedCultures(unique: string): Promise<Array<string | null> | undefined> {
+	async #getAncestorPublishCoverage(unique: string): Promise<UmbDocumentAncestorPublishCoverageModel | undefined> {
 		const { data, error } = await this.#publishingRepository.ancestorVariantStates(unique);
 		if (error || !data) return undefined;
-		return computeAncestorPublishedCultures(data);
+		return computeAncestorPublishCoverage(data);
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {

@@ -9,19 +9,21 @@ export interface UmbDocumentScheduleSelectionModel {
 	schedule?: ScheduleRequestModel | null;
 }
 
+export interface UmbDocumentAncestorPublishCoverageModel {
+	/** Whether every ancestor is published in at least one culture, which publishing requires. */
+	isPathPublished: boolean;
+	/** The cultures published in every ancestor, or `null` when every ancestor is published invariantly. */
+	publishedCultures: Array<string> | null;
+}
+
 export interface UmbDocumentScheduleModalData extends UmbDocumentVariantPickerData {
 	activeVariants: Array<string>;
 	prevalues: Array<UmbDocumentScheduleSelectionModel>;
 	/**
-	 * Cultures published across the entire ancestor chain — i.e. the intersection of
-	 * each ancestor's published cultures. Used to warn when a scheduled publish won't
-	 * take effect because an ancestor isn't published in that culture.
-	 *
-	 * - `undefined` — root document or lookup unavailable; no warnings rendered.
-	 * - `[null]` — every ancestor is published in the invariant variant (covers all child cultures).
-	 * - `[]` — no culture is published in every ancestor; every variant is warned.
+	 * How the document's ancestors cover a scheduled publish, used to warn when it will fail or
+	 * won't be visible. `undefined` for a root document or when the lookup is unavailable.
 	 */
-	ancestorPublishedCultures?: Array<string | null>;
+	ancestorPublishCoverage?: UmbDocumentAncestorPublishCoverageModel;
 }
 
 export interface UmbDocumentScheduleModalValue {

@@ -202,7 +202,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		const persistedFromDate = option.variant?.scheduledPublishDate ?? null;
 		const persistedToDate = option.variant?.scheduledUnpublishDate ?? null;
 		const isChanged = fromDate !== persistedFromDate || toDate !== persistedToDate;
-		const showAncestorWarning = pickable && !this.#ancestorsCoverVariant(option);
+		const ancestorWarningKey = pickable ? this.#ancestorWarningKey(option) : undefined;
 
 		return html`
 			<uui-menu-item
@@ -216,14 +216,11 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
 			</uui-menu-item>
 			${when(
-				showAncestorWarning,
-				() => html`
+				ancestorWarningKey,
+				(key) => html`
 					<p class="ancestor-not-published">
 						<uui-icon name="icon-alert"></uui-icon>
-						<umb-localize
-							key=${option.culture
-								? 'content_ancestorCultureNotPublishedScheduleWarning'
-								: 'content_ancestorNotPublishedScheduleWarning'}></umb-localize>
+						<umb-localize key=${key}></umb-localize>
 					</p>
 				`,
 			)}
@@ -238,16 +235,14 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	#ancestorsCoverVariant(option: UmbDocumentVariantOptionModel): boolean {
-		const ancestorPublishedCultures = this.data?.ancestorPublishedCultures;
-		// Undefined means root document or lookup unavailable — render no warning.
-		if (ancestorPublishedCultures === undefined) return true;
-		// `null` entry means every ancestor is published in the invariant variant — covers all child cultures.
-		if (ancestorPublishedCultures.includes(null)) return true;
-		// An invariant child option is served wherever its ancestors are published, so any
-		// non-empty culture coverage means the schedule will take effect somewhere.
-		if (option.culture === null) return ancestorPublishedCultures.length > 0;
-		return ancestorPublishedCultures.includes(option.culture);
+	#ancestorWarningKey(option: UmbDocumentVariantOptionModel): string | undefined {
+		const coverage = this.data?.ancestorPublishCoverage;
+		if (!coverage) return undefined;
+		if (!coverage.isPathPublished) return 'content_ancestorNotPublishedScheduleWarning';
+		if (option.culture && coverage.publishedCultures && !coverage.publishedCultures.includes(option.culture)) {
+			return 'content_ancestorCultureNotPublishedScheduleWarning';
+		}
+		return undefined;
 	}
 
 	#attachValidatorsToPublish(element: UmbInputDateElement | null) {
