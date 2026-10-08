@@ -2642,6 +2642,7 @@ declare global {
 		user_stateInactive: string;
 		user_stateInvited: string;
 		user_stateLockedOut: string;
+		user_type: string;
 		user_unknownFailure: string;
 		user_unlockUserConfirmation: string;
 		user_unlockUserHeadline: (name: string) => string;

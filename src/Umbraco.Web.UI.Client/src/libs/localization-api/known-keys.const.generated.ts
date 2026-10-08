@@ -2615,6 +2615,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'user_stateInactive',
 	'user_stateInvited',
 	'user_stateLockedOut',
+	'user_type',
 	'user_unknownFailure',
 	'user_unlockUserConfirmation',
 	'user_unlockUserHeadline',
