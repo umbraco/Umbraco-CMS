@@ -6,7 +6,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceContext',
 		kind: 'contentLanguageAccess',
 		name: 'Document Language Access Workspace Context',
-		alias: 'Umb.WorkspaceContext.Document.LanguageAccess',
+		alias: 'Umb.WorkspaceContext.DocumentLanguageAccess',
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
