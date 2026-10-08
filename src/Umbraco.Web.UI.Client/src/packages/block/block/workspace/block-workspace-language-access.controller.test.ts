@@ -421,6 +421,16 @@ describe('UmbBlockLanguageAccessWorkspaceController', () => {
 			expect(isSharedPropertyWritable(daDK)).to.be.true;
 		});
 
+		it('does not restrict blocks before the owner has reported whether it varies by culture', async () => {
+			const owner = ownerHost.provideOwnerWorkspaceContext();
+			owner.setCultures(['en-US', 'da-DK']);
+			host.currentUserContext.setHasAccessToInvariantForVariant(false);
+			await createController();
+
+			expect(isSharedPropertyWritable(enUS)).to.be.true;
+			expect(isSharedPropertyWritable(daDK)).to.be.true;
+		});
+
 		it('does not restrict blocks that are not hosted by a content workspace', async () => {
 			host.currentUserContext.setHasAccessToInvariantForVariant(false);
 			await createController();

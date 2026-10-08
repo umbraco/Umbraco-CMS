@@ -257,7 +257,7 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 		if (!workspace || !this.#ownerWorkspace) return;
 		if (this.#currentUserHasAccessToInvariantForVariant !== false) return;
 		if (this.#hostedByVaryingProperty) return;
-		if (this.#ownerVariesByCulture === false) return;
+		if (this.#ownerVariesByCulture !== true) return;
 		if (this.#ownerVariantOptions.length === 0) return;
 
 		const guards = [
