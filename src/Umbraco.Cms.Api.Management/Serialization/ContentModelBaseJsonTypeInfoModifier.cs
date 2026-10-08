@@ -17,12 +17,12 @@ namespace Umbraco.Cms.Api.Management.Serialization;
 /// </summary>
 /// <remarks>
 /// <see cref="ContentModelBase{TValueModel, TVariantModel}"/> is an open generic type, so unlike
-/// <see cref="BlockValueJsonTypeInfoModifiers"/>, <see cref="Apply"/> cannot match <paramref name="JsonTypeInfo.Type"/>
+/// <see cref="BlockValueJsonTypeInfoModifiers"/>, <see cref="Apply"/> cannot match <see cref="JsonTypeInfo.Type"/>
 /// directly: it walks the type's base-class chain looking for a closed <c>ContentModelBase&lt;,&gt;</c>, then closes
 /// <see cref="Modifier{TValueModel, TVariantModel}"/> - which does the actual sorting/restoring - over that type's two
 /// generic arguments via <see cref="Type.MakeGenericType"/>. Only constructing that one instance per resolved
 /// <see cref="JsonTypeInfo"/> uses reflection; the <c>OnSerializing</c>/<c>OnSerialized</c> delegates it hands back
-/// are ordinary generic code, invoked like any other delegate - no <see cref="System.Reflection.MethodInfo.Invoke"/>
+/// are ordinary generic code, invoked like any other delegate - no <see cref="System.Reflection.MethodBase.Invoke(object, object[])"/>
 /// call sits on the serialization path itself.
 /// </remarks>
 internal static class ContentModelBaseJsonTypeInfoModifier
@@ -73,10 +73,7 @@ internal static class ContentModelBaseJsonTypeInfoModifier
         private readonly ConditionalWeakTable<object, OriginalCollections> _originals = new();
 
         public void Apply(JsonTypeInfo typeInfo)
-        {
-            typeInfo.OnSerializing = Sort;
-            typeInfo.OnSerialized = Restore;
-        }
+            => typeInfo.AddSerializationCallbacks(Sort, Restore);
 
         private void Sort(object obj)
         {

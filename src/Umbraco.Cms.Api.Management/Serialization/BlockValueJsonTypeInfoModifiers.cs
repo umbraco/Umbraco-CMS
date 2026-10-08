@@ -29,13 +29,11 @@ internal static class BlockValueJsonTypeInfoModifiers
     {
         if (typeInfo.Type == typeof(BlockItemData))
         {
-            typeInfo.OnSerializing = SortValues;
-            typeInfo.OnSerialized = RestoreValues;
+            typeInfo.AddSerializationCallbacks(SortValues, RestoreValues);
         }
         else if (typeInfo.Type == typeof(IList<BlockItemVariation>))
         {
-            typeInfo.OnSerializing = SortExpose;
-            typeInfo.OnSerialized = RestoreExpose;
+            typeInfo.AddSerializationCallbacks(SortExpose, RestoreExpose);
         }
     }
 

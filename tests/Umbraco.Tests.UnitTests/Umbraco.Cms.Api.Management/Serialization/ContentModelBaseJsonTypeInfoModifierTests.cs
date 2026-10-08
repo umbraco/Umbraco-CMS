@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Serialization;
@@ -190,6 +191,30 @@ public class ContentModelBaseJsonTypeInfoModifierTests
         });
     }
 
+    [Test]
+    public void Write_Preserves_Existing_Serialization_Callbacks()
+    {
+        var model = new CallbackDocumentResponseModel
+        {
+            Id = Guid.NewGuid(),
+            DocumentType = new DocumentTypeReferenceResponseModel { Id = Guid.NewGuid() },
+            Values =
+            [
+                new DocumentValueResponseModel { Culture = "en-us", Alias = "title", Value = "value" },
+                new DocumentValueResponseModel { Culture = "da-dk", Alias = "title", Value = "value" },
+            ],
+        };
+
+        var json = JsonSerializer.Serialize(model, _jsonSerializerOptions);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(model.SerializingCalls, Is.EqualTo(1));
+            Assert.That(model.SerializedCalls, Is.EqualTo(1));
+            CollectionAssert.AreEqual(new[] { "da-dk", "en-us" }, GetValueOrder(json).Select(v => v.Culture).ToArray());
+        });
+    }
+
     private static (string Culture, string Segment, string Alias)[] GetValueOrder(string json)
     {
         using JsonDocument document = JsonDocument.Parse(json);
@@ -203,4 +228,17 @@ public class ContentModelBaseJsonTypeInfoModifierTests
         => element.TryGetProperty(propertyName, out JsonElement value) && value.ValueKind != JsonValueKind.Null
             ? value.GetString()
             : null;
+
+    private sealed class CallbackDocumentResponseModel : DocumentResponseModel, IJsonOnSerializing, IJsonOnSerialized
+    {
+        [JsonIgnore]
+        public int SerializingCalls { get; private set; }
+
+        [JsonIgnore]
+        public int SerializedCalls { get; private set; }
+
+        void IJsonOnSerializing.OnSerializing() => SerializingCalls++;
+
+        void IJsonOnSerialized.OnSerialized() => SerializedCalls++;
+    }
 }
