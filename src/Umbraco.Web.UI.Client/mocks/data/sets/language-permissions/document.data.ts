@@ -9,9 +9,9 @@ import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/exter
 type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 export const PAGE_WITH_TEXT_PER_LANGUAGE_AND_SHARED_TEXT_DOCUMENT_ID =
-	'document-language-permissions-page-with-text-per-language-and-shared-text-document-id';
+	'language-permissions-page-with-text-per-language-and-shared-text-document-id';
 export const PAGE_THAT_DOES_NOT_VARY_BY_LANGUAGE_DOCUMENT_ID =
-	'document-language-permissions-page-that-does-not-vary-by-language-document-id';
+	'language-permissions-page-that-does-not-vary-by-language-document-id';
 
 const createDate = '2024-01-15T10:00:00.000Z';
 const publishDate = '2024-01-15T10:05:00.000Z';

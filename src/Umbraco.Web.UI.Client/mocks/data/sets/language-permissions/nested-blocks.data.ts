@@ -2,6 +2,7 @@ import type {
 	UmbMockDataTypeModel,
 	UmbMockDocumentModel,
 	UmbMockDocumentTypeModel,
+	UmbMockElementModel,
 } from '../../mock-data-set.types.js';
 import { TEXTSTRING_DATA_TYPE_ID } from './data-type.data.js';
 import { DANISH_ISO_CODE, ENGLISH_ISO_CODE, VIETNAMESE_ISO_CODE } from './language.data.js';
@@ -11,6 +12,7 @@ import {
 	NESTED_BLOCKS_SCENARIOS,
 	type UmbNestedBlocksScenario,
 } from './nested-blocks-scenarios.js';
+import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
@@ -28,10 +30,10 @@ const SHARED_TEXT = 'Shared text (the same in every language)';
 // ---------------------------------------------------------------------------------------------------------------------
 
 const idOf = (scenario: UmbNestedBlocksScenario, what: string) =>
-	`document-language-permissions-nested-blocks-${scenario.number}-${what}-id`;
+	`language-permissions-nested-blocks-${scenario.number}-${what}-id`;
 
 const keyOf = (scenario: UmbNestedBlocksScenario, block: 'outer-block' | 'inner-block', culture: string | null) =>
-	`document-language-permissions-nested-blocks-${scenario.number}-${block}-${culture ?? 'shared'}-key`;
+	`language-permissions-nested-blocks-${scenario.number}-${block}-${culture ?? 'shared'}-key`;
 
 const languageName = (isoCode: string) => languages.find((language) => language.isoCode === isoCode)?.name ?? isoCode;
 
@@ -374,3 +376,73 @@ export const dataTypes: Array<UmbMockDataTypeModel> = NESTED_BLOCKS_SCENARIOS.fl
 export const documentTypes: Array<UmbMockDocumentTypeModel> = NESTED_BLOCKS_SCENARIOS.flatMap(createDocumentTypes);
 
 export const documents: Array<UmbMockDocumentModel> = NESTED_BLOCKS_SCENARIOS.map(createDocument);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Elements: the same nested blocks, with an element (in the Library) as the owner instead of a document
+// ---------------------------------------------------------------------------------------------------------------------
+
+const elementTitle = (scenario: UmbNestedBlocksScenario) =>
+	getNestedBlocksTitle(scenario).replace('Nested blocks', 'Element with nested blocks');
+
+/**
+ *
+ * @param scenario
+ */
+function createElementType(scenario: UmbNestedBlocksScenario): UmbMockDocumentTypeModel {
+	return {
+		...typeDefaults,
+		id: idOf(scenario, 'element-owner-element-type'),
+		alias: `elementWithNestedBlocks${scenario.number}`,
+		name: elementTitle(scenario),
+		icon: 'icon-brick',
+		allowedAsRoot: false,
+		allowedInLibrary: true,
+		isElement: true,
+		variesByCulture: true,
+		properties: [
+			createProperty({
+				id: idOf(scenario, 'element-owner-outer-list-property'),
+				alias: 'outerBlockList',
+				label: 'Outer list',
+				dataTypeId: idOf(scenario, 'outer-list-data-type'),
+				variesByLanguage: scenario.outerList,
+			}),
+		],
+	};
+}
+
+/**
+ *
+ * @param scenario
+ */
+function createElement(scenario: UmbNestedBlocksScenario): UmbMockElementModel {
+	const elementId = idOf(scenario, 'element-owner');
+	return {
+		id: elementId,
+		name: elementTitle(scenario),
+		createDate,
+		parent: null,
+		ancestors: [],
+		documentType: { id: idOf(scenario, 'element-owner-element-type'), icon: 'icon-brick' },
+		hasChildren: false,
+		isTrashed: false,
+		isFolder: false,
+		flags: [],
+		noAccess: false,
+		variants: languages.map((language) => ({
+			state: UmbElementVariantState.PUBLISHED,
+			publishDate,
+			culture: language.isoCode,
+			name: `${elementTitle(scenario)} - ${language.name}`,
+			createDate,
+			updateDate: publishDate,
+			id: `${elementId}-${language.isoCode}`,
+			flags: [],
+		})),
+		values: createOuterListValues(scenario),
+	} as UmbMockElementModel;
+}
+
+export const elementTypes: Array<UmbMockDocumentTypeModel> = NESTED_BLOCKS_SCENARIOS.map(createElementType);
+
+export const elements: Array<UmbMockElementModel> = NESTED_BLOCKS_SCENARIOS.map(createElement);

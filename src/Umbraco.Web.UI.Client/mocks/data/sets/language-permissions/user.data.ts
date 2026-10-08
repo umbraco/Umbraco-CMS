@@ -8,7 +8,7 @@ import { UserKindModel, UserStateModel } from '@umbraco-cms/backoffice/external/
  */
 export const data: Array<UmbMockUserModel> = LANGUAGE_ACCESS_SCENARIOS.flatMap((scenario) =>
 	[true, false].map((canEditSharedData) => ({
-		id: `document-language-permissions-user-${scenario.key}-${canEditSharedData ? 'can' : 'cannot'}-edit-shared-data-id`,
+		id: `language-permissions-user-${scenario.key}-${canEditSharedData ? 'can' : 'cannot'}-edit-shared-data-id`,
 		name: userGroupName(scenario, canEditSharedData),
 		email: `${scenario.key}.${canEditSharedData ? 'can' : 'cannot'}-edit-shared-data@example.com`,
 		userName: '',

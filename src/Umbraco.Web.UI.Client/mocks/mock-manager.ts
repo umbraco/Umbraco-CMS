@@ -52,9 +52,9 @@ class UmbMockManager {
 			loader: () => import('./data/sets/blocks-reusable-content/index.js') as Promise<UmbMockDataSet>,
 			visible: true,
 		},
-		documentLanguagePermissions: {
-			label: 'Document: Language Permissions',
-			loader: () => import('./data/sets/document-language-permissions/index.js') as Promise<UmbMockDataSet>,
+		languagePermissions: {
+			label: 'Language Permissions',
+			loader: () => import('./data/sets/language-permissions/index.js') as Promise<UmbMockDataSet>,
 			visible: true,
 			userSwitcher: true,
 		},

@@ -33,7 +33,7 @@ export const LANGUAGE_ACCESS_SCENARIOS: Array<UmbLanguageAccessScenario> = [
 ];
 
 export const userGroupId = (scenario: UmbLanguageAccessScenario, canEditSharedData: boolean) =>
-	`document-language-permissions-user-group-${scenario.key}-${canEditSharedData ? 'can' : 'cannot'}-edit-shared-data-id`;
+	`language-permissions-user-group-${scenario.key}-${canEditSharedData ? 'can' : 'cannot'}-edit-shared-data-id`;
 
 export const userGroupName = (scenario: UmbLanguageAccessScenario, canEditSharedData: boolean) =>
 	`${scenario.label}, ${canEditSharedData ? 'can' : 'cannot'} edit shared data`;
@@ -48,7 +48,7 @@ function createUserGroup(scenario: UmbLanguageAccessScenario, canEditSharedData:
 	return {
 		id: userGroupId(scenario, canEditSharedData),
 		name,
-		alias: `documentLanguagePermissions-${scenario.key}-${canEditSharedData ? 'can' : 'cannot'}-edit-shared-data`,
+		alias: `languagePermissions-${scenario.key}-${canEditSharedData ? 'can' : 'cannot'}-edit-shared-data`,
 		description: `Languages: ${scenario.label}. Shared data: ${canEditSharedData ? 'can' : 'cannot'} be edited.`,
 		icon: 'icon-users',
 		fallbackPermissions: [
@@ -58,9 +58,13 @@ function createUserGroup(scenario: UmbLanguageAccessScenario, canEditSharedData:
 			'Umb.Document.Unpublish',
 			'Umb.Document.PropertyValue.Read',
 			'Umb.Document.PropertyValue.Write',
+			'Umb.Element.Read',
+			'Umb.Element.Update',
+			'Umb.Element.Publish',
+			'Umb.Element.Unpublish',
 		],
 		permissions: [],
-		sections: ['Umb.Section.Content'],
+		sections: ['Umb.Section.Content', 'Umb.Section.Library'],
 		languages: scenario.languages,
 		hasAccessToAllLanguages: scenario.hasAccessToAllLanguages,
 		hasAccessToInvariantForVariant: canEditSharedData,

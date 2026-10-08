@@ -1,10 +1,10 @@
 import type { UmbMockDocumentTypeModel } from '../../mock-data-set.types.js';
 import { TEXTSTRING_DATA_TYPE_ID } from './data-type.data.js';
 
-export const PAGE_WITH_TEXT_PER_LANGUAGE_AND_SHARED_TEXT_DOCUMENT_TYPE_ID =
-	'document-language-permissions-page-with-text-per-language-and-shared-text-document-type-id';
-export const PAGE_THAT_DOES_NOT_VARY_BY_LANGUAGE_DOCUMENT_TYPE_ID =
-	'document-language-permissions-page-that-does-not-vary-by-language-document-type-id';
+export const ELEMENT_WITH_TEXT_PER_LANGUAGE_AND_SHARED_TEXT_ELEMENT_TYPE_ID =
+	'language-permissions-element-with-text-per-language-and-shared-text-element-type-id';
+export const ELEMENT_THAT_DOES_NOT_VARY_BY_LANGUAGE_ELEMENT_TYPE_ID =
+	'language-permissions-element-that-does-not-vary-by-language-element-type-id';
 
 const noValidation = {
 	mandatory: false,
@@ -13,15 +13,15 @@ const noValidation = {
 	regExMessage: null,
 };
 
-const documentTypeDefaults = {
+const elementTypeDefaults = {
 	description: null,
-	icon: 'icon-document',
+	icon: 'icon-brick',
 	allowedTemplates: [],
 	defaultTemplate: null,
-	allowedAsRoot: true,
-	allowedInLibrary: false,
+	allowedAsRoot: false,
+	allowedInLibrary: true,
 	variesBySegment: false,
-	isElement: false,
+	isElement: true,
 	hasChildren: false,
 	parent: null,
 	isFolder: false,
@@ -39,14 +39,14 @@ const documentTypeDefaults = {
 
 export const data: Array<UmbMockDocumentTypeModel> = [
 	{
-		...documentTypeDefaults,
-		id: PAGE_WITH_TEXT_PER_LANGUAGE_AND_SHARED_TEXT_DOCUMENT_TYPE_ID,
-		alias: 'pageWithTextPerLanguageAndSharedText',
-		name: 'Page with text per language and shared text',
+		...elementTypeDefaults,
+		id: ELEMENT_WITH_TEXT_PER_LANGUAGE_AND_SHARED_TEXT_ELEMENT_TYPE_ID,
+		alias: 'elementWithTextPerLanguageAndSharedText',
+		name: 'Element with text per language and shared text',
 		variesByCulture: true,
 		properties: [
 			{
-				id: 'document-language-permissions-text-per-language-property-id',
+				id: 'language-permissions-element-text-per-language-property-id',
 				container: null,
 				alias: 'textPerLanguage',
 				name: 'Text per language',
@@ -59,7 +59,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				appearance: { labelOnTop: false },
 			},
 			{
-				id: 'document-language-permissions-shared-text-property-id',
+				id: 'language-permissions-element-shared-text-property-id',
 				container: null,
 				alias: 'sharedText',
 				name: 'Shared text',
@@ -74,18 +74,18 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		],
 	},
 	{
-		...documentTypeDefaults,
-		id: PAGE_THAT_DOES_NOT_VARY_BY_LANGUAGE_DOCUMENT_TYPE_ID,
-		alias: 'pageThatDoesNotVaryByLanguage',
-		name: 'Page that does not vary by language',
+		...elementTypeDefaults,
+		id: ELEMENT_THAT_DOES_NOT_VARY_BY_LANGUAGE_ELEMENT_TYPE_ID,
+		alias: 'elementThatDoesNotVaryByLanguage',
+		name: 'Element that does not vary by language',
 		variesByCulture: false,
 		properties: [
 			{
-				id: 'document-language-permissions-text-of-page-that-does-not-vary-by-language-property-id',
+				id: 'language-permissions-element-text-of-element-that-does-not-vary-by-language-property-id',
 				container: null,
 				alias: 'text',
 				name: 'Text',
-				description: 'This page does not vary by language, so there is only one version of this text.',
+				description: 'This element does not vary by language, so there is only one version of this text.',
 				dataType: { id: TEXTSTRING_DATA_TYPE_ID },
 				variesByCulture: false,
 				variesBySegment: false,

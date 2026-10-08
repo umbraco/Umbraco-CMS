@@ -1,6 +1,6 @@
 import type { UmbMockDataTypeModel } from '../../mock-data-set.types.js';
 
-export const TEXTSTRING_DATA_TYPE_ID = 'document-language-permissions-textstring-data-type-id';
+export const TEXTSTRING_DATA_TYPE_ID = 'language-permissions-textstring-data-type-id';
 
 export const data: Array<UmbMockDataTypeModel> = [
 	{
