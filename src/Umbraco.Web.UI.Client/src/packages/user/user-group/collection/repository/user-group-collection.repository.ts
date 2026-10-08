@@ -54,8 +54,12 @@ export class UmbUserGroupCollectionRepository extends UmbControllerBase implemen
 	 * Requests all user groups by paging through the collection until every item has been retrieved.
 	 * Use this in preference to `requestCollection` when callers need the full set — the server defaults
 	 * `take` to 100, so a single un-paged request would silently truncate installations with more user groups.
-	 * @returns {Promise} A promise resolving to `{ data: { items, total } }` containing every user group, or `{ error }`,
-	 * along with an `asObservable` function observing the user groups held in the store.
+	 * @returns {Promise<{ data?: { items: Array<UmbUserGroupDetailModel>, total: number }, error?: Error, asObservable: () => Observable<Array<UmbUserGroupDetailModel>> }>}
+	 * A promise resolving to an object with:
+	 * - `data`: `{ items, total }` containing every user group, once all pages have been fetched.
+	 * - `error`: set instead of `data` if any page fails.
+	 * - `asObservable`: always present; observes every user group currently held in the shared user group detail store,
+	 *   which may include groups loaded by other requests.
 	 */
 	async requestAllItems() {
 		await this.#init;
