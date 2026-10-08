@@ -7,10 +7,11 @@ import { data as documentType } from './document-type.data.js';
 import { data as language } from './language.data.js';
 import { data as media } from './media.data.js';
 import { data as mediaType } from './media-type.data.js';
+import { data as news } from './umbraco-news.data.js';
 import { data as user } from './user.data.js';
 import { data as userGroup } from './user-group.data.js';
 
-export { dataType, document, documentType, language, media, mediaType, user, userGroup };
+export { dataType, document, documentType, language, media, mediaType, news, user, userGroup };
 
 export const documentTypeConfiguration = {
 	dataTypesCanBeChanged: DataTypeChangeModeModel.TRUE,
@@ -28,6 +29,7 @@ export const documentTypeConfiguration = {
 	language,
 	media,
 	mediaType,
+	news,
 	user,
 	userGroup,
 }) satisfies UmbMockDataSet;
