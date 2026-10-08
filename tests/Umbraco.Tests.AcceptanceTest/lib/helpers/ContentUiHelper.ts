@@ -55,11 +55,13 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly addMultipleTextStringBtn: Locator;
   private readonly multipleTextStringValueTxt: Locator;
   private readonly sliderInput: Locator;
+  private readonly dateInputTxt: Locator;
   private readonly focalPointImg: Locator;
   private readonly tabItems: Locator;
   private readonly documentWorkspace: Locator;
   private readonly selectAVariantBtn: Locator;
   private readonly variantAddModeBtn: Locator;
+  private readonly variantRow: Locator;
   private readonly saveAndCloseBtn: Locator;
   private readonly enterNameInContainerTxt: Locator;
   private readonly listView: Locator;
@@ -276,6 +278,7 @@ export class ContentUiHelper extends UiBaseLocators {
       .locator("umb-input-multiple-text-string")
       .getByLabel("Value");
     this.sliderInput = page.locator("umb-property-editor-ui-slider #input");
+    this.dateInputTxt = page.locator("umb-input-date #input");
     // Scoped: umb-image-cropper and umb-image-cropper-preview also render #image.
     this.focalPointImg = page.locator("umb-image-cropper-focus-setter #image");
     this.tabItems = page.locator("uui-tab");
@@ -284,6 +287,7 @@ export class ContentUiHelper extends UiBaseLocators {
       name: "Open version selector",
     });
     this.variantAddModeBtn = page.locator('.switch-button.add-mode').locator('.variant-name');
+    this.variantRow = page.locator('.variant.culture-variant');
     this.saveAndCloseBtn = page.getByLabel('Save and close');
     this.documentTreeItem = page.locator('umb-document-tree-item');
     this.documentLanguageSelect = page.locator('umb-app-language-select');
@@ -1050,9 +1054,25 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.enterText(this.numericTxt, number.toString());
   }
 
+  async isNumericBelowMinimum(isInvalid: boolean = true) {
+    await this.isInputRangeUnderflow(this.numericTxt, isInvalid);
+  }
+
+  async isNumericAboveMaximum(isInvalid: boolean = true) {
+    await this.isInputRangeOverflow(this.numericTxt, isInvalid);
+  }
+
   // Decimal
   async enterDecimal(number: number) {
     await this.enterText(this.decimalTxt, number.toString());
+  }
+
+  async isDecimalBelowMinimum(isInvalid: boolean = true) {
+    await this.isInputRangeUnderflow(this.decimalTxt, isInvalid);
+  }
+
+  async isDecimalAboveMaximum(isInvalid: boolean = true) {
+    await this.isInputRangeOverflow(this.decimalTxt, isInvalid);
   }
 
   // Radiobox
@@ -1167,6 +1187,14 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.sliderInput.fill(value);
   }
 
+  /**
+   * Enters a value into the date input of the property editor currently in view.
+   * @param value - The date value, in the format the editor expects (e.g. `2026-09-01`)
+   */
+  async enterDateInputValue(value: string) {
+    await this.enterText(this.dateInputTxt, value);
+  }
+
   async isDocumentTypeNameVisible(contentName: string, isVisible: boolean = true) {
     return await this.isVisible(this.sidebarModal.getByText(contentName), isVisible);
   }
@@ -1197,7 +1225,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickExpandSegmentButton(contentName: string) {
-    await this.page.locator('.variant.culture-variant').filter({hasText: contentName}).locator(this.expandSegmentBtn).click();
+    await this.variantRow.filter({hasText: contentName}).locator(this.expandSegmentBtn).click();
   }
 
   async clickSegmentVariantButton(segmentName: string) {
@@ -1208,6 +1236,13 @@ export class ContentUiHelper extends UiBaseLocators {
   async clickVariantAddModeButtonForLanguageName(language: string) {
     await this.click(this.variantAddModeBtn.getByText(language));
     await this.page.waitForTimeout(ConstantHelper.wait.short);
+  }
+
+  async isVariantErrorHintBadgeVisibleForLanguageName(language: string, isVisible: boolean = true) {
+    const variantRow = this.variantRow.filter({has: this.page.getByText(language, {exact: true})});
+    // umb-badge's own host element has a zero-size layout box; the visible badge is its shadow-DOM
+    // uui-badge child, so check that instead of the host (Playwright locators pierce open shadow roots).
+    await this.isVisible(variantRow.locator('uui-badge'), isVisible);
   }
 
   async clickSaveAndCloseButton() {
