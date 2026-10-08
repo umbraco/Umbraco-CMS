@@ -11,6 +11,7 @@ import {
 import { UMB_DISCARD_CHANGES_MODAL, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbDocumentPublishingServerDataSource } from '../repository/document-publishing.server.data-source.js';
 import { UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import { umbLanguageMockDb } from '../../../../../../mocks/db/language.db.js';
 
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
 const EN_US = UmbVariantId.Create({ culture: 'en-US', segment: null });
@@ -57,6 +58,38 @@ async function countPublishWithDescendantsCalls(run: () => Promise<unknown>): Pr
 	}
 
 	return calls;
+}
+
+/**
+ * Counts calls to the update-and-publish endpoint and to open a modal while `run` executes.
+ */
+async function countUpdateAndPublishCallsAndModals(
+	run: () => Promise<unknown>,
+): Promise<{ publishCalls: number; modals: number }> {
+	let publishCalls = 0;
+	let modals = 0;
+	const originalUpdateAndPublish = UmbDocumentPublishingServerDataSource.prototype.updateAndPublish;
+	UmbDocumentPublishingServerDataSource.prototype.updateAndPublish = function (...args) {
+		publishCalls++;
+		return originalUpdateAndPublish.apply(this, args as never);
+	};
+	const originalOpen = UmbModalManagerContext.prototype.open;
+	UmbModalManagerContext.prototype.open = function (
+		this: UmbModalManagerContext,
+		...args: Parameters<typeof originalOpen>
+	) {
+		modals++;
+		return originalOpen.apply(this, args as never);
+	} as typeof originalOpen;
+
+	try {
+		await run();
+	} finally {
+		UmbDocumentPublishingServerDataSource.prototype.updateAndPublish = originalUpdateAndPublish;
+		UmbModalManagerContext.prototype.open = originalOpen;
+	}
+
+	return { publishCalls, modals };
 }
 
 /**
@@ -186,6 +219,46 @@ describe('UmbDocumentPublishingWorkspaceContext', function () {
 			);
 
 			expect(publishCalls, 'descendants were not published').to.equal(0);
+		});
+	});
+
+	describe('save and publish with a single culture', () => {
+		beforeEach(async () => {
+			// The host loads the languages when it initializes, so the culture must be gone before a new host does.
+			hostElement.remove();
+			umbLanguageMockDb.delete('da');
+			hostElement = new UmbTestDocumentWorkspaceHostElement();
+			document.body.appendChild(hostElement);
+			await hostElement.init();
+			context = new UmbDocumentWorkspaceContext(hostElement);
+			publishingContext = new UmbDocumentPublishingWorkspaceContext(context);
+			await context.load(VARIANT_DOCUMENT_ID);
+			await aTimeout(0);
+		});
+
+		it('publishes the culture without asking when the user may write it', async () => {
+			await context.setPropertyValue('variantText', 'Edited English', EN_US);
+
+			const { publishCalls, modals } = await countUpdateAndPublishCallsAndModals(() =>
+				publishingContext.saveAndPublish(),
+			);
+
+			expect(publishCalls, 'published').to.equal(1);
+			expect(modals, 'no dialog').to.equal(0);
+		});
+
+		it('does not publish a culture the user may not write', async () => {
+			context.getIsWritableVariant = () => false;
+
+			const { publishCalls, modals } = await countUpdateAndPublishCallsAndModals(() =>
+				publishingContext.saveAndPublish().then(
+					() => undefined,
+					() => undefined,
+				),
+			);
+
+			expect(publishCalls, 'not published').to.equal(0);
+			expect(modals, 'the dialog shows why').to.equal(1);
 		});
 	});
 

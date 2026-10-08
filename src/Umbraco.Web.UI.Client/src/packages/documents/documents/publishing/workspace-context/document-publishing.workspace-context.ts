@@ -478,14 +478,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		const { options, selected } = await this.#determineVariantOptions();
 
-		// If there is only one variant, we don't need to open the modal.
+		// If there is only one variant and it may be published, we don't need to open the modal.
 		if (options.length === 0) {
 			throw new Error('No variants are available');
-		} else if (options.length === 1) {
+		} else if (options.length === 1 && this.#publishableVariantsFilter(options[0])) {
 			// If only one option we will skip ahead and save the document with the only variant available:
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
-			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
+			// Otherwise the modal lets the user pick which variants to publish, and shows the ones that may not be.
 			const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
