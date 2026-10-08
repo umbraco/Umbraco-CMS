@@ -1329,6 +1329,7 @@ export default {
 		stateLockedOut: 'Utlåst',
 		stateInvited: 'Inbjuden',
 		stateInactive: 'Inaktiv',
+		type: 'Typ',
 		sortNameAscending: 'Namn (A-Z)',
 		sortNameDescending: 'Namn (Z-A)',
 		startnode: 'Startnod för innehåll',
