@@ -215,7 +215,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			{ alias: 'heroImage', name: 'Hero image', dataTypeId: mediaPicker, container: productsTab.id },
 		],
 		allowedChildren: [DOCUMENT_TYPE_IDS.product],
-		compositions: [DOCUMENT_TYPE_IDS.seoComposition],
+		compositions: [DOCUMENT_TYPE_IDS.seoComposition, DOCUMENT_TYPE_IDS.pageContentComposition],
 		collection: DATA_TYPE_IDS.productsCollection,
 	}),
 	documentType({
@@ -318,7 +318,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			{ alias: 'heroImage', name: 'Hero image', dataTypeId: mediaPicker, container: articlesTab.id },
 		],
 		allowedChildren: [DOCUMENT_TYPE_IDS.article],
-		compositions: [DOCUMENT_TYPE_IDS.seoComposition],
+		compositions: [DOCUMENT_TYPE_IDS.seoComposition, DOCUMENT_TYPE_IDS.pageContentComposition],
 		collection: DATA_TYPE_IDS.articlesCollection,
 	}),
 	documentType({
