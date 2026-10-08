@@ -2493,6 +2493,7 @@ export type ServerInformationResponseModel = {
     assemblyVersion: string;
     baseUtcOffset: string;
     runtimeMode: RuntimeModeModel;
+    isDebugMode: boolean;
 };
 
 export type ServerStatusResponseModel = {
