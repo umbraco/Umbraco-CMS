@@ -94,6 +94,11 @@ public static partial class Constants
         public const string Element = "element";
 
         /// <summary>
+        ///     The entity type for element type containers (folders).
+        /// </summary
+        public const string ElementContainer = "element-container";
+
+        /// <summary>
         ///     The entity type for media items.
         /// </summary>
         public const string Media = "media";

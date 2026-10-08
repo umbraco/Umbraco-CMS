@@ -1,11 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -29,7 +27,6 @@ public class SearchMediaItemController : MediaItemControllerBase
     /// <param name="indexedEntitySearchService">Service used to perform indexed searches on entities.</param>
     /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
     /// <param name="dataTypeService">Service for accessing data type information.</param>
-    [ActivatorUtilitiesConstructor]
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory,
@@ -39,60 +36,6 @@ public class SearchMediaItemController : MediaItemControllerBase
         _mediaPresentationFactory = mediaPresentationFactory;
         _dataTypeService = dataTypeService;
     }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SearchMediaItemController"/> class.
-    /// </summary>
-    /// <param name="indexedEntitySearchService">
-    /// The service used to perform indexed searches on entities.
-    /// </param>
-    /// <param name="mediaPresentationFactory">
-    /// The factory responsible for creating media presentation models.
-    /// </param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public SearchMediaItemController(
-        IIndexedEntitySearchService indexedEntitySearchService,
-        IMediaPresentationFactory mediaPresentationFactory)
-        : this(
-            indexedEntitySearchService,
-            mediaPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IDataTypeService>())
-    {
-    }
-
-    /// <summary>
-    /// Searches for media items under a specified parent, filtered by allowed media types.
-    /// </summary>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <param name="query">The search query string used to filter media items.</param>
-    /// <param name="trashed">Optional. Whether to include trashed media items in the results.</param>
-    /// <param name="culture">Optional. The culture to filter the media items by.</param>
-    /// <param name="skip">The number of items to skip for paging.</param>
-    /// <param name="take">The number of items to return for paging.</param>
-    /// <param name="parentId">Optional. The ID of the parent media item to search under.</param>
-    /// <param name="allowedMediaTypes">Optional. A list of allowed media type IDs to filter the results.</param>
-    /// <returns>A task representing the asynchronous operation. The result contains an <see cref="IActionResult"/> with the search results.</returns>
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> SearchFromParentWithAllowedTypes(
-        CancellationToken cancellationToken,
-        string query,
-        bool? trashed = null,
-        string? culture = null,
-        int skip = 0,
-        int take = 100,
-        Guid? parentId = null,
-        [FromQuery] IEnumerable<Guid>? allowedMediaTypes = null)
-        => await SearchFromParentWithAllowedTypes(
-            cancellationToken,
-            query,
-            trashed,
-            culture,
-            skip,
-            take,
-            parentId,
-            allowedMediaTypes,
-            null);
 
     /// <summary>
     /// Searches for media items under a specified parent node, filtered by allowed media types.

@@ -183,6 +183,7 @@ export class UmbBlockGridEntriesContext
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
 				const blockTypes = this.#allowedBlockTypes.getValue();
+				const libraryAllowedElementTypeKeys = await this._getLibraryAllowedElementTypeKeys(blockTypes);
 
 				const configuredSize = this._manager
 					.getEditorConfiguration()
@@ -200,6 +201,7 @@ export class UmbBlockGridEntriesContext
 						blocks: blockTypes,
 						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
+						libraryAllowedElementTypeKeys,
 						clipboardFilter: async (clipboardEntryDetail) => {
 							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
 								pasteTranslatorManifests,
@@ -237,7 +239,7 @@ export class UmbBlockGridEntriesContext
 				};
 			})
 			.onSubmit(async (value, data) => {
-				if (value?.create && data) {
+				if (value && 'create' in value && data) {
 					const created = await this.create(
 						value.create.contentElementTypeKey,
 						// We can parse an empty object, cause the rest will be filled in by others.
@@ -254,7 +256,9 @@ export class UmbBlockGridEntriesContext
 					} else {
 						throw new Error('Failed to create block');
 					}
-				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
+				} else if (value && 'library' in value) {
+					this._manager?.insertExternalContent(value.library.elementKey);
+				} else if (value && 'clipboard' in value && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 					if (!clipboardContext) {
 						throw new Error('Clipboard context not available');
@@ -497,12 +501,12 @@ export class UmbBlockGridEntriesContext
 	}
 
 	// create Block?
-	override async delete(contentKey: string) {
+	override async delete(key: string) {
 		// TODO: Loop through children and delete them as well?
 		// Find layout entry:
-		const layout = this._layoutEntries.getValue().find((x) => x.contentKey === contentKey);
+		const layout = this._layoutEntries.getValue().find((x) => x.key === key);
 		if (!layout) {
-			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
+			throw new Error(`Cannot delete block, missing layout for ${key}`);
 		}
 		// The following loop will only delete the referenced data of sub Layout Entries, as the Layout entry is part of the main Layout Entry they will go away when that is removed. [NL]
 		await forEachBlockLayoutEntryOf(layout, async (entry) => {
@@ -513,7 +517,7 @@ export class UmbBlockGridEntriesContext
 			this._manager!.removeExposesOf(entry.contentKey);
 		});
 
-		await super.delete(contentKey);
+		await super.delete(key);
 	}
 
 	protected async _insertFromPropertyValue(value: UmbBlockGridValueModel, originData: UmbBlockGridWorkspaceOriginData) {

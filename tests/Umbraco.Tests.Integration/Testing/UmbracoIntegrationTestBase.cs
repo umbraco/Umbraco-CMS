@@ -26,8 +26,9 @@ public abstract class UmbracoIntegrationTestBase
     private static ITestDatabase? _dbInstance;
     private static TestDbMeta _fixtureDbMeta;
 
-    // TODO (V18): Rename to s_testCount to follow naming conventions
-    protected static int TestCount = 1;
+    private static int _testCount;
+
+    protected static int GetNextTestCount() => ++_testCount;
 
     private readonly List<Action> _fixtureTeardown = new();
     private readonly Queue<Action> _testTeardown = new();
@@ -47,7 +48,7 @@ public abstract class UmbracoIntegrationTestBase
 
     [SetUp]
     public virtual void SetUp_Logging() =>
-        TestContext.Out.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.Name}");
+        TestContext.Out.Write($"Start test {GetNextTestCount()}: {TestContext.CurrentContext.Test.Name}");
 
     [TearDown]
     public void TearDown_Logging() =>

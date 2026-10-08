@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 700,
 		api: () => import('./media-global-search.js'),
 		meta: {
-			label: 'Media',
+			label: '#sections_media',
 			searchProviderAlias: UMB_MEDIA_SEARCH_PROVIDER_ALIAS,
 			sectionAlias: UMB_MEDIA_SECTION_ALIAS,
 		},

@@ -4,6 +4,7 @@ import type { UmbUserCollectionFilterModel } from '../types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type {
 	DirectionModel,
+	UserKindModel,
 	UserOrderModel,
 	UserResponseModel,
 	UserStateModel,
@@ -50,6 +51,7 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 					take: filter.take,
 					userGroupIds: filter.userGroupIds,
 					userStates: filter.userStates as unknown as Array<UserStateModel>, // TODO: This is a temporary workaround to avoid a type error.
+					userKinds: filter.userKinds as unknown as Array<UserKindModel>, // TODO: This is a temporary workaround to avoid a type error.
 				},
 			}),
 		);
@@ -70,18 +72,12 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 					}),
 					unique: item.id,
 					languageIsoCode: item.languageIsoCode || null,
-					documentStartNodeUniques: item.documentStartNodeIds.map((node) => {
-						return {
-							unique: node.id,
-						};
-					}),
-					mediaStartNodeUniques: item.mediaStartNodeIds.map((node) => {
-						return {
-							unique: node.id,
-						};
-					}),
+					documentStartNodeUniques: item.documentStartNodeIds.map((node) => ({ unique: node.id })),
+					mediaStartNodeUniques: item.mediaStartNodeIds.map((node) => ({ unique: node.id })),
+					elementStartNodeUniques: item.elementStartNodeIds.map((node) => ({ unique: node.id })),
 					hasDocumentRootAccess: item.hasDocumentRootAccess,
 					hasMediaRootAccess: item.hasMediaRootAccess,
+					hasElementRootAccess: item.hasElementRootAccess,
 					avatarUrls: item.avatarUrls,
 					state: item.state,
 					failedLoginAttempts: item.failedLoginAttempts,

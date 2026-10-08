@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -14,25 +13,15 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 public class SiblingMemberTypeTreeController : MemberTypeTreeControllerBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="SiblingMemberTypeTreeController"/> class.
-    /// </summary>
-    /// <param name="entityService">Service used for operations on entities within the Umbraco CMS.</param>
-    /// <param name="memberTypeService">Service used for managing member types in the Umbraco CMS.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public SiblingMemberTypeTreeController(IEntityService entityService, IMemberTypeService memberTypeService)
-        : base(entityService, memberTypeService)
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="SiblingMemberTypeTreeController"/> class, which manages the tree structure for sibling member types in the Umbraco backoffice.
     /// </summary>
     /// <param name="entityService">Service for managing and retrieving entities.</param>
+    /// <param name="entitySearchService">The <see cref="IEntitySearchService"/> used to search entities.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used to map between identifiers and keys.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
     /// <param name="memberTypeService">Service for managing member types.</param>
-    [ActivatorUtilitiesConstructor]
-    public SiblingMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
-        : base(entityService, flagProviders, memberTypeService)
+    public SiblingMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IMemberTypeService memberTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, memberTypeService)
     {
     }
 

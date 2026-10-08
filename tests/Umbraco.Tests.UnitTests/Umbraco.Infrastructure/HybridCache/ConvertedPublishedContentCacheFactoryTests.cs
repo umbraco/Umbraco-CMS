@@ -20,24 +20,24 @@ public class ConvertedPublishedContentCacheFactoryTests
         var boundedFactory = new Mock<IBoundedConvertedPublishedContentCacheFactory>();
         var factory = CreateFactory(boundedFactory.Object);
 
-        IConvertedPublishedContentCache<string> cache = factory.Create<string>(maximumItems: null, CacheName);
+        IConvertedPublishedContentCache<string, IPublishedContent> cache = factory.Create<string, IPublishedContent>(maximumItems: null, CacheName);
 
-        Assert.That(cache, Is.TypeOf<UnboundedConvertedPublishedContentCache<string>>());
-        boundedFactory.Verify(x => x.CreateBounded<string>(It.IsAny<int>()), Times.Never);
+        Assert.That(cache, Is.TypeOf<UnboundedConvertedPublishedContentCache<string, IPublishedContent>>());
+        boundedFactory.Verify(x => x.CreateBounded<string, IPublishedContent>(It.IsAny<int>()), Times.Never);
     }
 
     [Test]
     public void Can_Create_Bounded_Cache_When_Maximum_Set_And_Provider_Present()
     {
-        var expected = Mock.Of<IConvertedPublishedContentCache<string>>();
+        var expected = Mock.Of<IConvertedPublishedContentCache<string, IPublishedContent>>();
         var boundedFactory = new Mock<IBoundedConvertedPublishedContentCacheFactory>();
-        boundedFactory.Setup(x => x.CreateBounded<string>(5)).Returns(expected);
+        boundedFactory.Setup(x => x.CreateBounded<string, IPublishedContent>(5)).Returns(expected);
         var factory = CreateFactory(boundedFactory.Object);
 
-        IConvertedPublishedContentCache<string> cache = factory.Create<string>(maximumItems: 5, CacheName);
+        IConvertedPublishedContentCache<string, IPublishedContent> cache = factory.Create<string, IPublishedContent>(maximumItems: 5, CacheName);
 
         Assert.That(cache, Is.SameAs(expected));
-        boundedFactory.Verify(x => x.CreateBounded<string>(5), Times.Once);
+        boundedFactory.Verify(x => x.CreateBounded<string, IPublishedContent>(5), Times.Once);
     }
 
     [Test]
@@ -45,9 +45,9 @@ public class ConvertedPublishedContentCacheFactoryTests
     {
         var factory = CreateFactory(boundedFactory: null);
 
-        IConvertedPublishedContentCache<string> cache = factory.Create<string>(maximumItems: 5, CacheName);
+        IConvertedPublishedContentCache<string, IPublishedContent> cache = factory.Create<string, IPublishedContent>(maximumItems: 5, CacheName);
 
-        Assert.That(cache, Is.TypeOf<UnboundedConvertedPublishedContentCache<string>>());
+        Assert.That(cache, Is.TypeOf<UnboundedConvertedPublishedContentCache<string, IPublishedContent>>());
     }
 
     private static ConvertedPublishedContentCacheFactory CreateFactory(

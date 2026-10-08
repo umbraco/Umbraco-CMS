@@ -23,11 +23,31 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
 
     private BlockListPropertyValueConverter CreateConverter()
     {
+        var blockElementServiceMock = new Mock<IBlockElementService>();
+        var publishedContentTypeCache = GetPublishedContentTypeCache();
+        blockElementServiceMock
+            .Setup(service => service.BuildElementAsync(It.IsAny<IPublishedElement>(), It.IsAny<BlockItemData>(), It.IsAny<bool?>()))
+            .Returns<IPublishedElement, BlockItemData, bool?>((owner, blockItemData, preview) =>
+            {
+                var publishedElementType = publishedContentTypeCache.Get(PublishedItemType.Element, blockItemData.ContentTypeKey);
+
+                var elementTypeMock = Mock.Of<IPublishedContentType>(mock =>
+                    mock.Variations == publishedElementType.Variations
+                    && mock.Key == publishedElementType.Key
+                    && mock.Alias == publishedElementType.Alias);
+
+                var elementMock = Mock.Of<IPublishedElement>(mock =>
+                    mock.Key == blockItemData.Key
+                    && mock.ContentType == elementTypeMock);
+
+                return Task.FromResult(elementMock);
+            });
+
         var publishedModelFactory = new NoopPublishedModelFactory();
-        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>(), Mock.Of<IContentTypeService>());
+        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>(), Mock.Of<IContentTypeService>(), Mock.Of<IVariationContextAccessor>());
         var editor = new BlockListPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
-            new BlockEditorConverter(GetPublishedContentTypeCache(), Mock.Of<ICacheManager>(), publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),
+            new BlockEditorConverter(publishedContentTypeCache, publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler, blockElementServiceMock.Object),
             Mock.Of<IContentTypeService>(),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
@@ -35,7 +55,8 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             Mock.Of<IVariationContextAccessor>(),
             blockVarianceHandler,
             Mock.Of<ILanguageService>(),
-            Mock.Of<IPropertyRenderingContextAccessor>());
+            Mock.Of<IPropertyRenderingContextAccessor>(),
+            Mock.Of<IElementCacheService>());
         return editor;
     }
 
@@ -61,11 +82,17 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = ContentKey1 } },
     };
 
-    private BlockListConfiguration ConfigForSingleBlockMode() => new()
+    /// <summary>
+    /// Configuration as it was left on a data type that had been put in single block mode before that mode became
+    /// the separate single block editor.
+    /// </summary>
+    private BlockListConfiguration ConfigForObsoleteSingleBlockMode() => new()
     {
         Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = ContentKey1 } },
         ValidationLimit = new() { Min = 1, Max = 1 },
+#pragma warning disable CS0618 // Type or member is obsolete
         UseSingleBlockMode = true,
+#pragma warning restore CS0618 // Type or member is obsolete
     };
 
     [Test]
@@ -109,17 +136,18 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
     }
 
     [Test]
-    public void Get_Value_TypeSingleBlockMode()
+    public void Get_Value_Type_Ignores_Obsolete_Single_Block_Mode_Configuration()
     {
         var editor = CreateConverter();
-        var config = ConfigForSingleBlockMode();
+        var config = ConfigForObsoleteSingleBlockMode();
 
         var dataType = new PublishedDataType(1, "test", "test", new Lazy<object>(() => config));
         var propType = Mock.Of<IPublishedPropertyType>(x => x.DataType == dataType);
 
         var valueType = editor.GetPropertyValueType(propType);
 
-        Assert.AreEqual(typeof(BlockListItem), valueType);
+        // the result is always block list model
+        Assert.AreEqual(typeof(BlockListModel), valueType);
     }
 
     [Test]

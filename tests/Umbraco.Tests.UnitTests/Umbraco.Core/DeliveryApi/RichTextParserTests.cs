@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
+using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -358,6 +359,26 @@ public class RichTextParserTests : PropertyValueConverterTests
 
     [TestCase(true)]
     [TestCase(false)]
+    public void ParseElement_CleansUpBlocks_RemovesLayoutKey(bool inlineBlock)
+    {
+        var parser = CreateRichTextElementParser();
+        var id = Guid.NewGuid();
+        var layoutKey = Guid.NewGuid();
+
+        var tagName = $"umb-rte-block{(inlineBlock ? "-inline" : string.Empty)}";
+        var element = parser.Parse($"<p><{tagName} data-key=\"{layoutKey:N}\" data-content-key=\"{id:N}\"><!--Umbraco-Block--></{tagName}></p>", RichTextBlockModel.Empty) as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var paragraph = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(paragraph);
+        var block = paragraph.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(block);
+        Assert.AreEqual(1, block.Attributes.Count);
+        Assert.IsTrue(block.Attributes.ContainsKey("content-id"));
+        Assert.AreEqual(id, block.Attributes["content-id"]);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
     public void ParseElement_AppendsBlocks(bool inlineBlock)
     {
         var parser = CreateRichTextElementParser();
@@ -368,14 +389,14 @@ public class RichTextParserTests : PropertyValueConverterTests
             new List<RichTextBlockItem>
             {
                 new (
-                    Udi.Create(Constants.UdiEntityType.Element, block1ContentId),
+                    block1ContentId,
                     CreateElement(block1ContentId, 123),
-                    null!,
-                    null!),
+                    null,
+                    null),
                 new (
-                    Udi.Create(Constants.UdiEntityType.Element, block2ContentId),
+                    block2ContentId,
                     CreateElement(block2ContentId, 456),
-                    Udi.Create(Constants.UdiEntityType.Element, block2SettingsId),
+                    block2SettingsId,
                     CreateElement(block2SettingsId, 789))
             });
 
@@ -766,7 +787,8 @@ public class RichTextParserTests : PropertyValueConverterTests
         element.SetupGet(c => c.ContentType).Returns(elementType.Object);
 
         var numberPropertyType = SetupPublishedPropertyType(new IntegerValueConverter(), "number", Constants.PropertyEditors.Aliases.Label);
-        var property = new PublishedElementPropertyBase(numberPropertyType, element.Object, false, PropertyCacheLevel.None, VariationContext, CacheManager, propertyValue);
+        var propertyData = new PropertyData { Value = propertyValue, Culture = string.Empty, Segment = string.Empty };
+        var property = new PublishedProperty(numberPropertyType, element.Object, CreateVariationContextAccessor(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
 
         element.SetupGet(c => c.Properties).Returns(new[] { property });
         return element.Object;

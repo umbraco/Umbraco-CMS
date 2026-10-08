@@ -118,7 +118,7 @@ public partial class ContentEditingServiceTests
         var creator = await CreateAdminUserAsync("creator");
         var deleter = await CreateAdminUserAsync("deleter");
 
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
         var createResult = await ContentEditingService.CreateAsync(
             new ContentCreateModel
             {

@@ -31,7 +31,7 @@ public class UmbracoRouteValuesFactoryTests
         out IOptions<UmbracoRenderingDefaultsOptions> renderingDefaults,
         out IPublishedRequest request)
     {
-        var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<IFileService>());
+        var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<ITemplateService>());
         builder.SetPublishedContent(Mock.Of<IPublishedContent>());
         var builtRequest = request = builder.Build();
 

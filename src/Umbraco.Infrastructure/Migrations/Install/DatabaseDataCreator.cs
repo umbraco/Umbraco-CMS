@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -63,7 +63,7 @@ internal sealed class DatabaseDataCreator
         new()
         {
             Name = "Find logs where one of the items in the SortedComponentTypes property array is equal to",
-            Query = "SortedComponentTypes[?] = 'Umbraco.Web.Search.ExamineComponent'",
+            Query = "SortedComponentTypes[?] = 'Umbraco.Cms.Infrastructure.Runtime.CoreRuntime'",
         },
         new()
         {
@@ -211,10 +211,106 @@ internal sealed class DatabaseDataCreator
     {
         var userGroupKeyToPermissions = new Dictionary<Guid, IEnumerable<string>>()
         {
-            [Constants.Security.AdminGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.EditorGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.WriterGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.TranslatorGroupKey] = [ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
+            [Constants.Security.AdminGroupKey] =
+            [
+                ActionNew.ActionLetter,
+                ActionUpdate.ActionLetter,
+                ActionDelete.ActionLetter,
+                ActionMove.ActionLetter,
+                ActionCopy.ActionLetter,
+                ActionSort.ActionLetter,
+                ActionRollback.ActionLetter,
+                ActionProtect.ActionLetter,
+                ActionAssignDomain.ActionLetter,
+                ActionPublish.ActionLetter,
+                ActionRights.ActionLetter,
+                ActionUnpublish.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionCreateBlueprintFromContent.ActionLetter,
+                ActionNotify.ActionLetter,
+                ":",
+                "5",
+                "7",
+                "T",
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementDelete.ActionLetter,
+                ActionElementMove.ActionLetter,
+                ActionElementCopy.ActionLetter,
+                ActionElementPublish.ActionLetter,
+                ActionElementUnpublish.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+                ActionElementRollback.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerDelete.ActionLetter,
+                ActionElementContainerMove.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
+            ],
+            [Constants.Security.EditorGroupKey] =
+            [
+                ActionNew.ActionLetter,
+                ActionUpdate.ActionLetter,
+                ActionDelete.ActionLetter,
+                ActionMove.ActionLetter,
+                ActionCopy.ActionLetter,
+                ActionSort.ActionLetter,
+                ActionRollback.ActionLetter,
+                ActionProtect.ActionLetter,
+                ActionPublish.ActionLetter,
+                ActionUnpublish.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionCreateBlueprintFromContent.ActionLetter,
+                ActionNotify.ActionLetter,
+                ":",
+                "5",
+                "T",
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementDelete.ActionLetter,
+                ActionElementMove.ActionLetter,
+                ActionElementCopy.ActionLetter,
+                ActionElementPublish.ActionLetter,
+                ActionElementUnpublish.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+                ActionElementRollback.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerDelete.ActionLetter,
+                ActionElementContainerMove.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
+            ],
+            [Constants.Security.WriterGroupKey] =
+            [
+                ActionNew.ActionLetter,
+                ActionUpdate.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionNotify.ActionLetter,
+                ":",
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
+            ],
+            [Constants.Security.TranslatorGroupKey] =
+            [
+                ActionUpdate.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
+            ],
         };
 
         var i = 1;
@@ -324,6 +420,21 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.System.RecycleBinMediaKey,
                 Text = "Recycle Bin",
                 NodeObjectType = Constants.ObjectTypes.MediaRecycleBin,
+                CreateDate = DateTime.UtcNow,
+            });
+        _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
+            new NodeDto
+            {
+                NodeId = Constants.System.RecycleBinElement,
+                Trashed = false,
+                ParentId = -1,
+                UserId = -1,
+                Level = 0,
+                Path = "-1,-22",
+                SortOrder = 0,
+                UniqueId = Constants.System.RecycleBinElementKey,
+                Text = "Recycle Bin",
+                NodeObjectType = Constants.ObjectTypes.ElementRecycleBin,
                 CreateDate = DateTime.UtcNow,
             });
 
@@ -1113,6 +1224,7 @@ internal sealed class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DistributedJobs, Name = "DistributedJobs" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.CacheVersion, Name = "CacheVersion" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrlAliases, Name = "DocumentUrlAliases" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.ElementTree, Name = "ElementTree" });
     }
 
     private void CreateContentTypeData()
@@ -1298,6 +1410,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.AdminGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
                 Name = "Administrators",
                 Description = "Users with full access to all sections and functionality",
@@ -1316,6 +1429,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.WriterGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = WriterGroupAlias,
                 Name = "Writers",
                 Description = "Users with permission to create and update but not publish content",
@@ -1334,6 +1448,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.EditorGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = EditorGroupAlias,
                 Name = "Editors",
                 Description = "Users with full permission to create, update and publish content",
@@ -1352,6 +1467,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.TranslatorGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = TranslatorGroupAlias,
                 Name = "Translators",
                 Description = "Users with permission to manage dictionary entries",
@@ -1402,12 +1518,15 @@ internal sealed class DatabaseDataCreator
         _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Users });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Forms });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Translation });
+        _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Library });
 
         _database.Insert(new UserGroup2AppDto { UserGroupId = 2, AppAlias = Constants.Applications.Content });
+        _database.Insert(new UserGroup2AppDto { UserGroupId = 2, AppAlias = Constants.Applications.Library });
 
         _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Content });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Media });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Forms });
+        _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Library });
 
         _database.Insert(new UserGroup2AppDto { UserGroupId = 4, AppAlias = Constants.Applications.Translation });
     }
@@ -2219,54 +2338,55 @@ internal sealed class DatabaseDataCreator
                 });
         }
 
+        // There is one label editor per type of value a label can hold.
         InsertDataTypeDto(
             Constants.DataTypes.LabelString,
             Constants.PropertyEditors.Aliases.Label,
             "Umb.PropertyEditorUi.Label",
             "Nvarchar",
-            "{\"umbracoDataValueType\":\"STRING\"}");
+            null);
         InsertDataTypeDto(
             Constants.DataTypes.LabelInt,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelInteger,
+            "Umb.PropertyEditorUi.Label.Integer",
             "Integer",
-            "{\"umbracoDataValueType\":\"INT\"}");
+            null);
         InsertDataTypeDto(
             Constants.DataTypes.LabelBigint,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelBigInt,
+            "Umb.PropertyEditorUi.Label.BigInt",
             "Nvarchar",
-            "{\"umbracoDataValueType\":\"BIGINT\"}");
+            null);
         InsertDataTypeDto(
             Constants.DataTypes.LabelDateTime,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelDateTime,
+            "Umb.PropertyEditorUi.Label.DateTime",
             "Date",
-            "{\"umbracoDataValueType\":\"DATETIME\"}");
+            null);
         InsertDataTypeDto(
             Constants.DataTypes.LabelDecimal,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelDecimal,
+            "Umb.PropertyEditorUi.Label.Decimal",
             "Decimal",
-            "{\"umbracoDataValueType\":\"DECIMAL\"}");
+            null);
         InsertDataTypeDto(
             Constants.DataTypes.LabelTime,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelTime,
+            "Umb.PropertyEditorUi.Label.Time",
             "Date",
-            "{\"umbracoDataValueType\":\"TIME\"}");
+            null);
         InsertDataTypeDto(
             Constants.DataTypes.LabelBytes,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelBigInt,
+            "Umb.PropertyEditorUi.Label.BigInt",
             "Nvarchar",
-            "{\"umbracoDataValueType\":\"BIGINT\", \"labelTemplate\":\"{=value | bytes}\"}");
+            "{\"labelTemplate\":\"{=value | bytes}\"}");
         InsertDataTypeDto(
             Constants.DataTypes.LabelPixels,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelInteger,
+            "Umb.PropertyEditorUi.Label.Integer",
             "Integer",
-            "{\"umbracoDataValueType\":\"INT\", \"labelTemplate\":\"{=value}px\"}");
+            "{\"labelTemplate\":\"{=value}px\"}");
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.DateTime))
         {
@@ -2301,10 +2421,10 @@ internal sealed class DatabaseDataCreator
 
         InsertDataTypeDto(
             Constants.DataTypes.DropDownSingle,
-            Constants.PropertyEditors.Aliases.DropDownListFlexible,
-            "Umb.PropertyEditorUi.Dropdown",
+            Constants.PropertyEditors.Aliases.SingleDropDown,
+            "Umb.PropertyEditorUi.Dropdown.Single",
             "Nvarchar",
-            "{\"multiple\":false}");
+            "{}");
 
         if (_database.Exists<NodeDto>(-40))
         {
@@ -2339,10 +2459,10 @@ internal sealed class DatabaseDataCreator
 
         InsertDataTypeDto(
             Constants.DataTypes.DropDownMultiple,
-            Constants.PropertyEditors.Aliases.DropDownListFlexible,
+            Constants.PropertyEditors.Aliases.MultipleDropDown,
             "Umb.PropertyEditorUi.Dropdown",
             "Nvarchar",
-            "{\"multiple\":true}");
+            "{}");
 
         if (_database.Exists<NodeDto>(-43))
         {
@@ -2567,10 +2687,10 @@ internal sealed class DatabaseDataCreator
                 new DataTypeDto
                 {
                     NodeId = 1051,
-                    EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
-                    EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
+                    EditorAlias = Constants.PropertyEditors.Aliases.SingleMediaPicker,
+                    EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker.Single",
                     DbType = "Ntext",
-                    Configuration = "{\"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}",
+                    Configuration = "{}",
                 });
         }
 
@@ -2586,7 +2706,7 @@ internal sealed class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                     EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                     DbType = "Ntext",
-                    Configuration = "{\"multiple\": true}",
+                    Configuration = "{}",
                 });
         }
 
@@ -2599,11 +2719,10 @@ internal sealed class DatabaseDataCreator
                 new DataTypeDto
                 {
                     NodeId = 1053,
-                    EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
-                    EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
+                    EditorAlias = Constants.PropertyEditors.Aliases.SingleMediaPicker,
+                    EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker.Single",
                     DbType = "Ntext",
-                    Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image +
-                                    "\", \"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}",
+                    Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image + "\"}",
                 });
         }
 
@@ -2619,8 +2738,7 @@ internal sealed class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                     EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                     DbType = "Ntext",
-                    Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image +
-                                    "\", \"multiple\": true}",
+                    Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image + "\"}",
                 });
         }
 
@@ -2691,7 +2809,38 @@ internal sealed class DatabaseDataCreator
             null,
             false,
             true);
-
+        CreateRelationTypeData(
+            7,
+            Constants.Conventions.RelationTypes.RelatedElementAlias,
+            Constants.Conventions.RelationTypes.RelatedElementName,
+            null,
+            null,
+            false,
+            true);
+        CreateRelationTypeData(
+            8,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteName,
+            Constants.ObjectTypes.ElementContainer,
+            Constants.ObjectTypes.Element,
+            false,
+            false);
+        CreateRelationTypeData(
+            9,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteName,
+            Constants.ObjectTypes.ElementContainer,
+            Constants.ObjectTypes.ElementContainer,
+            false,
+            false);
+        CreateRelationTypeData(
+            10,
+            Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias,
+            Constants.Conventions.RelationTypes.RelatedExternalBlockElementName,
+            null,
+            null,
+            false,
+            true);
     }
 
     private void CreateRelationTypeData(

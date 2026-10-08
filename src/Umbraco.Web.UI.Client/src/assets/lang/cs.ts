@@ -507,33 +507,6 @@ export default {
 		changeKeyError: "Klíč '%0%' již existuje.",
 		overviewTitle: 'Přehled slovníku',
 	},
-	examineManagement: {
-		configuredSearchers: 'Konfigurovaní vyhledávače',
-		configuredSearchersDescription:
-			'Zobrazuje vlastnosti a nástroje pro libovolný konfigurovaný vyhledávač (např. pro víceindexový vyhledávač)',
-		fieldValues: 'Hodnoty pole',
-		healthStatus: 'Stav',
-		healthStatusDescription: 'Stav indexu a jeho čitelnost',
-		indexers: 'Indexery',
-		indexInfo: 'Informace o indexu',
-		indexInfoDescription: 'Uvádí vlastnosti indexu',
-		manageIndexes: 'Spravovat indexy Examine',
-		manageIndexesDescription:
-			'Umožňuje zobrazit podrobnosti každého indexu a poskytuje některé nástroje pro správu indexů',
-		rebuildIndex: 'Znovu vytvořit index',
-		rebuildIndexWarning:
-			'\n      To způsobí opětovné sestavení indexu.<br />V závislosti na tom, kolik obsahu je na vašem webu, může to chvíli trvat.<br />Nedoporučuje se znovu vytvářet index v době vysokého provozu na webu nebo při úpravách obsahu editory.\n     ',
-		searchers: 'Vyhledávače',
-		searchDescription: 'Prohledat index a zobrazit výsledky',
-		tools: 'Nástroje',
-		toolsDescription: 'Nástroje pro správu indexu',
-		fields: 'pole',
-		indexCannotRead: 'Index nelze číst a bude nutné jej znovu sestavit',
-		processIsTakingLonger:
-			'Proces trvá déle, než se očekávalo, zkontrolujte Umbraco log a zkontrolujte, zda během této operace nedošlo k chybám',
-		indexCannotRebuild: 'Tento index nelze znovu sestavit, protože nemá přiřazen',
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: 'Zadejte Vaše uživatelské jméno',
 		password: 'Zadejte Vaše heslo',
@@ -901,8 +874,6 @@ export default {
 		instruction: 'přihlašte se níže',
 		signInWith: 'Přihlásit se pomocí',
 		timeout: 'Relace vypršela',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ',
 		forgottenPassword: 'Zapomenuté heslo?',
 		forgottenPasswordInstruction: 'Na uvedenou adresu bude zaslán e-mail s odkazem pro obnovení hesla',
 		requestPasswordResetConfirmation:
@@ -913,9 +884,6 @@ export default {
 		setPasswordInstruction: 'Zadejte nové heslo',
 		setPasswordConfirmation: 'Vaše heslo bylo aktualizováno',
 		resetCodeExpired: 'Odkaz, na který jste klikli, je neplatný nebo jeho platnost vypršela',
-		resetPasswordEmailCopySubject: 'Umbraco: Resetování hesla',
-		resetPasswordEmailCopyFormat:
-			"\n        <html>\n            <head>\n                <meta name='viewport' content='width=device-width'>\n                <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n            </head>\n            <body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>\n                <style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>\n                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"body\" style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;\" bgcolor=\"#1d1333\">\n                    <tr>\n                        <td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;\" valign=\"top\">\n                            <table style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;\">\n                                <tr>\n                                    <td background=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" bgcolor=\"#1d1333\" width=\"28\" height=\"28\" valign=\"top\" style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\">\n                                        <!--[if gte mso 9]> <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\" style=\"width:30px;height:30px;\"> <v:fill type=\"tile\" src=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" color=\"#1d1333\" /> <v:textbox inset=\"0,0,0,0\"> <![endif]-->\n                                        <div> </div>\n                                        <!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->\n                                    </td>\n                                    <td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\" valign=\"top\"></td>\n                                </tr>\n                            </table>\n                        </td>\n                    </tr>\n                </table>\n                <table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>\n                    <tr>\n                        <td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>\n                        <td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>\n                            <div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>\n                                <br>\n                                <table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>\n                                    <tr>\n                                        <td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>\n                                            <table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>\n                                                <tr>\n                                                    <td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>\n                                                        <h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>\n                                                            Vyžadováno resetování hesla\n                                                        </h1>\n                                                        <p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n                                                            Vaše uživatelské jméno pro přihlášení do backoffice Umbraco je: <strong>%0%</strong>\n                                                        </p>\n                                                        <p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n                                                            <table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>\n                                                                <tbody>\n                                                                    <tr>\n                                                                        <td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>\n                                                                            <a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>\n                                                                                Kliknutím na tento odkaz obnovíte své heslo\n                                                                            </a>\n                                                                        </td>\n                                                                    </tr>\n                                                                </tbody>\n                                                            </table>\n                                                        </p>\n                                                        <p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Pokud nemůžete kliknout na odkaz, zkopírujte a vložte tuto adresu URL do okna prohlížeče:</p>\n                                                            <table border='0' cellpadding='0' cellspacing='0'>\n                                                                <tr>\n                                                                    <td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>\n                                                                        <font style=\"-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;\">\n                                                                            <a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>\n                                                                        </font>\n                                                                    </td>\n                                                                </tr>\n                                                            </table>\n                                                        </p>\n                                                    </td>\n                                                </tr>\n                                            </table>\n                                        </td>\n                                    </tr>\n                                </table>\n                                <br><br><br>\n                            </div>\n                        </td>\n                        <td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>\n                    </tr>\n                </table>\n            </body>\n        </html>\n    ",
 	},
 	main: {
 		dashboard: 'Ovládací panel',
@@ -1103,20 +1071,13 @@ export default {
 	},
 	sections: {
 		content: 'Obsah',
-		forms: 'Formuláře',
+		library: 'Knihovna',
 		media: 'Média',
 		member: 'Členové',
 		packages: 'Balíčky',
 		settings: 'Nastavení',
 		translation: 'Překlad',
 		users: 'Uživatelé',
-		concierge: 'Domovník',
-		courier: 'Kurýr',
-		developer: 'Vývojář',
-		installer: 'Průvodce nastavením Umbraca',
-		newsletters: 'Zpravodaje',
-		statistics: 'Statistiky',
-		help: 'Nápověda',
 	},
 	settings: {
 		defaulttemplate: 'Výchozí šablona',
@@ -1694,6 +1655,7 @@ export default {
 		stateLockedOut: 'Uzamčeno',
 		stateInvited: 'Pozváno',
 		stateInactive: 'Neaktivní',
+		type: 'Typ',
 		sortNameAscending: 'Jméno (A-Z)',
 		sortNameDescending: 'Jméno (Z-A)',
 		sortCreateDateAscending: 'Nejstarší',
@@ -1823,7 +1785,6 @@ export default {
 		contentRedirectManager: 'Správa přesměrování',
 		mediaFolderBrowser: 'Obsah',
 		settingsWelcome: 'Vítejte',
-		settingsExamine: 'Správa Examine',
 		settingsPublishedStatus: 'Stav publikování',
 		settingsModelsBuilder: 'Tvůrce modelů',
 		settingsHealthCheck: 'Health Check',

@@ -80,9 +80,26 @@ public class UserGroupBase
     public bool MediaRootAccess { get; init; }
 
     /// <summary>
+    /// Gets or sets the key of the element that should act as root node for the user group.
+    /// <remarks>
+    /// This can be overwritten by a different user group if a user is a member of multiple groups
+    /// </remarks>
+    /// </summary>
+    public ReferenceByIdModel? ElementStartNode { get; init; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the group should have access to the element root.
+    /// <remarks>
+    /// This will be ignored if an explicit start node has been specified in <see cref="ElementStartNode"/>.
+    /// </remarks>
+    /// </summary>
+    public bool ElementRootAccess { get; init; }
+
+    /// <summary>
     /// Gets or sets the list of permissions provided and maintained by the front-end. The server has no concept of all of them, but some can be used on the server.
     /// </summary>
     public required ISet<string> FallbackPermissions { get; init; }
+
     /// <summary>
     /// Gets or sets the set of permissions associated with the user group.
     /// </summary>

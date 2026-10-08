@@ -111,11 +111,11 @@ export default class UmbMfaPageElement extends UmbLitElement {
         <form id="LoginForm" @submit=${this.#handleSubmit} novalidate>
           <header id="header">
             <h1>
-              <umb-localize key="auth_mfaTitle">One last step</umb-localize>
+              <umb-localize key="login_mfaTitle">One last step</umb-localize>
             </h1>
 
             <p>
-              <umb-localize key="auth_mfaText">
+              <umb-localize key="login_mfaText">
                 You have enabled 2-factor authentication and must verify your identity.
               </umb-localize>
             </p>
@@ -126,16 +126,16 @@ export default class UmbMfaPageElement extends UmbLitElement {
             ? html`
               <uui-form-layout-item>
                 <uui-label id="providerLabel" for="provider" slot="label" required>
-                  <umb-localize key="auth_mfaMultipleText">Please choose a 2-factor provider</umb-localize>
+                  <umb-localize key="login_mfaMultipleText">Please choose a 2-factor provider</umb-localize>
                 </uui-label>
-                <uui-select label=${this.localize.term('auth_mfaMultipleText')} id="provider" name="provider" .options=${this.providers} aria-required="true" required></uui-select>
+                <uui-select label=${this.localize.term('login_mfaMultipleText')} id="provider" name="provider" .options=${this.providers} aria-required="true" required></uui-select>
               </uui-form-layout-item>
             `
             : nothing}
 
           <uui-form-layout-item>
             <uui-label id="mfacodeLabel" for="mfacode" slot="label" required>
-              <umb-localize key="auth_mfaCodeInput">Verification code</umb-localize>
+              <umb-localize key="login_mfaCodeInput">Verification code</umb-localize>
             </uui-label>
 
             <uui-input
@@ -145,11 +145,11 @@ export default class UmbMfaPageElement extends UmbLitElement {
               name="token"
               inputmode="numeric"
               autocomplete="one-time-code"
-              placeholder=${this.localize.term('auth_mfaCodeInputHelp')}
+              placeholder=${this.localize.term('login_mfaCodeInputHelp')}
               aria-required="true"
               required
-              required-message=${this.localize.term('auth_mfaCodeInputHelp')}
-              label=${this.localize.term('auth_mfaCodeInput')}
+              required-message=${this.localize.term('login_mfaCodeInputHelp')}
+              label=${this.localize.term('login_mfaCodeInput')}
               style="width:100%;">
             </uui-input>
           </uui-form-layout-item>
@@ -161,7 +161,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
             button-style="success"
             look="primary"
             color="default"
-            label=${this.localize.term('auth_validate')}
+            label=${this.localize.term('login_validate')}
             type="submit"></uui-button>
         </form>
       </uui-form>

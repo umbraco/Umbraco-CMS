@@ -53,6 +53,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<HostingSettings>, HostingSettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<ImagingSettings>, ImagingSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<LoggingSettings>, LoggingSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
@@ -60,22 +61,12 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<ScheduledPublishingSettings>, ScheduledPublishingSettingsValidator>();
 
         // Register configuration sections.
-        // TODO (V18): Remove the registrations of UserPasswordConfigurationSettings and MemberPasswordConfigurationSettings.
-        // Update any class taking these as constructor dependencies to instead take SecuritySettings and read the UserPassword or MemberPassword properties.
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
-            .AddUmbracoOptions<IndexCreatorSettings>()
             .AddUmbracoOptions<MarketplaceSettings>()
             .AddUmbracoOptions<ContentSettings>()
             .AddUmbracoOptions<DeliveryApiSettings>()
-
-            // Bound to the canonical "Umbraco:CMS:Debug" section (via the UmbracoOptions attribute), plus the
-            // legacy "Umbraco:CMS:Core:Debug" section for backwards compatibility. The legacy bind runs last so
-            // existing configuration under that section continues to take effect.
-            // TODO (V19): remove the legacy section bind.
-            .AddUmbracoOptions<CoreDebugSettings>(optionsBuilder => optionsBuilder.Bind(
-                builder.Config.GetSection(Constants.Configuration.ConfigCoreDebug)))
-
+            .AddUmbracoOptions<DebugSettings>()
             .AddUmbracoOptions<DictionarySettings>()
             .AddUmbracoOptions<ExceptionFilterSettings>()
             .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
@@ -104,18 +95,12 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<BasicAuthSettings>()
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
             .AddUmbracoOptions<PackageMigrationSettings>()
-#pragma warning disable CS0618 // Type or member is obsolete
-            .AddUmbracoOptions<HelpPageSettings>()
-#pragma warning restore CS0618 // Type or member is obsolete
             .AddUmbracoOptions<DataTypesSettings>()
             .AddUmbracoOptions<WebhookSettings>()
             .AddUmbracoOptions<CacheSettings>()
             .AddUmbracoOptions<SystemDateMigrationSettings>()
             .AddUmbracoOptions<DistributedJobSettings>()
             .AddUmbracoOptions<ScheduledPublishingSettings>(options => options.ValidateOnStart())
-#pragma warning disable CS0618 // Type or member is obsolete
-            .AddUmbracoOptions<BackOfficeTokenCookieSettings>()
-#pragma warning restore CS0618 // Type or member is obsolete
             .AddUmbracoOptions<WebsiteSettings>()
             .AddUmbracoOptions<SignalRSettings>();
 

@@ -1,15 +1,16 @@
-import type { UmbContentPickerDynamicRoot, UmbContentPickerSourceType } from '../../types.js';
-import type { UmbInputContentPickerDocumentRootElement } from '../../dynamic-root/components/input-content-picker-document-root.element.js';
+import type { UmbContentPickerSourceType } from '../../types.js';
+import type { UmbInputDocumentDynamicRootElement } from '@umbraco-cms/backoffice/document';
+import type { UmbDynamicRoot } from '@umbraco-cms/backoffice/dynamic-root';
 import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-import '../../dynamic-root/components/input-content-picker-document-root.element.js';
+import '@umbraco-cms/backoffice/document';
 
 @customElement('umb-input-content-picker-source')
-export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputContentPickerSourceElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	protected override getFormElement() {
 		return undefined;
 	}
@@ -40,10 +41,10 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 	nodeId?: string;
 
 	@property({ attribute: false })
-	dynamicRoot?: UmbContentPickerDynamicRoot;
+	dynamicRoot?: UmbDynamicRoot;
 
 	@state()
-	private _options: Array<Option> = [
+	private _options: Array<UUISelectOption> = [
 		{ value: 'content', name: 'Content' },
 		{ value: 'media', name: 'Media' },
 		{ value: 'member', name: 'Members' },
@@ -69,7 +70,7 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onDocumentRootChange(event: CustomEvent & { target: UmbInputContentPickerDocumentRootElement }) {
+	#onDocumentRootChange(event: CustomEvent & { target: UmbInputDocumentDynamicRootElement }) {
 		switch (this.type) {
 			case 'content':
 				this.dynamicRoot = event.target.data;
@@ -115,8 +116,8 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 
 	#renderDocumentSourcePicker() {
 		return html`
-			<umb-input-content-picker-document-root .data=${this.dynamicRoot} @change=${this.#onDocumentRootChange}>
-			</umb-input-content-picker-document-root>
+			<umb-input-document-dynamic-root .data=${this.dynamicRoot} @change=${this.#onDocumentRootChange}>
+			</umb-input-document-dynamic-root>
 		`;
 	}
 

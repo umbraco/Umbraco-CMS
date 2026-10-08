@@ -31,8 +31,13 @@ public class PropertyValidationServiceTests
         var dataType = Mock.Of<IDataType>(x => (string)x.ConfigurationObject == string.Empty // irrelevant but needs a value
                                                && x.DatabaseType == ValueStorageType.Nvarchar
                                                && x.EditorAlias == Constants.PropertyEditors.Aliases.TextBox);
-        dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>())).Returns(() => dataType);
+        var dataTypeKey = Guid.NewGuid();
+        dataTypeService.Setup(x => x.GetAsync(It.IsAny<Guid>())).ReturnsAsync(() => dataType);
         dt = dataType;
+
+        var idKeyMap = new Mock<IIdKeyMap>();
+        idKeyMap.Setup(x => x.GetKeyForId(It.IsAny<int>(), UmbracoObjectTypes.DataType))
+            .Returns(Attempt.Succeed(dataTypeKey));
 
 
         // new data editor that returns a TextOnlyValueEditor which will do the validation for the properties
@@ -61,7 +66,8 @@ public class PropertyValidationServiceTests
             new ValueEditorCache(),
             Mock.Of<ICultureDictionary>(),
             languageService.Object,
-            contentSettings.Object);
+            contentSettings.Object,
+            idKeyMap.Object);
     }
 
     [Test]

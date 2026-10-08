@@ -362,7 +362,7 @@ public class PublishedContentStatusFilteringServiceTests
 
         // Publish status must short-circuit before the full candidate set is enumerated.
         statusMock.Verify(
-            s => s.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()),
+            s => s.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()),
             Times.AtMost(items.Count - 1));
     }
 
@@ -393,7 +393,7 @@ public class PublishedContentStatusFilteringServiceTests
     private static (
         PublishedContentStatusFilteringService Service,
         Dictionary<Guid, IPublishedContent> Items,
-        Mock<IPublishStatusQueryService> StatusMock,
+        Mock<IDocumentPublishStatusQueryService> StatusMock,
         List<Guid> BatchedKeys,
         Mock<IDocumentCacheService> ServiceMock)
         SetupCounting(bool forPreview, bool warm)
@@ -439,16 +439,15 @@ public class PublishedContentStatusFilteringServiceTests
                     .ToArray();
             });
 
-        var statusMock = new Mock<IPublishStatusQueryService>();
+        var statusMock = new Mock<IDocumentPublishStatusQueryService>();
         statusMock
-            .Setup(s => s.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Setup(s => s.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns((Guid key, string _) => items.TryGetValue(key, out IPublishedContent? item) && item.Id % 2 == 0);
         statusMock
             .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns(true);
 
-        var previewService = new Mock<IPreviewService>();
-        previewService.Setup(p => p.IsInPreview()).Returns(forPreview);
+        var previewSessionService = SetupPreviewService(forPreview);
 
         var variationContextAccessor = new Mock<IVariationContextAccessor>();
         variationContextAccessor.SetupGet(v => v.VariationContext).Returns(new VariationContext(null));
@@ -456,7 +455,7 @@ public class PublishedContentStatusFilteringServiceTests
         var service = new PublishedContentStatusFilteringService(
             variationContextAccessor.Object,
             statusMock.Object,
-            previewService.Object,
+            previewSessionService,
             Mock.Of<IPublishedContentCache>(),
             serviceMock.Object);
 
@@ -486,7 +485,7 @@ public class PublishedContentStatusFilteringServiceTests
         }
 
         var documentCacheService = SetupDocumentCacheService(items);
-        var previewService = SetupPreviewService(forPreview);
+        var previewSessionService = SetupPreviewService(forPreview);
         var publishStatusQueryService = SetupPublishStatusQueryService(items);
         var variationContextAccessor = SetupVariantContextAccessor(null);
 
@@ -494,7 +493,7 @@ public class PublishedContentStatusFilteringServiceTests
             new PublishedContentStatusFilteringService(
                 variationContextAccessor,
                 publishStatusQueryService,
-                previewService,
+                previewSessionService,
                 Mock.Of<IPublishedContentCache>(),
                 documentCacheService),
             items);
@@ -532,7 +531,7 @@ public class PublishedContentStatusFilteringServiceTests
         }
 
         var documentCacheService = SetupDocumentCacheService(items);
-        var previewService = SetupPreviewService(forPreview);
+        var previewSessionService = SetupPreviewService(forPreview);
         var publishStatusQueryService = SetupPublishStatusQueryService(items, hasPublishedAncestorPath);
         var variationContextAccessor = SetupVariantContextAccessor(requestCulture);
 
@@ -540,7 +539,7 @@ public class PublishedContentStatusFilteringServiceTests
             new PublishedContentStatusFilteringService(
                 variationContextAccessor,
                 publishStatusQueryService,
-                previewService,
+                previewSessionService,
                 Mock.Of<IPublishedContentCache>(),
                 documentCacheService),
             items);
@@ -587,7 +586,7 @@ public class PublishedContentStatusFilteringServiceTests
         }
 
         var documentCacheService = SetupDocumentCacheService(items);
-        var previewService = SetupPreviewService(forPreview);
+        var previewSessionService = SetupPreviewService(forPreview);
         var publishStatusQueryService = SetupPublishStatusQueryService(items);
         var variationContextAccessor = SetupVariantContextAccessor(requestCulture);
 
@@ -595,20 +594,20 @@ public class PublishedContentStatusFilteringServiceTests
             new PublishedContentStatusFilteringService(
                 variationContextAccessor,
                 publishStatusQueryService,
-                previewService,
+                previewSessionService,
                 Mock.Of<IPublishedContentCache>(),
                 documentCacheService),
             items);
     }
 
-    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
+    private IDocumentPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
         => SetupPublishStatusQueryService(items, id => id % 2 == 0, hasPublishedAncestorPath);
 
-    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<int, bool> idIsPublished, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
+    private IDocumentPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<int, bool> idIsPublished, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
     {
-        var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
+        var publishStatusQueryService = new Mock<IDocumentPublishStatusQueryService>();
         publishStatusQueryService
-            .Setup(p => p.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Setup(p => p.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns((Guid key, string culture) => items
                                                        .TryGetValue(key, out var item)
                                                    && idIsPublished(item.Id)
@@ -619,11 +618,11 @@ public class PublishedContentStatusFilteringServiceTests
         return publishStatusQueryService.Object;
     }
 
-    private IPreviewService SetupPreviewService(bool forPreview)
+    private static IPreviewSessionService SetupPreviewService(bool forPreview)
     {
-        var previewService = new Mock<IPreviewService>();
-        previewService.Setup(p => p.IsInPreview()).Returns(forPreview);
-        return previewService.Object;
+        var previewSessionService = new Mock<IPreviewSessionService>();
+        previewSessionService.Setup(p => p.IsActive()).Returns(forPreview);
+        return previewSessionService.Object;
     }
 
     private IVariationContextAccessor SetupVariantContextAccessor(string? requestCulture)

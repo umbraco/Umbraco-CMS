@@ -24,6 +24,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
     private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DataTypeCacheRefresher" /> class.
@@ -39,6 +40,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
     /// <param name="documentCacheService">The document cache service.</param>
     /// <param name="mediaCacheService">The media cache service.</param>
     /// <param name="contentTypeCommonRepository">The content type common repository.</param>
+    /// <param name="dataTypeConfigurationCache">The data type configuration cache.</param>
     public DataTypeCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -50,7 +52,8 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         IPublishedContentTypeCache publishedContentTypeCache,
         IDocumentCacheService documentCacheService,
         IMediaCacheService mediaCacheService,
-        IContentTypeCommonRepository contentTypeCommonRepository)
+        IContentTypeCommonRepository contentTypeCommonRepository,
+        IDataTypeConfigurationCache dataTypeConfigurationCache)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -60,6 +63,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         _documentCacheService = documentCacheService;
         _mediaCacheService = mediaCacheService;
         _contentTypeCommonRepository = contentTypeCommonRepository;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
     /// <summary>
@@ -75,7 +79,8 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
     /// <param name="publishedContentTypeCache">The published content type cache.</param>
     /// <param name="documentCacheService">The document cache service.</param>
     /// <param name="mediaCacheService">The media cache service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
+    /// <param name="contentTypeCommonRepository">The content type common repository.</param>
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public DataTypeCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -86,7 +91,8 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         IPublishedContentTypeFactory publishedContentTypeFactory,
         IPublishedContentTypeCache publishedContentTypeCache,
         IDocumentCacheService documentCacheService,
-        IMediaCacheService mediaCacheService)
+        IMediaCacheService mediaCacheService,
+        IContentTypeCommonRepository contentTypeCommonRepository)
         : this(
             appCaches,
             serializer,
@@ -98,7 +104,8 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             publishedContentTypeCache,
             documentCacheService,
             mediaCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeCommonRepository>())
+            contentTypeCommonRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IDataTypeConfigurationCache>())
     {
     }
 
@@ -172,6 +179,8 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
 
         // Also clear the 5 minute runtime cache held in ContentTypeCommonRepository.
         _contentTypeCommonRepository.ClearCache();
+
+        _dataTypeConfigurationCache.ClearCache(payloads.Select(x => x.Key));
 
         Attempt<IAppPolicyCache?> dataTypeCache = AppCaches.IsolatedCaches.Get<IDataType>();
 

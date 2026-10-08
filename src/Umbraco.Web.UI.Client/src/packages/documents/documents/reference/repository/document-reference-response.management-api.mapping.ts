@@ -1,7 +1,7 @@
 import type { UmbDocumentReferenceModel } from '../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { DocumentReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { IReferenceResponseModelDocumentReferenceResponseModel as DocumentReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDataSourceDataMapping } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDocumentReferenceResponseManagementApiDataMapping

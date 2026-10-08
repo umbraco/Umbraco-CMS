@@ -109,7 +109,7 @@ internal class UserStartNodeTreeFilterServiceTests
         };
 
         _userStartNodeEntitiesServiceMock
-            .Setup(x => x.RootUserAccessEntities(UmbracoObjectTypes.Document, startNodeIds))
+            .Setup(x => x.RootUserAccessEntities(It.Is<UmbracoObjectTypes[]>(t => t.SequenceEqual(new[] { UmbracoObjectTypes.Document })), startNodeIds))
             .Returns(expected);
 
         var sut = CreateService(startNodeIds, []);
@@ -137,7 +137,7 @@ internal class UserStartNodeTreeFilterServiceTests
 
         _userStartNodeEntitiesServiceMock
             .Setup(x => x.ChildUserAccessEntities(
-                UmbracoObjectTypes.Document,
+                It.Is<UmbracoObjectTypes[]>(t => t.SequenceEqual(new[] { UmbracoObjectTypes.Document })),
                 startNodePaths,
                 parentKey,
                 0,
@@ -172,7 +172,7 @@ internal class UserStartNodeTreeFilterServiceTests
 
         _userStartNodeEntitiesServiceMock
             .Setup(x => x.SiblingUserAccessEntities(
-                UmbracoObjectTypes.Document,
+                It.Is<UmbracoObjectTypes[]>(t => t.SequenceEqual(new[] { UmbracoObjectTypes.Document })),
                 startNodePaths,
                 target,
                 5,
@@ -192,6 +192,28 @@ internal class UserStartNodeTreeFilterServiceTests
         Assert.IsFalse(result[2].HasAccess);
     }
 
+    [Test]
+    public void GetFilteredRootEntities_Passes_All_TreeObjectTypes_To_UserStartNodeEntitiesService()
+    {
+        UmbracoObjectTypes[] treeObjectTypes = [UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer];
+        var expected = new[]
+        {
+            new UserAccessEntity(CreateEntity(Guid.NewGuid()), true),
+        };
+
+        UmbracoObjectTypes[]? capturedObjectTypes = null;
+        _userStartNodeEntitiesServiceMock
+            .Setup(x => x.RootUserAccessEntities(It.IsAny<UmbracoObjectTypes[]>(), It.IsAny<int[]>()))
+            .Callback<UmbracoObjectTypes[], int[]>((types, _) => capturedObjectTypes = types)
+            .Returns(expected);
+
+        var sut = CreateService([100], [], treeObjectTypes);
+
+        sut.GetFilteredRootEntities(out _);
+
+        Assert.AreEqual(treeObjectTypes, capturedObjectTypes);
+    }
+
     private void SetupDataTypeIgnoringStartNodes(Guid dataTypeKey, bool ignores)
     {
         var dataTypeMock = new Mock<IDataType>();
@@ -204,8 +226,8 @@ internal class UserStartNodeTreeFilterServiceTests
             .ReturnsAsync(dataTypeMock.Object);
     }
 
-    private TestUserStartNodeTreeFilterService CreateService(int[] startNodeIds, string[] startNodePaths) =>
-        new(_userStartNodeEntitiesServiceMock.Object, _dataTypeServiceMock.Object, startNodeIds, startNodePaths);
+    private TestUserStartNodeTreeFilterService CreateService(int[] startNodeIds, string[] startNodePaths, UmbracoObjectTypes[]? treeObjectTypes = null) =>
+        new(_userStartNodeEntitiesServiceMock.Object, _dataTypeServiceMock.Object, startNodeIds, startNodePaths, treeObjectTypes ?? [UmbracoObjectTypes.Document]);
 
     private static IEntitySlim CreateEntity(Guid key)
     {
@@ -218,19 +240,22 @@ internal class UserStartNodeTreeFilterServiceTests
     {
         private readonly int[] _startNodeIds;
         private readonly string[] _startNodePaths;
+        private readonly UmbracoObjectTypes[] _treeObjectTypes;
 
         public TestUserStartNodeTreeFilterService(
             IUserStartNodeEntitiesService userStartNodeEntitiesService,
             IDataTypeService dataTypeService,
             int[] startNodeIds,
-            string[] startNodePaths)
+            string[] startNodePaths,
+            UmbracoObjectTypes[] treeObjectTypes)
             : base(userStartNodeEntitiesService, dataTypeService)
         {
             _startNodeIds = startNodeIds;
             _startNodePaths = startNodePaths;
+            _treeObjectTypes = treeObjectTypes;
         }
 
-        protected override UmbracoObjectTypes TreeObjectType => UmbracoObjectTypes.Document;
+        protected override UmbracoObjectTypes[] TreeObjectTypes => _treeObjectTypes;
 
         protected override int[] CalculateUserStartNodeIds() => _startNodeIds;
 

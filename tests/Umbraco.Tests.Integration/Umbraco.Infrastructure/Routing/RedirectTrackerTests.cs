@@ -28,9 +28,9 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     private IContent _rootPage;
     private IContent _testPage;
 
-    public override void CreateTestData()
+    public override async Task CreateTestDataAsync()
     {
-        base.CreateTestData();
+        await base.CreateTestDataAsync();
 
         var rootContent = ContentService.GetRootContent().First();
         _rootPage = rootContent;

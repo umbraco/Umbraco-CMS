@@ -108,6 +108,11 @@ public class PackageInstallation : IPackageInstallation
             packageDefinition.MediaUdis.Add(x.GetUdi());
         }
 
+        foreach (IElement x in installationSummary.ElementsInstalled)
+        {
+            packageDefinition.Elements.Add(x.Key);
+        }
+
         return installationSummary;
     }
 }

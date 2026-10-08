@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -22,22 +20,10 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     private readonly IRequestPreviewService _requestPreviewService;
     private readonly IPublishedContentCache _contentCache;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly IDocumentUrlService _documentUrlService;
     private RequestHandlerSettings _requestSettings;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ApiContentRouteBuilder"/> class.
-    /// </summary>
-    /// <param name="apiContentPathProvider">The API content path provider.</param>
-    /// <param name="globalSettings">The global settings.</param>
-    /// <param name="variationContextAccessor">The variation context accessor.</param>
-    /// <param name="requestPreviewService">The request preview service.</param>
-    /// <param name="requestSettings">The request handler settings.</param>
-    /// <param name="contentCache">The published content cache.</param>
-    /// <param name="navigationQueryService">The document navigation query service.</param>
-    /// <param name="publishStatusQueryService">The publish status query service.</param>
-    /// <param name="documentUrlService">The document URL service.</param>
     public ApiContentRouteBuilder(
         IApiContentPathProvider apiContentPathProvider,
         IOptions<GlobalSettings> globalSettings,
@@ -46,7 +32,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         IOptionsMonitor<RequestHandlerSettings> requestSettings,
         IPublishedContentCache contentCache,
         IDocumentNavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         IDocumentUrlService documentUrlService)
     {
         _apiContentPathProvider = apiContentPathProvider;
@@ -85,7 +71,8 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
             return null;
         }
 
-        var rootPath = root.UrlSegment(_variationContextAccessor, culture) ?? string.Empty;
+        var resolvedCulture = culture ?? _variationContextAccessor.VariationContext?.Culture ?? string.Empty;
+        var rootPath = _documentUrlService.GetUrlSegment(root.Key, resolvedCulture, isPreview) ?? string.Empty;
 
         if (_globalSettings.HideTopLevelNodeFromPath == false)
         {
@@ -99,7 +86,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     {
         // entirely unpublished content does not resolve any route, but we need one i.e. for preview to work,
         // so we'll use the content key as path.
-        if (isPreview && _publishStatusQueryService.IsDocumentPublished(content.Key, culture ?? string.Empty) is false)
+        if (isPreview && _publishStatusQueryService.IsPublished(content.Key, culture ?? string.Empty) is false)
         {
             return ContentPreviewPath(content);
         }

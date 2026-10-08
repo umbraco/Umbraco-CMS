@@ -1,7 +1,7 @@
 import type { UmbInstallerContext } from '../installer.context.js';
 import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
 
-import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIButtonElement, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, nothing, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import type {
@@ -21,7 +21,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	public databaseFormData!: DatabaseInstallRequestModel;
 
 	@state()
-	private _options: Option[] = [];
+	private _options: UUISelectOption[] = [];
 
 	@state()
 	private _databases: DatabaseSettingsPresentationModel[] = [];

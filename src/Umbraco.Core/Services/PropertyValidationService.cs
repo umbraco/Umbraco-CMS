@@ -1,9 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Validation;
@@ -18,6 +16,7 @@ namespace Umbraco.Cms.Core.Services;
 public class PropertyValidationService : IPropertyValidationService
 {
     private readonly IDataTypeService _dataTypeService;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly ILocalizedTextService _textService;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IValueEditorCache _valueEditorCache;
@@ -35,6 +34,7 @@ public class PropertyValidationService : IPropertyValidationService
     /// <param name="cultureDictionary">The culture dictionary for translating validation messages.</param>
     /// <param name="languageService">The language service for language operations.</param>
     /// <param name="contentSettings">The content settings options.</param>
+    /// <param name="idKeyMap">The cached id-to-key map used to resolve int data type IDs to GUID keys.</param>
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
@@ -42,7 +42,8 @@ public class PropertyValidationService : IPropertyValidationService
         IValueEditorCache valueEditorCache,
         ICultureDictionary cultureDictionary,
         ILanguageService languageService,
-        IOptions<ContentSettings> contentSettings)
+        IOptions<ContentSettings> contentSettings,
+        IIdKeyMap idKeyMap)
     {
         _propertyEditors = propertyEditors;
         _dataTypeService = dataTypeService;
@@ -51,6 +52,7 @@ public class PropertyValidationService : IPropertyValidationService
         _cultureDictionary = cultureDictionary;
         _languageService = languageService;
         _contentSettings = contentSettings.Value;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc />
@@ -64,7 +66,7 @@ public class PropertyValidationService : IPropertyValidationService
             throw new ArgumentNullException(nameof(propertyType));
         }
 
-        IDataType? dataType = GetDataType(propertyType);
+        IDataType? dataType = propertyType.GetDataType(_dataTypeService, _idKeyMap);
         if (dataType == null)
         {
             throw new InvalidOperationException("No data type found by id " + propertyType.DataTypeId);
@@ -130,7 +132,7 @@ public class PropertyValidationService : IPropertyValidationService
     }
 
     /// <inheritdoc />
-    public bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact? impact)
+    public bool IsPropertyDataValid(IPublishableContentBase content, out IProperty[] invalidProperties, CultureImpact? impact)
     {
         // select invalid properties
         invalidProperties = content.Properties.Where(x =>
@@ -173,8 +175,7 @@ public class PropertyValidationService : IPropertyValidationService
                 {
                     Culture = null,
                     Segment = null,
-                    CulturesBeingValidated = [impact.Culture!],
-                    SegmentsBeingValidated = []
+                    CulturesBeingValidated = [impact.Culture!]
                 });
 #pragma warning restore CS0618 // Type or member is obsolete
             }
@@ -206,8 +207,7 @@ public class PropertyValidationService : IPropertyValidationService
         {
             Culture = validationContext.Culture?.NullOrWhiteSpaceAsNull(),
             Segment = validationContext.Segment?.NullOrWhiteSpaceAsNull(),
-            CulturesBeingValidated = validationContext.CulturesBeingValidated,
-            SegmentsBeingValidated = validationContext.SegmentsBeingValidated
+            CulturesBeingValidated = validationContext.CulturesBeingValidated
         };
 
         var culture = validationContext.Culture;
@@ -249,7 +249,6 @@ public class PropertyValidationService : IPropertyValidationService
                         Culture = culture,
                         Segment = null,
                         CulturesBeingValidated = validationContext.CulturesBeingValidated,
-                        SegmentsBeingValidated = validationContext.SegmentsBeingValidated,
                     }))
             {
                 return false;
@@ -314,7 +313,7 @@ public class PropertyValidationService : IPropertyValidationService
             return true;
         }
 
-        var configuration = GetDataType(propertyType)?.ConfigurationObject;
+        var configuration = propertyType.GetDataType(_dataTypeService, _idKeyMap)?.ConfigurationObject;
         IDataValueEditor valueEditor = editor.GetValueEditor(configuration);
 
         var isRequired = ShouldValidateAsRequired(propertyType, validationContext);
@@ -330,9 +329,6 @@ public class PropertyValidationService : IPropertyValidationService
     /// </remarks>
     private static bool ShouldValidateAsRequired(IPropertyType propertyType, PropertyValidationContext validationContext)
         => propertyType.Mandatory && validationContext.Segment.IsNullOrWhiteSpace();
-
-    private IDataType? GetDataType(IPropertyType propertyType)
-        => _dataTypeService.GetDataType(propertyType.DataTypeId);
 
     private IDataEditor? GetDataEditor(IPropertyType propertyType)
         => _propertyEditors[propertyType.PropertyEditorAlias];

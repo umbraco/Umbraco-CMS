@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Notifications
     /// <summary>
     /// Notification that is raised when a recurring background job is triggered or executed.
     /// </summary>
-    public class RecurringBackgroundJobNotification : ObjectNotification<IRecurringBackgroundJob>
+    public abstract class RecurringBackgroundJobNotification : ObjectNotification<IRecurringBackgroundJob>
     {
         /// <summary>
         /// Gets the recurring background job associated with this notification.
@@ -19,6 +19,6 @@ namespace Umbraco.Cms.Infrastructure.Notifications
         /// </summary>
         /// <param name="target">The recurring background job that triggered the notification.</param>
         /// <param name="messages">The <see cref="EventMessages"/> associated with this notification instance.</param>
-        public RecurringBackgroundJobNotification(IRecurringBackgroundJob target, EventMessages messages) : base(target, messages) => Job = target;
+        protected RecurringBackgroundJobNotification(IRecurringBackgroundJob target, EventMessages messages) : base(target, messages) => Job = target;
     }
 }

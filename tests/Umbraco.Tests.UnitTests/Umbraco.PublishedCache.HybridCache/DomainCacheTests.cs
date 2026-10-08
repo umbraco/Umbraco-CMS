@@ -48,9 +48,7 @@ internal sealed class DomainCacheTests
     [Test]
     public void Can_Cache_Site_Default_Culture_Once_Runtime_Level_Is_Run()
     {
-#pragma warning disable CS0618 // Type or member is obsolete
-        DomainCache sut = CreateSut(() => RuntimeLevel.Run, out Mock<ILocalizationService> localizationService);
-#pragma warning restore CS0618 // Type or member is obsolete
+        DomainCache sut = CreateSut(() => RuntimeLevel.Run, out Mock<ILanguageService> languageService);
 
         for (var i = 0; i < 5; i++)
         {
@@ -58,38 +56,28 @@ internal sealed class DomainCacheTests
         }
 
         // Read per URL generated, so the resolved value must not be looked up again once it can be trusted.
-#pragma warning disable CS0618 // Type or member is obsolete. This is what DefaultCultureAccessor still calls.
-        localizationService.Verify(x => x.GetDefaultLanguageIsoCode(), Times.Once);
-#pragma warning restore CS0618 // Type or member is obsolete
+        languageService.Verify(x => x.GetDefaultIsoCodeAsync(), Times.Once);
     }
 
     [Test]
     public void Cannot_Retain_Empty_Site_Default_Culture()
     {
-#pragma warning disable CS0618 // Type or member is obsolete
-        DomainCache sut = CreateSut(() => RuntimeLevel.Run, out Mock<ILocalizationService> localizationService, siteDefaultCulture: null);
-#pragma warning restore CS0618 // Type or member is obsolete
+        DomainCache sut = CreateSut(() => RuntimeLevel.Run, out Mock<ILanguageService> languageService, siteDefaultCulture: null);
 
         Assert.AreEqual(string.Empty, sut.DefaultCulture);
 
-#pragma warning disable CS0618 // Type or member is obsolete. This is what DefaultCultureAccessor still calls.
-        localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns(SiteDefaultCulture);
-#pragma warning restore CS0618 // Type or member is obsolete
+        languageService.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync(SiteDefaultCulture);
 
         Assert.AreEqual(SiteDefaultCulture, sut.DefaultCulture);
     }
 
     private static DomainCache CreateSut(
         Func<RuntimeLevel> level,
-#pragma warning disable CS0618 // Type or member is obsolete
-        out Mock<ILocalizationService> localizationService,
-#pragma warning restore CS0618 // Type or member is obsolete
+        out Mock<ILanguageService> languageService,
         string? siteDefaultCulture = SiteDefaultCulture)
     {
-#pragma warning disable CS0618 // Type or member is obsolete
-        localizationService = new Mock<ILocalizationService>();
-        localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns(siteDefaultCulture!);
-#pragma warning restore CS0618 // Type or member is obsolete
+        languageService = new Mock<ILanguageService>();
+        languageService.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync(siteDefaultCulture!);
 
         var runtimeState = new Mock<IRuntimeState>();
         runtimeState.SetupGet(x => x.Level).Returns(level);
@@ -99,7 +87,7 @@ internal sealed class DomainCacheTests
 
         // The real accessor, so the test exercises the actual runtime-level-dependent behaviour it provides.
         var defaultCultureAccessor = new DefaultCultureAccessor(
-            localizationService.Object,
+            languageService.Object,
             runtimeState.Object,
             globalSettingsMonitor);
 

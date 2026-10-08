@@ -1,0 +1,1 @@
+export const UMB_BLOCK_ACTION_TRANSFER_TO_ELEMENT_LIBRARY_ALIAS = 'Umb.BlockAction.TransferToElementLibrary';

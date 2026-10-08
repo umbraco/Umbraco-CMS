@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -63,84 +61,6 @@ namespace Umbraco.Cms.Core.Services
             _userIdKeyResolver = userIdKeyResolver;
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
             _logger = loggerFactory.CreateLogger<MemberService>();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MemberService"/> class.
-        /// </summary>
-        /// <param name="provider">The core scope provider for managing database operations.</param>
-        /// <param name="loggerFactory">The factory for creating loggers.</param>
-        /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
-        /// <param name="memberGroupService">The service for managing member groups.</param>
-        /// <param name="memberRepository">The repository for member data access.</param>
-        /// <param name="memberTypeRepository">The repository for member type data access.</param>
-        /// <param name="memberGroupRepository">The repository for member group data access.</param>
-        /// <param name="auditRepository">The repository for audit data access (obsolete).</param>
-        /// <param name="idKeyMap">The lazy-loaded service for mapping between IDs and keys.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-        public MemberService(
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IMemberGroupService memberGroupService,
-            IMemberRepository memberRepository,
-            IMemberTypeRepository memberTypeRepository,
-            IMemberGroupRepository memberGroupRepository,
-            IAuditRepository auditRepository,
-            Lazy<IIdKeyMap> idKeyMap)
-            : this(
-                provider,
-                loggerFactory,
-                eventMessagesFactory,
-                memberGroupService,
-                memberRepository,
-                memberTypeRepository,
-                memberGroupRepository,
-                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-                idKeyMap,
-                StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MemberService"/> class.
-        /// </summary>
-        /// <param name="provider">The core scope provider for managing database operations.</param>
-        /// <param name="loggerFactory">The factory for creating loggers.</param>
-        /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
-        /// <param name="memberGroupService">The service for managing member groups.</param>
-        /// <param name="memberRepository">The repository for member data access.</param>
-        /// <param name="memberTypeRepository">The repository for member type data access.</param>
-        /// <param name="memberGroupRepository">The repository for member group data access.</param>
-        /// <param name="auditService">The service for audit logging.</param>
-        /// <param name="auditRepository">The repository for audit data access (obsolete).</param>
-        /// <param name="idKeyMap">The lazy-loaded service for mapping between IDs and keys.</param>
-        /// <param name="userIdKeyResolver">The resolver for user ID to key mapping.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-        public MemberService(
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IMemberGroupService memberGroupService,
-            IMemberRepository memberRepository,
-            IMemberTypeRepository memberTypeRepository,
-            IMemberGroupRepository memberGroupRepository,
-            IAuditService auditService,
-            IAuditRepository auditRepository,
-            Lazy<IIdKeyMap> idKeyMap,
-            IUserIdKeyResolver userIdKeyResolver)
-            : this(
-                provider,
-                loggerFactory,
-                eventMessagesFactory,
-                memberGroupService,
-                memberRepository,
-                memberTypeRepository,
-                memberGroupRepository,
-                auditService,
-                idKeyMap,
-                userIdKeyResolver)
-        {
         }
 
         #endregion
@@ -723,111 +643,6 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: null, Ordering.By("LoginName"));
         }
 
-        /// <inheritdoc />
-        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
-        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
-        {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            scope.ReadLock(Constants.Locks.MemberTree);
-            IQuery<IMember> query;
-
-            switch (matchType)
-            {
-                case StringPropertyMatchType.Exact:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlEquals(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlEquals(value, TextColumnType.NVarchar)));
-                    break;
-                case StringPropertyMatchType.Contains:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlContains(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlContains(value, TextColumnType.NVarchar)));
-                    break;
-                case StringPropertyMatchType.StartsWith:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue.SqlStartsWith(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue.SqlStartsWith(value, TextColumnType.NVarchar)));
-                    break;
-                case StringPropertyMatchType.EndsWith:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlEndsWith(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlEndsWith(value, TextColumnType.NVarchar)));
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(matchType));
-            }
-
-            return _memberRepository.Get(query);
-        }
-
-        /// <inheritdoc />
-        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
-        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
-        {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            scope.ReadLock(Constants.Locks.MemberTree);
-            IQuery<IMember> query;
-
-            switch (matchType)
-            {
-                case ValuePropertyMatchType.Exact:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue == value);
-                    break;
-                case ValuePropertyMatchType.GreaterThan:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue > value);
-                    break;
-                case ValuePropertyMatchType.LessThan:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue < value);
-                    break;
-                case ValuePropertyMatchType.GreaterThanOrEqualTo:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue >= value);
-                    break;
-                case ValuePropertyMatchType.LessThanOrEqualTo:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue <= value);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(matchType));
-            }
-
-            return _memberRepository.Get(query);
-        }
-
-        /// <inheritdoc />
-        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
-        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value)
-        {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            scope.ReadLock(Constants.Locks.MemberTree);
-            IQuery<IMember> query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).BoolPropertyValue == value);
-
-            return _memberRepository.Get(query);
-        }
-
-        /// <inheritdoc />
-        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
-        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
-        {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            scope.ReadLock(Constants.Locks.MemberTree);
-            IQuery<IMember> query;
-
-            switch (matchType)
-            {
-                case ValuePropertyMatchType.Exact:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue == value);
-                    break;
-                case ValuePropertyMatchType.GreaterThan:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue > value);
-                    break;
-                case ValuePropertyMatchType.LessThan:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue < value);
-                    break;
-                case ValuePropertyMatchType.GreaterThanOrEqualTo:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue >= value);
-                    break;
-                case ValuePropertyMatchType.LessThanOrEqualTo:
-                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue <= value);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(matchType)); // causes rollback // causes rollback
-            }
-
-            // TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
-            return _memberRepository.Get(query);
-        }
-
         /// <summary>
         /// Checks if a Member with the id exists
         /// </summary>
@@ -1003,8 +818,8 @@ namespace Umbraco.Cms.Core.Services
             }
 
             // Login is not a member update: UpdateDate is intentionally left untouched, and the
-            // IndexableFieldsChanged state flag tells the Examine indexing handler to skip the
-            // re-index since no indexed field has changed.
+            // IndexableFieldsChanged state flag tells search indexing to skip the re-index since
+            // no indexed field has changed.
             var savingNotification = new MemberSavingNotification(member, evtMsgs);
             savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
             savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, false);
@@ -1173,7 +988,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 foreach (IMemberGroup memberGroup in found)
                 {
-                    _memberGroupService.Delete(memberGroup);
+                    _memberGroupService.DeleteAsync(memberGroup.Key).GetAwaiter().GetResult();
                 }
             }
 
@@ -1312,12 +1127,13 @@ namespace Umbraco.Cms.Core.Services
         /// </remarks>
         public MemberExportModel? ExportMember(Guid key)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             IQuery<IMember>? query = Query<IMember>().Where(x => x.Key == key);
             IMember? member = _memberRepository.Get(query)?.FirstOrDefault();
 
             if (member == null)
             {
+                scope.Complete();
                 return null;
             }
 
@@ -1336,6 +1152,7 @@ namespace Umbraco.Cms.Core.Services
             };
 
             scope.Notifications.Publish(new ExportedMemberNotification(member, model));
+            scope.Complete();
 
             return model;
         }

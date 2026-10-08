@@ -62,11 +62,33 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		// TODO: Investigate whether some of these interceptors (e.g. addUmbGeneratedResourceInterceptor,
 		// addForbiddenResponseInterceptor, addUmbNotificationsInterceptor, addErrorInterceptor) belong
 		// somewhere else, since they are not auth-specific.
+		this.addSessionActivityInterceptor(client);
 		this.addAuthResponseInterceptor(client);
 		this.addForbiddenResponseInterceptor(client);
 		this.addUmbGeneratedResourceInterceptor(client);
 		this.addUmbNotificationsInterceptor(client);
 		this.addErrorInterceptor(client);
+	}
+
+	/**
+	 * Interceptor which signals the auth layer that a request succeeded. The server renews the session
+	 * on any request carrying a valid session, so this is what lets the auth layer keep its own expiry
+	 * bookkeeping in step with the server without a request of its own.
+	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 * @internal
+	 */
+	addSessionActivityInterceptor(client: typeof umbHttpClient) {
+		client.interceptors.response.use((response): Response => {
+			// A successful response stands in for the renewal, which the client cannot observe directly:
+			// the session lives in a cookie it cannot read. The proxy is optimistic in one direction —
+			// a request to an endpoint that does not require a session succeeds without renewing one —
+			// so it can report activity the server did not act on, never miss activity it did.
+			if (response.ok) {
+				this.#signaler.signalActivity();
+			}
+
+			return response;
+		});
 	}
 
 	/**
@@ -277,7 +299,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any. Removes the umb-notifications from the headers.
+	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any.
 	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 * @internal
 	 */
@@ -295,11 +317,15 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				if (!isUmbNotifications(notifications)) return response;
 
 				for (const notification of notifications) {
+					// Backend event messages may contain HTML (e.g. links) and are rendered sanitized by the
+					// notification layout via htmlMessage. The plain message must stay markup-free because it is
+					// read by screen readers (see umb-backoffice-notification-container).
 					this.#peekError(
 						notification.category,
-						notification.message,
+						this.#extractText(notification.message),
 						undefined,
 						extractUmbNotificationColor(notification.type),
+						notification.message,
 					);
 				}
 			} catch {
@@ -356,25 +382,29 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
 	 * Helper to create a new Response with correct Content-Type.
 	 * @param {unknown} body The body of the response, can be a string or an object.
-	 * @param {Response} originalResponse The original response to copy status and headers from.
+	 * @param {Response} [originalResponse] The original response to copy status and headers from, if any.
+	 * @param {number} [fallbackStatus] Status to use when no upstream response is available. Defaults to 500.
 	 * @returns {Response} The new Response object with the correct Content-Type and body.
 	 */
-	#createResponse(body: unknown, originalResponse: Response): Response {
+	#createResponse(body: unknown, originalResponse?: Response, fallbackStatus: number = 500): Response {
 		const isString = typeof body === 'string';
 		const contentType = isString ? 'text/plain' : 'application/json';
 		const responseBody = isString ? body : JSON.stringify(body);
 
-		// Construct new headers but preserve "X-" headers from the original response
+		// Construct new headers but preserve "X-" headers and Umbraco's own "Umb-" headers from the original
+		// response, so interceptors running after the one that rebuilt it can still read them.
+		// @see https://github.com/umbraco/Umbraco-CMS/issues/23589
 		const headersOverride: Record<string, string> = {};
-		originalResponse.headers.forEach((value, key) => {
-			if (key.toLowerCase().startsWith('x-')) {
+		originalResponse?.headers.forEach((value, key) => {
+			const name = key.toLowerCase();
+			if (name.startsWith('x-') || name.startsWith('umb-')) {
 				headersOverride[key] = value;
 			}
 		});
 
 		return new Response(responseBody, {
-			status: originalResponse.status,
-			statusText: originalResponse.statusText,
+			status: originalResponse?.status ?? fallbackStatus,
+			statusText: originalResponse?.statusText ?? '',
 			headers: {
 				...headersOverride,
 				'Content-Type': contentType,
@@ -383,13 +413,29 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
+	 * Extracts the plain text of an HTML string using an inert document, so nothing is executed or loaded.
+	 * @param {string} html The HTML string.
+	 * @returns {string} The text content of the parsed HTML.
+	 */
+	#extractText(html: string): string {
+		return new DOMParser().parseFromString(html, 'text/html').body.textContent ?? '';
+	}
+
+	/**
 	 * Helper to show a notification error.
 	 * @param {string} headline The headline of the error notification.
 	 * @param {string} message The message of the error notification.
 	 * @param {Record<string, string[]>} [errors] Validation errors keyed by field name.
 	 * @param {UmbNotificationColor} [color] The color of the notification.
+	 * @param {string} [htmlMessage] A message rendered as sanitized HTML, taking precedence over `message`.
 	 */
-	async #peekError(headline: string, message: string, errors?: Record<string, string[]>, color?: UmbNotificationColor) {
+	async #peekError(
+		headline: string,
+		message: string,
+		errors?: Record<string, string[]>,
+		color?: UmbNotificationColor,
+		htmlMessage?: string,
+	) {
 		// Store the host for usage in the following async context
 		const host = this._host;
 
@@ -397,6 +443,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, {
 			headline,
 			message,
+			htmlMessage,
 			errors,
 			color,
 		});

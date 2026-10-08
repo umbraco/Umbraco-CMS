@@ -35,7 +35,9 @@ export default [
 			'src/packages/core/icon-registry/icons.ts',
 			'src/**/*.test.ts',
 			'src/packages/core/backend-api',
-			'src/packages/core/openapi-ts.*.js',
+			'src/packages/search-management/examine/api',
+			'src/packages/core/openapi-ts.config.ts',
+			'src/packages/search-management/openapi-ts.config.ts',
 		],
 	},
 
@@ -66,6 +68,7 @@ export default [
 			'local-rules/enforce-manifest-alias': 'warn',
 			'local-rules/prefer-static-styles-last': 'warn',
 			'local-rules/no-unsafe-localize': 'error',
+			'local-rules/no-unknown-localization-key': 'error',
 			'local-rules/enforce-null-observe-alias-in-constructor': 'error',
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',

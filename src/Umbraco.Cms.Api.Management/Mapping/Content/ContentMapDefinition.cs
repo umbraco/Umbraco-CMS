@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -27,17 +28,9 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
         _dataValueEditorFactory = dataValueEditorFactory;
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    protected ContentMapDefinition(PropertyEditorCollection propertyEditorCollection)
-        : this(
-            propertyEditorCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
-    {
-    }
-
     protected delegate void ValueViewModelMapping(IDataEditor propertyEditor, TValueViewModel variantViewModel);
 
-    protected delegate void VariantViewModelMapping(string? culture, string? segment, TVariantViewModel variantViewModel);
+    protected delegate void VariantViewModelMapping(string? culture, TVariantViewModel variantViewModel);
 
     protected IEnumerable<TValueViewModel> MapValueViewModels(
         IEnumerable<IProperty> properties,
@@ -88,27 +81,52 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
 
     protected IEnumerable<TVariantViewModel> MapVariantViewModels(TContent source, VariantViewModelMapping? additionalVariantMapping = null)
     {
-        IPropertyValue[] propertyValues = source.Properties.SelectMany(propertyCollection => propertyCollection.Values).ToArray();
         var cultures = source.AvailableCultures.DefaultIfEmpty(null).ToArray();
-        // the default segment (null) must always be included in the view model - both for variant and invariant documents
-        var segments = propertyValues.Select(property => property.Segment).Union([null]).Distinct().ToArray();
 
         return cultures
-            .SelectMany(culture => segments.Select(segment =>
+            .Select(culture =>
             {
                 var variantViewModel = new TVariantViewModel
                 {
                     Culture = culture,
-                    Segment = segment,
                     Name = source.GetCultureName(culture) ?? string.Empty,
                     CreateDate = source.CreateDate, // apparently there is no culture specific creation date
                     UpdateDate = culture == null
                         ? source.UpdateDate
                         : source.GetUpdateDate(culture) ?? source.UpdateDate,
                 };
-                additionalVariantMapping?.Invoke(culture, segment, variantViewModel);
+                additionalVariantMapping?.Invoke(culture, variantViewModel);
                 return variantViewModel;
-            }))
+            })
             .ToArray();
     }
+
+    protected void MapContentScheduleCollection<TContentResponseModel, TPublishableVariantResponseModelBase>(ContentScheduleCollection source, TContentResponseModel target, MapperContext context)
+        where TContentResponseModel : ContentResponseModelBase<TValueViewModel, TPublishableVariantResponseModelBase>
+        where TPublishableVariantResponseModelBase : PublishableVariantResponseModelBase, TVariantViewModel
+    {
+        foreach (ContentSchedule schedule in source.FullSchedule)
+        {
+            TPublishableVariantResponseModelBase? variant = target.Variants
+                .FirstOrDefault(v =>
+                    v.Culture == schedule.Culture ||
+                    (IsInvariant(v.Culture) && IsInvariant(schedule.Culture)));
+            if (variant is null)
+            {
+                continue;
+            }
+
+            switch (schedule.Action)
+            {
+                case ContentScheduleAction.Release:
+                    variant.ScheduledPublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
+                    break;
+                case ContentScheduleAction.Expire:
+                    variant.ScheduledUnpublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
+                    break;
+            }
+        }
+    }
+
+    private static bool IsInvariant(string? culture) => culture.IsNullOrWhiteSpace() || culture == Core.Constants.System.InvariantCulture;
 }

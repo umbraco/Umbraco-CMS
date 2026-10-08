@@ -16,6 +16,7 @@ export class UserUiHelper extends UiBaseLocators {
   private readonly userSectionCard: Locator;
   private readonly statusBtn: Locator;
   private readonly groupBtn: Locator;
+  private readonly typeBtn: Locator;
   private readonly chooseUserGroupsBtn: Locator;
   private readonly allowAccessToAllDocumentsToggle: Locator;
   private readonly allowAccessToAllMediaToggle: Locator;
@@ -49,6 +50,7 @@ export class UserUiHelper extends UiBaseLocators {
     this.userSectionCard = page.locator('uui-card-user');
     this.statusBtn = page.locator('uui-button', {hasText: 'Status'});
     this.groupBtn = page.locator('uui-button', {hasText: 'Groups'});
+    this.typeBtn = page.locator('uui-button', {hasText: 'Type'});
     this.allowAccessToAllDocumentsToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all documents'}).locator('#toggle');
     this.allowAccessToAllMediaToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all media'}).locator('#toggle');
     this.mediaInput = page.locator('umb-input-media');
@@ -120,23 +122,8 @@ export class UserUiHelper extends UiBaseLocators {
     return await this.isVisible(this.page.getByText(name, {exact: true}), isVisible);
   }
 
-  async clickChangePhotoButton() {
-    await this.click(this.changePhotoBtn);
-  }
-
   async clickRemoveButtonForUserGroupWithName(userGroupName: string) {
     await this.click(this.page.locator('umb-user-group-ref', {hasText: userGroupName}).locator('[label="Remove"]'));
-  }
-
-  async clickRemovePhotoButton() {
-    await this.click(this.removePhotoBtn);
-  }
-
-  async changePhotoWithFileChooser(filePath: string) {
-    const fileChooserPromise = this.page.waitForEvent('filechooser');
-    await this.clickChangePhotoButton();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles(filePath);
   }
 
   async searchInUserSection(name: string) {
@@ -194,6 +181,11 @@ export class UserUiHelper extends UiBaseLocators {
     await this.click(this.page.locator('label').filter({hasText: groupName}));
   }
 
+  async filterByTypeName(typeName: string) {
+    await this.click(this.typeBtn);
+    await this.click(this.page.locator('label').filter({hasText: typeName}));
+  }
+
   async isPasswordUpdatedForUserWithId(userId: string) {
     await Promise.all([
       this.page.waitForResponse(resp => resp.url().includes(umbracoConfig.environment.baseUrl + '/umbraco/management/api/v1/user/' + userId + '/change-password') && resp.status() === 200),
@@ -203,10 +195,6 @@ export class UserUiHelper extends UiBaseLocators {
 
   async clickChooseContainerButton() {
     await this.click(this.chooseContainerBtn);
-  }
-
-  async selectUserLanguage(language: string) {
-    await this.languageBtn.selectOption(language, {force: true});
   }
 
   async clickRemoveButtonForContentNodeWithName(name: string) {
@@ -266,7 +254,7 @@ export class UserUiHelper extends UiBaseLocators {
     await this.clickUsersMenu();
     await this.searchInUserSection(name);
     await this.clickUserWithName(name);
-    await this.hasValue(this.nameOfUserInput, name);
+    await this.hasValue(this.nameOfUserInput, name, ConstantHelper.timeout.navigation);
   }
 
   async clickUserButton() {
@@ -303,5 +291,9 @@ export class UserUiHelper extends UiBaseLocators {
     const userGroupRefLocator = this.page.locator('umb-user-group-ref').filter({has: this.page.getByText(userGroupName, {exact: true})});
     const detailsLocator = userGroupRefLocator.locator('#details');
     return await this.containsText(detailsLocator, details);
+  }
+
+  async doesUserHaveAccessToElementNodeWithName(name: string) {
+    await this.isVisible(this.elementStartNode.locator(`[name="${name}"]`));
   }
 }

@@ -3,7 +3,7 @@
 Published content caching layer for Umbraco CMS using Microsoft's HybridCache (in-memory + optional distributed cache). Provides high-performance content delivery with cache seeding, serialization, and notification-based invalidation.
 
 **Project Type**: Class Library (NuGet package)
-**Target Framework**: net10.0
+**Target Framework**: net11.0
 **Package ID**: Umbraco.Cms.PublishedCache.HybridCache
 **Namespace**: Umbraco.Cms.Infrastructure.HybridCache
 **Dependencies**: Umbraco.Core, Umbraco.Infrastructure, Microsoft.Extensions.Caching.Hybrid, MessagePack, K4os.Compression.LZ4
@@ -271,8 +271,8 @@ exposes the underlying `IMember`, which cannot be reconstructed from a cache row
 regardless — there is nothing a cached row could save. Nothing reads member rows, and the rebuild does not write
 them.
 
-Consequence for anything touching the rebuild: it has two arms (documents and media), not three. A site upgraded
-from a version that did write member rows keeps them until its next *full* rebuild, which truncates the table.
+Consequence for anything touching the rebuild: its arms are documents, media and elements - never members. A site upgraded
+from a version that did write member rows keeps them until its next *full* rebuild, which clears the whole table.
 
 ### Draft vs Published Caching
 
@@ -287,14 +287,14 @@ Before returning cached content, verifies ancestor path is published via `_publi
 
 ### In-Memory Content Cache (the L0 converted-content cache)
 
-The converted `IPublishedContent` objects are cached behind `IConvertedPublishedContentCache<TKey>`
-(`Services/IConvertedPublishedContentCache.cs`), used by `DocumentCacheService` (`<string>`) and
-`MediaCacheService` (`<Guid>`), since `ContentCacheNode` → `IPublishedContent` conversion is expensive.
+The converted `IPublishedElement` objects are cached behind `IConvertedPublishedContentCache<TKey, TValue>`
+(`Services/IConvertedPublishedContentCache.cs`), used by `DocumentCacheService` (`<string, IPublishedContent>`),
+`MediaCacheService` (`<Guid, IPublishedContent>`) and `ElementCacheService` (`<string, IPublishedElement>`).
 This is the single insert/remove/clear path for the L0 cache, and each implementation tracks both the entry
 count and an approximate retained byte total. The implementation is chosen per service by
-`IConvertedPublishedContentCacheFactory` (injected into both services) from the configured maximum.
+`IConvertedPublishedContentCacheFactory` (injected into all three services) from the configured maximum.
 
-The cache is **unbounded by default** — `UnboundedConvertedPublishedContentCache<TKey>`, a plain
+The cache is **unbounded by default** — `UnboundedConvertedPublishedContentCache<TKey, TValue>`, a plain
 `ConcurrentDictionary` only evicted on content change / explicit clear, so walking the whole published tree
 (Delivery API crawl, sitemap, warm-up) retains the whole tree's converted form.
 
@@ -303,7 +303,8 @@ A **bounded, scan-resistant** mode is available as an **opt-in package**,
 **not** part of the default install — that keeps its `BitFaster.Caching` dependency (the W-TinyLFU
 `ConcurrentLfu` backing) out of every site's dependency graph. Installing the package registers
 `IBoundedConvertedPublishedContentCacheFactory` (via an auto-discovered `IComposer`); then setting
-`CacheSettings.Entry.Document.MaximumLocalCacheItems` / `...Media.MaximumLocalCacheItems` makes the
+`CacheSettings.Entry.Document.MaximumLocalCacheItems` / `...Media.MaximumLocalCacheItems` /
+`...Element.MaximumLocalCacheItems` makes the
 corresponding L0 cache bounded, so frequently requested content is retained while rarely accessed content is
 evicted and a one-off full-tree walk cannot grow it without bound. If a maximum is configured but the
 package is absent, the default factory logs a `Warning` and falls back to unbounded (it never fails to boot).
@@ -319,8 +320,9 @@ The in-memory structures whose footprint scales with the size of the content tre
 |------------------------|-----------|---------------|
 | `Published content (converted, L0)` | `DocumentCacheService` L0 cache | running total of per-entry node-size estimates |
 | `Published media (converted, L0)` | `MediaCacheService` L0 cache | running total of per-entry node-size estimates |
+| `Published elements (converted, L0)` | `ElementCacheService` L0 cache | running total of per-entry node-size estimates |
 | `Document URL segments` | `DocumentUrlService._documentUrlCache` (≈ documents × cultures × draft/published) | sampled structural estimate |
-| `Document navigation` / `Media navigation` | the in-memory navigation trees (active + recycle bin) | sampled structural estimate |
+| `Document navigation` / `Media navigation` / `Element navigation` | the in-memory navigation trees (active + recycle bin) | sampled structural estimate |
 
 `MemoryCacheSizeReportingJob` (a recurring job, all server roles, 1-minute period) logs each count and byte
 estimate plus `GC.GetTotalMemory` and `Environment.WorkingSet` **at `Debug` level** — enable `Debug` for

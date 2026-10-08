@@ -46,7 +46,9 @@ internal sealed class MediaEditingService
         IMediaValidationService mediaValidationService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        ILanguageService languageService,
+        IUserService userService)
         : base(
             contentService,
             contentTypeService,
@@ -59,14 +61,16 @@ internal sealed class MediaEditingService
             treeEntitySortingService,
             optionsMonitor,
             relationService,
-            contentTypeFilters)
+            contentTypeFilters,
+            languageService,
+            userService)
         => _logger = logger;
 
     /// <inheritdoc/>
     protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
 
     /// <inheritdoc />
-    public Task<IMedia?> GetAsync(Guid key)
+    public override Task<IMedia?> GetAsync(Guid key)
     {
         IMedia? media = ContentService.GetById(key);
         return Task.FromResult(media);
@@ -166,11 +170,6 @@ internal sealed class MediaEditingService
         => await HandleMoveAsync(key, parentKey, userKey);
 
     /// <inheritdoc />
-    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
-    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await RestoreAsync(key, parentKey, userKey, true);
-
-    /// <inheritdoc />
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
         => await HandleMoveAsync(key, parentKey, userKey, true, includeDescendants);
 
@@ -184,8 +183,9 @@ internal sealed class MediaEditingService
         // Media never varies by culture, so children are always ordered by the invariant name.
         => await HandleSortByFieldAsync(parentKey, field, direction, culture: null, userKey);
 
+
     /// <inheritdoc />
-    protected override IMedia New(string? name, int parentId, IMediaType mediaType)
+    protected override IMedia New(string name, int parentId, IMediaType mediaType)
         => new Models.Media(name, parentId, mediaType);
 
     /// <inheritdoc />
@@ -194,7 +194,7 @@ internal sealed class MediaEditingService
 
     /// <inheritdoc />
     /// <exception cref="NotSupportedException">Copy is not supported for media items.</exception>
-    protected override IMedia? Copy(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override Task<IMedia?> CopyAsync(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => throw new NotSupportedException("Copy is not supported for media");
 
     /// <inheritdoc />

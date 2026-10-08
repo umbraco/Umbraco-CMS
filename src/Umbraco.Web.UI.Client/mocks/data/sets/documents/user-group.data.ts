@@ -1,5 +1,6 @@
 import type { UmbMockUserGroupModel } from '../../mock-data-set.types.js';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ADMIN_USER_GROUP_ID = 'variant-documents-user-group-administrators-id';
 
 export const data: Array<UmbMockUserGroupModel> = [
@@ -41,6 +42,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		languages: [],
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
+		elementRootAccess: true,
 		mediaRootAccess: true,
 		aliasCanBeChanged: false,
 		isDeletable: false,

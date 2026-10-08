@@ -46,7 +46,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IMediaTypeContainerRepository, MediaTypeContainerRepository>();
         builder.Services.AddUnique<IMediaTypeRepository, MediaTypeRepository>();
         builder.Services.AddUnique<IMemberGroupRepository, MemberGroupRepository>();
-        builder.Services.AddUnique<IMemberRepository, MemberRepository>();
+        builder.Services.AddUnique<IMemberRepository>(sp => ActivatorUtilities.CreateInstance<MemberRepository>(sp));
         builder.Services.AddUnique<IExternalMemberRepository, ExternalMemberRepository>();
         builder.Services.AddUnique<IMemberFilterRepository, MemberFilterRepository>();
         builder.Services.AddUnique<IMemberTypeContainerRepository, MemberTypeContainerRepository>();
@@ -69,8 +69,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IStylesheetRepository, StylesheetRepository>();
         builder.Services.AddUnique<IContentTypeCommonRepository, ContentTypeCommonRepository>();
         builder.Services.AddUnique<IKeyValueRepository, KeyValueRepository>();
-        builder.Services.AddUnique<IInstallationRepository, InstallationRepository>();
-        builder.Services.AddUnique<IUpgradeCheckRepository, UpgradeCheckRepository>();
         builder.Services.AddUnique<ILogViewerQueryRepository, LogViewerQueryRepository>();
         builder.Services.AddUnique<INodeCountRepository, NodeCountRepository>();
         builder.Services.AddUnique<IIdKeyMapRepository, IdKeyMapRepository>();
@@ -93,6 +91,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDatabaseReadOnlyAccessor, DatabaseReadOnlyAccessor>();
         builder.Services.AddUnique<ILastSyncedRepository, ServerRoleAwareLastSyncedRepository>();
         builder.Services.AddUnique<IDistributedJobRepository, DistributedJobRepository>();
+        builder.Services.AddUnique<IElementRepository, ElementRepository>();
+        builder.Services.AddUnique<IElementContainerRepository, ElementContainerRepository>();
+        builder.Services.AddUnique<IElementVersionRepository, ElementVersionRepository>();
 
         return builder;
     }

@@ -53,11 +53,19 @@ internal sealed class MemberContentEditingService
         IUserService userService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService, optionsMonitor, relationService, contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        ILanguageService languageService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService, optionsMonitor, relationService, contentTypeFilters, languageService, userService)
     {
         _logger = logger;
         _userService = userService;
+    }
+
+    /// <inheritdoc />
+    public override Task<IMember?> GetAsync(Guid key)
+    {
+        IMember? content = ContentService.GetById(key);
+        return Task.FromResult(content);
     }
 
     /// <inheritdoc />
@@ -106,7 +114,7 @@ internal sealed class MemberContentEditingService
         => await HandleDeleteAsync(key, userKey, false);
 
     /// <inheritdoc />
-    protected override IMember New(string? name, int parentId, IMemberType memberType)
+    protected override IMember New(string name, int parentId, IMemberType memberType)
         => throw new NotSupportedException("Member creation is not supported by this service. This should never be called.");
 
     /// <inheritdoc />
@@ -114,7 +122,7 @@ internal sealed class MemberContentEditingService
         => throw new InvalidOperationException("Move is not supported for members");
 
     /// <inheritdoc />
-    protected override IMember? Copy(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override Task<IMember?> CopyAsync(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => throw new NotSupportedException("Copy is not supported for Member");
 
     /// <inheritdoc />

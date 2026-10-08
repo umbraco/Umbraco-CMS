@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Media;
 
-internal sealed class MediaBreadthFirstKeyProvider :  BreadthFirstKeyProvider, IMediaSeedKeyProvider
+internal sealed class MediaBreadthFirstKeyProvider : BreadthFirstKeyProvider, IMediaSeedKeyProvider
 {
     public MediaBreadthFirstKeyProvider(
         IMediaNavigationQueryService navigationQueryService, IOptions<CacheSettings> cacheSettings)

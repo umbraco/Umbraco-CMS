@@ -397,7 +397,7 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Cannot_Save_DataType_With_Empty_Name()
+    public async Task Cannot_Save_DataType_With_Empty_Name()
     {
         // Act
         var dataTypeDefinition =
@@ -408,9 +408,9 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
             };
 
         // Act & Assert
-#pragma warning disable CS0618 // Type or member is obsolete
-        Assert.Throws<ArgumentException>(() => DataTypeService.Save(dataTypeDefinition));
-#pragma warning restore CS0618 // Type or member is obsolete
+        var result = await DataTypeService.CreateAsync(dataTypeDefinition, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.InvalidName, result.Status);
     }
 
     [Test]

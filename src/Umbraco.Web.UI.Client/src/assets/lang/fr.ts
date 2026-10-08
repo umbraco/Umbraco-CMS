@@ -528,33 +528,6 @@ export default {
 		changeKeyError: "La clé '%0%' existe déjà.",
 		overviewTitle: 'Aperçu du dictionaire',
 	},
-	examineManagement: {
-		configuredSearchers: 'Recherches configurées',
-		configuredSearchersDescription:
-			'Affiche les propriétés et les outils de chaque Recherche configurée (e.g. une recherche multi-index)',
-		fieldValues: 'Valeurs du champ',
-		healthStatus: 'Etat de santé',
-		healthStatusDescription: "L'état de santé de l'index et s'il peut être lu",
-		indexers: 'Indexeurs',
-		indexInfo: 'Info Index',
-		indexInfoDescription: "Liste les propriétés de l'index",
-		manageIndexes: "Gérer les index d'Examine",
-		manageIndexesDescription:
-			'Vous permet de voir les détails de chaque index et fournit des outils pour gérer les index',
-		rebuildIndex: "Reconstruire l'index",
-		rebuildIndexWarning:
-			"\n      Ceci provoquera la reconstruction de l'index.<br />\n      Cela pourrait prendre un certain temps en fonction de la quantité de contenu présente dans votre site.<br />\n      Il est déconseillé de reconstruire un index pendant les périodes de trafic intense sur le site web ou quand les éditeurs sont en train d'éditer du contenu.\n     ",
-		searchers: 'Recherches',
-		searchDescription: "Rechercher dans l'index et afficher les résultats",
-		tools: 'Outils',
-		toolsDescription: "Outils pour gérer l'index",
-		fields: 'champs',
-		indexCannotRead: "L'index ne peut pas être lu et devra être reconstruit",
-		processIsTakingLonger:
-			"Le processus dure plus de temps que prévu, vérifiez les logs Umbraco afin de voir s'il y a eu des erreurs pendant cette opératon",
-		indexCannotRebuild: "Cet index ne peut pas être reconstruit parce qu'on ne lui a pas assigné de",
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: "Votre nom d'utilisateur",
 		password: 'Votre mot de passe',
@@ -934,8 +907,6 @@ export default {
 		instruction: 'Connectez-vous ci-dessous',
 		signInWith: 'Identifiez-vous avec {0}',
 		timeout: 'La session a expiré',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ',
 		forgottenPassword: 'Mot de passe oublié?',
 		forgottenPasswordInstruction:
 			"Un email contenant un lien pour ré-initialiser votre mot de passe sera envoyé à l'adresse spécifiée",
@@ -947,9 +918,6 @@ export default {
 		setPasswordInstruction: 'Veuillez fournir un nouveau mot de passe',
 		setPasswordConfirmation: 'Votre mot de passe a été mis à jour',
 		resetCodeExpired: 'Le lien sur lequel vous avez cliqué est non valide ou a expiré.',
-		resetPasswordEmailCopySubject: 'Umbraco: Ré-initialiser le mot de passe',
-		resetPasswordEmailCopyFormat:
-			"\n        <html>\n\t\t\t<head>\n\t\t\t\t<meta name='viewport' content='width=device-width'>\n\t\t\t\t<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n\t\t\t</head>\n\t\t\t<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>\n\t\t\t\t<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>\n\t\t\t\t<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"body\" style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;\" bgcolor=\"#1d1333\">\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;\" valign=\"top\">\n\t\t\t\t\t\t\t<table style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;\">\n\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t<td background=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" bgcolor=\"#1d1333\" width=\"28\" height=\"28\" valign=\"top\" style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\">\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\" style=\"width:30px;height:30px;\"> <v:fill type=\"tile\" src=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" color=\"#1d1333\" /> <v:textbox inset=\"0,0,0,0\"> <![endif]-->\n\t\t\t\t\t\t\t\t\t\t<div> </div>\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->\n\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\" valign=\"top\"></td>\n\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t</td>\n\t\t\t\t\t</tr>\n\t\t\t\t</table>\n\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>\n\t\t\t\t\t\t<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>\n\t\t\t\t\t\t\t<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>\n\t\t\t\t\t\t\t\t<br>\n\t\t\t\t\t\t\t\t<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>\n\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>\n\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tUne réinitialisation de votre mot de passe a été demandée\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</h1>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tVotre nom d'utilisateur pour vous connecter au backoffice Umbraco est : <strong>%0%</strong>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCliquez sur ce lien pour réinitialiser votre mot de passe\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tbody>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Si vous ne pouvez pas cliquer sur le lien, recopiez cet URL dans votre navigateur :</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<font style=\"-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</font>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t<br><br><br>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</td>\n\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>\n\t\t\t\t\t</tr>\n\t\t\t\t</table>\n\t\t\t</body>\n\t\t</html>\n\t",
 	},
 	main: {
 		dashboard: 'Tableau de bord',
@@ -1131,7 +1099,7 @@ export default {
 	},
 	sections: {
 		content: 'Contenu',
-		forms: 'Formulaires',
+		library: 'Bibliothèque',
 		media: 'Medias',
 		member: 'Membres',
 		packages: 'Packages',
@@ -1744,6 +1712,7 @@ export default {
 		stateLockedOut: 'Bloqué',
 		stateInvited: 'Invité',
 		stateInactive: 'Inactif',
+		type: 'Type',
 		sortNameAscending: 'Nom (A-Z)',
 		sortNameDescending: 'Nom (Z-A)',
 		sortCreateDateAscending: 'Plus ancien',
@@ -1877,7 +1846,6 @@ export default {
 		contentRedirectManager: "Gestion des redirections d'URL",
 		mediaFolderBrowser: 'Contenu',
 		settingsWelcome: 'Bienvenue',
-		settingsExamine: "Gestion d'Examine",
 		settingsPublishedStatus: 'Statut Publié',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Health Check',

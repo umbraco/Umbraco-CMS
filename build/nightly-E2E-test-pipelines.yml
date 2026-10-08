@@ -4,11 +4,11 @@ pr: none
 trigger: none
 
 schedules:
-  - cron: '0 3 * * *'
-    displayName: Daily 3AM build (v17/dev)
+  - cron: '30 1 * * *'
+    displayName: Daily 1:30 AM build (v19/dev)
     branches:
       include:
-        - v17/dev
+        - v19/dev
 
 parameters:
   - name: skipIntegrationTests
@@ -33,7 +33,6 @@ parameters:
     default: true
 
 variables:
-  nodeVersion: 20
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -69,13 +68,9 @@ stages:
             inputs:
               command: restore
               projects: $(solution)
-          - task: DotNetCoreCLI@2
+          - script: dotnet build $(solution) --configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
             name: build
             displayName: Run dotnet build and generate NuGet packages
-            inputs:
-              command: build
-              projects: $(solution)
-              arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
@@ -189,7 +184,7 @@ stages:
               command: test
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
-              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
 
       # Integration Tests (SQL Server)
       - job:
@@ -199,31 +194,37 @@ stages:
           SA_PASSWORD: UmbracoAcceptance123!
         strategy:
           matrix:
-            # We split the tests into 4 parts for each OS to reduce the time it takes to run them on the pipeline
-            WindowsPart1Of4:
+            # Windows is split into 5 parts (ManagementApi split in two to avoid memory pressure on LocalDb); Linux into 4.
+            WindowsPart1Of5:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
-            WindowsPart2Of4:
+            WindowsPart2Of5:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
               # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-            WindowsPart3Of4:
+            WindowsPart3Of5:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
               # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace.
               testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
-            WindowsPart4Of4:
+            WindowsPart4Of5:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              # Filter tests that are part of the ManagementApi namespace.
-              testFilter: "(FullyQualifiedName~ManagementApi)"
+              # ManagementApi, heavier sub-namespaces. Trailing dots prevent "User." from matching "UserGroup." etc.
+              testFilter: "FullyQualifiedName~ManagementApi & (FullyQualifiedName~ManagementApi.Element. | FullyQualifiedName~ManagementApi.User. | FullyQualifiedName~ManagementApi.Document. | FullyQualifiedName~ManagementApi.DataType. | FullyQualifiedName~ManagementApi.DocumentType. | FullyQualifiedName~ManagementApi.MediaType. | FullyQualifiedName~ManagementApi.Template.)"
+            WindowsPart5Of5:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+              # ManagementApi, remainder (complement of Part4). vstest filters do not support group
+              testFilter: "FullyQualifiedName~ManagementApi & FullyQualifiedName!~ManagementApi.Element. & FullyQualifiedName!~ManagementApi.User. & FullyQualifiedName!~ManagementApi.Document. & FullyQualifiedName!~ManagementApi.DataType. & FullyQualifiedName!~ManagementApi.DocumentType. & FullyQualifiedName!~ManagementApi.MediaType. & FullyQualifiedName!~ManagementApi.Template."
             LinuxPart1Of4:
               vmImage: "ubuntu-latest"
               Tests__Database__DatabaseType: SqlServer
@@ -306,7 +307,7 @@ stages:
               command: test
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
 
           # Stop SQL Server
           - pwsh: docker stop mssql
@@ -340,6 +341,10 @@ stages:
       UMBRACO__CMS__GLOBAL__USEHTTPS: true
       UMBRACO__CMS__HEALTHCHECKS__NOTIFICATION__ENABLED: false
       UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
+      # Back-office auth is cookie-only. Sliding the session on every request keeps the shared
+      # admin cookie alive for the length of a shard, so tests never have to re-authenticate
+      # mid-run just to dodge the session expiring.
+      UMBRACO__CMS__SECURITY__KEEPUSERLOGGEDIN: true
       ASPNETCORE_URLS: https://localhost:44331
     jobs:
       # E2E Tests
@@ -385,7 +390,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
@@ -464,7 +468,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
@@ -603,6 +606,23 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
+            # AllowEditInvariantConfig
+            WindowsAllowEditInvariantConfig:
+              vmImage: "windows-latest"
+              testFolder: "AllowEditInvariantConfig"
+              port: ''
+              testCommand: "npx playwright test --project=allowEditInvariantConfig"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxAllowEditInvariantConfig:
+              vmImage: "ubuntu-latest"
+              testFolder: "AllowEditInvariantConfig"
+              port: ''
+              testCommand: "npx playwright test --project=allowEditInvariantConfig"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
             # SMTP
             LinuxSMTP:
               vmImage: "ubuntu-latest"
@@ -618,7 +638,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.PlaywrightUserEmail }}
               PlaywrightPassword: ${{ variables.PlaywrightPassword }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}

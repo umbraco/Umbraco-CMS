@@ -4,6 +4,9 @@ import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-a
 export type BlockWorkspaceHasSettingsConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceHasSettings'>;
 
+// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-empty-object-type
+export interface BlockWorkspaceHasContentConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceHasContent'> {}
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface BlockEntryShowContentEditConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryShowContentEdit'> {
 	match?: boolean;
@@ -19,11 +22,21 @@ export interface BlockWorkspaceIsReadOnlyConditionConfig extends UmbConditionCon
 	match?: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-empty-object-type
+export interface BlockEntryHasSettingsConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryHasSettings'> {}
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export type BlockEntryHasSettingsConditionConfig = UmbConditionConfigBase<'Umb.Condition.BlockEntryHasSettings'>;
+export interface BlockEntryHasExternalContentConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryHasExternalContent'> {
+	match?: boolean;
+}
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface BlockEntryIsReadOnlyConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryIsReadOnly'> {
+	match?: boolean;
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface BlockEntryIsAllowedInLibraryConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryIsAllowedInLibrary'> {
 	match?: boolean;
 }
 
@@ -38,10 +51,13 @@ declare global {
 		umbBlock:
 			| BlockEntryShowContentEditConditionConfig
 			| BlockWorkspaceHasSettingsConditionConfig
+			| BlockWorkspaceHasContentConditionConfig
 			| BlockEntryIsExposedConditionConfig
+			| BlockEntryHasExternalContentConditionConfig
 			| BlockWorkspaceIsReadOnlyConditionConfig
 			| BlockEntryIsReadOnlyConditionConfig
 			| BlockEntryHasSettingsConditionConfig
+			| BlockEntryIsAllowedInLibraryConditionConfig
 			| UmbBlockEntryIsExposedConditionConfig;
 	}
 }

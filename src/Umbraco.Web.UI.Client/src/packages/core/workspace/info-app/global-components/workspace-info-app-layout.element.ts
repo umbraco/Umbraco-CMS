@@ -21,6 +21,7 @@ export class UmbWorkspaceInfoAppLayoutElement extends UmbLitElement {
 		css`
 			uui-box {
 				--uui-box-default-padding: 0;
+				overflow: clip;
 			}
 		`,
 	];

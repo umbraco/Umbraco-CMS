@@ -22,7 +22,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
 public class ScheduledPublishingJobTests
 {
     private Mock<IContentService> _mockContentService;
+    private Mock<IElementService> _mockElementService;
     private Mock<ILogger<ScheduledPublishingJob>> _mockLogger;
+    private Mock<ICoreScope> _mockScope;
 
     [Test]
     public async Task Does_Not_Execute_When_Not_Enabled()
@@ -30,6 +32,7 @@ public class ScheduledPublishingJobTests
         var sut = CreateScheduledPublishing(enabled: false);
         await sut.ExecuteAsync();
         VerifyScheduledPublishingNotPerformed();
+        VerifyElementScheduledPublishingNotPerformed();
     }
 
     [Test]
@@ -38,6 +41,28 @@ public class ScheduledPublishingJobTests
         var sut = CreateScheduledPublishing();
         await sut.ExecuteAsync();
         VerifyScheduledPublishingPerformed();
+        VerifyElementScheduledPublishingPerformed();
+    }
+
+    [Test]
+    public async Task Completes_Scope_After_Performing_Scheduled_Publishing()
+    {
+        var sut = CreateScheduledPublishing();
+        await sut.ExecuteAsync();
+        _mockScope.Verify(x => x.Complete(), Times.Once);
+    }
+
+    [Test]
+    public async Task Does_Not_Complete_Scope_When_Scheduled_Publishing_Throws()
+    {
+        var sut = CreateScheduledPublishing();
+        _mockContentService
+            .Setup(x => x.PerformScheduledPublish(It.IsAny<DateTime>()))
+            .Throws<InvalidOperationException>();
+
+        await sut.ExecuteAsync();
+
+        _mockScope.Verify(x => x.Complete(), Times.Never);
     }
 
     [Test]
@@ -70,6 +95,7 @@ public class ScheduledPublishingJobTests
         }
 
         _mockContentService = new Mock<IContentService>();
+        _mockElementService = new Mock<IElementService>();
 
         var mockUmbracoContextFactory = new Mock<IUmbracoContextFactory>();
         mockUmbracoContextFactory.Setup(x => x.EnsureUmbracoContext())
@@ -79,6 +105,7 @@ public class ScheduledPublishingJobTests
 
         var mockServerMessenger = new Mock<IServerMessenger>();
 
+        _mockScope = new Mock<ICoreScope>();
         var mockScopeProvider = new Mock<ICoreScopeProvider>();
         mockScopeProvider
             .Setup(x => x.CreateCoreScope(
@@ -89,13 +116,14 @@ public class ScheduledPublishingJobTests
                 It.IsAny<bool?>(),
                 It.IsAny<bool>(),
                 It.IsAny<bool>()))
-            .Returns(Mock.Of<IScope>());
+            .Returns(_mockScope.Object);
 
         var scheduledPublishingSettings =
             Mock.Of<IOptionsMonitor<ScheduledPublishingSettings>>(x => x.CurrentValue == (settings ?? new ScheduledPublishingSettings()));
 
         return new ScheduledPublishingJob(
             _mockContentService.Object,
+            _mockElementService.Object,
             mockUmbracoContextFactory.Object,
             _mockLogger.Object,
             mockServerMessenger.Object,
@@ -110,4 +138,11 @@ public class ScheduledPublishingJobTests
 
     private void VerifyScheduledPublishingPerformed(Times times) =>
         _mockContentService.Verify(x => x.PerformScheduledPublish(It.IsAny<DateTime>()), times);
+
+    private void VerifyElementScheduledPublishingNotPerformed() => VerifyElementScheduledPublishingPerformed(Times.Never());
+
+    private void VerifyElementScheduledPublishingPerformed() => VerifyElementScheduledPublishingPerformed(Times.Once());
+
+    private void VerifyElementScheduledPublishingPerformed(Times times) =>
+        _mockElementService.Verify(x => x.PerformScheduledPublish(It.IsAny<DateTime>()), times);
 }

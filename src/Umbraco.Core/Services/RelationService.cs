@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -56,74 +54,6 @@ public class RelationService : RepositoryService, IRelationService
         _auditService = auditService;
         _userIdKeyResolver = userIdKeyResolver;
         _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RelationService" /> class.
-    /// </summary>
-    /// <param name="uowProvider">The scope provider for unit of work operations.</param>
-    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
-    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
-    /// <param name="entityService">The entity service for entity operations.</param>
-    /// <param name="relationRepository">The repository for relation data access.</param>
-    /// <param name="relationTypeRepository">The repository for relation type data access.</param>
-    /// <param name="auditRepository">The audit repository (unused, kept for backward compatibility).</param>
-    /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public RelationService(
-        ICoreScopeProvider uowProvider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IEntityService entityService,
-        IRelationRepository relationRepository,
-        IRelationTypeRepository relationTypeRepository,
-        IAuditRepository auditRepository,
-        IUserIdKeyResolver userIdKeyResolver)
-        : this(
-            uowProvider,
-            loggerFactory,
-            eventMessagesFactory,
-            entityService,
-            relationRepository,
-            relationTypeRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            userIdKeyResolver)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RelationService" /> class.
-    /// </summary>
-    /// <param name="uowProvider">The scope provider for unit of work operations.</param>
-    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
-    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
-    /// <param name="entityService">The entity service for entity operations.</param>
-    /// <param name="relationRepository">The repository for relation data access.</param>
-    /// <param name="relationTypeRepository">The repository for relation type data access.</param>
-    /// <param name="auditService">The audit service for recording audit entries.</param>
-    /// <param name="auditRepository">The audit repository (unused, kept for backward compatibility).</param>
-    /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public RelationService(
-        ICoreScopeProvider uowProvider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IEntityService entityService,
-        IRelationRepository relationRepository,
-        IRelationTypeRepository relationTypeRepository,
-        IAuditService auditService,
-        IAuditRepository auditRepository,
-        IUserIdKeyResolver userIdKeyResolver)
-        : this(
-            uowProvider,
-            loggerFactory,
-            eventMessagesFactory,
-            entityService,
-            relationRepository,
-            relationTypeRepository,
-            auditService,
-            userIdKeyResolver)
-    {
     }
 
     /// <inheritdoc />
@@ -433,6 +363,43 @@ public class RelationService : RepositoryService, IRelationService
     }
 
     /// <inheritdoc />
+    public IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
+        IEnumerable<int> childIds,
+        IEnumerable<string> relationTypeAliases,
+        UmbracoObjectTypes entityType)
+    {
+        var childIdsArray = childIds as int[] ?? childIds.ToArray();
+        if (childIdsArray.Length == 0)
+        {
+            return [];
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        ICollection<string> aliases = relationTypeAliases as ICollection<string> ?? relationTypeAliases.ToArray();
+        var relationTypeIds = ResolveRelationTypeIdFilter(aliases);
+        if (relationTypeIds is { Length: 0 })
+        {
+            return [];
+        }
+
+        return _relationRepository.GetParentEntitiesByChildIds(
+            childIdsArray,
+            relationTypeIds ?? [],
+            entityType.GetGuid());
+    }
+
+    // Resolves relation type aliases to their ids. Returns null when no alias filter is requested (match all
+    // relation types); returns an empty array when a filter was requested but no alias matched (match none).
+    private int[]? ResolveRelationTypeIdFilter(ICollection<string> relationTypeAliases)
+        => relationTypeAliases.Count == 0
+            ? null
+            : _relationTypeRepository.GetMany(Array.Empty<int>())
+                .Where(relationType => relationTypeAliases.Contains(relationType.Alias))
+                .Select(relationType => relationType.Id)
+                .ToArray();
+
+    /// <inheritdoc />
     public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -523,23 +490,6 @@ public class RelationService : RepositoryService, IRelationService
         IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
         return _relationRepository.Get(query).Any();
     }
-
-    /// <summary>
-    /// Checks whether an entity has any relations.
-    /// </summary>
-    /// <param name="id">The identifier of the entity.</param>
-    /// <returns><c>true</c> if the entity has any relations; otherwise, <c>false</c>.</returns>
-    [Obsolete("No longer used in Umbraco, please the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any, null, null);
-
-    /// <summary>
-    /// Checks whether an entity has relations in the specified direction.
-    /// </summary>
-    /// <param name="id">The identifier of the entity.</param>
-    /// <param name="directionFilter">The direction filter to apply when checking relations.</param>
-    /// <returns><c>true</c> if the entity has relations matching the filter; otherwise, <c>false</c>.</returns>
-    [Obsolete("Please the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public bool IsRelated(int id, RelationDirectionFilter directionFilter) => IsRelated(id, directionFilter, null, null);
 
     /// <inheritdoc />
     public bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
@@ -812,6 +762,8 @@ public class RelationService : RepositoryService, IRelationService
             UmbracoObjectTypes.MemberType,
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.MemberGroup,
+            UmbracoObjectTypes.Element,
+            UmbracoObjectTypes.ElementContainer,
             UmbracoObjectTypes.ROOT,
             UmbracoObjectTypes.RecycleBin,
         ];

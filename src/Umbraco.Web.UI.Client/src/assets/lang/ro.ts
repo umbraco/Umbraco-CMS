@@ -12,7 +12,7 @@ import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localiza
 export default {
 	sections: {
 		content: 'Conţinut',
-		forms: 'Formulare',
+		library: 'Bibliotecă',
 		media: 'Media',
 		member: 'Membrii',
 		packages: 'Pachete',

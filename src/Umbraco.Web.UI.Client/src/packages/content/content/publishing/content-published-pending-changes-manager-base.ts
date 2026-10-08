@@ -37,7 +37,7 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 		if (args.persistedData.unique !== args.publishedData.unique)
 			throw new Error('Persisted and published data does not have the same unique');
 
-		const variantIds = args.persistedData.variants?.map((x) => UmbVariantId.Create(x)) ?? [];
+		const variantIds = args.persistedData.variants?.map((x) => UmbVariantId.CreateFromPartial(x)) ?? [];
 		const pendingChangesPromises = variantIds.map((variantId) => this.#processVariant(args, variantId));
 		const variantsWithPendingChanges = (await Promise.all(pendingChangesPromises)).filter((x) => x !== null);
 		this.#variantsWithChanges.setValue(variantsWithPendingChanges);

@@ -7,14 +7,15 @@ namespace Umbraco.Cms.Web.Common.Security;
 
 public sealed class ConfigureMemberIdentityOptions : IConfigureOptions<IdentityOptions>
 {
-    private readonly MemberPasswordConfigurationSettings _memberPasswordConfiguration;
     private readonly SecuritySettings _securitySettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigureMemberIdentityOptions" /> class.
+    /// </summary>
+    /// <param name="securitySettings">The security configuration.</param>
     public ConfigureMemberIdentityOptions(
-        IOptions<MemberPasswordConfigurationSettings> memberPasswordConfiguration,
         IOptions<SecuritySettings> securitySettings)
     {
-        _memberPasswordConfiguration = memberPasswordConfiguration.Value;
         _securitySettings = securitySettings.Value;
     }
 
@@ -33,8 +34,8 @@ public sealed class ConfigureMemberIdentityOptions : IConfigureOptions<IdentityO
 
         options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(_securitySettings.MemberDefaultLockoutTimeInMinutes);
 
-        options.Password.ConfigurePasswordOptions(_memberPasswordConfiguration);
+        options.Password.ConfigurePasswordOptions(_securitySettings.MemberPassword);
 
-        options.Lockout.MaxFailedAccessAttempts = _memberPasswordConfiguration.MaxFailedAccessAttemptsBeforeLockout;
+        options.Lockout.MaxFailedAccessAttempts = _securitySettings.MemberPassword.MaxFailedAccessAttemptsBeforeLockout;
     }
 }

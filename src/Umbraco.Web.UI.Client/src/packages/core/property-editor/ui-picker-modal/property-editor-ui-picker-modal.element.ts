@@ -4,7 +4,8 @@ import type {
 	UmbPropertyEditorUIPickerModalValue,
 } from './property-editor-ui-picker-modal.token.js';
 import { UmbPropertyEditorUISearchController } from './property-editor-ui-search.controller.js';
-import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { selectablePropertyEditorUis } from './selectable-property-editor-uis.function.js';
+import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { debounce, fromCamelCaseIfCamelCase } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -39,9 +40,15 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	#usePropertyEditorUIs() {
 		this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
 			// Only include Property Editor UIs which has Property Editor Schema Alias
-			this.#propertyEditorUIs = propertyEditorUIs
-				.filter((propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias)
-				.sort((a, b) => a.meta.label.localeCompare(b.meta.label));
+			const withSchemaAlias = propertyEditorUIs.filter(
+				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,
+			);
+
+			this.#propertyEditorUIs = selectablePropertyEditorUis(
+				withSchemaAlias,
+				this.value.selection,
+				this.data?.offerDeprecated,
+			).sort((a, b) => a.meta.label.localeCompare(b.meta.label));
 
 			this.#searchController.setPropertyEditorUIs(this.#propertyEditorUIs);
 			this.#performFiltering();
@@ -91,15 +98,13 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#groupPropertyEditorUIs(items: Array<ManifestPropertyEditorUi>) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-expect-error
 		const grouped = Object.groupBy(items, (propertyEditorUi: ManifestPropertyEditorUi) =>
 			this.#resolveGroupName(propertyEditorUi.meta.group),
 		);
 
-		this._groupedPropertyEditorUIs = Object.keys(grouped)
-			.sort((a, b) => a.localeCompare(b))
-			.map((key) => ({ key, items: grouped[key] }));
+		this._groupedPropertyEditorUIs = Object.entries(grouped)
+			.sort(([a], [b]) => a.localeCompare(b))
+			.map(([key, items]) => ({ key, items: items ?? [] }));
 	}
 
 	override render() {
@@ -153,6 +158,11 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 								<button type="button" @click=${() => this.#handleClick(propertyEditorUI)}>
 									<umb-icon name=${propertyEditorUI.meta.icon} class="icon"></umb-icon>
 									<span class="label" title=${label}>${label}</span>
+									${propertyEditorUI.meta.deprecated
+										? html`<small class="deprecated"
+												>${this.localize.term('propertyEditorPicker_deprecatedLabel')}</small
+											>`
+										: nothing}
 								</button>
 							</li>
 						`;
@@ -255,6 +265,10 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 				display: -webkit-box;
 				overflow: hidden;
 				padding-bottom: 0.1em;
+			}
+
+			#item-grid .item .deprecated {
+				opacity: 0.7;
 			}
 		`,
 	];

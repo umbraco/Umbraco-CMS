@@ -45,6 +45,8 @@ const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprint
 		name: model.name,
 		parent: model.parent,
 		flags: model.flags,
+		noAccess: model.noAccess,
+		variants: model.isFolder ? [] : model.variants,
 	};
 };
 
@@ -71,7 +73,6 @@ const createMockDocumentBlueprintMapper = (
 		variants: request.variants.map((variantRequest) => {
 			return {
 				culture: variantRequest.culture,
-				segment: variantRequest.segment,
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
@@ -82,6 +83,7 @@ const createMockDocumentBlueprintMapper = (
 			};
 		}),
 		flags: [],
+		noAccess: false,
 	};
 };
 

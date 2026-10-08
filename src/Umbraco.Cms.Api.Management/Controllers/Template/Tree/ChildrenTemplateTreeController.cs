@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -17,21 +16,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 public class ChildrenTemplateTreeController : TemplateTreeControllerBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ChildrenTemplateTreeController"/> class.
-    /// </summary>
-    /// <param name="entityService">The service used to manage and retrieve entities within the controller.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public ChildrenTemplateTreeController(IEntityService entityService)
-        : base(entityService)
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="ChildrenTemplateTreeController"/> class, which manages the retrieval of child template tree items.
     /// </summary>
     /// <param name="entityService">The service used to interact with entities in the system.</param>
     /// <param name="flagProviders">A collection of providers that supply additional flags or metadata for entities.</param>
-    [ActivatorUtilitiesConstructor]
     public ChildrenTemplateTreeController(IEntityService entityService, FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)
     {

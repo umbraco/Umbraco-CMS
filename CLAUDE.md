@@ -1,6 +1,6 @@
 # Umbraco CMS - Multi-Project Repository
 
-Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
+Enterprise-grade CMS built on .NET 11.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
 
 **Repository**: https://github.com/umbraco/Umbraco-CMS
 **License**: MIT
@@ -28,7 +28,7 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 3. **Specialized Features** (Pluggable Modules)
    - Persistence: EF Core (modern), NPoco (legacy) for SQL Server & SQLite
    - Caching: `PublishedCache.HybridCache` (in-memory + distributed)
-   - Search: `Examine.Lucene` (full-text search)
+   - Search: `Umbraco.Cms.Search.*` (search abstractions + Examine/Lucene provider)
    - Imaging: `Imaging.ImageSharp` v1 & v2 (image processing)
    - Other: Static assets, targets, development tools
 
@@ -42,11 +42,12 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 
 ### Key Technologies
 
-- **.NET 10.0** - Target framework for all projects
+- **.NET 11.0** - Target framework for all projects
 - **ASP.NET Core** - Web framework
 - **Entity Framework Core** - Modern ORM
 - **OpenIddict** - OAuth 2.0/OpenID Connect authentication
-- **Swashbuckle** - OpenAPI/Swagger documentation
+- **Microsoft.AspNetCore.OpenApi** - OpenAPI document generation
+- **Swashbuckle.AspNetCore.SwaggerUI** - Swagger UI for API documentation
 - **Lucene.NET** - Full-text search via Examine
 - **ImageSharp** - Image processing
 
@@ -77,7 +78,8 @@ Umbraco-CMS/
 │   ├── Umbraco.Cms.Api.Common/            # Shared API infrastructure
 │   │   └── CLAUDE.md                      # ⭐ API patterns guide
 │   ├── Umbraco.PublishedCache.HybridCache/ # Content caching
-│   ├── Umbraco.Examine.Lucene/            # Search indexing
+│   ├── Umbraco.Cms.Search.Core/           # Search abstractions
+│   ├── Umbraco.Cms.Search.Provider.Examine/ # Examine (Lucene) search provider
 │   ├── Umbraco.Cms.Persistence.EFCore/    # EF Core data access
 │   ├── Umbraco.Cms.Persistence.EFCore.Sqlite/
 │   ├── Umbraco.Cms.Persistence.EFCore.SqlServer/
@@ -133,7 +135,8 @@ Web.UI → Web.Common → Infrastructure → Core
 **Infrastructure Layer**:
 - `Umbraco.Infrastructure` → `Umbraco.Core`
 - `Umbraco.PublishedCache.*` → `Umbraco.Infrastructure`
-- `Umbraco.Examine.Lucene` → `Umbraco.Infrastructure`
+- `Umbraco.Cms.Search.Core` → `Umbraco.Infrastructure`
+- `Umbraco.Cms.Search.Provider.Examine` → `Umbraco.Cms.Search.Core` + `Umbraco.Web.Common` + `Umbraco.Cms.Api.Common` + `Umbraco.Cms.Api.Management`
 - `Umbraco.Cms.Persistence.*` → `Umbraco.Infrastructure`
 
 **Web Layer**:
@@ -240,7 +243,7 @@ Project ownership is distributed across teams. Check individual project director
    - Infrastructure implements contracts that need Infrastructure-owned machinery
    - Web/APIs consume implementations via DI
 
-   **Where service implementations live**: Services whose dependencies are satisfiable from Core interfaces alone (repositories, scope, config, other Core services) live in `Umbraco.Core/Services/` — this covers the majority of domain services (`MemberService`, `ContentService`, `MediaService`, `ContentTypeService`, `EntityService`, `AuditService`, `ExternalMemberService`, etc.). Service implementations only live in `Umbraco.Infrastructure/Services/Implement/` when they genuinely need Infrastructure concerns — Examine indexes (`ContentSearchService`, `MediaSearchService`, `IndexedEntitySearchService`), log files (`LogViewerRepository`), packaging internals (`PackagingService`), webhook firing (`WebhookFiringService`), distributed-job coordination (`DistributedJobService`). When adding a new service, default to Core and only move to Infrastructure if a concrete dependency forces it.
+   **Where service implementations live**: Services whose dependencies are satisfiable from Core interfaces alone (repositories, scope, config, other Core services) live in `Umbraco.Core/Services/` — this covers the majority of domain services (`MemberService`, `ContentService`, `MediaService`, `ContentTypeService`, `EntityService`, `AuditService`, `ExternalMemberService`, etc.). Service implementations only live in `Umbraco.Infrastructure/Services/Implement/` when they genuinely need Infrastructure concerns — log files (`LogViewerRepository`), packaging internals (`PackagingService`), webhook firing (`WebhookFiringService`), distributed-job coordination (`DistributedJobService`). When adding a new service, default to Core and only move to Infrastructure if a concrete dependency forces it.
 
 2. **Interface-First Design**
    - All services defined as interfaces in Core
@@ -376,15 +379,26 @@ public interface IMyService
 
 ### Centralized Package Management
 
-**All NuGet package versions** are centralized in `Directory.Packages.props`. Individual projects do NOT specify versions.
+**NuGet package versions** are centralized in `Directory.Packages.props`. There are two `Directory.Packages.props` files in the source tree, with multi-level merging enabled so the test file inherits from the root:
+
+| File | Scope |
+|------|-------|
+| `Directory.Packages.props` (root) | Production source code packages — referenced by all `src/**` projects |
+| `tests/Directory.Packages.props` | Test-only packages (NUnit, Moq, Bogus, BenchmarkDotNet, etc.) — adds entries on top of the inherited root file |
+
+When updating dependencies, decide which file the package belongs in:
+- A package used only by test projects → `tests/Directory.Packages.props`
+- A package used by any production project (or by both production and tests) → root `Directory.Packages.props`
 
 ```xml
 <!-- Individual projects reference WITHOUT version -->
-<PackageReference Include="Swashbuckle.AspNetCore" />
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
 
 <!-- Versions defined in Directory.Packages.props -->
-<PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+<PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
 ```
+
+**Opt-out**: `src/Umbraco.Web.UI/Umbraco.Web.UI.csproj` sets `<ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>` and specifies versions inline (for `Microsoft.EntityFrameworkCore.Design`, `Microsoft.Build.Tasks.Core`, `Microsoft.ICU.ICU4C.Runtime`, etc.). Update those versions directly in that csproj when bumping. Two further `Directory.Packages.props` files exist under `templates/` for the project/extension templates and have their own version sets — keep `Microsoft.AspNetCore.OpenApi` aligned between the root file and `templates/UmbracoExtension/`.
 
 ### Build Configuration
 
@@ -400,20 +414,26 @@ The repository contains BOTH (actively supported):
 
 **Note**: The codebase is actively migrating to EF Core, but NPoco remains the primary persistence layer and is not deprecated. Both are fully supported.
 
-### Authentication: OpenIddict
+### Authentication
 
-All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
-- Reference tokens (not JWT) for better security
-- **Secure cookie-based token storage** (v17+) - tokens stored in HTTP-only cookies with `__Host-` prefix
-- Tokens are redacted from client-side responses and passed via secure cookies only (`[redacted]` placeholder)
-- ASP.NET Core Data Protection for token encryption
-- Configured in `Umbraco.Cms.Api.Common`
-- API requests must include credentials (`credentials: include` for fetch)
+**Back office (v19+)**: a single HTTP-only authentication cookie — no client-side tokens and no
+OpenIddict flow. The back-office authorization policies accept both the cookie scheme
+(`Constants.Security.BackOfficeAuthenticationType`) and the OpenIddict validation scheme; see
+`BackOfficeAuthPolicyBuilderExtensions`. Cookie behaviour (expiry, renewal, SameSite) is
+configured in `ConfigureBackOfficeCookieOptions`. Whether an unauthenticated request gets a
+401/403 or a 302 to the login page follows ASP.NET Core's endpoint metadata: `[ApiController]` on
+`ManagementApiControllerBase` disables the redirect, and `[AllowCookieRedirect]` opts an endpoint
+back in (the OAuth `authorize` action).
+
+**API users / external clients**: **OpenIddict** (OAuth 2.0/OpenID Connect) with reference tokens
+(not JWT), configured in `Umbraco.Cms.Api.Common`.
+
+- ASP.NET Core Data Protection protects both the auth cookie and OpenIddict tokens
+- Back-office requests must include credentials (`credentials: include` for fetch)
 
 **Load Balancing Requirement**: All servers must share the same Data Protection key ring.
 
 **Frontend auth pitfalls** — see `src/Umbraco.Web.UI.Client/docs/edge-cases.md` (Auth & Cross-tab section) and `docs/security.md`. Key points:
-- Never call `validateToken()` per API request — it revokes the previous reference token (ID2019 errors)
 - `window.opener` is set for ANY `window.open()` target, not only OAuth popups — scope guards to the pathname too
 - BroadcastChannel does not deliver messages to the sender's own tab
 
@@ -429,7 +449,8 @@ All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
 APIs use `Asp.Versioning.Mvc`:
 - Management API: `/umbraco/management/api/v{version}/*`
 - Delivery API: `/umbraco/delivery/api/v{version}/*`
-- OpenAPI/Swagger docs per version
+- OpenAPI docs: `/umbraco/openapi/management.json`, `/umbraco/openapi/delivery.json`
+- Swagger UI: `/umbraco/openapi/`
 
 ### Updating `OpenApi.json` (Management API)
 
@@ -562,6 +583,7 @@ For integration tests that exercise caching or cache refreshers, see `tests/Umbr
 
 - **Fresh build before trusting a green.** Never treat `--no-build` or cached/incremental output as proof a change compiles or passes — a stale run can mask a compile error. Rebuild before reporting build or test state. (Integration tests have a related false-green trap — see `tests/Umbraco.Tests.Integration/CLAUDE.md`.)
 - **Grep the branch you think you're on.** A search only supports a claim against the branch actually checked out, so confirm HEAD is where you expect before drawing a conclusion from a grep. Easy to get wrong whenever the tree moves under you — reviewing a PR head, switching worktrees, or mid merge-up/rebase.
+- **Remove unused usings — touched files only.** Before handing back C# changes, remove unused `using` directives (IDE0005) from the `.cs` files the change adds or modifies, and never sweep other files (unrelated churn causes merge-up conflicts). Run it per affected project, not the solution, which is slow to load: `dotnet format style <project>.csproj --diagnostics IDE0005 --severity info --include <files>`, then rebuild (a using may only be needed under an `#if` symbol).
 
 ---
 
@@ -607,7 +629,8 @@ SQL Server-specific tests use `BaseTestDatabase.IsSqlite()` to skip when running
 | **Umbraco.Cms.Api.Delivery** | Library | Delivery API (headless CMS) |
 | **Umbraco.Cms.Api.Common** | Library | Shared API infrastructure |
 | **Umbraco.PublishedCache.HybridCache** | Library | Published content caching |
-| **Umbraco.Examine.Lucene** | Library | Full-text search indexing |
+| **Umbraco.Cms.Search.Core** | Library | Search abstractions and indexing pipeline |
+| **Umbraco.Cms.Search.Provider.Examine** | Library | Examine (Lucene) search provider |
 
 ### Important Files
 

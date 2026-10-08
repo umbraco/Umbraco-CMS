@@ -27,6 +27,7 @@ export class DocumentTypeBuilder {
   preventCleanup: boolean;
   keepAllVersionsNewerThanDays: number;
   keepLatestVersionPerDayForDays: number;
+  allowedInLibrary: boolean;
 
   constructor() {
     this.documentTypePropertyBuilder = [];
@@ -141,6 +142,11 @@ export class DocumentTypeBuilder {
     return this;
   }
 
+  withAllowedInLibrary(allowedInLibrary: boolean) {
+    this.allowedInLibrary = allowedInLibrary;
+    return this;
+  }
+
   build() {
     this.id = ensureIdExists(this.id);
 
@@ -150,6 +156,7 @@ export class DocumentTypeBuilder {
       description: this.description || '',
       icon: this.icon || 'icon-document',
       allowedAsRoot: this.allowedAsRoot || false,
+      allowedInLibrary: this.allowedInLibrary || false,
       variesByCulture: this.variesByCulture || false,
       variesBySegment: this.variesBySegment || false,
       collection: this.collectionId ? {id: this.collectionId} : null,

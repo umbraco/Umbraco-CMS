@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel;
@@ -98,11 +98,10 @@ public class ContentSettings
     /// </summary>
     internal const bool StaticShowUnroutableContentWarnings = true;
 
-    // TODO (V18): Consider enabling this by default and documenting as a behavioural breaking change.
     /// <summary>
     ///     The default value for enabling media recycle bin protection.
     /// </summary>
-    private const bool StaticEnableMediaRecycleBinProtection = false;
+    private const bool StaticEnableMediaRecycleBinProtection = true;
 
     /// <summary>
     ///     Gets or sets a value for the content notification settings.
@@ -169,6 +168,11 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value indicating whether deprecated property editors should be shown.
     /// </summary>
+    /// <remarks>
+    ///     No longer used. The setting moved to <see cref="DataTypesSettings.OfferDeprecatedPropertyEditors" />, and
+    ///     only that one is read.
+    /// </remarks>
+    [Obsolete("No longer used. Use DataTypesSettings.OfferDeprecatedPropertyEditors instead. Scheduled for removal in Umbraco 21.")]
     [DefaultValue(StaticShowDeprecatedPropertyEditors)]
     public bool ShowDeprecatedPropertyEditors { get; set; } = StaticShowDeprecatedPropertyEditors;
 
@@ -208,13 +212,6 @@ public class ContentSettings
     /// <remarks>This is the alternative version to the regular logo found at <see cref="BackOfficeLogo"/>.</remarks>
     [DefaultValue(StaticBackOfficeLogoAlternative)]
     public string BackOfficeLogoAlternative { get; set; } = StaticBackOfficeLogoAlternative;
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
-    /// </summary>
-    [DefaultValue(StaticHideBackOfficeLogo)]
-    [Obsolete("This setting is no longer used. An alternative BackOffice logo can be set using the BackOfficeLogo setting. Scheduled for removal in Umbraco 18.")]
-    public bool HideBackOfficeLogo { get; set; } = StaticHideBackOfficeLogo;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to disable the deletion of items referenced by other items.

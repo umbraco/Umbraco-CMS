@@ -243,6 +243,18 @@ public interface IRelationService : IService
     IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
 
     /// <summary>
+    ///     Returns all parent entities for a set of related child ids in a single batched query, filtered by relation type alias.
+    /// </summary>
+    /// <param name="childIds">The child entity ids.</param>
+    /// <param name="relationTypeAliases">Relation type aliases to filter by. Pass an empty sequence to include all relation types.</param>
+    /// <param name="entityType">The entity type to filter by.</param>
+    /// <returns>The distinct parent entities of the given type related to any of the specified children.</returns>
+    IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
+        IEnumerable<int> childIds,
+        IEnumerable<string> relationTypeAliases,
+        UmbracoObjectTypes entityType);
+
+    /// <summary>
     ///     Returns paged child entities for a related parent id
     /// </summary>
     /// <param name="id"></param>
@@ -310,23 +322,11 @@ public interface IRelationService : IService
     /// </summary>
     /// <param name="id">Id of an object to check relations for</param>
     /// <param name="directionFilter">Indicates whether to check for relations as parent, child or in either direction.</param>
-    /// <returns>Returns <c>True</c> if any relations exists with the given Id, otherwise <c>False</c>.</returns>
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
-    bool IsRelated(int id, RelationDirectionFilter directionFilter);
-
-    /// <summary>
-    ///     Checks whether any relations exists for the passed in Id and direction.
-    /// </summary>
-    /// <param name="id">Id of an object to check relations for</param>
-    /// <param name="directionFilter">Indicates whether to check for relations as parent, child or in either direction.</param>
     /// <param name="includeRelationTypeIds">A collection of relation type Ids to include consideration in the relation checks.</param>
     /// <param name="excludeRelationTypeIds">A collection of relation type Ids to exclude from consideration in the relation checks.</param>
     /// <remarks>If no relation type Ids are provided in includeRelationTypeIds or excludeRelationTypeIds, all relation type Ids are considered.</remarks>
     /// <returns>Returns <c>True</c> if any relations exists with the given Id, otherwise <c>False</c>.</returns>
-    bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => IsRelated(id, directionFilter);
-#pragma warning restore CS0618 // Type or member is obsolete
+    bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null);
 
     /// <summary>
     ///     Checks whether two items are related

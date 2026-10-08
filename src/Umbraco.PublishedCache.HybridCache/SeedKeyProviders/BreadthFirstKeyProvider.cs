@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders;
 
@@ -7,13 +7,13 @@ public abstract class BreadthFirstKeyProvider
     protected readonly INavigationQueryService NavigationQueryService;
     private readonly int _seedCount;
 
-    public BreadthFirstKeyProvider(INavigationQueryService navigationQueryService, int seedCount)
+    protected BreadthFirstKeyProvider(INavigationQueryService navigationQueryService, int seedCount)
     {
         NavigationQueryService = navigationQueryService;
         _seedCount = seedCount;
     }
 
-    public ISet<Guid> GetSeedKeys()
+    public virtual ISet<Guid> GetSeedKeys()
     {
         if (_seedCount == 0)
         {
@@ -31,12 +31,19 @@ public abstract class BreadthFirstKeyProvider
 
         foreach (Guid key in rootKeys)
         {
-            keyCount++;
-            keys.Add(key);
-            keyQueue.Enqueue(key);
-            if (keyCount == _seedCount)
+            if (ShouldSeed(key))
             {
-                return keys;
+                keys.Add(key);
+                keyCount++;
+                if (keyCount == _seedCount)
+                {
+                    return keys;
+                }
+            }
+
+            if (ShouldTraverseChildren(key))
+            {
+                keyQueue.Enqueue(key);
             }
         }
 
@@ -51,17 +58,41 @@ public abstract class BreadthFirstKeyProvider
 
             foreach (Guid childKey in childKeys)
             {
-                keys.Add(childKey);
-                keyCount++;
-                if (keyCount == _seedCount)
+                if (ShouldSeed(childKey))
                 {
-                    return keys;
+                    keys.Add(childKey);
+                    keyCount++;
+                    if (keyCount == _seedCount)
+                    {
+                        return keys;
+                    }
                 }
 
-                keyQueue.Enqueue(childKey);
+                if (ShouldTraverseChildren(childKey))
+                {
+                    keyQueue.Enqueue(childKey);
+                }
             }
         }
 
         return keys;
     }
+
+    /// <summary>
+    /// Determines whether a node should be included in the seed set and counted toward the seed limit.
+    /// </summary>
+    /// <param name="key">The node key.</param>
+    /// <returns><c>true</c> if the node should be seeded; otherwise, <c>false</c>.</returns>
+    protected virtual bool ShouldSeed(Guid key) => true;
+
+    /// <summary>
+    /// Determines whether a node's children should be traversed during the breadth-first search.
+    /// </summary>
+    /// <param name="key">The node key.</param>
+    /// <returns><c>true</c> if the node's children should be traversed; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// By default, only nodes that pass <see cref="ShouldSeed"/> are traversed.
+    /// Override this to traverse nodes that aren't themselves seeded (e.g. containers).
+    /// </remarks>
+    protected virtual bool ShouldTraverseChildren(Guid key) => ShouldSeed(key);
 }

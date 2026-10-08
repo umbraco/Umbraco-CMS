@@ -1,12 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -36,11 +34,11 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     private readonly MemberRepositoryUsernameCachePolicy _memberByUsernameCachePolicy;
     private readonly IMemberGroupRepository _memberGroupRepository;
     private readonly IMemberTypeRepository _memberTypeRepository;
-    private readonly MemberPasswordConfigurationSettings _passwordConfiguration;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITagRepository _tagRepository;
     private bool _passwordConfigInitialized;
     private string? _passwordConfigJson;
+    private readonly SecuritySettings _securitySettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.MemberRepository"/> class.
@@ -60,9 +58,10 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     /// <param name="dataTypeService">Service for managing data types.</param>
     /// <param name="serializer">The JSON serializer instance.</param>
     /// <param name="eventAggregator">Service for publishing and subscribing to events.</param>
-    /// <param name="passwordConfiguration">Configuration settings for member passwords.</param>
     /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
     /// <param name="cacheSyncService">Service for synchronizing cache across servers.</param>
+    /// <param name="securitySettings">Configuration settings for member passwords.</param>
+    [ActivatorUtilitiesConstructor]
     public MemberRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -77,11 +76,12 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IDataTypeService dataTypeService,
+        IIdKeyMap idKeyMap,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
-        IOptions<MemberPasswordConfigurationSettings> passwordConfiguration,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IOptions<SecuritySettings> securitySettings)
         : base(
             scopeAccessor,
             cache,
@@ -92,6 +92,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             propertyEditors,
             dataValueReferenceFactories,
             dataTypeService,
+            idKeyMap,
             eventAggregator,
             repositoryCacheVersionService,
             cacheSyncService)
@@ -102,68 +103,9 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         _passwordHasher = passwordHasher;
         _jsonSerializer = serializer;
         _memberGroupRepository = memberGroupRepository;
-        _passwordConfiguration = passwordConfiguration.Value;
+        _securitySettings = securitySettings.Value;
         _memberByUsernameCachePolicy =
             new MemberRepositoryUsernameCachePolicy(GlobalIsolatedCache, ScopeAccessor, DefaultOptions, repositoryCacheVersionService, cacheSyncService);
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MemberRepository"/> class with the specified dependencies.
-    /// </summary>
-    /// <param name="scopeAccessor">The <see cref="IScopeAccessor"/> used to manage database scopes.</param>
-    /// <param name="cache">The <see cref="AppCaches"/> instance for caching data.</param>
-    /// <param name="logger">The <see cref="ILogger{MemberRepository}"/> for logging repository operations.</param>
-    /// <param name="memberTypeRepository">The <see cref="IMemberTypeRepository"/> for accessing member types.</param>
-    /// <param name="memberGroupRepository">The <see cref="IMemberGroupRepository"/> for accessing member groups.</param>
-    /// <param name="tagRepository">The <see cref="ITagRepository"/> for managing tags.</param>
-    /// <param name="languageRepository">The <see cref="ILanguageRepository"/> for accessing language data.</param>
-    /// <param name="relationRepository">The <see cref="IRelationRepository"/> for managing entity relations.</param>
-    /// <param name="relationTypeRepository">The <see cref="IRelationTypeRepository"/> for managing relation types.</param>
-    /// <param name="passwordHasher">The <see cref="IPasswordHasher"/> used for hashing member passwords.</param>
-    /// <param name="propertyEditors">The <see cref="PropertyEditorCollection"/> containing property editors.</param>
-    /// <param name="dataValueReferenceFactories">The <see cref="DataValueReferenceFactoryCollection"/> for resolving data value references.</param>
-    /// <param name="dataTypeService">The <see cref="IDataTypeService"/> for accessing data types.</param>
-    /// <param name="serializer">The <see cref="IJsonSerializer"/> for serializing and deserializing JSON data.</param>
-    /// <param name="eventAggregator">The <see cref="IEventAggregator"/> for publishing and subscribing to events.</param>
-    /// <param name="passwordConfiguration">The <see cref="IOptions{MemberPasswordConfigurationSettings}"/> containing member password configuration settings.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public MemberRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches cache,
-        ILogger<MemberRepository> logger,
-        IMemberTypeRepository memberTypeRepository,
-        IMemberGroupRepository memberGroupRepository,
-        ITagRepository tagRepository,
-        ILanguageRepository languageRepository,
-        IRelationRepository relationRepository,
-        IRelationTypeRepository relationTypeRepository,
-        IPasswordHasher passwordHasher,
-        PropertyEditorCollection propertyEditors,
-        DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeService dataTypeService,
-        IJsonSerializer serializer,
-        IEventAggregator eventAggregator,
-        IOptions<MemberPasswordConfigurationSettings> passwordConfiguration)
-        : this(
-            scopeAccessor,
-            cache,
-            logger,
-            memberTypeRepository,
-            memberGroupRepository,
-            tagRepository,
-            languageRepository,
-            relationRepository,
-            relationTypeRepository,
-            passwordHasher,
-            propertyEditors,
-            dataValueReferenceFactories,
-            dataTypeService,
-            serializer,
-            eventAggregator,
-            passwordConfiguration,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
     }
 
     /// <summary>
@@ -180,7 +122,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
             var passwordConfig = new PersistedPasswordSettings
             {
-                HashAlgorithm = _passwordConfiguration.HashAlgorithmType
+                HashAlgorithm = _securitySettings.MemberPassword.HashAlgorithmType
             };
 
             _passwordConfigJson = passwordConfig == null ? null : _jsonSerializer.Serialize(passwordConfig);
@@ -467,19 +409,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             }
         }
     }
-
-    /// <summary>
-    ///     Gets paged member results.
-    /// </summary>
-    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
-    public override IEnumerable<IMember> GetPage(
-        IQuery<IMember>? query,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        IQuery<IMember>? filter,
-        Ordering? ordering)
-        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: filter, ordering: ordering);
 
     /// <summary>
     ///     Gets a page of member results based on the specified query and paging parameters.

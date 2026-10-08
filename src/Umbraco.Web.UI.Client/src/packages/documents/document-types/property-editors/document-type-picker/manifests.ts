@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Document Type Picker Property Editor UI',
 	element: () => import('./property-editor-ui-document-type-picker.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Document Type Picker',
 		icon: 'icon-document-dashed-line',
 		group: '#propertyEditorUIGroups_advanced',
@@ -17,6 +18,12 @@ export const manifest: ManifestPropertyEditorUi = {
 					alias: 'onlyPickElementTypes',
 					label: 'Only Element Types',
 					description: 'Limit to only pick Element Types',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+				},
+				{
+					alias: 'onlyPickDocumentTypes',
+					label: 'Only Document Types',
+					description: 'Limit to only pick Document Types',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],

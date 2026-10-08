@@ -44,7 +44,7 @@ export class UmbCollectionFilterFieldElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-input
-				label=${this.localize.term('general_filter')}
+				label=${this.localize.term('placeholders_filter')}
 				placeholder=${this.localize.term('placeholders_filter')}
 				data-mark="input:filter"
 				.value=${this._value}

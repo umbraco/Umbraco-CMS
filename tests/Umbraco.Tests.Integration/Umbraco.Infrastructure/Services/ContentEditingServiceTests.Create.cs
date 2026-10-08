@@ -75,7 +75,7 @@ public partial class ContentEditingServiceTests
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = allowedAtRoot;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -183,7 +183,7 @@ public partial class ContentEditingServiceTests
 
         var childContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         childContentType.AllowedAsRoot = false;
-        ContentTypeService.Save(childContentType);
+        await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
 
         var rootContentType = ContentTypeBuilder.CreateBasicContentType();
         rootContentType.AllowedAsRoot = true;
@@ -194,7 +194,7 @@ public partial class ContentEditingServiceTests
                 new ContentTypeSort(childContentType.Key, 1, childContentType.Alias)
             };
         }
-        ContentTypeService.Save(rootContentType);
+        await ContentTypeService.CreateAsync(rootContentType, Constants.Security.SuperUserKey);
 
         var rootKey = (await ContentEditingService.CreateAsync(
             new ContentCreateModel
@@ -254,7 +254,7 @@ public partial class ContentEditingServiceTests
         var contentType = ContentTypeBuilder.CreateContentMetaContentType();
         contentType.AllowedTemplates = null;
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -286,7 +286,7 @@ public partial class ContentEditingServiceTests
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -318,7 +318,7 @@ public partial class ContentEditingServiceTests
         contentType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
         contentType.PropertyTypes.First(pt => pt.Alias == "keywords").ValidationRegExp = "^\\d*$";
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var titleValue = addValidProperties ? "The title value" : null;
         var keywordsValue = addValidProperties ? "12345" : "This is not a number";
@@ -362,7 +362,7 @@ public partial class ContentEditingServiceTests
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -409,7 +409,7 @@ public partial class ContentEditingServiceTests
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -434,7 +434,7 @@ public partial class ContentEditingServiceTests
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -460,7 +460,7 @@ public partial class ContentEditingServiceTests
         var contentType = ContentTypeBuilder.CreateContentMetaContentType();
         contentType.AllowedTemplates = null;
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -490,7 +490,7 @@ public partial class ContentEditingServiceTests
         var contentType = ContentTypeBuilder.CreateContentMetaContentType();
         contentType.AllowedTemplates = null;
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -516,7 +516,7 @@ public partial class ContentEditingServiceTests
         var contentType = ContentTypeBuilder.CreateContentMetaContentType();
         contentType.AllowedTemplates = null;
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -550,7 +550,7 @@ public partial class ContentEditingServiceTests
         var contentType = ContentTypeBuilder.CreateContentMetaContentType();
         contentType.AllowedTemplates = null;
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -638,9 +638,7 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new () { Name = "The Name" },
-                new () { Segment = "seg-1", Name = "The Name" },
-                new () { Segment = "seg-2", Name = "The Name" }
+                new () { Name = "The Name" }
             ]
         };
 
@@ -689,11 +687,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new () { Name = "The English Name", Culture = "en-US" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
-                new () { Name = "The Danish Name", Culture = "da-DK" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+                new () { Name = "The Danish Name", Culture = "da-DK" }
             ]
         };
 
@@ -731,7 +725,7 @@ public partial class ContentEditingServiceTests
         var propertyType = contentType.PropertyTypes.First(pt => pt.Alias == "invariantTitle");
         propertyType.Alias = "segmentVariantTitle";
         propertyType.Variations = ContentVariation.Segment;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -752,11 +746,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new () { Name = "The English Name", Culture = "en-US" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
-                new () { Name = "The Danish Name", Culture = "da-DK" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+                new () { Name = "The Danish Name", Culture = "da-DK" }
             ]
         };
 
@@ -796,7 +786,7 @@ public partial class ContentEditingServiceTests
         var propertyType = contentType.PropertyTypes.First(pt => pt.Alias == "invariantTitle");
         propertyType.Alias = "cultureVariantTitle";
         propertyType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -816,11 +806,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new () { Name = "The English Name", Culture = "en-US" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
-                new () { Name = "The Danish Name", Culture = "da-DK" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+                new () { Name = "The Danish Name", Culture = "da-DK" }
             ]
         };
 
@@ -858,7 +844,7 @@ public partial class ContentEditingServiceTests
         var contentType = ContentTypeBuilder.CreateContentMetaContentType();
         contentType.AllowedTemplates = null;
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var key = Guid.NewGuid();
         var createModel = new ContentCreateModel
@@ -932,7 +918,7 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new () { Name = "The name", Culture = "en-US", Segment = "segment" }
+                new () { Name = "The name", Culture = "en-US" }
             ]
         };
 
@@ -952,7 +938,7 @@ public partial class ContentEditingServiceTests
         {
             new ContentTypeSort(contentType.Key, 1, contentType.Alias)
         };
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var rootKey = (await ContentEditingService.CreateAsync(
             new ContentCreateModel
@@ -1013,33 +999,6 @@ public partial class ContentEditingServiceTests
         Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status);
     }
 
-    [Test]
-    public async Task Cannot_Create_Segment_Variant_Without_Default_Segment()
-    {
-        var contentType = await CreateVariantContentType(ContentVariation.Segment);
-
-        var createModel = new ContentCreateModel
-        {
-            ContentTypeKey = contentType.Key,
-            ParentKey = Constants.System.RootKey,
-            Properties =
-            [
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The Seg-1 Title", Segment = "seg-1" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The Seg-2 Title", Segment = "seg-2" }
-            ],
-            Variants =
-            [
-                new () { Segment = "seg-1", Name = "The Name" },
-                new () { Segment = "seg-2", Name = "The Name" }
-            ]
-        };
-
-        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch, result.Status);
-    }
-
     private void AssertBodyTextEquals(string expected, IContent content)
     {
         var bodyTextValue = content.GetValue<string>("bodyText");
@@ -1050,5 +1009,72 @@ public partial class ContentEditingServiceTests
                 Mock.Of<ILogger>(),
                 out RichTextEditorValue? richTextEditorValue));
         Assert.AreEqual(expected, richTextEditorValue!.Markup);
+    }
+
+    [Test]
+    public async Task Cannot_Create_With_An_Over_Long_Name()
+    {
+        var contentType = await CreateInvariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Name = new string('x', 256) }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The title" }],
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Create_With_A_Name_At_The_Maximum_Length()
+    {
+        var contentType = await CreateInvariantContentType();
+        var name = new string('x', 255);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Name = name }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The title" }],
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(name, result.Result.Content!.Name);
+    }
+
+    [Test]
+    public async Task Cannot_Create_With_An_Over_Long_Name_For_Any_Culture()
+    {
+        var contentType = await CreateVariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            // only the non-default culture is too long, so a check on the entity name alone would miss it
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "English" },
+                new VariantModel { Culture = "da-DK", Name = new string('x', 256) }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "variantTitle", Value = "English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "Danish title", Culture = "da-DK" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
     }
 }

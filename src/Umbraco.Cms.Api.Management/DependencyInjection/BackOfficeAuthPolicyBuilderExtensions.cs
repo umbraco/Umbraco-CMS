@@ -4,6 +4,7 @@ using OpenIddict.Validation.AspNetCore;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.Security.Authorization.DenyLocalLogin;
 using Umbraco.Cms.Api.Management.Security.Authorization.Dictionary;
+using Umbraco.Cms.Api.Management.Security.Authorization.Element;
 using Umbraco.Cms.Api.Management.Security.Authorization.Media;
 using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
@@ -24,6 +25,8 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, ContentPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, DictionaryPermissionHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, ElementPermissionHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, ElementContainerPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserGroupPermissionHandler>();
@@ -40,19 +43,19 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         void AddAllowedApplicationsPolicy(string policyName, params string[] allowedClaimValues)
             => options.AddPolicy(policyName, policy =>
             {
-                policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+                AddAuthenticationSchemes(policy);
                 policy.Requirements.Add(new AllowedApplicationRequirement(allowedClaimValues));
             });
 
         options.AddPolicy(AuthorizationPolicies.BackOfficeAccess, policy =>
         {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            AddAuthenticationSchemes(policy);
             policy.Requirements.Add(new BackOfficeRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.RequireAdminAccess, policy =>
         {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            AddAuthenticationSchemes(policy);
             policy.RequireRole(Constants.Security.AdminGroupAlias);
         });
 
@@ -65,7 +68,8 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
             Constants.Applications.Users,
             Constants.Applications.Settings,
             Constants.Applications.Packages,
-            Constants.Applications.Members);
+            Constants.Applications.Members,
+            Constants.Applications.Library);
         AddAllowedApplicationsPolicy(
             AuthorizationPolicies.SectionAccessForMediaTree,
             Constants.Applications.Content,
@@ -73,25 +77,40 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
             Constants.Applications.Users,
             Constants.Applications.Settings,
             Constants.Applications.Packages,
-            Constants.Applications.Members);
+            Constants.Applications.Members,
+            Constants.Applications.Library);
         AddAllowedApplicationsPolicy(
             AuthorizationPolicies.SectionAccessForMemberTree,
             Constants.Applications.Content,
             Constants.Applications.Media,
-            Constants.Applications.Members);
+            Constants.Applications.Members,
+            Constants.Applications.Library);
+        AddAllowedApplicationsPolicy(
+            AuthorizationPolicies.SectionAccessForElementTree,
+            Constants.Applications.Content,
+            Constants.Applications.Media,
+            Constants.Applications.Users,
+            Constants.Applications.Settings,
+            Constants.Applications.Packages,
+            Constants.Applications.Members,
+            Constants.Applications.Library);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessMedia, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessMembers, Constants.Applications.Members);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessPackages, Constants.Applications.Packages);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessSettings, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessUsers, Constants.Applications.Users);
+        AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessLibrary, Constants.Applications.Library);
 
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDataTypes, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDictionary, Constants.Applications.Translation);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, Constants.Applications.Translation, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocuments, Constants.Applications.Content);
+        AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessElements, Constants.Applications.Library);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes, Constants.Applications.Content, Constants.Applications.Settings);
+        AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentsOrElementsOrDocumentTypes, Constants.Applications.Content, Constants.Applications.Library, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentOrMediaOrContentTypes, Constants.Applications.Content, Constants.Applications.Settings, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentsOrMediaOrMembersOrContentTypes, Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members, Constants.Applications.Settings);
+        AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentsOrElementsOrMediaOrMembersOrContentTypes, Constants.Applications.Content, Constants.Applications.Library, Constants.Applications.Media, Constants.Applications.Members, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentTypes, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessLanguages, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessMediaTypes, Constants.Applications.Settings);
@@ -110,44 +129,61 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         // Contextual permissions
         options.AddPolicy(AuthorizationPolicies.ContentPermissionByResource, policy =>
         {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            AddAuthenticationSchemes(policy);
             policy.Requirements.Add(new ContentPermissionRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.DenyLocalLoginIfConfigured, policy =>
         {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            AddAuthenticationSchemes(policy);
             policy.Requirements.Add(new DenyLocalLoginRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.DictionaryPermissionByResource, policy =>
         {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            AddAuthenticationSchemes(policy);
             policy.Requirements.Add(new DictionaryPermissionRequirement());
+        });
+
+        options.AddPolicy(AuthorizationPolicies.ElementPermissionByResource, policy =>
+        {
+            AddAuthenticationSchemes(policy);
+            policy.Requirements.Add(new ElementPermissionRequirement());
+        });
+
+        options.AddPolicy(AuthorizationPolicies.ElementFolderPermissionByResource, policy =>
+        {
+            AddAuthenticationSchemes(policy);
+            policy.Requirements.Add(new ElementContainerPermissionRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.MediaPermissionByResource, policy =>
         {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            AddAuthenticationSchemes(policy);
             policy.Requirements.Add(new MediaPermissionRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.UmbracoFeatureEnabled, policy =>
         {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            AddAuthenticationSchemes(policy);
             policy.Requirements.Add(new FeatureAuthorizeRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.UserBelongsToUserGroupInRequest, policy =>
         {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            AddAuthenticationSchemes(policy);
             policy.Requirements.Add(new UserGroupPermissionRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.UserPermissionByResource, policy =>
         {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            AddAuthenticationSchemes(policy);
             policy.Requirements.Add(new UserPermissionRequirement());
         });
     }
+
+    private static void AddAuthenticationSchemes(AuthorizationPolicyBuilder policy)
+        => policy.AddAuthenticationSchemes(
+            OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme,
+            Constants.Security.BackOfficeAuthenticationType);
 }

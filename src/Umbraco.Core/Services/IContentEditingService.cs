@@ -48,9 +48,11 @@ public interface IContentEditingService
     /// <param name="culturesToPublish">The cultures to publish.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the creation result or an error status.</returns>
-    // TODO (V19): Remove default implementation.
-    Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ContentCreateModel createModel, string[] culturesToPublish, Guid userKey)
-        => throw new NotImplementedException();
+    /// <remarks>
+    ///     The returned status reports the outcome of the save and the publish separately, as the two can differ:
+    ///     a publish blocked by a business rule still leaves the save in effect.
+    /// </remarks>
+    Task<Attempt<ContentCreateResult, ContentEditingAndPublishingStatus>> CreateAndPublishAsync(ContentCreateModel createModel, ISet<string> culturesToPublish, Guid userKey);
 
     /// <summary>
     ///     Updates an existing content item.
@@ -69,9 +71,11 @@ public interface IContentEditingService
     /// <param name="culturesToPublish">The cultures to publish.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the update result or an error status.</returns>
-    // TODO (V19): Remove default implementation.
-    Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
-        => throw new NotImplementedException();
+    /// <remarks>
+    ///     The returned status reports the outcome of the save and the publish separately, as the two can differ:
+    ///     a publish blocked by a business rule still leaves the save in effect.
+    /// </remarks>
+    Task<Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, ISet<string> culturesToPublish, Guid userKey);
 
     /// <summary>
     ///     Moves a content item to the recycle bin.
@@ -127,8 +131,7 @@ public interface IContentEditingService
     /// <param name="culture">The culture whose variant name to sort by, or <c>null</c> to sort by the invariant name. Only applies when sorting by <see cref="ContentSortField.Name"/>. The culture is not validated: a child that does not vary by the given culture - or an unrecognised culture - falls back to the invariant name.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>The operation status indicating success or failure.</returns>
-    Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, string? culture, Guid userKey)
-        => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
+    Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, string? culture, Guid userKey);
 
     /// <summary>
     ///     Deletes a content item whether it is in the recycle bin or not.
@@ -137,16 +140,6 @@ public interface IContentEditingService
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the deleted content item or an error status.</returns>
     Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey);
-
-    /// <summary>
-    ///     Restores a content item from the recycle bin.
-    /// </summary>
-    /// <param name="key">The unique identifier of the content item to restore.</param>
-    /// <param name="parentKey">The unique identifier of the parent to restore to, or <c>null</c> for the original location.</param>
-    /// <param name="userKey">The unique identifier of the user performing the action.</param>
-    /// <returns>An attempt containing the restored content item or an error status.</returns>
-    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
-    Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey);
 
     /// <summary>
     ///     Restores a content item from the recycle bin, optionally leaving its descendants behind.
@@ -160,19 +153,5 @@ public interface IContentEditingService
     ///     restored later.
     /// </param>
     /// <returns>An attempt containing the restored content item or an error status.</returns>
-    // TODO (V19): Remove the default implementation when the obsolete overload without includeDescendants is removed.
-    Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
-    {
-        // Only the whole-tree restore can be satisfied by delegating to the existing method; there is no way to honour
-        // includeDescendants: false without the concrete implementation, so fail fast rather than silently restore
-        // the descendants after all.
-        if (includeDescendants is false)
-        {
-            throw new NotImplementedException("This IContentEditingService implementation does not support restoring without descendants. Override the RestoreAsync overload that takes an includeDescendants parameter to support it.");
-        }
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        return RestoreAsync(key, parentKey, userKey);
-#pragma warning restore CS0618 // Type or member is obsolete
-    }
+    Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants);
 }

@@ -48,5 +48,30 @@ public enum EntityContainerOperationStatus
     /// <summary>
     ///     A container with the same name already exists at this level.
     /// </summary>
-    DuplicateName
+    DuplicateName,
+
+    /// <summary>
+    ///     The container has an invalid parent.
+    /// </summary>
+    InvalidParent,
+
+    /// <summary>
+    ///     The container is trashed.
+    /// </summary>
+    InTrash,
+
+    /// <summary>
+    ///     The container is not trashed.
+    /// </summary>
+    NotInTrash,
+
+    /// <summary>
+    ///     The container cannot be moved to the recycle bin because it has descendants that are referenced.
+    /// </summary>
+    HasReferencedDescendants,
+
+    /// <summary>
+    ///     Failure for an an unknown reason.
+    /// </summary>
+    Unknown,
 }

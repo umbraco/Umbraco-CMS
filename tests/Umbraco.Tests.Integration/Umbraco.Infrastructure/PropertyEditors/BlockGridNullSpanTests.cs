@@ -20,7 +20,7 @@ internal sealed class BlockGridNullSpanTests : BlockEditorElementVariationTestBa
     [Test]
     public async Task Can_Render_BlockGrid_When_Items_Have_Null_Spans()
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var areaKey = Guid.NewGuid();
 
         var blockGridDataType = await CreateBlockEditorDataType(
@@ -35,7 +35,7 @@ internal sealed class BlockGridNullSpanTests : BlockEditorElementVariationTestBa
                 },
             });
 
-        var contentType = CreateContentType(ContentVariation.Nothing, blockGridDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockGridDataType);
 
         var rootKey = Guid.NewGuid();
         var nestedKey = Guid.NewGuid();
@@ -65,7 +65,7 @@ internal sealed class BlockGridNullSpanTests : BlockEditorElementVariationTestBa
                 new(rootKey, elementType.Key, elementType.Alias) { Values = [new() { Alias = "invariantText", Value = "Root" }] },
                 new(nestedKey, elementType.Key, elementType.Alias) { Values = [new() { Alias = "invariantText", Value = "Nested" }] },
             ],
-            Expose = [new(rootKey, null, null), new(nestedKey, null, null)],
+            Expose = [new(rootKey, null), new(nestedKey, null)],
         };
 
         var content = new ContentBuilder().WithContentType(contentType).WithName("Home").Build();

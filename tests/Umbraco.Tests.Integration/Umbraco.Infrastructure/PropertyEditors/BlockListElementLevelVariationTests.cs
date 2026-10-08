@@ -87,15 +87,8 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
                 cultures = [null];
             }
 
-            var segments = elementType.VariesBySegment()
-                ? new[] { block.BlocksProperty.Segment }
-                    .Union(block.BlocksProperty.BlockContentValues.Select(value => value.Segment))
-                    .Distinct()
-                    .ToArray()
-                : [null];
-
-            expose.AddRange(cultures.SelectMany(culture => segments.Select(segment =>
-                new BlockItemVariation(block.contentElementKey, culture, segment))));
+            expose.AddRange(cultures.Select(culture =>
+                new BlockItemVariation(block.contentElementKey, culture)));
         }
 
         return new BlockListValue
@@ -139,9 +132,9 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
 
     private async Task<IPublishedContent> CreatePublishedContent(ContentVariation variation, IList<BlockPropertyValue> blockContentValues, IList<BlockPropertyValue> blockSettingsValues)
     {
-        var elementType = CreateElementType(variation);
+        var elementType = await CreateElementType(variation);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(variation, blockListDataType);
+        var contentType = await CreateContentType(variation, blockListDataType);
 
         var content = CreateContent(contentType, elementType, blockContentValues, blockSettingsValues, true);
         return GetPublishedContent(content.Key);
@@ -149,7 +142,7 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
 
     private async Task<IContentType> CreateElementTypeWithValidationAsync(ContentVariation contentVariation = ContentVariation.Culture)
     {
-        var elementType = CreateElementType(contentVariation);
+        var elementType = await CreateElementType(contentVariation);
         foreach (var propertyType in elementType.PropertyTypes)
         {
             propertyType.Mandatory = true;

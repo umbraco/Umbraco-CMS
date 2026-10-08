@@ -25,7 +25,7 @@ public class ContentFinderByKeyTests
         [Frozen] IPublishedContent publishedContent,
         [Frozen] IUmbracoContextAccessor umbracoContextAccessor,
         [Frozen] IUmbracoContext umbracoContext,
-        IFileService fileService)
+        ITemplateService templateService)
     {
         var absoluteUrl = "http://localhost" + urlAsString;
 
@@ -35,7 +35,7 @@ public class ContentFinderByKeyTests
         Mock.Get(umbracoContext).Setup(x => x.Content.GetById(nodeKey)).Returns(publishedContent);
         Mock.Get(publishedContent).Setup(x => x.Key).Returns(nodeKey);
 
-        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService);
+        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), templateService);
         var webRoutingSettings = new WebRoutingSettings();
 
         var sut = new ContentFinderByKeyPath(

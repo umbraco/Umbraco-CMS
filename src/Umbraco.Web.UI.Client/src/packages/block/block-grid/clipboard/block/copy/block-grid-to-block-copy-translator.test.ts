@@ -25,7 +25,6 @@ describe('UmbBlockListToBlockClipboardCopyPropertyValueTranslator', () => {
 						alias: 'headline',
 						editorAlias: 'Umbraco.TextBox',
 						value: 'Headline value',
-						entityType: '',
 					},
 				],
 			},
@@ -33,6 +32,7 @@ describe('UmbBlockListToBlockClipboardCopyPropertyValueTranslator', () => {
 		layout: {
 			[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: [
 				{
+					key: 'contentKey',
 					columnSpan: 12,
 					rowSpan: 1,
 					areas: [],
@@ -46,7 +46,6 @@ describe('UmbBlockListToBlockClipboardCopyPropertyValueTranslator', () => {
 			{
 				contentKey: 'contentKey',
 				culture: null,
-				segment: null,
 			},
 		],
 	};
@@ -55,6 +54,7 @@ describe('UmbBlockListToBlockClipboardCopyPropertyValueTranslator', () => {
 		contentData: blockGridPropertyValue.contentData,
 		layout: [
 			{
+				key: 'contentKey',
 				contentKey: 'contentKey',
 				settingsKey: null,
 			},

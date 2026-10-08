@@ -112,15 +112,6 @@ public interface IUserGroupService
     Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid userGroupKey) => DeleteAsync(new HashSet<Guid> { userGroupKey });
 
     /// <summary>
-    /// Updates the users to have the groups specified.
-    /// </summary>
-    /// <param name="userGroupKeys">The user groups the users should be part of.</param>
-    /// <param name="userKeys">The user whose groups we want to alter.</param>
-    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    [Obsolete("Please use the overload accepting all parameters. Scheduled for removal in Umbraco 19.")]
-    Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
-
-    /// <summary>
     /// Updates the users to have the groups specified, with authorization checks based on the performing user.
     /// </summary>
     /// <param name="userGroupKeys">The user groups the users should be part of.</param>
@@ -130,11 +121,7 @@ public interface IUserGroupService
     /// <remarks>
     /// Non-admin users can only add groups they themselves belong to. Removing groups is always allowed.
     /// </remarks>
-    // TODO (V18): Remove default implementation.
-    Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(ISet<Guid> userGroupKeys, ISet<Guid> userKeys, Guid performingUserKey)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => UpdateUserGroupsOnUsersAsync(userGroupKeys, userKeys);
-#pragma warning restore CS0618 // Type or member is obsolete
+    Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(ISet<Guid> userGroupKeys, ISet<Guid> userKeys, Guid performingUserKey);
 
     /// <summary>
     ///     Adds users to a user group.

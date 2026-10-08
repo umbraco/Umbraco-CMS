@@ -8,7 +8,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests
     [Test]
     public async Task RootUserAccessEntities_FirstAndLastRoot_YieldsBoth_AsAllowed()
     {
-        var contentStartNodeIds = await CreateUserAndGetStartNodeIds(_mediaByName["1"].Id, _mediaByName["5"].Id);
+        var contentStartNodeIds = await CreateUserAndGetStartNodeIds(ItemsByName["1"].Id, ItemsByName["5"].Id);
 
         var roots = UserStartNodeEntitiesService
             .RootUserAccessEntities(
@@ -21,8 +21,8 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.Multiple(() =>
         {
             // first and last content items are the ones allowed
-            Assert.AreEqual(_mediaByName["1"].Key, roots[0].Entity.Key);
-            Assert.AreEqual(_mediaByName["5"].Key, roots[1].Entity.Key);
+            Assert.AreEqual(ItemsByName["1"].Key, roots[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["5"].Key, roots[1].Entity.Key);
 
             // explicitly verify the entity sort order, both so we know sorting works,
             // and so we know it's actually the first and last item at root
@@ -38,7 +38,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests
     [Test]
     public async Task RootUserAccessEntities_ChildrenAsStartNode_YieldsChildRoots_AsNotAllowed()
     {
-        var contentStartNodeIds = await CreateUserAndGetStartNodeIds(_mediaByName["1-3"].Id, _mediaByName["3-3"].Id, _mediaByName["5-3"].Id);
+        var contentStartNodeIds = await CreateUserAndGetStartNodeIds(ItemsByName["1-3"].Id, ItemsByName["3-3"].Id, ItemsByName["5-3"].Id);
 
         var roots = UserStartNodeEntitiesService
             .RootUserAccessEntities(
@@ -50,9 +50,9 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.Multiple(() =>
         {
             // the three start nodes are the children of the "1", "3" and "5" roots, respectively, so these are expected as roots
-            Assert.AreEqual(_mediaByName["1"].Key, roots[0].Entity.Key);
-            Assert.AreEqual(_mediaByName["3"].Key, roots[1].Entity.Key);
-            Assert.AreEqual(_mediaByName["5"].Key, roots[2].Entity.Key);
+            Assert.AreEqual(ItemsByName["1"].Key, roots[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["3"].Key, roots[1].Entity.Key);
+            Assert.AreEqual(ItemsByName["5"].Key, roots[2].Entity.Key);
 
             // all are disallowed - only the children (the actual start nodes) are allowed
             Assert.IsTrue(roots.All(r => r.HasAccess is false));
@@ -62,7 +62,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests
     [Test]
     public async Task RootUserAccessEntities_GrandchildrenAsStartNode_YieldsGrandchildRoots_AsNotAllowed()
     {
-        var contentStartNodeIds = await CreateUserAndGetStartNodeIds(_mediaByName["1-2-3"].Id, _mediaByName["2-3-4"].Id, _mediaByName["3-4-5"].Id);
+        var contentStartNodeIds = await CreateUserAndGetStartNodeIds(ItemsByName["1-2-3"].Id, ItemsByName["2-3-4"].Id, ItemsByName["3-4-5"].Id);
 
         var roots = UserStartNodeEntitiesService
             .RootUserAccessEntities(
@@ -74,9 +74,9 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.Multiple(() =>
         {
             // the three start nodes are the grandchildren of the "1", "2" and "3" roots, respectively, so these are expected as roots
-            Assert.AreEqual(_mediaByName["1"].Key, roots[0].Entity.Key);
-            Assert.AreEqual(_mediaByName["2"].Key, roots[1].Entity.Key);
-            Assert.AreEqual(_mediaByName["3"].Key, roots[2].Entity.Key);
+            Assert.AreEqual(ItemsByName["1"].Key, roots[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["2"].Key, roots[1].Entity.Key);
+            Assert.AreEqual(ItemsByName["3"].Key, roots[2].Entity.Key);
 
             // all are disallowed - only the grandchildren (the actual start nodes) are allowed
             Assert.IsTrue(roots.All(r => r.HasAccess is false));

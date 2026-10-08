@@ -44,7 +44,7 @@ public class NewDefaultUrlProviderTests
 
         public Mock<ILanguageService> LanguageService { get; } = new();
 
-        public Mock<ILogger<NewDefaultUrlProvider>> Logger { get; } = new();
+        public Mock<ILogger<DefaultUrlProvider>> Logger { get; } = new();
 
         public RequestHandlerSettings RequestConfig { get; set; } = new() { AddTrailingSlash = true };
 
@@ -66,7 +66,7 @@ public class NewDefaultUrlProviderTests
                 .ReturnsAsync(() => DefaultCulture);
         }
 
-        public NewDefaultUrlProvider CreateProvider()
+        public DefaultUrlProvider CreateProvider()
         {
             var hostingEnv = new Mock<IHostingEnvironment>();
             hostingEnv.Setup(x => x.ApplicationVirtualPath).Returns("/");
@@ -75,7 +75,7 @@ public class NewDefaultUrlProviderTests
             var optionsMonitor = new Mock<IOptionsMonitor<RequestHandlerSettings>>();
             optionsMonitor.Setup(x => x.CurrentValue).Returns(RequestConfig);
 
-            return new NewDefaultUrlProvider(
+            return new DefaultUrlProvider(
                 optionsMonitor.Object,
                 Logger.Object,
                 SiteDomainMapper.Object,

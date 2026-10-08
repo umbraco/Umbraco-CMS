@@ -55,7 +55,8 @@ export abstract class UmbBlockPropertyValueCloner<
 		const contentKey = layoutEntry.contentKey;
 		const settingsKey = layoutEntry.settingsKey;
 
-		// Generate new contentKey and settingsKey:
+		// Generate new key and contentKey:
+		clonedLayoutEntry.key = UmbId.new();
 		const newContentKey = UmbId.new();
 		clonedLayoutEntry.contentKey = newContentKey;
 

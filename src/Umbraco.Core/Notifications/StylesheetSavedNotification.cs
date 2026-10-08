@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Notifications;
 ///     Notification that is published after a stylesheet has been saved.
 /// </summary>
 /// <remarks>
-///     This notification is published by the <see cref="Services.IFileService"/> after the stylesheet has been persisted.
+///     This notification is published by the <see cref="Services.IStylesheetService"/> after the stylesheet has been persisted.
 ///     It is not cancelable since the save operation has already completed.
 /// </remarks>
 public class StylesheetSavedNotification : SavedNotification<IStylesheet>

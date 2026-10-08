@@ -67,6 +67,26 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
         };
     }
 
+    public ContentCacheNode ToContentCacheNode(IElement element, bool preview)
+    {
+        ContentData contentData = GetContentData(
+            element,
+            preview is false,
+            null,
+            element.PublishCultureInfos?.Values.Select(x => x.Culture).ToHashSet() ?? []);
+        return new ContentCacheNode
+        {
+            Id = element.Id,
+            Key = element.Key,
+            SortOrder = element.SortOrder,
+            CreateDate = element.CreateDate,
+            CreatorId = element.CreatorId,
+            ContentTypeId = element.ContentTypeId,
+            Data = contentData,
+            IsDraft = preview,
+        };
+    }
+
     private ContentData GetContentData(IContentBase content, bool published, int? templateId, ISet<string> publishedCultures)
     {
         var propertyData = new Dictionary<string, PropertyData[]>();
@@ -111,10 +131,11 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
         // sanitize - names should be ok but ... never knows
         if (content.ContentType.VariesByCulture())
         {
-            ContentCultureInfosCollection? infos = content is IContent document
+            var publishableContent = content as IPublishableContentBase;
+            ContentCultureInfosCollection? infos = publishableContent is not null
                 ? published
-                    ? document.PublishCultureInfos
-                    : document.CultureInfos
+                    ? publishableContent.PublishCultureInfos
+                    : publishableContent.CultureInfos
                 : content.CultureInfos;
 
             // ReSharper disable once UseDeconstruction
@@ -122,7 +143,7 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             {
                 foreach (ContentCultureInfos cultureInfo in infos)
                 {
-                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
+                    var cultureIsDraft = !published && publishableContent is not null && publishableContent.IsCultureEdited(cultureInfo.Culture);
                     cultureData[cultureInfo.Culture] = new CultureVariation
                     {
                         Name = cultureInfo.Name,

@@ -44,9 +44,9 @@ internal sealed class MediaCacheServiceTests : UmbracoIntegrationTestWithContent
 
     private IMedia MediaItem { get; set; }
 
-    public override void CreateTestData()
+    public override async Task CreateTestDataAsync()
     {
-        base.CreateTestData();
+        await base.CreateTestDataAsync();
 
         MediaType = MediaTypeService.Get("image")!;
 
@@ -145,7 +145,7 @@ internal sealed class MediaCacheServiceTests : UmbracoIntegrationTestWithContent
                 .WithAlias("metadata")
                 .WithSortOrder(1)
                 .AddPropertyType()
-                    .WithPropertyEditorAlias(Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+                    .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
                     .WithValueStorageType(ValueStorageType.Nvarchar)
                     .WithAlias("altText")
                     .WithName("Alt Text")
@@ -165,7 +165,7 @@ internal sealed class MediaCacheServiceTests : UmbracoIntegrationTestWithContent
                 .WithAlias("extra")
                 .WithSortOrder(2)
                 .AddPropertyType()
-                    .WithPropertyEditorAlias(Cms.Core.Constants.PropertyEditors.Aliases.TextBox)
+                    .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
                     .WithValueStorageType(ValueStorageType.Nvarchar)
                     .WithAlias("caption")
                     .WithName("Caption")

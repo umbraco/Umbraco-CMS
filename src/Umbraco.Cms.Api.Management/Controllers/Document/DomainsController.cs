@@ -2,10 +2,8 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security.Authorization;
@@ -30,21 +28,11 @@ public class DomainsController : DocumentControllerBase
     /// </summary>
     /// <param name="domainService">Service used to manage domain-related operations.</param>
     /// <param name="umbracoMapper">The mapper used to map Umbraco objects to API models.</param>
-    [ActivatorUtilitiesConstructor]
     public DomainsController(IAuthorizationService authorizationService, IDomainService domainService, IUmbracoMapper umbracoMapper)
     {
         _authorizationService = authorizationService;
         _domainService = domainService;
         _umbracoMapper = umbracoMapper;
-    }
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public DomainsController(IDomainService domainService, IUmbracoMapper umbracoMapper)
-        : this(
-            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>(),
-            domainService,
-            umbracoMapper)
-    {
     }
 
     /// <summary>

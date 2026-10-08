@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
-using Umbraco.Cms.Core.Models.Installer;
 
 namespace Umbraco.Cms.Core.Factories;
 
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Factories;
 public class UserSettingsFactory : IUserSettingsFactory
 {
     private readonly ILocalizedTextService _localizedTextService;
-    private readonly UserPasswordConfigurationSettings _passwordConfiguration;
+    private readonly SecuritySettings _securitySettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserSettingsFactory"/> class.
@@ -21,11 +21,11 @@ public class UserSettingsFactory : IUserSettingsFactory
     /// <param name="securitySettings">The user password configuration settings.</param>
     /// <param name="localizedTextService">The localized text service for retrieving localized descriptions.</param>
     public UserSettingsFactory(
-        IOptions<UserPasswordConfigurationSettings> securitySettings,
+        IOptions<SecuritySettings> securitySettings,
         ILocalizedTextService localizedTextService)
     {
         _localizedTextService = localizedTextService;
-        _passwordConfiguration = securitySettings.Value;
+        _securitySettings = securitySettings.Value;
     }
 
     /// <inheritdoc />
@@ -43,8 +43,8 @@ public class UserSettingsFactory : IUserSettingsFactory
     private PasswordSettingsModel CreatePasswordSettingsModel() =>
         new()
         {
-            MinCharLength = _passwordConfiguration.RequiredLength,
-            MinNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars()
+            MinCharLength = _securitySettings.UserPassword.RequiredLength,
+            MinNonAlphaNumericLength = _securitySettings.UserPassword.GetMinNonAlphaNumericChars()
         };
 
     /// <summary>

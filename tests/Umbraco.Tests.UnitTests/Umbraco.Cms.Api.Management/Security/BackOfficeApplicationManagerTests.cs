@@ -41,8 +41,7 @@ public class BackOfficeApplicationManagerTests
 
         _securitySettings = Options.Create(new SecuritySettings
         {
-            AuthorizeCallbackPathName = "umbraco/oauth_complete",
-            AuthorizeCallbackLogoutPathName = "umbraco/logout"
+            CallbackPathName = "umbraco/oauth_complete",
         });
 
         // Default: RuntimeLevel allows execution
@@ -325,8 +324,7 @@ public class BackOfficeApplicationManagerTests
         var securitySettingsWithHost = Options.Create(new SecuritySettings
         {
             BackOfficeHost = configuredHost,
-            AuthorizeCallbackPathName = "umbraco/oauth_complete",
-            AuthorizeCallbackLogoutPathName = "umbraco/logout"
+            CallbackPathName = "umbraco/oauth_complete",
         });
 
         var mockApplication = new object();
@@ -387,8 +385,7 @@ public class BackOfficeApplicationManagerTests
         var securitySettingsWithHost = Options.Create(new SecuritySettings
         {
             BackOfficeHost = configuredHost,
-            AuthorizeCallbackPathName = "umbraco/oauth_complete",
-            AuthorizeCallbackLogoutPathName = "umbraco/logout"
+            CallbackPathName = "umbraco/oauth_complete",
         });
 
         var mockApplication = new object();
@@ -432,6 +429,32 @@ public class BackOfficeApplicationManagerTests
 
         var redirectUriStrings = capturedDescriptor.RedirectUris.Select(u => u.ToString()).ToList();
         Assert.That(redirectUriStrings, Does.Contain("https://server1.local/umbraco/oauth_complete"));
+    }
+
+    /// <summary>
+    /// Tests that RedirectUris and PostLogoutRedirectUris are built from <see cref="SecuritySettings.CallbackPathName"/>,
+    /// with the logout path derived via <see cref="SecuritySettings.GetEffectiveLogoutPathName"/> when no explicit
+    /// override is configured.
+    /// </summary>
+    [Test]
+    public void BackofficeOpenIddictApplicationDescriptor_NoExplicitLogoutOverride_UsesCallbackPathNameAndDerivedLogoutPath()
+    {
+        var sut = CreateDefaultMockedBackofficeApplicationManager();
+
+        OpenIddictApplicationDescriptor descriptor = sut.BackofficeOpenIddictApplicationDescriptor(new Uri("https://server1.local/"));
+
+        var redirectUriStrings = descriptor.RedirectUris.Select(u => u.ToString()).ToList();
+        var postLogoutUriStrings = descriptor.PostLogoutRedirectUris.Select(u => u.ToString()).ToList();
+
+        Assert.That(redirectUriStrings, Does.Contain("https://server1.local/umbraco/oauth_complete"));
+        Assert.That(postLogoutUriStrings, Does.Contain("https://server1.local/umbraco/oauth_complete"));
+        Assert.That(postLogoutUriStrings, Does.Contain("https://server1.local/umbraco/oauth_complete/logout"));
+
+        // Assert
+        _mockApplicationManager.Verify(
+            x => x.UpdateAsync(It.IsAny<object>(), It.IsAny<OpenIddictApplicationDescriptor>(), It.IsAny<CancellationToken>()),
+            Times.Never,
+            "An unchanged descriptor must not be written, otherwise concurrent instances contend over the concurrency token");
     }
 
     /// <summary>
@@ -607,7 +630,7 @@ public class BackOfficeApplicationManagerTests
             .Setup(x => x.GetPostLogoutRedirectUrisAsync(storedApplication, It.IsAny<CancellationToken>()))
             .ReturnsAsync(ImmutableArray.Create(
                 $"{authority}/umbraco/oauth_complete",
-                $"{authority}/umbraco/logout"));
+                $"{authority}/umbraco/oauth_complete/logout"));
 
         _mockApplicationManager
             .Setup(x => x.GetDisplayNameAsync(storedApplication, It.IsAny<CancellationToken>()))

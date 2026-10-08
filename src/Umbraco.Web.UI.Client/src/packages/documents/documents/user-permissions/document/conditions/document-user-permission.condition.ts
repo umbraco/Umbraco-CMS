@@ -5,7 +5,7 @@ import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_ENTITY_CONTEXT, type UmbEntityUnique 
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { DocumentPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { IPermissionPresentationModelDocumentPermissionPresentationModel as DocumentPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbDocumentUserPermissionCondition

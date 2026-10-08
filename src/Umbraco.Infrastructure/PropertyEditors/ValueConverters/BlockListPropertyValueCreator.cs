@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
@@ -15,19 +16,22 @@ internal sealed class BlockListPropertyValueCreator : BlockPropertyValueCreatorB
     /// </summary>
     /// <param name="blockEditorConverter">The service used to convert block editor data into strongly typed objects.</param>
     /// <param name="variationContextAccessor">Provides access to the current variation context, used for handling content variations.</param>
+    /// <param name="propertyRenderingContextAccessor">Provides access to the current rendering context.</param>
     /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors, determining how values vary by culture or segment.</param>
     /// <param name="jsonSerializer">The serializer used for serializing and deserializing JSON data related to block list properties.</param>
     /// <param name="constructorCache">A cache that stores constructors for block list property values to improve performance.</param>
     /// <param name="languageService">Service used to retrieve language information for fallback resolution.</param>
+    /// <param name="elementCacheService">The cache for elements.</param>
     public BlockListPropertyValueCreator(
         BlockEditorConverter blockEditorConverter,
         IVariationContextAccessor variationContextAccessor,
         IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
+        IElementCacheService elementCacheService,
         IJsonSerializer jsonSerializer,
         BlockListPropertyValueConstructorCache constructorCache,
         ILanguageService languageService)
-        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService)
+        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService, elementCacheService)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;

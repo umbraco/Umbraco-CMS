@@ -25,31 +25,6 @@ public interface IConfigManipulator
     Task RemoveConnectionStringAsync();
 
     /// <summary>
-    /// Updates an existing value in the base JSON configuration source (typically <c>appsettings.json</c>).
-    /// </summary>
-    /// <param name="itemPath">The path to update, using <c>:</c> as the separator.</param>
-    /// <param name="value">The new value.</param>
-    /// <returns>
-    /// A task representing the asynchronous operation.
-    /// </returns>
-    /// <remarks>
-    /// Will only update an existing key; if the key is not already present, nothing is saved.
-    /// </remarks>
-    [Obsolete("This method is no longer used by Umbraco. Scheduled for removal in Umbraco 19.")]
-    Task SaveConfigValueAsync(string itemPath, object value);
-
-    /// <summary>
-    /// Updates the redirect URL tracking setting in the base JSON configuration source (typically <c>appsettings.json</c>),
-    /// since the value applies across all environments. Creates the node if it does not already exist.
-    /// </summary>
-    /// <param name="disable">The value to save.</param>
-    /// <returns>
-    /// A task representing the asynchronous operation.
-    /// </returns>
-    [Obsolete("This method is no longer used by Umbraco. Set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead. Scheduled for removal in Umbraco 19.")]
-    Task SaveDisableRedirectUrlTrackingAsync(bool disable);
-
-    /// <summary>
     /// Sets the global site identifier in the base JSON configuration source (typically <c>appsettings.json</c>),
     /// since the value applies across all environments. Creates the node if it does not already exist.
     /// </summary>
@@ -67,6 +42,5 @@ public interface IConfigManipulator
     /// <returns>
     /// A task representing the asynchronous operation.
     /// </returns>
-    Task SetImagingHmacSecretKeyAsync(string base64Key)
-        => Task.CompletedTask; // TODO (V18): Remove the default implementation
+    Task SetImagingHmacSecretKeyAsync(string base64Key);
 }

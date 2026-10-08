@@ -16,7 +16,6 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import {
-	extractJsonQueryProps,
 	UmbFormControlMixin,
 	UmbValidationContext,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -40,10 +39,10 @@ import '../../components/block-list-entry/index.js';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.contentKey!;
+		return element.key!;
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentKey;
+		return modelEntry.key;
 	},
 	//identifier: 'block-list-editor',
 	itemSelector: 'umb-block-list-entry',
@@ -74,8 +73,8 @@ export class UmbPropertyEditorUIBlockListElement
 			super.value = undefined;
 			// Clear manager state so blocks are actually removed
 			this.#managerContext.setLayouts([]);
-			this.#managerContext.setContents([]);
-			this.#managerContext.setSettings([]);
+			this.#managerContext.setContents(undefined);
+			this.#managerContext.setSettings(undefined);
 			this.#managerContext.setExposes([]);
 			return;
 		}
@@ -231,38 +230,6 @@ export class UmbPropertyEditorUIBlockListElement
 			this.#gotPropertyContext(context);
 		});
 
-		// TODO: Why is this logic not part of the Block Grid and RTE Editors? [NL]
-		// Observe Blocks and clean up validation messages for content/settings that are not in the block list anymore:
-		this.observe(
-			this.#managerContext.layouts,
-			(layouts) => {
-				const validationMessagesToRemove: string[] = [];
-				const contentKeys = layouts.map((x) => x.contentKey);
-				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.contentData').forEach((message) => {
-					// get the KEY from this string: $.contentData[?(@.key == 'KEY')]
-					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
-					const key = extractJsonQueryProps(message.path).key;
-					if (key && contentKeys.indexOf(key) === -1) {
-						validationMessagesToRemove.push(message.key);
-					}
-				});
-
-				const settingsKeys = layouts.map((x) => x.settingsKey).filter((x) => x !== undefined) as string[];
-				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.settingsData').forEach((message) => {
-					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
-					// get the key from this string: $.settingsData[?(@.key == 'KEY')]
-					const key = extractJsonQueryProps(message.path).key;
-					if (key && settingsKeys.indexOf(key) === -1) {
-						validationMessagesToRemove.push(message.key);
-					}
-				});
-
-				// Remove the messages after the loop to prevent changing the array while iterating over it.
-				this.#validationContext.messages.removeMessageByKeys(validationMessagesToRemove);
-			},
-			null,
-		);
-
 		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
 			this.observe(
 				context?.displayVariantId,
@@ -406,15 +373,10 @@ export class UmbPropertyEditorUIBlockListElement
 			${this.#renderSortModeToolbar()}
 			${repeat(
 				this._layouts,
-				(layout) => layout.contentKey,
+				(layout) => layout.key,
 				(layout, index) => html`
 					${this.#renderInlineCreateButton(index)}
-					<umb-block-list-entry
-						index=${index}
-						.contentKey=${layout.contentKey}
-						.layout=${layout}
-						${umbDestroyOnDisconnect()}>
-					</umb-block-list-entry>
+					<umb-block-list-entry index=${index} .layout=${layout} ${umbDestroyOnDisconnect()}></umb-block-list-entry>
 				`,
 			)}
 			${this.#renderCreateButtonGroup()}

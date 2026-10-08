@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
@@ -28,13 +29,14 @@ internal sealed class ConvertedPublishedContentCacheFactory : IConvertedPublishe
     }
 
     /// <inheritdoc />
-    public IConvertedPublishedContentCache<TKey> Create<TKey>(int? maximumItems, string cacheName)
+    public IConvertedPublishedContentCache<TKey, TValue> Create<TKey, TValue>(int? maximumItems, string cacheName)
         where TKey : notnull
+        where TValue : class, IPublishedElement
     {
         if (maximumItems is null)
         {
             _logger.LogInformation("{CacheName}: using an unbounded in-memory (L0) cache.", cacheName);
-            return new UnboundedConvertedPublishedContentCache<TKey>();
+            return new UnboundedConvertedPublishedContentCache<TKey, TValue>();
         }
 
         if (_boundedFactory is null)
@@ -47,7 +49,7 @@ internal sealed class ConvertedPublishedContentCacheFactory : IConvertedPublishe
                 maximumItems.Value,
                 "Umbraco.Cms.PublishedCache.HybridCache.Bounded");
 
-            return new UnboundedConvertedPublishedContentCache<TKey>();
+            return new UnboundedConvertedPublishedContentCache<TKey, TValue>();
         }
 
         _logger.LogInformation(
@@ -55,6 +57,6 @@ internal sealed class ConvertedPublishedContentCacheFactory : IConvertedPublishe
             cacheName,
             maximumItems.Value);
 
-        return _boundedFactory.CreateBounded<TKey>(maximumItems.Value);
+        return _boundedFactory.CreateBounded<TKey, TValue>(maximumItems.Value);
     }
 }

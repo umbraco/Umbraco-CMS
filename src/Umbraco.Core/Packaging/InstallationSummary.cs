@@ -85,6 +85,11 @@ public class InstallationSummary
     public IEnumerable<IMedia> MediaInstalled { get; set; } = Enumerable.Empty<IMedia>();
 
     /// <summary>
+    ///     Gets or sets the collection of elements that were installed.
+    /// </summary>
+    public IEnumerable<IElement> ElementsInstalled { get; set; } = Enumerable.Empty<IElement>();
+
+    /// <summary>
     ///     Gets or sets the collection of entity containers that were installed.
     /// </summary>
     public IEnumerable<EntityContainer> EntityContainersInstalled { get; set; } = Enumerable.Empty<EntityContainer>();
@@ -133,7 +138,8 @@ public class InstallationSummary
         WriteCount("Partial views installed: ", PartialViewsInstalled);
         WriteCount("Entity containers installed: ", EntityContainersInstalled);
         WriteCount("Content items installed: ", ContentInstalled);
-        WriteCount("Media items installed: ", MediaInstalled, false);
+        WriteCount("Media items installed: ", MediaInstalled);
+        WriteCount("Elements installed: ", ElementsInstalled, false);
 
         return sb.ToString();
     }

@@ -21,6 +21,16 @@ public static partial class Constants
         public const string Document = UdiEntityType.Document;
 
         /// <summary>
+        ///     The reference type for element entities.
+        /// </summary>
+        public const string Element = UdiEntityType.Element;
+
+        /// <summary>
+        ///     The reference type for element container entities.
+        /// </summary>
+        public const string ElementContainer = UdiEntityType.ElementContainer;
+
+        /// <summary>
         ///     The reference type for media entities.
         /// </summary>
         public const string Media = UdiEntityType.Media;

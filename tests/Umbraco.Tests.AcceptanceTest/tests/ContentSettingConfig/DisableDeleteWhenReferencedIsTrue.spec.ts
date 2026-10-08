@@ -188,7 +188,7 @@ test('can bulk trash content nodes when none have references', async ({umbracoAp
   await umbracoUi.content.selectContentCardWithName(firstChildContentName);
   await umbracoUi.content.selectContentCardWithName(secondChildContentName);
   await umbracoUi.content.clickTrashSelectedListItems();
-  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed(2);
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();

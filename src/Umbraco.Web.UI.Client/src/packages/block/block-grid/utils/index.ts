@@ -39,7 +39,7 @@ export async function forEachBlockLayoutEntryOf(
 	callback: (entry: UmbBlockGridLayoutModel, parentUnique: string, areaKey: string) => PromiseLike<void>,
 ): Promise<void> {
 	if (entry.areas) {
-		const parentUnique = entry.contentKey;
+		const parentUnique = entry.key;
 		await Promise.all(
 			entry.areas.map(async (area) => {
 				const areaKey = area.key;

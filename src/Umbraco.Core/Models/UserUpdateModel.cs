@@ -57,7 +57,21 @@ public class UserUpdateModel
     public bool HasMediaRootAccess { get; set; }
 
     /// <summary>
+    ///     Gets or sets the collection of element start node keys for the user.
+    /// </summary>
+    /// <remarks>
+    ///     These define the element tree sections the user has access to.
+    /// </remarks>
+    public ISet<Guid> ElementStartNodeKeys { get; set; } = new HashSet<Guid>();
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the user has access to the elements root.
+    /// </summary>
+    public bool HasElementRootAccess { get; set; }
+
+    /// <summary>
     ///     Gets or sets the collection of user group keys the user belongs to.
     /// </summary>
+
     public ISet<Guid> UserGroupKeys { get; set; } = new HashSet<Guid>();
 }

@@ -48,7 +48,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 				id="popover-trigger"
 				popovertarget="property-action-popover"
 				data-mark="open-property-actions"
-				label=${this.localize.term('actions_viewActionsFor')}
+				label=${this.localize.term('actions_viewActionsFor', '')}
 				compact>
 				<uui-symbol-more id="more-symbol"></uui-symbol-more>
 			</uui-button>

@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Represents a multi-node tree picker property editor.
 /// </summary>
+[Obsolete("The multi node tree picker is replaced by the dedicated document, media, element and member pickers. Scheduled for removal in Umbraco 22.")]
 [DataEditor(
     Constants.PropertyEditors.Aliases.MultiNodeTreePicker,
     ValueType = ValueTypes.Text,
@@ -220,7 +221,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
         /// <summary>
         /// Validates the min/max configuration for the multi-node tree picker property editor.
         /// </summary>
-        internal sealed class MinMaxValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        internal sealed class MinMaxValidator : ITypedValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
 
@@ -278,7 +279,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
         /// <summary>
         /// Validates the selected object type for the multi-node tree picker property editor.
         /// </summary>
-        internal sealed class ObjectTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        internal sealed class ObjectTypeValidator : ITypedValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly ICoreScopeProvider _coreScopeProvider;
@@ -369,7 +370,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
         /// <summary>
         /// Validates the selected content type for the multi-node tree picker property editor.
         /// </summary>
-        internal sealed class ContentTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        internal sealed class ContentTypeValidator : ITypedValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly ICoreScopeProvider _coreScopeProvider;

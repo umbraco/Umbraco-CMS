@@ -5,7 +5,7 @@ import type { UmbMenuStructureWorkspaceContext } from './menu-structure-workspac
 import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { debounce, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -37,12 +37,6 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 	readonly #structure = new UmbArrayState<UmbStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
 
-	readonly #parent = new UmbObjectState<UmbStructureItemModel | undefined>(undefined);
-	/**
-	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead.
-	 */
-	public readonly parent = this.#parent.asObservable();
-
 	protected _sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
 	readonly #parentContext = new UmbParentEntityContext(this);
@@ -58,22 +52,20 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
-		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
-		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
 			this.#isModalContext = modalContext !== undefined;
 		});
 
+		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
+			this._sectionContext = instance;
+		});
+
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
 			this.#removeEventListeners();
 			this.#actionEventContext = instance;
 			this.#addEventListeners();
-		});
-
-		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
-			this._sectionContext = instance;
 		});
 
 		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
@@ -277,7 +269,6 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 
 	#clearStructure() {
 		this.#structure.setValue([]);
-		this.#parent.setValue(undefined);
 		this.#parentContext.setParent(undefined);
 		this.#ancestorContext.setAncestors([]);
 	}
@@ -286,9 +277,6 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 		/* If the item is not new, the current item is the last item in the array.
 			We filter out the current item unique to handle any case where it could show up */
 		const parent = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique()).pop();
-
-		// TODO: remove this when the parent gets removed from the structure interface
-		this.#parent.setValue(parent);
 
 		const parentEntity = parent
 			? {
@@ -338,7 +326,6 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 		this.#removeEventListeners();
 		super.destroy();
 		this.#structure.destroy();
-		this.#parent.destroy();
 		this.#parentContext.destroy();
 		this.#ancestorContext.destroy();
 	}

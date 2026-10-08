@@ -49,7 +49,7 @@ public sealed class TypeLoader
     public ITypeFinder TypeFinder { get; }
 
     /// <summary>
-    ///     Gets or sets the set of assemblies to scan.
+    ///     Gets the set of assemblies to scan.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -58,19 +58,15 @@ public sealed class TypeLoader
     ///         assemblies
     ///         for example.
     ///     </para>
-    ///     <para>This is for unit tests.</para>
+    ///     <para>Marked as internal as used only for unit tests.</para>
     /// </remarks>
-    // internal for tests
-    [Obsolete("Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<Assembly> AssembliesToScan => _assemblies ??= TypeFinder.AssembliesToScan;
+    internal IEnumerable<Assembly> AssembliesToScan => _assemblies ??= TypeFinder.AssembliesToScan;
 
     /// <summary>
     ///     Gets the type lists.
     /// </summary>
-    /// <remarks>For unit tests.</remarks>
-    // internal for tests
-    [Obsolete("Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<TypeList> TypeLists => _types.Values;
+    /// <remarks>Marked as internal as used only for unit tests.</remarks>
+    internal IEnumerable<TypeList> TypeLists => _types.Values;
 
     #region Get Assembly Attributes
 

@@ -102,6 +102,7 @@ public class DocumentUrlAliasServiceTests
         contentMock.Setup(x => x.Key).Returns(documentKey);
         contentMock.Setup(x => x.Trashed).Returns(false);
         contentMock.Setup(x => x.Blueprint).Returns(false);
+        contentMock.Setup(x => x.Published).Returns(true);
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
         contentMock.Setup(x => x.Properties).Returns(propertyCollectionMock.Object);
         contentMock.Setup(x => x.GetValue<string>(
@@ -141,6 +142,7 @@ public class DocumentUrlAliasServiceTests
         contentMock.Setup(x => x.Key).Returns(documentKey);
         contentMock.Setup(x => x.Trashed).Returns(false);
         contentMock.Setup(x => x.Blueprint).Returns(false);
+        contentMock.Setup(x => x.Published).Returns(true);
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
         contentMock.Setup(x => x.Properties).Returns(propertyCollectionMock.Object);
 
@@ -191,7 +193,7 @@ public class DocumentUrlAliasServiceTests
     #region CreateOrUpdateAliasesAsync Tests
 
     /// <summary>
-    /// For invariant content the alias property value is stored once, with <c>NullableLanguageId = null</c>,
+    /// For invariant content the alias property value is stored once, with <c>LanguageId = null</c>,
     /// irrespective of how many languages are configured.
     /// </summary>
     [Test]
@@ -221,7 +223,7 @@ public class DocumentUrlAliasServiceTests
         Assert.That(savedAliases, Is.Not.Null);
         Assert.That(savedAliases, Has.Count.EqualTo(1));
         Assert.That(savedAliases![0].DocumentKey, Is.EqualTo(documentKey));
-        Assert.That(savedAliases[0].NullableLanguageId, Is.Null);
+        Assert.That(savedAliases[0].LanguageId, Is.Null);
         Assert.That(savedAliases[0].Alias, Is.EqualTo("my-alias"));
     }
 
@@ -252,7 +254,7 @@ public class DocumentUrlAliasServiceTests
             savedAliases!.Select(x => x.Alias),
             Is.EquivalentTo(new[] { "alias-one", "alias-two", "alias-three" }));
         Assert.That(
-            savedAliases.All(x => x.NullableLanguageId is null),
+            savedAliases.All(x => x.LanguageId is null),
             Is.True,
             "All rows from an invariant content must share a null language id.");
     }
@@ -320,8 +322,8 @@ public class DocumentUrlAliasServiceTests
         Assert.That(savedAliases, Is.Not.Null);
         Assert.That(savedAliases, Has.Count.EqualTo(2));
 
-        var english = savedAliases!.Single(x => x.NullableLanguageId == 1);
-        var french = savedAliases.Single(x => x.NullableLanguageId == 2);
+        var english = savedAliases!.Single(x => x.LanguageId == 1);
+        var french = savedAliases.Single(x => x.LanguageId == 2);
         Assert.That(english.Alias, Is.EqualTo("english-alias"));
         Assert.That(french.Alias, Is.EqualTo("alias-francais"));
     }
@@ -538,7 +540,7 @@ public class DocumentUrlAliasServiceTests
             new PublishedDocumentUrlAlias
             {
                 DocumentKey = documentKey,
-                NullableLanguageId = null,
+                LanguageId = null,
                 Alias = "my-alias",
             },
         };
@@ -567,7 +569,7 @@ public class DocumentUrlAliasServiceTests
             new PublishedDocumentUrlAlias
             {
                 DocumentKey = documentKey,
-                NullableLanguageId = null,
+                LanguageId = null,
                 Alias = "my-alias",
             },
         };
@@ -592,8 +594,8 @@ public class DocumentUrlAliasServiceTests
         var documentKey = Guid.NewGuid();
         var seeded = new[]
         {
-            new PublishedDocumentUrlAlias { DocumentKey = documentKey, NullableLanguageId = null, Alias = "alias-one" },
-            new PublishedDocumentUrlAlias { DocumentKey = documentKey, NullableLanguageId = null, Alias = "alias-two" },
+            new PublishedDocumentUrlAlias { DocumentKey = documentKey, LanguageId = null, Alias = "alias-one" },
+            new PublishedDocumentUrlAlias { DocumentKey = documentKey, LanguageId = null, Alias = "alias-two" },
         };
         var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
 
@@ -621,7 +623,7 @@ public class DocumentUrlAliasServiceTests
                 new PublishedDocumentUrlAlias
                 {
                     DocumentKey = Guid.NewGuid(),
-                    NullableLanguageId = null,
+                    LanguageId = null,
                     Alias = "any",
                 },
             },
@@ -703,7 +705,7 @@ public class DocumentUrlAliasServiceTests
             new PublishedDocumentUrlAlias
             {
                 DocumentKey = documentKey,
-                NullableLanguageId = null,
+                LanguageId = null,
                 Alias = "my-alias",
             },
         };

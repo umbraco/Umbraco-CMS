@@ -90,9 +90,10 @@ internal static class PropertyDataCultureResolver
     /// <remarks>
     /// When a property type varies by culture (e.g. inherited from a composition) but the data
     /// is invariant (null culture), <see cref="Property.SetValue"/> rejects the null culture.
-    /// This method handles that case by deep-cloning the property type and setting its
-    /// <see cref="IPropertyType.Variations"/> to <see cref="ContentVariation.Nothing"/>,
-    /// which is safe because the data genuinely is invariant.
+    /// This method handles that case by deep-cloning the property type and clearing only the
+    /// <see cref="ContentVariation.Culture"/> flag from its <see cref="IPropertyType.Variations"/>,
+    /// which is safe because the data genuinely is culture-invariant. The segment flag is
+    /// preserved so that invariant data still carrying a segment continues to validate.
     /// </remarks>
     internal static Property CreateMigrationProperty(
         IPropertyType propertyType,
@@ -107,7 +108,10 @@ internal static class PropertyDataCultureResolver
             // Invariant data on a culture-varying property type (composition scenario).
             // Clone to avoid mutating shared state — important for parallel migration execution.
             effectivePropertyType = (IPropertyType)propertyType.DeepClone();
-            effectivePropertyType.Variations = ContentVariation.Nothing;
+
+            // Drop only the culture flag; keep segment variation so invariant data that still
+            // carries a segment (e.g. Engage personalization) validates. (#23357)
+            effectivePropertyType.Variations = propertyType.Variations.SetFlag(ContentVariation.Culture, false);
         }
 
         var property = new Property(effectivePropertyType);

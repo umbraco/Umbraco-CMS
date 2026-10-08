@@ -30,7 +30,7 @@ export const savedSearches: Array<SavedLogSearchResponseModel> = [
 	},
 	{
 		name: 'Find logs where one of the items in the SortedComponentTypes property array is equal to',
-		query: "SortedComponentTypes[?] = 'Umbraco.Web.Search.ExamineComponent'",
+		query: "SortedComponentTypes[?] = 'Umbraco.Cms.Infrastructure.Runtime.CoreRuntime'",
 	},
 	{
 		name: 'Find logs where one of the items in the SortedComponentTypes property array contains',

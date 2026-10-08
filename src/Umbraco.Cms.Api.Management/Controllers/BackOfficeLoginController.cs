@@ -60,14 +60,13 @@ public class BackOfficeLoginController : Controller
             model.UmbracoUrl = _hostingEnvironment.GetBackOfficePath();
         }
 
-        if (string.IsNullOrEmpty(model.ReturnUrl))
+        // Guard against open redirects: a client-supplied ReturnUrl must be a local, relative path.
+        // Url.IsLocalUrl rejects absolute URLs, protocol-relative "//host" and backslash tricks. When
+        // it's absent the view supplies the default (the configured back-office path), so only a value
+        // that actually arrived on the request is validated here.
+        if (string.IsNullOrEmpty(model.ReturnUrl) is false && Url.IsLocalUrl(model.ReturnUrl) is false)
         {
-            model.ReturnUrl = model.UmbracoUrl;
-        }
-
-        if ( Uri.TryCreate(model.ReturnUrl, UriKind.Relative, out _) is false) // Needs to test for relative and not absolute, as /whatever/ is an absolute path on linux
-        {
-            return BadRequest("ReturnUrl must be a relative path.");
+            return BadRequest("ReturnUrl must be a local, relative path.");
         }
 
         return View("/umbraco/UmbracoLogin/Index.cshtml", model);

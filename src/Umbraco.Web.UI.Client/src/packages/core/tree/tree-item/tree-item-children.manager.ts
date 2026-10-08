@@ -2,7 +2,7 @@ import type { UmbTreeRootItemsRequestArgs } from '../data/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../entity-actions/reload-tree-item-children/index.js';
-import { UMB_TREE_ITEM_EXPANDABLE_CONTEXT } from './tree-item.context.token.js';
+import { UMB_TREE_ITEM_CONTEXT } from './tree-item.context.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -70,7 +70,7 @@ export class UmbTreeItemChildrenManager<
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
-	#parentTreeItemContext?: typeof UMB_TREE_ITEM_EXPANDABLE_CONTEXT.TYPE;
+	#parentTreeItemContext?: typeof UMB_TREE_ITEM_CONTEXT.TYPE;
 	#requestMaxRetries = 2;
 
 	constructor(host: UmbControllerHost) {
@@ -81,7 +81,7 @@ export class UmbTreeItemChildrenManager<
 			this.#treeContext = treeContext;
 		});
 
-		this.consumeContext(UMB_TREE_ITEM_EXPANDABLE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
 			this.#parentTreeItemContext = instance;
 		}).skipHost();
 	}
@@ -282,15 +282,11 @@ export class UmbTreeItemChildrenManager<
 						unique: parent.unique,
 						entityType: parent.entityType,
 					},
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging || offsetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await repository.requestTreeRootItems({
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging || offsetPaging,
 					foldersOnly,
 					...additionalArgs,
@@ -393,10 +389,6 @@ export class UmbTreeItemChildrenManager<
 		}
 
 		if (data) {
-			if (data.totalBefore === undefined) {
-				throw new Error('totalBefore is missing in the response');
-			}
-
 			const items = data.items as Array<TreeItemType>;
 
 			// We have loaded previous items so we add them to the top of the array
@@ -440,28 +432,17 @@ export class UmbTreeItemChildrenManager<
 			takeAfter: this.targetPagination.getTakeSize(),
 		};
 
-		const offsetPaging: UmbOffsetPaginationRequestModel = {
-			// Derive skip from the already-loaded children rather than the page counter: the page number
-			// is only advanced after this request completes, so reading it here would trail by one page.
-			skip: this.#children.getValue().length,
-			take: this.offsetPagination.getPageSize(),
-		};
-
 		const { data, error } = parent?.unique
 			? await repository.requestTreeItemsOf({
 					parent: {
 						unique: parent.unique,
 						entityType: parent.entityType,
 					},
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await repository.requestTreeRootItems({
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging,
 					foldersOnly,
 					...additionalArgs,
@@ -564,15 +545,11 @@ export class UmbTreeItemChildrenManager<
 		const { data } = parent?.unique
 			? await repository.requestTreeItemsOf({
 					parent: { unique: parent.unique, entityType: parent.entityType },
-					skip: offsetPaging.skip,
-					take: offsetPaging.take,
 					paging: offsetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await repository.requestTreeRootItems({
-					skip: offsetPaging.skip,
-					take: offsetPaging.take,
 					paging: offsetPaging,
 					foldersOnly,
 					...additionalArgs,

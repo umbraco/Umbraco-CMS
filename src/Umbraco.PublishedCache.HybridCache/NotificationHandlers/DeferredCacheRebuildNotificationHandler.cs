@@ -43,14 +43,27 @@ internal sealed class DeferredCacheRebuildNotificationHandler :
             return;
         }
 
-        var rebuildIds = notification.Changes
-            .Where(x => x.ChangeTypes.RequiresRawDataRebuild())
+        // Content type changes can affect both documents and elements — route based on IsElement
+        // so the appropriate cache is rebuilt (rebuilding document cache for element type changes
+        // would be a no-op and leave the element cache stale).
+        var documentStructuralIds = notification.Changes
+            .Where(x => x.ChangeTypes.RequiresRawDataRebuild() && x.Item.IsElement is false)
             .Select(x => x.Item.Id)
             .ToArray();
 
-        if (rebuildIds.Length > 0)
+        var elementStructuralIds = notification.Changes
+            .Where(x => x.ChangeTypes.RequiresRawDataRebuild() && x.Item.IsElement)
+            .Select(x => x.Item.Id)
+            .ToArray();
+
+        if (documentStructuralIds.Length > 0)
         {
-            _deferredCacheRebuildService.QueueContentTypeRebuild(rebuildIds);
+            _deferredCacheRebuildService.QueueContentTypeRebuild(documentStructuralIds);
+        }
+
+        if (elementStructuralIds.Length > 0)
+        {
+            _deferredCacheRebuildService.QueueElementTypeRebuild(elementStructuralIds);
         }
     }
 
@@ -62,14 +75,14 @@ internal sealed class DeferredCacheRebuildNotificationHandler :
             return;
         }
 
-        var rebuildIds = notification.Changes
+        var structuralChangeIds = notification.Changes
             .Where(x => x.ChangeTypes.RequiresRawDataRebuild())
             .Select(x => x.Item.Id)
             .ToArray();
 
-        if (rebuildIds.Length > 0)
+        if (structuralChangeIds.Length > 0)
         {
-            _deferredCacheRebuildService.QueueMediaTypeRebuild(rebuildIds);
+            _deferredCacheRebuildService.QueueMediaTypeRebuild(structuralChangeIds);
         }
     }
 }

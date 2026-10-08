@@ -251,7 +251,7 @@
 		</key>
 		<key alias="parentNotPublishedAnomaly">Ups! Dieses Dokument ist veröffentlicht aber nicht im internen Cache aufzufinden: Systemfehler.</key>
 		<key alias="getUrlException">Der URL wurde nicht gefunden</key>
-		<key alias="routeError">Dieses Dokument wurde veröffentlicht, aber sein URL würde mit Inhalt %0% kollidieren</key>
+		<key alias="routeError">Dieses Dokument wurde veröffentlicht, aber sein URL würde mit Inhalt '%0%' kollidieren</key>
 		<key alias="routeErrorCannotRoute">Dieses Dokument wurde veröffentlicht, aber sein URL kann nicht aufgelöst (routed) werden</key>
 		<key alias="publish">Veröffentlichen</key>
 		<key alias="published">Veröffentlicht</key>
@@ -655,44 +655,6 @@
    ]]>
 		</key>
 		<key alias="overviewTitle">Wörterbuch Übersicht</key>
-	</area>
-	<area alias="examineManagement">
-		<key alias="configuredSearchers"><![CDATA[<em>Sucher</em> einrichten ]]></key>
-		<key alias="configuredSearchersDescription">
-			<![CDATA[
-    Zeigt die Eigenschaften und Werkzeuge für eingerichtete <em>Sucher</em> (z.B.: multi-index searcher)]]>
-		</key>
-		<key alias="fieldValues">Feldwerte</key>
-		<key alias="healthStatus">Gesundheitsstatus</key>
-		<key alias="healthStatusDescription">Der Gesundheitsstatus und Lesbarkeit des Indizes.</key>
-		<key alias="indexers">Indizierer</key>
-		<key alias="indexInfo">Indexinformationen</key>
-		<key alias="contentInIndex">Inhalt des Indexes</key>
-		<key alias="indexInfoDescription">Zeigt die Eigenschaften des Indizes</key>
-		<key alias="manageIndexes">Examine Index-Verwaltung</key>
-		<key alias="manageIndexesDescription">
-			Index Detailanzeige und Verwaltungswerkzeuge
-		</key>
-		<key alias="rebuildIndex">Index erneuern</key>
-		<key alias="rebuildIndexWarning">
-			<![CDATA[
-      Dies erzeugt den Index neu.<br />
-      Abhängig von der Inhaltsmenge Ihrer <em>Website</em> kann das eingie Zeit dauern.<br />
-      Es wird davon abgeraten, einen Index einer <em>Website</em> während hoher Auslastung- oder Inhaltbearbeitungszeiten zu erneuern.
-     ]]>
-		</key>
-		<key alias="searchers">Sucher</key>
-		<key alias="searchDescription">Durchsuche den Index und betrachte die Ergebnisse</key>
-		<key alias="tools">Werkzeuge</key>
-		<key alias="toolsDescription">Werkzeuge zur Indexverwaltung</key>
-		<key alias="fields">Felder</key>
-		<key alias="indexCannotRead">Der Index kann nicht gelesen werden und wird deshalb neu erstellt.</key>
-		<key alias="processIsTakingLonger">
-			Der Prozess dauert länger als erwartet, checken Sie die Umbraco Logs um zu sehen ob
-			Fehler passiert sind.
-		</key>
-		<key alias="indexCannotRebuild">Der Index kann nicht rebuilded werden weil er nicht zugewissen wurde.</key>
-		<key alias="iIndexPopulator">IIndexPopulator</key>
 	</area>
 	<area alias="placeholders">
 		<key alias="username">Benutzername eingeben</key>
@@ -2327,16 +2289,7 @@
 	<area alias="textbox">
 		<key alias="characters_left">Buchstaben verbleiben</key>
 	</area>
-	<area alias="recycleBin">
-		<key alias="contentTrashed">Inhalt mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen</key>
-		<key alias="mediaTrashed">Medienelement mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen</key>
-		<key alias="itemCannotBeRestored">Dieses Element kann nicht automatisch wiederhergestellt werden</key>
-		<key alias="itemCannotBeRestoredHelpText">
-			Es gibt keine Position für das automatische Wiederherstellen dieses Elementes.
-			Sie können es manuell mit Hilfe der untenstehenden Baumstruktur verschieben.
-		</key>
-		<key alias="wasRestored">wurde wiederhergestellt unterhalb von</key>
-	</area>
+
 	<area alias="relationType">
 		<key alias="direction">Richtung</key>
 		<key alias="parentToChild">Ober- zu Unterknoten</key>
@@ -2358,7 +2311,6 @@
 		<key alias="contentRedirectManager">URL-Weiterleitungen verwalten</key>
 		<key alias="mediaFolderBrowser">Inhalt</key>
 		<key alias="settingsWelcome">Begrüßung</key>
-		<key alias="settingsExamine">Examine Management</key>
 		<key alias="settingsPublishedStatus">Status der Veröffentlichungen</key>
 		<key alias="settingsModelsBuilder">Models Builder</key>
 		<key alias="settingsHealthCheck">Systemzustand prüfen</key>

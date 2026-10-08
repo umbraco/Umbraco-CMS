@@ -65,7 +65,7 @@
     <key alias="parentCultureNotPublished">Mae'r diwylliant yma yn cyhoeddedig ond ddim yn weladwy oherwydd mae'n anghyhoeddedig ar rhiant '%0%'</key>
     <key alias="parentNotPublishedAnomaly">Mae'r ddogfen yma wedi'i gyhoeddi ond nid yw'n bodoli yn y storfa</key>
     <key alias="getUrlException">Ni ellir nôl y url</key>
-    <key alias="routeError">Mae'r ddogfen yma wedi'i gyhoeddi ond byddai'r url yn gwrthdaro gyda chynnwys %0%</key>
+    <key alias="routeError">Mae'r ddogfen yma wedi'i gyhoeddi ond byddai'r url yn gwrthdaro gyda chynnwys '%0%'</key>
     <key alias="routeErrorCannotRoute">Mae'r ddogfen yma wedi'i gyhoeddi ond mae'r url methu cael ei cyfeirio</key>
   </area>
   <area alias="member">
@@ -459,10 +459,6 @@
     <key alias="smtpMailSettingsNotFound">Nid oedd modd dod o hyd i'r ffurfweddiad 'Umbraco:CMS:Global:Smtp'.</key>
     <key alias="smtpMailSettingsHostNotConfigured">Nid oedd modd dod o hyd i'r ffurfweddiad 'Umbraco:CMS:Global:Smtp:Host'.</key>
     <key alias="smtpMailSettingsConnectionFail">Methwyd cyrraedd y gweinydd SMTP a ffurfweddwyd gyda gwesteiwr '%0%' a phorth '%1%'. Gwiriwch i sicrhau bod y gosodiadau SMTP yn y ffurfweddiad 'Umbraco:CMS:Global:Smtp' yn gywir.</key>
-  </area>
-  <area alias="recycleBin">
-    <key alias="contentTrashed">Wedi chwalu cynnwys gyda Id: {0} yn berthnasol i gynnwys rhiant gwreiddiol gyda Id: {1}</key>
-    <key alias="mediaTrashed">Wedi chwalu cyfrwng gyda Id: {0} yn berthnasol i gyfrwng rhiant gwreiddiol gyda Id: {1}</key>
   </area>
   <area alias="permissions">
     <key alias="FolderCreation">Creu ffolder</key>

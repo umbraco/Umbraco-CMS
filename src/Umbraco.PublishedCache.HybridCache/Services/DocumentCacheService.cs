@@ -34,12 +34,12 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     private readonly ICacheNodeFactory _cacheNodeFactory;
     private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
-    private readonly IPreviewService _previewService;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IPreviewSessionService _previewSessionService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<DocumentCacheService> _logger;
 
-    private readonly IConvertedPublishedContentCache<string> _publishedContentCache;
+    private readonly IConvertedPublishedContentCache<string, IPublishedContent> _publishedContentCache;
 
     // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
     // GetNodeAsync captures it before reading the backing store and re-checks it before writing
@@ -105,8 +105,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         IEnumerable<IDocumentSeedKeyProvider> seedKeyProviders,
         IOptions<CacheSettings> cacheSettings,
         IPublishedModelFactory publishedModelFactory,
-        IPreviewService previewService,
-        IPublishStatusQueryService publishStatusQueryService,
+        IPreviewSessionService previewSessionService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         ILogger<DocumentCacheService> logger,
         IConvertedPublishedContentCacheFactory cacheFactory)
     {
@@ -118,11 +118,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         _cacheNodeFactory = cacheNodeFactory;
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
-        _previewService = previewService;
+        _previewSessionService = previewSessionService;
         _publishStatusQueryService = publishStatusQueryService;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
-        _publishedContentCache = cacheFactory.Create<string>(_cacheSettings.Entry.Document.MaximumLocalCacheItems, CacheName);
+        _publishedContentCache = cacheFactory.Create<string, IPublishedContent>(_cacheSettings.Entry.Document.MaximumLocalCacheItems, CacheName);
     }
 
     /// <inheritdoc />
@@ -229,8 +229,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     // accounts for its key and is not passed on to the database read — re-reading such a key on every
     // request is the regression reported in #18869. Keys are probed one at a time, and the probe is not
     // free even on a hit: TryGetValueAsync takes a per-key lock and goes through GetOrCreateAsync, which
-    // on a miss creates and then removes an entry. With a distributed L2 (e.g. Redis) configured that is
-    // a serial round-trip per key, plus a write and a delete for each miss.
+    // on a miss creates and then removes a local entry. With a distributed L2 (e.g. Redis) configured that
+    // is a serial round-trip per key, plus a delete for each miss.
     private async Task<List<Guid>> ProbeHybridCacheAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved)
     {
         var pending = new List<Guid>(keys.Count);
@@ -271,7 +271,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         IReadOnlyCollection<ContentCacheNode> coldNodes;
         using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
         {
-            coldNodes = (await _databaseCacheRepository.GetContentSourcesAsync(keys, preview)).ToArray();
+            coldNodes = (await _databaseCacheRepository.GetDocumentSourcesAsync(keys, preview)).ToArray();
         }
 
         // Mirrors GetNodeAsync, which warms the id/key map for every node the database returns,
@@ -405,7 +405,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         async Task<(ContentCacheNode? Node, bool AncestorCheckFailed)> GetContentCacheNodeFromRepo()
         {
             using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-            ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, preview);
+            ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetDocumentSourceAsync(key, preview);
 
             // If we can resolve the content cache node, we still need to check if the ancestor path is published.
             // This does cost some performance, but it's necessary to ensure that the content is actually published.
@@ -425,7 +425,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         }
     }
 
-    private bool GetPreview() => _previewService.IsInPreview();
+    private bool GetPreview() => _previewSessionService.IsActive();
 
     // Bumped after every in-memory cache invalidation/refresh so in-flight read-through snapshots
     // (see GetNodeAsync) can detect they have been superseded and skip writing back stale content.
@@ -466,7 +466,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
-        (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = await _databaseCacheRepository.GetContentSourceForPublishStatesAsync(key);
+        (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = await _databaseCacheRepository.GetDocumentSourceForPublishStatesAsync(key);
 
         if (draftNode is not null)
         {
@@ -541,7 +541,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
             // Materialized because the repository defers deserialization of each node until it is enumerated,
             // and the sequence is walked more than once below.
-            var cacheNodes = (await _databaseCacheRepository.GetContentSourcesAsync(uncachedKeys)).ToList();
+            var cacheNodes = (await _databaseCacheRepository.GetDocumentSourcesAsync(uncachedKeys)).ToList();
 
             scope.Complete();
 
@@ -631,16 +631,17 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
         var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
-        await _databaseCacheRepository.RefreshContentAsync(draftCacheNode);
+        await _databaseCacheRepository.RefreshDocumentAsync(draftCacheNode);
+
 
         if (content.PublishedState is PublishedState.Publishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
-            await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode);
+            await _databaseCacheRepository.RefreshDocumentAsync(publishedCacheNode);
         }
         else if (content.PublishedState is PublishedState.Unpublishing)
         {
-            await _databaseCacheRepository.RemovePublishedContentAsync(content.Id);
+            await _databaseCacheRepository.RemovePublishedDocumentAsync(content.Id);
             await ClearPublishedCacheAsync(content.Key);
         }
 
@@ -681,6 +682,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
         => _databaseCacheRepository.Rebuild(
             contentTypeIds.ToList(),
+            null,
             null,
             action =>
             {

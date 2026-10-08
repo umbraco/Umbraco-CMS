@@ -46,17 +46,19 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 
 **Before performing any of these actions, you MUST read the linked doc first:**
 
-| Before you...                                 | Read                                                                                                                          |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Deprecate or remove a public API              | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning |
-| Create a new element or component             | [docs/style-guide.md](./docs/style-guide.md)                                                                                  |
-| Build, style, or write copy for any UI        | [docs/design-choices.md](./docs/design-choices.md) — default to no icon, no colour, terse contextual copy                     |
-| Create a repository or data source            | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md)                                     |
-| Add error handling or debugging               | [docs/error-handling.md](./docs/error-handling.md)                                                                            |
-| Write or modify tests                         | [docs/testing.md](./docs/testing.md)                                                                                          |
-| Work with auth or security                    | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                           |
-| Scaffold a new package or module              | [docs/package-development.md](./docs/package-development.md)                                                                  |
-| Write or change observers / `Umb*State` usage | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards           |
+| Before you...                                           | Read                                                                                                                           |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Deprecate or remove a public API                        | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning  |
+| Create a new element or component                       | [docs/style-guide.md](./docs/style-guide.md)                                                                                   |
+| Build, style, or write copy for any UI                  | [docs/design-choices.md](./docs/design-choices.md) — default to no icon, no colour, terse contextual copy                      |
+| Create a repository or data source                      | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md)                                      |
+| Add error handling or debugging                         | [docs/error-handling.md](./docs/error-handling.md)                                                                             |
+| Write or modify tests                                   | [docs/testing.md](./docs/testing.md)                                                                                           |
+| Work with auth or security                              | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                            |
+| Scaffold a new package or module                        | [docs/package-development.md](./docs/package-development.md)                                                                   |
+| Change how a package is bundled or chunked              | [docs/package-development.md](./docs/package-development.md#coalescing-a-packages-lazy-modules) — a wrong `eagerModules` list makes boot heavier, and the build still succeeds |
+| Write or change observers / `Umb*State` usage           | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards            |
+| Add, rename, or remove a key in `src/assets/lang/en.ts` | [docs/package-development.md](./docs/package-development.md#type-safe-localization-keys)                                       |
 
 This is not optional. Skipping these leads to convention violations that are caught in review.
 
@@ -176,9 +178,10 @@ When using `@umbraco-cms/backoffice`:
 
 ### Key Files
 
-| File                            | Purpose                                                          |
-| ------------------------------- | ---------------------------------------------------------------- |
-| `package.json`                  | Root package with exports and workspace references               |
-| `devops/publish/cleanse-pkg.js` | Script that runs during `npm pack` to hoist and convert versions |
-| `src/external/*`                | Dependency wrapper packages                                      |
-| `src/packages/core`             | Contains `@hey-api/openapi-ts` and other utilities               |
+| File                                         | Purpose                                                                                                            |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `package.json`                               | Root package: exports, workspace references, and `@hey-api/openapi-ts` for every workspace that generates a client |
+| `devops/publish/cleanse-pkg.js`              | Script that runs during `npm pack` to hoist and convert versions                                                   |
+| `devops/package/validate-hey-api-version.js` | Fails `package:validate` when the extension template's `@hey-api/openapi-ts` leaves the backoffice's range         |
+| `src/external/*`                             | Dependency wrapper packages                                                                                        |
+| `src/packages/core`                          | Generated backend API client and other utilities                                                                   |

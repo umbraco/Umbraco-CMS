@@ -23,6 +23,7 @@
     content: "Content",
     media: "Media",
     settings: "Settings",
+    library: "Library",
     packages: "Packages",
     members: "Members",
     dictionary: "Translation",
@@ -66,8 +67,10 @@
   }
 
   public static readonly contentPickerSettings = {
-    0: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
-    1: ['Start node', '']
+    0: ['Accepted types', 'Limit to specific types'],
+    1: ['Start node', ''],
+    2: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
+    3: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.']
   }
 
   public static readonly datePickerSettings = {
@@ -76,9 +79,12 @@
   }
 
   public static readonly dropdownSettings = {
-    0: ['Enable multiple choice', ''],
-    1: ['Add options', ''],
-    2: ['Placeholder', '']
+    0: ['Add options', '']
+  }
+
+  public static readonly singleDropdownSettings = {
+    0: ['Add options', ''],
+    1: ['Placeholder', '']
   }
 
   public static readonly imageCropperSettings = {
@@ -87,17 +93,25 @@
 
   public static readonly mediaPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
-    1: ['Pick multiple items', 'Outputs a IEnumerable'],
-    2: ['Amount', 'Set a required range of medias'],
-    3: ['Start node', ''],
+    1: ['Amount', 'Set a required range of medias'],
+    2: ['Start node', ''],
+    3: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
     4: ['Enable Focal Point', ''],
     5: ['Image Crops', 'Local crops, stored on document'],
     6: ['Ignore User Start Nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
   }
 
+  public static readonly singleMediaPickerSettings = {
+    0: ['Accepted types', 'Limit to specific types'],
+    1: ['Start node', ''],
+    2: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
+    3: ['Enable Focal Point', ''],
+    4: ['Image Crops', 'Local crops, stored on document'],
+    5: ['Ignore User Start Nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
+  }
+
   public static readonly labelSettings = {
-    0: ['Value type', 'The type of value to store'],
-    1: ['Label template', 'Enter a template for the label.'],
+    0: ['Label template', 'Enter a template for the label.'],
   }
 
   public static readonly listViewSettings = {
@@ -109,6 +123,46 @@
     5: ['Workspace View icon', "The icon for the Collection's Workspace View."],
     6: ['Workspace View name', "The name of the Collection's Workspace View (default if empty: Child Items)."],
     7: ['Show Content Workspace View First', "Enable this to show the Content Workspace View by default instead of the Collection's."],
+  }
+
+  public static readonly sliderSettings = {
+    0: ['Minimum value', ''],
+    1: ['Maximum value', ''],
+    2: ['Initial value', ''],
+    3: ['Step increments', '']
+  }
+
+  public static readonly rangeSliderSettings = {
+    0: ['Minimum value', ''],
+    1: ['Maximum value', ''],
+    2: ['Minimum range', ''],
+    3: ['Initial low value', ''],
+    4: ['Initial high value', ''],
+    5: ['Step increments', '']
+  }
+
+  public static readonly multipleDocumentPickerSettings = {
+    0: ['Accepted types', 'Limit to specific types'],
+    1: ['Amount', 'Set a required range of documents'],
+    2: ['Start node', ''],
+    3: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
+    4: ['Ignore user start nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."]
+  }
+
+  public static readonly memberPickerSettings = {
+    0: ['Accepted types', 'Limit to specific member types']
+  }
+
+  public static readonly multipleMemberPickerSettings = {
+    0: ['Accepted types', 'Limit to specific member types'],
+    1: ['Amount', 'Set a required range of members']
+  }
+
+  public static readonly singleUrlPickerSettings = {
+    0: ['Ignore user start nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
+    1: ['Overlay Size', 'Select the width of the overlay.'],
+    2: ['Hide anchor/query string input', 'Selecting this hides the anchor/query string input field in the link picker overlay.'],
+    3: ['Culture-specific document links', 'Enable specifying a culture when linking to documents.']
   }
 
   public static readonly multiURLPickerSettings = {
@@ -204,7 +258,7 @@
     1: ['Granular permissions', 'Assign permissions to Document property values'],
   }
 
-  public static readonly userGroupPermissionsSettings = {
+  public static readonly userGroupDocumentPermissionsSettings = {
     0: ['Read', 'Allow access to read a Document', 'Umb.Document.Read'],
     1: ['Create Document Blueprint', 'Allow access to create a Document Blueprint', 'Umb.Document.CreateBlueprint'],
     2: ['Delete', 'Allow access to delete a Document', 'Umb.Document.Delete'],
@@ -221,15 +275,27 @@
     13: ['Rollback', 'Allow access to roll back a Document to a previous state', 'Umb.Document.Rollback']
   }
 
+  public static readonly sectionAliases = {
+    content: 'Umb.Section.Content',
+    library: 'Umb.Section.Library',
+    media: 'Umb.Section.Media',
+    members: 'Umb.Section.Members',
+    packages: 'Umb.Section.Packages',
+    settings: 'Umb.Section.Settings',
+    translation: 'Umb.Section.Translation',
+    users: 'Umb.Section.Users',
+  }
+
   public static readonly userGroupSectionsSettings = {
     0: ['Content', 'Umb.Section.Content'],
     1: ['Forms', 'Umb.Section.Forms'],
-    2: ['Media', 'Umb.Section.Media'],
-    3: ['Members', 'Umb.Section.Members'],
-    4: ['Packages', 'Umb.Section.Packages'],
-    5: ['Settings', 'Umb.Section.Settings'],
-    6: ['Translation', 'Umb.Section.Translation'],
-    7: ['Users', 'Umb.Section.Users'],
+    2: ['Library', 'Umb.Section.Library'],
+    3: ['Media', 'Umb.Section.Media'],
+    4: ['Members', 'Umb.Section.Members'],
+    5: ['Packages', 'Umb.Section.Packages'],
+    6: ['Settings', 'Umb.Section.Settings'],
+    7: ['Translation', 'Umb.Section.Translation'],
+    8: ['Users', 'Umb.Section.Users'],
   }
 
   public static readonly trashDeleteDialogMessage = {
@@ -273,7 +339,8 @@
 
   public static readonly statusCodes = {
     ok: 200,
-    created: 201
+    created: 201,
+    forbidden: 403
   }
 
   public static readonly httpMethods = {
@@ -284,11 +351,10 @@
   }
 
   // Matched against response URLs via url().includes(), so entries are either full paths
-  // (e.g. '/umbraco/management/api/v1/document') or path fragments (e.g. '/update-and-publish').
+  // (e.g. '/umbraco/management/api/v1/document') or path fragments.
   public static readonly apiEndpoints = {
     profilingStatus: '/umbraco/management/api/v1/profiling/status',
     document: '/umbraco/management/api/v1/document',
-    updateAndPublish: '/update-and-publish',
     documentType: '/umbraco/management/api/v1/document-type',
     documentTypeFolder: '/umbraco/management/api/v1/document-type/folder',
     documentBlueprint: '/umbraco/management/api/v1/document-blueprint',
@@ -297,6 +363,7 @@
     dictionary: '/umbraco/management/api/v1/dictionary',
     dictionaryImport: '/umbraco/management/api/v1/dictionary/import',
     language: '/umbraco/management/api/v1/language',
+    logViewerSavedSearch: '/umbraco/management/api/v1/log-viewer/saved-search',
     media: '/umbraco/management/api/v1/media',
     mediaType: '/umbraco/management/api/v1/media-type',
     memberType: '/umbraco/management/api/v1/member-type',
@@ -316,13 +383,24 @@
     webhook: '/umbraco/management/api/v1/webhook',
     recycleBinDocument: '/umbraco/management/api/v1/recycle-bin/document',
     recycleBinMedia: '/umbraco/management/api/v1/recycle-bin/media',
+    recycleBinElement: '/umbraco/management/api/v1/recycle-bin/element',
     domains: '/domains',
     notifications: '/notifications',
     currentUser: '/umbraco/management/api/v1/user/current',
-    revoke: '/umbraco/management/api/v1/security/back-office/revoke',
+    currentUserConfiguration: '/umbraco/management/api/v1/user/current/configuration',
+    backOfficeLogin: '/umbraco/management/api/v1/security/back-office/login',
+    backOfficeSignOut: '/umbraco/management/api/v1/security/back-office/signout',
+    backOfficeKeepAlive: '/umbraco/management/api/v1/security/back-office/keep-alive',
     documentSearch: '/umbraco/management/api/v1/item/document/search',
     mediaSearch: '/umbraco/management/api/v1/item/media/search',
-    memberSearch: '/umbraco/management/api/v1/item/member/search'
+    memberSearch: '/umbraco/management/api/v1/item/member/search',
+    elementSearch: '/umbraco/management/api/v1/item/element/search',
+    element: '/umbraco/management/api/v1/element',
+    elementFolder: '/umbraco/management/api/v1/element/folder',
+    treeElementRoot: '/umbraco/management/api/v1/tree/element/root',
+    treeElementChildren: '/umbraco/management/api/v1/tree/element/children',
+    currentUserProfile: '/umbraco/management/api/v1/user/current/profile',
+    currentUserAvatar: '/umbraco/management/api/v1/user/current/avatar'
   }
 
   public static readonly userGroupDescriptionValues = {
@@ -331,6 +409,26 @@
     'Sensitive data': 'Users with the specific permission to be able to manage properties and data marked as sensitive',
     'Translators': 'Users with permission to manage dictionary entries',
     'Writers': 'Users with permission to create and update but not publish content'
+  }
+
+  public static readonly userGroupElementPermissionsSettings = {
+    0: ['Read', 'Allow access to read an element', 'Umb.Element.Read'],
+    1: ['Create', 'Allow access to create an element', 'Umb.Element.Create'],
+    2: ['Delete', 'Allow access to delete an element', 'Umb.Element.Delete'],
+    3: ['Publish', 'Allow access to publish an element', 'Umb.Element.Publish'],
+    4: ['Unpublish', 'Allow access to unpublish an element', 'Umb.Element.Unpublish'],
+    5: ['Update', 'Allow access to save an element', 'Umb.Element.Update'],
+    6: ['Duplicate', 'Allow access to duplicate an element', 'Umb.Element.Duplicate'],
+    7: ['Move', 'Allow access to move an element', 'Umb.Element.Move'],
+    8: ['Rollback', 'Allow access to rollback an element to a previous state', 'Umb.Element.Rollback']
+  }
+
+  public static readonly userGroupElementFolderPermissionsSettings = {
+    0: ['Read', 'Allow access to read an element folder', 'Umb.ElementContainer.Read'],
+    1: ['Create', 'Allow access to create an element folder', 'Umb.ElementContainer.Create'],
+    2: ['Delete', 'Allow access to delete an element folder', 'Umb.ElementContainer.Delete'],
+    3: ['Update', 'Allow access to save an element folder', 'Umb.ElementContainer.Update'],
+    4: ['Move', 'Allow access to move an element folder', 'Umb.ElementContainer.Move']
   }
 
   public static readonly healthCheckMessages = {
@@ -358,7 +456,14 @@
     contentCopied: 'Content copied',
     contentDeleted: 'Content deleted',
     contentRolledBack: 'Content rolled back',
-    contentSorted: 'Sort child items performed by user'
+    contentSorted: 'Sort child items performed by user',
+    elementSaved: 'Element saved',
+    elementSavedAndPublished: 'Element saved and published',
+    elementUnpublished: 'Element unpublished',
+    elementMoved: 'Element moved',
+    elementCopied: 'Element copied',
+    elementDeleted: 'Element deleted',
+    elementRolledBack: 'Element rolled back'
   }
 
   public static readonly auditTrailTypes = {
@@ -370,5 +475,15 @@
     rollback: 'Rollback',
     copy: 'Copy',
     unpublish: 'Unpublish'
+  }
+
+  public static readonly documentUrlInfoMessages = {
+    cannotBeRouted: 'This document is published but its URL cannot be routed'
+  }
+
+  public static readonly elementTypeChangeMessages = {
+    elementHasContent: 'Cannot change to document type because content has already been created with this element type.',
+    documentHasContent: 'Cannot change to element type because content has already been created with this document type.',
+    elementUsedInBlockEditor: 'Cannot change to document type because this element type is used in the configuration of a data type.',
   }
 }

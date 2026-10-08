@@ -32,6 +32,8 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 			return UmbCancelError.fromLegacyCancelError(error);
 		} else if (UmbCancelError.isUmbCancelError(error)) {
 			return error;
+		} else if (error instanceof DOMException && error.name === 'AbortError') {
+			return new UmbCancelError(error.message);
 		} else if (UmbApiError.isUmbApiError(error)) {
 			return error;
 		} else if (error instanceof TypeError) {

@@ -1,6 +1,3 @@
-using System.Runtime.Versioning;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -33,26 +30,6 @@ public class MemberRepositoryUsernameCachePolicy : DefaultRepositoryCachePolicy<
             options,
             repositoryCacheVersionService,
             cacheSyncService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MemberRepositoryUsernameCachePolicy"/> class.
-    /// </summary>
-    /// <param name="cache">The <see cref="IAppPolicyCache"/> instance used for caching member data by username.</param>
-    /// <param name="scopeAccessor">The <see cref="IScopeAccessor"/> used to manage the current scope for cache operations.</param>
-    /// <param name="options">The <see cref="RepositoryCachePolicyOptions"/> that configure cache policy behavior for the repository.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public MemberRepositoryUsernameCachePolicy(
-        IAppPolicyCache cache,
-        IScopeAccessor scopeAccessor,
-        RepositoryCachePolicyOptions options)
-        : this(
-            cache,
-            scopeAccessor,
-            options,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 

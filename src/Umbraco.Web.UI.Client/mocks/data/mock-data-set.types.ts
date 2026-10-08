@@ -3,6 +3,7 @@ import type {
 	DataTypeItemResponseModel,
 	DataTypeResponseModel,
 	DataTypeTreeItemResponseModel,
+	DatatypeConfigurationResponseModel,
 	// Dictionary
 	DictionaryItemItemResponseModel,
 	DictionaryItemResponseModel,
@@ -19,8 +20,14 @@ import type {
 	// Document Type
 	DocumentTypeConfigurationResponseModel,
 	DocumentTypeItemResponseModel,
+	DocumentTypeReferenceResponseModel,
 	DocumentTypeResponseModel,
 	DocumentTypeTreeItemResponseModel,
+	// Element
+	ElementResponseModel,
+	ElementTreeItemResponseModel,
+	ElementItemResponseModel,
+	ElementVariantResponseModel,
 	// Language
 	LanguageItemResponseModel,
 	LanguageResponseModel,
@@ -83,15 +90,11 @@ import type {
 	// Health Check
 	HealthCheckGroupPresentationModel,
 	HealthCheckGroupWithResultResponseModel,
-	// Examine
-	IndexResponseModel,
-	PagedIndexResponseModel,
-	SearchResultResponseModel,
 	// Tracked Reference
-	DefaultReferenceResponseModel,
-	DocumentReferenceResponseModel,
-	MediaReferenceResponseModel,
-	MemberReferenceResponseModel,
+	IReferenceResponseModelDefaultReferenceResponseModel,
+	IReferenceResponseModelDocumentReferenceResponseModel,
+	IReferenceResponseModelMediaReferenceResponseModel,
+	IReferenceResponseModelMemberReferenceResponseModel,
 	// News
 	NewsDashboardItemResponseModel,
 	// Webhook
@@ -125,6 +128,15 @@ export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
 export type UmbMockDocumentTypeModel = DocumentTypeResponseModel &
 	DocumentTypeTreeItemResponseModel &
 	DocumentTypeItemResponseModel;
+
+export type UmbMockElementModel = Omit<ElementResponseModel, 'documentType'> &
+	Omit<ElementTreeItemResponseModel, 'documentType' | 'variants'> &
+	Omit<ElementItemResponseModel, 'documentType' | 'variants'> & {
+		ancestors: Array<{ id: string }>;
+		createDate: string;
+		documentType: DocumentTypeReferenceResponseModel | null;
+		variants: Array<ElementVariantResponseModel>;
+	};
 
 export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseModel;
 
@@ -182,10 +194,10 @@ export type UmbMockWebhookDeliveryModel = WebhookLogResponseModel;
 export type UmbMockAuditLogModel = AuditLogResponseModel;
 
 export type UmbMockTrackedReferenceItemModel =
-	| DefaultReferenceResponseModel
-	| DocumentReferenceResponseModel
-	| MediaReferenceResponseModel
-	| MemberReferenceResponseModel;
+	| IReferenceResponseModelDefaultReferenceResponseModel
+	| IReferenceResponseModelDocumentReferenceResponseModel
+	| IReferenceResponseModelMediaReferenceResponseModel
+	| IReferenceResponseModelMemberReferenceResponseModel;
 
 // ============================================================================
 // Log Levels Type (matches the structure in log-viewer.data.ts)
@@ -211,11 +223,13 @@ export interface UmbMockLogLevelsModel {
 export interface UmbMockDataSet {
 	// Core entity data arrays (all optional, defaults to empty array)
 	dataType?: Array<UmbMockDataTypeModel>;
+	dataTypeConfiguration?: DatatypeConfigurationResponseModel;
 	dictionary?: Array<UmbMockDictionaryModel>;
 	document?: Array<UmbMockDocumentModel>;
 	documentBlueprint?: Array<UmbMockDocumentBlueprintModel>;
 	documentType?: Array<UmbMockDocumentTypeModel>;
 	documentTypeConfiguration?: DocumentTypeConfigurationResponseModel;
+	element?: Array<UmbMockElementModel>;
 	language?: Array<UmbMockLanguageModel>;
 	media?: Array<UmbMockMediaModel>;
 	mediaType?: Array<UmbMockMediaTypeModel>;
@@ -249,11 +263,6 @@ export interface UmbMockDataSet {
 	// Health check data
 	healthGroups?: Array<HealthCheckGroupWithResultResponseModel & { name: string }>;
 	healthGroupsWithoutResult?: Array<HealthCheckGroupPresentationModel>;
-
-	// Examine/search data
-	examineIndexers?: Array<IndexResponseModel>;
-	examinePagedIndexers?: PagedIndexResponseModel;
-	examineSearchResults?: Array<SearchResultResponseModel>;
 
 	// Tracked references
 	trackedReferenceItems?: Array<UmbMockTrackedReferenceItemModel>;

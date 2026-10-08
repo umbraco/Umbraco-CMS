@@ -49,6 +49,8 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     [TestCase(Constants.ObjectTypes.Strings.DataType, Constants.ObjectTypes.Strings.MemberGroup)]
     [TestCase(Constants.ObjectTypes.Strings.Document, Constants.ObjectTypes.Strings.ContentRecycleBin)]
     [TestCase(Constants.ObjectTypes.Strings.Document, Constants.ObjectTypes.Strings.SystemRoot)]
+    [TestCase(Constants.ObjectTypes.Strings.Element, Constants.ObjectTypes.Strings.ElementContainer)]
+    [TestCase(Constants.ObjectTypes.Strings.ElementContainer, Constants.ObjectTypes.Strings.ElementContainer)]
     public async Task Can_Create_Relation_Types_With_Allowed_Object_Types(string childObjectTypeGuid, string parentObjectTypeGuid)
     {
         IRelationTypeWithIsDependency relationType = new RelationTypeBuilder()

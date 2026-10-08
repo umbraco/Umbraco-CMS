@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -110,8 +109,8 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
             propertyRenderingContextAccessor,
             contentTypeCache);
 
-        var publishStatusMock = new Mock<IPublishStatusQueryService>();
-        publishStatusMock.Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>())).Returns(true);
+        var publishStatusMock = new Mock<IDocumentPublishStatusQueryService>();
+        publishStatusMock.Setup(x => x.IsPublished(It.IsAny<Guid>(), It.IsAny<string>())).Returns(true);
         publishStatusMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>())).Returns(true);
         publishStatusMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>())).Returns(true);
 
@@ -120,7 +119,7 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
         // an optional per-call latency so the benchmark can model database round-trip cost — the single
         // vs batched read count is what distinguishes the cold per-key path from the batched one.
         var repoMock = new Mock<IDatabaseCacheRepository>();
-        repoMock.Setup(r => r.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+        repoMock.Setup(r => r.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .Returns(async (Guid key, bool _) =>
             {
                 Interlocked.Increment(ref _singleFetchCount);
@@ -131,7 +130,7 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
 
                 return _nodesByKey.GetValueOrDefault(key);
             });
-        repoMock.Setup(r => r.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()))
+        repoMock.Setup(r => r.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()))
             .Returns(async (IEnumerable<Guid> keys, bool _) =>
             {
                 Interlocked.Increment(ref _batchFetchCount);
@@ -147,8 +146,8 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
                     .ToArray();
             });
 
-        var previewMock = new Mock<IPreviewService>();
-        previewMock.Setup(x => x.IsInPreview()).Returns(false);
+        var previewMock = new Mock<IPreviewSessionService>();
+        previewMock.Setup(x => x.IsActive()).Returns(false);
 
         var idKeyMapMock = new Mock<IIdKeyMap>();
         idKeyMapMock.Setup(x => x.GetKeyForId(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
@@ -200,12 +199,7 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
             }
         }
 
-        var documentCache = new DocumentCache(
-            cacheService,
-            contentTypeCache,
-            navigationService,
-            Mock.Of<IDocumentUrlService>(),
-            new Lazy<IPublishedUrlProvider>(() => Mock.Of<IPublishedUrlProvider>()));
+        var documentCache = new DocumentCache(cacheService);
 
         PublishedContentCache = documentCache;
         NavigationQueryService = navigationService;
@@ -245,13 +239,9 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
         var dataType = new DataType(new VoidEditor(Mock.Of<IDataValueEditorFactory>()), jsonSerializer) { Id = 1 };
         var dataTypeServiceMock = new Mock<IDataTypeService>();
 
-        // PublishedContentTypeFactory.GetDataType calls the synchronous GetAll() overload (the obsolete
-        // params int[] one), so we must set up that one rather than the new GetAllAsync.
-#pragma warning disable CS0618
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { dataType });
-#pragma warning restore CS0618
+        dataTypeServiceMock.Setup(x => x.GetAllAsync(It.IsAny<Guid[]>())).ReturnsAsync(new[] { dataType });
 
-        var factory = new PublishedContentTypeFactory(modelFactory, converters, dataTypeServiceMock.Object);
+        var factory = new PublishedContentTypeFactory(modelFactory, converters, dataTypeServiceMock.Object, Mock.Of<IIdKeyMap>());
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
         {

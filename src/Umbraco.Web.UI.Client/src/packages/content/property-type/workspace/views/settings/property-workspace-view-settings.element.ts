@@ -6,7 +6,12 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import type { UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type {
+	UUIBooleanInputEvent,
+	UUIInputEvent,
+	UUISelectEvent,
+	UUISelectOption,
+} from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-property-type-workspace-view-settings')
@@ -14,7 +19,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	#context?: typeof UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	private _customValidationOptions: Array<Option> = [
+	private _customValidationOptions: Array<UUISelectOption> = [
 		{
 			name: this.localize.term('validation_validateNothing'),
 			value: '!NOVALIDATION!',

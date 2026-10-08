@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_TREE_ALIAS } from '../../../tree/manifests.js';
 import { UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '../../../search/constants.js';
-import { type UmbDocumentTreeItemModel } from '../../../types.js';
+import type { UmbDocumentTreeItemModel } from '../../../types.js';
 import type {
 	UmbDuplicateDocumentModalData,
 	UmbDuplicateDocumentModalValue,

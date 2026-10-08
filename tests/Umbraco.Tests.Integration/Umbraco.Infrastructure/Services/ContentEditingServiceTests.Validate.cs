@@ -132,11 +132,8 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Culture = "en-US", Segment = "seg-1", Name = "Updated English segment 1 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-1", Name = "Updated Danish segment 1 Name" },
-                new VariantModel { Culture = "en-US", Segment = "seg-2", Name = "Updated English segment 2 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-2", Name = "Updated Danish segment 2 Name" }
-
+                new VariantModel { Culture = "en-US", Name = "Updated English segment 1 Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish segment 1 Name" }
             ],
         };
 
@@ -163,10 +160,8 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Culture = "en-US", Segment = "seg-1", Name = "Updated English segment 1 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-1", Name = "Updated Danish segment 1 Name" },
-                new VariantModel { Culture = "en-US", Segment = "seg-2", Name = "Updated English segment 2 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-2", Name = "Updated Danish segment 2 Name" }
+                new VariantModel { Culture = "en-US", Name = "Updated English segment 1 Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish segment 1 Name" }
             ],
         };
 
@@ -279,7 +274,7 @@ public partial class ContentEditingServiceTests
 
         var childContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         childContentType.AllowedAsRoot = false;
-        ContentTypeService.Save(childContentType);
+        await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
 
         var rootContentType = ContentTypeBuilder.CreateBasicContentType();
         rootContentType.AllowedAsRoot = true;
@@ -291,7 +286,7 @@ public partial class ContentEditingServiceTests
             };
         }
 
-        ContentTypeService.Save(rootContentType);
+        await ContentTypeService.CreateAsync(rootContentType, Constants.Security.SuperUserKey);
 
         var rootKey = (await ContentEditingService.CreateAsync(
             new ContentCreateModel
@@ -329,7 +324,7 @@ public partial class ContentEditingServiceTests
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = allowedAsRoot;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return new ContentCreateModel
         {

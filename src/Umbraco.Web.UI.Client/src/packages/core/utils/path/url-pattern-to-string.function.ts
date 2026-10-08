@@ -1,9 +1,4 @@
 export type UmbUrlParametersRecord = Record<string, string | number | { toString: () => string } | null>;
-/**
- * @deprecated Use `UmbUrlParametersRecord` instead. Will be removed in v.18
- */
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export type UrlParametersRecord = UmbUrlParametersRecord;
 
 const PARAM_IDENTIFIER = /:([^/]+)/g;
 

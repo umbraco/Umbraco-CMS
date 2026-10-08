@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Events;
 /// <summary>
 ///     Handles the <see cref="ContentPublishedNotification" /> to add warnings when domains are not properly configured for multilingual sites.
 /// </summary>
-public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationHandler<ContentPublishedNotification>
+public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationAsyncHandler<ContentPublishedNotification>
 {
     private readonly IOptions<ContentSettings> _contentSettings;
     private readonly IContentService _contentService;
@@ -42,13 +42,14 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationH
     }
 
     /// <inheritdoc />
-    public void Handle(ContentPublishedNotification notification)
+    public async Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken)
     {
         if (_contentSettings.Value.ShowDomainWarnings is false)
         {
             return;
         }
 
+        IDomain[]? allDomains = null;
 
         foreach (IContent content in notification.PublishedEntities)
         {
@@ -60,32 +61,30 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationH
                 return;
             }
 
-            // If more than a single culture is published we need to verify that there's a domain registered for each published culture
-            HashSet<IDomain>? assignedDomains = content is null
-                ? null
-                : _domainService.GetAssignedDomains(content.Id, true)?.ToHashSet();
+            // Lazily fetch all domains once per notification, then filter for the content and its ancestors.
+            allDomains ??= (await _domainService.GetAllAsync(true)).ToArray();
 
-            IEnumerable<int>? ancestorIds = content?.GetAncestorIds();
-            if (ancestorIds is not null && assignedDomains is not null)
+            var contentIds = new HashSet<int> { content.Id };
+            IEnumerable<int>? ancestorIds = content.GetAncestorIds();
+            if (ancestorIds is not null)
             {
-                // We also have to check all of the ancestors, if any of those has the appropriate culture assigned we don't need to warn
-                foreach (var ancestorID in ancestorIds)
-                {
-                    assignedDomains.UnionWith(_domainService.GetAssignedDomains(ancestorID, true) ??
-                                              Enumerable.Empty<IDomain>());
-                }
+                contentIds.UnionWith(ancestorIds);
             }
+
+            var assignedDomains = allDomains
+                .Where(d => d.RootContentId.HasValue && contentIds.Contains(d.RootContentId.Value))
+                .ToHashSet();
 
             var eventMessages = _eventMessagesFactory.Get();
             // No domains at all, add a warning, to add domains.
-            if (assignedDomains is null || assignedDomains.Count == 0)
+            if (assignedDomains.Count == 0)
             {
 
                 eventMessages.Add(new EventMessage("Content published", $"Domains are not configured for multilingual site, please contact an administrator, see log for more information", EventMessageType.Warning));
 
                 _logger.LogWarning(
                     "The root node {RootNodeName} was published with multiple cultures, but no domains are configured, this will cause routing and caching issues, please register domains for: {Cultures}",
-                    content?.Name,
+                    content.Name,
                     string.Join(", ", publishedCultures));
                 return;
 
@@ -101,7 +100,7 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationH
 
                 _logger.LogWarning(
                     "The root node {RootNodeName} was published in culture {Culture}, but there's no domain configured for it, this will cause routing and caching issues, please register a domain for it",
-                    content?.Name,
+                    content.Name,
                     culture);
             }
         }

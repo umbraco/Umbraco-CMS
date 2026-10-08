@@ -214,9 +214,9 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         }
 
         // Login is not a member update: UpdateDate is intentionally left untouched, and the
-        // IndexableFieldsChanged state flag tells the Examine indexing handler to skip the
-        // re-index since no indexed field has changed. Mirror the content-member pattern
-        // (MemberService.UpdateLoginPropertiesAsync) so downstream handlers see the same shape.
+        // IndexableFieldsChanged state flag signals that no indexed field changed, mirroring
+        // the content-member pattern (MemberService.UpdateLoginPropertiesAsync). External
+        // members are not currently indexed by search, so this flag has no consumer yet.
         var savingNotification = new ExternalMemberSavingNotification(member, evtMsgs);
         savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
         savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, false);

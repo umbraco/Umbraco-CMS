@@ -1,10 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Filters;
@@ -19,12 +17,8 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class ContentEditingService
     : ContentEditingServiceWithSortingBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
 {
-    private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly ITemplateService _templateService;
     private readonly ILogger<ContentEditingService> _logger;
-    private readonly IUserService _userService;
-    private readonly ILocalizationService _localizationService;
-    private readonly ILanguageService _languageService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentEditingService"/> class.
@@ -40,7 +34,6 @@ internal sealed class ContentEditingService
     /// <param name="treeEntitySortingService">The tree entity sorting service.</param>
     /// <param name="contentValidationService">The content validation service.</param>
     /// <param name="userService">The user service.</param>
-    /// <param name="localizationService">The localization service.</param>
     /// <param name="languageService">The language service.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
@@ -57,7 +50,6 @@ internal sealed class ContentEditingService
         ITreeEntitySortingService treeEntitySortingService,
         IContentValidationService contentValidationService,
         IUserService userService,
-        ILocalizationService localizationService,
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
@@ -74,37 +66,44 @@ internal sealed class ContentEditingService
             treeEntitySortingService,
             optionsMonitor,
             relationService,
-            contentTypeFilters)
+            contentTypeFilters,
+            languageService,
+            userService)
     {
-        _propertyEditorCollection = propertyEditorCollection;
         _templateService = templateService;
         _logger = logger;
-        _userService = userService;
-        _localizationService = localizationService;
-        _languageService = languageService;
     }
 
     /// <inheritdoc/>
     protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
 
     /// <inheritdoc />
-    public Task<IContent?> GetAsync(Guid key)
+    public override Task<IContent?> GetAsync(Guid key)
     {
         IContent? content = ContentService.GetById(key);
         return Task.FromResult(content);
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateContentUpdateModel updateModel, Guid userKey)
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(
+        Guid key,
+        ValidateContentUpdateModel updateModel,
+        Guid userKey)
     {
         IContent? content = ContentService.GetById(key);
         return content is not null
-            ? await ValidateCulturesAndPropertiesAsync(updateModel, content.ContentType.Key, await GetCulturesToValidate(updateModel.Cultures, userKey))
+            ? await ValidateCulturesAndPropertiesAsync(
+                updateModel,
+                content.ContentType.Key,
+                updateModel.Cultures,
+                userKey)
             : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel, Guid userKey)
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(
+        ContentCreateModel createModel,
+        Guid userKey)
     {
         ContentEditingOperationStatus creationAllowedStatus = await ValidateCreationAllowedAsync(createModel);
         if (creationAllowedStatus != ContentEditingOperationStatus.Success)
@@ -112,54 +111,32 @@ internal sealed class ContentEditingService
             return Attempt.FailWithStatus(creationAllowedStatus, new ContentValidationResult());
         }
 
-        return await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey, await GetCulturesToValidate(createModel.Variants.Select(variant => variant.Culture), userKey));
-    }
-
-    private async Task<IEnumerable<string?>?> GetCulturesToValidate(IEnumerable<string?>? cultures, Guid userKey)
-    {
-        // Cultures to validate can be provided by the calling code, but if the editor is restricted to only have
-        // access to certain languages, we don't want to validate by any they aren't allowed to edit.
-
-        // TODO: Remove this check once the obsolete overloads to ValidateCreateAsync and ValidateUpdateAsync that don't provide a user key are removed.
-        // We only have this to ensure backwards compatibility with the obsolete overloads.
-        if (userKey == Guid.Empty)
-        {
-            return cultures;
-        }
-
-        HashSet<string>? allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
-
-        if (cultures == null)
-        {
-            // If no cultures are provided, we are asking to validate all cultures. But if the user doesn't have access to all, we
-            // should only validate the ones they do.
-            IEnumerable<string> allCultures = await _languageService.GetAllIsoCodesAsync();
-            return allowedCultures.Count == allCultures.Count() ? null : allowedCultures;
-        }
-
-        // If explicit cultures are provided, we should only validate the ones the user has access to.
-        return cultures.Where(x => !string.IsNullOrEmpty(x) && allowedCultures.Contains(x)).ToList();
+        return await ValidateCulturesAndPropertiesAsync(
+            createModel,
+            createModel.ContentTypeKey,
+            createModel.Variants.Select(variant => variant.Culture),
+            userKey);
     }
 
     /// <inheritdoc />
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
-        => await HandleCreateAsync(createModel, null, userKey);
+        => ToEditingAttempt(await HandleCreateAsync(createModel, null, userKey));
 
     /// <inheritdoc />
-    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ContentCreateModel createModel, string[] culturesToPublish, Guid userKey)
+    public async Task<Attempt<ContentCreateResult, ContentEditingAndPublishingStatus>> CreateAndPublishAsync(ContentCreateModel createModel, ISet<string> culturesToPublish, Guid userKey)
         => await HandleCreateAsync(createModel, culturesToPublish, userKey);
 
-    private async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> HandleCreateAsync(ContentCreateModel createModel, string[]? culturesToPublish, Guid userKey)
+    private async Task<Attempt<ContentCreateResult, ContentEditingAndPublishingStatus>> HandleCreateAsync(ContentCreateModel createModel, ISet<string>? culturesToPublish, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)
         {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentCreateResult());
+            return Attempt.FailWithStatus(EditingStatus(ContentEditingOperationStatus.InvalidCulture), new ContentCreateResult());
         }
 
         Attempt<ContentCreateResult, ContentEditingOperationStatus> result = await MapCreate<ContentCreateResult>(createModel);
         if (result.Success == false)
         {
-            return result;
+            return Attempt.FailWithStatus(EditingStatus(result.Status), result.Result);
         }
 
         // the create mapping might succeed, but this doesn't mean the model is valid at property level.
@@ -171,175 +148,57 @@ internal sealed class ContentEditingService
         ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, createModel.TemplateKey);
         if (updateTemplateStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus(updateTemplateStatus, new ContentCreateResult { Content = content });
+            return Attempt.FailWithStatus(
+                EditingStatus(updateTemplateStatus),
+                new ContentCreateResult { Content = content, ValidationResult = validationResult });
         }
 
-        ContentEditingOperationStatus saveStatus = culturesToPublish is null
-            ? await Save(content, userKey)
+        (ContentEditingAndPublishingStatus saveStatus, IEnumerable<string> invalidPropertyAliases) = culturesToPublish is null
+            ? (EditingStatus(await Save(content, userKey)), Enumerable.Empty<string>())
             : await SaveAndPublish(content, culturesToPublish, userKey);
-        return saveStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(validationStatus, new ContentCreateResult { Content = content, ValidationResult = validationResult })
-            : Attempt.FailWithStatus(saveStatus, new ContentCreateResult { Content = content });
-    }
-
-    /// <summary>
-    /// A temporary method that ensures the data is sent in is overridden by the original data, in cases where the user do not have permissions to change the data.
-    /// </summary>
-    private async Task<IContent> EnsureOnlyAllowedFieldsAreUpdated(IContent contentWithPotentialUnallowedChanges, Guid userKey)
-    {
-        if (contentWithPotentialUnallowedChanges.ContentType.VariesByCulture() is false)
-        {
-            return contentWithPotentialUnallowedChanges;
-        }
-
-        IContent? existingContent = await GetAsync(contentWithPotentialUnallowedChanges.Key);
-
-        HashSet<string>? allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
-
-        ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
-
-        var disallowedCultures = (contentWithPotentialUnallowedChanges.EditedCultures ??
-                               contentWithPotentialUnallowedChanges.PublishedCultures)
-            .Where(culture => allowedCultures.Contains(culture) is false).ToList();
-
-        var allowedToEditDefaultLanguage = allowedCultures.Contains(defaultLanguage?.IsoCode ?? string.Empty);
-
-        var variantProperties = new List<IProperty>();
-        var invariantWithVariantSupportProperties = new List<(IProperty Property, IDataEditor DataEditor)>();
-        var invariantProperties = new List<IProperty>();
-
-        // group properties in processing groups
-        foreach (IProperty property in contentWithPotentialUnallowedChanges.Properties)
-        {
-            if (property.PropertyType.VariesByCulture())
-            {
-                variantProperties.Add(property);
-            }
-            else if (_propertyEditorCollection.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor) && dataEditor.CanMergePartialPropertyValues(property.PropertyType))
-            {
-                invariantWithVariantSupportProperties.Add((property, dataEditor));
-            }
-            else
-            {
-                invariantProperties.Add(property);
-            }
-        }
-
-        // If the property varies by culture, simply overwrite the edited property value with the current property value
-        // for every culture.
-        foreach (IProperty property in variantProperties)
-        {
-            foreach (var culture in disallowedCultures)
-            {
-                RestoreExistingPropertyValues(property, existingContent, culture);
-            }
-        }
-
-        // If property does not support merging, we still need to overwrite if we are not allowed to edit invariant properties.
-        if (ContentSettings.AllowEditInvariantFromNonDefault is false && allowedToEditDefaultLanguage is false)
-        {
-            foreach (IProperty property in invariantProperties)
-            {
-                RestoreExistingPropertyValues(property, existingContent, null);
-            }
-        }
-
-        // if the property does not vary by culture and the data editor supports variance within invariant property values,
-        // we need perform a merge between the edited property value and the current property value
-        foreach ((IProperty Property, IDataEditor DataEditor) propertyWithEditor in invariantWithVariantSupportProperties)
-        {
-            IProperty property = propertyWithEditor.Property;
-            IProperty? existingProperty = existingContent?.Properties.First(x => x.Alias == property.Alias);
-
-            // The property may vary by segment, in which case each segment holds its own value to merge.
-            foreach (var segment in GetSegmentsToRestore(property, existingProperty, null))
-            {
-                var currentValue = existingProperty?.GetValue(null, segment, false);
-                var editedValue = property.GetValue(null, segment, false);
-
-                // update the editedValue with a merged value of invariant data and allowed culture data using the currentValue as a fallback.
-                var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
-                    currentValue,
-                    editedValue,
-                    ContentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
-                    allowedCultures);
-
-                property.SetValue(mergedValue, null, segment);
-            }
-        }
-
-        return contentWithPotentialUnallowedChanges;
-    }
-
-    /// <summary>
-    /// Overwrites the edited values of a property for one culture with the values held by the existing content.
-    /// </summary>
-    /// <remarks>
-    /// The property may vary by segment, so every segment of the culture has to be restored, not only its
-    /// segment-less value - including any segment the edit added, which is restored to no value.
-    /// </remarks>
-    private static void RestoreExistingPropertyValues(IProperty property, IContent? existingContent, string? culture)
-    {
-        IProperty? existingProperty = existingContent?.Properties.First(x => x.Alias == property.Alias);
-
-        foreach (var segment in GetSegmentsToRestore(property, existingProperty, culture))
-        {
-            property.SetValue(existingProperty?.GetValue(culture, segment, false), culture, segment);
-        }
-    }
-
-    /// <summary>
-    /// Gets every segment of a culture held by either the edited or the existing property, along with the
-    /// segment-less value, so all of them can be restored or merged.
-    /// </summary>
-    /// <remarks>
-    /// Materialized because writing to a segment can add a property value, which would otherwise modify the
-    /// collection being enumerated.
-    /// </remarks>
-    private static string?[] GetSegmentsToRestore(IProperty property, IProperty? existingProperty, string? culture)
-        => property.Values
-            .Concat(existingProperty?.Values ?? [])
-            .Where(value => culture.InvariantEquals(value.Culture))
-            .Select(value => value.Segment)
-            .Append(null)
-            .Distinct()
-            .ToArray();
-
-    private async Task<HashSet<string>> GetAllowedCulturesForEditingUser(Guid userKey)
-    {
-        IUser? user = await _userService.GetAsync(userKey)
-            ?? throw new InvalidOperationException($"Could not find user by key {userKey} when editing or validating content.");
-
-        var allowedLanguageIds = user.CalculateAllowedLanguageIds(_localizationService)!;
-
-        return (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
+        return IsSuccess(saveStatus)
+            ? Attempt.SucceedWithStatus(
+                new ContentEditingAndPublishingStatus
+                {
+                    ContentEditingOperationStatus = validationStatus,
+                    ContentPublishingOperationStatus = saveStatus.ContentPublishingOperationStatus,
+                },
+                new ContentCreateResult { Content = content, ValidationResult = validationResult })
+            : Attempt.FailWithStatus(
+                saveStatus,
+                new ContentCreateResult
+                {
+                    Content = content,
+                    ValidationResult = validationResult,
+                    InvalidPropertyAliases = invalidPropertyAliases,
+                });
     }
 
     /// <inheritdoc />
     public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey)
-        => await HandleUpdateAsync(key, updateModel, null, userKey);
+        => ToEditingAttempt(await HandleUpdateAsync(key, updateModel, null, userKey));
 
     /// <inheritdoc />
-    public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
+    public async Task<Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, ISet<string> culturesToPublish, Guid userKey)
         => await HandleUpdateAsync(key, updateModel, culturesToPublish, userKey);
 
-    private async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> HandleUpdateAsync(Guid key, ContentUpdateModel updateModel, string[]? culturesToPublish, Guid userKey)
+    private async Task<Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus>> HandleUpdateAsync(Guid key, ContentUpdateModel updateModel, ISet<string>? culturesToPublish, Guid userKey)
     {
         IContent? content = ContentService.GetById(key);
         if (content is null)
         {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentUpdateResult());
+            return Attempt.FailWithStatus(EditingStatus(ContentEditingOperationStatus.NotFound), new ContentUpdateResult());
         }
 
         if (await ValidateCulturesAsync(updateModel) is false)
         {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentUpdateResult { Content = content });
+            return Attempt.FailWithStatus(EditingStatus(ContentEditingOperationStatus.InvalidCulture), new ContentUpdateResult { Content = content });
         }
 
         Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<ContentUpdateResult>(content, updateModel);
         if (result.Success == false)
         {
-            return Attempt.FailWithStatus(result.Status, result.Result);
+            return Attempt.FailWithStatus(EditingStatus(result.Status), result.Result);
         }
 
         // the update mapping might succeed, but this doesn't mean the model is valid at property level.
@@ -352,15 +211,30 @@ internal sealed class ContentEditingService
         ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, updateModel.TemplateKey);
         if (updateTemplateStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus(updateTemplateStatus, new ContentUpdateResult { Content = content });
+            return Attempt.FailWithStatus(
+                EditingStatus(updateTemplateStatus),
+                new ContentUpdateResult { Content = content, ValidationResult = validationResult });
         }
 
-        ContentEditingOperationStatus saveStatus = culturesToPublish is null
-            ? await Save(content, userKey)
+        (ContentEditingAndPublishingStatus saveStatus, IEnumerable<string> invalidPropertyAliases) = culturesToPublish is null
+            ? (EditingStatus(await Save(content, userKey)), Enumerable.Empty<string>())
             : await SaveAndPublish(content, culturesToPublish, userKey);
-        return saveStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(validationStatus, new ContentUpdateResult { Content = content, ValidationResult = validationResult })
-            : Attempt.FailWithStatus(saveStatus, new ContentUpdateResult { Content = content });
+        return IsSuccess(saveStatus)
+            ? Attempt.SucceedWithStatus(
+                new ContentEditingAndPublishingStatus
+                {
+                    ContentEditingOperationStatus = validationStatus,
+                    ContentPublishingOperationStatus = saveStatus.ContentPublishingOperationStatus,
+                },
+                new ContentUpdateResult { Content = content, ValidationResult = validationResult })
+            : Attempt.FailWithStatus(
+                saveStatus,
+                new ContentUpdateResult
+                {
+                    Content = content,
+                    ValidationResult = validationResult,
+                    InvalidPropertyAliases = invalidPropertyAliases,
+                });
     }
 
     /// <inheritdoc />
@@ -378,11 +252,6 @@ internal sealed class ContentEditingService
     /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
-
-    /// <inheritdoc />
-    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await RestoreAsync(key, parentKey, userKey, true);
 
     /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
@@ -407,14 +276,6 @@ internal sealed class ContentEditingService
         string? culture,
         Guid userKey)
         => await HandleSortByFieldAsync(parentKey, field, direction, culture, userKey);
-
-    private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCulturesAndPropertiesAsync(
-        ContentEditingModelBase contentEditingModelBase,
-        Guid contentTypeKey,
-        IEnumerable<string?>? culturesToValidate = null)
-        => await ValidateCulturesAsync(contentEditingModelBase) is false
-            ? Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentValidationResult())
-            : await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey, culturesToValidate);
 
     private async Task<ContentEditingOperationStatus> UpdateTemplateAsync(IContent content, Guid? templateKey)
     {
@@ -442,7 +303,7 @@ internal sealed class ContentEditingService
     }
 
     /// <inheritdoc />
-    protected override IContent New(string? name, int parentId, IContentType contentType)
+    protected override IContent New(string name, int parentId, IContentType contentType)
         => new Content(name, parentId, contentType);
 
     /// <inheritdoc />
@@ -450,8 +311,11 @@ internal sealed class ContentEditingService
         => ContentService.Move(content, newParentId, includeDescendants, userId);
 
     /// <inheritdoc />
-    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
-        => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
+    protected override async Task<IContent?> CopyAsync(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    {
+        var userId = await GetUserIdAsync(userKey);
+        return ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, userId);
+    }
 
     /// <inheritdoc />
     protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => ContentService.MoveToRecycleBin(content, userId);
@@ -500,27 +364,54 @@ internal sealed class ContentEditingService
         }
     }
 
-    private async Task<ContentEditingOperationStatus> SaveAndPublish(IContent content, string[] culturesToPublish, Guid userKey)
+    private async Task<(ContentEditingAndPublishingStatus Status, IEnumerable<string> InvalidPropertyAliases)> SaveAndPublish(IContent content, ISet<string> culturesToPublish, Guid userKey)
     {
+        // The cultures to publish must match the content type's variance, or the publish cannot be attempted at all.
+        // Checked up-front so the caller gets the reason: the underlying service signals this by throwing, which would
+        // otherwise be caught below and reported as an unknown error.
+        ContentEditingOperationStatus? invalidCulturesStatus = await ValidateCulturesToPublishAsync(content, culturesToPublish);
+        if (invalidCulturesStatus is not null)
+        {
+            return (EditingStatus(invalidCulturesStatus.Value), Enumerable.Empty<string>());
+        }
+
         try
         {
             var currentUserId = await GetUserIdAsync(userKey);
-            PublishResult publishResult = ContentService.SaveAndPublish(content, culturesToPublish, userId: currentUserId);
+            PublishResult publishResult = ContentService.SaveAndPublish(content, culturesToPublish.ToArray(), userId: currentUserId);
             if (publishResult.Success)
             {
-                return ContentEditingOperationStatus.Success;
+                return (
+                    new ContentEditingAndPublishingStatus
+                    {
+                        ContentEditingOperationStatus = ContentEditingOperationStatus.Success,
+                        ContentPublishingOperationStatus = ContentPublishingOperationStatus.Success,
+                    },
+                    Enumerable.Empty<string>());
             }
 
-            return publishResult.Result switch
+            // Some failures are returned before the document is persisted, so they cannot be reported against the
+            // publishing status: doing so would state that the save succeeded when nothing was written at all.
+            ContentEditingOperationStatus? nothingPersistedStatus = NothingPersistedStatus(publishResult.Result);
+            if (nothingPersistedStatus is not null)
             {
-                PublishResultType.FailedPublishCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
-                _ => ContentEditingOperationStatus.Unknown,
-            };
+                return (EditingStatus(nothingPersistedStatus.Value), Enumerable.Empty<string>());
+            }
+
+            // Any other failure means the publish was rejected after the save took effect, so report the save as
+            // successful and let the publishing status carry the reason.
+            return (
+                new ContentEditingAndPublishingStatus
+                {
+                    ContentEditingOperationStatus = ContentEditingOperationStatus.Success,
+                    ContentPublishingOperationStatus = publishResult.ToContentPublishingOperationStatus(),
+                },
+                publishResult.InvalidProperties?.Select(property => property.Alias).ToArray() ?? Enumerable.Empty<string>());
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Content save operation failed");
-            return ContentEditingOperationStatus.Unknown;
+            _logger.LogError(ex, "Content save and publish operation failed");
+            return (EditingStatus(ContentEditingOperationStatus.Unknown), Enumerable.Empty<string>());
         }
     }
 }

@@ -56,6 +56,14 @@ public interface IEntityXmlSerializer
     XElement Serialize(IMember member);
 
     /// <summary>
+    ///     Exports an <see cref="IElement"/> item as an <see cref="XElement"/>.
+    /// </summary>
+    /// <param name="element">The element item to serialize.</param>
+    /// <returns>An <see cref="XElement"/> containing the XML representation of the element item.</returns>
+    // TODO (V20): Remove the default implementation and make this a required interface member.
+    XElement Serialize(IElement element) => throw new NotImplementedException();
+
+    /// <summary>
     ///     Exports a list of Data Types
     /// </summary>
     /// <param name="dataTypeDefinitions">List of data types to export</param>

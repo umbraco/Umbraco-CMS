@@ -5,11 +5,11 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-input-language')
-export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputLanguageElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -19,6 +19,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 		},
 		identifier: 'Umb.SorterIdentifier.InputLanguage',
 		itemSelector: 'umb-entity-item-ref',
+		disabledItemSelector: '[error]',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -177,7 +178,9 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 			<uui-ref-list>
 				${repeat(
 					this._statuses,
-					(status) => status.unique,
+					// Re-key on error state so the sorter re-evaluates `disabledItemSelector` when an item settles
+					// into "not found" — the sorter only checks this when an element is first mounted.
+					(status) => `${status.unique}:${status.state.type === 'error'}`,
 					(status) => {
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
@@ -189,7 +192,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 								?error=${isError}
 								.errorMessage=${status.state.error}
 								.errorDetail=${isError ? unique : undefined}
-								?readonly=${this.readonly}
+								?readonly=${this.readonly || isError}
 								?standalone=${this.max === 1}>
 								${when(
 									!this.readonly,

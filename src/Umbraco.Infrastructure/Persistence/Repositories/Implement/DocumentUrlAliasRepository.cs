@@ -114,7 +114,9 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
     /// This is more efficient than loading all IContent objects.
     /// Aliases are routing data for the published site, so this reads the published version's property
     /// data (joined via <see cref="DocumentVersionDto"/>) rather than the current/draft version - a draft
-    /// edit to an alias must not affect routing until the document is actually published.
+    /// edit to an alias must not affect routing until the document is actually published. Unpublishing a document
+    /// clears the document's published flag but leaves its last published version flagged, so the document's own
+    /// flag is checked as well.
     /// </remarks>
     public IEnumerable<DocumentUrlAliasRaw> GetAllDocumentUrlAliases()
     {
@@ -126,8 +128,10 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
             .InnerJoin<ContentVersionDto>("cv").On<PropertyDataDto, ContentVersionDto>((pd, cv) => pd.VersionId == cv.Id, "pd", "cv")
             .InnerJoin<DocumentVersionDto>("dv").On<ContentVersionDto, DocumentVersionDto>((cv, dv) => cv.Id == dv.Id, "cv", "dv")
             .InnerJoin<NodeDto>("n").On<ContentVersionDto, NodeDto>((cv, n) => cv.NodeId == n.NodeId, "cv", "n")
+            .InnerJoin<DocumentDto>("d").On<NodeDto, DocumentDto>((n, d) => n.NodeId == d.NodeId, "n", "d")
             .Where<PropertyTypeDto>(pt => pt.Alias == Constants.Conventions.Content.UrlAlias, "pt")
             .Where<DocumentVersionDto>(dv => dv.Published == true, "dv")
+            .Where<DocumentDto>(d => d.Published == true, "d")
             .Where<NodeDto>(n => n.Trashed == false, "n")
             .Where<NodeDto>(n => n.NodeObjectType == Constants.ObjectTypes.Document, "n") // Exclude blueprints
             .Append($"AND (pd.{QuotedColName("textValue")} IS NOT NULL OR pd.{QuotedColName("varcharValue")} IS NOT NULL)");
@@ -141,7 +145,7 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
         {
             Alias = dto.Alias,
             DocumentKey = dto.UniqueId,
-            NullableLanguageId = dto.LanguageId,
+            LanguageId = dto.LanguageId,
         };
 
     private DocumentUrlAliasDto BuildDto(PublishedDocumentUrlAlias model) =>
@@ -149,6 +153,6 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
         {
             Alias = model.Alias,
             UniqueId = model.DocumentKey,
-            LanguageId = model.NullableLanguageId,
+            LanguageId = model.LanguageId,
         };
 }

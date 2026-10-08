@@ -14,9 +14,11 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Bounded;
 ///     The byte total is an <em>approximation</em> (the per-entry size is supplied by the caller), suitable for
 ///     diagnostics, not exact accounting.
 /// </remarks>
-/// <typeparam name="TKey">The cache key type (string for documents, Guid for media).</typeparam>
-internal sealed class BoundedConvertedPublishedContentCache<TKey> : IConvertedPublishedContentCache<TKey>
+/// <typeparam name="TKey">The cache key type (string for documents/elements, Guid for media).</typeparam>
+/// <typeparam name="TValue">The cached converted type (<see cref="IPublishedContent" /> or <see cref="IPublishedElement" />).</typeparam>
+internal sealed class BoundedConvertedPublishedContentCache<TKey, TValue> : IConvertedPublishedContentCache<TKey, TValue>
     where TKey : notnull
+    where TValue : class, IPublishedElement
 {
     // BitFaster's ConcurrentLfu partitions its capacity across admission window / probation / protected
     // regions and so requires a small minimum capacity.
@@ -29,7 +31,7 @@ internal sealed class BoundedConvertedPublishedContentCache<TKey> : IConvertedPu
     private readonly ConcurrentLfu<TKey, CacheEntry> _cache;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="BoundedConvertedPublishedContentCache{TKey}" /> class.
+    ///     Initializes a new instance of the <see cref="BoundedConvertedPublishedContentCache{TKey,TValue}" /> class.
     /// </summary>
     /// <param name="maximumItems">
     ///     The maximum number of entries to retain. Values below the W-TinyLFU minimum capacity are raised to it.
@@ -49,7 +51,7 @@ internal sealed class BoundedConvertedPublishedContentCache<TKey> : IConvertedPu
         SampledSizeEstimator.Estimate(_cache.Count, _cache, entry => entry.Value.Size, ByteEstimateSampleSize);
 
     /// <inheritdoc />
-    public bool TryGet(TKey key, out IPublishedContent? content)
+    public bool TryGet(TKey key, out TValue? content)
     {
         if (_cache.TryGet(key, out CacheEntry entry))
         {
@@ -62,14 +64,14 @@ internal sealed class BoundedConvertedPublishedContentCache<TKey> : IConvertedPu
     }
 
     /// <inheritdoc />
-    public void Set(TKey key, IPublishedContent content, long approximateSizeInBytes)
+    public void Set(TKey key, TValue content, long approximateSizeInBytes)
         => _cache.AddOrUpdate(key, new CacheEntry(content, approximateSizeInBytes));
 
     /// <inheritdoc />
     public bool Remove(TKey key) => _cache.TryRemove(key);
 
     /// <inheritdoc />
-    public void RemoveWhere(Func<IPublishedContent, bool> predicate)
+    public void RemoveWhere(Func<TValue, bool> predicate)
     {
         // Enumerating is a snapshot read and does not register accesses against the eviction policy.
         foreach (KeyValuePair<TKey, CacheEntry> entry in _cache)
@@ -90,5 +92,5 @@ internal sealed class BoundedConvertedPublishedContentCache<TKey> : IConvertedPu
     /// </summary>
     internal void RunPendingMaintenance() => _cache.DoMaintenance();
 
-    private readonly record struct CacheEntry(IPublishedContent Content, long Size);
+    private readonly record struct CacheEntry(TValue Content, long Size);
 }

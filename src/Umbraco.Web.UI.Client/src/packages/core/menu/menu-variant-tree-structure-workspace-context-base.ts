@@ -2,11 +2,10 @@ import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from './menu-variant-str
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/section-context/section-sidebar-menu.section-context.token.js';
 import type { ManifestWorkspaceContextMenuStructureKind, UmbVariantStructureItemModel } from './types.js';
 import type { UmbMenuVariantStructureWorkspaceContext } from './menu-variant-structure-workspace-context.interface.js';
-import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { debounce, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -22,6 +21,7 @@ import {
 	UMB_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -39,12 +39,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 
 	readonly #structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
-
-	readonly #parent = new UmbObjectState<UmbVariantStructureItemModel | undefined>(undefined);
-	/**
-	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead.
-	 */
-	public readonly parent = this.#parent.asObservable();
 
 	protected _sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
@@ -65,8 +59,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 
 	constructor(host: UmbControllerHost, args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT);
-		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
-		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
@@ -141,9 +133,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 
 		// find related variant id from structure item:
 		const itemVariantFit = structureItem.variants.find(
-			(variant) =>
-				variant.culture === this.#workspaceActiveVariantId?.culture &&
-				variant.segment === this.#workspaceActiveVariantId?.segment,
+			(variant) => variant.culture === this.#workspaceActiveVariantId?.culture,
 		);
 
 		if (itemVariantFit) {
@@ -236,7 +226,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 				{
 					unique: root.unique,
 					entityType: root.entityType,
-					variants: [{ name: root.name, culture: null, segment: null }],
+					variants: [{ name: root.name, culture: null }],
 				},
 			];
 		}
@@ -248,11 +238,12 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 				return {
 					unique: treeItem.unique,
 					entityType: treeItem.entityType,
+					name: treeItem.name,
+					isFolder: treeItem.isFolder,
 					variants: treeItem.variants.map((variant: any) => {
 						return {
 							name: variant.name,
 							culture: variant.culture,
-							segment: variant.segment,
 						};
 					}),
 				};
@@ -300,7 +291,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 
 	#clearStructure() {
 		this.#structure.setValue([]);
-		this.#parent.setValue(undefined);
 		this.#parentContext.setParent(undefined);
 		this.#ancestorContext.setAncestors([]);
 	}
@@ -309,9 +299,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 		/* If the item is not new, the current item is the last item in the array.
 			We filter out the current item unique to handle any case where it could show up */
 		const parent = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique()).pop();
-
-		// TODO: remove this when the parent gets removed from the structure interface
-		this.#parent.setValue(parent);
 
 		const parentEntity = parent
 			? {
@@ -374,7 +361,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase
 		this.#removeEventListeners();
 		super.destroy();
 		this.#structure.destroy();
-		this.#parent.destroy();
 		this.#parentContext.destroy();
 		this.#ancestorContext.destroy();
 	}

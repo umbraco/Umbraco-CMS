@@ -28,7 +28,8 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
         IWithThumbnailBuilder,
         IWithTrashedBuilder,
         IWithIsContainerBuilder,
-        IWithAllowAsRootBuilder
+        IWithAllowAsRootBuilder,
+        IWithAllowedInLibraryBuilder
     where TParent : IBuildContentTypes
 {
     private string _alias;
@@ -49,6 +50,7 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
     private bool? _trashed;
     private DateTime? _updateDate;
     private bool? _allowedAtRoot;
+    private bool? _allowedInLibrary;
 
     public ContentTypeBaseBuilder(TParent parentBuilder)
         : base(parentBuilder)
@@ -174,6 +176,12 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
         set => _allowedAtRoot = value;
     }
 
+    bool? IWithAllowedInLibraryBuilder.AllowedInLibrary
+    {
+        get => _allowedInLibrary;
+        set => _allowedInLibrary = value;
+    }
+
     protected int GetId() => _id ?? 0;
 
     protected Guid GetKey() => _key ?? Guid.NewGuid();
@@ -209,6 +217,8 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
     protected Guid? GetListView() => _listView;
 
     protected bool GetAllowedAtRoot() => _allowedAtRoot ?? false;
+
+    protected bool GetAllowedInLibrary() => _allowedInLibrary ?? false;
 
     protected void BuildPropertyGroups(ContentTypeCompositionBase contentType, IEnumerable<PropertyGroup> propertyGroups)
     {

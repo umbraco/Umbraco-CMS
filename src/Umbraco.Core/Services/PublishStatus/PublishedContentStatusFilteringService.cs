@@ -16,8 +16,8 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 internal sealed class PublishedContentStatusFilteringService : IPublishedContentStatusFilteringService
 {
     private readonly IVariationContextAccessor _variationContextAccessor;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
-    private readonly IPreviewService _previewService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
+    private readonly IPreviewSessionService _previewSessionService;
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IDocumentCacheService _documentCacheService;
 
@@ -26,19 +26,19 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
     /// </summary>
     /// <param name="variationContextAccessor">The variation context accessor for retrieving culture information.</param>
     /// <param name="publishStatusQueryService">The service for querying document publish status.</param>
-    /// <param name="previewService">The service for determining if the current request is in preview mode.</param>
+    /// <param name="previewSessionService">The service for determining if the current request is in preview mode.</param>
     /// <param name="publishedContentCache">The published content cache for retrieving content items.</param>
     /// <param name="documentCacheService">The document cache service used to materialise candidate keys in batches.</param>
     public PublishedContentStatusFilteringService(
         IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        IPreviewService previewService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
+        IPreviewSessionService previewSessionService,
         IPublishedContentCache publishedContentCache,
         IDocumentCacheService documentCacheService)
     {
         _variationContextAccessor = variationContextAccessor;
         _publishStatusQueryService = publishStatusQueryService;
-        _previewService = previewService;
+        _previewSessionService = previewSessionService;
         _publishedContentCache = publishedContentCache;
         _documentCacheService = documentCacheService;
     }
@@ -54,14 +54,14 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
             return [];
         }
 
-        var preview = _previewService.IsInPreview();
+        var preview = _previewSessionService.IsActive();
 
         // Kept lazy so the publish-status filter is only evaluated for keys actually drawn — preserving
         // the short-circuit for .FirstOrDefault() / .Take(n).
         IEnumerable<Guid> keys = preview
             ? candidateKeysAsArray
             : candidateKeysAsArray.Where(key =>
-                _publishStatusQueryService.IsDocumentPublished(key, culture)
+                _publishStatusQueryService.IsPublished(key, culture)
                 && _publishStatusQueryService.HasPublishedAncestorPath(key, culture));
 
         // Materialise in growing chunks: an all-L0-hit chunk stays fully synchronous (no async, no
@@ -80,7 +80,7 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
     /// <inheritdoc />
     public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
     {
-        var preview = _previewService.IsInPreview();
+        var preview = _previewSessionService.IsActive();
         return candidateKeys.Select(key => _publishedContentCache.GetById(preview, key)).WhereNotNull();
     }
 

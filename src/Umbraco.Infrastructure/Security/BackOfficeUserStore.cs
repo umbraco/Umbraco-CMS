@@ -3,7 +3,6 @@ using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
@@ -62,7 +61,6 @@ public class BackOfficeUserStore :
     /// <param name="eventMessagesFactory">Factory for creating event message collections.</param>
     /// <param name="logger">Logger instance for logging operations related to the user store.</param>
     /// <param name="backOfficeUserReader">The shared reader used for back office user lookups.</param>
-    [ActivatorUtilitiesConstructor]
     public BackOfficeUserStore(
         ICoreScopeProvider scopeProvider,
         IEntityService entityService,
@@ -93,55 +91,6 @@ public class BackOfficeUserStore :
         _eventMessagesFactory = eventMessagesFactory;
         _logger = logger;
         _backOfficeUserReader = backOfficeUserReader;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="BackOfficeUserStore" /> class.
-    /// </summary>
-    /// <param name="scopeProvider">Provides database transaction scopes for data operations.</param>
-    /// <param name="entityService">Service for managing Umbraco entities.</param>
-    /// <param name="externalLoginService">Handles external login providers with key support.</param>
-    /// <param name="globalSettings">The global configuration settings for Umbraco.</param>
-    /// <param name="mapper">Maps between domain and view models in Umbraco.</param>
-    /// <param name="describer">Provides error descriptions for back office user operations.</param>
-    /// <param name="appCaches">Provides access to application-level caches.</param>
-    /// <param name="twoFactorLoginService">Service for managing two-factor authentication for users.</param>
-    /// <param name="userGroupService">Service for managing user groups in the back office.</param>
-    /// <param name="userRepository">Repository for accessing and persisting user data.</param>
-    /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
-    /// <param name="eventMessagesFactory">Factory for creating event message collections.</param>
-    /// <param name="logger">Logger instance for logging operations related to the user store.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public BackOfficeUserStore(
-        ICoreScopeProvider scopeProvider,
-        IEntityService entityService,
-        IExternalLoginWithKeyService externalLoginService,
-        IOptionsSnapshot<GlobalSettings> globalSettings,
-        IUmbracoMapper mapper,
-        BackOfficeErrorDescriber describer,
-        AppCaches appCaches,
-        ITwoFactorLoginService twoFactorLoginService,
-        IUserGroupService userGroupService,
-        IUserRepository userRepository,
-        IRuntimeState runtimeState,
-        IEventMessagesFactory eventMessagesFactory,
-        ILogger<BackOfficeUserStore> logger)
-        : this(
-            scopeProvider,
-            entityService,
-            externalLoginService,
-            globalSettings,
-            mapper,
-            describer,
-            appCaches,
-            twoFactorLoginService,
-            userGroupService,
-            userRepository,
-            runtimeState,
-            eventMessagesFactory,
-            logger,
-            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeUserReader>())
-    {
     }
 
     /// <inheritdoc />

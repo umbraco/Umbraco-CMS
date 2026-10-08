@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -28,17 +28,13 @@ public interface IDataEditor : IDiscoverable
     ///     Gets a value indicating whether the editor is deprecated.
     /// </summary>
     /// <remarks>Deprecated editors are supported but not proposed in the UI.</remarks>
-    bool IsDeprecated { get; }
+    [Obsolete("Nothing reads this value. Declare \"deprecated\" on the property editor UI manifest instead, which is what the backoffice reads. Scheduled for removal in Umbraco 21.")]
+    bool IsDeprecated => false;
 
     /// <summary>
     ///     Gets the configuration for the value editor.
     /// </summary>
     IDictionary<string, object>? DefaultConfiguration { get; }
-
-    /// <summary>
-    ///     Gets the index value factory for the editor.
-    /// </summary>
-    IPropertyIndexValueFactory PropertyIndexValueFactory { get; }
 
     /// <summary>
     ///     Gets a value editor.

@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Extensions;
@@ -24,7 +25,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
 public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
-    private readonly IContentTypeService _contentTypeService;
     private readonly IProfilingLogger _proflog;
     private readonly BlockEditorConverter _blockConverter;
     private readonly IApiElementBuilder _apiElementBuilder;
@@ -34,6 +34,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
     private readonly ILanguageService _languageService;
     private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
+    private readonly IElementCacheService _elementCacheService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BlockListPropertyValueConverter"/> class.
@@ -48,6 +49,33 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     /// <param name="blockEditorVarianceHandler">Handles variance for block editors.</param>
     /// <param name="languageService">Service used to retrieve language information for fallback resolution.</param>
     /// <param name="propertyRenderingContextAccessor">Accessor for the current property rendering context.</param>
+    /// <param name="elementCacheService">The cache for elements.</param>
+    public BlockListPropertyValueConverter(
+        IProfilingLogger proflog,
+        BlockEditorConverter blockConverter,
+        IContentTypeService contentTypeService,
+        IApiElementBuilder apiElementBuilder,
+        IJsonSerializer jsonSerializer,
+        BlockListPropertyValueConstructorCache constructorCache,
+        IVariationContextAccessor variationContextAccessor,
+        BlockEditorVarianceHandler blockEditorVarianceHandler,
+        ILanguageService languageService,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
+        IElementCacheService elementCacheService)
+    {
+        _proflog = proflog;
+        _blockConverter = blockConverter;
+        _apiElementBuilder = apiElementBuilder;
+        _jsonSerializer = jsonSerializer;
+        _constructorCache = constructorCache;
+        _variationContextAccessor = variationContextAccessor;
+        _blockEditorVarianceHandler = blockEditorVarianceHandler;
+        _languageService = languageService;
+        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
+        _elementCacheService = elementCacheService;
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V20.")]
     public BlockListPropertyValueConverter(
         IProfilingLogger proflog,
         BlockEditorConverter blockConverter,
@@ -59,31 +87,18 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
         BlockEditorVarianceHandler blockEditorVarianceHandler,
         ILanguageService languageService,
         IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
-    {
-        _proflog = proflog;
-        _blockConverter = blockConverter;
-        _contentTypeService = contentTypeService;
-        _apiElementBuilder = apiElementBuilder;
-        _jsonSerializer = jsonSerializer;
-        _constructorCache = constructorCache;
-        _variationContextAccessor = variationContextAccessor;
-        _blockEditorVarianceHandler = blockEditorVarianceHandler;
-        _languageService = languageService;
-        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
-    }
-
-    /// <inheritdoc cref="BlockListPropertyValueConverter(IProfilingLogger, BlockEditorConverter, IContentTypeService, IApiElementBuilder, IJsonSerializer, BlockListPropertyValueConstructorCache, IVariationContextAccessor, BlockEditorVarianceHandler, ILanguageService, IPropertyRenderingContextAccessor)"/>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public BlockListPropertyValueConverter(
-        IProfilingLogger proflog,
-        BlockEditorConverter blockConverter,
-        IContentTypeService contentTypeService,
-        IApiElementBuilder apiElementBuilder,
-        IJsonSerializer jsonSerializer,
-        BlockListPropertyValueConstructorCache constructorCache,
-        IVariationContextAccessor variationContextAccessor,
-        BlockEditorVarianceHandler blockEditorVarianceHandler)
-        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, jsonSerializer, constructorCache, variationContextAccessor, blockEditorVarianceHandler, StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(), StaticServiceProvider.Instance.GetRequiredService<IPropertyRenderingContextAccessor>())
+        : this(
+            proflog,
+            blockConverter,
+            contentTypeService,
+            apiElementBuilder,
+            jsonSerializer,
+            constructorCache,
+            variationContextAccessor,
+            blockEditorVarianceHandler,
+            languageService,
+            propertyRenderingContextAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IElementCacheService>())
     {
     }
 
@@ -93,42 +108,11 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
 
     /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-    {
-        var isSingleBlockMode = IsSingleBlockMode(propertyType.DataType);
-        if (isSingleBlockMode)
-        {
-            BlockListConfiguration.BlockConfiguration? block =
-                ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(propertyType.DataType.ConfigurationObject)?.Blocks.FirstOrDefault();
-
-            ModelType? contentElementType = block?.ContentElementTypeKey is Guid contentElementTypeKey && _contentTypeService.Get(contentElementTypeKey) is IContentType contentType ? ModelType.For(contentType.Alias) : null;
-            ModelType? settingsElementType = block?.SettingsElementTypeKey is Guid settingsElementTypeKey && _contentTypeService.Get(settingsElementTypeKey) is IContentType settingsType ? ModelType.For(settingsType.Alias) : null;
-
-            if (contentElementType is not null)
-            {
-                if (settingsElementType is not null)
-                {
-                    return typeof(BlockListItem<,>).MakeGenericType(contentElementType, settingsElementType);
-                }
-
-                return typeof(BlockListItem<>).MakeGenericType(contentElementType);
-            }
-
-            return typeof(BlockListItem);
-        }
-
-        return typeof(BlockListModel);
-    }
-
-    private bool IsSingleBlockMode(PublishedDataType dataType)
-    {
-        BlockListConfiguration? config =
-            ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(dataType.ConfigurationObject);
-        return (config?.UseSingleBlockMode ?? false) && config?.Blocks.Length == 1 && config?.ValidationLimit?.Min == 1 && config?.ValidationLimit?.Max == 1;
-    }
+        => typeof(BlockListModel);
 
     /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
-        => PropertyCacheLevel.Element;
+        => PropertyCacheLevel.Elements;
 
     /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
@@ -141,18 +125,13 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
         using (!_proflog.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _proflog.DebugDuration<BlockListPropertyValueConverter>(
                    $"ConvertPropertyToBlockList ({propertyType.DataType.Id})"))
         {
-            BlockListModel? blockListModel = ConvertIntermediateToBlockListModel(owner, propertyType, referenceCacheLevel, inter, preview);
-            if (blockListModel == null)
-            {
-                return null;
-            }
-
-            return IsSingleBlockMode(propertyType.DataType) ? blockListModel.FirstOrDefault() : blockListModel;
+            return ConvertIntermediateToBlockListModel(owner, propertyType, referenceCacheLevel, inter, preview);
         }
     }
 
     /// <inheritdoc />
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType)
+        => PropertyCacheLevel.Elements;
 
     /// <inheritdoc />
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
@@ -196,7 +175,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
                 return null;
             }
 
-            var creator = new BlockListPropertyValueCreator(_blockConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache, _languageService);
+            var creator = new BlockListPropertyValueCreator(_blockConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _elementCacheService, _jsonSerializer, _constructorCache, _languageService);
             return creator.CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, BlockPropertyVariance.OwningPropertyCulture(_variationContextAccessor, owner, propertyType), configuration.Blocks).GetAwaiter().GetResult();
         }
     }

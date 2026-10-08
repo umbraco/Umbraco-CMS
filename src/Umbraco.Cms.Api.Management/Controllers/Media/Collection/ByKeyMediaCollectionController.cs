@@ -1,13 +1,11 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -34,7 +32,6 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
     /// <param name="mapper">The Umbraco object mapper.</param>
     /// <param name="mediaCollectionPresentationFactory">Factory for creating media collection presentation models.</param>
     /// <param name="flagProviders">A collection of flag providers for the media collection.</param>
-    [ActivatorUtilitiesConstructor]
     public ByKeyMediaCollectionController(
         IMediaListViewService mediaListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -46,28 +43,6 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
         _mediaListViewService = mediaListViewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _mediaCollectionPresentationFactory = mediaCollectionPresentationFactory;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ByKeyMediaCollectionController"/> class with the specified services and factories required for media collection operations.
-    /// </summary>
-    /// <param name="mediaListViewService">Service for handling media list view operations.</param>
-    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
-    /// <param name="mapper">The Umbraco object mapper.</param>
-    /// <param name="mediaCollectionPresentationFactory">Factory for creating media collection presentation models.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in Umbraco 18")]
-    public ByKeyMediaCollectionController(
-        IMediaListViewService mediaListViewService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUmbracoMapper mapper,
-        IMediaCollectionPresentationFactory mediaCollectionPresentationFactory)
-        : this(
-            mediaListViewService,
-            backOfficeSecurityAccessor,
-            mapper,
-            mediaCollectionPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
     }
 
     /// <summary>

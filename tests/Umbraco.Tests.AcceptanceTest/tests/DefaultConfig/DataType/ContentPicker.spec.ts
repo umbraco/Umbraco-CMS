@@ -42,7 +42,7 @@ test('can add start node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
-  await umbracoUi.dataType.clickChooseButton();
+  await umbracoUi.dataType.clickChooseStartNodeButton();
   await umbracoUi.dataType.addContentStartNode(contentName);
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 

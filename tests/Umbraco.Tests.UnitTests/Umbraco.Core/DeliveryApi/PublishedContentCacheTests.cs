@@ -29,22 +29,22 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var contentTypeOneMock = new Mock<IPublishedContentType>();
         contentTypeOneMock.SetupGet(m => m.Alias).Returns("theContentType");
         var contentOneMock = new Mock<IPublishedContent>();
-        ConfigurePublishedContentMock(contentOneMock, _contentOneId, "Content One", "content-one", contentTypeOneMock.Object, Array.Empty<IPublishedProperty>());
+        ConfigurePublishedContentMock(contentOneMock, _contentOneId, "Content One", contentTypeOneMock.Object, Array.Empty<IPublishedProperty>());
 
         var contentTypeTwoMock = new Mock<IPublishedContentType>();
         contentTypeTwoMock.SetupGet(m => m.Alias).Returns("theOtherContentType");
         var contentTwoMock = new Mock<IPublishedContent>();
-        ConfigurePublishedContentMock(contentTwoMock, _contentTwoId, "Content Two", "content-two", contentTypeTwoMock.Object, Array.Empty<IPublishedProperty>());
+        ConfigurePublishedContentMock(contentTwoMock, _contentTwoId, "Content Two", contentTypeTwoMock.Object, Array.Empty<IPublishedProperty>());
 
         var contentTypeThreeMock = new Mock<IPublishedContentType>();
         contentTypeThreeMock.SetupGet(m => m.Alias).Returns("theThirdContentType");
         var contentThreeMock = new Mock<IPublishedContent>();
-        ConfigurePublishedContentMock(contentThreeMock, _contentThreeId, "Content Three", "content-three", contentTypeThreeMock.Object, Array.Empty<IPublishedProperty>());
+        ConfigurePublishedContentMock(contentThreeMock, _contentThreeId, "Content Three", contentTypeThreeMock.Object, Array.Empty<IPublishedProperty>());
 
         var contentTypeFourMock = new Mock<IPublishedContentType>();
         contentTypeFourMock.SetupGet(m => m.Alias).Returns("theFourthContentType");
         var contentFourMock = new Mock<IPublishedContent>();
-        ConfigurePublishedContentMock(contentFourMock, _contentFourId, "Content Four", "content-four", contentTypeFourMock.Object, Array.Empty<IPublishedProperty>());
+        ConfigurePublishedContentMock(contentFourMock, _contentFourId, "Content Four", contentTypeFourMock.Object, Array.Empty<IPublishedProperty>());
 
         var documentUrlService = new Mock<IDocumentUrlService>();
         documentUrlService
@@ -85,7 +85,6 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var content = publishedContentCache.GetById(_contentOneId);
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentOneId, content.Key);
-        Assert.AreEqual("content-one", content.UrlSegment);
         Assert.AreEqual("theContentType", content.ContentType.Alias);
     }
 
@@ -96,7 +95,6 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var content = publishedContentCache.GetByRoute("/content-two");
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentTwoId, content.Key);
-        Assert.AreEqual("content-two", content.UrlSegment);
         Assert.AreEqual("theOtherContentType", content.ContentType.Alias);
     }
 
@@ -107,7 +105,6 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var content = publishedContentCache.GetByRoute("1234/content-three");
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentThreeId, content.Key);
-        Assert.AreEqual("content-three", content.UrlSegment);
         Assert.AreEqual("theThirdContentType", content.ContentType.Alias);
     }
 
@@ -184,7 +181,6 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var content = publishedContentCache.GetById(_contentTwoId);
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentTwoId, content.Key);
-        Assert.AreEqual("content-two", content.UrlSegment);
         Assert.AreEqual("theOtherContentType", content.ContentType.Alias);
     }
 
@@ -196,7 +192,6 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var content = publishedContentCache.GetByRoute("/content-one");
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentOneId, content.Key);
-        Assert.AreEqual("content-one", content.UrlSegment);
         Assert.AreEqual("theContentType", content.ContentType.Alias);
     }
 
@@ -208,7 +203,6 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var content = publishedContentCache.GetByRoute("/content-four");
         Assert.IsNotNull(content);
         Assert.AreEqual(_contentFourId, content.Key);
-        Assert.AreEqual("content-four", content.UrlSegment);
         Assert.AreEqual("theFourthContentType", content.ContentType.Alias);
     }
 

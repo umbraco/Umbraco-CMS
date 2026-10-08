@@ -1,9 +1,11 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Filters;
@@ -33,6 +35,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly IContentValidationServiceBase<TContentType> _validationService;
     private readonly IRelationService _relationService;
     private readonly ContentTypeFilterCollection _contentTypeFilters;
+    private readonly ILanguageService _languageService;
+    private readonly IUserService _userService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentEditingServiceBase{TContent, TContentType, TContentService, TContentTypeService}"/> class.
@@ -59,7 +63,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         IContentValidationServiceBase<TContentType> validationService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        ILanguageService languageService,
+        IUserService userService)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
@@ -77,7 +83,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         ContentService = contentService;
         ContentTypeService = contentTypeService;
         _contentTypeFilters = contentTypeFilters;
+        _languageService = languageService;
+        _userService = userService;
     }
+
+    public abstract Task<TContent?> GetAsync(Guid key);
 
     /// <summary>
     /// Creates a new content entity.
@@ -86,7 +96,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="parentId">The parent identifier.</param>
     /// <param name="contentType">The content type.</param>
     /// <returns>A new content entity.</returns>
-    protected abstract TContent New(string? name, int parentId, TContentType contentType);
+    protected abstract TContent New(string name, int parentId, TContentType contentType);
 
     /// <summary>
     /// Moves content to a new parent.
@@ -118,9 +128,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="newParentId">The new parent identifier.</param>
     /// <param name="relateToOriginal">Whether to create a relation to the original.</param>
     /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
-    /// <param name="userId">The user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>The copied content, or null if the operation failed.</returns>
-    protected abstract TContent? Copy(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId);
+    protected abstract Task<TContent?> CopyAsync(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey);
 
     /// <summary>
     /// Moves content to the recycle bin.
@@ -172,6 +182,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected async Task<Attempt<TContentCreateResult, ContentEditingOperationStatus>> MapCreate<TContentCreateResult>(ContentCreationModelBase contentCreationModelBase)
         where TContentCreateResult : ContentCreateResultBase<TContent>, new()
     {
+        if (HasValidNames(contentCreationModelBase) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidName, new TContentCreateResult());
+        }
+
         TContentType? contentType = TryGetAndValidateContentType(contentCreationModelBase.ContentTypeKey, contentCreationModelBase, out ContentEditingOperationStatus validationOperationStatus);
         if (contentType == null)
         {
@@ -188,7 +203,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         //       instead, the error state and validation errors will be communicated in the return value.
         Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentCreationModelBase, contentType);
 
-        TContent content = New(null, parent.ParentId ?? Constants.System.Root, contentType);
+        TContent content = New(string.Empty, parent.ParentId ?? Constants.System.Root, contentType);
         if (contentCreationModelBase.Key.HasValue)
         {
             content.Key = contentCreationModelBase.Key.Value;
@@ -210,6 +225,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected async Task<Attempt<TContentUpdateResult, ContentEditingOperationStatus>> MapUpdate<TContentUpdateResult>(TContent content, ContentEditingModelBase contentEditingModelBase)
         where TContentUpdateResult : ContentUpdateResultBase<TContent>, new()
     {
+        if (HasValidNames(contentEditingModelBase) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidName, new TContentUpdateResult { Content = content });
+        }
+
         TContentType? contentType = TryGetAndValidateContentType(content.ContentType.Key, contentEditingModelBase, out ContentEditingOperationStatus operationStatus);
         if (contentType == null)
         {
@@ -228,12 +248,38 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     }
 
     /// <summary>
+    /// Determines whether every supplied variant name is within the maximum length the persistence layer accepts.
+    /// </summary>
+    /// <remarks>
+    /// Checked here rather than left to the content service, which signals an over-long name by throwing. Every
+    /// variant is checked, not just the one that becomes the entity name, so the reason is reported for whichever
+    /// culture carries it.
+    /// </remarks>
+    private static bool HasValidNames(ContentEditingModelBase contentEditingModelBase)
+        => contentEditingModelBase.Variants.All(variant => variant.Name.Length <= Constants.Validation.MaxNameLength);
+
+    /// <summary>
     /// Validates the cultures in the content editing model.
     /// </summary>
     /// <param name="contentEditingModelBase">The content editing model to validate.</param>
     /// <returns><c>true</c> if all cultures are valid; otherwise, <c>false</c>.</returns>
     protected async Task<bool> ValidateCulturesAsync(ContentEditingModelBase contentEditingModelBase)
         => await _validationService.ValidateCulturesAsync(contentEditingModelBase);
+
+    protected async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCulturesAndPropertiesAsync(
+        ContentEditingModelBase contentEditingModelBase,
+        Guid contentTypeKey,
+        IEnumerable<string?>? cultures,
+        Guid userKey)
+    {
+        if (await ValidateCulturesAsync(contentEditingModelBase) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentValidationResult());
+        }
+
+        IEnumerable<string?>? culturesToValidate = await GetCulturesToValidate(cultures, userKey);
+        return await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey, culturesToValidate);
+    }
 
     /// <summary>
     /// Validates the properties in the content editing model against the content type.
@@ -265,6 +311,24 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return result.ValidationErrors.Any() is false
             ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, result)
             : Attempt.FailWithStatus(ContentEditingOperationStatus.PropertyValidationError, result);
+    }
+
+    protected async Task<IEnumerable<string?>?> GetCulturesToValidate(IEnumerable<string?>? cultures, Guid userKey)
+    {
+        // Cultures to validate can be provided by the calling code, but if the editor is restricted to only have
+        // access to certain languages, we don't want to validate by any they aren't allowed to edit.
+        HashSet<string> allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
+
+        if (cultures == null)
+        {
+            // If no cultures are provided, we are asking to validate all cultures. But if the user doesn't have access to all, we
+            // should only validate the ones they do.
+            IEnumerable<string> allCultures = await _languageService.GetAllIsoCodesAsync();
+            return allowedCultures.Count == allCultures.Count() ? null : allowedCultures;
+        }
+
+        // If explicit cultures are provided, we should only validate the ones the user has access to.
+        return cultures.Where(x => !string.IsNullOrEmpty(x) && allowedCultures.Contains(x)).ToList();
     }
 
     /// <summary>
@@ -447,8 +511,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(parent.OperationStatus, content);
         }
 
-        var userId = await GetUserIdAsync(userKey);
-        TContent? copy = Copy(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userId);
+        TContent? copy = await CopyAsync(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userKey);
         scope.Complete();
 
         // we'll assume that we have performed all validations for unsuccessful scenarios above, so a null result here
@@ -494,7 +557,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <returns>The user ID.</returns>
     protected async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 
-    private TContentType? TryGetAndValidateContentType(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase, out ContentEditingOperationStatus operationStatus)
+    protected virtual TContentType? TryGetAndValidateContentType(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase, out ContentEditingOperationStatus operationStatus)
     {
         TContentType? contentType = ContentTypeService.Get(contentTypeKey);
         if (contentType == null)
@@ -503,7 +566,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return null;
         }
 
-        if (contentType.VariesByNothing() && contentEditingModelBase.Variants.Any(v => v.Culture is null && v.Segment is null) is false)
+        if (contentType.VariesByNothing() && contentEditingModelBase.Variants.Any(v => v.Culture is null) is false)
         {
             // does not vary by anything and is missing the invariant name = invalid
             operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
@@ -514,13 +577,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         {
             // varies by culture with one or more variants not bound to a culture = invalid
             operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
-            return null;
-        }
-
-        if (contentType.VariesBySegment() && contentEditingModelBase.Variants.Any(v => v.Segment is null) is false)
-        {
-            // varies by segment with no default segment variants = invalid
-            operationStatus = ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch;
             return null;
         }
 
@@ -664,11 +720,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     {
         if (contentType.VariesByCulture())
         {
-            // get the content names for each culture, keeping in mind that there may be multiple per culture
-            // as each culture can have several segments. we'll prioritize the segment-less names
+            // the model does not guarantee a single variant per culture, so collapse any duplicates to the first name
             var variantNamesByCulture = contentEditingModelBase.Variants
                 .Where(v => v.Culture.IsNullOrWhiteSpace() == false)
-                .OrderBy(v => v.Segment.IsNullOrWhiteSpace() ? 0 : 1)
                 .GroupBy(v => v.Culture!)
                 .ToDictionary(g => g.Key, g => g.First().Name);
 
@@ -678,16 +732,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                 content.SetCultureName(name, culture);
             }
         }
-        else if (contentType.VariesBySegment())
-        {
-            // this should be validated already so it's OK to throw an exception here
-            content.Name = contentEditingModelBase.Variants.FirstOrDefault(v => v.Segment is null)?.Name
-                           ?? throw new ArgumentException("Could not find the default segment variant", nameof(contentEditingModelBase));
-        }
         else
         {
             // this should be validated already so it's OK to throw an exception here
-            content.Name = contentEditingModelBase.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
+            content.Name = contentEditingModelBase.Variants.FirstOrDefault(v => v.Culture is null)?.Name
                            ?? throw new ArgumentException("Could not find a culture invariant variant", nameof(contentEditingModelBase));
         }
     }
@@ -771,6 +819,140 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private static Dictionary<string, IPropertyType> GetPropertyTypesByAlias(TContentType contentType)
         => contentType.CompositionPropertyTypes.ToDictionary(pt => pt.Alias);
 
+    protected async Task<HashSet<string>> GetAllowedCulturesForEditingUser(Guid userKey)
+    {
+        IUser user = await _userService.GetAsync(userKey)
+                      ?? throw new InvalidOperationException($"Could not find user by key {userKey} when editing or validating content.");
+
+        var allowedLanguageIds = (await user.CalculateAllowedLanguageIdsAsync(_languageService))!;
+
+        return (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
+    }
+
+    /// <summary>
+    /// A temporary method that ensures the data is sent in is overridden by the original data, in cases where the user do not have permissions to change the data.
+    /// </summary>
+    protected async Task<TPublishableContent> EnsureOnlyAllowedFieldsAreUpdated<TPublishableContent>(TPublishableContent contentWithPotentialUnallowedChanges, Guid userKey)
+        where TPublishableContent : IPublishableContentBase, TContent
+    {
+        if (contentWithPotentialUnallowedChanges.ContentType.VariesByCulture() is false)
+        {
+            return contentWithPotentialUnallowedChanges;
+        }
+
+        TContent? existingContent = await GetAsync(contentWithPotentialUnallowedChanges.Key);
+
+        HashSet<string>? allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
+
+        ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
+
+        var disallowedCultures = (contentWithPotentialUnallowedChanges.EditedCultures ??
+                               contentWithPotentialUnallowedChanges.PublishedCultures)
+            .Where(culture => allowedCultures.Contains(culture) is false).ToList();
+
+        var allowedToEditDefaultLanguage = allowedCultures.Contains(defaultLanguage?.IsoCode ?? string.Empty);
+
+        var variantProperties = new List<IProperty>();
+        var invariantWithVariantSupportProperties = new List<(IProperty Property, IDataEditor DataEditor)>();
+        var invariantProperties = new List<IProperty>();
+
+        // group properties in processing groups
+        foreach (IProperty property in contentWithPotentialUnallowedChanges.Properties)
+        {
+            if (property.PropertyType.VariesByCulture())
+            {
+                variantProperties.Add(property);
+            }
+            else if (_propertyEditorCollection.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor) && dataEditor.CanMergePartialPropertyValues(property.PropertyType))
+            {
+                invariantWithVariantSupportProperties.Add((property, dataEditor));
+            }
+            else
+            {
+                invariantProperties.Add(property);
+            }
+        }
+
+        // If the property varies by culture, simply overwrite the edited property value with the current property value
+        // for every culture.
+        foreach (IProperty property in variantProperties)
+        {
+            foreach (var culture in disallowedCultures)
+            {
+                RestoreExistingPropertyValues(property, existingContent, culture);
+            }
+        }
+
+        // If property does not support merging, we still need to overwrite if we are not allowed to edit invariant properties.
+        if (ContentSettings.AllowEditInvariantFromNonDefault is false && allowedToEditDefaultLanguage is false)
+        {
+            foreach (IProperty property in invariantProperties)
+            {
+                RestoreExistingPropertyValues(property, existingContent, null);
+            }
+        }
+
+        // if the property does not vary by culture and the data editor supports variance within invariant property values,
+        // we need perform a merge between the edited property value and the current property value
+        foreach ((IProperty Property, IDataEditor DataEditor) propertyWithEditor in invariantWithVariantSupportProperties)
+        {
+            IProperty property = propertyWithEditor.Property;
+            IProperty? existingProperty = existingContent?.Properties.First(x => x.Alias == property.Alias);
+
+            // The property may vary by segment, in which case each segment holds its own value to merge.
+            foreach (var segment in GetSegmentsToRestore(property, existingProperty, null))
+            {
+                var currentValue = existingProperty?.GetValue(null, segment, false);
+                var editedValue = property.GetValue(null, segment, false);
+
+                // update the editedValue with a merged value of invariant data and allowed culture data using the currentValue as a fallback.
+                var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
+                    currentValue,
+                    editedValue,
+                    ContentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
+                    allowedCultures);
+
+                property.SetValue(mergedValue, null, segment);
+            }
+        }
+
+        return contentWithPotentialUnallowedChanges;
+    }
+
+    /// <summary>
+    /// Overwrites the edited values of a property for one culture with the values held by the existing content.
+    /// </summary>
+    /// <remarks>
+    /// The property may vary by segment, so every segment of the culture has to be restored, not only its
+    /// segment-less value - including any segment the edit added, which is restored to no value.
+    /// </remarks>
+    private static void RestoreExistingPropertyValues(IProperty property, TContent? existingContent, string? culture)
+    {
+        IProperty? existingProperty = existingContent?.Properties.First(x => x.Alias == property.Alias);
+
+        foreach (var segment in GetSegmentsToRestore(property, existingProperty, culture))
+        {
+            property.SetValue(existingProperty?.GetValue(culture, segment, false), culture, segment);
+        }
+    }
+
+    /// <summary>
+    /// Gets every segment of a culture held by either the edited or the existing property, along with the
+    /// segment-less value, so all of them can be restored or merged.
+    /// </summary>
+    /// <remarks>
+    /// Materialized because writing to a segment can add a property value, which would otherwise modify the
+    /// collection being enumerated.
+    /// </remarks>
+    private static string?[] GetSegmentsToRestore(IProperty property, IProperty? existingProperty, string? culture)
+        => property.Values
+            .Concat(existingProperty?.Values ?? [])
+            .Where(value => culture.InvariantEquals(value.Culture))
+            .Select(value => value.Segment)
+            .Append(null)
+            .Distinct()
+            .ToArray();
+
     /// <summary>
     /// Should never be made public, serves the purpose of a nullable bool but more readable.
     /// </summary>
@@ -779,5 +961,84 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         Irrelevant,
         MustBeTrashed,
         MustNotBeTrashed
+    }
+
+    /// <summary>
+    ///     Validates the cultures requested for publishing against the content type's variance and the configured
+    ///     languages, returning <c>null</c> when they are acceptable.
+    /// </summary>
+    protected async Task<ContentEditingOperationStatus?> ValidateCulturesToPublishAsync(TContent content, ISet<string> culturesToPublish)
+    {
+        if (culturesToPublish.Any(culture => culture.IsNullOrWhiteSpace() || culture == "*"))
+        {
+            return ContentEditingOperationStatus.InvalidCulture;
+        }
+
+        if (content.ContentType.VariesByCulture() is false)
+        {
+            return culturesToPublish.Count > 0
+                ? ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch
+                : null;
+        }
+
+        // Publishing an unconfigured culture would otherwise silently publish nothing at all.
+        IEnumerable<string> configuredCultures = await _languageService.GetAllIsoCodesAsync();
+        return culturesToPublish.Except(configuredCultures).Any()
+            ? ContentEditingOperationStatus.InvalidCulture
+            : null;
+    }
+
+    /// <summary>
+    ///     Gets the editing status for a publish result that is returned before the content is persisted, or
+    ///     <c>null</c> when the result implies the save took effect.
+    /// </summary>
+    /// <remarks>
+    ///     These are the results <see cref="IPublishableContentService{TContent}.SaveAndPublish"/> can return without
+    ///     having written anything: a handler cancelling the saving, publishing or unpublishing notification, and a
+    ///     concurrency violation. Every other failure is raised after the content has been saved.
+    /// </remarks>
+    protected static ContentEditingOperationStatus? NothingPersistedStatus(PublishResultType resultType)
+        => resultType switch
+        {
+            // The saving and publishing notifications are both raised before persistence, and the two cancel points
+            // are indistinguishable in the result.
+            PublishResultType.FailedPublishCancelledByEvent or PublishResultType.FailedUnpublishCancelledByEvent
+                => ContentEditingOperationStatus.CancelledByNotification,
+            PublishResultType.FailedPublishConcurrencyViolation
+                => ContentEditingOperationStatus.ConcurrencyViolation,
+            _ => null,
+        };
+
+    protected static ContentEditingAndPublishingStatus EditingStatus(ContentEditingOperationStatus status)
+        => new() { ContentEditingOperationStatus = status };
+
+    protected static bool IsSuccess(ContentEditingAndPublishingStatus status)
+        => status.ContentEditingOperationStatus is ContentEditingOperationStatus.Success
+           && status.ContentPublishingOperationStatus is null or ContentPublishingOperationStatus.Success;
+
+    /// <summary>
+    ///     Projects a combined status onto the editing status alone, for the save-only operations and for the obsolete
+    ///     overloads that predate the combined status.
+    /// </summary>
+    // TODO (V19): Remove the collapse to "unknown" below when the obsolete CreateAndPublishAsync and
+    // UpdateAndPublishAsync overloads taking a string[] of cultures to publish are removed. The remaining callers -
+    // CreateAsync and UpdateAsync - do not publish, so their publishing status is always null and this method
+    // reduces to projecting the editing status.
+    protected static Attempt<TResult, ContentEditingOperationStatus> ToEditingAttempt<TResult>(Attempt<TResult, ContentEditingAndPublishingStatus> attempt)
+    {
+        if (attempt.Success)
+        {
+            return Attempt.SucceedWithStatus(attempt.Status.ContentEditingOperationStatus, attempt.Result);
+        }
+
+        // The editing status cannot express a publish failure, so it collapses to "unknown" - which is precisely why the
+        // combined status exists. Retained here so the obsolete overloads keep behaving as they did.
+        ContentEditingOperationStatus status =
+            attempt.Status.ContentEditingOperationStatus is ContentEditingOperationStatus.Success
+            && attempt.Status.ContentPublishingOperationStatus is not null
+                ? ContentEditingOperationStatus.Unknown
+                : attempt.Status.ContentEditingOperationStatus;
+
+        return Attempt.FailWithStatus(status, attempt.Result);
     }
 }

@@ -19,11 +19,11 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
     [Test]
     public async Task Can_Publish_Cultures_Independently()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
 
         var areaKey = Guid.NewGuid();
         var blockGridDataType = await CreateBlockGridDataType(elementType, areaKey);
-        var contentType = CreateContentType(blockGridDataType);
+        var contentType = await CreateContentType(blockGridDataType);
         var blockGridValue = CreateBlockGridValue(elementType, areaKey);
         var content = CreateContent(contentType, blockGridValue);
 
@@ -176,11 +176,11 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
     [Test]
     public async Task Can_Publish_With_Blocks_Removed_At_Root()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
 
         var areaKey = Guid.NewGuid();
         var blockGridDataType = await CreateBlockGridDataType(elementType, areaKey);
-        var contentType = CreateContentType(blockGridDataType);
+        var contentType = await CreateContentType(blockGridDataType);
         var blockGridValue = CreateBlockGridValue(elementType, areaKey);
         var content = CreateContent(contentType, blockGridValue);
 
@@ -282,11 +282,11 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
     [Test]
     public async Task Can_Publish_With_Blocks_Removed_In_Area()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
 
         var areaKey = Guid.NewGuid();
         var blockGridDataType = await CreateBlockGridDataType(elementType, areaKey);
-        var contentType = CreateContentType(blockGridDataType);
+        var contentType = await CreateContentType(blockGridDataType);
         var blockGridValue = CreateBlockGridValue(elementType, areaKey);
         var content = CreateContent(contentType, blockGridValue);
 
@@ -410,8 +410,8 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
                 }
             });
 
-    private IContentType CreateContentType(IDataType blockListDataType)
-        => CreateContentType(ContentVariation.Culture, blockListDataType);
+    private async Task<IContentType> CreateContentType(IDataType blockListDataType)
+        => await CreateContentType(ContentVariation.Culture, blockListDataType);
 
     private BlockGridValue CreateBlockGridValue(IContentType elementType, Guid areaKey)
     {
@@ -505,12 +505,12 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             ],
             Expose =
             [
-                new (contentElementKey1, "en-US", null),
-                new (contentElementKey1, "da-DK", null),
-                new (contentElementKey2, "en-US", null),
-                new (contentElementKey2, "da-DK", null),
-                new (contentElementKey3, "en-US", null),
-                new (contentElementKey3, "da-DK", null),
+                new (contentElementKey1, "en-US"),
+                new (contentElementKey1, "da-DK"),
+                new (contentElementKey2, "en-US"),
+                new (contentElementKey2, "da-DK"),
+                new (contentElementKey3, "en-US"),
+                new (contentElementKey3, "da-DK"),
             ]
         };
     }
@@ -535,10 +535,10 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
     public async Task Publishing_After_Changing_Element_Property_From_Variant_To_Invariant_Does_Not_Keep_Old_Culture_Specific_Values()
     {
         // 1. Create element type WITH culture variation
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var areaKey = Guid.NewGuid();
         var blockGridDataType = await CreateBlockGridDataType(elementType, areaKey);
-        var contentType = CreateContentType(blockGridDataType);
+        var contentType = await CreateContentType(blockGridDataType);
 
         // 2. Create a simple block grid value with a single block for clarity
         var contentElementKey = Guid.NewGuid();
@@ -573,8 +573,8 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             ],
             Expose =
             [
-                new(contentElementKey, "en-US", null),
-                new(contentElementKey, "da-DK", null)
+                new(contentElementKey, "en-US"),
+                new(contentElementKey, "da-DK")
             ]
         };
 
@@ -584,7 +584,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         // 3. Change element property type to invariant (remove culture variation)
         elementType.PropertyTypes.Single(pt => pt.Alias == "variantText").Variations = ContentVariation.Nothing;
 
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         // 4. Update the content values to be invariant
         blockGridValue = JsonSerializer.Deserialize<BlockGridValue>((string)content.Properties["blocks"]!.GetValue()!)!;
@@ -602,7 +602,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         }
 
         blockGridValue.Expose = blockGridValue.Expose
-            .Select(e => new BlockItemVariation(e.ContentKey, null, null))
+            .Select(e => new BlockItemVariation(e.ContentKey, null))
             .DistinctBy(e => e.ContentKey)
             .ToList();
 
@@ -651,10 +651,10 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
     public async Task Publishing_After_Changing_Element_Property_From_Invariant_To_Variant_Does_Not_Keep_Old_Invariant_Values(bool republishEnglish, bool republishDanish)
     {
         // 1. Create element type WITHOUT culture variation (invariant)
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var areaKey = Guid.NewGuid();
         var blockGridDataType = await CreateBlockGridDataType(elementType, areaKey);
-        var contentType = CreateContentType(blockGridDataType);
+        var contentType = await CreateContentType(blockGridDataType);
 
         // 2. Create a simple block grid value with a single block
         var contentElementKey = Guid.NewGuid();
@@ -687,7 +687,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             ],
             Expose =
             [
-                new(contentElementKey, null, null)
+                new(contentElementKey, null)
             ]
         };
 
@@ -698,7 +698,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.Single(pt => pt.Alias == "variantText").Variations = ContentVariation.Culture;
 
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         // 4. Update the content values to have culture-specific values
         blockGridValue = JsonSerializer.Deserialize<BlockGridValue>((string)content.Properties["blocks"]!.GetValue()!)!;
@@ -734,8 +734,8 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
 
         blockGridValue.Expose =
         [
-            new BlockItemVariation(contentElementKey, "en-US", null),
-            new BlockItemVariation(contentElementKey, "da-DK", null)
+            new BlockItemVariation(contentElementKey, "en-US"),
+            new BlockItemVariation(contentElementKey, "da-DK")
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockGridValue));
@@ -774,9 +774,9 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
 
         // Verify Expose entries are not duplicated
-        var exposeGroups = publishedBlockGridValue.Expose.GroupBy(e => (e.ContentKey, e.Culture, e.Segment));
+        var exposeGroups = publishedBlockGridValue.Expose.GroupBy(e => (e.ContentKey, e.Culture));
         Assert.IsTrue(
             exposeGroups.All(g => g.Count() == 1),
-            $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockGridValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}:{e.Segment}"))}");
+            $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockGridValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}"))}");
     }
 }

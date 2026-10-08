@@ -32,7 +32,7 @@
 //         FileService.SaveTemplate(template);
 //
 //         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
-//         ContentTypeService.Save(contentType);
+//         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 //
 //         var content = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
 //

@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
@@ -30,17 +30,6 @@ public class MissingPropertyEditor : IDataEditor
         Alias = missingEditorAlias;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MissingPropertyEditor"/> class.
-    /// </summary>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public MissingPropertyEditor()
-        : this(
-            EditorAlias,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
-    {
-    }
-
     /// <inheritdoc />
     public string Alias { get; }
 
@@ -50,6 +39,7 @@ public class MissingPropertyEditor : IDataEditor
     public string Name => "Missing property editor";
 
     /// <inheritdoc />
+    [Obsolete("Nothing reads this value. Declare \"deprecated\" on the property editor UI manifest instead, which is what the backoffice reads. Scheduled for removal in Umbraco 21.")]
     public bool IsDeprecated => false;
 
     /// <inheritdoc />
@@ -57,9 +47,6 @@ public class MissingPropertyEditor : IDataEditor
 
     /// <inheritdoc />
     public IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>();
-
-    /// <inheritdoc />
-    public IPropertyIndexValueFactory PropertyIndexValueFactory => new DefaultPropertyIndexValueFactory();
 
     /// <inheritdoc />
     public IDataValueEditor GetValueEditor() => _valueEditor

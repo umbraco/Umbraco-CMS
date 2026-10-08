@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
@@ -271,6 +271,13 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return operationStatus;
         }
 
+        // verify that no property varies in a way the content type itself does not
+        operationStatus = ValidatePropertyVariations(model);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return operationStatus;
+        }
+
         // verify that no newly introduced property/composition alias collides with a property already effective on a descendant
         operationStatus = ValidateDescendantPropertyAliases(contentType, model, allContentTypeCompositions);
         if (operationStatus is not ContentTypeOperationStatus.Success)
@@ -466,6 +473,22 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     /// <param name="model">The model to validate.</param>
     /// <param name="allContentTypeCompositions">All existing content type compositions.</param>
     /// <returns>The validation status.</returns>
+    /// <summary>
+    ///     Validates that no property type varies in a way the content type itself does not.
+    /// </summary>
+    /// <param name="model">The model to validate.</param>
+    /// <returns>The validation status.</returns>
+    /// <remarks>
+    ///     The persistence layer rejects this combination outright, so it has to be caught here to yield an
+    ///     operation status rather than an exception.
+    /// </remarks>
+    private static ContentTypeOperationStatus ValidatePropertyVariations(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+        => model.Properties.Any(property
+            => (property.VariesByCulture && model.VariesByCulture is false)
+               || (property.VariesBySegment && model.VariesBySegment is false))
+            ? ContentTypeOperationStatus.InvalidPropertyTypeVariation
+            : ContentTypeOperationStatus.Success;
+
     private static ContentTypeOperationStatus ValidateProperties(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
     {
         // grab all content types used for composition and/or inheritance
@@ -638,6 +661,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         contentType.Name = model.Name;
         contentType.AllowedAsRoot = model.AllowedAsRoot;
         contentType.IsElement = model.IsElement;
+        contentType.AllowedInLibrary = model.AllowedInLibrary;
         contentType.ListView = model.ListView;
         contentType.SetVariesBy(ContentVariation.Culture, model.VariesByCulture);
         contentType.SetVariesBy(ContentVariation.Segment, model.VariesBySegment);

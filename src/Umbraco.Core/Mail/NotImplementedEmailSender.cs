@@ -12,17 +12,7 @@ namespace Umbraco.Cms.Core.Mail;
 internal sealed class NotImplementedEmailSender : IEmailSender
 {
     /// <inheritdoc />
-    public Task SendAsync(EmailMessage message, string emailType)
-        => throw new NotImplementedException(
-            "To send an Email ensure IEmailSender is implemented with a custom implementation");
-
-    /// <inheritdoc />
-    public Task SendAsync(EmailMessage message, string emailType, bool enableNotification) =>
-        throw new NotImplementedException(
-            "To send an Email ensure IEmailSender is implemented with a custom implementation");
-
-    /// <inheritdoc />
-    public Task SendAsync(EmailMessage message, string emailType, bool enableNotification, TimeSpan? expires) =>
+    public Task SendAsync(EmailMessage message, string emailType, bool enableNotification = false, TimeSpan? expires = null) =>
         throw new NotImplementedException(
             "To send an Email ensure IEmailSender is implemented with a custom implementation");
 

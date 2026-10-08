@@ -53,6 +53,17 @@ public interface IMediaService : IContentServiceBase<IMedia>
     IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids);
 
     /// <summary>
+    ///     Gets a collection of <see cref="IMedia" /> objects by their unique Guids, loading only the requested properties.
+    /// </summary>
+    /// <param name="ids">The collection of <see cref="Guid" /> keys to retrieve media for.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded.
+    /// </param>
+    /// <returns>An enumerable collection of <see cref="IMedia" /> objects, in the order of <paramref name="ids" />.</returns>
+    IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases);
+
+    /// <summary>
     ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />
     ///     that this Media should based on.
     /// </summary>
@@ -86,7 +97,7 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <returns>
     ///     <see cref="IMedia" />
     /// </returns>
-    IMedia CreateMedia(string? name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
+    IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />
@@ -126,6 +137,22 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="ordering"></param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null);
+
+    /// <summary>
+    ///     Gets a collection of <see cref="IMedia" /> objects by Parent Id, loading only the requested properties.
+    /// </summary>
+    /// <param name="id">Id of the Parent to retrieve Children from.</param>
+    /// <param name="pageIndex">Page number.</param>
+    /// <param name="pageSize">Page size.</param>
+    /// <param name="totalRecords">Total records query would return without paging.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded.
+    /// </param>
+    /// <param name="filter">Query filter.</param>
+    /// <param name="ordering">Ordering infos.</param>
+    /// <returns>An Enumerable list of <see cref="IMedia" /> objects.</returns>
+    IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IMedia>? filter, Ordering? ordering);
 
     /// <summary>
     ///     Gets a collection of <see cref="IMedia" /> objects by Parent Id
@@ -273,27 +300,6 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="userId">Id of the User saving the Media</param>
     Attempt<OperationResult?> Save(IMedia media, int userId = Constants.Security.SuperUserId);
 
-    /// <summary>
-    ///     Saves a collection of <see cref="IMedia" /> objects
-    /// </summary>
-    /// <param name="medias">Collection of <see cref="IMedia" /> to save</param>
-    /// <param name="userId">Id of the User saving the Media</param>
-    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
-#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-    Attempt<OperationResult?> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId);
-#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
-
-    /// <summary>
-    ///     Gets an <see cref="IMedia" /> object by its 'UniqueId'
-    /// </summary>
-    /// <param name="key">Guid key of the Media to retrieve</param>
-    /// <returns>
-    ///     <see cref="IMedia" />
-    /// </returns>
-    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
-#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-    IMedia? GetById(Guid key);
-#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
     /// <summary>
     ///     Gets a collection of <see cref="IMedia" /> objects by Level
@@ -398,9 +404,7 @@ public interface IMediaService : IContentServiceBase<IMedia>
     ///     Unlike <see cref="Sort(IEnumerable{IMedia}, int)" />, this does not load the children or fire per-item
     ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
-        => throw new NotImplementedException();
+    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />

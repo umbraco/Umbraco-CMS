@@ -3,10 +3,10 @@
 Shared ASP.NET Core web functionality for Umbraco CMS. Provides controllers, middleware, application builder extensions, security/identity, localization, and the UmbracoContext request pipeline.
 
 **Project Type**: Class Library (NuGet package)
-**Target Framework**: net10.0
+**Target Framework**: net11.0
 **Package ID**: Umbraco.Cms.Web.Common
 **Namespace**: Umbraco.Cms.Web.Common
-**Dependencies**: Umbraco.Examine.Lucene, Umbraco.PublishedCache.HybridCache, MiniProfiler, Serilog, Asp.Versioning
+**Dependencies**: Umbraco.PublishedCache.HybridCache, MiniProfiler, Serilog, Asp.Versioning
 
 ---
 
@@ -39,10 +39,9 @@ Umbraco.Web.Common/
 ├── Controllers/
 │   ├── IRenderController.cs                   # Frontend controller marker
 │   ├── IVirtualPageController.cs              # Virtual page support
-│   ├── PluginController.cs                    # Plugin controller base (104 lines)
-│   ├── UmbracoApiController.cs                # Legacy API controller (obsolete)
+│   ├── PluginController.cs                    # Plugin controller base
 │   ├── UmbracoAuthorizedController.cs         # Backoffice authorized base
-│   └── UmbracoController.cs                   # Base MVC controller (13 lines)
+│   └── UmbracoController.cs                   # Base MVC controller
 ├── DependencyInjection/
 │   └── UmbracoBuilderExtensions.cs            # AddUmbraco(), AddUmbracoCore() (338 lines)
 ├── Extensions/
@@ -225,13 +224,14 @@ Template helper for Razor views (scoped lifetime).
 | `UmbracoController` | Base MVC controller | Simple base, debug InstanceId |
 | `UmbracoAuthorizedController` | Backoffice controllers | `[Authorize(BackOfficeAccess)]`, `[DisableBrowserCache]` |
 | `PluginController` | Plugin/package controllers | UmbracoContext, Services, AppCaches, ProfilingLogger |
-| `UmbracoApiController` | Legacy API controller | **Obsolete** - Use ASP.NET Core ApiController |
 | `IRenderController` | Frontend rendering marker | Route hijacking support |
 
-**PluginController** (lines 18-104):
+For new front-end HTTP APIs use a plain `ControllerBase` with `[ApiController]` and an explicit `[Route]` (e.g. `[Route("umbraco/api/<your-prefix>")]`). The legacy `UmbracoApiController` and its convention-based discovery were removed in v18.
+
+**PluginController**:
 - Provides `UmbracoContext`, `DatabaseFactory`, `Services`, `AppCaches`
 - Static metadata caching with `ConcurrentDictionary<Type, PluginControllerMetadata>`
-- Auto-discovers `[PluginController]` and `[IsBackOffice]` attributes
+- Auto-discovers `[PluginController]` for plugin area routing
 
 ### Member Sign-In (Security/MemberSignInManager.cs)
 
@@ -265,10 +265,11 @@ ASP.NET Core Identity sign-in manager for members.
 - Debug mode: Rethrows exception for stack trace
 - Production: Shows `BootFailed.html` error page
 
-**PreviewAuthenticationMiddleware** (lines 22-84):
+**PreviewAuthenticationMiddleware** (lines 14-75):
 - Adds backoffice identity to principal for preview requests
 - Skips client-side requests and backoffice paths
-- Uses `IPreviewService.TryGetPreviewClaimsIdentityAsync()`
+- Re-authenticates the request against the backoffice cookie scheme (`context.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType)`) — preview no longer carries its own token/identity, it rides the backoffice's long-lived auth cookie
+- On success, flags the request as an active preview session via `IPreviewSessionService.Start()` (in `Umbraco.Core`) — `PublishedContentStatusFilteringService` and the HybridCache document/element services read this back via `IsActive()` to decide draft vs. published content
 
 **UmbracoBackOfficeCacheHeadersMiddleware**:
 - Sets `Cache-Control: public, max-age=31536000, immutable` on responses under the cache-busted backoffice asset prefix (`/umbraco/backoffice/<hash>/…`); `no-cache` in debug mode
@@ -310,7 +311,7 @@ Implement `IVirtualPageController` for URL-to-content mapping without physical c
 Multiple analyzer warnings suppressed:
 - SA1117, SA1401, SA1134 - StyleCop formatting
 - ASP0019 - Header dictionary usage
-- CS0618/SYSLIB0051 - Obsolete references
+- CS0618 - Obsolete references
 - IDE0040/SA1400 - Access modifiers
 - SA1649 - File name matching
 
@@ -325,8 +326,7 @@ Multiple analyzer warnings suppressed:
 1. **MVC Global State** (UmbracoBuilderExtensions.cs:210-211): `AddControllersWithViews` modifies global app, order matters
 2. **OptionsMonitor Hack** (AspNetCore/OptionsMonitorAdapter.cs:6): Temporary workaround for TypeLoader during ConfigureServices
 3. **DisposeResources TODO** (UmbracoContext.cs:168-171): Empty dispose method marked for removal
-4. **Pipeline Default Implementations** (IUmbracoPipelineFilter.cs:36,45): Default methods to remove in Umbraco 13
-5. **SignIn Manager Sharing** (MemberSignInManager.cs:319,325): Could share code with backoffice sign-in
+4. **SignIn Manager Sharing** (MemberSignInManager.cs:319,325): Could share code with backoffice sign-in
 
 ### Session Configuration
 
@@ -383,7 +383,6 @@ Most extensions are in `Umbraco.Extensions` namespace:
 |---------|--------------|
 | `Umbraco.Core` | Interface contracts |
 | `Umbraco.Infrastructure` | Service implementations |
-| `Umbraco.Examine.Lucene` | Search dependency |
 | `Umbraco.PublishedCache.HybridCache` | Caching dependency |
 | `Umbraco.Web.UI` | Main web application (references this) |
 | `Umbraco.Cms.Api.Common` | API layer (references this) |

@@ -27,7 +27,6 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Templates;
@@ -43,7 +42,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Blocks;
 using Umbraco.Cms.Web.Common.Cache;
 using Umbraco.Cms.Web.Common.Configuration;
-using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
 using Umbraco.Cms.Web.Common.HealthChecks;
@@ -52,7 +50,6 @@ using Umbraco.Cms.Web.Common.Localization;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Mvc;
-using Umbraco.Cms.Web.Common.Preview;
 using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Cms.Web.Common.Repositories;
 using Umbraco.Cms.Web.Common.Security;
@@ -219,9 +216,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
         builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
         builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
-#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
-        builder.Services.AddUnique<IPreviewTokenGenerator, UserBasedPreviewTokenGenerator>();
-#pragma warning restore CS0618 // Type or member is obsolete
 
         return builder;
     }
@@ -245,15 +239,6 @@ public static partial class UmbracoBuilderExtensions
     private static IUmbracoBuilder AddHttpClients(this IUmbracoBuilder builder)
     {
         builder.Services.AddHttpClient();
-        // TODO (V19): Remove this registration along with Constants.HttpClients.IgnoreCertificateErrors.
-        #pragma warning disable CS0618 // Type or member is obsolete
-        builder.Services.AddHttpClient(Constants.HttpClients.IgnoreCertificateErrors)
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback =
-                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
-            });
-        #pragma warning restore CS0618 // Type or member is obsolete
         builder.Services.AddHttpClient(Constants.HttpClients.WebhookFiring, (services, client) =>
         {
             var productVersion = services.GetRequiredService<IUmbracoVersion>().SemanticVersion.ToSemanticStringWithoutBuild();
@@ -339,10 +324,6 @@ public static partial class UmbracoBuilderExtensions
         // register the umbraco context factory
         builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
         builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
-
-        var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
-        builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
-            .Add(umbracoApiControllerTypes);
 
         builder.Services.AddSingleton<UmbracoRequestLoggingMiddleware>();
         builder.Services.AddSingleton<PreviewAuthenticationMiddleware>();

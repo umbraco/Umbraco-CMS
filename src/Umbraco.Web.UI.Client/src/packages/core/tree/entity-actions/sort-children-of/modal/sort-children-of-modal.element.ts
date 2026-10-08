@@ -172,8 +172,10 @@ export class UmbSortChildrenOfModalElement<
 					unique: this.data.unique,
 					entityType: this.data.entityType,
 				},
-				skip: this.#pagination.getSkip(),
-				take: this.#pagination.getPageSize(),
+				paging: {
+					skip: this.#pagination.getSkip(),
+					take: this.#pagination.getPageSize(),
+				},
 			});
 
 			if (data) {

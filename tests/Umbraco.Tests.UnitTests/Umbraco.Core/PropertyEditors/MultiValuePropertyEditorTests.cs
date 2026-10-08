@@ -42,11 +42,6 @@ public class MultiValuePropertyEditorTests
         Assert.NotNull(configuration);
         Assert.AreEqual(3, configuration.Items.Count);
 
-        var dataTypeServiceMock = new Mock<IDataTypeService>();
-        dataTypeServiceMock
-            .Setup(x => x.GetDataType(It.IsAny<int>()))
-            .Returns(dataType);
-
         var multipleValueEditor = CreateValueEditor();
         dataValueEditorFactoryMock
             .Setup(x => x.Create<MultipleValueEditor>(It.IsAny<DataEditorAttribute>()))
@@ -76,11 +71,6 @@ public class MultiValuePropertyEditorTests
         var configuration = dataType.ConfigurationObject as ValueListConfiguration;
         Assert.NotNull(configuration);
         Assert.AreEqual(3, configuration.Items.Count);
-
-        var dataTypeServiceMock = new Mock<IDataTypeService>();
-        dataTypeServiceMock
-            .Setup(x => x.GetDataType(It.IsAny<int>()))
-            .Returns(dataType);
 
         var multipleValueEditor = CreateValueEditor();
         dataValueEditorFactoryMock

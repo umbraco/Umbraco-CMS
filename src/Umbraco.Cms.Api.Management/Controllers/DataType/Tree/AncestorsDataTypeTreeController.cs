@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
@@ -15,25 +14,15 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 public class AncestorsDataTypeTreeController : DataTypeTreeControllerBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="AncestorsDataTypeTreeController"/> class, which provides API endpoints for retrieving ancestor data types in the tree structure.
+    /// Initializes a new instance of the <see cref="AncestorsDataTypeTreeController"/> class.
     /// </summary>
-    /// <param name="entityService">Service used for entity operations within the API.</param>
-    /// <param name="dataTypeService">Service used for data type management and retrieval.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public AncestorsDataTypeTreeController(IEntityService entityService, IDataTypeService dataTypeService)
-        : base(entityService, dataTypeService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AncestorsDataTypeTreeController"/> class, which manages operations related to ancestor data type trees in the Umbraco CMS.
-    /// </summary>
-    /// <param name="entityService">Service used for entity-related operations.</param>
+    /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for tree nodes.</param>
-    /// <param name="dataTypeService">Service used for data type management operations.</param>
-    [ActivatorUtilitiesConstructor]
-    public AncestorsDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
-    : base(entityService, flagProviders, dataTypeService)
+    /// <param name="entitySearchService">Service for searching entities.</param>
+    /// <param name="idKeyMap">Maps between integer identifiers and keys.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    public AncestorsDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IDataTypeService dataTypeService)
+    : base(entityService, flagProviders, entitySearchService, idKeyMap, dataTypeService)
     {
     }
 

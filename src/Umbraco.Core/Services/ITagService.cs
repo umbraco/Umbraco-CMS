@@ -55,6 +55,23 @@ public interface ITagService : IService
     IEnumerable<TaggedEntity> GetTaggedMembersByTag(string tag, string? group = null, string? culture = null);
 
     /// <summary>
+    ///     Gets all elements tagged with any tag in the specified group.
+    /// </summary>
+    /// <param name="group">The tag group.</param>
+    /// <param name="culture">The optional culture to filter by.</param>
+    /// <returns>The tagged elements.</returns>
+    IEnumerable<TaggedEntity> GetTaggedElementsByTagGroup(string group, string? culture = null);
+
+    /// <summary>
+    ///     Gets all elements tagged with the specified tag.
+    /// </summary>
+    /// <param name="tag">The tag.</param>
+    /// <param name="group">The optional tag group to filter by.</param>
+    /// <param name="culture">The optional culture to filter by.</param>
+    /// <returns>The tagged elements.</returns>
+    IEnumerable<TaggedEntity> GetTaggedElementsByTag(string tag, string? group = null, string? culture = null);
+
+    /// <summary>
     ///     Gets all tags.
     /// </summary>
     IEnumerable<ITag> GetAllTags(string? group = null, string? culture = null);
@@ -99,6 +116,14 @@ public interface ITagService : IService
     ///     Gets all member tags.
     /// </summary>
     IEnumerable<ITag> GetAllMemberTags(string? group = null, string? culture = null);
+
+    /// <summary>
+    ///     Gets all element tags.
+    /// </summary>
+    /// <param name="group">The optional tag group to filter by.</param>
+    /// <param name="culture">The optional culture to filter by.</param>
+    /// <returns>The element tags.</returns>
+    IEnumerable<ITag> GetAllElementTags(string? group = null, string? culture = null);
 
     /// <summary>
     ///     Gets all tags attached to an entity via a property.

@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core;
@@ -10,7 +10,7 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 namespace Umbraco.Cms.Tests.Common.Builders;
 
 public class ContentTypeBuilder
-    : ContentTypeBaseBuilder<ContentBuilder, IContentType>,
+    : ContentTypeBaseBuilder<IBuildContentTypes, IContentType>,
         IWithPropertyTypeIdsIncrementingFrom,
         IBuildPropertyTypes
 {
@@ -30,7 +30,7 @@ public class ContentTypeBuilder
     {
     }
 
-    public ContentTypeBuilder(ContentBuilder parentBuilder)
+    public ContentTypeBuilder(IBuildContentTypes parentBuilder)
         : base(parentBuilder)
     {
     }
@@ -124,6 +124,7 @@ public class ContentTypeBuilder
         contentType.ListView = GetListView();
         contentType.IsElement = _isElement ?? false;
         contentType.AllowedAsRoot = GetAllowedAtRoot();
+        contentType.AllowedInLibrary = GetAllowedInLibrary();
         contentType.HistoryCleanup = new HistoryCleanup();
 
         contentType.Variations = contentVariation;
@@ -169,6 +170,17 @@ public class ContentTypeBuilder
             .Build();
     }
 
+    public static ContentType CreateBasicElementType(string alias = "elementType", string name = "Element Type")
+    {
+        var builder = new ContentTypeBuilder();
+        return (ContentType)builder
+            .WithAlias(alias)
+            .WithName(name)
+            .WithIsElement(true)
+            .WithAllowedInLibrary(true)
+            .Build();
+    }
+
     public static ContentType CreateSimpleContentType2(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupAlias = "content", string propertyGroupName = "Content")
     {
         var builder = CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases: randomizeAliases, propertyGroupAlias: propertyGroupAlias, propertyGroupName: propertyGroupName);
@@ -197,6 +209,9 @@ public class ContentTypeBuilder
         bool mandatoryProperties = false,
         int defaultTemplateId = 0) =>
         (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, propertyTypeCollection, randomizeAliases, propertyGroupAlias, propertyGroupName, mandatoryProperties, defaultTemplateId).Build();
+
+    public static IContentType CreateSimpleElementType(string alias = "elementType", string name = "Element Type")
+        => CreateSimpleContentTypeHelper(alias, name).WithIsElement(true).WithAllowedInLibrary(true).Build();
 
     public static ContentTypeBuilder CreateSimpleContentTypeHelper(
         string alias = null,
@@ -254,13 +269,16 @@ public class ContentTypeBuilder
                 .Done();
         }
 
-        builder = builder
-            .AddAllowedTemplate()
-            .WithId(defaultTemplateId)
-            .WithAlias("textPage")
-            .WithName("Textpage")
-            .Done()
-            .WithDefaultTemplateId(defaultTemplateId);
+        if (defaultTemplateId > 0)
+        {
+            builder = builder
+                .AddAllowedTemplate()
+                .WithId(defaultTemplateId)
+                .WithAlias("textPage")
+                .WithName("Textpage")
+                .Done()
+                .WithDefaultTemplateId(defaultTemplateId);
+        }
 
         return builder;
     }
@@ -463,7 +481,7 @@ public class ContentTypeBuilder
             .WithAlias("ddlMultiple")
             .WithName("Dropdown List Multiple")
             .WithDataTypeId(Constants.DataTypes.DropDownMultiple)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .WithValueStorageType(ValueStorageType.Nvarchar)
             .WithSortOrder(11)
             .Done()
@@ -487,7 +505,7 @@ public class ContentTypeBuilder
             .WithAlias("ddl")
             .WithName("Dropdown List")
             .WithDataTypeId(Constants.DataTypes.DropDownSingle)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .WithValueStorageType(ValueStorageType.Integer)
             .WithSortOrder(14)
             .Done()

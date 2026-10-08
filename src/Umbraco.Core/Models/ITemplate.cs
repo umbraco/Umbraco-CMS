@@ -18,17 +18,18 @@ public interface ITemplate : IFile
     /// <summary>
     ///     Returns true if the template is used as a layout for other templates (i.e. it has 'children')
     /// </summary>
-    bool IsMasterTemplate { get; set; }
+    bool IsLayoutTemplate { get; set; }
 
     /// <summary>
-    ///     returns the master template alias
+    ///     Returns the layout template alias (the parent template this template inherits from).
     /// </summary>
-    string? MasterTemplateAlias { get; }
+    string? LayoutTemplateAlias { get; }
 
-    /// <summary>
-    ///     Set the mastertemplate
-    /// </summary>
-    /// <param name="masterTemplate"></param>
-    [Obsolete("MasterTemplate is now calculated from the content. Scheduled for removal in Umbraco 18.")]
-    void SetMasterTemplate(ITemplate? masterTemplate);
+    /// <inheritdoc cref="IsLayoutTemplate" />
+    [Obsolete("Use IsLayoutTemplate instead. Scheduled for removal in Umbraco 20.")]
+    bool IsMasterTemplate { get => IsLayoutTemplate; set => IsLayoutTemplate = value; }
+
+    /// <inheritdoc cref="LayoutTemplateAlias" />
+    [Obsolete("Use LayoutTemplateAlias instead. Scheduled for removal in Umbraco 20.")]
+    string? MasterTemplateAlias => LayoutTemplateAlias;
 }

@@ -1,7 +1,10 @@
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
@@ -103,18 +106,25 @@ internal sealed class PropertyValueLevelDetectionTests : UmbracoIntegrationTestW
     [TestCase("somethingElse", false)]
     public async Task Can_Detect_Property_Value_At_All_Levels_For_Element(string titleValue, bool expectHasValue)
     {
+        var publishedContentTypeMock = new Mock<IPublishedContentType>();
+        publishedContentTypeMock.SetupGet(m => m.Variations).Returns(ContentVariation.Nothing);
+        var publishedContentMock = new Mock<IPublishedContent>();
+        publishedContentMock.SetupGet(m => m.ContentType).Returns(publishedContentTypeMock.Object);
+
         var elementType = ContentTypeBuilder.CreateSimpleContentType("umbElement");
         elementType.IsElement = true;
         await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
-        var publishedElementType = PublishedContentTypeFactory.CreateContentType(elementType);
+        var blockElementService = GetRequiredService<IBlockElementService>();
+        var element = await blockElementService.BuildElementAsync(
+            publishedContentMock.Object,
+            new BlockItemData(Guid.NewGuid(), elementType.Key, "umbElement")
+            {
+                Values = [new BlockPropertyValue { Alias = "title", Value = titleValue, }]
+            },
+            false);
 
-        var element = new PublishedElement(
-            publishedElementType,
-            Guid.NewGuid(),
-            new Dictionary<string, object> { { "title", titleValue } },
-            false,
-            new VariationContext());
 
+        Assert.IsNotNull(element);
         Assert.AreEqual(expectHasValue, element.HasValue("title"));
 
         // NOTE: the .Value() extensions always end up returning the source value, no matter if the property value

@@ -25,6 +25,7 @@ public static class ContentTagsExtensions
         this IContentBase content,
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
+        IIdKeyMap idKeyMap,
         IJsonSerializer serializer,
         string propertyTypeAlias,
         IEnumerable<string> tags,
@@ -32,13 +33,14 @@ public static class ContentTagsExtensions
         string? culture = null) =>
         content
         .GetTagProperty(propertyTypeAlias)
-        .AssignTags(propertyEditors, dataTypeService, serializer, tags, merge, culture);
+        .AssignTags(propertyEditors, dataTypeService, idKeyMap, serializer, tags, merge, culture);
 
     /// <summary>
     ///     Remove tags.
     /// </summary>
     /// <param name="content">The content item.</param>
     /// <param name="dataTypeService"></param>
+    /// <param name="idKeyMap">The cached id-to-key map used to resolve int data type IDs to GUID keys.</param>
     /// <param name="propertyTypeAlias">The property alias.</param>
     /// <param name="tags">The tags.</param>
     /// <param name="culture">A culture, for multi-lingual properties.</param>
@@ -48,12 +50,13 @@ public static class ContentTagsExtensions
         this IContentBase content,
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
+        IIdKeyMap idKeyMap,
         IJsonSerializer serializer,
         string propertyTypeAlias,
         IEnumerable<string> tags,
         string? culture = null) =>
         content.GetTagProperty(propertyTypeAlias)
-        .RemoveTags(propertyEditors, dataTypeService, serializer, tags, culture);
+        .RemoveTags(propertyEditors, dataTypeService, idKeyMap, serializer, tags, culture);
 
     // gets and validates the property
     private static IProperty GetTagProperty(this IContentBase content, string propertyTypeAlias)

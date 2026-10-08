@@ -73,7 +73,7 @@ public static class TestHelper
 
     public static IMarchal Marchal => s_testHelperInternal.Marchal;
 
-    public static CoreDebugSettings CoreDebugSettings => s_testHelperInternal.CoreDebugSettings;
+    public static DebugSettings DebugSettings => s_testHelperInternal.DebugSettings;
 
     public static IIOHelper IOHelper => s_testHelperInternal.IOHelper;
 
@@ -291,11 +291,7 @@ public static class TestHelper
         if (actualListEx.Count != expectedListEx.Count)
         {
             Assert.Fail(
-                "Collection {0}.{1} does not match. Expected IEnumerable containing {2} elements but was IEnumerable containing {3} elements",
-                property.PropertyType.Name,
-                property.Name,
-                expectedListEx.Count,
-                actualListEx.Count);
+                $"Collection {property.PropertyType.Name}.{property.Name} does not match. Expected IEnumerable containing {expectedListEx.Count} elements but was IEnumerable containing {actualListEx.Count} elements");
         }
 
         for (var i = 0; i < actualListEx.Count; i++)

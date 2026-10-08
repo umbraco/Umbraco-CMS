@@ -2,6 +2,7 @@ import { UmbPropertyEditorUIOverlaySizeElement } from './property-editor-ui-over
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 
 describe('UmbPropertyEditorUIOverlaySizeElement', () => {
 	let element: UmbPropertyEditorUIOverlaySizeElement;
@@ -19,8 +20,8 @@ describe('UmbPropertyEditorUIOverlaySizeElement', () => {
 		await element.updateComplete;
 
 		const select = element.shadowRoot!.querySelector('uui-select')!;
-		const options = (select as any).options as Array<Option>;
-		const defaultOption = options.find((o: Option) => o.value === undefined);
+		const options = (select as any).options as Array<UUISelectOption>;
+		const defaultOption = options.find((o: UUISelectOption) => o.value === undefined);
 		expect(defaultOption?.name).to.equal('Auto');
 	});
 
@@ -29,8 +30,8 @@ describe('UmbPropertyEditorUIOverlaySizeElement', () => {
 		await element.updateComplete;
 
 		const select = element.shadowRoot!.querySelector('uui-select')!;
-		const options = (select as any).options as Array<Option>;
-		const defaultOption = options.find((o: Option) => o.value === undefined);
+		const options = (select as any).options as Array<UUISelectOption>;
+		const defaultOption = options.find((o: UUISelectOption) => o.value === undefined);
 		expect(defaultOption?.name).to.equal('Default');
 	});
 

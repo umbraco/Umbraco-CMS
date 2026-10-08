@@ -162,7 +162,9 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 			:host {
 				display: flex;
 				flex-direction: column;
-				gap: var(--uui-size-2);
+				gap: 1px;
+				--umb-block-grid--areas-column-gap: 1px;
+				--umb-block-grid--areas-row-gap: 1px;
 			}
 
 			.umb-block-grid__area {

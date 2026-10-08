@@ -49,11 +49,6 @@ public class Member : ContentBase, IMember
     public Member(string name, IMemberType contentType)
         : base(name, -1, contentType, new PropertyCollection())
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
-
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException(
@@ -81,11 +76,6 @@ public class Member : ContentBase, IMember
     public Member(string name, string email, string username, IMemberType contentType, bool isApproved = true)
         : base(name, -1, contentType, new PropertyCollection())
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
-
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException(
@@ -93,21 +83,11 @@ public class Member : ContentBase, IMember
                 nameof(name));
         }
 
-        if (email == null)
-        {
-            throw new ArgumentNullException(nameof(email));
-        }
-
         if (string.IsNullOrWhiteSpace(email))
         {
             throw new ArgumentException(
                 "Value can't be empty or consist only of white-space characters.",
                 nameof(email));
-        }
-
-        if (username == null)
-        {
-            throw new ArgumentNullException(nameof(username));
         }
 
         if (string.IsNullOrWhiteSpace(username))
@@ -138,11 +118,6 @@ public class Member : ContentBase, IMember
     public Member(string name, string email, string username, IMemberType contentType, int userId, bool isApproved = true)
         : base(name, -1, contentType, new PropertyCollection())
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
-
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException(
@@ -150,21 +125,11 @@ public class Member : ContentBase, IMember
                 nameof(name));
         }
 
-        if (email == null)
-        {
-            throw new ArgumentNullException(nameof(email));
-        }
-
         if (string.IsNullOrWhiteSpace(email))
         {
             throw new ArgumentException(
                 "Value can't be empty or consist only of white-space characters.",
                 nameof(email));
-        }
-
-        if (username == null)
-        {
-            throw new ArgumentNullException(nameof(username));
         }
 
         if (string.IsNullOrWhiteSpace(username))
@@ -194,7 +159,7 @@ public class Member : ContentBase, IMember
     ///     password
     /// </param>
     /// <param name="contentType"></param>
-    public Member(string? name, string email, string username, string? rawPasswordValue, IMemberType? contentType)
+    public Member(string name, string email, string username, string? rawPasswordValue, IMemberType? contentType)
         : base(name, -1, contentType, new PropertyCollection())
     {
         _email = email;

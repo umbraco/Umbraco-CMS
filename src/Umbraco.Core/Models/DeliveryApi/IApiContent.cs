@@ -6,11 +6,6 @@ namespace Umbraco.Cms.Core.Models.DeliveryApi;
 public interface IApiContent : IApiElement
 {
     /// <summary>
-    ///     Gets the name of the content.
-    /// </summary>
-    string? Name { get; }
-
-    /// <summary>
     ///     Gets the date and time when the content was created.
     /// </summary>
     public DateTime CreateDate { get; }

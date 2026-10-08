@@ -189,6 +189,21 @@ export default {
 		openVersionSelector: 'Open version selector',
 		closeVersionSelector: 'Close version selector',
 	},
+	auditTrailsElement: {
+		delete: 'Element deleted',
+		unpublish: 'Element unpublished',
+		unpublishvariant: 'Element unpublished for languages: %0%',
+		publish: 'Element saved and published',
+		publishvariant: 'Element saved and published for languages: %0%',
+		save: 'Element saved',
+		savevariant: 'Element saved for languages: %0%',
+		move: 'Element moved',
+		copy: 'Element copied',
+		rollback: 'Element rolled back',
+		custom: '%0%',
+		contentversionpreventcleanup: 'Clean up disabled for version: %0%',
+		contentversionenablecleanup: 'Clean up enabled for version: %0%',
+	},
 	auditTrailsMedia: {
 		delete: 'Media deleted',
 		move: 'Media moved',
@@ -241,6 +256,8 @@ export default {
 		noItemsTitle: 'No items',
 		addCollectionConfiguration: 'Add collection',
 		cardViewLabel: 'Cards',
+		gridViewLabel: 'Grid',
+		listViewLabel: 'List',
 		tableViewLabel: 'Table',
 	},
 	content: {
@@ -310,6 +327,8 @@ export default {
 		unpublish: 'Unpublish',
 		unpublished: 'Unpublished',
 		notCreated: 'Not created',
+		segmentHasContent: 'Has segmented content',
+		segmentNoContent: 'No content',
 		updateDate: 'Last edited',
 		updateDateDesc: 'Date/time this document was edited',
 		uploadClear: 'Clear file(s)',
@@ -487,6 +506,8 @@ export default {
 		noMediaTypesWithNoSettingsAccess:
 			"The selected media in the tree doesn't allow for any other media to be created below it.",
 		noMediaTypesEditPermissions: 'Edit permissions for this Media Type',
+		noElementTypes:
+			'There are no allowed Element Types available for creating elements here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allow in Library</strong> under <strong>Structure</strong>.',
 		documentTypeWithoutTemplate: 'Document Type without a template',
 		documentTypeWithTemplate: 'Document Type with Template',
 		documentTypeWithTemplateDescription:
@@ -494,6 +515,8 @@ export default {
 		documentType: 'Document Type',
 		documentTypeDescription:
 			'The data definition for a content component that can be created by editors in the content tree and be picked on other pages but has no direct URL.',
+		element: 'Element',
+		elementDescription: 'Select the Element Type you want to make an element for',
 		elementType: 'Element Type',
 		elementTypeDescription:
 			"Defines the schema for a repeating set of properties, for example, in a 'Block List' or 'Block Grid' property editor.",
@@ -705,38 +728,6 @@ export default {
 		changeKeyError: "The key '%0%' already exists.",
 		overviewTitle: 'Dictionary overview',
 	},
-	examineManagement: {
-		configuredSearchers: 'Configured Searchers',
-		configuredSearchersDescription:
-			'Shows properties and tools for any configured Searcher (e.g. such as a multi-index searcher)',
-		fieldValues: 'Field values',
-		healthStatus: 'Health status',
-		healthStatusDescription: 'The health status of the index and if it can be read',
-		indexers: 'Indexers',
-		indexInfo: 'Index info',
-		contentInIndex: 'Content in index',
-		indexInfoDescription: 'Lists the properties of the index',
-		manageIndexes: 'Manage Examine indexes',
-		manageIndexesDescription:
-			'Allows you to view the details of each index and provides some tools for managing the indexes',
-		rebuildIndex: 'Rebuild index',
-		rebuildIndexWarning:
-			'This will cause the index to be rebuilt.<br /> Depending on how much content there is in your site this could take a while.<br /> It is not recommended to rebuild an index during times of high website traffic or when editors are editing content.',
-		searchers: 'Searchers',
-		searchDescription: 'Search the index and view the results',
-		tools: 'Tools',
-		toolsDescription: 'Tools to manage the index',
-		fields: 'fields',
-		indexCannotRead: 'The index cannot be read and will need to be rebuilt',
-		processIsTakingLonger:
-			'The process is taking longer than expected, check the Umbraco log to see if there have been any errors during this operation',
-		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
-		iIndexPopulator: 'IIndexPopulator',
-		noResults: 'No results were found',
-		searchResultsFound: 'Showing %0% - %1% of %2% result(s) - Page %3% of %4%',
-		corruptStatus: 'Possible corrupt index detected',
-		corruptErrorDescription: 'Error received when evaluating the index:',
-	},
 	placeholders: {
 		username: 'Enter your username',
 		password: 'Enter your password',
@@ -835,6 +826,8 @@ export default {
 		externalLoginError: 'External login',
 		unauthorized: 'You were not authorized before performing this action',
 		userNotFound: 'The local user was not found in the database',
+		lockedOut: 'The user is locked, and needs to be unlocked before more login attempts can be made',
+		notAllowed: 'The operation is not allowed on the user',
 		externalInfoNotFound: 'The server did not succeed in communicating with the external login provider',
 		externalLoginFailed:
 			'The server failed to authorize you against the external login provider. Please close the window and try again.',
@@ -866,6 +859,7 @@ export default {
 		by: 'by',
 		cancel: 'Cancel',
 		cellMargin: 'Cell margin',
+		changeView: 'Change view',
 		choose: 'Choose',
 		clear: 'Clear',
 		close: 'Close',
@@ -947,6 +941,7 @@ export default {
 		next: 'Next',
 		no: 'No',
 		nodeName: 'Node Name',
+		none: 'None',
 		notFound: 'Not found',
 		noResults: 'No results',
 		noResultsFor: (query: string) => `No result for "${query}".`,
@@ -1107,6 +1102,7 @@ export default {
 		text: 'Text',
 	},
 	globalSearch: {
+		documents: 'Documents',
 		navigateSearchProviders: 'Navigate search providers',
 		navigateSearchResults: 'Navigate search results',
 	},
@@ -1220,6 +1216,53 @@ export default {
 		instruction: 'Sign in to Umbraco',
 		signInWith: 'Sign in with {0}',
 		timeout: 'Your session has timed out. Please sign in again below.',
+		continue: 'Continue',
+		validate: 'Validate',
+		login: 'Login',
+		email: 'E-mail',
+		username: 'Username',
+		password: 'Password',
+		submit: 'Submit',
+		required: 'Required',
+		success: 'Success',
+		forgottenPassword: 'Forgotten password?',
+		forgottenPasswordInstruction: 'An email will be sent with a link to reset your password',
+		requestPasswordResetConfirmation:
+			'We sent an email with password reset instructions, if the email address matches a registered user.',
+		setPasswordInstruction: 'Please provide a new password.',
+		setPasswordConfirmation: 'Your password has been updated',
+		rememberMe: 'Remember me',
+		error: 'Error',
+		defaultError: 'An error occurred while processing your request.',
+		errorInPasswordFormat:
+			'The password must be at least {0} characters long and contain at least {1} special characters.',
+		passwordMismatch: 'The confirmed password does not match the new password!',
+		passwordMinLength: 'The password must be at least {0} characters long.',
+		passwordIsBlank: 'The password cannot be blank.',
+		userFailedLogin: "Oops! We couldn't log you in. Please check your credentials and try again.",
+		userLockedOut: 'Your account has been locked out. Please try again later.',
+		receivedErrorFromServer: 'Received an error from the server',
+		resetCodeExpired: 'The link you have clicked on is invalid or has expired',
+		userInviteWelcomeMessage:
+			"Hello there and welcome to Umbraco! In just 1 minute you'll be good to go, we just need you to setup a password.",
+		userInviteExpiredMessage:
+			'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.',
+		newPassword: 'New password',
+		confirmNewPassword: 'Confirm password',
+		mfaTitle: 'One last step',
+		mfaCodeInputHelp: 'Enter the code from your authenticator app',
+		mfaText: 'You have enabled 2-factor authentication and must verify your identity.',
+		mfaMultipleText: 'Please choose a 2-factor provider',
+		mfaCodeInput: 'Verification code',
+		mfaInvalidCode: 'Invalid code entered',
+		returnToLogin: 'Return to login',
+		localLoginDisabled: 'Unfortunately, direct login is not possible. It has been disabled by a provider.',
+		friendlyGreeting: 'Hello',
+		requiredEmailValidationMessage: 'Please fill in an email',
+		requiredUsernameValidationMessage: 'Please fill in a username',
+		requiredPasswordValidationMessage: 'Please fill in a password',
+		showPassword: 'Show password',
+		hidePassword: 'Hide password',
 		invalidPasswordMessage: 'The password is not strong enough.',
 	},
 	main: {
@@ -1446,6 +1489,7 @@ export default {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
 		selectAction: 'Select Property Editor',
+		deprecatedLabel: 'Deprecated',
 	},
 	propertyEditorUIGroups: {
 		advanced: 'Advanced',
@@ -1482,6 +1526,7 @@ export default {
 		noDiff: 'There are no differences between the current (draft) version and the selected version.',
 		contentRolledBack: 'Content has been rolled back',
 		documentRolledBack: 'Document has been rolled back',
+		elementRolledBack: 'Element has been rolled back',
 		headline: 'Select a version to compare with the current version',
 		htmlHelp:
 			'This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view',
@@ -1495,9 +1540,11 @@ export default {
 	},
 	scripts: {
 		editscript: 'Edit script file',
+		tabCode: 'Code',
 	},
 	sections: {
 		content: 'Content',
+		library: 'Library',
 		media: 'Media',
 		member: 'Members',
 		packages: 'Packages',
@@ -1576,11 +1623,16 @@ export default {
 		editContentPublishedFailedByValidation: 'Document could not be published, but we saved it for you',
 		editContentPublishedFailedByParent: 'Document could not be published, because a parent page is not published',
 		editContentPublishedHeader: 'Document published',
+		editElementPublishedFailed: 'Element could not be published or saved',
+		editElementPublishedHeader: 'Element published',
 		editContentPublishedReloadFailed: 'Document published, but the editor could not be refreshed',
+		editElementPublishedReloadFailed: 'Element published, but the editor could not be refreshed',
 		editContentPublishedText: 'and is visible on the website',
 		editContentUnpublishedHeader: 'Document unpublished',
 		editContentUnpublishedText: 'and is no longer visible on the website',
+		editElementUnpublishedHeader: 'Element unpublished',
 		editVariantPublishedText: '%0% published and is visible on the website',
+		editVariantElementPublishedText: '%0% published',
 		editVariantSavedText: '%0% saved',
 		editBlueprintSavedHeader: 'Document Blueprint saved',
 		editBlueprintSavedText: 'Changes have been successfully saved',
@@ -1652,11 +1704,15 @@ export default {
 		editMultiContentPublishedText: '%0% documents published and are visible on the website',
 		editMultiContentPublishedPartialText: '%0% of %1% documents published.',
 		editMultiContentUnpublishedText: '%0% documents unpublished and are no longer visible on the website',
+		editMultiElementPublishedText: '%0% elements published',
 		editMultiContentUnpublishedPartialText: '%0% of %1% documents unpublished.',
+		editMultiElementUnpublishedText: '%0% elements unpublished',
 		editVariantUnpublishedText: '%0% unpublished and is no longer visible on the website',
 		editMultiVariantPublishedText: '%0% documents published for languages %1% and are visible on the website',
 		editMultiVariantUnpublishedText:
 			'%0% documents unpublished for languages %1% and are no longer visible on the website',
+		editMultiElementVariantPublishedText: '%0% elements published for languages %1%',
+		editMultiElementVariantUnpublishedText: '%0% elements unpublished for languages %1%',
 		editContentScheduledSavedText: 'A schedule for publishing has been updated',
 		editContentScheduledNotSavedText: 'The schedule for publishing could not be updated',
 		editVariantSendToPublishText: '%0% changes have been sent for approval',
@@ -1696,6 +1752,7 @@ export default {
 		notAllowed: 'The selected template is no longer allowed on this document type.',
 		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
+		tabCode: 'Code',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
 		edittemplate: 'Edit template',
 		insertSections: 'Sections',
@@ -1716,8 +1773,10 @@ export default {
 		insertPartialViewDesc:
 			"A partial view is a separate template file which can be rendered inside another template, it's great for reusing markup or for separating complex templates into separate files.",
 		mastertemplate: 'Master template',
+		layouttemplate: 'Layout template',
 		quickGuide: 'Quick guide to template tags',
 		noMaster: 'No master',
+		noLayout: 'No layout',
 		renderBody: 'Render child template',
 		renderBodyDesc: 'Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.',
 		defineSection: 'Define a named section',
@@ -1832,6 +1891,8 @@ export default {
 		allowedTemplatesDescription: 'Choose which templates editors are allowed to use on content of this type',
 		allowAtRootHeading: 'Allow at root',
 		allowAtRootDescription: 'Allow editors to create content of this type in the root of the content tree.',
+		allowInLibraryHeading: 'Allow in Library',
+		allowInLibraryDescription: 'Allow editors to create Elements of this type in the Library section.',
 		childNodesHeading: 'Allowed child node types',
 		childNodesDescription: 'Allow content of the specified types to be created underneath content of this type.',
 		chooseChildNode: 'Choose child node',
@@ -1904,10 +1965,13 @@ export default {
 		allowVaryBySegment: 'Allow segmentation',
 		elementType: 'Element Type',
 		elementHeading: 'Is an Element Type',
-		elementDescription: 'An Element Type is meant to be used within other Document Types, and not in the Content tree.',
+		elementDescription: 'Use for Blocks or Reusable Elements in the Library section.',
 		elementCannotToggle:
 			'A Document Type cannot be changed to an Element Type once it has been used to create one or more content items.',
-		elementDoesNotSupport: 'This is not applicable for an Element Type',
+		elementDoesNotSupport: 'This is not applicable for an Element Type.',
+		elementTypeOnlySupport: 'This is only applicable for an Element Type.',
+		elementTypeOnlyAllowedInLibrarySupport:
+			'This is only applicable for an Element Type that is allowed in the Library.',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
 		displaySettingsHeadline: 'Appearance',
 		displaySettingsLabelOnLeft: 'Label to the left',
@@ -2140,6 +2204,8 @@ export default {
 		changePassword: 'Change your password',
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure 2FA',
+		disableUserHeadline: (name: string) => `Disable ${name}`,
+		disableUserConfirmation: 'Are you sure you want to disable this user?',
 		emailRequired: 'Required - enter an email address for this user',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2223,15 +2289,19 @@ export default {
 		granularRightsLabel: 'Documents',
 		granularRightsDescription: 'Assign permissions to specific documents',
 		permissionsEntityGroup_document: 'Document permissions',
+		permissionsEntityGroup_element: 'Element permissions',
+		'permissionsEntityGroup_element-folder': 'Element Folder permissions',
 		permissionsEntityGroup_media: 'Media permissions',
 		permissionsEntityGroup_member: 'Member permissions',
 		'permissionsEntityGroup_document-property-value': 'Document Property Value permissions',
+		'permissionsEntityGroup_element-property-value': 'Element Property Value permissions',
 		permissionNoVerbs: 'No allowed permissions',
 		profile: 'Profile',
 		searchAllChildren: 'Search all children',
 		languagesHelp: 'Limit the languages users have access to edit',
 		allowAccessToAllLanguages: 'Allow access to all languages',
 		allowAccessToAllDocuments: 'Allow access to all documents',
+		allowAccessToAllElements: 'Allow access to all elements',
 		allowAccessToAllMedia: 'Allow access to all media',
 		sectionsHelp: 'Add sections to give users access',
 		selectUserGroup: (multiple: boolean) => {
@@ -2289,6 +2359,7 @@ export default {
 		stateApproved: 'Approved',
 		stateInvited: 'Invited',
 		stateInactive: 'Inactive',
+		type: 'Type',
 		sortNameAscending: 'Name (A-Z)',
 		sortNameDescending: 'Name (Z-A)',
 		sortCreateDateDescending: 'Newest',
@@ -2318,6 +2389,39 @@ export default {
 		avatarDeleteSuccess: 'Avatar deleted',
 		unknownFailure: 'Unknown failure',
 		usersNotManagedFromGroup: 'not manageable from this screen.',
+		selectElementStartNode: 'Select element start node',
+		selectElementStartNodeDescription: 'Limit the element library to a specific start node',
+		enableUserHeadline: (name: string) => `Enable ${name}`,
+		enableUserConfirmation: 'Are you sure you want to enable this user?',
+		unlockUserHeadline: (name: string) => `Unlock ${name}`,
+		unlockUserConfirmation: 'Are you sure you want to unlock this user?',
+	},
+	userPermissions: {
+		create: 'Create',
+		create_element: 'Allow access to create an element',
+		create_element_folder: 'Allow access to create an element folder',
+		delete: 'Delete',
+		delete_element: 'Allow access to delete an element',
+		delete_element_folder: 'Allow access to delete an element folder',
+		duplicate: 'Duplicate',
+		duplicate_element: 'Allow access to duplicate an element',
+		granular_element: 'Assign permissions to specific elements',
+		granular_elementFolder: 'Assign permissions to specific element folders',
+		move: 'Move',
+		move_element: 'Allow access to move an element',
+		move_element_folder: 'Allow access to move an element folder',
+		publish: 'Publish',
+		publish_element: 'Allow access to publish an element',
+		read: 'Read',
+		read_element: 'Allow access to read an element',
+		read_element_folder: 'Allow access to read an element folder',
+		rollback: 'Rollback',
+		rollback_element: 'Allow access to rollback an element to a previous state',
+		unpublish: 'Unpublish',
+		unpublish_element: 'Allow access to unpublish an element',
+		update: 'Update',
+		update_element: 'Allow access to save an element',
+		update_element_folder: 'Allow access to save an element folder',
 	},
 	validation: {
 		validation: 'Validation',
@@ -2503,9 +2607,9 @@ export default {
 	dashboardTabs: {
 		contentIntro: 'Welcome to Umbraco',
 		contentRedirectManager: 'Redirect URL Management',
+		libraryWelcome: 'Welcome',
 		mediaFolderBrowser: 'Content',
 		settingsWelcome: 'Welcome',
-		settingsExamine: 'Examine Management',
 		settingsPublishedStatus: 'Published Status',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Health Check',
@@ -2712,6 +2816,9 @@ export default {
 		errorDisablingProfilerDescription:
 			'It was not possible to disable the profiler. Try again, and if the problem persists, please check the log for more details.',
 	},
+	libraryDashboard: {
+		welcomeHeader: 'Welcome to the library',
+	},
 	settingsDashboard: {
 		documentationHeader: 'Documentation',
 		documentationDescription: 'Read more about working with the items in Settings in our Documentation.',
@@ -2885,11 +2992,18 @@ export default {
 		labelInlineMode: 'Display inline with text',
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
+		notPublishedLibraryElementDescription: 'The Library Element used by this Block is not published',
 		areaValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in this area.',
 		rootValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in the root of this property.',
 		unsupportedBlockName: 'Unsupported',
 		unsupportedBlockDescription:
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
+		tabLibrary: 'Library',
+		transferToElementLibrary: 'Transfer to Library',
+		disconnectFromElementLibrary: 'Disconnect from Library',
+		disconnectFromElementLibraryConfirm:
+			'This will create a local copy of the Element content. The Library Element will not be affected.',
+		elementUsedByCount: (count: number) => `This Element is referenced by ${count} item(s).`,
 		blockVariantConfigurationNotSupported:
 			'One or more Block Types of this Block Editor is using a Element-Type that is configured to Vary By Culture or Vary By Segment. This is not supported on a Content item that does not vary by Culture or Segment.',
 	},
@@ -2921,6 +3035,8 @@ export default {
 		viewPublishedContentDeclineButton: 'Stay in preview mode',
 		connectionFailed: 'Could not establish a connection to the server, preview live updates will not work.',
 		connectionLost: 'Connection to the server lost, preview live updates will not work.',
+		connectionReconnecting: 'Connection to the server lost, trying to reconnect…',
+		connectionRestored: 'Connection to the server restored, preview live updates are working again.',
 	},
 	permissions: {
 		FolderCreation: 'Folder creation',
@@ -3068,6 +3184,105 @@ export default {
 		emptyDate: 'Please select a date',
 		emptyTimeZone: 'Please select a time zone',
 		invalidTimeZone: 'The selected time zone is not valid',
+	},
+	searchExamine: {
+	  showFields: 'Show Fields',
+	  invariantCulture: 'Invariant',
+	  headline: 'Search Document Fields',
+	  filterPlaceholder: 'Filter fields by name or value...',
+	  filterLabel: 'Filter fields by name or value',
+	  fieldCount: (count: number) => {
+	    switch (count) {
+	      case 1:
+	        return '1 field';
+	      default:
+	        return `${count} fields`;
+	    }
+	  },
+	  tableColumnName: 'Name',
+	  tableColumnValue: 'Value',
+	  copyValue: 'Copy value',
+	  seeMore: 'See more',
+	  seeLess: 'See less',
+	  noFieldsMatch: 'No fields match your filter.',
+	  noFields: 'This document has no indexed fields.',
+	  loadError: 'Failed to load document fields. Please try again.',
+	  valueIndex: (index: number) => `Value ${index}`,
+	  fieldType: (type: string) => {
+	    switch (type) {
+	      case 'keywords':
+	        return 'Keyword (exact match)';
+	      case 'texts':
+	        return 'Full Text';
+	      case 'textsr1':
+	        return 'Full Text (Boost: High)';
+	      case 'textsr2':
+	        return 'Full Text (Boost: Medium)';
+	      case 'textsr3':
+	        return 'Full Text (Boost: Low)';
+	      case 'integers':
+	        return 'Integer';
+	      case 'decimals':
+	        return 'Decimal';
+	      case 'datetimeoffsets':
+	        return 'Date/Time';
+	      default:
+	        return type;
+	    }
+	  },
+	},
+	searchManagement: {
+		treeHeader: 'Search',
+		tableColumnAlias: 'Alias',
+		tableColumnHealthStatus: 'Health status',
+		tableColumnDocumentCount: 'Document count',
+		healthStatus: (status: string) => status,
+		documentCount: (cnt: number | string) => {
+			switch (cnt) {
+				case 0:
+					return 'Empty';
+				case 1:
+					return '1 document';
+				default:
+					return `${cnt} documents`;
+			}
+		},
+		collectionActionReload: 'Refresh',
+		entityActionRebuildIndex: 'Rebuild',
+		rebuildConfirmHeadline: 'Rebuild index',
+		rebuildConfirmMessage:
+			'<strong>{0}</strong> will be rebuilt from scratch. Searching it may return <i>incomplete results</i> until the rebuild finishes.',
+		rebuildConfirmLabel: 'Rebuild',
+		rebuildStartedMessage: 'Rebuilding {0} in the background.',
+		rebuildCompletedTitle: 'Rebuild completed',
+		rebuildCompletedMessage: '{0} has finished rebuilding.',
+		indexInfo: 'Index information',
+		indexAlias: 'Alias',
+		providerName: 'Provider',
+		searchBox: 'Search',
+		searchPlaceholder: 'Search',
+		searchButton: 'Search',
+		noResults: 'No results',
+		resultsCount: (count: number) => `Found ${count} result${count !== 1 ? 's' : ''}`,
+		tableColumnName: 'Name',
+		tableColumnEntityType: 'Type',
+		// Accessibility labels
+		searching: 'Searching...',
+		searchFailed: 'Search failed',
+		searchComplete: (count: number) => `Search complete. Found ${count} result${count !== 1 ? 's' : ''}`,
+		openEntity: (type: string, id: string) => `Open ${type} with ID ${id}`,
+		searchFormLabel: (indexAlias: string) => `Search ${indexAlias} index`,
+		searchInputLabel: 'Search query',
+		searchInputAriaLabel: (indexAlias: string) => `Enter search query for ${indexAlias} index`,
+		searchButtonAriaLabel: 'Execute search',
+		searchHint: 'Press Enter to search',
+		loading: 'Loading search results',
+		resultsRegion: 'Search results',
+		resultsTable: 'Search results table',
+		paginationLabel: 'Search results pages',
+		cultureSelectLabel: 'Culture',
+		searchDisabled: 'Search unavailable. Index status:',
+		searchError: 'Search failed. Try again.',
 	},
 	uiCulture: {
 		ar: 'العربية',

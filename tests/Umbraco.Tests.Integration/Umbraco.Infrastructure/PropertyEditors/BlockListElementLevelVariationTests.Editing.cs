@@ -29,9 +29,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -187,9 +187,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -319,9 +319,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -480,9 +480,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -603,9 +603,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -768,9 +768,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -893,9 +893,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -996,9 +996,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
         content.SetCultureName("Home (de)", "de-DE");
         ContentService.Save(content);
@@ -1141,7 +1141,7 @@ internal partial class BlockListElementLevelVariationTests
         var userKey = updateWithLimitedUserAccess
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
-        var nestedElementType = CreateElementType(ContentVariation.Culture);
+        var nestedElementType = await CreateElementType(ContentVariation.Culture);
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
 
         var rootElementType = new ContentTypeBuilder()
@@ -1160,7 +1160,7 @@ internal partial class BlockListElementLevelVariationTests
             .Build();
         await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
-        var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, rootBlockListDataType);
 
         var nestedElementContentKey = Guid.NewGuid();
         var nestedElementSettingsKey = Guid.NewGuid();
@@ -1290,9 +1290,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Align_Culture_Variance_For_Variant_Element_Types()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -1348,9 +1348,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase(ContentVariation.Nothing)]
     public async Task Can_Turn_Invariant_Element_Variant(ContentVariation contentTypeVariation)
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(contentTypeVariation, blockListDataType);
+        var contentType = await CreateContentType(contentTypeVariation, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -1407,9 +1407,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase(ContentVariation.Culture)]
     public async Task Can_Turn_Variant_Element_Invariant(ContentVariation contentTypeVariation)
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(contentTypeVariation, blockListDataType);
+        var contentType = await CreateContentType(contentTypeVariation, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -1472,9 +1472,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase("da-DK", "Variant content in Danish", "Variant settings in Danish", true)]
     public async Task Can_Turn_Variant_Element_Invariant_For_Variant_Block_Property(string culture, string expectedContentValue, string expectedSettingsValue, bool addCarriedPropertyValues)
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
 
         // Each culture of this block property is stored as its own document, and a document can carry entries
         // for cultures other than its own. The value retained must be the one for the culture being mapped,
@@ -1579,9 +1579,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.CultureAndSegment);
+        var elementType = await CreateElementType(ContentVariation.CultureAndSegment);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.CultureAndSegment, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType);
         var content = CreateContent(contentType, elementType, [], false);
 
         var blockListValue = BlockListPropertyValue(
@@ -1671,9 +1671,9 @@ internal partial class BlockListElementLevelVariationTests
             ? (await CreateLimitedUser()).Key
             : Constants.Security.SuperUserKey;
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.CultureAndSegment, blockListDataType, ContentVariation.Segment);
+        var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType, ContentVariation.Segment);
         var content = CreateContent(contentType, elementType, [], false);
 
         var contentElementKey = Guid.NewGuid();
@@ -1797,14 +1797,8 @@ internal partial class BlockListElementLevelVariationTests
             cultures = [null];
         }
 
-        var segments = elementType.VariesBySegment()
-            ? contentData.Values.Select(value => value.Segment)
-                .Distinct()
-                .ToArray()
-            : [null];
-
-        foreach (var exposeItem in cultures.SelectMany(culture => segments.Select(segment =>
-                     new BlockItemVariation(contentData.Key, culture, segment))))
+        foreach (var exposeItem in cultures.Select(culture =>
+                     new BlockItemVariation(contentData.Key, culture)))
         {
             listValue.Expose.Add(exposeItem);
         }

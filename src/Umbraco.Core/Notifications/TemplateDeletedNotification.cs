@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications;
 /// <summary>
-///  A notification that is used to trigger the IFileService when the DeleteTemplate method is called in the API, after the template has been deleted.
+///  A notification that is used to trigger the <see cref="Services.ITemplateService"/> after a template has been deleted.
 /// </summary>
 public class TemplateDeletedNotification : DeletedNotification<ITemplate>
 {

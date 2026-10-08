@@ -15,7 +15,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_ENTITY_USER_PERMISSION_MODAL,
 	type ManifestEntityUserPermission,
@@ -27,7 +27,10 @@ import {
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-document-property-value-user-permission')
-export class UmbInputDocumentPropertyValueUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputDocumentPropertyValueUserPermissionElement extends UUIFormControlWithBasicsMixin(
+	UmbLitElement,
+	'',
+) {
 	#permissions: Array<UmbDocumentPropertyValueUserPermissionModel> = [];
 	public get permissions(): Array<UmbDocumentPropertyValueUserPermissionModel> {
 		return this.#permissions;

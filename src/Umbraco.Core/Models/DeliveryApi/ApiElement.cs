@@ -7,21 +7,32 @@ namespace Umbraco.Cms.Core.Models.DeliveryApi;
 /// </summary>
 public class ApiElement : IApiElement
 {
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
+    public ApiElement(Guid id, string contentType, IDictionary<string, object?> properties)
+        : this(id, string.Empty, contentType, properties)
+    {
+    }
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="ApiElement" /> class.
     /// </summary>
     /// <param name="id">The unique identifier of the element.</param>
+    /// <param name="name">The name of the element.</param>
     /// <param name="contentType">The content type alias of the element.</param>
     /// <param name="properties">The property values of the element.</param>
-    public ApiElement(Guid id, string contentType, IDictionary<string, object?> properties)
+    public ApiElement(Guid id, string name, string contentType, IDictionary<string, object?> properties)
     {
         Id = id;
+        Name = name;
         ContentType = contentType;
         Properties = properties;
     }
 
     /// <inheritdoc />
     public Guid Id { get; }
+
+    /// <inheritdoc />
+    public string Name { get; }
 
     /// <summary>
     ///     Gets the content type alias of the element.

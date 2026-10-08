@@ -11,7 +11,7 @@ RESTful API for Umbraco backoffice operations. Manages content, media, users, an
 ## 1. Architecture
 
 ### Target Framework
-- **.NET 10.0** (`net10.0`)
+- **.NET 11.0** (`net11.0`)
 - **C# 12** with nullable reference types enabled
 - **ASP.NET Core** Web API
 
@@ -20,7 +20,7 @@ RESTful API for Umbraco backoffice operations. Manages content, media, users, an
 
 ### Key Technologies
 - **Web Framework**: ASP.NET Core MVC with `Asp.Versioning.Mvc` (v1.0 and v1.1)
-- **OpenAPI**: Swashbuckle.AspNetCore with custom schema/operation filters
+- **OpenAPI**: Microsoft.AspNetCore.OpenApi with custom transformers, Swagger UI via Swashbuckle
 - **Authentication**: OpenIddict via `Umbraco.Cms.Api.Common` (reference tokens, not JWT)
 - **Authorization**: Policy-based with `IAuthorizationService`
 - **Validation**: FluentValidation via base controllers
@@ -57,7 +57,7 @@ src/Umbraco.Cms.Api.Management/
 ├── Services/                      # Business logic (thin layer over Core.Services)
 ├── Mapping/                       # ViewModel → domain model mappers
 ├── Security/                      # Auth providers, sign-in manager, external logins
-├── OpenApi/                       # Swashbuckle filters (schema, operation, security)
+├── OpenApi/                       # OpenAPI transformers (schema, operation, security)
 ├── Routing/                       # Route configuration, SignalR hubs
 ├── DependencyInjection/           # Service registration (55+ files)
 ├── Middleware/                    # Preview, server events
@@ -71,7 +71,8 @@ src/Umbraco.Cms.Api.Management/
 - **Umbraco.Cms.Api.Common** - Shared API infrastructure (base controllers, OpenAPI config)
 - **Umbraco.Infrastructure** - Service implementations, data access
 - **Umbraco.PublishedCache.HybridCache** - Published content queries
-- **Swashbuckle.AspNetCore** - OpenAPI generation
+- **Microsoft.AspNetCore.OpenApi** - OpenAPI document generation
+- **Swashbuckle.AspNetCore.SwaggerUI** - Swagger UI
 
 ### Design Patterns
 1. **Controller-per-Operation** - Each endpoint is a separate controller class
@@ -123,9 +124,9 @@ These are firm design rules for this API. Prefer an extra round-trip over bendin
    detail or batch endpoint instead.
 
 3. **Versioning an endpoint the backoffice calls: pin the operation ID with a route `Name`.**
-   Operation IDs are generated from the route by `OperationIdHandler`, and a non-default
+   Operation IDs are generated from the route by `UmbracoOperationIdTransformer`, and a non-default
    `[MapToApiVersion]` is appended to them — so bumping an endpoint to `1.1` would rename the
-   generated client method (`putDocumentByIdValidate` → `putDocumentByIdValidate11`) and churn every
+   generated client method (`putDocumentByIdValidate` → `putDocumentByIdValidate1_1`) and churn every
    call site in the backoffice. The backoffice always calls the latest version, so the version in the
    method name carries no information.
 
@@ -185,8 +186,8 @@ dotnet build src/Umbraco.Cms.Api.Management /p:TreatWarningsAsErrors=true
 ### OpenAPI Documentation
 The project embeds a pre-generated `OpenApi.json` (1.3MB). To regenerate:
 ```bash
-# Run Umbraco.Web.UI, access /umbraco/swagger
-# Export JSON from Swagger UI
+# Run Umbraco.Web.UI, access /umbraco/openapi/
+# Download JSON from /umbraco/openapi/management.json
 ```
 
 ### Package Management
@@ -199,7 +200,7 @@ dotnet list src/Umbraco.Cms.Api.Management package --vulnerable
 ```
 
 ### Environment Setup
-1. **Prerequisites**: .NET 10 SDK
+1. **Prerequisites**: .NET 11 SDK
 2. **IDE**: Visual Studio 2022 or Rider (with .editorconfig support)
 3. **Configuration**: Inherits from `Umbraco.Web.UI` appsettings (no app settings in this library)
 
@@ -264,7 +265,7 @@ dotnet test --filter "FullyQualifiedName~Management.Controllers.Document"
 1. **Controller logic** - Request validation, authorization checks, status code mapping
 2. **Factories** - ViewModel ↔ Domain model conversion accuracy
 3. **Authorization** - Policy enforcement for each operation
-4. **OpenAPI schema** - Ensure Swagger generation doesn't break
+4. **OpenAPI schema** - Ensure OpenAPI document generation doesn't break
 
 ### InternalsVisibleTo
 Tests have access to internal types (see .csproj:44-52):
@@ -329,10 +330,11 @@ All errors return RFC 7807 ProblemDetails via helper methods in base controllers
 - Served for client SDK generation
 - **Why?** Deterministic output, faster startup (no runtime generation)
 
-**SignalR for Real-time** (Routing/BackofficeHub.cs:33):
-- `BackofficeHub` - User notifications, cache refreshes
-- `ServerEventHub` - Background job updates, health checks
-- Routes: `/umbraco/backoffice-signalr`, `/umbraco/serverevent-signalr`
+**SignalR for Real-time**:
+- `BackofficeHub` (`/umbraco/backofficeHub`) - Generic payload broadcast
+- `ServerEventHub` (`/umbraco/serverEventHub`) - Entity change events, filtered per user
+- `PreviewHub` (`/umbraco/PreviewHub`) - Content refresh notifications for the preview window
+- Every hub class carries `[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]`. `MapHub` copies it onto the negotiate and connection endpoints, so an unattributed hub is reachable anonymously. `PreviewRoutesTests` and `BackOfficeAreaRoutesTests` assert this for every mapped hub endpoint.
 
 ### Code Smells to Watch For
 
@@ -528,7 +530,7 @@ TODO: [NL] This must return path segments for a query to work
 1. All tests pass
 2. Code formatted (`dotnet format`)
 3. No new warnings (check suppressed warnings list in .csproj:23)
-4. OpenAPI schema valid (run Swagger UI)
+4. OpenAPI schema valid (check at `/umbraco/openapi/`)
 5. Authorization tested (unit + integration tests)
 
 ### Common Pitfalls
@@ -677,7 +679,7 @@ Examples:
 - `PUT /umbraco/management/api/v1/document/{id}` - Update document
 - `DELETE /umbraco/management/api/v1/document/{id}` - Delete document
 
-Full spec: See OpenApi.json or Swagger UI at `/umbraco/swagger`
+Full spec: See OpenApi.json or Swagger UI at `/umbraco/openapi/`
 
 ### Getting Help
 - **Root Documentation**: `/CLAUDE.md` (repository overview)

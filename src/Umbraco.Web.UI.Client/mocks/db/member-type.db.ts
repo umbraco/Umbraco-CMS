@@ -3,6 +3,7 @@ import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityNamedItemManager } from './utils/entity/entity-named-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
+import { pagedResult } from './utils/paged-result.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	AllowedMemberTypeModel,
@@ -21,10 +22,10 @@ class UmbMemberTypeMockDB extends UmbEntityMockDbBase<UmbMockMemberTypeModel> {
 		super('memberType', data);
 	}
 
-	getAllowedAtRoot(): PagedAllowedMemberTypeModel {
+	getAllowedAtRoot(skip = 0, take = 100): PagedAllowedMemberTypeModel {
 		const mockItems = this.data.filter((item) => item.allowedAsRoot);
 		const mappedItems = mockItems.map((item) => allowedMemberTypeMapper(item));
-		return { items: mappedItems, total: mappedItems.length };
+		return pagedResult(mappedItems, skip, take);
 	}
 }
 
@@ -38,10 +39,12 @@ const createDetailMockMapper = (request: CreateMemberTypeRequestModel): UmbMockM
 		properties: request.properties,
 		containers: request.containers,
 		allowedAsRoot: request.allowedAsRoot,
+		allowedInLibrary: request.allowedInLibrary,
 		variesByCulture: request.variesByCulture,
 		variesBySegment: request.variesBySegment,
 		isElement: request.isElement,
 		compositions: request.compositions,
+		noAccess: false,
 		hasChildren: false,
 		parent: null,
 		hasListView: false,
@@ -60,6 +63,7 @@ const detailResponseMapper = (item: UmbMockMemberTypeModel): MemberTypeResponseM
 		properties: item.properties,
 		containers: item.containers,
 		allowedAsRoot: item.allowedAsRoot,
+		allowedInLibrary: false,
 		variesByCulture: item.variesByCulture,
 		variesBySegment: item.variesBySegment,
 		isElement: item.isElement,

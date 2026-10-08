@@ -3,6 +3,7 @@
 
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
@@ -18,7 +19,9 @@ internal sealed class RichTextBlockPropertyValueCreator : BlockPropertyValueCrea
     /// </summary>
     /// <param name="blockEditorConverter">The <see cref="BlockEditorConverter"/> used to convert block editor values.</param>
     /// <param name="variationContextAccessor">The <see cref="IVariationContextAccessor"/> providing access to the variation context.</param>
+    /// <param name="propertyRenderingContextAccessor">Provides access to the current rendering context.</param>
     /// <param name="blockEditorVarianceHandler">The <see cref="BlockEditorVarianceHandler"/> that handles block editor variance.</param>
+    /// <param name="elementCacheService">The cache for elements.</param>
     /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/> used for JSON serialization and deserialization.</param>
     /// <param name="constructorCache">The <see cref="RichTextBlockPropertyValueConstructorCache"/> used to cache rich text block property value constructors.</param>
     /// <param name="languageService">Service used to retrieve language information for fallback resolution.</param>
@@ -27,10 +30,11 @@ internal sealed class RichTextBlockPropertyValueCreator : BlockPropertyValueCrea
         IVariationContextAccessor variationContextAccessor,
         IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
+        IElementCacheService elementCacheService,
         IJsonSerializer jsonSerializer,
         RichTextBlockPropertyValueConstructorCache constructorCache,
         ILanguageService languageService)
-        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService)
+        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService, elementCacheService)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;

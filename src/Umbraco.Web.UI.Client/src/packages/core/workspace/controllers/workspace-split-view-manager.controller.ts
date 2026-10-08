@@ -10,12 +10,6 @@ export type UmbActiveVariant = {
 };
 
 /**
- * @deprecated Use {@link UmbActiveVariant} instead. This will be removed in Umbraco 18.
- */
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export type ActiveVariant = UmbActiveVariant;
-
-/**
  * @class UmbWorkspaceSplitViewManager
  * @description - Class managing the split view state for a workspace context.
  */

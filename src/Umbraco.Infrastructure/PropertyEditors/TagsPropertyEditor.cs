@@ -3,8 +3,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Nodes;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -25,7 +23,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.Text)]
 public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
 {
-    private readonly ITagPropertyIndexValueFactory _tagPropertyIndexValueFactory;
     private readonly IIOHelper _ioHelper;
 
     /// <summary>
@@ -33,21 +30,13 @@ public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
     /// </summary>
     /// <param name="dataValueEditorFactory">Factory used to create data value editors for property editors.</param>
     /// <param name="ioHelper">Helper for IO (input/output) operations, such as file and path handling.</param>
-    /// <param name="tagPropertyIndexValueFactory">Factory responsible for creating index values for tag properties.</param>
     public TagsPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        ITagPropertyIndexValueFactory tagPropertyIndexValueFactory)
+        IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _tagPropertyIndexValueFactory = tagPropertyIndexValueFactory;
     }
-
-    /// <summary>
-    /// Gets the <see cref="IPropertyIndexValueFactory"/> used to index values for the tags property editor.
-    /// </summary>
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _tagPropertyIndexValueFactory;
 
     /// <inheritdoc />
     public Type? GetValueType(object? configuration) => typeof(IEnumerable<string>);
@@ -75,6 +64,7 @@ public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
     {
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IDataTypeService _dataTypeService;
+        private readonly IIdKeyMap _idKeyMap;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.PropertyEditors.TagsPropertyEditor.TagPropertyValueEditor"/> class,
@@ -85,16 +75,19 @@ public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
         /// <param name="ioHelper">Assists with IO operations and path handling.</param>
         /// <param name="attribute">The attribute that defines metadata for the data editor.</param>
         /// <param name="dataTypeService">Service for accessing and managing data types.</param>
+        /// <param name="idKeyMap">The cached id-to-key map used to resolve int data type IDs to GUID keys.</param>
         public TagPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
-            IDataTypeService dataTypeService)
+            IDataTypeService dataTypeService,
+            IIdKeyMap idKeyMap)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
             _dataTypeService = dataTypeService;
+            _idKeyMap = idKeyMap;
         }
 
         /// <inheritdoc />
@@ -177,7 +170,7 @@ public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
                 return null;
             }
 
-            IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            IDataType? dataType = property.PropertyType.GetDataType(_dataTypeService, _idKeyMap);
             TagConfiguration configuration = dataType?.ConfigurationObject as TagConfiguration ?? new TagConfiguration();
             var tags = ParseTags(val, configuration);
 

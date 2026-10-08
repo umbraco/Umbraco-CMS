@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -41,9 +42,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
-            CreateTestData();
+            await CreateTestData();
         }
 
         private const int MaxThreadCount = 20;
@@ -285,12 +286,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             }
         }
 
-        public void CreateTestData()
+        public async Task CreateTestData()
         {
             // Create and Save ContentType "umbTextpage" -> 1045
             ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage");
             contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-            ContentTypeService.Save(contentType);
+            await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         }
     }
 }

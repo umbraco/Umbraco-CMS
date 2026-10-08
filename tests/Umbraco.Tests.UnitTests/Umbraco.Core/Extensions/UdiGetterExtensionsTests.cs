@@ -18,6 +18,7 @@ public class UdiGetterExtensionsTests
     [TestCase(Constants.ObjectTypes.Strings.DataType, "6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://data-type-container/6ad82c70685c4e049b36d81bd779d16f")]
     [TestCase(Constants.ObjectTypes.Strings.DocumentBlueprint, "6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://document-blueprint-container/6ad82c70685c4e049b36d81bd779d16f")]
     [TestCase(Constants.ObjectTypes.Strings.DocumentType, "6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://document-type-container/6ad82c70685c4e049b36d81bd779d16f")]
+    [TestCase(Constants.ObjectTypes.Strings.Element, "6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://element-container/6ad82c70685c4e049b36d81bd779d16f")]
     [TestCase(Constants.ObjectTypes.Strings.MediaType, "6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://media-type-container/6ad82c70685c4e049b36d81bd779d16f")]
     [TestCase(Constants.ObjectTypes.Strings.MemberType, "6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://member-type-container/6ad82c70685c4e049b36d81bd779d16f")]
     public void GetUdiForEntityContainer(Guid containedObjectType, Guid key, string expected)
@@ -163,6 +164,24 @@ public class UdiGetterExtensionsTests
             .Build();
 
         Udi udi = entity.GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+
+        udi = ((IEntity)entity).GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+    }
+
+    [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://element/6ad82c70685c4e049b36d81bd779d16f")]
+    public void GetUdiForElement(Guid key, string expected)
+    {
+        Element entity = new ElementBuilder()
+            .WithKey(key)
+            .WithContentType(ContentTypeBuilder.CreateBasicContentType())
+            .Build();
+
+        Udi udi = entity.GetUdi();
+        Assert.AreEqual(expected, udi.ToString());
+
+        udi = ((IContentBase)entity).GetUdi();
         Assert.AreEqual(expected, udi.ToString());
 
         udi = ((IEntity)entity).GetUdi();

@@ -30,9 +30,9 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
     [TestCase(2)] // publish w/ cultures: new [] { "*" }
     [TestCase(3)] // publish w/ cultures: Array.Empty<string>()
     [LongRunning]
-    public void Can_Publish_Invariant_Branch(int method)
+    public async Task Can_Publish_Invariant_Branch(int method)
     {
-        CreateTypes(out var iContentType, out _);
+        var (iContentType, _) = await CreateTypes();
 
         IContent iRoot = new Content("iroot", -1, iContentType);
         iRoot.SetValue("ip", "iroot");
@@ -155,9 +155,9 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Publish_Variant_Branch_When_No_Changes_On_Root_All_Cultures()
+    public async Task Can_Publish_Variant_Branch_When_No_Changes_On_Root_All_Cultures()
     {
-        CreateTypes(out _, out var vContentType);
+        var (_, vContentType) = await CreateTypes();
 
         // create/publish root
         IContent vRoot = new Content("vroot", -1, vContentType, "de");
@@ -194,9 +194,9 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Publish_Variant_Branch_When_No_Changes_On_Root_Specific_Culture()
+    public async Task Can_Publish_Variant_Branch_When_No_Changes_On_Root_Specific_Culture()
     {
-        CreateTypes(out _, out var vContentType);
+        var (_, vContentType) = await CreateTypes();
 
         // create/publish root
         IContent vRoot = new Content("vroot", -1, vContentType, "de");
@@ -232,9 +232,9 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Publish_Variant_Branch()
+    public async Task Can_Publish_Variant_Branch()
     {
-        CreateTypes(out _, out var vContentType);
+        var (_, vContentType) = await CreateTypes();
 
         IContent vRoot = new Content("vroot", -1, vContentType, "de");
         vRoot.SetCultureName("vroot.de", "de");
@@ -341,25 +341,25 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         Assert.AreEqual("iv1.ru", iv1.GetValue("vp", "ru", published: true));
     }
 
-    private void Can_Publish_Mixed_Branch(out IContent iRoot, out IContent ii1, out IContent iv11)
+    private async Task<(IContent IRoot, IContent Ii1, IContent Iv11)> Can_Publish_Mixed_Branch()
     {
         // invariant root -> variant -> invariant
         // variant root -> variant -> invariant
         // variant root -> invariant -> variant
-        CreateTypes(out var iContentType, out var vContentType);
+        var (iContentType, vContentType) = await CreateTypes();
 
         // invariant root -> invariant -> variant
-        iRoot = new Content("iroot", -1, iContentType);
+        IContent iRoot = new Content("iroot", -1, iContentType);
         iRoot.SetValue("ip", "iroot");
         ContentService.Save(iRoot);
         ContentService.Publish(iRoot, iRoot.AvailableCultures.ToArray());
-        ii1 = new Content("ii1", iRoot, iContentType);
+        IContent ii1 = new Content("ii1", iRoot, iContentType);
         ii1.SetValue("ip", "vii1");
         ContentService.Save(ii1);
         ContentService.Publish(ii1, ii1.AvailableCultures.ToArray());
         ii1.SetValue("ip", "changed");
         ContentService.Save(ii1);
-        iv11 = new Content("iv11.de", ii1, vContentType, "de");
+        IContent iv11 = new Content("iv11.de", ii1, vContentType, "de");
         iv11.SetValue("ip", "iv11");
         iv11.SetValue("vp", "iv11.de", "de");
         iv11.SetValue("vp", "iv11.ru", "ru");
@@ -377,12 +377,14 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         iv11.SetValue("vp", "changed.de", "de");
         iv11.SetValue("vp", "changed.ru", "ru");
         ContentService.Save(iv11);
+
+        return (iRoot, ii1, iv11);
     }
 
     [Test]
-    public void Can_Publish_Mixed_Branch_1()
+    public async Task Can_Publish_Mixed_Branch_1()
     {
-        Can_Publish_Mixed_Branch(out var iRoot, out var ii1, out var iv11);
+        var (iRoot, ii1, iv11) = await Can_Publish_Mixed_Branch();
 
         var r = ContentService.PublishBranch(iRoot, PublishBranchFilter.Default, ["de"]).ToArray();
         AssertPublishResults(r, x => x.Content.Name, "iroot", "ii1", "iv11.de");
@@ -406,9 +408,9 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Publish_MixedBranch_2()
+    public async Task Can_Publish_MixedBranch_2()
     {
-        Can_Publish_Mixed_Branch(out var iRoot, out var ii1, out var iv11);
+        var (iRoot, ii1, iv11) = await Can_Publish_Mixed_Branch();
 
         var r = ContentService.PublishBranch(iRoot, PublishBranchFilter.Default, ["de", "ru"]).ToArray();
         AssertPublishResults(r, x => x.Content.Name, "iroot", "ii1", "iv11.de");
@@ -435,9 +437,9 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
     [TestCase(PublishBranchFilter.IncludeUnpublished)]
     [TestCase(PublishBranchFilter.ForceRepublish)]
     [TestCase(PublishBranchFilter.All)]
-    public void Can_Publish_Invariant_Branch_With_Force_Options(PublishBranchFilter publishBranchFilter)
+    public async Task Can_Publish_Invariant_Branch_With_Force_Options(PublishBranchFilter publishBranchFilter)
     {
-        CreateTypes(out var iContentType, out _);
+        var (iContentType, _) = await CreateTypes();
 
         // Create content (published root, published child, unpublished child, changed child).
         IContent iRoot = new Content("iroot", -1, iContentType);
@@ -480,9 +482,9 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
     [TestCase("de", PublishBranchFilter.IncludeUnpublished)]
     [TestCase("de", PublishBranchFilter.ForceRepublish)]
     [TestCase("de", PublishBranchFilter.All)]
-    public void Can_Publish_Variant_Branch_With_Force_Options(string culture, PublishBranchFilter publishBranchFilter)
+    public async Task Can_Publish_Variant_Branch_With_Force_Options(string culture, PublishBranchFilter publishBranchFilter)
     {
-        CreateTypes(out _, out var vContentType);
+        var (_, vContentType) = await CreateTypes();
 
         // Create content (published root, published child, unpublished child, changed child).
         IContent vRoot = new Content("vroot", -1, vContentType);
@@ -607,16 +609,16 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
     private void Reload(ref IContent document)
         => document = ContentService.GetById(document.Id);
 
-    private void CreateTypes(out IContentType iContentType, out IContentType vContentType)
+    private async Task<(IContentType IContentType, IContentType VContentType)> CreateTypes()
     {
         var langDe = new Language("de", "German") { IsDefault = true };
-        LanguageService.CreateAsync(langDe, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+        await LanguageService.CreateAsync(langDe, Constants.Security.SuperUserKey);
         var langRu = new Language("ru", "Russian");
-        LanguageService.CreateAsync(langRu, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+        await LanguageService.CreateAsync(langRu, Constants.Security.SuperUserKey);
         var langEs = new Language("es", "Spanish");
-        LanguageService.CreateAsync(langEs, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+        await LanguageService.CreateAsync(langEs, Constants.Security.SuperUserKey);
 
-        iContentType = new ContentType(ShortStringHelper, -1)
+        var iContentType = new ContentType(ShortStringHelper, -1)
         {
             Alias = "ict",
             Name = "Invariant Content Type",
@@ -629,9 +631,9 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
                 ValueStorageType.Nvarchar,
                 "ip")
             { Variations = ContentVariation.Nothing });
-        ContentTypeService.Save(iContentType);
+        await ContentTypeService.CreateAsync(iContentType, Constants.Security.SuperUserKey);
 
-        vContentType = new ContentType(ShortStringHelper, -1)
+        var vContentType = new ContentType(ShortStringHelper, -1)
         {
             Alias = "vct",
             Name = "Variant Content Type",
@@ -651,7 +653,8 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
                 ValueStorageType.Nvarchar,
                 "vp")
             { Variations = ContentVariation.Culture });
-        ContentTypeService.Save(vContentType);
+        await ContentTypeService.CreateAsync(vContentType, Constants.Security.SuperUserKey);
+        return (iContentType, vContentType);
     }
 
     private IEnumerable<PublishResult> PublishInvariantBranch(IContent content, PublishBranchFilter publishBranchFilter, int method)

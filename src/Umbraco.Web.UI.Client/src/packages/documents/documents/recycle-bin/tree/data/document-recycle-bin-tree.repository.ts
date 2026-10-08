@@ -1,7 +1,6 @@
 import { UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../../constants.js';
 import type { UmbDocumentRecycleBinTreeItemModel, UmbDocumentRecycleBinTreeRootModel } from '../types.js';
 import { UmbDocumentRecycleBinTreeServerDataSource } from './document-recycle-bin-tree.server.data-source.js';
-import { UMB_DOCUMENT_RECYCLE_BIN_TREE_STORE_CONTEXT } from './document-recycle-bin-tree.store.context-token.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -11,11 +10,11 @@ export class UmbDocumentRecycleBinTreeRepository
 	implements UmbApi
 {
 	constructor(host: UmbControllerHost) {
-		super(host, UmbDocumentRecycleBinTreeServerDataSource, UMB_DOCUMENT_RECYCLE_BIN_TREE_STORE_CONTEXT);
+		super(host, UmbDocumentRecycleBinTreeServerDataSource);
 	}
 
 	async requestTreeRoot() {
-		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 0 });
+		const { data: treeRootData } = await this._treeSource.getRootItems({ paging: { skip: 0, take: 0 } });
 		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
 
 		const data = {

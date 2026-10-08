@@ -25,7 +25,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var accessor = CreateOutputExpansionStrategyAccessor($"properties[{rootPropertyTypeAlias}[properties[{nestedPropertyTypeAlias}]]]");
         var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
 
         var nestedContentPickerContent = CreateSimplePickedContent(987, 654);
         var contentPickerContent = CreateMultiLevelPickedContent(123, nestedContentPickerContent, nestedPropertyTypeAlias, apiContentBuilder);
@@ -62,7 +62,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var contentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPicker2Value = CreateSimplePickedContent(666, 777);
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
         SetupContentMock(
             content,
             CreateNumberProperty(content.Object, 444, "number"),
@@ -105,7 +105,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var contentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPicker2Value = CreateSimplePickedContent(666, 777);
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
         SetupContentMock(
             content,
             CreateNumberProperty(content.Object, 444, "number"),
@@ -162,7 +162,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var nestedContentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPickerValue = CreateMultiLevelPickedContent(987, nestedContentPickerValue, "contentPicker", apiContentBuilder);
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
         SetupContentMock(content, CreateElementProperty(content.Object, "element", 333, contentPickerValue.Key, "contentPicker", apiContentBuilder, apiElementBuilder));
 
         var result = apiContentBuilder.Build(content.Object);
@@ -194,7 +194,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var nestedContentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPickerValue = CreateMultiLevelPickedContent(987, nestedContentPickerValue, "nestedContentPicker", apiContentBuilder);
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
         SetupContentMock(content, CreateElementProperty(content.Object, "element", 333, contentPickerValue.Key, "contentPicker", apiContentBuilder, apiElementBuilder));
 
         var result = apiContentBuilder.Build(content.Object);
@@ -224,7 +224,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var accessor = CreateOutputExpansionStrategyAccessor($"properties[level1Picker[properties[level2Picker[properties[level3Picker[properties[level4Picker]]]]]]]");
         var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
 
         var level5PickedContent = CreateSimplePickedContent(1234, 5678);
         var level4PickedContent = CreateMultiLevelPickedContent(444, level5PickedContent, "level4Picker", apiContentBuilder);
@@ -287,7 +287,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var accessor = CreateOutputExpansionStrategyAccessor(expand ? "properties[$all]" : null, "properties[contentPickerOne[properties[numberOne]],contentPickerTwo[properties[numberTwo]]]");
         var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
 
         var contentPickerOneContent = CreateSimplePickedContent(12, 34);
         var contentPickerOneProperty = CreateContentPickerProperty(content.Object, contentPickerOneContent.Key, "contentPickerOne", apiContentBuilder);

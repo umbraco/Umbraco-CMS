@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Services;

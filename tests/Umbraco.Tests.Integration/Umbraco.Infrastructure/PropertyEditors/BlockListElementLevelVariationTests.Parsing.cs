@@ -239,9 +239,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase("da-DK", false)]
     public async Task Can_Become_Variant_After_Publish(string culture, bool expectExposedBlocks)
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -325,9 +325,9 @@ internal partial class BlockListElementLevelVariationTests
         language!.IsDefault = true;
         await LanguageService.UpdateAsync(language, Constants.Security.SuperUserKey);
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -356,12 +356,6 @@ internal partial class BlockListElementLevelVariationTests
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         RefreshContentTypeCache(elementType, contentType);
-
-        // to re-publish the content we need to set the invariant name
-        content = ContentService.GetById(content.Key)!;
-        content.Name = "Home";
-        ContentService.Save(content);
-        PublishContent(content, contentType);
 
         var publishedContent = GetPublishedContent(content.Key);
 
@@ -412,9 +406,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase(ContentVariation.Segment, "da-DK", "Danish")]
     public async Task Can_Handle_Both_Content_And_Element_Level_Variation(ContentVariation elementVariation, string culture, string expectedStartsWith)
     {
-        var elementType = CreateElementType(elementVariation);
+        var elementType = await CreateElementType(elementVariation);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
 
         var content = CreateContent(
             contentType,
@@ -488,9 +482,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase("da-DK", "Danish")]
     public async Task Can_Become_Invariant_After_Publish_For_Variant_Block_Property(string culture, string expectedStartsWith)
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
 
         var content = CreateContent(
             contentType,
@@ -568,6 +562,8 @@ internal partial class BlockListElementLevelVariationTests
         });
     }
 
+    [TestCase(ContentVariation.Culture, "en-US", null)]
+    [TestCase(ContentVariation.Culture, "da-DK", null)]
     [TestCase(ContentVariation.Culture, "en-US", "Segment1")]
     [TestCase(ContentVariation.Culture, "en-US", "Segment2")]
     [TestCase(ContentVariation.Culture, "da-DK", "Segment1")]
@@ -580,27 +576,49 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase(ContentVariation.Segment, "en-US", "Segment2")]
     [TestCase(ContentVariation.Segment, "da-DK", "Segment1")]
     [TestCase(ContentVariation.Segment, "da-DK", "Segment2")]
-    public async Task Can_Handle_Variant_Element_For_Invariant_Content(ContentVariation elementVariation, string culture, string segment)
+    public async Task Can_Handle_Variant_Element_For_Invariant_Content(ContentVariation elementVariation, string culture, string? segment)
     {
-        var elementType = CreateElementType(elementVariation);
+        var elementType = await CreateElementType(elementVariation);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var content = CreateContent(
             contentType,
             elementType,
             new []
             {
+                // NOTE: the content is fully invariant, so the variant element properties can only ever vary by the
+                //       default language (if they even vary) - appearing to be invariant, but being variant at data level.
                 new BlockProperty(
                     new List<BlockPropertyValue>
                     {
-                        new() { Alias = "invariantText", Value = "This is invariant content text" },
-                        new() { Alias = "variantText", Value = "This is also invariant content text" }
+                        new()
+                        {
+                            Alias = "invariantText",
+                            Value = "This is invariant content text"
+                        },
+                        new()
+                        {
+                            Alias = "variantText",
+                            Value = "This is variant content text",
+                            Culture = elementVariation.VariesByCulture() ? "en-US" : null,
+                            Segment = null
+                        }
                     },
                     new List<BlockPropertyValue>
                     {
-                        new() { Alias = "invariantText", Value = "This is invariant settings text" },
-                        new() { Alias = "variantText", Value = "This is also invariant settings text" }
+                        new()
+                        {
+                            Alias = "invariantText",
+                            Value = "This is invariant settings text"
+                        },
+                        new()
+                        {
+                            Alias = "variantText",
+                            Value = "This is variant settings text",
+                            Culture = elementVariation.VariesByCulture() ? "en-US" : null,
+                            Segment = null
+                        }
                     },
                     null,
                     null)
@@ -608,37 +626,48 @@ internal partial class BlockListElementLevelVariationTests
             true);
 
         SetVariationContext(culture, segment);
+        AssertBlockValues();
 
-        var publishedContent = GetPublishedContent(content.Key);
+        // Retry to re-visit the cache within the same test, but for another culture, so we don't get false positives
+        // because of caching. No matter the requested culture, the variant-for-invariant handling should always
+        // resolve the default language for rendering.
+        culture = culture == "en-US" ? "da-DK" : "en-US";
+        SetVariationContext(culture, segment);
+        AssertBlockValues();
 
-        var value = publishedContent.GetProperty("blocks")!.GetValue() as BlockListModel;
-        Assert.IsNotNull(value);
-        Assert.AreEqual(1, value.Count);
-
-        var blockListItem = value.First();
-        Assert.AreEqual(2, blockListItem.Content.Properties.Count());
-        Assert.Multiple(() =>
+        void AssertBlockValues()
         {
-            var invariantProperty = blockListItem.Content.Properties.First();
-            Assert.AreEqual("invariantText", invariantProperty.Alias);
-            Assert.AreEqual("This is invariant content text", invariantProperty.GetValue());
+            var publishedContent = GetPublishedContent(content.Key);
 
-            var variantProperty = blockListItem.Content.Properties.Last();
-            Assert.AreEqual("variantText", variantProperty.Alias);
-            Assert.AreEqual("This is also invariant content text", variantProperty.GetValue());
-        });
+            var value = publishedContent.GetProperty("blocks")!.GetValue() as BlockListModel;
+            Assert.IsNotNull(value);
+            Assert.AreEqual(1, value.Count);
 
-        Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
-        Assert.Multiple(() =>
-        {
-            var invariantProperty = blockListItem.Settings.Properties.First();
-            Assert.AreEqual("invariantText", invariantProperty.Alias);
-            Assert.AreEqual("This is invariant settings text", invariantProperty.GetValue());
+            var blockListItem = value.First();
+            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                var invariantProperty = blockListItem.Content.Properties.First();
+                Assert.AreEqual("invariantText", invariantProperty.Alias);
+                Assert.AreEqual("This is invariant content text", invariantProperty.GetValue());
 
-            var variantProperty = blockListItem.Settings.Properties.Last();
-            Assert.AreEqual("variantText", variantProperty.Alias);
-            Assert.AreEqual("This is also invariant settings text", variantProperty.GetValue());
-        });
+                var variantProperty = blockListItem.Content.Properties.Last();
+                Assert.AreEqual("variantText", variantProperty.Alias);
+                Assert.AreEqual("This is variant content text", variantProperty.GetValue());
+            });
+
+            Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                var invariantProperty = blockListItem.Settings.Properties.First();
+                Assert.AreEqual("invariantText", invariantProperty.Alias);
+                Assert.AreEqual("This is invariant settings text", invariantProperty.GetValue());
+
+                var variantProperty = blockListItem.Settings.Properties.Last();
+                Assert.AreEqual("variantText", variantProperty.Alias);
+                Assert.AreEqual("This is variant settings text", variantProperty.GetValue());
+            });
+        }
     }
 
     [TestCase("en-US", null)]
@@ -649,9 +678,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase("da-DK", "segment2")]
     public async Task Can_Combine_Element_Level_Segment_Variation_With_Document_Level_Language_Variation(string culture, string? segment)
     {
-        var elementType = CreateElementType(ContentVariation.Segment);
+        var elementType = await CreateElementType(ContentVariation.Segment);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.CultureAndSegment, blockListDataType, ContentVariation.Culture);
+        var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType, ContentVariation.Culture);
 
         var content = CreateContent(
             contentType,

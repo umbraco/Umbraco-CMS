@@ -1,6 +1,15 @@
 import type { UmbNotificationHandler } from '../../notification-handler.js';
 import type { UmbPeekErrorArgs } from '../../types.js';
-import { css, customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	unsafeHTML,
+} from '@umbraco-cms/backoffice/external/lit';
+import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UMB_ERROR_VIEWER_MODAL,
@@ -28,10 +37,19 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 	}
 
 	get #message() {
+		const message = this.#renderMessage();
 		const detail = this.data?.detail;
 		if (detail && detail.length <= DETAIL_MAX_LENGTH) {
-			return html`${this.data?.message}
+			return html`${message}
 				<p class="detail">${detail}</p>`;
+		}
+		return message;
+	}
+
+	#renderMessage() {
+		const htmlMessage = this.data?.htmlMessage;
+		if (htmlMessage) {
+			return typeof htmlMessage === 'string' ? unsafeHTML(sanitizeHTML(htmlMessage)) : htmlMessage;
 		}
 		return this.data?.message;
 	}

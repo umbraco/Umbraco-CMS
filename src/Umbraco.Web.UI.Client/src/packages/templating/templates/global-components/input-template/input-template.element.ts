@@ -3,17 +3,19 @@ import type { UmbTemplateItemModel } from '../../repository/item/index.js';
 import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { UMB_TEMPLATE_PICKER_MODAL } from '../../modals/index.js';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 import '../template-card/template-card.element.js';
 
 @customElement('umb-input-template')
-export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
+	readonly #templateItemRepository = new UmbTemplateItemRepository(this);
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -72,8 +74,6 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 
 	@state()
 	private _pickedTemplates: UmbTemplateItemModel[] = [];
-
-	readonly #templateItemRepository = new UmbTemplateItemRepository(this);
 
 	@state()
 	private _templatePath?: string;

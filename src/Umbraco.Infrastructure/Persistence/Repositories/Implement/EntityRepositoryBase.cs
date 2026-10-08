@@ -1,9 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -47,27 +45,9 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    protected EntityRepositoryBase(
-        IScopeAccessor scopeAccessor,
-        AppCaches appCaches,
-        ILogger<EntityRepositoryBase<TId, TEntity>> logger)
-        : this(
-            scopeAccessor,
-            appCaches,
-            logger,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
-    }
+    protected IRepositoryCacheVersionService RepositoryCacheVersionService { get; }
 
-// TODO (V18): Make these fields into read-only properties.
-
-#pragma warning disable IDE1006 // Naming Styles
-    protected readonly IRepositoryCacheVersionService RepositoryCacheVersionService;
-
-    protected readonly ICacheSyncService CacheSyncService;
-#pragma warning restore IDE1006 // Naming Styles
+    protected ICacheSyncService CacheSyncService { get; }
 
     /// <summary>
     ///     Gets the logger

@@ -27,7 +27,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
 
     protected IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
-    protected IContentType CreateInvariantContentType(params ITemplate[] templates)
+    protected async Task<IContentType> CreateInvariantContentType(params ITemplate[] templates)
     {
         var contentTypeBuilder = new ContentTypeBuilder()
             .WithAlias("invariantTest")
@@ -69,7 +69,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
 
         var contentType = contentTypeBuilder.Build();
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return contentType;
     }
@@ -105,13 +105,13 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
                 .Done()
             .Build();
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         return contentType;
     }
 
     protected async Task<IContent> CreateInvariantContent(params ITemplate[] templates)
     {
-        var contentType = CreateInvariantContentType(templates);
+        var contentType = await CreateInvariantContentType(templates);
 
         var createModel = new ContentCreateModel
         {
@@ -177,9 +177,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
             ],
             Variants =
             [
-                new VariantModel { Segment = null, Name = "The Name" },
-                new VariantModel { Segment = "seg-1", Name = "The Name" },
-                new VariantModel { Segment = "seg-2", Name = "The Name" }
+                new VariantModel { Name = "The Name" }
             ],
         };
 
@@ -194,7 +192,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         var propertyType = contentType.PropertyTypes.First(pt => pt.Alias == "invariantTitle");
         propertyType.Alias = "otherTitle";
         propertyType.Variations = otherTitleVariation;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IEnumerable<PropertyValueModel> otherTitleValues = otherTitleVariation switch
         {
@@ -226,12 +224,8 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
             ]),
             Variants =
             [
-                new VariantModel { Name = "The Name", Culture = "en-US", Segment = null },
-                new VariantModel { Name = "The Name", Culture = "en-US", Segment = "seg-1" },
-                new VariantModel { Name = "The Name", Culture = "en-US", Segment = "seg-2" },
-                new VariantModel { Name = "The Name", Culture = "da-DK", Segment = null },
-                new VariantModel { Name = "The Name", Culture = "da-DK", Segment = "seg-1" },
-                new VariantModel { Name = "The Name", Culture = "da-DK", Segment = "seg-2" },
+                new VariantModel { Name = "The Name", Culture = "en-US" },
+                new VariantModel { Name = "The Name", Culture = "da-DK" },
             ],
         };
 

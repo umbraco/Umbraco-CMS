@@ -44,10 +44,8 @@ internal sealed class DefaultCultureAccessorTests
 
     private static DefaultCultureAccessor CreateSut(RuntimeLevel level, string? siteDefaultCulture = SiteDefaultCulture)
     {
-#pragma warning disable CS0618 // Type or member is obsolete. This is what DefaultCultureAccessor still calls.
-        var localizationService = new Mock<ILocalizationService>();
-        localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns(siteDefaultCulture!);
-#pragma warning restore CS0618 // Type or member is obsolete
+        var languageService = new Mock<ILanguageService>();
+        languageService.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync(siteDefaultCulture!);
 
         var runtimeState = new Mock<IRuntimeState>();
         runtimeState.SetupGet(x => x.Level).Returns(level);
@@ -55,7 +53,7 @@ internal sealed class DefaultCultureAccessorTests
         var globalSettings = new GlobalSettings { DefaultUILanguage = ConfiguredUiLanguage };
 
         return new DefaultCultureAccessor(
-            localizationService.Object,
+            languageService.Object,
             runtimeState.Object,
             Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings));
     }

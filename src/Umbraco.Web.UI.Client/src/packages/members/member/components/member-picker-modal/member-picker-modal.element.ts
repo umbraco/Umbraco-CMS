@@ -1,6 +1,6 @@
 import { UmbMemberCollectionRepository } from '../../collection/index.js';
 import { UMB_MEMBER_ENTITY_TYPE } from '../../constants.js';
-import { type UmbMemberDetailModel } from '../../types.js';
+import type { UmbMemberDetailModel } from '../../types.js';
 import type { UmbMemberItemModel } from '../../item/types.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';

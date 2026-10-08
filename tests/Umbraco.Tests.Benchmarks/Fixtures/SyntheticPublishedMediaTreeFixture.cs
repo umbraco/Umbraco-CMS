@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -180,7 +180,7 @@ internal sealed class SyntheticPublishedMediaTreeFixture
             }
         }
 
-        var mediaCache = new MediaCache(cacheService, contentTypeCache, navigationService);
+        var mediaCache = new MediaCache(cacheService, navigationService);
 
         NavigationQueryService = navigationService;
         StatusFilteringService = new PublishedMediaStatusFilteringService(mediaCache, cacheService);
@@ -209,11 +209,9 @@ internal sealed class SyntheticPublishedMediaTreeFixture
         var dataType = new DataType(new VoidEditor(Mock.Of<IDataValueEditorFactory>()), jsonSerializer) { Id = 1 };
         var dataTypeServiceMock = new Mock<IDataTypeService>();
 
-#pragma warning disable CS0618
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { dataType });
-#pragma warning restore CS0618
+        dataTypeServiceMock.Setup(x => x.GetAllAsync(It.IsAny<Guid[]>())).ReturnsAsync(new[] { dataType });
 
-        var factory = new PublishedContentTypeFactory(modelFactory, converters, dataTypeServiceMock.Object);
+        var factory = new PublishedContentTypeFactory(modelFactory, converters, dataTypeServiceMock.Object, Mock.Of<IIdKeyMap>());
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
         {

@@ -5,6 +5,18 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+
+const warnedLegacyKeys = new Set<string>();
+const umbWarnLegacyGreetingKey = (legacyKey: string, canonicalKey: string) => {
+	if (warnedLegacyKeys.has(legacyKey)) return;
+	warnedLegacyKeys.add(legacyKey);
+	new UmbDeprecation({
+		deprecated: `Translation key "${legacyKey}"`,
+		removeInVersion: '20.0.0',
+		solution: `Use "${canonicalKey}" instead. See https://github.com/umbraco/Umbraco-CMS/issues/20082`,
+	}).warn();
+};
 
 /**
  * A reusable auth login view that renders the full login screen (background, logo, greeting, providers).
@@ -38,19 +50,21 @@ export class UmbAuthViewElement extends UmbLitElement {
 	}
 
 	get headline() {
-		return this.userLoginState === 'timedOut'
-			? this.localize.term('login_instruction')
-			: this.localize.term(
-					[
-						'login_greeting0',
-						'login_greeting1',
-						'login_greeting2',
-						'login_greeting3',
-						'login_greeting4',
-						'login_greeting5',
-						'login_greeting6',
-					][new Date().getDay()],
-				);
+		if (this.userLoginState === 'timedOut') {
+			return this.localize.term('login_instruction');
+		}
+		const day = new Date().getDay();
+		const legacyKey = `auth_greeting${day}`;
+		const canonicalKey = `login_greeting${day}`;
+		// Honour translation packages still shipping the legacy `auth_greeting*` namespace,
+		// otherwise use the canonical `login_greeting*` key. See #20082.
+		// TODO (V20): remove the auth_greeting* fallback and the warning helper above; only
+		// login_greeting* remains.
+		if (this.localize.termOrDefault(legacyKey, null) !== null) {
+			umbWarnLegacyGreetingKey(legacyKey, canonicalKey);
+			return this.localize.term(legacyKey);
+		}
+		return this.localize.term(canonicalKey);
 	}
 
 	override firstUpdated(): void {
@@ -146,27 +160,18 @@ export class UmbAuthViewElement extends UmbLitElement {
 		return provider.forProviderName.toLowerCase() !== 'umbraco';
 	};
 
-	#onSubmit = async (providerOrManifest: string | ManifestAuthProvider, loginHint?: string) => {
+	#onSubmit = async (manifest: ManifestAuthProvider) => {
 		try {
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 			if (!authContext) {
 				throw new Error('Auth context not available');
 			}
-
-			const manifest = typeof providerOrManifest === 'string' ? undefined : providerOrManifest;
-			const providerName =
-				typeof providerOrManifest === 'string' ? providerOrManifest : providerOrManifest.forProviderName;
-
-			// If the user is timed out, we do not want to lose the state, so avoid redirecting to the provider
-			// and instead just make the authorization request. In all other cases, we want to redirect to the provider.
-			const isTimedOut = this.userLoginState === 'timedOut';
-
-			await authContext.makeAuthorizationRequest(providerName, isTimedOut ? false : true, loginHint, manifest);
-
-			const isAuthed = authContext.getIsAuthorized();
-			if (isAuthed) {
-				this.onSuccess?.();
-			}
+			// Only a timed-out session has unsaved work behind the modal, so that is the one flow that
+			// needs the popup. A cold-boot login has nothing to preserve and takes the full-page round
+			// trip instead — the same path local login already uses when it is the only provider, and it
+			// avoids depending on the popup's cross-tab broadcast reaching this window.
+			const redirect = this.userLoginState !== 'timedOut';
+			await authContext.makeAuthorizationRequest(manifest.forProviderName, redirect, undefined, manifest);
 		} catch (error) {
 			console.error('[AuthView] Error submitting auth request', error);
 			this._error = error instanceof Error ? error.message : 'Unknown error (see console)';

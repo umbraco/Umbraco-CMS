@@ -46,9 +46,9 @@ internal sealed class MemberCacheServiceTests : UmbracoIntegrationTestWithConten
 
     private IMember Member { get; set; }
 
-    public override void CreateTestData()
+    public override async Task CreateTestDataAsync()
     {
-        base.CreateTestData();
+        await base.CreateTestDataAsync();
 
         // Create and Save Member "MemberItem" based on "Member" member type
         MemberType = MemberTypeService.Get("Member")!;
@@ -100,16 +100,6 @@ internal sealed class MemberCacheServiceTests : UmbracoIntegrationTestWithConten
 
         // Assert
         Assert.That(GetCacheRecords(Member.Id), Is.Empty, "Existing member cache entries should be removed");
-    }
-
-    [Test]
-    public void Rebuild_Does_Not_Create_Member_Database_Cache_Records()
-    {
-#pragma warning disable CS0618 // Type or member is obsolete
-        MemberCacheService.Rebuild([MemberType.Id]);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.That(GetCacheRecords(Member.Id), Is.Empty);
     }
 
     private List<ContentNuDto> GetCacheRecords(int nodeId)

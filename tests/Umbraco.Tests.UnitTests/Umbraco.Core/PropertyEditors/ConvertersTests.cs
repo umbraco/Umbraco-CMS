@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -14,8 +12,9 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Published;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Extensions;
@@ -71,9 +70,9 @@ public class ConvertersTests
             serializer)
         { Id = 2 };
 
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { dataType1, dataType2 });
+        dataTypeServiceMock.Setup(x => x.GetAllAsync(It.IsAny<Guid[]>())).ReturnsAsync(new[] { dataType1, dataType2 });
 
-        var contentTypeFactory = new PublishedContentTypeFactory(factory, converters, dataTypeServiceMock.Object);
+        var contentTypeFactory = new PublishedContentTypeFactory(factory, converters, dataTypeServiceMock.Object, Mock.Of<IIdKeyMap>());
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType, int i)
         {
@@ -89,18 +88,16 @@ public class ConvertersTests
         var contentType2 =
             contentTypeFactory.CreateContentType(Guid.NewGuid(), 1003, "content2", t => CreatePropertyTypes(t, 2));
 
-        var element1 = new PublishedElement(
-            elementType1,
-            Guid.NewGuid(),
-            new Dictionary<string, object> { { "prop1", "val1" } },
-            false,
-            new VariationContext());
-        var element2 = new PublishedElement(
-            elementType2,
-            Guid.NewGuid(),
-            new Dictionary<string, object> { { "prop2", "1003" } },
-            false,
-            new VariationContext());
+        var elementsCache = new ElementsDictionaryAppCache();
+        var variationContextAccessor = new TestVariationContextAccessor { VariationContext = new() };
+        var propertyRenderingContextAccessor = new TestPropertyRenderingContextAccessor { PropertyRenderingContext = new(default) };
+
+        var contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", "val1" } }, owningContentId: 5678);
+        var element1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
+
+        contentNode = CreateContentNode("Element 2", 2345, elementType2, new Dictionary<string, object> { { "prop2", "1003" } });
+        var element2 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
+
         var cnt1 = new InternalPublishedContent(contentType1)
         {
             Id = 1003,
@@ -137,6 +134,9 @@ public class ConvertersTests
         Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestElementModel1>(model1);
         Assert.AreEqual("val1", ((PublishedSnapshotTestObjects.TestElementModel1)model1).Prop1);
 
+        // the model forwards OwningContentId to the wrapped element instead of falling back to the interface default
+        Assert.AreEqual(5678, ((PublishedSnapshotTestObjects.TestElementModel1)model1).OwningContentId);
+
         // can create a model for a published content
         var model2 = factory.CreateModel(element2);
         Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestElementModel2>(model2);
@@ -156,6 +156,24 @@ public class ConvertersTests
 
         // and we get what we want
         Assert.AreSame(cacheContent[mmodel1.Id], mmodel1);
+    }
+
+    private ContentNode CreateContentNode(string name, int id, IPublishedContentType contentType, Dictionary<string, object> properties, int? owningContentId = null)
+    {
+        var contentData = new ContentData(
+            name: name,
+            urlSegment: name.ToLowerInvariant().Replace(" ", "-"),
+            versionId: 1,
+            versionDate: DateTime.Today,
+            writerId: -1,
+            templateId: null,
+            published: true,
+            properties: properties
+                .ToDictionary(
+                    p => p.Key,
+                    p => new PropertyData[] { new() { Value = p.Value, Culture = string.Empty, Segment = string.Empty } }),
+            cultureInfos: null);
+        return new ContentNode(id, Guid.NewGuid(), 1, DateTime.Today, -1, contentType, contentData, contentData, owningContentId);
     }
 
     public class SimpleConverter3A : PropertyValueConverterBase

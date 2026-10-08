@@ -2,6 +2,7 @@ import { UmbPropertyContext } from './property.context.js';
 import { css, customElement, html, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
@@ -23,6 +24,12 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 
+const UMB_LEGACY_PROPERTY_VALUE_CHANGE_DEPRECATION = new UmbDeprecation({
+	deprecated: '`property-value-change` event',
+	removeInVersion: '20.0.0',
+	solution: 'Use `UmbChangeEvent` or the standard `change` event instead',
+});
+
 /**
  *  @element umb-property
  *  @description Component for displaying a property with editor from extension registry.
@@ -31,6 +38,8 @@ import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
  */
 @customElement('umb-property')
 export class UmbPropertyElement extends UmbLitElement {
+	#manifest?: ManifestPropertyEditorUi;
+
 	/**
 	 * Label. Name of the property
 	 * @type {string}
@@ -144,10 +153,32 @@ export class UmbPropertyElement extends UmbLitElement {
 	 */
 	@property({ type: String, attribute: 'data-path' })
 	public set dataPath(dataPath: string | undefined) {
+		const oldDataPath = this.dataPath;
+		this.#dismantleControlValidation();
 		this.#propertyContext.setDataPath(dataPath);
-		new UmbObserveValidationStateController(this, dataPath, (invalid) => {
-			this._invalid = invalid;
-		});
+
+		if (dataPath === undefined || dataPath === oldDataPath) {
+			this.removeUmbControllerByAlias('observeValidationState');
+			return;
+		}
+
+		new UmbObserveValidationStateController(
+			this,
+			dataPath,
+			(invalid) => {
+				this._invalid = invalid;
+			},
+			'observeValidationState',
+		);
+
+		// Only re-create when moving between data paths, as the element may hold state belonging to the
+		// previous one, and only if the editor does not handle the switch itself. [NL]
+		if (oldDataPath !== undefined && this.#manifest?.meta.supportsVariantChange !== true) {
+			this.#initiateEditor();
+		} else {
+			// If not re-creating the element, we can just setup the validation: [NL]
+			this.#setupControlValidation();
+		}
 	}
 	public get dataPath(): string | undefined {
 		return this.#propertyContext.getDataPath();
@@ -216,6 +247,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	#configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
 	#validationMessageObserver?: UmbObserverController<string | undefined>;
 	#extensionsController?: UmbExtensionsApiInitializer<any>;
+	#hasWarnedLegacyPropertyValueChange = false;
 
 	constructor() {
 		super();
@@ -305,6 +337,14 @@ export class UmbPropertyElement extends UmbLitElement {
 		e.stopPropagation();
 	};
 
+	private _onLegacyPropertyValueChange = (e: CustomEvent): void => {
+		if (!this.#hasWarnedLegacyPropertyValueChange) {
+			this.#hasWarnedLegacyPropertyValueChange = true;
+			UMB_LEGACY_PROPERTY_VALUE_CHANGE_DEPRECATION.warn();
+		}
+		this._onPropertyEditorChange(e);
+	};
+
 	private _observePropertyEditorUI(): void {
 		if (this._propertyEditorUiAlias) {
 			this.observe(
@@ -315,19 +355,16 @@ export class UmbPropertyElement extends UmbLitElement {
 						this._observePropertyEditorUI();
 						return;
 					}
-					this._gotEditorUI(manifest);
+					this.#manifest = manifest;
+					this.#initiateEditor();
 				},
 				'_observePropertyEditorUI',
 			);
 		}
 	}
 
-	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null): Promise<void> {
-		if (this._element && this._element.manifest === manifest) {
-			// If we already have an element and the manifest haven't changed, we don't need to do anything.
-			return;
-		}
-
+	async #initiateEditor(): Promise<void> {
+		const manifest = this.#manifest;
 		this.#extensionsController?.destroy();
 		this.#propertyContext.setEditor(undefined);
 		this.#propertyContext.setEditorManifest(manifest ?? undefined);
@@ -346,10 +383,12 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#valueObserver?.destroy();
 			this.#configObserver?.destroy();
 			this.#validationMessageObserver?.destroy();
-			this.#controlValidator?.destroy();
 			oldElement?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
-			/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 18. [LK] */
-			oldElement?.removeEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
+			/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 20. [LK] */
+			oldElement?.removeEventListener(
+				'property-value-change',
+				this._onLegacyPropertyValueChange as any as EventListener,
+			);
 			oldElement?.destroy?.();
 
 			this._element = el as ManifestPropertyEditorUi['ELEMENT_TYPE'];
@@ -358,8 +397,11 @@ export class UmbPropertyElement extends UmbLitElement {
 
 			if (this._element) {
 				this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
-				/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 18. [LK] */
-				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
+				/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 20. [LK] */
+				this._element.addEventListener(
+					'property-value-change',
+					this._onLegacyPropertyValueChange as any as EventListener,
+				);
 				// No need to observe mandatory or label, as we already do so and set it on the _element if present: [NL]
 				this._element.manifest = manifest;
 				this._element.mandatory = this._mandatory;
@@ -373,9 +415,6 @@ export class UmbPropertyElement extends UmbLitElement {
 					(value) => {
 						// Set the value on the element:
 						this._element!.value = value;
-						if (this.#validationMessageBinder) {
-							this.#validationMessageBinder.value = value;
-						}
 					},
 					null,
 				);
@@ -398,19 +437,7 @@ export class UmbPropertyElement extends UmbLitElement {
 					null,
 				);
 
-				if ('checkValidity' in this._element) {
-					const dataPath = this.dataPath;
-					this.#controlValidator = new UmbFormControlValidator(this, this._element as any, dataPath);
-					// We trust blindly that the dataPath will be present at this stage and not arrive later than this moment. [NL]
-					if (dataPath) {
-						this.#validationMessageBinder = new UmbBindServerValidationToFormControl(
-							this,
-							this._element as any,
-							dataPath,
-						);
-						this.#validationMessageBinder.value = this.#propertyContext.getValue();
-					}
-				}
+				this.#setupControlValidation();
 
 				this._element.readonly = this._isReadOnly;
 				this._element.toggleAttribute('readonly', this._isReadOnly);
@@ -419,6 +446,32 @@ export class UmbPropertyElement extends UmbLitElement {
 			}
 
 			this.requestUpdate('element', oldElement);
+		}
+	}
+
+	/**
+	 * Destroys the current form control validator and server-validation message binder, if any.
+	 *
+	 * Called synchronously, immediately, wherever `dataPath` or the element itself may have changed — before the
+	 * value for a new dataPath is pushed onto the element — so the outgoing validator can't catch that value change
+	 * and misattribute it to the variant it used to represent, incorrectly clearing (or setting) that variant's
+	 * validation message.
+	 */
+	#dismantleControlValidation(): void {
+		this.#controlValidator?.destroy();
+		this.#controlValidator = undefined;
+		this.#validationMessageBinder?.destroy();
+		this.#validationMessageBinder = undefined;
+	}
+
+	#setupControlValidation(): void {
+		this.#dismantleControlValidation();
+		if (!this._element || !('checkValidity' in this._element)) return;
+
+		const dataPath = this.dataPath;
+		this.#controlValidator = new UmbFormControlValidator(this, this._element as any, dataPath);
+		if (dataPath) {
+			this.#validationMessageBinder = new UmbBindServerValidationToFormControl(this, this._element as any, dataPath);
 		}
 	}
 

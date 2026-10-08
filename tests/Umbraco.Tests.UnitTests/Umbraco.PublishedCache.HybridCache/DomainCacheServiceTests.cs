@@ -21,10 +21,8 @@ internal sealed class DomainCacheServiceTests
 
         var domainService = new Mock<IDomainService>();
         domainService
-#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
-            .Setup(x => x.GetAll(true))
-#pragma warning restore CS0618 // Type or member is obsolete
-            .Returns([assigned, wildcard]);
+            .Setup(x => x.GetAllAsync(true))
+            .ReturnsAsync([assigned, wildcard]);
 
         var sut = new DomainCacheService(domainService.Object, CreateScopeProvider());
 
@@ -53,10 +51,8 @@ internal sealed class DomainCacheServiceTests
 
         var domainService = new Mock<IDomainService>();
         domainService
-#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
-            .Setup(x => x.GetAll(true))
-#pragma warning restore CS0618 // Type or member is obsolete
-            .Returns(() =>
+            .Setup(x => x.GetAllAsync(true))
+            .ReturnsAsync(() =>
             {
                 loadStarted.Set();
 
@@ -113,10 +109,8 @@ internal sealed class DomainCacheServiceTests
     {
         var domainService = new Mock<IDomainService>();
         domainService
-#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
-            .Setup(x => x.GetAll(true))
-#pragma warning restore CS0618 // Type or member is obsolete
-            .Returns([]);
+            .Setup(x => x.GetAllAsync(true))
+            .ReturnsAsync([]);
 
         var sut = new DomainCacheService(domainService.Object, CreateScopeProvider());
 
@@ -154,10 +148,8 @@ internal sealed class DomainCacheServiceTests
         var current = new List<IDomain> { first, second };
         var domainService = new Mock<IDomainService>();
         domainService
-#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
-            .Setup(x => x.GetAll(true))
-#pragma warning restore CS0618 // Type or member is obsolete
-            .Returns(() => current.ToArray());
+            .Setup(x => x.GetAllAsync(true))
+            .ReturnsAsync(() => current.ToArray());
 
         var sut = new DomainCacheService(domainService.Object, CreateScopeProvider());
 

@@ -3,6 +3,7 @@ import {
 	LoginResponse,
 	MfaCodeResponse,
 	NewPasswordResponse,
+	PendingTwoFactorResponse,
 	ResetPasswordResponse,
 	ValidateInviteCodeResponse,
 	ValidatePasswordResetCodeResponse,
@@ -56,7 +57,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 		} catch (error) {
 			return {
 				status: 500,
-				error: error instanceof Error ? error.message : this.#localize.term('auth_receivedErrorFromServer'),
+				error: error instanceof Error ? error.message : this.#localize.term('login_receivedErrorFromServer'),
 			};
 		}
 	}
@@ -79,15 +80,44 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 			if (!response.ok) {
 				return {
 					error:
-						response.status === 400 ? this.#localize.term('auth_mfaInvalidCode') : await this.#getErrorText(response),
+						response.status === 400 ? this.#localize.term('login_mfaInvalidCode') : await this.#getErrorText(response),
 				};
 			}
 
 			return {};
 		} catch (error) {
 			return {
-				error: error instanceof Error ? error.message : this.#localize.term('auth_receivedErrorFromServer'),
+				error: error instanceof Error ? error.message : this.#localize.term('login_receivedErrorFromServer'),
 			};
+		}
+	}
+
+	/**
+	 * Looks up a pending two-factor sign-in for the current browser session, driven by the two-factor
+	 * cookie a prior sign-in attempt (local or external) already set - not by a username. Used to
+	 * populate the MFA screen when it's reached other than as a direct continuation of `login()`
+	 * (e.g. after redirecting back from an external login provider).
+	 * @returns The provider options, or `undefined` when there is no pending two-factor sign-in.
+	 */
+	public async fetchPendingTwoFactorInfo(): Promise<PendingTwoFactorResponse | undefined> {
+		try {
+			const response = await fetch('/umbraco/management/api/v1/security/back-office/pending-2fa', {
+				headers: {
+					Accept: 'application/json',
+				},
+			});
+
+			if (!response.ok) {
+				return undefined;
+			}
+
+			const responseData = await response.json();
+			return {
+				twoFactorView: responseData.twoFactorLoginView ?? '',
+				twoFactorProviders: responseData.enabledTwoFactorProviderNames ?? [],
+			};
+		} catch {
+			return undefined;
 		}
 	}
 
@@ -206,16 +236,16 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 		switch (response.status) {
 			case 400:
 			case 401:
-				return this.#localize.term('auth_userFailedLogin');
+				return this.#localize.term('login_userFailedLogin');
 
 			case 402:
-				return this.#localize.term('auth_mfaText');
+				return this.#localize.term('login_mfaText');
 
 			case 403:
-				return this.#localize.term('auth_userLockedOut');
+				return this.#localize.term('login_userLockedOut');
 
 			default:
-				return this.#localize.term('auth_receivedErrorFromServer');
+				return this.#localize.term('login_receivedErrorFromServer');
 		}
 	}
 }

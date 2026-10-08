@@ -14,24 +14,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 [ApiVersion("1.0")]
 public class AncestorsDictionaryTreeController : DictionaryTreeControllerBase
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AncestorsDictionaryTreeController"/> class.
-    /// </summary>
-    /// <param name="entityService">Service used for managing and retrieving entities within Umbraco.</param>
-    /// <param name="dictionaryItemService">Service used for managing dictionary items in the Umbraco dictionary tree.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public AncestorsDictionaryTreeController(IEntityService entityService, IDictionaryItemService dictionaryItemService)
-        : base(entityService, dictionaryItemService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AncestorsDictionaryTreeController"/> class, which handles operations related to retrieving ancestor dictionary tree items.
-    /// </summary>
-    /// <param name="entityService">The service used for entity operations.</param>
-    /// <param name="flagProviders">A collection of providers for entity flags.</param>
-    /// <param name="dictionaryItemService">The service used for dictionary item operations.</param>
-    [ActivatorUtilitiesConstructor]
     public AncestorsDictionaryTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDictionaryItemService dictionaryItemService)
         : base(entityService, flagProviders, dictionaryItemService)
     {

@@ -13,52 +13,6 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     /// <param name="id">The unique identifier for the user group.</param>
     /// <param name="key">The unique key for the user group.</param>
     /// <param name="name">The name of the user group.</param>
-    /// <param name="icon">The icon for the user group.</param>
-    /// <param name="startContentId">The starting content node identifier.</param>
-    /// <param name="startMediaId">The starting media node identifier.</param>
-    /// <param name="alias">The alias of the user group.</param>
-    /// <param name="allowedLanguages">The collection of allowed language identifiers.</param>
-    /// <param name="allowedSections">The collection of allowed section aliases.</param>
-    /// <param name="permissions">The set of permissions.</param>
-    /// <param name="granularPermissions">The set of granular permissions.</param>
-    /// <param name="hasAccessToAllLanguages">Indicates whether the group has access to all languages.</param>
-    [Obsolete("Please use the constructor that includes all parameters. Scheduled for removal in Umbraco 19.")]
-    public ReadOnlyUserGroup(
-        int id,
-        Guid key,
-        string? name,
-        string? icon,
-        int? startContentId,
-        int? startMediaId,
-        string? alias,
-        IEnumerable<int> allowedLanguages,
-        IEnumerable<string> allowedSections,
-        ISet<string> permissions,
-        ISet<IGranularPermission> granularPermissions,
-        bool hasAccessToAllLanguages)
-        : this(
-            id,
-            key,
-            name,
-            null,
-            icon,
-            startContentId,
-            startMediaId,
-            alias,
-            allowedLanguages,
-            allowedSections,
-            permissions,
-            granularPermissions,
-            hasAccessToAllLanguages)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ReadOnlyUserGroup" /> class.
-    /// </summary>
-    /// <param name="id">The unique identifier for the user group.</param>
-    /// <param name="key">The unique key for the user group.</param>
-    /// <param name="name">The name of the user group.</param>
     /// <param name="description">The description of the user group.</param>
     /// <param name="icon">The icon for the user group.</param>
     /// <param name="startContentId">The starting content node identifier.</param>
@@ -77,6 +31,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         string? icon,
         int? startContentId,
         int? startMediaId,
+        int? startElementId,
         string? alias,
         IEnumerable<int> allowedLanguages,
         IEnumerable<string> allowedSections,
@@ -96,6 +51,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         // Zero is invalid and will be treated as Null
         StartContentId = startContentId == 0 ? null : startContentId;
         StartMediaId = startMediaId == 0 ? null : startMediaId;
+        StartElementId = startElementId == 0 ? null : startElementId;
         HasAccessToAllLanguages = hasAccessToAllLanguages;
         Permissions = permissions;
         GranularPermissions = granularPermissions;
@@ -121,6 +77,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
 
     /// <inheritdoc />
     public int? StartMediaId { get; }
+
+    public int? StartElementId { get; }
 
     /// <inheritdoc />
     public string Alias { get; }

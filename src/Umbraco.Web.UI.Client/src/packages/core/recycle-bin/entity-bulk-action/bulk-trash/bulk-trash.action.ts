@@ -12,7 +12,6 @@ import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-act
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbTrashEntityBulkAction<
@@ -20,19 +19,6 @@ export class UmbTrashEntityBulkAction<
 > extends UmbEntityBulkActionBase<MetaKindType> {
 	#localize = new UmbLocalizationController(this);
 	#items: Array<any> = [];
-	/**
-	 * @deprecated this has been turned into a private property and cannot be used from v.18. Will be removed in v.18
-	 * @returns {Array<UmbEntityModel>} The items to be trashed
-	 */
-	protected get _items(): Array<UmbEntityModel> {
-		return this.#items;
-	}
-	/**
-	 * @deprecated this has been turned into a private property and cannot be used from v.18. Will be removed in v.18
-	 */
-	protected set _items(value: Array<any>) {
-		this.#items = value;
-	}
 
 	override async execute() {
 		if (this.selection?.length === 0) {

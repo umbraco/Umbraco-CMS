@@ -9,22 +9,16 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 public interface IBlockLayoutItem
 {
     /// <summary>
-    ///     Gets or sets the content UDI.
+    ///     Gets or sets the layout item key.
     /// </summary>
     /// <value>
-    ///     The content UDI.
+    ///     The layout item key.
     /// </value>
-    [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
-    public Udi? ContentUdi { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the settings UDI.
-    /// </summary>
-    /// <value>
-    ///     The settings UDI.
-    /// </value>
-    [Obsolete("Use SettingsKey instead. Scheduled for removal in Umbraco 18.")]
-    public Udi? SettingsUdi { get; set; }
+    /// <remarks>
+    ///     Uniquely identifies a layout item. Previously the <see cref="ContentKey"/> could be used for this, but
+    ///     with reusable elements, the same <see cref="ContentKey"/> can appear multiple times in one layout.
+    /// </remarks>
+    public Guid Key { get; set; }
 
     /// <summary>
     ///     Gets or sets the content key.
@@ -43,6 +37,11 @@ public interface IBlockLayoutItem
     public Guid? SettingsKey { get; set; }
 
     /// <summary>
+    ///     Indicates if the content source is local or originates from the element service.
+    /// </summary>
+    public bool IsExternalContent { get; set; }
+
+    /// <summary>
     ///     Determines whether this layout item references the specified content key.
     /// </summary>
     /// <param name="key">The content key to check.</param>
@@ -59,4 +58,10 @@ public interface IBlockLayoutItem
     ///     <c>true</c> if this layout item references the specified settings key; otherwise, <c>false</c>.
     /// </returns>
     public bool ReferencesSetting(Guid key) => SettingsKey == key;
+
+    /// <summary>
+    ///     Returns any nested layouts for this layout (e.g. area layouts for the Block Grid).
+    /// </summary>
+    /// <returns>The nested layouts.</returns>
+    public IEnumerable<IBlockLayoutItem> GetContainedLayouts();
 }

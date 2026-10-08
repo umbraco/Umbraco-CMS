@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -37,29 +38,29 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Empty_Description_Is_Always_Null_After_Saving_Media_Type()
+    public async Task Empty_Description_Is_Always_Null_After_Saving_Media_Type()
     {
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("mediaType", "Media Type");
         mediaType.Description = null;
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         var mediaType2 = MediaTypeBuilder.CreateSimpleMediaType("mediaType2", "Media Type 2");
         mediaType2.Description = string.Empty;
-        MediaTypeService.Save(mediaType2);
+        await MediaTypeService.CreateAsync(mediaType2, Constants.Security.SuperUserKey);
 
         Assert.IsNull(mediaType.Description);
         Assert.IsNull(mediaType2.Description);
     }
 
     [Test]
-    public void Deleting_Media_Type_With_Hierarchy_Of_Media_Items_Moves_Orphaned_Media_To_Recycle_Bin()
+    public async Task Deleting_Media_Type_With_Hierarchy_Of_Media_Items_Moves_Orphaned_Media_To_Recycle_Bin()
     {
         IMediaType contentType1 = MediaTypeBuilder.CreateSimpleMediaType("test1", "Test1");
-        MediaTypeService.Save(contentType1);
+        await MediaTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
         IMediaType contentType2 = MediaTypeBuilder.CreateSimpleMediaType("test2", "Test2");
-        MediaTypeService.Save(contentType2);
+        await MediaTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
         IMediaType contentType3 = MediaTypeBuilder.CreateSimpleMediaType("test3", "Test3");
-        MediaTypeService.Save(contentType3);
+        await MediaTypeService.CreateAsync(contentType3, Constants.Security.SuperUserKey);
 
         IMediaType[] contentTypes = { contentType1, contentType2, contentType3 };
         var parentId = -1;
@@ -93,18 +94,18 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Deleting_Media_Types_With_Hierarchy_Of_Media_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items()
+    public async Task Deleting_Media_Types_With_Hierarchy_Of_Media_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items()
     {
         ContentNotificationHandler.MovedMediaToRecycleBin = MovedMediaToRecycleBin;
 
         try
         {
             IMediaType contentType1 = MediaTypeBuilder.CreateSimpleMediaType("test1", "Test1");
-            MediaTypeService.Save(contentType1);
+            await MediaTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
             IMediaType contentType2 = MediaTypeBuilder.CreateSimpleMediaType("test2", "Test2");
-            MediaTypeService.Save(contentType2);
+            await MediaTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
             IMediaType contentType3 = MediaTypeBuilder.CreateSimpleMediaType("test3", "Test3");
-            MediaTypeService.Save(contentType3);
+            await MediaTypeService.CreateAsync(contentType3, Constants.Security.SuperUserKey);
 
             IMediaType[] contentTypes = { contentType1, contentType2, contentType3 };
             var parentId = -1;
@@ -380,6 +381,37 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(baseline.Total + 1, result.Total);
             Assert.IsTrue(result.Items.Any(x => x.Key == allowedAtRoot.Key));
             Assert.IsFalse(result.Items.Any(x => x.Key == notAllowedAtRoot.Key));
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Last_Page_Of_Allowed_Children()
+    {
+        IMediaType[] children =
+        [
+            MediaTypeBuilder.CreateSimpleMediaType("childOne", "Child One"),
+            MediaTypeBuilder.CreateSimpleMediaType("childTwo", "Child Two"),
+            MediaTypeBuilder.CreateSimpleMediaType("childThree", "Child Three"),
+        ];
+
+        foreach (IMediaType child in children)
+        {
+            await MediaTypeService.CreateAsync(child, Constants.Security.SuperUserKey);
+        }
+
+        children[0].AllowedContentTypes = children
+            .Select((child, index) => new ContentTypeSort(child.Key, index, child.Alias))
+            .ToArray();
+        await MediaTypeService.UpdateAsync(children[0], Constants.Security.SuperUserKey);
+
+        Attempt<PagedModel<IMediaType>?, ContentTypeOperationStatus> result =
+            await MediaTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 2, take: 2);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, result.Result!.Total);
+            Assert.AreEqual(new[] { children[2].Key }, result.Result.Items.Select(x => x.Key).ToArray());
         });
     }
 }

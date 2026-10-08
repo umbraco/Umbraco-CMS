@@ -17,11 +17,6 @@ public sealed class PublicAccessEntrySavedDistributedCacheNotificationHandler : 
         => _distributedCache = distributedCache;
 
     /// <inheritdoc />
-    [Obsolete("Scheduled for removal in Umbraco 18.")]
-    protected override void Handle(IEnumerable<PublicAccessEntry> entities)
-        => Handle(entities, new Dictionary<string, object?>());
-
-    /// <inheritdoc />
     protected override void Handle(IEnumerable<PublicAccessEntry> entities, IDictionary<string, object?> state)
         => _distributedCache.RefreshPublicAccess();
 }

@@ -14,7 +14,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
 {
     [SetUp]
-    public new void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
+    public new void Setup()
+    {
+        ContentRepositoryBase.ThrowOnWarning = true;
+        ContentEditingNotificationHandler.Reset();
+    }
+
+    [TearDown]
+    public void TearDownNotificationHandler() => ContentEditingNotificationHandler.Reset();
 
     public void Relate(IContent parent, IContent child, string relationTypeAlias = Constants.Conventions.RelationTypes.RelatedDocumentAlias)
     {
@@ -25,7 +32,10 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.AddNotificationAsyncHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>();
+        => builder
+            .AddNotificationAsyncHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>()
+            .AddNotificationHandler<ContentSavingNotification, ContentEditingNotificationHandler>()
+            .AddNotificationHandler<ContentPublishingNotification, ContentEditingNotificationHandler>();
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
@@ -38,7 +48,7 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return contentType;
     }
@@ -58,7 +68,7 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
         {
             new (contentType.Key, 1, contentType.Alias)
         };
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         createModel.ParentKey = root.Key;
         createModel.Variants = [new() { Name = childName }];
@@ -68,4 +78,27 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
 
         return (root, child);
     }
- }
+
+    /// <summary>
+    ///     Lets a test intercept the cancelable content notifications, following the pattern used by
+    ///     <c>ContentServiceNotificationTests</c>.
+    /// </summary>
+    internal sealed class ContentEditingNotificationHandler :
+        INotificationHandler<ContentSavingNotification>,
+        INotificationHandler<ContentPublishingNotification>
+    {
+        public static Action<ContentSavingNotification>? SavingContent { get; set; }
+
+        public static Action<ContentPublishingNotification>? PublishingContent { get; set; }
+
+        public static void Reset()
+        {
+            SavingContent = null;
+            PublishingContent = null;
+        }
+
+        public void Handle(ContentSavingNotification notification) => SavingContent?.Invoke(notification);
+
+        public void Handle(ContentPublishingNotification notification) => PublishingContent?.Invoke(notification);
+    }
+}

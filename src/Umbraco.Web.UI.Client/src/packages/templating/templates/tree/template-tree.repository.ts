@@ -1,6 +1,5 @@
 import { UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbTemplateTreeServerDataSource } from './server-data-source/template-tree.server.data-source.js';
-import { UMB_TEMPLATE_TREE_STORE_CONTEXT } from './template-tree.store.context-token.js';
 import type { UmbTemplateTreeItemModel, UmbTemplateTreeRootModel } from './types.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -11,11 +10,11 @@ export class UmbTemplateTreeRepository
 	implements UmbApi
 {
 	constructor(host: UmbControllerHost) {
-		super(host, UmbTemplateTreeServerDataSource, UMB_TEMPLATE_TREE_STORE_CONTEXT);
+		super(host, UmbTemplateTreeServerDataSource);
 	}
 
 	async requestTreeRoot() {
-		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 0 });
+		const { data: treeRootData } = await this._treeSource.getRootItems({ paging: { skip: 0, take: 0 } });
 		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
 
 		const data: UmbTemplateTreeRootModel = {

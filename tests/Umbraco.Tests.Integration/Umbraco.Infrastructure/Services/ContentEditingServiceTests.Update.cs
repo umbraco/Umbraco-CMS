@@ -100,9 +100,7 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Name = "The Updated Name" },
-                new VariantModel { Segment = "seg-1", Name = "The Updated Name" },
-                new VariantModel { Segment = "seg-2", Name = "The Updated Name" }
+                new VariantModel { Name = "The Updated Name" }
             ]
         };
 
@@ -149,11 +147,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new VariantModel { Name = "The Updated English Default Name", Culture = "en-US" },
-                new VariantModel { Name = "The Updated English Seg-1 Name", Culture = "en-US", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated English Seg-2 Name", Culture = "en-US", Segment = "seg-2" },
                 new VariantModel { Name = "The Updated Danish Default Name", Culture = "da-DK" },
-                new VariantModel { Name = "The Updated Danish Seg-1 Name", Culture = "da-DK", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated Danish Seg-2 Name", Culture = "da-DK", Segment = "seg-2" },
             ]
         };
 
@@ -207,11 +201,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new VariantModel { Name = "The Updated English Default Name", Culture = "en-US" },
-                new VariantModel { Name = "The Updated English Seg-1 Name", Culture = "en-US", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated English Seg-2 Name", Culture = "en-US", Segment = "seg-2" },
                 new VariantModel { Name = "The Updated Danish Default Name", Culture = "da-DK" },
-                new VariantModel { Name = "The Updated Danish Seg-1 Name", Culture = "da-DK", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated Danish Seg-2 Name", Culture = "da-DK", Segment = "seg-2" },
             ]
         };
 
@@ -528,7 +518,7 @@ public partial class ContentEditingServiceTests
         var contentType = await ContentTypeService.GetAsync(content.ContentType.Key)!;
         contentType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
         contentType.PropertyTypes.First(pt => pt.Alias == "text").ValidationRegExp = "^\\d*$";
-        await ContentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var titleValue = addValidProperties ? "The title value" : null;
         var textValue = addValidProperties ? "12345" : "This is not a number";
@@ -861,5 +851,27 @@ public partial class ContentEditingServiceTests
             Assert.AreEqual(firstUpdateDateEn, updatedContent.GetUpdateDate("en-US"));
             Assert.Less(firstUpdateDateDa, updatedContent.GetUpdateDate("da-DK"));
         }
+    }
+
+    [Test]
+    public async Task Cannot_Update_With_An_Over_Long_Name()
+    {
+        var content = await CreateInvariantContent();
+        var originalName = content.Name;
+
+        var updateModel = new ContentUpdateModel
+        {
+            Variants = [new VariantModel { Name = new string('x', 256) }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The updated title" }],
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+
+        var updated = await ContentEditingService.GetAsync(content.Key);
+        Assert.IsNotNull(updated);
+        Assert.AreEqual(originalName, updated.Name);
     }
 }

@@ -1,12 +1,12 @@
+import { UmbDocumentVariantState } from '../../../variant-state.js';
 import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT, UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../constants.js';
 import type { UmbDocumentVariantModel } from '../../../types.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../../publishing/index.js';
-import { UmbDocumentVariantState } from '../../../variant-state.js';
 import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbTemplateItemRepository, UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
+import { UMB_ITEM_PICKER_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbTemplateItemRepository } from '@umbraco-cms/backoffice/template';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
 import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
@@ -74,7 +74,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this._documentTypeUnique = this.#workspaceContext?.getContentTypeId();
+			this._documentTypeUnique = this.#workspaceContext?.getContentTypeUnique();
 			this.#observeContent();
 		});
 
@@ -326,24 +326,32 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	async #openTemplatePicker() {
-		const result = await umbOpenModal(this, UMB_TEMPLATE_PICKER_MODAL, {
+		const allowedTemplateIds = this._allowedTemplates?.map((template) => template.id) ?? [];
+		const allowedTemplates = allowedTemplateIds.length
+			? ((await this.#templateRepository.requestItems(allowedTemplateIds)).data ?? [])
+			: [];
+
+		const currentLabel = this.localize.term('general_current');
+
+		const result = await umbOpenModal(this, UMB_ITEM_PICKER_MODAL, {
 			data: {
-				multiple: false,
-				pickableFilter: (template) =>
-					this._allowedTemplates?.find((allowed) => template.unique === allowed.id) ? true : false,
-			},
-			value: {
-				selection: [this._templateUnique],
+				headline: '#general_choose',
+				items: allowedTemplates
+					.sort((a, b) => a.name.localeCompare(b.name))
+					.map((template) => ({
+						label: template.name,
+						value: template.unique,
+						icon: 'icon-document-html',
+						// The item picker cannot pre-select an item, so the current template is marked in its description.
+						description:
+							template.unique === this._templateUnique ? `${template.alias} (${currentLabel})` : template.alias,
+					})),
 			},
 		}).catch(() => undefined);
 
-		if (!result?.selection.length) return;
+		if (!result?.value) return;
 
-		const templateUnique = result.selection[0];
-
-		if (!templateUnique) return;
-
-		this.#workspaceContext?.setTemplate(templateUnique);
+		this.#workspaceContext?.setTemplate(result.value);
 	}
 
 	static override styles = [

@@ -25,8 +25,6 @@ public class UmbracoDatabaseTests
     [Test]
     public void Can_Leave_Command_Timeout_To_Provider_When_Connection_String_Configures_One()
     {
-        // The connect timeout has to be present for this to have teeth: with "Command Timeout" alone the
-        // pre-fix code found no keyword it recognised and left CommandTimeout at zero anyway.
         using UmbracoDatabase database = CreateSqlServerDatabase("Server=.;Database=x;Connect Timeout=15;Command Timeout=300");
 
         Assert.Multiple(() =>
@@ -49,14 +47,14 @@ public class UmbracoDatabaseTests
     }
 
     [Test]
-    public void Can_Apply_Connect_Timeout_As_Command_Timeout_When_None_Configured()
+    public void Cannot_Apply_Connect_Timeout_As_Command_Timeout()
     {
         using UmbracoDatabase database = CreateSqlServerDatabase("Server=.;Database=x;Connect Timeout=60");
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(60, database.CommandTimeout);
-            Assert.AreEqual(60, database.EffectiveCommandTimeout);
+            Assert.AreEqual(0, database.CommandTimeout);
+            Assert.AreEqual(30, database.EffectiveCommandTimeout);
         });
     }
 

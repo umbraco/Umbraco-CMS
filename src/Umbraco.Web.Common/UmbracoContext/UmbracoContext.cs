@@ -157,6 +157,9 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
     public IPublishedMediaCache Media => _cacheManager.Media;
 
     /// <inheritdoc />
+    public IPublishedElementCache Elements => _cacheManager.Elements;
+
+    /// <inheritdoc />
     public IDomainCache Domains => _cacheManager.Domains;
 
     /// <inheritdoc />

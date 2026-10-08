@@ -1,4 +1,3 @@
-using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -43,7 +42,6 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Configuration;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Mail;
@@ -60,7 +58,6 @@ using Umbraco.Cms.Infrastructure.Routing;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
@@ -113,7 +110,8 @@ public static partial class UmbracoBuilderExtensions
             .Add<JITOptimizerValidator>()
             .Add<UmbracoApplicationUrlValidator>()
             .Add<UseHttpsValidator>()
-            .Add<ModelsBuilderModeValidator>();
+            .Add<ModelsBuilderModeValidator>()
+            .Add<InMemoryModelsBuilderModeValidator>();
 
         // composers
         builder
@@ -180,12 +178,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<RichTextBlockPropertyValueConstructorCache>();
         builder.Services.AddSingleton<BlockEditorVarianceHandler>();
 
-        // both SimpleTinyMceValueConverter (in Core) and RteBlockRenderingValueConverter (in Infrastructure) will be
-        // discovered when CoreBootManager configures the converters. We will remove the basic one defined
-        // in core so that the more enhanced version is active.
-        builder.PropertyValueConverters()
-            .Remove<SimpleRichTextValueConverter>();
-
         // register *all* checks, except those marked [HideFromTypeFinder] of course
         builder.Services.AddSingleton<Core.HealthChecks.NotificationMethods.IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
@@ -206,25 +198,16 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<IUserInviteSender, EmailUserInviteSender>();
         builder.Services.AddTransient<IUserForgotPasswordSender, EmailUserForgotPasswordSender>();
 
-        builder.Services.AddSingleton<IExamineManager, NoopExamineManager>();
-        builder.Services.AddSingleton<IIndexRebuilder, NoopIndexRebuilder>();
-
         builder.Services.AddScoped<ITagQuery, TagQuery>();
 
-        builder.Services.AddSingleton<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
         builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>(sp =>
             new PublishedContentQueryAccessor(sp.GetRequiredService<IScopedServiceProvider>()));
         builder.Services.AddScoped<IPublishedContentQuery>(factory =>
-        {
-            IUmbracoContextAccessor umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
-            return new PublishedContentQuery(
-                factory.GetRequiredService<IVariationContextAccessor>(),
-                factory.GetRequiredService<IExamineManager>(),
+            new PublishedContentQuery(
                 factory.GetRequiredService<IPublishedContentCache>(),
                 factory.GetRequiredService<IPublishedMediaCache>(),
                 factory.GetRequiredService<IDocumentNavigationQueryService>(),
-                factory.GetRequiredService<IMediaNavigationQueryService>());
-        });
+                factory.GetRequiredService<IMediaNavigationQueryService>()));
 
         // register accessors for cultures
         builder.Services.AddSingleton<IDefaultCultureAccessor, DefaultCultureAccessor>();
@@ -233,7 +216,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
-        builder.Services.AddSingleton<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
 
         builder.Services.AddSingleton<UploadAutoFillProperties>();
         builder.Services.AddSingleton<IImageDimensionExtractor, NoopImageDimensionExtractor>();
@@ -254,8 +236,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
-
-        builder.AddPropertyIndexValueFactories();
 
         builder.AddDeliveryApiCoreServices();
         builder.Services.AddTransient<IWebhookFiringService, WebhookFiringService>();
@@ -281,24 +261,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRichTextRequiredValidator, RichTextRequiredValidator>();
 
         builder.Services.AddSingleton<IRichTextRegexValidator, RichTextRegexValidator>();
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers the default property index value factories used for indexing property values in Umbraco's search infrastructure.
-    /// </summary>
-    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to add the property index value factories to.</param>
-    /// <returns>The same <see cref="Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder"/> instance so that multiple calls can be chained.</returns>
-    public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
-        builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IDateOnlyPropertyIndexValueFactory, DateOnlyPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<ITimeOnlyPropertyIndexValueFactory, TimeOnlyPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IDateTimeUnspecifiedPropertyIndexValueFactory, DateTimeUnspecifiedPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IDateTimeWithTimeZonePropertyIndexValueFactory, DateTimeWithTimeZonePropertyIndexValueFactory>();
 
         return builder;
     }
@@ -390,19 +352,29 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentMovedNotification, RelateOnTrashNotificationHandler>()
             .AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
             .AddNotificationHandler<MediaMovedNotification, RelateOnTrashNotificationHandler>()
-            .AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
+            .AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationHandler<ElementMovedNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationAsyncHandler<ElementMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationHandler<EntityContainerMovedNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationAsyncHandler<EntityContainerMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
 
         // add notification handlers for property editors
         builder
             .AddNotificationHandler<ContentSavingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, BlockListPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementSavingNotification, BlockListPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementCopyingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, BlockGridPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementSavingNotification, BlockGridPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementCopyingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, RichTextPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementSavingNotification, RichTextPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementCopyingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
             .AddNotificationHandler<ContentSavedBlueprintNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
@@ -462,6 +434,8 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<MediaTypeChangedNotification, MediaTypeChangedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MemberTypeChangedNotification, MemberTypeChangedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ElementTreeChangeNotification, ElementTreeChangeDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<EntityContainerDeletedNotification, ElementContainerDeletedDistributedCacheNotificationHandler>()
             ;
 
         // add notification handlers for auditing
@@ -481,7 +455,7 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationAsyncHandler<RemovedExternalMemberRolesNotification, AuditNotificationsHandler>();
 
         // Handlers for publish warnings
-        builder.AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
         builder.AddNotificationAsyncHandler<ContentPublishedNotification, AddUnroutableContentWarningsWhenPublishingNotificationHandler>();
 
         // Handlers for save warnings
@@ -495,7 +469,9 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<ContentUnpublishedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<MediaSavedNotification, ContentRelationsUpdate>()
-            .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>();
+            .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ElementSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ElementPublishedNotification, ContentRelationsUpdate>();
 
         return builder;
     }

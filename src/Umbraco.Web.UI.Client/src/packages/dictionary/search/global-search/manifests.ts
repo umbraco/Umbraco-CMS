@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'globalSearch',
 		weight: 600,
 		meta: {
-			label: 'Dictionary',
+			label: '#treeHeaders_dictionary',
 			searchProviderAlias: UMB_DICTIONARY_SEARCH_PROVIDER_ALIAS,
 			sectionAlias: UMB_TRANSLATION_SECTION_ALIAS,
 		},

@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
@@ -24,12 +22,6 @@ public class UmbracoRequestPaths
     private readonly string _deliveryApiPath;
     private readonly IOptions<UmbracoRequestPathsOptions> _umbracoRequestPathsOptions;
     private readonly IOptions<DeliveryApiSettings> _deliveryApiSettings;
-
-    [Obsolete("Please use the constructor that accepts all arguments. Scheduled for removal in Umbraco 19.")]
-    public UmbracoRequestPaths(IHostingEnvironment hostingEnvironment, IOptions<UmbracoRequestPathsOptions> umbracoRequestPathsOptions)
-        : this(hostingEnvironment, umbracoRequestPathsOptions, StaticServiceProvider.Instance.GetRequiredService<IOptions<DeliveryApiSettings>>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoRequestPaths" /> class.
@@ -71,9 +63,7 @@ public class UmbracoRequestPaths
     ///     </para>
     ///     <para>
     ///         If it's not any of the above then we cannot determine if it's back office or front-end
-    ///         so we can only assume that it is not back office. This will occur if people use an UmbracoApiController for the
-    ///         backoffice
-    ///         but do not inherit from UmbracoAuthorizedApiController and do not use [IsBackOffice] attribute.
+    ///         so we can only assume that it is not back office.
     ///     </para>
     ///     <para>
     ///         These are def front-end:

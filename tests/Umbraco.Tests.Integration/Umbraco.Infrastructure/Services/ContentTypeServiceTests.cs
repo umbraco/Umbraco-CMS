@@ -19,10 +19,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
-internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
+internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
 {
-    private IFileService FileService => GetRequiredService<IFileService>();
-
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private IContentTypeContainerService ContentTypeContainerService => GetRequiredService<IContentTypeContainerService>();
@@ -45,19 +43,19 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetComposedOf_Distinguishes_Composition_From_Inheritance()
+    public async Task GetComposedOf_Distinguishes_Composition_From_Inheritance()
     {
         var parent = ContentTypeBuilder.CreateBasicContentType("parent", "Parent");
-        ContentTypeService.Save(parent);
+        await ContentTypeService.CreateAsync(parent, Constants.Security.SuperUserKey);
 
         // child inherits from parent (tree inheritance stores the parent in the child's ContentTypeComposition)
         var child = ContentTypeBuilder.CreateBasicContentType("child", "Child", parent);
-        ContentTypeService.Save(child);
+        await ContentTypeService.CreateAsync(child, Constants.Security.SuperUserKey);
 
         // composer uses parent as a true composition
         var composer = ContentTypeBuilder.CreateBasicContentType("composer", "Composer");
         composer.AddContentType(parent);
-        ContentTypeService.Save(composer);
+        await ContentTypeService.CreateAsync(composer, Constants.Security.SuperUserKey);
 
         var composedOfIds = ContentTypeService.GetComposedOf(parent.Id).Select(x => x.Id).ToArray();
         var compositionIds = ContentTypeService.GetComposedOf(parent.Id, ComposedOfType.Composition).Select(x => x.Id).ToArray();
@@ -81,7 +79,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CanSaveAndGetIsElement()
+    public async Task CanSaveAndGetIsElement()
     {
         // create content type with a property type that varies by culture
         IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
@@ -105,13 +103,13 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             Name = "Content",
             SortOrder = 1
         });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         contentType = ContentTypeService.Get(contentType.Id);
         Assert.IsFalse(contentType.IsElement);
 
         contentType.IsElement = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         contentType = ContentTypeService.Get(contentType.Id);
         Assert.IsTrue(contentType.IsElement);
@@ -127,15 +125,15 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         IContentType contentType1 =
             ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
         await TemplateService.CreateAsync(contentType1.DefaultTemplate, Constants.Security.SuperUserKey);
-        ContentTypeService.Save(contentType1);
+        await ContentTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
         IContentType contentType2 =
             ContentTypeBuilder.CreateSimpleContentType("test2", "Test2", defaultTemplateId: template.Id);
         await TemplateService.CreateAsync(contentType2.DefaultTemplate, Constants.Security.SuperUserKey);
-        ContentTypeService.Save(contentType2);
+        await ContentTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
         IContentType contentType3 =
             ContentTypeBuilder.CreateSimpleContentType("test3", "Test3", defaultTemplateId: template.Id);
         await TemplateService.CreateAsync(contentType3.DefaultTemplate, Constants.Security.SuperUserKey);
-        ContentTypeService.Save(contentType3);
+        await ContentTypeService.CreateAsync(contentType3, Constants.Security.SuperUserKey);
 
         IContentType[] contentTypes = { contentType1, contentType2, contentType3 };
         var parentId = -1;
@@ -183,15 +181,15 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             IContentType contentType1 =
                 ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
             await TemplateService.CreateAsync(contentType1.DefaultTemplate, Constants.Security.SuperUserKey);
-            ContentTypeService.Save(contentType1);
+            await ContentTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
             IContentType contentType2 =
                 ContentTypeBuilder.CreateSimpleContentType("test2", "Test2", defaultTemplateId: template.Id);
             await TemplateService.CreateAsync(contentType2.DefaultTemplate, Constants.Security.SuperUserKey);
-            ContentTypeService.Save(contentType2);
+            await ContentTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
             IContentType contentType3 =
                 ContentTypeBuilder.CreateSimpleContentType("test3", "Test3", defaultTemplateId: template.Id);
             await TemplateService.CreateAsync(contentType3.DefaultTemplate, Constants.Security.SuperUserKey);
-            ContentTypeService.Save(contentType3);
+            await ContentTypeService.CreateAsync(contentType3, Constants.Security.SuperUserKey);
 
             IContentType[] contentTypes = { contentType1, contentType2, contentType3 };
             var parentId = -1;
@@ -234,15 +232,15 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             IContentType contentType1 =
                 ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
             await TemplateService.CreateAsync(contentType1.DefaultTemplate, Constants.Security.SuperUserKey);
-            ContentTypeService.Save(contentType1);
+            await ContentTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
             IContentType contentType2 =
                 ContentTypeBuilder.CreateSimpleContentType("test2", "Test2", defaultTemplateId: template.Id);
             await TemplateService.CreateAsync(contentType2.DefaultTemplate, Constants.Security.SuperUserKey);
-            ContentTypeService.Save(contentType2);
+            await ContentTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
             IContentType contentType3 =
                 ContentTypeBuilder.CreateSimpleContentType("test3", "Test3", defaultTemplateId: template.Id);
             await TemplateService.CreateAsync(contentType3.DefaultTemplate, Constants.Security.SuperUserKey);
-            ContentTypeService.Save(contentType3);
+            await ContentTypeService.CreateAsync(contentType3, Constants.Security.SuperUserKey);
 
             var root = ContentBuilder.CreateSimpleContent(contentType1, "Root");
             ContentService.Save(root);
@@ -288,7 +286,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         IContentType contentType1 = ContentTypeBuilder.CreateTextPageContentType("test1", "Test1", template.Id);
         await TemplateService.CreateAsync(contentType1.DefaultTemplate, Constants.Security.SuperUserKey);
-        ContentTypeService.Save(contentType1);
+        await ContentTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
         IContent contentItem = ContentBuilder.CreateTextpageContent(contentType1, "Testing", -1);
         ContentService.Save(contentItem);
         ContentService.Publish(contentItem, new[] { "*" });
@@ -296,7 +294,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // remove a property
         contentType1.RemovePropertyType(contentType1.PropertyTypes.First().Alias);
-        ContentTypeService.Save(contentType1);
+        await ContentTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
 
         // re-load it from the db
         contentItem = ContentService.GetById(contentItem.Id);
@@ -310,7 +308,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         var contentTypeService = ContentTypeService;
         var hierarchy = await CreateContentTypeHierarchy();
-        contentTypeService.Save(hierarchy, -1); // ensure they are saved!
+        foreach (var item in hierarchy)
+        {
+            await contentTypeService.CreateAsync(item, Constants.Security.SuperUserKey);
+        }
         var master = hierarchy.First();
 
         // Act
@@ -326,7 +327,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         var contentTypeService = ContentTypeService;
         var hierarchy = await CreateContentTypeHierarchy();
-        contentTypeService.Save(hierarchy, -1); // ensure they are saved!
+        foreach (var item in hierarchy)
+        {
+            await contentTypeService.CreateAsync(item, Constants.Security.SuperUserKey);
+        }
         var master = hierarchy.First();
 
         // Act
@@ -344,7 +348,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var hierarchy = await CreateContentTypeHierarchy();
 
         // Act
-        contentTypeService.Save(hierarchy, -1);
+        foreach (var item in hierarchy)
+        {
+            await contentTypeService.CreateAsync(item, Constants.Security.SuperUserKey);
+        }
 
         Assert.That(hierarchy.Any(), Is.True);
         Assert.That(hierarchy.Any(x => x.HasIdentity == false), Is.False);
@@ -381,7 +388,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             Name = "Hide From Navigation"
         });
         /*,"Navigation"*/
-        cts.Save(ctBase);
+        await cts.CreateAsync(ctBase, Constants.Security.SuperUserKey);
 
         const string contentTypeAlias = "HomePage";
         var ctHomePage = new ContentType(ShortStringHelper, ctBase, contentTypeAlias)
@@ -395,7 +402,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ctHomePage.AddPropertyType(
             new PropertyType(ShortStringHelper, dtdYesNo, "someProperty") { Name = "Some property" });
         /*,"Navigation"*/
-        cts.Save(ctHomePage);
+        await cts.CreateAsync(ctHomePage, Constants.Security.SuperUserKey);
 
         // Act
         var homeDoc = cs.Create("Home Page", -1, contentTypeAlias);
@@ -410,7 +417,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Create_Content_Type_Ensures_Sort_Orders()
+    public async Task Create_Content_Type_Ensures_Sort_Orders()
     {
         var contentType = new ContentType(ShortStringHelper, -1)
         {
@@ -446,7 +453,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 "author")
             { Name = "Author", Description = "Name of the author", Mandatory = false, DataTypeId = -88 });
 
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var sortOrders = contentType.PropertyTypes.Select(x => x.SortOrder).ToArray();
 
@@ -467,7 +474,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var global = ContentTypeBuilder.CreateSimpleContentType("global", "Global", defaultTemplateId: template.Id);
-        ContentTypeService.Save(global);
+        await ContentTypeService.CreateAsync(global, Constants.Security.SuperUserKey);
 
         var components = ContentTypeBuilder.CreateSimpleContentType(
             "components",
@@ -475,7 +482,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             global,
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(components);
+        await ContentTypeService.CreateAsync(components, Constants.Security.SuperUserKey);
 
         var component = ContentTypeBuilder.CreateSimpleContentType(
             "component",
@@ -483,7 +490,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             components,
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(component);
+        await ContentTypeService.CreateAsync(component, Constants.Security.SuperUserKey);
 
         var category = ContentTypeBuilder.CreateSimpleContentType(
             "category",
@@ -491,7 +498,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             global,
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(category);
+        await ContentTypeService.CreateAsync(category, Constants.Security.SuperUserKey);
 
         var success = category.AddContentType(component);
 
@@ -509,7 +516,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             "Page",
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var childContentType = ContentTypeBuilder.CreateSimpleContentType(
             "childPage",
@@ -519,7 +526,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             propertyGroupAlias: "childContent",
             propertyGroupName: "Child Content",
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(childContentType);
+        await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
         var content = ContentService.Create("Page 1", -1, childContentType.Alias);
         ContentService.Save(content);
 
@@ -573,7 +580,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         ContentTypeNotificationHandler.Deleted +=
             notification => deletedEntities += notification.DeletedEntities.Count();
@@ -592,10 +599,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var contentType2 =
             ContentTypeBuilder.CreateSimpleContentType("otherPage", "Other page", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType2);
+        await ContentTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
 
         ContentTypeNotificationHandler.Deleted +=
             notification => deletedEntities += notification.DeletedEntities.Count();
@@ -615,11 +622,11 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var contentType2 =
             ContentTypeBuilder.CreateSimpleContentType("subPage", "Sub page", defaultTemplateId: template.Id);
         contentType2.ParentId = contentType.Id;
-        ContentTypeService.Save(contentType2);
+        await ContentTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
 
         ContentTypeNotificationHandler.Deleted +=
             notification => deletedEntities += notification.DeletedEntities.Count();
@@ -636,7 +643,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         try
         {
@@ -665,17 +672,17 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Arrange
         var component = CreateComponent();
-        cts.Save(component);
+        await cts.CreateAsync(component, Constants.Security.SuperUserKey);
         var banner = CreateBannerComponent(component);
-        cts.Save(banner);
+        await cts.CreateAsync(banner, Constants.Security.SuperUserKey);
         var site = CreateSite();
-        cts.Save(site);
+        await cts.CreateAsync(site, Constants.Security.SuperUserKey);
         var homepage = await CreateHomepage(site);
-        cts.Save(homepage);
+        await cts.CreateAsync(homepage, Constants.Security.SuperUserKey);
 
         // Add banner to homepage
         var added = homepage.AddContentType(banner);
-        cts.Save(homepage);
+        await cts.UpdateAsync(homepage, Constants.Security.SuperUserKey);
 
         // Assert composition
         var bannerExists = homepage.ContentTypeCompositionExists(banner.Alias);
@@ -687,7 +694,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Remove banner from homepage
         var removed = homepage.RemoveContentType(banner.Alias);
-        cts.Save(homepage);
+        await cts.UpdateAsync(homepage, Constants.Security.SuperUserKey);
 
         // Assert composition
         var bannerStillExists = homepage.ContentTypeCompositionExists(banner.Alias);
@@ -703,7 +710,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var metaContentType = ContentTypeBuilder.CreateMetaContentType();
-        ContentTypeService.Save(metaContentType);
+        await ContentTypeService.CreateAsync(metaContentType, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -713,13 +720,13 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 "Category",
                 metaContentType,
                 defaultTemplateId: template.Id) as IContentType;
-        ContentTypeService.Save(simpleContentType);
+        await ContentTypeService.CreateAsync(simpleContentType, Constants.Security.SuperUserKey);
         var categoryId = simpleContentType.Id;
 
         // Act
         var sut = simpleContentType.DeepCloneWithResetIdentities("newcategory");
         Assert.IsNotNull(sut);
-        ContentTypeService.Save(sut);
+        await ContentTypeService.CreateAsync(sut, Constants.Security.SuperUserKey);
 
         // Assert
         Assert.That(sut.HasIdentity, Is.True);
@@ -752,13 +759,13 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         var parentContentType1 =
             ContentTypeBuilder.CreateSimpleContentType("parent1", "Parent1", defaultTemplateId: template.Id);
-        ContentTypeService.Save(parentContentType1);
+        await ContentTypeService.CreateAsync(parentContentType1, Constants.Security.SuperUserKey);
         var parentContentType2 = ContentTypeBuilder.CreateSimpleContentType(
             "parent2",
             "Parent2",
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(parentContentType2);
+        await ContentTypeService.CreateAsync(parentContentType2, Constants.Security.SuperUserKey);
 
         var simpleContentType = ContentTypeBuilder.CreateSimpleContentType(
             "category",
@@ -766,7 +773,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             parentContentType1,
             randomizeAliases: true,
             defaultTemplateId: template.Id) as IContentType;
-        ContentTypeService.Save(simpleContentType);
+        await ContentTypeService.CreateAsync(simpleContentType, Constants.Security.SuperUserKey);
 
         // Act
         var clone = simpleContentType.DeepCloneWithResetIdentities("newcategory");
@@ -774,7 +781,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         clone.RemoveContentType("parent1");
         clone.AddContentType(parentContentType2);
         clone.ParentId = parentContentType2.Id;
-        ContentTypeService.Save(clone);
+        await ContentTypeService.CreateAsync(clone, Constants.Security.SuperUserKey);
 
         // Assert
         Assert.That(clone.HasIdentity, Is.True);
@@ -808,7 +815,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var metaContentType = ContentTypeBuilder.CreateMetaContentType();
-        ContentTypeService.Save(metaContentType);
+        await ContentTypeService.CreateAsync(metaContentType, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -818,7 +825,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             "Category",
             metaContentType,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(simpleContentType);
+        await ContentTypeService.CreateAsync(simpleContentType, Constants.Security.SuperUserKey);
         var categoryId = simpleContentType.Id;
 
         // Act
@@ -868,13 +875,13 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         var parentContentType1 =
             ContentTypeBuilder.CreateSimpleContentType("parent1", "Parent1", defaultTemplateId: template.Id);
-        ContentTypeService.Save(parentContentType1);
+        await ContentTypeService.CreateAsync(parentContentType1, Constants.Security.SuperUserKey);
         var parentContentType2 = ContentTypeBuilder.CreateSimpleContentType(
             "parent2",
             "Parent2",
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(parentContentType2);
+        await ContentTypeService.CreateAsync(parentContentType2, Constants.Security.SuperUserKey);
 
         var simpleContentType = ContentTypeBuilder.CreateSimpleContentType(
             "category",
@@ -882,7 +889,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             parentContentType1,
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(simpleContentType);
+        await ContentTypeService.CreateAsync(simpleContentType, Constants.Security.SuperUserKey);
 
         // Act - clone and re-parent via DeepCloneWithResetIdentities + CreateAsync
         var clone = (IContentType)simpleContentType.DeepCloneWithResetIdentities("newAlias");
@@ -930,20 +937,20 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var parent = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(parent);
+        await ContentTypeService.CreateAsync(parent, Constants.Security.SuperUserKey);
         var child = ContentTypeBuilder.CreateSimpleContentType(
             "simpleChildPage",
             "Simple Child Page",
             parent,
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(child);
+        await ContentTypeService.CreateAsync(child, Constants.Security.SuperUserKey);
         var composition = ContentTypeBuilder.CreateMetaContentType();
-        ContentTypeService.Save(composition);
+        await ContentTypeService.CreateAsync(composition, Constants.Security.SuperUserKey);
 
         // Adding Meta-composition to child doc type
         child.AddContentType(composition);
-        ContentTypeService.Save(child);
+        await ContentTypeService.CreateAsync(child, Constants.Security.SuperUserKey);
 
         // Act
         var duplicatePropertyType =
@@ -963,7 +970,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Assert
         Assert.That(added, Is.True);
-        Assert.Throws<InvalidCompositionException>(() => ContentTypeService.Save(composition));
+        Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(composition, Constants.Security.SuperUserKey));
         Assert.DoesNotThrow(() => ContentTypeService.Get("simpleChildPage"));
     }
 
@@ -979,30 +986,30 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             "Base Page",
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
         var contentPage = ContentTypeBuilder.CreateSimpleContentType(
             "contentPage",
             "Content Page",
             basePage,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
         var advancedPage = ContentTypeBuilder.CreateSimpleContentType(
             "advancedPage",
             "Advanced Page",
             contentPage,
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         var metaComposition = ContentTypeBuilder.CreateMetaContentType();
-        ContentTypeService.Save(metaComposition);
+        await ContentTypeService.CreateAsync(metaComposition, Constants.Security.SuperUserKey);
         var seoComposition = ContentTypeBuilder.CreateMetaContentType("seo", "SEO");
-        ContentTypeService.Save(seoComposition);
+        await ContentTypeService.CreateAsync(seoComposition, Constants.Security.SuperUserKey);
 
         var metaAdded = contentPage.AddContentType(metaComposition);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
         var seoAdded = advancedPage.AddContentType(seoComposition);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         // Act
         var duplicatePropertyType =
@@ -1032,9 +1039,9 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(addedToMeta, Is.True);
         Assert.That(addedToSeo, Is.True);
 
-        Assert.Throws<InvalidCompositionException>(() => ContentTypeService.Save(basePage));
-        Assert.Throws<InvalidCompositionException>(() => ContentTypeService.Save(metaComposition));
-        Assert.Throws<InvalidCompositionException>(() => ContentTypeService.Save(seoComposition));
+        Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey));
+        Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(metaComposition, Constants.Security.SuperUserKey));
+        Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(seoComposition, Constants.Security.SuperUserKey));
 
         Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
         Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
@@ -1043,7 +1050,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Cannot_Add_Duplicate_PropertyType_Alias_At_Root_Which_Conflicts_With_Third_Levels_Composition()
+    public async Task Cannot_Add_Duplicate_PropertyType_Alias_At_Root_Which_Conflicts_With_Third_Levels_Composition()
     {
         /*
          * BasePage, gets 'Title' added but should not be allowed
@@ -1057,14 +1064,14 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Arrange
         var basePage = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
         var contentPage = ContentTypeBuilder.CreateBasicContentType("contentPage", "Content Page", basePage);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
         var advancedPage = ContentTypeBuilder.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         var contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
-        ContentTypeService.Save(contentMetaComposition);
+        await ContentTypeService.CreateAsync(contentMetaComposition, Constants.Security.SuperUserKey);
 
         // Act
         var bodyTextPropertyType =
@@ -1081,7 +1088,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "content", "Content");
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
         var authorPropertyType =
             new PropertyType(
@@ -1097,10 +1104,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var compositionAdded = advancedPage.AddContentType(contentMetaComposition);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         // NOTE: It should not be possible to Save 'BasePage' with the Title PropertyType added
         var titlePropertyType =
@@ -1124,24 +1131,28 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(titleAdded, Is.True);
         Assert.That(compositionAdded, Is.True);
 
-        Assert.Throws<InvalidCompositionException>(() => ContentTypeService.Save(basePage));
+        Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey));
 
         Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
         Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
     }
 
     [Test]
-    public void Cannot_Save_ContentType_With_Empty_Name()
+    public async Task Cannot_Save_ContentType_With_Empty_Name()
     {
         // Arrange
         var contentType = ContentTypeBuilder.CreateSimpleContentType("contentType", string.Empty);
 
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => ContentTypeService.Save(contentType));
+        // Act
+        var result = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.NameCannotBeEmpty, result.Result);
     }
 
     [Test]
-    public void Cannot_Rename_PropertyType_Alias_On_Composition_Which_Would_Cause_Conflict_In_Other_Composition()
+    public async Task Cannot_Rename_PropertyType_Alias_On_Composition_Which_Would_Cause_Conflict_In_Other_Composition()
     {
         /*
          * Meta renames alias to 'title'
@@ -1154,19 +1165,19 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Arrange
         var basePage = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
         var contentPage = ContentTypeBuilder.CreateBasicContentType("contentPage", "Content Page", basePage);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
         var advancedPage = ContentTypeBuilder.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
         var moreAdvancedPage =
             ContentTypeBuilder.CreateBasicContentType("moreAdvancedPage", "More Advanced Page", advancedPage);
-        ContentTypeService.Save(moreAdvancedPage);
+        await ContentTypeService.CreateAsync(moreAdvancedPage, Constants.Security.SuperUserKey);
 
         var seoComposition = ContentTypeBuilder.CreateMetaContentType("seo", "SEO");
-        ContentTypeService.Save(seoComposition);
+        await ContentTypeService.CreateAsync(seoComposition, Constants.Security.SuperUserKey);
         var metaComposition = ContentTypeBuilder.CreateMetaContentType();
-        ContentTypeService.Save(metaComposition);
+        await ContentTypeService.CreateAsync(metaComposition, Constants.Security.SuperUserKey);
 
         // Act
         var bodyTextPropertyType =
@@ -1183,7 +1194,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "content", "Content");
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
         var authorPropertyType =
             new PropertyType(
@@ -1199,7 +1210,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var subtitlePropertyType =
             new PropertyType(
@@ -1215,7 +1226,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var subtitleAdded = advancedPage.AddPropertyType(subtitlePropertyType, "content", "Content");
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         var titlePropertyType =
             new PropertyType(
@@ -1231,12 +1242,12 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var titleAdded = seoComposition.AddPropertyType(titlePropertyType, "content", "Content");
-        ContentTypeService.Save(seoComposition);
+        await ContentTypeService.CreateAsync(seoComposition, Constants.Security.SuperUserKey);
 
         var seoCompositionAdded = advancedPage.AddContentType(seoComposition);
         var metaCompositionAdded = moreAdvancedPage.AddContentType(metaComposition);
-        ContentTypeService.Save(advancedPage);
-        ContentTypeService.Save(moreAdvancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(moreAdvancedPage, Constants.Security.SuperUserKey);
 
         var keywordsPropertyType = metaComposition.PropertyTypes.First(x => x.Alias.Equals("metakeywords"));
         keywordsPropertyType.Alias = "title";
@@ -1249,7 +1260,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(seoCompositionAdded, Is.True);
         Assert.That(metaCompositionAdded, Is.True);
 
-        Assert.Throws<InvalidCompositionException>(() => ContentTypeService.Save(metaComposition));
+        Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(metaComposition, Constants.Security.SuperUserKey));
 
         Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
         Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
@@ -1257,7 +1268,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Add_Additional_Properties_On_Composition_Once_Composition_Has_Been_Saved()
+    public async Task Can_Add_Additional_Properties_On_Composition_Once_Composition_Has_Been_Saved()
     {
         /*
          * Meta renames alias to 'title'
@@ -1270,19 +1281,19 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Arrange
         var basePage = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
         var contentPage = ContentTypeBuilder.CreateBasicContentType("contentPage", "Content Page", basePage);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
         var advancedPage = ContentTypeBuilder.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
         var moreAdvancedPage =
             ContentTypeBuilder.CreateBasicContentType("moreAdvancedPage", "More Advanced Page", advancedPage);
-        ContentTypeService.Save(moreAdvancedPage);
+        await ContentTypeService.CreateAsync(moreAdvancedPage, Constants.Security.SuperUserKey);
 
         var seoComposition = ContentTypeBuilder.CreateMetaContentType("seo", "SEO");
-        ContentTypeService.Save(seoComposition);
+        await ContentTypeService.CreateAsync(seoComposition, Constants.Security.SuperUserKey);
         var metaComposition = ContentTypeBuilder.CreateMetaContentType();
-        ContentTypeService.Save(metaComposition);
+        await ContentTypeService.CreateAsync(metaComposition, Constants.Security.SuperUserKey);
 
         // Act
         var bodyTextPropertyType =
@@ -1299,7 +1310,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "content", "Content");
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
         var authorPropertyType =
             new PropertyType(
@@ -1315,7 +1326,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var subtitlePropertyType =
             new PropertyType(
@@ -1331,7 +1342,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var subtitleAdded = advancedPage.AddPropertyType(subtitlePropertyType, "content", "Content");
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         var titlePropertyType =
             new PropertyType(
@@ -1347,12 +1358,12 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var titleAdded = seoComposition.AddPropertyType(titlePropertyType, "content", "Content");
-        ContentTypeService.Save(seoComposition);
+        await ContentTypeService.CreateAsync(seoComposition, Constants.Security.SuperUserKey);
 
         var seoCompositionAdded = advancedPage.AddContentType(seoComposition);
         var metaCompositionAdded = moreAdvancedPage.AddContentType(metaComposition);
-        ContentTypeService.Save(advancedPage);
-        ContentTypeService.Save(moreAdvancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(moreAdvancedPage, Constants.Security.SuperUserKey);
 
         // Assert
         Assert.That(bodyTextAdded, Is.True);
@@ -1376,7 +1387,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var testAdded = seoComposition.AddPropertyType(testPropertyType, "content", "Content");
-        ContentTypeService.Save(seoComposition);
+        await ContentTypeService.CreateAsync(seoComposition, Constants.Security.SuperUserKey);
 
         Assert.That(testAdded, Is.True);
 
@@ -1397,7 +1408,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             "Page",
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(page);
+        await ContentTypeService.CreateAsync(page, Constants.Security.SuperUserKey);
         var contentPage = ContentTypeBuilder.CreateSimpleContentType(
             "contentPage",
             "Content Page",
@@ -1406,7 +1417,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             propertyGroupAlias: "content2",
             propertyGroupName: "Content_",
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
         var advancedPage = ContentTypeBuilder.CreateSimpleContentType(
             "advancedPage",
             "Advanced Page",
@@ -1415,10 +1426,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             propertyGroupAlias: "details",
             propertyGroupName: "Details",
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         var contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
-        ContentTypeService.Save(contentMetaComposition);
+        await ContentTypeService.CreateAsync(contentMetaComposition, Constants.Security.SuperUserKey);
 
         // Act
         var subtitlePropertyType =
@@ -1449,10 +1460,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             };
         var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "content", "Content");
         var authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var compositionAdded = contentPage.AddContentType(contentMetaComposition);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         // Change the name of the tab on the "root" content type 'page'.
         var propertyGroup = contentPage.PropertyGroups["content2"];
@@ -1474,15 +1485,15 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Cannot_Rename_PropertyType_Alias_Causing_Conflicts_With_Parents()
+    public async Task Cannot_Rename_PropertyType_Alias_Causing_Conflicts_With_Parents()
     {
         // Arrange
         var basePage = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
         var contentPage = ContentTypeBuilder.CreateBasicContentType("contentPage", "Content Page", basePage);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
         var advancedPage = ContentTypeBuilder.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         // Act
         var titlePropertyType =
@@ -1541,9 +1552,9 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var authorAdded = advancedPage.AddPropertyType(authorPropertyType, "content", "Content");
-        ContentTypeService.Save(basePage);
-        ContentTypeService.Save(contentPage);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         // Rename the PropertyType to something that already exists in the Composition - NOTE this should not be allowed and Saving should throw an exception
         var authorPropertyTypeToRename = advancedPage.PropertyTypes.First(x => x.Alias.Equals("author"));
@@ -1555,7 +1566,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(titleAdded, Is.True);
         Assert.That(subtitleAdded, Is.True);
 
-        Assert.Throws<InvalidCompositionException>(() => ContentTypeService.Save(advancedPage));
+        Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey));
 
         Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
         Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
@@ -1579,33 +1590,33 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             "Base Page",
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
         var contentPage = ContentTypeBuilder.CreateSimpleContentType(
             "contentPage",
             "Content Page",
             basePage,
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
         var advancedPage = ContentTypeBuilder.CreateSimpleContentType(
             "advancedPage",
             "Advanced Page",
             contentPage,
             randomizeAliases: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         var metaComposition = ContentTypeBuilder.CreateMetaContentType();
-        ContentTypeService.Save(metaComposition);
+        await ContentTypeService.CreateAsync(metaComposition, Constants.Security.SuperUserKey);
 
         var contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
-        ContentTypeService.Save(contentMetaComposition);
+        await ContentTypeService.CreateAsync(contentMetaComposition, Constants.Security.SuperUserKey);
 
         var metaAdded = contentPage.AddContentType(metaComposition);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var metaAddedToComposition = contentMetaComposition.AddContentType(metaComposition);
-        ContentTypeService.Save(contentMetaComposition);
+        await ContentTypeService.CreateAsync(contentMetaComposition, Constants.Security.SuperUserKey);
 
         // Act
         var propertyType =
@@ -1628,7 +1639,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(metaAddedToComposition, Is.True);
 
         Assert.That(addedToContentPage, Is.True);
-        Assert.DoesNotThrow(() => ContentTypeService.Save(contentPage));
+        Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey));
     }
 
     [Test]
@@ -1652,7 +1663,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("Title", page.PropertyTypes.First().Name);
         Assert.AreEqual("Body text", page.PropertyTypes.Skip(1).First().Name);
         Assert.AreEqual("Author", page.PropertyTypes.Skip(2).First().Name);
-        ContentTypeService.Save(page);
+        await ContentTypeService.CreateAsync(page, Constants.Security.SuperUserKey);
 
         // create 'contentPage' content type as a child of 'page'
         var contentPage = ContentTypeBuilder.CreateSimpleContentType(
@@ -1667,7 +1678,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("Title", contentPage.PropertyTypes.First().Name);
         Assert.AreEqual("Body text", contentPage.PropertyTypes.Skip(1).First().Name);
         Assert.AreEqual("Author", contentPage.PropertyTypes.Skip(2).First().Name);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         // add 'Content' group to 'meta' content type
         var meta = ContentTypeBuilder.CreateMetaContentType();
@@ -1678,11 +1689,11 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("Meta Description", meta.PropertyTypes.Skip(1).First().Name);
         meta.AddPropertyGroup("content", "Content");
         Assert.AreEqual(2, meta.PropertyTypes.Count());
-        ContentTypeService.Save(meta);
+        await ContentTypeService.CreateAsync(meta, Constants.Security.SuperUserKey);
 
         // add 'meta' content type to 'contentPage' composition
         contentPage.AddContentType(meta);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         // add property 'prop1' to 'contentPage' group 'Content_'
         var prop1 =
@@ -1719,11 +1730,11 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(prop2Added);
 
         // save 'contentPage' content type
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var group = page.PropertyGroups["content2"];
         group.Name = "ContentTab"; // rename the group
-        ContentTypeService.Save(page);
+        await ContentTypeService.CreateAsync(page, Constants.Security.SuperUserKey);
         Assert.AreEqual(3, page.PropertyTypes.Count());
 
         // get 'contentPage' content type again
@@ -1756,7 +1767,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             propertyGroupAlias: "content2",
             propertyGroupName: "Content_",
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(page);
+        await ContentTypeService.CreateAsync(page, Constants.Security.SuperUserKey);
         var contentPage = ContentTypeBuilder.CreateSimpleContentType(
             "contentPage",
             "Content Page",
@@ -1765,7 +1776,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             propertyGroupAlias: "contentx",
             propertyGroupName: "Contentx",
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
         var advancedPage = ContentTypeBuilder.CreateSimpleContentType(
             "advancedPage",
             "Advanced Page",
@@ -1774,12 +1785,12 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             propertyGroupAlias: "contenty",
             propertyGroupName: "Contenty",
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         var contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
-        ContentTypeService.Save(contentMetaComposition);
+        await ContentTypeService.CreateAsync(contentMetaComposition, Constants.Security.SuperUserKey);
         var compositionAdded = contentPage.AddContentType(contentMetaComposition);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         // Act
         var bodyTextPropertyType =
@@ -1818,7 +1829,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 subtitlePropertyType,
                 "content",
                 "Content"); // Will be added to the "Content Meta" composition
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var authorPropertyType =
             new PropertyType(
@@ -1874,7 +1885,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 keywordsPropertyType,
                 "content",
                 "Content"); // Will be added to the "Content Meta" composition
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         // Change the name of the tab on the "root" content type 'page'.
         var propertyGroup = page.PropertyGroups["content2"];
@@ -1885,7 +1896,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             Alias = "content",
             SortOrder = 0
         });
-        ContentTypeService.Save(page);
+        await ContentTypeService.CreateAsync(page, Constants.Security.SuperUserKey);
 
         // Assert
         Assert.That(compositionAdded, Is.True);
@@ -1922,7 +1933,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             propertyGroupAlias: "content2",
             propertyGroupName: "Content_",
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(page);
+        await ContentTypeService.CreateAsync(page, Constants.Security.SuperUserKey);
         var contentPage = ContentTypeBuilder.CreateSimpleContentType(
             "contentPage",
             "Content Page",
@@ -1931,10 +1942,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             propertyGroupAlias: "content",
             propertyGroupName: "Content",
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
-        ContentTypeService.Save(contentMetaComposition);
+        await ContentTypeService.CreateAsync(contentMetaComposition, Constants.Security.SuperUserKey);
 
         // Act
         var bodyTextPropertyType =
@@ -1979,11 +1990,11 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var bodyTextAdded = page.AddPropertyType(bodyTextPropertyType, "content2", "Content_");
         var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "content", "Content");
         var authorAdded = contentPage.AddPropertyType(authorPropertyType, "content2", "Content_");
-        ContentTypeService.Save(page);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(page, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var compositionAdded = contentPage.AddContentType(contentMetaComposition);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         // Change the alias/name of the tab on the "root" content type 'page'.
         var propertyGroup = page.PropertyGroups["content2"];
@@ -1994,7 +2005,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             Name = "Content",
             SortOrder = 0
         });
-        ContentTypeService.Save(page);
+        await ContentTypeService.CreateAsync(page, Constants.Security.SuperUserKey);
 
         // Assert
         Assert.That(compositionAdded, Is.True);
@@ -2006,20 +2017,20 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Remove_PropertyGroup_On_Parent_Without_Causing_Duplicate_PropertyGroups()
+    public async Task Can_Remove_PropertyGroup_On_Parent_Without_Causing_Duplicate_PropertyGroups()
     {
         // Arrange
         var basePage = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
         var contentPage = ContentTypeBuilder.CreateBasicContentType("contentPage", "Content Page", basePage);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var advancedPage = ContentTypeBuilder.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         var contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
-        ContentTypeService.Save(contentMetaComposition);
+        await ContentTypeService.CreateAsync(contentMetaComposition, Constants.Security.SuperUserKey);
 
         // Act
         var bodyTextPropertyType =
@@ -2036,7 +2047,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "content", "Content");
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
         var authorPropertyType =
             new PropertyType(
@@ -2052,13 +2063,13 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var compositionAdded = contentPage.AddContentType(contentMetaComposition);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         basePage.RemovePropertyGroup("content");
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
         // Assert
         Assert.That(bodyTextAdded, Is.True);
@@ -2073,12 +2084,12 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Remove_PropertyGroup_Without_Removing_Property_Types()
+    public async Task Can_Remove_PropertyGroup_Without_Removing_Property_Types()
     {
         var basePage = (IContentType)ContentTypeBuilder.CreateBasicContentType();
         basePage.AddPropertyGroup("content", "Content");
         basePage.AddPropertyGroup("meta", "Meta");
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
         var authorPropertyType =
             new PropertyType(
@@ -2110,7 +2121,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             };
         Assert.IsTrue(basePage.AddPropertyType(titlePropertyType, "meta", "Meta"));
 
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
         basePage = ContentTypeService.Get(basePage.Id);
 
         var count = basePage.PropertyTypes.Count();
@@ -2118,16 +2129,16 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         basePage.RemovePropertyGroup("content");
 
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
         basePage = ContentTypeService.Get(basePage.Id);
 
         Assert.AreEqual(count, basePage.PropertyTypes.Count());
     }
 
     [Test]
-    public void Can_Move_PropertyType_To_No_Group()
+    public async Task Can_Move_PropertyType_To_No_Group()
     {
-        IContentType basePage = CreateContentTypeWithSingleGroupedProperty();
+        IContentType basePage = await CreateContentTypeWithSingleGroupedProperty();
 
         Assert.IsTrue(basePage.MovePropertyType("title", null));
 
@@ -2138,7 +2149,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             Assert.IsEmpty(basePage.PropertyGroups["content"].PropertyTypes!);
         });
 
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.UpdateAsync(basePage, Constants.Security.SuperUserKey);
         basePage = ContentTypeService.Get(basePage.Id);
 
         Assert.Multiple(() =>
@@ -2151,16 +2162,16 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Move_PropertyType_To_No_Group_Without_Losing_Content_Values()
+    public async Task Can_Move_PropertyType_To_No_Group_Without_Losing_Content_Values()
     {
-        IContentType basePage = CreateContentTypeWithSingleGroupedProperty();
+        IContentType basePage = await CreateContentTypeWithSingleGroupedProperty();
 
         IContent contentItem = ContentBuilder.CreateBasicContent(basePage);
         contentItem.SetValue("title", "The title");
         ContentService.Save(contentItem);
 
         basePage.MovePropertyType("title", null);
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.UpdateAsync(basePage, Constants.Security.SuperUserKey);
 
         contentItem = ContentService.GetById(contentItem.Id);
 
@@ -2168,9 +2179,9 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Move_PropertyType_From_No_Group_Into_Group()
+    public async Task Can_Move_PropertyType_From_No_Group_Into_Group()
     {
-        IContentType basePage = CreateContentTypeWithSingleUngroupedProperty();
+        IContentType basePage = await CreateContentTypeWithSingleUngroupedProperty();
         Assert.AreEqual("title", basePage.NoGroupPropertyTypes.SingleOrDefault()?.Alias, "the property type should start un-grouped");
 
         Assert.IsTrue(basePage.MovePropertyType("title", "content"));
@@ -2181,7 +2192,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             Assert.AreEqual("title", basePage.PropertyGroups["content"].PropertyTypes!.SingleOrDefault()?.Alias);
         });
 
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.UpdateAsync(basePage, Constants.Security.SuperUserKey);
         basePage = ContentTypeService.Get(basePage.Id);
 
         Assert.Multiple(() =>
@@ -2192,18 +2203,18 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         });
     }
 
-    private IContentType CreateContentTypeWithSingleGroupedProperty()
+    private async Task<IContentType> CreateContentTypeWithSingleGroupedProperty()
     {
         ContentType basePage = ContentTypeBuilder.CreateBasicContentType();
         basePage.AddPropertyGroup("content", "Content");
         Assert.IsTrue(basePage.AddPropertyType(CreateTitlePropertyType(), "content", "Content"));
 
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
         return ContentTypeService.Get(basePage.Id);
     }
 
-    private IContentType CreateContentTypeWithSingleUngroupedProperty()
+    private async Task<IContentType> CreateContentTypeWithSingleUngroupedProperty()
     {
         ContentType basePage = ContentTypeBuilder.CreateBasicContentType();
         basePage.AddPropertyGroup("content", "Content");
@@ -2211,7 +2222,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         // the single argument overload adds the property type without a group
         Assert.IsTrue(basePage.AddPropertyType(CreateTitlePropertyType()));
 
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
         return ContentTypeService.Get(basePage.Id);
     }
@@ -2231,7 +2242,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         };
 
     [Test]
-    public void Can_Add_PropertyGroup_With_Same_Name_On_Parent_and_Child()
+    public async Task Can_Add_PropertyGroup_With_Same_Name_On_Parent_and_Child()
     {
         /*
          * BasePage
@@ -2242,16 +2253,16 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Arrange
         var basePage = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
         var contentPage = ContentTypeBuilder.CreateBasicContentType("contentPage", "Content Page", basePage);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var advancedPage = ContentTypeBuilder.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
-        ContentTypeService.Save(advancedPage);
+        await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey);
 
         var contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
-        ContentTypeService.Save(contentMetaComposition);
+        await ContentTypeService.CreateAsync(contentMetaComposition, Constants.Security.SuperUserKey);
 
         // Act
         var authorPropertyType =
@@ -2268,7 +2279,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         var bodyTextPropertyType =
             new PropertyType(
@@ -2284,10 +2295,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "content", "Content");
-        ContentTypeService.Save(basePage);
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
         var compositionAdded = contentPage.AddContentType(contentMetaComposition);
-        ContentTypeService.Save(contentPage);
+        await ContentTypeService.CreateAsync(contentPage, Constants.Security.SuperUserKey);
 
         // Assert
         Assert.That(bodyTextAdded, Is.True);
@@ -2318,7 +2329,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
                 DataTypeId = -88
             };
         var descriptionAdded = contentType.AddPropertyType(descriptionPropertyType, "content", "Content");
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         Assert.That(descriptionAdded, Is.True);
 
         var contentPageReloaded = ContentTypeService.Get("contentPage");
@@ -2331,15 +2342,15 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Empty_Description_Is_Always_Null_After_Saving_Content_Type()
+    public async Task Empty_Description_Is_Always_Null_After_Saving_Content_Type()
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Description = null;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var contentType2 = ContentTypeBuilder.CreateBasicContentType("basePage2", "Base Page 2");
         contentType2.Description = string.Empty;
-        ContentTypeService.Save(contentType2);
+        await ContentTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
 
         Assert.IsNull(contentType.Description);
         Assert.IsNull(contentType2.Description);
@@ -2354,7 +2365,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         typeA.Variations = ContentVariation.Culture; // make it variant
         typeA.PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations =
             ContentVariation.Culture; // with a variant property
-        ContentTypeService.Save(typeA);
+        await ContentTypeService.CreateAsync(typeA, Constants.Security.SuperUserKey);
 
         var typeB = ContentTypeBuilder.CreateSimpleContentType(
             "b",
@@ -2363,7 +2374,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             randomizeAliases: true,
             defaultTemplateId: template.Id);
         typeB.Variations = ContentVariation.Nothing; // make it invariant
-        ContentTypeService.Save(typeB);
+        await ContentTypeService.CreateAsync(typeB, Constants.Security.SuperUserKey);
 
         var typeC = ContentTypeBuilder.CreateSimpleContentType(
             "c",
@@ -2372,7 +2383,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             randomizeAliases: true,
             defaultTemplateId: template.Id);
         typeC.Variations = ContentVariation.Culture; // make it variant
-        ContentTypeService.Save(typeC);
+        await ContentTypeService.CreateAsync(typeC, Constants.Security.SuperUserKey);
 
         // property is variant on A
         var test = ContentTypeService.Get(typeA.Id);
@@ -2423,7 +2434,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             Alias = Constants.Conventions.Content.NaviHide,
             DataTypeKey = dtdYesNo.Key
         });
-        cts.Save(ctBase);
+        await cts.CreateAsync(ctBase, Constants.Security.SuperUserKey);
 
         // Assert
         ctBase = cts.Get(ctBase.Key);
@@ -2452,7 +2463,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             Name = "Hide From Navigation",
             Alias = Constants.Conventions.Content.NaviHide,
         });
-        cts.Save(ctBase);
+        await cts.CreateAsync(ctBase, Constants.Security.SuperUserKey);
 
         // Assert
         ctBase = cts.Get(ctBase.Key);
@@ -2468,7 +2479,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Act
         var result = await ContentTypeService.CreateTemplateAsync(
@@ -2512,7 +2523,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Act - use an empty alias which is invalid
         var result = await ContentTypeService.CreateTemplateAsync(
@@ -2532,7 +2543,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Act - use an alias that exceeds the maximum length (255 characters)
         var tooLongAlias = new string('a', 300);
@@ -2553,7 +2564,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Act
         var result = await ContentTypeService.CreateTemplateAsync(
@@ -2603,12 +2614,12 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var childContentType = ContentTypeBuilder.CreateBasicContentType("child", "Child");
-        ContentTypeService.Save(childContentType);
+        await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
 
         var parentContentType = ContentTypeBuilder.CreateBasicContentType("parent", "Parent");
 
         // Parent does not allow child as a child type
-        ContentTypeService.Save(parentContentType);
+        await ContentTypeService.CreateAsync(parentContentType, Constants.Security.SuperUserKey);
 
         // Act
         var result = await ContentTypeService.GetAllowedParentKeysAsync(childContentType.Key);
@@ -2624,25 +2635,25 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var childContentType = ContentTypeBuilder.CreateBasicContentType("child", "Child");
-        ContentTypeService.Save(childContentType);
+        await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
 
         var parentContentType1 = ContentTypeBuilder.CreateBasicContentType("parent1", "Parent1");
         parentContentType1.AllowedContentTypes =
         [
             new ContentTypeSort(childContentType.Key, 0, childContentType.Alias)
         ];
-        ContentTypeService.Save(parentContentType1);
+        await ContentTypeService.CreateAsync(parentContentType1, Constants.Security.SuperUserKey);
 
         var parentContentType2 = ContentTypeBuilder.CreateBasicContentType("parent2", "Parent2");
         parentContentType2.AllowedContentTypes =
         [
             new ContentTypeSort(childContentType.Key, 0, childContentType.Alias)
         ];
-        ContentTypeService.Save(parentContentType2);
+        await ContentTypeService.CreateAsync(parentContentType2, Constants.Security.SuperUserKey);
 
         // A parent that does NOT allow the child type
         var unrelatedParentContentType = ContentTypeBuilder.CreateBasicContentType("unrelated", "Unrelated");
-        ContentTypeService.Save(unrelatedParentContentType);
+        await ContentTypeService.CreateAsync(unrelatedParentContentType, Constants.Security.SuperUserKey);
 
         // Act
         var result = await ContentTypeService.GetAllowedParentKeysAsync(childContentType.Key);
@@ -2789,7 +2800,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             "MasterContentType",
             defaultTemplateId: template.Id);
         masterContentType.Key = new Guid("C00CA18E-5A9D-483B-A371-EECE0D89B4AE");
-        ContentTypeService.Save(masterContentType);
+        await ContentTypeService.CreateAsync(masterContentType, Constants.Security.SuperUserKey);
 
         // add the one we just created
         var list = new List<IContentType> { masterContentType };
@@ -2860,5 +2871,101 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             Assert.IsTrue(result.Items.Any(x => x.Key == allowedAtRoot.Key));
             Assert.IsFalse(result.Items.Any(x => x.Key == notAllowedAtRoot.Key));
         });
+    }
+
+    [Test]
+    public async Task Can_Get_First_Page_Of_Allowed_Children()
+    {
+        IContentType[] children = await CreateContentTypesAllowedAsChildren();
+
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> result =
+            await ContentTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 0, take: 2);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, result.Result!.Total);
+            Assert.AreEqual(new[] { children[0].Key, children[1].Key }, result.Result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Subsequent_Page_Of_Allowed_Children()
+    {
+        IContentType[] children = await CreateContentTypesAllowedAsChildren();
+
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> result =
+            await ContentTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 1, take: 2);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, result.Result!.Total);
+            Assert.AreEqual(new[] { children[1].Key, children[2].Key }, result.Result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Last_Page_Of_Allowed_Children()
+    {
+        IContentType[] children = await CreateContentTypesAllowedAsChildren();
+
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> result =
+            await ContentTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 2, take: 2);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, result.Result!.Total);
+            Assert.AreEqual(new[] { children[2].Key }, result.Result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Subsequent_Page_Of_ContentTypes_Allowed_At_Root()
+    {
+        foreach (var alias in new[] { "rootOne", "rootTwo", "rootThree" })
+        {
+            ContentType contentType = ContentTypeBuilder.CreateBasicContentType(alias, alias);
+            contentType.AllowedAsRoot = true;
+            await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        }
+
+        PagedModel<IContentType> all = await ContentTypeService.GetAllAllowedAsRootAsync(0, 1000);
+        Assert.GreaterOrEqual(all.Total, 3);
+        Guid[] expectedKeys = all.Items.Skip(1).Take(2).Select(x => x.Key).ToArray();
+
+        PagedModel<IContentType> result = await ContentTypeService.GetAllAllowedAsRootAsync(1, 2);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(all.Total, result.Total);
+            Assert.AreEqual(expectedKeys, result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    /// <summary>
+    /// Creates three content types, each allowed as a child of the first, in a known order.
+    /// </summary>
+    private async Task<IContentType[]> CreateContentTypesAllowedAsChildren()
+    {
+        IContentType[] children =
+        [
+            ContentTypeBuilder.CreateBasicContentType("childOne", "Child One"),
+            ContentTypeBuilder.CreateBasicContentType("childTwo", "Child Two"),
+            ContentTypeBuilder.CreateBasicContentType("childThree", "Child Three"),
+        ];
+
+        foreach (IContentType child in children)
+        {
+            await ContentTypeService.CreateAsync(child, Constants.Security.SuperUserKey);
+        }
+
+        children[0].AllowedContentTypes = children
+            .Select((child, index) => new ContentTypeSort(child.Key, index, child.Alias))
+            .ToArray();
+        await ContentTypeService.UpdateAsync(children[0], Constants.Security.SuperUserKey);
+
+        return children;
     }
 }

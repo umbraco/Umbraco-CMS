@@ -105,14 +105,14 @@ export default class UmbNewPasswordPageElement extends UmbLitElement {
       case 'error':
         return html`
           <umb-error-layout
-            header=${this.localize.term('auth_error')}
-            message=${this.error ?? this.localize.term('auth_defaultError')}>
+            header=${this.localize.term('login_error')}
+            message=${this.error ?? this.localize.term('login_defaultError')}>
           </umb-error-layout>`;
       case 'done':
         return html`
           <umb-confirmation-layout
-            header=${this.localize.term('auth_success')}
-            message=${this.localize.term('auth_setPasswordConfirmation')}>
+            header=${this.localize.term('login_success')}
+            message=${this.localize.term('login_setPasswordConfirmation')}>
           </umb-confirmation-layout>`;
     }
   }

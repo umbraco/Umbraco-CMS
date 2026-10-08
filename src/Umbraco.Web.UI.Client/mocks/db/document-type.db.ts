@@ -5,6 +5,7 @@ import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityNamedItemManager } from './utils/entity/entity-named-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
+import { pagedResult } from './utils/paged-result.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	DataTypeChangeModeModel,
@@ -42,17 +43,23 @@ class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel
 		super('documentType', data);
 	}
 
-	getAllowedChildren(id: string): PagedAllowedDocumentTypeModel {
+	getAllowedChildren(id: string, skip = 0, take = 100): PagedAllowedDocumentTypeModel {
 		const documentType = this.detail.read(id);
 		const allowedDocumentTypes = documentType.allowedDocumentTypes.map((sortModel: DocumentTypeSortModel) =>
 			this.detail.read(sortModel.documentType.id),
 		);
 		const mappedItems = allowedDocumentTypes.map((item: UmbMockDocumentTypeModel) => allowedDocumentTypeMapper(item));
-		return { items: mappedItems, total: mappedItems.length };
+		return pagedResult(mappedItems, skip, take);
 	}
 
-	getAllowedAtRoot(): PagedAllowedDocumentTypeModel {
+	getAllowedAtRoot(skip = 0, take = 100): PagedAllowedDocumentTypeModel {
 		const mockItems = this.data.filter((item) => item.allowedAsRoot);
+		const mappedItems = mockItems.map((item) => allowedDocumentTypeMapper(item));
+		return pagedResult(mappedItems, skip, take);
+	}
+
+	getAllowedInLibrary(): PagedAllowedDocumentTypeModel {
+		const mockItems = this.data.filter((item) => item.allowedInLibrary);
 		const mappedItems = mockItems.map((item) => allowedDocumentTypeMapper(item));
 		return { items: mappedItems, total: mappedItems.length };
 	}
@@ -82,6 +89,7 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 		properties: [],
 		containers: [],
 		allowedAsRoot: false,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -96,6 +104,7 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	};
 };
 
@@ -109,6 +118,7 @@ const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): 
 		properties: request.properties,
 		containers: request.containers,
 		allowedAsRoot: request.allowedAsRoot,
+		allowedInLibrary: request.allowedInLibrary,
 		variesByCulture: request.variesByCulture,
 		variesBySegment: request.variesBySegment,
 		isElement: request.isElement,
@@ -124,6 +134,7 @@ const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): 
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	};
 };
 
@@ -137,6 +148,7 @@ const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeR
 		properties: item.properties,
 		containers: item.containers,
 		allowedAsRoot: item.allowedAsRoot,
+		allowedInLibrary: item.allowedInLibrary,
 		variesByCulture: item.variesByCulture,
 		variesBySegment: item.variesBySegment,
 		isElement: item.isElement,
@@ -158,6 +170,7 @@ const documentTypeTreeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTyp
 		icon: item.icon,
 		isElement: item.isElement,
 		flags: item.flags,
+		noAccess: item.noAccess,
 	};
 };
 
@@ -169,6 +182,7 @@ const documentTypeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTypeIte
 		isElement: item.isElement,
 		description: item.description ?? undefined,
 		flags: item.flags,
+		allowedInLibrary: item.allowedInLibrary,
 	};
 };
 

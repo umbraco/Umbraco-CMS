@@ -7,6 +7,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -22,8 +23,6 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
-
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
     private IContentTypeRepository ContentTypeRepository => GetRequiredService<IContentTypeRepository>();
 
@@ -306,8 +305,9 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
     {
         using (ScopeProvider.CreateScope())
         {
+            // Any editor with a typed configuration will do; this asserts the repository round-trips one.
             var dataTypeDefinition =
-                new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
+                new DataType(new TextboxPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
@@ -316,7 +316,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
 
             dataTypeDefinition.ConfigurationData = dataTypeDefinition.Editor!.GetConfigurationEditor()
                 .FromConfigurationObject(
-                    new LabelConfiguration { ValueType = ValueTypes.Xml },
+                    new TextboxConfiguration { MaxChars = 42 },
                     ConfigurationEditorJsonSerializer);
 
             // Act
@@ -334,12 +334,12 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
 
             // still, can compare explicitely
             Assert.IsNotNull(dataTypeDefinition.ConfigurationObject);
-            Assert.IsInstanceOf<LabelConfiguration>(dataTypeDefinition.ConfigurationObject);
+            Assert.IsInstanceOf<TextboxConfiguration>(dataTypeDefinition.ConfigurationObject);
             Assert.IsNotNull(fetched.ConfigurationObject);
-            Assert.IsInstanceOf<LabelConfiguration>(fetched.ConfigurationObject);
+            Assert.IsInstanceOf<TextboxConfiguration>(fetched.ConfigurationObject);
             Assert.AreEqual(
-                ConfigurationEditor.ConfigurationAs<LabelConfiguration>(dataTypeDefinition.ConfigurationObject).ValueType,
-                ConfigurationEditor.ConfigurationAs<LabelConfiguration>(fetched.ConfigurationObject).ValueType);
+                ConfigurationEditor.ConfigurationAs<TextboxConfiguration>(dataTypeDefinition.ConfigurationObject).MaxChars,
+                ConfigurationEditor.ConfigurationAs<TextboxConfiguration>(fetched.ConfigurationObject).MaxChars);
         }
     }
 

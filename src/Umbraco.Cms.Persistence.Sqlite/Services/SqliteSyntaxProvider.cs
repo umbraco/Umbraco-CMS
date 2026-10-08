@@ -137,13 +137,12 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return foreignKeys.Select(Format).ToList();
     }
 
-    // TODO (V18): Change 'new virtual' to 'override' to properly override base class method.
     /// <summary>
     /// Formats a foreign key definition for SQLite inline table constraint syntax.
     /// </summary>
     /// <param name="foreignKey">The foreign key definition to format.</param>
     /// <returns>The formatted foreign key constraint SQL.</returns>
-    public new virtual string Format(ForeignKeyDefinition foreignKey)
+    public override string Format(ForeignKeyDefinition foreignKey)
     {
         var constraintName = string.IsNullOrEmpty(foreignKey.Name)
             ? $"FK_{foreignKey.ForeignTable}_{foreignKey.PrimaryTable}_{foreignKey.PrimaryColumns.First()}"
@@ -319,9 +318,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return sql.Append($"LIMIT {top}");
     }
 
-    // TODO (V18): Change 'new virtual' to 'override' to properly override base class method.
     /// <inheritdoc />
-    public new virtual string Format(IEnumerable<ColumnDefinition> columns)
+    public override string Format(IEnumerable<ColumnDefinition> columns)
     {
         var sb = new StringBuilder();
         foreach (ColumnDefinition column in columns)
@@ -386,24 +384,34 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
     {
         IEnumerable<string> tables = GetTablesInSchema(db);
+        var columns = new List<ColumnInfo>();
 
+        // Materialized rather than yielded, so the transaction always completes and a caller that stops
+        // enumerating early cannot leave it open (which would prevent the enclosing scope from committing).
         db.BeginTransaction();
-        foreach (var table in tables)
+        try
         {
-            DbCommand? cmd = db.CreateCommand(db.Connection, CommandType.Text, $"PRAGMA table_info({table})");
-            DbDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
+            foreach (var table in tables)
             {
-                var ordinal = reader.GetInt32("cid");
-                var columnName = reader.GetString("name");
-                var type = reader.GetString("type");
-                var notNull = reader.GetBoolean("notnull");
-                yield return new ColumnInfo(table, columnName, ordinal, notNull, type);
+                using DbCommand cmd = db.CreateCommand(db.Connection, CommandType.Text, $"PRAGMA table_info({table})");
+                using DbDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    var ordinal = reader.GetInt32("cid");
+                    var columnName = reader.GetString("name");
+                    var type = reader.GetString("type");
+                    var notNull = reader.GetBoolean("notnull");
+                    columns.Add(new ColumnInfo(table, columnName, ordinal, notNull, type));
+                }
             }
         }
+        finally
+        {
+            db.CompleteTransaction();
+        }
 
-        db.CompleteTransaction();
+        return columns;
     }
 
     /// <inheritdoc />

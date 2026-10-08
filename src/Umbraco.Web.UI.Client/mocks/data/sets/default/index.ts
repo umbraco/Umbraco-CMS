@@ -4,6 +4,7 @@ export { data as dictionary } from './dictionary.data.js';
 export { data as document } from './document.data.js';
 export { data as documentBlueprint } from './document-blueprint.data.js';
 export { data as documentType } from './document-type.data.js';
+export { data as element } from './element.data.js';
 export { data as language } from './language.data.js';
 export { data as media } from './media.data.js';
 export { data as mediaType } from './media-type.data.js';
@@ -29,10 +30,5 @@ export {
 export { data as logs } from './logs.data.js';
 export { data as auditLogs } from './audit-log.data.js';
 export { healthGroups, healthGroupsWithoutResult } from './health-check.data.js';
-export {
-	Indexers as examineIndexers,
-	PagedIndexers as examinePagedIndexers,
-	searchResultMockData as examineSearchResults,
-} from './examine.data.js';
 export { items as trackedReferenceItems } from './tracked-reference.data.js';
 export { data as news } from './umbraco-news.data.js';

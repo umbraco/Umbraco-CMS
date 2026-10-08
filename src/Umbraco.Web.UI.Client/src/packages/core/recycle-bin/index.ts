@@ -8,6 +8,5 @@ export {
 	UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT,
 } from './workspace-context/index.js';
 
-export type * from './collection-action/index.js';
 export type * from './types.js';
 export type * from './workspace-context/types.js';

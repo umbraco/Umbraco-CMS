@@ -96,7 +96,22 @@ This is why `UserGroupUiHelper`/`UserUiHelper` filter with `getByText(name, {exa
 
 ---
 
-## 5. Generated / ignored files
+## 5. Authentication
+
+Back-office auth is **cookie-only**. There is no OAuth/PKCE flow, no `oauth_complete` callback and no client-readable token — the httpOnly authentication cookie is the sole credential.
+
+- **Signing in**: `POST security/back-office/login` (`ApiHelpers.signIn` → `LoginApiHelper.login`). The response sets the cookie on the browser context; Playwright's `page.request` shares that cookie jar, so every later API and UI request carries it. Never set an `Authorization` header — `ApiHelpers.getHeaders()` deliberately returns none.
+- **Signing out**: `GET security/back-office/signout` (`ApiHelpers.signOut`). `AllowAnonymous`, so it is safe to call without a session. It answers with a redirect to the client logout landing; the cleared cookie is the point, not the redirect.
+- **Session lifetime**: `POST security/back-office/keep-alive` renews the cookie, and `GET user/current/configuration` probes it without renewing (a non-ok response means "no session"). `ApiHelpers.isLoginStateValid()` — run before every test by the `umbracoApi` fixture — uses both.
+- **Keep the session alive with config, not with the login UI.** Every acceptance-test app sets `Umbraco:CMS:Security:KeepUserLoggedIn: true`, which slides the cookie expiry on every request. A test should never drive the login UI just to dodge an expiring session; drive it only when login itself is what is under test.
+- **Switching users**: `UserApiHelper.loginToUser()` just signs the new user in — there is one cookie, so that replaces the previous session, and a failed switch still surfaces because `login()` asserts the response status. Restore the admin with `ApiHelpers.loginToAdminUser()` when the test is done.
+- **Reusing the session**: `tests/auth.setup.ts` signs in **over the API** once and writes `storageState`; every authenticated project depends on that `setup` project and loads the state. Add a new project the same way rather than signing in per spec. Don't reintroduce a UI login there — it costs every project a back-office boot, and the login screen is covered by `DefaultConfig/Login/BackOfficeLogin.spec.ts`.
+
+`ApiHelpers.updateTokenAndCookie()` and `ApiHelpers.revokeTokens()` survive as deprecated shims over `signIn`/`signOut` — do not use them in new code.
+
+---
+
+## 6. Generated / ignored files
 
 - `console-errors.json` is generated at install/run time and is **git-ignored** — do not commit it. Console errors captured during a run are appended here for inspection; they are not (yet) a failing gate.
 - `.env`, `playwright/.auth/`, and `results/` are also ignored.

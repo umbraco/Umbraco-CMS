@@ -54,8 +54,8 @@ export class LoginUiHelper extends UiBaseLocators {
   }
 
   async clickLoginButtonAndWaitForBackOffice() {
-    // The login button triggers the OAuth token exchange and redirect; wait for the backoffice shell to
-    // mount before continuing, otherwise the next navigation races an unauthenticated (still-login) page.
+    // The login button signs in and redirects back to the back office; wait for the backoffice shell
+    // to mount before continuing, otherwise the next navigation races an unauthenticated (still-login) page.
     await this.click(this.loginBtn);
     await expect(this.backOfficeMain).toBeVisible({timeout: ConstantHelper.timeout.pageLoad});
   }
@@ -76,12 +76,15 @@ export class LoginUiHelper extends UiBaseLocators {
   }
 
   async clickLogoutButtonAndWaitForUserLogout() {
-    // Register the listener before clicking: the revoke can complete before a post-click waiter attaches.
-    const revokeResponse = this.page.waitForResponse(
-      resp => resp.url().includes(ConstantHelper.apiEndpoints.revoke) && resp.status() === ConstantHelper.statusCodes.ok,
+    // Logging out is a full-page navigation to the sign-out endpoint, which clears the auth cookie
+    // and redirects to the logout landing. Register the listener before clicking: the response can
+    // arrive before a post-click waiter attaches. Any status is accepted - the endpoint answers with
+    // a redirect, and the cleared cookie is what matters.
+    const signOutResponse = this.page.waitForResponse(
+      resp => resp.url().includes(ConstantHelper.apiEndpoints.backOfficeSignOut),
     );
     await this.click(this.logoutBtn);
-    return await revokeResponse;
+    return await signOutResponse;
   }
 
   async clickForgottenPasswordButton() {

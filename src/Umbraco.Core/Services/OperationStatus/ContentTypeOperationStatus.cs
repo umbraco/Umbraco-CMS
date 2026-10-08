@@ -135,4 +135,14 @@ public enum ContentTypeOperationStatus
     ///     The alias of a system content type cannot be changed.
     /// </summary>
     SystemAliasChangeNotAllowed,
+
+    /// <summary>
+    ///     Cannot change the element flag because the element type has existing element instances.
+    /// </summary>
+    InvalidElementFlagElementHasContent,
+
+    /// <summary>
+    ///     A property type varies in a way the content type itself does not.
+    /// </summary>
+    InvalidPropertyTypeVariation,
 }

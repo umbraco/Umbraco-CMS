@@ -104,7 +104,7 @@ public interface IPublishedRequestBuilder
     ///     <para>Successfully setting the template does refresh <c>RenderingEngine</c>.</para>
     ///     <para>If setting the template fails, then the previous template (if any) remains in place.</para>
     /// </remarks>
-    bool TrySetTemplate(string alias);
+    Task<bool> TrySetTemplateAsync(string alias);
 
     /// <summary>
     ///     Sets the template to use to display the requested content.

@@ -1,11 +1,14 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -40,6 +43,54 @@ internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumen
     /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
     /// <param name="serializer">The JSON serializer for serializing and deserializing data.</param>
     /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
+    /// <param name="repositoryCacheVersionService">Tracks repository cache versions.</param>
+    /// <param name="cacheSyncService">Synchronises caches across servers.</param>
+    /// <param name="idKeyMap">Maps between integer identifiers and keys.</param>
+    /// <param name="shortStringHelper">Helper for producing safe strings and aliases.</param>
+    public DocumentBlueprintRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<DocumentBlueprintRepository> logger,
+        ILoggerFactory loggerFactory,
+        IContentTypeRepository contentTypeRepository,
+        ITemplateRepository templateRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        PropertyEditorCollection propertyEditorCollection,
+        IDataTypeService dataTypeService,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService,
+        IIdKeyMap idKeyMap,
+        IShortStringHelper shortStringHelper)
+        : base(
+            scopeAccessor,
+            appCaches,
+            logger,
+            loggerFactory,
+            contentTypeRepository,
+            templateRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditorCollection,
+            dataValueReferenceFactories,
+            dataTypeService,
+            idKeyMap,
+            serializer,
+            eventAggregator,
+            repositoryCacheVersionService,
+            cacheSyncService,
+            shortStringHelper)
+    {
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public DocumentBlueprintRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
@@ -56,7 +107,7 @@ internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumen
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator)
-        : base(
+        : this(
             scopeAccessor,
             appCaches,
             logger,
@@ -68,10 +119,14 @@ internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumen
             relationRepository,
             relationTypeRepository,
             propertyEditorCollection,
-            dataValueReferenceFactories,
             dataTypeService,
+            dataValueReferenceFactories,
             serializer,
-            eventAggregator)
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            StaticServiceProvider.Instance.GetRequiredService<IShortStringHelper>())
     {
     }
 

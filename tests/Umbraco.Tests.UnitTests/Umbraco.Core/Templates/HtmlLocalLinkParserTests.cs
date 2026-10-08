@@ -586,9 +586,9 @@ public class HtmlLocalLinkParserTests
         IEnumerable<Guid> ancestorKeys = [];
         navigationQueryService.Setup(x => x.TryGetAncestorsKeys(It.IsAny<Guid>(), out ancestorKeys)).Returns(true);
 
-        var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
+        var publishStatusQueryService = new Mock<IDocumentPublishStatusQueryService>();
         publishStatusQueryService
-            .Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Setup(x => x.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns(true);
 
         return new UrlProvider(

@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 
@@ -11,29 +10,34 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 public sealed class PublishStatusInitializationNotificationHandler : INotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification>
 {
     private readonly IRuntimeState _runtimeState;
-    private readonly IPublishStatusManagementService _publishStatusManagementService;
+    private readonly IDocumentPublishStatusManagementService _documentPublishStatusManagementService;
+    private readonly IElementPublishStatusManagementService _elementPublishStatusManagementService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublishStatusInitializationNotificationHandler"/> class.
     /// </summary>
     /// <param name="runtimeState">The runtime state.</param>
-    /// <param name="publishStatusManagementService">The publish status management service.</param>
+    /// <param name="documentPublishStatusManagementService">The document publish status management service.</param>
+    /// <param name="elementPublishStatusManagementService">The element publish status management service.</param>
     public PublishStatusInitializationNotificationHandler(
         IRuntimeState runtimeState,
-        IPublishStatusManagementService publishStatusManagementService)
+        IDocumentPublishStatusManagementService documentPublishStatusManagementService,
+        IElementPublishStatusManagementService elementPublishStatusManagementService)
     {
         _runtimeState = runtimeState;
-        _publishStatusManagementService = publishStatusManagementService;
+        _documentPublishStatusManagementService = documentPublishStatusManagementService;
+        _elementPublishStatusManagementService = elementPublishStatusManagementService;
     }
 
     /// <inheritdoc />
     public async Task HandleAsync(PostRuntimePremigrationsUpgradeNotification notification, CancellationToken cancellationToken)
     {
-        if(_runtimeState.Level < RuntimeLevel.Upgrade)
+        if (_runtimeState.Level < RuntimeLevel.Upgrade)
         {
             return;
         }
 
-        await _publishStatusManagementService.InitializeAsync(cancellationToken);
+        await _documentPublishStatusManagementService.InitializeAsync(cancellationToken);
+        await _elementPublishStatusManagementService.InitializeAsync(cancellationToken);
     }
 }

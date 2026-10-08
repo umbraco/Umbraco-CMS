@@ -246,7 +246,6 @@ public class MyPropertyEditor : IDataEditor
 **Key interfaces**:
 - `IDataEditor` - Property editor registration
 - `IDataValueEditor` - Value editing and conversion
-- `IPropertyIndexValueFactory` - Search indexing
 - `IPropertyValueConverter` - Convert stored values to typed values
 
 ### 7. Cache Refreshers (Distributed Cache)
@@ -281,7 +280,8 @@ public class MyEntityCacheRefresher : CacheRefresherBase<MyEntityCacheRefresher>
 - `IMediaService` - Media operations
 - `IDataTypeService` - Data type configuration
 - `IUserService` - User management
-- `ILocalizationService` - Languages and dictionary
+- `ILanguageService` - Languages
+- `IDictionaryItemService` - Dictionary items
 - `IRelationService` - Entity relationships
 
 #### Content Models

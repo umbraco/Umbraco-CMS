@@ -27,7 +27,7 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Mapping.Media.MediaMapDefinition"/> class with the specified dependencies.
     /// </summary>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public MediaMapDefinition(
         PropertyEditorCollection propertyEditorCollection,
         CommonMapper commonMapper,
@@ -63,41 +63,6 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
         _mediaUrlGenerators = mediaUrlGenerators;
         _contentSettings = contentSettings.CurrentValue;
         contentSettings.OnChange(x => _contentSettings = x);
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MediaMapDefinition"/> class.
-    /// </summary>
-    /// <param name="propertyEditorCollection">A collection containing the available property editors.</param>
-    /// <param name="commonMapper">An instance of <see cref="CommonMapper"/> used for common mapping operations.</param>
-    /// <param name="dataValueEditorFactory">A factory for creating data value editors.</param>
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public MediaMapDefinition(
-        PropertyEditorCollection propertyEditorCollection,
-        CommonMapper commonMapper,
-        IDataValueEditorFactory dataValueEditorFactory)
-        : this(
-              propertyEditorCollection,
-              commonMapper,
-              dataValueEditorFactory,
-              StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Mapping.Media.MediaMapDefinition"/> class.
-    /// </summary>
-    /// <param name="propertyEditorCollection">A collection containing the property editors used for mapping media properties.</param>
-    /// <param name="commonMapper">An instance of <see cref="CommonMapper"/> used for common mapping operations.</param>
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public MediaMapDefinition(
-        PropertyEditorCollection propertyEditorCollection,
-        CommonMapper commonMapper)
-        : this(
-            propertyEditorCollection,
-            commonMapper,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
-    {
     }
 
     /// <summary>

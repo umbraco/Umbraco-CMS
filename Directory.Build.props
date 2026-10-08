@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <Company>Umbraco HQ</Company>
     <Authors>Umbraco</Authors>
     <Copyright>Copyright © Umbraco $([System.DateTime]::Today.ToString('yyyy'))</Copyright>
@@ -18,6 +18,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
+  </PropertyGroup>
+
+  <!-- Opt in to runtime-native async (preview in .NET 11): https://learn.microsoft.com/dotnet/core/whats-new/dotnet-11/runtime#runtime-async -->
+  <PropertyGroup>
+    <Features>$(Features);runtime-async=on</Features>
   </PropertyGroup>
 
 
@@ -40,8 +45,8 @@
   <!-- Package Validation -->
   <PropertyGroup>
     <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
-    <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageValidationBaselineVersion>17.0.0</PackageValidationBaselineVersion>
+    <EnablePackageValidation>false</EnablePackageValidation><!-- TODO (V19): Set to true once this version is released. -->
+    <PackageValidationBaselineVersion>19.0.0</PackageValidationBaselineVersion>
     <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
     <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
   </PropertyGroup>
@@ -62,6 +67,16 @@
       <_ProjectReferencesWithVersions Condition="'%(ProjectVersion)' != ''">
         <ProjectVersion>[%(ProjectVersion), $([MSBuild]::Add($([System.Text.RegularExpressions.Regex]::Match('%(ProjectVersion)', '^\d+').Value), 1)))</ProjectVersion>
       </_ProjectReferencesWithVersions>
+    </ItemGroup>
+  </Target>
+
+  <!-- Workaround for https://github.com/umbraco/Umbraco-CMS/issues/23018
+       Due to the amount of XML documentation in this solution, the OpenAPI XML documentation source generator produces
+       too many lines of code causing a StackOverflowException when running on IIS. For that reason we disable the analyzer.
+       See https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/openapi-comments?view=aspnetcore-10.0#disabling-xml-documentation-support -->
+  <Target Name="DisableCompileTimeOpenApiXmlGenerator" BeforeTargets="CoreCompile" Condition="'$(IsPackable)' != 'false' or '$(IsTestProject)' == 'true'">
+    <ItemGroup>
+      <Analyzer Remove="@(Analyzer)" Condition="'%(Filename)' == 'Microsoft.AspNetCore.OpenApi.SourceGenerators'" />
     </ItemGroup>
   </Target>
 </Project>

@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
@@ -69,9 +68,9 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
             new CountingDatabaseCacheRepository(ActivatorUtilities.CreateInstance<DatabaseCacheRepository>(sp)));
     }
 
-    public override void Setup()
+    public override async Task Setup()
     {
-        base.Setup();
+        await base.Setup();
 
         // The base fixture gives Textpage three children (Subpage, Subpage2, Subpage3). Add more so the
         // traversal spans several of the enumerator's growing chunks, plus grandchildren under Subpage
@@ -134,7 +133,7 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
 
         // Populate the publish-status service the filtering service consults (in the running app the
         // content cache refresher does this on publish; the integration harness doesn't run it).
-        await GetRequiredService<IPublishStatusManagementService>()
+        await GetRequiredService<IDocumentPublishStatusManagementService>()
             .AddOrUpdateStatusWithDescendantsAsync(Textpage.Key, CancellationToken.None);
 
         var cacheService = (DocumentCacheService)DocumentCacheService;
@@ -203,17 +202,20 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
             BatchMediaReads = 0;
         }
 
-        public Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
+        public Task<ContentCacheNode?> GetDocumentSourceAsync(Guid key, bool preview = false)
         {
             SingleContentReads++;
-            return _inner.GetContentSourceAsync(key, preview);
+            return _inner.GetDocumentSourceAsync(key, preview);
         }
 
-        public Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
+        public Task<IEnumerable<ContentCacheNode>> GetDocumentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
         {
             BatchContentReads++;
-            return _inner.GetContentSourcesAsync(keys, preview);
+            return _inner.GetDocumentSourcesAsync(keys, preview);
         }
+
+        public Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetDocumentSourceForPublishStatesAsync(Guid key)
+            => _inner.GetDocumentSourceForPublishStatesAsync(key);
 
         public Task<ContentCacheNode?> GetMediaSourceAsync(Guid key)
         {
@@ -227,6 +229,22 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
             return _inner.GetMediaSourcesAsync(keys);
         }
 
+        public Task<ContentCacheNode?> GetElementSourceAsync(Guid key, bool preview = false)
+            => _inner.GetElementSourceAsync(key, preview);
+
+        public Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetElementSourceForPublishStatesAsync(Guid key)
+            => _inner.GetElementSourceForPublishStatesAsync(key);
+
+        public Task<IEnumerable<ContentCacheNode>> GetElementSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
+            => _inner.GetElementSourcesAsync(keys, preview);
+
+        public IEnumerable<Guid> GetElementKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
+            => _inner.GetElementKeysByContentTypeKeys(keys, published);
+
+        public Task RefreshElementAsync(ContentCacheNode contentCacheNode) => _inner.RefreshElementAsync(contentCacheNode);
+
+        public Task RemovePublishedElementAsync(int id) => _inner.RemovePublishedElementAsync(id);
+
         public Task DeleteContentItemAsync(int id) => _inner.DeleteContentItemAsync(id);
 
         public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType)
@@ -235,16 +253,23 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
         public IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
             => _inner.GetDocumentKeysByContentTypeKeys(keys, published);
 
-        public Task RefreshContentAsync(ContentCacheNode contentCacheNode) => _inner.RefreshContentAsync(contentCacheNode);
+        public IEnumerable<(Guid Key, bool IsDraft)> GetDocumentKeysWithPublishedStatus(IEnumerable<Guid> contentTypeKeys)
+            => _inner.GetDocumentKeysWithPublishedStatus(contentTypeKeys);
+
+        public IEnumerable<Guid> GetMediaKeysByContentTypeKeys(IEnumerable<Guid> mediaTypeKeys)
+            => _inner.GetMediaKeysByContentTypeKeys(mediaTypeKeys);
+
+        public Task RefreshDocumentAsync(ContentCacheNode contentCacheNode) => _inner.RefreshDocumentAsync(contentCacheNode);
 
         public Task RefreshMediaAsync(ContentCacheNode contentCacheNode) => _inner.RefreshMediaAsync(contentCacheNode);
 
-        public Task RemovePublishedContentAsync(int id) => _inner.RemovePublishedContentAsync(id);
+        public Task RemovePublishedDocumentAsync(int id) => _inner.RemovePublishedDocumentAsync(id);
 
         public void Rebuild(
             IReadOnlyCollection<int>? contentTypeIds,
             IReadOnlyCollection<int>? mediaTypeIds,
+            IReadOnlyCollection<int>? elementTypeIds,
             Action<Action>? executeStep)
-            => _inner.Rebuild(contentTypeIds, mediaTypeIds, executeStep);
+            => _inner.Rebuild(contentTypeIds, mediaTypeIds, elementTypeIds, executeStep);
     }
 }

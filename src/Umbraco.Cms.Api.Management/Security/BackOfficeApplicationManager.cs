@@ -2,14 +2,12 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
 
@@ -24,30 +22,8 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     private readonly IRuntimeState _runtimeState;
     private readonly ILogger<BackOfficeApplicationManager> _logger;
     private readonly Uri? _backOfficeHost;
-    private readonly string _authorizeCallbackPathName;
-    private readonly string _authorizeCallbackLogoutPathName;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BackOfficeApplicationManager"/> class with the specified dependencies.
-    /// </summary>
-    /// <param name="applicationManager">The OpenIddict application manager used for managing backoffice applications.</param>
-    /// <param name="webHostEnvironment">Provides information about the web hosting environment.</param>
-    /// <param name="securitySettings">The security settings options for configuration.</param>
-    /// <param name="runtimeState">The current runtime state of the Umbraco application.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public BackOfficeApplicationManager(
-        IOpenIddictApplicationManager applicationManager,
-        IWebHostEnvironment webHostEnvironment,
-        IOptions<SecuritySettings> securitySettings,
-        IRuntimeState runtimeState)
-        : this(
-            applicationManager,
-            webHostEnvironment,
-            securitySettings,
-            runtimeState,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<BackOfficeApplicationManager>>())
-    {
-    }
+    private readonly string _callbackPathName;
+    private readonly string _effectiveLogoutPathName;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BackOfficeApplicationManager"/> class.
@@ -69,8 +45,8 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         _runtimeState = runtimeState;
         _logger = logger;
         _backOfficeHost = securitySettings.Value.BackOfficeHost;
-        _authorizeCallbackPathName = securitySettings.Value.AuthorizeCallbackPathName;
-        _authorizeCallbackLogoutPathName = securitySettings.Value.AuthorizeCallbackLogoutPathName;
+        _callbackPathName = securitySettings.Value.CallbackPathName;
+        _effectiveLogoutPathName = securitySettings.Value.GetEffectiveLogoutPathName();
     }
 
     /// <summary>
@@ -122,16 +98,16 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
 
         if (_webHostEnvironment.IsProduction())
         {
-            await Delete(Constants.OAuthClientIds.Swagger, cancellationToken);
+            await Delete(Constants.OAuthClientIds.OpenApiUi, cancellationToken);
             await Delete(Constants.OAuthClientIds.Postman, cancellationToken);
         }
         else
         {
             await CreateOrUpdate(
                 DeveloperOpenIddictApplicationDescriptor(
-                    "Umbraco Swagger access",
-                    Constants.OAuthClientIds.Swagger,
-                    backOfficeHostsAsArray.Select(backOfficeUrl => CallbackUrlFor(backOfficeUrl, "/umbraco/swagger/oauth2-redirect.html")).ToArray()),
+                    "Umbraco OpenAPI access",
+                    Constants.OAuthClientIds.OpenApiUi,
+                    backOfficeHostsAsArray.Select(backOfficeUrl => CallbackUrlFor(backOfficeUrl, "/umbraco/openapi/oauth2-redirect.html")).ToArray()),
                 cancellationToken);
 
             await CreateOrUpdate(
@@ -290,9 +266,9 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
 
         foreach (Uri backOfficeHost in backOfficeHosts)
         {
-            descriptor.RedirectUris.Add(CallbackUrlFor(backOfficeHost, _authorizeCallbackPathName));
-            descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, _authorizeCallbackPathName));
-            descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, _authorizeCallbackLogoutPathName));
+            descriptor.RedirectUris.Add(CallbackUrlFor(backOfficeHost, _callbackPathName));
+            descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, _callbackPathName));
+            descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, _effectiveLogoutPathName));
         }
 
         return descriptor;

@@ -4,6 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
@@ -125,31 +126,40 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
     }
 
     /// <summary>
-    ///     Exercises the multi-type guard: in a batch save, one type only has a property removed (a
-    ///     RawDataUnaffected candidate) while a type it composes has a property alias change (rebuild-required,
-    ///     which propagates to the composing type). The composing type must NOT end up flagged RawDataUnaffected,
-    ///     because its inherited renamed property means the stored blob is genuinely stale.
+    ///     Exercises the multi-type guard: when one type only has a property removed (a RawDataUnaffected
+    ///     candidate) while a type it composes has a property alias change (rebuild-required, which propagates
+    ///     to the composing type), the composing type must NOT end up flagged RawDataUnaffected — its inherited
+    ///     renamed property means the stored blob is genuinely stale. There is no multi-type save API, so this
+    ///     drives the internal change-composition step directly with both types, which is where the by-Id guard
+    ///     resolves the flag.
     /// </summary>
     [Test]
-    public async Task Batch_Save_Does_Not_Flag_A_Type_That_Independently_Requires_A_Rebuild()
+    public async Task Multi_Type_Change_Does_Not_Flag_A_Type_That_Independently_Requires_A_Rebuild()
     {
         var composition = await CreateContentType("compositionType", "compProp");
         var composing = await CreateContentType("composingType", "ownProp", composition);
 
-        _capturedContentTypeChanges.Clear();
-
-        // Act - composing removes its own property (candidate); composition renames its property alias
-        // (rebuild-required, propagates to composing). Saved together as a single batch so both changes are
-        // classified in one ComposeContentTypeChanges call — which is what exercises the multi-type guard.
+        // composing removes its own property (a RawDataUnaffected candidate); composition renames a property
+        // alias (rebuild-required, and propagates a rebuild to composing via GetComposedOf).
         composing.RemovePropertyType("ownProp");
-        composition.PropertyTypes.First(p => p.Alias == "compProp").Alias = "compPropRenamed";
-#pragma warning disable CS0618 // Type or member is obsolete
-        ContentTypeService.Save([composing, composition]);
-#pragma warning restore CS0618 // Type or member is obsolete
+        IPropertyType renamedProperty = composition.PropertyTypes.First(p => p.Alias == "compProp");
+        renamedProperty.Alias = "compPropRenamed";
+
+        // ComposeContentTypeChanges runs after commit and reads WasPropertyDirty(...), so remember the pending
+        // changes to mirror that state without going through a save. Resetting the content type cascades to its
+        // property types (so the renamed property's alias change is remembered too) — resetting the property
+        // again here would clear that remembered state, because a second reset has no current changes to capture.
+        ((IRememberBeingDirty)composing).ResetDirtyProperties(true);
+        ((IRememberBeingDirty)composition).ResetDirtyProperties(true);
+
+        // Act - classify both types in a single call (the path that exercises the by-Id multi-type guard).
+        IContentTypeService contentTypeService = ContentTypeService;
+        var service = (global::Umbraco.Cms.Core.Services.ContentTypeService)contentTypeService;
+        List<ContentTypeChange<IContentType>> changes = service.ComposeContentTypeChanges(composing, composition).ToList();
 
         // Assert - the composing type keeps a full rebuild; the guard prevents the removal-only flag.
         // (It can surface as more than one change entry — the guard must leave none of them flagged.)
-        var composingChanges = ChangeTypesFor(composing.Id);
+        var composingChanges = changes.Where(c => c.Item.Id == composing.Id).Select(c => c.ChangeTypes).ToList();
         Assert.Multiple(() =>
         {
             Assert.That(composingChanges.Any(c => c.RequiresRawDataRebuild()), Is.True, "A type that inherits a renamed property must still be rebuilt.");

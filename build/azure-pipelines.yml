@@ -34,6 +34,10 @@ parameters:
     displayName: Upload API docs
     type: boolean
     default: false
+  - name: buildDependencyTrack
+    displayName: Generate BOMs for Dependency Track
+    type: boolean
+    default: false
   - name: uploadDependencyTrack
     displayName: Upload BOMs to Dependency Track
     type: boolean
@@ -45,7 +49,7 @@ parameters:
   - name: integrationNonReleaseTestFilter
     displayName: TestFilter used for non-release type builds
     type: string
-    default: "--filter TestCategory!=LongRunning&TestCategory!=NonCritical"
+    default: "TestCategory!=LongRunning&TestCategory!=NonCritical"
   - name: integrationReleaseTestFilter
     displayName: TestFilter used for release type builds
     type: string
@@ -53,7 +57,7 @@ parameters:
   - name: nonWindowsIntegrationNonReleaseTestFilter
     displayName: TestFilter used for non-release type builds on non Windows agents
     type: string
-    default: "--filter TestCategory!=LongRunning&TestCategory!=NonCritical"
+    default: "TestCategory!=LongRunning&TestCategory!=NonCritical"
   - name: nonWindowsIntegrationReleaseTestFilter
     displayName: TestFilter used for release type builds on non Windows agents
     type: string
@@ -64,7 +68,6 @@ parameters:
     default: false
 
 variables:
-  nodeVersion: 20
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -100,13 +103,9 @@ stages:
             inputs:
               command: restore
               projects: $(solution)
-          - task: DotNetCoreCLI@2
+          - script: dotnet build $(solution) --configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
             name: build
             displayName: Run dotnet build and generate NuGet packages
-            inputs:
-              command: build
-              projects: $(solution)
-              arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
           # Publish compiled DLLs for C# API documentation generation
           # Separate artifact to avoid increasing build_output size for all builds
           - task: PublishPipelineArtifact@1
@@ -115,15 +114,6 @@ stages:
             inputs:
               targetPath: $(Build.SourcesDirectory)/src/Umbraco.Cms/bin/Release
               artifactName: csharp-docs-dlls
-          - powershell: |
-              dotnet tool install --global CycloneDX
-              dotnet-CycloneDX $(solution) --spec-version 1.5 --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
-            displayName: 'Generate Backend BOM'
-          - powershell: |
-              npm install --global @cyclonedx/cyclonedx-npm
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)\bom\bom-login.xml --ignore-npm-errors --verbose
-            displayName: Generate Login UI BOM
-            workingDirectory: src/Umbraco.Web.UI.Login
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
@@ -134,11 +124,6 @@ stages:
             inputs:
               targetPath: $(Build.SourcesDirectory)
               artifactName: build_output
-          - task: PublishPipelineArtifact@1
-            displayName: Publish Backend BOM
-            inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)/bom
-              artifactName: bom-backend
 
       - job: B
         displayName: Build Bellissima Package
@@ -150,11 +135,6 @@ stages:
             lfs: false,
             fetchDepth: 500
           - template: templates/backoffice-install.yml
-          - powershell: |
-              npm install --global @cyclonedx/cyclonedx-npm
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml --ignore-npm-errors --verbose
-            displayName: Generate Backoffice UI BOM
-            workingDirectory: src/Umbraco.Web.UI.Client
           - script: npm run build:for:npm
             displayName: Run build:for:npm
             workingDirectory: src/Umbraco.Web.UI.Client
@@ -171,9 +151,6 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/npm
               artifactName: npm
-          - publish: $(Build.ArtifactStagingDirectory)/bom
-            artifact: bom-frontend
-            displayName: 'Publish Frontend BOM'
 
       - job: C
         displayName: Build Test Helpers Package
@@ -186,7 +163,6 @@ stages:
             fetchDepth: 500
           - template: templates/e2e-install.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               npm_config_cache: ${{ variables.npm_config_cache }}
           - template: templates/set-npm-version.yml
             parameters:
@@ -202,32 +178,6 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/npm-testhelpers
               artifactName: npm-testhelpers
-
-  - stage: E2E_BOM
-    displayName: E2E Tests BOM Generation
-    dependsOn: []
-    jobs:
-    - job:
-      displayName: E2E Generate BOM
-      pool:
-        vmImage: "ubuntu-latest"
-      steps:
-        - checkout: self
-          submodules: false
-          lfs: false,
-          fetchDepth: 500
-        - template: templates/e2e-install.yml
-          parameters:
-            nodeVersion: ${{ variables.nodeVersion }}
-            npm_config_cache: ${{ variables.npm_config_cache }}
-        - powershell: |
-            npm install --global @cyclonedx/cyclonedx-npm
-            cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-e2e.xml --ignore-npm-errors --verbose
-          displayName: Generate E2E Tests BOM
-          workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-        - publish: $(Build.ArtifactStagingDirectory)/bom
-          artifact: bom-e2e
-          displayName: 'Publish E2E BOM'
 
   - stage: Build_Docs
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.buildApiDocs}}))
@@ -411,8 +361,8 @@ stages:
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
             macOSPart1Of3:
               vmImage: "macOS-latest"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
@@ -423,8 +373,8 @@ stages:
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
             macOSPart3Of3:
               vmImage: "macOS-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure and the ManagementApi namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
         pool:
           vmImage: $(vmImage)
         variables:
@@ -455,13 +405,49 @@ stages:
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
+                arguments: '--filter "$(testFilter) & ${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
               ${{ else }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
+                arguments: '--filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
+      # Search Integration Tests (SQLite)
+      - job:
+        timeoutInMinutes: 60
+        displayName: Search Integration Tests (SQLite)
+        strategy:
+          matrix:
+            Linux:
+              vmImage: "ubuntu-latest"
+            macOS:
+              vmImage: "macOS-latest"
+        pool:
+          vmImage: $(vmImage)
+        variables:
+          Tests__Database__DatabaseType: "Sqlite"
+        steps:
+          - checkout: self
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
+            fetchFilter: tree:0
+          - task: DownloadPipelineArtifact@2
+            displayName: Download build artifacts
+            inputs:
+              artifact: build_output
+              path: $(Build.SourcesDirectory)
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+          - task: DotNetCoreCLI@2
+            displayName: Run dotnet test
+            inputs:
+              command: test
+              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
+              arguments: '--filter "FullyQualifiedName~Umbraco.Search" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
+              testRunTitle: Search Integration Tests SQLite - $(Agent.OS)
       # Integration Tests (SQL Server)
       - job:
         timeoutInMinutes: 180
@@ -487,8 +473,8 @@ stages:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
@@ -508,8 +494,8 @@ stages:
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -569,15 +555,95 @@ stages:
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
+                arguments: '--filter "$(testFilter) & ${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
               ${{ else }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
+                arguments: '--filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
 
           # Stop SQL Server
+          - pwsh: docker stop mssql
+            displayName: Stop SQL Server Docker image (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - pwsh: SqlLocalDB stop MSSQLLocalDB
+            displayName: Stop SQL Server LocalDB (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+      # Search Integration Tests (SQL Server)
+      - job:
+        timeoutInMinutes: 60
+        condition: eq(${{parameters.sqlServerIntegrationTests}}, True)
+        displayName: Search Integration Tests (SQL Server)
+        strategy:
+          matrix:
+            Windows:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+            Linux:
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: UmbracoIntegration123!
+              Tests__Database__DatabaseType: SqlServer
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: Download build artifacts
+            inputs:
+              artifact: build_output
+              path: $(Build.SourcesDirectory)
+
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+
+          - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=$(SA_PASSWORD)" mcr.microsoft.com/mssql/server:2022-latest
+            displayName: Start SQL Server Docker image (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - powershell: |
+              $maxAttempts = 12
+              $attempt = 0
+              $status = ""
+
+              while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
+                Start-Sleep -Seconds 5
+                # We use the docker inspect command to check the status of the container. If the container is not running, we wait 5 seconds and try again. And if reaches 12 attempts, we fail the build.
+                $status = docker inspect -f '{{.State.Status}}' mssql
+
+                if ($status -ne 'running') {
+                  Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
+                  $attempt++
+                }
+              }
+
+              if ($status -eq 'running') {
+                Write-Host "SQL Server container is running"
+                docker ps -a
+              } else {
+                Write-Host "SQL Server did not become ready in time. Last known status: $status"
+                docker logs mssql
+                exit 1
+              }
+            displayName: Wait for SQL Server to be ready (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - pwsh: SqlLocalDB start MSSQLLocalDB
+            displayName: Start SQL Server LocalDB (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+
+          - task: DotNetCoreCLI@2
+            displayName: Run dotnet test
+            inputs:
+              command: test
+              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
+              arguments: '--filter "FullyQualifiedName~Umbraco.Search" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
+              testRunTitle: Search Integration Tests SQL Server - $(Agent.OS)
+
           - pwsh: docker stop mssql
             displayName: Stop SQL Server Docker image (Linux)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
@@ -653,7 +719,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
@@ -731,7 +796,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
@@ -767,16 +831,109 @@ stages:
 
   - stage: Dependency_Track
     displayName: Dependency Track
-    dependsOn:
-      - Build
-      - E2E_BOM
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadDependencyTrack}}))
+    dependsOn: Build
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.buildDependencyTrack}}, ${{parameters.uploadDependencyTrack}}))
     variables:
+      uploadToDependencyTrack: $[ or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.uploadDependencyTrack }}', 'True')) ]
       # Determine Umbraco version based on whether it's a public release or not. If public release, use major version, else use full NuGet package version.
       umbracoVersion: $[ iif(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'], stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion']) ]
     jobs:
+      - job: Dotnet_BOM
+        displayName: Generate Backend BOM
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: self
+            submodules: false
+            lfs: false
+            fetchDepth: 1
+            fetchFilter: tree:0
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+          - bash: |
+              dotnet tool install --global CycloneDX --version 6.2.0
+              dotnet-CycloneDX $(solution) --spec-version 1.5 --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
+            displayName: Generate Backend BOM
+          - publish: $(Build.ArtifactStagingDirectory)/bom
+            artifact: bom-backend
+            displayName: Publish Backend BOM
+
+      - job: Backoffice_BOM
+        displayName: Generate Backoffice UI BOM
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: self
+            submodules: false
+            lfs: false
+            fetchDepth: 1
+            fetchFilter: tree:0
+          - template: templates/backoffice-install.yml
+          - bash: |
+              npm install --global --ignore-scripts @cyclonedx/cyclonedx-npm@6.0.1
+              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml --ignore-npm-errors --verbose
+            displayName: Generate Backoffice UI BOM
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - publish: $(Build.ArtifactStagingDirectory)/bom
+            artifact: bom-backoffice
+            displayName: Publish Backoffice UI BOM
+
+      - job: Login_BOM
+        displayName: Generate Login UI BOM
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: self
+            submodules: false
+            lfs: false
+            fetchDepth: 1
+            fetchFilter: tree:0
+          - task: UseNode@1
+            displayName: Use Node.js
+            retryCountOnTaskFailure: 3
+            inputs:
+              versionSource: 'fromFile'
+              versionFilePath: src/Umbraco.Web.UI.Login/.nvmrc
+          - script: npm ci --no-fund --no-audit --ignore-scripts
+            displayName: Run npm ci (Login)
+            workingDirectory: src/Umbraco.Web.UI.Login
+          - bash: |
+              npm install --global --ignore-scripts @cyclonedx/cyclonedx-npm@6.0.1
+              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-login.xml --ignore-npm-errors --verbose
+            displayName: Generate Login UI BOM
+            workingDirectory: src/Umbraco.Web.UI.Login
+          - publish: $(Build.ArtifactStagingDirectory)/bom
+            artifact: bom-login
+            displayName: Publish Login UI BOM
+
+      - job: E2E_BOM
+        displayName: Generate E2E Tests BOM
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: self
+            submodules: false
+            lfs: false
+            fetchDepth: 1
+            fetchFilter: tree:0
+          - template: templates/e2e-install.yml
+            parameters:
+              npm_config_cache: ${{ variables.npm_config_cache }}
+          - bash: |
+              npm install --global --ignore-scripts @cyclonedx/cyclonedx-npm@6.0.1
+              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-e2e.xml --ignore-npm-errors --verbose
+            displayName: Generate E2E Tests BOM
+            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+          - publish: $(Build.ArtifactStagingDirectory)/bom
+            artifact: bom-e2e
+            displayName: Publish E2E BOM
+
       - template: templates/dependency-track.yml
         parameters:
+          dependsOn: [Dotnet_BOM, Backoffice_BOM, Login_BOM, E2E_BOM]
+          condition: and(succeeded(), eq(variables['uploadToDependencyTrack'], 'True'))
           projectName: "Umbraco-CMS"
           umbracoVersion: $(umbracoVersion)
           projects:
@@ -784,10 +941,10 @@ stages:
               artifact: "bom-backend"
               bomFilePath: "bom-dotnet.xml"
             - name: "Login"
-              artifact: "bom-backend"
+              artifact: "bom-login"
               bomFilePath: "bom-login.xml"
             - name: "Backoffice"
-              artifact: "bom-frontend"
+              artifact: "bom-backoffice"
               bomFilePath: "bom-backoffice.xml"
             - name: "E2E"
               artifact: "bom-e2e"
@@ -862,10 +1019,10 @@ stages:
       - job: WaitForApproval
         displayName: Wait for manual approval
         pool: server
-        timeoutInMinutes: 4320 # 3 days
         steps:
-          - task: ManualValidation@0
+          - task: ManualValidation@1
             displayName: Manual approval to push to NuGet
+            timeoutInMinutes: 4320 # 3 days
             inputs:
               notifyUsers: ''
               instructions: 'Approve to push the NuGet release.'

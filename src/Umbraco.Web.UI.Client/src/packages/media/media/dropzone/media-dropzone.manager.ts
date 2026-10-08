@@ -1,6 +1,5 @@
 import { UmbMediaDetailRepository } from '../repository/detail/index.js';
 import type { UmbMediaDetailModel, UmbMediaValueModel } from '../types.js';
-import { UMB_MEDIA_PROPERTY_VALUE_ENTITY_TYPE } from '../entity.js';
 import { toFriendlyName } from '../utils/to-friendly-name.function.js';
 import { UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL } from './modals/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -233,8 +232,8 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		if (allowed) return allowed;
 
 		// Request information on this media type.
-		const { data } = await this.#mediaTypeStructure.requestAllowedChildrenOf(mediaTypeUnique, parentUnique);
-		if (!data) throw new Error('Parent media type does not exist');
+		const { data } = await this.#mediaTypeStructure.requestAllAllowedChildrenOf(mediaTypeUnique, parentUnique);
+		if (!data) throw new Error('Could not retrieve the media types allowed under the parent media type');
 
 		this.#allowedChildrenOf.appendOne({ mediaTypeUnique, allowedChildren: data.items });
 		return data.items;
@@ -250,13 +249,12 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 			value: { temporaryFileId: item.temporaryFile?.temporaryUnique },
 			culture: null,
 			segment: null,
-			entityType: UMB_MEDIA_PROPERTY_VALUE_ENTITY_TYPE,
 		};
 
 		const preset: Partial<UmbMediaDetailModel> = {
 			unique: item.unique,
 			mediaType: { unique: mediaTypeUnique, collection: null },
-			variants: [{ culture: null, segment: null, createDate: null, updateDate: null, flags: [], name }],
+			variants: [{ culture: null, createDate: null, updateDate: null, flags: [], name }],
 			values: item.temporaryFile ? [umbracoFile] : undefined,
 		};
 		const { data } = await this.#mediaDetailRepository.createScaffold(preset);

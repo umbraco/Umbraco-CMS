@@ -62,8 +62,12 @@
     <key alias="parentCultureNotPublished"><![CDATA[Questa lingua è pubblicata, ma non è visibile perché non è pubblicata al padre '%0%']]></key>
     <key alias="parentNotPublishedAnomaly"><![CDATA[Questo documento è pubblicato, ma non è nella cache]]></key>
     <key alias="getUrlException">Impossibile ottenere l'URL</key>
-    <key alias="routeError"><![CDATA[Questo documento è pubblicato ma il suo URL entrerebbe in conflitto con il contenuto %0%]]></key>
+    <key alias="routeError"><![CDATA[Questo documento è pubblicato ma il suo URL entrerebbe in conflitto con il contenuto '%0%']]></key>
     <key alias="routeErrorCannotRoute"><![CDATA[Questo documento è pubblicato ma il suo URL non può essere instradato]]></key>
+    <key alias="unroutableContentWarningHeader">Contenuto pubblicato</key>
+    <key alias="unroutableContentWarning">Il documento non ha un URL. Maggiori dettagli sono disponibili in "Info".</key>
+    <key alias="unroutableContentWarningWithReason">Il documento non ha un URL. %0% Maggiori dettagli sono disponibili in "Info".</key>
+    <key alias="routeErrorNoDomainForCulture">Questo documento è pubblicato in '%0%' ma non ha un URL perché non è la lingua predefinita e non gli è stato assegnato alcun nome host</key>
   </area>
   <area alias="member">
   </area>
@@ -448,10 +452,5 @@
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[L'email di notifica è ancora impostata al valore predefinito di <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>I risultati dell'Health Check programmato di Umbraco del %0% alle %1% è il seguente:</p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Stato dell'Health Check di Umbraco: %0%</key>
-  </area>
-  <area alias="recycleBin">
-    <key alias="contentTrashed">Contenuto cestinato con Id: {0} relativo al contenuto principale originale con Id: {1}
-    </key>
-    <key alias="mediaTrashed">Media cestinato con Id: {0} relativo al media principale originale con Id: {1}</key>
   </area>
 </language>

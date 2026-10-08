@@ -32,6 +32,7 @@ public class CreateTemporaryFileController : TemporaryFileControllerBase
 
     [HttpPost("")]
     [MapToApiVersion("1.0")]
+    [Consumes("multipart/form-data")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [EndpointSummary("Creates a temporary file.")]

@@ -96,12 +96,6 @@ public static partial class Constants
             public const string DocumentType = /*TableNamePrefix*/ "cms" + "DocumentType";
 
             /// <summary>
-            ///     The element type tree table name.
-            /// </summary>
-            [Obsolete("Please use ContentTypeTree instead. Scheduled for removal in Umbraco 18.")]
-            public const string ElementTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType";
-
-            /// <summary>
             ///     The content type tree (composition) table name.
             /// </summary>
             public const string ContentTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType";
@@ -157,9 +151,24 @@ public static partial class Constants
             public const string DocumentUrl = TableNamePrefix + "DocumentUrl";
 
             /// <summary>
-            ///     The document URL alias.
+            ///     The document URL alias table name.
             /// </summary>
             public const string DocumentUrlAlias = TableNamePrefix + "DocumentUrlAlias";
+
+            /// <summary>
+            ///     The elements table name.
+            /// </summary>
+            public const string Element = TableNamePrefix + "Element";
+
+            /// <summary>
+            ///     The elements culture variation table name.
+            /// </summary>
+            public const string ElementCultureVariation = TableNamePrefix + "ElementCultureVariation";
+
+            /// <summary>
+            ///     The elements version table name.
+            /// </summary>
+            public const string ElementVersion = TableNamePrefix + "ElementVersion";
 
             /// <summary>
             ///     The media version table name.
@@ -257,18 +266,6 @@ public static partial class Constants
             public const string UserData = TableNamePrefix + "UserData";
 
             /// <summary>
-            ///     The user group to node mapping table name.
-            /// </summary>
-            [Obsolete("Scheduled for removal in Umbraco 18 as this table hasn't existed since Umbraco 14.")]
-            public const string UserGroup2Node = TableNamePrefix + "UserGroup2Node";
-
-            /// <summary>
-            ///     The user group to node permission mapping table name.
-            /// </summary>
-            [Obsolete("Scheduled for removal in Umbraco 18 as this table hasn't existed since Umbraco 14.")]
-            public const string UserGroup2NodePermission = TableNamePrefix + "UserGroup2NodePermission";
-
-            /// <summary>
             ///     The user group to permission mapping table name.
             /// </summary>
             public const string UserGroup2Permission = TableNamePrefix + "UserGroup2Permission";
@@ -307,6 +304,11 @@ public static partial class Constants
             ///     The external member to member group mapping table name.
             /// </summary>
             public const string ExternalMember2MemberGroup = TableNamePrefix + "ExternalMember2MemberGroup";
+
+            /// <summary>
+            ///     The search index document table name.
+            /// </summary>
+            public const string IndexDocument = TableNamePrefix + "IndexDocument";
 
             /// <summary>
             ///     The member table name.

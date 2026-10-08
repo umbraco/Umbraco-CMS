@@ -32,7 +32,6 @@ public static partial class UmbracoBuilderExtensions
     /// </remarks>
     public static IUmbracoBuilder AddDistributedCache(this IUmbracoBuilder builder)
     {
-        builder.Services.AddSingleton<LastSyncedFileManager>();
         builder.Services.AddSingleton<ISyncBootStateAccessor, SyncBootStateAccessor>();
         builder.SetServerMessenger(factory => new BatchedDatabaseServerMessenger(
             factory.GetRequiredService<IMainDom>(),
@@ -47,7 +46,7 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
             factory.GetRequiredService<IMachineInfoFactory>()));
         builder.AddNotificationHandler<UmbracoApplicationStartingNotification, DatabaseServerMessengerNotificationHandler>();
-        builder.AddNotificationHandler<UmbracoRequestEndNotification, DatabaseServerMessengerNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UmbracoRequestEndNotification, DatabaseServerMessengerNotificationHandler>();
         return builder;
     }
 

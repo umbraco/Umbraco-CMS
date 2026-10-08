@@ -6,7 +6,7 @@
  * retrying while nothing is listening yet, for when the backend was only just started.
  * @example node devops/openapi/index.js
  * @example node devops/openapi/index.js --wait
- * @example node devops/openapi/index.js https://localhost:5001/umbraco/swagger/management/swagger.json
+ * @example node devops/openapi/index.js https://localhost:5001/umbraco/openapi/management.json
  * @author Umbraco HQ
  */
 
@@ -14,7 +14,7 @@ import { get } from 'node:https';
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const DEFAULT_URL = 'https://localhost:44339/umbraco/swagger/management/swagger.json';
+const DEFAULT_URL = 'https://localhost:44339/umbraco/openapi/management.json';
 const TARGET = join(import.meta.dirname, '../../../Umbraco.Cms.Api.Management/OpenApi.json');
 const REQUEST_TIMEOUT_MS = 30_000;
 const WAIT_TIMEOUT_MS = 300_000;
@@ -57,7 +57,7 @@ const deadline = Date.now() + (shouldWait ? WAIT_TIMEOUT_MS : 0);
 let announcedWait = false;
 let document;
 
-for (;;) {
+for (; ;) {
 	try {
 		document = await fetchDocument();
 		break;
@@ -67,7 +67,7 @@ for (;;) {
 			console.error(
 				isConnectionError(error)
 					? 'Nothing is listening on that address. Start a backend first:\n  dotnet run --project src/Umbraco.Web.UI --no-launch-profile -- --environment Development --urls https://localhost:44339'
-					: 'Something is listening on that address but is not serving the Management API OpenAPI document.\nSwagger is only mapped when the environment is not Production, so a backend started without\n--environment Development will return 404 here.',
+					: 'Something is listening on that address but is not serving the Management API OpenAPI document.\OpenAPI is only mapped when the environment is not Production, so a backend started without\n--environment Development will return 404 here.',
 			);
 			process.exit(1);
 		}

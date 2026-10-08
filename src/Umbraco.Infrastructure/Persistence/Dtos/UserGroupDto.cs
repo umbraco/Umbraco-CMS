@@ -69,19 +69,6 @@ public class UserGroupDto
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the default permissions assigned to the user group.
-    /// </summary>
-    /// <remarks>
-    /// This property is obsolete and no longer used. Use <c>UserGroup2PermissionDtos</c> instead.
-    /// Scheduled for removal in Umbraco 18.
-    /// </remarks>
-    [Column("userGroupDefaultPermissions")]
-    [Length(50)]
-    [NullSetting(NullSetting = NullSettings.Null)]
-    [Obsolete("Is not used anymore. Use UserGroup2PermissionDtos instead. Scheduled for removal in Umbraco 18.")]
-    public string? DefaultPermissions { get; set; }
-
-    /// <summary>
     /// Gets or sets the date and time when the user group was created.
     /// </summary>
     [Column("createDate")]
@@ -127,6 +114,14 @@ public class UserGroupDto
     [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(NodeDto), Name = "FK_startMediaId_umbracoNode_id")]
     public int? StartMediaId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the identifier of the element node that defines the starting point for media access for the user group.
+    /// </summary>
+    [Column("startElementId")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [ForeignKey(typeof(NodeDto), Name = "FK_startElementId_umbracoNode_id")]
+    public int? StartElementId { get; set; }
 
     /// <summary>
     /// Gets or sets the collection of application associations for this user group.

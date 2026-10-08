@@ -1,3 +1,4 @@
+import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbUfmRenderElement } from '../../../ufm/components/ufm-render/index.js';
 import {
 	css,
@@ -35,6 +36,8 @@ export interface UmbTableItem {
 		href?: string;
 		/** When set (and no `href` is provided), the indicator becomes a button invoking this callback. */
 		onOpen?: () => void;
+		/** Replaces the default expand symbol. The table still wraps it in the link or button the other options describe. */
+		renderExpandSymbol?: () => TemplateResult;
 	};
 }
 
@@ -421,7 +424,7 @@ export class UmbTableElement extends UmbLitElement {
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._handleAllRowsCheckboxChange}"
 							?checked=${allSelected}
-							.indeterminate=${indeterminate}></uui-checkbox>
+							?indeterminate=${indeterminate}></uui-checkbox>
 					`,
 				)}
 			</uui-table-head-cell>
@@ -461,7 +464,7 @@ export class UmbTableElement extends UmbLitElement {
 		const indicator = item.childrenIndicator;
 		if (!indicator) return nothing;
 
-		const symbol = html`<uui-symbol-expand></uui-symbol-expand>`;
+		const symbol = indicator.renderExpandSymbol?.() ?? html`<uui-symbol-expand></uui-symbol-expand>`;
 
 		if (indicator.href) {
 			return html`
@@ -585,25 +588,14 @@ export class UmbTableElement extends UmbLitElement {
 				}
 			}
 
-			uui-table {
-				box-shadow: var(--uui-shadow-depth-1);
-			}
-
-			uui-table-head {
-				position: sticky;
-				top: 0;
-				z-index: 1;
-				background-color: var(--uui-color-surface, #fff);
-			}
-
 			uui-table-row uui-checkbox {
 				display: none;
 			}
 
-			uui-table-row[selectable]:focus umb-icon,
-			uui-table-row[selectable]:focus-within umb-icon,
-			uui-table-row[selectable]:hover umb-icon,
-			uui-table-row[data-selection-mode] umb-icon {
+			uui-table-row[selectable]:focus uui-table-cell:not(.children-indicator-cell) umb-icon,
+			uui-table-row[selectable]:focus-within uui-table-cell:not(.children-indicator-cell) umb-icon,
+			uui-table-row[selectable]:hover uui-table-cell:not(.children-indicator-cell) umb-icon,
+			uui-table-row[data-selection-mode] uui-table-cell:not(.children-indicator-cell) umb-icon {
 				display: none;
 			}
 

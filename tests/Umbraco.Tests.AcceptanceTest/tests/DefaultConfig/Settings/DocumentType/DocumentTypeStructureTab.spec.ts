@@ -91,3 +91,84 @@ test('can configure a collection for a document type', {tag: '@release'}, async 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(collectionDataTypeName);
 });
+
+test('cannot see Allow at Root toggle in Structure tab for an Element Type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createEmptyElementType(documentTypeName);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.documentType.clickStructureTab();
+
+  // Assert
+  // Wait for the not-applicable message first: it confirms the tab has rendered, so the "button is absent" check below is meaningful rather than passing while the panel is still loading.
+  await umbracoUi.documentType.isElementTypeNotApplicableMessageForPropertyWithNameVisible('Allow at root');
+  await umbracoUi.documentType.isAllowAtRootButtonVisible(false);
+});
+
+test('cannot see Allowed Child Nodes section in Structure tab for an Element Type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createEmptyElementType(documentTypeName);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.documentType.clickStructureTab();
+  // Assert
+  // Anchor on the not-applicable message so the tab has loaded before asserting the section is absent.
+  await umbracoUi.documentType.isElementTypeNotApplicableMessageForPropertyWithNameVisible('Allowed child node types');
+  await umbracoUi.documentType.isAllowedChildNodesButtonVisible(false);
+});
+
+test('cannot see Collection section in Structure tab for an Element Type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createEmptyElementType(documentTypeName);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.documentType.clickStructureTab();
+
+  // Assert
+  // Anchor on the not-applicable message so the tab has loaded before asserting the section is absent.
+  await umbracoUi.documentType.isElementTypeNotApplicableMessageForPropertyWithNameVisible('Collection');
+  await umbracoUi.documentType.isAddCollectionButtonVisible(false);
+});
+
+test('can see Allow at Root toggle in Structure tab after toggling off Element Type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createEmptyElementType(documentTypeName);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.documentType.clickDocumentTypeSettingsTab();
+  await umbracoUi.documentType.clickTextButtonWithName('Element Type');
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
+  await umbracoUi.documentType.clickStructureTab();
+
+  // Assert
+  await umbracoUi.documentType.isAllowAtRootButtonVisible(true);
+  await umbracoUi.documentType.isAllowedChildNodesButtonVisible(true);
+  await umbracoUi.documentType.isAddCollectionButtonVisible(true);
+  await umbracoUi.documentType.doesElementTypeNotApplicableMessageExist(false);
+  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  expect(documentTypeData.isElement).toBeFalsy();
+});
+
+test('cannot see element type not applicable message in Structure tab for a Document Type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.documentType.clickStructureTab();
+
+  // Assert
+  await umbracoUi.documentType.doesElementTypeNotApplicableMessageExist(false);
+  await umbracoUi.documentType.isAllowAtRootButtonVisible();
+  await umbracoUi.documentType.isAllowedChildNodesButtonVisible();
+  await umbracoUi.documentType.isAddCollectionButtonVisible();
+});

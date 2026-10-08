@@ -6,11 +6,11 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-input-property-editor-data-source')
-export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -185,12 +185,13 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 					(status) => {
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
+						const isError = status.state.type === 'error';
 						return html`<umb-entity-item-ref
 							id=${unique}
 							.item=${item}
-							?error=${status.state.type === 'error'}
+							?error=${isError}
 							.errorMessage=${status.state.error}
-							?readonly=${this.readonly}
+							?readonly=${this.readonly || isError}
 							?standalone=${this.max === 1}>
 							${when(
 								!this.readonly,

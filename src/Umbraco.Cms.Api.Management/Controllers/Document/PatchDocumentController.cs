@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -44,7 +45,7 @@ public class PatchDocumentController : PatchDocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [EndpointSummary("Make partial updates to a document. For more information, see the documentation at https://docs.umbraco.com/umbraco-cms/reference/management-api/patching/document-endpoint-guide or https://docs.umbraco.com/umbraco-cms/reference/management-api/patching/document-endpoint-spec")]
-    [Consumes("application/json-patch+json")]
+    [Consumes(MediaTypeNames.Application.JsonPatch)]
     public async Task<IActionResult> Patch(
         CancellationToken cancellationToken,
         Guid id,

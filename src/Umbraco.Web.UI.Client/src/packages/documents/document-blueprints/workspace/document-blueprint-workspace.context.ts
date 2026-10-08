@@ -3,9 +3,14 @@ import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentBlueprintDetailRepository } from '../repository/index.js';
 import { UMB_DOCUMENT_BLUEPRINT_DETAIL_REPOSITORY_ALIAS } from '../constants.js';
 import type { UmbDocumentBlueprintDetailModel, UmbDocumentBlueprintVariantModel } from '../types.js';
-import { UMB_CREATE_DOCUMENT_BLUEPRINT_WORKSPACE_PATH_PATTERN } from '../paths.js';
-import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from './constants.js';
 import {
+	UMB_CREATE_DOCUMENT_BLUEPRINT_WORKSPACE_PATH_PATTERN,
+	UMB_DOCUMENT_BLUEPRINT_ROOT_WORKSPACE_PATH,
+} from '../paths.js';
+import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from './constants.js';
+import { UMB_SETTINGS_SECTION_PATHNAME } from '@umbraco-cms/backoffice/settings';
+import {
+	UMB_WORKSPACE_EDIT_PATH_PATTERN,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
@@ -17,7 +22,6 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import {
-	UMB_DOCUMENT_COLLECTION_ALIAS,
 	UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/document';
@@ -87,6 +91,18 @@ export class UmbDocumentBlueprintWorkspaceContext
 		]);
 	}
 
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) {
+			return UMB_DOCUMENT_BLUEPRINT_ROOT_WORKSPACE_PATH;
+		}
+
+		return UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
+			sectionName: UMB_SETTINGS_SECTION_PATHNAME,
+			entityType: entity.entityType,
+			unique: entity.unique,
+		});
+	}
+
 	async create(parent: UmbEntityModel, documentTypeUnique: string) {
 		return this.createScaffold({
 			parent,
@@ -97,20 +113,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 				},
 			},
 		});
-	}
-
-	getCollectionAlias() {
-		return UMB_DOCUMENT_COLLECTION_ALIAS;
-	}
-
-	/**
-	 * Gets the unique identifier of the content type.
-	 * @deprecated Use `getContentTypeUnique` instead.
-	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbDocumentBlueprintWorkspaceContext
-	 */
-	getContentTypeId(): string | undefined {
-		return this.getContentTypeUnique();
 	}
 
 	/**
@@ -134,7 +136,9 @@ export class UmbDocumentBlueprintWorkspaceContext
 		variantIds: Array<UmbVariantId> = [],
 	): Promise<void> {
 		const namedVariants = saveData.variants.filter((v) => v.name);
-		const filteredVariantIds = variantIds.filter((variantId) => namedVariants.some((v) => variantId.compare(v)));
+		const filteredVariantIds = variantIds.filter((variantId) =>
+			namedVariants.some((v) => variantId.culture === v.culture),
+		);
 		return super.runMandatoryValidationForSaveData({ ...saveData, variants: namedVariants }, filteredVariantIds);
 	}
 

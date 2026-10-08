@@ -12,12 +12,12 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { TagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-tags-input')
-export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbTagsInputElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	@property({ type: String })
 	group?: string;
 
@@ -186,6 +186,41 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		} else {
 			this.#getExistingTags(this._currentInput);
 		}
+	}
+
+	#onPaste(e: ClipboardEvent) {
+		const pastedText = e.clipboardData?.getData('text') ?? '';
+
+		// A typed comma is a literal part of a single tag; only a pasted separator splits into multiple tags.
+		if (!/[,\r\n]/.test(pastedText)) return;
+
+		e.preventDefault();
+
+		const candidates = pastedText
+			.split(/[,\r\n]+/)
+			.map((tag) => tag.trim())
+			.filter((tag) => tag !== '');
+
+		this.#addTags(candidates);
+	}
+
+	#addTags(candidates: string[]) {
+		const existing = new Set(this.items);
+		const newTags: string[] = [];
+		for (const candidate of candidates) {
+			if (existing.has(candidate)) continue;
+			existing.add(candidate);
+			newTags.push(candidate);
+		}
+
+		if (!newTags.length) return;
+
+		this.#inputError(false);
+		this.items = [...this.items, ...newTags];
+		this._tagInput.value = '';
+		this._currentInput = '';
+		this._matches = [];
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	protected override updated(): void {
@@ -392,6 +427,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 					.value="${this._currentInput ?? undefined}"
 					@keydown="${this.#onInputKeydown}"
 					@input="${this.#onInput}"
+					@paste="${this.#onPaste}"
 					@blur="${this.#onBlur}" />
 				<uui-icon id="icon-add" name="icon-add"></uui-icon>
 				${this.#renderTagOptions()}

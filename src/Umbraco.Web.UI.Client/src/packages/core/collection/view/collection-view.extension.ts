@@ -8,7 +8,9 @@ export interface ManifestCollectionView
 
 export interface MetaCollectionView {
 	/**
-	 * The friendly name of the collection view
+	 * The friendly name of the collection view.
+	 * Core collection views use localization keys prefixed with `#` (e.g. `"#collection_tableViewLabel"`).
+	 * @example ["#collection_tableViewLabel", "Table"]
 	 */
 	label: string;
 
@@ -36,12 +38,6 @@ export interface UmbConditionsCollectionView {
 	 */
 	entityType: string;
 }
-
-/**
- * @deprecated Use {@link UmbConditionsCollectionView} instead. This will be removed in Umbraco 18.
- */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/naming-convention
-export interface ConditionsCollectionView extends UmbConditionsCollectionView {}
 
 declare global {
 	interface UmbExtensionManifestMap {

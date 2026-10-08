@@ -231,7 +231,7 @@
 		<key alias="parentCultureNotPublished">Cette culture est publiée mais n'est pas visible car elle n'est pas publiée pour le parent '%0%'</key>
 		<key alias="parentNotPublishedAnomaly">Ce document est publié mais n'est pas présent dans le cache</key>
 		<key alias="getUrlException">Oups: impossible d'obtenir cet URL (erreur interne - voir fichier log)</key>
-		<key alias="routeError">Ce document est publié mais son URL entrerait en collision avec le contenu %0%</key>
+		<key alias="routeError">Ce document est publié mais son URL entrerait en collision avec le contenu '%0%'</key>
 		<key alias="routeErrorCannotRoute">Ce document est publié mais son URL ne peut pas être routé</key>
 		<key alias="publish">Publier</key>
 		<key alias="published">Publié</key>
@@ -502,35 +502,6 @@
    ]]>
 		</key>
 		<key alias="overviewTitle">Aperçu du dictionaire</key>
-	</area>
-	<area alias="examineManagement">
-		<key alias="configuredSearchers">Recherches configurées</key>
-		<key alias="configuredSearchersDescription">Affiche les propriétés et les outils de chaque Recherche configurée (e.g. une recherche multi-index)</key>
-		<key alias="fieldValues">Valeurs du champ</key>
-		<key alias="healthStatus">Etat de santé</key>
-		<key alias="healthStatusDescription">L'état de santé de l'index et s'il peut être lu</key>
-		<key alias="indexers">Indexeurs</key>
-		<key alias="indexInfo">Info Index</key>
-		<key alias="indexInfoDescription">Liste les propriétés de l'index</key>
-		<key alias="manageIndexes">Gérer les index d'Examine</key>
-		<key alias="manageIndexesDescription">Vous permet de voir les détails de chaque index et fournit des outils pour gérer les index</key>
-		<key alias="rebuildIndex">Reconstruire l'index</key>
-		<key alias="rebuildIndexWarning">
-			<![CDATA[
-      Ceci provoquera la reconstruction de l'index.<br />
-      Cela pourrait prendre un certain temps en fonction de la quantité de contenu présente dans votre site.<br />
-      Il est déconseillé de reconstruire un index pendant les périodes de trafic intense sur le site web ou quand les éditeurs sont en train d'éditer du contenu.
-     ]]>
-		</key>
-		<key alias="searchers">Recherches</key>
-		<key alias="searchDescription">Rechercher dans l'index et afficher les résultats</key>
-		<key alias="tools">Outils</key>
-		<key alias="toolsDescription">Outils pour gérer l'index</key>
-		<key alias="fields">champs</key>
-		<key alias="indexCannotRead">L'index ne peut pas être lu et devra être reconstruit</key>
-		<key alias="processIsTakingLonger">Le processus dure plus de temps que prévu, vérifiez les logs Umbraco afin de voir s'il y a eu des erreurs pendant cette opératon</key>
-		<key alias="indexCannotRebuild">Cet index ne peut pas être reconstruit parce qu'on ne lui a pas assigné de</key>
-		<key alias="iIndexPopulator">IIndexPopulator</key>
 	</area>
 	<area alias="placeholders">
 		<key alias="username">Votre nom d'utilisateur</key>
@@ -2147,13 +2118,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="characters_left"><![CDATA[<strong>%0%</strong> caractères restant.]]></key>
 		<key alias="characters_exceed"><![CDATA[Maximum %0% caractères, <strong>%1%</strong> en trop.]]></key>
 	</area>
-	<area alias="recycleBin">
-		<key alias="contentTrashed">Suppression du contenu avec l'Id : {0} lié au contenu parent original avec l'Id : {1}</key>
-		<key alias="mediaTrashed">Suppression du media avec l'Id : {0} lié à l'élément media parent original avec l'Id : {1}</key>
-		<key alias="itemCannotBeRestored">Cet élément ne peut pas être restauré automatiquement</key>
-		<key alias="itemCannotBeRestoredHelpText">Il n'y a aucun endroit où cet élément peut être restauré automatiquement. Vous pouvez déplacer l'élément manuellement en utilisant l'arborescence ci-dessous.</key>
-		<key alias="wasRestored">a été restauré sous</key>
-	</area>
+
 	<area alias="relationType">
 		<key alias="direction">Direction</key>
 		<key alias="parentToChild">Parent vers enfant</key>
@@ -2174,7 +2139,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="contentRedirectManager">Gestion des redirections d'URL</key>
 		<key alias="mediaFolderBrowser">Contenu</key>
 		<key alias="settingsWelcome">Bienvenue</key>
-		<key alias="settingsExamine">Gestion d'Examine</key>
 		<key alias="settingsPublishedStatus">Statut Publié</key>
 		<key alias="settingsModelsBuilder">Models Builder</key>
 		<key alias="settingsHealthCheck">Health Check</key>

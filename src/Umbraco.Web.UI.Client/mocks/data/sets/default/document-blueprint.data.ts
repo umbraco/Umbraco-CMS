@@ -19,7 +19,6 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 				state: 'Draft' as UmbDocumentVariantState,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-us',
-				segment: null,
 				name: 'The Simplest Document Blueprint',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
@@ -37,6 +36,7 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 			},
 		],
 		flags: [],
+		noAccess: false,
 	},
 	{
 		id: 'forbidden',
@@ -53,7 +53,6 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 				state: 'Draft' as UmbDocumentVariantState,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-US',
-				segment: null,
 				name: 'A Forbidden Document Blueprint',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
@@ -71,5 +70,6 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 			},
 		],
 		flags: [],
+		noAccess: false,
 	},
 ];
