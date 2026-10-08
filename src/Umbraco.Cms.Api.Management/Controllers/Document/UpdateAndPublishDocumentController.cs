@@ -81,10 +81,10 @@ public class UpdateAndPublishDocumentController : UpdateDocumentControllerBase
 
             ContentUpdateModel model = _documentEditingPresentationFactory.MapUpdateModel(requestModel);
             Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
-            Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await _contentEditingService.UpdateAndPublishAsync(id, model, requestModel.CulturesToPublish, currentUserKey);
+            Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus> result = await _contentEditingService.UpdateAndPublishAsync(id, model, requestModel.CulturesToPublish.ToHashSet(), currentUserKey);
 
             return result.Success
                 ? Ok()
-                : ContentEditingOperationStatusResult(result.Status);
+                : DocumentEditingAndPublishingOperationStatusResult(result.Status, result.Result.InvalidPropertyAliases);
         });
 }

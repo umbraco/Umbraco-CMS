@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -34,6 +35,7 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
+    private readonly ILogger<FileUploadPropertyValueEditor> _logger;
     private readonly FileUploadValueParser _valueParser;
 
     private ContentSettings _contentSettings;
@@ -52,6 +54,7 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
     /// <param name="temporaryFileService">Manages temporary files used during file upload processes.</param>
     /// <param name="scopeProvider">Provides database scope management for transactional operations.</param>
     /// <param name="fileStreamSecurityValidator">Validates file streams for security during upload and access.</param>
+    /// <param name="logger">The logger.</param>
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
         MediaFileManager mediaFileManager,
@@ -61,13 +64,15 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
         IIOHelper ioHelper,
         ITemporaryFileService temporaryFileService,
         IScopeProvider scopeProvider,
-        IFileStreamSecurityValidator fileStreamSecurityValidator)
+        IFileStreamSecurityValidator fileStreamSecurityValidator,
+        ILogger<FileUploadPropertyValueEditor> logger)
         : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _mediaFileManager = mediaFileManager;
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
+        _logger = logger;
         _valueParser = new FileUploadValueParser(jsonSerializer);
 
         _contentSettings = contentSettings.CurrentValue;
@@ -129,8 +134,9 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
         // resetting the current value?
         if (string.IsNullOrEmpty(editorModelValue?.Src) && currentPath.IsNullOrWhiteSpace() is false)
         {
-            // delete the current file and clear the value of this property
-            _mediaFileManager.FileSystem.DeleteFile(currentPath);
+            // clear the value of this property, deleting the current file - but only if the stored path actually
+            // belongs to this property, as it could reference another item's file (see MediaFileManager.IsFileOwnedBy)
+            DeleteFileIfOwned(currentPath, editorValue.ContentKey, editorValue.PropertyTypeKey);
             return null;
         }
 
@@ -167,12 +173,30 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
         // remove current file if replaced
         if (currentPath != filepath && currentPath.IsNullOrWhiteSpace() is false)
         {
-            _mediaFileManager.FileSystem.DeleteFile(currentPath);
+            DeleteFileIfOwned(currentPath, contentKey, propertyTypeKey);
         }
 
         scope.Complete();
 
         return filepath is null ? null : _mediaFileManager.FileSystem.GetUrl(filepath);
+    }
+
+    private void DeleteFileIfOwned(string path, Guid contentKey, Guid propertyTypeKey)
+    {
+        if (_mediaFileManager.IsFileOwnedBy(path, contentKey, propertyTypeKey) is false)
+        {
+            // The stored path does not resolve to one this content and property type could own, so it references
+            // another item's file. Refuse to delete it - the value may have been tampered with to target a file
+            // the editing user is not authorized to remove.
+            _logger.LogWarning(
+                "Refused to delete media file at path '{Path}' while editing content {ContentKey}: the path does not belong to property type {PropertyTypeKey}.",
+                path,
+                contentKey,
+                propertyTypeKey);
+            return;
+        }
+
+        _mediaFileManager.FileSystem.DeleteFile(path);
     }
 
     private Guid? TryParseTemporaryFileKey(object? editorValue)

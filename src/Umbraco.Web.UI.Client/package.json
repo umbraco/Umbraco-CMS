@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "17.8.0-rc",
+	"version": "17.9.0-rc",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -223,7 +223,7 @@
 		"wc-analyze": "wca **/*.element.ts --outFile ./custom-elements.json",
 		"generate:tsconfig": "node ./devops/tsconfig/index.js",
 		"generate:manifest": "node ./devops/build/create-umbraco-package.js",
-		"package:validate": "node ./devops/package/validate-exports.js",
+		"package:validate": "node ./devops/package/validate-exports.js && node ./devops/package/validate-hey-api-version.js",
 		"generate:ui-api-docs": "npm run generate:check-const-test && typedoc --options typedoc.config.js"
 	},
 	"engines": {
