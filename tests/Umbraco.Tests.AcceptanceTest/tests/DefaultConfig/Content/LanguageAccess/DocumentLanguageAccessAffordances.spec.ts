@@ -106,7 +106,7 @@ test('only lets the user select the language they can edit when saving', async (
   await expectOnlyDanishToBeSelectable(page);
 });
 
-test('only lets the user select the language they can edit when saving and publishing', async ({page, umbracoUi}) => {
+test('only lets the user select the language they can edit when saving and publishing', {tag: '@smoke'}, async ({page, umbracoUi}) => {
   // Arrange
   await umbracoUi.content.changeDocumentSectionLanguage(danish.name);
   await umbracoUi.content.goToContentWithName(danish.documentName);

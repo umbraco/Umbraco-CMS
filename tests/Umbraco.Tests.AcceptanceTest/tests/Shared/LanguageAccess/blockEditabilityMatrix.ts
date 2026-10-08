@@ -124,6 +124,13 @@ async function openExistingInnerBlock(umbracoUi) {
   await umbracoUi.content.clickEditNestedBlockListEntry(outerElementTypeName, innerElementTypeName);
 }
 
+async function closeInnerBlock(umbracoUi) {
+  await umbracoUi.content.clickCloseButtonInBlockWorkspace(innerElementTypeName);
+  await umbracoUi.content.clickCloseButtonInBlockWorkspace(outerElementTypeName);
+}
+
+const describe = (editable: boolean) => editable ? 'can edit' : 'cannot edit';
+
 // Opens the inner block in the Danish variant, adding a Danish block where the block lists vary by culture.
 async function openInnerBlockInDanish(umbracoUi, tc: MatrixCase) {
   await umbracoUi.content.switchLanguage(danishIsoCode);
@@ -172,12 +179,10 @@ export function registerBlockEditabilityTests(userCanEditSharedData: boolean) {
 
     test.describe('user with access to Danish only', () => {
       for (const tc of matrixCases) {
-        const danishEditable = userCanEditSharedData || tc.editableWithoutSharedDataAccess;
         const englishEditable = userCanEditSharedData && isSharedData(tc);
-        const expectedLabel = danishEditable ? 'can edit' : 'cannot edit';
-        const englishLabel = englishEditable ? 'can edit' : 'cannot edit';
+        const danishEditable = userCanEditSharedData || tc.editableWithoutSharedDataAccess;
 
-        test(`${englishLabel} the English block text (${formatCombo(tc)})`, async ({umbracoApi, umbracoUi}) => {
+        test(`${describe(englishEditable)} the English block text and ${describe(danishEditable)} the Danish block text (${formatCombo(tc)})`, async ({umbracoApi, umbracoUi}) => {
           test.slow();
           // Arrange
           await createPublishedNestedBlockInEnglish(umbracoApi, umbracoUi, textStringDataTypeId, tc);
@@ -188,15 +193,9 @@ export function registerBlockEditabilityTests(userCanEditSharedData: boolean) {
 
           // Assert
           await umbracoUi.content.isBlockWorkspacePropertyEditable(innerElementTypeName, textPropertyName, englishEditable);
-        });
-
-        test(`${expectedLabel} the Danish block text (${formatCombo(tc)})`, async ({umbracoApi, umbracoUi}) => {
-          test.slow();
-          // Arrange
-          await createPublishedNestedBlockInEnglish(umbracoApi, umbracoUi, textStringDataTypeId, tc);
-          await loginAsUserWithLanguages(umbracoApi, umbracoUi, [danishIsoCode], userCanEditSharedData);
 
           // Act
+          await closeInnerBlock(umbracoUi);
           await openInnerBlockInDanish(umbracoUi, tc);
 
           // Assert
@@ -206,23 +205,28 @@ export function registerBlockEditabilityTests(userCanEditSharedData: boolean) {
     });
 
     test.describe('user with access to the default language only', () => {
-      // Block lists that are shared show the English block in the Danish variant, which this user has no language access to.
-      const sharedCase = matrixCases[matrixCases.length - 1];
+      // Language access to the default language does not grant access to shared data.
+      for (const tc of matrixCases.filter(isSharedData)) {
+        test(`${describe(userCanEditSharedData)} the block text of the English and the Danish variant (${formatCombo(tc)})`, async ({umbracoApi, umbracoUi}) => {
+          test.slow();
+          // Arrange
+          await createPublishedNestedBlockInEnglish(umbracoApi, umbracoUi, textStringDataTypeId, tc);
+          await loginAsUserWithLanguages(umbracoApi, umbracoUi, [englishIsoCode], userCanEditSharedData);
 
-      const danishEditable = userCanEditSharedData && isSharedData(sharedCase);
+          // Act
+          await openExistingInnerBlock(umbracoUi);
 
-      test(`${danishEditable ? 'can edit' : 'cannot edit'} the block text of the Danish variant (${formatCombo(sharedCase)})`, async ({umbracoApi, umbracoUi}) => {
-        test.slow();
-        // Arrange
-        await createPublishedNestedBlockInEnglish(umbracoApi, umbracoUi, textStringDataTypeId, sharedCase);
-        await loginAsUserWithLanguages(umbracoApi, umbracoUi, [englishIsoCode], userCanEditSharedData);
+          // Assert
+          await umbracoUi.content.isBlockWorkspacePropertyEditable(innerElementTypeName, textPropertyName, userCanEditSharedData);
 
-        // Act
-        await openInnerBlockInDanish(umbracoUi, sharedCase);
+          // Act - the Danish variant, which the user has no language access to
+          await closeInnerBlock(umbracoUi);
+          await openInnerBlockInDanish(umbracoUi, tc);
 
-        // Assert
-        await umbracoUi.content.isBlockWorkspacePropertyEditable(innerElementTypeName, textPropertyName, danishEditable);
-      });
+          // Assert
+          await umbracoUi.content.isBlockWorkspacePropertyEditable(innerElementTypeName, textPropertyName, userCanEditSharedData);
+        });
+      }
     });
   });
 }

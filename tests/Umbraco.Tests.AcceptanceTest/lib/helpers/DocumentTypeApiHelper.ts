@@ -1145,6 +1145,36 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
+  async createCultureAndSegmentVariantDocumentTypeWithProperties(documentTypeName: string, dataTypeId: string, properties: {name: string, variesByCulture: boolean, variesBySegment: boolean}[]) {
+    const crypto = require('crypto');
+    const containerId = crypto.randomUUID();
+    await this.ensureNameNotExists(documentTypeName);
+
+    const builder = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .withVariesByCulture(true)
+      .withVariesBySegment(true)
+      .addContainer()
+        .withName('TestGroup')
+        .withId(containerId)
+        .withType("Group")
+        .done();
+    for (const property of properties) {
+      builder.addProperty()
+        .withContainerId(containerId)
+        .withAlias(AliasHelper.toAlias(property.name))
+        .withName(property.name)
+        .withDataTypeId(dataTypeId)
+        .withVariesByCulture(property.variesByCulture)
+        .withVariesBySegment(property.variesBySegment)
+        .done();
+    }
+
+    return await this.create(builder.build());
+  }
+
   async createVariantDocumentTypeWithAllowedChildNodeAndInvariantPropertyEditor(documentTypeName: string, allowedChildNodeId: string, dataTypeName: string, dataTypeId: string, groupName: string = "TestGroup") {
     const crypto = require('crypto');
     const containerId = crypto.randomUUID();

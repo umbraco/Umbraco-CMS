@@ -227,6 +227,30 @@ export class UserGroupApiHelper {
     return await this.create(userGroup);
   }
 
+  async createUserGroupWithLanguagesAndElementAccess(name: string, isoCodes: string[], hasAccessToInvariantForVariant: boolean = false) {
+    await this.ensureNameNotExists(name);
+
+    const builder = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.library)
+      .withElementRootAccess(true)
+      .withHasAccessToAllLanguages(false)
+      .withHasAccessToInvariantForVariant(hasAccessToInvariantForVariant);
+    for (const isoCode of isoCodes) {
+      builder.addLanguage(isoCode);
+    }
+    const userGroup = builder
+      .addFallbackPermission()
+        .withReadElementPermission(true)
+        .withUpdateElementPermission(true)
+        .withPublishElementPermission(true)
+        .withReadElementContainerPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
   async createUserGroupWithAllLanguages(name: string, hasAccessToInvariantForVariant: boolean = false) {
     await this.ensureNameNotExists(name);
 

@@ -102,32 +102,6 @@ async function expectOnlyDanishToBeSelectable(page) {
 }
 
 test.describe('user who can edit Danish and can edit shared data', () => {
-  test('only offers Danish in the save dialog', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    await loginToContentSectionAs(umbracoApi, umbracoUi, [danish.isoCode], true);
-    await umbracoUi.content.changeDocumentSectionLanguage(danish.name);
-    await umbracoUi.content.goToContentWithName(danish.documentName);
-
-    // Act
-    await umbracoUi.content.clickSaveButtonForContent();
-
-    // Assert
-    await expectOnlyDanishToBeSelectable(page);
-  });
-
-  test('only offers Danish in the publish dialog', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    await loginToContentSectionAs(umbracoApi, umbracoUi, [danish.isoCode], true);
-    await umbracoUi.content.changeDocumentSectionLanguage(danish.name);
-    await umbracoUi.content.goToContentWithName(danish.documentName);
-
-    // Act
-    await umbracoUi.content.clickSaveAndPublishButton();
-
-    // Assert
-    await expectOnlyDanishToBeSelectable(page);
-  });
-
   test('only offers Danish in the schedule publish dialog', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     await loginToContentSectionAs(umbracoApi, umbracoUi, [danish.isoCode], true);
@@ -204,18 +178,6 @@ test.describe('user who can edit Danish and can edit shared data', () => {
     // Assert
     await umbracoUi.content.isDocumentReadOnly(true);
     await expect(propertyInput(page, sharedPropertyName)).toBeEditable();
-  });
-
-  test('does not tag the Danish variant as read-only', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    await loginToContentSectionAs(umbracoApi, umbracoUi, [danish.isoCode], true);
-    await umbracoUi.content.changeDocumentSectionLanguage(danish.name);
-
-    // Act
-    await umbracoUi.content.goToContentWithName(danish.documentName);
-
-    // Assert
-    await umbracoUi.content.isDocumentReadOnly(false);
   });
 });
 
