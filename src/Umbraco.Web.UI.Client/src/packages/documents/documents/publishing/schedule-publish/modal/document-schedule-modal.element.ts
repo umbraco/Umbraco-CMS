@@ -161,6 +161,13 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`<uui-dialog-layout headline=${this.localize.term('content_saveAndScheduleModalTitle')}>
+			${when(
+				this.data?.ancestorPublishCoverage?.isPathPublished === false,
+				() =>
+					html`<p class="ancestor-not-published">
+						<umb-localize key="content_ancestorNotPublishedScheduleWarning"></umb-localize>
+					</p>`,
+			)}
 			${this.#renderOptions()}
 
 			<div slot="actions">
@@ -202,7 +209,6 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		const persistedFromDate = option.variant?.scheduledPublishDate ?? null;
 		const persistedToDate = option.variant?.scheduledUnpublishDate ?? null;
 		const isChanged = fromDate !== persistedFromDate || toDate !== persistedToDate;
-		const ancestorWarningKey = pickable ? this.#ancestorWarningKey(option) : undefined;
 
 		return html`
 			<uui-menu-item
@@ -216,15 +222,18 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
 			</uui-menu-item>
 			${when(
-				ancestorWarningKey,
-				(key) => html`
-					<p class="ancestor-not-published">
-						<uui-icon name="icon-alert"></uui-icon>
-						<umb-localize key=${key}></umb-localize>
-					</p>
+				this.#isSelected(option.unique),
+				() => html`
+					${when(
+						this.#isCultureNotPublishedInAncestors(option),
+						() =>
+							html`<p class="ancestor-culture-not-published">
+								<umb-localize key="content_ancestorCultureNotPublishedScheduleWarning"></umb-localize>
+							</p>`,
+					)}
+					${this.#renderPublishDateInput(option, fromDate, toDate)}
 				`,
 			)}
-			${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option, fromDate, toDate))}
 			${when(
 				isChanged,
 				() =>
@@ -235,14 +244,10 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	#ancestorWarningKey(option: UmbDocumentVariantOptionModel): string | undefined {
+	#isCultureNotPublishedInAncestors(option: UmbDocumentVariantOptionModel): boolean {
 		const coverage = this.data?.ancestorPublishCoverage;
-		if (!coverage) return undefined;
-		if (!coverage.isPathPublished) return 'content_ancestorNotPublishedScheduleWarning';
-		if (option.culture && coverage.publishedCultures && !coverage.publishedCultures.includes(option.culture)) {
-			return 'content_ancestorCultureNotPublishedScheduleWarning';
-		}
-		return undefined;
+		if (!coverage?.isPathPublished || !option.culture || !coverage.publishedCultures) return false;
+		return !coverage.publishedCultures.includes(option.culture);
 	}
 
 	#attachValidatorsToPublish(element: UmbInputDateElement | null) {
@@ -490,15 +495,13 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			}
 
 			.ancestor-not-published {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-2);
-				margin: 0 0 var(--uui-size-space-2);
-				padding: var(--uui-size-space-2) var(--uui-size-space-3);
-				background-color: var(--uui-color-warning);
-				color: var(--uui-color-warning-contrast);
-				border: 1px solid var(--uui-color-warning-standalone);
-				border-radius: var(--uui-border-radius);
+				margin-top: 0;
+			}
+
+			.ancestor-culture-not-published {
+				margin: 0;
+				font-size: var(--uui-type-small-size);
+				color: var(--uui-color-text-alt);
 			}
 		`,
 	];
