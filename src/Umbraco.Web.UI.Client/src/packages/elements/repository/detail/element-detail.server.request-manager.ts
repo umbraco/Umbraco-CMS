@@ -1,3 +1,4 @@
+/* eslint-disable local-rules/no-direct-api-import */
 import { elementDetailCache } from './element-detail.server.cache.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
