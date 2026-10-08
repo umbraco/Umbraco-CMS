@@ -121,5 +121,6 @@ const mapRedirectUrl = (item: RedirectUrlResponseModel): UmbDocumentRedirectUrlM
 	unique: item.id,
 	originalUrl: item.originalUrl,
 	destinationUrl: item.destinationUrl,
+	created: item.created,
 	culture: item.culture ?? null,
 });
