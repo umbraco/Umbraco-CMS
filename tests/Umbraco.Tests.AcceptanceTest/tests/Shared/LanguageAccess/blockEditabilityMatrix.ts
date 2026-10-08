@@ -4,7 +4,8 @@ import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 // nested block editor vary by culture. The block content is created as an administrator in the default language.
 //  - Block data that belongs to a culture is editable only by users with access to that culture.
 //  - Shared data is editable on every variant when the user can edit shared data, including variants the user has
-//    no language access to. A block whose levels are all shared is shared data.
+//    no language access to. Text is shared data when it is shared and neither block list varies by culture, whether
+//    or not the blocks themselves vary by culture.
 //  - When the user cannot edit shared data, shared data is read-only unless the block content belongs to a
 //    culture-varying block list.
 // The tests are shared by the two config projects, which differ only in whether users can edit shared data.
@@ -72,8 +73,7 @@ const formatCombo = (tc: MatrixCase): string =>
   `, inner element=${tc.innerElement ? 'Varies by culture' : 'Shared'}` +
   `, text=${tc.text ? 'Varies by culture' : 'Shared'}`;
 
-const isFullyShared = (tc: MatrixCase): boolean =>
-  !tc.outerBlockList && !tc.outerElement && !tc.innerBlockList && !tc.innerElement && !tc.text;
+const isSharedData = (tc: MatrixCase): boolean => !tc.outerBlockList && !tc.innerBlockList && !tc.text;
 
 // Creates the document and, as the admin user, publishes a nested block with text in the default language.
 async function createPublishedNestedBlockInEnglish(umbracoApi, umbracoUi, textStringDataTypeId: string, tc: MatrixCase) {
@@ -172,7 +172,7 @@ export function registerBlockEditabilityTests(userCanEditSharedData: boolean) {
   test.describe('user with access to Danish only', () => {
     for (const tc of matrixCases) {
       const danishEditable = userCanEditSharedData || tc.editableWithoutSharedDataAccess;
-      const englishEditable = userCanEditSharedData && isFullyShared(tc);
+      const englishEditable = userCanEditSharedData && isSharedData(tc);
       const expectedLabel = danishEditable ? 'can edit' : 'cannot edit';
       const englishLabel = englishEditable ? 'can edit' : 'cannot edit';
 
@@ -208,7 +208,7 @@ export function registerBlockEditabilityTests(userCanEditSharedData: boolean) {
     // Block lists that are shared show the English block in the Danish variant, which this user has no language access to.
     const sharedCase = matrixCases[matrixCases.length - 1];
 
-    const danishEditable = userCanEditSharedData && isFullyShared(sharedCase);
+    const danishEditable = userCanEditSharedData && isSharedData(sharedCase);
 
     test(`${danishEditable ? 'can edit' : 'cannot edit'} the block text of the Danish variant (${formatCombo(sharedCase)})`, async ({umbracoApi, umbracoUi}) => {
       test.slow();

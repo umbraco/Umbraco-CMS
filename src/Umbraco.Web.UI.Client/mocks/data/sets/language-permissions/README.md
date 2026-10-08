@@ -98,7 +98,7 @@ For a user who may edit **Danish only**, the text of the inner block in the **Da
 | 14, 15, 17, 18      | read-only               | editable             |
 | All other scenarios | editable                | editable             |
 
-In the **English** language it is read-only for that user, except in scenario 18 (everything is shared), where a user who can edit shared data may edit it.
+In the **English** language it is read-only for that user, except in scenarios 14, 15, 17 and 18, where a user who can edit shared data may edit it: the text and both lists are shared, so the text is shared data even when a block varies by language.
 
 Per user, the languages in which Name and Text per language are editable:
 
