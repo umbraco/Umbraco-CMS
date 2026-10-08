@@ -2176,7 +2176,7 @@ export default {
 		allowAccessToAllLanguages: 'Tillad adgang til alle sprog',
 		allowAccessToAllDocuments: 'Tillad adgang til alle dokumenter',
 		allowAccessToInvariantForVariant: 'Tillad redigering af delt indhold',
-		invariantForVariantHelp: 'Giver adgang til at redigere egenskaber, der deles på tværs af sprog, på sprogvarieret indhold. Gælder ikke for indhold, der ikke varierer efter sprog.',
+		invariantForVariantHelp: 'Tillader redigering af indhold delt på tværs af sprogvarianter. *Gælder ikke for indhold, der ikke varierer efter sprog.*',
 		allowAccessToAllMedia: 'Tillad adgang til alle medier',
 		selectUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
