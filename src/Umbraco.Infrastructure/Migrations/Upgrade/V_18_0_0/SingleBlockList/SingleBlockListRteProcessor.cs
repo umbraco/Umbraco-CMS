@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList;
 
-[Obsolete("Scheduled for removal in Umbraco 22.")] // available in v17, activated in v18 migration needs to work on LTS to LTS 17=>21
+[Obsolete("Only used by the obsolete MigrateSingleBlockList, which is no longer part of the upgrade plan. Scheduled for removal in Umbraco 20.")]
 internal class SingleBlockListRteProcessor : SingleBlockBlockProcessorBase, ITypedSingleBlockListProcessor
 {
     /// <summary>

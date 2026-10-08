@@ -51,7 +51,7 @@ internal sealed class SingleBlockPropertyValueCreator : BlockPropertyValueCreato
 
         BlockListModel CreateModel(IList<BlockListItem> items) => new BlockListModel(items);
 
-        BlockListItem? blockModel = (await CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, owningPropertyCulture, blockConfigurations, CreateEmptyModel, CreateModel)).SingleOrDefault();
+        BlockListItem? blockModel = (await CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, owningPropertyCulture, blockConfigurations, CreateEmptyModel, CreateModel)).FirstOrDefault();
 
         return blockModel;
     }

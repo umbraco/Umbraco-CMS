@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList
 /// perfectly valid JSON - so counting the conversions on both sides of that step is what makes the loss detectable
 /// (see https://github.com/umbraco/Umbraco-CMS/issues/23596).
 /// </remarks>
-[Obsolete("Scheduled for removal in Umbraco 22.")] // Available in v17, activated in v18. Migration needs to work on LTS to LTS 17=>21
+[Obsolete("Only used by the obsolete MigrateSingleBlockList, which is no longer part of the upgrade plan. Scheduled for removal in Umbraco 20.")]
 internal static class SingleBlockConversionVerifier
 {
     /// <summary>

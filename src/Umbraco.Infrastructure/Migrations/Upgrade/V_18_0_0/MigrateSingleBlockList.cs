@@ -26,6 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0;
 /// <summary>
 /// Handles migration of single block list data structures during the upgrade to Umbraco version 18.0.0.
 /// </summary>
+[Obsolete("Superseded by MigrateSingleBlockListDataTypes, which only migrates the data types as the single block property editor reads values stored in the block list format. Scheduled for removal in Umbraco 20.")]
 public class MigrateSingleBlockList : AsyncMigrationBase
 {
     private const int DefaultPageSize = 1000;

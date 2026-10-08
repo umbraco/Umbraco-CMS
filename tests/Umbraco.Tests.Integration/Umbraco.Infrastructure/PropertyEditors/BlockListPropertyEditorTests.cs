@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -396,6 +397,76 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             var itemVariation = toEditorValue.Expose[0];
             Assert.AreEqual(contentElementKey, itemVariation.ContentKey);
             Assert.AreEqual(null, itemVariation.Culture);
+        });
+    }
+
+    [Test]
+    public async Task Can_Read_Value_Stored_By_The_Single_Block_Editor()
+    {
+        var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
+        elementType.IsElement = true;
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+
+        var blockListContentType = await CreateBlockListContentType(elementType);
+
+        // e.g. a value saved while the data type used the single block editor, before being switched to the block list
+        var contentElementKey = Guid.NewGuid();
+        var singleBlockValue = new SingleBlockValue(new SingleBlockLayoutItem { ContentKey = contentElementKey })
+        {
+            ContentData =
+            [
+                new()
+                {
+                    Key = contentElementKey,
+                    ContentTypeAlias = elementType.Alias,
+                    ContentTypeKey = elementType.Key,
+                    Values =
+                    [
+                        new ()
+                        {
+                            Alias = "singleLineText",
+                            Value = "The single line text"
+                        }
+                    ]
+                }
+            ],
+            Expose =
+            [
+                new (contentElementKey, null, null)
+            ]
+        };
+
+        var content = new ContentBuilder()
+            .WithContentType(blockListContentType)
+            .WithName("My Blocks")
+            .WithPropertyValues(new { blocks = JsonSerializer.Serialize(singleBlockValue) })
+            .Build();
+        ContentService.Save(content);
+
+        var valueEditor = await GetValueEditor(blockListContentType);
+        var toEditorValue = valueEditor.ToEditor(content.Properties["blocks"]!) as BlockListValue;
+        Assert.IsNotNull(toEditorValue);
+
+        var layoutItems = toEditorValue.GetLayouts()?.ToArray();
+        Assert.IsNotNull(layoutItems);
+        Assert.AreEqual(1, layoutItems.Length);
+        Assert.AreEqual(contentElementKey, layoutItems[0].ContentKey);
+
+        Assert.AreEqual(1, toEditorValue.ContentData.Count);
+        var property = toEditorValue.ContentData.First().Values.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("singleLineText", property.Alias);
+            Assert.AreEqual("The single line text", property.Value);
+        });
+
+        // saving the value back stores it in the block list format
+        var savedValue = valueEditor.FromEditor(new ContentPropertyData(JsonSerializer.Serialize(toEditorValue), null), null) as string;
+        Assert.IsNotNull(savedValue);
+        Assert.Multiple(() =>
+        {
+            Assert.That(savedValue, Does.Contain($"\"{Constants.PropertyEditors.Aliases.BlockList}\""));
+            Assert.That(savedValue, Does.Not.Contain($"\"{Constants.PropertyEditors.Aliases.SingleBlock}\""));
         });
     }
 

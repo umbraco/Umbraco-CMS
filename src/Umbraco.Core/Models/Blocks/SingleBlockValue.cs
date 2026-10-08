@@ -23,4 +23,8 @@ public class SingleBlockValue : BlockValue<SingleBlockLayoutItem>
     /// <inheritdoc />
     [JsonIgnore]
     public override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.SingleBlock;
+
+    /// <inheritdoc />
+    public override bool SupportsBlockLayoutAlias(string alias)
+        => base.SupportsBlockLayoutAlias(alias) || alias.Equals(Constants.PropertyEditors.Aliases.BlockList);
 }
