@@ -3,6 +3,7 @@ import { execSync } from 'node:child_process';
 import { readdir } from 'node:fs/promises';
 
 const exampleDirectory = 'examples';
+const useMock = process.argv.includes('--mock');
 const digitTimeoutMs = 1000;
 const minListRows = 8;
 // Header, two indicator lines and one spare row, so the frame never scrolls the terminal.
@@ -236,7 +237,7 @@ function startExample(name) {
 
 	// Start vite server:
 	try {
-		execSync('npm run dev', { stdio: 'inherit' });
+		execSync(useMock ? 'npm run dev:mock' : 'npm run dev', { stdio: 'inherit' });
 	} catch {
 		// Nothing, cause this is most likely just the server being stopped.
 	}
@@ -258,7 +259,7 @@ async function pickExampleUI() {
 	}
 
 	// An example name passed on the command line skips the picker:
-	const requested = process.argv[2];
+	const requested = process.argv.slice(2).find((arg) => !arg.startsWith('--'));
 	if (requested) {
 		if (exampleFolderNames.includes(requested)) {
 			startExample(requested);
