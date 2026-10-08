@@ -656,6 +656,11 @@ internal partial class UserService : RepositoryService, IUserService
         Attempt<Uri, UserOperationStatus> uriAttempt = await uriProvider.CreateForgotPasswordUriAsync(user);
         if (uriAttempt.Success is false)
         {
+            _logger.LogWarning(
+                "Could not create the password reset link for user {UserId} {UserKey}. Status: {Status}.",
+                user.Id,
+                user.Key,
+                uriAttempt.Status);
             return Attempt.Fail(uriAttempt.Status);
         }
 
