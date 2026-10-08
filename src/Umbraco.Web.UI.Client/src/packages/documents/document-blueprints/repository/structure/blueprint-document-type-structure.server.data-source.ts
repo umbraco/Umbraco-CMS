@@ -4,6 +4,7 @@ import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backof
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import type { AllowedDocumentTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @class UmbBlueprintDocumentTypeStructureServerDataSource
@@ -18,10 +19,14 @@ export class UmbBlueprintDocumentTypeStructureServerDataSource extends UmbConten
 	}
 }
 
-const getAllowedChildrenOf = (_unique: string | null, parentUnique: string | null) => {
+const getAllowedChildrenOf = (
+	_unique: string | null,
+	parentUnique: string | null,
+	paging?: UmbOffsetPaginationRequestModel,
+) => {
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	return DocumentTypeService.getDocumentTypeAllowedForBlueprint({
-		query: { parentKey: parentUnique ?? undefined },
+		query: { parentKey: parentUnique ?? undefined, skip: paging?.skip, take: paging?.take },
 	});
 };
 
