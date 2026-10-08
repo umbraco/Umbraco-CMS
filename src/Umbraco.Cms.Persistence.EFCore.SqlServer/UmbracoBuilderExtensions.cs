@@ -1,9 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
-using Umbraco.Cms.Persistence.EFCore.Migrations;
 using Umbraco.Cms.Persistence.EFCore.SqlServer.DtoCustomization;
 using Umbraco.Extensions;
 
@@ -35,6 +33,7 @@ public static class UmbracoBuilderExtensions
             .AddEFCoreModelCustomizer<SqlServerContentVersionDtoModelCustomizer>()
             .AddEFCoreModelCustomizer<SqlServerContentVersionCultureVariationDtoModelCustomizer>()
             .AddEFCoreModelCustomizer<SqlServerDocumentVersionDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerElementVersionDtoModelCustomizer>()
             .AddEFCoreModelCustomizer<SqlServerDocumentUrlDtoModelCustomizer>()
             .AddEFCoreModelCustomizer<SqlServerDocumentUrlAliasDtoModelCustomizer>()
             .AddEFCoreModelCustomizer<SqlServerTagDtoModelCustomizer>()

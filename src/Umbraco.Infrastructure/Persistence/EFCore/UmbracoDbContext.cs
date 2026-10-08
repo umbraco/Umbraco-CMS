@@ -100,6 +100,12 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<DocumentCultureVariationDto> DocumentCultureVariations { get; set; }
 
+    public required DbSet<ElementDto> Elements { get; set; }
+
+    public required DbSet<ElementVersionDto> ElementVersions { get; set; }
+
+    public required DbSet<ElementCultureVariationDto> ElementCultureVariations { get; set; }
+
     public required DbSet<DocumentUrlDto> DocumentUrls { get; set; }
 
     public required DbSet<DocumentUrlAliasDto> DocumentUrlAliases { get; set; }
