@@ -37,11 +37,6 @@ public class UserGroupDto
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the default permissions assigned to the user group.
-    /// </summary>
-    public string? DefaultPermissions { get; set; }
-
-    /// <summary>
     /// Gets or sets the date and time when the user group was created.
     /// </summary>
     public DateTime CreateDate { get; set; }

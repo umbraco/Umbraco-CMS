@@ -21,11 +21,13 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification, EFCoreCreateTablesNotificationHandler>();
         builder.AddNotificationAsyncHandler<UnattendedInstallNotification, EFCoreCreateTablesNotificationHandler>();
 
-        builder.Services.AddUmbracoDbContext<UmbracoDbContext>((provider, options, connectionString, providerName) =>
-        {
-            options.UseUmbracoDatabaseProvider(provider);
-            options.UseOpenIddict();
-        });
+        builder.Services.AddUmbracoDbContext<UmbracoDbContext>(
+            (provider, options, connectionString, providerName) =>
+            {
+                options.UseUmbracoDatabaseProvider(provider);
+                options.UseOpenIddict();
+            },
+            shareUmbracoConnection: true);
         builder.Services.AddUnique<IScopeAccessor>(sp => sp.GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>());
         builder.Services.AddUnique<IScopeProvider>(sp => sp.GetRequiredService<IEFCoreScopeProvider<UmbracoDbContext>>());
 

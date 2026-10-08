@@ -86,7 +86,7 @@ public class UpdateDocumentControllerTests : ManagementApiUserGroupTestBase<Upda
         {
             Variants = new DocumentVariantRequestModel[]
             {
-                new() { Culture = null, Segment = null, Name = "The new name", },
+                new() { Culture = null, Name = "The new name", },
             },
         };
 

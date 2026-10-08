@@ -1517,4 +1517,45 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidSegmentVariationForElementType, result.Status);
     }
+
+    [Test]
+    public async Task Cannot_Create_With_Property_Varying_By_Culture_When_Content_Type_Does_Not()
+    {
+        var propertyType = ContentTypePropertyTypeModel("Title", "title");
+        propertyType.VariesByCulture = true;
+        var createModel = ContentTypeCreateModel("Test", "test", propertyTypes: [propertyType]);
+        createModel.VariesByCulture = false;
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeVariation, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Create_With_Property_Varying_By_Segment_When_Content_Type_Does_Not()
+    {
+        var propertyType = ContentTypePropertyTypeModel("Title", "title");
+        propertyType.VariesBySegment = true;
+        var createModel = ContentTypeCreateModel("Test", "test", propertyTypes: [propertyType]);
+        createModel.VariesBySegment = false;
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeVariation, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Create_With_Property_Varying_By_Segment_When_Content_Type_Does()
+    {
+        var propertyType = ContentTypePropertyTypeModel("Title", "title");
+        propertyType.VariesBySegment = true;
+        var createModel = ContentTypeCreateModel("Test", "test", propertyTypes: [propertyType]);
+        createModel.VariesBySegment = true;
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+    }
 }

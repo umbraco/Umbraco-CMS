@@ -1,8 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
@@ -135,7 +134,7 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
 
         // Populate the publish-status service the filtering service consults (in the running app the
         // content cache refresher does this on publish; the integration harness doesn't run it).
-        await GetRequiredService<IPublishStatusManagementService>()
+        await GetRequiredService<IDocumentPublishStatusManagementService>()
             .AddOrUpdateStatusWithDescendantsAsync(Textpage.Key, CancellationToken.None);
 
         var cacheService = (DocumentCacheService)DocumentCacheService;

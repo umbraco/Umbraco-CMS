@@ -23,6 +23,8 @@ namespace Umbraco.Cms.Core.Services
     /// </summary>
     public class MediaService : RepositoryService, IMediaService
     {
+        private const string SortOrderField = "sortOrder";
+
         private readonly IMediaRepository _mediaRepository;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly IAuditService _auditService;
@@ -476,6 +478,32 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
+        public IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases)
+        {
+            Guid[] idsA = ids.Distinct().ToArray();
+            if (idsA.Length == 0)
+            {
+                return Enumerable.Empty<IMedia>();
+            }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+
+            var index = new Dictionary<Guid, IMedia>(idsA.Length);
+            foreach (IEnumerable<Guid> group in idsA.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                List<Guid> groupKeys = group.ToList();
+                IQuery<IMedia>? query = Query<IMedia>()?.Where(x => groupKeys.Contains(x.Key));
+                foreach (IMedia item in _mediaRepository.GetPage(query, 0, groupKeys.Count, out _, propertyAliases, null, Ordering.By(SortOrderField)))
+                {
+                    index[item.Key] = item;
+                }
+            }
+
+            return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+        }
+
+        /// <inheritdoc />
         public IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
             if (pageIndex < 0)
@@ -490,7 +518,7 @@ namespace Umbraco.Cms.Core.Services
 
             if (ordering == null)
             {
-                ordering = Ordering.By("sortOrder");
+                ordering = Ordering.By(SortOrderField);
             }
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -513,7 +541,7 @@ namespace Umbraco.Cms.Core.Services
 
             if (ordering == null)
             {
-                ordering = Ordering.By("sortOrder");
+                ordering = Ordering.By(SortOrderField);
             }
 
             // Need to use a List here because the expression tree cannot convert the array when used in Contains.
@@ -606,7 +634,11 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IMedia>? filter = null, Ordering? ordering = null)
+        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
+            => GetPagedChildren(id, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter, ordering);
+
+        /// <inheritdoc />
+        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IMedia>? filter, Ordering? ordering)
         {
             if (pageIndex < 0)
             {
@@ -620,14 +652,14 @@ namespace Umbraco.Cms.Core.Services
 
             if (ordering == null)
             {
-                ordering = Ordering.By("sortOrder");
+                ordering = Ordering.By(SortOrderField);
             }
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MediaTree);
 
             IQuery<IMedia>? query = Query<IMedia>()?.Where(x => x.ParentId == id);
-            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
+            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases, filter, ordering);
         }
 
         /// <inheritdoc />

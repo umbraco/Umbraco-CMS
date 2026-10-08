@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Search.Core.Extensions;
-using Umbraco.Cms.Search.Core.Helpers;
-using Umbraco.Cms.Search.Core.Models.Indexing;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing.Indexers;
 
@@ -58,15 +58,15 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
 
         var fields = new List<IndexField>
         {
-            new(Constants.FieldNames.Id, new() { Keywords = [content.Key.AsKeyword()] }, null, null),
-            new(Constants.FieldNames.ParentId, new() { Keywords = [parentKey.Value.AsKeyword()] }, null, null),
-            new(Constants.FieldNames.PathIds, new() { Keywords = pathKeys.Select(key => key.AsKeyword()).ToArray() }, null, null),
-            new(Constants.FieldNames.ContentTypeId, new() { Keywords = [content.ContentType.Key.AsKeyword()] }, null, null),
-            new(Constants.FieldNames.CreateDate, new() { DateTimeOffsets = [_dateTimeOffsetConverter.ToDateTimeOffset(content.CreateDate)] }, null, null),
-            new(Constants.FieldNames.UpdateDate, new() { DateTimeOffsets = [_dateTimeOffsetConverter.ToDateTimeOffset(content.UpdateDate)] }, null, null),
-            new(Constants.FieldNames.Level, new() { Integers = [content.Level] }, null, null),
-            new(Constants.FieldNames.ObjectType, new() { Keywords = [objectType.ToString()] }, null, null),
-            new(Constants.FieldNames.SortOrder, new() { Integers = [content.SortOrder] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.Id, new() { Keywords = [content.Key.AsKeyword()] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.ParentId, new() { Keywords = [parentKey.Value.AsKeyword()] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.PathIds, new() { Keywords = pathKeys.Select(key => key.AsKeyword()).ToArray() }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.ContentTypeId, new() { Keywords = [content.ContentType.Key.AsKeyword()] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.CreateDate, new() { DateTimeOffsets = [_dateTimeOffsetConverter.ToDateTimeOffset(content.CreateDate)] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.UpdateDate, new() { DateTimeOffsets = [_dateTimeOffsetConverter.ToDateTimeOffset(content.UpdateDate)] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.Level, new() { Integers = [content.Level] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.ObjectType, new() { Keywords = [objectType.ToString()] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.SortOrder, new() { Integers = [content.SortOrder] }, null, null),
         };
 
         fields.AddRange(GetCultureTagFields(content, cultures));
@@ -179,7 +179,7 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
                 continue;
             }
 
-            yield return new IndexField(Constants.FieldNames.Tags, new() { Keywords = tags }, culture, null);
+            yield return new IndexField(Umbraco.Cms.Core.Constants.Search.FieldNames.Tags, new() { Keywords = tags }, culture, null);
         }
     }
 
@@ -198,7 +198,7 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
             }
 
             // the name is indexed both as analyzed text (for free text search) and as a keyword (for exact matching, e.g. Delivery API name filters)
-            yield return new IndexField(Constants.FieldNames.Name, new() { TextsR1 = [name], Keywords = [name] }, culture, null);
+            yield return new IndexField(Umbraco.Cms.Core.Constants.Search.FieldNames.Name, new() { TextsR1 = [name], Keywords = [name] }, culture, null);
         }
     }
 

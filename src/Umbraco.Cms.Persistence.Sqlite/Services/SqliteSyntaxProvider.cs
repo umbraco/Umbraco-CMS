@@ -425,24 +425,34 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
     {
         IEnumerable<string> tables = GetTablesInSchema(db);
+        var columns = new List<ColumnInfo>();
 
+        // Materialized rather than yielded, so the transaction always completes and a caller that stops
+        // enumerating early cannot leave it open (which would prevent the enclosing scope from committing).
         db.BeginTransaction();
-        foreach (var table in tables)
+        try
         {
-            DbCommand? cmd = db.CreateCommand(db.Connection, CommandType.Text, $"PRAGMA table_info({table})");
-            DbDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
+            foreach (var table in tables)
             {
-                var ordinal = reader.GetInt32("cid");
-                var columnName = reader.GetString("name");
-                var type = reader.GetString("type");
-                var notNull = reader.GetBoolean("notnull");
-                yield return new ColumnInfo(table, columnName, ordinal, notNull, type);
+                using DbCommand cmd = db.CreateCommand(db.Connection, CommandType.Text, $"PRAGMA table_info({table})");
+                using DbDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    var ordinal = reader.GetInt32("cid");
+                    var columnName = reader.GetString("name");
+                    var type = reader.GetString("type");
+                    var notNull = reader.GetBoolean("notnull");
+                    columns.Add(new ColumnInfo(table, columnName, ordinal, notNull, type));
+                }
             }
         }
+        finally
+        {
+            db.CompleteTransaction();
+        }
 
-        db.CompleteTransaction();
+        return columns;
     }
 
     /// <inheritdoc />

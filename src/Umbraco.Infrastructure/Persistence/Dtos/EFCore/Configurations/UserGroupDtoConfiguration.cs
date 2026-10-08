@@ -32,10 +32,6 @@ public class UserGroupDtoConfiguration : IEntityTypeConfiguration<UserGroupDto>
         builder.Property(x => x.Description)
             .HasColumnName("description");
 
-        builder.Property(x => x.DefaultPermissions)
-            .HasColumnName("userGroupDefaultPermissions")
-            .HasMaxLength(50);
-
         builder.Property(x => x.CreateDate)
             .HasColumnName("createDate");
 

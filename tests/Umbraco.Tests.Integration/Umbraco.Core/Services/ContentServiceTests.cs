@@ -137,6 +137,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         public void ClearCache(int id) => _inner.ClearCache(id);
 
         public void ClearCache(Guid key) => _inner.ClearCache(key);
+
+        public void PopulateCache(IReadOnlyCollection<(int Id, Guid Key)> pairs, UmbracoObjectTypes umbracoObjectType) => _inner.PopulateCache(pairs, umbracoObjectType);
     }
 
     [Test]
@@ -2103,7 +2105,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsFalse(content.HasIdentity);
 
         // content cannot publish values because they are invalid
-        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>(), Mock.Of<ILanguageService>(), Mock.Of<IOptions<ContentSettings>>());
+        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>(), Mock.Of<ILanguageService>(), Mock.Of<IOptions<ContentSettings>>(), GetRequiredService<IIdKeyMap>());
         var isValid = propertyValidationService.IsPropertyDataValid(
             content,
             out var invalidProperties,

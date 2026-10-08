@@ -638,9 +638,7 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new () { Name = "The Name" },
-                new () { Segment = "seg-1", Name = "The Name" },
-                new () { Segment = "seg-2", Name = "The Name" }
+                new () { Name = "The Name" }
             ]
         };
 
@@ -689,11 +687,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new () { Name = "The English Name", Culture = "en-US" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
-                new () { Name = "The Danish Name", Culture = "da-DK" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+                new () { Name = "The Danish Name", Culture = "da-DK" }
             ]
         };
 
@@ -752,11 +746,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new () { Name = "The English Name", Culture = "en-US" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
-                new () { Name = "The Danish Name", Culture = "da-DK" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+                new () { Name = "The Danish Name", Culture = "da-DK" }
             ]
         };
 
@@ -816,11 +806,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new () { Name = "The English Name", Culture = "en-US" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
-                new () { Name = "The Danish Name", Culture = "da-DK" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+                new () { Name = "The Danish Name", Culture = "da-DK" }
             ]
         };
 
@@ -932,7 +918,7 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new () { Name = "The name", Culture = "en-US", Segment = "segment" }
+                new () { Name = "The name", Culture = "en-US" }
             ]
         };
 
@@ -1011,33 +997,6 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status);
-    }
-
-    [Test]
-    public async Task Cannot_Create_Segment_Variant_Without_Default_Segment()
-    {
-        var contentType = await CreateVariantContentType(ContentVariation.Segment);
-
-        var createModel = new ContentCreateModel
-        {
-            ContentTypeKey = contentType.Key,
-            ParentKey = Constants.System.RootKey,
-            Properties =
-            [
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The Seg-1 Title", Segment = "seg-1" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The Seg-2 Title", Segment = "seg-2" }
-            ],
-            Variants =
-            [
-                new () { Segment = "seg-1", Name = "The Name" },
-                new () { Segment = "seg-2", Name = "The Name" }
-            ]
-        };
-
-        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch, result.Status);
     }
 
     private void AssertBodyTextEquals(string expected, IContent content)

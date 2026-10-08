@@ -359,6 +359,26 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
     }
 
+    /// <inheritdoc/>
+    public async Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> ids, string[]? propertyAliases, bool loadTemplates, CancellationToken cancellationToken)
+    {
+        Guid[] idsA = [.. ids.Distinct()];
+        if (idsA.Length == 0)
+        {
+            return [];
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.ReadLock(ReadLockIds);
+            IEnumerable<TContent> items = await _asyncContentRepository.GetManyAsync(idsA, propertyAliases, loadTemplates, cancellationToken);
+            var index = items.ToDictionary(x => x.Key, x => x);
+            IEnumerable<TContent> result = idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+            scope.Complete();
+            return result;
+        }
+    }
+
     /// <inheritdoc />
     public async Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken)
     {

@@ -1,6 +1,9 @@
 using System.Collections.Concurrent;
+using System.Data;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -13,6 +16,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 public class ContentNavigationServiceBaseTests
 {
     private TestContentNavigationService _navigationService;
+
+    private Mock<INavigationRepository> _navigationRepository = new();
 
     private Guid ContentType { get; set; }
 
@@ -37,9 +42,10 @@ public class ContentNavigationServiceBaseTests
     [SetUp]
     public void Setup()
     {
+        _navigationRepository = new Mock<INavigationRepository>();
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             Mock.Of<IContentTypeService>());
 
         // Root - E48DD82A-7059-418E-9B82-CDD5205796CF
@@ -108,8 +114,8 @@ public class ContentNavigationServiceBaseTests
     {
         // Arrange
         var emptyNavigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             Mock.Of<IContentTypeService>());
 
         // Act
@@ -188,8 +194,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -229,8 +235,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -277,8 +283,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -316,8 +322,8 @@ public class ContentNavigationServiceBaseTests
             .ReturnsAsync(contentTypeMock.Object);
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -427,8 +433,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // Act
@@ -465,8 +471,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -504,8 +510,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -553,8 +559,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -593,8 +599,8 @@ public class ContentNavigationServiceBaseTests
             .ReturnsAsync(contentTypeMock.Object);
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -704,8 +710,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // Act
@@ -744,8 +750,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -783,8 +789,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -832,8 +838,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -949,8 +955,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // Act
@@ -987,8 +993,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -1026,8 +1032,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -1187,8 +1193,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // Act
@@ -1225,8 +1231,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -1264,8 +1270,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -1313,8 +1319,8 @@ public class ContentNavigationServiceBaseTests
         contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         // We need to re-create the test data since we use new mock
@@ -2046,8 +2052,8 @@ public class ContentNavigationServiceBaseTests
             });
 
         var navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             contentTypeServiceMock.Object);
 
         var exceptions = new ConcurrentQueue<Exception>();
@@ -2123,8 +2129,8 @@ public class ContentNavigationServiceBaseTests
         const int ThreadCount = 8;
 
         var navigationService = new TestContentNavigationService(
-            Mock.Of<ICoreScopeProvider>(),
-            Mock.Of<INavigationRepository>(),
+            CreateScopeProvider(),
+            _navigationRepository.Object,
             Mock.Of<IContentTypeService>());
 
         var contentTypeKey = Guid.NewGuid();
@@ -2225,6 +2231,236 @@ public class ContentNavigationServiceBaseTests
         CollectionAssert.AreEquivalent(expectedRootKeys, rootKeys, "The roots set does not hold exactly the expected roots, so a concurrent write was lost.");
     }
 
+    [Test]
+    public void Can_Add_Node_When_Missing_Parent_Chain_Exists_In_Repository()
+    {
+        // Arrange
+        var grandparent = Guid.NewGuid();
+        var parent = Guid.NewGuid();
+        var newNodeKey = Guid.NewGuid();
+        SetupAncestorChain(parent, Node(1000, grandparent, parentId: -1, sortOrder: 5), Node(1001, parent, parentId: 1000, sortOrder: 0));
+
+        // Act
+        var result = _navigationService.Add(newNodeKey, ContentType, parent);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.IsTrue(_navigationService.TryGetParentKey(newNodeKey, out Guid? parentKey));
+            Assert.AreEqual(parent, parentKey);
+            Assert.IsTrue(_navigationService.TryGetParentKey(parent, out Guid? grandparentKey));
+            Assert.AreEqual(grandparent, grandparentKey);
+            Assert.IsTrue(_navigationService.TryGetParentKey(grandparent, out Guid? rootParentKey));
+            Assert.IsNull(rootParentKey);
+            _navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+            CollectionAssert.AreEquivalent(new[] { Root, grandparent }, rootKeys);
+            _navigationService.TryGetChildrenKeys(grandparent, out IEnumerable<Guid> grandparentChildren);
+            CollectionAssert.AreEqual(new[] { parent }, grandparentChildren);
+            _navigationService.TryGetChildrenKeys(parent, out IEnumerable<Guid> parentChildren);
+            CollectionAssert.AreEqual(new[] { newNodeKey }, parentChildren);
+        });
+        _navigationRepository.Verify(x => x.GetContentNodeWithAncestors(parent, Constants.ObjectTypes.Document), Times.Once);
+    }
+
+    [Test]
+    public void Can_Move_Node_When_Missing_Target_Parent_Chain_Exists_In_Repository()
+    {
+        // Arrange
+        var newRoot = Guid.NewGuid();
+        var target = Guid.NewGuid();
+        SetupAncestorChain(target, Node(1000, newRoot, parentId: -1, sortOrder: 0), Node(1001, target, parentId: 1000, sortOrder: 0));
+
+        // Act
+        var result = _navigationService.Move(Grandchild1, target);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.IsTrue(_navigationService.TryGetParentKey(Grandchild1, out Guid? parentKey));
+            Assert.AreEqual(target, parentKey);
+            _navigationService.TryGetChildrenKeys(Child1, out IEnumerable<Guid> child1Children);
+            CollectionAssert.AreEquivalent(new[] { Grandchild2 }, child1Children);
+            _navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+            CollectionAssert.AreEquivalent(new[] { Root, newRoot }, rootKeys);
+        });
+    }
+
+    [Test]
+    public void Can_Restore_Node_When_Missing_Target_Parent_Chain_Exists_In_Repository()
+    {
+        // Arrange
+        var newRoot = Guid.NewGuid();
+        var target = Guid.NewGuid();
+        SetupAncestorChain(target, Node(1000, newRoot, parentId: -1, sortOrder: 0), Node(1001, target, parentId: 1000, sortOrder: 0));
+        _navigationService.MoveToBin(Grandchild1);
+
+        // Act
+        var result = _navigationService.RestoreFromBin(Grandchild1, target);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.IsTrue(_navigationService.TryGetParentKey(Grandchild1, out Guid? parentKey));
+            Assert.AreEqual(target, parentKey);
+            Assert.IsFalse(_navigationService.TryGetParentKeyInBin(Grandchild1, out _));
+        });
+    }
+
+    [Test]
+    public void Restoring_Under_A_Target_That_Is_Itself_In_The_Bin_Restores_Both()
+    {
+        // Arrange: Child 2 and its descendants are in this structure's bin, while another server has already restored Child 2 under Root.
+        _navigationService.MoveToBin(Child2);
+        SetupAncestorChain(Child2, Node(1000, Root, parentId: -1, sortOrder: 0), Node(1001, Child2, parentId: 1000, sortOrder: 1));
+
+        // Act
+        var result = _navigationService.RestoreFromBin(Grandchild3, Child2);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.IsTrue(_navigationService.TryGetParentKey(Child2, out Guid? child2Parent));
+            Assert.AreEqual(Root, child2Parent);
+            Assert.IsTrue(_navigationService.TryGetParentKey(Grandchild3, out Guid? grandchild3Parent));
+            Assert.AreEqual(Child2, grandchild3Parent);
+            Assert.IsTrue(_navigationService.TryGetParentKey(GreatGrandchild1, out Guid? greatGrandchild1Parent));
+            Assert.AreEqual(Grandchild3, greatGrandchild1Parent);
+            Assert.IsFalse(_navigationService.TryGetParentKeyInBin(Child2, out _));
+            Assert.IsFalse(_navigationService.TryGetParentKeyInBin(Grandchild3, out _));
+            Assert.IsFalse(_navigationService.TryGetParentKeyInBin(GreatGrandchild1, out _));
+        });
+    }
+
+    [Test]
+    public void Cannot_Add_Node_When_Missing_Parent_Chain_Is_Trashed()
+    {
+        // Arrange
+        var parent = Guid.NewGuid();
+        var newNodeKey = Guid.NewGuid();
+        SetupAncestorChain(parent, Node(1000, parent, parentId: Constants.System.RecycleBinContent, sortOrder: 0, trashed: true));
+
+        // Act
+        var result = _navigationService.Add(newNodeKey, ContentType, parent);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsFalse(_navigationService.TryGetParentKey(parent, out _));
+            Assert.IsFalse(_navigationService.TryGetParentKey(newNodeKey, out _));
+        });
+    }
+
+    [Test]
+    public void Materialised_Parent_From_The_Bin_Keeps_Its_Persisted_Sort_Order()
+    {
+        // Arrange: Child 3 is in this structure's bin; another server restored it under Root as the first child.
+        _navigationService.MoveToBin(Child3);
+        SetupAncestorChain(Child3, Node(1000, Root, parentId: -1, sortOrder: 0), Node(1001, Child3, parentId: 1000, sortOrder: -1));
+        var newNodeKey = Guid.NewGuid();
+
+        // Act
+        var result = _navigationService.Add(newNodeKey, ContentType, Child3);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            _navigationService.TryGetChildrenKeys(Root, out IEnumerable<Guid> rootChildren);
+            CollectionAssert.AreEqual(new[] { Child3, Child1, Child2 }, rootChildren);
+        });
+    }
+
+    [Test]
+    public void Concurrent_Adds_Under_The_Same_Missing_Parent_Link_Every_Child()
+    {
+        // Arrange
+        var parent = Guid.NewGuid();
+        SetupAncestorChain(parent, Node(1000, parent, parentId: -1, sortOrder: 0));
+        Guid[] children = Enumerable.Range(0, 16).Select(_ => Guid.NewGuid()).ToArray();
+        var results = new ConcurrentBag<bool>();
+
+        // Act
+        Parallel.ForEach(children, child => results.Add(_navigationService.Add(child, ContentType, parent)));
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(results, Is.All.True);
+            _navigationService.TryGetChildrenKeys(parent, out IEnumerable<Guid> parentChildren);
+            CollectionAssert.AreEquivalent(children, parentChildren);
+            foreach (Guid child in children)
+            {
+                Assert.IsTrue(_navigationService.TryGetParentKey(child, out Guid? parentKey));
+                Assert.AreEqual(parent, parentKey);
+            }
+
+            _navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+            Assert.AreEqual(1, rootKeys.Count(x => x == parent));
+        });
+    }
+
+    [Test]
+    public void Repository_Is_Not_Queried_When_The_Parent_Exists()
+    {
+        // Act
+        _navigationService.Add(Guid.NewGuid(), ContentType, Child1);
+
+        // Assert
+        _navigationRepository.Verify(x => x.GetContentNodeWithAncestors(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
+    }
+
+    private void SetupAncestorChain(Guid key, params INavigationModel[] chain)
+        => _navigationRepository
+            .Setup(x => x.GetContentNodeWithAncestors(key, Constants.ObjectTypes.Document))
+            .Returns(chain);
+
+    private INavigationModel Node(int id, Guid key, int parentId, int sortOrder, bool trashed = false)
+        => new TestNavigationModel
+        {
+            Id = id,
+            Key = key,
+            ContentTypeKey = ContentType,
+            ParentId = parentId,
+            SortOrder = sortOrder,
+            Trashed = trashed,
+        };
+
+    private static ICoreScopeProvider CreateScopeProvider()
+    {
+        var scopeProvider = new Mock<ICoreScopeProvider>();
+        scopeProvider
+            .Setup(x => x.CreateCoreScope(
+                It.IsAny<IsolationLevel>(),
+                It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher>(),
+                It.IsAny<IScopedNotificationPublisher>(),
+                It.IsAny<bool?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()))
+            .Returns(Mock.Of<ICoreScope>());
+        return scopeProvider.Object;
+    }
+
+    private sealed class TestNavigationModel : INavigationModel
+    {
+        public int Id { get; set; }
+
+        public Guid Key { get; set; }
+
+        public Guid ContentTypeKey { get; set; }
+
+        public int ParentId { get; set; }
+
+        public int SortOrder { get; set; }
+
+        public bool Trashed { get; set; }
+    }
+
     private void CreateTestData()
     {
         ContentType = new Guid("217C492D-0067-478C-BEA8-D0CE2DECBEB9");
@@ -2273,4 +2509,8 @@ internal class TestContentNavigationService : AsyncContentNavigationServiceBase<
 
     // Not needed for testing here
     public override Task RebuildBinAsync() => Task.CompletedTask;
+
+    protected override int TreeLockId => Constants.Locks.ContentTree;
+
+    protected override Guid ObjectTypeKey => Constants.ObjectTypes.Document;
 }

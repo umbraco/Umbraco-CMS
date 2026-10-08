@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -26,19 +26,19 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
     public async Task GetContentVersionsEligibleForCleanup_Always_ExcludesActiveVersions()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 2 versions, a draft version and a published version.
 
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 3 versions, a historic version, a draft version and a published version.
 
         using (ScopeProvider.CreateScope())
@@ -58,21 +58,21 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
     public async Task GetContentVersionsEligibleForCleanup_Always_ExcludesPinnedVersions()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 2 versions, a draft version and a published version.
 
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
         // At this point content has 5 versions, 3 historic versions, a draft version and a published version.
 
         var allVersions = await ContentService.GetVersionsAsync(content.Key, CancellationToken.None);
@@ -102,18 +102,18 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
     public async Task GetContentVersionsEligibleForCleanup_WithDateFilter_OnlyReturnsOlderVersions()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Create 4 versions in total: 2 historic (1, 2), 1 current draft (3), 1 current published (4).
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         using (ScopeProvider.CreateScope())
         {
@@ -142,19 +142,19 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
     public async Task GetContentVersionsEligibleForCleanup_WithMaxCount_RespectsLimitAndReturnsOldestFirst()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Create 5 versions in total: 3 historic (1, 2, 3), 1 current draft (4), 1 current published (5).
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         using (ScopeProvider.CreateScope())
         {
@@ -186,19 +186,19 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
     public async Task DeleteVersions_Always_DeletesSpecifiedVersions()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
         using (var scope = ScopeProvider.CreateScope())
         {
             var query = ScopeAccessor.AmbientScope.SqlContext.Sql();
@@ -223,18 +223,18 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
     public async Task DeleteVersions_VerifiesCascadeDeletion()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // At this point content has 4 versions: 2 historic, 1 draft, 1 published.
         using (var scope = ScopeProvider.CreateScope())
@@ -279,17 +279,17 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
     public async Task GetPagedItemsByContentId_WithInvariantCultureContent_ReturnsPaginatedResults()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None); // Draft + Published
-        await ContentService.PublishAsync(content, [], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None); // New Draft
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None); // Draft + Published
+        await ContentService.PublishAsync(content, [], Constants.Security.SuperUserKey, CancellationToken.None); // New Draft
 
         using (ScopeProvider.CreateScope())
         {
@@ -312,7 +312,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
     public async Task GetPagedItemsByContentId_WithVariantCultureContent_ReturnsPaginatedResults()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
@@ -322,14 +322,14 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        await ContentTypeService.UpdateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "foo", culture: "en-US");
         content.SetCultureName("foo", "en-US");
 
-        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
-        await ContentService.PublishAsync(content, ["en-US"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None); // Draft + Published
-        await ContentService.PublishAsync(content, ["en-US"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None); // New Draft
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None); // Draft + Published
+        await ContentService.PublishAsync(content, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None); // New Draft
 
         using (ScopeProvider.CreateScope())
         {

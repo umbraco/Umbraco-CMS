@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Notifications;
@@ -46,14 +47,14 @@ internal sealed class DatabaseServerMessengerMainDomTests : UmbracoIntegrationTe
         var maxInstructionIdBeforePublish = CacheInstructionService.GetMaxInstructionId();
 
         var template = TemplateBuilder.CreateTextPageTemplate("testPageTemplate");
-        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("testPage", "Test Page", defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var content = ContentBuilder.CreateSimpleContent(contentType, "Test Content");
-        await ContentService.SaveAsync(content, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        var publishResult = await ContentService.PublishAsync(content, Array.Empty<string>(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+        var publishResult = await ContentService.PublishAsync(content, Array.Empty<string>(), Constants.Security.SuperUserKey, CancellationToken.None);
         Assert.That(publishResult.Success, Is.True);
 
         var maxInstructionIdAfterPublish = CacheInstructionService.GetMaxInstructionId();

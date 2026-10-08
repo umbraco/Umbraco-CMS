@@ -129,6 +129,10 @@ internal class DocumentRepository
         => await PerformGetRangeAsync(keys);
 
     /// <inheritdoc />
+    public override async Task<IEnumerable<IContent>> GetManyAsync(Guid[] keys, string[]? propertyAliases, bool loadTemplates, CancellationToken cancellationToken)
+        => keys.Length == 0 ? [] : await PerformGetRangeAsync(keys, propertyAliases, loadTemplates);
+
+    /// <inheritdoc />
     protected override async Task PersistNewItemAsync(IContent item) =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
@@ -1576,7 +1580,7 @@ internal class DocumentRepository
         return string.CompareOrdinal(left.VarcharValue ?? string.Empty, right.VarcharValue ?? string.Empty);
     }
 
-    private Task<List<IContent>> PerformGetRangeAsync(Guid[]? keys) =>
+    private Task<List<IContent>> PerformGetRangeAsync(Guid[]? keys, string[]? propertyAliases = null, bool loadTemplates = true) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
             IQueryable<NodeDto> nodeQuery = db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey);
@@ -1595,7 +1599,7 @@ internal class DocumentRepository
                 return [];
             }
 
-            return await AssembleEntitiesAsync(rows, db);
+            return await AssembleEntitiesAsync(rows, db, propertyAliases, loadTemplates);
         });
 
     private async Task<HashSet<int>> ResolveValidTemplateIdsAsync(IReadOnlyList<DocumentRow> rows)

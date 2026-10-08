@@ -25,26 +25,6 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     /// <summary>
     /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
     /// </summary>
-    [Obsolete("Use the overload accepting shareUmbracoConnection. Scheduled for removal in Umbraco 19.")]
-    public static IServiceCollection AddUmbracoDbContext<T>(
-        this IServiceCollection services,
-        Action<DbContextOptionsBuilder, string?, string?, IServiceProvider?>? optionsAction = null)
-        where T : DbContext
-        => AddUmbracoDbContext<T>(services, optionsAction, shareUmbracoConnection: true);
-
-    /// <summary>
-    /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
-    /// </summary>
-    [Obsolete("Use the overload accepting shareUmbracoConnection. Scheduled for removal in Umbraco 19.")]
-    public static IServiceCollection AddUmbracoDbContext<T>(
-        this IServiceCollection services,
-        Action<IServiceProvider, DbContextOptionsBuilder, string?, string?>? optionsAction = null)
-        where T : DbContext
-        => AddUmbracoDbContext<T>(services, optionsAction, shareUmbracoConnection: true);
-
-    /// <summary>
-    /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
-    /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="optionsAction">An optional action to configure the DbContext options.</param>
     /// <param name="shareUmbracoConnection">

@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -48,57 +46,6 @@ public class RelationService : AsyncRepositoryService, IRelationService
         _auditService = auditService;
         _userIdKeyResolver = userIdKeyResolver;
         _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RelationService" /> class.
-    /// </summary>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public RelationService(
-        IScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IEntityService entityService,
-        IRelationRepository relationRepository,
-        IRelationTypeRepository relationTypeRepository,
-        IAuditRepository auditRepository,
-        IUserIdKeyResolver userIdKeyResolver)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            entityService,
-            relationRepository,
-            relationTypeRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            userIdKeyResolver)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RelationService" /> class.
-    /// </summary>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public RelationService(
-        IScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IEntityService entityService,
-        IRelationRepository relationRepository,
-        IRelationTypeRepository relationTypeRepository,
-        IAuditService auditService,
-        IAuditRepository auditRepository,
-        IUserIdKeyResolver userIdKeyResolver)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            entityService,
-            relationRepository,
-            relationTypeRepository,
-            auditService,
-            userIdKeyResolver)
-    {
     }
 
     /// <inheritdoc />

@@ -1865,7 +1865,7 @@ export default {
 		allowVaryBySegment: 'Tillad segmentering',
 		elementType: 'Element-type',
 		elementHeading: 'Er en Element-type',
-		elementDescription: 'En Element-type er tiltænkt brug i andre Dokumenttyper, ikke i indholdstræet.\n    ',
+		elementDescription: 'Tiltænkt Block eller Genanvendeligt Element i Library sektionen.\n    ',
 		elementCannotToggle:
 			'En Dokumenttype kan ikke ændres til en Element-type efter den er blevet brugt til\n      at oprette en eller flere indholds elementer.\n    ',
 		elementDoesNotSupport: 'Dette benyttes ikke for en Element-type',
@@ -2228,6 +2228,7 @@ export default {
 		stateApproved: 'Godkendt',
 		stateInvited: 'Inviteret',
 		stateInactive: 'Inaktiv',
+		type: 'Type',
 		sortNameAscending: 'Navn (A-Å)',
 		sortNameDescending: 'Navn (Å-A)',
 		sortCreateDateAscending: 'Nyeste',
@@ -2562,19 +2563,19 @@ export default {
 		labelcreateNewElementType: 'Opret ny elementtype',
 		labelCustomStylesheet: 'Overskriv stylesheet',
 		addCustomStylesheet: 'Tilføj stylesheet',
-		headlineEditorAppearance: 'Redigerings udseende',
+		headlineEditorAppearance: 'Redigeringsudseende',
 		headlineDataModels: 'Data modeller',
-		headlineCatalogueAppearance: 'Katalog udseende',
+		headlineCatalogueAppearance: 'Katalogudseende',
 		labelBackgroundColor: 'Baggrundsfarve',
 		labelIconColor: 'Ikonfarve',
-		labelContentElementType: 'Indholds model',
+		labelContentElementType: 'Indholdsmodel',
 		labelLabelTemplate: 'Label',
 		labelCustomView: 'Speciel visning',
 		labelCustomViewInfoTitle: 'Vis speciel visning beskrivelsen',
 		labelCustomViewDescription:
 			'Overskrift hvordan denne blok præsenteres i backoffice interfacet. Vælg en\n      .html fil der indeholder din præsensation.\n    ',
 		labelSettingsElementType: 'Indstillingsmodel',
-		labelEditorSize: 'Rederings lagets størrelse',
+		labelEditorSize: 'Redigeringslagets størrelse',
 		addCustomView: 'Tilføj speciel visning',
 		addSettingsElementType: 'Tilføj indstillinger',
 		confirmDeleteBlockTitle: 'Slet %0%?',
@@ -2597,7 +2598,7 @@ export default {
 		headlineAdvanced: 'Avanceret',
 		headlineCustomView: 'Brugerdefineret visning',
 		forceHideContentEditor: 'Skjul indholdseditoren',
-		forceHideContentEditorHelp: 'Skjul indholds redigerings knappen samt indholdseditoren i Blok Redigerings vinduet',
+		forceHideContentEditorHelp: 'Skjul indholds redigeringsknappen samt indholdseditoren i Blok Redigerings vinduet',
 		gridInlineEditing: 'Direkte redigering',
 		gridInlineEditingHelp:
 			'Tilføjer direkte redigering af det første felt. Yderligere felter optræder kun i redigerings vinduet.',
@@ -2624,7 +2625,7 @@ export default {
 		confirmDeleteBlockAreaNotice: 'Alle blokke, der er oprettet i dette område, vil blive slettet.',
 		layoutOptions: 'Layout-opsætning',
 		structuralOptions: 'Struktur',
-		sizeOptions: 'Størrelses opsætning',
+		sizeOptions: 'Størrelsesopsætning',
 		sizeOptionsHelp: 'Definér en eller flere størrelsesmuligheder for at gøre blokken kan ændres i størrelse',
 		allowedBlockColumns: 'Tilgængelige kolonne-størrelser',
 		allowedBlockColumnsHelp:
@@ -2650,8 +2651,8 @@ export default {
 			'Dette alias skrives ud via GetBlockGridHTML(), brug aliaset til at fange det element der repræsentere dette område. F.eks.. .umb-block-grid__area[data-area-alias="MitOmraadeAlias"] { ... }',
 		scaleHandlerButtonTitle: 'Træk for at skalere',
 		areaCreateLabelTitle: 'Tilføj indhold label',
-		areaCreateLabelHelp: 'Overskriv labellen for tilføj indholds knappen i dette område.',
-		showSizeOptions: 'Tilføj skalerings muligheder',
+		areaCreateLabelHelp: 'Overskriv labellen for tilføj indholdsknappen i dette område.',
+		showSizeOptions: 'Tilføj skaleringsmuligheder',
 		addBlockType: 'Tilføj blok',
 		addBlockGroup: 'Tilføj gruppe',
 		pickSpecificAllowance: 'Tilføj gruppe eller blok',
@@ -2665,12 +2666,12 @@ export default {
 		tabAreas: 'Områder',
 		tabAdvanced: 'Avanceret',
 		headlineAllowance: 'Tilladelser',
-		getSampleHeadline: 'Installer demo konfiguration',
+		getSampleHeadline: 'Installer demokonfiguration',
 		getSampleDescription:
 			'Dette tilføjer basale og hjælper dig til at komme igang med Block Grid Editor.<br/>Dette indeholder blokke for Overskrift, Beriget-Tekst, Billede og To-Koloners-Layout.',
 		getSampleButton: 'Installer',
-		actionEnterSortMode: 'Sortings tilstand',
-		actionExitSortMode: 'Afslut sortings tilstand',
+		actionEnterSortMode: 'Sorteringstilstand',
+		actionExitSortMode: 'Afslut sorteringstilstand',
 		areaAliasIsNotUnique: 'Dette område alias skal være unikt sammenlignet med andre områder af denne blok.',
 		configureArea: 'Konfigurer område',
 		deleteArea: 'Slet område',
@@ -2684,6 +2685,7 @@ export default {
 		labelInlineMode: 'Indsæt på linje med tekst',
 		notExposedLabel: 'ikke oprettet',
 		notExposedDescription: 'Denne blok er endnu ikke oprettet for denne variant',
+		notPublishedLibraryElementDescription: 'Det bibliotekselement, som denne blok bruger, er ikke udgivet',
 		unsupportedBlockName: 'Ugyldigt indhold',
 		unsupportedBlockDescription:
 			'Dette indhold er ikke længere understøttet. Hvis du mangler dette indhold bør du kontakte din administrator. Ellers bør du slette dette indhold.',
@@ -2721,6 +2723,8 @@ export default {
 		connectionFailed:
 			'Kunne ikke etablere forbindelse til serveren, forhåndsvisning af liveopdateringer vil ikke fungere.',
 		connectionLost: 'Forbindelse til serveren mistet, forhåndsvisning af liveopdateringer vil ikke fungere.',
+		connectionReconnecting: 'Forbindelse til serveren mistet, forsøger at genoprette forbindelsen…',
+		connectionRestored: 'Forbindelse til serveren genoprettet, forhåndsvisning af liveopdateringer fungerer igen.',
 	},
 	permissions: {
 		FolderCreation: 'Mappeoprettelse',
@@ -2975,5 +2979,116 @@ export default {
 		browseTab: 'Gennemse',
 		searchTab: 'Søg',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
+	},
+	searchExamine: {
+	  showFields: 'Vis felter',
+	  headline: 'Søgedokumentfelter',
+	  filterPlaceholder: 'Filtrer felter efter navn eller v\u00E6rdi...',
+	  filterLabel: 'Filtrer felter efter navn eller v\u00E6rdi',
+	  fieldCount: (count: number) => {
+	    switch (count) {
+	      case 1:
+	        return '1 felt';
+	      default:
+	        return `${count} felter`;
+	    }
+	  },
+	  tableColumnName: 'Navn',
+	  tableColumnValue: 'V\u00E6rdi',
+	  copyValue: 'Kopi\u00E9r v\u00E6rdi',
+	  seeMore: 'Se mere',
+	  seeLess: 'Se mindre',
+	  noFieldsMatch: 'Ingen felter matcher dit filter.',
+	  noFields: 'Dette dokument har ingen indekserede felter.',
+	  loadError: 'Kunne ikke indl\u00E6se dokumentfelter. Pr\u00F8v venligst igen.',
+	  valueIndex: (index: number) => `V\u00E6rdi ${index}`,
+	  fieldType: (type: string) => {
+	    switch (type) {
+	      case 'keywords':
+	        return 'N\u00F8gleord (eksakt match)';
+	      case 'texts':
+	        return 'Fuldtekst';
+	      case 'textsr1':
+	        return 'Fuldtekst (Boost: H\u00F8j)';
+	      case 'textsr2':
+	        return 'Fuldtekst (Boost: Medium)';
+	      case 'textsr3':
+	        return 'Fuldtekst (Boost: Lav)';
+	      case 'integers':
+	        return 'Heltal';
+	      case 'decimals':
+	        return 'Decimal';
+	      case 'datetimeoffsets':
+	        return 'Dato/tid';
+	      default:
+	        return type;
+	    }
+	  },
+	},
+	searchManagement: {
+		treeHeader: 'Søgning',
+		tableColumnAlias: 'Alias',
+		tableColumnHealthStatus: 'Status',
+		tableColumnDocumentCount: 'Antal dokumenter',
+		healthStatus: (status: string) => {
+			switch (status) {
+				case 'Empty':
+					return 'Tom';
+				case 'Corrupted':
+					return 'Fejl: Korrupt';
+				case 'Rebuilding':
+					return 'Gen-indekserer';
+				case 'Healthy':
+					return 'God';
+				default:
+					return 'Fejl: Ukendt';
+			}
+		},
+		documentCount: (cnt: number | string) => {
+			switch (cnt) {
+				case 0:
+					return 'Tom';
+				case 1:
+					return '1 dokument';
+				default:
+					return `${cnt} dokumenter`;
+			}
+		},
+		collectionActionReload: 'Opdater',
+		entityActionRebuildIndex: 'Genopbyg',
+		rebuildConfirmHeadline: 'Genopbyg indeks',
+		rebuildConfirmMessage:
+			'<strong>{0}</strong> genopbygges fra bunden. Søgning i indekset kan give <i>ufuldstændige resultater</i>, indtil genopbygningen er færdig.',
+		rebuildConfirmLabel: 'Genopbyg',
+		rebuildStartedMessage: 'Genopbygger {0} i baggrunden.',
+		rebuildCompletedTitle: 'Genopbygning fuldført',
+		rebuildCompletedMessage: '{0} er færdig med at genopbygge.',
+		indexInfo: 'Indeksinformation',
+		indexAlias: 'Alias',
+		providerName: 'Udbyder',
+		searchBox: 'Søg',
+		searchPlaceholder: 'Søg',
+		searchButton: 'Søg',
+		noResults: 'Ingen resultater',
+		resultsCount: (count: number) => `Fandt ${count} resultat${count !== 1 ? 'er' : ''}`,
+		tableColumnName: 'Navn',
+		tableColumnEntityType: 'Type',
+		// Accessibility labels
+		searching: 'Søger...',
+		searchFailed: 'Søgning fejlede',
+		searchComplete: (count: number) => `Søgning færdig. Fandt ${count} resultat${count !== 1 ? 'er' : ''}`,
+		openEntity: (type: string, id: string) => `Åbn ${type} med ID ${id}`,
+		searchFormLabel: (indexAlias: string) => `Søg i ${indexAlias} indeks`,
+		searchInputLabel: 'Søgeforespørgsel',
+		searchInputAriaLabel: (indexAlias: string) => `Indtast søgeforespørgsel for ${indexAlias} indeks`,
+		searchButtonAriaLabel: 'Udfør søgning',
+		searchHint: 'Tryk Enter for at søge',
+		loading: 'Indlæser søgeresultater',
+		resultsRegion: 'Søgeresultater',
+		resultsTable: 'Tabel med søgeresultater',
+		paginationLabel: 'Sider med søgeresultater',
+		cultureSelectLabel: 'Kultur',
+		searchDisabled: 'Søgning utilgængelig. Indeksstatus:',
+		searchError: 'Søgningen fejlede. Prøv igen.',
 	},
 } as UmbLocalizationDictionary;

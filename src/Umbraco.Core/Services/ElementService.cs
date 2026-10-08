@@ -70,6 +70,10 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     public Task<IEnumerable<IElement>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken) => Task.FromResult(GetByIds(ids));
 
     /// <inheritdoc />
+    public Task<IEnumerable<IElement>> GetByIdsAsync(IEnumerable<Guid> ids, string[]? propertyAliases, bool loadTemplates, CancellationToken cancellationToken)
+        => Task.FromResult(GetByIds(ids, propertyAliases, loadTemplates));
+
+    /// <inheritdoc />
     public Task<Attempt<ContentScheduleOperationStatus>> PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken)
     {
         PersistContentSchedule(content, contentSchedule);

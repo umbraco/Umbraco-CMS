@@ -313,9 +313,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         /// <inheritdoc/>
         public IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId)
-#pragma warning disable CS0618 // Type or member is obsolete
             => ImportMediaTypes(docTypeElements, userId, out _);
-#pragma warning restore CS0618 // Type or member is obsolete
 
         /// <summary>
         /// Imports media types from the provided XML elements and installs any associated entity containers.
@@ -324,8 +322,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="userId">The identifier of the user performing the import operation.</param>
         /// <param name="entityContainersInstalled">When this method returns, contains the collection of <see cref="EntityContainer"/> objects that were installed as part of the import process.</param>
         /// <returns>A read-only list of the imported <see cref="IMediaType"/> objects.</returns>
-        [Obsolete("This method is not used in Umbraco outside of this class so will be made private in Umbraco 19.")]
-        public IReadOnlyList<IMediaType> ImportMediaTypes(
+        private IReadOnlyList<IMediaType> ImportMediaTypes(
             IEnumerable<XElement> docTypeElements,
             int userId,
             out IEnumerable<EntityContainer> entityContainersInstalled)

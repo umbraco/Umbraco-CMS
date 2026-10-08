@@ -29,6 +29,19 @@ public interface IPublishableContentService<TContent> : IAsyncContentServiceBase
     Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> keys, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Gets content items by their unique identifiers, loading only the requested properties and, optionally, templates.
+    /// </summary>
+    /// <param name="keys">The unique identifiers of the content items.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If <c>null</c>, all properties are loaded.
+    ///     If empty, no custom properties are loaded (only system properties).
+    /// </param>
+    /// <param name="loadTemplates">Whether to load templates. Ignored for content that has no templates.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The content items, in the order requested.</returns>
+    Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> keys, string[]? propertyAliases, bool loadTemplates, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Gets a dictionary of content keys and their matching content schedules.
     /// </summary>
     /// <param name="keys">The content keys.</param>

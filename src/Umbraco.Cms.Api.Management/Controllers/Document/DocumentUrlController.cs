@@ -36,16 +36,6 @@ public class DocumentUrlController : DocumentControllerBase
     /// Retrieves the URLs for the documents identified by the specified set of IDs.
     /// </summary>
     /// <param name="ids">A set of document IDs for which to retrieve URLs.</param>
-    /// <returns>A task representing the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a collection of URL information for each requested document.</returns>
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public Task<IActionResult> GetUrls([FromQuery(Name = "id")] HashSet<Guid> ids)
-        => GetUrls(ids, null);
-
-    /// <summary>
-    /// Retrieves the URLs for the documents identified by the specified set of IDs.
-    /// </summary>
-    /// <param name="ids">A set of document IDs for which to retrieve URLs.</param>
     /// <param name="culture">An optional culture to restrict variant document URLs to. When omitted, URLs for all cultures are returned.</param>
     /// <returns>A task representing the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a collection of URL information for each requested document.</returns>
     [MapToApiVersion("1.0")]

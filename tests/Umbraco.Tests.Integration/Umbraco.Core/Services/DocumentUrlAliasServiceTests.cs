@@ -37,6 +37,8 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
     private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
+    private IKeyValueService KeyValueService => GetRequiredService<IKeyValueService>();
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
@@ -1410,6 +1412,108 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Assert - the published alias should still resolve; the unpublished draft alias should not.
         Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("variant-published-alias", defaultLanguage.IsoCode), Does.Contain(content.Key));
         Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("variant-draft-alias", defaultLanguage.IsoCode), Is.Empty);
+    }
+
+    [Test]
+    public async Task Unpublished_Document_Does_Not_Resolve_Via_Its_Former_Alias()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var pageAKey = new Guid(PageWithSingleAliasKey);
+
+        // Page A is published (from setup) with alias "my-single-alias". Unpublish it,
+        // then change its alias and save without publishing (issue #23948).
+        var pageA = (await ContentService.GetByIdAsync(pageAKey, CancellationToken.None))!;
+        await ContentService.UnpublishAsync(pageA, null, Constants.Security.SuperUserKey, CancellationToken.None);
+        pageA = (await ContentService.GetByIdAsync(pageAKey, CancellationToken.None))!;
+        pageA.SetValue(Constants.Conventions.Content.UrlAlias, "archived-single-alias");
+        await ContentService.SaveAsync(pageA, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        // Page B takes over the alias and is published.
+        var pageB = ContentBuilder.CreateSimpleContent(ContentType, "Page B", RootPage.Id);
+        pageB.SetValue(Constants.Conventions.Content.UrlAlias, "my-single-alias");
+        await ContentService.SaveAsync(pageB, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(pageB, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+
+        var result = (await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode)).ToList();
+
+        Assert.That(result, Does.Not.Contain(pageAKey), "Unpublished page should not resolve via its former alias.");
+        Assert.That(result, Is.EqualTo(new[] { pageB.Key }));
+    }
+
+    [Test]
+    public async Task RebuildAllAliasesAsync_Ignores_Alias_For_Unpublished_Document()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var pageAKey = new Guid(PageWithSingleAliasKey);
+
+        await ContentService.UnpublishAsync((await ContentService.GetByIdAsync(pageAKey, CancellationToken.None))!, null, Constants.Security.SuperUserKey, CancellationToken.None);
+        await DocumentUrlAliasService.RebuildAllAliasesAsync();
+
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
+    }
+
+    [Test]
+    public async Task InitAsync_Rebuilds_And_Flushes_Rows_When_Persisted_Rebuild_Value_Is_Outdated()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var pageAKey = new Guid(PageWithSingleAliasKey);
+
+        await ContentService.UnpublishAsync((await ContentService.GetByIdAsync(pageAKey, CancellationToken.None))!, null, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        // An unpublished document's alias is a row the current rebuild rules would not produce.
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope())
+        {
+            DocumentUrlAliasRepository.Save([new PublishedDocumentUrlAlias { DocumentKey = pageAKey, LanguageId = null, Alias = "my-single-alias" }]);
+            await KeyValueService.SetValueAsync(global::Umbraco.Cms.Core.Services.DocumentUrlAliasService.RebuildKey, "outdated");
+            scope.Complete();
+        }
+
+        await DocumentUrlAliasService.InitAsync(false, CancellationToken.None);
+
+        List<PublishedDocumentUrlAlias> stored;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            stored = DocumentUrlAliasRepository.GetAll().Where(a => a.DocumentKey == pageAKey).ToList();
+        }
+
+        Assert.That(stored, Is.Empty);
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Is.Empty);
+    }
+
+    [Test]
+    public async Task CreateOrUpdateAliasesAsync_Ignores_Alias_For_Unpublished_Culture()
+    {
+        var secondLanguage = new LanguageBuilder()
+            .WithCultureInfo("fr-FR")
+            .WithIsDefault(false)
+            .Build();
+        await LanguageService.CreateAsync(secondLanguage, Constants.Security.SuperUserKey);
+
+        var defaultIsoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        var template = TemplateBuilder.CreateTextPageTemplate("unpublishCultureRefreshTemplate");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithAliasUnpublishCultureRefresh");
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        var content = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName(defaultIsoCode, "Multi Culture Page")
+            .WithCultureName("fr-FR", "Page Multi Culture")
+            .Build();
+        content.ParentId = RootPage.Id;
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "default-culture-alias", defaultIsoCode);
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "french-culture-alias", "fr-FR");
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, [defaultIsoCode, "fr-FR"], Constants.Security.SuperUserKey, CancellationToken.None);
+
+        // Unpublish only the French culture; the document stays published via the default culture.
+        await ContentService.UnpublishAsync(content, "fr-FR", Constants.Security.SuperUserKey, CancellationToken.None);
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("default-culture-alias", defaultIsoCode), Does.Contain(content.Key));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("french-culture-alias", "fr-FR"), Is.Empty);
     }
 
     #endregion

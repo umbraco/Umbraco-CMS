@@ -1,7 +1,7 @@
 import {test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-const propertyEditorName = 'Multiple Text String';
+const propertyEditorName = 'Text Box List';
 const customDataTypeName = 'Custom Multiple Text String';
 const editorAlias = 'Umbraco.MultipleTextstring';
 const editorUiAlias = 'Umb.PropertyEditorUi.MultipleTextString';

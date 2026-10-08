@@ -120,4 +120,20 @@ public interface IAsyncPublishableContentRepository<TContent> : IAsyncContentRep
     /// <returns>A paged result containing the matching content items.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
     Task<PagedModel<TContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets content items by their keys, loading only the requested properties and, optionally, templates.
+    /// </summary>
+    /// <remarks>
+    ///     Partially loaded items bypass the repository cache, which only ever holds fully loaded items.
+    /// </remarks>
+    /// <param name="keys">The keys of the content items.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If <c>null</c>, all properties are loaded.
+    ///     If empty, no custom properties are loaded (only system properties).
+    /// </param>
+    /// <param name="loadTemplates">Whether to load templates. Ignored for content that has no templates.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The matching content items, in no particular order.</returns>
+    Task<IEnumerable<TContent>> GetManyAsync(Guid[] keys, string[]? propertyAliases, bool loadTemplates, CancellationToken cancellationToken);
 }

@@ -53,6 +53,17 @@ public interface IMediaService : IContentServiceBase<IMedia>, IAsyncContentServi
     IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids);
 
     /// <summary>
+    ///     Gets a collection of <see cref="IMedia" /> objects by their unique Guids, loading only the requested properties.
+    /// </summary>
+    /// <param name="ids">The collection of <see cref="Guid" /> keys to retrieve media for.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded.
+    /// </param>
+    /// <returns>An enumerable collection of <see cref="IMedia" /> objects, in the order of <paramref name="ids" />.</returns>
+    IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases);
+
+    /// <summary>
     ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />
     ///     that this Media should based on.
     /// </summary>
@@ -126,6 +137,22 @@ public interface IMediaService : IContentServiceBase<IMedia>, IAsyncContentServi
     /// <param name="ordering"></param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null);
+
+    /// <summary>
+    ///     Gets a collection of <see cref="IMedia" /> objects by Parent Id, loading only the requested properties.
+    /// </summary>
+    /// <param name="id">Id of the Parent to retrieve Children from.</param>
+    /// <param name="pageIndex">Page number.</param>
+    /// <param name="pageSize">Page size.</param>
+    /// <param name="totalRecords">Total records query would return without paging.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded.
+    /// </param>
+    /// <param name="filter">Query filter.</param>
+    /// <param name="ordering">Ordering infos.</param>
+    /// <returns>An Enumerable list of <see cref="IMedia" /> objects.</returns>
+    IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IMedia>? filter, Ordering? ordering);
 
     /// <summary>
     ///     Gets a collection of <see cref="IMedia" /> objects by Parent Id
@@ -377,9 +404,7 @@ public interface IMediaService : IContentServiceBase<IMedia>, IAsyncContentServi
     ///     Unlike <see cref="Sort(IEnumerable{IMedia}, int)" />, this does not load the children or fire per-item
     ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
-        => throw new NotImplementedException();
+    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />

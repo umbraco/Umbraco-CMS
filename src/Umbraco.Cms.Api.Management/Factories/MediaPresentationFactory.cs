@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -52,6 +53,7 @@ internal sealed class MediaPresentationFactory : IMediaPresentationFactory
             Parent = parentKeyAttempt.Success ? new ReferenceByIdModel { Id = parentKeyAttempt.Result } : null,
             HasChildren = entity.HasChildren,
             MediaType = _umbracoMapper.Map<MediaTypeReferenceResponseModel>(entity)!,
+            Extension = entity.GetFileExtension(),
             Variants = CreateVariantsItemResponseModels(entity)
         };
     }

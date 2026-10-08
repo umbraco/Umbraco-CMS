@@ -40,6 +40,10 @@ internal sealed class ContentPermissionService : IContentPermissionService
     }
 
     /// <inheritdoc/>
+    public Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid contentKey, string permissionToCheck)
+        => AuthorizeAccessAsync(user, contentKey.Yield(), new HashSet<string> { permissionToCheck });
+
+    /// <inheritdoc/>
     public Task<ContentAuthorizationStatus> AuthorizeAccessAsync(
         IUser user,
         IEnumerable<Guid> contentKeys,

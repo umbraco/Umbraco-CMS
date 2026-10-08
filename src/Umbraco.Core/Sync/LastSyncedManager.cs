@@ -6,43 +6,39 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Sync;
 
-/// <summary>
-/// Default implementation of <see cref="ILastSyncedManager"/> that manages last synced IDs with caching.
-/// </summary>
 internal sealed class LastSyncedManager : ILastSyncedManager
 {
     private readonly ILastSyncedRepository _lastSyncedRepository;
     private readonly IScopeProvider _scopeProvider;
+    private readonly Lock _internalIdLock = new();
     private int? _lastSyncedInternalId;
     private int? _lastSyncedExternalId;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LastSyncedManager"/> class.
-    /// </summary>
-    /// <param name="lastSyncedRepository">The repository for persisting last synced data.</param>
-    /// <param name="coreScopeProvider">The scope provider for database transactions.</param>
     public LastSyncedManager(ILastSyncedRepository lastSyncedRepository, IScopeProvider scopeProvider)
     {
         _lastSyncedRepository = lastSyncedRepository;
         _scopeProvider = scopeProvider;
     }
 
-    /// <inheritdoc/>
     public async Task<int?> GetLastSyncedInternalAsync()
     {
-        if (_lastSyncedInternalId is not null)
+        lock (_internalIdLock)
         {
-            return _lastSyncedInternalId;
+            if (_lastSyncedInternalId is not null)
+            {
+                return _lastSyncedInternalId;
+            }
         }
 
-        using ICoreScope scope = _scopeProvider.CreateScope();
-        _lastSyncedInternalId = await _lastSyncedRepository.GetInternalIdAsync();
-        scope.Complete();
+        int? persistedExternalId = await GetLastSyncedExternalAsync();
 
-        return _lastSyncedInternalId;
+        lock (_internalIdLock)
+        {
+            _lastSyncedInternalId ??= persistedExternalId;
+            return _lastSyncedInternalId;
+        }
     }
 
-    /// <inheritdoc/>
     public async Task<int?> GetLastSyncedExternalAsync()
     {
         if (_lastSyncedExternalId is not null)
@@ -57,7 +53,6 @@ internal sealed class LastSyncedManager : ILastSyncedManager
         return _lastSyncedExternalId;
     }
 
-    /// <inheritdoc/>
     public async Task<Attempt<LastSyncedOperationStatus>> SaveLastSyncedInternalAsync(int id)
     {
         if (id < 0)
@@ -65,15 +60,12 @@ internal sealed class LastSyncedManager : ILastSyncedManager
             return Attempt.Fail(LastSyncedOperationStatus.InvalidId);
         }
 
-        using ICoreScope scope = _scopeProvider.CreateScope();
-        await _lastSyncedRepository.SaveInternalIdAsync(id);
-        _lastSyncedInternalId = id;
-        scope.Complete();
+        await GetLastSyncedInternalAsync();
+        RaiseInternalId(id);
 
         return Attempt.Succeed(LastSyncedOperationStatus.Success);
     }
 
-    /// <inheritdoc/>
     public async Task<Attempt<LastSyncedOperationStatus>> SaveLastSyncedExternalAsync(int id)
     {
         if (id < 0)
@@ -89,7 +81,6 @@ internal sealed class LastSyncedManager : ILastSyncedManager
         return Attempt.Succeed(LastSyncedOperationStatus.Success);
     }
 
-    /// <inheritdoc/>
     public async Task<Attempt<LastSyncedOperationStatus>> DeleteOlderThanAsync(DateTime date)
     {
         using ICoreScope scope = _scopeProvider.CreateScope();
@@ -99,16 +90,27 @@ internal sealed class LastSyncedManager : ILastSyncedManager
         return Attempt.Succeed(LastSyncedOperationStatus.Success);
     }
 
-    /// <summary>
-    /// Clears the local cache of last synced IDs.
-    /// </summary>
-    /// <remarks>
-    /// This method is intended for testing purposes only.
-    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal void ClearLocalCache()
     {
-        _lastSyncedInternalId = null;
+        lock (_internalIdLock)
+        {
+            _lastSyncedInternalId = null;
+        }
+
         _lastSyncedExternalId = null;
+    }
+
+    // The periodic sync and inline syncs can record the same instructions concurrently or in a different order;
+    // only ever moving the id forward keeps the checkpoint consistent.
+    private void RaiseInternalId(int id)
+    {
+        lock (_internalIdLock)
+        {
+            if (_lastSyncedInternalId is null || _lastSyncedInternalId < id)
+            {
+                _lastSyncedInternalId = id;
+            }
+        }
     }
 }

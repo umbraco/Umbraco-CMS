@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -58,17 +56,6 @@ public sealed class AuditService : AsyncRepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use AddAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public void Add(
-        AuditType type,
-        int userId,
-        int objectId,
-        string? entityType,
-        string comment,
-        string? parameters = null) =>
-        AddInnerAsync(type, userId, objectId, entityType, comment, parameters).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
     public async Task<PagedModel<IAuditItem>> GetItemsAsync(
         int skip,
         int take,
@@ -80,15 +67,6 @@ public sealed class AuditService : AsyncRepositoryService, IAuditService
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(take);
 
         return await GetItemsInnerAsync(skip, take, orderDirection, sinceDate?.UtcDateTime, auditTypeFilter);
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Use GetItemsAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null)
-    {
-        PagedModel<IAuditItem> result = GetItemsInnerAsync(0, int.MaxValue, Direction.Ascending, sinceDate)
-            .GetAwaiter().GetResult();
-        return result.Items;
     }
 
     /// <inheritdoc />
@@ -143,55 +121,6 @@ public sealed class AuditService : AsyncRepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public IEnumerable<IAuditItem> GetPagedItemsByEntity(
-        int entityId,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        Direction orderDirection = Direction.Descending,
-        AuditType[]? auditTypeFilter = null,
-        IQuery<IAuditItem>? customFilter = null)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageSize);
-
-        if (entityId is Constants.System.Root or <= 0)
-        {
-            totalRecords = 0L;
-            return [];
-        }
-
-        var skip = (int)(pageIndex * pageSize);
-        PagedModel<IAuditItem> result = GetItemsByEntityInnerAsync(
-            entityId,
-            skip,
-            pageSize,
-            orderDirection,
-            sinceDate: null,
-            auditTypeFilter)
-            .GetAwaiter().GetResult();
-        totalRecords = result.Total;
-
-        return result.Items;
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public IEnumerable<IAuditItem> GetLogs(int objectId)
-    {
-        PagedModel<IAuditItem> result = GetItemsByEntityInnerAsync(
-            objectId,
-            0,
-            int.MaxValue,
-            Direction.Ascending,
-            sinceDate: null,
-            auditTypeFilter: null)
-            .GetAwaiter().GetResult();
-        return result.Items;
-    }
-
-    /// <inheritdoc />
     public async Task<PagedModel<IAuditItem>> GetPagedItemsByUserAsync(
         Guid userKey,
         int skip,
@@ -218,89 +147,8 @@ public sealed class AuditService : AsyncRepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public IEnumerable<IAuditItem> GetPagedItemsByUser(
-        int userId,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        Direction orderDirection = Direction.Descending,
-        AuditType[]? auditTypeFilter = null,
-        IQuery<IAuditItem>? customFilter = null)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageSize);
-
-        if (userId is Constants.System.Root or <= 0)
-        {
-            totalRecords = 0L;
-            return [];
-        }
-
-        var skip = (int)(pageIndex * pageSize);
-        PagedModel<IAuditItem> items = GetItemsByUserInnerAsync(
-            userId,
-            skip,
-            pageSize,
-            orderDirection,
-            sinceDate: null,
-            auditTypeFilter)
-            .GetAwaiter().GetResult();
-        totalRecords = items.Total;
-
-        return items.Items;
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null)
-    {
-        PagedModel<IAuditItem> result = GetItemsByUserInnerAsync(
-            userId,
-            0,
-            int.MaxValue,
-            Direction.Ascending,
-            sinceDate,
-            [type])
-            .GetAwaiter().GetResult();
-        return result.Items;
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Use AuditEntryService.WriteAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public IAuditEntry Write(
-        int performingUserId,
-        string perfomingDetails,
-        string performingIp,
-        DateTime eventDateUtc,
-        int affectedUserId,
-        string? affectedDetails,
-        string eventType,
-        string eventDetails)
-    {
-        // Use the static service provider to resolve the audit entry service, as this is only needed for this obsolete method.
-        var auditEntryService =
-            (AuditEntryService)StaticServiceProvider.Instance.GetRequiredService<IAuditEntryService>();
-
-        return auditEntryService.WriteInnerAsync(
-            performingUserId,
-            perfomingDetails,
-            performingIp,
-            eventDateUtc,
-            affectedUserId,
-            affectedDetails,
-            eventType,
-            eventDetails).GetAwaiter().GetResult();
-    }
-
-    /// <inheritdoc />
     public Task CleanLogsAsync(int maximumAgeOfLogsInMinutes)
         => CleanLogsInnerAsync(maximumAgeOfLogsInMinutes);
-
-    /// <inheritdoc />
-    [Obsolete("Use CleanLogsAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public void CleanLogs(int maximumAgeOfLogsInMinutes)
-        => CleanLogsInnerAsync(maximumAgeOfLogsInMinutes).GetAwaiter().GetResult();
 
     private async Task<Attempt<AuditLogOperationStatus>> AddInnerAsync(
         AuditType type,

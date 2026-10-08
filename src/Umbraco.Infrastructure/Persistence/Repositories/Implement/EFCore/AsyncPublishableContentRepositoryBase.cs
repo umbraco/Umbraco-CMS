@@ -472,6 +472,9 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// <inheritdoc />
     public abstract Task<PagedModel<TEntity>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
+    /// <inheritdoc />
+    public abstract Task<IEnumerable<TEntity>> GetManyAsync(Guid[] keys, string[]? propertyAliases, bool loadTemplates, CancellationToken cancellationToken);
+
     private async Task<ContentSchedule> ToContentScheduleAsync(ContentScheduleDto dto) =>
         new(
             dto.Id,

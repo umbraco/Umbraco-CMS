@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -8,7 +6,6 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Filters;
-using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -65,92 +62,6 @@ public class MemberTypeService : AsyncContentTypeServiceBase<IMemberTypeReposito
     {
         MemberService = memberService;
         _memberTypeRepository = memberTypeRepository;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MemberTypeService" /> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider for managing database transactions.</param>
-    /// <param name="loggerFactory">The factory for creating loggers.</param>
-    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
-    /// <param name="memberService">The member service for member-related operations.</param>
-    /// <param name="memberTypeRepository">The repository for member type operations.</param>
-    /// <param name="auditRepository">The repository for audit logging (obsolete).</param>
-    /// <param name="entityContainerRepository">The repository for member type container operations.</param>
-    /// <param name="entityRepository">The repository for entity operations.</param>
-    /// <param name="eventAggregator">The event aggregator for publishing notifications.</param>
-    /// <param name="userIdKeyResolver">The resolver for converting user keys to IDs.</param>
-    /// <param name="contentTypeFilters">The collection of content type filters.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public MemberTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IMemberService memberService,
-        IMemberTypeRepository memberTypeRepository,
-        IAuditRepository auditRepository,
-        IMemberTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            memberService,
-            memberTypeRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MemberTypeService" /> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider for managing database transactions.</param>
-    /// <param name="loggerFactory">The factory for creating loggers.</param>
-    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
-    /// <param name="memberService">The member service for member-related operations.</param>
-    /// <param name="memberTypeRepository">The repository for member type operations.</param>
-    /// <param name="auditService">The service for audit logging.</param>
-    /// <param name="auditRepository">The repository for audit logging (obsolete).</param>
-    /// <param name="entityContainerRepository">The repository for member type container operations.</param>
-    /// <param name="entityRepository">The repository for entity operations.</param>
-    /// <param name="eventAggregator">The event aggregator for publishing notifications.</param>
-    /// <param name="userIdKeyResolver">The resolver for converting user keys to IDs.</param>
-    /// <param name="contentTypeFilters">The collection of content type filters.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public MemberTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IMemberService memberService,
-        IMemberTypeRepository memberTypeRepository,
-        IAuditService auditService,
-        IAuditRepository auditRepository,
-        IMemberTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            memberService,
-            memberTypeRepository,
-            auditService,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters)
-    {
     }
 
     // beware! order is important to avoid deadlocks

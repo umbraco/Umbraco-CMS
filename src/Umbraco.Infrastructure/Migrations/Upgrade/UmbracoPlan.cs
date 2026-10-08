@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Semver;
@@ -121,6 +121,12 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_19_0_0.AddExternalBlockElementRelationType>("{2D8F1B6E-4C3A-4E7D-9A1B-5F0C7E2D8A93}");
         To<V_19_0_0.AddIndexDocumentTable>("{8A5C1B2E-4F6D-4E1A-9C3B-D2E7F0A16C54}");
         To<V_19_0_0.RemoveLegacyExamineIndexFiles>("{6F1A9C3D-2B4E-4F7A-8C1D-9E3F5A7B2C60}");
+        To<V_19_0_0.RemoveUserGroupDefaultPermissionsColumn>("{B7E3D2A1-6C4F-4A8E-9D2B-3F1C5E7A9B04}");
+        To<V_19_0_0.MigrateTypedLabelDataTypes>("{D5F54DD5-A01E-4CB9-A34D-D078BA571C17}");
+        To<V_19_0_0.MigrateRangeSliderDataTypes>("{97463AFC-D1AB-4D31-9001-2061DBEDE25D}");
+        To<V_19_0_0.MigrateSingleMediaPickerDataTypes>("{B84A1E90-9F3C-4C1F-9E51-3A2D7C4F8B16}");
+        To<V_19_0_0.MigrateSingleUrlPickerDataTypes>("{4E0B7D51-6C89-4A3F-B1D2-7F5A9E30C48B}");
+        To<V_19_0_0.MigrateSingleDropDownDataTypes>("{A21C6F84-3B5D-4E92-8C07-1D4F6B8A5E30}");
 
         // To EFCore
         To<V_18_0_0.AddWebhookDto>("{F3CC0076-0692-41E5-9B2B-C58D46E556D4}");
@@ -142,6 +148,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddRedirectUrlDto>("{72B8BF0F-28C1-4FE3-ABD7-122D5E962C1C}");
         To<V_19_0_0.ReconcileDocumentRepositoryModel>("{740529F1-B2FF-44C6-B4F8-5EA30D400C8A}");
         To<V_19_0_0.AddTemplateDto>("{F1A0FF0C-3BFB-462D-A387-99913767AF9E}");
+        To<V_19_0_0.RemoveUserGroupDefaultPermissionsFromModel>("{F6C49C99-3805-4ED8-AA5B-39937DC4081C}");
     }
 
     /// <summary>

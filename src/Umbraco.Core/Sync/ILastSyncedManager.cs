@@ -8,9 +8,12 @@ namespace Umbraco.Cms.Core.Sync;
 public interface ILastSyncedManager
 {
     /// <summary>
-    /// Fetches the last synced internal ID from the database.
+    /// Gets the last synced internal ID of this server.
     /// </summary>
-    /// <returns>The Internal ID from the database.</returns>
+    /// <returns>The internal ID, or the persisted external ID when no internal ID has been recorded yet.</returns>
+    /// <remarks>
+    /// The internal ID is kept in memory only and is not persisted.
+    /// </remarks>
     Task<int?> GetLastSyncedInternalAsync();
 
     /// <summary>
@@ -20,9 +23,13 @@ public interface ILastSyncedManager
     Task<int?> GetLastSyncedExternalAsync();
 
     /// <summary>
-    /// Saves the last synced Internal ID to the Database.
+    /// Records the last synced internal ID of this server.
     /// </summary>
     /// <param name="id">The last synced internal ID.</param>
+    /// <remarks>
+    /// The internal ID is kept in memory only and only moves forward: an ID that is not higher than the one already
+    /// recorded is ignored.
+    /// </remarks>
     Task<Attempt<LastSyncedOperationStatus>> SaveLastSyncedInternalAsync(int id);
 
     /// <summary>

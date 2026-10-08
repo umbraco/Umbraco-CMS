@@ -294,35 +294,55 @@ public class ImageCropperPropertyEditor : DataEditor,
     /// </summary>
     /// <param name="entities">The content entities to search for image cropper properties.</param>
     private IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
-        .SelectMany(x => x.Properties)
-        .Where(IsCropperField)
-        .SelectMany(GetFilePathsFromPropertyValues)
+        .SelectMany(entity => entity.Properties
+            .Where(IsCropperField)
+            .SelectMany(prop => GetFilePathsFromPropertyValues(prop, entity.Key)))
         .Distinct();
 
     /// <summary>
     ///     Look through all property values stored against the property and resolve any file paths stored
     /// </summary>
     /// <param name="prop">The property containing image cropper values.</param>
+    /// <param name="contentKey">The unique identifier of the content owning the property.</param>
     /// <returns>The file paths from the property values.</returns>
-    private IEnumerable<string> GetFilePathsFromPropertyValues(IProperty prop)
+    private IEnumerable<string> GetFilePathsFromPropertyValues(IProperty prop, Guid contentKey)
     {
         // parses out the src from a json string
         foreach (IPropertyValue propertyValue in prop.Values)
         {
             // check if the published value contains data and return it
             var src = GetFileSrcFromPropertyValue(propertyValue.PublishedValue);
-            if (src != null)
+            if (src != null && IsOwnedFile(_mediaFileManager.FileSystem.GetRelativePath(src), contentKey, prop.PropertyType.Key, out var publishedPath))
             {
-                yield return _mediaFileManager.FileSystem.GetRelativePath(src);
+                yield return publishedPath;
             }
 
             // check if the edited value contains data and return it
             src = GetFileSrcFromPropertyValue(propertyValue.EditedValue);
-            if (src != null)
+            if (src != null && IsOwnedFile(_mediaFileManager.FileSystem.GetRelativePath(src), contentKey, prop.PropertyType.Key, out var editedPath))
             {
-                yield return _mediaFileManager.FileSystem.GetRelativePath(src);
+                yield return editedPath;
             }
         }
+    }
+
+    private bool IsOwnedFile(string relativePath, Guid contentKey, Guid propertyTypeKey, out string ownedPath)
+    {
+        ownedPath = relativePath;
+        if (_mediaFileManager.IsFileOwnedBy(relativePath, contentKey, propertyTypeKey))
+        {
+            return true;
+        }
+
+        // The stored path does not resolve to one this content and property type could own, so it references
+        // another item's file. Exclude it from the delete/rename operation - the value may have been tampered
+        // with to target a file the acting user is not authorized to affect.
+        _logger.LogWarning(
+            "Skipping media file operation for path '{Path}' on content {ContentKey}: the path does not belong to property type {PropertyTypeKey}.",
+            relativePath,
+            contentKey,
+            propertyTypeKey);
+        return false;
     }
 
     /// <summary>

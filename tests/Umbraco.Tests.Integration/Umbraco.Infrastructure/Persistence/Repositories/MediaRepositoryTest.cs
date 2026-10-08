@@ -8,7 +8,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
@@ -82,6 +81,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             mediaUrlGenerators,
             dataValueReferences,
             DataTypeService,
+            IdKeyMap,
             JsonSerializer,
             Mock.Of<IEventAggregator>(),
             Mock.Of<IRepositoryCacheVersionService>(),

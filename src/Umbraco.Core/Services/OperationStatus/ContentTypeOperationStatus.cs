@@ -145,4 +145,9 @@ public enum ContentTypeOperationStatus
     ///     A template with the specified alias already exists.
     /// </summary>
     DuplicateTemplateAlias,
+
+    /// <summary>
+    ///     A property type varies in a way the content type itself does not.
+    /// </summary>
+    InvalidPropertyTypeVariation,
 }

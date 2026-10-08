@@ -1,0 +1,169 @@
+using Examine;
+using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
+
+public partial class InvariantDocumentTreeTests : IndexTestBase
+{
+    [Test]
+    public async Task PublishedStructure_YieldsAllPublishedDocuments()
+    {
+        await CreateInvariantDocumentTree(true);
+        IIndex index = GetIndex(Constants.Search.IndexAliases.PublishedContent);
+        ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Length, Is.EqualTo(3));
+            Assert.That(
+                results.Select(d => d.Id),
+                Is.EquivalentTo(new[]
+                {
+                    RootKey.ToString(),
+                    ChildKey.ToString(),
+                    GrandchildKey.ToString(),
+                }));
+        });
+    }
+
+    [Test]
+    public async Task PublishedStructure_AlsoIndexesDraftStructure()
+    {
+        await CreateInvariantDocumentTree(true);
+        IIndex index = GetIndex(Constants.Search.IndexAliases.PublishedContent);
+        ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Length, Is.EqualTo(3));
+            Assert.That(
+                results.Select(d => d.Id),
+                Is.EquivalentTo(new[]
+                {
+                    RootKey.ToString(),
+                    ChildKey.ToString(),
+                    GrandchildKey.ToString(),
+                }));
+        });
+    }
+
+    [Test]
+    public async Task PublishedStructure_WithUnpublishedRoot_YieldsNoDocuments()
+    {
+        await CreateInvariantDocumentTree(true);
+        await WaitForIndexing(Constants.Search.IndexAliases.PublishedContent, async () =>
+        {
+            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.UnpublishAsync(root, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+        });
+
+        IIndex index = GetIndex(Constants.Search.IndexAliases.PublishedContent);
+        ISearchResults publishedResultsRoot = index.Searcher.CreateQuery().All().Execute();
+        Assert.That(publishedResultsRoot.TotalItemCount, Is.EqualTo(0));
+    }
+
+    [Test]
+    public async Task PublishedStructure_WithUnpublishedChild_YieldsNothingBelowRoot()
+    {
+        await CreateInvariantDocumentTree(true);
+        await WaitForIndexing(Constants.Search.IndexAliases.PublishedContent, async () =>
+        {
+            IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.UnpublishAsync(child, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+        });
+
+        IIndex index = GetIndex(Constants.Search.IndexAliases.PublishedContent);
+        ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Length, Is.EqualTo(1));
+            Assert.That(results[0].Id, Is.EqualTo(RootKey.ToString()));
+        });
+    }
+
+    [Test]
+    public async Task PublishedStructure_WithUnpublishedGrandchild_YieldsNothingBelowChild()
+    {
+        await CreateInvariantDocumentTree(true);
+        await WaitForIndexing(Constants.Search.IndexAliases.PublishedContent, async () =>
+        {
+            IContent grandChild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.UnpublishAsync(grandChild, "*", Constants.Security.SuperUserKey, CancellationToken.None);
+        });
+
+        IIndex index = GetIndex(Constants.Search.IndexAliases.PublishedContent);
+        ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Length, Is.EqualTo(2));
+            Assert.That(
+                results.Select(d => d.Id),
+                Is.EquivalentTo(new[]
+                {
+                    RootKey.ToString(),
+                    ChildKey.ToString(),
+                }));
+        });
+    }
+
+    [Test]
+    public async Task PublishedStructure_WithRootInRecycleBin_YieldsNoDocuments()
+    {
+        await CreateInvariantDocumentTree(true);
+        await WaitForIndexing(Constants.Search.IndexAliases.PublishedContent, async () =>
+        {
+            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.MoveToRecycleBinAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
+        });
+
+        IIndex index = GetIndex(Constants.Search.IndexAliases.PublishedContent);
+        ISearchResults publishedResultsRoot = index.Searcher.CreateQuery().All().Execute();
+        Assert.That(publishedResultsRoot.TotalItemCount, Is.EqualTo(0));
+    }
+
+    [Test]
+    public async Task PublishedStructure_WithChildInRecycleBin_YieldsNothingBelowRoot()
+    {
+        await CreateInvariantDocumentTree(true);
+        await WaitForIndexing(Constants.Search.IndexAliases.PublishedContent, async () =>
+        {
+            IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.MoveToRecycleBinAsync(child, Constants.Security.SuperUserKey, CancellationToken.None);
+        });
+
+        IIndex index = GetIndex(Constants.Search.IndexAliases.PublishedContent);
+        ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Length, Is.EqualTo(1));
+            Assert.That(results[0].Id, Is.EqualTo(RootKey.ToString()));
+        });
+    }
+
+    [Test]
+    public async Task PublishedStructure_WithUGrandchildInRecycleBin_YieldsNothingBelowChild()
+    {
+        await CreateInvariantDocumentTree(true);
+        await WaitForIndexing(Constants.Search.IndexAliases.PublishedContent, async () =>
+        {
+            IContent grandChild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
+            await ContentService.MoveToRecycleBinAsync(grandChild, Constants.Security.SuperUserKey, CancellationToken.None);
+        });
+
+        IIndex index = GetIndex(Constants.Search.IndexAliases.PublishedContent);
+        ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Length, Is.EqualTo(2));
+            Assert.That(
+                results.Select(d => d.Id),
+                Is.EquivalentTo(new[]
+                {
+                    RootKey.ToString(),
+                    ChildKey.ToString(),
+                }));
+        });
+    }
+}

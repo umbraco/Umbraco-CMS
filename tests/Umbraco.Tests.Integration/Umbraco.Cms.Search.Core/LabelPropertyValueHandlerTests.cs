@@ -1,0 +1,172 @@
+using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Integration.Testing.Search;
+
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
+
+public class LabelPropertyValueHandlerTests : ContentTestBase
+{
+    private IContentType _contentType;
+
+    [Test]
+    public async Task AllLabelEditors_CanBeIndexed()
+    {
+        Content content = new ContentBuilder()
+            .WithContentType(_contentType)
+            .WithName("All Label Editors")
+            .WithPropertyValues(
+                new
+                {
+                    bigIntValue = 123456789L,
+                    decimalValue = 56.78m,
+                    integerValue = 1234,
+                    stringValue = "The label value",
+                    timeValue = new DateTime(1900, 01, 01).Add(new TimeSpan(02, 03, 04)),
+                    dateTimeValue = new DateTime(2004, 05, 06, 07, 08, 09)
+                })
+            .Build();
+
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+
+        IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
+        Assert.That(documents, Has.Count.EqualTo(1));
+
+        TestIndexDocument document = documents.Single();
+        Assert.Multiple(() =>
+        {
+            var bigIntValue = document.Fields.FirstOrDefault(f => f.FieldName == "bigIntValue")?.Value.Integers?.SingleOrDefault();
+            Assert.That(bigIntValue, Is.EqualTo(123456789));
+
+            var decimalValue = document.Fields.FirstOrDefault(f => f.FieldName == "decimalValue")?.Value.Decimals?.SingleOrDefault();
+            Assert.That(decimalValue, Is.EqualTo(56.78m));
+
+            var integerValue = document.Fields.FirstOrDefault(f => f.FieldName == "integerValue")?.Value.Integers?.SingleOrDefault();
+            Assert.That(integerValue, Is.EqualTo(1234));
+
+            var stringValue = document.Fields.FirstOrDefault(f => f.FieldName == "stringValue")?.Value.Texts?.SingleOrDefault();
+            Assert.That(stringValue, Is.EqualTo("The label value"));
+
+            DateTimeOffset? dateTimeValue = document.Fields.FirstOrDefault(f => f.FieldName == "dateTimeValue")?.Value.DateTimeOffsets?.SingleOrDefault();
+            Assert.That(dateTimeValue, Is.EqualTo(new DateTimeOffset(new DateOnly(2004, 05, 06), new TimeOnly(07, 08, 09), TimeSpan.Zero)));
+
+            // time is unsupported
+            Assert.That(document.Fields.Any(f => f.FieldName == "timeValue"), Is.False);
+        });
+    }
+
+    [TestCase(long.MaxValue)]
+    [TestCase(long.MinValue)]
+    public async Task LongValueWithOverflowAsInteger_IsNotIndexed(long value)
+    {
+        Content content = new ContentBuilder()
+            .WithContentType(_contentType)
+            .WithName("All Label Editors")
+            .WithPropertyValues(
+                new
+                {
+                    bigIntValue = value
+                })
+            .Build();
+
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+
+        IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
+        Assert.That(documents, Has.Count.EqualTo(1));
+
+        TestIndexDocument document = documents.Single();
+        Assert.That(document.Fields.Any(f => f.FieldName == "bigIntValue"), Is.False);
+    }
+
+    [TestCase(null)]
+    [TestCase("")]
+    public async Task EmptyValues_AreNotIndexed(string? value)
+    {
+        Content content = new ContentBuilder()
+            .WithContentType(_contentType)
+            .WithName("All Label Editors")
+            .WithPropertyValues(
+                new
+                {
+                    bigIntValue = value,
+                    decimalValue = value,
+                    integerValue = value,
+                    stringValue = value,
+                    timeValue = value,
+                    dateTimeValue = value
+                })
+            .Build();
+
+        await ContentService.SaveAsync(content, Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ContentService.PublishAsync(content, ["*"], Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
+
+        IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
+        Assert.That(documents, Has.Count.EqualTo(1));
+
+        TestIndexDocument document = documents.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.That(document.Fields.Any(f => f.FieldName == "bigIntValue"), Is.False);
+            Assert.That(document.Fields.Any(f => f.FieldName == "decimalValue"), Is.False);
+            Assert.That(document.Fields.Any(f => f.FieldName == "integerValue"), Is.False);
+            Assert.That(document.Fields.Any(f => f.FieldName == "stringValue"), Is.False);
+            Assert.That(document.Fields.Any(f => f.FieldName == "timeValue"), Is.False);
+            Assert.That(document.Fields.Any(f => f.FieldName == "dateTimeValue"), Is.False);
+        });
+    }
+
+    /// <summary>
+    /// Creates a content type holding a property for every built-in label data type.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <remarks>
+    /// Each built-in label data type sits on the label editor for the type of value it holds, and that is what the
+    /// handler keys off. The editor alias is stated here to match, even though it is resolved from the data type when
+    /// the content type is saved.
+    /// </remarks>
+    [SetUp]
+    protected async Task CreateAllLabelEditorsContentType()
+    {
+        _contentType = new ContentTypeBuilder()
+            .WithAlias("allLabelEditors")
+            .AddPropertyType()
+            .WithAlias("bigIntValue")
+            .WithDataTypeId(Constants.DataTypes.LabelBigint)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.LabelBigInt)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("decimalValue")
+            .WithDataTypeId(Constants.DataTypes.LabelDecimal)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.LabelDecimal)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("integerValue")
+            .WithDataTypeId(Constants.DataTypes.LabelInt)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.LabelInteger)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("stringValue")
+            .WithDataTypeId(Constants.DataTypes.LabelString)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("timeValue")
+            .WithDataTypeId(Constants.DataTypes.LabelTime)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.LabelTime)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("dateTimeValue")
+            .WithDataTypeId(Constants.DataTypes.LabelDateTime)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.LabelDateTime)
+            .Done()
+            .Build();
+
+        await ContentTypeService.CreateAsync(_contentType, Cms.Core.Constants.Security.SuperUserKey);
+
+        IndexerAndSearcher.Reset();
+    }
+}

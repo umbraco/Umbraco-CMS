@@ -70,6 +70,10 @@ internal sealed class MediaListViewService : AsyncContentListViewServiceBase<IMe
         return await GetListViewResultAsync(user, media, dataTypeKey, orderBy, null, orderDirection, filter, skip, take);
     }
 
+    // We can use an authorizer here, as it already handles all the necessary checks for this filtering.
+    // However, we cannot pass in all the items; we want only the ones that comply, as opposed to
+    // a general response whether the user has access to all nodes.
+
     /// <inheritdoc/>
     protected override async Task<ISet<Guid>> FilterAuthorizedKeysAsync(IUser user, IEnumerable<Guid> keys) =>
         await _mediaPermissionAuthorizer.FilterAuthorizedAsync(user, keys);
