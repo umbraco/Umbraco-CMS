@@ -42,10 +42,10 @@
       "id": 1,
       "slug": "element-dtos",
       "title": "EF Core Element DTOs and no-op migration",
-      "status": "in-progress",
+      "status": "in-review",
       "branch": "v20/feature/ef-core-element-repository-1-element-dtos",
-      "pr": "",
-      "prUrl": "",
+      "pr": "24134",
+      "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24134",
       "dependsOn": [],
       "summary": "ElementDto, ElementVersionDto, ElementCultureVariationDto, the shared ICultureVariationDto, configurations, SQL Server customizer, DbSets and the AddElementDtos migration.",
       "tasks": [
@@ -75,7 +75,7 @@
         }
       ],
       "acceptance": "Solution builds; snapshots list umbracoElement, umbracoElementVersion, umbracoElementCultureVariation; migration-plan tests pass.",
-      "notes": "Ready to commit (uncommitted on the branch). SQL Server migration 20261008103850_AddElementDtos, SQLite 20261008103922_AddElementDtos, plan step {1EC33267-3D0C-4D67-BC41-5AA5D0DFF3F2}. Review: no bugs. Tests: unit 7316 passed; 753 Document/Element/Migrations/ContentService integration tests, 748 passed, 5 skipped, 0 failed."
+      "notes": "Commits c7b7aa1951b (ICultureVariationDto), a8eb63bbdbc (element DTOs, customizer, DbSets), 0648b879a95 (AddElementDtos migration). Migrations 20261008103850 (SQL Server) / 20261008103922 (SQLite), plan step {1EC33267-3D0C-4D67-BC41-5AA5D0DFF3F2}. Unit 7316 and integration 748 passed."
     },
     {
       "id": 2,
@@ -286,6 +286,10 @@
     }
   ],
   "log": [
+    {
+      "date": "08-10-2026",
+      "text": "PR 1 opened as #24134 against v18/feature/ef-core-repositories."
+    },
     {
       "date": "08-10-2026",
       "text": "PR 1 reviewed (no bugs, one doc nit fixed) and regression-tested: 7316 unit and 748 integration tests passed, 0 failed."
