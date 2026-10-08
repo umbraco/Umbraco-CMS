@@ -16,7 +16,7 @@ export class UmbDefaultBlueprintCreateOptionAction extends UmbEntityCreateOption
 			| UmbDocumentBlueprintFolderEntityType;
 		const parentUnique = this.args.unique ?? null;
 
-		const { data } = await this.#structureRepository.requestAllowedChildrenOf(null, parentUnique);
+		const { data } = await this.#structureRepository.requestAllAllowedChildrenOf(null, parentUnique);
 
 		const value = await umbOpenModal(this, UMB_ITEM_PICKER_MODAL, {
 			data: {
