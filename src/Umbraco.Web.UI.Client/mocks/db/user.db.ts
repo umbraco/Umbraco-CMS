@@ -134,7 +134,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			: false;
 		const hasAccessToInvariantForVariant = currentUser.userGroupIds?.length
 			? umbUserGroupMockDb.getHasAccessToInvariantForVariant(currentUser.userGroupIds)
-			: true;
+			: false;
 		const languages = currentUser.userGroupIds?.length
 			? umbUserGroupMockDb.getAllowedLanguages(currentUser.userGroupIds)
 			: [];
