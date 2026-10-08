@@ -16,6 +16,7 @@ export class UserUiHelper extends UiBaseLocators {
   private readonly userSectionCard: Locator;
   private readonly statusBtn: Locator;
   private readonly groupBtn: Locator;
+  private readonly typeBtn: Locator;
   private readonly chooseUserGroupsBtn: Locator;
   private readonly allowAccessToAllDocumentsToggle: Locator;
   private readonly allowAccessToAllMediaToggle: Locator;
@@ -49,6 +50,7 @@ export class UserUiHelper extends UiBaseLocators {
     this.userSectionCard = page.locator('uui-card-user');
     this.statusBtn = page.locator('uui-button', {hasText: 'Status'});
     this.groupBtn = page.locator('uui-button', {hasText: 'Groups'});
+    this.typeBtn = page.locator('uui-button', {hasText: 'Type'});
     this.allowAccessToAllDocumentsToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all documents'}).locator('#toggle');
     this.allowAccessToAllMediaToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all media'}).locator('#toggle');
     this.mediaInput = page.locator('umb-input-media');
@@ -108,7 +110,7 @@ export class UserUiHelper extends UiBaseLocators {
   }
 
   async clickChangePasswordButton() {
-    await this.click(this.changePasswordBtn);
+    await this.click(this.changePasswordBtn, {timeout: ConstantHelper.timeout.long});
   }
 
   async updatePassword(newPassword: string) {
@@ -179,6 +181,11 @@ export class UserUiHelper extends UiBaseLocators {
     await this.click(this.page.locator('label').filter({hasText: groupName}));
   }
 
+  async filterByTypeName(typeName: string) {
+    await this.click(this.typeBtn);
+    await this.click(this.page.locator('label').filter({hasText: typeName}));
+  }
+
   async isPasswordUpdatedForUserWithId(userId: string) {
     await Promise.all([
       this.page.waitForResponse(resp => resp.url().includes(umbracoConfig.environment.baseUrl + '/umbraco/management/api/v1/user/' + userId + '/change-password') && resp.status() === 200),
@@ -247,9 +254,9 @@ export class UserUiHelper extends UiBaseLocators {
     await this.clickUsersMenu();
     await this.searchInUserSection(name);
     await this.clickUserWithName(name);
-    await this.hasValue(this.nameOfUserInput, name);
+    await this.hasValue(this.nameOfUserInput, name, ConstantHelper.timeout.navigation);
   }
-  
+
   async clickUserButton() {
     await this.click(this.userBtn);
   }
@@ -279,7 +286,9 @@ export class UserUiHelper extends UiBaseLocators {
   }
 
   async doesUserGroupPickerHaveDetails(userGroupName: string, details: string) {
-    const userGroupRefLocator = this.page.locator('umb-user-group-ref', {hasText: userGroupName});
+    // Filter by an exact-text match so a longer leftover name (e.g. 'TestUserGroupNameDescription')
+    // does not also match 'TestUserGroupName' and trip strict-mode multi-match.
+    const userGroupRefLocator = this.page.locator('umb-user-group-ref').filter({has: this.page.getByText(userGroupName, {exact: true})});
     const detailsLocator = userGroupRefLocator.locator('#details');
     return await this.containsText(detailsLocator, details);
   }

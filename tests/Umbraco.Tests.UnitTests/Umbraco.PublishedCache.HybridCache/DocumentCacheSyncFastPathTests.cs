@@ -2,9 +2,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.HybridCache;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
@@ -76,12 +73,7 @@ public class DocumentCacheSyncFastPathTests
     }
 
     private static DocumentCache CreateCache(Mock<IDocumentCacheService> cacheService)
-        => new(
-            cacheService.Object,
-            Mock.Of<IPublishedContentTypeCache>(),
-            Mock.Of<IDocumentNavigationQueryService>(),
-            Mock.Of<IDocumentUrlService>(),
-            new Lazy<IPublishedUrlProvider>(() => Mock.Of<IPublishedUrlProvider>()));
+        => new(cacheService.Object);
 
     // Moq cannot bind directly to ref / out parameters in the lambda overload, so we
     // declare a delegate that matches the TryGetCached signature and pass it explicitly.

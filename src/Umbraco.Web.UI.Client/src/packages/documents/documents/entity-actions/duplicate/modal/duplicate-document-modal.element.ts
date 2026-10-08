@@ -1,6 +1,10 @@
 import { UMB_DOCUMENT_TREE_ALIAS } from '../../../tree/manifests.js';
 import { UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '../../../search/constants.js';
-import type { UmbDuplicateDocumentModalData, UmbDuplicateDocumentModalValue } from './duplicate-document-modal.token.js';
+import type { UmbDocumentTreeItemModel } from '../../../types.js';
+import type {
+	UmbDuplicateDocumentModalData,
+	UmbDuplicateDocumentModalValue,
+} from './duplicate-document-modal.token.js';
 import { html, customElement, nothing, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -8,11 +12,8 @@ import { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
 import type { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbDocumentTreeItemModel } from '../../../types.js';
 
-const elementName = 'umb-document-duplicate-to-modal';
-
-@customElement(elementName)
+@customElement('umb-document-duplicate-to-modal')
 export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	UmbDuplicateDocumentModalData,
 	UmbDuplicateDocumentModalValue
@@ -49,7 +50,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 					this.updateValue({ destination: { unique: this._destinationUnique } });
 				}
 			},
-			'umbPickerSelectionObserver',
+			null,
 		);
 
 		this.observe(
@@ -57,7 +58,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 			(query) => {
 				this._searchQuery = query?.query;
 			},
-			'umbPickerSearchQueryObserver',
+			null,
 		);
 	}
 
@@ -90,7 +91,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_copyTo')}>
 				<uui-box id="tree-box">
-					<umb-picker-search-field></umb-picker-search-field>
+					<umb-picker-search-field .alias=${UMB_DOCUMENT_TREE_ALIAS}></umb-picker-search-field>
 					<umb-picker-search-result .pickableFilter=${this.#selectableFilter}></umb-picker-search-result>
 					${this.#renderTree()}
 				</uui-box>
@@ -170,6 +171,6 @@ export { UmbDocumentDuplicateToModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDocumentDuplicateToModalElement;
+		'umb-document-duplicate-to-modal': UmbDocumentDuplicateToModalElement;
 	}
 }

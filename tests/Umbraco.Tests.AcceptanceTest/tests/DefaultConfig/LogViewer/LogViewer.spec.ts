@@ -59,10 +59,10 @@ test('can create a saved search', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoUi.logViewer.saveSearch(searchName);
 
   // Assert
-  // Checks if the saved search is visible in the UI
-  await umbracoUi.logViewer.clickOverviewButton();
+  // Checks if the saved search is visible in the UI (saved searches live in the "Saved searches" dropdown)
+  await umbracoUi.logViewer.clickSavedSearchesButton();
   await expect(umbracoUi.logViewer.checkSavedSearch(searchName)).toBeVisible();
-  expect(umbracoApi.logViewer.doesSavedSearchExist(searchName)).toBeTruthy();
+  expect(await umbracoApi.logViewer.doesSavedSearchExist(searchName)).toBeTruthy();
 
   // Clean
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
@@ -91,10 +91,10 @@ test.skip('can create a complex saved search', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.logViewer.saveSearch(searchName);
 
   // Assert
-  // Checks if the saved search is visible in the UI
-  await umbracoUi.logViewer.clickOverviewButton();
+  // Checks if the saved search is visible in the UI (saved searches live in the "Saved searches" dropdown)
+  await umbracoUi.logViewer.clickSavedSearchesButton();
   await expect(umbracoUi.logViewer.checkSavedSearch(searchName)).toBeVisible();
-  expect(umbracoApi.logViewer.doesSavedSearchExist(searchName)).toBeTruthy();
+  expect(await umbracoApi.logViewer.doesSavedSearchExist(searchName)).toBeTruthy();
 
   // Clean
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
@@ -112,7 +112,7 @@ test('can delete a saved search', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
   await umbracoUi.logViewer.clickSavedSearchesButton();
   await umbracoUi.logViewer.removeSavedSearchByName(searchName + ' ' + search);
-  await umbracoUi.logViewer.clickDeleteButton();
+  await umbracoUi.logViewer.clickDeleteButtonAndWaitForSavedSearchToBeDeleted();
 
   // Assert
   // Checks if the saved search is visible in the UI
@@ -189,7 +189,9 @@ test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.logViewer.goToSettingsTreeItem('Log Viewer');
 
   // Act
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
+  // Saved searches live in the "Saved searches" dropdown on the Search view, so open Search first.
+  await umbracoUi.logViewer.clickSearchButton();
+  await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
   await umbracoUi.logViewer.clickSavedSearchByName(searchName);
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
 

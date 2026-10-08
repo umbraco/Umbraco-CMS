@@ -41,16 +41,16 @@ public class EventNameExtractorTests
         Assert.AreEqual(EventNameExtractorError.NoneFound, found.Result.Error);
     }
 
-    public static event EventHandler<SaveEventArgs<string>> FindingMe;
+    public static event EventHandler<SaveEventArgs<string>> FindingMe { add { } remove { } }
 
-    public static event EventHandler<SaveEventArgs<string>> FoundMe;
+    public static event EventHandler<SaveEventArgs<string>> FoundMe { add { } remove { } }
 
     // will lead to ambiguous matches
-    public static event EventHandler<SaveEventArgs<int>> SavingThis;
+    public static event EventHandler<SaveEventArgs<int>> SavingThis { add { } remove { } }
 
-    public static event EventHandler<SaveEventArgs<int>> SavedThis;
+    public static event EventHandler<SaveEventArgs<int>> SavedThis { add { } remove { } }
 
-    public static event EventHandler<SaveEventArgs<int>> SavingThat;
+    public static event EventHandler<SaveEventArgs<int>> SavingThat { add { } remove { } }
 
-    public static event EventHandler<SaveEventArgs<int>> SavedThat;
+    public static event EventHandler<SaveEventArgs<int>> SavedThat { add { } remove { } }
 }

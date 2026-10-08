@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
@@ -9,8 +10,11 @@ public class MemberApplicationManager : OpenIdDictApplicationManagerBase, IMembe
 {
     private readonly IRuntimeState _runtimeState;
 
-    public MemberApplicationManager(IOpenIddictApplicationManager applicationManager, IRuntimeState runtimeState)
-        : base(applicationManager)
+    public MemberApplicationManager(
+        IOpenIddictApplicationManager applicationManager,
+        IRuntimeState runtimeState,
+        ILogger<MemberApplicationManager> logger)
+        : base(applicationManager, logger)
         => _runtimeState = runtimeState;
 
     public async Task EnsureMemberApplicationAsync(IEnumerable<Uri> loginRedirectUrls, IEnumerable<Uri> logoutRedirectUrls, CancellationToken cancellationToken = default)

@@ -1,6 +1,6 @@
 import type { UmbWorkspaceModalData } from './workspace-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup, TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -26,9 +26,9 @@ export class UmbWorkspaceModalElement extends UmbLitElement {
 
 	/**
 	 * TODO: Consider if this binding and events integration is the right for communicating back the modal handler. Or if we should go with some Context API. like a Modal Context API.
-	 *
+	 * @returns {TemplateResult | string} The rendered workspace element, or an empty string when there is no data.
 	 */
-	override render() {
+	override render(): TemplateResult | string {
 		return this.data
 			? html`<umb-workspace .entityType=${this.data.entityType} ${umbDestroyOnDisconnect()}></umb-workspace>`
 			: '';

@@ -473,8 +473,9 @@ public class ContentRouteBuilderTests : DeliveryApiTests
             var publishedContentStatusFilteringService = new PublishedContentStatusFilteringService(
                 variantContextAccessor,
                 PublishStatusQueryService,
-                Mock.Of<IPreviewService>(),
-                contentCache);
+                Mock.Of<IPreviewSessionService>(),
+                contentCache,
+                Mock.Of<IDocumentCacheService>());
             var ancestorsOrSelf = content.AncestorsOrSelf(navigationQueryService, publishedContentStatusFilteringService).ToArray();
             return ancestorsOrSelf.All(c => c.IsPublished(culture))
                 ? string.Join("/", ancestorsOrSelf.Reverse().Skip(hideTopLevelNodeFromPath ? 1 : 0).Select(c => documentUrlService.GetUrlSegment(c.Key, culture ?? string.Empty, false))).EnsureStartsWith("/")

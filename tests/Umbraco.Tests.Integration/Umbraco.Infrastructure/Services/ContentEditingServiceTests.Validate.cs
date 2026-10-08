@@ -132,11 +132,8 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Culture = "en-US", Segment = "seg-1", Name = "Updated English segment 1 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-1", Name = "Updated Danish segment 1 Name" },
-                new VariantModel { Culture = "en-US", Segment = "seg-2", Name = "Updated English segment 2 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-2", Name = "Updated Danish segment 2 Name" }
-
+                new VariantModel { Culture = "en-US", Name = "Updated English segment 1 Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish segment 1 Name" }
             ],
         };
 
@@ -156,7 +153,6 @@ public partial class ContentEditingServiceTests
             [
                 new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" },
                 new PropertyValueModel { Alias = "variantTitle", Value = "The updated English default segment title", Culture = "en-US" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish default segment title", Culture = "da-DK" },
                 new PropertyValueModel { Alias = "variantTitle", Value = "The updated English segment 1 title", Culture = "en-US", Segment = "seg-1" },
                 new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish segment 1 title", Culture = "da-DK", Segment = "seg-1" },
                 new PropertyValueModel { Alias = "variantTitle", Value = "The updated English segment 2 title", Culture = "en-US", Segment = "seg-2" },
@@ -164,10 +160,8 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Culture = "en-US", Segment = "seg-1", Name = "Updated English segment 1 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-1", Name = "Updated Danish segment 1 Name" },
-                new VariantModel { Culture = "en-US", Segment = "seg-2", Name = "Updated English segment 2 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-2", Name = "Updated Danish segment 2 Name" }
+                new VariantModel { Culture = "en-US", Name = "Updated English segment 1 Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish segment 1 Name" }
             ],
         };
 
@@ -175,7 +169,7 @@ public partial class ContentEditingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, result.Status);
         Assert.AreEqual(1, result.Result.ValidationErrors.Count());
-        Assert.AreEqual("#validation_invalidNull", result.Result.ValidationErrors.Single(x => x.Alias == "variantTitle" && x.Culture == "da-DK" && x.Segment == "seg-2").ErrorMessages[0]);
+        Assert.AreEqual("#validation_invalidNull", result.Result.ValidationErrors.Single(x => x.Alias == "variantTitle" && x.Culture == "da-DK" && x.Segment == null).ErrorMessages[0]);
     }
 
     [Test]
@@ -349,13 +343,16 @@ public partial class ContentEditingServiceTests
         };
     }
 
-    private async Task<IUser> CreateEnglishLanguageOnlyEditor()
+    private async Task<IUser> CreateEnglishLanguageOnlyEditor() => await CreateSingleLanguageEditor("en-US");
+
+    private async Task<IUser> CreateSingleLanguageEditor(string isoCode)
     {
-        var enUSLanguage = await LanguageService.GetAsync("en-US");
+        var language = await LanguageService.GetAsync(isoCode);
+        var alias = isoCode.Replace("-", string.Empty);
         var userGroup = new UserGroupBuilder()
-            .WithName("English Editors")
-            .WithAlias("englishEditors")
-            .WithAllowedLanguages([enUSLanguage.Id])
+            .WithName($"{isoCode} Editors")
+            .WithAlias($"{alias}Editors")
+            .WithAllowedLanguages([language.Id])
             .Build();
 
         var createUserGroupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
@@ -363,9 +360,9 @@ public partial class ContentEditingServiceTests
 
         var createUserAttempt = await UserService.CreateAsync(Constants.Security.SuperUserKey, new UserCreateModel
         {
-            Email = "english-editor@test.com",
-            Name = "Test English Editor",
-            UserName = "english-editor@test.com",
+            Email = $"{alias}-editor@test.com",
+            Name = $"Test {isoCode} Editor",
+            UserName = $"{alias}-editor@test.com",
             UserGroupKeys = new[] { userGroup.Key }.ToHashSet(),
         });
         Assert.IsTrue(createUserAttempt.Success);

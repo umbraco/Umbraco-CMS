@@ -547,6 +547,7 @@ export type CultureReponseModel = {
 
 export type CurrentUserConfigurationResponseModel = {
     keepUserLoggedIn: boolean;
+    timeoutUtc?: null | string;
     passwordConfiguration: PasswordConfigurationResponseModel;
     allowChangePassword: boolean;
     allowTwoFactor: boolean;
@@ -612,6 +613,7 @@ export type DatatypeConfigurationResponseModel = {
     canBeChanged: DataTypeChangeModeModel;
     documentListViewId: string;
     mediaListViewId: string;
+    offerDeprecatedPropertyEditors: boolean;
 };
 
 export type DataTypeItemResponseModel = {
@@ -720,6 +722,7 @@ export type DocumentBlueprintResponseModel = {
 
 export type DocumentBlueprintTreeItemResponseModel = {
     documentType?: null | DocumentTypeReferenceResponseModel;
+    variants: Array<DocumentVariantItemResponseModel>;
     isFolder: boolean;
     noAccess: boolean;
     name: string;
@@ -737,6 +740,7 @@ export type DocumentCollectionResponseModel = {
     updater?: null | string;
     creator?: null | string;
     sortOrder: number;
+    hasChildren: boolean;
     id: string;
     flags: Array<FlagModel>;
     values: Array<DocumentValueResponseModel>;
@@ -747,7 +751,6 @@ export type DocumentConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
-    allowNonExistingSegmentsCreation: boolean;
 };
 
 export type DocumentItemResponseModel = {
@@ -927,6 +930,7 @@ export type DocumentTypeTreeItemResponseModel = {
 export type DocumentUrlInfoModel = {
     message: null | string;
     provider: string;
+    isExternal: boolean;
     culture: null | string;
     url: null | string;
 };
@@ -961,7 +965,6 @@ export type DocumentVariantItemResponseModel = {
 
 export type DocumentVariantRequestModel = {
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -975,7 +978,6 @@ export type DocumentVariantResponseModel = {
     createDate: string;
     updateDate: string;
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1044,7 +1046,6 @@ export type ElementConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
-    allowNonExistingSegmentsCreation: boolean;
 };
 
 export type ElementItemResponseModel = {
@@ -1115,7 +1116,6 @@ export type ElementVariantItemResponseModel = {
 
 export type ElementVariantRequestModel = {
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1129,7 +1129,6 @@ export type ElementVariantResponseModel = {
     createDate: string;
     updateDate: string;
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1176,14 +1175,22 @@ export enum EventMessageTypeModel {
     WARNING = 'Warning'
 }
 
+export type FacetModel = {
+    fieldName: string;
+};
+
+export type FacetResultResponseModel = {
+    fieldName: string;
+    values: Array<FacetValueModel>;
+};
+
+export type FacetValueModel = {
+    count: number;
+};
+
 export type FetchResponseModelDataTypeSchemaItemResponseModel = {
     total: number;
     items: Array<DataTypeSchemaItemResponseModel>;
-};
-
-export type FieldPresentationModel = {
-    name: string;
-    values: Array<string>;
 };
 
 export type FileSystemFolderModel = {
@@ -1196,6 +1203,11 @@ export type FileSystemTreeItemPresentationModel = {
     parent?: null | FileSystemFolderModel;
     isFolder: boolean;
     hasChildren: boolean;
+};
+
+export type FilterModel = {
+    fieldName: string;
+    negate: boolean;
 };
 
 export type FlagModel = {
@@ -1261,22 +1273,11 @@ export type HealthCheckWithResultPresentationModel = {
 
 export enum HealthStatusModel {
     HEALTHY = 'Healthy',
-    UNHEALTHY = 'Unhealthy',
     REBUILDING = 'Rebuilding',
-    CORRUPT = 'Corrupt'
+    CORRUPTED = 'Corrupted',
+    EMPTY = 'Empty',
+    UNKNOWN = 'Unknown'
 }
-
-export type HealthStatusResponseModel = {
-    status: HealthStatusModel;
-    message?: null | string;
-};
-
-export type HelpPageResponseModel = {
-    name?: null | string;
-    description?: null | string;
-    url?: null | string;
-    type?: null | string;
-};
 
 export enum ImageCropModeModel {
     CROP = 'Crop',
@@ -1305,16 +1306,10 @@ export type ImportMemberTypeRequestModel = {
 };
 
 export type IndexResponseModel = {
-    name: string;
-    healthStatus: HealthStatusResponseModel;
-    canRebuild: boolean;
-    searcherName: string;
+    indexAlias: string;
+    providerName: string;
     documentCount: number;
-    fieldCount: number;
-    providerProperties?: null | {
-        [key: string]: unknown;
-    };
-    uniqueKeyFieldName?: null | string;
+    healthStatus: HealthStatusModel;
 };
 
 export type InstallRequestModel = {
@@ -1338,13 +1333,13 @@ export type InviteUserRequestModel = {
 };
 
 export type IPermissionPresentationModel = ({
-    $type?: 'DocumentPermissionPresentationModel';
+    $type: 'DocumentPermissionPresentationModel';
 } & IPermissionPresentationModelDocumentPermissionPresentationModel) | ({
-    $type?: 'DocumentPropertyValuePermissionPresentationModel';
+    $type: 'DocumentPropertyValuePermissionPresentationModel';
 } & IPermissionPresentationModelDocumentPropertyValuePermissionPresentationModel) | ({
-    $type?: 'ElementPermissionPresentationModel';
+    $type: 'ElementPermissionPresentationModel';
 } & IPermissionPresentationModelElementPermissionPresentationModel) | ({
-    $type?: 'UnknownTypePermissionPresentationModel';
+    $type: 'UnknownTypePermissionPresentationModel';
 } & IPermissionPresentationModelUnknownTypePermissionPresentationModel);
 
 export type IPermissionPresentationModelDocumentPermissionPresentationModel = {
@@ -1373,23 +1368,23 @@ export type IPermissionPresentationModelUnknownTypePermissionPresentationModel =
 };
 
 export type IReferenceResponseModel = ({
-    $type?: 'DefaultReferenceResponseModel';
+    $type: 'DefaultReferenceResponseModel';
 } & IReferenceResponseModelDefaultReferenceResponseModel) | ({
-    $type?: 'DocumentReferenceResponseModel';
+    $type: 'DocumentReferenceResponseModel';
 } & IReferenceResponseModelDocumentReferenceResponseModel) | ({
-    $type?: 'DocumentTypePropertyTypeReferenceResponseModel';
+    $type: 'DocumentTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelDocumentTypePropertyTypeReferenceResponseModel) | ({
-    $type?: 'ElementContainerReferenceResponseModel';
+    $type: 'ElementContainerReferenceResponseModel';
 } & IReferenceResponseModelElementContainerReferenceResponseModel) | ({
-    $type?: 'ElementReferenceResponseModel';
+    $type: 'ElementReferenceResponseModel';
 } & IReferenceResponseModelElementReferenceResponseModel) | ({
-    $type?: 'MediaReferenceResponseModel';
+    $type: 'MediaReferenceResponseModel';
 } & IReferenceResponseModelMediaReferenceResponseModel) | ({
-    $type?: 'MediaTypePropertyTypeReferenceResponseModel';
+    $type: 'MediaTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelMediaTypePropertyTypeReferenceResponseModel) | ({
-    $type?: 'MemberReferenceResponseModel';
+    $type: 'MemberReferenceResponseModel';
 } & IReferenceResponseModelMemberReferenceResponseModel) | ({
-    $type?: 'MemberTypePropertyTypeReferenceResponseModel';
+    $type: 'MemberTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelMemberTypePropertyTypeReferenceResponseModel);
 
 export type IReferenceResponseModelDefaultReferenceResponseModel = {
@@ -1462,9 +1457,7 @@ export type IReferenceResponseModelMemberTypePropertyTypeReferenceResponseModel 
     name?: null | string;
 };
 
-export type ISetupTwoFactorModel = {
-    $type?: 'NoopSetupTwoFactorModel';
-} & ISetupTwoFactorModelNoopSetupTwoFactorModel;
+export type ISetupTwoFactorModel = ISetupTwoFactorModelNoopSetupTwoFactorModel;
 
 export type ISetupTwoFactorModelNoopSetupTwoFactorModel = {
     $type: 'NoopSetupTwoFactorModel';
@@ -1572,8 +1565,10 @@ export type ManifestResponseModel = {
 
 export type MediaCollectionResponseModel = {
     mediaType: MediaTypeCollectionReferenceResponseModel;
+    extension?: null | string;
     creator?: null | string;
     sortOrder: number;
+    hasChildren: boolean;
     id: string;
     flags: Array<FlagModel>;
     values: Array<MediaValueResponseModel>;
@@ -1582,7 +1577,6 @@ export type MediaCollectionResponseModel = {
 
 export type MediaConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
-    disableUnpublishWhenReferenced: boolean;
 };
 
 export type MediaItemResponseModel = {
@@ -1590,6 +1584,7 @@ export type MediaItemResponseModel = {
     parent?: null | ReferenceByIdModel;
     hasChildren: boolean;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: null | string;
     variants: Array<VariantItemResponseModel>;
     id: string;
     flags: Array<FlagModel>;
@@ -1615,6 +1610,7 @@ export type MediaResponseModel = {
 
 export type MediaTreeItemResponseModel = {
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: null | string;
     variants: Array<VariantItemResponseModel>;
     noAccess: boolean;
     isTrashed: boolean;
@@ -1756,7 +1752,6 @@ export type MediaValueResponseModel = {
 
 export type MediaVariantRequestModel = {
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1764,7 +1759,6 @@ export type MediaVariantResponseModel = {
     createDate: string;
     updateDate: string;
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1921,7 +1915,6 @@ export type MemberValueResponseModel = {
 
 export type MemberVariantRequestModel = {
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1929,7 +1922,6 @@ export type MemberVariantResponseModel = {
     createDate: string;
     updateDate: string;
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -2176,11 +2168,6 @@ export type PagedHealthCheckGroupResponseModel = {
     items: Array<HealthCheckGroupResponseModel>;
 };
 
-export type PagedHelpPageResponseModel = {
-    total: number;
-    items: Array<HelpPageResponseModel>;
-};
-
 export type PagedIndexResponseModel = {
     total: number;
     items: Array<IndexResponseModel>;
@@ -2349,16 +2336,6 @@ export type PagedRelationTypeResponseModel = {
 export type PagedSavedLogSearchResponseModel = {
     total: number;
     items: Array<SavedLogSearchResponseModel>;
-};
-
-export type PagedSearcherResponseModel = {
-    total: number;
-    items: Array<SearcherResponseModel>;
-};
-
-export type PagedSearchResultResponseModel = {
-    total: number;
-    items: Array<SearchResultResponseModel>;
 };
 
 export type PagedSegmentResponseModel = {
@@ -2686,15 +2663,27 @@ export type ScriptResponseModel = {
     path: string;
 };
 
-export type SearcherResponseModel = {
-    name: string;
+export type SearchDocumentResponseModel = {
+    id: string;
+    objectType: UmbracoObjectTypesModel;
+    name?: null | string;
+    icon?: null | string;
+};
+
+export type SearchRequestModel = {
+    indexAlias: string;
+    query?: null | string;
+    filters?: null | Array<FilterModel>;
+    facets?: null | Array<FacetModel>;
+    sorters?: null | Array<SorterModel>;
+    culture?: null | string;
+    segment?: null | string;
 };
 
 export type SearchResultResponseModel = {
-    id: string;
-    score: number;
-    fieldCount: number;
-    fields: Array<FieldPresentationModel>;
+    total: number;
+    documents: Array<SearchDocumentResponseModel>;
+    facets: Array<FacetResultResponseModel>;
 };
 
 export type SecurityConfigurationResponseModel = {
@@ -2704,6 +2693,9 @@ export type SecurityConfigurationResponseModel = {
 export type SegmentResponseModel = {
     name: string;
     alias: string;
+    /**
+     * @deprecated
+     */
     cultures?: null | Array<string>;
 };
 
@@ -2746,6 +2738,11 @@ export type SignalRClientSettingsResponseModel = {
 export type SortDocumentChildrenByFieldRequestModel = {
     culture?: null | string;
     field: ContentSortFieldModel;
+    direction: DirectionModel;
+};
+
+export type SorterModel = {
+    fieldName: string;
     direction: DirectionModel;
 };
 
@@ -3000,6 +2997,36 @@ export type TrackedReferenceMemberTypeModel = {
 };
 
 export type TreeItemKindModel = string;
+
+export enum UmbracoObjectTypesModel {
+    UNKNOWN = 'Unknown',
+    ROOT = 'ROOT',
+    DOCUMENT = 'Document',
+    MEDIA = 'Media',
+    TEMPLATE = 'Template',
+    DOCUMENT_TYPE = 'DocumentType',
+    MEDIA_TYPE = 'MediaType',
+    MEMBER_TYPE = 'MemberType',
+    MEMBER_GROUP = 'MemberGroup',
+    RECYCLE_BIN = 'RecycleBin',
+    MEMBER = 'Member',
+    DATA_TYPE = 'DataType',
+    DOCUMENT_TYPE_CONTAINER = 'DocumentTypeContainer',
+    MEDIA_TYPE_CONTAINER = 'MediaTypeContainer',
+    MEMBER_TYPE_CONTAINER = 'MemberTypeContainer',
+    DATA_TYPE_CONTAINER = 'DataTypeContainer',
+    DOCUMENT_BLUEPRINT_CONTAINER = 'DocumentBlueprintContainer',
+    RELATION_TYPE = 'RelationType',
+    FORMS_FORM = 'FormsForm',
+    FORMS_PRE_VALUE = 'FormsPreValue',
+    FORMS_DATA_SOURCE = 'FormsDataSource',
+    LANGUAGE = 'Language',
+    DOCUMENT_BLUEPRINT = 'DocumentBlueprint',
+    ID_RESERVATION = 'IdReservation',
+    ELEMENT = 'Element',
+    ELEMENT_CONTAINER = 'ElementContainer',
+    ELEMENT_RECYCLE_BIN = 'ElementRecycleBin'
+}
 
 export type UnlockUsersRequestModel = {
     userIds: Array<ReferenceByIdModel>;
@@ -3314,18 +3341,12 @@ export type UpdateWebhookRequestModel = {
     };
 };
 
-export type UpgradeCheckResponseModel = {
-    type: string;
-    comment: string;
-    url: string;
-};
-
 export type UpgradeSettingsResponseModel = {
     currentState: string;
     newState: string;
     newVersion: string;
     oldVersion: string;
-    reportUrl: null | string;
+    reportUrl: string;
 };
 
 export type UserConfigurationResponseModel = {
@@ -3541,7 +3562,7 @@ export type WebhookLogResponseModel = {
     key: string;
     webhookKey: string;
     statusCode: string;
-    httpStatusCode?: number | null;
+    httpStatusCode?: null | number;
     isSuccessStatusCode: boolean;
     date: string;
     eventAlias: string;
@@ -4803,7 +4824,7 @@ export type GetTreeDictionaryRootResponses = {
 
 export type GetTreeDictionaryRootResponse = GetTreeDictionaryRootResponses[keyof GetTreeDictionaryRootResponses];
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
+export type PutDocumentByIdValidateData = {
     body: ValidateUpdateDocumentRequestModel;
     path: {
         id: string;
@@ -4812,7 +4833,7 @@ export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
     url: '/umbraco/management/api/v1.1/document/{id}/validate';
 };
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Errors = {
+export type PutDocumentByIdValidateErrors = {
     /**
      * Bad Request
      */
@@ -4831,9 +4852,9 @@ export type PutUmbracoManagementApiV11DocumentByIdValidate11Errors = {
     404: ProblemDetails;
 };
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Error = PutUmbracoManagementApiV11DocumentByIdValidate11Errors[keyof PutUmbracoManagementApiV11DocumentByIdValidate11Errors];
+export type PutDocumentByIdValidateError = PutDocumentByIdValidateErrors[keyof PutDocumentByIdValidateErrors];
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Responses = {
+export type PutDocumentByIdValidateResponses = {
     /**
      * OK
      */
@@ -10237,41 +10258,6 @@ export type PostHealthCheckExecuteActionResponses = {
 
 export type PostHealthCheckExecuteActionResponse = PostHealthCheckExecuteActionResponses[keyof PostHealthCheckExecuteActionResponses];
 
-export type GetHelpData = {
-    body?: never;
-    path?: never;
-    query?: {
-        section?: string;
-        tree?: string;
-        skip?: number;
-        take?: number;
-        baseUrl?: string;
-    };
-    url: '/umbraco/management/api/v1/help';
-};
-
-export type GetHelpErrors = {
-    /**
-     * Bad Request
-     */
-    400: ProblemDetails;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetHelpError = GetHelpErrors[keyof GetHelpErrors];
-
-export type GetHelpResponses = {
-    /**
-     * OK
-     */
-    200: PagedHelpPageResponseModel;
-};
-
-export type GetHelpResponse = GetHelpResponses[keyof GetHelpResponses];
-
 export type GetImagingResizeUrlsData = {
     body?: never;
     path?: never;
@@ -10339,100 +10325,6 @@ export type GetImportAnalyzeResponses = {
 };
 
 export type GetImportAnalyzeResponse = GetImportAnalyzeResponses[keyof GetImportAnalyzeResponses];
-
-export type GetIndexerData = {
-    body?: never;
-    path?: never;
-    query?: {
-        skip?: number;
-        take?: number;
-    };
-    url: '/umbraco/management/api/v1/indexer';
-};
-
-export type GetIndexerErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetIndexerResponses = {
-    /**
-     * OK
-     */
-    200: PagedIndexResponseModel;
-};
-
-export type GetIndexerResponse = GetIndexerResponses[keyof GetIndexerResponses];
-
-export type GetIndexerByIndexNameData = {
-    body?: never;
-    path: {
-        indexName: string;
-    };
-    query?: never;
-    url: '/umbraco/management/api/v1/indexer/{indexName}';
-};
-
-export type GetIndexerByIndexNameErrors = {
-    /**
-     * Bad Request
-     */
-    400: ProblemDetails;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetIndexerByIndexNameError = GetIndexerByIndexNameErrors[keyof GetIndexerByIndexNameErrors];
-
-export type GetIndexerByIndexNameResponses = {
-    /**
-     * OK
-     */
-    200: IndexResponseModel;
-};
-
-export type GetIndexerByIndexNameResponse = GetIndexerByIndexNameResponses[keyof GetIndexerByIndexNameResponses];
-
-export type PostIndexerByIndexNameRebuildData = {
-    body?: never;
-    path: {
-        indexName: string;
-    };
-    query?: never;
-    url: '/umbraco/management/api/v1/indexer/{indexName}/rebuild';
-};
-
-export type PostIndexerByIndexNameRebuildErrors = {
-    /**
-     * Bad Request
-     */
-    400: ProblemDetails;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * Not Found
-     */
-    404: ProblemDetails;
-    /**
-     * Conflict
-     */
-    409: ProblemDetails;
-};
-
-export type PostIndexerByIndexNameRebuildError = PostIndexerByIndexNameRebuildErrors[keyof PostIndexerByIndexNameRebuildErrors];
-
-export type PostIndexerByIndexNameRebuildResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
 
 export type GetInstallSettingsData = {
     body?: never;
@@ -15768,6 +15660,10 @@ export type PostPublishedCacheRebuildErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheRebuildResponses = {
@@ -15789,6 +15685,10 @@ export type GetPublishedCacheRebuildStatusErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetPublishedCacheRebuildStatusResponses = {
@@ -15812,6 +15712,10 @@ export type PostPublishedCacheReloadErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheReloadResponses = {
@@ -15953,33 +15857,6 @@ export type GetRedirectManagementStatusResponses = {
 };
 
 export type GetRedirectManagementStatusResponse = GetRedirectManagementStatusResponses[keyof GetRedirectManagementStatusResponses];
-
-export type PostRedirectManagementStatusData = {
-    body?: never;
-    path?: never;
-    query?: {
-        status?: RedirectStatusModel;
-    };
-    url: '/umbraco/management/api/v1/redirect-management/status';
-};
-
-export type PostRedirectManagementStatusErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-};
-
-export type PostRedirectManagementStatusResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
 
 export type GetRelationByRelationTypeIdData = {
     body?: never;
@@ -16543,66 +16420,142 @@ export type GetTreeScriptSiblingsResponses = {
 
 export type GetTreeScriptSiblingsResponse = GetTreeScriptSiblingsResponses[keyof GetTreeScriptSiblingsResponses];
 
-export type GetSearcherData = {
+export type GetSearchIndexesData = {
     body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/search/indexes';
+};
+
+export type GetSearchIndexesErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetSearchIndexesResponses = {
+    /**
+     * OK
+     */
+    200: PagedIndexResponseModel;
+};
+
+export type GetSearchIndexesResponse = GetSearchIndexesResponses[keyof GetSearchIndexesResponses];
+
+export type GetSearchIndexesByIndexAliasData = {
+    body?: never;
+    path: {
+        indexAlias: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/search/indexes/{indexAlias}';
+};
+
+export type GetSearchIndexesByIndexAliasErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: unknown;
+};
+
+export type GetSearchIndexesByIndexAliasResponses = {
+    /**
+     * OK
+     */
+    200: IndexResponseModel;
+};
+
+export type GetSearchIndexesByIndexAliasResponse = GetSearchIndexesByIndexAliasResponses[keyof GetSearchIndexesByIndexAliasResponses];
+
+export type PutSearchRebuildData = {
+    body?: never;
+    path?: never;
+    query?: {
+        indexAlias?: string;
+    };
+    url: '/umbraco/management/api/v1/search/rebuild';
+};
+
+export type PutSearchRebuildErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: unknown;
+};
+
+export type PutSearchRebuildResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PostSearchSearchData = {
+    body: SearchRequestModel;
     path?: never;
     query?: {
         skip?: number;
         take?: number;
     };
-    url: '/umbraco/management/api/v1/searcher';
+    url: '/umbraco/management/api/v1/search/search';
 };
 
-export type GetSearcherErrors = {
+export type PostSearchSearchErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
-};
-
-export type GetSearcherResponses = {
     /**
-     * OK
+     * The authenticated user does not have access to this resource
      */
-    200: PagedSearcherResponseModel;
-};
-
-export type GetSearcherResponse = GetSearcherResponses[keyof GetSearcherResponses];
-
-export type GetSearcherBySearcherNameQueryData = {
-    body?: never;
-    path: {
-        searcherName: string;
-    };
-    query?: {
-        term?: string;
-        skip?: number;
-        take?: number;
-    };
-    url: '/umbraco/management/api/v1/searcher/{searcherName}/query';
-};
-
-export type GetSearcherBySearcherNameQueryErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
+    403: unknown;
     /**
      * Not Found
      */
-    404: ProblemDetails;
+    404: unknown;
 };
 
-export type GetSearcherBySearcherNameQueryError = GetSearcherBySearcherNameQueryErrors[keyof GetSearcherBySearcherNameQueryErrors];
-
-export type GetSearcherBySearcherNameQueryResponses = {
+export type PostSearchSearchResponses = {
     /**
      * OK
      */
-    200: PagedSearchResultResponseModel;
+    200: SearchResultResponseModel;
 };
 
-export type GetSearcherBySearcherNameQueryResponse = GetSearcherBySearcherNameQueryResponses[keyof GetSearcherBySearcherNameQueryResponses];
+export type PostSearchSearchResponse = PostSearchSearchResponses[keyof PostSearchSearchResponses];
 
 export type GetSecurityConfigurationData = {
     body?: never;
@@ -16846,33 +16799,6 @@ export type GetServerTroubleshootingResponses = {
 };
 
 export type GetServerTroubleshootingResponse = GetServerTroubleshootingResponses[keyof GetServerTroubleshootingResponses];
-
-export type GetServerUpgradeCheckData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/management/api/v1/server/upgrade-check';
-};
-
-export type GetServerUpgradeCheckErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-};
-
-export type GetServerUpgradeCheckResponses = {
-    /**
-     * OK
-     */
-    200: UpgradeCheckResponseModel;
-};
-
-export type GetServerUpgradeCheckResponse = GetServerUpgradeCheckResponses[keyof GetServerUpgradeCheckResponses];
 
 export type GetItemStaticFileData = {
     body?: never;
@@ -18150,6 +18076,7 @@ export type GetFilterUserData = {
         orderDirection?: DirectionModel;
         userGroupIds?: Array<string>;
         userStates?: Array<UserStateModel>;
+        userKinds?: Array<UserKindModel>;
         filter?: string;
     };
     url: '/umbraco/management/api/v1/filter/user';

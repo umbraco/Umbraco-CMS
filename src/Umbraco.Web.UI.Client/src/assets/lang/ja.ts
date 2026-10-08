@@ -11,10 +11,15 @@
 import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
 export default {
 	actions: {
+		read: '読む',
+		enable: '有効',
+		resendInvite: '招待を再送信',
+		unlock: 'ロック解除',
 		assigndomain: 'ドメインの割り当て',
 		auditTrail: '動作記録',
 		browse: 'ノードの参照',
 		changeDocType: 'ドキュメントタイプの変更',
+		clear: 'クリア',
 		copy: '複製',
 		copyTo: '複製先',
 		create: '新規作成',
@@ -40,6 +45,7 @@ export default {
 		republish: 'サイトのリフレッシュ',
 		restore: '復元',
 		rename: '名前の変更',
+		replace: '置き換え',
 		rights: 'アクセス権',
 		rollback: '以前の版に戻る',
 		sendtopublish: '公開に送る',
@@ -74,6 +80,7 @@ export default {
 		atViewingFor: 'これらを表示',
 	},
 	buttons: {
+		choose: '選択',
 		clearSelection: '選択の消去',
 		select: '選択',
 		somethingElse: 'その他のアクション',
@@ -168,6 +175,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'クリックしてアップロードする',
+		browseFilesAction: 'ファイルを参照',
+		dropFilesOr: 'メディアをここにドラッグ&ドロップ<br />または',
 		orClickHereToUpload: 'またはクリックしてファイルを選択',
 		maxFileSize: 'ファイルの最大サイズ',
 	},
@@ -193,6 +202,18 @@ export default {
 		restart: '再起動',
 		visit: '訪れる',
 		welcome: 'ようこそ',
+	},
+	clipboard: {
+		labelForClearClipboard: 'クリップボードをクリア',
+		labelForCopyToClipboard: 'クリップボードにコピー',
+		confirmDeleteHeadline: 'クリップボードから削除',
+		confirmDeleteDescription: '本当に <strong>{0}</strong> をクリップボードから削除しますか？',
+		confirmClearDescription: '本当にクリップボードをクリアしますか？',
+		confirmPasteHeadline: 'クリップボードから貼り付け',
+		confirmPasteOverwriteMessage: (name: string) =>
+			`プロパティにはすでに値が含まれています。クリップボードから貼り付けると現在の値が上書きされます。現在の値を <strong>${name}</strong> に置き換えますか？`,
+		copySuccessHeadline: 'クリップボードにコピーされました',
+		noItemsMessage: 'クリップボードに項目はありません。',
 	},
 	prompt: {
 		stay: 'このページに留まる',
@@ -227,6 +248,17 @@ export default {
 		copiedItems: '%0% 件の項目をコピーしました',
 		copiedItemOfItem: '%1% 件中 %0% 件の項目をコピーしました',
 		copiedItemOfItems: '%1% 件中 %0% 件の項目をコピーしました',
+	},
+	blockEditor: {
+		confirmDeleteBlockTitle: '%0% を削除しますか？',
+		confirmDeleteBlockMessage: '本当にこの %0% を削除しますか？',
+		tabCreateEmpty: '空のブロックを作成',
+		tabClipboard: 'クリップボード',
+		addBlock: 'コンテンツを追加',
+		addThis: '%0% を追加',
+		actionEnterSortMode: '並べ替えモードに入る',
+		actionExitSortMode: '並べ替えモードを終了',
+		notExposedLabel: '下書き',
 	},
 	defaultdialogs: {
 		anchorInsert: '名前',
@@ -364,6 +396,8 @@ export default {
 		tableSplitNotSplittable: 'このセルは結合されたものではないので分離する事はできません。',
 	},
 	general: {
+		users: 'ユーザー',
+		message: 'メッセージ',
 		about: 'Umbracoについて',
 		action: 'アクション',
 		actions: 'アクション選択',
@@ -378,6 +412,7 @@ export default {
 		choose: '選択',
 		close: '閉じる',
 		closewindow: 'ウィンドウを閉じる',
+		clipboard: 'クリップボード',
 		comment: 'コメント',
 		confirm: '確認',
 		constrainProportions: '縦横比',
@@ -413,6 +448,7 @@ export default {
 		install: 'インストール',
 		invalid: '無効',
 		justify: '位置揃え',
+		label: 'ラベル',
 		language: '言語',
 		layout: 'レイアウト',
 		links: 'リンク',
@@ -422,11 +458,14 @@ export default {
 		logoff: 'ログオフ',
 		logout: 'ログアウト',
 		macro: 'マクロ',
+		mandatory: '必須',
 		move: '移動',
 		name: '名前',
 		new: '新規',
 		next: '次へ',
 		no: 'いいえ',
+		noResults: '結果がありません',
+		noResultsFor: (query: string) => `"${query}" の結果が見つかりません。`,
 		of: 'of',
 		ok: 'OK',
 		open: '開く',
@@ -440,6 +479,7 @@ export default {
 		reciept: 'フォームからEmailを受信',
 		recycleBin: 'ごみ箱',
 		remaining: '残り',
+		remove: '削除',
 		rename: '名前の変更',
 		renew: '更新',
 		required: 'この項目は必須です',
@@ -699,6 +739,7 @@ export default {
 		noColors: '設定済みの色はありません。',
 	},
 	propertyEditorPicker: {
+		title: 'プロパティエディターの選択',
 		selectAction: 'プロパティエディターの選択',
 	},
 	relatedlinks: {
@@ -759,8 +800,22 @@ export default {
 		sortHelp:
 			'上下にアイテムをドラッグするなどして適当に配置したり、列のヘッダーをクリックしてコレクション全体をソートできます',
 		sortPleaseWait: ' 項目の並べ替えには少し時間がかかります。しばらくお待ちください。',
+		sortByFieldHeadline: 'フィールドで並べ替え',
+		sortByFieldSentence: 'すべての子項目を次で並べ替え:',
+		sortByFieldDirectionLabel: '方向',
+		sortByFieldAscending: '昇順',
+		sortByFieldDescending: '降順',
+		sortByFieldNameOption: '名前',
+		sortByFieldCreateDateOption: '作成日',
+		sortByFieldUpdateDateOption: '最終編集',
+		sortIndividuallyHeadline: '個別に並べ替え',
+		sortByFieldCultureSentence: '言語:',
+		sortByFieldCultureLabel: '言語',
 	},
 	speechBubbles: {
+		enableUserSuccess: '%0% を有効にしました',
+		unlockUsersSuccess: '%0% 人のユーザーのロックを解除しました',
+		unlockUserSuccess: '%0% のロックを解除しました',
 		validationFailedHeader: '検証',
 		validationFailedMessage: 'アイテムを保存する前に検証エラーを修正してください。',
 		operationFailedHeader: '失敗しました',
@@ -1012,6 +1067,25 @@ export default {
 		updateNoServerError: '更新の確認中にエラーが発生しました。詳細についてはスタックトレースを確認してください。',
 	},
 	user: {
+		createUserHeadline: (kind: string) => {
+			return kind === 'Api' ? 'API ユーザーを作成' : 'ユーザーを作成';
+		},
+		createUserDescription: (kind: string) => {
+			const defaultUserText = `ユーザーを作成して Umbraco へのアクセス権を付与します。ユーザーが作成されるとパスワードが生成され、そのユーザーと共有できます。`;
+			const apiUserText = `API ユーザーを作成して、外部サービスが Umbraco Management API で認証できるようにします。`;
+			return kind === 'Api' ? apiUserText : defaultUserText;
+		},
+		createUser: 'ユーザーを作成',
+		disableUserHeadline: (name: string) => `${name} を無効にする`,
+		disableUserConfirmation: 'このユーザーを無効にしてもよろしいですか？',
+		enableUserHeadline: (name: string) => `${name} を有効にする`,
+		enableUserConfirmation: 'このユーザーを有効にしてもよろしいですか？',
+		groupsHelp: 'グループを追加してアクセス権と権限を割り当てます',
+		inviteUser: 'ユーザーを招待',
+		inviteUserHelp: '新しいユーザーを招待して Umbraco へのアクセス権を付与します。Umbraco へのログイン方法が記載された招待メールがユーザーに送信されます。招待の有効期限は 72 時間です。',
+		sendInvite: '招待を送信',
+		unlockUserHeadline: (name: string) => `${name} のロックを解除`,
+		unlockUserConfirmation: 'このユーザーのロックを解除してもよろしいですか？',
 		administrators: '管理者',
 		categoryField: 'フィールドのカテゴリー',
 		changePassword: 'パスワードの変更',
@@ -1049,6 +1123,7 @@ export default {
 		username: 'ユーザー名',
 		userPermissions: 'ユーザーの権限',
 		usergroups: 'ユーザーのグループ',
+		type: '型',
 		usertype: 'ユーザーの種類',
 		userTypes: 'ユーザーの種類',
 		writer: '投稿者',
@@ -1056,6 +1131,16 @@ export default {
 		yourProfile: 'あなたのプロフィール',
 		yourHistory: 'あなたの最新の履歴',
 		sessionExpires: 'セッションの期限',
+		invite: '招待',
+		kind: '種類',
+		userKindDefault: 'ユーザー',
+		userKindApi: 'API ユーザー',
+		selectUserGroup: (multiple: boolean) => {
+			return multiple ? 'ユーザーグループを選択' : 'ユーザーグループを選択';
+		},
+		chooseUserGroup: (multiple: boolean) => {
+			return multiple ? 'ユーザーグループを選択' : 'ユーザーグループを選択';
+		},
 	},
 	validation: {
 		validation: '検証',
@@ -1077,8 +1162,20 @@ export default {
 		invalidPattern: '値が無効です。正しいパターンと一致しません',
 		customValidation: 'カスタム検証',
 	},
+	recycleBin: {
+		restoreItemTo: (from: string, to: string) => `<strong>${from}</strong> を<strong>${to}</strong> に復元します`,
+		itemCannotBeRestored: 'この項目は自動的に復元できません',
+		itemCannotBeRestoredHelpText: 'この項目を自動的に復元できる場所がありません。以下から新しい場所を選択できます。',
+		restoreToTitle: '復元先',
+		selectRestoreLocation: '場所を選択',
+	},
 	logViewer: {
 		selectAllLogLevelFilters: 'すべて選択',
 		deselectAllLogLevelFilters: 'すべての選択を解除',
+	},
+	picker: {
+		browseTab: '参照',
+		searchTab: '検索',
+		selectedCount: (count: number) => `${count}件選択済み`,
 	},
 } as UmbLocalizationDictionary;

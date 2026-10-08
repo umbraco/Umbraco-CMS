@@ -97,7 +97,9 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
                         throw new Exception("bang!");
                     }
 
+#pragma warning disable CS0162 // Unreachable code detected
                     return Task.FromResult(true);
+#pragma warning restore CS0162 // Unreachable code detected
                 });
 
                 scope.Complete();

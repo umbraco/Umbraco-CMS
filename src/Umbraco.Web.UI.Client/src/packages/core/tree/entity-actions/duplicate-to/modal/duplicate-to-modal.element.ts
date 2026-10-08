@@ -6,12 +6,10 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
-const elementName = 'umb-duplicate-to-modal';
-
 /**
  * @deprecated Deprecated since v17. The "Duplicate to" entity action now uses the shared `UMB_TREE_PICKER_MODAL`. Scheduled for removal in Umbraco 19.
  */
-@customElement(elementName)
+@customElement('umb-duplicate-to-modal')
 export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicateToModalData, UmbDuplicateToModalValue> {
 	@state()
 	private _destinationUnique?: string | null;
@@ -80,6 +78,6 @@ export { UmbDuplicateToModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDuplicateToModalElement;
+		'umb-duplicate-to-modal': UmbDuplicateToModalElement;
 	}
 }

@@ -1,8 +1,6 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
@@ -68,45 +66,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         _eventAggregator = eventAggregator;
         _userIdKeyResolver = userIdKeyResolver;
         _contentTypeFilters = contentTypeFilters;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentTypeServiceBase{TRepository, TItem}"/> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="repository">The content type repository.</param>
-    /// <param name="auditRepository">The audit repository.</param>
-    /// <param name="containerRepository">The entity container repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="eventAggregator">The event aggregator.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="contentTypeFilters">The content type filter collection.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    protected ContentTypeServiceBase(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        TRepository repository,
-        IAuditRepository auditRepository,
-        IEntityContainerRepository containerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            repository,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            containerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters)
-    {
     }
 
     /// <summary>
@@ -408,6 +367,14 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             // property variation change?
             var hasAnyPropertyVariationChanged = contentType.WasPropertyTypeVariationChanged();
 
+            // A composition change dirties the composition collection (add or remove). Both directions change the
+            // set of properties this content type - and every type composed of or inheriting from it - exposes, so
+            // it is a main-impact change that must refresh this type and its descendants. Whether it also needs a
+            // raw cmsContentNu rebuild is decided separately below: an addition on its own does not (its aliases
+            // have no stored values yet), but a removal - or an addition that reintroduces a just-removed alias -
+            // does. See the rawDataAffected calculation.
+            var hasCompositionChanged = dirty.WasPropertyDirty("ContentTypeComposition");
+
             // Detect all granular change types independently so that structural
             // and non-structural changes can be detected in the same operation
             // (e.g. removing a property AND adding another at the same time).
@@ -459,23 +426,33 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
             // main impact on properties? Propagate RefreshMain to composed types.
             var hasPropertyMainImpact = hasContentTypeVariationChanged || hasAnyPropertyVariationChanged
-                                                                       || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias;
+                                                                       || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias
+                                                                       || hasCompositionChanged;
 
-            // A property removal is the only structural change that leaves the stored cmsContentNu blob valid:
-            // the removed alias simply stops resolving against the content type, so its orphaned value is never
-            // read. This holds only when nothing else in the same change alters the stored data or reintroduces
-            // the alias (an added composition can), so any other structural cause — or a composition addition —
-            // disqualifies it. Tracked by Id and resolved after the loop, so a rebuild required via any path wins.
-            var rawDataUnaffected = hasAnyPropertyBeenRemoved
-                && hasAliasChanged is false
-                && hasAnyPropertyChangedAlias is false
-                && hasContentTypeVariationChanged is false
-                && hasAnyPropertyVariationChanged is false
-                && hasAnyCompositionBeenRemoved is false
-                && hasAnyCompositionBeenAdded is false;
+            // The raw cmsContentNu blob is keyed by property alias, so a structural change only requires a
+            // rebuild when it re-keys existing stored values or lets a stale value resolve to a different
+            // property. It does NOT when the only structural change is:
+            //  - a property removal - the orphaned value simply stops resolving and is never read again, or
+            //  - a composition being added - its new aliases have no stored value yet.
+            // In those cases clearing the converted content cache is enough (the content type cache is
+            // refreshed regardless). An alias or variation change, a composition removal, or a property
+            // removal combined with a composition change (which can reintroduce the removed alias behind a
+            // different property type) all re-key or revive stored values and therefore need a rebuild.
+            var rawDataAffected =
+                hasAliasChanged ||
+                hasAnyPropertyChangedAlias ||
+                hasContentTypeVariationChanged ||
+                hasAnyPropertyVariationChanged ||
+                hasAnyCompositionBeenRemoved ||
+                (hasAnyPropertyBeenRemoved && hasCompositionChanged);
+            var rawDataUnaffected = rawDataAffected is false;
 
             if (hasAliasChanged || hasPropertyMainImpact)
             {
+                // A composition change alone (add or remove) needs RefreshMain even when none of the granular
+                // flags above fired for it.
+                AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);
+                hasAnyChange = true;
                 (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(contentType.Id);
             }
 

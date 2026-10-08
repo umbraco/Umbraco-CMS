@@ -9,8 +9,8 @@ import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffi
 
 /**
  *
- * @param manifest
- * @returns
+ * @param {ManifestPropertyAction} manifest - The property action manifest
+ * @returns {[UmbPropertyActionArgs<MetaPropertyAction>]} The API arguments built from the manifest
  */
 function ExtensionApiArgsMethod(manifest: ManifestPropertyAction): [UmbPropertyActionArgs<MetaPropertyAction>] {
 	return [{ meta: manifest.meta }];
@@ -48,7 +48,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 				id="popover-trigger"
 				popovertarget="property-action-popover"
 				data-mark="open-property-actions"
-				label=${this.localize.term('actions_viewActionsFor')}
+				label=${this.localize.term('actions_viewActionsFor', '')}
 				compact>
 				<uui-symbol-more id="more-symbol"></uui-symbol-more>
 			</uui-button>

@@ -8,10 +8,12 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 
 /**
  *
- * @param manifest
- * @param constructorArgs
- * @param fallbackElement
- * @param fallbackApi
+ * @template {UmbControllerHostElement} ElementType
+ * @template {UmbApi} ApiType
+ * @param {ManifestElementAndApi<ElementType, ApiType>} manifest The manifest to create the element and api from.
+ * @param {unknown[] | UmbApiConstructorArgumentsMethodType<ManifestElementAndApi<ElementType, ApiType>>} [constructorArgs] Additional arguments passed to the api constructor, or a function that returns them.
+ * @param {string} [fallbackElement] An element tag name to fall back to if the manifest does not provide one.
+ * @param {ApiLoaderProperty<ApiType>} [fallbackApi] An api class to fall back to if the manifest does not provide one.
  * @returns {Promise<{ element?: ElementType; api?: ApiType }>} - Returns an object with the created element and api.
  */
 export async function createExtensionElementWithApi<

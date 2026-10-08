@@ -9,7 +9,7 @@ let userGroupId = null;
 let memberId = '';
 let memberTypeId = '';
 const memberName = 'Test Member';
-const memberTypeName = 'Test Member Type';
+const memberTypeName = 'Test Member Type Member Section';
 const comment = 'This is test comment';
 const username = 'testmember';
 const email = 'testmember@acceptance.test';
@@ -89,6 +89,5 @@ test('can update member with members section set', async ({umbracoApi, umbracoUi
 
   // Assert
   await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
-  const memberData = await umbracoApi.member.get(memberId);
-  expect(memberData.username).toBe(updatedUsername);
+  await expect.poll(async () => (await umbracoApi.member.get(memberId)).username).toBe(updatedUsername);
 });

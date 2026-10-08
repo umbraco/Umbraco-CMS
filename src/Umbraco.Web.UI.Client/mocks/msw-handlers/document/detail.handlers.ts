@@ -72,7 +72,7 @@ export const detailHandlers = [
 		const skip = query.get('skip') ? parseInt(query.get('skip') as string, 10) : 0;
 		const take = query.get('take') ? parseInt(query.get('take') as string, 10) : 100;
 
-		let data: Array<IReferenceResponseModel> = [];
+		let data: PagedIReferenceResponseModel['items'] = [];
 
 		if (id === 'all-property-editors-document-id') {
 			data = getReferenceData();
@@ -114,7 +114,9 @@ export const detailHandlers = [
 			return new HttpResponse(null, { status: 404 });
 		}
 
-		const availableSegments = document.variants.filter((v) => !!v.segment).map((v) => v.segment!) ?? [];
+		const availableSegments = [
+			...new Set(document.values.filter((v) => !!v.segment).map((v) => v.segment!)),
+		];
 
 		const response: GetDocumentByIdAvailableSegmentOptionsResponse = {
 			total: availableSegments.length,
@@ -123,7 +125,7 @@ export const detailHandlers = [
 				const isGeneric = alias.includes('generic');
 				const whichCulturesHaveThisSegment: string[] | undefined = isGeneric
 					? undefined
-					: document.variants.filter((v) => v.segment === alias).map((v) => v.culture!);
+					: document.values.filter((v) => v.segment === alias).map((v) => v.culture!);
 
 				let availableSegmentOptions: string[] | null = whichCulturesHaveThisSegment ?? null;
 

@@ -36,10 +36,6 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
-using Umbraco.Cms.Core.HostedServices;
-using Umbraco.Cms.Core.Preview;
-using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services.FileSystem;
@@ -210,10 +206,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<IMetricsConsentService, MetricsConsentService>();
 
-            // will be injected in controllers when needed to invoke rest endpoints on Our
-            Services.AddUnique<IInstallationService, InstallationService>();
-            Services.AddUnique<IUpgradeService, UpgradeService>();
-
             Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
             Services.AddUnique<ISiteDomainMapper, SiteDomainMapper>();
 
@@ -383,8 +375,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<ConflictingPackageData>();
             Services.AddSingleton<CompiledPackageXmlParser>();
-            Services.AddUnique<IPreviewTokenGenerator, NoopPreviewTokenGenerator>();
             Services.AddUnique<IPreviewService, PreviewService>();
+            Services.AddUnique<IPreviewSessionService, PreviewSessionService>();
             Services.AddUnique<DocumentNavigationService, DocumentNavigationService>();
             Services.AddUnique<IDocumentNavigationQueryService>(x => x.GetRequiredService<DocumentNavigationService>());
             Services.AddUnique<IDocumentNavigationManagementService>(x => x.GetRequiredService<DocumentNavigationService>());
@@ -404,10 +396,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ElementPublishStatusService, ElementPublishStatusService>();
             Services.AddUnique<IElementPublishStatusQueryService>(x => x.GetRequiredService<ElementPublishStatusService>());
             Services.AddUnique<IElementPublishStatusManagementService>(x => x.GetRequiredService<ElementPublishStatusService>());
-#pragma warning disable CS0618 // Type or member is obsolete
-            Services.AddUnique<IPublishStatusManagementService>(x => x.GetRequiredService<DocumentPublishStatusService>());
-            Services.AddUnique<IPublishStatusQueryService>(x => x.GetRequiredService<DocumentPublishStatusService>());
-#pragma warning restore CS0618 // Type or member is obsolete
 
             Services.AddUnique<IPublishedContentStatusFilteringService, PublishedContentStatusFilteringService>();
             Services.AddUnique<IPublishedMediaStatusFilteringService, PublishedMediaStatusFilteringService>();

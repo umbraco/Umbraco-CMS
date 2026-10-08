@@ -1,4 +1,5 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
+import { data as pageTree } from './page-tree.data.js';
 import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
@@ -783,7 +784,7 @@ const rawData = [
 				publishDate: '2026-04-16 11:10:37.0088468',
 				culture: null,
 				segment: null,
-				name: 'Content Picker',
+				name: 'Single Document Picker',
 				createDate: '2023-02-20 16:20:08',
 				updateDate: '2026-04-16 11:10:37.0088468',
 				id: '58e300ad-868c-4a84-9915-2aef20ea681c',
@@ -793,31 +794,117 @@ const rawData = [
 		values: [
 			{
 				editorAlias: 'Umbraco.ContentPicker',
-				alias: 'contentPickerDefaultConfig',
+				alias: 'singleDocumentPickerDefaultConfig',
 				culture: null,
 				segment: null,
 				value: 'db2a48d5-5883-465f-b1d7-e012af2f16d0',
 			},
 			{
 				editorAlias: 'Umbraco.ContentPicker',
-				alias: 'contentPickerIgnoreUserStartNodes',
+				alias: 'singleDocumentPickerIgnoreUserStartNodes',
 				culture: null,
 				segment: null,
 				value: '9394af8f-d306-4778-9f03-2431eb8f5b6b',
 			},
 			{
 				editorAlias: 'Umbraco.ContentPicker',
-				alias: 'contentPickerShowOpenButton',
+				alias: 'singleDocumentPickerShowOpenButton',
 				culture: null,
 				segment: null,
 				value: 'a7823036-0486-44f5-af33-deb6780e07e6',
 			},
 			{
 				editorAlias: 'Umbraco.ContentPicker',
-				alias: 'contentPickerStartNode',
+				alias: 'singleDocumentPickerStartNode',
 				culture: null,
 				segment: null,
 				value: 'c680be85-0bb7-4429-9d4a-73ffb83e427b',
+			},
+			{
+				editorAlias: 'Umbraco.ContentPicker',
+				alias: 'singleDocumentPickerDynamicRoot',
+				culture: null,
+				segment: null,
+				value: '0865b2ab-ad7c-48d4-a8c6-608986a0e942',
+			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
+			{
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
+		id: '762a451b-2a81-4e7e-bd3a-e5288d0155e6',
+		createDate: '2023-02-20 16:20:09',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: 'e48ff934-a019-4ac4-91c7-91fc9e608773',
+			icon: 'icon-autofill color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0089468',
+				culture: null,
+				segment: null,
+				name: 'Document Picker',
+				createDate: '2023-02-20 16:20:09',
+				updateDate: '2026-04-16 11:10:37.0089468',
+				id: '762a451b-2a81-4e7e-bd3a-e5288d0155e6',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.DocumentPicker.Multiple',
+				alias: 'documentPickerDefaultConfig',
+				culture: null,
+				segment: null,
+				value: ['4babad2f-967a-49e1-9f92-407e95ff9df9', '0865b2ab-ad7c-48d4-a8c6-608986a0e942'],
+			},
+			{
+				editorAlias: 'Umbraco.DocumentPicker.Multiple',
+				alias: 'documentPickerAllowedContentTypes',
+				culture: null,
+				segment: null,
+				value: ['4babad2f-967a-49e1-9f92-407e95ff9df9', '0865b2ab-ad7c-48d4-a8c6-608986a0e942'],
+			},
+			{
+				editorAlias: 'Umbraco.DocumentPicker.Multiple',
+				alias: 'documentPickerStartNode',
+				culture: null,
+				segment: null,
+				value: ['c680be85-0bb7-4429-9d4a-73ffb83e427b'],
+			},
+			{
+				editorAlias: 'Umbraco.DocumentPicker.Multiple',
+				alias: 'documentPickerIgnoreUserStartNodes',
+				culture: null,
+				segment: null,
+				value: ['9394af8f-d306-4778-9f03-2431eb8f5b6b'],
+			},
+			{
+				editorAlias: 'Umbraco.DocumentPicker.Multiple',
+				alias: 'documentPickerDynamicRoot',
+				culture: null,
+				segment: null,
+				value: ['0865b2ab-ad7c-48d4-a8c6-608986a0e942'],
+			},
+			{
+				editorAlias: 'Umbraco.DocumentPicker.Multiple',
+				alias: 'documentPickerValidationLimit',
+				culture: null,
+				segment: null,
+				value: ['4babad2f-967a-49e1-9f92-407e95ff9df9', 'db2a48d5-5883-465f-b1d7-e012af2f16d0'],
 			},
 		],
 		flags: [],
@@ -972,12 +1059,56 @@ const rawData = [
 				segment: null,
 				value: ['One', 'Three'],
 			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
 			{
-				editorAlias: 'Umbraco.DropDown.Flexible',
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
+		id: 'ca0ddcd2-c0f1-4369-9cd3-0831b747b83f',
+		createDate: '2023-02-20 16:20:25',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: '9f0c98d0-fc32-4477-91fb-b552ce88334c',
+			icon: 'icon-indent color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0253980',
+				culture: null,
+				segment: null,
+				name: 'Single Dropdown',
+				createDate: '2023-02-20 16:20:25',
+				updateDate: '2026-04-16 11:10:37.0253980',
+				id: 'ca0ddcd2-c0f1-4369-9cd3-0831b747b83f',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.DropDown.Single',
 				alias: 'dropdownSingleValue',
 				culture: null,
 				segment: null,
 				value: ['Two'],
+			},
+			{
+				editorAlias: 'Umbraco.DropDown.Single',
+				alias: 'dropdownSingleWithPlaceholder',
+				culture: null,
+				segment: null,
+				value: ['Green'],
 			},
 		],
 		flags: [],
@@ -1254,7 +1385,280 @@ const rawData = [
 				flags: [],
 			},
 		],
-		values: [],
+		values: [
+			{
+				editorAlias: 'Umbraco.Label',
+				alias: 'labelString',
+				culture: null,
+				segment: null,
+				value: 'This is a plain text label.',
+			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
+			{
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
+		id: 'bd3820ab-c146-4db0-a291-a407a9949f05',
+		createDate: '2023-02-27 08:39:27',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: '4806b702-faa4-400d-b379-28069e3b0f0a',
+			icon: 'icon-readonly color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0419725',
+				culture: null,
+				segment: null,
+				name: 'Label (long string)',
+				createDate: '2023-02-27 08:39:27',
+				updateDate: '2026-04-16 11:10:37.0419725',
+				id: 'bd3820ab-c146-4db0-a291-a407a9949f05',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.Label.Text',
+				alias: 'labelLongString',
+				culture: null,
+				segment: null,
+				value:
+					'This is a much longer piece of text used to demonstrate the long string label, capable of holding multiple sentences of content.',
+			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
+			{
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
+		id: '39328c4d-3ab2-4700-b5dd-fb70ee114ece',
+		createDate: '2023-02-27 08:39:27',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: '0be776a9-84ff-4c49-bdee-61d1419073d3',
+			icon: 'icon-readonly color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0419725',
+				culture: null,
+				segment: null,
+				name: 'Label (integer)',
+				createDate: '2023-02-27 08:39:27',
+				updateDate: '2026-04-16 11:10:37.0419725',
+				id: '39328c4d-3ab2-4700-b5dd-fb70ee114ece',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.Label.Integer',
+				alias: 'labelInteger',
+				culture: null,
+				segment: null,
+				value: '42',
+			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
+			{
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
+		id: '160ba583-5d5a-4144-9a4a-183f72c6a8d0',
+		createDate: '2023-02-27 08:39:27',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: 'e9d47255-4801-49f4-9e76-880ef2d44323',
+			icon: 'icon-readonly color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0419725',
+				culture: null,
+				segment: null,
+				name: 'Label (big integer)',
+				createDate: '2023-02-27 08:39:27',
+				updateDate: '2026-04-16 11:10:37.0419725',
+				id: '160ba583-5d5a-4144-9a4a-183f72c6a8d0',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.Label.BigInt',
+				alias: 'labelBigInteger',
+				culture: null,
+				segment: null,
+				value: '9223372036854',
+			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
+			{
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
+		id: '8cadf636-4e00-4242-93bb-0d728cfc8738',
+		createDate: '2023-02-27 08:39:27',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: 'b5ce5b0d-a418-4671-afb2-4a08e9483933',
+			icon: 'icon-readonly color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0419725',
+				culture: null,
+				segment: null,
+				name: 'Label (decimal)',
+				createDate: '2023-02-27 08:39:27',
+				updateDate: '2026-04-16 11:10:37.0419725',
+				id: '8cadf636-4e00-4242-93bb-0d728cfc8738',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.Label.Decimal',
+				alias: 'labelDecimal',
+				culture: null,
+				segment: null,
+				value: '12.345',
+			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
+			{
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
+		id: 'a42c158e-9722-43a2-82c8-9367b54d4b00',
+		createDate: '2023-02-27 08:39:27',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: 'caf33323-624c-4f82-b0b0-a456611e9dc7',
+			icon: 'icon-readonly color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0419725',
+				culture: null,
+				segment: null,
+				name: 'Label (date and time)',
+				createDate: '2023-02-27 08:39:27',
+				updateDate: '2026-04-16 11:10:37.0419725',
+				id: 'a42c158e-9722-43a2-82c8-9367b54d4b00',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.Label.DateTime',
+				alias: 'labelDateTime',
+				culture: null,
+				segment: null,
+				value: '2023-02-01 14:30:00',
+			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
+			{
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
+		id: '6c8276f8-4ab8-4795-9822-a1ba2f45d6e3',
+		createDate: '2023-02-27 08:39:27',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: '43898876-0b3a-4bbe-bc9e-c1d00f024715',
+			icon: 'icon-readonly color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0419725',
+				culture: null,
+				segment: null,
+				name: 'Label (time)',
+				createDate: '2023-02-27 08:39:27',
+				updateDate: '2026-04-16 11:10:37.0419725',
+				id: '6c8276f8-4ab8-4795-9822-a1ba2f45d6e3',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.Label.Time',
+				alias: 'labelTime',
+				culture: null,
+				segment: null,
+				value: '14:30:00',
+			},
+		],
 		flags: [],
 	},
 	{
@@ -1562,6 +1966,154 @@ const rawData = [
 			},
 		],
 		template: null,
+		id: 'b5611160-60a1-4718-989d-24f7f5809353',
+		createDate: '2023-02-20 16:20:56',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: 'd7b68f8a-7509-4c33-845e-ec9cce78e5e3',
+			icon: 'icon-umb-media color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0488102',
+				culture: null,
+				segment: null,
+				name: 'Single Media Picker',
+				createDate: '2023-02-20 16:20:56',
+				updateDate: '2026-04-16 11:10:37.0488102',
+				id: 'b5611160-60a1-4718-989d-24f7f5809353',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.MediaPicker.Single',
+				alias: 'singleMediaPickerDefaultConfig',
+				culture: null,
+				segment: null,
+				value: [
+					{
+						key: '4a26eb6e-3087-4d9a-855b-9f2d80f30236',
+						mediaKey: '76c02ec8-6a82-4c47-95da-56f6628b58fb',
+						mediaTypeAlias: 'Image',
+						crops: [],
+						focalPoint: null,
+					},
+				],
+			},
+			{
+				editorAlias: 'Umbraco.MediaPicker.Single',
+				alias: 'singleMediaPickerAcceptedTypes',
+				culture: null,
+				segment: null,
+				value: [
+					{
+						key: '1596f831-097a-4aa1-9f52-0260d88f6517',
+						mediaKey: 'ee9c1205-4121-4610-b0b3-a522dfd3461d',
+						mediaTypeAlias: 'Image',
+						crops: [],
+						focalPoint: null,
+					},
+				],
+			},
+			{
+				editorAlias: 'Umbraco.MediaPicker.Single',
+				alias: 'singleMediaPickerStartNode',
+				culture: null,
+				segment: null,
+				value: [
+					{
+						key: '56eb46fd-604e-4c02-bb2d-feacfa7f69a4',
+						mediaKey: 'b44956af-620a-4e17-bbce-3987446fb2f1',
+						mediaTypeAlias: 'Image',
+						crops: [],
+						focalPoint: null,
+					},
+				],
+			},
+			{
+				editorAlias: 'Umbraco.MediaPicker.Single',
+				alias: 'singleMediaPickerFocalPoint',
+				culture: null,
+				segment: null,
+				value: [
+					{
+						key: '9d1f402a-9a85-45a1-951c-7a3f72e86651',
+						mediaKey: '76c02ec8-6a82-4c47-95da-56f6628b58fb',
+						mediaTypeAlias: 'Image',
+						crops: [],
+						focalPoint: {
+							left: 0.292,
+							top: 0.7642514616309971,
+						},
+					},
+				],
+			},
+			{
+				editorAlias: 'Umbraco.MediaPicker.Single',
+				alias: 'singleMediaPickerCrops',
+				culture: null,
+				segment: null,
+				value: [
+					{
+						key: 'b035522a-2614-4087-bdc1-3ae7e4baa5f2',
+						mediaKey: 'ee9c1205-4121-4610-b0b3-a522dfd3461d',
+						mediaTypeAlias: 'Image',
+						crops: [],
+						focalPoint: null,
+					},
+				],
+			},
+			{
+				editorAlias: 'Umbraco.MediaPicker.Single',
+				alias: 'singleMediaPickerIgnoreUserStartNodes',
+				culture: null,
+				segment: null,
+				value: [
+					{
+						key: '87f45ef4-bdab-46af-ac86-be0990b8fd6f',
+						mediaKey: 'ee9c1205-4121-4610-b0b3-a522dfd3461d',
+						mediaTypeAlias: 'Image',
+						crops: [],
+						focalPoint: null,
+					},
+				],
+			},
+			{
+				editorAlias: 'Umbraco.MediaPicker.Single',
+				alias: 'singleMediaPickerFullyConfigured',
+				culture: null,
+				segment: null,
+				value: [
+					{
+						key: '541801bd-b68f-4f0b-8cda-50bfc499d551',
+						mediaKey: 'f06adb91-8cdd-408d-83dd-f7b833fc393c',
+						mediaTypeAlias: 'Image',
+						crops: [],
+						focalPoint: {
+							left: 0.5,
+							top: 0.5,
+						},
+					},
+				],
+			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
+			{
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
 		id: '4e02a6bf-5ab6-4b55-8f06-c6d24e892f8c',
 		createDate: '2023-02-20 16:21:02',
 		parent: {
@@ -1625,7 +2177,7 @@ const rawData = [
 				publishDate: '2026-04-16 11:10:37.0560881',
 				culture: null,
 				segment: null,
-				name: 'Member Picker',
+				name: 'Single Member Picker',
 				createDate: '2023-02-20 16:21:11',
 				updateDate: '2026-04-16 11:10:37.0560881',
 				id: 'a7823036-0486-44f5-af33-deb6780e07e6',
@@ -1635,10 +2187,75 @@ const rawData = [
 		values: [
 			{
 				editorAlias: 'Umbraco.MemberPicker',
-				alias: 'memberPicker',
+				alias: 'singleMemberPicker',
 				culture: null,
 				segment: null,
 				value: 'e93b2557-5fcb-4495-bbb3-9f5fd87055a8',
+			},
+			{
+				editorAlias: 'Umbraco.MemberPicker',
+				alias: 'singleMemberPickerWithFilter',
+				culture: null,
+				segment: null,
+				value: 'd74d2bd0-f55a-4a06-beb8-d8e931fc726b',
+			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
+			{
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
+		id: '2c0d0cbd-0b38-4783-9dda-2e48a7dc6f11',
+		createDate: '2023-02-20 16:21:12',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: '58e3d0c8-9204-41d9-931d-baa9020d8d00',
+			icon: 'icon-user color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0561881',
+				culture: null,
+				segment: null,
+				name: 'Member Picker',
+				createDate: '2023-02-20 16:21:12',
+				updateDate: '2026-04-16 11:10:37.0561881',
+				id: '2c0d0cbd-0b38-4783-9dda-2e48a7dc6f11',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.MemberPicker.Multiple',
+				alias: 'memberPickerDefaultConfig',
+				culture: null,
+				segment: null,
+				value: ['e93b2557-5fcb-4495-bbb3-9f5fd87055a8', 'd74d2bd0-f55a-4a06-beb8-d8e931fc726b'],
+			},
+			{
+				editorAlias: 'Umbraco.MemberPicker.Multiple',
+				alias: 'memberPickerWithFilter',
+				culture: null,
+				segment: null,
+				value: ['e93b2557-5fcb-4495-bbb3-9f5fd87055a8'],
+			},
+			{
+				editorAlias: 'Umbraco.MemberPicker.Multiple',
+				alias: 'memberPickerValidationLimit',
+				culture: null,
+				segment: null,
+				value: ['e93b2557-5fcb-4495-bbb3-9f5fd87055a8', 'd74d2bd0-f55a-4a06-beb8-d8e931fc726b'],
 			},
 		],
 		flags: [],
@@ -1669,7 +2286,7 @@ const rawData = [
 				publishDate: '2026-04-16 11:10:37.0591605',
 				culture: null,
 				segment: null,
-				name: 'Multi URL Picker',
+				name: 'URL Picker',
 				createDate: '2023-02-20 16:22:41',
 				updateDate: '2026-04-16 11:10:37.0591605',
 				id: '80954b94-1d32-4edd-9c01-105561a7415d',
@@ -1679,7 +2296,7 @@ const rawData = [
 		values: [
 			{
 				editorAlias: 'Umbraco.MultiUrlPicker',
-				alias: 'multiUrlPickerDefaultConfig',
+				alias: 'urlPickerDefaultConfig',
 				culture: null,
 				segment: null,
 				value: [
@@ -1703,7 +2320,7 @@ const rawData = [
 			},
 			{
 				editorAlias: 'Umbraco.MultiUrlPicker',
-				alias: 'multiUrlPickerFullyConfigured',
+				alias: 'urlPickerFullyConfigured',
 				culture: null,
 				segment: null,
 				value: [
@@ -1721,12 +2338,12 @@ const rawData = [
 			},
 			{
 				editorAlias: 'Umbraco.MultiUrlPicker',
-				alias: 'multiUrlPickerHideAnchorQueryString',
+				alias: 'urlPickerHideAnchorQueryString',
 				culture: null,
 				segment: null,
 				value: [
 					{
-						name: 'Content Picker',
+						name: 'Single Document Picker',
 						type: 'document',
 						unique: '58e300ad-868c-4a84-9915-2aef20ea681c',
 					},
@@ -1734,7 +2351,7 @@ const rawData = [
 			},
 			{
 				editorAlias: 'Umbraco.MultiUrlPicker',
-				alias: 'multiUrlPickerIgnoreUserStartNodes',
+				alias: 'urlPickerIgnoreUserStartNodes',
 				culture: null,
 				segment: null,
 				value: [
@@ -1757,7 +2374,7 @@ const rawData = [
 			},
 			{
 				editorAlias: 'Umbraco.MultiUrlPicker',
-				alias: 'multiUrlPickerLargeOverlaySize',
+				alias: 'urlPickerLargeOverlaySize',
 				culture: null,
 				segment: null,
 				value: [
@@ -1771,7 +2388,7 @@ const rawData = [
 			},
 			{
 				editorAlias: 'Umbraco.MultiUrlPicker',
-				alias: 'multiUrlPickerMinAndMax',
+				alias: 'urlPickerMinAndMax',
 				culture: null,
 				segment: null,
 				value: [
@@ -1797,9 +2414,99 @@ const rawData = [
 						url: 'https://umbraco.com',
 					},
 					{
-						name: 'Multiple Textstring',
+						name: 'Text Box List',
 						type: 'document',
 						unique: '17149c1e-44a8-4882-a088-6a1d84e0e86a',
+					},
+				],
+			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
+			{
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
+		id: '1a8e0933-7405-4986-95ae-cad353b9c71e',
+		createDate: '2023-02-20 16:22:42',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: 'f964cfed-7295-4584-b98f-2fb038970e67',
+			icon: 'icon-link color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0592605',
+				culture: null,
+				segment: null,
+				name: 'Single URL Picker',
+				createDate: '2023-02-20 16:22:42',
+				updateDate: '2026-04-16 11:10:37.0592605',
+				id: '1a8e0933-7405-4986-95ae-cad353b9c71e',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.UrlPicker.Single',
+				alias: 'singleUrlPickerDefaultConfig',
+				culture: null,
+				segment: null,
+				value: [
+					{
+						name: 'Color Picker',
+						type: 'document',
+						unique: '23b1bf0a-c56e-4b0c-a2a9-a83d0d9708ef',
+					},
+				],
+			},
+			{
+				editorAlias: 'Umbraco.UrlPicker.Single',
+				alias: 'singleUrlPickerLargeOverlaySize',
+				culture: null,
+				segment: null,
+				value: [
+					{
+						name: 'Umbraco Dot Com',
+						type: 'external',
+						target: '_blank',
+						url: 'https://umbraco.com',
+					},
+				],
+			},
+			{
+				editorAlias: 'Umbraco.UrlPicker.Single',
+				alias: 'singleUrlPickerHideAnchorQueryString',
+				culture: null,
+				segment: null,
+				value: [
+					{
+						name: 'Single Document Picker',
+						type: 'document',
+						unique: '58e300ad-868c-4a84-9915-2aef20ea681c',
+					},
+				],
+			},
+			{
+				editorAlias: 'Umbraco.UrlPicker.Single',
+				alias: 'singleUrlPickerIgnoreUserStartNodes',
+				culture: null,
+				segment: null,
+				value: [
+					{
+						name: 'DateTime Picker',
+						type: 'document',
+						unique: '0865b2ab-ad7c-48d4-a8c6-608986a0e942',
 					},
 				],
 			},
@@ -1936,71 +2643,6 @@ const rawData = [
 				culture: null,
 				segment: null,
 				value: [{ type: 'member', unique: 'e93b2557-5fcb-4495-bbb3-9f5fd87055a8' }],
-			},
-		],
-		flags: [],
-	},
-	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
-		template: null,
-		id: '17149c1e-44a8-4882-a088-6a1d84e0e86a',
-		createDate: '2023-02-20 16:22:56',
-		parent: {
-			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-		},
-		documentType: {
-			id: 'cc827fc0-e385-494b-88f6-d4abb47b7081',
-			icon: 'icon-ordered-list color-green',
-		},
-		hasChildren: false,
-		noAccess: false,
-		isProtected: false,
-		isTrashed: false,
-		variants: [
-			{
-				state: 'Published',
-				publishDate: '2026-04-16 11:10:37.0670868',
-				culture: null,
-				segment: null,
-				name: 'Multiple Textstring',
-				createDate: '2023-02-20 16:22:56',
-				updateDate: '2026-04-16 11:10:37.0670868',
-				id: '17149c1e-44a8-4882-a088-6a1d84e0e86a',
-				flags: [],
-			},
-		],
-		values: [
-			{
-				editorAlias: 'Umbraco.MultipleTextstring',
-				alias: 'multipleTextstringDefaultConfig',
-				culture: null,
-				segment: null,
-				value: ['One', 'Two', 'Three'],
-			},
-			{
-				editorAlias: 'Umbraco.MultipleTextstring',
-				alias: 'multipleTextstringFullyConfigured',
-				culture: null,
-				segment: null,
-				value: ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'],
-			},
-			{
-				editorAlias: 'Umbraco.MultipleTextstring',
-				alias: 'multipleTextstringMax',
-				culture: null,
-				segment: null,
-				value: ['One', 'Two', 'Three', 'Four', 'Five', 'Six'],
-			},
-			{
-				editorAlias: 'Umbraco.MultipleTextstring',
-				alias: 'multipleTextstringMin',
-				culture: null,
-				segment: null,
-				value: ['One', 'Two', 'Three', 'Four', 'Five'],
 			},
 		],
 		flags: [],
@@ -2185,8 +2827,22 @@ const rawData = [
 				culture: null,
 				segment: null,
 				value: {
-					markup:
-						'<p>Yikes so many buttons!</p><ul><li><p>Button</p></li><li><p>Button</p></li><li><p>More button!</p></li></ul><p><img data-udi="umb://media/f06adb918cdd408d83ddf7b833fc393c" src="/umbraco/backoffice/assets/umb-pattern-blue.png" alt="" width="284" height="284"></p><p>&nbsp;</p>',
+					markup: `<p>Yikes so many buttons!</p>
+<ul><li><p>Button</p></li><li><p>Button</p></li><li><p>More button!</p></li></ul>
+<p><img data-udi="umb://media/f06adb918cdd408d83ddf7b833fc393c" src="/umbraco/backoffice/assets/umb-pattern-blue.png" alt="" width="284" height="284"></p>
+<p>&nbsp;</p>
+<div style="border: 5px solid #123456; padding: 1em;">
+  <p><strong>Example Section A</strong></p>
+  <p><a href="https://example.com/item-a" title="Example A">ITEM A</a></p>
+  <ul>
+    <li>Example list item</li>
+  </ul>
+</div>
+<p>&nbsp;</p>
+<div style="border: 5px solid #654321; padding: 1em;">
+  <p><strong>Example Section B</strong></p>
+  <p><a href="https://example.com/item-b" title="Example B">ITEM B</a></p>
+</div>`,
 					blocks: {
 						contentData: [],
 						settingsData: [],
@@ -2262,6 +2918,78 @@ const rawData = [
 			},
 			{
 				editorAlias: 'Umbraco.Slider',
+				alias: 'sliderFullyConfigured',
+				culture: null,
+				segment: null,
+				value: '75',
+			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
+			{
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
+		id: 'cacc9629-df9e-4430-9e09-5a06c724a471',
+		createDate: '2023-02-20 16:23:24',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: 'fd62e565-4894-4da8-a6ac-80572431b2d2',
+			icon: 'icon-navigation-horizontal color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0807808',
+				culture: null,
+				segment: null,
+				name: 'Range Slider',
+				createDate: '2023-02-20 16:23:24',
+				updateDate: '2026-04-16 11:10:37.0807808',
+				id: 'cacc9629-df9e-4430-9e09-5a06c724a471',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.Slider.Range',
+				alias: 'rangeSliderDefaultConfig',
+				culture: null,
+				segment: null,
+				value: '0,0',
+			},
+			{
+				editorAlias: 'Umbraco.Slider.Range',
+				alias: 'rangeSliderMinAndMax',
+				culture: null,
+				segment: null,
+				value: '20,80',
+			},
+			{
+				editorAlias: 'Umbraco.Slider.Range',
+				alias: 'rangeSliderStepIncrements',
+				culture: null,
+				segment: null,
+				value: '30,60',
+			},
+			{
+				editorAlias: 'Umbraco.Slider.Range',
+				alias: 'rangeSliderInitialValue',
+				culture: null,
+				segment: null,
+				value: '6,24',
+			},
+			{
+				editorAlias: 'Umbraco.Slider.Range',
 				alias: 'sliderFullyConfigured',
 				culture: null,
 				segment: null,
@@ -2444,6 +3172,71 @@ const rawData = [
 			},
 		],
 		template: null,
+		id: '17149c1e-44a8-4882-a088-6a1d84e0e86a',
+		createDate: '2023-02-20 16:22:56',
+		parent: {
+			id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+		},
+		documentType: {
+			id: 'cc827fc0-e385-494b-88f6-d4abb47b7081',
+			icon: 'icon-ordered-list color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published',
+				publishDate: '2026-04-16 11:10:37.0670868',
+				culture: null,
+				segment: null,
+				name: 'Text Box List',
+				createDate: '2023-02-20 16:22:56',
+				updateDate: '2026-04-16 11:10:37.0670868',
+				id: '17149c1e-44a8-4882-a088-6a1d84e0e86a',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.MultipleTextstring',
+				alias: 'textBoxListDefaultConfig',
+				culture: null,
+				segment: null,
+				value: ['One', 'Two', 'Three'],
+			},
+			{
+				editorAlias: 'Umbraco.MultipleTextstring',
+				alias: 'textBoxListFullyConfigured',
+				culture: null,
+				segment: null,
+				value: ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'],
+			},
+			{
+				editorAlias: 'Umbraco.MultipleTextstring',
+				alias: 'textBoxListMax',
+				culture: null,
+				segment: null,
+				value: ['One', 'Two', 'Three', 'Four', 'Five', 'Six'],
+			},
+			{
+				editorAlias: 'Umbraco.MultipleTextstring',
+				alias: 'textBoxListMin',
+				culture: null,
+				segment: null,
+				value: ['One', 'Two', 'Three', 'Four', 'Five'],
+			},
+		],
+		flags: [],
+	},
+	{
+		ancestors: [
+			{
+				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+		],
+		template: null,
 		id: '57257cd6-8100-4fbf-a734-f4147ce30701',
 		createDate: '2023-02-20 16:23:36',
 		parent: {
@@ -2528,7 +3321,7 @@ const rawData = [
 				publishDate: '2026-04-16 11:10:37.09819',
 				culture: null,
 				segment: null,
-				name: 'User Picker',
+				name: 'Single User Picker',
 				createDate: '2023-02-27 08:34:21',
 				updateDate: '2026-04-16 11:10:37.09819',
 				id: '06e4bd2f-98f7-48cc-85e9-2a4b8cd668e8',
@@ -2538,7 +3331,7 @@ const rawData = [
 		values: [
 			{
 				editorAlias: 'Umbraco.UserPicker',
-				alias: 'userPicker',
+				alias: 'singleUserPicker',
 				culture: null,
 				segment: null,
 				value: '1e70f841-c261-413b-abb2-2d68cdb96094',
@@ -2595,4 +3388,5 @@ export const data: Array<UmbMockDocumentModel> = [
 		values: allDataTypesValues,
 		flags: [],
 	},
+	...pageTree,
 ];

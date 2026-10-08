@@ -134,7 +134,8 @@ internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
         true,
         true,
         TestName = "D=>E Valid Children, Invalid Parent")]
-    [TestCase(new[] { false, true, false, true, true },
+    [TestCase(
+        new[] { false, true, false, true, true },
         2,
         true,
         true,

@@ -33,17 +33,12 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         builder.AddUmbracoOpenApi();
 
-#pragma warning disable CS0618 // Type or member is obsolete
-        if (!services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(JsonPatchService)))
-#pragma warning restore CS0618 // Type or member is obsolete
+        if (services.All(x => x.ServiceType != typeof(ManagementApiRegistrationMarker)))
         {
-#pragma warning disable CS0618 // Type or member is obsolete
+            services.AddSingleton<ManagementApiRegistrationMarker>();
             ModelsBuilderBuilderExtensions.AddModelsBuilder(builder)
-                .AddJson()
-#pragma warning restore CS0618 // Type or member is obsolete
                 .AddInstaller()
                 .AddUpgrader()
-                .AddSearchManagement()
                 .AddTrees()
                 .AddAuditLogs()
                 .AddConfigurationFactories()
@@ -135,5 +130,10 @@ public static partial class UmbracoBuilderExtensions
         builder.AddCollectionBuilders();
 
         return builder;
+    }
+
+    // Registered once by AddUmbracoManagementApi so a second call does not repeat the registrations below it.
+    private sealed class ManagementApiRegistrationMarker
+    {
     }
 }

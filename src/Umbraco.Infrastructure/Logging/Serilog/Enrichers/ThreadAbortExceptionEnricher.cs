@@ -15,7 +15,7 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
 {
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IMarchal _marchal;
-    private CoreDebugSettings _coreDebugSettings;
+    private DebugSettings _coreDebugSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThreadAbortExceptionEnricher"/> class.
@@ -24,7 +24,7 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
     /// <param name="hostingEnvironment">The current hosting environment.</param>
     /// <param name="marchal">The marshal instance used for thread operations.</param>
     public ThreadAbortExceptionEnricher(
-        IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
+        IOptionsMonitor<DebugSettings> coreDebugSettings,
         IHostingEnvironment hostingEnvironment,
         IMarchal marchal)
     {

@@ -17,7 +17,8 @@ export interface UmbMenuItemActionElement extends UmbControllerHostElement {
 // Unable to extend from `ManifestMenuItem` as `UmbMenuItemElement` is of type `HTMLElement`, but for use with an API,
 // it needs to be of type `UmbControllerHostElement`, and modifying `UmbMenuItemElement` would be a breaking-change. [LK]
 export interface ManifestMenuItemActionKind
-	extends ManifestElementAndApi<UmbMenuItemActionElement, UmbMenuItemActionApi<MetaMenuItemActionKind>>,
+	extends
+		ManifestElementAndApi<UmbMenuItemActionElement, UmbMenuItemActionApi<MetaMenuItemActionKind>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'menuItem';
 	kind: 'action';

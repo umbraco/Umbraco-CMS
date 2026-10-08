@@ -41,9 +41,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		weight: 950,
 		forEntityTypes: [UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE],
 		element: () =>
-			import(
-				'./input-document-property-value-user-permission/input-document-property-value-user-permission.element.js'
-			),
+			import('./input-document-property-value-user-permission/input-document-property-value-user-permission.element.js'),
 		meta: {
 			schemaType: 'DocumentPropertyValuePermissionPresentationModel',
 			label: '#user_permissionsGranular',

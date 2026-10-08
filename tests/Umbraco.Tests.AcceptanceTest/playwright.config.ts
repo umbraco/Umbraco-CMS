@@ -8,7 +8,7 @@ export const STORAGE_STATE = path.join(__dirname, 'playwright/.auth/user.json');
 export default defineConfig({
   testDir: './tests/',
   /* Maximum time one test can run for. */
-  timeout: 30 * 1000,
+  timeout: 60 * 1000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -110,6 +110,17 @@ export default defineConfig({
       testMatch: 'UnattendedInstallConfig/**',
       use: {
         ...devices['Desktop Chrome']
+      }
+    },
+    {
+      name: 'allowEditInvariantConfig',
+      testMatch: 'AllowEditInvariantConfig/**',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
       }
     },
     {

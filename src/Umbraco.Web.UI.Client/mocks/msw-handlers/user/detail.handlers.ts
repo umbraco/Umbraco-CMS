@@ -24,6 +24,10 @@ export const detailHandlers = [
 		return HttpResponse.json(umbUserMockDb.getConfiguration());
 	}),
 
+	http.get(umbracoPath(`${UMB_SLUG}/current/configuration`), () => {
+		return HttpResponse.json(umbUserMockDb.getCurrentConfiguration());
+	}),
+
 	http.get(umbracoPath(`${UMB_SLUG}/:id/calculate-start-nodes`), ({ params }) => {
 		const id = params.id as string;
 		if (!id) return new HttpResponse(null, { status: 400 });

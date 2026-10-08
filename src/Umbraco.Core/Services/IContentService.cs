@@ -46,8 +46,7 @@ public interface IContentService : IPublishableContentService<IContent>
     /// </summary>
     /// <param name="content">The blueprint to move.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
-    // TODO (V19): Remove the default implementation from this
-    void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
+    void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes a blueprint.
@@ -166,18 +165,6 @@ public interface IContentService : IPublishableContentService<IContent>
     IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
 
     /// <summary>
-    ///     Gets child documents of a parent.
-    /// </summary>
-    /// <param name="id">The parent identifier.</param>
-    /// <param name="pageIndex">The page number.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <param name="totalRecords">Total number of documents.</param>
-    /// <param name="filter">Query filter.</param>
-    /// <param name="ordering">Ordering infos.</param>
-    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
-    IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
-
-    /// <summary>
     ///     Gets child documents of a parent with optional property filtering.
     /// </summary>
     /// <param name="id">The parent identifier.</param>
@@ -194,10 +181,8 @@ public interface IContentService : IPublishableContentService<IContent>
     ///     Whether to load templates. Set to false for performance optimization when templates are not needed
     ///     (e.g., collection views). Default is true.
     /// </param>
-#pragma warning disable CS0618 // Type or member is obsolete
-    IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true)
-        => GetPagedChildren(id, pageIndex, pageSize, out totalRecords, filter, ordering);
-#pragma warning restore CS0618 // Type or member is obsolete
+    /// <returns>The child documents of the parent.</returns>
+    IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true);
 
     /// <summary>
     ///     Gets descendant documents of a given parent.
@@ -270,14 +255,6 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <param name="id">The document identifier.</param>
     /// <returns><c>true</c> if the document has children; otherwise, <c>false</c>.</returns>
     bool HasChildren(int id);
-
-    /// <summary>
-    ///     Gets a dictionary of content Ids and their matching content schedules.
-    /// </summary>
-    /// <param name="keys">The content keys.</param>
-    /// <returns>A dictionary with a node Id and an IEnumerable of matching ContentSchedules.</returns>
-    [Obsolete("Use GetContentSchedulesByKeys instead. Scheduled for removal in Umbraco 19.")]
-    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
 
     #endregion
 
@@ -355,6 +332,33 @@ public interface IContentService : IPublishableContentService<IContent>
     OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Moves a document under a new parent, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="content">The document to move.</param>
+    /// <param name="parentId">The identifier of the new parent.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the document along with it. When restoring a document out of the recycle
+    ///     bin this can be set to <c>false</c> to restore only the document itself, leaving its descendants in the
+    ///     recycle bin as top-level bin items.
+    /// </param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
+    OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
+    {
+        // Only the whole-tree move can be satisfied by delegating to the existing method; there is no way to honour
+        // includeDescendants: false without the concrete implementation, so fail fast rather than silently move
+        // the descendants after all.
+        if (includeDescendants is false)
+        {
+            throw new NotImplementedException("This IContentService implementation does not support moving without descendants. Override the Move overload that takes an includeDescendants parameter to support it.");
+        }
+
+        return Move(content, parentId, userId);
+    }
+
+    /// <summary>
     ///     Copies a document.
     /// </summary>
     /// <param name="content">The document to copy.</param>
@@ -430,9 +434,7 @@ public interface IContentService : IPublishableContentService<IContent>
     ///     Unlike <see cref="Sort(IEnumerable{int}?, int)" />, this does not load the children or fire per-item
     ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
-        => throw new NotImplementedException();
+    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId);
 
     #endregion
 

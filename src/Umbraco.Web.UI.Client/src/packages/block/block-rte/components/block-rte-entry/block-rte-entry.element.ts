@@ -100,7 +100,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	@state()
 	private _isReadOnly = false;
 
-	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
+	@state()
 	private _name?: string;
 
 	@state()
@@ -108,6 +108,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
+
+	// 'is-reference' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
+	private _isExternalContent = false;
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
@@ -186,7 +190,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				this._isReadOnly = isReadOnly;
 				this.#updateBlockViewProps({ readonly: isReadOnly });
 			},
-			'umbReadOnlyObserver',
+			null,
 		);
 	}
 
@@ -233,10 +237,17 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			null,
 		);
 		this.observe(
-			this.#context.hasExpose,
-			(exposed) => {
-				this.#updateBlockViewProps({ unpublished: !exposed });
-				this._exposed = exposed;
+			this.#context.isExposed,
+			(isExposed) => {
+				this.#updateBlockViewProps({ unpublished: !isExposed });
+				this._exposed = isExposed;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.isExternalContent,
+			(isExternalContent) => {
+				this._isExternalContent = isExternalContent;
 			},
 			null,
 		);
@@ -324,7 +335,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return when(
 			this.contentKey && (this._contentTypeAlias || this.unsupported),
 			() => html`
-				<div>
+				<div class="umb-block-rte__block">
+					<umb-entity-frame>
+						${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._name}
+					</umb-entity-frame>
 					<umb-extension-slot
 						type="blockEditorCustomView"
 						default-element="umb-ref-rte-block"
@@ -366,6 +380,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
+				.isExternalContent=${this._isExternalContent}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
 				.config=${this._blockViewProps.config}>
@@ -382,6 +397,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			:host {
 				position: relative;
 				display: block;
+				margin-top: var(--uui-size-3);
 				user-select: all;
 				user-drag: auto;
 				white-space: nowrap;
@@ -389,13 +405,33 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				--umb-block-entry-actions-opacity: 0;
 			}
 
+			:host([settings-invalid]),
+			:host([content-invalid]),
 			:host(:hover),
 			:host(:focus-within) {
 				--umb-block-entry-actions-opacity: 1;
 			}
 
+			:host::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				pointer-events: none;
+				inset: 0;
+				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
+
+				transition: border-color 240ms ease-in;
+			}
+
+			:host([settings-invalid])::after,
+			:host([content-invalid])::after {
+				border-color: var(--uui-color-invalid);
+			}
+
 			:host(.ProseMirror-selectednode) {
 				--uui-color-default-contrast: initial;
+				border-radius: var(--uui-border-radius);
 				outline: 3px solid var(--uui-color-focus);
 			}
 
@@ -413,13 +449,17 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				z-index: 1;
 			}
 
+			uui-badge {
+				z-index: 2;
+			}
+
 			:host([drag-placeholder]) {
 				opacity: 0.2;
 			}
 
 			:host([is-reference]) .umb-block-rte__block {
-				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
-				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+				--umb-entity-frame-color: var(--umb-color-reference);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
 			}
 
 			.umb-block-rte__block {

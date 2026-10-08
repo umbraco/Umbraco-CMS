@@ -1,8 +1,8 @@
 import type { UmbTreeItemModel } from '../../types.js';
+import type { UmbTreeItemCardApi } from '../types.js';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbTreeItemCardApi } from '../types.js';
 
 @customElement('umb-default-tree-item-card')
 export class UmbDefaultTreeItemCardElement extends UmbLitElement {
@@ -20,7 +20,6 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 			this.observe(value.hasChildren, (v) => (this._hasChildren = v), '_observeHasChildren');
 			this.observe(value.noAccess, (v) => (this._noAccess = v), '_observeNoAccess');
 			this.observe(value.path, (v) => (this._path = v), '_observePath');
-			this.observe(value.hasActions, (v) => (this._hasActions = v), '_observeHasActions');
 		}
 	}
 	public get api(): UmbTreeItemCardApi | undefined {
@@ -54,9 +53,6 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 	@state()
 	private _path = '';
 
-	@state()
-	private _hasActions = false;
-
 	#onSelected(e: CustomEvent) {
 		e.stopPropagation();
 		this.#api?.select();
@@ -83,12 +79,15 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 	override render() {
 		if (!this.item) return nothing;
 		const href = this._isSelectableContext ? undefined : this._path || undefined;
+		// select-only makes the entire card a select target, so it must never be applied to an item with
+		// children — that would leave no way to drill into it while a selection is in progress.
+		const selectOnly = !this._hasChildren && (this._selectOnly || this._isSelectableContext);
 		return html`
 			<umb-figure-card
 				name=${this.localize.string(this.item?.name ?? '')}
 				href=${ifDefined(href)}
 				?selectable=${this._isSelectable}
-				?select-only=${this._selectOnly || (!this._hasChildren && this._isSelectableContext)}
+				?select-only=${selectOnly}
 				?selected=${this._isSelected}
 				?active=${this._isActive}
 				?has-children=${this._hasChildren}
@@ -109,8 +108,9 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 	}
 
 	#renderActions() {
-		if (!this._hasActions) return nothing;
-		return html`<umb-entity-actions-bundle slot="actions" .label=${this.localize.string(this.item?.name ?? '')}></umb-entity-actions-bundle>`;
+		return html`<umb-entity-actions-bundle
+			slot="actions"
+			.label=${this.localize.string(this.item?.name ?? '')}></umb-entity-actions-bundle>`;
 	}
 }
 

@@ -1,0 +1,48 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Search;
+using Umbraco.Cms.Core.Search.Configuration;
+using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Search.Provider.Examine.Configuration;
+using Umbraco.Cms.Search.Provider.Examine.Services;
+using Umbraco.Extensions;
+using ServicesCollectionExtensions = Examine.ServicesCollectionExtensions;
+
+namespace Umbraco.Cms.Search.Provider.Examine.DependencyInjection;
+
+/// <summary>
+/// Provides extension methods for registering the Examine search provider's own services on an <see cref="IServiceCollection"/>.
+/// </summary>
+internal static class ServiceCollectionExtensions
+{
+    /// <summary>
+    /// Registers Examine itself, the Examine-backed <see cref="IIndexer"/>/<see cref="ISearcher"/> implementations,
+    /// and the content index registrations for the built-in document, media, and member indexes.
+    /// </summary>
+    /// <param name="services">The service collection to register the Examine search provider's services on.</param>
+    public static void AddExamineSearchProviderServices(this IServiceCollection services)
+    {
+        ServicesCollectionExtensions.AddExamine(services);
+
+        // The concrete ExamineManager must win over the NoopExamineManager fallback registered by the CMS core
+        // (Examine's own AddExamine only uses TryAddSingleton, which would lose against the fallback).
+        services.AddUnique<global::Examine.IExamineManager, global::Examine.ExamineManager>();
+
+        services.ConfigureOptions<ConfigureIndexOptions>();
+
+        // register the in-memory searcher and indexer so they can be used explicitly for index registrations
+        services.AddTransient<IExamineIndexer, Indexer>();
+        services.AddTransient<IExamineSearcher, Searcher>();
+
+        services.AddTransient<IIndexer, Indexer>();
+        services.AddTransient<ISearcher, Searcher>();
+
+        services.Configure<IndexOptions>(options =>
+        {
+            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftContent, UmbracoObjectTypes.Document);
+            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IPublishedContentChangeStrategy>(Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent, UmbracoObjectTypes.Document);
+            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMedia, UmbracoObjectTypes.Media);
+            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMembers, UmbracoObjectTypes.Member);
+        });
+    }
+}

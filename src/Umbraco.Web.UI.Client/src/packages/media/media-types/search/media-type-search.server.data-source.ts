@@ -4,11 +4,12 @@ import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/bac
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbMediaTypeSearchServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbSearchDataSource}
  */
 export class UmbMediaTypeSearchServerDataSource implements UmbSearchDataSource<UmbMediaTypeSearchItemModel> {
 	#host: UmbControllerHost;
@@ -24,11 +25,11 @@ export class UmbMediaTypeSearchServerDataSource implements UmbSearchDataSource<U
 
 	/**
 	 * Get a list of versions for a data
-	 * @param args
-	 * @returns {*}
+	 * @param {UmbSearchRequestArgs} args - The search request arguments
+	 * @returns {UmbDataSourceResponse<UmbPagedModel<UmbMediaTypeSearchItemModel>>} The search results
 	 * @memberof UmbMediaTypeSearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
+	async search(args: UmbSearchRequestArgs): Promise<UmbDataSourceResponse<UmbPagedModel<UmbMediaTypeSearchItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaTypeService.getItemMediaTypeSearch({

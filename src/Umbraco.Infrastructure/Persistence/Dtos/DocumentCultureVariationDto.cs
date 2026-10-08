@@ -5,18 +5,16 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName)]
+[PrimaryKey(ICultureVariationDto.Columns.Id)]
 [ExplicitColumns]
 internal sealed class DocumentCultureVariationDto : ICultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentCultureVariation;
 
-    private const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
-
     /// <summary>
     /// Gets or sets the unique identifier for the document culture variation.
     /// </summary>
-    [Column(PrimaryKeyColumnName)]
+    [Column(ICultureVariationDto.Columns.Id)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 

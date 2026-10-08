@@ -1,4 +1,7 @@
-import { UMB_MEDIA_PICKER_PROPERTY_EDITOR_VALUE_TYPE } from '../value-type/constants.js';
+import {
+	UMB_MEDIA_PICKER_PROPERTY_EDITOR_VALUE_TYPE,
+	UMB_SINGLE_MEDIA_PICKER_PROPERTY_EDITOR_VALUE_TYPE,
+} from '../value-type/constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,6 +10,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.ValueSummary.PropertyEditor.MediaPicker',
 		name: 'Media Picker Property Editor Value Summary',
 		forValueType: UMB_MEDIA_PICKER_PROPERTY_EDITOR_VALUE_TYPE,
+		element: () => import('./value-summary.js'),
+		valueResolver: () => import('./value-summary.js'),
+	},
+	{
+		type: 'valueSummary',
+		kind: 'default',
+		alias: 'Umb.ValueSummary.PropertyEditor.SingleMediaPicker',
+		name: 'Single Media Picker Property Editor Value Summary',
+		forValueType: UMB_SINGLE_MEDIA_PICKER_PROPERTY_EDITOR_VALUE_TYPE,
 		element: () => import('./value-summary.js'),
 		valueResolver: () => import('./value-summary.js'),
 	},

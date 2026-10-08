@@ -1,4 +1,4 @@
-import {Page, Locator, expect} from "@playwright/test";
+﻿import {Page, Locator, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
@@ -28,6 +28,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly minimumTxt: Locator;
   private readonly maximumTxt: Locator;
   private readonly stepSizeTxt: Locator;
+  private readonly sliderMinimumTxt: Locator;
+  private readonly sliderMaximumTxt: Locator;
   private readonly optionTxt: Locator;
   private readonly addOptionBtn: Locator;
   private readonly maximumAllowedCharsTxt: Locator;
@@ -41,7 +43,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly ignoreUserStartNodesToggle: Locator;
   private readonly overlaySizeDropDownBox: Locator;
   private readonly hideAnchorQueryStringInputToggle: Locator;
-  private readonly pickMultipleItemsToggle: Locator;
   private readonly enableFocalPointToggle: Locator;
   private readonly amountLowValueTxt: Locator;
   private readonly amountHighValueTxt: Locator;
@@ -53,7 +54,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly hideLabelToggle: Locator;
   private readonly defineTagGroupTxt: Locator;
   private readonly showOpenButtonToggle: Locator;
-  private readonly enableMultipleChoiceToggle: Locator;
   private readonly addOptionsBtn: Locator;
   private readonly presetValueToggle: Locator;
   private readonly showToggleLabelsToggle: Locator;
@@ -162,7 +162,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.ignoreUserStartNodesToggle = page.getByTestId('property:ignoreUserStartNodes').locator('#toggle');
     this.duplicateBtn = this.sidebarModal.getByLabel('Duplicate', {exact: true});
     this.selectAPropertyEditorBtn = page.getByLabel('Select a property editor');
-    this.typeToFilterTxt = page.locator('#filter #input');
+    this.typeToFilterTxt = page.locator('umb-backoffice-modal-container #filter #input');
 
     // Approved Color
     this.includeLabelsToggle = page.locator('#toggle');
@@ -178,13 +178,13 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.ascendingRadioBtn = page.locator('uui-radio[label="Ascending [a-z]"] #button');
     this.descendingRadioBtn = page.locator('uui-radio[label="Descending [z-a]"] #button');
     this.chooseColumnsDisplayedBtn = page.getByTestId('property:includeProperties').getByLabel('Choose');
-    this.columnsDisplayedItems = page.getByTestId('property:includeProperties').locator('.layout-item');
+    this.columnsDisplayedItems = page.getByTestId('property:includeProperties').locator('umb-sortable-list-item');
     this.workspaceViewName = page.getByTestId('property:tabName').locator('#input');
     this.showWorkspaceViewFirstToggle = page.getByTestId('property:showContentFirst').locator('#toggle');
     this.editInInfiniteEditorToggle = page.locator('umb-property[label="Edit in Infinite Editor"] #toggle');
     this.orderByDropDownBox = page.getByTestId('property:orderBy').locator('select');
     this.chooseLayoutsBtn = page.getByTestId('property:layouts').getByLabel('Choose');
-    this.layoutsItems = page.getByTestId('property:layouts').locator('.layout-item');
+    this.layoutsItems = page.getByTestId('property:layouts').locator('umb-sortable-list-item');
 
     // Image Cropper
     this.labelTxt = page.getByLabel('Label', {exact: true});
@@ -193,13 +193,17 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.heightTxt = page.getByLabel('Height', {exact: true});
     this.propertyCrops = page.getByTestId('property:crops');
     this.createCropBtn = this.propertyCrops.getByRole('button', {name: 'Create'});
-    this.editCropBtn = this.propertyCrops.getByRole('button', {name: 'Edit'});
+    this.editCropBtn = this.propertyCrops.locator('.crop-form uui-button[type="submit"]');
 
     // Numeric
     this.minimumTxt = page.getByTestId('property:min').locator('#input');
     this.maximumTxt = page.getByTestId('property:max').locator('#input');
     this.stepSizeTxt = page.getByTestId('property:step').locator('#input');
     this.allowDecimalsToggle = page.locator('umb-property[label="Allow decimals"] #toggle');
+
+    // Slider (uses minVal/maxVal aliases rather than the Numeric min/max)
+    this.sliderMinimumTxt = page.getByTestId('property:minVal').locator('#input');
+    this.sliderMaximumTxt = page.getByTestId('property:maxVal').locator('#input');
 
     // Radiobox
     this.optionTxt = page.getByTestId('property:items').locator('#input');
@@ -222,7 +226,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.hideAnchorQueryStringInputToggle = page.getByTestId('property:hideAnchor').locator('#toggle');
 
     // Media Picker
-    this.pickMultipleItemsToggle = page.getByTestId('property:multiple').locator('#toggle');
     this.enableFocalPointToggle = page.getByTestId('property:enableLocalFocalPoint').locator('#toggle');
     this.amountLowValueTxt = page.getByTestId('property:validationLimit').getByLabel('Low value');
     this.amountHighValueTxt = page.getByTestId('property:validationLimit').getByLabel('High value');
@@ -249,7 +252,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.showOpenButtonToggle = page.getByTestId('property:showOpenButton').locator('#toggle');
 
     // Dropdown
-    this.enableMultipleChoiceToggle = page.getByTestId('property:multiple').locator('#toggle');
     this.addOptionsBtn = page.getByTestId('property:items').getByLabel('Add', {exact: true});
 
     // True/false
@@ -260,8 +262,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
     // Block List Editor and Block Grid Editor
     this.addBlockBtn = page.locator('umb-input-block-type #blocks').getByLabel('open');
-    this.minAmountTxt = page.getByLabel('Low value');
-    this.maxAmountTxt = page.getByLabel('High value');
+    this.minAmountTxt = page.getByTestId('property:validationLimit').getByLabel('Low value');
+    this.maxAmountTxt = page.getByTestId('property:validationLimit').getByLabel('High value');
     this.singleBlockModeBtn = this.page.locator('umb-property-layout').filter({hasText: 'Single block mode'}).locator('#toggle');
     this.liveEditingModeBtn = this.page.locator('umb-property-layout').filter({hasText: 'Live editing'}).locator('#toggle');
     this.inlineEditingModeBtn = this.page.locator('umb-property-layout').filter({hasText: 'Inline editing'}).locator('#toggle');
@@ -335,10 +337,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.dataSourceChooseBtn = page.locator('[label="Data Source"]').locator(this.chooseBtn);
 
     // Dynamic Root
-    this.dynamicRootComponent = page.locator('umb-input-content-picker-document-root');
+    this.dynamicRootComponent = page.locator('umb-input-document-dynamic-root');
     this.dynamicRootPlaceholderBtn = this.dynamicRootComponent.locator('uui-button[look="placeholder"]');
-    this.dynamicRootOriginPickerModal = page.locator('umb-dynamic-root-origin-picker-modal');
-    this.dynamicRootQueryStepPickerModal = page.locator('umb-dynamic-root-query-step-picker-modal');
+    this.dynamicRootOriginPickerModal = page.locator('umb-document-dynamic-root-origin-picker-modal');
+    this.dynamicRootQueryStepPickerModal = page.locator('umb-document-dynamic-root-query-step-picker-modal');
     this.closeDynamicRootOriginPickerModalBtn = this.dynamicRootOriginPickerModal.getByLabel('Close');
   }
 
@@ -386,11 +388,12 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async isDataTypeTreeItemVisible(name: string, isVisible: boolean = true) {
-    const hasShowChildren = await this.dataTypeTreeRoot.getAttribute('show-children') !== null;
-
-    if (!hasShowChildren) {
-      await this.click(this.dataTypeTreeRoot.locator(this.caretBtn).first());
-    }
+    await expect(async () => {
+      if (await this.dataTypeTreeRoot.getAttribute('show-children') === null) {
+        await this.click(this.dataTypeTreeRoot.locator(this.caretBtn).first());
+      }
+      expect(await this.dataTypeTreeRoot.getAttribute('show-children')).not.toBeNull();
+    }).toPass({timeout: ConstantHelper.timeout.medium});
 
     await this.isTreeItemVisible(name, isVisible);
   }
@@ -465,8 +468,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async selectAPropertyEditor(propertyName: string, filterKeyword?: string) {
-    await this.typeToFilterTxt.fill(filterKeyword ? filterKeyword : propertyName);
-    await this.clickTextButtonWithName(propertyName);
+    const propertyEditorOption = this.backofficeModalContainer.getByText(propertyName, {exact: true});
+    await expect(async () => {
+      await this.enterText(this.typeToFilterTxt, filterKeyword ? filterKeyword : propertyName);
+      await this.click(propertyEditorOption, {timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
   // Approved Color
@@ -482,11 +488,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
   async addColor(value: string) {
     await this.click(this.addColorBtn);
     await this.enterText(this.colorValueTxt, value);
-  }
-
-  // Label
-  async changeValueType(valueType: string) {
-    await this.selectByText(this.page.getByLabel('Select a value type'), valueType);
   }
 
   // Date Picker
@@ -520,7 +521,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async removeColumnDisplayed(propertyAlias: string) {
-    await this.click(this.columnsDisplayedItems.filter({has: this.page.getByText(propertyAlias, {exact: true})}).getByText('Remove'));
+    await this.click(this.columnsDisplayedItems.filter({has: this.page.getByText(propertyAlias, {exact: true})}).getByLabel('Remove', {exact: true}), {force: true});
+    await this.click(this.confirmToRemoveBtn);
   }
 
   async addLayouts(layoutName: string) {
@@ -529,7 +531,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async removeLayouts(layoutAlias: string) {
-    await this.click(this.layoutsItems.filter({has: this.page.getByText(layoutAlias, {exact: true})}).getByText('Remove'));
+    await this.click(this.layoutsItems.filter({has: this.page.getByText(layoutAlias, {exact: true})}).getByLabel('Remove', {exact: true}), {force: true});
+    await this.click(this.confirmToRemoveBtn);
   }
 
   async chooseOrderByValue(value: string) {
@@ -597,6 +600,14 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async enterStepSizeValue(value: string) {
     await this.enterText(this.stepSizeTxt, value);
+  }
+
+  async enterSliderMinimumValue(value: string) {
+    await this.enterText(this.sliderMinimumTxt, value);
+  }
+
+  async enterSliderMaximumValue(value: string) {
+    await this.enterText(this.sliderMaximumTxt, value);
   }
 
   async clickAllowDecimalsToggle() {
@@ -670,10 +681,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   // Media Picker
-  async clickPickMultipleItemsToggle() {
-    await this.click(this.pickMultipleItemsToggle);
-  }
-
   async clickEnableFocalPointToggle() {
     await this.click(this.enableFocalPointToggle);
   }
@@ -788,11 +795,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
     const startNodeLocator = this.entityItem.filter({has: this.page.locator(`[name="${contentName}"]`)});
     await this.hoverAndClick(startNodeLocator, startNodeLocator.getByLabel('Remove'));
     await this.clickConfirmRemoveButton();
-  }
-
-  // Dropdown
-  async clickEnableMultipleChoiceToggle() {
-    await this.click(this.enableMultipleChoiceToggle);
   }
 
   async clickAddOptionsButton() {
@@ -948,7 +950,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   async chooseBlockThumbnailWithPath(mediaPath: string) {
     const mediaItems = mediaPath.split('/media/')[1].split('/');
     await this.click(this.chooseThumbnailAlias);
-    await this.openCaretButtonForName('wwwroot', true);
+    await this.clickModalCaretButtonForName('wwwroot');
     await this.clickExpandChildItemsForMediaButton();
     for (let i = 0; i < mediaItems.length; i++) {
       if (i === mediaItems.length - 1) {
@@ -1100,7 +1102,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
       await this.focus(minInput); // Focus is needed
       await this.clearText(minInput);
       return;
-    } 
+    }
     await this.enterText(minInput, value.toString());
   }
 

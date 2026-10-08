@@ -3,6 +3,7 @@
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
@@ -53,6 +54,11 @@ public class SecuritySettings
     internal const string StaticAuthCookieName = "UMB_UCONTEXT";
 
     /// <summary>
+    ///     The default authentication cookie SameSite mode.
+    /// </summary>
+    internal const string StaticAuthCookieSameSite = "Strict";
+
+    /// <summary>
     ///     The default value for using email as username.
     /// </summary>
     internal const bool StaticUsernameIsEmail = true;
@@ -89,19 +95,9 @@ public class SecuritySettings
     internal const long StaticUserMinimumFailedLoginDurationInMilliseconds = 250;
 
     /// <summary>
-    ///     The default path for the authorization callback.
+    ///     The default path the back office is served at.
     /// </summary>
-    internal const string StaticAuthorizeCallbackPathName = "/umbraco/oauth_complete";
-
-    /// <summary>
-    ///     The default path for the authorization callback logout.
-    /// </summary>
-    internal const string StaticAuthorizeCallbackLogoutPathName = "/umbraco/logout";
-
-    /// <summary>
-    ///     The default path for the authorization callback error.
-    /// </summary>
-    internal const string StaticAuthorizeCallbackErrorPathName = "/umbraco/error";
+    internal const string StaticCallbackPathName = "/umbraco";
 
     /// <summary>
     ///     The default expiry time for password reset emails.
@@ -141,6 +137,27 @@ public class SecuritySettings
     ///     Gets or sets a value for the authorization cookie domain.
     /// </summary>
     public string? AuthCookieDomain { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the SameSite mode for the back-office authentication cookie.
+    /// </summary>
+    /// <remarks>
+    ///     Valid values are "Strict" (default), "Lax", "None" and "Unspecified".
+    ///     <para>
+    ///     Keep the default in production. SameSite is what stops a cross-site request from carrying
+    ///     the authentication cookie, and the Management API has no antiforgery tokens of its own.
+    ///     </para>
+    ///     <para>
+    ///     Only set "None" when the back office is served from a different origin than the server,
+    ///     such as a local front-end dev server or a containerised setup, so the cookie is sent on
+    ///     cross-site requests. "None" additionally requires the cookie to be marked Secure, so
+    ///     <see cref="GlobalSettings.UseHttps" /> must be enabled - browsers reject a "None" cookie
+    ///     that is not Secure, and sign-in then fails with no server-side error. A normal deployment
+    ///     serves both from the same origin and does not need it.
+    ///     </para>
+    /// </remarks>
+    [DefaultValue(StaticAuthCookieSameSite)]
+    public string AuthCookieSameSite { get; set; } = StaticAuthCookieSameSite;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the user's email address is to be considered as their username.
@@ -244,22 +261,15 @@ public class SecuritySettings
     public Uri? BackOfficeHost { get; set; }
 
     /// <summary>
-    ///     Gets or sets the path to use for authorization callback. Will be appended to the BackOfficeHost.
+    ///     Gets or sets the path at which the back-office client is served. Used as the default
+    ///     post-login return target: appended to <see cref="BackOfficeHost" /> when that is set (e.g.
+    ///     "/" when the client runs at the root of a separate host such as a dev server), and used
+    ///     as-is on the current host otherwise. The logout and error paths are derived from it - see
+    ///     <see cref="GetEffectiveLogoutPathName" /> and <see cref="GetEffectiveErrorPathName" />.
+    ///     Defaults to the standard back-office path.
     /// </summary>
-    [DefaultValue(StaticAuthorizeCallbackPathName)]
-    public string AuthorizeCallbackPathName { get; set; } = StaticAuthorizeCallbackPathName;
-
-    /// <summary>
-    ///     Gets or sets the path to use for authorization callback logout. Will be appended to the BackOfficeHost.
-    /// </summary>
-    [DefaultValue(StaticAuthorizeCallbackLogoutPathName)]
-    public string AuthorizeCallbackLogoutPathName { get; set; } = StaticAuthorizeCallbackLogoutPathName;
-
-    /// <summary>
-    ///     Gets or sets the path to use for authorization callback error. Will be appended to the BackOfficeHost.
-    /// </summary>
-    [DefaultValue(StaticAuthorizeCallbackErrorPathName)]
-    public string AuthorizeCallbackErrorPathName { get; set; } = StaticAuthorizeCallbackErrorPathName;
+    [DefaultValue(StaticCallbackPathName)]
+    public string CallbackPathName { get; set; } = StaticCallbackPathName;
 
     /// <summary>
     ///     Gets or sets the expiry time for password reset emails.
@@ -290,4 +300,16 @@ public class SecuritySettings
     ///     for the <c>Umbraco:CMS:Security:MemberPassword</c> configuration section.
     /// </remarks>
     public MemberPasswordConfigurationSettings MemberPassword { get; set; } = new();
+
+    /// <summary>
+    ///     Gets the path to the back-office client's logout route, derived from <see cref="CallbackPathName" />.
+    /// </summary>
+    /// <returns>The logout path.</returns>
+    public string GetEffectiveLogoutPathName() => CallbackPathName.EnsureEndsWith('/') + "logout";
+
+    /// <summary>
+    ///     Gets the path to the back-office client's error route, derived from <see cref="CallbackPathName" />.
+    /// </summary>
+    /// <returns>The error path.</returns>
+    public string GetEffectiveErrorPathName() => CallbackPathName.EnsureEndsWith('/') + "error";
 }

@@ -41,9 +41,13 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 	constructor() {
 		super();
 
-		this.observe(this.#context.alias, (alias) => {
-			this._alias = alias ?? '';
-		});
+		this.observe(
+			this.#context.alias,
+			(alias) => {
+				this._alias = alias ?? '';
+			},
+			null,
+		);
 	}
 
 	override connectedCallback(): void {

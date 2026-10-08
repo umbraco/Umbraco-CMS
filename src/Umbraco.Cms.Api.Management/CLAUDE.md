@@ -11,7 +11,7 @@ RESTful API for Umbraco backoffice operations. Manages content, media, users, an
 ## 1. Architecture
 
 ### Target Framework
-- **.NET 10.0** (`net10.0`)
+- **.NET 11.0** (`net11.0`)
 - **C# 12** with nullable reference types enabled
 - **ASP.NET Core** Web API
 
@@ -19,7 +19,7 @@ RESTful API for Umbraco backoffice operations. Manages content, media, users, an
 **REST API Library** - Plugged into Umbraco.Web.UI, provides the Management API surface for backoffice operations.
 
 ### Key Technologies
-- **Web Framework**: ASP.NET Core MVC with `Asp.Versioning.Mvc` (v1.0 currently)
+- **Web Framework**: ASP.NET Core MVC with `Asp.Versioning.Mvc` (v1.0 and v1.1)
 - **OpenAPI**: Microsoft.AspNetCore.OpenApi with custom transformers, Swagger UI via Swashbuckle
 - **Authentication**: OpenIddict via `Umbraco.Cms.Api.Common` (reference tokens, not JWT)
 - **Authorization**: Policy-based with `IAuthorizationService`
@@ -123,6 +123,41 @@ These are firm design rules for this API. Prefer an extra round-trip over bendin
    past the resource's real authorization boundary. Put such fields on the properly-authorized
    detail or batch endpoint instead.
 
+3. **Versioning an endpoint the backoffice calls: pin the operation ID with a route `Name`.**
+   Operation IDs are generated from the route by `UmbracoOperationIdTransformer`, and a non-default
+   `[MapToApiVersion]` is appended to them — so bumping an endpoint to `1.1` would rename the
+   generated client method (`putDocumentByIdValidate` → `putDocumentByIdValidate1_1`) and churn every
+   call site in the backoffice. The backoffice always calls the latest version, so the version in the
+   method name carries no information.
+
+   Give the **latest** version an explicit name matching what the unversioned route would have
+   produced:
+
+   ```csharp
+   [HttpPut("{id:guid}/validate", Name = "PutDocumentByIdValidate")]
+   [MapToApiVersion("1.1")]
+   ```
+
+   Rules:
+   - Only the **latest** version gets the unversioned name. Older versions keep their generated
+     (version-suffixed) IDs — **except at the default version (`1.0`), which is never suffixed**.
+     An older `1.0` action therefore generates the very name you are pinning, so it needs an
+     explicit versioned name of its own at the same time:
+
+     ```csharp
+     [HttpPut("{id:guid}/validate", Name = "PutDocumentByIdValidate1_0")]
+     [MapToApiVersion("1.0")]
+     ```
+
+   - **Two versions must never carry the same ID** — duplicate operation IDs break OpenAPI
+     generation, and ASP.NET Core will not catch the clash, since route names are only unique when
+     both are explicit. `OpenApiDocumentTests` guards `OpenApi.json` against it. When moving the
+     name to a new version, remove it from the old one, which deliberately renames the old
+     operation.
+   - Match the generated convention (`{HttpMethod}{Path}By{Param}...`) rather than inventing a
+     name, or the API surface ends up a mix of styles.
+   - Update `OpenApi.json` and regenerate the backoffice client afterwards.
+
 ---
 
 ## 2. Commands
@@ -165,7 +200,7 @@ dotnet list src/Umbraco.Cms.Api.Management package --vulnerable
 ```
 
 ### Environment Setup
-1. **Prerequisites**: .NET 10 SDK
+1. **Prerequisites**: .NET 11 SDK
 2. **IDE**: Visual Studio 2022 or Rider (with .editorconfig support)
 3. **Configuration**: Inherits from `Umbraco.Web.UI` appsettings (no app settings in this library)
 
@@ -295,10 +330,11 @@ All errors return RFC 7807 ProblemDetails via helper methods in base controllers
 - Served for client SDK generation
 - **Why?** Deterministic output, faster startup (no runtime generation)
 
-**SignalR for Real-time** (Routing/BackofficeHub.cs:33):
-- `BackofficeHub` - User notifications, cache refreshes
-- `ServerEventHub` - Background job updates, health checks
-- Routes: `/umbraco/backoffice-signalr`, `/umbraco/serverevent-signalr`
+**SignalR for Real-time**:
+- `BackofficeHub` (`/umbraco/backofficeHub`) - Generic payload broadcast
+- `ServerEventHub` (`/umbraco/serverEventHub`) - Entity change events, filtered per user
+- `PreviewHub` (`/umbraco/PreviewHub`) - Content refresh notifications for the preview window
+- Every hub class carries `[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]`. `MapHub` copies it onto the negotiate and connection endpoints, so an unattributed hub is reachable anonymously. `PreviewRoutesTests` and `BackOfficeAreaRoutesTests` assert this for every mapped hub endpoint.
 
 ### Code Smells to Watch For
 

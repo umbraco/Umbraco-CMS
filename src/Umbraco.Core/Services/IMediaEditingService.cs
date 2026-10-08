@@ -1,6 +1,5 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -127,8 +126,7 @@ public interface IMediaEditingService
     /// <param name="userKey">The unique identifier of the user performing the operation.</param>
     /// <returns>The operation status indicating the operation outcome.</returns>
     /// <remarks>Media items never vary by culture, so children are always ordered by the invariant name.</remarks>
-    Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, Guid userKey)
-        => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
+    Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, Guid userKey);
 
     /// <summary>
     ///     Permanently deletes a media item from the recycle bin.
@@ -143,15 +141,21 @@ public interface IMediaEditingService
     Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey);
 
     /// <summary>
-    ///     Restores a media item from the recycle bin to a specified parent location.
+    ///     Restores a media item from the recycle bin to a specified parent location, optionally leaving its
+    ///     descendants behind.
     /// </summary>
     /// <param name="key">The unique identifier of the media item to restore.</param>
     /// <param name="parentKey">The unique identifier of the parent to restore to, or <c>null</c> to restore to the root.</param>
     /// <param name="userKey">The unique identifier of the user performing the operation.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to restore the descendants of the media item along with it. When <c>false</c>, only the media item
+    ///     itself is restored and its descendants remain in the recycle bin as top-level bin items, ready to be
+    ///     restored later.
+    /// </param>
     /// <returns>
     ///     A task that represents the asynchronous operation. The task result contains an
     ///     <see cref="Attempt{TResult,TStatus}"/> with the restored <see cref="IMedia"/> item (if successful)
     ///     and <see cref="ContentEditingOperationStatus"/> indicating the operation outcome.
     /// </returns>
-    Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey);
+    Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants);
 }

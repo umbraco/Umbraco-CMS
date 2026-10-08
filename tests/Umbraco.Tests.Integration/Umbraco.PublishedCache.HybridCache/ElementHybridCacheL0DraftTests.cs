@@ -82,7 +82,7 @@ internal sealed class ElementHybridCacheL0DraftTests : UmbracoIntegrationTest
             GetRequiredService<ICacheNodeFactory>(),
             Array.Empty<IElementSeedKeyProvider>(),
             GetRequiredService<IPublishedModelFactory>(),
-            GetRequiredService<IPreviewService>(),
+            GetRequiredService<IPreviewSessionService>(),
             GetRequiredService<IOptions<CacheSettings>>(),
             new NullLogger<ElementCacheService>(),
             GetRequiredService<IConvertedPublishedContentCacheFactory>());

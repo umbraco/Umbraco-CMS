@@ -21,6 +21,7 @@ public class DataTypeCacheRefresherTests
     private Mock<IDocumentCacheService> _documentCacheService = null!;
     private Mock<IMediaCacheService> _mediaCacheService = null!;
     private Mock<IPublishedContentTypeCache> _publishedContentTypeCache = null!;
+    private Mock<IDataTypeConfigurationCache> _dataTypeConfigurationCache = null!;
 
     private DataTypeCacheRefresher CreateRefresher(IPublishedModelFactory publishedModelFactory)
     {
@@ -47,7 +48,8 @@ public class DataTypeCacheRefresherTests
             _publishedContentTypeCache.Object,
             _documentCacheService.Object,
             _mediaCacheService.Object,
-            Mock.Of<IContentTypeCommonRepository>());
+            Mock.Of<IContentTypeCommonRepository>(),
+            _dataTypeConfigurationCache.Object);
     }
 
     [SetUp]
@@ -56,6 +58,19 @@ public class DataTypeCacheRefresherTests
         _documentCacheService = new Mock<IDocumentCacheService>(MockBehavior.Strict);
         _mediaCacheService = new Mock<IMediaCacheService>(MockBehavior.Strict);
         _publishedContentTypeCache = new Mock<IPublishedContentTypeCache>();
+        _dataTypeConfigurationCache = new Mock<IDataTypeConfigurationCache>();
+    }
+
+    [Test]
+    public void RefreshInternal_Clears_The_Data_Type_Configuration_Cache()
+    {
+        var refresher = CreateRefresher(Mock.Of<IPublishedModelFactory>());
+        Guid[] keys = [Guid.NewGuid(), Guid.NewGuid()];
+        DataTypeCacheRefresher.JsonPayload[] payloads = keys.Select((key, index) => new DataTypeCacheRefresher.JsonPayload(index + 1, key, false)).ToArray();
+
+        refresher.RefreshInternal(payloads);
+
+        _dataTypeConfigurationCache.Verify(x => x.ClearCache(It.Is<IEnumerable<Guid>>(cleared => cleared.SequenceEqual(keys))), Times.Once);
     }
 
     [Test]

@@ -4,12 +4,10 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -26,40 +24,22 @@ public class FilterMemberFilterController : MemberFilterControllerBase
 {
     private readonly IMemberFilterService _memberFilterService;
     private readonly IMemberPresentationFactory _memberPresentationFactory;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FilterMemberFilterController"/> class.
     /// </summary>
-    /// <param name="memberService">Service used for member management operations (unused, retained for DI compatibility).</param>
     /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models.</param>
-    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context (unused, retained for DI compatibility).</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     /// <param name="memberFilterService">Service for combined member filtering across content and external stores.</param>
-    // TODO (V19): Remove unused parameters which are only here to avoid ambiguous constructor errors.
-    [ActivatorUtilitiesConstructor]
     public FilterMemberFilterController(
-        IMemberService memberService,
         IMemberPresentationFactory memberPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IMemberFilterService memberFilterService)
     {
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _memberFilterService = memberFilterService;
         _memberPresentationFactory = memberPresentationFactory;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FilterMemberFilterController"/> class.
-    /// </summary>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public FilterMemberFilterController(
-        IMemberService memberService,
-        IMemberPresentationFactory memberPresentationFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(
-            memberService,
-            memberPresentationFactory,
-            backOfficeSecurityAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberFilterService>())
-    {
     }
 
     /// <summary>
@@ -84,6 +64,16 @@ public class FilterMemberFilterController : MemberFilterControllerBase
         int skip = 0,
         int take = 100)
     {
+        IUser currentUser = CurrentUser(_backOfficeSecurityAccessor);
+
+        // Approval and lockout state are only disclosed to users with access to sensitive data. Filtering by
+        // them would disclose the state of each matched member regardless of the values in the response, so
+        // the filter is refused rather than silently widened.
+        if ((isApproved is not null || isLockedOut is not null) && currentUser.HasAccessToSensitiveData() is false)
+        {
+            return Forbidden();
+        }
+
         var memberFilter = new MemberFilter
         {
             MemberTypeId = memberTypeId,
@@ -95,7 +85,9 @@ public class FilterMemberFilterController : MemberFilterControllerBase
 
         PagedModel<MemberFilterItem> result = await _memberFilterService.FilterAsync(memberFilter, orderBy, orderDirection, skip, take);
 
-        var responseModels = result.Items.Select(_memberPresentationFactory.CreateFilterItemResponseModel).ToList();
+        var responseModels = result.Items
+            .Select(item => _memberPresentationFactory.CreateFilterItemResponseModel(item, currentUser))
+            .ToList();
 
         return Ok(new PagedViewModel<MemberResponseModel>
         {

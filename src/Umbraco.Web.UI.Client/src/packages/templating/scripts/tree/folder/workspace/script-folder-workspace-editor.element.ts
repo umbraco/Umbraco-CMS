@@ -25,6 +25,6 @@ export { UmbScriptFolderWorkspaceEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-script-folder-workspace-editor']: UmbScriptFolderWorkspaceEditorElement;
+		'umb-script-folder-workspace-editor': UmbScriptFolderWorkspaceEditorElement;
 	}
 }

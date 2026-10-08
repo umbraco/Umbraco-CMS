@@ -105,19 +105,52 @@ internal sealed class TemporaryFileService : ITemporaryFileService
     /// </summary>
     /// <param name="fileName">The file name to check.</param>
     /// <returns><c>true</c> if the file extension is allowed; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     The extension is resolved from the name the file will be stored under, not from the name as supplied.
+    ///     Trailing periods and whitespace are discarded when a file is created on some platforms, so a name that
+    ///     presents no extension to compare against the configured lists can still come to rest carrying one.
+    /// </remarks>
     private bool IsAllowedFileExtension(string fileName)
     {
-        var extension = fileName.GetFileExtension().TrimStart(Constants.CharArrays.Period);
+        var extension = TrimTrailingPeriodsAndWhitespace(fileName).GetFileExtension().TrimStart(Constants.CharArrays.Period);
         return _contentSettings.IsFileAllowedForUpload(extension);
     }
 
     /// <summary>
-    ///     Determines whether the file name is valid (not empty and contains no invalid characters).
+    ///     Determines whether the file name is valid (not empty, contains no invalid characters, and does not end in
+    ///     a period or whitespace).
     /// </summary>
     /// <param name="fileName">The file name to validate.</param>
     /// <returns><c>true</c> if the file name is valid; otherwise, <c>false</c>.</returns>
     private static bool IsValidFileName(string fileName) =>
-        !string.IsNullOrEmpty(fileName) && fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
+        !string.IsNullOrEmpty(fileName)
+        && fileName.IndexOfAny(Constants.CharSearchValues.InvalidFileNameChars) < 0
+        && TrimTrailingPeriodsAndWhitespace(fileName).Length == fileName.Length;
+
+    /// <summary>
+    ///     Removes any trailing periods and whitespace from a file name.
+    /// </summary>
+    /// <param name="fileName">The file name to trim.</param>
+    /// <returns>The trimmed file name, or the original instance when there is nothing to trim.</returns>
+    /// <remarks>
+    ///     Some platforms discard trailing periods and whitespace when creating a file, so the name a file comes to
+    ///     rest under is not necessarily the name that was supplied.
+    /// </remarks>
+    internal static string TrimTrailingPeriodsAndWhitespace(string fileName)
+    {
+        if (string.IsNullOrEmpty(fileName))
+        {
+            return fileName;
+        }
+
+        var end = fileName.Length;
+        while (end > 0 && (fileName[end - 1] == '.' || char.IsWhiteSpace(fileName[end - 1])))
+        {
+            end--;
+        }
+
+        return end == fileName.Length ? fileName : fileName[..end];
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<TemporaryFileModel?, TemporaryFileOperationStatus>> DeleteAsync(Guid key)

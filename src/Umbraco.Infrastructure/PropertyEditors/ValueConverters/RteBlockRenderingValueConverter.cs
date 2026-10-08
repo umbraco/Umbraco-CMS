@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     A value converter for TinyMCE that will ensure any blocks content are rendered properly even when
 ///     used dynamically.
 /// </summary>
-[DefaultPropertyValueConverter]
+[DefaultPropertyValueConverter(typeof(SimpleRichTextValueConverter))]
 public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDeliveryApiPropertyValueConverter, IDisposable
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
@@ -110,27 +110,6 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
 
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
         _deliveryApiSettingsChangeSubscription = deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
-    }
-
-    /// <inheritdoc cref="RteBlockRenderingValueConverter(HtmlLocalLinkParser, HtmlUrlParser, HtmlImageSourceParser, IApiRichTextElementParser, IApiRichTextMarkupParser, IPartialViewBlockEngine, BlockEditorConverter, IJsonSerializer, IApiElementBuilder, RichTextBlockPropertyValueConstructorCache, ILogger{RteBlockRenderingValueConverter}, IVariationContextAccessor, BlockEditorVarianceHandler, IOptionsMonitor{DeliveryApiSettings}, ILanguageService, IPropertyRenderingContextAccessor)"/>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public RteBlockRenderingValueConverter(
-        HtmlLocalLinkParser linkParser,
-        HtmlUrlParser urlParser,
-        HtmlImageSourceParser imageSourceParser,
-        IApiRichTextElementParser apiRichTextElementParser,
-        IApiRichTextMarkupParser apiRichTextMarkupParser,
-        IPartialViewBlockEngine partialViewBlockEngine,
-        BlockEditorConverter blockEditorConverter,
-        IJsonSerializer jsonSerializer,
-        IApiElementBuilder apiElementBuilder,
-        RichTextBlockPropertyValueConstructorCache constructorCache,
-        ILogger<RteBlockRenderingValueConverter> logger,
-        IVariationContextAccessor variationContextAccessor,
-        BlockEditorVarianceHandler blockEditorVarianceHandler,
-        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
-        : this(linkParser, urlParser, imageSourceParser, apiRichTextElementParser, apiRichTextMarkupParser, partialViewBlockEngine, blockEditorConverter, jsonSerializer, apiElementBuilder, constructorCache, logger, variationContextAccessor, blockEditorVarianceHandler, deliveryApiSettingsMonitor, StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(), StaticServiceProvider.Instance.GetRequiredService<IPropertyRenderingContextAccessor>())
-    {
     }
 
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V20.")]
@@ -373,7 +352,7 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         }
 
         var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _elementCacheService, _jsonSerializer, _constructorCache, _languageService);
-        return creator.CreateBlockModelAsync(owner, referenceCacheLevel, blocks, preview, configuration.Blocks).GetAwaiter().GetResult();
+        return creator.CreateBlockModelAsync(owner, referenceCacheLevel, blocks, preview, BlockPropertyVariance.OwningPropertyCulture(_variationContextAccessor, owner, propertyType), configuration.Blocks).GetAwaiter().GetResult();
     }
 
     private string RenderRichTextBlockModel(string source, RichTextBlockModel? richTextBlockModel)

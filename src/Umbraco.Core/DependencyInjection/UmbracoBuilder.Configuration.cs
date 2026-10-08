@@ -53,6 +53,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<HostingSettings>, HostingSettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<ImagingSettings>, ImagingSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<LoggingSettings>, LoggingSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
@@ -62,11 +63,10 @@ public static partial class UmbracoBuilderExtensions
         // Register configuration sections.
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
-            .AddUmbracoOptions<IndexCreatorSettings>()
             .AddUmbracoOptions<MarketplaceSettings>()
             .AddUmbracoOptions<ContentSettings>()
             .AddUmbracoOptions<DeliveryApiSettings>()
-            .AddUmbracoOptions<CoreDebugSettings>()
+            .AddUmbracoOptions<DebugSettings>()
             .AddUmbracoOptions<DictionarySettings>()
             .AddUmbracoOptions<ExceptionFilterSettings>()
             .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
@@ -95,14 +95,12 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<BasicAuthSettings>()
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
             .AddUmbracoOptions<PackageMigrationSettings>()
-            .AddUmbracoOptions<HelpPageSettings>()
             .AddUmbracoOptions<DataTypesSettings>()
             .AddUmbracoOptions<WebhookSettings>()
             .AddUmbracoOptions<CacheSettings>()
             .AddUmbracoOptions<SystemDateMigrationSettings>()
             .AddUmbracoOptions<DistributedJobSettings>()
             .AddUmbracoOptions<ScheduledPublishingSettings>(options => options.ValidateOnStart())
-            .AddUmbracoOptions<BackOfficeTokenCookieSettings>()
             .AddUmbracoOptions<WebsiteSettings>()
             .AddUmbracoOptions<SignalRSettings>();
 
