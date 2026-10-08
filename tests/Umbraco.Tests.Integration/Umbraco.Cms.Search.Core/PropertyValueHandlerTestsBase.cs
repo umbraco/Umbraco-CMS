@@ -1,5 +1,8 @@
-using Umbraco.Cms.Core;
+﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -8,6 +11,85 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 public abstract class PropertyValueHandlerTestsBase : ContentTestBase
 {
+    /// <summary>
+    /// Builds a document of the given content type with a "blocks" block list property externally referencing the
+    /// given (reusable) element key.
+    /// </summary>
+    protected Content CreatePageWithExternalBlockReference(IContentType contentType, Guid externalElementKey)
+    {
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    [new BlockListLayoutItem { ContentKey = externalElementKey, IsExternalContent = true }]
+                }
+            },
+            ContentData = [],
+            Expose = [],
+        };
+
+        Content content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("My Page")
+            .Build();
+        content.Properties["blocks"]!.SetValue(GetRequiredService<IJsonSerializer>().Serialize(blockListValue));
+        return content;
+    }
+
+    /// <summary>
+    /// Creates a reusable element type (with a single "textValue" textbox property) and a document type with a
+    /// "blocks" block list property configured to accept blocks of that element type.
+    /// </summary>
+    protected async Task<(IContentType ContentType, IContentType ElementType)> SetupBlockListWithElementType()
+    {
+        IContentType elementType = new ContentTypeBuilder()
+            .WithAlias("reusableElement")
+            .WithName("Reusable Element")
+            .WithIsElement(true)
+            .AddPropertyType()
+            .WithAlias("textValue")
+            .WithName("Text")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+
+        var blockListDataType = new DataType(GetRequiredService<PropertyEditorCollection>()[Constants.PropertyEditors.Aliases.BlockList], GetRequiredService<IConfigurationEditorJsonSerializer>())
+        {
+            ConfigurationData = new Dictionary<string, object>
+            {
+                {
+                    "blocks",
+                    new BlockListConfiguration.BlockConfiguration[]
+                    {
+                        new() { ContentElementTypeKey = elementType.Key }
+                    }
+                }
+            },
+            Name = "My Block List",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow
+        };
+        await GetRequiredService<IDataTypeService>().CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
+
+        IContentType contentType = new ContentTypeBuilder()
+            .WithAlias("pageWithBlocks")
+            .WithName("Page With Blocks")
+            .AddPropertyType()
+            .WithAlias("blocks")
+            .WithName("blocks")
+            .WithDataTypeId(blockListDataType.Id)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        return (contentType, elementType);
+    }
+
     protected async Task<IContentType> CreateAllSimpleEditorsContentType()
     {
         IDataTypeService dataTypeService = GetRequiredService<IDataTypeService>();
@@ -153,7 +235,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithDatabaseType(ValueStorageType.Nvarchar)
             .WithName("Drop-down (single)")
             .AddEditor()
-            .WithAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .Done()
             .Build();
         dropdownSingleDataType.ConfigurationData = new Dictionary<string, object>
@@ -168,7 +250,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithDatabaseType(ValueStorageType.Nvarchar)
             .WithName("Drop-down (multiple)")
             .AddEditor()
-            .WithAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .Done()
             .Build();
         dropdownMultipleDataType.ConfigurationData = new Dictionary<string, object>
@@ -311,12 +393,12 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .AddPropertyType()
             .WithAlias("dropdownSingleValue")
             .WithDataTypeId(dropdownSingleDataType.Id)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .Done()
             .AddPropertyType()
             .WithAlias("dropdownMultipleValue")
             .WithDataTypeId(dropdownMultipleDataType.Id)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .Done()
             .AddPropertyType()
             .WithAlias("radioButtonListValue")

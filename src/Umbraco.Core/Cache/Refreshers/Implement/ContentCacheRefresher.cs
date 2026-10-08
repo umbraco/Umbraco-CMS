@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -78,123 +76,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         _cacheManager = cacheManager;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
-    /// </summary>
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
-    public ContentCacheRefresher(
-        AppCaches appCaches,
-        IJsonSerializer serializer,
-        IIdKeyMap idKeyMap,
-        IDomainService domainService,
-        IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory,
-        IDocumentUrlService documentUrlService,
-        IDomainCacheService domainCacheService,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IDocumentNavigationManagementService documentNavigationManagementService,
-        IContentService contentService,
-        IPublishStatusManagementService publishStatusManagementService,
-        IDocumentCacheService documentCacheService,
-        ICacheManager cacheManager)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            domainService,
-            eventAggregator,
-            factory,
-            documentUrlService,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlAliasService>(),
-            domainCacheService,
-            documentNavigationQueryService,
-            documentNavigationManagementService,
-            contentService,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusManagementService>(),
-            documentCacheService,
-            cacheManager)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
-    /// </summary>
-    [Obsolete("Please use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public ContentCacheRefresher(
-        AppCaches appCaches,
-        IJsonSerializer serializer,
-        IIdKeyMap idKeyMap,
-        IDomainService domainService,
-        IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory,
-        IDocumentUrlService documentUrlService,
-        IDocumentUrlAliasService documentUrlAliasService,
-        IDomainCacheService domainCacheService,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IDocumentNavigationManagementService documentNavigationManagementService,
-        IContentService contentService,
-        IPublishStatusManagementService publishStatusManagementService,
-        IDocumentCacheService documentCacheService,
-        ICacheManager cacheManager)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            domainService,
-            eventAggregator,
-            factory,
-            documentUrlService,
-            documentUrlAliasService,
-            domainCacheService,
-            documentNavigationQueryService,
-            documentNavigationManagementService,
-            contentService,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusManagementService>(),
-            documentCacheService,
-            cacheManager)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
-    /// </summary>
-    [Obsolete("Please use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public ContentCacheRefresher(
-        AppCaches appCaches,
-        IJsonSerializer serializer,
-        IIdKeyMap idKeyMap,
-        IDomainService domainService,
-        IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory,
-        IDocumentUrlService documentUrlService,
-        IDocumentUrlAliasService documentUrlAliasService,
-        IDomainCacheService domainCacheService,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IDocumentNavigationManagementService documentNavigationManagementService,
-        IContentService contentService,
-        IPublishStatusManagementService publishStatusManagementService,
-        IDocumentPublishStatusManagementService documentPublishStatusManagementService,
-        IDocumentCacheService documentCacheService,
-        ICacheManager cacheManager)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            domainService,
-            eventAggregator,
-            factory,
-            documentUrlService,
-            documentUrlAliasService,
-            domainCacheService,
-            documentNavigationQueryService,
-            documentNavigationManagementService,
-            contentService,
-            documentPublishStatusManagementService,
-            documentCacheService,
-            cacheManager)
-    {
-    }
-
     #region Indirect
 
     /// <summary>
@@ -263,6 +144,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 var pathid = "," + payload.Id + ",";
                 isolatedCache.ClearOfType<IContent>((k, v) => v.Path?.Contains(pathid) ?? false);
             }
+
+            HandleIdKeyMap(payload);
         }
 
         base.RefreshInternal(payloads);
@@ -299,8 +182,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             {
                 HandleRouting(payload);
             }
-
-            HandleIdKeyMap(payload);
         }
 
         // Clear partial view cache when published content changes.
@@ -652,6 +533,11 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         /// <summary>
         /// Gets the unique GUID key associated with the entity, or null if no key is assigned.
         /// </summary>
+        /// <remarks>
+        /// Required when <see cref="ChangeTypes"/> includes <see cref="TreeChangeTypes.Remove"/>: the refresher clears the
+        /// id/key map for a removed entity before the published-cache refresh runs, and the removed entity can no longer be
+        /// looked up in the database, so the key cannot be resolved from <see cref="Id"/> alone.
+        /// </remarks>
         public Guid? Key { get; init; }
 
         /// <summary>

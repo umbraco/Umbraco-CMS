@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
@@ -95,7 +94,7 @@ public class ScopedNotificationPublisherTests
             Mock.Of<IDistributedLockingMechanismFactory>(),
             Mock.Of<IUmbracoDatabaseFactory>(),
             fileSystems,
-            new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
+            new TestOptionsMonitor<DebugSettings>(new DebugSettings()),
             mediaFileManager,
             loggerFactory,
 

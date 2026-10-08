@@ -2,12 +2,10 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security.Authorization;
@@ -35,7 +33,6 @@ public class UpdateDomainsController : DocumentControllerBase
     /// <param name="domainService">Service used to manage domain entities within the Umbraco CMS.</param>
     /// <param name="umbracoMapper">The mapper responsible for converting between Umbraco domain models and API models.</param>
     /// <param name="domainPresentationFactory">Factory for creating presentation models for domains.</param>
-    [ActivatorUtilitiesConstructor]
     public UpdateDomainsController(IAuthorizationService authorizationService, IDomainService domainService, IUmbracoMapper umbracoMapper, IDomainPresentationFactory domainPresentationFactory)
     {
         _authorizationService = authorizationService;

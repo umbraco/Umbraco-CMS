@@ -56,7 +56,7 @@ public class ExplicitSegmentIndexTests : IndexTestBase
     /// </summary>
     private ISearchResult? GetDocumentByKeyAndCulture(IIndex index, Guid key, string culture)
     {
-        var idFieldName = FieldNameHelper.FieldName(CoreConstants.IndexFieldNames.Id, Constants.FieldValues.Keywords);
+        var idFieldName = FieldNameHelper.FieldName(CoreConstants.Search.FieldNames.Id, Constants.FieldValues.Keywords);
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
 
         return results.FirstOrDefault(doc =>
@@ -71,7 +71,7 @@ public class ExplicitSegmentIndexTests : IndexTestBase
     /// </summary>
     private IEnumerable<ISearchResult> GetDocumentsByKey(IIndex index, Guid key)
     {
-        var idFieldName = FieldNameHelper.FieldName(CoreConstants.IndexFieldNames.Id, Constants.FieldValues.Keywords);
+        var idFieldName = FieldNameHelper.FieldName(CoreConstants.Search.FieldNames.Id, Constants.FieldValues.Keywords);
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
 
         return results.Where(doc =>

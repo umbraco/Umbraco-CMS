@@ -7,7 +7,7 @@ Shared infrastructure for Umbraco CMS REST APIs (Management and Delivery).
 ## 1. Architecture
 
 **Type**: Class Library (NuGet Package)
-**Target Framework**: .NET 10.0
+**Target Framework**: .NET 11.0
 **Purpose**: Common API infrastructure - OpenAPI/Swagger, JSON serialization, OpenIddict authentication, problem details
 
 ### Key Technologies

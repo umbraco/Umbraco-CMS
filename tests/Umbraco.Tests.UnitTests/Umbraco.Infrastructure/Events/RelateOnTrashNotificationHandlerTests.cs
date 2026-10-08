@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Events;
@@ -79,11 +78,5 @@ public class RelateOnTrashNotificationHandlerTests
         => new(
             relationService,
             Mock.Of<IEntityService>(),
-            Mock.Of<ILocalizedTextService>(),
-            Mock.Of<IAuditService>(),
-#pragma warning disable CS0618 // Type or member is obsolete
-            Mock.Of<IScopeProvider>(),
-#pragma warning restore CS0618 // Type or member is obsolete
-            Mock.Of<IBackOfficeSecurityAccessor>(),
-            Mock.Of<IUserIdKeyResolver>());
+            Mock.Of<ICoreScopeProvider>());
 }
