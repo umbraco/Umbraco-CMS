@@ -23,9 +23,7 @@ export class ExampleMaterialShowcaseBlockView extends ExampleBlockViewBase {
 	@state()
 	private _swatches: Array<ExampleMaterialSwatch> = [];
 
-	#loadId = 0;
-
-	protected override async _load() {
+	protected override async _load(isCurrent: () => boolean) {
 		const nested = this.content?.materials as ExampleNestedBlockValue | undefined;
 		const items = nested?.contentData ?? [];
 		const layout = nested?.layout?.['Umbraco.BlockList'];
@@ -35,7 +33,6 @@ export class ExampleMaterialShowcaseBlockView extends ExampleBlockViewBase {
 			? layout.flatMap((entry) => items.find((item) => item.key === entry.contentKey) ?? [])
 			: items;
 
-		const loadId = ++this.#loadId;
 		const swatches = await Promise.all(
 			ordered.map(async (item) => {
 				const names = item.values.filter((value) => value.alias === 'material');
@@ -46,7 +43,7 @@ export class ExampleMaterialShowcaseBlockView extends ExampleBlockViewBase {
 			}),
 		);
 
-		if (loadId !== this.#loadId) return;
+		if (!isCurrent()) return;
 		this._swatches = swatches;
 	}
 

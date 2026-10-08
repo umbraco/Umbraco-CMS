@@ -8,8 +8,10 @@ export class ExampleHeroBlockView extends ExampleBlockViewBase {
 	@state()
 	private _imageUrl?: string;
 
-	protected override async _load() {
-		this._imageUrl = await this._requestMediaUrl(this.content?.image);
+	protected override async _load(isCurrent: () => boolean) {
+		const imageUrl = await this._requestMediaUrl(this.content?.image);
+		if (!isCurrent()) return;
+		this._imageUrl = imageUrl;
 	}
 
 	override render() {

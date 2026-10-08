@@ -27,6 +27,7 @@ export abstract class ExampleBlockViewBase
 
 	#mediaUrlRepository = new UmbMediaUrlRepository(this);
 	#documentDetailRepository = new UmbDocumentDetailRepository(this);
+	#loadId = 0;
 
 	constructor() {
 		super();
@@ -48,11 +49,16 @@ export abstract class ExampleBlockViewBase
 		}
 
 		if (changedProperties.has('content') || changedProperties.has('_culture')) {
-			this._load();
+			const loadId = ++this.#loadId;
+			this._load(() => loadId === this.#loadId);
 		}
 	}
 
-	protected async _load(): Promise<void> {}
+	/**
+	 * Loads the data the view renders. Loads can overlap, so only commit state while `_isCurrent()` returns true.
+	 * @param {() => boolean} _isCurrent - Returns false once a newer load has started.
+	 */
+	protected async _load(_isCurrent: () => boolean): Promise<void> {}
 
 	protected async _requestMediaUrl(mediaPickerValue: unknown): Promise<string | undefined> {
 		const mediaKey = getMediaKey(mediaPickerValue);

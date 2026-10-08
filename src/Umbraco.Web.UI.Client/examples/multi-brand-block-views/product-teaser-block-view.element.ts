@@ -12,9 +12,12 @@ export class ExampleProductTeaserBlockView extends ExampleBlockViewBase {
 	@state()
 	private _imageUrl?: string;
 
-	protected override async _load() {
-		this._product = await this._requestDocument(this.content?.product);
-		this._imageUrl = await this._requestMediaUrl(getDocumentValue(this._product, 'picture', this._culture));
+	protected override async _load(isCurrent: () => boolean) {
+		const product = await this._requestDocument(this.content?.product);
+		const imageUrl = await this._requestMediaUrl(getDocumentValue(product, 'picture', this._culture));
+		if (!isCurrent()) return;
+		this._product = product;
+		this._imageUrl = imageUrl;
 	}
 
 	override render() {
