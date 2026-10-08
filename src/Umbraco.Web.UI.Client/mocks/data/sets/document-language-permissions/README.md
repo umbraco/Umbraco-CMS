@@ -24,6 +24,8 @@ There is one user and one user group for every combination of languages and shar
 | Danish only | cannot edit shared data |
 | English and Danish | can edit shared data |
 | English and Danish | cannot edit shared data |
+| No languages | can edit shared data |
+| No languages | cannot edit shared data |
 
 Vietnamese is never granted individually, so it is the language a restricted user has no access to. **Shared data** is data that does not vary by language.
 
@@ -94,6 +96,7 @@ Per user, the languages in which Name and Text per language are editable:
 | English only (either shared data access) | yes | no | no |
 | Danish only (either shared data access) | no | yes | no |
 | English and Danish (either shared data access) | yes | yes | no |
+| No languages (either shared data access) | no | no | no |
 
 ## Known gaps
 

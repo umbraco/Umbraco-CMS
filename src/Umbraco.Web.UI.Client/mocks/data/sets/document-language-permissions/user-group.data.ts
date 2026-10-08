@@ -29,6 +29,7 @@ export const LANGUAGE_ACCESS_SCENARIOS: Array<UmbLanguageAccessScenario> = [
 		languages: [ENGLISH_ISO_CODE, DANISH_ISO_CODE],
 		hasAccessToAllLanguages: false,
 	},
+	{ key: 'no-languages', label: 'No languages', languages: [], hasAccessToAllLanguages: false },
 ];
 
 export const userGroupId = (scenario: UmbLanguageAccessScenario, canEditSharedData: boolean) =>
