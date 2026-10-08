@@ -29,8 +29,6 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { apiErrorWasNotified } from '@umbraco-cms/backoffice/resources';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
-import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { notifyWorkspaceActionStarting } from '@umbraco-cms/backoffice/workspace';
@@ -598,28 +596,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		this.#eventContext?.dispatchEvent(event);
 	}
 
-	/**
-	 * Fetches the ancestor chain of the current document and delegates to
-	 * {@link computeAncestorPublishedCultures} to derive which cultures are
-	 * published across every ancestor.
-	 * @param unique The unique of the document being scheduled.
-	 */
 	async #getAncestorPublishedCultures(unique: string): Promise<Array<string | null> | undefined> {
-		const { data, error } = await tryExecute(
-			this,
-			DocumentService.getItemDocumentAncestors({ query: { id: [unique] } }),
-		);
+		const { data, error } = await this.#publishingRepository.ancestorVariantStates(unique);
 		if (error || !data) return undefined;
-
-		const ancestors = data.find((entry) => entry.id === unique)?.ancestors ?? [];
-		return computeAncestorPublishedCultures(
-			ancestors.map((ancestor) => ({
-				variants: ancestor.variants.map((variant) => ({
-					culture: variant.culture ?? null,
-					state: variant.state,
-				})),
-			})),
-		);
+		return computeAncestorPublishedCultures(data);
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {

@@ -21,7 +21,7 @@ export function isNotPublishedMandatory(option: UmbDocumentVariantOptionModel): 
  */
 export interface UmbAncestorVariantForCoverage {
 	culture: string | null;
-	state?: UmbDocumentVariantState | string | null;
+	state: UmbDocumentVariantState | null;
 }
 export interface UmbAncestorForCoverage {
 	variants: ReadonlyArray<UmbAncestorVariantForCoverage>;
@@ -34,8 +34,8 @@ export interface UmbAncestorForCoverage {
  * published in that culture. A variant counts as "published" if its state is
  * `Published` or `PublishedPendingChanges`. An ancestor with the invariant variant
  * published (culture === null) covers every child culture and adds no constraint.
- * @param ancestors The ordered list of ancestors (any order works — the result is an intersection).
- * @returns
+ * @param {ReadonlyArray<UmbAncestorForCoverage>} ancestors The ordered list of ancestors (any order works — the result is an intersection).
+ * @returns {Array<string | null> | undefined}
  *  - `undefined` when there are no ancestors (root document) — the caller renders no warning;
  *  - `[null]` when no ancestor adds a constraint (every ancestor is invariant-published) — covers all child cultures;
  *  - otherwise the cultures published in every ancestor.
