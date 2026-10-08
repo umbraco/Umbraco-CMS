@@ -14,15 +14,18 @@ const IDENTIFIER_PREFIX = 'UMB_LANGUAGE_PERMISSION_';
 const INVARIANT_PROPERTY_WRITE_RULE_PREFIX = 'UMB_LANGUAGE_PERMISSION_INVARIANT_PROPERTY_';
 const INVARIANT_WRITE_DENIED_MESSAGE =
 	'You do not have permission to edit shared (invariant) properties on this content.';
+const CULTURE_WRITE_DENIED_MESSAGE = 'You do not have permission to edit this culture.';
 
 /**
  * Configures the read-only state of a Block Workspace based on the parent Block Manager
  * and the current user's language access.
  *
  * - For invariant blocks, the workspace inherits the read-only state of the parent Block Manager(Host Property).
- * - For variant blocks (with a culture), the workspace is editable only when the current user
+ * - For variant blocks (with a culture), the culture data of the block is editable only when the current user
  *   has access to that culture (either via `hasAccessToAllLanguages` or an entry in their
- *   allowed languages).
+ *   allowed languages). Without that access, the whole block is read-only, unless the user has the
+ *   invariant-for-variant permission and the block is shared data (not hosted by a property that varies by
+ *   culture) - then only its culture-varying properties are read-only.
  *
  * Without the invariant-for-variant permission, shared (invariant) properties of the block are also
  * read-only, unless the block is hosted by a property that varies by culture - the block content then
@@ -44,6 +47,7 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 	#contentVariesByCulture?: boolean;
 	#settingsVariesByCulture?: boolean;
 	#invariantRules: Array<{ guard: UmbVariantPropertyGuardManager; unique: string }> = [];
+	#cultureRules: Array<{ guard: UmbVariantPropertyGuardManager; unique: string }> = [];
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -108,6 +112,7 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 				context?.hasAccessToInvariantForVariant,
 				(hasAccessToInvariantForVariant) => {
 					this.#currentUserHasAccessToInvariantForVariant = hasAccessToInvariantForVariant;
+					this.#checkForLanguageAccess();
 					this.#restrictInvariantData();
 				},
 				'observeCurrentUserHasAccessToInvariantForVariant',
@@ -116,6 +121,7 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT_FOR_CULTURE_VARIANT, (propertyContext) => {
 			this.#hostedByVaryingProperty = propertyContext !== undefined;
+			this.#checkForLanguageAccess();
 			this.#restrictInvariantData();
 		}).passContextAliasMatches();
 
@@ -226,11 +232,32 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 			this.#workspaceContext.settings.readOnlyGuard.removeRule(this.#appliedLanguageUnique);
 			this.#appliedLanguageUnique = undefined;
 		}
+		this.#clearCultureRules();
 
 		if (allowed || !culture || !this.#variantId) return;
 
 		const variantId = this.#variantId;
 		const unique = IDENTIFIER_PREFIX + culture;
+
+		if (this.#currentUserHasAccessToInvariantForVariant === true && !this.#hostedByVaryingProperty) {
+			// The block is shared data, so only its culture data is out of reach. Rules match on culture, so this
+			// denies the culture-varying properties of the dataset and leaves its shared properties editable.
+			for (const guard of [
+				this.#workspaceContext.content.propertyWriteGuard,
+				this.#workspaceContext.settings.propertyWriteGuard,
+			]) {
+				guard.addRule({
+					unique,
+					message: CULTURE_WRITE_DENIED_MESSAGE,
+					variantId: new UmbVariantId(culture),
+					datasetVariantId: variantId,
+					permitted: false,
+				});
+				this.#cultureRules.push({ guard, unique });
+			}
+			return;
+		}
+
 		const rule = {
 			unique,
 			variantId,
@@ -287,6 +314,11 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 			permitted: false,
 		});
 		this.#invariantRules.push({ guard, unique });
+	}
+
+	#clearCultureRules() {
+		this.#cultureRules.forEach(({ guard, unique }) => guard.removeRule(unique));
+		this.#cultureRules = [];
 	}
 
 	#clearInvariantRules() {

@@ -353,6 +353,77 @@ describe('UmbBlockLanguageAccessWorkspaceController', () => {
 		});
 	});
 
+	describe('Culture without language access', () => {
+		function isPropertyWritable(propertyVariantId: UmbVariantId, part: 'content' | 'settings' = 'content') {
+			return host.workspaceContext[part].propertyWriteGuard.getIsPermittedForVariantAndProperty(
+				propertyVariantId,
+				{ unique: 'property' },
+				enUS,
+			);
+		}
+
+		async function createController() {
+			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
+			await flushMicrotasks();
+		}
+
+		beforeEach(() => {
+			host.workspaceContext.setVariantId(enUS);
+			host.currentUserContext.setHasAccessToAllLanguages(false);
+			host.currentUserContext.setLanguages(['da-DK']);
+		});
+
+		it('keeps shared properties editable and denies culture properties with invariant-for-variant access', async () => {
+			host.currentUserContext.setHasAccessToInvariantForVariant(true);
+			await createController();
+
+			expectEditable(enUS);
+			for (const part of ['content', 'settings'] as const) {
+				expect(isPropertyWritable(UmbVariantId.CreateInvariant(), part), `${part} shared property`).to.be.true;
+				expect(isPropertyWritable(enUS, part), `${part} culture property`).to.be.false;
+			}
+		});
+
+		it('is read-only without invariant-for-variant access', async () => {
+			host.currentUserContext.setHasAccessToInvariantForVariant(false);
+			await createController();
+
+			expectReadOnly(enUS);
+		});
+
+		it('is read-only when hosted by a property that varies by culture, with invariant-for-variant access', async () => {
+			ownerHost.provideVaryingPropertyContext();
+			host.currentUserContext.setHasAccessToInvariantForVariant(true);
+			await createController();
+
+			expectReadOnly(enUS);
+		});
+
+		it('keeps shared properties editable when the user gains invariant-for-variant access', async () => {
+			host.currentUserContext.setHasAccessToInvariantForVariant(false);
+			await createController();
+			expectReadOnly(enUS);
+
+			host.currentUserContext.setHasAccessToInvariantForVariant(true);
+			await flushMicrotasks();
+
+			expectEditable(enUS);
+			expect(isPropertyWritable(UmbVariantId.CreateInvariant())).to.be.true;
+			expect(isPropertyWritable(enUS)).to.be.false;
+		});
+
+		it('is read-only again when the user loses invariant-for-variant access', async () => {
+			host.currentUserContext.setHasAccessToInvariantForVariant(true);
+			await createController();
+
+			host.currentUserContext.setHasAccessToInvariantForVariant(false);
+			await flushMicrotasks();
+
+			expectReadOnly(enUS);
+			expect(isPropertyWritable(UmbVariantId.CreateInvariant()), 'no culture write rule lingers').to.be.true;
+		});
+	});
+
 	describe('Shared (invariant) properties', () => {
 		const invariant = UmbVariantId.CreateInvariant();
 
