@@ -249,3 +249,48 @@ test.skip('can add an image from the image media picker with a image crop', asyn
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
 });
+
+test('can navigate away from content with a image media picker value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataType = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+  const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataType.id, groupName);
+  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentTypeId, AliasHelper.toAlias(dataTypeName), imageId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+});
+
+test('can see discard changes when navigating away from content with a changed image media picker value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataType = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+  const imageId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataType.id, groupName);
+  await umbracoApi.document.createDocumentWithImageMediaPicker(contentName, documentTypeId, AliasHelper.toAlias(dataTypeName), imageId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickRemoveButtonForName(mediaName);
+  await umbracoUi.content.clickConfirmRemoveButton();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+});

@@ -1110,6 +1110,10 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
+  async isSectionActive(sectionName: string) {
+    await expect(this.activeSectionLink.getByText(sectionName)).toBeVisible();
+  }
+
   async isBackOfficeMainVisible(isVisible: boolean = true) {
     await this.isVisible(this.backOfficeMain, isVisible, ConstantHelper.timeout.navigation);
   }
@@ -2028,6 +2032,18 @@ export class UiBaseLocators extends BasePage {
 
   async isTextWithMessageVisible(message: string, isVisible: boolean = true) {
     return await this.isVisible(this.page.getByText(message), isVisible);
+  }
+
+  async isDiscardChangesModalVisible(isVisible: boolean = true) {
+    return await this.isVisible(this.page.getByTestId('discard-changes-modal'), isVisible);
+  }
+
+  async clickDiscardChangesButton() {
+    await this.click(this.page.getByTestId('discard-changes-modal').getByTestId('action:discard-changes'));
+  }
+
+  async clickStayOnPageButton() {
+    await this.click(this.page.getByTestId('discard-changes-modal').getByTestId('action:stay'));
   }
 
   /**

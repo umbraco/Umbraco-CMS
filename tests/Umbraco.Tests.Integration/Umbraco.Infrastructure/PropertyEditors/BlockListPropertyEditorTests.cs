@@ -399,27 +399,221 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
         });
     }
 
-    private async Task<IContentType> CreateBlockListContentType(IContentType elementType)
+    [Test]
+    public async Task ToEditor_Orders_Block_Values_And_Expose_Deterministically()
     {
-        var blockListDataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList], ConfigurationEditorJsonSerializer)
+        var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
+        elementType.IsElement = true;
+        ContentTypeService.Save(elementType);
+
+        var blockListContentType = await CreateBlockListContentType(elementType);
+
+        // keys and aliases are stored in reverse of their ordinal order
+        var firstContentKey = new Guid("00000000-0000-0000-0000-000000000002");
+        var secondContentKey = new Guid("00000000-0000-0000-0000-000000000001");
+        var blockListValue = new BlockListValue
         {
-            ConfigurationData = new Dictionary<string, object>
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
             {
                 {
-                    "blocks",
-                    new BlockListConfiguration.BlockConfiguration[]
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    new IBlockLayoutItem[]
                     {
-                        new() { ContentElementTypeKey = elementType.Key }
+                        new BlockListLayoutItem { ContentKey = firstContentKey },
+                        new BlockListLayoutItem { ContentKey = secondContentKey },
                     }
                 }
             },
-            Name = "My Block List",
-            DatabaseType = ValueStorageType.Ntext,
-            ParentId = Constants.System.Root,
-            CreateDate = DateTime.UtcNow
+            ContentData =
+            [
+                new()
+                {
+                    Key = firstContentKey,
+                    ContentTypeAlias = elementType.Alias,
+                    ContentTypeKey = elementType.Key,
+                    Values =
+                    [
+                        new() { Alias = "singleLineText", Value = "The single line text" },
+                        new() { Alias = "multilineText", Value = "The multiline text" },
+                    ]
+                },
+                new()
+                {
+                    Key = secondContentKey,
+                    ContentTypeAlias = elementType.Alias,
+                    ContentTypeKey = elementType.Key,
+                    Values = [new() { Alias = "singleLineText", Value = "The other single line text" }]
+                }
+            ],
+            Expose =
+            [
+                new(firstContentKey, null, null),
+                new(secondContentKey, null, null),
+            ]
         };
 
-        await DataTypeService.CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
+        var content = new ContentBuilder()
+            .WithContentType(blockListContentType)
+            .WithName("My Blocks")
+            .WithPropertyValues(new { blocks = JsonSerializer.Serialize(blockListValue) })
+            .Build();
+        ContentService.Save(content);
+
+        var valueEditor = await GetValueEditor(blockListContentType);
+        var toEditorValue = valueEditor.ToEditor(content.Properties["blocks"]!) as BlockListValue;
+        Assert.IsNotNull(toEditorValue);
+
+        Assert.Multiple(() =>
+        {
+            CollectionAssert.AreEqual(
+                new[] { "multilineText", "singleLineText" },
+                toEditorValue.ContentData.First(c => c.Key == firstContentKey).Values.Select(v => v.Alias));
+            CollectionAssert.AreEqual(
+                new[] { secondContentKey, firstContentKey },
+                toEditorValue.Expose.Select(e => e.ContentKey));
+            CollectionAssert.AreEqual(
+                new[] { firstContentKey, secondContentKey },
+                toEditorValue.ContentData.Select(c => c.Key),
+                "Block order is defined by the layout and must not be changed.");
+        });
+    }
+
+    [Test]
+    public async Task ToEditor_Orders_Nested_Block_Values_And_Expose_Deterministically()
+    {
+        var nestedElementType = ContentTypeBuilder.CreateAllTypesContentType("myNestedElementType", "My Nested Element Type");
+        nestedElementType.IsElement = true;
+        ContentTypeService.Save(nestedElementType);
+        var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
+
+        var rootElementType = new ContentTypeBuilder()
+            .WithAlias("myRootElementType")
+            .WithName("My Root Element Type")
+            .WithIsElement(true)
+            .AddPropertyType()
+                .WithAlias("title")
+                .WithName("Title")
+                .WithDataTypeId(Constants.DataTypes.Textbox)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                .WithValueStorageType(ValueStorageType.Nvarchar)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("nestedBlocks")
+                .WithName("Nested blocks")
+                .WithDataTypeId(nestedBlockListDataType.Id)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.BlockList)
+                .WithValueStorageType(ValueStorageType.Ntext)
+                .Done()
+            .Build();
+        ContentTypeService.Save(rootElementType);
+
+        var blockListContentType = await CreateBlockListContentType(rootElementType);
+
+        // keys and aliases are stored in reverse of their ordinal order, at both levels
+        var firstNestedContentKey = new Guid("00000000-0000-0000-0000-000000000002");
+        var secondNestedContentKey = new Guid("00000000-0000-0000-0000-000000000001");
+        var nestedBlockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    new IBlockLayoutItem[]
+                    {
+                        new BlockListLayoutItem { ContentKey = firstNestedContentKey },
+                        new BlockListLayoutItem { ContentKey = secondNestedContentKey },
+                    }
+                }
+            },
+            ContentData =
+            [
+                new()
+                {
+                    Key = firstNestedContentKey,
+                    ContentTypeAlias = nestedElementType.Alias,
+                    ContentTypeKey = nestedElementType.Key,
+                    Values =
+                    [
+                        new() { Alias = "singleLineText", Value = "The nested single line text" },
+                        new() { Alias = "multilineText", Value = "The nested multiline text" },
+                    ]
+                },
+                new()
+                {
+                    Key = secondNestedContentKey,
+                    ContentTypeAlias = nestedElementType.Alias,
+                    ContentTypeKey = nestedElementType.Key,
+                    Values = [new() { Alias = "singleLineText", Value = "The other nested single line text" }]
+                }
+            ],
+            Expose =
+            [
+                new(firstNestedContentKey, null, null),
+                new(secondNestedContentKey, null, null),
+            ]
+        };
+
+        var rootContentKey = Guid.NewGuid();
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    new IBlockLayoutItem[] { new BlockListLayoutItem { ContentKey = rootContentKey } }
+                }
+            },
+            ContentData =
+            [
+                new()
+                {
+                    Key = rootContentKey,
+                    ContentTypeAlias = rootElementType.Alias,
+                    ContentTypeKey = rootElementType.Key,
+                    Values =
+                    [
+                        new() { Alias = "title", Value = "The root title" },
+                        new() { Alias = "nestedBlocks", Value = nestedBlockListValue },
+                    ]
+                }
+            ],
+            Expose = [new(rootContentKey, null, null)]
+        };
+
+        var content = new ContentBuilder()
+            .WithContentType(blockListContentType)
+            .WithName("My Nested Blocks")
+            .WithPropertyValues(new { blocks = JsonSerializer.Serialize(blockListValue) })
+            .Build();
+        ContentService.Save(content);
+
+        var valueEditor = await GetValueEditor(blockListContentType);
+        var toEditorValue = valueEditor.ToEditor(content.Properties["blocks"]!) as BlockListValue;
+        Assert.IsNotNull(toEditorValue);
+
+        IList<BlockPropertyValue> rootValues = toEditorValue.ContentData.Single().Values;
+        var nestedToEditorValue = rootValues.Single(v => v.Alias == "nestedBlocks").Value as BlockListValue;
+        Assert.IsNotNull(nestedToEditorValue);
+
+        Assert.Multiple(() =>
+        {
+            CollectionAssert.AreEqual(new[] { "nestedBlocks", "title" }, rootValues.Select(v => v.Alias));
+            CollectionAssert.AreEqual(
+                new[] { "multilineText", "singleLineText" },
+                nestedToEditorValue.ContentData.First(c => c.Key == firstNestedContentKey).Values.Select(v => v.Alias));
+            CollectionAssert.AreEqual(
+                new[] { secondNestedContentKey, firstNestedContentKey },
+                nestedToEditorValue.Expose.Select(e => e.ContentKey));
+            CollectionAssert.AreEqual(
+                new[] { firstNestedContentKey, secondNestedContentKey },
+                nestedToEditorValue.ContentData.Select(c => c.Key),
+                "Block order is defined by the layout and must not be changed.");
+        });
+    }
+
+    private async Task<IContentType> CreateBlockListContentType(IContentType elementType)
+    {
+        var blockListDataType = await CreateBlockListDataType(elementType);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("myPage")
@@ -433,6 +627,30 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
         // re-fetch to wire up all key bindings (particularly to the datatype)
         return await ContentTypeService.GetAsync(contentType.Key);
+    }
+
+    private async Task<IDataType> CreateBlockListDataType(IContentType elementType)
+    {
+        var blockListDataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList], ConfigurationEditorJsonSerializer)
+        {
+            ConfigurationData = new Dictionary<string, object>
+            {
+                {
+                    "blocks",
+                    new BlockListConfiguration.BlockConfiguration[]
+                    {
+                        new() { ContentElementTypeKey = elementType.Key }
+                    }
+                }
+            },
+            Name = $"My Block List ({elementType.Alias})",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow
+        };
+
+        await DataTypeService.CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
+        return blockListDataType;
     }
 
     private async Task<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor> GetValueEditor(IContentType contentType)
