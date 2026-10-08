@@ -1,3 +1,4 @@
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Patching;
@@ -119,9 +120,7 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
                     };
                 }))
             .WhereNotNull()
-            .OrderBy(value => value.Culture, StringComparer.Ordinal)
-            .ThenBy(value => value.Segment, StringComparer.Ordinal)
-            .ThenBy(value => value.Alias, StringComparer.Ordinal)
+            .OrderByCultureSegmentAndAlias()
             .ToArray();
     }
 
@@ -140,8 +139,7 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
                 Segment = segment,
                 Name = content.GetCultureName(culture) ?? string.Empty,
             }))
-            .OrderBy(variant => variant.Culture, StringComparer.Ordinal)
-            .ThenBy(variant => variant.Segment, StringComparer.Ordinal)
+            .OrderByCultureAndSegment()
             .ToArray();
     }
 
