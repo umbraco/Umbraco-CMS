@@ -1,29 +1,40 @@
-import { UMB_LANGUAGE_ACCESS_WORKSPACE_CONTEXT } from './language-access.workspace.context-token.js';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '../workspace/content-workspace.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import type { UmbEntityVariantOptionModel, UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 
 const READ_ONLY_RULE_PREFIX = 'UMB_LANGUAGE_PERMISSION_';
 const PROPERTY_WRITE_RULE_PREFIX = 'UMB_LANGUAGE_PERMISSION_PROPERTY_';
-const VARIANT_WRITE_RULE_PREFIX = 'UMB_LANGUAGE_PERMISSION_VARIANT_';
+const NAME_WRITE_RULE_PREFIX = 'UMB_LANGUAGE_PERMISSION_NAME_';
+const INVARIANT_PROPERTY_WRITE_RULE_PREFIX = 'UMB_LANGUAGE_PERMISSION_INVARIANT_PROPERTY_';
+const INVARIANT_WRITE_DENIED_MESSAGE =
+	'You do not have permission to edit shared (invariant) properties on this content.';
 
-export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
+/**
+ * Applies the current user's language access and invariant-for-variant permission to a content workspace.
+ * A plain controller, not a context - nothing consumes it from elsewhere. Registered as the default `api` of the
+ * `Umb.Kind.WorkspaceContext.Content.LanguageAccess` kind; entity types opt in with a `kind: 'contentLanguageAccess'`
+ * workspace context manifest.
+ * @class UmbContentLanguageAccessWorkspaceController
+ * @augments {UmbControllerBase}
+ */
+export class UmbContentLanguageAccessWorkspaceController extends UmbControllerBase {
 	#workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;
 	#currentUserHasAccessToInvariantForVariant?: boolean;
+	#ownerVariesByCulture?: boolean;
 	#variantOptions?: UmbEntityVariantOptionModel<UmbEntityVariantModel>[];
 	#contentTypeProperties?: Array<UmbPropertyTypeModel>;
 	#readOnlyRuleUniques: Array<string> = [];
 	#propertyWriteRuleUniques: Array<string> = [];
-	#variantWriteRuleUniques: Array<string> = [];
+	#nameWriteRuleUniques: Array<string> = [];
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_LANGUAGE_ACCESS_WORKSPACE_CONTEXT);
+		super(host);
 
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -33,6 +44,10 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 			});
 			this.observe(instance?.structure.contentTypeProperties, (properties) => {
 				this.#contentTypeProperties = properties;
+				this.#checkForLanguageAccess();
+			});
+			this.observe(instance?.structure.variesByCulture, (variesByCulture) => {
+				this.#ownerVariesByCulture = variesByCulture;
 				this.#checkForLanguageAccess();
 			});
 		});
@@ -78,15 +93,15 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 		// switching between "has invariant access" and "no invariant access" leaves no orphaned rules
 		this.#clearPreviousRules();
 
-		// Regardless of invariant access, a culture the user has no access to must never be saved or published.
-		const variantWriteRules = datasetVariantIds.map((variantId) => ({
-			unique: VARIANT_WRITE_RULE_PREFIX + variantId.toString(),
+		// Regardless of invariant access, the name of a culture the user has no access to is read-only.
+		const nameWriteRules = datasetVariantIds.map((variantId) => ({
+			unique: NAME_WRITE_RULE_PREFIX + variantId.toString(),
 			variantId,
 			permitted: false,
 			message: 'You do not have permission to edit this culture',
 		}));
-		this.#workspaceContext.variantWriteGuard?.addRules(variantWriteRules);
-		this.#variantWriteRuleUniques = variantWriteRules.map((rule) => rule.unique);
+		this.#workspaceContext.nameWriteGuard?.addRules(nameWriteRules);
+		this.#nameWriteRuleUniques = nameWriteRules.map((rule) => rule.unique);
 
 		if (this.#currentUserHasAccessToInvariantForVariant) {
 			// The user is allowed to edit invariant (shared) property data on variant content. Don't
@@ -126,16 +141,46 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 			this.#workspaceContext.readOnlyGuard?.addRules(readOnlyRules);
 			this.#readOnlyRuleUniques = readOnlyRules.map((rule) => rule.unique);
 		}
+
+		this.#restrictInvariantData();
+	}
+
+	/**
+	 * Without the invariant-for-variant permission, data that is shared between the variants of content that varies
+	 * by culture is read-only on every variant. Content that does not vary by culture has no shared data to protect.
+	 */
+	#restrictInvariantData() {
+		if (this.#currentUserHasAccessToInvariantForVariant !== false) return;
+		if (this.#ownerVariesByCulture !== true) return;
+		if (!this.#workspaceContext) return;
+
+		const invariantVariantId = UmbVariantId.CreateInvariant();
+
+		const datasetVariantIds = [
+			...(this.#variantOptions ?? []).map((variantOption) => UmbVariantId.CreateFromPartial(variantOption)),
+			invariantVariantId,
+		];
+		const propertyRules = datasetVariantIds.map((datasetVariantId) => {
+			return {
+				unique: INVARIANT_PROPERTY_WRITE_RULE_PREFIX + datasetVariantId.toString(),
+				variantId: invariantVariantId,
+				datasetVariantId,
+				permitted: false,
+				message: INVARIANT_WRITE_DENIED_MESSAGE,
+			};
+		});
+		this.#workspaceContext.propertyWriteGuard?.addRules(propertyRules);
+		this.#propertyWriteRuleUniques.push(...propertyRules.map((rule) => rule.unique));
 	}
 
 	#clearPreviousRules() {
 		this.#workspaceContext?.readOnlyGuard?.removeRules(this.#readOnlyRuleUniques);
 		this.#workspaceContext?.propertyWriteGuard?.removeRules(this.#propertyWriteRuleUniques);
-		this.#workspaceContext?.variantWriteGuard?.removeRules(this.#variantWriteRuleUniques);
+		this.#workspaceContext?.nameWriteGuard?.removeRules(this.#nameWriteRuleUniques);
 		this.#readOnlyRuleUniques = [];
 		this.#propertyWriteRuleUniques = [];
-		this.#variantWriteRuleUniques = [];
+		this.#nameWriteRuleUniques = [];
 	}
 }
 
-export { UmbLanguageAccessWorkspaceContext as api };
+export { UmbContentLanguageAccessWorkspaceController as api };

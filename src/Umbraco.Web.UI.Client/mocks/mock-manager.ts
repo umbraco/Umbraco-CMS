@@ -1,11 +1,15 @@
 import type { UmbMockDataSet } from './data/mock-data-set.types.js';
 import { umbMockDbRegistry } from './db/mock-db-registry.js';
 
+export const MOCK_USER_STORAGE_KEY = 'umb:mockUser';
+
 interface UmbMockSetEntry {
 	label: string;
 	loader: () => Promise<UmbMockDataSet>;
 	/** Whether the set appears in the header app dropdown. Defaults to false. */
 	visible?: boolean;
+	/** Whether the current user can be switched between the users of the set from the header. Defaults to false. */
+	userSwitcher?: boolean;
 }
 
 /**
@@ -48,6 +52,12 @@ class UmbMockManager {
 			loader: () => import('./data/sets/blocks-reusable-content/index.js') as Promise<UmbMockDataSet>,
 			visible: true,
 		},
+		languagePermissions: {
+			label: 'Language Permissions',
+			loader: () => import('./data/sets/language-permissions/index.js') as Promise<UmbMockDataSet>,
+			visible: true,
+			userSwitcher: true,
+		},
 	};
 
 	/**
@@ -72,6 +82,39 @@ class UmbMockManager {
 		return Object.entries(this.#mockSetLoaders)
 			.filter(([, { visible }]) => visible === true)
 			.map(([alias, { label }]) => ({ alias, label }));
+	}
+
+	/**
+	 * Whether the current mock set lets you switch the current user.
+	 */
+	get canSwitchUser(): boolean {
+		return this.#mockSetLoaders[this.#currentSetName]?.userSwitcher === true;
+	}
+
+	/**
+	 * Get the users of the current mock set as id/name pairs. Empty unless the set lets you switch the current user.
+	 */
+	get availableUsers(): Array<{ id: string; name: string }> {
+		if (!this.canSwitchUser) return [];
+		return (this.#currentDataSet?.user ?? []).map(({ id, name }) => ({ id, name }));
+	}
+
+	/**
+	 * Get the id of the user that was picked with the user switcher.
+	 * Undefined when nothing valid was picked, in which case the first user of the set is the current user.
+	 */
+	get currentUserId(): string | undefined {
+		if (!this.canSwitchUser) return undefined;
+		const pickedUserId = localStorage.getItem(MOCK_USER_STORAGE_KEY);
+		return this.availableUsers.find((user) => user.id === pickedUserId)?.id;
+	}
+
+	/**
+	 * Get the name of the current user when the set lets you switch the current user.
+	 */
+	get currentUserName(): string | undefined {
+		const users = this.availableUsers;
+		return (users.find((user) => user.id === this.currentUserId) ?? users[0])?.name;
 	}
 
 	/**

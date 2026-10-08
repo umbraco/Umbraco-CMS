@@ -391,7 +391,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 	}
 
 	#publishableVariantsFilter = (option: UmbElementVariantOptionModel) => {
-		return this.#elementWorkspaceContext!.getIsVariantWritable(UmbVariantId.Create(option));
+		return this.#elementWorkspaceContext!.getIsWritableVariant(UmbVariantId.Create(option));
 	};
 
 	async #determineVariantOptions(): Promise<{
@@ -410,7 +410,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		selected = selected.filter((x) => options.some((o) => o.unique === x));
 
 		// Filter out variants that cannot be written
-		selected = selected.filter((x) => this.#elementWorkspaceContext!.getIsVariantWritable(new UmbVariantId(x)));
+		selected = selected.filter((x) => this.#elementWorkspaceContext!.getIsWritableVariant(new UmbVariantId(x)));
 
 		return {
 			options,

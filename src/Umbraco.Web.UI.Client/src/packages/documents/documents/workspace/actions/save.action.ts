@@ -2,8 +2,8 @@ import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../context/document-workspace.co
 import type UmbDocumentWorkspaceContext from '../context/document-workspace.context.js';
 import type { UmbDocumentVariantModel } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbSaveWorkspaceAction,
 	type MetaWorkspaceAction,
@@ -15,8 +15,6 @@ export class UmbDocumentSaveWorkspaceAction
 	extends UmbSaveWorkspaceAction<MetaWorkspaceAction, UmbDocumentWorkspaceContext>
 	implements UmbWorkspaceActionDefaultKind<MetaWorkspaceAction>
 {
-	#variants: Array<UmbDocumentVariantModel> | undefined;
-
 	constructor(
 		host: UmbControllerHost,
 		args: UmbSaveWorkspaceActionArgs<MetaWorkspaceAction, UmbDocumentWorkspaceContext>,
@@ -36,41 +34,39 @@ export class UmbDocumentSaveWorkspaceAction
 
 	protected override _gotWorkspaceContext() {
 		super._gotWorkspaceContext();
-		this.#observeVariants();
-		this.#observeGuardRules();
-	}
-
-	#observeVariants() {
 		this.observe(
 			this._workspaceContext?.variants,
-			(variants) => {
-				this.#variants = variants;
-				this.#checkWritableVariants();
-			},
+			(variants) => this.#observeWritableVariants(variants ?? []),
 			'saveWorkspaceActionVariantsObserver',
 		);
 	}
 
-	#observeGuardRules() {
-		this.observe(
-			this._workspaceContext
-				? observeMultiple([this._workspaceContext.readOnlyGuard.rules, this._workspaceContext.variantWriteGuard.rules])
-				: undefined,
-			() => this.#checkWritableVariants(),
-			'umbObserveReadOnlyGuardRules',
-		);
-	}
+	#observeWritableVariants(variants: Array<UmbDocumentVariantModel>) {
+		const workspaceContext = this._workspaceContext;
+		if (!workspaceContext) return;
 
-	#checkWritableVariants() {
-		const hasWritableVariant =
-			this.#variants?.some((variant) =>
-				this._workspaceContext!.getIsVariantWritable(UmbVariantId.CreateFromPartial(variant)),
-			) || this._workspaceContext!.getIsInvariantDataWritable();
-		if (!hasWritableVariant) {
-			this.disable();
-		} else {
-			this.enable();
-		}
+		// The invariant (shared) data is handled as a variant of its own, saved on its own for existing content.
+		const variantIds = [
+			...variants.map((variant) => UmbVariantId.CreateFromPartial(variant)),
+			UmbVariantId.CreateInvariant(),
+		];
+
+		this.observe(
+			combineLatest(variantIds.map((variantId) => workspaceContext.isWritableVariant(variantId))),
+			(writable) => {
+				const isNew = workspaceContext.getIsNew();
+				const hasWritableVariant = variantIds.some(
+					(variantId, index) =>
+						writable[index] && (isNew === false || !variantId.equal(UmbVariantId.CreateInvariant())),
+				);
+				if (hasWritableVariant) {
+					this.enable();
+				} else {
+					this.disable();
+				}
+			},
+			'saveWorkspaceActionWritableVariantsObserver',
+		);
 	}
 }
 

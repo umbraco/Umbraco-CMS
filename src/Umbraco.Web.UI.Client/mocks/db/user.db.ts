@@ -119,46 +119,48 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 	 * @memberof UmbUserData
 	 */
 	getCurrentUser(): CurrentUserResponseModel {
-		const firstUser = this.data[0];
-		const permissions = firstUser.userGroupIds?.length ? umbUserGroupMockDb.getPermissions(firstUser.userGroupIds) : [];
-		const fallbackPermissions = firstUser.userGroupIds?.length
-			? umbUserGroupMockDb.getFallbackPermissions(firstUser.userGroupIds)
+		const currentUser = this.data.find((user) => user.id === umbMockManager.currentUserId) ?? this.data[0];
+		const permissions = currentUser.userGroupIds?.length
+			? umbUserGroupMockDb.getPermissions(currentUser.userGroupIds)
 			: [];
-		const allowedSections = firstUser.userGroupIds?.length
-			? umbUserGroupMockDb.getAllowedSections(firstUser.userGroupIds)
+		const fallbackPermissions = currentUser.userGroupIds?.length
+			? umbUserGroupMockDb.getFallbackPermissions(currentUser.userGroupIds)
 			: [];
-		const hasAccessToAllLanguages = firstUser.userGroupIds?.length
-			? umbUserGroupMockDb.getHasAccessToAllLanguages(firstUser.userGroupIds)
+		const allowedSections = currentUser.userGroupIds?.length
+			? umbUserGroupMockDb.getAllowedSections(currentUser.userGroupIds)
+			: [];
+		const hasAccessToAllLanguages = currentUser.userGroupIds?.length
+			? umbUserGroupMockDb.getHasAccessToAllLanguages(currentUser.userGroupIds)
 			: false;
-		const hasAccessToInvariantForVariant = firstUser.userGroupIds?.length
-			? umbUserGroupMockDb.getHasAccessToInvariantForVariant(firstUser.userGroupIds)
+		const hasAccessToInvariantForVariant = currentUser.userGroupIds?.length
+			? umbUserGroupMockDb.getHasAccessToInvariantForVariant(currentUser.userGroupIds)
 			: true;
-		const languages = firstUser.userGroupIds?.length
-			? umbUserGroupMockDb.getAllowedLanguages(firstUser.userGroupIds)
+		const languages = currentUser.userGroupIds?.length
+			? umbUserGroupMockDb.getAllowedLanguages(currentUser.userGroupIds)
 			: [];
 
 		return {
-			id: firstUser.id,
-			name: firstUser.name,
-			email: firstUser.email,
-			userName: firstUser.email,
+			id: currentUser.id,
+			name: currentUser.name,
+			email: currentUser.email,
+			userName: currentUser.email,
 			hasAccessToSensitiveData: true,
 			avatarUrls: [],
 			hasAccessToAllLanguages,
 			hasAccessToInvariantForVariant,
-			languageIsoCode: firstUser.languageIsoCode || null,
+			languageIsoCode: currentUser.languageIsoCode || null,
 			languages,
-			documentStartNodeIds: firstUser.documentStartNodeIds,
-			mediaStartNodeIds: firstUser.mediaStartNodeIds,
-			elementStartNodeIds: firstUser.elementStartNodeIds,
-			hasDocumentRootAccess: firstUser.hasDocumentRootAccess,
-			hasMediaRootAccess: firstUser.hasMediaRootAccess,
-			hasElementRootAccess: firstUser.hasElementRootAccess,
+			documentStartNodeIds: currentUser.documentStartNodeIds,
+			mediaStartNodeIds: currentUser.mediaStartNodeIds,
+			elementStartNodeIds: currentUser.elementStartNodeIds,
+			hasDocumentRootAccess: currentUser.hasDocumentRootAccess,
+			hasMediaRootAccess: currentUser.hasMediaRootAccess,
+			hasElementRootAccess: currentUser.hasElementRootAccess,
 			fallbackPermissions,
 			permissions,
 			allowedSections,
-			isAdmin: firstUser.isAdmin,
-			userGroupIds: firstUser.userGroupIds,
+			isAdmin: currentUser.isAdmin,
+			userGroupIds: currentUser.userGroupIds,
 		};
 	}
 

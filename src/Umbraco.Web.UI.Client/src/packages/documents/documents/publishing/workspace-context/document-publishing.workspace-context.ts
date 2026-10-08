@@ -588,7 +588,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
-		return this.#documentWorkspaceContext!.getIsVariantWritable(UmbVariantId.Create(option));
+		return this.#documentWorkspaceContext!.getIsWritableVariant(UmbVariantId.Create(option));
 	};
 
 	async #determineVariantOptions(): Promise<{
@@ -611,7 +611,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		// Filter out variants that cannot be written
 		// TODO: This would not work with segments, as the 'selected'-array is an array of strings, not UmbVariantId's. [NL]
 		// Please have a look at the implementation in the content-detail workspace context, as that one compares variantIds. [NL]
-		selected = selected.filter((x) => this.#documentWorkspaceContext!.getIsVariantWritable(new UmbVariantId(x)));
+		selected = selected.filter((x) => this.#documentWorkspaceContext!.getIsWritableVariant(new UmbVariantId(x)));
 
 		return {
 			options,

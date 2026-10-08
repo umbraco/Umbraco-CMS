@@ -1,4 +1,4 @@
-import { manifests as invariantForVariantGuardManifests } from './invariant-for-variant-guard/manifests.js';
+import { manifests as languageAccessManifests } from './language-access/manifests.js';
 import { manifests as auditLogManifests } from './audit-log/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as configurationManifests } from './configuration/manifests.js';
@@ -25,7 +25,7 @@ import { manifests as userPermissionsManifests } from './user-permissions/manife
 import './global-components/index.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
-	...invariantForVariantGuardManifests,
+	...languageAccessManifests,
 	...auditLogManifests,
 	...collectionManifests,
 	...configurationManifests,
