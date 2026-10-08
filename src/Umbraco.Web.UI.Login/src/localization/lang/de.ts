@@ -25,6 +25,7 @@ export default {
     userFailedLogin: 'Hoppla! Wir konnten Sie nicht anmelden. Bitte überprüfen Sie Ihre Anmeldeinformationen und versuchen Sie es erneut.',
     userLockedOut: 'Ihr Konto wurde gesperrt. Bitte versuchen Sie es später erneut.',
     receivedErrorFromServer: 'Der Server hat einen Fehler gemeldet',
+    passwordResetUnavailable: 'Das Zurücksetzen des Kennworts ist derzeit leider nicht verfügbar. Bitte versuchen Sie es später erneut oder wenden Sie sich an Ihren Administrator.',
     resetCodeExpired: 'Der aufgerufene Link ist ungültig oder abgelaufen',
     userInviteWelcomeMessage: 'Hallo und Willkommen bei Umbraco! In nur einer Minute sind Sie bereit loszulegen, Sie müssen nur ein Kennwort festlegen.',
     userInviteExpiredMessage: 'Willkommen bei Umbraco! Bedauerlicherweise ist Ihre Einladung verfallen. Bitte kontaktieren Sie Ihren Administrator und bitten Sie ihn, diese erneut zu schicken.',
