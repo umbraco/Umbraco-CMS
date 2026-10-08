@@ -1,4 +1,10 @@
 parameters:
+  - name: dependsOn
+    type: object
+    default: []
+  - name: condition
+    type: string
+    default: succeeded()
   - name: projectName
     type: string
   - name: umbracoVersion
@@ -9,6 +15,8 @@ parameters:
 jobs:
 - job: Create_DT_Project
   displayName: Create Dependency Track Project
+  dependsOn: ${{ parameters.dependsOn }}
+  condition: ${{ parameters.condition }}
   steps:
     - checkout: none
 
@@ -35,6 +43,7 @@ jobs:
   - job:
     displayName: Upload ${{ project.name }} BOM
     dependsOn: Create_DT_Project
+    condition: ${{ parameters.condition }}
     steps:
       - checkout: none
 

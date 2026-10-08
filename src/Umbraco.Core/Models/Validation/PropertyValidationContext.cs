@@ -21,11 +21,6 @@ public sealed class PropertyValidationContext
     public required IEnumerable<string> CulturesBeingValidated { get; init; }
 
     /// <summary>
-    ///     Gets the collection of segments being validated.
-    /// </summary>
-    public required IEnumerable<string?> SegmentsBeingValidated { get; init; }
-
-    /// <summary>
     ///     Gets a value indicating whether invariant (shared) properties should be validated in this context.
     /// </summary>
     /// <remarks>
@@ -43,7 +38,7 @@ public sealed class PropertyValidationContext
     /// <returns>An empty property validation context.</returns>
     public static PropertyValidationContext Empty() => new()
     {
-        Culture = null, Segment = null, CulturesBeingValidated = [], SegmentsBeingValidated = []
+        Culture = null, Segment = null, CulturesBeingValidated = []
     };
 
     /// <summary>
@@ -54,6 +49,6 @@ public sealed class PropertyValidationContext
     /// <returns>A property validation context for the specified culture and segment.</returns>
     public static PropertyValidationContext CultureAndSegment(string? culture, string? segment) => new()
     {
-        Culture = culture, Segment = segment, CulturesBeingValidated = [], SegmentsBeingValidated = []
+        Culture = culture, Segment = segment, CulturesBeingValidated = []
     };
 }
