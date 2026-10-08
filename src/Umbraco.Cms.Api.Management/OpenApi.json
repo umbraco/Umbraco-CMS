@@ -51132,6 +51132,7 @@
         "required": [
           "assemblyVersion",
           "baseUtcOffset",
+          "isDebugMode",
           "runtimeMode",
           "version"
         ],
@@ -51148,6 +51149,9 @@
           },
           "runtimeMode": {
             "$ref": "#/components/schemas/RuntimeModeModel"
+          },
+          "isDebugMode": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

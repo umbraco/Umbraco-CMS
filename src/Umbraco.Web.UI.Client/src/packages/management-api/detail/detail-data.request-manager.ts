@@ -254,6 +254,8 @@ export class UmbManagementApiDetailDataRequestManager<
 		const { error } = await tryExecute(this, this.#update(id, data));
 
 		if (!error) {
+			// The server event that invalidates the cached item can arrive after the update response.
+			this.#dataCache.delete(id);
 			return this.read(id);
 		}
 

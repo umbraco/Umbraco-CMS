@@ -11,16 +11,24 @@ public class ServerInformationResponseModel
     /// Gets or sets the version string of the Umbraco server instance.
     /// </summary>
     public string Version { get; set; } = string.Empty;
+
     /// <summary>
     /// Gets or sets the version of the server's assembly.
     /// </summary>
     public string AssemblyVersion { get; set; } = string.Empty;
+
     /// <summary>
     /// Gets or sets the base UTC offset of the server.
     /// </summary>
     public string BaseUtcOffset { get; set; } = string.Empty;
+
     /// <summary>
     /// Gets or sets the current runtime mode of the Umbraco server.
     /// </summary>
     public RuntimeMode RuntimeMode { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the Umbraco server is running in debug mode.
+    /// </summary>
+    public bool IsDebugMode { get; set; }
 }

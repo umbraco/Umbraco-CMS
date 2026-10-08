@@ -1,5 +1,6 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
 import { data as pageTree } from './page-tree.data.js';
+import { data as collectionTree } from './collection-tree.data.js';
 import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
@@ -801,13 +802,6 @@ const rawData = [
 			},
 			{
 				editorAlias: 'Umbraco.ContentPicker',
-				alias: 'contentPickerNotExisting',
-				culture: null,
-				segment: null,
-				value: 'dead0000-0000-4000-8000-000000000000',
-			},
-			{
-				editorAlias: 'Umbraco.ContentPicker',
 				alias: 'contentPickerIgnoreUserStartNodes',
 				culture: null,
 				segment: null,
@@ -826,6 +820,13 @@ const rawData = [
 				culture: null,
 				segment: null,
 				value: 'c680be85-0bb7-4429-9d4a-73ffb83e427b',
+			},
+			{
+				editorAlias: 'Umbraco.ContentPicker',
+				alias: 'contentPickerDefaultConfigNotFound',
+				culture: null,
+				segment: null,
+				value: 'deadbeef-0000-4000-8000-000000000003',
 			},
 		],
 		flags: [],
@@ -1385,17 +1386,9 @@ const rawData = [
 						crops: [],
 						focalPoint: null,
 					},
-				],
-			},
-			{
-				editorAlias: 'Umbraco.MediaPicker3',
-				alias: 'mediaPickerNotExisting',
-				culture: null,
-				segment: null,
-				value: [
 					{
-						key: 'dead0001-0000-4000-8000-000000000000',
-						mediaKey: 'dead0000-0000-4000-8000-000000000000',
+						key: 'a1e9b8f4-3f2a-4b0a-9c8e-6d9f7b2a5c31',
+						mediaKey: 'deadbeef-0000-4000-8000-000000000000',
 						mediaTypeAlias: 'Image',
 						crops: [],
 						focalPoint: null,
@@ -1617,14 +1610,8 @@ const rawData = [
 				alias: 'memberGroupPicker',
 				culture: null,
 				segment: null,
-				value: '4bff0fe9-6cf4-47cd-a87e-cd4a3a860c86,015dd839-aace-4372-8238-5ec353c3a4d7',
-			},
-			{
-				editorAlias: 'Umbraco.MemberGroupPicker',
-				alias: 'memberGroupPickerNotExisting',
-				culture: null,
-				segment: null,
-				value: 'dead0000-0000-4000-8000-000000000000',
+				value:
+					'4bff0fe9-6cf4-47cd-a87e-cd4a3a860c86,015dd839-aace-4372-8238-5ec353c3a4d7,deadbeef-0000-4000-8000-000000000006',
 			},
 		],
 		flags: [],
@@ -1672,10 +1659,10 @@ const rawData = [
 			},
 			{
 				editorAlias: 'Umbraco.MemberPicker',
-				alias: 'memberPickerNotExisting',
+				alias: 'memberPickerNotFound',
 				culture: null,
 				segment: null,
-				value: 'dead0000-0000-4000-8000-000000000000',
+				value: 'deadbeef-0000-4000-8000-000000000004',
 			},
 		],
 		flags: [],
@@ -1736,18 +1723,10 @@ const rawData = [
 						type: 'external',
 						url: 'https://umbraco.com',
 					},
-				],
-			},
-			{
-				editorAlias: 'Umbraco.MultiUrlPicker',
-				alias: 'multiUrlPickerNotExisting',
-				culture: null,
-				segment: null,
-				value: [
 					{
-						name: 'Not existing',
+						name: 'Not Found',
 						type: 'document',
-						unique: 'dead0000-0000-4000-8000-000000000000',
+						unique: 'deadbeef-0000-4000-8000-000000000007',
 					},
 				],
 			},
@@ -1903,14 +1882,8 @@ const rawData = [
 					{ type: 'document', unique: '80954b94-1d32-4edd-9c01-105561a7415d' },
 					{ type: 'document', unique: 'a3a37004-139f-4254-ba56-3ed381b3007c' },
 					{ type: 'document', unique: '17149c1e-44a8-4882-a088-6a1d84e0e86a' },
+					{ type: 'document', unique: 'deadbeef-0000-4000-8000-000000000001' },
 				],
-			},
-			{
-				editorAlias: 'Umbraco.MultiNodeTreePicker',
-				alias: 'multinodeTreepickerNotExisting',
-				culture: null,
-				segment: null,
-				value: [{ type: 'document', unique: 'dead0000-0000-4000-8000-000000000000' }],
 			},
 			{
 				editorAlias: 'Umbraco.MultiNodeTreePicker',
@@ -1968,21 +1941,15 @@ const rawData = [
 				value: [
 					{ type: 'media', unique: 'b44956af-620a-4e17-bbce-3987446fb2f1' },
 					{ type: 'media', unique: 'f06adb91-8cdd-408d-83dd-f7b833fc393c' },
+					{ type: 'media', unique: 'deadbeef-0000-4000-8000-000000000000' },
 				],
-			},
-			{
-				editorAlias: 'Umbraco.MultiNodeTreePicker',
-				alias: 'multinodeTreepickerMediaNotExisting',
-				culture: null,
-				segment: null,
-				value: [{ type: 'media', unique: 'dead0000-0000-4000-8000-000000000000' }],
 			},
 			{
 				editorAlias: 'Umbraco.MultiNodeTreePicker',
 				alias: 'multinodeTreepickerMediaFullyConfigured',
 				culture: null,
 				segment: null,
-				value: [{ type: 'media', unique: 'a0651d98-14a9-4d92-8133-336f59b248d31' }],
+				value: [{ type: 'media', unique: 'a0651d98-14a9-4d92-8133-36f59b248d31' }],
 			},
 			{
 				editorAlias: 'Umbraco.MultiNodeTreePicker',
@@ -1992,14 +1959,8 @@ const rawData = [
 				value: [
 					{ type: 'member', unique: 'e93b2557-5fcb-4495-bbb3-9f5fd87055a8' },
 					{ type: 'member', unique: 'd74d2bd0-f55a-4a06-beb8-d8e931fc726b' },
+					{ type: 'member', unique: 'deadbeef-0000-4000-8000-000000000002' },
 				],
-			},
-			{
-				editorAlias: 'Umbraco.MultiNodeTreePicker',
-				alias: 'multinodeTreepickerMembersNotExisting',
-				culture: null,
-				segment: null,
-				value: [{ type: 'member', unique: 'dead0000-0000-4000-8000-000000000000' }],
 			},
 			{
 				editorAlias: 'Umbraco.MultiNodeTreePicker',
@@ -2630,10 +2591,10 @@ const rawData = [
 			},
 			{
 				editorAlias: 'Umbraco.UserPicker',
-				alias: 'userPickerNotExisting',
+				alias: 'userPickerNotFound',
 				culture: null,
 				segment: null,
-				value: 'dead0000-0000-4000-8000-000000000000',
+				value: 'deadbeef-0000-4000-8000-000000000005',
 			},
 		],
 		flags: [],
@@ -2688,4 +2649,5 @@ export const data: Array<UmbMockDocumentModel> = [
 		flags: [],
 	},
 	...pageTree,
+	...collectionTree,
 ];

@@ -366,3 +366,34 @@ test('can move away from a content node with a block list after making no change
   // We do this to make sure that there is no discard changes button visible, if the discard changes was visible, we would not be able to go to the document type
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
 });
+
+test('can navigate away from content with a block list value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDefaultDocumentWithABlockListEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed block list value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDefaultDocumentWithABlockListEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickDeleteBlockListBlockButton();
+  await umbracoUi.content.clickConfirmToDeleteButton();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});
