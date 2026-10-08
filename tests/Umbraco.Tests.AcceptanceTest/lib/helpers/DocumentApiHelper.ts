@@ -16,6 +16,11 @@ export class DocumentApiHelper {
     return await response.json();
   }
 
+  async getPublished(id: string) {
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id + '/published');
+    return await response.json();
+  }
+
   async waitUntilIndexed(query: string, id: string) {
     await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.documentSearch, query, id);
   }
