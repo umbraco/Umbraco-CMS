@@ -2,10 +2,12 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Common.Serialization;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Serialization;
 
@@ -19,7 +21,7 @@ public class ContentModelBaseJsonTypeInfoModifierTests
         => _jsonSerializerOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            TypeInfoResolver = new ModifyingJsonTypeInfoResolver(new DefaultJsonTypeInfoResolver(), ContentModelBaseJsonTypeInfoModifier.Apply),
+            TypeInfoResolver = new ModifyingJsonTypeInfoResolver(new UmbracoJsonTypeInfoResolver(TestHelper.GetTypeFinder()), ContentModelBaseJsonTypeInfoModifier.Apply),
         };
 
     [TestCase(typeof(DocumentResponseModel))]

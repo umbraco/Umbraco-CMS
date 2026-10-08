@@ -1,8 +1,9 @@
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Common.Serialization;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Serialization;
 
@@ -16,7 +17,7 @@ public class BlockValueJsonTypeInfoModifiersTests
         => _jsonSerializerOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            TypeInfoResolver = new ModifyingJsonTypeInfoResolver(new DefaultJsonTypeInfoResolver(), BlockValueJsonTypeInfoModifiers.Apply),
+            TypeInfoResolver = new ModifyingJsonTypeInfoResolver(new UmbracoJsonTypeInfoResolver(TestHelper.GetTypeFinder()), BlockValueJsonTypeInfoModifiers.Apply),
         };
 
     [Test]
@@ -187,8 +188,8 @@ public class BlockValueJsonTypeInfoModifiersTests
         // Apply is a stateless static method shared across every JsonSerializerOptions that wires it in -
         // unlike the previous JsonConverter-based design, there is no per-instance cache keyed by options that
         // could confuse one options instance for another.
-        var firstOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, TypeInfoResolver = new ModifyingJsonTypeInfoResolver(new DefaultJsonTypeInfoResolver(), BlockValueJsonTypeInfoModifiers.Apply) };
-        var secondOptions = new JsonSerializerOptions { PropertyNamingPolicy = null, TypeInfoResolver = new ModifyingJsonTypeInfoResolver(new DefaultJsonTypeInfoResolver(), BlockValueJsonTypeInfoModifiers.Apply) };
+        var firstOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, TypeInfoResolver = new ModifyingJsonTypeInfoResolver(new UmbracoJsonTypeInfoResolver(TestHelper.GetTypeFinder()), BlockValueJsonTypeInfoModifiers.Apply) };
+        var secondOptions = new JsonSerializerOptions { PropertyNamingPolicy = null, TypeInfoResolver = new ModifyingJsonTypeInfoResolver(new UmbracoJsonTypeInfoResolver(TestHelper.GetTypeFinder()), BlockValueJsonTypeInfoModifiers.Apply) };
 
         BlockItemData model = CreateBlockItemData([(null, "title", null)]);
 

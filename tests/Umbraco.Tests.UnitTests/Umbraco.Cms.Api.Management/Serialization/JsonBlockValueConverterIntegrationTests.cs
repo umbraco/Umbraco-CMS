@@ -1,9 +1,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Common.Serialization;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Serialization;
 
@@ -176,11 +178,10 @@ public class JsonBlockValueConverterIntegrationTests
 
     private static JsonSerializerOptions CreateOptions(bool includeBlockSortingModifier)
     {
-        IJsonTypeInfoResolver typeInfoResolver = new DefaultJsonTypeInfoResolver();
-        if (includeBlockSortingModifier)
-        {
-            typeInfoResolver = new ModifyingJsonTypeInfoResolver(typeInfoResolver, BlockValueJsonTypeInfoModifiers.Apply);
-        }
+        var umbracoJsonTypeInfoResolver = new UmbracoJsonTypeInfoResolver(TestHelper.GetTypeFinder());
+        IJsonTypeInfoResolver typeInfoResolver = includeBlockSortingModifier
+            ? new ModifyingJsonTypeInfoResolver(umbracoJsonTypeInfoResolver, BlockValueJsonTypeInfoModifiers.Apply)
+            : umbracoJsonTypeInfoResolver;
 
         return new JsonSerializerOptions
         {

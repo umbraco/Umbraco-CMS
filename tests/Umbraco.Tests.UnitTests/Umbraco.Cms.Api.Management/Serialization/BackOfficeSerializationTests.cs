@@ -35,6 +35,10 @@ public class BackOfficeSerializationTests
         Assert.AreEqual("{\"stringValue\":\"theValue\"}", json);
     }
 
+    [Test]
+    public void TypeInfoResolver_Is_An_Umbraco_Json_Type_Info_Resolver()
+        => Assert.That(jsonOptions.JsonSerializerOptions.TypeInfoResolver, Is.InstanceOf<IUmbracoJsonTypeInfoResolver>());
+
     // the limit is 64, but it seems like the functional limit is that minus 1
     [TestCase(1, true, TestName = "Can_Serialize_At_Min_Depth(1)")]
     [TestCase(48, true, TestName = "Can_Serialize_At_High_Depth(33)")]
