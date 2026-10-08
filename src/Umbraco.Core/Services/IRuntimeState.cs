@@ -46,8 +46,7 @@ public interface IRuntimeState
     /// <summary>
     ///     Gets the semantic version corresponding to the current migration state.
     /// </summary>
-    // TODO (V19): Remove the default implementation.
-    SemVersion? CurrentMigrationVersion => null;
+    SemVersion? CurrentMigrationVersion { get; }
 
     /// <summary>
     ///     Gets the exception that caused the boot to fail.

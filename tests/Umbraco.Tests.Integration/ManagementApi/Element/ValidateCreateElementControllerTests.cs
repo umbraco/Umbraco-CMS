@@ -60,7 +60,7 @@ public class ValidateCreateElementControllerTests : ManagementApiUserGroupTestBa
             Parent = null,
             Id = Guid.NewGuid(),
             Values = [],
-            Variants = [new ElementVariantRequestModel { Culture = null, Segment = null, Name = "Test Element" }],
+            Variants = [new ElementVariantRequestModel { Culture = null, Name = "Test Element" }],
         };
 
         return await Client.PostAsync(Url, JsonContent.Create(createModel));

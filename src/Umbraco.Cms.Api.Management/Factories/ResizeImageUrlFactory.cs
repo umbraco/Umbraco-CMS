@@ -38,30 +38,6 @@ public class ResizeImageUrlFactory : IResizeImageUrlFactory
         _absoluteUrlBuilder = absoluteUrlBuilder;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ResizeImageUrlFactory"/> class.
-    /// </summary>
-    /// <param name="imageUrlGenerator">The service used to generate image URLs.</param>
-    /// <param name="contentSettings">The options for content settings.</param>
-    /// <param name="imagingSettings">The options for content imaging settings. This parameter is ignored; imaging settings are read from <see cref="ContentSettings.Imaging"/>.</param>
-    /// <param name="mediaUrlGenerators">A collection of media URL generators.</param>
-    /// <param name="absoluteUrlBuilder">The service used to build absolute URLs.</param>
-    [Obsolete("Use the constructor that does not accept IOptions<ContentImagingSettings>; imaging settings are read from ContentSettings.Imaging. Scheduled for removal in Umbraco 19.")]
-    public ResizeImageUrlFactory(
-        IImageUrlGenerator imageUrlGenerator,
-        IOptions<ContentSettings> contentSettings,
-        IOptions<ContentImagingSettings> imagingSettings,
-        MediaUrlGeneratorCollection mediaUrlGenerators,
-        IAbsoluteUrlBuilder absoluteUrlBuilder)
-        : this(imageUrlGenerator, contentSettings, mediaUrlGenerators, absoluteUrlBuilder)
-    {
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Use the overload that accepts ImageResizeOptions instead. Scheduled for removal in Umbraco 19.")]
-    public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, int height, int width, ImageCropMode? mode)
-        => CreateUrlSets(mediaItems, new ImageResizeOptions(height, width, mode));
-
     /// <inheritdoc />
     public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, ImageResizeOptions options)
         => mediaItems.Select(media => new MediaUrlInfoResponseModel(media.Key, CreateUrls(media, options))).ToArray();

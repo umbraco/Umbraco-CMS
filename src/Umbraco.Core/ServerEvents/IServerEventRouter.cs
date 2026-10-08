@@ -21,9 +21,7 @@ public interface IServerEventRouter
     /// <param name="serverEvent">The server event to route.</param>
     /// <param name="context">Server-side routing context. Not sent to clients.</param>
     /// <returns>A task that represents the asynchronous routing operation.</returns>
-    // TODO (V19): Remove this default implementation.
-    Task RouteEventAsync(ServerEvent serverEvent, ServerEventRoutingContext context)
-        => RouteEventAsync(serverEvent);
+    Task RouteEventAsync(ServerEvent serverEvent, ServerEventRoutingContext context);
 
     /// <summary>
     /// Notify a specific user about a server event.

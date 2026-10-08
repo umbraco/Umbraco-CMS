@@ -1,3 +1,4 @@
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Services.FileSystem;
@@ -33,6 +34,12 @@ public class PhysicalFileSystemTreeService : FileSystemTreeServiceBase, IPhysica
         => IsTreeRootPath(path) || IsAllowedPath(path) is false
             ? []
             : base.GetFiles(path);
+
+    /// <inheritdoc/>
+    public override FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
+        => IsAllowedPath(path)
+            ? base.GetAncestorModels(path, includeSelf)
+            : [];
 
     private static bool IsTreeRootPath(string path) => path == Path.DirectorySeparatorChar.ToString();
 

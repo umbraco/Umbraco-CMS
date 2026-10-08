@@ -155,7 +155,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ],
             Expose =
             [
-                new BlockItemVariation(contentElementKey, null, null)
+                new BlockItemVariation(contentElementKey, null)
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
@@ -172,7 +172,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
         AssertDocumentFields(IndexAliases.PublishedContent);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
-        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.IndexFieldNames.Tags)?.Value;
+        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.Search.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
         CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
 
@@ -261,7 +261,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
                                     ],
                                     Expose =
                                     [
-                                        new BlockItemVariation(nestedElement1Key, null, null)
+                                        new BlockItemVariation(nestedElement1Key, null)
                                     ]
                                 })
                         }
@@ -291,8 +291,8 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ],
             Expose =
             [
-                new BlockItemVariation(rootElement1Key, null, null),
-                new BlockItemVariation(rootElement2Key, null, null),
+                new BlockItemVariation(rootElement1Key, null),
+                new BlockItemVariation(rootElement2Key, null),
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockGridValue);
@@ -320,7 +320,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             CollectionAssert.AreEqual(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, indexValue.Keywords);
         });
 
-        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.IndexFieldNames.Tags)?.Value;
+        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.Search.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
         CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
     }

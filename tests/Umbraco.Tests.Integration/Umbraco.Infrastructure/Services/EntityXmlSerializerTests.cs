@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -152,7 +153,8 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
             scheme,
             loggerFactory.CreateLogger<MediaFileManager>(),
             ShortStringHelper,
-            Services);
+            Services,
+            new Lazy<ICoreScopeProvider>(GetRequiredService<ICoreScopeProvider>));
 
         var ignored = new FileUploadPropertyEditor(
             DataValueEditorFactory,

@@ -98,8 +98,7 @@ public interface IUserService : IMembershipUserService
     /// <param name="userKey">The key of the user.</param>
     /// <param name="model">The model containing the updated user details.</param>
     /// <returns>An attempt containing the updated <see cref="IUser"/> if successful, as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
-    // TODO V19: Remove default implementation
-    Task<Attempt<IUser?, UserOperationStatus>> UpdateProfileAsync(Guid userKey, UserUpdateProfileModel model) => throw new NotImplementedException();
+    Task<Attempt<IUser?, UserOperationStatus>> UpdateProfileAsync(Guid userKey, UserUpdateProfileModel model);
 
     /// <summary>
     ///     Sets the avatar for a user from a temporary file.
@@ -346,7 +345,7 @@ public interface IUserService : IMembershipUserService
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>, and an enumerable of permissions.</returns>
     Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetElementPermissionsAsync(
         Guid userKey,
-        IEnumerable<Guid> elementKeys) => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
+        IEnumerable<Guid> elementKeys);
 
     /// <summary>
     ///     Get explicitly assigned permissions for a user and optional node ids

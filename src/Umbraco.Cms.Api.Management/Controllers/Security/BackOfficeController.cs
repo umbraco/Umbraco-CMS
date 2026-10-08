@@ -261,6 +261,7 @@ public class BackOfficeController : SecurityControllerBase
     /// A task representing the asynchronous operation. The result contains an <see cref="IActionResult"/> indicating the outcome of the authorization request, including possible error responses for invalid contexts or unauthorized clients.
     /// </returns>
     [AllowAnonymous]
+    [AllowCookieRedirect]
     [HttpGet("authorize")]
     [EndpointSummary("Authorizes the current request.")]
     [EndpointDescription("Validates and authorizes the OAuth authorization request.")]
@@ -707,6 +708,18 @@ public class BackOfficeController : SecurityControllerBase
             BackOfficeIdentityUser? backOfficeUser = await _backOfficeUserManager.FindByNameAsync(userName);
             if (backOfficeUser != null)
             {
+                // The auth cookie outlives a user being disabled or locked out, so sign it out
+                // and fall through to the login screen rather than issuing new tokens.
+                if (backOfficeUser.IsApproved is false || await _backOfficeUserManager.IsLockedOutAsync(backOfficeUser))
+                {
+                    await _backOfficeSignInManager.SignOutAsync();
+                    _logger.LogInformation(
+                        "User {UserName} from IP address {RemoteIpAddress} was signed out because the account is disabled or locked out",
+                        userName,
+                        HttpContext.Connection.RemoteIpAddress);
+                    return DefaultChallengeResult();
+                }
+
                 return await SignInBackOfficeUser(backOfficeUser, request);
             }
         }

@@ -31,13 +31,13 @@ public abstract class IndexedSearchServiceBase
         if (Guid.TryParse(query, out Guid id))
         {
             // if the query is an ID, filter for that ID rather than attempting a full text query match (which will likely turn up empty)
-            filters.Add(new KeywordFilter(Umbraco.Cms.Core.Constants.IndexFieldNames.Id, [id.AsKeyword()], false));
+            filters.Add(new KeywordFilter(Constants.Search.FieldNames.Id, [id.AsKeyword()], false));
             effectiveQuery = null;
         }
 
         if (parentId.HasValue)
         {
-            filters.Add(new KeywordFilter(Umbraco.Cms.Core.Constants.IndexFieldNames.ParentId, [parentId.Value.AsKeyword()], false));
+            filters.Add(new KeywordFilter(Constants.Search.FieldNames.ParentId, [parentId.Value.AsKeyword()], false));
         }
 
         return filters;

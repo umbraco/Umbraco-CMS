@@ -106,8 +106,8 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
             => value switch
             {
                 decimal d => d,
-                double db => (decimal)db,
-                float f => (decimal)f,
+                double db => db.ToShortestDecimal(),
+                float f => f.ToShortestDecimal(),
                 IFormattable f => decimal.TryParse(f.ToString(null, CultureInfo.InvariantCulture), NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedDecimalValue)
                         ? parsedDecimalValue
                         : null,
@@ -253,7 +253,7 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
                     step = 0.000001;
                 }
 
-                if (ValidationHelper.IsValueValidForStep((decimal)parsedDecimalValue, (decimal)min, (decimal)step) is false)
+                if (ValidationHelper.IsValueValidForStep(parsedDecimalValue.ToShortestDecimal(), min.ToShortestDecimal(), step.ToShortestDecimal()) is false)
                 {
                     yield return new ValidationResult(
                         LocalizedTextService.Localize("validation", "invalidStep", [parsedDecimalValue.ToString(), step.ToString(), min.ToString()]),

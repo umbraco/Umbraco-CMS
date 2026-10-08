@@ -25,9 +25,7 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
     ///     This persists the sort order directly and does not load the entities or fire any notifications;
     ///     callers are responsible for any required cache refresh and auditing.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    void UpdateSortOrder(IReadOnlyList<int> orderedNodeIds)
-        => throw new NotImplementedException();
+    void UpdateSortOrder(IReadOnlyList<int> orderedNodeIds);
 
     /// <summary>
     ///     Gets versions.
@@ -85,19 +83,6 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
     /// <summary>
     ///     Gets paged content items.
     /// </summary>
-    /// <remarks>Here, <paramref name="filter" /> can be null but <paramref name="ordering" /> cannot.</remarks>
-    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
-    IEnumerable<TEntity> GetPage(
-        IQuery<TEntity>? query,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        IQuery<TEntity>? filter,
-        Ordering? ordering);
-
-    /// <summary>
-    ///     Gets paged content items.
-    /// </summary>
     /// <param name="query">The base query for content items.</param>
     /// <param name="pageIndex">The page index (zero-based).</param>
     /// <param name="pageSize">The number of items per page.</param>
@@ -110,7 +95,6 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
     /// <param name="ordering">The ordering specification.</param>
     /// <returns>A collection of content items for the specified page.</returns>
     /// <remarks>Here, <paramref name="filter" /> can be null but <paramref name="ordering" /> cannot.</remarks>
-#pragma warning disable CS0618 // Type or member is obsolete
     IEnumerable<TEntity> GetPage(
         IQuery<TEntity>? query,
         long pageIndex,
@@ -118,9 +102,7 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
         out long totalRecords,
         string[]? propertyAliases,
         IQuery<TEntity>? filter,
-        Ordering? ordering)
-        => GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
-#pragma warning restore CS0618 // Type or member is obsolete
+        Ordering? ordering);
 
     /// <summary>
     ///     Checks the data integrity of content items.

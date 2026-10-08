@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -20,6 +21,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IContentService _contentService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly ILanguageService _languageService;
     private readonly ILogger<ContentPublishingService> _logger;
     private readonly ILongRunningOperationService _longRunningOperationService;
     private readonly IUmbracoContextFactory _umbracoContextFactory;
@@ -66,6 +68,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
         _userIdKeyResolver = userIdKeyResolver;
+        _languageService = languageService;
         _logger = logger;
         _longRunningOperationService = longRunningOperationService;
         _umbracoContextFactory = umbracoContextFactory;
@@ -143,11 +146,37 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
                 });
         }
 
+        var culturesToPublish = cultures.ToArray();
+        var rootCulturesToValidate = await GetRootCulturesToValidateAsync(content, culturesToPublish, publishBranchFilter);
+        if (rootCulturesToValidate.Length > 0)
+        {
+            ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, rootCulturesToValidate);
+            if (validationResult.ValidationErrors.Any())
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(
+                    ContentPublishingOperationStatus.FailedBranch,
+                    new ContentPublishingBranchInternalResult
+                    {
+                        ContentKey = content.Key,
+                        Content = returnContent ? content : null,
+                        FailedItems =
+                        [
+                            new ContentPublishingBranchItemResult
+                            {
+                                Key = content.Key,
+                                OperationStatus = ContentPublishingOperationStatus.ContentInvalid,
+                            }
+                        ],
+                    });
+            }
+        }
+
         var userId = await _userIdKeyResolver.GetAsync(userKey);
-        IEnumerable<PublishResult> result = _contentService.PublishBranch(content, publishBranchFilter, cultures.ToArray(), userId);
+        IEnumerable<PublishResult> result = _contentService.PublishBranch(content, publishBranchFilter, culturesToPublish, userId);
         scope.Complete();
 
-        var itemResults = result.ToDictionary(r => r.Content.Key, ToContentPublishingOperationStatus);
+        var itemResults = result.ToDictionary(r => r.Content.Key, r => r.ToContentPublishingOperationStatus());
         var branchResult = new ContentPublishingBranchInternalResult
         {
             ContentKey = content.Key,
@@ -167,6 +196,37 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
             : Attempt.FailWithStatus(ContentPublishingOperationStatus.FailedBranch, branchResult);
 
         return attempt;
+    }
+
+    /// <summary>
+    /// Determines the cultures of the branch root that a branch publish will (re)publish, mirroring the
+    /// selection made by <see cref="IContentService.PublishBranch"/> so that unchanged, already published
+    /// cultures do not block the operation.
+    /// </summary>
+    private async Task<string[]> GetRootCulturesToValidateAsync(IContent content, string[] cultures, PublishBranchFilter publishBranchFilter)
+    {
+        var forceRepublish = publishBranchFilter.HasFlag(PublishBranchFilter.ForceRepublish);
+
+        if (content.ContentType.VariesByCulture() is false)
+        {
+            return content.Published && content.Edited is false && forceRepublish is false
+                ? []
+                : [Constants.System.InvariantCulture];
+        }
+
+        if (content.Published is false)
+        {
+            return cultures.Contains(Constants.System.InvariantCulture)
+                ? content.AvailableCultures.ToArray()
+                : cultures;
+        }
+
+        var defaultCulture = await _languageService.GetDefaultIsoCodeAsync();
+        return cultures
+            .Select(culture => culture == Constants.System.InvariantCulture ? defaultCulture : culture)
+            .Where(culture => forceRepublish || content.IsCulturePublished(culture) is false || content.IsCultureEdited(culture))
+            .Distinct(StringComparer.InvariantCultureIgnoreCase)
+            .ToArray();
     }
 
     /// <inheritdoc/>

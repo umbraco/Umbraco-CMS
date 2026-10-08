@@ -102,6 +102,7 @@ public class DocumentUrlAliasServiceTests
         contentMock.Setup(x => x.Key).Returns(documentKey);
         contentMock.Setup(x => x.Trashed).Returns(false);
         contentMock.Setup(x => x.Blueprint).Returns(false);
+        contentMock.Setup(x => x.Published).Returns(true);
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
         contentMock.Setup(x => x.Properties).Returns(propertyCollectionMock.Object);
         contentMock.Setup(x => x.GetValue<string>(
@@ -141,6 +142,7 @@ public class DocumentUrlAliasServiceTests
         contentMock.Setup(x => x.Key).Returns(documentKey);
         contentMock.Setup(x => x.Trashed).Returns(false);
         contentMock.Setup(x => x.Blueprint).Returns(false);
+        contentMock.Setup(x => x.Published).Returns(true);
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
         contentMock.Setup(x => x.Properties).Returns(propertyCollectionMock.Object);
 
@@ -191,7 +193,7 @@ public class DocumentUrlAliasServiceTests
     #region CreateOrUpdateAliasesAsync Tests
 
     /// <summary>
-    /// For invariant content the alias property value is stored once, with <c>NullableLanguageId = null</c>,
+    /// For invariant content the alias property value is stored once, with <c>LanguageId = null</c>,
     /// irrespective of how many languages are configured.
     /// </summary>
     [Test]

@@ -72,7 +72,7 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
         if (exposeSeen is false && blockValue.ContentData.Count > 0)
         {
             blockValue.Expose = blockValue.ContentData
-                .Select(cd => new BlockItemVariation(cd.Key, null, null))
+                .Select(cd => new BlockItemVariation(cd.Key, null))
                 .ToList();
         }
 

@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -119,23 +120,23 @@ internal sealed class ContentEditingService
 
     /// <inheritdoc />
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
-        => await HandleCreateAsync(createModel, null, userKey);
+        => ToEditingAttempt(await HandleCreateAsync(createModel, null, userKey));
 
     /// <inheritdoc />
-    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ContentCreateModel createModel, string[] culturesToPublish, Guid userKey)
+    public async Task<Attempt<ContentCreateResult, ContentEditingAndPublishingStatus>> CreateAndPublishAsync(ContentCreateModel createModel, ISet<string> culturesToPublish, Guid userKey)
         => await HandleCreateAsync(createModel, culturesToPublish, userKey);
 
-    private async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> HandleCreateAsync(ContentCreateModel createModel, string[]? culturesToPublish, Guid userKey)
+    private async Task<Attempt<ContentCreateResult, ContentEditingAndPublishingStatus>> HandleCreateAsync(ContentCreateModel createModel, ISet<string>? culturesToPublish, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)
         {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentCreateResult());
+            return Attempt.FailWithStatus(EditingStatus(ContentEditingOperationStatus.InvalidCulture), new ContentCreateResult());
         }
 
         Attempt<ContentCreateResult, ContentEditingOperationStatus> result = await MapCreate<ContentCreateResult>(createModel);
         if (result.Success == false)
         {
-            return result;
+            return Attempt.FailWithStatus(EditingStatus(result.Status), result.Result);
         }
 
         // the create mapping might succeed, but this doesn't mean the model is valid at property level.
@@ -147,42 +148,57 @@ internal sealed class ContentEditingService
         ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, createModel.TemplateKey);
         if (updateTemplateStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus(updateTemplateStatus, new ContentCreateResult { Content = content });
+            return Attempt.FailWithStatus(
+                EditingStatus(updateTemplateStatus),
+                new ContentCreateResult { Content = content, ValidationResult = validationResult });
         }
 
-        ContentEditingOperationStatus saveStatus = culturesToPublish is null
-            ? await Save(content, userKey)
+        (ContentEditingAndPublishingStatus saveStatus, IEnumerable<string> invalidPropertyAliases) = culturesToPublish is null
+            ? (EditingStatus(await Save(content, userKey)), Enumerable.Empty<string>())
             : await SaveAndPublish(content, culturesToPublish, userKey);
-        return saveStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(validationStatus, new ContentCreateResult { Content = content, ValidationResult = validationResult })
-            : Attempt.FailWithStatus(saveStatus, new ContentCreateResult { Content = content });
+        return IsSuccess(saveStatus)
+            ? Attempt.SucceedWithStatus(
+                new ContentEditingAndPublishingStatus
+                {
+                    ContentEditingOperationStatus = validationStatus,
+                    ContentPublishingOperationStatus = saveStatus.ContentPublishingOperationStatus,
+                },
+                new ContentCreateResult { Content = content, ValidationResult = validationResult })
+            : Attempt.FailWithStatus(
+                saveStatus,
+                new ContentCreateResult
+                {
+                    Content = content,
+                    ValidationResult = validationResult,
+                    InvalidPropertyAliases = invalidPropertyAliases,
+                });
     }
 
     /// <inheritdoc />
     public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey)
-        => await HandleUpdateAsync(key, updateModel, null, userKey);
+        => ToEditingAttempt(await HandleUpdateAsync(key, updateModel, null, userKey));
 
     /// <inheritdoc />
-    public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
+    public async Task<Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, ISet<string> culturesToPublish, Guid userKey)
         => await HandleUpdateAsync(key, updateModel, culturesToPublish, userKey);
 
-    private async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> HandleUpdateAsync(Guid key, ContentUpdateModel updateModel, string[]? culturesToPublish, Guid userKey)
+    private async Task<Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus>> HandleUpdateAsync(Guid key, ContentUpdateModel updateModel, ISet<string>? culturesToPublish, Guid userKey)
     {
         IContent? content = ContentService.GetById(key);
         if (content is null)
         {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentUpdateResult());
+            return Attempt.FailWithStatus(EditingStatus(ContentEditingOperationStatus.NotFound), new ContentUpdateResult());
         }
 
         if (await ValidateCulturesAsync(updateModel) is false)
         {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentUpdateResult { Content = content });
+            return Attempt.FailWithStatus(EditingStatus(ContentEditingOperationStatus.InvalidCulture), new ContentUpdateResult { Content = content });
         }
 
         Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<ContentUpdateResult>(content, updateModel);
         if (result.Success == false)
         {
-            return Attempt.FailWithStatus(result.Status, result.Result);
+            return Attempt.FailWithStatus(EditingStatus(result.Status), result.Result);
         }
 
         // the update mapping might succeed, but this doesn't mean the model is valid at property level.
@@ -195,15 +211,30 @@ internal sealed class ContentEditingService
         ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, updateModel.TemplateKey);
         if (updateTemplateStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus(updateTemplateStatus, new ContentUpdateResult { Content = content });
+            return Attempt.FailWithStatus(
+                EditingStatus(updateTemplateStatus),
+                new ContentUpdateResult { Content = content, ValidationResult = validationResult });
         }
 
-        ContentEditingOperationStatus saveStatus = culturesToPublish is null
-            ? await Save(content, userKey)
+        (ContentEditingAndPublishingStatus saveStatus, IEnumerable<string> invalidPropertyAliases) = culturesToPublish is null
+            ? (EditingStatus(await Save(content, userKey)), Enumerable.Empty<string>())
             : await SaveAndPublish(content, culturesToPublish, userKey);
-        return saveStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(validationStatus, new ContentUpdateResult { Content = content, ValidationResult = validationResult })
-            : Attempt.FailWithStatus(saveStatus, new ContentUpdateResult { Content = content });
+        return IsSuccess(saveStatus)
+            ? Attempt.SucceedWithStatus(
+                new ContentEditingAndPublishingStatus
+                {
+                    ContentEditingOperationStatus = validationStatus,
+                    ContentPublishingOperationStatus = saveStatus.ContentPublishingOperationStatus,
+                },
+                new ContentUpdateResult { Content = content, ValidationResult = validationResult })
+            : Attempt.FailWithStatus(
+                saveStatus,
+                new ContentUpdateResult
+                {
+                    Content = content,
+                    ValidationResult = validationResult,
+                    InvalidPropertyAliases = invalidPropertyAliases,
+                });
     }
 
     /// <inheritdoc />
@@ -221,11 +252,6 @@ internal sealed class ContentEditingService
     /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
-
-    /// <inheritdoc />
-    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await RestoreAsync(key, parentKey, userKey, true);
 
     /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
@@ -338,27 +364,54 @@ internal sealed class ContentEditingService
         }
     }
 
-    private async Task<ContentEditingOperationStatus> SaveAndPublish(IContent content, string[] culturesToPublish, Guid userKey)
+    private async Task<(ContentEditingAndPublishingStatus Status, IEnumerable<string> InvalidPropertyAliases)> SaveAndPublish(IContent content, ISet<string> culturesToPublish, Guid userKey)
     {
+        // The cultures to publish must match the content type's variance, or the publish cannot be attempted at all.
+        // Checked up-front so the caller gets the reason: the underlying service signals this by throwing, which would
+        // otherwise be caught below and reported as an unknown error.
+        ContentEditingOperationStatus? invalidCulturesStatus = await ValidateCulturesToPublishAsync(content, culturesToPublish);
+        if (invalidCulturesStatus is not null)
+        {
+            return (EditingStatus(invalidCulturesStatus.Value), Enumerable.Empty<string>());
+        }
+
         try
         {
             var currentUserId = await GetUserIdAsync(userKey);
-            PublishResult publishResult = ContentService.SaveAndPublish(content, culturesToPublish, userId: currentUserId);
+            PublishResult publishResult = ContentService.SaveAndPublish(content, culturesToPublish.ToArray(), userId: currentUserId);
             if (publishResult.Success)
             {
-                return ContentEditingOperationStatus.Success;
+                return (
+                    new ContentEditingAndPublishingStatus
+                    {
+                        ContentEditingOperationStatus = ContentEditingOperationStatus.Success,
+                        ContentPublishingOperationStatus = ContentPublishingOperationStatus.Success,
+                    },
+                    Enumerable.Empty<string>());
             }
 
-            return publishResult.Result switch
+            // Some failures are returned before the document is persisted, so they cannot be reported against the
+            // publishing status: doing so would state that the save succeeded when nothing was written at all.
+            ContentEditingOperationStatus? nothingPersistedStatus = NothingPersistedStatus(publishResult.Result);
+            if (nothingPersistedStatus is not null)
             {
-                PublishResultType.FailedPublishCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
-                _ => ContentEditingOperationStatus.Unknown,
-            };
+                return (EditingStatus(nothingPersistedStatus.Value), Enumerable.Empty<string>());
+            }
+
+            // Any other failure means the publish was rejected after the save took effect, so report the save as
+            // successful and let the publishing status carry the reason.
+            return (
+                new ContentEditingAndPublishingStatus
+                {
+                    ContentEditingOperationStatus = ContentEditingOperationStatus.Success,
+                    ContentPublishingOperationStatus = publishResult.ToContentPublishingOperationStatus(),
+                },
+                publishResult.InvalidProperties?.Select(property => property.Alias).ToArray() ?? Enumerable.Empty<string>());
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Content save and publish operation failed");
-            return ContentEditingOperationStatus.Unknown;
+            return (EditingStatus(ContentEditingOperationStatus.Unknown), Enumerable.Empty<string>());
         }
     }
 }
