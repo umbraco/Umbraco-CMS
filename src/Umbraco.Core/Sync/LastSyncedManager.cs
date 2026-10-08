@@ -7,10 +7,17 @@ namespace Umbraco.Cms.Core.Sync;
 /// <summary>
 /// Default implementation of <see cref="ILastSyncedManager"/> that manages last synced IDs with caching.
 /// </summary>
+/// <remarks>
+/// The external id is persisted. The internal id is kept in memory only: it is recorded by the periodic sync and by
+/// inline syncs on request threads, and writing it would join the caller's transaction and hold this server's
+/// umbracoLastSynced row until that transaction commits. Before any internal id has been recorded, it starts at the
+/// persisted external id, which the periodic sync only moves past instructions it has fully processed.
+/// </remarks>
 internal sealed class LastSyncedManager : ILastSyncedManager
 {
     private readonly ILastSyncedRepository _lastSyncedRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
+    private readonly Lock _internalIdLock = new();
     private int? _lastSyncedInternalId;
     private int? _lastSyncedExternalId;
 
@@ -28,16 +35,21 @@ internal sealed class LastSyncedManager : ILastSyncedManager
     /// <inheritdoc/>
     public async Task<int?> GetLastSyncedInternalAsync()
     {
-        if (_lastSyncedInternalId is not null)
+        lock (_internalIdLock)
         {
-            return _lastSyncedInternalId;
+            if (_lastSyncedInternalId is not null)
+            {
+                return _lastSyncedInternalId;
+            }
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        _lastSyncedInternalId = await _lastSyncedRepository.GetInternalIdAsync();
-        scope.Complete();
+        int? persistedExternalId = await GetLastSyncedExternalAsync();
 
-        return _lastSyncedInternalId;
+        lock (_internalIdLock)
+        {
+            _lastSyncedInternalId ??= persistedExternalId;
+            return _lastSyncedInternalId;
+        }
     }
 
     /// <inheritdoc/>
@@ -63,10 +75,8 @@ internal sealed class LastSyncedManager : ILastSyncedManager
             throw new ArgumentException("Invalid last synced id. Must be non-negative.");
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        await _lastSyncedRepository.SaveInternalIdAsync(id);
-        _lastSyncedInternalId = id;
-        scope.Complete();
+        await GetLastSyncedInternalAsync();
+        RaiseInternalId(id);
     }
 
     /// <inheritdoc/>
@@ -100,7 +110,24 @@ internal sealed class LastSyncedManager : ILastSyncedManager
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal void ClearLocalCache()
     {
-        _lastSyncedInternalId = null;
+        lock (_internalIdLock)
+        {
+            _lastSyncedInternalId = null;
+        }
+
         _lastSyncedExternalId = null;
+    }
+
+    // The periodic sync and inline syncs can record the same instructions concurrently or in a different order;
+    // only ever moving the id forward keeps the checkpoint consistent.
+    private void RaiseInternalId(int id)
+    {
+        lock (_internalIdLock)
+        {
+            if (_lastSyncedInternalId is null || _lastSyncedInternalId < id)
+            {
+                _lastSyncedInternalId = id;
+            }
+        }
     }
 }

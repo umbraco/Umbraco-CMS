@@ -134,8 +134,8 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                     .WithDetail("The publish operation was cancelled by an event.")
                     .Build()),
                 ContentPublishingOperationStatus.ContentInvalid => BadRequest(problemDetailsBuilder
-                    .WithTitle($"Invalid {EntityName}")
-                    .WithDetail($"The specified {EntityName} had an invalid configuration.")
+                    .WithTitle("Validation failed")
+                    .WithDetail($"One or more property values of the {EntityName} failed validation.")
                     .WithExtension("invalidProperties", invalidPropertyAliases ?? Enumerable.Empty<string>())
                     .Build()),
                 ContentPublishingOperationStatus.NothingToPublish => BadRequest(problemDetailsBuilder

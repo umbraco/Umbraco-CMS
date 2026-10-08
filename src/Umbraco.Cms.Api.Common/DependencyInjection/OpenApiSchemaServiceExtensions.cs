@@ -52,15 +52,25 @@ internal static class OpenApiSchemaServiceExtensions
         string documentName,
         Func<IServiceProvider, JsonOptions> jsonOptionsFactory)
     {
-        ServiceDescriptor descriptor = services.FirstOrDefault(sd =>
+        // AddOpenApi registers the schema service either once per document (keyed by document name) or once for all
+        // documents (keyed with AnyKey). A registration keyed by document name takes precedence over AnyKey when resolving,
+        // so the shared registration is left in place for other documents and only a per-document one is replaced.
+        ServiceDescriptor descriptor = services.LastOrDefault(sd =>
             sd.ServiceType.FullName == OpenApiSchemaServiceFullName
             && Equals(sd.ServiceKey, documentName))
+            ?? services.LastOrDefault(sd =>
+                sd.ServiceType.FullName == OpenApiSchemaServiceFullName
+                && Equals(sd.ServiceKey, KeyedService.AnyKey))
             ?? throw new InvalidOperationException(
                 $"Could not find a registration for {OpenApiSchemaServiceFullName} keyed with '{documentName}'. "
                 + $"Ensure AddOpenApi(\"{documentName}\") has been called before {nameof(ReplaceOpenApiSchemaService)}, "
                 + "or check whether the internal Microsoft.AspNetCore.OpenApi registration shape has changed.");
 
-        services.Remove(descriptor);
+        if (Equals(descriptor.ServiceKey, documentName))
+        {
+            services.Remove(descriptor);
+        }
+
         services.AddKeyedSingleton(
             descriptor.ServiceType,
             documentName,
