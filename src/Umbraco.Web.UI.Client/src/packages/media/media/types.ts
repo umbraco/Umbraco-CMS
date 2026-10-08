@@ -1,7 +1,7 @@
 import type { UmbMediaEntityType } from './entity.js';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbContentDetailModel, UmbEntryValueModel } from '@umbraco-cms/backoffice/content';
 
 export type * from './audit-log/types.js';
 export type * from './collection/types.js';
@@ -34,7 +34,7 @@ export interface UmbMediaUrlInfoModel {
 export interface UmbMediaVariantModel extends UmbEntityVariantModel {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbMediaValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}
+export interface UmbMediaValueModel<ValueType = unknown> extends UmbEntryValueModel<ValueType> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMediaVariantOptionModel extends UmbEntityVariantOptionModel<UmbEntityVariantModel> {}

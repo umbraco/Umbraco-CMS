@@ -84,6 +84,9 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 
 	/**
 	 * Moves invariant variant entries to the default language, keeping existing culture entries as-is.
+	 * @param {DetailModelType['variants']} variants - The variants to transform.
+	 * @param {string} defaultLanguage - The default language to assign to invariant entries.
+	 * @returns {DetailModelType['variants']} The transformed variants.
 	 */
 	#transformVariantsToCultureVariant(
 		variants: DetailModelType['variants'],
@@ -95,7 +98,7 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 				result.push(variant);
 				continue;
 			}
-			const hasCultureVariant = variants.some((v) => v.culture === defaultLanguage && v.segment === variant.segment);
+			const hasCultureVariant = variants.some((v) => v.culture === defaultLanguage);
 			if (!hasCultureVariant) {
 				result.push({ ...variant, culture: defaultLanguage });
 			}
@@ -105,6 +108,9 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 
 	/**
 	 * Collapses culture variant entries to invariant, preferring the default language and discarding other cultures.
+	 * @param {DetailModelType['variants']} variants - The variants to transform.
+	 * @param {string} defaultLanguage - The default language to prefer when collapsing.
+	 * @returns {DetailModelType['variants']} The transformed variants.
 	 */
 	#transformVariantsToInvariant(
 		variants: DetailModelType['variants'],
@@ -119,7 +125,7 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 			if (variant.culture === null) {
 				result.push(variant);
 			} else if (variant.culture === cultureToKeep) {
-				const hasInvariantVariant = variants.some((v) => v.culture === null && v.segment === variant.segment);
+				const hasInvariantVariant = variants.some((v) => v.culture === null);
 				if (!hasInvariantVariant) {
 					result.push({ ...variant, culture: null });
 				}

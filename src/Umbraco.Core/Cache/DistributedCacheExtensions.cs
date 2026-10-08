@@ -341,15 +341,6 @@ public static class DistributedCacheExtensions
     /// </summary>
     /// <param name="dc">The distributed cache.</param>
     /// <param name="externalMembers">The external members to refresh in cache.</param>
-    [Obsolete("Use the overload taking notification state instead. Scheduled for removal in Umbraco 19.")]
-    public static void RefreshExternalMemberCache(this DistributedCache dc, IEnumerable<ExternalMemberIdentity> externalMembers)
-        => dc.RefreshExternalMemberCache(externalMembers, new Dictionary<string, object?>());
-
-    /// <summary>
-    ///     Refreshes the specified external members in the distributed cache.
-    /// </summary>
-    /// <param name="dc">The distributed cache.</param>
-    /// <param name="externalMembers">The external members to refresh in cache.</param>
     /// <param name="state">The notification state dictionary.</param>
     public static void RefreshExternalMemberCache(this DistributedCache dc, IEnumerable<ExternalMemberIdentity> externalMembers, IDictionary<string, object?> state)
         => dc.RefreshByPayload(
@@ -506,7 +497,7 @@ public static class DistributedCacheExtensions
     /// <param name="dc">The distributed cache.</param>
     /// <param name="changes">The content type changes to refresh.</param>
     public static void RefreshContentTypeCache(this DistributedCache dc, IEnumerable<ContentTypeChange<IContentType>> changes)
-        => dc.RefreshByPayload(ContentTypeCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.ChangeTypes)).Select(x => new ContentTypeCacheRefresher.JsonPayload(typeof(IContentType).Name, x.Item.Id, x.ChangeTypes)));
+        => dc.RefreshByPayload(ContentTypeCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.ChangeTypes)).Select(x => new ContentTypeCacheRefresher.JsonPayload(typeof(IContentType).Name, x.Item.Id, x.ChangeTypes, x.Item.IsElement)));
 
     /// <summary>
     ///     Refreshes the content type cache for the specified media type changes.

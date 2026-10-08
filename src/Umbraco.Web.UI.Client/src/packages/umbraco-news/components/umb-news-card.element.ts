@@ -28,7 +28,11 @@ export class UmbNewsCardElement extends UmbLitElement {
 				showImage,
 				() =>
 					this.item.imageUrl
-						? html`<img class="card-img" src=${this.item.imageUrl} alt=${this.item.imageAltText ?? ''} decoding="async" />`
+						? html`<img
+								class="card-img"
+								src=${this.item.imageUrl}
+								alt=${this.item.imageAltText ?? ''}
+								decoding="async" />`
 						: html`<div class="card-img placeholder" aria-hidden="true"></div>`,
 				() => nothing,
 			)}

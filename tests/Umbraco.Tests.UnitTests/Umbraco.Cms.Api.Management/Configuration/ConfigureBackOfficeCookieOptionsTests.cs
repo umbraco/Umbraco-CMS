@@ -6,22 +6,27 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Api.Management.Configuration;
+using Umbraco.Cms.Api.Management.Controllers;
+using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Configuration;
@@ -29,7 +34,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Configuration;
 [TestFixture]
 public class ConfigureBackOfficeCookieOptionsTests
 {
-    private static readonly DateTimeOffset Now = new(2025, 6, 15, 12, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset _now = new(2025, 6, 15, 12, 0, 0, TimeSpan.Zero);
     private Mock<TimeProvider> _timeProviderMock = null!;
     private GlobalSettings _globalSettings = null!;
     private SecuritySettings _securitySettings = null!;
@@ -40,7 +45,7 @@ public class ConfigureBackOfficeCookieOptionsTests
     public void SetUp()
     {
         _timeProviderMock = new Mock<TimeProvider>();
-        _timeProviderMock.Setup(tp => tp.GetUtcNow()).Returns(Now);
+        _timeProviderMock.Setup(tp => tp.GetUtcNow()).Returns(_now);
         _globalSettings = new GlobalSettings { TimeOut = TimeSpan.FromMinutes(60) };
         _securitySettings = new SecuritySettings { KeepUserLoggedIn = false };
         _mockSignInManager = new Mock<IBackOfficeSignInManager>();
@@ -48,23 +53,60 @@ public class ConfigureBackOfficeCookieOptionsTests
     }
 
     [Test]
-    public async Task OnValidatePrincipal_IssuedUtc_Not_Reset_When_No_Renewal_Triggered()
+    public async Task Can_Extend_Expiry_On_Activity_Without_Resetting_IssuedUtc_When_Stamp_Not_Revalidated()
     {
-        // Arrange: validator does nothing (ShouldRenew stays false)
+        // Arrange: the stamp validator does nothing, i.e. its ValidationInterval has not elapsed yet
+        // (this is the common case for most requests: AllowConcurrentLogins = true keeps a non-zero
+        // interval, so most requests fall in the gap between stamp re-validations).
         _mockStampValidator
             .Setup(v => v.ValidateAsync(It.IsAny<CookieValidatePrincipalContext>()))
             .Returns(Task.CompletedTask);
 
-        var originalIssuedUtc = Now.AddMinutes(-5);
-        var originalExpiresUtc = Now.AddMinutes(55);
+        var originalIssuedUtc = _now.AddMinutes(-5);
+        var originalExpiresUtc = _now.AddMinutes(55);
 
-        CookieValidatePrincipalContext context = CreateValidatePrincipalContext(originalIssuedUtc, originalExpiresUtc);
+        CookieValidatePrincipalContext context = CreateValidatePrincipalContext(
+            originalIssuedUtc,
+            originalExpiresUtc,
+            "/umbraco/management/api/v1/document");
         Func<CookieValidatePrincipalContext, Task> onValidatePrincipal = GetOnValidatePrincipal();
 
         // Act
         await onValidatePrincipal(context);
 
-        // Assert: IssuedUtc should NOT be reset when ShouldRenew was not triggered
+        // Assert: the session still gets refreshed on activity (ExpiresUtc slides forward), but
+        // IssuedUtc must be left untouched - resetting it here would reset the SecurityStampValidator's
+        // interval clock on every request and stop it from ever re-checking the stamp again during an
+        // active session (e.g. a password change or a disabled account would go unnoticed).
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.ShouldRenew, Is.True);
+            Assert.That(context.Properties.IssuedUtc, Is.EqualTo(originalIssuedUtc));
+            Assert.That(context.Properties.ExpiresUtc, Is.EqualTo(_now.Add(_globalSettings.TimeOut)));
+        });
+    }
+
+    [Test]
+    public async Task Cannot_Renew_Ticket_When_Identity_Is_Invalid()
+    {
+        // Arrange: principal is missing a required back-office claim, so GetUmbracoIdentity() returns null.
+        _mockStampValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<CookieValidatePrincipalContext>()))
+            .Returns(Task.CompletedTask);
+
+        var originalIssuedUtc = _now.AddMinutes(-5);
+        var originalExpiresUtc = _now.AddMinutes(55);
+
+        CookieValidatePrincipalContext context = CreateValidatePrincipalContext(
+            originalIssuedUtc,
+            originalExpiresUtc,
+            principal: CreateInvalidBackOfficePrincipal());
+        Func<CookieValidatePrincipalContext, Task> onValidatePrincipal = GetOnValidatePrincipal();
+
+        // Act
+        await onValidatePrincipal(context);
+
+        // Assert: no valid identity means no renewal
         Assert.Multiple(() =>
         {
             Assert.That(context.ShouldRenew, Is.False);
@@ -74,7 +116,7 @@ public class ConfigureBackOfficeCookieOptionsTests
     }
 
     [Test]
-    public async Task OnValidatePrincipal_Timestamps_Reset_When_Validator_Triggers_Renewal()
+    public async Task Can_Reset_Timestamps_When_Validator_Triggers_Renewal()
     {
         // Arrange: validator sets ShouldRenew = true (stamp was valid, principal refreshed)
         _mockStampValidator
@@ -82,8 +124,8 @@ public class ConfigureBackOfficeCookieOptionsTests
             .Callback<CookieValidatePrincipalContext>(ctx => ctx.ShouldRenew = true)
             .Returns(Task.CompletedTask);
 
-        var originalIssuedUtc = Now.AddMinutes(-35);
-        var originalExpiresUtc = Now.AddMinutes(25);
+        var originalIssuedUtc = _now.AddMinutes(-35);
+        var originalExpiresUtc = _now.AddMinutes(25);
 
         CookieValidatePrincipalContext context = CreateValidatePrincipalContext(originalIssuedUtc, originalExpiresUtc);
         Func<CookieValidatePrincipalContext, Task> onValidatePrincipal = GetOnValidatePrincipal();
@@ -95,73 +137,149 @@ public class ConfigureBackOfficeCookieOptionsTests
         Assert.Multiple(() =>
         {
             Assert.That(context.ShouldRenew, Is.True);
-            Assert.That(context.Properties.IssuedUtc, Is.EqualTo(Now));
-            Assert.That(context.Properties.ExpiresUtc, Is.EqualTo(Now.Add(_globalSettings.TimeOut)));
+            Assert.That(context.Properties.IssuedUtc, Is.EqualTo(_now));
+            Assert.That(context.Properties.ExpiresUtc, Is.EqualTo(_now.Add(_globalSettings.TimeOut)));
         });
     }
 
-    [Test]
-    public async Task OnValidatePrincipal_Timestamps_Reset_When_KeepUserLoggedIn_Triggers_Renewal()
+    [TestCase("Strict", SameSiteMode.Strict)]
+    [TestCase("strict", SameSiteMode.Strict)]
+    [TestCase("None", SameSiteMode.None)]
+    [TestCase("Lax", SameSiteMode.Lax)]
+    [TestCase("Unspecified", SameSiteMode.Unspecified)]
+
+    // Numeric input is a legitimate spelling of a defined member and must keep working.
+    [TestCase("0", SameSiteMode.None)]
+    [TestCase("2", SameSiteMode.Strict)]
+    public void Can_Configure_SameSite_From_Defined_AuthCookieSameSite_Value(string configured, SameSiteMode expected)
     {
-        // Arrange: KeepUserLoggedIn = true, and timeRemaining < timeElapsed
-        _securitySettings.KeepUserLoggedIn = true;
+        _securitySettings.AuthCookieSameSite = configured;
 
-        _mockStampValidator
-            .Setup(v => v.ValidateAsync(It.IsAny<CookieValidatePrincipalContext>()))
-            .Returns(Task.CompletedTask);
+        CookieAuthenticationOptions options = ConfigureOptions();
 
-        // Set IssuedUtc far enough in the past that timeRemaining < timeElapsed
-        // IssuedUtc = now - 40 min, ExpiresUtc = now + 20 min
-        // timeElapsed = 40 min, timeRemaining = 20 min => timeRemaining < timeElapsed => ShouldRenew
-        var originalIssuedUtc = Now.AddMinutes(-40);
-        var originalExpiresUtc = Now.AddMinutes(20);
+        Assert.That(options.Cookie.SameSite, Is.EqualTo(expected));
+    }
 
-        CookieValidatePrincipalContext context = CreateValidatePrincipalContext(originalIssuedUtc, originalExpiresUtc);
-        Func<CookieValidatePrincipalContext, Task> onValidatePrincipal = GetOnValidatePrincipal();
+    // An out-of-range integer parses successfully but is not a defined SameSiteMode. Left unguarded it
+    // reaches SetCookieHeaderValue, which omits the samesite attribute entirely - silently downgrading
+    // from the configured default to whatever the browser falls back to. A configuration mistake must
+    // fail loudly, exactly as an unrecognised word does.
+    [TestCase("42")]
+    [TestCase("-7")]
+    [TestCase("Stirct")]
+    [TestCase("")]
+    public void Cannot_Configure_SameSite_From_Undefined_AuthCookieSameSite_Value(string configured)
+    {
+        _securitySettings.AuthCookieSameSite = configured;
 
-        // Act
-        await onValidatePrincipal(context);
+        Assert.Throws<ConfigurationException>(() => ConfigureOptions());
+    }
 
-        // Assert: ShouldRenew set by EnsureTicketRenewalIfKeepUserLoggedIn, timestamps reset
-        Assert.Multiple(() =>
-        {
-            Assert.That(context.ShouldRenew, Is.True);
-            Assert.That(context.Properties.IssuedUtc, Is.EqualTo(Now));
-            Assert.That(context.Properties.ExpiresUtc, Is.EqualTo(Now.Add(_globalSettings.TimeOut)));
-        });
+    // Whether an unauthenticated request gets a status code or a redirect to the login page is decided
+    // by the endpoint's cookie redirect metadata, not by where the endpoint is routed.
+    [TestCase("/umbraco/management/api/v1/document", EndpointKind.Api, 401)]
+    [TestCase("/umbraco/some-package/api/v1/item", EndpointKind.Api, 401)]
+    [TestCase("/umbraco/management/api/v1/security/back-office/authorize", EndpointKind.ApiAllowingRedirect, 302)]
+    [TestCase("/umbraco/some-page", EndpointKind.Page, 302)]
+    [TestCase("/umbraco/some-page", EndpointKind.None, 302)]
+    public void Can_Answer_Unauthorized_Request_According_To_Endpoint_Metadata(string path, EndpointKind endpointKind, int expectedStatusCode)
+    {
+        RedirectContext<CookieAuthenticationOptions> context = CreateRedirectContext(path, endpointKind);
+
+        ConfigureOptions().Events.OnRedirectToLogin(context);
+
+        AssertRedirectOutcome(context, expectedStatusCode);
+    }
+
+    [TestCase("/umbraco/management/api/v1/document", EndpointKind.Api, 403)]
+    [TestCase("/umbraco/some-package/api/v1/item", EndpointKind.Api, 403)]
+    [TestCase("/umbraco/management/api/v1/security/back-office/authorize", EndpointKind.ApiAllowingRedirect, 302)]
+    [TestCase("/umbraco/some-page", EndpointKind.Page, 302)]
+    [TestCase("/umbraco/some-page", EndpointKind.None, 302)]
+    public void Can_Answer_Forbidden_Request_According_To_Endpoint_Metadata(string path, EndpointKind endpointKind, int expectedStatusCode)
+    {
+        RedirectContext<CookieAuthenticationOptions> context = CreateRedirectContext(path, endpointKind);
+
+        ConfigureOptions().Events.OnRedirectToAccessDenied(context);
+
+        AssertRedirectOutcome(context, expectedStatusCode);
     }
 
     [Test]
-    public async Task OnValidatePrincipal_No_Renewal_When_KeepUserLoggedIn_But_TimeRemaining_Greater_Than_TimeElapsed()
+    public void Can_Answer_Unauthorized_Xhr_Request_To_Non_Api_Endpoint_With_401()
     {
-        // Arrange: KeepUserLoggedIn = true, but timeRemaining > timeElapsed
-        _securitySettings.KeepUserLoggedIn = true;
+        RedirectContext<CookieAuthenticationOptions> context = CreateRedirectContext("/umbraco/some-page", EndpointKind.Page);
+        context.Request.Headers.XRequestedWith = "XMLHttpRequest";
 
-        _mockStampValidator
-            .Setup(v => v.ValidateAsync(It.IsAny<CookieValidatePrincipalContext>()))
-            .Returns(Task.CompletedTask);
+        ConfigureOptions().Events.OnRedirectToLogin(context);
 
-        // IssuedUtc = now - 10 min, ExpiresUtc = now + 50 min
-        // timeElapsed = 10 min, timeRemaining = 50 min => timeRemaining > timeElapsed => no renewal
-        var originalIssuedUtc = Now.AddMinutes(-10);
-        var originalExpiresUtc = Now.AddMinutes(50);
+        AssertRedirectOutcome(context, 401);
+    }
 
-        CookieValidatePrincipalContext context = CreateValidatePrincipalContext(originalIssuedUtc, originalExpiresUtc);
-        Func<CookieValidatePrincipalContext, Task> onValidatePrincipal = GetOnValidatePrincipal();
+    [Test]
+    public void Management_Api_Controllers_Disable_Cookie_Redirects()
+        => Assert.That(
+            typeof(ManagementApiControllerBase).GetCustomAttributes(inherit: true).OfType<IDisableCookieRedirectMetadata>(),
+            Is.Not.Empty);
 
-        // Act
-        await onValidatePrincipal(context);
+    [Test]
+    public void Back_Office_Authorize_Endpoint_Allows_Cookie_Redirects()
+        => Assert.That(
+            typeof(BackOfficeController).GetMethod(nameof(BackOfficeController.Authorize))!
+                .GetCustomAttributes(inherit: true).OfType<IAllowCookieRedirectMetadata>(),
+            Is.Not.Empty);
 
-        // Assert: ShouldRenew stays false, timestamps unchanged
-        Assert.Multiple(() =>
+    public enum EndpointKind
+    {
+        None,
+        Page,
+        Api,
+        ApiAllowingRedirect,
+    }
+
+    private static void AssertRedirectOutcome(RedirectContext<CookieAuthenticationOptions> context, int expectedStatusCode)
+        => Assert.Multiple(() =>
         {
-            Assert.That(context.ShouldRenew, Is.False);
-            Assert.That(context.Properties.IssuedUtc, Is.EqualTo(originalIssuedUtc));
-            Assert.That(context.Properties.ExpiresUtc, Is.EqualTo(originalExpiresUtc));
+            Assert.That(context.Response.StatusCode, Is.EqualTo(expectedStatusCode));
+            Assert.That(context.Response.Headers.Location.ToString(), Is.EqualTo(context.RedirectUri));
         });
+
+    private RedirectContext<CookieAuthenticationOptions> CreateRedirectContext(string path, EndpointKind endpointKind)
+    {
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Path = path;
+
+        object[]? metadata = endpointKind switch
+        {
+            EndpointKind.None => null,
+            EndpointKind.Page => [],
+            EndpointKind.Api => [new ApiControllerAttribute()],
+            EndpointKind.ApiAllowingRedirect => [new ApiControllerAttribute(), new AllowCookieRedirectAttribute()],
+            _ => throw new ArgumentOutOfRangeException(nameof(endpointKind)),
+        };
+
+        if (metadata is not null)
+        {
+            httpContext.SetEndpoint(new Endpoint(null, new EndpointMetadataCollection(metadata), path));
+        }
+
+        var scheme = new AuthenticationScheme(
+            Constants.Security.BackOfficeAuthenticationType,
+            Constants.Security.BackOfficeAuthenticationType,
+            typeof(CookieAuthenticationHandler));
+
+        return new RedirectContext<CookieAuthenticationOptions>(
+            httpContext,
+            scheme,
+            new CookieAuthenticationOptions(),
+            new AuthenticationProperties(),
+            $"/umbraco/login?ReturnUrl={Uri.EscapeDataString(path)}");
     }
 
     private Func<CookieValidatePrincipalContext, Task> GetOnValidatePrincipal()
+        => ConfigureOptions().Events.OnValidatePrincipal;
+
+    private CookieAuthenticationOptions ConfigureOptions()
     {
         var sut = new ConfigureBackOfficeCookieOptions(
             Options.Create(_securitySettings),
@@ -174,14 +292,16 @@ public class ConfigureBackOfficeCookieOptionsTests
 
         var options = new CookieAuthenticationOptions();
         sut.Configure(Constants.Security.BackOfficeAuthenticationType, options);
-        return options.Events.OnValidatePrincipal;
+        return options;
     }
 
     private CookieValidatePrincipalContext CreateValidatePrincipalContext(
         DateTimeOffset issuedUtc,
-        DateTimeOffset expiresUtc)
+        DateTimeOffset expiresUtc,
+        string? requestPath = null,
+        ClaimsPrincipal? principal = null)
     {
-        ClaimsPrincipal principal = CreateBackOfficePrincipal();
+        principal ??= CreateBackOfficePrincipal();
 
         var properties = new AuthenticationProperties
         {
@@ -197,6 +317,10 @@ public class ConfigureBackOfficeCookieOptionsTests
         ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         var httpContext = new DefaultHttpContext { RequestServices = serviceProvider };
+        if (requestPath is not null)
+        {
+            httpContext.Request.Path = requestPath;
+        }
 
         var scheme = new AuthenticationScheme(
             Constants.Security.BackOfficeAuthenticationType,
@@ -226,6 +350,23 @@ public class ConfigureBackOfficeCookieOptionsTests
             new Claim(ClaimTypes.Locality, "en-US", ClaimValueTypes.String, Constants.Security.BackOfficeAuthenticationType),
             new Claim(Constants.Security.SecurityStampClaimType, Guid.NewGuid().ToString(), ClaimValueTypes.String, Constants.Security.BackOfficeAuthenticationType),
             new Claim(Constants.Security.SessionIdClaimType, Guid.NewGuid().ToString(), ClaimValueTypes.String, Constants.Security.BackOfficeAuthenticationType),
+        ]);
+
+        return new ClaimsPrincipal(identity);
+    }
+
+    // Missing required back-office claims (GivenName, Locality, SecurityStamp), so GetUmbracoIdentity() rejects it as not a valid back-office identity.
+    private static ClaimsPrincipal CreateInvalidBackOfficePrincipal()
+    {
+        var identity = new ClaimsIdentity(
+            Constants.Security.BackOfficeAuthenticationType,
+            ClaimTypes.Name,
+            ClaimTypes.Role);
+
+        identity.AddClaims(
+        [
+            new Claim(ClaimTypes.NameIdentifier, "1234", ClaimValueTypes.String, Constants.Security.BackOfficeAuthenticationType),
+            new Claim(ClaimTypes.Name, "admin@example.com", ClaimValueTypes.String, Constants.Security.BackOfficeAuthenticationType),
         ]);
 
         return new ClaimsPrincipal(identity);

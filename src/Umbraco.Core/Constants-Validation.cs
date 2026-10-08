@@ -8,6 +8,11 @@ public static partial class Constants
     public static class Validation
     {
         /// <summary>
+        ///     The maximum length of the name of an Umbraco entity, matching the length of the database column that stores it.
+        /// </summary>
+        public const int MaxNameLength = 255;
+
+        /// <summary>
         ///     Contains validation error message constants.
         /// </summary>
         public static class ErrorMessages

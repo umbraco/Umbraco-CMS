@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Umbraco.Cms.Core.Configuration.Models.Validation;
@@ -10,6 +11,17 @@ namespace Umbraco.Cms.Core.Configuration.Models.Validation;
 /// </summary>
 public class ContentSettingsValidator : ConfigurationValidatorBase, IValidateOptions<ContentSettings>
 {
+    private readonly ILogger<ContentSettingsValidator> _logger;
+
+    private string? _lastCheckedPreviewBadge;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentSettingsValidator" /> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    public ContentSettingsValidator(ILogger<ContentSettingsValidator> logger)
+        => _logger = logger;
+
     /// <inheritdoc />
     public ValidateOptionsResult Validate(string? name, ContentSettings options)
     {
@@ -22,6 +34,8 @@ public class ContentSettingsValidator : ConfigurationValidatorBase, IValidateOpt
         {
             return ValidateOptionsResult.Fail(message);
         }
+
+        WarnOnPreviewBadgeWithoutNoncePlaceholder(options);
 
         return ValidateOptionsResult.Success;
     }
@@ -39,4 +53,27 @@ public class ContentSettingsValidator : ConfigurationValidatorBase, IValidateOpt
             values,
             "Alias, WidthFieldAlias, HeightFieldAlias, LengthFieldAlias and ExtensionFieldAlias must be specified for each entry",
             out message);
+
+    private void WarnOnPreviewBadgeWithoutNoncePlaceholder(ContentSettings options)
+    {
+        // Validation runs once per options instance rather than once per process, and the scoped
+        // IOptionsSnapshot rebuilds per request, so only warn when the configured value changes.
+        if (Interlocked.Exchange(ref _lastCheckedPreviewBadge, options.PreviewBadge) == options.PreviewBadge)
+        {
+            return;
+        }
+
+        // The default mark-up carries the placeholder, so a value without it has been customised; an empty
+        // value disables the badge altogether. See https://github.com/umbraco/Umbraco-CMS/issues/23530.
+        if (string.IsNullOrWhiteSpace(options.PreviewBadge)
+            || options.PreviewBadge.Contains(ContentSettings.PreviewBadgeNoncePlaceholder, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _logger.LogWarning(
+            "Configuration entry {ConfigPath} has been customised without the {Placeholder} placeholder, so the preview badge script tag is rendered without a CSP nonce and will be blocked if the site's Content-Security-Policy relies on one. Add the placeholder to the opening script tag to resolve this.",
+            $"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.PreviewBadge)}",
+            ContentSettings.PreviewBadgeNoncePlaceholder);
+    }
 }

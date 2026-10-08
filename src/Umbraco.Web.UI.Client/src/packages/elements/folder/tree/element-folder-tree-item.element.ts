@@ -7,8 +7,7 @@ import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 export class UmbElementFolderTreeItemElement extends UmbTreeItemElementBase<
 	UmbElementFolderTreeItemModel,
 	UmbElementFolderTreeItemContext
-> {
-}
+> {}
 
 export { UmbElementFolderTreeItemElement as element };
 

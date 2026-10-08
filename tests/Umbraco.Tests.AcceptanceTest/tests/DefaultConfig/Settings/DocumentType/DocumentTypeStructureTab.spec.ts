@@ -100,11 +100,11 @@ test('cannot see Allow at Root toggle in Structure tab for an Element Type', asy
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickStructureTab();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for loading to complete
 
   // Assert
-  await umbracoUi.documentType.isAllowAtRootButtonVisible(false);
+  // Wait for the not-applicable message first: it confirms the tab has rendered, so the "button is absent" check below is meaningful rather than passing while the panel is still loading.
   await umbracoUi.documentType.isElementTypeNotApplicableMessageForPropertyWithNameVisible('Allow at root');
+  await umbracoUi.documentType.isAllowAtRootButtonVisible(false);
 });
 
 test('cannot see Allowed Child Nodes section in Structure tab for an Element Type', async ({umbracoApi, umbracoUi}) => {
@@ -115,10 +115,10 @@ test('cannot see Allowed Child Nodes section in Structure tab for an Element Typ
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickStructureTab();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for loading to complete
   // Assert
-  await umbracoUi.documentType.isAllowedChildNodesButtonVisible(false);
+  // Anchor on the not-applicable message so the tab has loaded before asserting the section is absent.
   await umbracoUi.documentType.isElementTypeNotApplicableMessageForPropertyWithNameVisible('Allowed child node types');
+  await umbracoUi.documentType.isAllowedChildNodesButtonVisible(false);
 });
 
 test('cannot see Collection section in Structure tab for an Element Type', async ({umbracoApi, umbracoUi}) => {
@@ -129,11 +129,11 @@ test('cannot see Collection section in Structure tab for an Element Type', async
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickStructureTab();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for loading to complete
 
   // Assert
-  await umbracoUi.documentType.isAddCollectionButtonVisible(false);
+  // Anchor on the not-applicable message so the tab has loaded before asserting the section is absent.
   await umbracoUi.documentType.isElementTypeNotApplicableMessageForPropertyWithNameVisible('Collection');
+  await umbracoUi.documentType.isAddCollectionButtonVisible(false);
 });
 
 test('can see Allow at Root toggle in Structure tab after toggling off Element Type', async ({umbracoApi, umbracoUi}) => {
@@ -165,7 +165,6 @@ test('cannot see element type not applicable message in Structure tab for a Docu
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickStructureTab();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for loading to complete
 
   // Assert
   await umbracoUi.documentType.doesElementTypeNotApplicableMessageExist(false);

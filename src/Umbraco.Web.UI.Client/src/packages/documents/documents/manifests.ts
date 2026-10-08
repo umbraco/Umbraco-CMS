@@ -2,6 +2,7 @@ import { manifests as startNodeManifests } from './user-start-node/manifests.js'
 import { manifests as auditLogManifests } from './audit-log/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as configurationManifests } from './configuration/manifests.js';
+import { manifests as dynamicRootManifests } from './dynamic-root/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests.js';
 import { manifests as entitySignManifests } from './entity-sign/manifests.js';
@@ -22,6 +23,7 @@ import { manifests as trackedReferenceManifests } from './reference/manifests.js
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as urlManifests } from './url/manifests.js';
 import { manifests as userPermissionManifests } from './user-permissions/manifests.js';
+import { manifests as variantStateManifests } from './variant-state/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as allowEditInvariantFromNonDefaultManifests } from './allow-edit-invariant-from-non-default/manifests.js';
 import * as entryPointModule from './entry-point.js';
@@ -33,6 +35,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...auditLogManifests,
 	...collectionManifests,
 	...configurationManifests,
+	...dynamicRootManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,
 	...entitySignManifests,
@@ -53,6 +56,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...treeManifests,
 	...urlManifests,
 	...userPermissionManifests,
+	...variantStateManifests,
 	...workspaceManifests,
 	...allowEditInvariantFromNonDefaultManifests,
 	{

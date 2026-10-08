@@ -27,6 +27,18 @@ public interface IMediaCacheService : IContentCacheService
     Task<IPublishedContent?> GetByIdAsync(int id);
 
     /// <summary>
+    /// Gets multiple published media items by their unique keys, fetching any not already cached
+    /// from the database in a single batched query rather than one at a time.
+    /// </summary>
+    /// <param name="keys">The unique keys of the media to retrieve.</param>
+    /// <returns>The published media items that exist, in the same order as <paramref name="keys"/> (missing items omitted).</returns>
+    /// <remarks>
+    /// Used to materialise sets of keys (e.g. children/descendants) without the per-item database
+    /// round trip and scope of repeated <see cref="GetByKeyAsync"/> calls when the cache is cold.
+    /// </remarks>
+    Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys);
+
+    /// <summary>
     /// Attempts to retrieve a media item from the in-memory converted-content cache without
     /// touching the distributed cache or the database.
     /// </summary>
@@ -39,12 +51,7 @@ public interface IMediaCacheService : IContentCacheService
     /// the caller falls back to the existing async path. The default implementation always
     /// returns <c>false</c> so the caller takes the async path.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    bool TryGetCached(Guid key, out IPublishedContent? content)
-    {
-        content = null;
-        return false;
-    }
+    bool TryGetCached(Guid key, out IPublishedContent? content);
 
     /// <summary>
     /// Determines whether media with the specified identifier exists in the cache.

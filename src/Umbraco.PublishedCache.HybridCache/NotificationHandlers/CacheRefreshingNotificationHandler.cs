@@ -115,10 +115,10 @@ internal sealed class CacheRefreshingNotificationHandler :
         // converted content cache cleared (ContentCacheNode only stores ContentTypeId). A structural change
         // flagged RawDataUnaffected (a property removal) keeps its stored blob valid, so it belongs with the
         // converted-clear group. Content type changes can affect both documents and elements, so route by IsElement.
-        var documentRebuild = new HashSet<int>();
-        var documentConvertedOnly = new HashSet<int>();
-        var elementRebuild = new HashSet<int>();
-        var elementConvertedOnly = new HashSet<int>();
+        var documentRebuild = new Dictionary<int, Guid>();
+        var documentConvertedOnly = new Dictionary<int, Guid>();
+        var elementRebuild = new Dictionary<int, Guid>();
+        var elementConvertedOnly = new Dictionary<int, Guid>();
 
         foreach (ContentTypeChange<IContentType> change in notification.Changes)
         {
@@ -127,11 +127,11 @@ internal sealed class CacheRefreshingNotificationHandler :
 
             if (change.ChangeTypes.RequiresRawDataRebuild())
             {
-                (isElement ? elementRebuild : documentRebuild).Add(id);
+                (isElement ? elementRebuild : documentRebuild)[id] = change.Item.Key;
             }
             else if (change.ChangeTypes.RequiresConvertedCacheClearOnly())
             {
-                (isElement ? elementConvertedOnly : documentConvertedOnly).Add(id);
+                (isElement ? elementConvertedOnly : documentConvertedOnly)[id] = change.Item.Key;
             }
         }
 
@@ -142,13 +142,13 @@ internal sealed class CacheRefreshingNotificationHandler :
     }
 
     private void RefreshCacheForContentTypeChanges(
-        HashSet<int> rebuildIds,
-        HashSet<int> clearConvertedOnlyIds,
+        Dictionary<int, Guid> rebuildTypes,
+        Dictionary<int, Guid> clearConvertedOnlyTypes,
         Action<IReadOnlyCollection<int>> rebuild,
         Action<IReadOnlyCollection<int>> clearConvertedCache)
     {
         // Clear content type definitions for all affected types
-        foreach (var contentTypeId in rebuildIds.Concat(clearConvertedOnlyIds))
+        foreach (var contentTypeId in rebuildTypes.Keys.Concat(clearConvertedOnlyTypes.Keys))
         {
             _publishedContentTypeCache.ClearContentType(contentTypeId);
         }
@@ -157,26 +157,27 @@ internal sealed class CacheRefreshingNotificationHandler :
         // changed, etc.). In deferred mode, the rebuild is queued from the ContentTypeChangedNotification
         // handler instead, which fires after the scope is disposed — avoiding database lock contention between
         // the deferred rebuild's transaction and the original save transaction.
-        if (rebuildIds.Count > 0)
+        if (rebuildTypes.Count > 0)
         {
             if (_cacheSettings.ContentTypeRebuildMode != ContentTypeRebuildMode.Deferred)
             {
-                rebuild(rebuildIds.ToArray());
+                rebuild(rebuildTypes.Keys.ToArray());
             }
-            else
+            else if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug(
-                    "Content type change: database cache rebuild for {Count} type(s) left to the deferred rebuild (ContentTypeRebuildMode.Deferred).",
-                    rebuildIds.Count);
+                    "Content type change: database cache rebuild for content type(s) {ContentTypeIds} (keys {ContentTypeKeys}) left to the deferred rebuild (ContentTypeRebuildMode.Deferred).",
+                    rebuildTypes.Keys.ToArray(),
+                    rebuildTypes.Values.ToArray());
             }
         }
 
         // For changes that leave the stored data valid (name, icon, description, new property added, or a
         // property removal flagged RawDataUnaffected), just clear the converted content cache - HybridCache
         // entries remain valid. Selective clearing is safe here because no model factory reset occurs in this handler.
-        if (clearConvertedOnlyIds.Count > 0)
+        if (clearConvertedOnlyTypes.Count > 0)
         {
-            clearConvertedCache(clearConvertedOnlyIds.ToArray());
+            clearConvertedCache(clearConvertedOnlyTypes.Keys.ToArray());
         }
     }
 
@@ -200,22 +201,22 @@ internal sealed class CacheRefreshingNotificationHandler :
         // converted content cache cleared (ContentCacheNode only stores ContentTypeId). A structural change
         // flagged RawDataUnaffected (a property removal) keeps its stored blob valid, so it belongs with the
         // converted-clear group.
-        var rebuildIds = new HashSet<int>();
-        var clearConvertedOnlyIds = new HashSet<int>();
+        var rebuildTypes = new Dictionary<int, Guid>();
+        var clearConvertedOnlyTypes = new Dictionary<int, Guid>();
 
         foreach (ContentTypeChange<IMediaType> change in notification.Changes)
         {
             if (change.ChangeTypes.RequiresRawDataRebuild())
             {
-                rebuildIds.Add(change.Item.Id);
+                rebuildTypes[change.Item.Id] = change.Item.Key;
             }
             else if (change.ChangeTypes.RequiresConvertedCacheClearOnly())
             {
-                clearConvertedOnlyIds.Add(change.Item.Id);
+                clearConvertedOnlyTypes[change.Item.Id] = change.Item.Key;
             }
         }
 
-        RefreshCacheForContentTypeChanges(rebuildIds, clearConvertedOnlyIds, _mediaCacheService.Rebuild, _mediaCacheService.ClearConvertedContentCache);
+        RefreshCacheForContentTypeChanges(rebuildTypes, clearConvertedOnlyTypes, _mediaCacheService.Rebuild, _mediaCacheService.ClearConvertedContentCache);
         return Task.CompletedTask;
     }
 

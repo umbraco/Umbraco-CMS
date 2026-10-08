@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.1",
+  "openapi": "3.1.2",
   "info": {
     "title": "Umbraco Management API",
     "description": "This shows all APIs available in this version of Umbraco - including all the legacy apis that are available for backward compatibility",
@@ -2028,8 +2028,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -2052,8 +2052,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -2940,7 +2940,7 @@
         ],
         "summary": "Validates updating a document.",
         "description": "Validates the request model for updating a document without actually updating it.",
-        "operationId": "PutUmbracoManagementApiV1.1DocumentByIdValidate1.1",
+        "operationId": "PutDocumentByIdValidate",
         "parameters": [
           {
             "name": "id",
@@ -3732,6 +3732,7 @@
             "description": "The authenticated user does not have access to this resource"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "Backoffice-User": [ ]
@@ -6903,8 +6904,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -6913,8 +6914,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -6984,8 +6985,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -7008,8 +7009,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -9888,8 +9889,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -9912,8 +9913,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -10984,8 +10985,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -11008,8 +11009,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -11580,8 +11581,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -11590,8 +11591,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -11644,8 +11645,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -11654,8 +11655,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -11722,8 +11723,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -11746,8 +11747,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -11842,8 +11843,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -11866,8 +11867,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -14976,8 +14977,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -14986,8 +14987,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -15057,8 +15058,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -15081,8 +15082,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -15337,8 +15338,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -15347,8 +15348,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -15418,8 +15419,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -15442,8 +15443,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -15989,8 +15990,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -15999,8 +16000,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -16053,8 +16054,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -16063,8 +16064,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -16131,8 +16132,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -16155,8 +16156,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -16251,8 +16252,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -16275,8 +16276,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -16399,22 +16400,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HealthCheckGroupPresentationModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -16452,30 +16453,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "headers": {
@@ -16496,6 +16473,30 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HealthCheckGroupWithResultResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -16547,30 +16548,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "headers": {
@@ -16595,6 +16572,30 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           },
@@ -16614,88 +16615,6 @@
                 }
               }
             }
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/help": {
-      "get": {
-        "tags": [
-          "Help"
-        ],
-        "summary": "Gets help information.",
-        "description": "Gets help information and documentation resources for the Umbraco back office.",
-        "operationId": "GetHelp",
-        "parameters": [
-          {
-            "name": "section",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "tree",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          },
-          {
-            "name": "baseUrl",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "default": "https://our.umbraco.com"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedHelpPageResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
           }
         },
         "security": [
@@ -16815,172 +16734,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/indexer": {
-      "get": {
-        "tags": [
-          "Indexer"
-        ],
-        "summary": "Gets a collection of indexers.",
-        "description": "Gets a collection of configured search indexers in the Umbraco installation.",
-        "operationId": "GetIndexer",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedIndexResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/indexer/{indexName}": {
-      "get": {
-        "tags": [
-          "Indexer"
-        ],
-        "summary": "Gets indexer details.",
-        "description": "Gets detailed information about the indexer identified by the provided name.",
-        "operationId": "GetIndexerByIndexName",
-        "parameters": [
-          {
-            "name": "indexName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IndexResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/indexer/{indexName}/rebuild": {
-      "post": {
-        "tags": [
-          "Indexer"
-        ],
-        "summary": "Rebuilds an indexer.",
-        "description": "Rebuilds the search index for the indexer identified by the provided name.",
-        "operationId": "PostIndexerByIndexNameRebuild",
-        "parameters": [
-          {
-            "name": "indexName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
             "content": {
               "application/json": {
                 "schema": {
@@ -16991,65 +16746,10 @@
           },
           "404": {
             "description": "Not Found",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
                 }
               }
             }
@@ -17074,22 +16774,22 @@
         "description": "Gets the current installation settings and status.",
         "operationId": "GetInstallSettings",
         "responses": {
-          "428": {
-            "description": "Precondition Required",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/InstallSettingsResponseModel"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Precondition Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -17117,6 +16817,23 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
           "428": {
             "description": "Precondition Required",
             "headers": {
@@ -17137,23 +16854,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
                 }
               }
             }
@@ -17181,6 +16881,23 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "headers": {
@@ -17201,23 +16918,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
                 }
               }
             }
@@ -17368,54 +17068,6 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Not Found",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "201": {
             "description": "Created",
             "headers": {
@@ -17444,6 +17096,54 @@
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -17495,22 +17195,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LanguageResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -17543,6 +17243,23 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "headers": {
@@ -17587,23 +17304,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
                 }
               }
             }
@@ -17663,8 +17363,8 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Not Found",
+          "200": {
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -17676,13 +17376,6 @@
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -17711,8 +17404,8 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -17724,6 +17417,13 @@
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -17836,22 +17536,22 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LogLevelCountsReponseModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -18009,22 +17709,22 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedLogTemplateResponseModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -18113,30 +17813,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "201": {
             "description": "Created",
             "headers": {
@@ -18165,6 +17841,30 @@
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -18216,22 +17916,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SavedLogSearchResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -18267,6 +17967,23 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "headers": {
@@ -18287,23 +18004,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
                 }
               }
             }
@@ -18363,6 +18063,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -18372,9 +18075,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "OK"
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
@@ -20562,8 +20262,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -20572,8 +20272,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -20643,8 +20343,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -20667,8 +20367,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -22282,8 +21982,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -22306,8 +22006,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -23203,8 +22903,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -23227,8 +22927,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -23848,8 +23548,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -23872,8 +23572,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -24918,6 +24618,23 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "headers": {
@@ -24962,23 +24679,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
                 }
               }
             }
@@ -26036,8 +25736,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -26060,8 +25760,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -26957,8 +26657,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -26981,8 +26681,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -27578,6 +27278,23 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "headers": {
@@ -27622,23 +27339,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
                 }
               }
             }
@@ -27774,54 +27474,6 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Not Found",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "201": {
             "description": "Created",
             "headers": {
@@ -27850,6 +27502,54 @@
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -27902,22 +27602,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PackageDefinitionResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -27954,6 +27654,23 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "headers": {
@@ -27974,23 +27691,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
                 }
               }
             }
@@ -28051,6 +27751,23 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "headers": {
@@ -28071,23 +27788,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
                 }
               }
             }
@@ -29589,22 +29289,22 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -29651,6 +29351,23 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -29681,6 +29398,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -29718,6 +29438,23 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -29763,22 +29500,22 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRedirectUrlResponseModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -29994,67 +29731,6 @@
           },
           "403": {
             "description": "The authenticated user does not have access to this resource"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "Redirect Management"
-        ],
-        "summary": "Deprecated. No longer changes the redirect URL tracking status.",
-        "description": "This endpoint is deprecated and no longer modifies the configuration. To toggle redirect URL tracking, set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead.",
-        "operationId": "PostRedirectManagementStatus",
-        "parameters": [
-          {
-            "name": "status",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/RedirectStatusModel"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user does not have access to this resource",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            }
           }
         },
         "security": [
@@ -31387,47 +31063,28 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/searcher": {
+    "/umbraco/management/api/v1/search/indexes": {
       "get": {
         "tags": [
-          "Searcher"
+          "Search"
         ],
-        "summary": "Gets a collection of searchers.",
-        "description": "Gets a collection of configured searchers in the Umbraco installation.",
-        "operationId": "GetSearcher",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
+        "operationId": "GetSearchIndexes",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedSearcherResponseModel"
+                  "$ref": "#/components/schemas/PagedIndexResponseModel"
                 }
               }
             }
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -31437,30 +31094,155 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/searcher/{searcherName}/query": {
+    "/umbraco/management/api/v1/search/indexes/{indexAlias}": {
       "get": {
         "tags": [
-          "Searcher"
+          "Search"
         ],
-        "summary": "Queries a searcher.",
-        "description": "Queries a named searcher with the provided search term and returns a paginated collection of search results.",
-        "operationId": "GetSearcherBySearcherNameQuery",
+        "operationId": "GetSearchIndexesByIndexAlias",
         "parameters": [
           {
-            "name": "searcherName",
+            "name": "indexAlias",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexResponseModel"
+                }
+              }
+            }
           },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
           {
-            "name": "term",
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/search/rebuild": {
+      "put": {
+        "tags": [
+          "Search"
+        ],
+        "operationId": "PutSearchRebuild",
+        "parameters": [
+          {
+            "name": "indexAlias",
             "in": "query",
             "schema": {
               "type": "string"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/search/search": {
+      "post": {
+        "tags": [
+          "Search"
+        ],
+        "operationId": "PostSearchSearch",
+        "parameters": [
           {
             "name": "skip",
             "in": "query",
@@ -31480,29 +31262,94 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedSearchResultResponseModel"
+                  "$ref": "#/components/schemas/SearchResultResponseModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
                 }
               }
             }
           },
           "404": {
             "description": "Not Found",
-            "content": {
-              "application/json": {
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
                 }
               }
             }
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -31962,22 +31809,22 @@
         "description": "Gets the current operational status of the Umbraco server.",
         "operationId": "GetServerStatus",
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ServerStatusResponseModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -32007,39 +31854,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/server/upgrade-check": {
-      "get": {
-        "tags": [
-          "Server"
-        ],
-        "summary": "Checks for available upgrades.",
-        "description": "Checks if there are any available upgrades for the Umbraco installation.",
-        "operationId": "GetServerUpgradeCheck",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UpgradeCheckResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -33515,6 +33329,23 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "headers": {
@@ -33535,23 +33366,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
                 }
               }
             }
@@ -34618,6 +34432,16 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemporaryFileResponseModel"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -34634,16 +34458,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TemporaryFileResponseModel"
                 }
               }
             }
@@ -34677,6 +34491,23 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "headers": {
@@ -34721,23 +34552,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
                 }
               }
             }
@@ -34989,6 +34803,16 @@
               "type": "array",
               "items": {
                 "$ref": "#/components/schemas/UserStateModel"
+              }
+            }
+          },
+          {
+            "name": "userKinds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/UserKindModel"
               }
             }
           },
@@ -35455,8 +35279,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -35479,8 +35303,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -35754,8 +35578,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -35778,8 +35602,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -35931,8 +35755,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -35955,8 +35779,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -36292,8 +36116,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -36316,8 +36140,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -36405,8 +36229,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -36429,8 +36253,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -36790,8 +36614,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -36814,8 +36638,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -36986,8 +36810,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -36996,8 +36820,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -38019,8 +37843,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -38043,8 +37867,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -38226,8 +38050,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -38250,8 +38074,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -39071,30 +38895,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "201": {
             "description": "Created",
             "headers": {
@@ -39123,6 +38923,30 @@
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -39942,6 +39766,23 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "headers": {
@@ -39986,23 +39827,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
                 }
               }
             }
@@ -40063,8 +39887,8 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Not Found",
+          "200": {
+            "description": "OK",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -40076,13 +39900,6 @@
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -40111,8 +39928,8 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "404": {
+            "description": "Not Found",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -40124,6 +39941,13 @@
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -42666,6 +42490,13 @@
           "keepUserLoggedIn": {
             "type": "boolean"
           },
+          "timeoutUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
           "passwordConfiguration": {
             "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
           },
@@ -42920,7 +42751,8 @@
         "required": [
           "canBeChanged",
           "documentListViewId",
-          "mediaListViewId"
+          "mediaListViewId",
+          "offerDeprecatedPropertyEditors"
         ],
         "type": "object",
         "properties": {
@@ -42934,6 +42766,9 @@
           "mediaListViewId": {
             "type": "string",
             "format": "uuid"
+          },
+          "offerDeprecatedPropertyEditors": {
+            "type": "boolean"
           }
         }
       },
@@ -43345,6 +43180,7 @@
       },
       "DocumentBlueprintTreeItemResponseModel": {
         "required": [
+          "variants",
           "isFolder",
           "noAccess",
           "name",
@@ -43363,6 +43199,12 @@
                 "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
               }
             ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
+            }
           },
           "isFolder": {
             "type": "boolean"
@@ -43405,6 +43247,7 @@
           "isProtected",
           "ancestors",
           "sortOrder",
+          "hasChildren",
           "id",
           "flags",
           "values",
@@ -43443,6 +43286,9 @@
             "type": "integer",
             "format": "int32"
           },
+          "hasChildren": {
+            "type": "boolean"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -43471,8 +43317,7 @@
         "required": [
           "disableDeleteWhenReferenced",
           "disableUnpublishWhenReferenced",
-          "allowEditInvariantFromNonDefault",
-          "allowNonExistingSegmentsCreation"
+          "allowEditInvariantFromNonDefault"
         ],
         "type": "object",
         "properties": {
@@ -43483,9 +43328,6 @@
             "type": "boolean"
           },
           "allowEditInvariantFromNonDefault": {
-            "type": "boolean"
-          },
-          "allowNonExistingSegmentsCreation": {
             "type": "boolean"
           }
         }
@@ -44258,7 +44100,8 @@
           "message",
           "provider",
           "culture",
-          "url"
+          "url",
+          "isExternal"
         ],
         "type": "object",
         "properties": {
@@ -44270,6 +44113,9 @@
           },
           "provider": {
             "type": "string"
+          },
+          "isExternal": {
+            "type": "boolean"
           },
           "culture": {
             "type": [
@@ -44401,12 +44247,6 @@
               "string"
             ]
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "name": {
             "type": "string"
           }
@@ -44466,12 +44306,6 @@
             "format": "date-time"
           },
           "culture": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "segment": {
             "type": [
               "null",
               "string"
@@ -44724,8 +44558,7 @@
         "required": [
           "disableDeleteWhenReferenced",
           "disableUnpublishWhenReferenced",
-          "allowEditInvariantFromNonDefault",
-          "allowNonExistingSegmentsCreation"
+          "allowEditInvariantFromNonDefault"
         ],
         "type": "object",
         "properties": {
@@ -44736,9 +44569,6 @@
             "type": "boolean"
           },
           "allowEditInvariantFromNonDefault": {
-            "type": "boolean"
-          },
-          "allowNonExistingSegmentsCreation": {
             "type": "boolean"
           }
         }
@@ -45052,12 +44882,6 @@
               "string"
             ]
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "name": {
             "type": "string"
           }
@@ -45117,12 +44941,6 @@
             "format": "date-time"
           },
           "culture": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "segment": {
             "type": [
               "null",
               "string"
@@ -45283,6 +45101,47 @@
           "Warning"
         ]
       },
+      "FacetModel": {
+        "required": [
+          "fieldName"
+        ],
+        "type": "object",
+        "properties": {
+          "fieldName": {
+            "type": "string"
+          }
+        }
+      },
+      "FacetResultResponseModel": {
+        "required": [
+          "fieldName",
+          "values"
+        ],
+        "type": "object",
+        "properties": {
+          "fieldName": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FacetValueModel"
+            }
+          }
+        }
+      },
+      "FacetValueModel": {
+        "required": [
+          "count"
+        ],
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "FetchResponseModelDataTypeSchemaItemResponseModel": {
         "required": [
           "total",
@@ -45298,24 +45157,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeSchemaItemResponseModel"
-            }
-          }
-        }
-      },
-      "FieldPresentationModel": {
-        "required": [
-          "name",
-          "values"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "values": {
-            "type": "array",
-            "items": {
-              "type": "string"
             }
           }
         }
@@ -45360,6 +45201,21 @@
             "type": "boolean"
           },
           "hasChildren": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FilterModel": {
+        "required": [
+          "fieldName",
+          "negate"
+        ],
+        "type": "object",
+        "properties": {
+          "fieldName": {
+            "type": "string"
+          },
+          "negate": {
             "type": "boolean"
           }
         }
@@ -45594,56 +45450,11 @@
       "HealthStatusModel": {
         "enum": [
           "Healthy",
-          "Unhealthy",
           "Rebuilding",
-          "Corrupt"
+          "Corrupted",
+          "Empty",
+          "Unknown"
         ]
-      },
-      "HealthStatusResponseModel": {
-        "required": [
-          "status"
-        ],
-        "type": "object",
-        "properties": {
-          "status": {
-            "$ref": "#/components/schemas/HealthStatusModel"
-          },
-          "message": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
-        }
-      },
-      "HelpPageResponseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "description": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "url": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "type": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
-        }
       },
       "ImageCropModeModel": {
         "enum": [
@@ -45652,8 +45463,7 @@
           "Stretch",
           "Pad",
           "BoxPad",
-          "Min",
-          null
+          "Min"
         ]
       },
       "ImportDictionaryRequestModel": {
@@ -45712,46 +45522,25 @@
       },
       "IndexResponseModel": {
         "required": [
-          "name",
-          "canRebuild",
+          "indexAlias",
+          "providerName",
           "documentCount",
-          "fieldCount",
-          "healthStatus",
-          "searcherName"
+          "healthStatus"
         ],
         "type": "object",
         "properties": {
-          "name": {
+          "indexAlias": {
             "type": "string"
           },
-          "healthStatus": {
-            "$ref": "#/components/schemas/HealthStatusResponseModel"
-          },
-          "canRebuild": {
-            "type": "boolean"
-          },
-          "searcherName": {
+          "providerName": {
             "type": "string"
           },
           "documentCount": {
             "type": "integer",
             "format": "int64"
           },
-          "fieldCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "providerProperties": {
-            "type": [
-              "null",
-              "object"
-            ]
-          },
-          "uniqueKeyFieldName": {
-            "type": [
-              "null",
-              "string"
-            ]
+          "healthStatus": {
+            "$ref": "#/components/schemas/HealthStatusModel"
           }
         }
       },
@@ -45866,6 +45655,7 @@
           "verbs",
           "$type"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -45891,6 +45681,7 @@
           "verbs",
           "$type"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -45918,6 +45709,7 @@
           "verbs",
           "$type"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -45942,6 +45734,7 @@
           "context",
           "$type"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -46014,6 +45807,7 @@
           "$type",
           "id"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -46052,6 +45846,7 @@
           "variants",
           "id"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -46092,6 +45887,7 @@
           "documentType",
           "id"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -46125,6 +45921,7 @@
           "$type",
           "id"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -46151,6 +45948,7 @@
           "variants",
           "id"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -46191,6 +45989,7 @@
           "mediaType",
           "id"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -46219,6 +46018,7 @@
           "mediaType",
           "id"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -46253,6 +46053,7 @@
           "memberType",
           "id"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -46281,6 +46082,7 @@
           "memberType",
           "id"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -46330,6 +46132,7 @@
         "required": [
           "$type"
         ],
+        "type": "object",
         "properties": {
           "$type": {
             "enum": [
@@ -46680,6 +46483,7 @@
         "required": [
           "mediaType",
           "sortOrder",
+          "hasChildren",
           "id",
           "flags",
           "values",
@@ -46690,6 +46494,12 @@
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeCollectionReferenceResponseModel"
           },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "creator": {
             "type": [
               "null",
@@ -46699,6 +46509,9 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasChildren": {
+            "type": "boolean"
           },
           "id": {
             "type": "string",
@@ -46726,15 +46539,11 @@
       },
       "MediaConfigurationResponseModel": {
         "required": [
-          "disableDeleteWhenReferenced",
-          "disableUnpublishWhenReferenced"
+          "disableDeleteWhenReferenced"
         ],
         "type": "object",
         "properties": {
           "disableDeleteWhenReferenced": {
-            "type": "boolean"
-          },
-          "disableUnpublishWhenReferenced": {
             "type": "boolean"
           }
         }
@@ -46768,6 +46577,12 @@
           },
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "variants": {
             "type": "array",
@@ -46885,6 +46700,12 @@
         "properties": {
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "variants": {
             "type": "array",
@@ -47471,12 +47292,6 @@
               "string"
             ]
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "name": {
             "type": "string"
           }
@@ -47499,12 +47314,6 @@
             "format": "date-time"
           },
           "culture": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "segment": {
             "type": [
               "null",
               "string"
@@ -48144,12 +47953,6 @@
               "string"
             ]
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
           "name": {
             "type": "string"
           }
@@ -48172,12 +47975,6 @@
             "format": "date-time"
           },
           "culture": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "segment": {
             "type": [
               "null",
               "string"
@@ -49097,25 +48894,6 @@
           }
         }
       },
-      "PagedHelpPageResponseModel": {
-        "required": [
-          "total",
-          "items"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/HelpPageResponseModel"
-            }
-          }
-        }
-      },
       "PagedIndexResponseModel": {
         "required": [
           "total",
@@ -49758,44 +49536,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SavedLogSearchResponseModel"
-            }
-          }
-        }
-      },
-      "PagedSearcherResponseModel": {
-        "required": [
-          "total",
-          "items"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SearcherResponseModel"
-            }
-          }
-        }
-      },
-      "PagedSearchResultResponseModel": {
-        "required": [
-          "total",
-          "items"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SearchResultResponseModel"
             }
           }
         }
@@ -50923,41 +50663,112 @@
           }
         }
       },
-      "SearcherResponseModel": {
+      "SearchDocumentResponseModel": {
         "required": [
-          "name"
+          "id",
+          "objectType"
         ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "objectType": {
+            "$ref": "#/components/schemas/UmbracoObjectTypesModel"
+          },
           "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "icon": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SearchRequestModel": {
+        "required": [
+          "indexAlias"
+        ],
+        "type": "object",
+        "properties": {
+          "indexAlias": {
             "type": "string"
+          },
+          "query": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "filters": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/FilterModel"
+            }
+          },
+          "facets": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/FacetModel"
+            }
+          },
+          "sorters": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/SorterModel"
+            }
+          },
+          "culture": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "segment": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
       "SearchResultResponseModel": {
         "required": [
-          "id",
-          "score",
-          "fieldCount",
-          "fields"
+          "documents",
+          "facets",
+          "total"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string"
-          },
-          "score": {
-            "type": "number",
-            "format": "float"
-          },
-          "fieldCount": {
+          "total": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
-          "fields": {
+          "documents": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/FieldPresentationModel"
+              "$ref": "#/components/schemas/SearchDocumentResponseModel"
+            }
+          },
+          "facets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FacetResultResponseModel"
             }
           }
         }
@@ -50993,7 +50804,8 @@
             ],
             "items": {
               "type": "string"
-            }
+            },
+            "deprecated": true
           }
         }
       },
@@ -51125,6 +50937,21 @@
           },
           "field": {
             "$ref": "#/components/schemas/ContentSortFieldModel"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/DirectionModel"
+          }
+        }
+      },
+      "SorterModel": {
+        "required": [
+          "fieldName",
+          "direction"
+        ],
+        "type": "object",
+        "properties": {
+          "fieldName": {
+            "type": "string"
           },
           "direction": {
             "$ref": "#/components/schemas/DirectionModel"
@@ -51920,6 +51747,7 @@
                 "type": "null"
               },
               {
+                "deprecated": true,
                 "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ]
@@ -52088,6 +51916,37 @@
       },
       "TreeItemKindModel": {
         "type": "string"
+      },
+      "UmbracoObjectTypesModel": {
+        "enum": [
+          "Unknown",
+          "ROOT",
+          "Document",
+          "Media",
+          "Template",
+          "DocumentType",
+          "MediaType",
+          "MemberType",
+          "MemberGroup",
+          "RecycleBin",
+          "Member",
+          "DataType",
+          "DocumentTypeContainer",
+          "MediaTypeContainer",
+          "MemberTypeContainer",
+          "DataTypeContainer",
+          "DocumentBlueprintContainer",
+          "RelationType",
+          "FormsForm",
+          "FormsPreValue",
+          "FormsDataSource",
+          "Language",
+          "DocumentBlueprint",
+          "IdReservation",
+          "Element",
+          "ElementContainer",
+          "ElementRecycleBin"
+        ]
       },
       "UnlockUsersRequestModel": {
         "required": [
@@ -53477,25 +53336,6 @@
           }
         }
       },
-      "UpgradeCheckResponseModel": {
-        "required": [
-          "type",
-          "comment",
-          "url"
-        ],
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string"
-          },
-          "comment": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
-          }
-        }
-      },
       "UpgradeSettingsResponseModel": {
         "required": [
           "currentState",
@@ -53519,10 +53359,7 @@
             "type": "string"
           },
           "reportUrl": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           }
         }
       },
@@ -54460,16 +54297,10 @@
       "name": "Health Check"
     },
     {
-      "name": "Help"
-    },
-    {
       "name": "Imaging"
     },
     {
       "name": "Import"
-    },
-    {
-      "name": "Indexer"
     },
     {
       "name": "Install"
@@ -54538,7 +54369,7 @@
       "name": "Script"
     },
     {
-      "name": "Searcher"
+      "name": "Search"
     },
     {
       "name": "Security"

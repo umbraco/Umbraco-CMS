@@ -29,9 +29,7 @@ public interface IDocumentUrlAliasRepository
     /// <summary>
     /// Deletes every persisted alias, i.e. for a full rebuild that repopulates the table from scratch.
     /// </summary>
-    // TODO (V19): Remove the default implementation.
-    void DeleteAll()
-        => DeleteByDocumentKey(GetAll().Select(x => x.DocumentKey).Distinct());
+    void DeleteAll();
 
     /// <summary>
     /// Gets all document aliases.

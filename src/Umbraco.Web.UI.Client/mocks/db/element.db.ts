@@ -24,7 +24,7 @@ export class UmbElementMockDB extends UmbEntityMockDbBase<UmbMockElementModel> {
 	item = new UmbMockEntityItemManager<UmbMockElementModel>(this, itemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockElementModel>(this, createMockElementMapper, detailResponseMapper);
 	folder = new UmbMockEntityFolderManager<UmbMockElementModel>(this, createMockElementFolderMapper);
-	recycleBin = new UmbEntityRecycleBin<UmbMockElementModel>(this.data, recycleBinItemMapper);
+	recycleBin = new UmbEntityRecycleBin<UmbMockElementModel>(this, recycleBinItemMapper);
 	publishing = new UmbMockElementPublishingManager(this);
 
 	constructor(data: Array<UmbMockElementModel>) {
@@ -34,7 +34,6 @@ export class UmbElementMockDB extends UmbEntityMockDbBase<UmbMockElementModel> {
 	getConfiguration(): ElementConfigurationResponseModel {
 		return {
 			allowEditInvariantFromNonDefault: true,
-			allowNonExistingSegmentsCreation: false,
 			disableDeleteWhenReferenced: true,
 			disableUnpublishWhenReferenced: true,
 		};
@@ -102,7 +101,6 @@ const createMockElementMapper = (request: CreateElementRequestModel): UmbMockEle
 		variants: request.variants.map((variantRequest) => {
 			return {
 				culture: variantRequest.culture,
-				segment: variantRequest.segment,
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
@@ -156,7 +154,6 @@ const detailResponseMapper = (model: UmbMockElementModel): ElementResponseModel 
 		values: model.values,
 		variants: model.variants.map((v) => ({
 			culture: v.culture,
-			segment: null,
 			name: v.name,
 			createDate: model.createDate,
 			updateDate: model.createDate,

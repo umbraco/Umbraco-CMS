@@ -5,9 +5,9 @@ import type { UmbContextCallback } from './context-request.event.js';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbContextConsumerController<
-		BaseType extends UmbContextMinimal = UmbContextMinimal,
-		ResultType extends BaseType = BaseType,
-	>
+	BaseType extends UmbContextMinimal = UmbContextMinimal,
+	ResultType extends BaseType = BaseType,
+>
 	extends UmbContextConsumer<BaseType, ResultType>
 	implements UmbController
 {

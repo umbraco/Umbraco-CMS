@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Core.Services;
@@ -15,25 +14,20 @@ public interface IPreviewService
     /// <summary>
     ///     Enters preview mode for a given user.
     /// </summary>
-    /// <param name="user">The user entering preview mode.</param>
+    /// <remarks>
+    ///     The preview mode is persistent across sessions (requests) until terminated with <see cref="EndPreviewAsync"/>.
+    /// </remarks>
+    /// <param name="user">The user entering preview mode; an implementation may scope the preview mode to this user.</param>
     /// <returns><c>true</c> if preview mode was entered successfully; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     The preview mode is persistent across sessions (requests) until terminated with <see cref="EndPreviewAsync"/>.
+    ///     Entering preview mode is not guaranteed to succeed, so callers must handle a <c>false</c> result.
+    /// </remarks>
     Task<bool> TryEnterPreviewAsync(IUser user);
 
     /// <summary>
-    ///     Exits preview mode for the current request.
+    ///     Terminates preview mode for the current user.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task EndPreviewAsync();
-
-    /// <summary>
-    ///     Determines whether the current request is in preview mode.
-    /// </summary>
-    /// <returns><c>true</c> if the current request is in preview mode; otherwise, <c>false</c>.</returns>
-    bool IsInPreview();
-
-    /// <summary>
-    ///     Attempts to get the claims identity for the current preview session.
-    /// </summary>
-    /// <returns>An attempt containing the claims identity if in preview mode; otherwise, a failed attempt.</returns>
-    Task<Attempt<ClaimsIdentity>> TryGetPreviewClaimsIdentityAsync();
 }

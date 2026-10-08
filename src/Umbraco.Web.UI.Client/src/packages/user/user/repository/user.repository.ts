@@ -3,6 +3,8 @@ import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.serve
 import { UmbUserRepositoryBase } from './user-repository-base.js';
 import { of } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import type { UserTwoFactorProviderModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbRepositoryResponse, UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
 
 export class UmbUserRepository extends UmbUserRepositoryBase {
 	#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(this._host);
@@ -23,23 +25,36 @@ export class UmbUserRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Request the MFA providers for a user
-	 * @param unique The unique id of the user
+	 * @param {string} unique The unique id of the user
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UserTwoFactorProviderModel> | undefined, Array<UserTwoFactorProviderModel>>>} The MFA providers for the user
 	 * @memberof UmbUserRepository
 	 */
-	async requestMfaProviders(unique: string) {
+	async requestMfaProviders(
+		unique: string,
+	): Promise<
+		UmbRepositoryResponseWithAsObservable<
+			Array<UserTwoFactorProviderModel> | undefined,
+			Array<UserTwoFactorProviderModel>
+		>
+	> {
 		const { data, error } = await this.#userMfaSource.requestMfaProviders(unique);
 		return { data, error, asObservable: () => of(data ?? []) };
 	}
 
 	/**
 	 * Disables a MFA provider for a user
-	 * @param unique The unique id of the user
-	 * @param providerName The name of the provider
-	 * @param displayName The display name of the provider to show in the notification (optional)
+	 * @param {string} unique The unique id of the user
+	 * @param {string} providerName The name of the provider
+	 * @param {string} displayName The display name of the provider to show in the notification (optional)
+	 * @returns {Promise<UmbRepositoryResponse<unknown>>} The result of disabling the MFA provider
 	 * @memberof UmbUserRepository
 	 */
-	async disableMfaProvider(unique: string, providerName: string, displayName?: string) {
-		const { data, error } = await this.#userMfaSource.disableMfaProvider(unique, providerName);
+	async disableMfaProvider(
+		unique: string,
+		providerName: string,
+		displayName?: string,
+	): Promise<UmbRepositoryResponse<unknown>> {
+		const { error } = await this.#userMfaSource.disableMfaProvider(unique, providerName);
 
 		const localize = new UmbLocalizationController(this._host);
 
@@ -56,6 +71,6 @@ export class UmbUserRepository extends UmbUserRepositoryBase {
 			this.notificationContext?.peek('warning', notification);
 		}
 
-		return { data, error };
+		return { error };
 	}
 }

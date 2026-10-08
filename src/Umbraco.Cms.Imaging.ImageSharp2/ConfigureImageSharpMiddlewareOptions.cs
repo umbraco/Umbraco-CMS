@@ -79,6 +79,23 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
             return Task.CompletedTask;
         };
 
+        // The decoded image has been disposed by the time this runs, and the cache write and the
+        // response that follow hold only the encoded result, so the place a gated request took in
+        // ImageProcessingThrottleMiddleware is given back here rather than when the request ends. The
+        // middleware releases again at the end of the request, which is a no-op after this, and
+        // covers a request that faulted before getting here.
+        Func<ImageProcessingContext, Task> onProcessedAsync = options.OnProcessedAsync;
+        options.OnProcessedAsync = async context =>
+        {
+            await onProcessedAsync(context);
+
+            if (context.Context.Items.TryGetValue(ImageProcessingSlot.HttpContextItemKey, out var value)
+                && value is ImageProcessingSlot slot)
+            {
+                slot.Release();
+            }
+        };
+
         // Change Cache-Control header when cache buster value is present
         options.OnPrepareResponseAsync = context =>
         {

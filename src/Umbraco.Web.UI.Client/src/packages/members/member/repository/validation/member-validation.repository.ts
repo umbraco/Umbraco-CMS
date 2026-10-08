@@ -2,7 +2,7 @@ import type { UmbMemberDetailModel } from '../../types.js';
 import { UmbMemberValidationServerDataSource } from './member-validation.server.data-source.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbContentValidationRepository } from '@umbraco-cms/backoffice/content';
 
 type DetailModelType = UmbMemberDetailModel;
@@ -23,9 +23,9 @@ export class UmbMemberValidationRepository
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {DetailModelType} model - The model to validate
 	 * @param {string | null} [parentUnique] - The parent unique
-	 * @returns {*}
+	 * @returns {Promise<UmbRepositoryResponse<string>>} The validation result.
 	 */
-	async validateCreate(model: DetailModelType, parentUnique: string | null) {
+	async validateCreate(model: DetailModelType, parentUnique: string | null): Promise<UmbRepositoryResponse<string>> {
 		if (!model) throw new Error('Data is missing');
 
 		return this.#validationDataSource.validateCreate(model, parentUnique);
@@ -35,9 +35,9 @@ export class UmbMemberValidationRepository
 	 * Saves the given data
 	 * @param {DetailModelType} model - The model to save
 	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
-	 * @returns {*}
+	 * @returns {Promise<UmbRepositoryResponse<string>>} The validation result.
 	 */
-	async validateSave(model: DetailModelType, variantIds: Array<UmbVariantId>) {
+	async validateSave(model: DetailModelType, variantIds: Array<UmbVariantId>): Promise<UmbRepositoryResponse<string>> {
 		if (!model) throw new Error('Data is missing');
 		if (!model.unique) throw new Error('Unique is missing');
 

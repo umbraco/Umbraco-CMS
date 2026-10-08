@@ -178,12 +178,11 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 	// 2. Media types that support the file's extension (e.g. .pdf → [Article(specific), File(fallback)])
 	// The result includes match info so callers can prefer specific matches over catch-all fallbacks.
 	async #getMediaTypeOptions(item: UmbUploadableItem): Promise<UmbMediaTypeOptionsResult> {
-
 		// Check the parent which children media types are allowed.
 		const parent = item.parentUnique ? await this.#mediaDetailRepository.requestByUnique(item.parentUnique) : null;
 		const allowedChildren = await this.#getAllowedChildrenOf(parent?.data?.mediaType.unique ?? null, item.parentUnique);
 
-		const extension = item.temporaryFile ? getFileExtension(item.temporaryFile.file.name) ?? null : null;
+		const extension = item.temporaryFile ? (getFileExtension(item.temporaryFile.file.name) ?? null) : null;
 
 		// Check which media types allow the file's extension.
 		const availableMediaTypes = await this.#getAvailableMediaTypesOf(extension);
@@ -233,8 +232,8 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		if (allowed) return allowed;
 
 		// Request information on this media type.
-		const { data } = await this.#mediaTypeStructure.requestAllowedChildrenOf(mediaTypeUnique, parentUnique);
-		if (!data) throw new Error('Parent media type does not exist');
+		const { data } = await this.#mediaTypeStructure.requestAllAllowedChildrenOf(mediaTypeUnique, parentUnique);
+		if (!data) throw new Error('Could not retrieve the media types allowed under the parent media type');
 
 		this.#allowedChildrenOf.appendOne({ mediaTypeUnique, allowedChildren: data.items });
 		return data.items;
@@ -255,7 +254,7 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		const preset: Partial<UmbMediaDetailModel> = {
 			unique: item.unique,
 			mediaType: { unique: mediaTypeUnique, collection: null },
-			variants: [{ culture: null, segment: null, createDate: null, updateDate: null, flags: [], name }],
+			variants: [{ culture: null, createDate: null, updateDate: null, flags: [], name }],
 			values: item.temporaryFile ? [umbracoFile] : undefined,
 		};
 		const { data } = await this.#mediaDetailRepository.createScaffold(preset);

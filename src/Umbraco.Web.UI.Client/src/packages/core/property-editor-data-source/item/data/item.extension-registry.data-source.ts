@@ -8,9 +8,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
  * @class UmbPropertyEditorDataSourceItemExtensionRegistryDataSource
  * @implements {UmbItemDataSource}
  */
-export class UmbPropertyEditorDataSourceItemExtensionRegistryDataSource
-	implements UmbItemDataSource<UmbPropertyEditorDataSourceItemModel>
-{
+export class UmbPropertyEditorDataSourceItemExtensionRegistryDataSource implements UmbItemDataSource<UmbPropertyEditorDataSourceItemModel> {
 	async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 

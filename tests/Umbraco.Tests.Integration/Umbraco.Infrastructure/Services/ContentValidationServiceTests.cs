@@ -466,9 +466,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
                     }
                 ],
                 Variants = [
-                    new() { Name = "Test Document" },
-                    new() { Name = "Test Document", Segment = "seg-1" },
-                    new() { Name = "Test Document", Segment = "seg-2" }
+                    new() { Name = "Test Document" }
                 ]
             },
             contentType);
@@ -513,9 +511,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
                     }
                 ],
                 Variants = [
-                    new() { Name = "Test Document" },
-                    new() { Name = "Test Document", Segment = "seg-1" },
-                    new() { Name = "Test Document", Segment = "seg-2" }
+                    new() { Name = "Test Document" }
                 ]
             },
             contentType);
@@ -525,6 +521,76 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
         {
             Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.Segment == "seg-1" && r.JsonPath == string.Empty));
         });
+    }
+
+    [Test]
+    public async Task Can_Validate_Mandatory_Property_For_Default_Segment()
+    {
+        var contentType = await SetupSegmentTest(ContentVariation.Segment, titleIsMandatory: true);
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Properties =
+                [
+                    new()
+                    {
+                        Alias = "title",
+                        Value = null,
+                        Segment = null
+                    },
+                    new()
+                    {
+                        Alias = "title",
+                        Value = "Valid seg-1 value",
+                        Segment = "seg-1"
+                    }
+                ],
+                Variants = [
+                    new() { Name = "Test Document" }
+                ]
+            },
+            contentType);
+
+        Assert.AreEqual(1, validationResult.ValidationErrors.Count());
+        Assert.Multiple(() =>
+        {
+            var validationError = validationResult.ValidationErrors.First();
+            Assert.AreEqual("title", validationError.Alias);
+            Assert.AreEqual(null, validationError.Segment);
+            Assert.IsEmpty(validationError.JsonPath);
+
+            Assert.AreEqual(1, validationError.ErrorMessages.Length);
+            Assert.AreEqual(Constants.Validation.ErrorMessages.Properties.Missing, validationError.ErrorMessages.Single());
+        });
+    }
+
+    [Test]
+    public async Task Does_Not_Flag_Mandatory_Property_For_Segment_When_Default_Has_Value()
+    {
+        var contentType = await SetupSegmentTest(ContentVariation.Segment, titleIsMandatory: true);
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Properties =
+                [
+                    new()
+                    {
+                        Alias = "title",
+                        Value = "Valid default value",
+                        Segment = null
+                    }
+                ],
+                Variants = [
+                    new() { Name = "Test Document" }
+                ]
+            },
+            contentType);
+
+        Assert.AreEqual(0, validationResult.ValidationErrors.Count());
     }
 
     private async Task<(IContentType DocumentType, IContentType ElementType)> SetupBlockListTest()
@@ -631,7 +697,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
         return contentType;
     }
 
-    private async Task<IContentType> SetupSegmentTest(ContentVariation variation)
+    private async Task<IContentType> SetupSegmentTest(ContentVariation variation, bool titleIsMandatory = false)
     {
         var language = new LanguageBuilder()
             .WithCultureInfo("da-DK")
@@ -643,6 +709,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
         var titlePropertyType = contentType.PropertyTypes.First(pt => pt.Alias == "title");
         titlePropertyType.Variations = variation;
         titlePropertyType.ValidationRegExp = "^Valid.*$";
+        titlePropertyType.Mandatory = titleIsMandatory;
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 

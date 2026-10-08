@@ -129,7 +129,9 @@ export class UmbElementUserPermissionCondition
 		this.permitted = allOfPermitted && oneOfPermitted;
 	}
 
-	#isElementUserPermission(permission: unknown): permission is IPermissionPresentationModelElementPermissionPresentationModel {
+	#isElementUserPermission(
+		permission: unknown,
+	): permission is IPermissionPresentationModelElementPermissionPresentationModel {
 		return (
 			(permission as IPermissionPresentationModelElementPermissionPresentationModel).$type ===
 			'ElementPermissionPresentationModel'

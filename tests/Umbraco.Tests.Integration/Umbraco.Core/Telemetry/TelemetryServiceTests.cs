@@ -31,7 +31,10 @@ internal sealed class TelemetryServiceTests : UmbracoIntegrationTest
         {
             Constants.Telemetry.RootCount,
             Constants.Telemetry.DomainCount,
-            Constants.Telemetry.ExamineIndexCount,
+
+            // ExamineIndexCount is no longer core telemetry: it is reported by ExamineTelemetryProvider in
+            // Umbraco.Cms.Search.Provider.Examine and only present when that search provider is composed
+            // (which this core test host does not do).
             Constants.Telemetry.LanguageCount,
             Constants.Telemetry.MediaCount,
             Constants.Telemetry.MediaCount,

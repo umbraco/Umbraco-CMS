@@ -1,3 +1,4 @@
+using System.Buffers;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -37,6 +38,11 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
     /// </summary>
     protected const string FieldsParameterName = "fields";
 
+    /// <summary>
+    /// Search values for the characters that are we looking for in the Node.Parse
+    /// </summary>
+    private static readonly SearchValues<char> _nodeSearchValues = SearchValues.Create("[,]");
+
     private readonly IApiPropertyRenderer _propertyRenderer;
     private readonly IApiPublishedContentCache _apiPublishedContentCache;
     private readonly IRequestMemberAccessService _requestMemberAccessService;
@@ -51,6 +57,10 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
     /// </summary>
     protected Stack<Node?> IncludeProperties { get; } = new();
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ElementOnlyOutputExpansionStrategy"/> class.
+    /// </summary>
+    /// <param name="propertyRenderer">The property renderer for converting property values.</param>
     [Obsolete("Please use the constructor that accepts all parameters. Scheduled for removal in V20.")]
     public ElementOnlyOutputExpansionStrategy(IApiPropertyRenderer propertyRenderer)
         : this(
@@ -219,13 +229,13 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
             }
 
             // verify that the value does not start with a start bracket
-            if (value.StartsWith('['))
+            if (valueAsSpan.StartsWith('['))
             {
                 throw new ArgumentException("Value cannot start with a bracket");
             }
 
             // verify that there are no empty brackets
-            if (value.Contains("[]"))
+            if (valueAsSpan.Contains("[]", StringComparison.Ordinal))
             {
                 throw new ArgumentException("Value cannot contain empty brackets");
             }
@@ -237,26 +247,42 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
             var currentNode = new Node();
             root.Items.Add(currentNode);
 
-            foreach (char c in value)
+            while (!valueAsSpan.IsEmpty)
             {
-                switch (c)
+                int idx = valueAsSpan.IndexOfAny(_nodeSearchValues);
+
+                // Key text is appended rather than assigned (historical behaviour retained after the performance
+                // optimisations in #23506). Valid syntax never resumes key text after a bracket group, but such
+                // values are still accepted, and appending keeps every fragment as before - the outer node in
+                // "a[b]c" stays keyed "ac".
+                if (idx < 0)
                 {
-                    case '[': // Start a new node, child of the current node
+                    currentNode.Key = string.Concat(currentNode.Key, valueAsSpan);
+                    break;
+                }
+
+                if (idx > 0)
+                {
+                    currentNode.Key = string.Concat(currentNode.Key, valueAsSpan[..idx]);
+                }
+
+                switch (valueAsSpan[idx])
+                {
+                    case '[': // Start a new node, child of the current node.
                         stack.Push(currentNode);
                         currentNode = new Node();
                         stack.Peek().Items.Add(currentNode);
                         break;
-                    case ',': // Start a new node, but at the same level of the current node
+                    case ',': // Start a new node, but at the same level of the current node.
                         currentNode = new Node();
                         stack.Peek().Items.Add(currentNode);
                         break;
-                    case ']': // Back to parent of the current node
+                    case ']': // Back to parent of the current node.
                         currentNode = stack.Pop();
                         break;
-                    default: // Add char to current node key
-                        currentNode.Key += c;
-                        break;
                 }
+
+                valueAsSpan = valueAsSpan[(idx + 1)..];
             }
 
             return root;

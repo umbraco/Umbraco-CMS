@@ -1,5 +1,6 @@
 import {Page, Locator, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
+import {ConstantHelper} from "./ConstantHelper";
 
 export class LogViewerUiHelper extends UiBaseLocators {
   private readonly searchBtn: Locator;
@@ -66,11 +67,12 @@ export class LogViewerUiHelper extends UiBaseLocators {
     // The force click is necessary.
     await this.click(this.saveSearchHeartIcon, {force: true});
     await this.enterText(this.searchNameTxt, searchName);
-    await this.click(this.saveSearchBtn);
+    await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.logViewerSavedSearch, this.click(this.saveSearchBtn), ConstantHelper.statusCodes.created, ConstantHelper.httpMethods.post);
   }
 
   checkSavedSearch(searchName: string) {
-    return this.page.locator('#saved-searches').getByLabel(searchName, {exact: true});
+    // Exact match so a longer-named sibling can't satisfy the negative (.not.toBeVisible) assertion.
+    return this.page.locator('.saved-search-item').filter({has: this.page.getByText(searchName, {exact: true})});
   }
 
   async clickSortLogByTimestampButton() {
@@ -90,7 +92,10 @@ export class LogViewerUiHelper extends UiBaseLocators {
   }
 
   async clickSavedSearchByName(name: string) {
-    await this.click(this.page.locator('#saved-searches').getByLabel(name));
+    await this.clickSavedSearchesButton();
+    // Click the item's search button (the <li> also holds a delete button); clicking the button is what
+    // applies the saved query.
+    await this.click(this.checkSavedSearch(name).locator('.saved-search-item-button').first());
   }
 
   async doesSearchBoxHaveValue(searchValue: string) {
@@ -118,5 +123,9 @@ export class LogViewerUiHelper extends UiBaseLocators {
 
   async waitUntilLoadingSpinnerInvisible() {
     await this.hasCount(this.loadingSpinner, 0);
+  }
+
+  async clickDeleteButtonAndWaitForSavedSearchToBeDeleted() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.logViewerSavedSearch, this.clickDeleteButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.delete);
   }
 }

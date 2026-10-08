@@ -1,4 +1,4 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../workspace/block-workspace.context-token.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../workspace/context/block-workspace.context-token.js';
 import type { BlockWorkspaceHasContentConditionConfig } from './types.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
@@ -8,10 +8,7 @@ export class UmbBlockWorkspaceHasContentCondition
 	extends UmbConditionBase<BlockWorkspaceHasContentConditionConfig>
 	implements UmbExtensionCondition
 {
-	constructor(
-		host: UmbControllerHost,
-		args: UmbConditionControllerArguments<BlockWorkspaceHasContentConditionConfig>,
-	) {
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<BlockWorkspaceHasContentConditionConfig>) {
 		super(host, args);
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {

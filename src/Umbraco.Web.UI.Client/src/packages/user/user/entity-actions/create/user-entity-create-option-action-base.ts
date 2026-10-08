@@ -10,8 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-create-option-action';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbUserEntityCreateOptionActionBaseArgs
-	extends UmbEntityCreateOptionActionArgs<MetaEntityCreateOptionAction> {
+export interface UmbUserEntityCreateOptionActionBaseArgs extends UmbEntityCreateOptionActionArgs<MetaEntityCreateOptionAction> {
 	kind: UmbUserKindType;
 }
 

@@ -1,5 +1,4 @@
 using System.Globalization;
-using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,7 +19,6 @@ namespace Umbraco.Cms.Core.Routing;
 public class ContentFinderByConfigured404 : IContentLastChanceFinder
 {
     private readonly IEntityService _entityService;
-    private readonly IExamineManager _examineManager;
     private readonly ILogger<ContentFinderByConfigured404> _logger;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IDocumentUrlService _documentUrlService;
@@ -36,7 +34,6 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
     /// <param name="logger">The logger used for diagnostic and error logging.</param>
     /// <param name="entityService">Service for accessing Umbraco entities.</param>
     /// <param name="contentSettings">The monitor providing current content settings options.</param>
-    /// <param name="examineManager">The manager for Examine search indexes.</param>
     /// <param name="variationContextAccessor">Accessor for the current variation context (e.g., culture/language).</param>
     /// <param name="umbracoContextAccessor">Accessor for the current Umbraco context.</param>
     /// <param name="documentUrlService">Service for resolving document URLs.</param>
@@ -47,7 +44,6 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         ILogger<ContentFinderByConfigured404> logger,
         IEntityService entityService,
         IOptionsMonitor<ContentSettings> contentSettings,
-        IExamineManager examineManager,
         IVariationContextAccessor variationContextAccessor,
         IUmbracoContextAccessor umbracoContextAccessor,
         IDocumentUrlService documentUrlService,
@@ -58,7 +54,6 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         _logger = logger;
         _entityService = entityService;
         _contentSettings = contentSettings.CurrentValue;
-        _examineManager = examineManager;
         _variationContextAccessor = variationContextAccessor;
         _umbracoContextAccessor = umbracoContextAccessor;
         _documentUrlService = documentUrlService;
@@ -69,30 +64,6 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public ContentFinderByConfigured404(
-        ILogger<ContentFinderByConfigured404> logger,
-        IEntityService entityService,
-        IOptionsMonitor<ContentSettings> contentSettings,
-        IExamineManager examineManager,
-        IVariationContextAccessor variationContextAccessor,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IDocumentUrlService documentUrlService,
-        IPublishedContentCache publishedContentCache,
-        IDocumentNavigationQueryService documentNavigationQueryService)
-        : this(
-            logger,
-            entityService,
-            contentSettings,
-            examineManager,
-            variationContextAccessor,
-            umbracoContextAccessor,
-            documentUrlService,
-            publishedContentCache,
-            documentNavigationQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
-    {
-    }
 
     /// <summary>
     ///     Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
@@ -156,7 +127,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
             _contentSettings.Error404Collection.ToArray(),
             _entityService,
-            new PublishedContentQuery(_variationContextAccessor, _examineManager, umbracoContext.Content!, umbracoContext.Media, _documentNavigationQueryService, _mediaNavigationQueryService),
+            new PublishedContentQuery(umbracoContext.Content!, umbracoContext.Media, _documentNavigationQueryService, _mediaNavigationQueryService),
             errorCulture,
             domainContentId);
 

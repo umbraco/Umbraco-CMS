@@ -1422,10 +1422,10 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             SettingsData = new List<BlockItemData>(),
             Expose = new List<BlockItemVariation>
             {
-                new BlockItemVariation(textBlock1Key, "en-US", null),
-                new BlockItemVariation(textBlock1Key, "da-DK", null),
-                new BlockItemVariation(textBlock2Key, "en-US", null),
-                new BlockItemVariation(textBlock2Key, "da-DK", null)
+                new BlockItemVariation(textBlock1Key, "en-US"),
+                new BlockItemVariation(textBlock1Key, "da-DK"),
+                new BlockItemVariation(textBlock2Key, "en-US"),
+                new BlockItemVariation(textBlock2Key, "da-DK")
             }
         };
         var blockListJson = jsonSerializer.Serialize(blockListValue);
@@ -1478,8 +1478,8 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             SettingsData = new List<BlockItemData>(),
             Expose = new List<BlockItemVariation>
             {
-                new BlockItemVariation(areaBlockKey, null, null),
-                new BlockItemVariation(listContainerKey, null, null)
+                new BlockItemVariation(areaBlockKey, null),
+                new BlockItemVariation(listContainerKey, null)
             }
         };
         var blockGridJson = jsonSerializer.Serialize(blockGridValue);
@@ -1506,7 +1506,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             SettingsData = new List<BlockItemData>(),
             Expose = new List<BlockItemVariation>
             {
-                new BlockItemVariation(gridContainerKey, null, null)
+                new BlockItemVariation(gridContainerKey, null)
             }
         };
 
@@ -1638,18 +1638,15 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Verify the patched text block
         var textBlock1 = blockListVal!.ContentData.FirstOrDefault(b => b.Key == setup.TextBlock1Key);
         Assert.IsNotNull(textBlock1);
-        Assert.AreEqual("updated deep value",
-            textBlock1!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
+        Assert.AreEqual("updated deep value", textBlock1!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
 
         // Verify da-DK text was NOT changed
-        Assert.AreEqual("original da",
-            textBlock1.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "da-DK")?.Value?.ToString());
+        Assert.AreEqual("original da", textBlock1.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "da-DK")?.Value?.ToString());
 
         // Verify the second text block was NOT changed
         var textBlock2 = blockListVal.ContentData.FirstOrDefault(b => b.Key == setup.TextBlock2Key);
         Assert.IsNotNull(textBlock2);
-        Assert.AreEqual("second block en",
-            textBlock2!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
+        Assert.AreEqual("second block en", textBlock2!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
     }
 
     [Test]

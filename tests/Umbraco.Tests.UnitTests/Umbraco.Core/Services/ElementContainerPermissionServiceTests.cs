@@ -247,6 +247,20 @@ public class ElementContainerPermissionServiceTests
         Assert.That(result, Is.EqualTo(ElementAuthorizationStatus.UnauthorizedMissingPermissionAccess));
     }
 
+    [Test]
+    public async Task Can_Pass_Through_Fallback_Permissions_Unchanged()
+    {
+        // Arrange
+        var user = new UserBuilder().WithId(0).Build();
+        var fallback = new HashSet<string> { "A", "B", "C" };
+
+        // Act - the stock implementation should pass through unchanged.
+        ISet<string> result = await _sut.FilterFallbackPermissionsAsync(user, fallback);
+
+        // Assert
+        Assert.That(result, Is.EquivalentTo(new[] { "A", "B", "C" }));
+    }
+
     private static IUser CreateUser(int id = 0, int? startElementId = null, bool withUserGroup = true)
     {
         var builder = new UserBuilder()

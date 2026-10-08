@@ -9,7 +9,7 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 /**
  * Base class for a collection repository that provides the children of a tree item.
  * Resolves the parent entity from the entity context and delegates to the tree repository.
- * Call {@link setTreeRepositoryAlias} in the constructor of the subclass to configure which tree repository to use.
+ * Call {@link UmbTreeItemChildrenCollectionRepositoryBase#_setTreeRepositoryAlias} in the constructor of the subclass to configure which tree repository to use.
  * @abstract
  * @class UmbTreeItemChildrenCollectionRepositoryBase
  * @augments {UmbRepositoryBase}

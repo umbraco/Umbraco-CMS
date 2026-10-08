@@ -1,4 +1,6 @@
 import type { UmbCollectionTextFilterApi } from './collection-text-filter-api.interface.js';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via {@link} in JSDoc below
+import type { UmbDefaultCollectionTextFilterApi } from './default-collection-text-filter.api.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 

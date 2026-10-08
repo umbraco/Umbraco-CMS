@@ -30,7 +30,6 @@ for (const userGroup of userGroups) {
     await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
     await umbracoUi.goToBackOffice();
     await umbracoUi.currentUserProfile.isBackOfficeMainVisible();
-    await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait to ensure the UI is fully loaded
 
     // Act
     await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
@@ -51,7 +50,6 @@ test('non-admin user clicking Edit opens the workspace modal', async ({umbracoAp
   await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
   await umbracoUi.goToBackOffice();
   await umbracoUi.currentUserProfile.isBackOfficeMainVisible();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
 
   // Act
   await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
@@ -66,7 +64,6 @@ test('admin user clicking Edit navigates to user editor', async ({umbracoApi, um
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.goToBackOffice();
   await umbracoUi.currentUserProfile.isBackOfficeMainVisible();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
 
   // Act
   await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
@@ -86,7 +83,6 @@ test('non-admin user can change UI language via the workspace modal', async ({um
   await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
   await umbracoUi.goToBackOffice();
   await umbracoUi.currentUserProfile.isBackOfficeMainVisible();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
 
   // Act
   await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
@@ -108,7 +104,6 @@ test('non-admin user can upload avatar via the workspace modal', async ({umbraco
   await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
   await umbracoUi.goToBackOffice();
   await umbracoUi.currentUserProfile.isBackOfficeMainVisible();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
 
   // Act
   await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
@@ -132,7 +127,6 @@ test('non-admin user can remove avatar via the workspace modal', async ({umbraco
   await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
   await umbracoUi.goToBackOffice();
   await umbracoUi.currentUserProfile.isBackOfficeMainVisible();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
 
   // Act
   await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
@@ -155,7 +149,6 @@ test('non-admin user closing the modal without saving does not persist changes',
   await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
   await umbracoUi.goToBackOffice();
   await umbracoUi.currentUserProfile.isBackOfficeMainVisible();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   const originalUser = await umbracoApi.user.getCurrentUser();
 
   // Act

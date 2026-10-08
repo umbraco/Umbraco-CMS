@@ -102,7 +102,6 @@ test('can select multiple elements in the element picker', async ({umbracoApi, u
   // Act
   await umbracoUi.library.goToElementWithName(elementName);
   await umbracoUi.library.addElementPicker(elementPickerName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for element to be added
   await umbracoUi.library.addElementPicker(secondElementPickerName);
   await umbracoUi.library.clickSaveAndPublishButtonAndWaitForElementToBePublished();
 
@@ -181,7 +180,6 @@ test('can validate maximum amount in element picker', async ({umbracoApi, umbrac
   // Act
   await umbracoUi.library.goToElementWithName(elementName);
   await umbracoUi.library.addElementPicker(elementPickerName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for element to be added
 
   // Assert
   await umbracoUi.library.isChooseButtonVisible(false);

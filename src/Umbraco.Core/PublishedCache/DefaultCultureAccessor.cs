@@ -25,7 +25,12 @@ public class DefaultCultureAccessor : IDefaultCultureAccessor
     }
 
     /// <inheritdoc />
-    public string DefaultCulture => _runtimeState.Level == RuntimeLevel.Run
-        ? _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult() ?? string.Empty // fast
-        : _options.DefaultUILanguage; // default for install and upgrade, when the service is n/a
+    /// <remarks>
+    ///     <see cref="RuntimeLevel.Upgrading" /> is included because during a background unattended upgrade the
+    ///     database is connected and the site is serving: reporting the configured fallback there left content
+    ///     unroutable (https://github.com/umbraco/Umbraco-CMS/issues/22581).
+    /// </remarks>
+    public string DefaultCulture => _runtimeState.Level is RuntimeLevel.Run or RuntimeLevel.Upgrading
+        ? _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult() ?? string.Empty
+        : _options.DefaultUILanguage; // no database to read from yet, e.g. install or early boot
 }

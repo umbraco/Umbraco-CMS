@@ -15,7 +15,7 @@ import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/ut
 /**
  * A data source for the Document Recycle Bin tree that fetches data from the server
  * @class UmbDocumentRecycleBinTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @augments {UmbTreeServerDataSourceBase}
  */
 export class UmbDocumentRecycleBinTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	DocumentRecycleBinItemResponseModel,
@@ -42,7 +42,10 @@ const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
 	const { data, ...rest } = await DocumentService.getRecycleBinDocumentRoot({
 		query: { skip, take },
 	});
-	return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+	return {
+		data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+		...rest,
+	};
 };
 
 const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
@@ -54,7 +57,10 @@ const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
 		const { data, ...rest } = await DocumentService.getRecycleBinDocumentChildren({
 			query: { parentId: args.parent.unique, skip, take },
 		});
-		return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+		return {
+			data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+			...rest,
+		};
 	}
 };
 
@@ -65,6 +71,12 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	});
 
 const mapper = (item: DocumentRecycleBinItemResponseModel): UmbDocumentRecycleBinTreeItemModel => {
+	const contentType = {
+		unique: item.documentType.id,
+		icon: item.documentType.icon,
+		collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
+	};
+
 	return {
 		unique: item.id,
 		parent: {
@@ -76,11 +88,9 @@ const mapper = (item: DocumentRecycleBinItemResponseModel): UmbDocumentRecycleBi
 		isTrashed: true,
 		hasChildren: item.hasChildren,
 		isProtected: false,
-		documentType: {
-			unique: item.documentType.id,
-			icon: item.documentType.icon,
-			collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
-		},
+		contentType,
+		// TODO (V20): remove when the deprecated `documentType` field is removed.
+		documentType: contentType,
 		variants: item.variants.map((variant) => {
 			return {
 				name: variant.name,

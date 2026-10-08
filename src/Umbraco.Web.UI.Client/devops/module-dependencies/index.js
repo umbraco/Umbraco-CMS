@@ -4,7 +4,7 @@ import { createImportMap } from '../importmap/index.js';
 
 const ILLEGAL_CORE_IMPORTS_THRESHOLD = 5;
 const SELF_IMPORTS_THRESHOLD = 0;
-const CORE_MODULES_BIDIRECTIONAL_IMPORTS_THRESHOLD = 16;
+const CORE_MODULES_BIDIRECTIONAL_IMPORTS_THRESHOLD = 15;
 const PACKAGES_MODULES_BIDIRECTIONAL_IMPORTS_THRESHOLD = 14;
 
 const clientProjectRoot = path.resolve(import.meta.dirname, '../../');

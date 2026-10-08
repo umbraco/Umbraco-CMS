@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -127,7 +127,7 @@ internal class BlockElementService : IBlockElementService
             SortOrder = 0,
         };
 
-        var result = _publishedContentFactory.ToIPublishedElement(contentCacheNode, draft);
+        var result = _publishedContentFactory.ToIPublishedElement(contentCacheNode, draft, owningContentId: owner.Id > 0 ? owner.Id : owner.OwningContentId);
         return result.CreateModel(_publishedModelFactory);
     }
 }

@@ -36,8 +36,8 @@ export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 
 	/**
 	 * Get the paste translator for the given clipboard entry values and property editor ui alias
-	 * @param {UmbClipboardEntryValuesType} clipboardEntryValues
-	 * @param {string} propertyEditorUiAlias
+	 * @param {UmbClipboardEntryValuesType} clipboardEntryValues - The clipboard entry values to find a translator for
+	 * @param {string} propertyEditorUiAlias - The alias of the property editor to match
 	 * @returns {Promise<UmbClipboardPastePropertyValueTranslator>} - The paste translator
 	 * @memberof UmbClipboardPastePropertyValueTranslatorValueResolver
 	 */

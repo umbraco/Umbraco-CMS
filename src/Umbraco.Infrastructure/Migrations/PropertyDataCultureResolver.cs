@@ -14,7 +14,7 @@ internal static class PropertyDataCultureResolver
     /// Log message template used when a property data row references a language that no longer exists.
     /// </summary>
     internal const string OrphanedLanguageWarningTemplate =
-        "    - property data with id: {propertyDataId} references a language that does not exist - language id: {languageId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})";
+        "    - property data with id: {propertyDataId} references a language that does not exist - language id: {languageId} (property type: {propertyTypeName}, id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias})";
 
     /// <summary>
     /// Represents the result of resolving a culture for a property data row.

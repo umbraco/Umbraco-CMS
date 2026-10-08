@@ -1,11 +1,9 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -113,128 +111,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         });
         _relationService = relationService;
         _logger = loggerFactory.CreateLogger<ContentService>();
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentService"/> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="documentRepository">The document repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="auditRepository">The audit repository.</param>
-    /// <param name="contentTypeRepository">The content type repository.</param>
-    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
-    /// <param name="languageRepository">The language repository.</param>
-    /// <param name="propertyValidationService">The property validation service.</param>
-    /// <param name="shortStringHelper">The short string helper.</param>
-    /// <param name="cultureImpactFactory">The culture impact factory.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="propertyEditorCollection">The property editor collection.</param>
-    /// <param name="idKeyMap">The ID key map.</param>
-    /// <param name="optionsMonitor">The content settings options monitor.</param>
-    /// <param name="relationService">The relation service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public ContentService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IDocumentRepository documentRepository,
-        IEntityRepository entityRepository,
-        IAuditRepository auditRepository,
-        IContentTypeRepository contentTypeRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository,
-        ILanguageRepository languageRepository,
-        Lazy<IPropertyValidationService> propertyValidationService,
-        IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory,
-        IUserIdKeyResolver userIdKeyResolver,
-        PropertyEditorCollection propertyEditorCollection,
-        IIdKeyMap idKeyMap,
-        IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            documentRepository,
-            entityRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            contentTypeRepository,
-            documentBlueprintRepository,
-            languageRepository,
-            propertyValidationService,
-            shortStringHelper,
-            cultureImpactFactory,
-            userIdKeyResolver,
-            propertyEditorCollection,
-            idKeyMap,
-            optionsMonitor,
-            relationService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentService"/> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="documentRepository">The document repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="auditRepository">The audit repository.</param>
-    /// <param name="auditService">The audit service.</param>
-    /// <param name="contentTypeRepository">The content type repository.</param>
-    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
-    /// <param name="languageRepository">The language repository.</param>
-    /// <param name="propertyValidationService">The property validation service.</param>
-    /// <param name="shortStringHelper">The short string helper.</param>
-    /// <param name="cultureImpactFactory">The culture impact factory.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="propertyEditorCollection">The property editor collection.</param>
-    /// <param name="idKeyMap">The ID key map.</param>
-    /// <param name="optionsMonitor">The content settings options monitor.</param>
-    /// <param name="relationService">The relation service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public ContentService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IDocumentRepository documentRepository,
-        IEntityRepository entityRepository,
-        IAuditRepository auditRepository,
-        IAuditService auditService,
-        IContentTypeRepository contentTypeRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository,
-        ILanguageRepository languageRepository,
-        Lazy<IPropertyValidationService> propertyValidationService,
-        IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory,
-        IUserIdKeyResolver userIdKeyResolver,
-        PropertyEditorCollection propertyEditorCollection,
-        IIdKeyMap idKeyMap,
-        IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            documentRepository,
-            entityRepository,
-            auditService,
-            contentTypeRepository,
-            documentBlueprintRepository,
-            languageRepository,
-            propertyValidationService,
-            shortStringHelper,
-            cultureImpactFactory,
-            userIdKeyResolver,
-            propertyEditorCollection,
-            idKeyMap,
-            optionsMonitor,
-            relationService)
-    {
     }
 
     #endregion
@@ -559,11 +435,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
-    public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
-        => GetPagedChildren(id, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter: filter, ordering: ordering);
-
-    /// <inheritdoc />
     public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true)
     {
         if (pageIndex < 0)
@@ -699,30 +570,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 .Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
             return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter, ordering);
         }
-    }
-
-    /// <inheritdoc/>
-    [Obsolete("Use GetContentSchedulesByKeys instead. Scheduled for removal in Umbraco 19.")]
-    public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys)
-    {
-        if (keys.Length == 0)
-        {
-            return ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
-        }
-
-        IDictionary<Guid, IEnumerable<ContentSchedule>> guidKeyedResults = GetContentSchedulesByKeys(keys);
-
-        var intKeyedResults = new Dictionary<int, IEnumerable<ContentSchedule>>(guidKeyedResults.Count);
-        foreach (KeyValuePair<Guid, IEnumerable<ContentSchedule>> entry in guidKeyedResults)
-        {
-            Attempt<int> contentId = _idKeyMap.GetIdForKey(entry.Key, UmbracoObjectTypes.Document);
-            if (contentId.Success)
-            {
-                intKeyedResults[contentId.Result] = entry.Value;
-            }
-        }
-
-        return intKeyedResults;
     }
 
     /// <summary>
@@ -1191,7 +1038,31 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// <param name="content">The <see cref="IContent" /> to move</param>
     /// <param name="parentId">Id of the Content's new Parent</param>
     /// <param name="userId">Optional Id of the User moving the Content</param>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
     public OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
+        => Move(content, parentId, true, userId);
+
+    /// <summary>
+    ///     Moves an <see cref="IContent" /> object to a new location by changing its parent id.
+    /// </summary>
+    /// <remarks>
+    ///     If the <see cref="IContent" /> object is already published it will be
+    ///     published after being moved to its new location. Otherwise it'll just
+    ///     be saved with a new parent id.
+    /// </remarks>
+    /// <param name="content">The <see cref="IContent" /> to move.</param>
+    /// <param name="parentId">Id of the Content's new Parent.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the content along with it. When restoring an item out of the recycle bin
+    ///     this can be set to <c>false</c> to restore only the item itself, leaving its descendants in the recycle bin
+    ///     as top-level bin items.
+    /// </param>
+    /// <param name="userId">Optional Id of the User moving the Content.</param>
+    /// <returns>The operation result.</returns>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
+    public OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -1233,6 +1104,10 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             // leave it unchanged
             var trashed = content.Trashed ? false : (bool?)null;
 
+            // when restoring a single item out of the recycle bin without its descendants, those descendants stay
+            // trashed and are re-homed under the recycle bin root - see PerformMoveLocked
+            var leaveDescendantsInRecycleBin = includeDescendants is false && content.Trashed && parentId != Constants.System.RecycleBinContent;
+
             // if the content was trashed under another content, and so has a published version,
             // it cannot move back as published but has to be unpublished first - that's for the
             // root content, everything underneath will retain its published status
@@ -1243,10 +1118,25 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 content.PublishedState = PublishedState.Unpublishing;
             }
 
-            PerformMoveLocked(content, parentId, parent, userId, moves, trashed);
+            PerformMoveLocked(content, parentId, parent, userId, moves, trashed, includeDescendants);
 
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+            if (leaveDescendantsInRecycleBin)
+            {
+                // The single RefreshBranch above cannot reconcile the descendants left in the bin (they are no longer
+                // descendants of the restored item), so also refresh the re-homed direct children. The navigation
+                // reconciler then moves them - and their sub-trees - back under the recycle bin root.
+                IContent[] rehomedChildren = moves
+                    .Select(x => x.Item1)
+                    .Where(x => x.ParentId == Constants.System.RecycleBinContent)
+                    .ToArray();
+                scope.Notifications.Publish(
+                    new ContentTreeChangeNotification(content.Yield().Concat(rehomedChildren), TreeChangeTypes.RefreshBranch, eventMessages));
+            }
+            else
+            {
+                scope.Notifications.Publish(
+                    new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+            }
 
             // changes
             MoveEventInfo<IContent>[] moveInfo = moves
@@ -1269,7 +1159,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     // MUST be called from within WriteLock
     // trash indicates whether we are trashing, un-trashing, or not changing anything
-    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash)
+    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, List<(IContent Content, string OriginalPath)> moves, bool? trash, bool includeDescendants = true)
     {
         content.WriterId = userId;
         content.ParentId = parentId;
@@ -1277,6 +1167,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         // get the level delta (old pos to new pos)
         // note that recycle bin (id:-20) level is 0!
         var levelDelta = 1 - content.Level + (parent?.Level ?? 0);
+        var originalLevel = content.Level;
 
         var paths = new Dictionary<int, string>();
 
@@ -1299,6 +1190,13 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 ? parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString
                 : parent.Path) + "," + content.Id;
 
+        // When restoring a single item out of the recycle bin without its descendants, the descendants must stay
+        // trashed: the item's direct children are re-homed to the recycle bin root (and the rest of the subtree keeps
+        // its relative structure), so nothing is orphaned and it can still be restored on its own later.
+        var leaveDescendantsInRecycleBin = includeDescendants is false
+            && parentId != Constants.System.RecycleBinContent
+            && originalPath.Contains(Constants.System.RecycleBinContentString);
+
         const int pageSize = 500;
         IQuery<IContent>? query = GetPagedDescendantQuery(originalPath);
         long total;
@@ -1312,13 +1210,43 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             {
                 moves.Add((descendant, descendant.Path)); // capture original path
 
-                // update path and level since we do not update parentId
-                descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                descendant.Level += levelDelta;
-                PerformMoveContentLocked(descendant, userId, trash);
+                if (leaveDescendantsInRecycleBin)
+                {
+                    LeaveDescendantInRecycleBinLocked(descendant, content.Id, originalLevel, userId, paths);
+                }
+                else
+                {
+                    PerformMoveDescendantLocked(descendant, levelDelta, userId, trash, paths);
+                }
             }
         }
         while (total > pageSize);
+    }
+
+    // Re-homes a descendant of a restored item within the recycle bin: the restored item's direct children become
+    // top-level recycle bin items, while deeper descendants keep their relative structure below their (now re-homed)
+    // ancestor. The trashed state is left untouched so these items remain in the recycle bin.
+    private void LeaveDescendantInRecycleBinLocked(IContent descendant, int restoredItemId, int originalLevel, int userId, Dictionary<int, string> paths)
+    {
+        var isDirectChild = descendant.ParentId == restoredItemId;
+        descendant.Path = paths[descendant.Id] = isDirectChild
+            ? Constants.System.RecycleBinContentPathPrefix + descendant.Id
+            : paths[descendant.ParentId] + "," + descendant.Id;
+        descendant.Level -= originalLevel;
+        if (isDirectChild)
+        {
+            descendant.ParentId = Constants.System.RecycleBinContent;
+        }
+
+        PerformMoveContentLocked(descendant, userId, null);
+    }
+
+    // Moves a descendant along with the item being moved, updating its path and level (parentId is unchanged).
+    private void PerformMoveDescendantLocked(IContent descendant, int levelDelta, int userId, bool? trash, Dictionary<int, string> paths)
+    {
+        descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+        descendant.Level += levelDelta;
+        PerformMoveContentLocked(descendant, userId, trash);
     }
 
     private void PerformMoveContentLocked(IContent content, int userId, bool? trash)

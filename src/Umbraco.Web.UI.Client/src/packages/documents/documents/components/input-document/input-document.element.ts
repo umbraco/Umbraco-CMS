@@ -25,6 +25,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 		},
 		identifier: 'Umb.SorterIdentifier.InputDocument',
 		itemSelector: 'umb-entity-item-ref',
+		disabledItemSelector: '[error]',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -170,19 +171,11 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 			() => !this.readonly && !!this.max && this.selection.length > this.max,
 		);
 
-		this.observe(
-			this.#pickerInputContext.selection,
-			(selection) => (this.value = selection.join(',')),
-			'_observeSelection',
-		);
+		this.observe(this.#pickerInputContext.selection, (selection) => (this.value = selection.join(',')), null);
 
-		this.observe(
-			this.#pickerInputContext.selectedItems,
-			(selectedItems) => (this._items = selectedItems),
-			'_observerItems',
-		);
+		this.observe(this.#pickerInputContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
 
-		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), '_observerStatuses');
+		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), null);
 	}
 
 	#openPicker() {
@@ -231,7 +224,9 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 			<uui-ref-list>
 				${repeat(
 					this._statuses,
-					(status) => status.unique,
+					// Re-key on error state so the sorter re-evaluates `disabledItemSelector` when an item settles
+					// into "not found" — the sorter only checks this when an element is first mounted.
+					(status) => `${status.unique}:${status.state.type === 'error'}`,
 					(status) => {
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
@@ -243,7 +238,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 								?error=${isError}
 								.errorMessage=${status.state.error}
 								.errorDetail=${isError ? unique : undefined}
-								?readonly=${this.readonly}
+								?readonly=${this.readonly || isError}
 								?standalone=${this.max === 1 && this._statuses?.length === 1}>
 								${when(
 									!this.readonly,
