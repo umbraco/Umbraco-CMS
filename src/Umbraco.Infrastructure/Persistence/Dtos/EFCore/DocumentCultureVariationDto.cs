@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Configurations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
 [EntityTypeConfiguration(typeof(DocumentCultureVariationDtoConfiguration))]
-public class DocumentCultureVariationDto
+public class DocumentCultureVariationDto : ICultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentCultureVariation;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
