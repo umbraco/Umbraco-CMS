@@ -75,7 +75,7 @@
         }
       ],
       "acceptance": "Solution builds; snapshots list umbracoElement, umbracoElementVersion, umbracoElementCultureVariation; migration-plan tests pass.",
-      "notes": "Commits c7b7aa1951b (ICultureVariationDto), a8eb63bbdbc (element DTOs, customizer, DbSets), 0648b879a95 (AddElementDtos migration). Migrations 20261008103850 (SQL Server) / 20261008103922 (SQLite), plan step {1EC33267-3D0C-4D67-BC41-5AA5D0DFF3F2}. Unit 7316 and integration 748 passed."
+      "notes": "Commits c7b7aa1951b (ICultureVariationDto), a8eb63bbdbc (element DTOs, customizer, DbSets), 0648b879a95 (AddElementDtos migration). Migrations 20261008103850 (SQL Server) / 20261008103922 (SQLite), plan step {1EC33267-3D0C-4D67-BC41-5AA5D0DFF3F2}. Unit 7316 and integration 748 passed. Review round 1: Copilot CS0061 claim rejected (public class may implement internal interface); ElementDtoMappingTests added (7899d8c9b21), proven to fail on swapped column mappings."
     },
     {
       "id": 2,
@@ -286,6 +286,10 @@
     }
   ],
   "log": [
+    {
+      "date": "08-10-2026",
+      "text": "PR 1 review round 1 answered: mapping round-trip test added (7899d8c9b21); CS0061 and Id-on-interface comments answered without code changes."
+    },
     {
       "date": "08-10-2026",
       "text": "PR 1 opened as #24134 against v18/feature/ef-core-repositories."
