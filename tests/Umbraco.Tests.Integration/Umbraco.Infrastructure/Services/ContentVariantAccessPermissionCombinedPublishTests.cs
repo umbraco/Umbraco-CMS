@@ -290,7 +290,7 @@ public class ContentVariantAccessPermissionCombinedPublishTests : UmbracoIntegra
                 Variants = [new VariantModel { Name = "Invariant Content" }],
                 Properties = [new PropertyValueModel { Alias = "title", Value = "Initial title" }],
             },
-            [],
+            new HashSet<string>(),
             Constants.Security.SuperUserKey);
         Assert.IsTrue(createResult.Success);
         var contentKey = createResult.Result.Content!.Key;
@@ -308,7 +308,7 @@ public class ContentVariantAccessPermissionCombinedPublishTests : UmbracoIntegra
                 Variants = [new VariantModel { Name = "Updated Invariant Content" }],
                 Properties = [new PropertyValueModel { Alias = "title", Value = "Updated title" }],
             },
-            [],
+            new HashSet<string>(),
             user.Key);
         Assert.IsTrue(updateResult.Success);
 
@@ -322,7 +322,7 @@ public class ContentVariantAccessPermissionCombinedPublishTests : UmbracoIntegra
 
     private static string InitialValueFor(string culture) => culture == EnglishCulture ? "Initial EN value" : "Initial DA value";
 
-    private async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(
+    private async Task<Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus>> UpdateAndPublishAsync(
         Guid contentKey,
         Guid userKey,
         IEnumerable<PropertyValueModel> properties,
@@ -330,7 +330,7 @@ public class ContentVariantAccessPermissionCombinedPublishTests : UmbracoIntegra
         => await ContentEditingService.UpdateAndPublishAsync(
             contentKey,
             new ContentUpdateModel { Properties = properties.ToList() },
-            culturesToPublish,
+            culturesToPublish.ToHashSet(),
             userKey);
 
     private async Task<Guid> SetupBaselineContentAsync()
@@ -354,7 +354,7 @@ public class ContentVariantAccessPermissionCombinedPublishTests : UmbracoIntegra
                     new PropertyValueModel { Alias = "invariantValue", Value = "Initial invariant value" },
                 ],
             },
-            [EnglishCulture, DanishCulture],
+            new HashSet<string> { EnglishCulture, DanishCulture },
             Constants.Security.SuperUserKey);
         Assert.IsTrue(createResult.Success);
 
