@@ -1,9 +1,11 @@
 ---
 name: sqlserver-efcore-model-customizers-inert
-description: Every SqlServer*ModelCustomizer uses the ADO.NET provider name constant, so UmbracoDbContext's provider filter never applies them (SQL Server snapshot has zero IncludeProperties/IsClustered annotations)
+description: RESOLVED by #24001 — SQL Server customizers now return Constants.ProviderNames.EFCore.SQLServer and their IncludeProperties land in the snapshot; this note is history
 metadata:
   type: project
 ---
+
+**Resolved (verified 08-10-2026):** the customizers now return `Constants.ProviderNames.EFCore.SQLServer`; the SQL Server snapshot carries 14 `IncludeProperties` calls at `f1583e70294` (fixed in #24001). New SQL Server customizers just follow the existing ones. Everything below is the original finding.
 
 Found 2026-09-24 during the ef-core-document-repository final review; pre-exists on v18/feature/ef-core-repositories (SqlServerNodeDto/RedirectUrl customizers) and the branch added 8 more with the same bug.
 

@@ -51,30 +51,31 @@
       "tasks": [
         {
           "text": "Three EF Core DTOs with configurations mirroring every NPoco index and FK",
-          "done": false
+          "done": true
         },
         {
           "text": "ICultureVariationDto implemented by document and element culture-variation DTOs",
-          "done": false
+          "done": true
         },
         {
           "text": "SQL Server customizer for IX_umbracoElementVersion_published (include id), registered",
-          "done": false
+          "done": true
         },
         {
           "text": "DbSets Elements, ElementVersions, ElementCultureVariations",
-          "done": false
+          "done": true
         },
         {
           "text": "AddElementDtos migration on both providers, empty Up/Down, snapshots contain all three tables",
-          "done": false
+          "done": true
         },
         {
           "text": "has-pending-model-changes clean on both providers",
-          "done": false
+          "done": true
         }
       ],
-      "acceptance": "Solution builds; snapshots list umbracoElement, umbracoElementVersion, umbracoElementCultureVariation; migration-plan tests pass."
+      "acceptance": "Solution builds; snapshots list umbracoElement, umbracoElementVersion, umbracoElementCultureVariation; migration-plan tests pass.",
+      "notes": "Ready to commit (uncommitted on the branch). SQL Server migration 20261008103850_AddElementDtos, SQLite 20261008103922_AddElementDtos, plan step {1EC33267-3D0C-4D67-BC41-5AA5D0DFF3F2}. Review: no bugs. Tests: unit 7316 passed; 753 Document/Element/Migrations/ContentService integration tests, 748 passed, 5 skipped, 0 failed."
     },
     {
       "id": 2,
@@ -285,6 +286,14 @@
     }
   ],
   "log": [
+    {
+      "date": "08-10-2026",
+      "text": "PR 1 reviewed (no bugs, one doc nit fixed) and regression-tested: 7316 unit and 748 integration tests passed, 0 failed."
+    },
+    {
+      "date": "08-10-2026",
+      "text": "PR 1 implemented: three element DTOs, shared ICultureVariationDto, SQL Server customizer, DbSets, AddElementDtos migration. Both providers report no pending model changes."
+    },
     {
       "date": "08-10-2026",
       "text": "PR 1 started on v20/feature/ef-core-element-repository-1-element-dtos."
