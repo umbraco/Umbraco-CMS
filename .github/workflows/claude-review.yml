@@ -48,7 +48,7 @@ jobs:
           show_full_output: false
 
           additional_permissions: "actions: read"
-          claude_args: "--model claude-opus-5-5 --allowedTools 'Bash(gh:*),Bash(git:*)'"
+          claude_args: "--model claude-opus-5-5 --allowedTools 'mcp__github_inline_comment__create_inline_comment,Bash(gh auth status),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh pr edit:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git fetch:*)'"
           prompt: |
             You are reviewing pull request #${{ github.event.pull_request.number }}
             in the Umbraco CMS repository.

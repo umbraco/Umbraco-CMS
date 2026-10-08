@@ -29,6 +29,15 @@ jobs:
         with:
           fetch-depth: 1
 
+      # Lets `npm` and `dotnet` commands build and test, e.g. for `fix` requests.
+      - name: Setup .NET from global.json
+        uses: actions/setup-dotnet@v5
+
+      - name: Setup Node from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: src/Umbraco.Web.UI.Client/.nvmrc
+
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY_03 }}
@@ -36,7 +45,7 @@ jobs:
           label_trigger: "claude"
           base_branch: "main"
           additional_permissions: "actions: read"
-          claude_args: "--model claude-opus-5-5 --max-turns 50 --allowedTools 'Bash(gh:*),Bash(git:*),Bash(npm:*),Bash(dotnet:*)'"
+          claude_args: "--model claude-opus-5-5 --max-turns 50 --permission-mode acceptEdits --allowedTools 'mcp__github_inline_comment__create_inline_comment,Bash(gh:*),Bash(git:*),Bash(npm:*),Bash(dotnet:*)'"
           prompt: |
             You are an AI assistant for the Umbraco CMS repository, an open-source
             .NET CMS that welcomes community contributions.

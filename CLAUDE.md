@@ -495,9 +495,11 @@ Responds to `@claude` mentions on PRs and issues. The trigger phrase is stripped
 - `@claude label` → applies labels
 - `@claude` (empty) → defaults to `review` on PRs, `help` on issues
 
-Also triggers on issue assignment to `claude` or adding the `claude` label. Gated: only runs when `@claude` appears in the comment/issue body. Max 25 turns.
+Also triggers on issue assignment to `claude` or adding the `claude` label. Gated: only runs when `@claude` appears in the comment/issue body. Max 50 turns.
 
-**Allowed Bash tools**: `gh`, `git`, `npm`, `dotnet` (interactive only; auto-review allows `gh` and `git`).
+**Allowed tools**:
+- Auto-review: inline comments, `gh auth status`, `gh pr view/diff/comment/edit`, and `git diff/log/show/fetch`.
+- Interactive: inline comments, `gh`, `git`, `npm` and `dotnet`, plus file edits inside the checkout (`--permission-mode acceptEdits`). Node and .NET are set up from `.nvmrc` and `global.json`.
 
 ### Labels
 
@@ -527,6 +529,8 @@ Labels are only added, never removed. Claude applies only labels it is confident
 
 - **Checkout required** — the action internally runs `git fetch origin main` for trusted file restoration. Without `actions/checkout`, it fails with `fatal: not a git repository`.
 - **`id-token: write` permission** — required for OIDC token exchange with the Claude GitHub App.
+- **Workflow files must match `main`** — the action skips, with a warning, when the workflow file it runs from differs from the version on the default branch. A PR that changes `claude-review.yml` can't review itself, and reviews on other branches skip until the change has been merged up to `main`.
+- **Mode decides the default tools** — `track_progress: true` runs the auto-review in tag mode, where the action adds read tools, file edits inside the checkout and its own commit tools. With a `prompt` and no progress tracking, the interactive and issue-deduplication workflows run in agent mode, where only `--allowedTools` applies: read-only tools always work, but file edits need `--permission-mode acceptEdits`.
 - **Trigger phrase stripping** — the action strips `@claude` from comments before passing to Claude. Prompts must reference commands without the prefix (e.g., `review` not `@claude review`).
 - **PR number injection** — the interactive workflow injects the PR/issue number into the prompt via `${{ github.event.issue.number }}` since Claude can't discover it from `gh pr view` when checked out on `main`.
 
