@@ -137,15 +137,15 @@ public class EmailSender : IEmailSender
     /// <inheritdoc/>
     /// <remarks>
     ///     Only the SMTP transport is probed. A pickup directory only requires a local file write, so it is assumed to be
-    ///     available. A registered notification handler cannot be probed, and may handle only some email types, so SMTP is
-    ///     still probed when it is configured as the fallback; a handler alone is assumed to be available.
+    ///     available. A registered notification handler cannot be probed, so it is assumed to deliver email and SMTP is not
+    ///     probed, even when configured as a fallback; if the handler does not handle a given email, the send fails instead.
     ///     Concurrent callers share a single probe, and its result is cached briefly, so the SMTP server is contacted at
     ///     most once per cache period regardless of how often this is called. The cancellation token only stops the
     ///     caller waiting; it does not cancel the shared probe.
     /// </remarks>
     public async Task<bool> IsEmailAvailableAsync(CancellationToken cancellationToken = default)
     {
-        if (UsesSmtpTransport() is false)
+        if (_notificationHandlerRegistered || UsesSmtpTransport() is false)
         {
             return IsEmailConfigured();
         }

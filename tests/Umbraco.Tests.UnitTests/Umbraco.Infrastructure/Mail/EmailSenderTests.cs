@@ -83,7 +83,7 @@ public class EmailSenderTests
     }
 
     [Test]
-    public async Task IsEmailAvailableAsync_Probes_Smtp_Fallback_When_Notification_Handler_Is_Registered()
+    public async Task IsEmailAvailableAsync_Does_Not_Probe_Smtp_Fallback_When_Notification_Handler_Is_Registered()
     {
         var clientMock = CreateUnreachableClientMock();
         var sender = CreateSender(
@@ -91,8 +91,8 @@ public class EmailSenderTests
             clientMock.Object,
             handler: Mock.Of<INotificationAsyncHandler<SendEmailNotification>>());
 
-        Assert.IsFalse(await sender.IsEmailAvailableAsync());
-        clientMock.Verify(x => x.VerifyConnectionAsync(It.IsAny<CancellationToken>()), Times.Once);
+        Assert.IsTrue(await sender.IsEmailAvailableAsync());
+        clientMock.Verify(x => x.VerifyConnectionAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Test]
