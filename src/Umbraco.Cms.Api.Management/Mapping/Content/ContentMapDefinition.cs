@@ -83,6 +83,9 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                     return variantViewModel;
                 }))
             .WhereNotNull()
+            .OrderBy(value => value.Culture, StringComparer.Ordinal)
+            .ThenBy(value => value.Segment, StringComparer.Ordinal)
+            .ThenBy(value => value.Alias, StringComparer.Ordinal)
             .ToArray();
     }
 
@@ -109,6 +112,8 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                 additionalVariantMapping?.Invoke(culture, segment, variantViewModel);
                 return variantViewModel;
             }))
+            .OrderBy(variant => variant.Culture, StringComparer.Ordinal)
+            .ThenBy(variant => variant.Segment, StringComparer.Ordinal)
             .ToArray();
     }
 }
