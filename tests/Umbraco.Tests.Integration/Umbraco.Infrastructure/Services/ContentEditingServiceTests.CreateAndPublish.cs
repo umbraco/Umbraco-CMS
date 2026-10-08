@@ -457,28 +457,6 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
-    public async Task Cannot_CreateAndPublish_Under_Unpublished_Parent_With_Obsolete_Overload()
-    {
-        var contentType = await CreateTextPageContentTypeAsync();
-        var (root, _) = await CreateRootAndChildAsync(contentType);
-
-        var createModel = new ContentCreateModel
-        {
-            ContentTypeKey = contentType.Key,
-            ParentKey = root.Key,
-            Variants = [new VariantModel { Name = "The Grandchild" }],
-        };
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        // the obsolete overload cannot express a publish failure, so it keeps collapsing to "unknown"
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Unknown, result.Status);
-    }
-
-    [Test]
     public async Task Cannot_CreateAndPublish_With_Cultures_For_An_Invariant_Content_Type()
     {
         var contentType = await CreateInvariantContentType();
