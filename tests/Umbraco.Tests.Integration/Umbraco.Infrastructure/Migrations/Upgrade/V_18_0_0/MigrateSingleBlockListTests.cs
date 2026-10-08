@@ -977,7 +977,6 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
     /// Migrations are activated with <see cref="ActivatorUtilities" />, which cannot use an inherited constructor,
     /// hence the forwarding one. Only one is declared so the activation stays unambiguous.
     /// </remarks>
-#pragma warning disable CS0618 // Type or member is obsolete
     private sealed class PageSizeOfTwoMigrateSingleBlockList : MigrateSingleBlockList
     {
         public PageSizeOfTwoMigrateSingleBlockList(IMigrationContext context, IServiceProvider serviceProvider)
@@ -996,7 +995,6 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                 serviceProvider.GetRequiredService<SingleBlockListConfigurationCache>(),
                 serviceProvider.GetRequiredService<IDataValueEditorFactory>(),
                 serviceProvider.GetRequiredService<IIOHelper>(),
-                serviceProvider.GetRequiredService<IBlockValuePropertyIndexValueFactory>(),
                 serviceProvider.GetRequiredService<IBlockEditorElementTypeCache>(),
                 serviceProvider.GetRequiredService<AppCaches>(),
                 serviceProvider.GetRequiredService<IDataTypeConfigurationCache>())
@@ -1005,7 +1003,6 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
 
         internal override int PageSize => 2;
     }
-#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Captures what the migration logged, which is the only place some of its behaviour is observable - the page
