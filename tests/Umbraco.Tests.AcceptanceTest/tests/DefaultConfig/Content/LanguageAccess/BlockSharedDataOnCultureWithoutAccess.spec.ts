@@ -77,7 +77,7 @@ test('can edit the shared block property on a culture with language access', asy
   await umbracoUi.content.isBlockWorkspacePropertyEditable(elementTypeName, sharedTextPropertyName, true);
 });
 
-test('can edit the shared block property on a culture without language access', async ({umbracoUi}) => {
+test('can edit the shared block property on a culture without language access', {tag: '@smoke'}, async ({umbracoUi}) => {
   test.slow();
   // Act - the document opens in English, which the user has no language access to
   await umbracoUi.content.clickEditBlockListEntryWithName(elementTypeName);

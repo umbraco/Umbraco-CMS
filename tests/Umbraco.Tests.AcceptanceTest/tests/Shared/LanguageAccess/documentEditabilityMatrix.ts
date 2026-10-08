@@ -19,10 +19,11 @@ const danish: Language = {isoCode: 'da', name: 'Danish', documentName: 'Language
 const vietnamese: Language = {isoCode: 'vi', name: 'Vietnamese', documentName: 'LanguageAccessMatrixDoc VI', isDefault: false};
 const languages = [english, danish, vietnamese];
 
-const users: {description: string, allowedIsoCodes: string[] | 'all'}[] = [
+// smokeTab: the variant tab whose test also runs in the pull request smoke tests.
+const users: {description: string, allowedIsoCodes: string[] | 'all', smokeTab?: Language}[] = [
   {description: 'all languages', allowedIsoCodes: 'all'},
   {description: 'the default language only', allowedIsoCodes: [english.isoCode]},
-  {description: 'Danish only', allowedIsoCodes: [danish.isoCode]},
+  {description: 'Danish only', allowedIsoCodes: [danish.isoCode], smokeTab: english},
   {description: 'the default language and Danish', allowedIsoCodes: [english.isoCode, danish.isoCode]},
 ];
 
@@ -70,7 +71,7 @@ export function registerDocumentEditabilityTests(userCanEditSharedData: boolean)
           const expected = expectedEditability(user.allowedIsoCodes, tab, userCanEditSharedData);
           const describe = (editable: boolean) => editable ? 'can edit' : 'cannot edit';
 
-          test(`${describe(expected.varying)} the culture-varying property, ${describe(expected.shared)} the shared property and ${describe(expected.name)} the name in the ${tab.name} variant`, async ({umbracoApi, umbracoUi}) => {
+          test(`${describe(expected.varying)} the culture-varying property, ${describe(expected.shared)} the shared property and ${describe(expected.name)} the name in the ${tab.name} variant`, {tag: user.smokeTab === tab ? ['@smoke'] : []}, async ({umbracoApi, umbracoUi}) => {
             // Arrange
             const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithVaryingAndSharedProperties(
               documentTypeName, textStringDataTypeId, varyingPropertyName, sharedPropertyName);

@@ -115,7 +115,7 @@ test.describe('user who can edit Danish and can edit shared data', () => {
     await expectOnlyDanishToBeSelectable(page);
   });
 
-  test('only offers Danish in the publish dialog', async ({page, umbracoApi, umbracoUi}) => {
+  test('only offers Danish in the publish dialog', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     await loginToContentSectionAs(umbracoApi, umbracoUi, [danish.isoCode], true);
     await umbracoUi.content.changeDocumentSectionLanguage(danish.name);
@@ -220,7 +220,7 @@ test.describe('user who can edit Danish and can edit shared data', () => {
 });
 
 test.describe('user who can edit Danish and cannot edit shared data', () => {
-  test('publishes Danish without the pending shared data', async ({page, umbracoApi, umbracoUi}) => {
+  test('publishes Danish without the pending shared data', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     const documentId = await publishEveryLanguageAndChangeSharedData(umbracoApi);
     await loginToContentSectionAs(umbracoApi, umbracoUi, [danish.isoCode], false);
@@ -240,7 +240,7 @@ test.describe('user who can edit Danish and cannot edit shared data', () => {
 });
 
 test.describe('user who cannot edit any language and can edit shared data', () => {
-  test('can save the shared data on its own and leaves every language untouched', async ({page, umbracoApi, umbracoUi}) => {
+  test('can save the shared data on its own and leaves every language untouched', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     const newSharedValue = 'UpdatedSharedValue';
     await loginToContentSectionAs(umbracoApi, umbracoUi, [], true);
