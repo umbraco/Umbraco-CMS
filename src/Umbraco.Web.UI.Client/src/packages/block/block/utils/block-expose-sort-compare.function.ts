@@ -3,7 +3,7 @@ import { umbVariantObjectSortCompare } from '@umbraco-cms/backoffice/variant';
 
 /**
  * Compares two block expose entries by culture, segment, then content key, matching the order the
- * Management API applies when serializing block exposes. Content keys are compared ordinally, which equals
+ * Management API returns block exposes in. Content keys are compared ordinally, which equals
  * the order of `Guid.CompareTo` as long as both sides use lowercase hexadecimal keys.
  * @param {UmbBlockExposeModel} a - The first expose to compare.
  * @param {UmbBlockExposeModel} b - The second expose to compare.

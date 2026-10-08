@@ -17,8 +17,8 @@ export function umbVariantCodeSortCompare(a: string | null | undefined, b: strin
 }
 
 /**
- * Compares two variant objects by culture, then by segment, in the canonical storage order the Management API
- * uses when serializing variant collections (invariant first, then ordinal and case-sensitive).
+ * Compares two variant objects by culture, then by segment, in the order the Management API returns
+ * variant collections in (invariant first, then ordinal and case-sensitive).
  * This is not the display order of `sortVariants`, which prioritizes default language, mandatory state and publish state.
  * @param {UmbSortableVariantObject} a - The first object to compare.
  * @param {UmbSortableVariantObject} b - The second object to compare.
