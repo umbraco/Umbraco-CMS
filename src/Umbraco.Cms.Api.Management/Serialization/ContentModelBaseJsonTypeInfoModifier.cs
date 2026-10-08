@@ -12,18 +12,12 @@ namespace Umbraco.Cms.Api.Management.Serialization;
 /// A <see cref="JsonTypeInfo"/> modifier that orders <see cref="ContentModelBase{TValueModel, TVariantModel}.Variants"/>
 /// (by culture, segment) and <see cref="ContentModelBase{TValueModel, TVariantModel}.Values"/> (by culture,
 /// segment, alias) deterministically on write, for any concrete implementation of
-/// <see cref="ContentModelBase{TValueModel, TVariantModel}"/> - restoring the original order afterward so the
-/// mutation does not outlive the write itself.
+/// <see cref="ContentModelBase{TValueModel, TVariantModel}"/> - restoring the original order once the write completes.
 /// </summary>
 /// <remarks>
-/// <see cref="ContentModelBase{TValueModel, TVariantModel}"/> is an open generic type, so unlike
-/// <see cref="BlockValueJsonTypeInfoModifiers"/>, <see cref="Apply"/> cannot match <see cref="JsonTypeInfo.Type"/>
-/// directly: it walks the type's base-class chain looking for a closed <c>ContentModelBase&lt;,&gt;</c>, then closes
-/// <see cref="Modifier{TValueModel, TVariantModel}"/> - which does the actual sorting/restoring - over that type's two
-/// generic arguments via <see cref="Type.MakeGenericType"/>. Only constructing that one instance per resolved
-/// <see cref="JsonTypeInfo"/> uses reflection; the <c>OnSerializing</c>/<c>OnSerialized</c> delegates it hands back
-/// are ordinary generic code, invoked like any other delegate - no <see cref="System.Reflection.MethodBase.Invoke(object, object[])"/>
-/// call sits on the serialization path itself.
+/// Reflection is only used once per resolved <see cref="JsonTypeInfo"/>, to close a strongly typed modifier over the
+/// type's generic arguments; the serialization path itself is reflection-free. If the write fails, the original order
+/// is not restored.
 /// </remarks>
 internal static class ContentModelBaseJsonTypeInfoModifier
 {

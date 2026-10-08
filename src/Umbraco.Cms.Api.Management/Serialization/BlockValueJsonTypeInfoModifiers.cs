@@ -10,15 +10,11 @@ namespace Umbraco.Cms.Api.Management.Serialization;
 /// <summary>
 /// <see cref="JsonTypeInfo"/> modifiers that order <see cref="BlockItemData.Values"/> (by culture, segment,
 /// alias) and <see cref="BlockValue.Expose"/> (by culture, segment, content key) deterministically on write,
-/// restoring the original order afterward so the mutation does not outlive the write itself.
+/// restoring the original order once the write completes.
 /// </summary>
 /// <remarks>
-/// Unlike a <see cref="System.Text.Json.Serialization.JsonConverter{T}"/> that delegates to the default
-/// (de)serialization via a modified <see cref="System.Text.Json.JsonSerializerOptions"/>, a
-/// <see cref="JsonTypeInfo.OnSerializing"/> callback runs the default serialization unchanged - it only gets a
-/// chance to mutate the value first. Nested occurrences of <see cref="BlockItemData"/> (e.g. a block nested
-/// inside another block) are therefore sorted the same way, at any depth, without any options-cloning or
-/// reentrancy handling: each occurrence is just another instance this callback runs for.
+/// Serialization callbacks run for every occurrence of the type, so nested blocks are ordered at any depth.
+/// If the write fails, the original order is not restored.
 /// </remarks>
 internal static class BlockValueJsonTypeInfoModifiers
 {
