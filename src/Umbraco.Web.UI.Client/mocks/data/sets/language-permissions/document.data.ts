@@ -1,6 +1,8 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
+import { BLOCK_THAT_VARIES_BY_LANGUAGE_ELEMENT_TYPE_ID } from './data-type.data.js';
 import {
 	PAGE_THAT_DOES_NOT_VARY_BY_LANGUAGE_DOCUMENT_TYPE_ID,
+	PAGE_WITH_A_SHARED_BLOCK_LIST_DOCUMENT_TYPE_ID,
 	PAGE_WITH_TEXT_PER_LANGUAGE_AND_SHARED_TEXT_DOCUMENT_TYPE_ID,
 } from './document-type.data.js';
 import { DANISH_ISO_CODE, ENGLISH_ISO_CODE, VIETNAMESE_ISO_CODE } from './language.data.js';
@@ -10,6 +12,8 @@ type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 export const PAGE_WITH_TEXT_PER_LANGUAGE_AND_SHARED_TEXT_DOCUMENT_ID =
 	'language-permissions-page-with-text-per-language-and-shared-text-document-id';
+export const PAGE_WITH_A_SHARED_BLOCK_LIST_DOCUMENT_ID =
+	'language-permissions-page-with-a-shared-block-list-document-id';
 export const PAGE_THAT_DOES_NOT_VARY_BY_LANGUAGE_DOCUMENT_ID =
 	'language-permissions-page-that-does-not-vary-by-language-document-id';
 
@@ -28,14 +32,22 @@ const documentDefaults = {
 	flags: [],
 };
 
-const documentName = 'Page with text per language and shared text';
+const languages = [
+	{ isoCode: ENGLISH_ISO_CODE, name: 'English' },
+	{ isoCode: DANISH_ISO_CODE, name: 'Danish' },
+	{ isoCode: VIETNAMESE_ISO_CODE, name: 'Vietnamese' },
+];
+
+const sharedBlockKey = 'language-permissions-page-with-a-shared-block-list-block-key';
 
 /**
  *
+ * @param documentId
+ * @param documentName
  * @param languageName
  * @param culture
  */
-function createLanguageVariant(languageName: string, culture: string) {
+function createLanguageVariant(documentId: string, documentName: string, languageName: string, culture: string) {
 	return {
 		state: 'Published' as UmbDocumentVariantState,
 		publishDate,
@@ -44,7 +56,7 @@ function createLanguageVariant(languageName: string, culture: string) {
 		name: `${documentName} - ${languageName}`,
 		createDate,
 		updateDate: publishDate,
-		id: `${PAGE_WITH_TEXT_PER_LANGUAGE_AND_SHARED_TEXT_DOCUMENT_ID}-${culture}`,
+		id: `${documentId}-${culture}`,
 		flags: [],
 	};
 }
@@ -69,15 +81,16 @@ export const data: Array<UmbMockDocumentModel> = [
 		...documentDefaults,
 		id: PAGE_WITH_TEXT_PER_LANGUAGE_AND_SHARED_TEXT_DOCUMENT_ID,
 		documentType: { id: PAGE_WITH_TEXT_PER_LANGUAGE_AND_SHARED_TEXT_DOCUMENT_TYPE_ID, icon: 'icon-document' },
-		variants: [
-			createLanguageVariant('English', ENGLISH_ISO_CODE),
-			createLanguageVariant('Danish', DANISH_ISO_CODE),
-			createLanguageVariant('Vietnamese', VIETNAMESE_ISO_CODE),
-		],
+		variants: languages.map((language) =>
+			createLanguageVariant(
+				PAGE_WITH_TEXT_PER_LANGUAGE_AND_SHARED_TEXT_DOCUMENT_ID,
+				'Page with text per language and shared text',
+				language.name,
+				language.isoCode,
+			),
+		),
 		values: [
-			createTextPerLanguageValue('English', ENGLISH_ISO_CODE),
-			createTextPerLanguageValue('Danish', DANISH_ISO_CODE),
-			createTextPerLanguageValue('Vietnamese', VIETNAMESE_ISO_CODE),
+			...languages.map((language) => createTextPerLanguageValue(language.name, language.isoCode)),
 			{
 				editorAlias: 'Umbraco.TextBox',
 				alias: 'sharedText',
@@ -111,6 +124,52 @@ export const data: Array<UmbMockDocumentModel> = [
 				culture: null,
 				segment: null,
 				value: 'Text (one value for the whole page)',
+			},
+		],
+	},
+	{
+		...documentDefaults,
+		id: PAGE_WITH_A_SHARED_BLOCK_LIST_DOCUMENT_ID,
+		documentType: { id: PAGE_WITH_A_SHARED_BLOCK_LIST_DOCUMENT_TYPE_ID, icon: 'icon-document' },
+		variants: languages.map((language) =>
+			createLanguageVariant(
+				PAGE_WITH_A_SHARED_BLOCK_LIST_DOCUMENT_ID,
+				'Page with a shared block list',
+				language.name,
+				language.isoCode,
+			),
+		),
+		values: [
+			{
+				editorAlias: 'Umbraco.BlockList',
+				alias: 'sharedBlockList',
+				culture: null,
+				segment: null,
+				value: {
+					contentData: [
+						{
+							contentTypeKey: BLOCK_THAT_VARIES_BY_LANGUAGE_ELEMENT_TYPE_ID,
+							key: sharedBlockKey,
+							values: [
+								...languages.map((language) => createTextPerLanguageValue(language.name, language.isoCode)),
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'sharedText',
+									culture: null,
+									segment: null,
+									value: 'Shared text in the block (the same in every language)',
+								},
+							],
+						},
+					],
+					settingsData: [],
+					expose: languages.map((language) => ({
+						contentKey: sharedBlockKey,
+						culture: language.isoCode,
+						segment: null,
+					})),
+					layout: { 'Umbraco.BlockList': [{ key: sharedBlockKey, contentKey: sharedBlockKey, settingsKey: null }] },
+				},
 			},
 		],
 	},

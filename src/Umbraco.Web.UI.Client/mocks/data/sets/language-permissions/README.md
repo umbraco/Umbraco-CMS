@@ -31,11 +31,12 @@ Vietnamese is never granted individually, so it is the language a restricted use
 
 ## The documents
 
-| Document                                                                    | What it is for                                                                                                                              |
-| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page with text per language and shared text (English / Danish / Vietnamese) | One page with three languages. It has a **Text per language** (one value per language) and a **Shared text** (one value for all languages). |
-| Page that does not vary by language                                         | A page with one version and one **Text**. It is never restricted by language.                                                               |
-| Nested blocks 01 ... 18                                                     | One document for every way the levels of a nested block editor can vary by language (see below).                                            |
+| Document                                                                    | What it is for                                                                                                                                                                                                                      |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page with text per language and shared text (English / Danish / Vietnamese) | One page with three languages. It has a **Text per language** (one value per language) and a **Shared text** (one value for all languages).                                                                                         |
+| Page that does not vary by language                                         | A page with one version and one **Text**. It is never restricted by language.                                                                                                                                                       |
+| Page with a shared block list (English / Danish / Vietnamese)               | One page with three languages and a **Shared block list** holding one block that varies by language, with a **Text per language** and a **Shared text**. The simplest case of a block that varies by language inside a shared list. |
+| Nested blocks 01 ... 18                                                     | One document for every way the levels of a nested block editor can vary by language (see below).                                                                                                                                    |
 
 ### Nested blocks 01 to 18
 
@@ -80,6 +81,7 @@ Every document above has an element twin in the **Library** section, with the sa
 - **Name and Text per language** are editable only in a language the user may edit. In any other language they are read-only.
 - **Shared text** is editable in every language when the user _can edit shared data_, including languages the user may not edit. When the user _cannot edit shared data_ it is read-only in every language, the default language included.
 - **Page that does not vary by language** is always editable.
+- **Page with a shared block list** follows the same rules inside the block: open the block in any language. Its **Text per language** is editable only in a language the user may edit. Its **Shared text** is editable in every language when the user _can edit shared data_, and read-only in every language when the user _cannot edit shared data_.
 - The language picker of the document and the app language mark a language the user may not edit as **Read-only**, also when the user can edit shared data. Shared text on that language can still be edited by a user who can edit shared data.
 - Saving and publishing only offer the languages the user may edit.
 - A user who may not edit any language but can edit shared data can still save the shared data on its own, but can publish no language.
