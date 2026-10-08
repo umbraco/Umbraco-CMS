@@ -92,7 +92,14 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	 * @default Infinity
 	 */
 	@property({ type: Number })
-	public max = Infinity;
+	public set max(value: number) {
+		this.#max = value;
+		this.#updateSorterEnabled();
+	}
+	public get max(): number {
+		return this.#max;
+	}
+	#max = Infinity;
 
 	/**
 	 * Max validation message.
@@ -150,13 +157,17 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 
 	@property({ type: Array, attribute: false })
 	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
