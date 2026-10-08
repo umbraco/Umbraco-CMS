@@ -1,0 +1,23 @@
+---
+name: feedback-sqlite-harness-masks-ordering-tiebreak-bugs
+description: SQLite integration test harness coincidentally preserves NodeId/insertion order for tied sort keys; resolved by unit-testing the pure ordering helper in isolation with a manipulated in-memory sequence instead
+metadata:
+  node_type: memory
+  type: feedback
+  originSessionId: 6b21014d-456d-4e72-9697-bec2de885da6
+  modified: 2026-08-05T10:42:43.035Z
+---
+
+When adding or fixing ORDER BY / paging logic in EF Core repositories tested against this repo's default SQLite integration test harness (`tests/Umbraco.Tests.Integration`), a test asserting a specific tiebreak order for rows with equal sort-key values can pass **both before and after** the fix — proving nothing, in direct violation of this repo's own TDD rule (root `CLAUDE.md` → "Tests for a bug fix must fail before the fix").
+
+**Why:** Freshly-inserted rows in a per-test SQLite schema get NodeId == insertion order, and for the join shapes used in this codebase's EF Core repositories (nested-loop joins over `Nodes` as the outer/driving table), the engine's default row-scan order for ties coincidentally matches NodeId-ascending order regardless of whether an explicit `.ThenBy(idSelector)` is present. This was discovered while fixing a real, documented bug (`AsyncDocumentRepository.ApplyDocumentOrdering` was missing NPoco's unconditional `ORDER BY umbracoNode.id` tiebreak, `ContentRepositoryBase.cs:467-474`, citing http://issues.umbraco.org/issue/U4-8831) — the fix was correct and justified by direct code comparison against NPoco, but every attempt to write an integration test proving the pre-fix behavior was wrong (tied SortOrder across different original parents; tied culture-variant name) passed unchanged with the fix reverted.
+
+**Resolution that actually worked**: when the user asked for a regression test "by manipulating the NodeId," the right move was to stop trying to force nondeterminism through the database and instead unit-test the pure ordering logic directly, decoupled from any DB engine:
+1. Changed the private ordering helper (`AsyncDocumentRepository.ApplyDocumentOrdering`) from `private static` to `internal static` — a safe, behavior-unchanged visibility bump — so a unit test in `Umbraco.Tests.UnitTests` can call it directly via `InternalsVisibleTo`. (This triggered a new StyleCop SA1600 warning, since `internal` members need XML doc comments but `private` ones don't — fixed by adding a `<summary>`/`<remarks>` block.)
+2. Built an in-memory `List<T>.AsQueryable()` with the row carrying the HIGHER id placed FIRST in the sequence — deliberately decoupling "sequence order" from "id order," which is impossible to do with real freshly-inserted SQLite rows (there, id is always assigned in insertion order, so the two can never diverge).
+3. Called the helper directly and asserted ascending-id output. TDD-verified by reverting the fix and rerunning: this time it genuinely failed (returned the deliberately-scrambled input order), because LINQ-to-Objects' `OrderBy` is a **documented, guaranteed-stable** sort — unlike SQL engines, where tie-order stability is implementation-defined, not guaranteed. This makes the test 100% deterministic and environment-independent.
+
+**How to apply:**
+1. If you add or change a `.ThenBy(...)`/secondary-ordering tiebreak fix and want to TDD-verify it at the INTEGRATION level, actually run the new test with the fix temporarily reverted first — don't assume a plausible-looking assertion is discriminating. If it passes both ways in this SQLite harness (likely, per the root-cause above), don't keep it as a "regression test" — that misrepresents what was verified and violates this repo's explicit "passes both ways proves nothing" rule.
+2. Instead, default to a UNIT test that manipulates the ordering key directly: bump the relevant private static/instance ordering helper to `internal` (harmless — visibility-only change, add an XML doc comment to satisfy SA1600 if needed), construct an in-memory sequence where physical/list order is deliberately the OPPOSITE of the expected tiebreak order, and assert on the helper's output directly. LINQ-to-Objects' guaranteed-stable sort makes this reliably discriminating in a way SQL-backed tests are not, for this entire class of "missing secondary ORDER BY key" bug.
+3. This is specific to ordering/tiebreak bugs in SQLite in this harness — it is not evidence that TDD verification is generally unreliable here; the same session's recycle-bin `NotImplementedException`→real-implementation TDD cycle (see [[project_ef_core_document_repository_status]]) worked exactly as expected via the scoped `git stash` technique.

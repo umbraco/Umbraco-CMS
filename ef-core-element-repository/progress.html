@@ -1,0 +1,235 @@
+<title>Element Repository Campaign</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: one centred column; a header strip with the campaign total, then the six PRs in sequence (the order is the dependency order), then the board log. */
+  :root {
+    --bg: #f6f7f5;
+    --surface: #ffffff;
+    --fg: #1d2420;
+    --muted: #5c6661;
+    --line: #d9ded9;
+    --accent: #0f6e63;
+    --accent-soft: #d8ebe7;
+    --planned: #e4e8e5;
+    --planned-fg: #4a5551;
+    --progress: #e3ecf9;
+    --progress-fg: #1f4f8f;
+    --review: #f6e9cf;
+    --review-fg: #7a5200;
+    --merged: #d8ebe7;
+    --merged-fg: #0f6e63;
+    --blocked: #f8dcd6;
+    --blocked-fg: #9a2f1e;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151917; --surface: #1d2321; --fg: #e6ebe8; --muted: #9aa5a0; --line: #2e3733;
+      --accent: #5fc2b3; --accent-soft: #1d3a36;
+      --planned: #2a322e; --planned-fg: #b3bdb8;
+      --progress: #1d2d44; --progress-fg: #8fb6ee;
+      --review: #3c3217; --review-fg: #e3c070;
+      --merged: #1d3a36; --merged-fg: #7fd5c6;
+      --blocked: #43221d; --blocked-fg: #f0a090;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #151917; --surface: #1d2321; --fg: #e6ebe8; --muted: #9aa5a0; --line: #2e3733;
+    --accent: #5fc2b3; --accent-soft: #1d3a36;
+    --planned: #2a322e; --planned-fg: #b3bdb8;
+    --progress: #1d2d44; --progress-fg: #8fb6ee;
+    --review: #3c3217; --review-fg: #e3c070;
+    --merged: #1d3a36; --merged-fg: #7fd5c6;
+    --blocked: #43221d; --blocked-fg: #f0a090;
+    color-scheme: dark;
+  }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 920px; margin: 0 auto; padding-block: 32px 64px; padding-inline: 16px; display: grid; gap: 28px; }
+  h1, h2, h3 { margin: 0; text-wrap: balance; }
+  h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.01em; }
+  h2 { font-size: 1.1rem; font-weight: 600; }
+  h3 { font-size: 1rem; font-weight: 600; }
+  .eyebrow { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .muted { color: var(--muted); }
+  code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+  a { color: var(--accent); }
+  header { display: grid; gap: 14px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 0.9rem; color: var(--muted); }
+  .meta span { min-width: 0; overflow-wrap: anywhere; }
+  .totals { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .total { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: grid; gap: 2px; }
+  .total .n { font-size: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .bar { height: 8px; background: var(--planned); border-radius: 4px; overflow: hidden; }
+  .bar > span { display: block; height: 100%; background: var(--accent); width: 0; transition: width 300ms ease; }
+  @media (prefers-reduced-motion: reduce) { .bar > span { transition: none; } }
+  .prs { display: grid; gap: 14px; }
+  .pr { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; display: grid; gap: 12px; }
+  .pr.merged { border-left: 4px solid var(--merged-fg); }
+  .pr.in-progress { border-left: 4px solid var(--progress-fg); }
+  .pr.in-review { border-left: 4px solid var(--review-fg); }
+  .pr.blocked { border-left: 4px solid var(--blocked-fg); }
+  .pr-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
+  .pr-num { font-family: var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .pill { font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+  .pill.planned { background: var(--planned); color: var(--planned-fg); }
+  .pill.in-progress { background: var(--progress); color: var(--progress-fg); }
+  .pill.in-review { background: var(--review); color: var(--review-fg); }
+  .pill.merged { background: var(--merged); color: var(--merged-fg); }
+  .pill.blocked { background: var(--blocked); color: var(--blocked-fg); }
+  .pr-meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.86rem; color: var(--muted); }
+  .pr-meta span { min-width: 0; overflow-wrap: anywhere; }
+  .tasks { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+  .tasks li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start; font-size: 0.93rem; }
+  .tasks li .box { width: 14px; height: 14px; margin-top: 4px; border: 1.5px solid var(--muted); border-radius: 3px; position: relative; }
+  .tasks li.done .box { background: var(--accent); border-color: var(--accent); }
+  .tasks li.done .box::after { content: ""; position: absolute; left: 4px; top: 1px; width: 4px; height: 8px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .tasks li.done span:last-child { color: var(--muted); }
+  .acceptance { font-size: 0.88rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
+  .acceptance b { color: var(--fg); font-weight: 500; }
+  .log { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; }
+  .log ol { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+  .log li { display: grid; grid-template-columns: 96px 1fr; gap: 12px; font-size: 0.92rem; }
+  .log li time { font-family: var(--font-mono); color: var(--muted); font-size: 0.84rem; font-variant-numeric: tabular-nums; }
+  .howto { font-size: 0.88rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+  .howto code { background: var(--accent-soft); color: var(--fg); padding: 1px 5px; border-radius: 3px; }
+  .error { background: var(--blocked); color: var(--blocked-fg); border-radius: 6px; padding: 12px 14px; }
+  @media (max-width: 480px) { .log li { grid-template-columns: 1fr; gap: 2px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">NPoco to EF Core campaign</div>
+    <h1 id="title">Element Repository Campaign</h1>
+    <div class="meta" id="meta"></div>
+    <div class="totals" id="totals"></div>
+    <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+  </header>
+
+  <section>
+    <h2 class="eyebrow" style="margin-bottom:10px">Pull requests, in dependency order</h2>
+    <div class="prs" id="prs"></div>
+  </section>
+
+  <section class="log">
+    <h2>Board log</h2>
+    <ol id="log"></ol>
+  </section>
+
+  <section class="howto">
+    Agents: status lives in <code>status.json</code> next to <code>progress.html</code> under <code>.claude/plans/ef-core-element-repository/</code>. Edit the JSON, then republish this page with the Artifact tool to the same URL, passing <code>status.json</code> in <code>files</code>. Section 7 of <code>CAMPAIGN.md</code> has the exact steps. The page never holds status itself.
+  </section>
+</div>
+
+<script>
+(function () {
+  var LABELS = { "planned": "Planned", "in-progress": "In progress", "in-review": "In review", "merged": "Merged", "blocked": "Blocked" };
+
+  function el(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) { node.className = cls; }
+    if (text !== undefined && text !== null) { node.textContent = text; }
+    return node;
+  }
+
+  function render(data) {
+    document.getElementById("title").textContent = data.campaign || "Element Repository Campaign";
+
+    var meta = document.getElementById("meta");
+    meta.textContent = "";
+    meta.appendChild(el("span", null, "Target branch: " + (data.targetBranch || "")));
+    meta.appendChild(el("span", null, "Plan: " + (data.planFile || "")));
+    meta.appendChild(el("span", null, "Updated: " + (data.updated || "")));
+
+    var prs = data.prs || [];
+    var merged = prs.filter(function (p) { return p.status === "merged"; }).length;
+    var active = prs.filter(function (p) { return p.status === "in-progress" || p.status === "in-review"; }).length;
+    var blocked = prs.filter(function (p) { return p.status === "blocked"; }).length;
+    var tasks = 0, done = 0;
+    prs.forEach(function (p) { (p.tasks || []).forEach(function (t) { tasks++; if (t.done) { done++; } }); });
+
+    var totals = document.getElementById("totals");
+    totals.textContent = "";
+    [["PRs merged", merged + " / " + prs.length], ["PRs active", String(active)], ["PRs blocked", String(blocked)], ["Tasks done", done + " / " + tasks]].forEach(function (pair) {
+      var box = el("div", "total");
+      box.appendChild(el("div", "eyebrow", pair[0]));
+      box.appendChild(el("div", "n", pair[1]));
+      totals.appendChild(box);
+    });
+    document.getElementById("bar").style.width = (tasks ? Math.round(done / tasks * 100) : 0) + "%";
+
+    var list = document.getElementById("prs");
+    list.textContent = "";
+    prs.forEach(function (p) {
+      var status = LABELS[p.status] ? p.status : "planned";
+      var card = el("article", "pr " + status);
+
+      var head = el("div", "pr-head");
+      head.appendChild(el("span", "pr-num", "PR " + p.id));
+      head.appendChild(el("h3", null, p.title || ""));
+      head.appendChild(el("span", "pill " + status, LABELS[status]));
+      card.appendChild(head);
+
+      if (p.summary) { card.appendChild(el("p", "muted", p.summary)); }
+
+      var pm = el("div", "pr-meta");
+      if (p.dependsOn && p.dependsOn.length) { pm.appendChild(el("span", null, "Depends on PR " + p.dependsOn.join(", PR "))); }
+      if (p.branch) { var b = el("span", "mono", p.branch); pm.appendChild(b); }
+      if (p.pr) {
+        var s = el("span");
+        if (p.prUrl) {
+          var a = el("a", null, "#" + String(p.pr).replace(/^#/, ""));
+          a.href = p.prUrl; a.target = "_blank"; a.rel = "noopener";
+          s.appendChild(a);
+        } else {
+          s.textContent = "#" + String(p.pr).replace(/^#/, "");
+        }
+        pm.appendChild(s);
+      }
+      if (p.mergeCommit) { pm.appendChild(el("span", "mono", "merged as " + p.mergeCommit)); }
+      if (pm.childNodes.length) { card.appendChild(pm); }
+
+      if (p.tasks && p.tasks.length) {
+        var ul = el("ul", "tasks");
+        p.tasks.forEach(function (t) {
+          var li = el("li", t.done ? "done" : "");
+          li.appendChild(el("span", "box"));
+          li.appendChild(el("span", null, t.text));
+          ul.appendChild(li);
+        });
+        card.appendChild(ul);
+      }
+
+      if (p.acceptance) {
+        var acc = el("div", "acceptance");
+        acc.appendChild(el("b", null, "Done when: "));
+        acc.appendChild(document.createTextNode(p.acceptance));
+        card.appendChild(acc);
+      }
+      if (p.notes) { card.appendChild(el("p", "muted", p.notes)); }
+      list.appendChild(card);
+    });
+
+    var log = document.getElementById("log");
+    log.textContent = "";
+    (data.log || []).forEach(function (entry) {
+      var li = el("li");
+      li.appendChild(el("time", null, entry.date || ""));
+      li.appendChild(el("span", null, entry.text || ""));
+      log.appendChild(li);
+    });
+  }
+
+  function fail(message) {
+    var list = document.getElementById("prs");
+    list.textContent = "";
+    list.appendChild(el("div", "error", message));
+  }
+
+  fetch("status.json?t=" + Date.now(), { cache: "no-store" })
+    .then(function (r) { if (!r.ok) { throw new Error("HTTP " + r.status); } return r.json(); })
+    .then(render)
+    .catch(function (e) { fail("Could not load status.json (" + e.message + "). Republish the page with status.json in files."); });
+})();
+</script>

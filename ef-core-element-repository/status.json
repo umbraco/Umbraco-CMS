@@ -1,0 +1,309 @@
+{
+  "campaign": "Element repository and service from NPoco to EF Core",
+  "targetBranch": "v18/feature/ef-core-repositories",
+  "planFile": ".claude/campaign/ef-core-element-repository/CAMPAIGN.md",
+  "updated": "08-10-2026",
+  "artifact": {
+    "url": "https://claude.ai/artifact/Q5Bttu57VfLyS1ajt7nKtU",
+    "title": "Element Repository Campaign"
+  },
+  "prs": [
+    {
+      "id": 0,
+      "slug": "relation-entity-lookups",
+      "title": "Relation parent and child entity lookups (optional, unblocks four search fixtures)",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [],
+      "summary": "Implement the three NotImplementedException stubs on the EF Core RelationRepository (ids via EF Core, hydration via IEntityRepository.GetAll) so ElementIndexingNotificationHandlerTests, ExternalBlockElementIndexingTests, ExternalBlockElementVarianceTests and ExternalElementReindexOnRepublishTests (25 tests) can pass. Skip if the EntityRepository migration lands first.",
+      "tasks": [
+        {
+          "text": "GetParentEntitiesByChildIds implemented, batched and de-duplicated",
+          "done": false
+        },
+        {
+          "text": "GetPagedParentEntitiesByChildIdAsync and GetPagedChildEntitiesByParentIdAsync implemented",
+          "done": false
+        },
+        {
+          "text": "Ignored relation repository and service tests un-ignored, red first then green",
+          "done": false
+        },
+        {
+          "text": "Four search fixtures green on SQLite",
+          "done": false
+        }
+      ],
+      "acceptance": "No NotImplementedException left in RelationRepository.cs; the four search fixtures and the un-ignored relation tests green."
+    },
+    {
+      "id": 1,
+      "slug": "element-dtos",
+      "title": "EF Core Element DTOs and no-op migration",
+      "status": "in-progress",
+      "branch": "v20/feature/ef-core-element-repository-1-element-dtos",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [],
+      "summary": "ElementDto, ElementVersionDto, ElementCultureVariationDto, the shared ICultureVariationDto, configurations, SQL Server customizer, DbSets and the AddElementDtos migration.",
+      "tasks": [
+        {
+          "text": "Three EF Core DTOs with configurations mirroring every NPoco index and FK",
+          "done": false
+        },
+        {
+          "text": "ICultureVariationDto implemented by document and element culture-variation DTOs",
+          "done": false
+        },
+        {
+          "text": "SQL Server customizer for IX_umbracoElementVersion_published (include id), registered",
+          "done": false
+        },
+        {
+          "text": "DbSets Elements, ElementVersions, ElementCultureVariations",
+          "done": false
+        },
+        {
+          "text": "AddElementDtos migration on both providers, empty Up/Down, snapshots contain all three tables",
+          "done": false
+        },
+        {
+          "text": "has-pending-model-changes clean on both providers",
+          "done": false
+        }
+      ],
+      "acceptance": "Solution builds; snapshots list umbracoElement, umbracoElementVersion, umbracoElementCultureVariation; migration-plan tests pass."
+    },
+    {
+      "id": 2,
+      "slug": "hoist-read-path",
+      "title": "Hoist the generic read path out of DocumentRepository",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [],
+      "summary": "Generic ContentJoinRow and BuildBaseQuery hook; GetAsync/GetMany/children/descendants/recycle bin/versions/ordering/assembly move into AsyncPublishableContentRepositoryBase. Zero behaviour change.",
+      "tasks": [
+        {
+          "text": "Spike: generic row + BuildBaseQuery + GetAsync green on SQLite and SQL Server",
+          "done": false
+        },
+        {
+          "text": "Assembly, property loading, variations, ordering hoisted",
+          "done": false
+        },
+        {
+          "text": "Children, descendants, root, recycle bin, paged-of-types, versions hoisted",
+          "done": false
+        },
+        {
+          "text": "Template handling isolated behind a virtual post-assembly hook on DocumentRepository",
+          "done": false
+        },
+        {
+          "text": "Document fixtures green with unchanged counts; snapshots untouched",
+          "done": false
+        }
+      ],
+      "acceptance": "DocumentRepositoryTest, DocumentBlueprintRepositoryTest, DocumentRepositoryUrlSegmentTests, ContentServiceTests and unit tests green with the same counts; no snapshot diff."
+    },
+    {
+      "id": 3,
+      "slug": "hoist-write-path",
+      "title": "Hoist the generic write path out of DocumentRepository",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [
+        2
+      ],
+      "summary": "PersistNew/PersistUpdated, versions, property data, culture variations, sortable values, tags and flag flips move into the base; version-DTO building and default template become hooks.",
+      "tasks": [
+        {
+          "text": "PersistNewItemAsync and helpers hoisted",
+          "done": false
+        },
+        {
+          "text": "PersistUpdatedItemAsync, property-data reconcile, IsMoving fast path hoisted",
+          "done": false
+        },
+        {
+          "text": "Culture-variation DTO building generic over ICultureVariationDto",
+          "done": false
+        },
+        {
+          "text": "BuildVersionDto hook; default-template assignment stays Document-only",
+          "done": false
+        },
+        {
+          "text": "IIdKeyMap, ITagRepository, IJsonSerializer moved into the base constructor",
+          "done": false
+        },
+        {
+          "text": "Document fixtures green with unchanged counts",
+          "done": false
+        }
+      ],
+      "acceptance": "Same as PR 2 plus every write-path test in DocumentRepositoryTest; DocumentRepository.cs is Document-only code."
+    },
+    {
+      "id": 4,
+      "slug": "async-element-repository",
+      "title": "AsyncElementRepository (additive)",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [
+        1,
+        3
+      ],
+      "summary": "IAsyncElementRepository and the thin EF Core AsyncElementRepository, element factory builders, DI registration, and AsyncElementRepositoryTest porting the 28 NPoco tests plus element-specific ones.",
+      "tasks": [
+        {
+          "text": "IAsyncElementRepository marker interface",
+          "done": false
+        },
+        {
+          "text": "AsyncElementRepository: BuildBaseQuery, factories, delete clauses, keys, IsPathPublishedAsync, refresh notification",
+          "done": false
+        },
+        {
+          "text": "ContentBaseFactory EF Core element builders",
+          "done": false
+        },
+        {
+          "text": "DI registration; resolvable through the container",
+          "done": false
+        },
+        {
+          "text": "28 NPoco ElementRepositoryTest tests ported (red first)",
+          "done": false
+        },
+        {
+          "text": "Element-specific tests: startElementId cleared, three-table delete, refresh notification, culture variations, recycle bin depth, paged-of-types, cache isolation",
+          "done": false
+        },
+        {
+          "text": "Contract check: no int ids, IQuery, out params or missing CancellationToken on the new repository surface",
+          "done": false
+        }
+      ],
+      "acceptance": "New fixture green on both providers; Document fixtures unchanged."
+    },
+    {
+      "id": 5,
+      "slug": "element-service-cutover",
+      "title": "ElementService onto the async engine; consumers cut over; NPoco repository deleted",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [
+        4
+      ],
+      "summary": "ElementService : AsyncPublishableContentServiceBase<IElement>; bridges deleted; DeleteLockedAsync, CheckDataIntegrityAsync, DeleteOfTypesAsync implemented; ElementContainerService on the async repository; NPoco ElementRepository, IElementRepository and its test removed; notification tests ported.",
+      "tasks": [
+        {
+          "text": "ElementService base swapped, bridges deleted, hooks implemented",
+          "done": false
+        },
+        {
+          "text": "IElementService aligned with IContentService (IContentServiceBase question settled)",
+          "done": false
+        },
+        {
+          "text": "ElementContainerService four call sites on the async repository",
+          "done": false
+        },
+        {
+          "text": "NPoco ElementRepository, IElementRepository, DI line and ElementRepositoryTest deleted",
+          "done": false
+        },
+        {
+          "text": "ElementServiceNotificationTests ported to the async surface",
+          "done": false
+        },
+        {
+          "text": "All Element fixtures green on SQLite; SQL Server differs only by known-flaky search jobs",
+          "done": false
+        },
+        {
+          "text": "Contract check: no public sync member, OperationResult, int userId, IQuery or Task.FromResult bridge left on ElementService or ElementContainerService",
+          "done": false
+        },
+        {
+          "text": "Checkpoint: run the four search fixtures from section 4a and record the result here (green, or baseline NotImplementedException only)",
+          "done": false
+        }
+      ],
+      "acceptance": "No reference to the NPoco IElementRepository remains; every Element fixture green; unit tests green."
+    },
+    {
+      "id": 6,
+      "slug": "retire-sync-engine",
+      "title": "Retire the sync engine and drop the scaffolding names",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [
+        5
+      ],
+      "summary": "Delete PublishableContentServiceBase, NPoco PublishableContentRepositoryBase and IPublishableContentRepository; rename AsyncElementRepository to ElementRepository; optional rename of the async base tier onto the freed names.",
+      "tasks": [
+        {
+          "text": "PublishableContentServiceBase.cs deleted",
+          "done": false
+        },
+        {
+          "text": "NPoco PublishableContentRepositoryBase.cs and IPublishableContentRepository.cs deleted",
+          "done": false
+        },
+        {
+          "text": "Unreferenced NPoco element factory builders removed",
+          "done": false
+        },
+        {
+          "text": "IAsyncElementRepository/AsyncElementRepository renamed to IElementRepository/ElementRepository",
+          "done": false
+        },
+        {
+          "text": "Decision recorded: rename the async base tier onto the freed names or not",
+          "done": false
+        },
+        {
+          "text": "Handover folder .claude/campaign/ef-core-element-repository/ deleted as the final commit (after a last sync-memory.sh push)",
+          "done": false
+        }
+      ],
+      "acceptance": "Solution builds; full suites green; only the agreed Async-prefixed names remain."
+    }
+  ],
+  "log": [
+    {
+      "date": "08-10-2026",
+      "text": "PR 1 started on v20/feature/ef-core-element-repository-1-element-dtos."
+    },
+    {
+      "date": "08-10-2026",
+      "text": "Retarget noted: branches use the v20/ prefix, PR target unchanged. Plan folder with memory snapshot committed as the cross-machine handover; PR 6 deletes it."
+    },
+    {
+      "date": "08-10-2026",
+      "text": "Known-failing baseline recorded: 4 search fixtures (25 tests) fail on NotImplementedException stubs in the EF Core RelationRepository. Optional PR 0 added to implement them; PR 5 gets a checkpoint."
+    },
+    {
+      "date": "08-10-2026",
+      "text": "Contract rules (Guid keys, GetAll/GetMany split, Attempt statuses, Guid userKey, trailing CancellationToken) written into CAMPAIGN.md section 3 and added as acceptance checks on PR 4 and PR 5."
+    },
+    {
+      "date": "08-10-2026",
+      "text": "Campaign planned; six PRs defined; progress page published."
+    }
+  ]
+}
