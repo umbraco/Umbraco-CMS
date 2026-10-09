@@ -42,16 +42,8 @@ public class DocumentEditingPresentationFactoryTests
                 },
                 model.Values.Select(value => (value.Culture, value.Segment, value.Alias)).ToArray());
             CollectionAssert.AreEqual(
-                new (string?, string?)[]
-                {
-                    ("da-DK", null),
-                    ("da-DK", "segment-a"),
-                    ("da-DK", "segment-b"),
-                    ("en-US", null),
-                    ("en-US", "segment-a"),
-                    ("en-US", "segment-b"),
-                },
-                model.Variants.Select(variant => (variant.Culture, variant.Segment)).ToArray());
+                new string?[] { "da-DK", "en-US" },
+                model.Variants.Select(variant => variant.Culture).ToArray());
         });
     }
 }

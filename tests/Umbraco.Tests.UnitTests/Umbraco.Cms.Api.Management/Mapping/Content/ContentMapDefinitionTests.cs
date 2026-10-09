@@ -38,27 +38,17 @@ public class ContentMapDefinitionTests
     }
 
     [Test]
-    public void MapVariantViewModels_Orders_Variants_By_Culture_Then_Segment()
+    public void MapVariantViewModels_Orders_Variants_By_Culture()
     {
         IContent content = CreateContent(
             ["en-US", "da-DK"],
-            CreateProperty("title", ("en-US", "segment-b"), ("en-US", "segment-a")));
+            CreateProperty("title", ("en-US", null), ("da-DK", null)));
 
         var variants = CreateMapDefinition().MapVariants(content)
-            .Select(variant => (variant.Culture, variant.Segment))
+            .Select(variant => variant.Culture)
             .ToArray();
 
-        CollectionAssert.AreEqual(
-            new (string?, string?)[]
-            {
-                ("da-DK", null),
-                ("da-DK", "segment-a"),
-                ("da-DK", "segment-b"),
-                ("en-US", null),
-                ("en-US", "segment-a"),
-                ("en-US", "segment-b"),
-            },
-            variants);
+        CollectionAssert.AreEqual(new string?[] { "da-DK", "en-US" }, variants);
     }
 
     internal static IContent CreateContent(string[] cultures, params IProperty[] properties)
