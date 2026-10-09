@@ -111,7 +111,7 @@ public class UdiRange
         // Only specify selector if query string is not empty
         return string.IsNullOrEmpty(uri.Query)
             ? new UdiRange(udi)
-            : new UdiRange(udi, uri.Query.TrimStart(Constants.CharArrays.QuestionMark));
+            : new UdiRange(udi, uri.Query.TrimStart('?'));
     }
 
     /// <inheritdoc />

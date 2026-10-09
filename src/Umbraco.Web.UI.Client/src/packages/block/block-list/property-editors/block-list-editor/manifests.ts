@@ -9,31 +9,39 @@ const propertyEditorUi: UmbExtensionManifest = {
 	name: 'Block List Property Editor UI',
 	element: () => import('./property-editor-ui-block-list.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Block List',
 		propertyEditorSchemaAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-thumbnail-list',
-		group: 'richContent',
+		group: '#propertyEditorUIGroups_richContent',
+		keywords: ['component', 'list', 'items', 'blocks', 'cards', 'faq', 'testimonials', 'features', 'services'],
 		supportsReadOnly: true,
 		settings: {
 			properties: [
 				{
 					alias: 'useLiveEditing',
 					label: 'Live editing mode',
-					description:
-						'Live editing in editor overlays for live updated custom views or labels using custom expression.',
+					description: 'Instant updates',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'useInlineEditingAsDefault',
 					label: 'Inline editing mode',
-					description: 'Use the inline editor as the default block view.',
+					description: 'Expand to edit',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'maxPropertyWidth',
-					label: 'Property editor width',
-					description: 'Optional CSS override, example: 800px or 100%',
+					label: 'Property Editor width',
+					description: 'Example: `800px`',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					config: [{ alias: 'placeholder', value: '100%' }],
+				},
+				{
+					alias: 'createModalSize',
+					label: '#blockEditor_labelCreateModalSize',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
+					config: [{ alias: 'defaultOptionLabel', value: 'Auto' }],
 				},
 				{
 					alias: 'useSingleBlockMode',

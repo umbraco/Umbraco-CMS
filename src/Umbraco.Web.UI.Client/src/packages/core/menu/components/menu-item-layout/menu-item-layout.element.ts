@@ -1,7 +1,7 @@
 import { customElement, html, ifDefined, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
-import { debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 
 /**
  * @element umb-menu-item-layout
@@ -12,7 +12,21 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
 @customElement('umb-menu-item-layout')
 export class UmbMenuItemLayoutElement extends UmbLitElement {
 	@property({ type: String, attribute: 'entity-type' })
-	public entityType?: string;
+	set entityType(value: string | undefined) {
+		this.#entityType = value;
+		this.#entityContext.setEntityType(value);
+	}
+	get entityType(): string | undefined {
+		return this.#entityType;
+	}
+	#entityType?: string;
+
+	#entityContext = new UmbEntityContext(this);
+
+	constructor() {
+		super();
+		this.#entityContext.setUnique(null);
+	}
 
 	/**
 	 * The icon name for the icon to show in this menu item.
@@ -52,10 +66,12 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 
 	override connectedCallback() {
 		super.connectedCallback();
-		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
+		window.addEventListener('navigationend', this.#onNavigationEnd);
 	}
 
-	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
+	// history.pushState runs synchronously before any router-slot dispatches this event, so the location
+	// is already final on the first firing — no need to coalesce repeat firings from nested router-slots.
+	#onNavigationEnd = () => this.#checkIsActive();
 
 	#checkIsActive() {
 		if (!this.href) {
@@ -83,13 +99,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 				<umb-icon slot="icon" name=${this.iconName}></umb-icon>
 				${when(
 					this.entityType,
-					() => html`
-						<umb-entity-actions-bundle
-							slot="actions"
-							.entityType=${this.entityType}
-							.unique=${null}
-							.label=${this.label}></umb-entity-actions-bundle>
-					`,
+					() => html`<umb-entity-actions-bundle slot="actions" .label=${this.label}></umb-entity-actions-bundle>`,
 				)}
 				<slot></slot>
 			</uui-menu-item>
@@ -98,7 +108,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 
 	override disconnectedCallback() {
 		super.disconnectedCallback();
-		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
+		window.removeEventListener('navigationend', this.#onNavigationEnd);
 	}
 }
 

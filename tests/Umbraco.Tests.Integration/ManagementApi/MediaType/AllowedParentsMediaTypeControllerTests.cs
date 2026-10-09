@@ -15,7 +15,7 @@ public class AllowedParentsMediaTypeControllerTests : ManagementApiUserGroupTest
     private Guid _key;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         _key = Guid.NewGuid();
         await MediaTypeEditingService.CreateAsync(new MediaTypeCreateModel { Key = _key, Name = Guid.NewGuid().ToString(), Alias = Guid.NewGuid().ToString() }, Constants.Security.SuperUserKey);

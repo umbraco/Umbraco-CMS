@@ -2,7 +2,9 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -22,7 +24,10 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
     public string Name => "ScheduledPublishingJob";
 
     /// <inheritdoc />
-    public TimeSpan Period => TimeSpan.FromMinutes(1);
+    public TimeSpan Period => _scheduledPublishingSettings.CurrentValue.Period;
+
+    /// <inheritdoc />
+    public bool AlignToClock => _scheduledPublishingSettings.CurrentValue.AlignToClock;
 
 
     private readonly IContentService _contentService;
@@ -31,6 +36,7 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
     private readonly TimeProvider _timeProvider;
     private readonly IServerMessenger _serverMessenger;
     private readonly IUmbracoContextFactory _umbracoContextFactory;
+    private readonly IOptionsMonitor<ScheduledPublishingSettings> _scheduledPublishingSettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ScheduledPublishingJob" /> class.
@@ -41,7 +47,8 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
         ILogger<ScheduledPublishingJob> logger,
         IServerMessenger serverMessenger,
         ICoreScopeProvider scopeProvider,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IOptionsMonitor<ScheduledPublishingSettings> scheduledPublishingSettings)
     {
         _contentService = contentService;
         _umbracoContextFactory = umbracoContextFactory;
@@ -49,6 +56,7 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
         _serverMessenger = serverMessenger;
         _scopeProvider = scopeProvider;
         _timeProvider = timeProvider;
+        _scheduledPublishingSettings = scheduledPublishingSettings;
     }
 
     /// <inheritdoc />

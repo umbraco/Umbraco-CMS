@@ -64,11 +64,11 @@ public class CleanUpDataTypeConfigurations : MigrationBase
 
                 dataTypeDto.Configuration = _configurationEditorJsonSerializer.Serialize(configurationDataWithoutNullValues);
                 Database.Update(dataTypeDto);
-                _logger.LogInformation("Configuration cleaned up for data type: {dataTypeName} (id: {dataTypeId}, editor alias: {dataTypeEditorAlias})", dataTypeDto.NodeDto?.Text, dataTypeDto.NodeId, dataTypeDto.EditorAlias);
+                _logger.LogInformation("Configuration cleaned up for data type: {dataTypeName} (id: {dataTypeId}, key: {dataTypeKey}, editor alias: {dataTypeEditorAlias})", dataTypeDto.NodeDto?.Text, dataTypeDto.NodeId, dataTypeDto.NodeDto?.UniqueId, dataTypeDto.EditorAlias);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Configuration clean-up failed for data type: {dataTypeName} (id: {dataTypeId}, editor alias: {dataTypeEditorAlias})", dataTypeDto.NodeDto?.Text, dataTypeDto.NodeId, dataTypeDto.EditorAlias);
+                _logger.LogError(ex, "Configuration clean-up failed for data type: {dataTypeName} (id: {dataTypeId}, key: {dataTypeKey}, editor alias: {dataTypeEditorAlias})", dataTypeDto.NodeDto?.Text, dataTypeDto.NodeId, dataTypeDto.NodeDto?.UniqueId, dataTypeDto.EditorAlias);
             }
         }
     }

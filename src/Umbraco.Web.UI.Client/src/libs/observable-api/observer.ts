@@ -4,6 +4,13 @@ export type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export type ObserverCallback<T> = (value: T) => void;
 
+/**
+ * TypeScript helper to infer type of the value of an Observable. Including potentially becoming 'undefined' if the Observable type is possibly 'undefined'.
+ */
+export type UmbObserverValueType<ObservableType> =
+	| (ObservableType extends Observable<infer U> ? U : never)
+	| (undefined extends ObservableType ? undefined : never);
+
 export class UmbObserver<T> {
 	#source!: Observable<T>;
 	#callback?: ObserverCallback<T>;
@@ -20,7 +27,7 @@ export class UmbObserver<T> {
 	/**
 	 * provides a promise which is resolved ones the observer got a value that is not undefined.
 	 * Notice this promise will resolve immediately if the Observable holds an empty array or empty string.
-	 *
+	 * @returns {Promise} - a promise resolving with the first non-undefined value.
 	 */
 	public asPromise() {
 		// Notice, we do not want to store and reuse the Promise, cause this promise guarantees that the value is not undefined when resolved. and reusing the promise would not ensure that.

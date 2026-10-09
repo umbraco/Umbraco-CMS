@@ -6,8 +6,9 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Static File Picker Property Editor UI',
 	element: () => import('./property-editor-ui-static-file-picker.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Static File Picker',
 		icon: 'icon-document',
-		group: 'common',
+		group: '#propertyEditorUIGroups_common',
 	},
 };

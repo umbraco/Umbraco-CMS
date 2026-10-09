@@ -33,7 +33,6 @@ export function getTimeZoneList(filter: Array<string> | undefined = undefined): 
 
 /**
  * Retrieves the client's time zone information.
- * @param {DateTime} [selectedDate] - An optional Luxon DateTime object to format the offset of the time zone.
  * @returns {UmbTimeZone} An object containing the client's time zone name and value.
  */
 export function getClientTimeZone(): UmbTimeZone {
@@ -46,8 +45,8 @@ export function getClientTimeZone(): UmbTimeZone {
 
 /**
  * Returns the time zone offset for a given time zone ID and date.
- * @param timeZoneId - The time zone identifier (e.g., 'America/New_York').
- * @param date - The Luxon DateTime object for which to get the offset.
+ * @param {string} timeZoneId - The time zone identifier (e.g., 'America/New_York').
+ * @param {DateTime} date - The Luxon DateTime object for which to get the offset.
  * @returns {string} The time zone offset
  */
 export function getTimeZoneOffset(timeZoneId: string, date: DateTime): string {
@@ -83,3 +82,15 @@ export function isEquivalentTimeZone(tz1: string, tz2: string): boolean {
 	const tz2Name = new Intl.DateTimeFormat(undefined, { timeZone: tz2 }).resolvedOptions().timeZone;
 	return tz1Name === tz2Name;
 }
+/**
+ * Default date and time format options for displaying dates.
+ * This can be used with Intl.DateTimeFormat to ensure consistent formatting.
+ */
+export const UMB_DATE_TIME_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	hour: 'numeric',
+	minute: 'numeric',
+	second: 'numeric',
+};

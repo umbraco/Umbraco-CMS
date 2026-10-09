@@ -5,10 +5,10 @@ trigger: none
 
 schedules:
   - cron: '0 3 * * *'
-    displayName: Daily 3AM build (main)
+    displayName: Daily 3AM build (v17/dev)
     branches:
       include:
-        - main
+        - v17/dev
 
 parameters:
   - name: skipIntegrationTests
@@ -33,7 +33,6 @@ parameters:
     default: true
 
 variables:
-  nodeVersion: 20
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -69,13 +68,9 @@ stages:
             inputs:
               command: restore
               projects: $(solution)
-          - task: DotNetCoreCLI@2
+          - script: dotnet build $(solution) --configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
             name: build
             displayName: Run dotnet build and generate NuGet packages
-            inputs:
-              command: build
-              projects: $(solution)
-              arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
@@ -117,7 +112,7 @@ stages:
   - stage: Integration
     displayName: Integration Tests
     dependsOn: Build
-    condition: ${{ eq(parameters.skipIntegrationTests, false) }}
+    condition: and(succeeded(), ${{ eq(parameters.skipIntegrationTests, false) }})
     jobs:
       # Integration Tests (SQLite)
       - job:
@@ -319,8 +314,8 @@ stages:
 
   - stage: DefaultConfigE2E
     displayName: Default Config E2E Tests
-    dependsOn: Integration
-    condition: always()
+    dependsOn: [Build, Integration]
+    condition: in(dependencies.Build.result, 'Succeeded', 'SucceededWithIssues')
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       # Enable console logging in Release mode
@@ -339,7 +334,6 @@ stages:
       UMBRACO__CMS__GLOBAL__VERSIONCHECKPERIOD: 0
       UMBRACO__CMS__GLOBAL__USEHTTPS: true
       UMBRACO__CMS__HEALTHCHECKS__NOTIFICATION__ENABLED: false
-      UMBRACO__CMS__KEEPALIVE__DISABLEKEEPALIVETASK: true
       UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
       ASPNETCORE_URLS: https://localhost:44331
     jobs:
@@ -386,7 +380,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
@@ -465,7 +458,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
@@ -501,8 +493,8 @@ stages:
 
   - stage: AdditionalConfigE2E
     displayName: Additional Config E2E Tests
-    dependsOn: DefaultConfigE2E
-    condition: always()
+    dependsOn: [Build, DefaultConfigE2E]
+    condition: in(dependencies.Build.result, 'Succeeded', 'SucceededWithIssues')
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       ASPNETCORE_URLS: https://localhost:44331
@@ -619,7 +611,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.PlaywrightUserEmail }}
               PlaywrightPassword: ${{ variables.PlaywrightPassword }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}

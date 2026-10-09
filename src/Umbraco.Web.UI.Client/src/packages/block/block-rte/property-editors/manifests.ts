@@ -7,9 +7,10 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		name: 'Block RTE Type Configuration Property Editor UI',
 		element: () => import('./property-editor-ui-block-rte-type-configuration.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Block RTE Type Configuration',
 			icon: 'icon-autofill',
-			group: 'common',
+			group: '#propertyEditorUIGroups_common',
 		},
 	},
 ];

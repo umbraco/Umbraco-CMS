@@ -84,7 +84,7 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	#pickableFilter = (
 		item: UmbMediaItemModel | UmbMediaTreeItemModel,
 		allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>,
-		folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_ONLY,
+		folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_AND_FOLDERS,
 	): boolean => {
 		// Check if the user has no access to this item (tree items only)
 		if (isMediaTreeItem(item) && item.noAccess) {

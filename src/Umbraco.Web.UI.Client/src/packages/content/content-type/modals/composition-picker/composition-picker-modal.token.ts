@@ -10,6 +10,7 @@ export interface UmbCompositionPickerModalData {
 	isElement: boolean;
 	currentPropertyAliases: Array<string>;
 	isNew: boolean;
+	entityType?: string;
 }
 
 export interface UmbCompositionPickerModalValue {

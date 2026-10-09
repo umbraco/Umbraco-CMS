@@ -49,7 +49,7 @@ internal class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistrib
     {
         if (scopeAccessor.AmbientScope is null)
         {
-            return;
+            throw new InvalidOperationException("No scope, could not update distributed job");
         }
 
         DistributedJobDto dto = MapToDto(distributedBackgroundJob);

@@ -1,0 +1,97 @@
+{
+  "skill_name": "umb-review",
+  "evals": [
+    {
+      "id": 0,
+      "name": "pr-22214-large-frontend-refactor",
+      "prompt": "Review the changes in PR #22214 (branch origin/pr/22214 targeting main). This is a large frontend refactor migrating create entity actions to use entityCreateOptionAction extensions, with deprecations.",
+      "expected_output": "A structured review that identifies frontend deprecation patterns, flags the large PR complexity, handles 75+ files correctly, checks for breaking changes in exported components, and produces the correct output format.",
+      "pr_number": 22214,
+      "pr_branch": "origin/pr/22214",
+      "base_branch": "origin/main",
+      "files": [],
+      "assertions": [
+        {"id": "deprecation-patterns-noted", "text": "Review identifies deprecation patterns (@deprecated, UmbDeprecation)"},
+        {"id": "frontend-breaking-change-awareness", "text": "Checks frontend-specific breaking changes (exports, custom elements) not just backend"},
+        {"id": "file-references-present", "text": "Findings reference specific files with line numbers"},
+        {"id": "no-false-critical-on-deprecations", "text": "Properly deprecated code is NOT flagged as Critical breaking change"},
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue — it is a legitimate finding."},
+        {"id": "manifest-alias-rename-detected", "text": "Alias renames (CreateOptions → Create) flagged as Critical breaking change"},
+        {"id": "non-exported-deletions-dismissed", "text": "Deleted action classes NOT flagged as breaking (verified against package.json exports)"},
+        {"id": "noise-files-filtered", "text": "Does not review noise files (generated files, lock files, etc.)"},
+        {"id": "complexity-advisory-triggers", "text": "Review includes a complexity/split advisory for the large 75+ file scope"}
+      ]
+    },
+    {
+      "id": 1,
+      "name": "pr-21672-small-frontend-bugfix",
+      "prompt": "Review the changes in PR #21672 (branch origin/pr/21672 targeting main). This is a small 4-file frontend bugfix implementing tab validation badges in the block editor.",
+      "expected_output": "A clean review that correctly identifies this as a small focused bugfix, avoids false positives, and either approves or approves with minor suggestions.",
+      "pr_number": 21672,
+      "pr_branch": "origin/pr/21672",
+      "base_branch": "origin/main",
+      "files": [],
+      "assertions": [
+        {"id": "complexity-advisory-absent", "text": "Review does NOT include a complexity/split advisory"},
+        {"id": "no-false-breaking-changes", "text": "Review does not flag breaking changes"},
+        {"id": "proportionate-verdict", "text": "Verdict is 'Request Changes'"},
+        {"id": "concise-review", "text": "Review output is under 200 lines"},
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue — it is a legitimate finding."}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "pr-22217-small-backend-webhook",
+      "prompt": "Review the changes in PR #22217 (branch origin/pr/22217 targeting v18/dev). This is a tiny 3-file backend change to the default webhook payload type.",
+      "expected_output": "A concise review that correctly resolves v18/dev as target branch, handles the small change proportionately, and considers the behavioral impact of changing a default value.",
+      "pr_number": 22217,
+      "pr_branch": "origin/pr/22217",
+      "base_branch": "origin/v18/dev",
+      "files": [],
+      "assertions": [
+        {"id": "correct-target-branch", "text": "Review references 'v18/dev' as the target branch (not 'main')"},
+        {"id": "default-value-change-noted", "text": "Review discusses the behavioral impact of changing the default payload type"},
+        {"id": "proportionate-review", "text": "Review output is under 150 lines"},
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue — it is a legitimate finding."},
+        {"id": "ignores-preexisting-issues", "text": "Does NOT flag the ~30 builder extension methods with Legacy defaults (pre-existing, not changed in the PR)"},
+        {"id": "side-effect-detection", "text": "Flags stale WebhookSettings.cs docs as a side-effect of the constant value change"},
+        {"id": "consumer-identification", "text": "Identifies affected consumers outside the PR (WebhookSettings, UmbracoBuilder, or WebhookEventCollectionBuilderExtensions)"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "pr-22268-frontend-feature-workspace-modal",
+      "prompt": "Review the changes in PR #22268 (branch origin/pr/22268 targeting main). This is a 29-file frontend feature adding a current user workspace modal.",
+      "expected_output": "A review of a medium-sized new feature PR. Should assess the new code for architectural compliance, check for breaking changes (new exports, custom elements), and evaluate code quality without flagging pre-existing issues.",
+      "pr_number": 22268,
+      "pr_branch": "origin/pr/22268",
+      "base_branch": "origin/main",
+      "files": [],
+      "assertions": [
+        {"id": "complexity-advisory-triggers", "text": "Review includes a complexity/split advisory (3 layers: Core, API, Frontend across 27+ files)"},
+        {"id": "breaking-changes-on-interface-additions", "text": "Flags new interface methods without default implementations as breaking changes (Pattern 3)"},
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue — it is a legitimate finding."},
+        {"id": "diff-scoped", "text": "All findings reference code that was changed in the diff, not pre-existing issues"},
+        {"id": "new-feature-assessed", "text": "Review assesses the new feature's architecture, patterns, or integration approach — not just absence of bugs"},
+        {"id": "no-false-notification-finding", "text": "Review does NOT flag UpdateCurrentUserAsync as missing UserSavingNotification/UserSavedNotification — the sibling UpdateAsync also does not publish these notifications, so flagging their absence would be a false positive"}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "pr-22215-frontend-architecture-violation",
+      "prompt": "Review the changes in PR #22215 (branch origin/pr/22215 targeting main). This is a 2-file frontend feature adding user management to the user group workspace.",
+      "expected_output": "A review that catches the architecture violation: the workspace context directly imports and calls UserService and UserGroupService (generated API clients) instead of going through a repository. In the Umbraco backoffice, workspace contexts access data via repositories, not by calling API services directly. The review should flag this as a significant architecture issue and request changes.",
+      "pr_number": 22215,
+      "pr_branch": "origin/pr/22215",
+      "base_branch": "origin/main",
+      "files": [],
+      "assertions": [
+        {"id": "service-bypass-detected", "text": "Review flags that the workspace context directly imports/calls UserService or UserGroupService instead of using a repository"},
+        {"id": "repository-pattern-recommended", "text": "Review recommends using the repository pattern (going through a repository/data-source layer) rather than calling API services directly from the workspace context"},
+        {"id": "verdict-request-changes", "text": "Verdict is 'Request Changes' (the architecture violation warrants requesting changes, not just approving with suggestions)"},
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue — it is a legitimate finding."},
+        {"id": "no-false-breaking-changes", "text": "Review does not flag breaking changes (this PR only adds new code, no public API is removed or modified)"}
+      ]
+    }
+  ]
+}

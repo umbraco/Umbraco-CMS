@@ -238,7 +238,7 @@ internal sealed class FaultHandlingDbCommand : DbCommand
     }
 
     /// <summary>
-    /// Gets or sets a value indicating how the results of a command are applied to a <see cref="DataRow"/> when used by the <see cref="DbDataAdapter.Update"/> method.
+    /// Gets or sets a value indicating how the results of a command are applied to a <see cref="DataRow"/> when used by the <see cref="DbDataAdapter.Update(DataRow[], DataTableMapping)"/> method.
     /// This property determines whether output parameters and/or the first returned row are mapped to the changed row in the data table.
     /// </summary>
     public override UpdateRowSource UpdatedRowSource

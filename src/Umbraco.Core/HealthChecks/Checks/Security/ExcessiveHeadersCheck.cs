@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -17,7 +18,6 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
     Group = "Security")]
 public class ExcessiveHeadersCheck : HealthCheck
 {
-    private static HttpClient? httpClient;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILocalizedTextService _textService;
 
@@ -30,7 +30,7 @@ public class ExcessiveHeadersCheck : HealthCheck
         _hostingEnvironment = hostingEnvironment;
     }
 
-    private static HttpClient HttpClient => httpClient ??= new HttpClient();
+    private static HttpClient HttpClient => SharedHttpClient.Instance;
 
     /// <inheritdoc />
     public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
@@ -45,6 +45,16 @@ public class ExcessiveHeadersCheck : HealthCheck
         string message;
         var success = false;
         var url = _hostingEnvironment.ApplicationMainUrl?.GetLeftPart(UriPartial.Authority);
+
+        if (url is null)
+        {
+            return new HealthCheckStatus(
+                _textService.Localize("healthcheck", "httpsCheckNoApplicationUrl"))
+            {
+                ResultType = StatusResultType.Info,
+                ReadMoreLink = Constants.HealthChecks.DocumentationLinks.Security.ExcessiveHeadersCheck,
+            };
+        }
 
         // Access the site home page and check for the headers
         using var request = new HttpRequestMessage(HttpMethod.Head, url);

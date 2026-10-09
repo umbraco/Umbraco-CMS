@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-key',
-			label: '#user_changePassword',
+			label: '#general_changePassword',
 		},
 		conditions: [
 			{

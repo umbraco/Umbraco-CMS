@@ -18,6 +18,7 @@ test.beforeEach(async ({umbracoApi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.language.ensureIsoCodeNotExists('da');
 });
 
 test('can schedule the publishing of invariant unpublished content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -276,9 +277,6 @@ test('can schedule the publishing of multiple culture variants content', async (
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesDocumentStateHaveText('Unpublished');
   await umbracoUi.content.doesPublishAtContainText(firstPublishedTime);
-
-  // Clean
-  await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
 });
 
 test('cannot schedule publishing with a publish time in the past', async ({umbracoApi, umbracoUi}) => {

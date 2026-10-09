@@ -153,8 +153,8 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @param {string} propertyAlias - the alias of the property to observe.
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - an Observable for the value of this property.
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
@@ -167,7 +167,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 	/**
 	 * @function setPropertyValue
-	 * @param {string} alias
+	 * @param {string} alias - the alias of the property to set.
 	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
 	 * @returns {Promise<void>}
 	 * @description Set the value of this property.

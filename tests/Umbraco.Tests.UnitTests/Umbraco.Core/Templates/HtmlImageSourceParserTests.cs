@@ -2,15 +2,14 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using System.Linq;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Templates;
@@ -22,6 +21,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates;
 [TestFixture]
 public class HtmlImageSourceParserTests
 {
+    private static IImageUrlTokenGenerator NoopSigner() => new NoopImageUrlTokenGenerator();
+
     [Test]
     public void Returns_Udis_From_Data_Udi_Html_Attributes()
     {
@@ -31,7 +32,7 @@ public class HtmlImageSourceParserTests
     </div>
 </p><p><img src='/media/234234.jpg' data-udi=""umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"" /></p>";
 
-        var imageSourceParser = new HtmlImageSourceParser(Mock.Of<IPublishedUrlProvider>());
+        var imageSourceParser = new HtmlImageSourceParser(Mock.Of<IPublishedUrlProvider>(), NoopSigner());
 
         var result = imageSourceParser.FindUdisFromDataAttributes(input).ToList();
         Assert.AreEqual(2, result.Count);
@@ -70,7 +71,7 @@ public class HtmlImageSourceParserTests
     [Category("Remove image sources")]
     public string Remove_Image_Sources(string sourceHtml)
     {
-        var imageSourceParser = new HtmlImageSourceParser(Mock.Of<IPublishedUrlProvider>());
+        var imageSourceParser = new HtmlImageSourceParser(Mock.Of<IPublishedUrlProvider>(), NoopSigner());
 
         var actual = imageSourceParser.RemoveImageSources(sourceHtml);
 
@@ -120,7 +121,7 @@ public class HtmlImageSourceParserTests
             var mediaCache = Mock.Get(reference.UmbracoContext.Media);
             mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
 
-            var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
+            var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider, NoopSigner());
 
             var result = imageSourceParser.EnsureImageSources(@"<p>
 <div>
@@ -197,7 +198,7 @@ public class HtmlImageSourceParserTests
     public string Ensure_ImageSources_Processing(string sourceHtml)
     {
         var fakeMediaUrl = "/media/1001/image.jpg";
-        var parser = new HtmlImageSourceParser(guid => fakeMediaUrl);
+        var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, NoopSigner());
         var actual = parser.EnsureImageSources(sourceHtml);
 
         return actual;
@@ -214,7 +215,7 @@ public class HtmlImageSourceParserTests
         var text = $@"<img src=""{longText}"" />";
 
         var fakeMediaUrl = "/media/1001/image.jpg";
-        var parser = new HtmlImageSourceParser(guid => fakeMediaUrl);
+        var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, NoopSigner());
 
         var timer = new Stopwatch();
         timer.Start();
@@ -222,5 +223,87 @@ public class HtmlImageSourceParserTests
         timer.Stop();
 
         Assert.IsTrue(timer.ElapsedMilliseconds <= maxMsToRun);
+    }
+
+    [Test]
+    public void EnsureImageSources_Calls_TokenGenerator_With_Refreshed_Url()
+    {
+        // Verifies the signer is invoked on the final URL (path from media provider + persisted query string)
+        // and that its return value replaces the src attribute.
+        var fakeMediaUrl = "/media/1001/image.jpg";
+        var signerMock = new Mock<IImageUrlTokenGenerator>();
+        signerMock
+            .Setup(s => s.RefreshSignature(It.IsAny<string>()))
+            .Returns<string>(url => url + "&hmac=fresh");
+
+        var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, signerMock.Object);
+
+        var input =
+            @"<img src=""old/path.jpg?width=100&hmac=stale"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/>";
+
+        var result = parser.EnsureImageSources(input);
+
+        signerMock.Verify(
+            s => s.RefreshSignature("/media/1001/image.jpg?width=100&hmac=stale"),
+            Times.Once);
+        StringAssert.Contains("src=\"/media/1001/image.jpg?width=100&hmac=stale&hmac=fresh\"", result);
+    }
+
+    [Test]
+    public void EnsureImageSources_Noop_Signer_Leaves_Src_Unchanged()
+    {
+        var fakeMediaUrl = "/media/1001/image.jpg";
+        var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, new NoopImageUrlTokenGenerator());
+
+        var input =
+            @"<img src=""x?width=100"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/>";
+
+        var result = parser.EnsureImageSources(input);
+
+        Assert.AreEqual(
+            @"<img src=""/media/1001/image.jpg?width=100"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/>",
+            result);
+    }
+
+    [Test]
+    public void Ensure_ImageSources_Processing_With_Cache_Buster()
+    {
+        var sourceHtml = """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="?width=100&height=500" /></div>""";
+        var fakeMediaUrl = "/media/1001/image.jpg?rand=1234";
+
+        var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, NoopSigner());
+        var actual = parser.EnsureImageSources(sourceHtml);
+
+        Assert.AreEqual(
+            """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="/media/1001/image.jpg?rand=1234&width=100&height=500" /></div>""",
+            actual);
+    }
+
+    [Test]
+    public void Ensure_ImageSources_With_Cache_Buster_And_No_Query_String()
+    {
+        var sourceHtml = """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="" /></div>""";
+        var fakeMediaUrl = "/media/1001/image.jpg?rand=1234";
+
+        var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, NoopSigner());
+        var actual = parser.EnsureImageSources(sourceHtml);
+
+        Assert.AreEqual(
+            """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="/media/1001/image.jpg?rand=1234" /></div>""",
+            actual);
+    }
+
+    [Test]
+    public void Ensure_ImageSources_With_No_Query_String_Does_Not_Append_Trailing_Query()
+    {
+        var sourceHtml = """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="" /></div>""";
+        var fakeMediaUrl = "/media/1001/image.jpg";
+
+        var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, NoopSigner());
+        var actual = parser.EnsureImageSources(sourceHtml);
+
+        Assert.AreEqual(
+            """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="/media/1001/image.jpg" /></div>""",
+            actual);
     }
 }

@@ -7,6 +7,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * Entity action for trashing an item.
@@ -49,7 +50,7 @@ export class UmbTrashEntityAction<
 		// TODO: handle items with variants
 		await umbConfirmModal(this, {
 			headline,
-			content: this.#localize.string(message, item.name),
+			content: html`${this.#localize.htmlString(message, item.name)}`,
 			color: 'danger',
 			confirmLabel: '#actions_trash',
 		});
@@ -73,19 +74,19 @@ export class UmbTrashEntityAction<
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!actionEventContext) throw new Error('Action event context is missing.');
 
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			unique: this.args.unique,
-			entityType: this.args.entityType,
-		});
-
-		actionEventContext.dispatchEvent(event);
-
 		const trashedEvent = new UmbEntityTrashedEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,
 		});
 
 		actionEventContext.dispatchEvent(trashedEvent);
+
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
+
+		actionEventContext.dispatchEvent(event);
 	}
 }
 

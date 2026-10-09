@@ -17,3 +17,18 @@ export const fromCamelCase = (str: string) => {
 	const s = str.replace(/([A-Z])/g, ' $1');
 	return s.charAt(0).toUpperCase() + s.slice(1);
 };
+
+/**
+ * Applies {@link fromCamelCase} only when the string looks like camelCase
+ * (starts with a lowercase letter and contains no spaces).
+ * Strings that are already display-ready (PascalCase, contain spaces, etc.)
+ * are returned as-is.
+ * @param {string} str - The string to conditionally convert.
+ * @returns {string} - The converted or original string.
+ */
+export const fromCamelCaseIfCamelCase = (str: string) => {
+	if (str.includes(' ') || str.charAt(0) === str.charAt(0).toUpperCase()) {
+		return str;
+	}
+	return fromCamelCase(str);
+};

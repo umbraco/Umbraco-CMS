@@ -87,5 +87,13 @@ public class EmailUserForgotPasswordSender : IUserForgotPasswordSender
     /// Determines whether a forgot password email can be sent, based on the current security settings and the email sender's capability to send required emails.
     /// </summary>
     /// <returns><c>true</c> if the forgot password email can be sent; otherwise, <c>false</c>.</returns>
-    public bool CanSend() => _securitySettings.AllowPasswordReset && _emailSender.CanSendRequiredEmail();
+    [Obsolete("Please use IsPasswordResetConfigured to check configuration only, or IsPasswordResetAvailableAsync to also check that messages can currently be delivered. Scheduled for removal in Umbraco 19.")]
+    public bool CanSend() => IsPasswordResetConfigured();
+
+    /// <inheritdoc />
+    public bool IsPasswordResetConfigured() => _securitySettings.AllowPasswordReset && _emailSender.IsEmailConfigured();
+
+    /// <inheritdoc />
+    public async Task<bool> IsPasswordResetAvailableAsync(CancellationToken cancellationToken = default)
+        => _securitySettings.AllowPasswordReset && await _emailSender.IsEmailAvailableAsync(cancellationToken);
 }

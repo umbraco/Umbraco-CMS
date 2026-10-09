@@ -57,7 +57,7 @@ test('can create a partial view in a folder', async ({umbracoApi, umbracoUi}) =>
   // Act
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
+  await umbracoUi.partialView.clickCreateActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
   await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeCreated();
@@ -84,7 +84,7 @@ test('can create a partial view in a folder in a folder', async ({umbracoApi, um
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.openCaretButtonForName(folderName);
   await umbracoUi.partialView.clickActionsMenuForPartialView(childFolderName);
-  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
+  await umbracoUi.partialView.clickCreateActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
   await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeCreated();
@@ -136,6 +136,27 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   expect(partialViewChildren[0].path).toBe('/' + folderName + '/' + childFolderName + '/' + childOfChildFolderName);
   await umbracoUi.partialView.openCaretButtonForName(childFolderName);
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(childOfChildFolderName, true, false);
+});
+
+test('can find a partial view in a sibling nested folder', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildFolderName = 'AAFirstChildFolder';
+  const nestedFolderName = 'NestedFolder';
+  const secondChildFolderName = 'ZZSecondChildFolder';
+  const targetPartialViewName = 'TargetPartialView';
+  const targetPartialViewFileName = targetPartialViewName + '.cshtml';
+  await umbracoApi.partialView.createFolder(folderName);
+  const firstChildFolderPath = await umbracoApi.partialView.createFolder(firstChildFolderName, folderName);
+  await umbracoApi.partialView.createFolder(nestedFolderName, firstChildFolderPath);
+  const secondChildFolderPath = await umbracoApi.partialView.createFolder(secondChildFolderName, folderName);
+  const targetPartialViewPath = await umbracoApi.partialView.create(targetPartialViewFileName, '<h1>Test</h1>', secondChildFolderPath);
+
+  // Act
+  const partialViewData = await umbracoApi.partialView.getByName(targetPartialViewFileName);
+
+  // Assert
+  expect(partialViewData).toBeTruthy();
+  expect(partialViewData.path).toBe(targetPartialViewPath);
 });
 
 test('cannot delete non-empty folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {

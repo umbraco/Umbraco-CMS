@@ -69,7 +69,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         {
             // Add a test auth scheme with a test auth handler to authn and assign the user
             services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
-                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme,
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                    TestAuthHandler.TestAuthenticationScheme,
                     options => { });
         }
 
@@ -287,7 +288,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddWebComponents()
                 .AddUmbracoHybridCache()
                 .AddBackOfficeCore()
-                .AddBackOfficeAuthentication()
+                .AddBackOfficeCookieAuthentication()
+                .AddBackOfficeOpenIddictServices()
                 .AddBackOfficeIdentity()
                 .AddMembersIdentity()
                 // .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)

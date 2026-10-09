@@ -15,7 +15,7 @@ export class UmbDictionaryTreeStore extends UmbUniqueTreeStore {
 	 * @memberof UmbDictionaryTreeStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DICTIONARY_TREE_STORE_CONTEXT.toString());
+		super(host, UMB_DICTIONARY_TREE_STORE_CONTEXT);
 	}
 }
 

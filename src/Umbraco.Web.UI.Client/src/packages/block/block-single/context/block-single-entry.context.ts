@@ -1,8 +1,15 @@
+import type { UmbBlockSingleValueModel } from '../types.js';
+import {
+	UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
+	UMB_BLOCK_SINGLE_PROPERTY_EDITOR_UI_ALIAS,
+} from '../constants.js';
 import { UMB_BLOCK_SINGLE_MANAGER_CONTEXT } from './block-single-manager.context-token.js';
 import { UMB_BLOCK_SINGLE_ENTRIES_CONTEXT } from './block-single-entries.context-token.js';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_SINGLE_MANAGER_CONTEXT,
 	typeof UMB_BLOCK_SINGLE_MANAGER_CONTEXT.TYPE,
@@ -26,6 +33,12 @@ export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 		super(host, UMB_BLOCK_SINGLE_MANAGER_CONTEXT, UMB_BLOCK_SINGLE_ENTRIES_CONTEXT);
 	}
 
+	protected override _needsLegacyLabelRenderer(): boolean {
+		// Block Single entry element owns the canonical `<umb-ufm-render>` (via its child
+		// views) and pushes resolved text via `setName()`. No hidden virtual renderer needed.
+		return false;
+	}
+
 	protected override _gotManager() {
 		this.observe(
 			this._manager?.inlineEditingMode,
@@ -39,4 +52,43 @@ export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 	protected override _gotEntries() {}
 
 	protected override _gotContentType() {}
+
+	override async copyToClipboard() {
+		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		if (!propertyDatasetContext) throw new Error('Could not get property dataset context to copy.');
+
+		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+		if (!propertyContext) throw new Error('Could not get property context to copy.');
+
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+		if (!clipboardContext) throw new Error('Could not get clipboard context to copy.');
+
+		const workspaceName = this.localize.string(propertyDatasetContext.getName());
+		const propertyLabel = this.localize.string(propertyContext.getLabel());
+		const blockLabel = this.getName();
+		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
+
+		clipboardContext.write({
+			icon: this.getContentElementTypeIcon(),
+			name: entryName,
+			propertyValue: this.#buildPropertyValue(),
+			propertyEditorUiAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_UI_ALIAS,
+		});
+	}
+
+	#buildPropertyValue(): UmbBlockSingleValueModel {
+		const content = this.getContent();
+		const layout = this.getLayout();
+		const settings = this.getSettings();
+		const expose = this.getExpose();
+
+		return {
+			contentData: content ? [structuredClone(content)] : [],
+			layout: {
+				[UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
+			},
+			settingsData: settings ? [structuredClone(settings)] : [],
+			expose: expose ? [structuredClone(expose)] : [],
+		};
+	}
 }

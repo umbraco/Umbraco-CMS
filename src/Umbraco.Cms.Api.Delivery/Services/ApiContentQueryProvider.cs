@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Delivery.Services;
 /// </summary>
 internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
 {
-    private const string ItemIdFieldName = "itemId";
+    private const string ItemIdFieldName = UmbracoExamineFieldNames.DeliveryApiContentIndex.ItemId;
     private readonly IExamineManager _examineManager;
     private readonly ILogger<ApiContentQueryProvider> _logger;
     private readonly ApiContentQuerySelectorBuilder _selectorBuilder;

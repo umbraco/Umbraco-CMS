@@ -3,7 +3,7 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDocumentPublishedPendingChangesManager } from './document-published-pending-changes.manager.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import { type UmbDocumentDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 
@@ -58,7 +58,7 @@ describe('UmbSelectionManager', () => {
 				flags: [],
 				variants: [
 					{
-						state: DocumentVariantStateModel.PUBLISHED,
+						state: UmbDocumentVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: null,
 						segment: null,
@@ -106,6 +106,12 @@ describe('UmbSelectionManager', () => {
 				expect(variantsWithChanges).to.have.lengthOf(1);
 				expect(variantsWithChanges[0].variantId.toString()).to.equal('invariant');
 			});
+
+			it('should not have variants with changes when only template differs', async () => {
+				persistedDocument.template = { unique: 'template-1' };
+				await manager.process({ persistedData: persistedDocument, publishedData: publishedDocument });
+				expect(manager.getVariantsWithChanges()).to.be.an('array').that.is.empty;
+			});
 		});
 
 		describe('variant data', () => {
@@ -124,11 +130,11 @@ describe('UmbSelectionManager', () => {
 				flags: [],
 				variants: [
 					{
-						state: DocumentVariantStateModel.PUBLISHED,
+						state: UmbDocumentVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
-						culture: 'en-US',
+						culture: 'da-DK',
 						segment: null,
-						name: 'Document 1 (en-US)',
+						name: 'Document 1 (da-DK)',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
 						scheduledPublishDate: null,
@@ -136,11 +142,11 @@ describe('UmbSelectionManager', () => {
 						flags: [],
 					},
 					{
-						state: DocumentVariantStateModel.PUBLISHED,
+						state: UmbDocumentVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
-						culture: 'da-DK',
+						culture: 'en-US',
 						segment: null,
-						name: 'Document 1 (da-DK)',
+						name: 'Document 1 (en-US)',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
 						scheduledPublishDate: null,
@@ -152,14 +158,14 @@ describe('UmbSelectionManager', () => {
 					{
 						editorAlias: 'Umbraco.TextBox',
 						alias: 'prop1',
-						culture: 'en-US',
+						culture: 'da-DK',
 						segment: null,
 						value: '',
 					},
 					{
 						editorAlias: 'Umbraco.TextBox',
 						alias: 'prop1',
-						culture: 'da-DK',
+						culture: 'en-US',
 						segment: null,
 						value: '',
 					},
@@ -177,7 +183,7 @@ describe('UmbSelectionManager', () => {
 			});
 
 			it('should have variants with changes when value is updated', async () => {
-				persistedDocument.values[0].value = 'value (en-US)';
+				persistedDocument.values[1].value = 'value (en-US)';
 				await manager.process({ persistedData: persistedDocument, publishedData: publishedDocument });
 				const variantsWithChanges = manager.getVariantsWithChanges();
 				expect(variantsWithChanges).to.have.lengthOf(1);
@@ -185,17 +191,17 @@ describe('UmbSelectionManager', () => {
 			});
 
 			it('should have variants with changes when multiple values are updated', async () => {
-				persistedDocument.values[0].value = 'value (en-US)';
-				persistedDocument.values[1].value = 'value (da-DK)';
+				persistedDocument.values[0].value = 'value (da-DK)';
+				persistedDocument.values[1].value = 'value (en-US)';
 				await manager.process({ persistedData: persistedDocument, publishedData: publishedDocument });
 				const variantsWithChanges = manager.getVariantsWithChanges();
 				expect(variantsWithChanges).to.have.lengthOf(2);
-				expect(variantsWithChanges[0].variantId.toString()).to.equal('en-US');
-				expect(variantsWithChanges[1].variantId.toString()).to.equal('da-DK');
+				expect(variantsWithChanges[0].variantId.toString()).to.equal('da-DK');
+				expect(variantsWithChanges[1].variantId.toString()).to.equal('en-US');
 			});
 
 			it('should have variants with changes when name of variant is updated', async () => {
-				persistedDocument.variants[0].name = 'Document 1 (en-US) Updated';
+				persistedDocument.variants[1].name = 'Document 1 (en-US) Updated';
 				await manager.process({ persistedData: persistedDocument, publishedData: publishedDocument });
 				const variantsWithChanges = manager.getVariantsWithChanges();
 				expect(variantsWithChanges).to.have.lengthOf(1);
@@ -203,13 +209,13 @@ describe('UmbSelectionManager', () => {
 			});
 
 			it('should have variants with changes when name of multiple variants are updated', async () => {
-				persistedDocument.variants[0].name = 'Document 1 (en-US) Updated';
-				persistedDocument.variants[1].name = 'Document 1 (da-DK) Updated';
+				persistedDocument.variants[0].name = 'Document 1 (da-DK) Updated';
+				persistedDocument.variants[1].name = 'Document 1 (en-US) Updated';
 				await manager.process({ persistedData: persistedDocument, publishedData: publishedDocument });
 				const variantsWithChanges = manager.getVariantsWithChanges();
 				expect(variantsWithChanges).to.have.lengthOf(2);
-				expect(variantsWithChanges[0].variantId.toString()).to.equal('en-US');
-				expect(variantsWithChanges[1].variantId.toString()).to.equal('da-DK');
+				expect(variantsWithChanges[0].variantId.toString()).to.equal('da-DK');
+				expect(variantsWithChanges[1].variantId.toString()).to.equal('en-US');
 			});
 		});
 	});

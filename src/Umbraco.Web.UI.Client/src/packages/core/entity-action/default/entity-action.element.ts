@@ -9,9 +9,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-entity-action')
 export class UmbEntityActionDefaultElement<
-		MetaType extends MetaEntityActionDefaultKind = MetaEntityActionDefaultKind,
-		ApiType extends UmbEntityAction<MetaType> = UmbEntityAction<MetaType>,
-	>
+	MetaType extends MetaEntityActionDefaultKind = MetaEntityActionDefaultKind,
+	ApiType extends UmbEntityAction<MetaType> = UmbEntityAction<MetaType>,
+>
 	extends UmbLitElement
 	implements UmbEntityActionElement
 {

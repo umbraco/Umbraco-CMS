@@ -1,5 +1,5 @@
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import type { ManifestApi, ManifestWithDynamicConditions } from '../types/index.js';
+import type { ManifestApi, ManifestBase, ManifestWithDynamicConditions } from '../types/index.js';
 import { UmbExtensionApiInitializer } from './index.js';
 import { expect, fixture } from '@open-wc/testing';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -8,6 +8,7 @@ import type { UmbControllerHostElement, UmbControllerHost } from '@umbraco-cms/b
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
+import type { SwitchConditionConfig } from 'src/packages/core/extension-registry/conditions/switch.condition.js';
 
 @customElement('umb-test-controller-host')
 // Element is used in tests
@@ -91,8 +92,10 @@ describe('UmbExtensionApiController', () => {
 
 	describe('Manifest with multiple conditions that changes over time', () => {
 		let hostElement: UmbControllerHostElement;
-		let extensionRegistry: UmbExtensionRegistry<ManifestSection>;
-		let manifest: ManifestSection;
+		let extensionRegistry: UmbExtensionRegistry<
+			ManifestApi<UmbTestApiController> & ManifestWithDynamicConditions<SwitchConditionConfig>
+		>;
+		let manifest: ManifestApi<UmbTestApiController> & ManifestWithDynamicConditions<SwitchConditionConfig>;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
@@ -105,15 +108,15 @@ describe('UmbExtensionApiController', () => {
 				api: UmbTestApiController,
 				conditions: [
 					{
-						alias: 'Umb.Test.Condition.Delay',
+						alias: 'Umb.Condition.Switch',
 						frequency: '100',
 					},
 					{
-						alias: 'Umb.Test.Condition.Delay',
+						alias: 'Umb.Condition.Switch',
 						frequency: '200',
 					},
 				],
-			} as any;
+			};
 
 			// A ASCII timeline for the conditions, when allowed and then not allowed:
 			// Condition		 				0ms  100ms  200ms  300ms  400ms  500ms
@@ -123,8 +126,8 @@ describe('UmbExtensionApiController', () => {
 
 			const conditionManifest = {
 				type: 'condition',
-				name: 'test-condition-delay',
-				alias: 'Umb.Test.Condition.Delay',
+				name: 'test-condition-switch',
+				alias: 'Umb.Condition.Switch',
 				api: UmbSwitchCondition,
 			};
 

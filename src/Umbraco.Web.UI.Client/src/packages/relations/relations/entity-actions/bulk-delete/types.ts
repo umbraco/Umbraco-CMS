@@ -1,8 +1,7 @@
 import type { MetaEntityBulkActionDeleteKind } from '@umbraco-cms/backoffice/entity-bulk-action';
 import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 
-export interface ManifestEntityBulkActionDeleteWithRelationKind
-	extends ManifestEntityBulkAction<MetaEntityBulkActionDeleteWithRelationKind> {
+export interface ManifestEntityBulkActionDeleteWithRelationKind extends ManifestEntityBulkAction<MetaEntityBulkActionDeleteWithRelationKind> {
 	type: 'entityBulkAction';
 	kind: 'deleteWithRelation';
 }

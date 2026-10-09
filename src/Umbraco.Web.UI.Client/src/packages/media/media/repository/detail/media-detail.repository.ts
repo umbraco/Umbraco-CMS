@@ -1,12 +1,11 @@
 import type { UmbMediaDetailModel } from '../../types.js';
 import { UmbMediaServerDataSource } from './media-detail.server.data-source.js';
 import { UMB_MEDIA_DETAIL_STORE_CONTEXT } from './media-detail.store.context-token.js';
-import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
+import { clearImagingCache } from '@umbraco-cms/backoffice/imaging';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbDetailRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbMediaDetailRepository extends UmbDetailRepositoryBase<UmbMediaDetailModel> {
-	#imagingRepository = new UmbImagingRepository(this);
 	constructor(host: UmbControllerHost) {
 		super(host, UmbMediaServerDataSource, UMB_MEDIA_DETAIL_STORE_CONTEXT);
 	}
@@ -14,8 +13,14 @@ export class UmbMediaDetailRepository extends UmbDetailRepositoryBase<UmbMediaDe
 	/**
 	 * Creates a media item without showing automatic error notifications.
 	 * Error handling is left to the caller (e.g. the dropzone manager).
+	 * @param {UmbMediaDetailModel} model - The media item to create
+	 * @param {string | null} parentUnique - The unique ID of the parent media item
+	 * @returns {UmbRepositoryResponse<UmbMediaDetailModel>} The created media item
 	 */
-	async createSilently(model: UmbMediaDetailModel, parentUnique: string | null) {
+	async createSilently(
+		model: UmbMediaDetailModel,
+		parentUnique: string | null,
+	): Promise<UmbRepositoryResponse<UmbMediaDetailModel>> {
 		if (!model) throw new Error('Data is missing');
 		return (this.detailDataSource as UmbMediaServerDataSource).create(model, parentUnique, true);
 	}
@@ -27,8 +32,7 @@ export class UmbMediaDetailRepository extends UmbDetailRepositoryBase<UmbMediaDe
 		const result = await super.save(model);
 
 		if (!result.error) {
-			// Attempt to clear image cache
-			await this.#imagingRepository._internal_clearCropByUnique(model.unique);
+			clearImagingCache(model.unique);
 		}
 
 		return result;
@@ -41,8 +45,7 @@ export class UmbMediaDetailRepository extends UmbDetailRepositoryBase<UmbMediaDe
 		const result = await super.delete(unique);
 
 		if (!result.error) {
-			// Attempt to clear image cache
-			await this.#imagingRepository._internal_clearCropByUnique(unique);
+			clearImagingCache(unique);
 		}
 
 		return result;

@@ -15,7 +15,7 @@ export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
 	 * @memberof UmbStylesheetTreeStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_STYLESHEET_TREE_STORE_CONTEXT.toString());
+		super(host, UMB_STYLESHEET_TREE_STORE_CONTEXT);
 	}
 }
 

@@ -1,4 +1,5 @@
 import { manifest as sliderSchemaManifest } from './Umbraco.Slider.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -14,10 +15,24 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Slider Property Editor UI',
 		element: () => import('./property-editor-ui-slider.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Slider',
 			propertyEditorSchemaAlias: 'Umbraco.Slider',
 			icon: 'icon-navigation-horizontal',
-			group: 'common',
+			group: '#propertyEditorUIGroups_common',
+			keywords: [
+				'number',
+				'range',
+				'percentage',
+				'rating',
+				'level',
+				'opacity',
+				'scale',
+				'volume',
+				'score',
+				'progress',
+				'zoom',
+			],
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -67,4 +82,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	sliderSchemaManifest,
+	...valueSummaryManifests,
 ];

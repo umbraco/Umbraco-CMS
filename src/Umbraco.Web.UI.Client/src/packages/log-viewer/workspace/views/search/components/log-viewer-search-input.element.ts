@@ -56,6 +56,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 				this._logViewerContext?.setFilterExpression(query);
 				this.#persist(query);
 			},
+			null,
 		);
 	}
 
@@ -112,10 +113,10 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 	async #removeSearch(name: string) {
 		await umbConfirmModal(this, {
-			headline: this.localize.term('logViewer_deleteSavedSearch'),
+			headline: '#logViewer_deleteSavedSearch',
 			content: this.localize.term('defaultdialogs_confirmdelete', escapeHTML(name)),
 			color: 'danger',
-			confirmLabel: this.localize.term('actions_delete'),
+			confirmLabel: '#actions_delete',
 		});
 
 		this._logViewerContext?.removeSearch({ name });

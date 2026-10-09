@@ -40,13 +40,16 @@ export const TextIndent = Extension.create<UmbTiptapTextIndentOptions>({
 						parseHTML: (element) => {
 							const minLevel = this.options.minLevel;
 							const maxLevel = this.options.maxLevel;
-							const indent = element.style.textIndent;
-							return indent ? Math.max(minLevel, Math.min(maxLevel, parseInt(indent, 10))) : null;
+							// Support both padding-left (current) and text-indent (legacy) for parsing
+							const paddingLeft = element.style.paddingLeft;
+							const textIndent = element.style.textIndent;
+							const value = paddingLeft || textIndent;
+							return value ? Math.max(minLevel, Math.min(maxLevel, parseInt(value, 10))) : null;
 						},
 						renderHTML: (attributes) => {
 							if (!attributes.indent) return {};
 							return {
-								style: `text-indent: ${attributes.indent}rem;`,
+								style: `padding-left: ${attributes.indent}rem;`,
 							};
 						},
 					},
@@ -106,6 +109,28 @@ export const TextIndent = Extension.create<UmbTiptapTextIndentOptions>({
 		return {
 			textIndent: commanderFactory(1),
 			textOutdent: commanderFactory(-1),
+		};
+	},
+
+	addKeyboardShortcuts() {
+		return {
+			Tab: () => {
+				if (this.editor.isActive('listItem')) {
+					// Attempt to sink; if not possible, just prevent focus loss
+					this.editor.commands.sinkListItem('listItem');
+					return true;
+				}
+				return this.editor.commands.textIndent();
+			},
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			'Shift-Tab': () => {
+				if (this.editor.isActive('listItem')) {
+					// Attempt to lift; if not possible, just prevent focus loss
+					this.editor.commands.liftListItem('listItem');
+					return true;
+				}
+				return this.editor.commands.textOutdent();
+			},
 		};
 	},
 });

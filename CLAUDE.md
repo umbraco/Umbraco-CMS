@@ -52,7 +52,17 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 
 ---
 
-## 2. Repository Structure
+## 2. General-Purpose by Default
+
+This repository is a product platform, not an application. Every layer is consumed by code that does not live here — implementors, package developers, and other parts of the CMS. A change is finished when it serves the use case that prompted it *and* the use cases nobody has described yet.
+
+**Design to the contract.** When you change shared code, work out the rule the layer must uphold for *any* implementation of it, and make that rule hold there. Name a concrete implementation freely in the code that owns it — a specific service, package, or project; a shared or generic layer implements only the contract. A specific editor alias, content type alias, or class name appearing in generic code is the signal that a fix has been fitted to one caller — express it instead as a capability the contract exposes.
+
+**Describe the contract.** Comments and public docs use the vocabulary of the layer they sit in. In public XML doc / JSDoc a concrete illustration is welcome where it reads as one possible implementation ("for example, an editor that emits several groups may…"), never as the definition of the behaviour.
+
+---
+
+## 3. Repository Structure
 
 ```
 Umbraco-CMS/
@@ -137,7 +147,7 @@ Web.UI → Web.Common → Infrastructure → Core
 
 ---
 
-## 3. Teamwork & Collaboration
+## 4. Teamwork & Collaboration
 
 ### Branching Strategy
 
@@ -198,7 +208,7 @@ Use the format: `Area: Description (closes #IssueID)`
 - Describe the change and its impact
 - Be specific, not vague (describe "a golden retriever" not just "a dog")
 
-**Issue Linking**: Add `(closes #IssueID)` to auto-close linked issues on merge.
+**Issue Linking**: Add `(closes #IssueID)` to the title for readability, AND include a closing keyword on its own line in the PR body (e.g., `Fixes #IssueID`) so GitHub actually auto-links and auto-closes the issue on merge. GitHub only parses closing keywords (`closes`, `fixes`, `resolves`) from the PR body or commit messages — the title suffix is cosmetic and does **not** trigger auto-close on its own.
 
 ### Commit Messages
 
@@ -221,14 +231,16 @@ Project ownership is distributed across teams. Check individual project director
 
 ---
 
-## 4. Architecture Patterns
+## 5. Architecture Patterns
 
 ### Core Architectural Decisions
 
 1. **Layered Architecture with Dependency Inversion**
    - Core defines contracts (interfaces)
-   - Infrastructure implements contracts
+   - Infrastructure implements contracts that need Infrastructure-owned machinery
    - Web/APIs consume implementations via DI
+
+   **Where service implementations live**: Services whose dependencies are satisfiable from Core interfaces alone (repositories, scope, config, other Core services) live in `Umbraco.Core/Services/` — this covers the majority of domain services (`MemberService`, `ContentService`, `MediaService`, `ContentTypeService`, `EntityService`, `AuditService`, `ExternalMemberService`, etc.). Service implementations only live in `Umbraco.Infrastructure/Services/Implement/` when they genuinely need Infrastructure concerns — Examine indexes (`ContentSearchService`, `MediaSearchService`, `IndexedEntitySearchService`), log files (`LogViewerRepository`), packaging internals (`PackagingService`), webhook firing (`WebhookFiringService`), distributed-job coordination (`DistributedJobService`). When adding a new service, default to Core and only move to Infrastructure if a concrete dependency forces it.
 
 2. **Interface-First Design**
    - All services defined as interfaces in Core
@@ -259,11 +271,11 @@ Project ownership is distributed across teams. Check individual project director
 
 ---
 
-## 5. Avoiding Breaking Changes
+## 6. Avoiding Breaking Changes
 
 No binary breaking changes are allowed within a major version. Three patterns are used:
 
-### 5.1 Obsolete Constructor + StaticServiceProvider
+### 6.1 Obsolete Constructor + StaticServiceProvider
 
 When a public class needs new dependencies, obsolete the existing constructor and add a new one. The old constructor delegates to the new one, resolving missing deps via `StaticServiceProvider`.
 
@@ -294,7 +306,7 @@ public MyService(IDependencyA depA, IDependencyB depB)
 - Uses `StaticServiceProvider.Instance.GetRequiredService<T>()` for new params only
 - DI registration must use the NEW constructor (old is for external consumers only)
 
-### 5.2 Obsolete Method + New Overload
+### 6.2 Obsolete Method + New Overload
 
 When a public method signature needs to change, add the new method/overload and obsolete the old. The obsolete method should call the new one with suitable defaults.
 
@@ -315,7 +327,7 @@ public void DoThing(string name, string? extraParam)
 - All internal callers must be updated to use the new method
 - No callers should remain on the obsolete method within the codebase
 
-### 5.3 Default Interface Implementation
+### 6.3 Default Interface Implementation
 
 When adding methods to a public interface, provide a default implementation so existing external implementations don't break.
 
@@ -345,7 +357,7 @@ public interface IMyService
 - Default impl should be functionally correct even if not optimal
 - If using `StaticServiceProvider` in a default impl, note this is temporary
 
-### 5.4 General Rules
+### 6.4 General Rules
 
 - **Removal policy**: Obsoleted members must remain for at least one full major version before removal. If obsoleted in version N, the earliest removal is version N+2. For example, something obsoleted in v17 is scheduled for removal in v19 (giving the whole of v18 as a deprecation period).
 - All `[Obsolete]` attributes must include **"Scheduled for removal in Umbraco {current+2}"**
@@ -360,7 +372,7 @@ public interface IMyService
 
 ---
 
-## 6. Project-Specific Notes
+## 7. Project-Specific Notes
 
 ### Centralized Package Management
 
@@ -419,70 +431,138 @@ APIs use `Asp.Versioning.Mvc`:
 - Delivery API: `/umbraco/delivery/api/v{version}/*`
 - OpenAPI/Swagger docs per version
 
-### Backoffice npm Package Structure
+### Updating `OpenApi.json` (Management API)
 
-The backoffice (`Umbraco.Web.UI.Client`) is published to npm as **`@umbraco-cms/backoffice`** with a plugin architecture:
+When a PR changes Management API controllers or models, the `OpenApi.json` file in the Management API project must be updated, along with the generated backoffice client that is derived from it.
 
-#### Architecture Overview
+With the Umbraco instance running locally (in a non-Production environment — Swagger isn't mapped in Production):
 
-- **Multi-workspace structure**: Subprojects in `src/libs/*`, `src/packages/*`, `src/external/*`
-- **Export model**: All exports defined in root `package.json` → `./exports` field
-- **Importmap-driven runtime**: Dependencies provided at runtime via importmap (single source of truth)
-- **Build-time types**: TypeScript types come from npm peerDependencies
-- **Plugin model**: Developers create plugins that import from `@umbraco-cms/backoffice/*` exports
+```bash
+npm --prefix src/Umbraco.Web.UI.Client run generate:openapi
+npm --prefix src/Umbraco.Web.UI.Client run generate:server-api
+```
 
-#### Dependency Hoisting Strategy
+The first fetches the document from `/umbraco/swagger/management/swagger.json` byte-for-byte into `src/Umbraco.Cms.Api.Management/OpenApi.json`; the second regenerates the hey-api client from that committed file. Both results must be committed together.
 
-When building for npm (`npm pack`), the `cleanse-pkg.js` script hoists subproject dependencies to root `peerDependencies` with intelligent version range conversion:
+They are two separate commands on purpose. The client generator only ever reads the committed schema — never a running site — so the schema and the client it produced always land in the same commit.
 
-**Version Range Logic** (uses `semver` package):
+The `/umb-update-openapi` skill wraps this: it starts and stops a backend for you if one isn't already running, and explains the diff. Reach for it when you want the whole round trip handled.
 
-1. **Pre-release (0.x.y)**: Convert to explicit range
-   - Input: `^0.85.0` or `0.85.0`
-   - Output: `>=0.85.0 <1.0.0`
-   - Rationale: Pre-release caret only allows patch updates, explicit range allows minor upgrades within 0.x.x
-   - Example: Plugin can use `@hey-api/openapi-ts@0.91.1` while backoffice uses `0.85.0`
+**Important**: The fetch is byte-for-byte on purpose, so the endpoint stays the source of truth. Don't reformat the result — commit only the substantive changes, not IDE-applied formatting (whitespace, reordering, etc.). Extraneous formatting diffs make PRs harder to review and merge-ups more error-prone.
 
-2. **Stable with caret (^X.Y.Z where X ≥ 1)**: Keep as-is
-   - Input: `^3.3.1`
-   - Output: `^3.3.1` (unchanged)
-   - Rationale: Caret already implements correct semantics for stable versions
+### Backoffice npm Package
 
-3. **Stable exact versions (X.Y.Z where X ≥ 1)**: Add caret
-   - Input: `3.16.0`
-   - Output: `^3.16.0`
-   - Rationale: Normalizes to conventional semver format
+The backoffice is published to npm as `@umbraco-cms/backoffice`. Runtime dependencies are provided via importmap; npm peerDependencies provide types only. For full details on dependency hoisting, version range logic, and plugin development, see `/src/Umbraco.Web.UI.Client/CLAUDE.md` → "npm Package Publishing".
 
-#### Key Dependencies
+### SQL Server 2100-parameter limit
 
-**Runtime via importmap** (types available from peerDependencies):
-- `lit`, `rxjs`, `@umbraco-ui/uui` - Core framework
-- `monaco-editor`, `@tiptap/*` - Feature-specific editors
-- `@hey-api/openapi-ts` - HTTP client type generation
+Any `WHERE IN (@0, @1, ...)` built from a runtime-sized collection risks hitting SQL Server's 2100-parameter ceiling and throwing `SqlException` 8003 in production.
 
-**Build-time only** (not hoisted):
-- `vite`, `typescript`, `eslint` - Dev tooling
+Batch with `IEnumerable<T>.InGroupsOf(Constants.Sql.MaxParameterCount)` or `Database.FetchByGroups(...)` whenever the collection size is driven by user data — not just when it currently fits. Watch for products of two scaling dimensions (documents × languages, properties × versions) and config-tunable batch sizes whose defaults are safe but ceilings aren't.
 
-#### Plugin Development Implications
-
-Plugin developers should:
-- **Declare explicit dependencies** in their own `package.json` (avoid relying on transitive deps)
-- **Understand the version ranges**: `>=0.85.0 <1.0.0` means they can use newer pre-release versions
-- **Know that types match npm ranges**, but runtime comes from importmap (managed by backoffice)
-- **When `@hey-api` hits 1.0.0**: Published constraint will automatically become `^1.0.0`
-
-#### Implementation Details
-
-- Script location: `src/Umbraco.Web.UI.Client/devops/publish/cleanse-pkg.js`
-- Runs as `prepack` hook before npm pack
-- Uses `semver.minVersion()` for robust version range parsing
-- Generates single source of truth for importmap versions
+Full guidance, safe patterns and decision rule: see `/src/Umbraco.Infrastructure/CLAUDE.md` → "Avoiding the SQL Server 2100-parameter limit".
 
 ### Known Limitations
 
 1. **Circular Dependencies**: Avoided via `Lazy<T>` or event notifications
 2. **Multi-Server**: Requires shared Data Protection key ring and synchronized clocks (NTP)
 3. **Database Support**: SQL Server, SQLite
+
+---
+
+## 8. CI/CD — Claude AI Assistant
+
+Two GitHub Actions workflows powered by `anthropics/claude-code-action@v1`. Advisory only — does not block merging.
+
+### Workflows
+
+| File | Trigger | Purpose |
+|------|---------|---------|
+| `claude-review.yml` | `pull_request: [opened, ready_for_review]` | Auto-review every non-draft PR using the `umb-review` skill |
+| `claude.yml` | `@claude` comments, issue assign/label | Interactive assistant for PRs and issues |
+
+### Auto-Review (`claude-review.yml`)
+
+Runs the full `.claude/skills/umb-review/SKILL.md` procedure on every newly opened or un-drafted PR. Produces inline comments per finding and one summary comment with a verdict. Skips draft PRs. No turn limit.
+
+### Interactive (`claude.yml`)
+
+Responds to `@claude` mentions on PRs and issues. The trigger phrase is stripped before Claude sees the message, so:
+
+- `@claude review` → light review using `gh pr diff` (not the umb-review skill)
+- `@claude fix ...` → implements a fix on a new branch
+- `@claude help` → answers questions about the codebase
+- `@claude label` → applies labels
+- `@claude` (empty) → defaults to `review` on PRs, `help` on issues
+
+Also triggers on issue assignment to `claude` or adding the `claude` label. Gated: only runs when `@claude` appears in the comment/issue body. Max 25 turns.
+
+**Allowed Bash tools**: `gh`, `git`, `npm`, `dotnet` (interactive only; auto-review allows `gh` and `git`).
+
+### Labels
+
+Both workflows apply labels based on content:
+
+**On PRs** (based on changed files):
+
+| Label | Condition |
+|-------|-----------|
+| `area/frontend` | Files under `src/Umbraco.Web.UI.Client/` |
+| `area/backend` | `.cs` files outside the frontend client |
+| `area/test` | Only test files changed |
+| `category/api` | Management or Delivery API files |
+| `category/breaking` | Breaking changes detected |
+| `category/localization` | Localization/language files |
+| `category/test-automation` | Only test files changed |
+| `category/refactor` | Pure refactoring, no new features |
+| `category/performance` | Performance-related changes |
+| `category/ux` | User-facing changes |
+| `category/ui` | UI layer changes |
+
+**On Issues** (based on content): same `area/*` and `category/*` labels, plus `affected/v14` through `affected/v17` and `affected/backoffice`.
+
+Labels are only added, never removed. Claude applies only labels it is confident about.
+
+### Key Implementation Notes
+
+- **Checkout required** — the action internally runs `git fetch origin main` for trusted file restoration. Without `actions/checkout`, it fails with `fatal: not a git repository`.
+- **`id-token: write` permission** — required for OIDC token exchange with the Claude GitHub App.
+- **Trigger phrase stripping** — the action strips `@claude` from comments before passing to Claude. Prompts must reference commands without the prefix (e.g., `review` not `@claude review`).
+- **PR number injection** — the interactive workflow injects the PR/issue number into the prompt via `${{ github.event.issue.number }}` since Claude can't discover it from `gh pr view` when checked out on `main`.
+
+---
+
+## 9. Code Comment Policy
+
+**Default to no comment.** Applies to all code in this repository — C#, TypeScript, Razor, build scripts. Identifiers, small functions, and recognized idioms (a guard clause, a null check, an early return) carry their own meaning, even when some other layer has a reason to trigger them redundantly — that reason belongs to that layer, not to a comment here. Write one only for what *this* code genuinely can't say on its own: a non-obvious *why*, an invariant the types don't enforce, or an edge case it deliberately handles. Public members get XML doc / JSDoc, kept concise.
+
+**When a comment is justified, pitch it at the altitude of the code it sits in** — the vocabulary of the layer it lives in, not the incident that prompted it. §2 shows what that looks like in practice.
+
+**Comments aren't a changelog.** An issue link (`#21996`) earns its place inline only while it's explaining a live *why* — a guard, a workaround, a regression test. It does not belong there as provenance (`// Fix for X`, `// Used by Y`, `// See PR #1234`); which task or PR produced a change lives in the commit message and PR description, where it stays accurate.
+
+### TODOs
+
+The one exception to "default to no comment" — deleted once the TODO is done, so it can't rot. Keep them short and trackable, anchored to an author or a version trigger: `// TODO (V19): remove once obsolete overload is gone`, `// TODO: pagination [NL]`.
+
+---
+
+## 10. Testing Practices
+
+A test for shared code asserts the general rule from §2, not the scenario that reported it, and is named for the rule.
+
+### Tests for a bug fix must fail before the fix
+
+Verify any test you add for a bug fix actually catches the bug: either write the failing test first (TDD), or temporarily revert the production change and confirm the test fails before re-applying. A test that passes both ways proves nothing. Watch for coincidental passes — default seed/sort orders can make a buggy path produce the right answer for the test's specific inputs; construct inputs so the broken and fixed behaviours give visibly different results.
+
+For integration tests that exercise caching or cache refreshers, see `tests/Umbraco.Tests.Integration/CLAUDE.md` — the harness disables caching by default, which can produce false greens.
+
+---
+
+## 11. Verification Discipline
+
+- **Fresh build before trusting a green.** Never treat `--no-build` or cached/incremental output as proof a change compiles or passes — a stale run can mask a compile error. Rebuild before reporting build or test state. (Integration tests have a related false-green trap — see `tests/Umbraco.Tests.Integration/CLAUDE.md`.)
+- **Grep the branch you think you're on.** A search only supports a claim against the branch actually checked out, so confirm HEAD is where you expect before drawing a conclusion from a grep. Easy to get wrong whenever the tree moves under you — reviewing a PR head, switching worktrees, or mid merge-up/rebase.
+- **Remove unused usings — touched files only.** Before handing back C# changes, remove unused `using` directives (IDE0005) from the `.cs` files the change adds or modifies, and never sweep other files (unrelated churn causes merge-up conflicts). Run it per affected project, not the solution, which is slow to load: `dotnet format style <project>.csproj --diagnostics IDE0005 --severity info --include <files>`, then rebuild (a using may only be needed under an `#if` symbol).
 
 ---
 
@@ -506,6 +586,16 @@ dotnet format
 # Pack all projects
 dotnet pack -c Release
 ```
+
+### Integration Test Database Configuration
+
+Integration tests are configured in `tests/Umbraco.Tests.Integration/appsettings.Tests.json`.
+
+The `Tests:Database:DatabaseType` setting controls which database is used:
+- `"SQLite"` (default) - No external dependencies
+- `"LocalDb"` - Uses SQL Server LocalDB, required for SQL Server-specific tests (e.g., page-level locking, `sys.dm_tran_locks`)
+
+SQL Server-specific tests use `BaseTestDatabase.IsSqlite()` to skip when running on SQLite.
 
 ### Key Projects
 
@@ -533,6 +623,8 @@ For detailed information about individual projects, see their CLAUDE.md files:
 - **Core Architecture**: `/src/Umbraco.Core/CLAUDE.md` - Service contracts, notification patterns
 - **API Infrastructure**: `/src/Umbraco.Cms.Api.Common/CLAUDE.md` - OpenAPI, authentication, serialization
 - **Backoffice Frontend**: `/src/Umbraco.Web.UI.Client/CLAUDE.md` - Lit web components, extension system, auth client
+
+**Important**: When working on backoffice client code (anything under `src/Umbraco.Web.UI.Client/`), read `/src/Umbraco.Web.UI.Client/CLAUDE.md` first. It contains action-specific checklists (deprecation, testing, security, etc.) that are not duplicated here.
 
 ### Getting Help
 

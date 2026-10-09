@@ -1,8 +1,9 @@
 import type { UmbPickerTreeDataSource } from './types.js';
 
 /**
- *
- * @param dataSource
+ * Checks if the given data source is a tree data source.
+ * @param {unknown} dataSource - The data source to check
+ * @returns {boolean} True if the data source is a tree data source
  */
 export function isPickerTreeDataSource(dataSource: unknown): dataSource is UmbPickerTreeDataSource {
 	return (

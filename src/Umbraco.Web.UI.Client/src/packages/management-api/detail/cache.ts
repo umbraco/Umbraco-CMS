@@ -53,7 +53,7 @@ export class UmbManagementApiDetailDataCache<DetailDataModelType> {
 	/**
 	 * Retrieves all entries from the cache
 	 * @returns {Array<DetailDataModelType>} - An array of all cached entries
-	 * @memberof UmbManagementApiItemDataCache
+	 * @memberof UmbManagementApiDetailDataCache
 	 */
 	getAll(): Array<DetailDataModelType> {
 		return Array.from(this.#entries.values()).map((entry) => entry.data);

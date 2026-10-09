@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -152,6 +153,31 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(postfix.NullOrWhiteSpaceAsNull(), route.QueryString);
         Assert.AreEqual(_contentRootKey, route.StartItem.Id);
         Assert.AreEqual("the-root-path", route.StartItem.Path);
+
+        Assert.IsNotNull(link.Attributes["destinationId"]);
+        Assert.IsNotNull(link.Attributes["destinationType"]);
+        Assert.IsNotNull(link.Attributes["linkType"]);
+        Assert.AreEqual(_contentKey, Guid.Parse((link.Attributes["destinationId"] as string)!));
+        Assert.AreEqual(_contentType, link.Attributes["destinationType"]);
+        Assert.AreEqual(nameof(LinkType.Content), link.Attributes["linkType"]);
+    }
+
+    // PascalCase type — historic mis-cased values written by the (now fixed) ConvertLocalLinks migration for Umbraco 15 (see #22597).
+    [Test]
+    public void ParseElement_CanParseContentLinkWithPascalCaseTypeAttribute()
+    {
+        var parser = CreateRichTextElementParser();
+
+        var element = parser.Parse($"<p><a href=\"/{{localLink:{_contentKey:N}}}\" type=\"Document\"></a></p>", RichTextBlockModel.Empty) as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(link);
+        Assert.AreEqual("a", link.Tag);
+
+        Assert.IsNotNull(link.Attributes["route"]);
+        var route = link.Attributes["route"] as IApiContentRoute;
+        Assert.IsNotNull(route);
+        Assert.AreEqual("/some-content-path", route.Path);
 
         Assert.IsNotNull(link.Attributes["destinationId"]);
         Assert.IsNotNull(link.Attributes["destinationType"]);
@@ -689,6 +715,7 @@ public class RichTextParserTests : PropertyValueConverterTests
             urlProvider,
             cacheManager.Content,
             cacheManager.Media,
+            new NoopImageUrlTokenGenerator(),
             Mock.Of<ILogger<ApiRichTextMarkupParser>>());
     }
 

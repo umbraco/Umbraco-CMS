@@ -14,7 +14,7 @@ public class AllCultureControllerTests : ManagementApiUserGroupTestBase<AllCultu
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var langDa = new LanguageBuilder()
             .WithCultureInfo("da-DK")

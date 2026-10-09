@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services.Changes;
@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Services;
 /// This ensures that when a content type changes from variant to invariant (or vice versa),
 /// the URL cache is properly rebuilt with the correct languageId (NULL for invariant, specific ID for variant).
 /// </summary>
-public class DocumentUrlServiceContentTypeChangedNotificationHandler : INotificationAsyncHandler<ContentTypeChangedNotification>
+public class DocumentUrlServiceContentTypeChangedNotificationHandler : IDistributedCacheAsyncNotificationHandler<ContentTypeChangedNotification>
 {
     private readonly IDocumentUrlService _documentUrlService;
     private readonly IDocumentUrlAliasService _documentUrlAliasService;

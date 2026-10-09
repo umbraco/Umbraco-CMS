@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 			properties: [
 				{
 					alias: 'maxChars',
-					label: 'Maximum allowed characters',
+					label: '#textbox_maxCharsLabel',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 					config: [
 						{ alias: 'min', value: 1 },
@@ -23,6 +23,10 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'maxChars',
 					value: 512,
+				},
+				{
+					alias: 'autocomplete',
+					value: 'off',
 				},
 			],
 		},

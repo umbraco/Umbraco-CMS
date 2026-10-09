@@ -72,9 +72,15 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 				icon: 'icon-umbraco',
 			},
 			{
+				label: this.localize.term('logViewer_searchUmbracoDocs'),
+				title: this.localize.term('logViewer_searchThisMessageInUmbracoDocs'),
+				href: () => `https://docs.umbraco.com/?q=${this.renderedMessage}`,
+				icon: 'icon-book-alt',
+			},
+			{
 				label: this.localize.term('logViewer_searchOurUmbracoWithGoogle'),
 				title: this.localize.term('logViewer_searchOurUmbracoForumsUsingGoogle'),
-				href: () => `https://www.google.com/?q=site:forum.umbraco.com%20${this.renderedMessage}`,
+				href: () => `https://www.google.com/search?q=site:forum.umbraco.com%20${this.renderedMessage}`,
 				icon: 'icon-google',
 			},
 			{
@@ -128,7 +134,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		return html`
 			<details @open=${this.#setOpen}>
 				<summary>
-					<div id="timestamp">${this.date?.toLocaleString()}</div>
+					<div id="timestamp">${this.date?.toLocaleString(this.localize.lang())}</div>
 					<div id="level">
 						<umb-log-viewer-level-tag .level=${this.level ? this.level : 'Information'}></umb-log-viewer-level-tag>
 					</div>
@@ -139,7 +145,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 				<ul id="properties-list">
 					<li class="property">
 						<div class="property-name"><umb-localize key="logViewer_timestamp">Timestamp</umb-localize></div>
-						<div class="property-value">${this.date?.toLocaleString()}</div>
+						<div class="property-value">${this.date?.toLocaleString(this.localize.lang())}</div>
 					</li>
 					<li class="property">
 						<div class="property-name">@MessageTemplate</div>

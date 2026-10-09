@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
@@ -34,7 +33,7 @@ public abstract class AppPolicedCacheDictionary<TKey> : IDisposable
     ///     Gets or creates a cache.
     /// </summary>
     public IAppPolicyCache GetOrCreate(TKey key)
-        => _caches.GetOrAdd(key, k => _cacheFactory(k));
+        => _caches.GetOrAdd(key, _cacheFactory);
 
     /// <summary>
     ///     Removes a cache.

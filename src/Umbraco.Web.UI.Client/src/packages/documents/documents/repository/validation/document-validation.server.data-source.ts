@@ -23,8 +23,8 @@ export class UmbDocumentValidationServerDataSource {
 	/**
 	 * Validate a new Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
-	 * @param parentUnique - Parent Unique
-	 * @returns {*}
+	 * @param {UmbEntityUnique} parentUnique - Parent Unique
+	 * @returns {Promise<UmbDataSourceResponse<string>>} The validation result.
 	 */
 	async validateCreate(
 		model: UmbDocumentDetailModel,
@@ -66,7 +66,7 @@ export class UmbDocumentValidationServerDataSource {
 	 * Validate a existing Document
 	 * @param {UmbDocumentDetailModel} model - Document Model
 	 * @param {Array<UmbVariantId>} variantIds - Variant Ids
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<string>>} The validation result.
 	 */
 	async validateUpdate(
 		model: UmbDocumentDetailModel,
@@ -87,12 +87,10 @@ export class UmbDocumentValidationServerDataSource {
 		// Maybe use: tryExecuteAndNotify
 		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentService.putUmbracoManagementApiV1Service.documentByIdValidate1Service.putUmbracoManagementApiV11DocumentByIdValidate11(
-				{
-					path: { id: model.unique },
-					body,
-				},
-			),
+			DocumentService.putDocumentByIdValidate({
+				path: { id: model.unique },
+				body,
+			}),
 			{
 				disableNotifications: true,
 			},

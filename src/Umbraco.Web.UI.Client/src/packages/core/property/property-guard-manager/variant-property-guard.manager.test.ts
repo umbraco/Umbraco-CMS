@@ -2,7 +2,7 @@ import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbVariantPropertyGuardManager } from './variant-property-guard.manager.js';
-import { UmbVariantId } from '../../variant/variant-id.class.js';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -240,6 +240,45 @@ describe('UmbVariantPropertyGuardManager', () => {
 					done();
 				})
 				.unsubscribe();
+		});
+	});
+
+	describe('Fallback', () => {
+		it('isPermittedForVariantAndProperty reacts to late fallback updates when no rules match', () => {
+			const emitted: boolean[] = [];
+			const subscription = manager
+				.isPermittedForVariantAndProperty(englishVariant, propB, invariantVariant)
+				.subscribe((value) => emitted.push(value));
+
+			manager.fallbackToPermitted();
+			manager.fallbackToNotPermitted();
+
+			subscription.unsubscribe();
+
+			expect(emitted).to.deep.equal([false, true, false]);
+		});
+
+		it('isPermittedForVariantAndProperty is stable when a matching rule determines the result', () => {
+			manager.addRule(statePropBEn);
+			const emitted: boolean[] = [];
+			const subscription = manager
+				.isPermittedForVariantAndProperty(englishVariant, propB, invariantVariant)
+				.subscribe((value) => emitted.push(value));
+
+			manager.fallbackToPermitted();
+			manager.fallbackToNotPermitted();
+
+			subscription.unsubscribe();
+
+			expect(emitted).to.deep.equal([true]);
+		});
+
+		it('getIsPermittedForVariantAndProperty reflects the current fallback when no rules match', () => {
+			expect(manager.getIsPermittedForVariantAndProperty(englishVariant, propB, invariantVariant)).to.equal(false);
+			manager.fallbackToPermitted();
+			expect(manager.getIsPermittedForVariantAndProperty(englishVariant, propB, invariantVariant)).to.equal(true);
+			manager.fallbackToNotPermitted();
+			expect(manager.getIsPermittedForVariantAndProperty(englishVariant, propB, invariantVariant)).to.equal(false);
 		});
 	});
 });

@@ -43,7 +43,7 @@
     <key alias="parentNotPublished">该文档不可见，因为其上级 '%0%' 未发布。</key>
     <key alias="parentNotPublishedAnomaly">该文档已发布，但是没有更新至缓存（内部错误）</key>
     <key alias="getUrlException">Could not get the URL</key>
-    <key alias="routeError">This document is published but its URL would collide with content %0%</key>
+    <key alias="routeError">This document is published but its URL would collide with content '%0%'</key>
   </area>
   <area alias="member">
   </area>

@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/document-workspace.context-token.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/context/document-workspace.context-token.js';
 import type { ManifestWorkspaceActionMenuItemPreviewOptionKind } from './preview-option.workspace-action-menu-item.extension.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
 

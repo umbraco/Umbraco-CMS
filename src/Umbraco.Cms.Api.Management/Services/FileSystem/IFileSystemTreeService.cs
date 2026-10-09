@@ -12,7 +12,7 @@ public interface IFileSystemTreeService
     /// </summary>
     /// <param name="path">The path to get ancestors for.</param>
     /// <param name="includeSelf">Whether to include the item at the specified path itself in the results.</param>
-    /// <returns>An array of <see cref="Umbraco.Cms.Api.Management.Services.FileSystem.FileSystemTreeItemPresentationModel"/> representing the ancestor items.</returns>
+    /// <returns>An array of <see cref="FileSystemTreeItemPresentationModel"/> representing the ancestor items.</returns>
     FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf);
 
     /// <summary>

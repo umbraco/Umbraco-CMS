@@ -164,6 +164,13 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
         return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData,allowedCultures);
     }
 
+    /// <inheritdoc />
+    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
+    {
+        var valueEditor = (RichTextPropertyValueEditor)GetValueEditor();
+        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue, defaultCulture);
+    }
+
     /// <summary>
     ///     Create a custom value editor
     /// </summary>
@@ -213,6 +220,10 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
         /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors.</param>
         /// <param name="languageService">Provides language and localization services.</param>
         /// <param name="ioHelper">Helper for IO operations.</param>
+        /// <param name="mediaService">Service for media operations.</param>
+        /// <param name="mediaTypeService">Service for media type operations.</param>
+        /// <param name="localizedTextService">Service for localized text lookups.</param>
+        /// <param name="appCaches">Application caches for request-level caching.</param>
         public RichTextPropertyValueEditor(
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
@@ -232,7 +243,11 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
             IRichTextRegexValidator richTextRegexValidator,
             BlockEditorVarianceHandler blockEditorVarianceHandler,
             ILanguageService languageService,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService,
+            ILocalizedTextService localizedTextService,
+            AppCaches appCaches)
             : base(propertyEditors, dataTypeReadCache, shortStringHelper, jsonSerializer, dataValueReferenceFactoryCollection, blockEditorVarianceHandler, languageService, ioHelper, attribute)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -248,6 +263,7 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
 
             BlockEditorValues = new(new RichTextEditorBlockDataConverter(_jsonSerializer), elementTypeCache, logger);
             Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, BlockEditorValues, elementTypeCache, jsonSerializer, logger));
+            Validators.Add(new RichTextAllowedMediaTypeValidator(imageSourceParser, mediaService, localizedTextService, jsonSerializer, logger, new AllowedMediaTypeHelper(mediaTypeService, appCaches)));
         }
 
         /// <summary>
@@ -518,6 +534,28 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
             // structure is global, and markup follows structure
             var mergedEditorValue = new RichTextEditorValue { Markup = sourceRichTextEditorValue.Markup, Blocks = blocksMergeResult };
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(mergedEditorValue, _jsonSerializer);
+        }
+
+        internal override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
+        {
+            TryParseEditorValue(sourceValue, out RichTextEditorValue? sourceRichTextEditorValue);
+            TryParseEditorValue(targetValue, out RichTextEditorValue? targetRichTextEditorValue);
+
+            if (sourceRichTextEditorValue?.Blocks is null && targetRichTextEditorValue?.Blocks is null)
+            {
+                // no blocks on either side - any difference is in the markup, which is invariant/structural
+                // for this property. Deliberately return empty rather than diffing the markup: this
+                // explicitly hands the change to the caller's default-culture fallback, it is not an
+                // "unable to determine" signal.
+                return [];
+            }
+
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? sourceBlockEditorData =
+                sourceRichTextEditorValue?.Blocks is not null ? ConvertAndClean(sourceRichTextEditorValue.Blocks) : null;
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? targetBlockEditorData =
+                targetRichTextEditorValue?.Blocks is not null ? ConvertAndClean(targetRichTextEditorValue.Blocks) : null;
+
+            return GetChangedCulturesForBlockValue(sourceBlockEditorData?.BlockValue, targetBlockEditorData?.BlockValue, defaultCulture);
         }
 
         private bool TryParseEditorValue(object? value, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)

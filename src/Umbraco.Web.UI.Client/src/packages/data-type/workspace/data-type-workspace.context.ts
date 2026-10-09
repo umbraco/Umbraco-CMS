@@ -1,5 +1,8 @@
 import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../types.js';
 import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_DATA_TYPE_ENTITY_TYPE } from '../constants.js';
+import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../entity.js';
+import { UMB_DATA_TYPE_ROOT_WORKSPACE_PATH, UMB_EDIT_DATA_TYPE_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_EDIT_DATA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN } from '../tree/folder/workspace/paths.js';
 import type { UmbDataTypeDetailRepository } from '../repository/index.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import { UMB_DATA_TYPE_WORKSPACE_ALIAS } from './constants.js';
@@ -15,12 +18,14 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type {
 	PropertyEditorSettingsDefaultData,
 	PropertyEditorSettingsProperty,
 } from '@umbraco-cms/backoffice/property-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
+import { UmbValidationCleanUpByUniqueManager } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDataTypeDetailModel;
 
@@ -60,6 +65,7 @@ export class UmbDataTypeWorkspaceContext
 		(a, b) => (a.weight || 0) - (b.weight || 0),
 	);
 	readonly properties = this.#properties.asObservable();
+	readonly #propertyAliases = this.#properties.asObservablePart((x) => x.map((y) => y.alias));
 
 	#propertyEditorSchemaSettingsDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
 	#propertyEditorUISettingsDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
@@ -90,6 +96,16 @@ export class UmbDataTypeWorkspaceContext
 		this.#observePropertyEditorUIAlias();
 		this.#observePropertyEditorDataSourceAlias();
 
+		// Clean up validation messages for config properties that are no longer part of the Property
+		// Editor UI's schema, e.g. when the user switches to a different Property Editor UI. [NL]
+		new UmbValidationCleanUpByUniqueManager(
+			this,
+			this.validationContext,
+			'$.values',
+			this.#propertyAliases,
+			(queryParams) => queryParams.alias,
+		);
+
 		this.routes.setRoutes([
 			{
 				path: 'create/parent/:entityType/:parentUnique',
@@ -115,6 +131,14 @@ export class UmbDataTypeWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_DATA_TYPE_ROOT_WORKSPACE_PATH;
+		if (entity.entityType === UMB_DATA_TYPE_FOLDER_ENTITY_TYPE) {
+			return UMB_EDIT_DATA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+		}
+		return UMB_EDIT_DATA_TYPE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	override resetState() {
@@ -256,6 +280,16 @@ export class UmbDataTypeWorkspaceContext
 
 		const mergedSettings = settings.flat();
 
+		// check if there is alias duplicates:
+		const aliasSet = new Set<string>();
+		for (const setting of mergedSettings) {
+			if (aliasSet.has(setting.alias)) {
+				console.error(`There is a duplicate alias "${setting.alias}" in the Property Editor configuration.`);
+				continue;
+			}
+			aliasSet.add(setting.alias);
+		}
+
 		if (mergedSettings) {
 			this.#properties.setValue(mergedSettings);
 
@@ -294,17 +328,16 @@ export class UmbDataTypeWorkspaceContext
 		const values: Array<UmbDataTypePropertyValueModel> = [];
 
 		// We want to keep the existing data, if it is not in the default data, and if it is in the default data, then we want to keep the default data.
-		for (const defaultDataItem of this.#properties.getValue()) {
+		for (const property of this.#properties.getValue()) {
 			// We are matching on the alias, as we assume that the alias is unique for the data type.
-			// TODO: Consider if we should also match on the editorAlias just to be on the safe side [JOV]
-			const existingData = data.values?.find((x) => x.alias === defaultDataItem.alias);
+			const existingData = data.values?.find((x) => x.alias === property.alias);
 			if (existingData) {
 				values.push(existingData);
 				continue;
 			}
 
 			// If the data is not in the existing data, then we want to add the default data if it exists.
-			const existingDefaultData = this.#settingsDefaultData.find((x) => x.alias === defaultDataItem.alias);
+			const existingDefaultData = this.#settingsDefaultData.find((x) => x.alias === property.alias);
 			if (existingDefaultData) {
 				values.push(existingDefaultData);
 			}
@@ -348,8 +381,8 @@ export class UmbDataTypeWorkspaceContext
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @param {string} propertyAlias - The alias of the property to get the value of.
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} An Observable of the property value.
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {

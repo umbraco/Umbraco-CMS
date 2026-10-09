@@ -244,10 +244,10 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     }
 
     /// <summary>
-    /// Retrieves a dictionary containing the number of users for each <see cref="Umbraco.Core.Models.Membership.UserState"/>.
+    /// Retrieves a dictionary containing the number of users for each <see cref="UserState"/>.
     /// </summary>
     /// <returns>
-    /// A dictionary where each key is a <see cref="Umbraco.Core.Models.Membership.UserState"/> value representing a user state, and the corresponding value is the count of users in that state.
+    /// A dictionary where each key is a <see cref="UserState"/> value representing a user state, and the corresponding value is the count of users in that state.
     /// </returns>
     public IDictionary<UserState, int> GetUserStates()
     {

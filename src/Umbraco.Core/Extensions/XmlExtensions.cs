@@ -237,7 +237,7 @@ public static class XmlExtensions
     /// <param name="xml">The XML element to convert.</param>
     /// <returns>A string representation of the XML element with preserved line endings.</returns>
     /// <remarks>
-    ///     This method exists because <see cref="XElement.ToString()"/> with SaveOptions changes line endings.
+    ///     This method exists because <see cref="XNode.ToString()"/> with SaveOptions changes line endings.
     ///     When saving data, we want the exact characters to be preserved.
     /// </remarks>
     public static string ToDataString(this XElement xml)

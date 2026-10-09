@@ -1,0 +1,70 @@
+import { umbMockManager } from '../mock-manager.js';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
+const MOCK_SET_STORAGE_KEY = 'umb:mockSet';
+
+@customElement('mock-set-header-app')
+export class MockSetHeaderAppElement extends UmbLitElement {
+	@state()
+	private _currentSet: string = umbMockManager.currentSetName;
+
+	@state()
+	private _currentSetLabel: string = umbMockManager.currentSetLabel;
+
+	#onSetSelected(alias: string) {
+		if (alias === this._currentSet) return;
+
+		localStorage.setItem(MOCK_SET_STORAGE_KEY, alias);
+		window.location.reload();
+	}
+
+	override render() {
+		if (umbMockManager.availableSets.length <= 1) return nothing;
+
+		return html`
+			<uui-button compact label="Mock data set" look="primary" popovertarget="mock-set-popover">
+				Mock: ${this._currentSetLabel}
+			</uui-button>
+			<uui-popover-container id="mock-set-popover" placement="bottom-start">
+				<umb-popover-layout>
+					<div class="mock-set-list">
+						${umbMockManager.availableSets.map(
+							({ alias, label }) => html`
+								<uui-menu-item
+									label=${label}
+									?active=${alias === this._currentSet}
+									@click=${() => this.#onSetSelected(alias)}>
+								</uui-menu-item>
+							`,
+						)}
+					</div>
+				</umb-popover-layout>
+			</uui-popover-container>
+		`;
+	}
+
+	static override styles = [
+		css`
+			uui-button {
+				text-wrap: nowrap;
+				--uui-button-background-color: transparent;
+				--uui-button-background-color-hover: var(--uui-color-emphasis);
+			}
+
+			.mock-set-list {
+				min-width: 120px;
+				--uui-menu-item-indent: 0;
+				--uui-menu-item-flat-structure: 1;
+			}
+		`,
+	];
+}
+
+export { MockSetHeaderAppElement as element };
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'mock-set-header-app': MockSetHeaderAppElement;
+	}
+}

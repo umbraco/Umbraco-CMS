@@ -43,6 +43,7 @@ public class ByPathMediaApiController : MediaApiControllerBase
             return NotFound();
         }
 
+        SetOutputCacheMedia(media);
         return Ok(BuildApiMediaWithCrops(media));
     }
 }

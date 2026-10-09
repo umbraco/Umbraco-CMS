@@ -1,4 +1,4 @@
-﻿import {Page, Locator} from "@playwright/test"
+﻿import {Page, Locator, expect} from "@playwright/test"
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
@@ -33,15 +33,15 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   async clickSaveButtonAndWaitForDocumentBlueprintToBeUpdated() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
   }
-  
+
   async reloadDocumentBlueprintsTree() {
     await this.reloadTree('Document Blueprints');
   }
-  
+
   async goToDocumentBlueprint(blueprintName: string) {
     await this.goToSection(ConstantHelper.sections.settings);
     await this.reloadDocumentBlueprintsTree();
-    await this.click(this.page.getByLabel(blueprintName, {exact: true}));
+    await this.clickTreeItemWithName(blueprintName);
   }
 
   async isDocumentBlueprintRootTreeItemVisible(blueprintName: string, isVisible: boolean = true, toReload: boolean = true){
@@ -60,7 +60,12 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   }
 
   async enterDocumentBlueprintName(blueprintName: string) {
-    await this.enterText(this.documentBlueprintNameTxt, blueprintName);
+    // The chosen document type loads asynchronously and can reset the form, wiping an early entry.
+    // Retry entering the name until it sticks rather than relying on a fixed wait for the load.
+    await expect(async () => {
+      await this.enterText(this.documentBlueprintNameTxt, blueprintName);
+      await expect(this.documentBlueprintNameTxt).toHaveValue(blueprintName, {timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   async clickDeleteMenuButton() {

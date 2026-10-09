@@ -39,7 +39,7 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
 
     /// <inheritdoc />
     /// <remarks>This event is not used by the list but is required by the interface.</remarks>
-    public event PropertyChangedEventHandler? PropertyChanged; // noop
+    public event PropertyChangedEventHandler? PropertyChanged { add { } remove { } }
 
     /// <summary>
     ///     Creates a new list and adds each element as a deep cloned element if it is of type IDeepCloneable

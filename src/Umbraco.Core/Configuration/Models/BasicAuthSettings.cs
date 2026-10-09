@@ -12,6 +12,8 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class BasicAuthSettings
 {
     private const bool StaticEnabled = false;
+    private const string StaticLoginViewPath = "/umbraco/BasicAuthLogin/Login.cshtml";
+    private const string StaticTwoFactorViewPath = "/umbraco/BasicAuthLogin/TwoFactor.cshtml";
 
     /// <summary>
     /// Gets or sets a value indicating whether Basic Auth Middleware is enabled.
@@ -33,6 +35,18 @@ public class BasicAuthSettings
     ///     Gets or sets a value indicating whether to redirect to the login page instead of showing basic auth prompt.
     /// </summary>
     public bool RedirectToLoginPage { get; set; } = false;
+
+    /// <summary>
+    ///     Gets or sets a value for the path to the login view.
+    /// </summary>
+    [DefaultValue(StaticLoginViewPath)]
+    public string LoginViewPath { get; set; } = StaticLoginViewPath;
+
+    /// <summary>
+    ///     Gets or sets a value for the path to the two-factor view.
+    /// </summary>
+    [DefaultValue(StaticTwoFactorViewPath)]
+    public string TwoFactorViewPath { get; set; } = StaticTwoFactorViewPath;
 }
 
 /// <summary>

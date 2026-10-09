@@ -1,6 +1,8 @@
 /**
  * Extracts the file extension from a filename.
  * Returns undefined when no valid extension can be determined.
+ * @param {string} filename - The filename to extract the extension from.
+ * @returns {string | undefined} The file extension, or undefined if it cannot be determined.
  */
 export function getFileExtension(filename: string): string | undefined {
 	const dotIndex = filename.lastIndexOf('.');

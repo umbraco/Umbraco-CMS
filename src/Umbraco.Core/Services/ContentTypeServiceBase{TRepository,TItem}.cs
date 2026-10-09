@@ -357,6 +357,14 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
         var changes = new List<ContentTypeChange<TItem>>();
 
+        // Track which types genuinely need a raw cmsContentNu rebuild vs. which only had a property removed.
+        // A type can appear via more than one path (e.g. a batch save touching a composition, where the same
+        // type is both saved directly and returned by GetComposedOf as a different instance), so we key these
+        // by Id — not entity reference — and resolve the RawDataUnaffected flag once at the end: it is only
+        // safe when *nothing* required a rebuild for that Id.
+        var rebuildRequiredIds = new HashSet<int>();
+        var rawDataUnaffectedCandidateIds = new HashSet<int>();
+
         foreach (TItem contentType in contentTypes)
         {
             var dirty = (IRememberBeingDirty)contentType;
@@ -400,14 +408,42 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             // property variation change?
             var hasAnyPropertyVariationChanged = contentType.WasPropertyTypeVariationChanged();
 
+            // A composition change dirties the composition collection (add or remove). Both directions change the
+            // set of properties this content type - and every type composed of or inheriting from it - exposes, so
+            // it is a main-impact change that must refresh this type and its descendants. Whether it also needs a
+            // raw cmsContentNu rebuild is decided separately below: an addition on its own does not (its aliases
+            // have no stored values yet), but a removal - or an addition that reintroduces a just-removed alias -
+            // does. See the rawDataAffected calculation.
+            var hasCompositionChanged = dirty.WasPropertyDirty("ContentTypeComposition");
+
             // main impact on properties?
             var hasPropertyMainImpact = hasContentTypeVariationChanged || hasAnyPropertyVariationChanged
-                                                                       || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias;
+                                                                       || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias
+                                                                       || hasCompositionChanged;
 
             if (hasAliasChanged || hasPropertyMainImpact)
             {
+                // The raw cmsContentNu blob is keyed by property alias, so a structural change only requires a
+                // rebuild when it re-keys existing stored values or lets a stale value resolve to a different
+                // property. It does NOT when the only structural change is:
+                //  - a property removal - the orphaned value simply stops resolving and is never read again, or
+                //  - a composition being added - its new aliases have no stored value yet.
+                // In those cases clearing the converted content cache is enough (the content type cache is
+                // refreshed regardless). An alias or variation change, a composition removal, or a property
+                // removal combined with a composition change (which can reintroduce the removed alias behind a
+                // different property type) all re-key or revive stored values and therefore need a rebuild.
+                var rawDataAffected =
+                    hasAliasChanged ||
+                    hasAnyPropertyChangedAlias ||
+                    hasContentTypeVariationChanged ||
+                    hasAnyPropertyVariationChanged ||
+                    hasAnyCompositionBeenRemoved ||
+                    (hasAnyPropertyBeenRemoved && hasCompositionChanged);
+                var rawDataUnaffected = rawDataAffected is false;
+
                 // add that one, as a main change
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);
+                (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(contentType.Id);
 
                 // Add VariationChanged flag if content type variation changed.
                 // This is used by DocumentUrlService to rebuild URL cache with correct languageId.
@@ -420,7 +456,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 {
                     foreach (TItem c in GetComposedOf(contentType.Id))
                     {
+                        // Composing types inherit the same property change, so they share its rebuild requirement.
                         AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
+                        (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(c.Id);
                     }
                 }
             }
@@ -428,6 +466,20 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             {
                 // add that one, as an other change
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
+            }
+        }
+
+        // Flag the raw data as unaffected only for types that were never independently marked as needing a
+        // rebuild. RawDataUnaffected supplements RefreshMain, so only apply it to entries that already carry
+        // RefreshMain — a batch save can emit a separate RefreshOther-only entry for the same Id, which must
+        // not be flagged.
+        foreach (ContentTypeChange<TItem> change in changes)
+        {
+            if (change.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain)
+                && rawDataUnaffectedCandidateIds.Contains(change.Item.Id)
+                && rebuildRequiredIds.Contains(change.Item.Id) is false)
+            {
+                change.ChangeTypes |= ContentTypeChangeTypes.RawDataUnaffected;
             }
         }
 
@@ -702,9 +754,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             throw new ArgumentException("Cannot save item with empty name.");
         }
 
-        if (item.Name != null && item.Name.Length > 255)
+        if (item.Name != null && item.Name.Length > Constants.Validation.MaxNameLength)
         {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
 
         scope.WriteLock(WriteLockIds);
@@ -860,7 +912,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return Attempt.Fail(ContentTypeOperationStatus.NameCannotBeEmpty);
         }
 
-        if (item.Name.Length > 255)
+        if (item.Name.Length > Constants.Validation.MaxNameLength)
         {
             return Attempt.Fail(ContentTypeOperationStatus.NameTooLong);
         }
@@ -1364,6 +1416,20 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Allowed types
 
+    /// <summary>
+    /// Gets the content types that are candidates for being allowed at root.
+    /// </summary>
+    /// <remarks>
+    /// Override this in derived classes to change the filtering behavior. For example,
+    /// member types override this to return all member types, since members are a flat list.
+    /// </remarks>
+    /// <returns>The content types allowed at root before additional filtering.</returns>
+    protected virtual IEnumerable<TItem> GetAllowedAtRootCandidates()
+    {
+        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
+        return Repository.Get(query).ToArray();
+    }
+
     /// <inheritdoc />
     public async Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take)
     {
@@ -1372,18 +1438,19 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         // that one is special because it works across content, media and member types
         scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
 
-        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
-        IEnumerable<TItem> contentTypes = Repository.Get(query).ToArray();
+        IEnumerable<TItem> contentTypes = GetAllowedAtRootCandidates();
 
         foreach (IContentTypeFilter filter in _contentTypeFilters)
         {
             contentTypes = await filter.FilterAllowedAtRootAsync(contentTypes);
         }
 
+        TItem[] materialized = contentTypes.ToArray();
+
         var pagedModel = new PagedModel<TItem>
         {
-            Total = contentTypes.Count(),
-            Items = contentTypes.Skip(skip).Take(take)
+            Total = materialized.Length,
+            Items = materialized.Skip(skip).Take(take)
         };
 
         return pagedModel;
@@ -1430,7 +1497,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             TItem[] allowedChildren = GetMany(sortedKeys).ToArray();
             result = new PagedModel<TItem>
             {
-                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Take(take).Skip(skip),
+                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Skip(skip).Take(take),
                 Total = allowedChildren.Length,
             };
         }

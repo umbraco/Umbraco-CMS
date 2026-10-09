@@ -9,7 +9,7 @@ export class UmbSubmitWorkspaceAction<
 	ArgsMetaType extends MetaWorkspaceAction = MetaWorkspaceAction,
 	WorkspaceContextType extends UmbSubmittableWorkspaceContext = UmbSubmittableWorkspaceContext,
 > extends UmbWorkspaceActionBase<ArgsMetaType> {
-	protected _retrieveWorkspaceContext: Promise<unknown>;
+	protected _retrieveWorkspaceContext?: Promise<unknown>;
 	protected _workspaceContext?: WorkspaceContextType;
 
 	constructor(host: UmbControllerHost, args: UmbSubmitWorkspaceActionArgs<ArgsMetaType>) {
@@ -23,13 +23,18 @@ export class UmbSubmitWorkspaceAction<
 				this.#observeUnique();
 				this._gotWorkspaceContext();
 			},
-		).asPromise();
+		)
+			.asPromise()
+			.catch(() => {
+				return undefined;
+			});
 	}
 
 	#observeUnique() {
 		this.observe(
 			this._workspaceContext?.unique,
 			(unique) => {
+				if (!this._workspaceContext) return;
 				// We can't save if we don't have a unique
 				if (unique === undefined) {
 					this.disable();
@@ -48,6 +53,6 @@ export class UmbSubmitWorkspaceAction<
 
 	override async execute() {
 		await this._retrieveWorkspaceContext;
-		return await this._workspaceContext!.requestSubmit();
+		return await this._workspaceContext?.requestSubmit();
 	}
 }

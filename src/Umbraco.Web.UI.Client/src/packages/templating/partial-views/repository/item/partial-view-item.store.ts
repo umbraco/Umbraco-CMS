@@ -16,7 +16,7 @@ export class UmbPartialViewItemStore extends UmbItemStoreBase<UmbPartialViewItem
 	 * @memberof UmbPartialViewItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_PARTIAL_VIEW_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_PARTIAL_VIEW_ITEM_STORE_CONTEXT);
 	}
 }
 

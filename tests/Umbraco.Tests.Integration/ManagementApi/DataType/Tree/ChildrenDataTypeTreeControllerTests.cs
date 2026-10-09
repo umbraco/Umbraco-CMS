@@ -19,7 +19,7 @@ public class ChildrenDataTypeTreeControllerTests : ManagementApiUserGroupTestBas
     private Guid _dataTypeFolderKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         // Folder
         _dataTypeFolderKey = Guid.NewGuid();

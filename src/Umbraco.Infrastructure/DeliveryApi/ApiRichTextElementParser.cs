@@ -122,7 +122,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             .ToArray();
 
         var tag = TagName(element);
-        var attributes = element.Attributes.ToDictionary(a => a.Name, a => a.Value as object);
+        var attributes = element.Attributes.ToDictionary(a => a.Name, a => (object)(a.Value ?? string.Empty));
 
         ReplaceLocalLinks(contentCache, mediaCache, attributes);
 
@@ -155,6 +155,10 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         {
             type = "unknown";
         }
+
+        // Normalize the type to lower case to tolerate historic mis-cased values written by the (now fixed)
+        // ConvertLocalLinks migration for Umbraco 15 (see #22597). Constants.UdiEntityType.* values are lower case.
+        type = type.ToLowerInvariant();
 
         // Extract culture from attributes if present
         var culture = attributes.TryGetValue("data-culture", out object? cultureAttribute)

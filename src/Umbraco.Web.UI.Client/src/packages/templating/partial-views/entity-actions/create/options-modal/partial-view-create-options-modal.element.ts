@@ -4,7 +4,9 @@ import type { UmbPartialViewCreateOptionsModalData } from './index.js';
 import { html, customElement, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
+/** @deprecated Use the `Umb.EntityAction.PartialView.Create` entity action with `entityCreateOptionAction` extensions instead. Scheduled for removal in Umbraco 19. */
 @customElement('umb-partial-view-create-options-modal')
 export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement<
 	UmbPartialViewCreateOptionsModalData,
@@ -14,6 +16,14 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 
 	override connectedCallback(): void {
 		super.connectedCallback();
+
+		new UmbDeprecation({
+			deprecated: 'UMB_PARTIAL_VIEW_CREATE_OPTIONS_MODAL and its associated modal element are deprecated.',
+			removeInVersion: '19.0.0',
+			solution:
+				'Use the Umb.EntityAction.PartialView.Create entity action with entityCreateOptionAction extensions instead.',
+		}).warn();
+
 		if (!this.data?.parent) throw new Error('A parent unique is required to create a folder');
 
 		this.#createFolderAction = new UmbCreateFolderEntityAction(this, {

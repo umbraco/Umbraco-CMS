@@ -85,13 +85,9 @@ public struct ContentAndSettingsReference : IEquatable<ContentAndSettingsReferen
     public override bool Equals(object? obj) => obj is ContentAndSettingsReference reference && Equals(reference);
 
     /// <inheritdoc />
-    public bool Equals(ContentAndSettingsReference other) => other != null
-                                                             && EqualityComparer<Udi>.Default.Equals(
-                                                                 ContentUdi,
-                                                                 other.ContentUdi)
-                                                             && EqualityComparer<Udi>.Default.Equals(
-                                                                 SettingsUdi,
-                                                                 other.SettingsUdi);
+    public bool Equals(ContentAndSettingsReference other) =>
+        EqualityComparer<Udi>.Default.Equals(ContentUdi, other.ContentUdi)
+        && EqualityComparer<Udi>.Default.Equals(SettingsUdi, other.SettingsUdi);
 
     /// <inheritdoc />
     public override int GetHashCode() => (ContentUdi, SettingsUdi).GetHashCode();

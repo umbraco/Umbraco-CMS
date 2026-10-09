@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 			properties: [
 				{
 					alias: 'maxChars',
-					label: 'Maximum allowed characters',
+					label: '#textbox_maxCharsLabel',
 					description: 'If empty - no character limit',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 					config: [{ alias: 'min', value: 0 }],

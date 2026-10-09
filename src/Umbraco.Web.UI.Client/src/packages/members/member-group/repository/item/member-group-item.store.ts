@@ -5,7 +5,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbMemberGroupItemStore
- * @augments {UmbStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Member Group items
  */
 
@@ -16,7 +16,7 @@ export class UmbMemberGroupItemStore extends UmbItemStoreBase<UmbMemberGroupItem
 	 * @memberof UmbMemberGroupItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MEMBER_GROUP_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_MEMBER_GROUP_ITEM_STORE_CONTEXT);
 	}
 }
 

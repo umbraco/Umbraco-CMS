@@ -7,9 +7,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Label Property Editor UI',
 		element: () => import('./property-editor-ui-label.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Label',
 			icon: 'icon-readonly',
-			group: 'common',
+			group: '#propertyEditorUIGroups_common',
+			keywords: ['readonly', 'display', 'static', 'computed', 'info', 'key', 'id'],
 			propertyEditorSchemaAlias: 'Umbraco.Label',
 			supportsReadOnly: true,
 			settings: {

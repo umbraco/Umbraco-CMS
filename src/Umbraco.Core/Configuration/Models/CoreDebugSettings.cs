@@ -6,9 +6,11 @@ using System.ComponentModel;
 namespace Umbraco.Cms.Core.Configuration.Models;
 
 /// <summary>
-///     Typed configuration options for core debug settings.
+///     Typed configuration options for debug settings.
 /// </summary>
-[UmbracoOptions(Constants.Configuration.ConfigCoreDebug)]
+// TODO (V19): Rename to DebugSettings to match the "Umbraco:CMS:Debug" section (the "Core" prefix
+// dates from the legacy "Umbraco:CMS:Core:Debug" section, which is deprecated).
+[UmbracoOptions(Constants.Configuration.ConfigDebug)]
 public class CoreDebugSettings
 {
     /// <summary>

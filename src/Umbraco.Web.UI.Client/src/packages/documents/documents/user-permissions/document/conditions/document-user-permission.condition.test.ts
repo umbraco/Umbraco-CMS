@@ -10,17 +10,18 @@ import {
 	UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_USER_PERMISSION_DOCUMENT_READ,
 } from '@umbraco-cms/backoffice/document';
+import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 
 @customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
 	currentUserContext = new UmbCurrentUserContext(this);
 	entityContext = new UmbEntityContext(this);
 	ancestorsContext = new UmbAncestorsEntityContext(this);
+	currentUserStore = new UmbCurrentUserStore(this);
 
 	constructor() {
 		super();
 		new UmbNotificationContext(this);
-		new UmbCurrentUserStore(this);
 	}
 
 	async init() {
@@ -35,11 +36,22 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 	setEntityAncestors(ancestors: Array<UmbEntityModel>) {
 		this.ancestorsContext.setAncestors(ancestors);
 	}
+
+	setDocumentStartNodeAccess(hasDocumentRootAccess: boolean, documentStartNodeUniques: Array<string>) {
+		this.currentUserStore.update({
+			hasDocumentRootAccess,
+			documentStartNodeUniques: documentStartNodeUniques.map((unique) => ({ unique })),
+		});
+	}
 }
 
 describe('UmbDocumentUserPermissionCondition', () => {
 	let hostElement: UmbTestControllerHostElement;
 	let condition: UmbDocumentUserPermissionCondition;
+
+	before(async () => {
+		await useMockSet('userPermissions');
+	});
 
 	beforeEach(async () => {
 		hostElement = new UmbTestControllerHostElement();
@@ -137,6 +149,121 @@ describe('UmbDocumentUserPermissionCondition', () => {
 				config: {
 					alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 					allOf: [UMB_USER_PERMISSION_DOCUMENT_READ],
+				},
+				onChange: () => {
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(condition.permitted).to.be.true;
+						condition.hostDisconnected();
+						done();
+					}
+				},
+			});
+		});
+	});
+
+	describe('Start node access', () => {
+		it('is permitted when the document is within the users start-node subtree', (done) => {
+			// User without root access, scoped to the "permissions-document-id" subtree
+			hostElement.setDocumentStartNodeAccess(false, ['permissions-document-id']);
+
+			// A descendant of the start node
+			hostElement.setEntity({
+				unique: 'permissions-document-1-id',
+				entityType: UMB_DOCUMENT_ENTITY_TYPE,
+			});
+			hostElement.setEntityAncestors([{ unique: 'permissions-document-id', entityType: UMB_DOCUMENT_ENTITY_TYPE }]);
+
+			let callbackCount = 0;
+
+			condition = new UmbDocumentUserPermissionCondition(hostElement, {
+				host: hostElement,
+				config: {
+					alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
+					allOf: [UMB_USER_PERMISSION_DOCUMENT_READ],
+				},
+				onChange: () => {
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(condition.permitted).to.be.true;
+						condition.hostDisconnected();
+						done();
+					}
+				},
+			});
+		});
+
+		it('is not permitted when the document is outside the users start-node subtree', (done) => {
+			// User without root access, scoped to the "permissions-document-id" subtree
+			hostElement.setDocumentStartNodeAccess(false, ['permissions-document-id']);
+
+			// A document outside the start-node subtree - fallback permissions would otherwise grant read
+			hostElement.setEntity({
+				unique: 'no-permissions-document-id',
+				entityType: UMB_DOCUMENT_ENTITY_TYPE,
+			});
+			hostElement.setEntityAncestors([
+				{ unique: 'no-permissions-parent-document-id', entityType: UMB_DOCUMENT_ENTITY_TYPE },
+			]);
+
+			condition = new UmbDocumentUserPermissionCondition(hostElement, {
+				host: hostElement,
+				config: {
+					alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
+					allOf: [UMB_USER_PERMISSION_DOCUMENT_READ],
+				},
+				onChange: () => {},
+			});
+
+			// The onChange callback is not called when the condition is false, so we need to wait and check manually
+			setTimeout(() => {
+				expect(condition.permitted).to.be.false;
+				condition.hostDisconnected();
+				done();
+			}, 200);
+		});
+
+		it('is not permitted when the user has no start nodes and no root access', (done) => {
+			hostElement.setDocumentStartNodeAccess(false, []);
+
+			hostElement.setEntity({
+				unique: 'permissions-document-id',
+				entityType: UMB_DOCUMENT_ENTITY_TYPE,
+			});
+			hostElement.setEntityAncestors([]);
+
+			condition = new UmbDocumentUserPermissionCondition(hostElement, {
+				host: hostElement,
+				config: {
+					alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
+					allOf: [UMB_USER_PERMISSION_DOCUMENT_READ],
+				},
+				onChange: () => {},
+			});
+
+			// The onChange callback is not called when the condition is false, so we need to wait and check manually
+			setTimeout(() => {
+				expect(condition.permitted).to.be.false;
+				condition.hostDisconnected();
+				done();
+			}, 200);
+		});
+
+		it('is permitted with ignorerUserStartNodes:true even when outside start-node subtree', (done) => {
+			hostElement.setDocumentStartNodeAccess(false, ['permissions-document-id']);
+			hostElement.setEntity({ unique: 'no-permissions-document-id', entityType: UMB_DOCUMENT_ENTITY_TYPE });
+			hostElement.setEntityAncestors([
+				{ unique: 'no-permissions-parent-document-id', entityType: UMB_DOCUMENT_ENTITY_TYPE },
+			]);
+
+			let callbackCount = 0;
+
+			condition = new UmbDocumentUserPermissionCondition(hostElement, {
+				host: hostElement,
+				config: {
+					alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
+					allOf: [UMB_USER_PERMISSION_DOCUMENT_READ],
+					ignorerUserStartNodes: true, // bypass start-node check
 				},
 				onChange: () => {
 					callbackCount++;

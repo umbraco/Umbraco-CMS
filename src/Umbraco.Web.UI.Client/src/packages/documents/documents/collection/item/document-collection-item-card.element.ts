@@ -1,6 +1,8 @@
 import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../document-collection.context-token.js';
 import type { UmbDocumentCollectionFilterModel } from '../types.js';
 import { UmbDocumentItemDataResolver } from '../../item/document-item-data-resolver.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
+import { getDocumentVariantStateTagConfig } from '../../variant-state/utils.js';
 import type { UmbDocumentCollectionItemModel } from './types.js';
 import {
 	css,
@@ -20,10 +22,9 @@ import type {
 	UmbDefaultCollectionContext,
 	UmbEntityCollectionItemElement,
 } from '@umbraco-cms/backoffice/collection';
+import { UmbTreeItemOpenEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-document-collection-item-card')
@@ -65,7 +66,7 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	private _name?: string;
 
 	@state()
-	private _state?: string;
+	private _state?: UmbDocumentVariantState | null;
 
 	@state()
 	private _createDate?: Date;
@@ -87,7 +88,7 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 		});
 
 		this.#resolver.observe(this.#resolver.name, (name) => (this._name = name || ''));
-		this.#resolver.observe(this.#resolver.state, (state) => (this._state = state || ''));
+		this.#resolver.observe(this.#resolver.state, (state) => (this._state = state));
 		this.#resolver.observe(this.#resolver.createDate, (createDate) => (this._createDate = createDate));
 		this.#resolver.observe(this.#resolver.updateDate, (updateDate) => (this._updateDate = updateDate));
 	}
@@ -116,65 +117,62 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 		this.dispatchEvent(new UmbDeselectedEvent(this.item.unique));
 	}
 
+	#onOpen(event: Event) {
+		if (!this.item?.hasChildren) return;
+		event.stopPropagation();
+		this.dispatchEvent(new UmbTreeItemOpenEvent({ unique: this.item.unique, entityType: this.item.entityType }));
+	}
+
 	#getPropertyValueByAlias(alias: string) {
-		if (!this.item) return '';
+		if (!this.item) return { value: '' };
 
 		switch (alias) {
 			case 'contentTypeAlias':
-				return this.item.documentType.alias;
+				return { value: this.item.documentType.alias };
 			case 'createDate':
-				return this._createDate?.toLocaleString();
+				return { value: this._createDate?.toLocaleString() };
 			case 'creator':
 			case 'owner':
-				return this.item.creator;
+				return { value: this.item.creator };
 			case 'name':
-				return this._name;
+				return { value: this._name };
 			case 'state':
-				return this._state ? fromCamelCase(this._state) : '';
+				return { value: this._state ? fromCamelCase(this._state) : '' };
 			case 'published':
-				return this._state !== DocumentVariantStateModel.DRAFT ? 'True' : 'False';
+				return { value: this._state !== UmbDocumentVariantState.DRAFT ? 'True' : 'False' };
 			case 'sortOrder':
-				return this.item.sortOrder;
+				return { value: this.item.sortOrder };
 			case 'updateDate':
-				return this._updateDate?.toLocaleString();
+				return { value: this._updateDate?.toLocaleString() };
 			case 'updater':
-				return this.item.updater;
+				return { value: this.item.updater };
 			default: {
 				const culture = this.#resolver.getCulture();
 				const prop = this.item.values.find((x) => x.alias === alias && (!x.culture || x.culture === culture));
-				return prop?.value ?? '';
+				return { value: prop?.value ?? '', editorAlias: prop?.editorAlias };
 			}
 		}
 	}
 
-	#getStateTagConfig(): { color: UUIInterfaceColor; label: string } | undefined {
-		if (!this._state) return;
-		switch (this._state) {
-			case DocumentVariantStateModel.PUBLISHED:
-				return { color: 'positive', label: this.localize.term('content_published') };
-			case DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES:
-				return { color: 'warning', label: this.localize.term('content_publishedPendingChanges') };
-			case DocumentVariantStateModel.DRAFT:
-				return { color: 'default', label: this.localize.term('content_unpublished') };
-			case DocumentVariantStateModel.NOT_CREATED:
-				return { color: 'danger', label: this.localize.term('content_notCreated') };
-			default:
-				return { color: 'danger', label: fromCamelCase(this._state) };
-		}
+	get #selectOnly(): boolean {
+		return !this.item?.hasChildren && this.selectOnly;
 	}
 
 	override render() {
 		if (!this.item) return nothing;
+		const href = this.selectOnly ? undefined : this.href;
 		return html`
 			<uui-card-content-node
 				.name=${this._name}
-				href=${ifDefined(this.href)}
+				href=${ifDefined(href)}
+				?has-children=${this.item.hasChildren}
 				?selectable=${this.selectable}
-				?select-only=${this.selectOnly}
+				?select-only=${this.#selectOnly}
 				?selected=${this.selected}
 				?disabled=${this.disabled}
 				@selected=${this.#onSelected}
-				@deselected=${this.#onDeselected}>
+				@deselected=${this.#onDeselected}
+				@open=${this.#onOpen}>
 				${this.#renderIcon()} ${this.#renderState()}
 				<div id="properties">${this.#renderProperties()}</div>
 				<slot name="actions" slot="actions"></slot>
@@ -188,9 +186,9 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	}
 
 	#renderState() {
-		const tagConfig = this.#getStateTagConfig();
-		if (!tagConfig) return nothing;
-		return html`<uui-tag slot="tag" id="state" color=${tagConfig.color} look="secondary">${tagConfig.label}</uui-tag>`;
+		if (this._state === undefined) return nothing;
+		const { color, label } = getDocumentVariantStateTagConfig(this._state, this.localize);
+		return html`<uui-tag slot="tag" id="state" color=${color} look="secondary">${label}</uui-tag>`;
 	}
 
 	#renderProperties() {
@@ -207,14 +205,19 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	}
 
 	#renderProperty(column: UmbCollectionColumnConfiguration) {
-		const value = this.#getPropertyValueByAlias(column.alias);
+		const { value, editorAlias } = this.#getPropertyValueByAlias(column.alias);
 		return html`
 			<li>
 				<span>${this.localize.string(column.header)}:</span>
 				${when(
 					column.nameTemplate,
 					() => html`<umb-ufm-render inline .markdown=${column.nameTemplate} .value=${{ value }}></umb-ufm-render>`,
-					() => html`${value}`,
+					() =>
+						editorAlias
+							? html`<umb-value-summary-extension
+									.valueType=${editorAlias}
+									.value=${value}></umb-value-summary-extension>`
+							: html`${value}`,
 				)}
 			</li>
 		`;

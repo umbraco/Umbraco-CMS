@@ -5,7 +5,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbDocumentBlueprintItemStore
- * @augments {UmbStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Document items
  */
 
@@ -16,7 +16,7 @@ export class UmbDocumentBlueprintItemStore extends UmbItemStoreBase<UmbDocumentB
 	 * @memberof UmbDocumentBlueprintItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DOCUMENT_BLUEPRINT_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_DOCUMENT_BLUEPRINT_ITEM_STORE_CONTEXT);
 	}
 }
 

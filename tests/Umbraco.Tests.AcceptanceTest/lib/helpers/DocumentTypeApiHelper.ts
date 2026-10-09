@@ -13,7 +13,7 @@ export class DocumentTypeApiHelper {
     const rootDocumentTypes = await this.getAllAtRoot();
     const jsonDocumentTypes = await rootDocumentTypes.json();
 
-    for (const documentType of jsonDocumentTypes.items) {
+    for (const documentType of this.api.itemsOf(jsonDocumentTypes)) {
       if (documentType.name === name) {
         if (documentType.isFolder) {
           return await this.recurseDeleteChildren(documentType);
@@ -46,7 +46,10 @@ export class DocumentTypeApiHelper {
         }
         return await this.delete(child.id);
       } else if (child.hasChildren) {
-        return await this.recurseChildren(name, child.id, toDelete);
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
@@ -73,7 +76,7 @@ export class DocumentTypeApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/document-type/children?parentId=${id}&skip=0&take=10000&foldersOnly=false`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async create(documentType) {
@@ -81,7 +84,7 @@ export class DocumentTypeApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-type', documentType);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async get(id: string) {
@@ -97,7 +100,7 @@ export class DocumentTypeApiHelper {
     const rootDocumentTypes = await this.getAllAtRoot();
     const jsonDocumentTypes = await rootDocumentTypes.json();
 
-    for (const documentType of jsonDocumentTypes.items) {
+    for (const documentType of this.api.itemsOf(jsonDocumentTypes)) {
       if (documentType.name === name) {
         if (documentType.isFolder) {
           return this.getFolder(documentType.id);
@@ -142,7 +145,7 @@ export class DocumentTypeApiHelper {
 
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-type/folder', folder);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async renameFolder(folderId: string, folderName: string) {
@@ -158,6 +161,17 @@ export class DocumentTypeApiHelper {
     const documentType = new DocumentTypeBuilder()
       .withName(documentTypeName)
       .withAlias(AliasHelper.toAlias(documentTypeName))
+      .build();
+    return await this.create(documentType);
+  }
+
+  async createDefaultDocumentTypeInFolder(documentTypeName: string, folderId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withFolderId(folderId)
       .build();
     return await this.create(documentType);
   }
@@ -467,7 +481,7 @@ export class DocumentTypeApiHelper {
       .build();
     return await this.create(documentType);
   }
-  
+
   async createDocumentTypeWithTwoGroups(documentTypeName: string,dataType: string, dataTypeId: string, groupNameOne: string, groupNameTwo: string) {
     const crypto = require('crypto');
     const groupOneId = crypto.randomUUID();
@@ -504,7 +518,7 @@ export class DocumentTypeApiHelper {
       .build();
     return await this.create(documentType);
   }
-  
+
   async createDocumentTypeWithAComposition(documentTypeName: string, compositionId: string) {
     await this.ensureNameNotExists(documentTypeName);
 
@@ -518,6 +532,97 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
+  async createDocumentTypeWithTwoCompositions(documentTypeName: string, firstCompositionId: string, secondCompositionId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .addComposition()
+        .withDocumentTypeId(firstCompositionId)
+        .done()
+      .addComposition()
+        .withDocumentTypeId(secondCompositionId)
+        .done()
+      .build();
+
+    return await this.create(documentType);
+  }
+
+  async createDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName: string, compositionId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .addComposition()
+        .withDocumentTypeId(compositionId)
+        .done()
+      .build();
+
+    return await this.create(documentType);
+  }
+
+  async createDocumentTypeWithPropertyEditorAndComposition(documentTypeName: string, dataTypeName: string, dataTypeId: string, groupName: string, compositionId: string) {
+    const crypto = require('crypto');
+    const containerId = crypto.randomUUID();
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .addContainer()
+        .withName(groupName)
+        .withId(containerId)
+        .withType("Group")
+        .done()
+      .addProperty()
+        .withContainerId(containerId)
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withName(dataTypeName)
+        .withDataTypeId(dataTypeId)
+        .done()
+      .addComposition()
+        .withDocumentTypeId(compositionId)
+        .done()
+      .build();
+
+    return await this.create(documentType);
+  }
+
+  async createVariantDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName: string, compositionId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .withVariesByCulture(true)
+      .addComposition()
+        .withDocumentTypeId(compositionId)
+        .done()
+      .build();
+
+    return await this.create(documentType);
+  }
+
+  async createElementTypeWithAComposition(elementTypeName: string, compositionId: string) {
+    await this.ensureNameNotExists(elementTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(elementTypeName)
+      .withAlias(AliasHelper.toAlias(elementTypeName))
+      .withIsElement(true)
+      .withIcon("icon-plugin")
+      .addComposition()
+        .withDocumentTypeId(compositionId)
+        .done()
+      .build();
+
+    return await this.create(documentType);
+  }
+
   async createEmptyElementType(elementTypeName: string) {
     await this.ensureNameNotExists(elementTypeName);
 
@@ -527,9 +632,10 @@ export class DocumentTypeApiHelper {
       .withIsElement(true)
       .withIcon("icon-plugin")
       .build();
+
     return await this.create(documentType);
   }
-  
+
   async createDocumentTypeWithTwoTabs(documentTypeName: string, dataType: string, dataTypeId: string, tabNameOne: string, tabNameTwo: string) {
     const crypto = require('crypto');
     const tabOneId = crypto.randomUUID();
@@ -583,10 +689,10 @@ export class DocumentTypeApiHelper {
 
   async createDefaultElementType(elementName: string, groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, isMandatory: boolean = false) {
     await this.ensureNameNotExists(elementName);
-    
+
     const crypto = require('crypto');
     const containerId = crypto.randomUUID();
-    
+
     const documentType = new DocumentTypeBuilder()
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
@@ -633,7 +739,7 @@ export class DocumentTypeApiHelper {
       .build();
     return await this.create(documentType);
   }
-  
+
   async createElementTypeWithRegexValidation(elementName: string, groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, regex: string) {
     await this.ensureNameNotExists(elementName);
 
@@ -693,7 +799,7 @@ export class DocumentTypeApiHelper {
       .build();
     return await this.create(documentType);
   }
-  
+
   async doesGroupContainCorrectPropertyEditor(documentTypeName: string, dataTypeName: string, dataTypeId: string, groupName: string) {
     const documentType = await this.getByName(documentTypeName);
     const group = documentType.containers.find(x => x.name === groupName);
@@ -726,7 +832,7 @@ export class DocumentTypeApiHelper {
       return false;
     }
   }
-  
+
   async doesDocumentTypeGroupNameContainCorrectSortOrder(documentTypeName: string, groupName: string, sortOrder: number) {
     const documentType = await this.getByName(documentTypeName);
     const group = documentType.containers.find(x => x.name === groupName);
@@ -738,7 +844,7 @@ export class DocumentTypeApiHelper {
       return false;
     }
   }
-  
+
   async doesDocumentTypeTabNameContainCorrectSortOrder(documentTypeName: string, tabName: string, sortOrder: number) {
     const documentType = await this.getByName(documentTypeName);
     const tab = documentType.containers.find(x => x.name === tabName);
@@ -750,7 +856,7 @@ export class DocumentTypeApiHelper {
       return false;
     }
   }
-  
+
   async getContainerIdWithName(documentTypeName: string, containerName: string) {
     const documentType = await this.getByName(documentTypeName);
     const container = documentType.containers.find(x => x.name === containerName);
@@ -777,7 +883,7 @@ export class DocumentTypeApiHelper {
       .build();
     return await this.create(documentType);
   }
-  
+
   async createDocumentTypeWithAllowedChildNodeAndDataType(documentTypeName: string, allowedChildNodeId: string, dataTypeName: string, dataTypeId: string, groupName: string = "TestGroup") {
     const crypto = require('crypto');
     const containerId = crypto.randomUUID();
@@ -817,6 +923,20 @@ export class DocumentTypeApiHelper {
         .done()
       .withCollectionId(collectionId)
       .build();
+    return await this.create(documentType);
+  }
+
+  async createDocumentTypeWithAllowedChildNodesAndCollectionId(documentTypeName: string, allowedChildNodeIds: string[], collectionId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const builder = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true);
+    for (const allowedChildNodeId of allowedChildNodeIds) {
+      builder.addAllowedDocumentType().withId(allowedChildNodeId).done();
+    }
+    const documentType = builder.withCollectionId(collectionId).build();
     return await this.create(documentType);
   }
 
@@ -869,7 +989,7 @@ export class DocumentTypeApiHelper {
         .done()
       .withDefaultTemplateId(templateId)
       .build();
-    
+
     return await this.create(documentType);
   }
 
@@ -926,7 +1046,7 @@ export class DocumentTypeApiHelper {
         .done()
       .withVariesByCulture(true)
       .build();
-      
+
     return await this.create(documentType);
   }
 

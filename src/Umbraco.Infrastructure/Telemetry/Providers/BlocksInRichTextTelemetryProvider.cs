@@ -26,7 +26,7 @@ public class BlocksInRichTextTelemetryProvider : IDetailedTelemetryProvider
     /// Retrieves telemetry usage statistics related to blocks within rich text editors.
     /// </summary>
     /// <returns>
-    /// An <see cref="IEnumerable{T}"/> of <see cref="Umbraco.Cms.Infrastructure.Telemetry.UsageInformation"/> objects, where each entry contains statistics such as the total number of rich text editors and the total number of registered blocks within those editors.
+    /// An <see cref="IEnumerable{T}"/> of <see cref="UsageInformation"/> objects, where each entry contains statistics such as the total number of rich text editors and the total number of registered blocks within those editors.
     /// </returns>
     public IEnumerable<UsageInformation> GetInformation()
     {

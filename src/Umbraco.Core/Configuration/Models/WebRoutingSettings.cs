@@ -63,6 +63,11 @@ public class WebRoutingSettings
     internal const bool StaticUseStrictDomainMatching = false;
 
     /// <summary>
+    ///     The default value for application URL detection mode.
+    /// </summary>
+    internal const ApplicationUrlDetection StaticApplicationUrlDetection = ApplicationUrlDetection.None;
+
+    /// <summary>
     ///     Gets or sets a value indicating whether to check if any routed endpoints match a front-end request before
     ///     the Umbraco dynamic router tries to map the request to an Umbraco content item.
     /// </summary>
@@ -122,6 +127,13 @@ public class WebRoutingSettings
     ///     Gets or sets a value for the Umbraco application URL.
     /// </summary>
     public string UmbracoApplicationUrl { get; set; } = null!;
+
+    /// <summary>
+    ///     Gets or sets a value controlling how the application main URL is auto-detected
+    ///     from incoming HTTP requests (<see cref="ApplicationUrlDetection" />).
+    /// </summary>
+    [DefaultValue(StaticApplicationUrlDetection)]
+    public ApplicationUrlDetection ApplicationUrlDetection { get; set; } = StaticApplicationUrlDetection;
 
     /// <summary>
     ///     Gets or sets a value indicating whether strict domain matching is used when finding content to match the request.

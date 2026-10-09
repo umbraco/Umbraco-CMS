@@ -22,6 +22,7 @@ export default {
 		chooseWhereToMove: 'Choose where to move',
 		clear: 'Clear',
 		copy: 'Duplicate',
+		copyInProgress: 'Duplication in progress - please wait...',
 		copyTo: 'Duplicate to',
 		create: 'Create',
 		createFor: (name: string) => (name ? `Create item for ${name}` : 'Create'),
@@ -29,6 +30,7 @@ export default {
 		createGroup: 'Create group',
 		createPackage: 'Create Package',
 		delete: 'Delete',
+		deleteInProgress: 'Deletion in progress - please wait...',
 		disable: 'Disable',
 		editContent: 'Edit content',
 		editSettings: 'Edit settings',
@@ -47,6 +49,7 @@ export default {
 		liveEdit: 'Edit in Canvas',
 		logout: 'Exit',
 		move: 'Move to',
+		moveInProgress: 'Move in progress - please wait...',
 		notify: 'Notifications',
 		protect: 'Public Access',
 		publish: 'Publish',
@@ -56,6 +59,7 @@ export default {
 		remove: 'Remove',
 		rename: 'Rename',
 		republish: 'Republish entire site',
+		replace: 'Replace',
 		resendInvite: 'Resend Invitation',
 		restore: 'Restore',
 		rights: 'Permissions',
@@ -208,8 +212,8 @@ export default {
 		sendtopublishvariant: 'Content sent for publishing for languages: %0%',
 		sort: 'Sort child items performed by user',
 		custom: '%0%',
-		contentversionpreventcleanup: 'Clean up disabled for version: %0%',
-		contentversionenablecleanup: 'Clean up enabled for version: %0%',
+		contentversionpreventcleanup: 'Cleanup disabled for version: %0%',
+		contentversionenablecleanup: 'Cleanup enabled for version: %0%',
 		smallAssignDomain: 'Assign Hostname',
 		smallCopy: 'Copy',
 		smallPublish: 'Publish',
@@ -237,6 +241,8 @@ export default {
 		noItemsTitle: 'No items',
 		addCollectionConfiguration: 'Add collection',
 		cardViewLabel: 'Cards',
+		gridViewLabel: 'Grid',
+		listViewLabel: 'List',
 		tableViewLabel: 'Table',
 	},
 	content: {
@@ -285,9 +291,9 @@ export default {
 		publishedPendingChanges: 'Published (pending changes)',
 		publishStatus: 'Publication Status',
 		publishDescendantsHelp:
-			'Publish <strong>%0%</strong> and all items underneath and thereby making their content publicly available.',
+			'Save and publish <strong>%0%</strong> and publish all items underneath thereby making their content publicly available.',
 		publishDescendantsWithVariantsHelp:
-			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
+			'Save and publish variants and publish variants of same type underneath thereby making their content publicly available.',
 		noVariantsToProcess: 'There are no available variants',
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
@@ -339,6 +345,7 @@ export default {
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your website administrator.',
 		isSensitiveValue_short: 'This value is hidden.',
+		isSensitiveValueNotice: 'If you need access to view the hidden values, contact your website administrator.',
 		languagesToPublish: 'What languages would you like to publish?',
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
@@ -365,6 +372,8 @@ export default {
 		selectAllVariants: 'Select all variants',
 		saveModalTitle: 'Save',
 		saveAndPublishModalTitle: 'Save and publish',
+		saveAndPublishDescendantsModalTitle: 'Save and publish with descendants',
+		saveAndScheduleModalTitle: 'Save and schedule publishing',
 		publishModalTitle: 'Publish',
 		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
 		sharedAcrossCultures: 'Shared across cultures',
@@ -403,6 +412,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Click to upload',
+		browseFilesAction: 'Browse files',
+		dropFilesOr: 'Drag and drop media here<br />or',
 		orClickHereToUpload: 'or click here to choose files',
 		disallowedFileType: 'Cannot upload this file, it does not have an approved file type',
 		disallowedFileExtension: (extension: string) =>
@@ -436,6 +447,11 @@ export default {
 		memberHasPassword: 'The member already has a password set',
 		memberKindDefault: 'Member',
 		memberKindApi: 'API Member',
+		memberKindExternalOnly: 'External',
+		profileData: 'Profile data',
+		externalMemberTitle: 'External member',
+		externalMemberDescription:
+			'This member is managed by an external authentication provider. Identity data such as email and username is maintained by the provider, not Umbraco.',
 		memberLockoutNotEnabled: 'Lockout is not enabled for this member',
 		memberNotInGroup: "The member is not in group '%0%'",
 	},
@@ -459,7 +475,7 @@ export default {
 		enterFolderName: 'Enter a folder name',
 		updateData: 'Choose a type and a title',
 		noDocumentTypes:
-			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.',
+			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Structure</strong>.',
 		noDocumentTypesAtRoot:
 			'There are no Document Types available for creating content here. You must create these in <strong>Document Types</strong> within the <strong>Settings</strong> section.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -467,9 +483,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Edit permissions for this Document Type',
 		noDocumentTypesCreateNew: 'Create a new Document Type',
 		noDocumentTypesAllowedAtRoot:
-			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.',
+			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Structure</strong>.',
 		noMediaTypes:
-			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.',
+			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Structure</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			"The selected media in the tree doesn't allow for any other media to be created below it.",
 		noMediaTypesEditPermissions: 'Edit permissions for this Media Type',
@@ -554,6 +570,7 @@ export default {
 		confirmdeleteNumberOfItems: 'Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items',
 		confirmdisable: 'Are you sure you want to disable',
 		confirmremove: 'Are you sure you want to remove',
+		confirmRemoveItem: (name: string) => `Are you sure you want to remove${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmremoveusageof: 'Are you sure you want to remove the usage of <strong>%0%</strong>',
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
@@ -669,7 +686,7 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
-		seeErrorAction: 'See error',
+		seeErrorAction: 'Full Error Message',
 		seeErrorDialogHeadline: 'Error details',
 	},
 	dictionary: {
@@ -863,6 +880,7 @@ export default {
 		content: 'Content',
 		continue: 'Continue',
 		copy: 'Copy',
+		copied: 'Copied!',
 		create: 'Create',
 		database: 'Database',
 		date: 'Date',
@@ -932,6 +950,8 @@ export default {
 		no: 'No',
 		nodeName: 'Node Name',
 		notFound: 'Not found',
+		noResults: 'No results',
+		noResultsFor: (query: string) => `No result for "${query}".`,
 		of: 'of',
 		off: 'Off',
 		ok: 'OK',
@@ -943,6 +963,7 @@ export default {
 		password: 'Password',
 		path: 'Path',
 		pixels: 'pixels',
+		placeholder: 'Placeholder',
 		pleasewait: 'One moment please...',
 		previous: 'Previous',
 		properties: 'Properties',
@@ -958,6 +979,7 @@ export default {
 		rename: 'Rename',
 		renew: 'Renew',
 		required: 'Required',
+		reset: 'Reset',
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
@@ -966,6 +988,8 @@ export default {
 		search: 'Search',
 		searchNoResult: 'Sorry, we can not find what you are looking for.',
 		noItemsInList: 'No items have been added',
+		scrollLeft: 'Scroll left',
+		scrollRight: 'Scroll right',
 		server: 'Server',
 		settings: 'Settings',
 		shared: 'Shared',
@@ -976,6 +1000,7 @@ export default {
 		status: 'Status',
 		submit: 'Submit',
 		success: 'Success',
+		switchView: 'Switch view',
 		type: 'Type',
 		typeName: 'Type Name',
 		typeToSearch: 'Type to search...',
@@ -993,6 +1018,7 @@ export default {
 		username: 'Username',
 		value: 'Value',
 		view: 'View',
+		weight: 'Weight',
 		welcome: 'Welcome...',
 		width: 'Width',
 		yes: 'Yes',
@@ -1196,6 +1222,7 @@ export default {
 		instruction: 'Sign in to Umbraco',
 		signInWith: 'Sign in with {0}',
 		timeout: 'Your session has timed out. Please sign in again below.',
+		invalidPasswordMessage: 'The password is not strong enough.',
 	},
 	main: {
 		dashboard: 'Dashboard',
@@ -1336,6 +1363,9 @@ export default {
 		contentPublishedFailedReqCultureValidationError:
 			"Validation failed for required language '%0%'. This language was saved but not published.",
 	},
+	unpublish: {
+		inProgress: 'Unpublishing in progress - please wait...',
+	},
 	colorpicker: {
 		noColors: 'You have not configured any approved colours',
 	},
@@ -1417,6 +1447,18 @@ export default {
 	propertyEditorPicker: {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
+		selectAction: 'Select Property Editor',
+	},
+	propertyEditorUIGroups: {
+		advanced: 'Advanced',
+		blocks: 'Blocks',
+		common: 'Common',
+		date: 'Date',
+		lists: 'Lists',
+		media: 'Media',
+		people: 'People',
+		pickers: 'Pickers',
+		richContent: 'Rich Content',
 	},
 	relatedlinks: {
 		enterExternal: 'enter external link',
@@ -1440,6 +1482,7 @@ export default {
 		showDiff: 'Show differences between the current (draft) version and the selected version.',
 		diffHelp: '<del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added.',
 		noDiff: 'There are no differences between the current (draft) version and the selected version.',
+		contentRolledBack: 'Content has been rolled back',
 		documentRolledBack: 'Document has been rolled back',
 		headline: 'Select a version to compare with the current version',
 		htmlHelp:
@@ -1454,6 +1497,7 @@ export default {
 	},
 	scripts: {
 		editscript: 'Edit script file',
+		tabCode: 'Code',
 	},
 	sections: {
 		content: 'Content',
@@ -1493,6 +1537,17 @@ export default {
 			'Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items',
 		sortPleaseWait: 'Please wait. Items are being sorted, this can take a while.',
 		sortEmptyState: 'This node has no child nodes to sort',
+		sortByFieldHeadline: 'Sort by field',
+		sortByFieldSentence: 'Sort all children by',
+		sortByFieldDirectionLabel: 'Direction',
+		sortByFieldAscending: 'Ascending',
+		sortByFieldDescending: 'Descending',
+		sortByFieldNameOption: 'Name',
+		sortByFieldCreateDateOption: 'Created',
+		sortByFieldUpdateDateOption: 'Last edited',
+		sortIndividuallyHeadline: 'Sort individually',
+		sortByFieldCultureSentence: 'in',
+		sortByFieldCultureLabel: 'Language',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validation',
@@ -1520,9 +1575,11 @@ export default {
 		cssSavedText: 'Stylesheet saved without any errors',
 		dataTypeSaved: 'Datatype saved',
 		dictionaryItemSaved: 'Dictionary item saved',
+		editContentPublishedFailed: 'Document could not be published or saved',
 		editContentPublishedFailedByValidation: 'Document could not be published, but we saved it for you',
 		editContentPublishedFailedByParent: 'Document could not be published, because a parent page is not published',
 		editContentPublishedHeader: 'Document published',
+		editContentPublishedReloadFailed: 'Document published, but the editor could not be refreshed',
 		editContentPublishedText: 'and is visible on the website',
 		editContentUnpublishedHeader: 'Document unpublished',
 		editContentUnpublishedText: 'and is no longer visible on the website',
@@ -1593,9 +1650,12 @@ export default {
 			'There is no hostname configured for %0%, please contact an administrator, see log for more information',
 		copySuccessMessage: 'Your system information has successfully been copied to the clipboard',
 		cannotCopyInformation: 'Could not copy your system information to the clipboard',
+		cannotCopyToClipboard: 'Could not copy to the clipboard',
 		webhookSaved: 'Webhook saved',
 		editMultiContentPublishedText: '%0% documents published and are visible on the website',
+		editMultiContentPublishedPartialText: '%0% of %1% documents published.',
 		editMultiContentUnpublishedText: '%0% documents unpublished and are no longer visible on the website',
+		editMultiContentUnpublishedPartialText: '%0% of %1% documents unpublished.',
 		editVariantUnpublishedText: '%0% unpublished and is no longer visible on the website',
 		editMultiVariantPublishedText: '%0% documents published for languages %1% and are visible on the website',
 		editMultiVariantUnpublishedText:
@@ -1636,8 +1696,10 @@ export default {
 		tabRules: 'Editor',
 	},
 	template: {
+		notAllowed: 'The selected template is no longer allowed on this document type.',
 		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
+		tabCode: 'Code',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
 		edittemplate: 'Edit template',
 		insertSections: 'Sections',
@@ -1779,8 +1841,16 @@ export default {
 		chooseChildNode: 'Choose child node',
 		compositionsDescription:
 			'Inherit tabs and properties from an existing Document Type. New tabs will be added to the current Document Type or merged if a tab with an identical name exists.',
-		compositionInUse: 'This Content Type is used in a composition, and therefore cannot be composed itself.',
-		noAvailableCompositions: 'There are no Content Types available to use as a composition.',
+		compositionsDescriptionMediaType:
+			'Inherit tabs and properties from an existing Media Type. New tabs will be added to the current Media Type or merged if a tab with an identical name exists.',
+		compositionsDescriptionMemberType:
+			'Inherit tabs and properties from an existing Member Type. New tabs will be added to the current Member Type or merged if a tab with an identical name exists.',
+		compositionInUse: 'This Document Type is used in a composition, and therefore cannot be composed itself.',
+		compositionInUseMediaType: 'This Media Type is used in a composition, and therefore cannot be composed itself.',
+		compositionInUseMemberType: 'This Member Type is used in a composition, and therefore cannot be composed itself.',
+		noAvailableCompositions: 'There are no Document Types available to use as a composition.',
+		noAvailableCompositionsMediaType: 'There are no Media Types available to use as a composition.',
+		noAvailableCompositionsMemberType: 'There are no Member Types available to use as a composition.',
 		compositionRemoveWarning:
 			"Removing a composition will delete all the associated property data. Once you save the Document Type there's no way back.",
 		availableEditors: 'Create new',
@@ -1788,6 +1858,7 @@ export default {
 		editorSettings: 'Editor settings',
 		searchResultSettings: 'Available configurations',
 		searchResultEditors: 'Create a new configuration',
+		suggestedEditors: 'Suggestions',
 		configuration: 'Configuration',
 		yesDelete: 'Yes, delete',
 		movedUnderneath: 'was moved underneath',
@@ -1817,7 +1888,11 @@ export default {
 		tabHasNoSortOrder: 'tab has no sort order',
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
-			'This composition is currently used in the composition of the following Content Types:',
+			'This composition is currently used in the composition of the following Document Types:',
+		compositionUsageSpecificationMediaType:
+			'This composition is currently used in the composition of the following Media Types:',
+		compositionUsageSpecificationMemberType:
+			'This composition is currently used in the composition of the following Member Types:',
 		variantsHeading: 'Variation',
 		cultureVariantHeading: 'Allow vary by culture',
 		segmentVariantHeading: 'Allow segmentation',
@@ -1854,14 +1929,14 @@ export default {
 		removeChildNodeWarning:
 			'Removing a child node will limit the editors options to create different content types beneath a node.',
 		usingEditor: 'using this editor will get updated with the new settings.',
-		historyCleanupHeading: 'History clean up',
-		historyCleanupDescription: 'Allow overriding the global history clean up settings.',
+		historyCleanupHeading: 'History cleanup',
+		historyCleanupDescription: 'Allow overriding the global history cleanup settings.',
 		historyCleanupKeepAllVersionsNewerThanDays: 'Keep all versions newer than days',
 		historyCleanupKeepLatestVersionPerDayForDays: 'Keep latest version per day for days',
-		historyCleanupPreventCleanup: 'Prevent clean up',
-		historyCleanupEnableCleanup: 'Enable clean up',
+		historyCleanupPreventCleanup: 'Prevent cleanup',
+		historyCleanupEnableCleanup: 'Enable cleanup',
 		historyCleanupGloballyDisabled:
-			'<strong>NOTE!</strong> The clean up of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
+			'<strong>NOTE!</strong> The clean up of historical content versions is disabled globally. These settings will not take effect before it is enabled.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collection: 'Collection',
@@ -2033,6 +2108,18 @@ export default {
 		advancedGroup: 'Advanced',
 		webhooks: 'Webhooks',
 	},
+	tree: {
+		classicViewLabel: 'Tree',
+		cardViewLabel: 'Cards',
+		tableViewLabel: 'Table',
+		children: 'Children',
+		noItems: 'No items',
+	},
+	picker: {
+		browseTab: 'Browse',
+		searchTab: 'Search',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} selected`,
+	},
 	update: {
 		updateAvailable: 'New update ready',
 		updateDownloadText: '%0% is ready, click here for download',
@@ -2056,7 +2143,9 @@ export default {
 		},
 		changePassword: 'Change your password',
 		changePhoto: 'Change photo',
-		configureMfa: 'Configure MFA',
+		configureMfa: 'Configure 2FA',
+		disableUserHeadline: (name: string) => `Disable ${name}`,
+		disableUserConfirmation: 'Are you sure you want to disable this user?',
 		emailRequired: 'Required - enter an email address for this user',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2114,6 +2203,7 @@ export default {
 		password: 'Password',
 		resetPassword: 'Reset password',
 		passwordChanged: 'Your password has been changed!',
+		passwordCopied: 'Password copied',
 		passwordChangedGeneric: 'Password changed',
 		passwordConfirm: 'Please confirm the new password',
 		passwordEnterNew: 'Enter your new password',
@@ -2167,6 +2257,7 @@ export default {
 		updateDate: 'User last updated',
 		userCreated: 'has been created',
 		userCreatedSuccessHelp: 'The new user has successfully been created. To log in to Umbraco use the password below.',
+		userCreatedApiSuccessHelp: "Set client credentials for the account via the user's profile.",
 		userHasPassword: 'The user already has a password set',
 		userHasGroup: "The user is already in group '%0%'",
 		userLockoutNotEnabled: 'Lockout is not enabled for this user',
@@ -2226,6 +2317,17 @@ export default {
 		'2faCodeInput': 'Verification code',
 		'2faCodeInputHelp': 'Please enter the verification code',
 		'2faInvalidCode': 'Invalid code entered',
+		addUsersToGroupError: 'Could not add users to the group.',
+		removeUsersFromGroupError: 'Could not remove users from the group.',
+		andMore: 'and %0% more',
+		avatarUploadSuccess: 'Avatar uploaded',
+		avatarDeleteSuccess: 'Avatar deleted',
+		unknownFailure: 'Unknown failure',
+		usersNotManagedFromGroup: 'not manageable from this screen.',
+		enableUserHeadline: (name: string) => `Enable ${name}`,
+		enableUserConfirmation: 'Are you sure you want to enable this user?',
+		unlockUserHeadline: (name: string) => `Unlock ${name}`,
+		unlockUserConfirmation: 'Are you sure you want to unlock this user?',
 	},
 	validation: {
 		validation: 'Validation',
@@ -2273,6 +2375,7 @@ export default {
 		numberMaximum: "Value must be less than or equal to '%0%'.",
 		numberMisconfigured: "Minimum value '%0%' must be less than the maximum value '%1%'.",
 		rangeExceeds: 'The low value must not exceed the high value.',
+		minimumRange: "The range between low and high values must be at least '%0%'.",
 		invalidExtensions: 'One or more of the extensions are invalid.',
 		allowedExtensions: 'Allowed extensions are:',
 		aliasInvalidFormat: 'Special characters are not allowed in alias',
@@ -2338,7 +2441,13 @@ export default {
 	},
 	redirectUrls: {
 		disableUrlTracker: 'Disable URL tracker',
+		disableUrlTrackerInstruction:
+			'Redirect URL tracking is configured through application settings. To disable tracking, set the following configuration key to true:',
 		enableUrlTracker: 'Enable URL tracker',
+		enableUrlTrackerInstruction:
+			'Redirect URL tracking is configured through application settings. To enable tracking, set the following configuration key to false:',
+		urlTrackerEnabled: 'Enabled',
+		urlTrackerDisabled: 'Disabled',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Redirected To',
 		redirectUrlManagement: 'Redirect URL Management',
@@ -2346,9 +2455,11 @@ export default {
 		noRedirects: 'No redirects have been made',
 		noRedirectsDescription:
 			'When a published page gets renamed or moved a redirect will automatically be made to the new page.',
+		noRedirectsForSearch: 'No redirects matching this search criteria',
+		noRedirectsForSearchDescription: 'Double check your search for any error or spelling mistakes.',
 		redirectRemoved: 'Redirect URL removed.',
 		redirectRemoveError: 'Error removing redirect URL.',
-		redirectRemoveWarning: 'This will remove the redirect',
+		redirectRemoveWarning: 'This will remove the redirect.',
 		confirmDisable: 'Are you sure you want to disable the URL tracker?',
 		disabledConfirm: 'URL tracker has now been disabled.',
 		disableError: 'Error disabling the URL tracker, more information can be found in your log file.',
@@ -2356,19 +2467,28 @@ export default {
 		enableError: 'Error enabling the URL tracker, more information can be found in your log file.',
 		culture: 'Culture',
 	},
+	embeddedMedia: {
+		dimensionsDescription:
+			'These values are passed as the maximum width and height to the embed provider. The provider may adjust the final dimensions to fit its own constraints.',
+	},
 	emptyStates: {
 		emptyDictionaryTree: 'No Dictionary items to choose from',
 	},
 	textbox: {
 		characters_left: '<strong>%0%</strong> characters left.',
 		characters_exceed: 'Maximum %0% characters, <strong>%1%</strong> too many.',
+		maxCharsLabel: 'Maximum allowed characters',
+		autocompleteLabel: 'Autocomplete',
 	},
 	recycleBin: {
+		restoreItemTo: (from: string, to: string) => `Restore <strong>${from}</strong> to <strong>${to}</strong>`,
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',
 		mediaTrashed: 'Trashed media with Id: {0} related to original parent media item with Id: {1}',
 		itemCannotBeRestored: 'Cannot automatically restore this item',
 		itemCannotBeRestoredHelpText:
-			'There is no location where this item can be automatically restored. You can move the item manually using the tree below.',
+			'There is no location where this item can be automatically restored. You can select a new location below.',
+		restoreToTitle: 'Restore to',
+		selectRestoreLocation: 'Select location',
 		wasRestored: 'was restored under',
 	},
 	relationType: {
@@ -2417,7 +2537,8 @@ export default {
 		openBackofficeSearch: 'Open backoffice search',
 		openCloseBackofficeHelp: 'Open/Close backoffice help',
 		openCloseBackofficeProfileOptions: 'Open/Close your profile options',
-		profileOptions: 'Profile options',
+		profileOptions: 'User profile for %0% (%1%)',
+		profileOptionsDefault: 'User profile',
 		assignDomainDescription: 'Setup Culture and Hostnames for %0%',
 		createDescription: 'Create new node under %0%',
 		protectDescription: 'Setup access restrictions on %0%',
@@ -2480,6 +2601,7 @@ export default {
 		labelUsedByItems: 'Referenced by',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
+		labelUsedByOtherContent: 'The following items are used by other content',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
@@ -2503,10 +2625,12 @@ export default {
 		searchThisMessageWithGoogle: 'Search this message with Google',
 		searchWithBing: 'Search With Bing',
 		searchThisMessageWithBing: 'Search this message with Bing',
-		searchOurUmbraco: 'Search Our Umbraco',
-		searchThisMessageOnOurUmbracoForumsAndDocs: 'Search this message on Our Umbraco forums and docs',
-		searchOurUmbracoWithGoogle: 'Search Our Umbraco with Google',
-		searchOurUmbracoForumsUsingGoogle: 'Search Our Umbraco forums using Google',
+		searchOurUmbraco: 'Search Umbraco forum',
+		searchThisMessageOnOurUmbracoForumsAndDocs: 'Search this message in the Umbraco forum',
+		searchOurUmbracoWithGoogle: 'Search Umbraco forum with Google',
+		searchOurUmbracoForumsUsingGoogle: 'Search Umbraco forum using Google',
+		searchUmbracoDocs: 'Search Umbraco documentation',
+		searchThisMessageInUmbracoDocs: 'Search this message in the Umbraco documentation',
 		searchUmbracoSource: 'Search Umbraco Source',
 		searchWithinUmbracoSourceCodeOnGithub: 'Search within Umbraco source code on GitHub',
 		searchUmbracoIssues: 'Search Umbraco Issues',
@@ -2554,7 +2678,11 @@ export default {
 		confirmDeleteHeadline: 'Delete from clipboard',
 		confirmDeleteDescription: 'Are you sure you want to delete <strong>{0}</strong> from the clipboard?',
 		confirmClearDescription: 'Are you sure you want to clear the clipboard?',
+		confirmPasteHeadline: 'Paste from clipboard',
+		confirmPasteOverwriteMessage: (name: string) =>
+			`The property already contains a value. Paste from the property action will overwrite the current value. Do you want to replace the current value with <strong>${name}</strong>?`,
 		copySuccessHeadline: 'Copied to clipboard',
+		noItemsMessage: 'There are no items in the clipboard.',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Open Property Actions',
@@ -2636,6 +2764,7 @@ export default {
 			'Master Umbraco with official training. Get practical experience through instructor-led courses and earn certifications that help you grow your skills and career.',
 	},
 	blockEditor: {
+		labelCreateModalSize: 'Create modal size',
 		headlineCreateBlock: 'Pick Element Type',
 		headlineAddSettingsElementType: 'Attach a settings Element Type',
 		headlineAddCustomView: 'Select view',
@@ -2802,6 +2931,8 @@ export default {
 		viewPublishedContentDeclineButton: 'Stay in preview mode',
 		connectionFailed: 'Could not establish a connection to the server, preview live updates will not work.',
 		connectionLost: 'Connection to the server lost, preview live updates will not work.',
+		connectionReconnecting: 'Connection to the server lost, trying to reconnect…',
+		connectionRestored: 'Connection to the server restored, preview live updates are working again.',
 	},
 	permissions: {
 		FolderCreation: 'Folder creation',
@@ -2845,6 +2976,9 @@ export default {
 	},
 	rte: {
 		label: 'Rich Text Editor',
+		config_allowedMediaTypes: 'Accepted media types',
+		config_allowedMediaTypes_description:
+			'Limit to specific media types for the media picker toolbar and drag-and-drop uploads.',
 		config_blocks: 'Available Blocks',
 		config_blocks_description: 'Define the available blocks.',
 		config_ignoreUserStartNodes: 'Ignore User Start Nodes',

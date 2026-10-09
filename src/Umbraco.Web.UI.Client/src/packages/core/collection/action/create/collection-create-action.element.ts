@@ -142,7 +142,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 
 		return html`
 			<uui-menu-item
-				label=${label}
+				label=${manifest.meta.additionalOptions ? label + '...' : label}
 				href=${ifDefined(href)}
 				target=${this.#getTarget(href)}
 				@click=${(event: Event) => this.#onClick(event, controller, href)}>

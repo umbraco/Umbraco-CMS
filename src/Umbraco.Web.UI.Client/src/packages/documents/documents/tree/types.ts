@@ -1,11 +1,11 @@
 import type { UmbDocumentEntityType, UmbDocumentRootEntityType } from '../entity.js';
+import type { UmbDocumentVariantState } from '../variant-state.js';
 import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeItemModel,
 	UmbTreeRootItemsRequestArgs,
 	UmbTreeRootModel,
 } from '@umbraco-cms/backoffice/tree';
-import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityFlag, UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity-flag';
@@ -16,6 +16,15 @@ export interface UmbDocumentTreeItemModel extends Omit<UmbTreeItemModel, 'flags'
 	noAccess: boolean;
 	isTrashed: boolean;
 	isProtected: boolean;
+	// TODO (V20): make `contentType` required when the deprecated `documentType` field is removed.
+	contentType?: {
+		unique: string;
+		icon: string;
+		collection: UmbReferenceByUnique | null;
+	};
+	/**
+	 * @deprecated Use `contentType` instead. This field will be removed in v20.
+	 */
 	documentType: {
 		unique: string;
 		icon: string;
@@ -33,7 +42,7 @@ export interface UmbDocumentTreeItemVariantModel {
 	name: string;
 	culture: string | null;
 	segment: string | null;
-	state: DocumentVariantStateModel | null; // TODO: make our own enum for this. We might have states for "unsaved changes" etc.
+	state: UmbDocumentVariantState | null; // TODO: make our own enum for this. We might have states for "unsaved changes" etc.
 	flags: Array<UmbEntityFlag>;
 }
 

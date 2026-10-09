@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -31,6 +32,9 @@ public partial class ContentBlueprintEditingServiceTests
             Assert.AreEqual(1, result.Length);
             Assert.AreEqual(blueprintKey, result.First().Key);
         });
+
+        var auditLog = (await AuditService.GetItemsByEntityAsync(blueprint!.Id, 0, 1)).Items.First();
+        Assert.AreEqual(AuditType.Move, auditLog.AuditType);
     }
 
     [Test]
@@ -60,6 +64,9 @@ public partial class ContentBlueprintEditingServiceTests
             Assert.AreEqual(1, result.Length);
             Assert.AreEqual(blueprintKey, result.First().Key);
         });
+
+        var auditLog = (await AuditService.GetItemsByEntityAsync(blueprint!.Id, 0, 1)).Items.First();
+        Assert.AreEqual(AuditType.Move, auditLog.AuditType);
     }
 
     [Test]
@@ -89,5 +96,8 @@ public partial class ContentBlueprintEditingServiceTests
             Assert.AreEqual(1, result.Length);
             Assert.AreEqual(blueprintKey, result.First().Key);
         });
+
+        var auditLog = (await AuditService.GetItemsByEntityAsync(blueprint!.Id, 0, 1)).Items.First();
+        Assert.AreEqual(AuditType.Move, auditLog.AuditType);
     }
 }

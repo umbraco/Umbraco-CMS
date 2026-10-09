@@ -5,7 +5,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbExtensionItemStore
- * @augments {UmbStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Extension items
  */
 export class UmbExtensionItemStore extends UmbItemStoreBase<UmbExtensionItemModel> {
@@ -15,7 +15,7 @@ export class UmbExtensionItemStore extends UmbItemStoreBase<UmbExtensionItemMode
 	 * @memberof UmbExtensionItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_EXTENSION_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_EXTENSION_ITEM_STORE_CONTEXT);
 	}
 }
 

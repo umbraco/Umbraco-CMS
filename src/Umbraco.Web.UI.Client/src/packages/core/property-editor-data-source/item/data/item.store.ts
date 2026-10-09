@@ -5,7 +5,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbPropertyEditorDataSourceItemStore
- * @augments {UmbStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Property Editor Data Source items
  */
 
@@ -16,7 +16,7 @@ export class UmbPropertyEditorDataSourceItemStore extends UmbItemStoreBase<UmbPr
 	 * @memberof UmbPropertyEditorDataSourceItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_PROPERTY_EDITOR_DATA_SOURCE_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_PROPERTY_EDITOR_DATA_SOURCE_ITEM_STORE_CONTEXT);
 	}
 }
 

@@ -72,6 +72,13 @@ public class ProfileModelBuilder : MemberModelBuilderBase
             Key = member.Key,
         };
 
+        // External-only members have no content type or content properties.
+        // Return the model populated from identity fields only.
+        if (member.IsExternalOnly)
+        {
+            return model;
+        }
+
         IMemberType? memberType = member.MemberTypeAlias is null ? null : MemberTypeService.Get(member.MemberTypeAlias);
         if (memberType == null)
         {

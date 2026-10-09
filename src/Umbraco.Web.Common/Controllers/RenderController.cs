@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
@@ -47,6 +48,7 @@ public class RenderController : UmbracoPageController, IRenderController
     /// <summary>
     ///     The default action to render the front-end view.
     /// </summary>
+    [OutputCache(PolicyName = Cms.Core.Constants.Website.OutputCache.ContentCachePolicy)]
     public virtual IActionResult Index() => CurrentTemplate(new ContentModel(CurrentPage));
 
     /// <summary>
@@ -58,8 +60,9 @@ public class RenderController : UmbracoPageController, IRenderController
         if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
         {
             _logger.LogDebug(
-            "Response status: Content={Content}, StatusCode={ResponseStatusCode}, Culture={Culture}, Segment={Segment}",
+            "Response status: ContentId={ContentId}, ContentKey={ContentKey}, StatusCode={ResponseStatusCode}, Culture={Culture}, Segment={Segment}",
             pcr.PublishedContent?.Id ?? -1,
+            pcr.PublishedContent?.Key,
             pcr.ResponseStatusCode,
             pcr.Culture,
             pcr.Segment);

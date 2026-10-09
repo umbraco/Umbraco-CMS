@@ -5,7 +5,7 @@ import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 
 /**
  * @class UmbScriptFolderStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for Script Folders
  */
 export class UmbScriptFolderStore extends UmbDetailStoreBase<UmbFolderModel> {
@@ -15,7 +15,7 @@ export class UmbScriptFolderStore extends UmbDetailStoreBase<UmbFolderModel> {
 	 * @memberof UmbScriptFolderStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_SCRIPT_FOLDER_STORE_CONTEXT.toString());
+		super(host, UMB_SCRIPT_FOLDER_STORE_CONTEXT);
 	}
 }
 

@@ -1,10 +1,13 @@
 using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -29,8 +32,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// Here, however, the alias parsing logic is internal and not customizable, so we simply use a constant value.
     /// By doing this we can keep the same logic for rebuild on startup after a migration, provide a means of triggering
     /// a rebuild, and we have future-proofing in case the alias parsing logic changes in future versions.
+    /// Bumped to "2" so that installs which persisted draft alias values (before aliases were restricted to the
+    /// published property value, see #23206) rebuild once on startup and flush the stale entries.
     /// </remarks>
-    private const string CurrentRebuildValue = "1";
+    private const string CurrentRebuildValue = "2";
 
     private readonly ILogger<DocumentUrlAliasService> _logger;
     private readonly IDocumentUrlAliasRepository _documentUrlAliasRepository;
@@ -39,6 +44,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private readonly IKeyValueService _keyValueService;
     private readonly IContentService _contentService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IServerRoleAccessor _serverRoleAccessor;
 
     // Lookup: alias -> list of matching document keys (multiple docs can have same alias).
     private readonly ConcurrentDictionary<AliasCacheKey, List<Guid>> _aliasCache = new();
@@ -89,6 +95,31 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         public override int GetHashCode() => HashCode.Combine(NormalizedAlias, LanguageId ?? 0);
     }
 
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentUrlAliasService"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public DocumentUrlAliasService(
+        ILogger<DocumentUrlAliasService> logger,
+        IDocumentUrlAliasRepository documentUrlAliasRepository,
+        ICoreScopeProvider coreScopeProvider,
+        ILanguageService languageService,
+        IKeyValueService keyValueService,
+        IContentService contentService,
+        IDocumentNavigationQueryService documentNavigationQueryService)
+        : this(
+            logger,
+            documentUrlAliasRepository,
+            coreScopeProvider,
+            languageService,
+            keyValueService,
+            contentService,
+            documentNavigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IServerRoleAccessor>())
+    {
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentUrlAliasService"/> class.
     /// </summary>
@@ -99,7 +130,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         ILanguageService languageService,
         IKeyValueService keyValueService,
         IContentService contentService,
-        IDocumentNavigationQueryService documentNavigationQueryService)
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IServerRoleAccessor serverRoleAccessor)
     {
         _logger = logger;
         _documentUrlAliasRepository = documentUrlAliasRepository;
@@ -108,7 +140,35 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         _keyValueService = keyValueService;
         _contentService = contentService;
         _documentNavigationQueryService = documentNavigationQueryService;
+        _serverRoleAccessor = serverRoleAccessor;
     }
+
+    /// <inheritdoc/>
+    public bool IsInitialized => _isInitialized;
+
+    /// <summary>
+    /// Indicates whether this instance should skip the database writes that are not tied to a local content change,
+    /// i.e. the start-up rebuild of URL aliases.
+    /// </summary>
+    /// <remarks>
+    /// The server role says which instance runs the scheduled jobs; it says nothing about which instance serves the
+    /// backoffice. Under the default election the publisher flag goes to whichever instance touches the server
+    /// registration first and moves whenever the holder is away for the stale timeout, so a front-end instance can be
+    /// the publisher while the only backoffice instance is a <see cref="ServerRole.Subscriber"/> for as long as that
+    /// front-end keeps running. The two only line up when roles are configured explicitly.
+    /// An explicitly configured subscriber is a dedicated front-end server that may run on a read-only database
+    /// connection; it never makes content changes, and the publisher maintains the persisted aliases on its behalf,
+    /// so the rebuild is gated on the role. <see cref="PersistAliasesAsync(IContent)"/>,
+    /// <see cref="CreateOrUpdateAliasesAsync(Guid)"/> and friends are not gated when they run for a change made on
+    /// this server: reaching them means a content write is being made, or has already committed, on this
+    /// connection, so the connection is writable whatever the role reads, and no other server persists the
+    /// aliases for that change (other servers receive a cache instruction and only refresh their in-memory cache).
+    /// Skipping the write there would lose the aliases on every server after its next restart.
+    /// <see cref="ServerRole.Unknown"/> is deliberately not grouped with Subscriber, so a server whose role is not
+    /// yet resolved still rebuilds.
+    /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
+    /// </remarks>
+    private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
 
     /// <inheritdoc/>
     public async Task InitAsync(bool forceEmpty, CancellationToken cancellationToken)
@@ -121,7 +181,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
-        if (ShouldRebuildAliases())
+        if (SkipDatabaseWrites() is false && ShouldRebuildAliases())
         {
             _logger.LogInformation("Rebuilding all document aliases.");
             await RebuildAllAliasesAsync();
@@ -229,6 +289,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public async Task CreateOrUpdateAliasesAsync(Guid documentKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        // A save persists its own alias rows under the content tree write lock, so the read lock keeps this
+        // write from overlapping one for the same document. Same lock order as RebuildAllAliasesAsync.
+        scope.ReadLock(Constants.Locks.ContentTree);
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
         await CreateOrUpdateAliasesInternalAsync(documentKey);
@@ -240,6 +304,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public async Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        // A save persists its own alias rows under the content tree write lock, so the read lock keeps this
+        // write from overlapping one for the same document. Same lock order as RebuildAllAliasesAsync.
+        scope.ReadLock(Constants.Locks.ContentTree);
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
         // Get document and all descendants
@@ -257,11 +325,94 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         scope.Complete();
     }
 
+    /// <inheritdoc/>
+    public Task PersistAliasesAsync(IContent document)
+        => PersistAliasesAsync(document, contentTreeWriteLockHeld: false);
+
+    /// <inheritdoc/>
+    public async Task PersistAliasesAsync(IContent document, bool contentTreeWriteLockHeld)
+    {
+        // Aliases are routing data for the published site, so only a change to the published state or to the
+        // trashed state can change them; a draft save cannot. Blueprints never have aliases.
+        if (document.Blueprint)
+        {
+            return;
+        }
+
+        var trashedChanged = document.IsPropertyDirty(nameof(document.Trashed));
+        var publishedStateChanged = document.PublishedState is PublishedState.Publishing or PublishedState.Unpublishing;
+        if (trashedChanged is false && publishedStateChanged is false)
+        {
+            return;
+        }
+
+        // Every writer of the alias table is ordered by the content tree lock. A caller that holds it exclusively
+        // (the transaction persisting the document) cannot overlap any other writer, so its write needs no lock of
+        // its own; taking the DocumentUrlAliases lock there would add a global lock to every publish and order it
+        // after the content tree lock, the reverse of the order the rebuild uses. Every other caller takes the
+        // content tree lock shared, which keeps the write from overlapping a save, and the DocumentUrlAliases lock,
+        // which keeps it from overlapping the rebuild, in the rebuild's order. An ambient scope says nothing about
+        // which locks are held, so only the caller's word is trusted.
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        if (contentTreeWriteLockHeld is false)
+        {
+            scope.ReadLock(Constants.Locks.ContentTree);
+            scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+        }
+
+        List<PublishedDocumentUrlAlias> aliases = document.Trashed || document.PublishedState == PublishedState.Unpublishing
+            ? []
+            : await ExtractAliasesFromDocumentAsync(document);
+
+        if (aliases.Count > 0)
+        {
+            _documentUrlAliasRepository.Save(aliases);
+        }
+        else
+        {
+            _documentUrlAliasRepository.DeleteByDocumentKey([document.Key]);
+        }
+
+        scope.Complete();
+    }
+
+    /// <inheritdoc/>
+    public async Task UpdateAliasCacheAsync(Guid documentKey)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await CreateOrUpdateAliasesInternalAsync(documentKey, forceSkipDatabaseWrite: true);
+        scope.Complete();
+    }
+
+    /// <inheritdoc/>
+    public async Task UpdateAliasCacheWithDescendantsAsync(Guid documentKey)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        var documentKeys = new List<Guid> { documentKey };
+        if (_documentNavigationQueryService.TryGetDescendantsKeys(documentKey, out IEnumerable<Guid> descendantKeys))
+        {
+            documentKeys.AddRange(descendantKeys);
+        }
+
+        foreach (Guid key in documentKeys)
+        {
+            await CreateOrUpdateAliasesInternalAsync(key, forceSkipDatabaseWrite: true);
+        }
+
+        scope.Complete();
+    }
+
     /// <summary>
     /// Internal implementation that processes a single document without creating its own scope.
-    /// Caller must ensure a scope with write lock is active.
+    /// Caller must ensure a scope is active. A write lock on <see cref="Constants.Locks.DocumentUrlAliases"/>
+    /// is required whenever this method may perform database writes, i.e. unless
+    /// <paramref name="forceSkipDatabaseWrite"/> is set, and the caller takes the
+    /// <see cref="Constants.Locks.ContentTree"/> read lock first: a save persists its own alias rows under the
+    /// content tree write lock, so the read lock keeps this write from overlapping it. That is the order
+    /// <see cref="RebuildAllAliasesAsync"/> uses as well.
     /// </summary>
-    private async Task CreateOrUpdateAliasesInternalAsync(Guid documentKey)
+    private async Task CreateOrUpdateAliasesInternalAsync(Guid documentKey, bool forceSkipDatabaseWrite = false)
     {
         IContent? document = _contentService.GetById(documentKey);
         if (document is null || document.Trashed || document.Blueprint)
@@ -276,17 +427,22 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Remove old aliases from cache (deferred until scope completes)
         RemoveFromCacheDeferred(_coreScopeProvider.Context!, documentKey);
 
-        // Save to database (handles insert/update/delete via diff) and add to cache
+        // Save to database (handles insert/update/delete via diff) and add to cache. When only the cache is being
+        // refreshed (a cache instruction from another server), the in-memory cache is still updated via the
+        // deferred enlistments so routing keeps working locally.
         if (aliases.Count > 0)
         {
-            _documentUrlAliasRepository.Save(aliases);
+            if (forceSkipDatabaseWrite is false)
+            {
+                _documentUrlAliasRepository.Save(aliases);
+            }
 
             foreach (PublishedDocumentUrlAlias alias in aliases)
             {
                 AddToCacheDeferred(_coreScopeProvider.Context!, alias);
             }
         }
-        else
+        else if (forceSkipDatabaseWrite is false)
         {
             // No aliases - delete any existing aliases for this document from the database
             _documentUrlAliasRepository.DeleteByDocumentKey(new[] { documentKey });
@@ -317,6 +473,12 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <inheritdoc/>
     public async Task RebuildAllAliasesAsync()
     {
+        if (SkipDatabaseWrites())
+        {
+            _logger.LogDebug("Skipping document URL alias rebuild — the current server role does not persist aliases.");
+            return;
+        }
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
@@ -327,7 +489,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Use optimized SQL query to fetch only documents with aliases
         IEnumerable<DocumentUrlAliasRaw> rawAliases = _documentUrlAliasRepository.GetAllDocumentUrlAliases();
 
-        var documentKeys = rawAliases.Select(x => x.DocumentKey).Distinct().ToList();
         var toSave = new List<PublishedDocumentUrlAlias>();
 
         foreach (DocumentUrlAliasRaw raw in rawAliases)
@@ -359,9 +520,12 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             }
         }
 
-        // Clear existing database records and save new
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
-        _documentUrlAliasRepository.DeleteByDocumentKey(documentKeys);
+
+        // Clear the table first and repopulate from scratch in case the rebuild no longer includes document URL aliases
+        // that are currently stored.
+        _documentUrlAliasRepository.DeleteAll();
+
         if (toSave.Count > 0)
         {
             _documentUrlAliasRepository.Save(toSave);
@@ -396,7 +560,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Store alias for ALL languages (like DocumentUrlService).
         if (document.ContentType.VariesByCulture() is false || aliasPropertyVariesByCulture is false)
         {
-            var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias);
+            // Aliases are routing data for the published site, so only the published property value counts -
+            // GetValue(published: true) returns null until the document is actually published.
+            var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias, published: true);
 
             if (!string.IsNullOrWhiteSpace(aliasValue))
             {
@@ -418,7 +584,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
         foreach (ILanguage language in languages)
         {
-            var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias, language.IsoCode);
+            var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias, language.IsoCode, published: true);
 
             if (string.IsNullOrWhiteSpace(aliasValue))
             {
@@ -584,10 +750,12 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             yield break;
         }
 
+        // Collapse duplicates that arise after normalization.
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var alias in rawValue.Split(',', StringSplitOptions.RemoveEmptyEntries))
         {
             var normalized = this.NormalizeAlias(alias);
-            if (!string.IsNullOrEmpty(normalized))
+            if (string.IsNullOrEmpty(normalized) is false && seen.Add(normalized))
             {
                 yield return normalized;
             }

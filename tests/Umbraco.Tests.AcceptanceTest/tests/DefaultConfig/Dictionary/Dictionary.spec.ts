@@ -10,6 +10,7 @@ test.beforeEach(async ({umbracoUi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
+  await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
 });
 
 test('can create a dictionary item', async ({umbracoApi, umbracoUi}) => {
@@ -25,7 +26,7 @@ test('can create a dictionary item', async ({umbracoApi, umbracoUi}) => {
   // Assert
   await umbracoUi.dictionary.isErrorNotificationVisible(false);
   expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeTruthy();
-  await umbracoUi.dictionary.clickLeftArrowButton();
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary, true, true);
   // Verify the dictionary item displays in the tree and in the list
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName);
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
@@ -67,12 +68,36 @@ test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({um
   await umbracoUi.dictionary.isErrorNotificationVisible(false);
   const dictionaryChildren = await umbracoApi.dictionary.getChildren(parentDictionaryId);
   expect(dictionaryChildren[0].name).toEqual(dictionaryName);
-  await umbracoUi.dictionary.clickLeftArrowButton();
+  await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary, true, true);
   // Verify the new dictionary item displays in the list
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
   // Verify the new dictionary item displays in the tree
   await umbracoUi.dictionary.reloadTree(parentDictionaryName);
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName);
+
+  // Clean
+  await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
+});
+
+test('can find a dictionary item in a sibling nested dictionary item', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildDictionaryName = 'AAFirstChildDictionary';
+  const nestedDictionaryName = 'NestedDictionary';
+  const secondChildDictionaryName = 'ZZSecondChildDictionary';
+  const targetDictionaryName = 'TargetDictionary';
+  await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
+  const parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
+  const firstChildDictionaryId = await umbracoApi.dictionary.create(firstChildDictionaryName, [], parentDictionaryId);
+  await umbracoApi.dictionary.create(nestedDictionaryName, [], firstChildDictionaryId);
+  const secondChildDictionaryId = await umbracoApi.dictionary.create(secondChildDictionaryName, [], parentDictionaryId);
+  const targetDictionaryId = await umbracoApi.dictionary.create(targetDictionaryName, [], secondChildDictionaryId);
+
+  // Act
+  const dictionaryData = await umbracoApi.dictionary.getByName(targetDictionaryName);
+
+  // Assert
+  expect(dictionaryData).toBeTruthy();
+  expect(dictionaryData.id).toBe(targetDictionaryId);
 
   // Clean
   await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);

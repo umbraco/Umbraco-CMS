@@ -23,9 +23,8 @@ public class CurrentDynamicRootOriginFinder : ByKeyDynamicRootOriginFinder
     /// <inheritdoc/>
     public override Guid? FindOriginKey(DynamicRootNodeQuery query)
     {
-        query.OriginKey = query.Context.CurrentKey;
-        var baseResult = base.FindOriginKey(query);
-
-        return baseResult;
+        // When creating new content, CurrentKey will be null - fallback to using ParentKey.
+        query.OriginKey = query.Context.CurrentKey ?? query.Context.ParentKey;
+        return base.FindOriginKey(query);
     }
 }

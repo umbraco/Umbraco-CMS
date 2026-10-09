@@ -1,5 +1,8 @@
+import UmbTiptapToolbarDefaultExtensionApi from '../../extensions/default-tiptap-toolbar-api.js';
 import type { Editor } from '../../externals.js';
 import type { UmbTiptapToolbarValue } from '../types.js';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via {@link} in JSDoc below
+import type { UmbInputTiptapElement } from '../input-tiptap/input-tiptap.element.js';
 import { css, customElement, html, nothing, property, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -25,9 +28,6 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 	#lookup: Map<string, unknown> = new Map();
 
-	@property({ type: Boolean, reflect: true })
-	readonly = false;
-
 	@property({ attribute: false })
 	editor?: Editor;
 
@@ -36,6 +36,9 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 	@property({ attribute: false })
 	toolbar: UmbTiptapToolbarValue = [[[]]];
+
+	@property({ type: Boolean, reflect: true })
+	scrolling = false;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -71,7 +74,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			},
 			undefined,
 			undefined,
-			() => import('../../extensions/default-tiptap-toolbar-api.js'),
+			UmbTiptapToolbarDefaultExtensionApi,
 		);
 
 		this.#extensionsController.apiProperties = { configuration: this.configuration };
@@ -100,11 +103,6 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 	}
 
 	static override readonly styles = css`
-		:host([readonly]) {
-			pointer-events: none;
-			background-color: var(--uui-color-surface-alt);
-		}
-
 		:host {
 			border-radius: var(--uui-border-radius);
 			border: 1px solid var(--uui-color-border);
@@ -129,7 +127,9 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			right: 0;
 			padding: var(--uui-size-3);
 			z-index: 9999999;
+		}
 
+		:host([scrolling]) {
 			box-shadow:
 				0 2px 2px -2px rgba(34, 47, 62, 0.1),
 				0 8px 8px -4px rgba(34, 47, 62, 0.07);

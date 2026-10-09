@@ -185,7 +185,7 @@ export class UmbAppErrorElement extends UmbLitElement {
 					<div slot="headline">
 						${this.errorHeadline
 							? this.errorHeadline
-							: html` <umb-localize key="errors_defaultError">An unknown failure has occured</umb-localize> `}
+							: html` <umb-localize key="errors_defaultError">An unknown failure has occurred</umb-localize> `}
 					</div>
 					<div id="message">${this.errorMessage}</div>
 					${this.error

@@ -42,7 +42,9 @@
     emptyValue: 'Value cannot be empty',
     nullValue: 'Value cannot be null',
     invalidEmail: 'Invalid email',
-    emptyManualLinkPicker: 'Please enter an URL or Anchor.'
+    emptyManualLinkPicker: 'Please enter an URL or Anchor.',
+    needMoreItems: 'This field needs more items',
+    minimumTwoEntriesRequiresOneMore: 'Minimum 2 entries, requires 1 more.',
   }
 
   public static readonly inputTypes = {
@@ -53,7 +55,7 @@
   public static readonly access = {
     denied: 'Access denied'
   }
-  
+
   public static readonly approvedColorSettings = {
     0: ['Include labels?', 'Displays colored field and a label for each color in the color picker, rather than just a colored field.'],
     1: ['Colors', 'Add, remove or sort colors (and labels).'],
@@ -75,7 +77,8 @@
 
   public static readonly dropdownSettings = {
     0: ['Enable multiple choice', ''],
-    1: ['Add options', '']
+    1: ['Add options', ''],
+    2: ['Placeholder', '']
   }
 
   public static readonly imageCropperSettings = {
@@ -134,7 +137,8 @@
 
   public static readonly textareaSettings = {
     0: ['Maximum allowed characters', 'If empty - no character limit'],
-    1: ['Number of rows', 'If empty or zero, the textarea is set to auto-height']
+    1: ['Number of rows', 'If empty or zero, the textarea is set to auto-height'],
+    2: ['Placeholder', 'Placeholder text shown inside the textarea when empty']
   }
 
   public static readonly textstringSettings = {
@@ -161,9 +165,11 @@
     4: ['Dimensions', 'Sets the fixed width and height of the editor. This excludes the toolbar and statusbar heights.'],
     5: ['Maximum size for inserted images', 'Maximum width or height - enter 0 to disable resizing.'],
     6: ['Overlay size', 'Select the width of the overlay (link picker).'],
-    7: ['Available Blocks', 'Define the available blocks.'],
-    8: ['Image Upload Folder', 'Choose the upload location of pasted images.'],
-    9: ['Ignore User Start Nodes', ''],
+    7: ['Create modal size', ''],
+    8: ['Available Blocks', 'Define the available blocks.'],
+    9: ['Image Upload Folder', 'Choose the upload location of pasted images.'],
+    10: ['Accepted media types', 'Limit to specific media types for the media picker toolbar and drag-and-drop uploads.'],
+    11: ['Ignore User Start Nodes', ''],
   }
 
   public static readonly tinyMCESettings = {
@@ -228,7 +234,7 @@
 
   public static readonly trashDeleteDialogMessage = {
     referenceHeadline: 'The following items depend on this',
-    bulkReferenceHeadline: 'The following items are used by other content.',
+    bulkReferenceHeadline: 'The following items are used by other content',
     descendingReferenceHeadline: 'The following descending items have dependencies'
   }
 
@@ -270,8 +276,19 @@
     created: 201
   }
 
+  public static readonly httpMethods = {
+    get: 'GET',
+    post: 'POST',
+    put: 'PUT',
+    delete: 'DELETE'
+  }
+
+  // Matched against response URLs via url().includes(), so entries are either full paths
+  // (e.g. '/umbraco/management/api/v1/document') or path fragments (e.g. '/update-and-publish').
   public static readonly apiEndpoints = {
+    profilingStatus: '/umbraco/management/api/v1/profiling/status',
     document: '/umbraco/management/api/v1/document',
+    updateAndPublish: '/update-and-publish',
     documentType: '/umbraco/management/api/v1/document-type',
     documentTypeFolder: '/umbraco/management/api/v1/document-type/folder',
     documentBlueprint: '/umbraco/management/api/v1/document-blueprint',
@@ -282,6 +299,8 @@
     language: '/umbraco/management/api/v1/language',
     media: '/umbraco/management/api/v1/media',
     mediaType: '/umbraco/management/api/v1/media-type',
+    memberType: '/umbraco/management/api/v1/member-type',
+    memberTypeFolder: '/umbraco/management/api/v1/member-type/folder',
     mediaTypeFolder: '/umbraco/management/api/v1/media-type/folder',
     member: '/umbraco/management/api/v1/member',
     memberGroup: '/umbraco/management/api/v1/member-group',
@@ -299,7 +318,11 @@
     recycleBinMedia: '/umbraco/management/api/v1/recycle-bin/media',
     domains: '/domains',
     notifications: '/notifications',
-    currentUser: '/umbraco/management/api/v1/user/current'
+    currentUser: '/umbraco/management/api/v1/user/current',
+    revoke: '/umbraco/management/api/v1/security/back-office/revoke',
+    documentSearch: '/umbraco/management/api/v1/item/document/search',
+    mediaSearch: '/umbraco/management/api/v1/item/media/search',
+    memberSearch: '/umbraco/management/api/v1/item/member/search'
   }
 
   public static readonly userGroupDescriptionValues = {
@@ -313,5 +336,39 @@
   public static readonly healthCheckMessages = {
     imagingHMACSecretKeyIsNotConfigured: 'No HMAC secret key is configured for image URL signing. It is recommended to set Umbraco:CMS:Imaging:HMACSecretKey to prevent unauthorized image manipulation requests.',
     imagingHMACSecretKeyIsConfigured: 'The HMAC secret key for image URL signing is configured'
+  }
+
+  public static readonly loginErrorMessages = {
+    lockedAccount: 'Your account has been locked out. Please try again later.',
+    invalidCredentials: "Oops! We couldn't log you in. Please check your credentials and try again.",
+    emptyEmail: 'Please fill in an email',
+    emptyPassword: 'Please fill in a password'
+  }
+
+  public static readonly forgottenPasswordMessages = {
+    confirmation: 'We sent an email with password reset instructions, if the email address matches a registered user.',
+    notFoundUserError: 'The specified user was not found.'
+  }
+
+  public static readonly auditTrailMessages = {
+    contentSaved: 'Content saved',
+    contentSavedAndPublished: 'Content saved and Published',
+    contentUnpublished: 'Content unpublished',
+    contentMoved: 'Content moved',
+    contentCopied: 'Content copied',
+    contentDeleted: 'Content deleted',
+    contentRolledBack: 'Content rolled back',
+    contentSorted: 'Sort child items performed by user'
+  }
+
+  public static readonly auditTrailTypes = {
+    save: 'Save',
+    delete: 'Delete',
+    move: 'Move',
+    sort: 'Sort',
+    publish: 'Publish',
+    rollback: 'Rollback',
+    copy: 'Copy',
+    unpublish: 'Unpublish'
   }
 }

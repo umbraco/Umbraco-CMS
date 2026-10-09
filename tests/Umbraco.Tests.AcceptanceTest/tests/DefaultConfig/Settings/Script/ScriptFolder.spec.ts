@@ -50,7 +50,7 @@ test('can create a script in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
-  await umbracoUi.script.clickCreateOptionsActionMenuOption();
+  await umbracoUi.script.clickCreateActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.enterScriptName(scriptName);
   await umbracoUi.script.enterScriptContent(scriptContent);
@@ -107,6 +107,26 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.script.isScriptRootTreeItemVisible(childOfChildFolderName, true, false);
 });
 
+test('can find a script in a sibling nested folder', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildFolderName = 'AAFirstChildFolder';
+  const nestedFolderName = 'NestedFolder';
+  const secondChildFolderName = 'ZZSecondChildFolder';
+  const targetScriptName = 'TargetScript.js';
+  await umbracoApi.script.createFolder(scriptFolderName);
+  const firstChildFolderPath = await umbracoApi.script.createFolder(firstChildFolderName, scriptFolderName);
+  await umbracoApi.script.createFolder(nestedFolderName, firstChildFolderPath);
+  const secondChildFolderPath = await umbracoApi.script.createFolder(secondChildFolderName, scriptFolderName);
+  const targetScriptPath = await umbracoApi.script.create(targetScriptName, 'const test = true;', secondChildFolderPath);
+
+  // Act
+  const scriptData = await umbracoApi.script.getByName(targetScriptName);
+
+  // Assert
+  expect(scriptData).toBeTruthy();
+  expect(scriptData.path).toBe(targetScriptPath);
+});
+
 test('can create a script in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childFolderName = 'ChildFolderName';
@@ -118,7 +138,7 @@ test('can create a script in a folder in a folder', async ({umbracoApi, umbracoU
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.openCaretButtonForName(scriptFolderName);
   await umbracoUi.script.clickActionsMenuForScript(childFolderName);
-  await umbracoUi.script.clickCreateOptionsActionMenuOption();
+  await umbracoUi.script.clickCreateActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.enterScriptName(scriptName);
   await umbracoUi.script.clickSaveButtonAndWaitForScriptToBeCreated();

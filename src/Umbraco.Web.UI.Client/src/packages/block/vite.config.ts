@@ -18,7 +18,6 @@ export default defineConfig({
 			'block-single/index': 'block-single/index.ts',
 			'block-rte/index': 'block-rte/index.ts',
 			'block-type/index': 'block-type/index.ts',
-			manifests: 'manifests.ts',
 			'umbraco-package': 'umbraco-package.ts',
 		},
 	}),

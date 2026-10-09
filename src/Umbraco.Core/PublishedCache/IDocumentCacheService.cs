@@ -29,6 +29,55 @@ public interface IDocumentCacheService
     Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null);
 
     /// <summary>
+    /// Gets multiple published content items by their unique keys, fetching any not already cached
+    /// from the database in a single batched query rather than one at a time.
+    /// </summary>
+    /// <param name="keys">The unique keys of the content to retrieve.</param>
+    /// <param name="preview">Optional value indicating whether to include unpublished content. If <c>null</c>, uses the default preview setting.</param>
+    /// <returns>The published content items that exist, in the same order as <paramref name="keys"/> (missing items omitted).</returns>
+    /// <remarks>
+    /// Used to materialise sets of keys (e.g. children/descendants) without the per-item database
+    /// round trip and scope of repeated <see cref="GetByKeyAsync"/> calls when the cache is cold.
+    /// The default implementation falls back to per-key retrieval so existing implementations keep working.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation and reference to it in the remarks.
+    async Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
+    {
+        var result = new List<IPublishedContent>(keys.Count);
+        foreach (Guid key in keys)
+        {
+            IPublishedContent? content = await GetByKeyAsync(key, preview);
+            if (content is not null)
+            {
+                result.Add(content);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Attempts to retrieve a content item from the in-memory converted-content cache without
+    /// touching the distributed cache or the database.
+    /// </summary>
+    /// <param name="key">The unique key of the content.</param>
+    /// <param name="preview">Whether to consider unpublished content.</param>
+    /// <param name="content">When this method returns, contains the cached published content if a hit was made; otherwise <c>null</c>.</param>
+    /// <returns><c>true</c> if the content was served from the in-memory cache; <c>false</c> if a slower retrieval (HybridCache or database) is required.</returns>
+    /// <remarks>
+    /// Synchronous fast-path used by sync consumers (e.g. <c>IPublishedContentCache.GetById(bool, Guid)</c>)
+    /// to avoid setting up the async state machine on the dominant warm-cache case. On a miss
+    /// the caller falls back to the existing async path. The default implementation always
+    /// returns <c>false</c> so the caller takes the async path.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    bool TryGetCached(Guid key, bool preview, out IPublishedContent? content)
+    {
+        content = null;
+        return false;
+    }
+
+    /// <summary>
     /// Seeds the cache with initial content data.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>

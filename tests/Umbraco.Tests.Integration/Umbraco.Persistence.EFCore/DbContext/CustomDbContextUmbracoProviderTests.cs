@@ -22,10 +22,12 @@ internal sealed class CustomDbContextUmbracoProviderTests : UmbracoIntegrationTe
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
-        builder.Services.AddUmbracoDbContext<CustomDbContext>((serviceProvider, options, connectionString, providerName) =>
-        {
-            options.UseUmbracoDatabaseProvider(serviceProvider);
-        });
+        builder.Services.AddUmbracoDbContext<CustomDbContext>(
+            (serviceProvider, options, connectionString, providerName) =>
+            {
+                options.UseUmbracoDatabaseProvider(serviceProvider);
+            },
+            shareUmbracoConnection: true);
     }
 
     internal class CustomDbContext : Microsoft.EntityFrameworkCore.DbContext
@@ -36,7 +38,6 @@ internal sealed class CustomDbContextUmbracoProviderTests : UmbracoIntegrationTe
         }
     }
 }
-
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
@@ -53,10 +54,12 @@ public class CustomDbContextCustomSqliteProviderTests : UmbracoIntegrationTest
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
-        builder.Services.AddUmbracoDbContext<CustomDbContext>((serviceProvider, options, connectionString, providerName) =>
-        {
-            options.UseSqlite("Data Source=:memory:;Version=3;New=True;");
-        });
+        builder.Services.AddUmbracoDbContext<CustomDbContext>(
+            (serviceProvider, options, connectionString, providerName) =>
+            {
+                options.UseSqlite("Data Source=:memory:;Version=3;New=True;");
+            },
+            shareUmbracoConnection: true);
     }
 
     internal class CustomDbContext : Microsoft.EntityFrameworkCore.DbContext

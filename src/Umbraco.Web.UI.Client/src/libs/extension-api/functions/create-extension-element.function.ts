@@ -2,9 +2,11 @@ import type { ManifestElement, ManifestElementAndApi } from '../types/base.types
 import { loadManifestElement } from './load-manifest-element.function.js';
 
 /**
- *
- * @param manifest
- * @param fallbackElement
+ * Creates an element instance from a manifest.
+ * @template {HTMLElement} ElementType
+ * @param {ManifestElement<ElementType> | ManifestElementAndApi<any>} manifest The manifest to create the element from.
+ * @param {string} [fallbackElement] An element tag name to fall back to if the manifest does not provide one.
+ * @returns {Promise<ElementType | undefined>} The created element, if successful.
  */
 export async function createExtensionElement<ElementType extends HTMLElement>(
 	manifest: ManifestElement<ElementType> | ManifestElementAndApi<any>,

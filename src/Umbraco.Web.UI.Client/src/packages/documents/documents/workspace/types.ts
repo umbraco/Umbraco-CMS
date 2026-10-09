@@ -1,1 +1,1 @@
-export type * from './document-workspace.context.js';
+export type * from './context/document-workspace.context.js';

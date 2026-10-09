@@ -42,7 +42,7 @@ export class UmbDictionaryTableCollectionViewElement extends UmbLitElement {
 	async #observeCollectionItems() {
 		if (!this.#collectionContext) return;
 
-		const { data: languageData } = await this.#languageCollectionRepository.requestCollection({});
+		const { data: languageData } = await this.#languageCollectionRepository.requestAllItems();
 		if (!languageData) return;
 
 		this.observe(

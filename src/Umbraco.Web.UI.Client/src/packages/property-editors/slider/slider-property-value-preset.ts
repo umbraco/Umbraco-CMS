@@ -2,9 +2,10 @@ import type { UmbSliderPropertyEditorUiValue } from './types.js';
 import type { UmbPropertyValuePreset } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 
-export class UmbSliderPropertyValuePreset
-	implements UmbPropertyValuePreset<UmbSliderPropertyEditorUiValue, UmbPropertyEditorConfig>
-{
+export class UmbSliderPropertyValuePreset implements UmbPropertyValuePreset<
+	UmbSliderPropertyEditorUiValue,
+	UmbPropertyEditorConfig
+> {
 	async processValue(value: undefined | UmbSliderPropertyEditorUiValue, config: UmbPropertyEditorConfig) {
 		if (value !== undefined) {
 			return value;

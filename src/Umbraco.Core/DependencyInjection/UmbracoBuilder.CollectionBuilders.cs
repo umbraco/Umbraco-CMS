@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
+using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Routing;
@@ -134,6 +135,19 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddDynamicRootStep<T>(this IUmbracoBuilder builder) where T : IDynamicRootQueryStep
     {
         builder.DynamicRootSteps().Append<T>();
+        return builder;
+    }
+
+    /// <summary>
+    /// Register a machine identity provider.
+    /// </summary>
+    /// <typeparam name="T">The type of the machine identity provider.</typeparam>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The builder.</returns>
+    public static IUmbracoBuilder AddMachineIdentityProvider<T>(this IUmbracoBuilder builder)
+        where T : IMachineIdentityProvider
+    {
+        builder.MachineIdentityProviders().Append<T>();
         return builder;
     }
 }

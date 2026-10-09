@@ -209,8 +209,8 @@ export class UmbPropertyTypeWorkspaceContext
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @param {string} propertyAlias - The alias of the property.
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} An observable for the property value.
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: keyof PropertyTypeDataModel) {
@@ -223,8 +223,7 @@ export class UmbPropertyTypeWorkspaceContext
 
 	/**
 	 * @function setPropertyValue
-	 * @param {string} propertyAlias
-	 * @param alias
+	 * @param {string} alias - The alias of the property to set.
 	 * @param {PromiseLike<unknown>} value - value can be a promise resolving into the actual value or the raw value it self.
 	 * @returns {Promise<void>}
 	 * @description Set the value of this property.

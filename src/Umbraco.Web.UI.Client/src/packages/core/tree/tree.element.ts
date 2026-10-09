@@ -1,9 +1,15 @@
 import type { ManifestTree } from './extensions/types.js';
+import type { UmbTreeContext } from './tree.context.interface.js';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionElementAndApiSlotElementBase } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbExtensionElementAndApiSlotElementBase<ManifestTree> {
+	get interactionMemories(): Array<UmbInteractionMemoryModel> {
+		return (this._api as UmbTreeContext | undefined)?.interactionMemory?.getAllMemories() ?? [];
+	}
+
 	getExtensionType() {
 		return 'tree';
 	}

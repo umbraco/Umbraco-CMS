@@ -13,6 +13,7 @@
 @inject IOptions<GlobalSettings> GlobalSettings
 @inject IOptions<SecuritySettings> SecuritySettings
 @inject IEmailSender EmailSender
+@inject Umbraco.Cms.Core.Security.IUserForgotPasswordSender ForgotPasswordSender
 @inject IHostingEnvironment HostingEnvironment
 @inject IProfilerHtml ProfilerHtml
 @inject IBackOfficeExternalLoginProviders ExternalLogins
@@ -29,13 +30,13 @@
     var loginLogoImageAlternative = Url.RouteUrl(BackOfficeGraphicsController.LoginLogoAlternativeRouteName, new {Version= "1"});
     var loginBackgroundImage = Url.RouteUrl(BackOfficeGraphicsController.LoginBackGroundRouteName, new {Version= "1"});
     var usernameIsEmail = SecuritySettings.Value.UsernameIsEmail;
-    var allowUserInvite = EmailSender.CanSendRequiredEmail();
-    var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
+    var allowUserInvite = EmailSender.IsEmailConfigured();
+    var allowPasswordReset = ForgotPasswordSender.IsPasswordResetConfigured();
     var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
 }
 
 <!DOCTYPE html>
-<html lang="@GlobalSettings.Value.DefaultUILanguage">
+<html lang="en">
 <head>
     <meta charset="UTF-8"/>
     <base href="@backOfficePath.EnsureEndsWith('/')" />
@@ -46,7 +47,7 @@
     <meta name="pinterest" content="nopin"/>
     <title>Umbraco</title>
 
-    <link rel="stylesheet" href="~/umbraco/backoffice/css/uui-css.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/umbraco/backoffice/css/light.css" asp-append-version="true" />
     <style>
       body {
         margin: 0;
@@ -83,6 +84,7 @@
 </noscript>
 
 <umb-auth
+    lang="@GlobalSettings.Value.DefaultUILanguage"
     return-url="@backOfficePath"
     logo-image="@loginLogoImage"
     logo-image-alternative="@loginLogoImageAlternative"

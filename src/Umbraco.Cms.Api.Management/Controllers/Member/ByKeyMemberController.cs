@@ -1,9 +1,11 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
@@ -16,24 +18,43 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member;
 [ApiVersion("1.0")]
 public class ByKeyMemberController : MemberControllerBase
 {
-    private readonly IMemberEditingService _memberEditingService;
-    private readonly IMemberPresentationFactory _memberPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IMemberPresentationService _memberPresentationService;
+
+    // TODO (V19): Remove the unnecessary parameters provided to the constructor.
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ByKeyMemberController"/> class, which handles member management operations by member key.
+    /// Initializes a new instance of the <see cref="ByKeyMemberController"/> class.
     /// </summary>
     /// <param name="memberEditingService">Service used to perform editing operations on members.</param>
     /// <param name="memberPresentationFactory">Factory for creating member presentation models.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="memberPresentationService">Service for resolving members across both content and external stores.</param>
+    [ActivatorUtilitiesConstructor]
+    public ByKeyMemberController(
+        IMemberEditingService memberEditingService,
+        IMemberPresentationFactory memberPresentationFactory,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IMemberPresentationService memberPresentationService)
+    {
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _memberPresentationService = memberPresentationService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyMemberController"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ByKeyMemberController(
         IMemberEditingService memberEditingService,
         IMemberPresentationFactory memberPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        : this(
+            memberEditingService,
+            memberPresentationFactory,
+            backOfficeSecurityAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IMemberPresentationService>())
     {
-        _memberEditingService = memberEditingService;
-        _memberPresentationFactory = memberPresentationFactory;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     /// <summary>
@@ -52,13 +73,7 @@ public class ByKeyMemberController : MemberControllerBase
     [EndpointDescription("Gets a member identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
-        IMember? member = await _memberEditingService.GetAsync(id);
-        if (member == null)
-        {
-            return MemberNotFound();
-        }
-
-        MemberResponseModel model = await _memberPresentationFactory.CreateResponseModelAsync(member, CurrentUser(_backOfficeSecurityAccessor));
-        return Ok(model);
+        MemberResponseModel? model = await _memberPresentationService.CreateResponseModelByKeyAsync(id, CurrentUser(_backOfficeSecurityAccessor));
+        return model is not null ? Ok(model) : MemberNotFound();
     }
 }

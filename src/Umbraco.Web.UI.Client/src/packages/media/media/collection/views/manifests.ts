@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./grid/media-grid-collection-view.element.js'),
 		weight: 300,
 		meta: {
-			label: 'Grid',
+			label: '#collection_gridViewLabel',
 			icon: 'icon-grid',
 			pathName: 'grid',
 		},
@@ -27,7 +27,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./table/media-table-collection-view.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Table',
+			label: '#collection_tableViewLabel',
 			icon: 'icon-table',
 			pathName: 'table',
 		},

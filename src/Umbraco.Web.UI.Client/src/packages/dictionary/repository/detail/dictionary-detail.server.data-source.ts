@@ -1,7 +1,11 @@
 import type { UmbDictionaryDetailModel } from '../../types.js';
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDictionaryItemRequestModel,
 	UpdateDictionaryItemRequestModel,
@@ -13,7 +17,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Dictionary that fetches data from the server
  * @class UmbDictionaryServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbDictionaryDetailModel>}
  */
 export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDictionaryDetailModel> {
 	#host: UmbControllerHost;
@@ -29,7 +33,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Creates a new Dictionary scaffold
-	 * @returns { CreateDictionaryRequestModel }
+	 * @returns { CreateDictionaryItemRequestModel } The dictionary scaffold.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async createScaffold() {
@@ -45,11 +49,11 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Fetches a Dictionary with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the dictionary to fetch.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>>} The dictionary.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this.#host, DictionaryService.getDictionaryById({ path: { id: unique } }));
@@ -71,12 +75,15 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Inserts a new Dictionary on the server
-	 * @param {UmbDictionaryDetailModel} model
-	 * @param parentUnique
-	 * @returns {*}
+	 * @param {UmbDictionaryDetailModel} model - The dictionary to create.
+	 * @param {string | null} parentUnique - The unique identifier of the parent, if any.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>>} The created dictionary.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
-	async create(model: UmbDictionaryDetailModel, parentUnique: string | null) {
+	async create(
+		model: UmbDictionaryDetailModel,
+		parentUnique: string | null,
+	): Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>> {
 		if (!model) throw new Error('Dictionary is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -103,12 +110,11 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Updates a Dictionary on the server
-	 * @param {UmbDictionaryDetailModel} Dictionary
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbDictionaryDetailModel} model - The dictionary to update.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>>} The updated dictionary.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
-	async update(model: UmbDictionaryDetailModel) {
+	async update(model: UmbDictionaryDetailModel): Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -134,11 +140,11 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Deletes a Dictionary on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the dictionary to delete.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(

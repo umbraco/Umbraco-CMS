@@ -17,7 +17,6 @@ export default defineConfig({
 			'user-group/index': 'user-group/index.ts',
 			'user-permission/index': 'user-permission/index.ts',
 			'user/index': 'user/index.ts',
-			manifests: 'manifests.ts',
 		},
 	}),
 });

@@ -3,12 +3,12 @@ import { UMB_RELATION_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { RelationTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import type { UmbReadDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse, UmbReadDetailDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Relation Type that fetches data from the server
  * @class UmbRelationTypeServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbReadDetailDataSource}
  */
 export class UmbRelationTypeDetailServerDataSource implements UmbReadDetailDataSource<UmbRelationTypeDetailModel> {
 	#host: UmbControllerHost;
@@ -24,11 +24,11 @@ export class UmbRelationTypeDetailServerDataSource implements UmbReadDetailDataS
 
 	/**
 	 * Fetches a Relation Type with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the relation type.
+	 * @returns {Promise<UmbDataSourceResponse<UmbRelationTypeDetailModel>>} The relation type detail.
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbRelationTypeDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(

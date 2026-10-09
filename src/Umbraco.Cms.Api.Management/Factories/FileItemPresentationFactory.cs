@@ -57,10 +57,10 @@ public class FileItemPresentationFactory : IFileItemPresentationFactory
             (name, path, parent, isFolder) => new() { Name = name, Path = path, Parent = parent, IsFolder = isFolder });
 
     /// <summary>
-    /// Creates a collection of <see cref="Umbraco.Cms.Api.Management.Models.StylesheetItemResponseModel"/> instances from the given stylesheet paths.
+    /// Creates a collection of <see cref="StylesheetItemResponseModel"/> instances from the given stylesheet paths.
     /// </summary>
     /// <param name="paths">The enumerable of stylesheet file paths to create response models for.</param>
-    /// <returns>An enumerable of <see cref="Umbraco.Cms.Api.Management.Models.StylesheetItemResponseModel"/> representing the stylesheet items.</returns>
+    /// <returns>An enumerable of <see cref="StylesheetItemResponseModel"/> representing the stylesheet items.</returns>
     public IEnumerable<StylesheetItemResponseModel> CreateStylesheetItemResponseModels(IEnumerable<string> paths)
         => CreateItemResponseModels<StylesheetItemResponseModel>(
             paths,

@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 /// <summary>
 /// Represents a response model containing information about a document item returned by the Umbraco Management API.
 /// </summary>
-public class DocumentItemResponseModel : ItemResponseModelBase, IIsProtected
+public class DocumentItemResponseModel : ItemResponseModelBase, IIsProtected, IHasChildren
 {
     /// <summary>
     /// Gets or sets a value indicating whether the document is trashed.
@@ -23,9 +23,7 @@ public class DocumentItemResponseModel : ItemResponseModelBase, IIsProtected
     /// </summary>
     public ReferenceByIdModel? Parent { get; set; }
 
-    /// <summary>
-    /// Gets or sets a value indicating whether the document has child items.
-    /// </summary>
+    /// <inheritdoc />
     public bool HasChildren { get; set; }
 
     /// <summary>

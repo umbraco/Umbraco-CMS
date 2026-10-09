@@ -1,5 +1,6 @@
 import type { UmbElementDetailModel } from '../types.js';
 import type { UmbElementPropertyDataOwner } from './element-property-data-owner.interface.js';
+import { umbExtractVariantValues } from './merge-variant-values.function.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -19,13 +20,13 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 type UmbPropertyVariantIdMapType = Array<{ alias: string; variantId: UmbVariantId }>;
 
 export abstract class UmbElementPropertyDatasetContext<
-		ContentModel extends UmbElementDetailModel = UmbElementDetailModel,
-		ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,
-		DataOwnerType extends UmbElementPropertyDataOwner<ContentModel, ContentTypeModel> = UmbElementPropertyDataOwner<
-			ContentModel,
-			ContentTypeModel
-		>,
-	>
+	ContentModel extends UmbElementDetailModel = UmbElementDetailModel,
+	ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,
+	DataOwnerType extends UmbElementPropertyDataOwner<ContentModel, ContentTypeModel> = UmbElementPropertyDataOwner<
+		ContentModel,
+		ContentTypeModel
+	>,
+>
 	extends UmbContextBase
 	implements UmbPropertyDatasetContext
 {
@@ -69,7 +70,8 @@ export abstract class UmbElementPropertyDatasetContext<
 		this.#variantContext.setVariantId(this.#variantId);
 
 		this.#propertyVariantIdPromise = new Promise((resolve) => {
-			this.#propertyVariantIdPromiseResolver = resolve as any;
+			this.#propertyVariantIdPromiseResolver = resolve as unknown as () => void;
+			// TODO: implement a rejector as well, and handle that in the places awaiting this promise. [NL]
 		});
 
 		this.observe(
@@ -118,16 +120,7 @@ export abstract class UmbElementPropertyDatasetContext<
 	}
 
 	#mergeVariantIdsAndValues([props, values]: [UmbPropertyVariantIdMapType, ContentModel['values'] | undefined]) {
-		const r: ContentModel['values'] = [];
-		if (values) {
-			for (const prop of props) {
-				const f = values.find((v) => prop.alias === v.alias && prop.variantId.compare(v));
-				if (f) {
-					r.push(f);
-				}
-			}
-		}
-		return r as ContentModel['values'];
+		return umbExtractVariantValues(props, values) as ContentModel['values'];
 	}
 
 	async getProperties(): Promise<ContentModel['values']> {

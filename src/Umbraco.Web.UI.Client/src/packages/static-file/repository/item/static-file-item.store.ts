@@ -5,7 +5,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbStaticFileItemStore
- * @augments {UmbStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Static File items
  */
 
@@ -16,7 +16,7 @@ export class UmbStaticFileItemStore extends UmbItemStoreBase<UmbStaticFileItemMo
 	 * @memberof UmbStaticFileItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_STATIC_FILE_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_STATIC_FILE_ITEM_STORE_CONTEXT);
 	}
 }
 

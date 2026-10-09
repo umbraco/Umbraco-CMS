@@ -1,3 +1,4 @@
+import UmbWorkspaceVariantMenuBreadcrumbElement from './workspace-variant-menu-breadcrumb.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbExtensionManifestKind = {
@@ -8,7 +9,7 @@ export const manifest: UmbExtensionManifestKind = {
 	manifest: {
 		type: 'workspaceFooterApp',
 		kind: 'variantMenuBreadcrumb',
-		element: () => import('./workspace-variant-menu-breadcrumb.element.js'),
+		element: UmbWorkspaceVariantMenuBreadcrumbElement,
 		weight: 1000,
 	},
 };

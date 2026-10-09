@@ -1,5 +1,6 @@
 import { UmbUserDetailRepository } from '../../../repository/index.js';
 import { UmbUserKind } from '../../../utils/index.js';
+import type { UmbUserKindType } from '../../../utils/index.js';
 import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token.js';
 import type { UmbCreateUserModalData } from './create-user-modal.token.js';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
@@ -47,19 +48,16 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 		const { data } = await this.#userDetailRepository.create(userScaffold);
 
 		if (data) {
-			if (data.kind === UmbUserKind.DEFAULT) {
-				this.#openSuccessModal(data.unique);
-			} else {
-				this._submitModal();
-			}
+			this.#openSuccessModal(data.unique, data.kind);
 		}
 	}
 
-	async #openSuccessModal(userUnique: string) {
+	async #openSuccessModal(userUnique: string, userKind: UmbUserKindType) {
 		await umbOpenModal(this, UMB_CREATE_USER_SUCCESS_MODAL, {
 			data: {
 				user: {
 					unique: userUnique,
+					kind: userKind,
 				},
 			},
 		})
@@ -80,12 +78,12 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 			<p>${this.localize.term('user_createUserDescription', this.data?.user.kind)}</p>
 
 			${this.#renderForm()}
-			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
+			<uui-button @click=${this._rejectModal} slot="actions" label=${this.localize.term('general_cancel')} look="secondary"></uui-button>
 			<uui-button
 				form="CreateUserForm"
 				slot="actions"
 				type="submit"
-				label="Create user"
+				label=${this.localize.term('user_createUser')}
 				look="primary"
 				color="positive"></uui-button>
 		</uui-dialog-layout>`;
@@ -95,16 +93,24 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 		return html` <uui-form>
 			<form id="CreateUserForm" name="form" @submit="${this.#onSubmit}">
 				<uui-form-layout-item>
-					<uui-label id="nameLabel" slot="label" for="name" required>Name</uui-label>
+					<uui-label id="nameLabel" slot="label" for="name" required>
+						<umb-localize key="general_name"></umb-localize>
+					</uui-label>
 					<uui-input id="name" label="name" type="text" name="name" required></uui-input>
 				</uui-form-layout-item>
 				<uui-form-layout-item>
-					<uui-label id="emailLabel" slot="label" for="email" required>Email</uui-label>
+					<uui-label id="emailLabel" slot="label" for="email" required>
+						<umb-localize key="general_email"></umb-localize>
+					</uui-label>
 					<uui-input id="email" label="email" type="email" name="email" required></uui-input>
 				</uui-form-layout-item>
 				<uui-form-layout-item>
-					<uui-label id="userGroupsLabel" slot="label" for="userGroups" required>User group</uui-label>
-					<span slot="description">Add groups to assign access and permissions</span>
+					<uui-label id="userGroupsLabel" slot="label" for="userGroups" required>
+						<umb-localize key="user_usergroups"></umb-localize>
+					</uui-label>
+					<span slot="description">
+						<umb-localize key="user_groupsHelp"></umb-localize>
+					</span>
 					<umb-user-group-input id="userGroups" name="userGroups"></umb-user-group-input>
 				</uui-form-layout-item>
 			</form>

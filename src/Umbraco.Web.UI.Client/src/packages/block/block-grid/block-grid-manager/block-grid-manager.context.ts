@@ -112,9 +112,11 @@ export class UmbBlockGridManagerContext<
 	}
 
 	/**
-	 * @param contentElementTypeKey
-	 * @param partialLayoutEntry
-	 * @param originData
+	 * Creates block data with default presets for the given content element type.
+	 * @param {string} contentElementTypeKey - The key of the content element type to create.
+	 * @param {Omit<BlockLayoutType, 'contentKey'>} [partialLayoutEntry] - Partial layout entry to merge into the created layout entry.
+	 * @param {UmbBlockGridWorkspaceOriginData} [originData] - Origin data, unused by this implementation.
+	 * @returns {Promise<{ layout: BlockLayoutType; content: UmbBlockDataModel; settings: UmbBlockDataModel | undefined }>} the created block data.
 	 */
 	async createWithPresets(
 		contentElementTypeKey: string,
@@ -128,14 +130,12 @@ export class UmbBlockGridManagerContext<
 
 	/**
 	 * Inserts a layout entry into an area of a layout entry.
-	 * @param layoutEntry The layout entry to insert.
-	 * @param insert
-	 * @param entries The layout entries to search within.
-	 * @param parentUnique The parentUnique to search for.
-	 * @param parentId
-	 * @param areaKey The areaKey to insert the layout entry into.
-	 * @param index The index to insert the layout entry at.
-	 * @returns a updated layout entries array if the insert was successful.
+	 * @param {UmbBlockGridLayoutModel} insert The layout entry to insert.
+	 * @param {Array<UmbBlockGridLayoutModel>} entries The layout entries to search within.
+	 * @param {string} parentId The parentId to search for.
+	 * @param {string} areaKey The areaKey to insert the layout entry into.
+	 * @param {number} index The index to insert the layout entry at.
+	 * @returns {Array<UmbBlockGridLayoutModel> | undefined} a updated layout entries array if the insert was successful.
 	 * @remarks
 	 * This method is recursive and will search for the parentUnique in the layout entries.
 	 * If the parentUnique is found, the layout entry will be inserted into the items of the area that matches the areaKey.

@@ -19,7 +19,7 @@ public class ChildrenDocumentTypeTreeControllerTests : ManagementApiUserGroupTes
     private Guid _contentTypeKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         _contentFolderKey = Guid.NewGuid();
         await ContentTypeContainerService.CreateAsync(_contentFolderKey,"Folder", null, Constants.Security.SuperUserKey);

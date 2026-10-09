@@ -183,6 +183,9 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
         TEntity? entity = Repository.Get(path);
         if (entity is null)
         {
+            // Logical "no-op", not a transactional error. Complete the scope so an enclosing parent
+            // scope is not silently rolled back by this child failing to complete.
+            scope.Complete();
             return NotFound;
         }
 
@@ -190,6 +193,7 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
         DeletingNotification<TEntity> deletingNotification = DeletingNotification(entity, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
+            scope.Complete();
             return CancelledByNotification;
         }
 
@@ -225,12 +229,16 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
             TOperationStatus validationResult = ValidateCreate(path);
             if (Success.Equals(validationResult) is false)
             {
+                // Logical "no-op", not a transactional error. Complete the scope so an enclosing parent
+                // scope is not silently rolled back by this child failing to complete.
+                scope.Complete();
                 return Attempt.FailWithStatus<TEntity?, TOperationStatus>(validationResult, default);
             }
         }
         catch (PathTooLongException exception)
         {
             _logger.LogError(exception, "The {EntityType} path was too long", EntityType);
+            scope.Complete();
             return Attempt.FailWithStatus<TEntity?, TOperationStatus>(PathTooLong, default);
         }
 
@@ -240,6 +248,7 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
         SavingNotification<TEntity> savingNotification = SavingNotification(entity, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
+            scope.Complete();
             return Attempt.FailWithStatus<TEntity?, TOperationStatus>(CancelledByNotification, default);
         }
 
@@ -267,6 +276,9 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
 
         if (entity is null)
         {
+            // Logical "no-op", not a transactional error. Complete the scope so an enclosing parent
+            // scope is not silently rolled back by this child failing to complete.
+            scope.Complete();
             return Attempt.FailWithStatus<TEntity?, TOperationStatus>(NotFound, default);
         }
 
@@ -276,6 +288,7 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
         SavingNotification<TEntity> savingNotification = SavingNotification(entity, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
+            scope.Complete();
             return Attempt.FailWithStatus<TEntity?, TOperationStatus>(CancelledByNotification, default);
         }
 
@@ -308,6 +321,9 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
 
         if (entity is null)
         {
+            // Logical "no-op", not a transactional error. Complete the scope so an enclosing parent
+            // scope is not silently rolled back by this child failing to complete.
+            scope.Complete();
             return Attempt.FailWithStatus<TEntity?, TOperationStatus>(NotFound, default);
         }
 
@@ -318,12 +334,14 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
             TOperationStatus validationResult = ValidateRename(newName, newPath);
             if (Success.Equals(validationResult) is false)
             {
+                scope.Complete();
                 return Attempt.FailWithStatus<TEntity?, TOperationStatus>(validationResult, default);
             }
         }
         catch (PathTooLongException exception)
         {
             _logger.LogError(exception, "The {EntityType} path was too long", EntityType);
+            scope.Complete();
             return Attempt.FailWithStatus<TEntity?, TOperationStatus>(PathTooLong, default);
         }
 
@@ -333,6 +351,7 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
         SavingNotification<TEntity> savingNotification = SavingNotification(entity, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
+            scope.Complete();
             return Attempt.FailWithStatus<TEntity?, TOperationStatus>(CancelledByNotification, default);
         }
 

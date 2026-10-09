@@ -7,6 +7,7 @@ export class SliderDataTypeBuilder extends DataTypeBuilder {
   initVal1: number;
   initVal2: number;
   step: number;
+  minimumRange: number;
 
   constructor() {
     super();
@@ -46,6 +47,11 @@ export class SliderDataTypeBuilder extends DataTypeBuilder {
     return this;
   }
 
+  withMinimumRange(minimumRange: number) {
+    this.minimumRange = minimumRange;
+    return this;
+  }
+
   getValues() {
     let values: any = [];
     values.push({
@@ -71,6 +77,10 @@ export class SliderDataTypeBuilder extends DataTypeBuilder {
     values.push({
       alias: 'step',
       value: this.step || 0
+    });
+    values.push({
+      alias: 'minimumRange',
+      value: this.minimumRange || 0
     });
     return values;
   }

@@ -13,6 +13,7 @@ export class UmbEntityContext extends UmbContextBase {
 	#entityType = new UmbStringState<string | undefined>(undefined);
 	public readonly entityType = this.#entityType.asObservable();
 
+	// TODO v19: Accept undefined as initial value to align with workspace contexts that start unloaded.
 	#unique = new UmbStringState<UmbEntityUnique>(null);
 	public readonly unique = this.#unique.asObservable();
 
@@ -27,7 +28,7 @@ export class UmbEntityContext extends UmbContextBase {
 
 	/**
 	 * Set the entity type
-	 * @param {string | undefined} entityType
+	 * @param {string | undefined} entityType - The entity type
 	 * @memberof UmbEntityContext
 	 */
 	setEntityType(entityType: string | undefined) {
@@ -36,7 +37,7 @@ export class UmbEntityContext extends UmbContextBase {
 
 	/**
 	 * Get the entity type
-	 * @returns {string | undefined}
+	 * @returns {string | undefined} The entity type
 	 * @memberof UmbEntityContext
 	 */
 	getEntityType(): string | undefined {
@@ -45,7 +46,7 @@ export class UmbEntityContext extends UmbContextBase {
 
 	/**
 	 * Set the unique
-	 * @param {string | null} unique
+	 * @param {string | null} unique - The unique identifier
 	 * @memberof UmbEntityContext
 	 */
 	setUnique(unique: string | null) {
@@ -54,7 +55,7 @@ export class UmbEntityContext extends UmbContextBase {
 
 	/**
 	 * Get the unique
-	 * @returns {string | null}
+	 * @returns {string | null} The unique identifier
 	 * @memberof UmbEntityContext
 	 */
 	getUnique() {

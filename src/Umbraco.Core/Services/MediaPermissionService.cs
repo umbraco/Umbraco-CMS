@@ -16,7 +16,6 @@ internal sealed class MediaPermissionService : IMediaPermissionService
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaPermissionService" /> class.
     /// </summary>
-    /// <param name="mediaService">The media service.</param>
     /// <param name="entityService">The entity service.</param>
     /// <param name="appCaches">The application caches.</param>
     public MediaPermissionService(

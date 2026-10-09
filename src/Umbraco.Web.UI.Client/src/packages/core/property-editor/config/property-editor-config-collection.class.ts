@@ -40,6 +40,7 @@ export class UmbPropertyEditorConfigCollection extends Array<UmbPropertyEditorCo
 	 *   myProperty: 27,
 	 * 	 anotherProperty: 'eleven',
 	 * }`
+	 * @returns {Record<string, unknown>} The config as an object keyed by alias
 	 */
 	toObject(): Record<string, unknown> {
 		return Object.fromEntries(this.map((x) => [x.alias, x.value]));

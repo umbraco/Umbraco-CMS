@@ -16,7 +16,7 @@ public class BatchDocumentTypesControllerTests : ManagementApiUserGroupTestBase<
     private Guid _key2;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         _key1 = Guid.NewGuid();
         _key2 = Guid.NewGuid();

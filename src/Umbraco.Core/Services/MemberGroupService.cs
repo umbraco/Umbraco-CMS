@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -93,6 +94,20 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         return Task.FromResult(_memberGroupRepository.Get(key));
+    }
+
+    /// <inheritdoc/>
+    public Task<IEnumerable<IMemberGroup>> GetAsync(IEnumerable<Guid> keys)
+    {
+        List<Guid> keysAsList = [.. keys];
+        if (keysAsList.Count == 0)
+        {
+            return Task.FromResult<IEnumerable<IMemberGroup>>([]);
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IMemberGroup> query = Query<IMemberGroup>().Where(x => keysAsList.Contains(x.Key));
+        return Task.FromResult(_memberGroupRepository.Get(query));
     }
 
     /// <inheritdoc/>

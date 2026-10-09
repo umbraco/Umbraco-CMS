@@ -24,6 +24,7 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         mapper.Define<IMemberEntitySlim, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
         mapper.Define<IMember, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
         mapper.Define<ISimpleContentType, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
+        mapper.Define<IMemberType, AllowedMemberType>((_, _) => new AllowedMemberType(), Map);
     }
 
     // Umbraco.Code.MapAll -Collection
@@ -75,6 +76,15 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
     private void Map(ISimpleContentType source, MemberTypeReferenceResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
+        target.Icon = source.Icon ?? string.Empty;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(IMemberType source, AllowedMemberType target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Name = source.Name ?? string.Empty;
+        target.Description = source.Description;
         target.Icon = source.Icon ?? string.Empty;
     }
 }

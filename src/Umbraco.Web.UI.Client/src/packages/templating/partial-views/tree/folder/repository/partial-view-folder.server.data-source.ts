@@ -6,12 +6,16 @@ import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDetailDataSource,
+	UmbDataSourceResponse,
+	UmbDataSourceErrorResponse,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for Partial View folders that fetches data from the server
  * @class UmbPartialViewFolderServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbFolderModel>}
  */
 export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;
@@ -28,11 +32,11 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Creates a scaffold for a Partial View folder
-	 * @param {Partial<UmbFolderModel>} [preset]
-	 * @returns {*}
+	 * @param {Partial<UmbFolderModel>} [preset] - Initial data to seed the scaffold with
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The scaffolded Partial View folder
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
-	async createScaffold(preset?: Partial<UmbFolderModel>) {
+	async createScaffold(preset?: Partial<UmbFolderModel>): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		const scaffold: UmbFolderModel = {
 			entityType: UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
 			unique: UmbId.new(),
@@ -45,8 +49,8 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Fetches a Partial View folder from the server
-	 * @param {string} unique
-	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
+	 * @param {string} unique - The unique identifier of the Partial View folder
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The Partial View folder
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -78,8 +82,8 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Creates a Partial View folder on the server
-	 * @param {UmbFolderModel} model
-	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
+	 * @param {UmbFolderModel} model - The Partial View folder to create
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The created Partial View folder
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -112,11 +116,11 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Deletes a Partial View folder on the server
-	 * @param {string} unique
-	 * @returns {UmbDataSourceErrorResponse}
-	 * @memberof UmbPartialViewServerDataSource
+	 * @param {string} unique - The unique identifier of the Partial View folder
+	 * @returns {UmbDataSourceErrorResponse} The result of the delete operation
+	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);

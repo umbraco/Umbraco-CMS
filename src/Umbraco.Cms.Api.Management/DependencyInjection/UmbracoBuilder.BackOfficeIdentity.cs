@@ -54,7 +54,8 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IUserRepository>(),
                 factory.GetRequiredService<IRuntimeState>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<ILogger<BackOfficeUserStore>>()))
+                factory.GetRequiredService<ILogger<BackOfficeUserStore>>(),
+                factory.GetRequiredService<IBackOfficeUserReader>()))
             .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
             .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
             .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory>()
@@ -67,7 +68,6 @@ public static partial class UmbracoBuilderExtensions
         services.AddScoped<IInviteUriProvider, InviteUriProvider>();
         services.AddScoped<IForgotPasswordUriProvider, ForgotPasswordUriProvider>();
         services.AddScoped<IBackOfficePasswordChanger, BackOfficePasswordChanger>();
-        services.AddScoped<IBackOfficeUserClientCredentialsManager, BackOfficeUserClientCredentialsManager>();
 
         services.AddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>();
 

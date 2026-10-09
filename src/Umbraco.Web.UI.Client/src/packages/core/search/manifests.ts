@@ -1,4 +1,5 @@
 import { manifests as examineManifests } from './examine-management-dashboard/manifests.js';
+import UmbSearchHeaderAppElement from './umb-search-header-app.element.js';
 import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -6,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'headerApp',
 		alias: 'Umb.HeaderApp.Search',
 		name: 'Header App Search',
-		element: () => import('./umb-search-header-app.element.js'),
+		element: UmbSearchHeaderAppElement,
 		weight: 900,
 		meta: {
 			label: 'Search',

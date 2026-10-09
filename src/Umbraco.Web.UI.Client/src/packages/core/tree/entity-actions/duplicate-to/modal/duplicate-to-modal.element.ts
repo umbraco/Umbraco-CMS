@@ -3,13 +3,29 @@ import type { UmbDuplicateToModalData, UmbDuplicateToModalValue } from './duplic
 import { html, customElement, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
-const elementName = 'umb-duplicate-to-modal';
-@customElement(elementName)
+/**
+ * @deprecated Deprecated since v17. The "Duplicate to" entity action now uses the shared `UMB_TREE_PICKER_MODAL`. Scheduled for removal in Umbraco 19.
+ */
+@customElement('umb-duplicate-to-modal')
 export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicateToModalData, UmbDuplicateToModalValue> {
 	@state()
 	private _destinationUnique?: string | null;
+
+	constructor() {
+		super();
+		new UmbDeprecation({
+			deprecated: 'UmbDuplicateToModalElement (umb-duplicate-to-modal / Umb.Modal.DuplicateTo)',
+			removeInVersion: '19.0.0',
+			solution: 'Use the shared UMB_TREE_PICKER_MODAL instead, passing `headline` and `confirmLabel`.',
+		}).warn();
+	}
+
+	private get _treeExpansion() {
+		return this.data?.treeExpansion ?? [];
+	}
 
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
@@ -26,16 +42,14 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_copyTo')}>
-				<uui-box>
-					<umb-tree
-						alias=${this.data.treeAlias}
-						.props=${{
-							foldersOnly: this.data?.foldersOnly,
-							expandTreeRoot: true,
-						}}
-						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
-				</uui-box>
-
+				<umb-tree
+					alias=${this.data.treeAlias}
+					.props=${{
+						foldersOnly: this.data?.foldersOnly,
+						expandTreeRoot: true,
+						expansion: this._treeExpansion,
+					}}
+					@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				${this.#renderActions()}
 			</umb-body-layout>
 		`;
@@ -43,7 +57,10 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 
 	#renderActions() {
 		return html`
-			<uui-button slot="actions" label=${this.localize.term('general_cancel')} @click="${this._rejectModal}"></uui-button>
+			<uui-button
+				slot="actions"
+				label=${this.localize.term('general_cancel')}
+				@click="${this._rejectModal}"></uui-button>
 			<uui-button
 				slot="actions"
 				color="positive"
@@ -61,6 +78,6 @@ export { UmbDuplicateToModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDuplicateToModalElement;
+		'umb-duplicate-to-modal': UmbDuplicateToModalElement;
 	}
 }

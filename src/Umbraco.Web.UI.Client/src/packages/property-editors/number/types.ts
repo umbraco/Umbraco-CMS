@@ -1,2 +1,2 @@
-export type UmbIntegerPropertyEditorUiValue = number;
-export type UmbDecimalPropertyEditorUiValue = number;
+export type UmbIntegerPropertyEditorUiValue = number | undefined;
+export type UmbDecimalPropertyEditorUiValue = number | undefined;

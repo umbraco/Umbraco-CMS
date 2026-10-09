@@ -1,20 +1,32 @@
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
+import { UmbDocumentVariantState } from '../../../variant-state.js';
+import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { isNotPublishedMandatory } from '../../utils.js';
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../../../modals/shared/document-variant-language-picker.element.js';
 
+/** @deprecated Use `umb-content-publish-modal` from `@umbraco-cms/backoffice/content` instead. Scheduled for removal in Umbraco 19. */
 @customElement('umb-document-publish-modal')
 export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	UmbDocumentPublishModalData,
 	UmbDocumentPublishModalValue
 > {
 	#selectionManager = new UmbSelectionManager<string>(this);
+
+	constructor() {
+		super();
+
+		new UmbDeprecation({
+			deprecated: 'UmbDocumentPublishModalElement is deprecated.',
+			removeInVersion: '19.0.0',
+			solution: 'Use umb-content-publish-modal from @umbraco-cms/backoffice/content instead.',
+		}).warn();
+	}
 
 	@state()
 	private _options: Array<UmbDocumentVariantOptionModel> = [];

@@ -1,9 +1,8 @@
 import type { UmbPickerContext } from '../picker.context.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbModalInteractionMemoryController } from '@umbraco-cms/backoffice/interaction-memory';
 import type { ManifestModal, UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
-import { UMB_PICKER_INPUT_CONTEXT } from '@umbraco-cms/backoffice/picker-input';
 
 export abstract class UmbPickerModalBaseElement<
 	ItemType = UmbEntityModel,
@@ -13,52 +12,24 @@ export abstract class UmbPickerModalBaseElement<
 > extends UmbModalBaseElement<ModalDataType, ModalValueType, ModalManifestType> {
 	protected abstract _pickerContext: UmbPickerContext;
 
-	#pickerInputContext?: typeof UMB_PICKER_INPUT_CONTEXT.TYPE;
-
 	constructor() {
 		super();
-		this.consumeContext(UMB_PICKER_INPUT_CONTEXT, (pickerInputContext) => {
-			this.#pickerInputContext = pickerInputContext;
-			this.#observeMemoriesFromInputContext();
+		// `_pickerContext` is a subclass field and does not exist yet, hence the accessors — the controller
+		// resolves both on connect.
+		new UmbModalInteractionMemoryController(this, {
+			memory: () => this._pickerContext.interactionMemory,
+			unique: () => this.#getInteractionMemoryUnique(),
 		});
 	}
 
-	override connectedCallback(): void {
-		super.connectedCallback();
-		this.#observeMemoriesFromPicker();
-	}
-
-	#observeMemoriesFromPicker() {
-		this.observe(this._pickerContext.interactionMemory.memories, (memories) => {
-			this.#setMemoriesOnInputContext(memories);
-		});
-	}
-
-	#getInteractionMemoryUnique() {
-		// TODO: consider appending with a unique when we have that implemented.
-		return `UmbPickerModal`;
-	}
-
-	#observeMemoriesFromInputContext() {
-		this.observe(
-			this.#pickerInputContext?.interactionMemory.memory(this.#getInteractionMemoryUnique()),
-			(memory) => {
-				memory?.memories?.forEach((memory) => this._pickerContext.interactionMemory.setMemory(memory));
-			},
-			'umbModalInteractionMemoryObserver',
-		);
-	}
-
-	#setMemoriesOnInputContext(pickerMemories: Array<UmbInteractionMemoryModel>) {
-		if (pickerMemories?.length > 0) {
-			const pickerModalMemory: UmbInteractionMemoryModel = {
-				unique: this.#getInteractionMemoryUnique(),
-				memories: pickerMemories,
-			};
-
-			this.#pickerInputContext?.interactionMemory.setMemory(pickerModalMemory);
-		} else {
-			this.#pickerInputContext?.interactionMemory.deleteMemory(this.#getInteractionMemoryUnique());
-		}
+	/**
+	 * Keyed by modal alias, so different picker modals — and the same modal reached through different
+	 * openers — share or isolate their remembered state as appropriate.
+	 * @returns {(string | undefined)} The interaction-memory key, or undefined when there is no alias to
+	 * key by, in which case nothing is bridged.
+	 */
+	#getInteractionMemoryUnique(): string | undefined {
+		const alias = this.manifest?.alias;
+		return alias ? `UmbPickerModal:${alias}` : undefined;
 	}
 }

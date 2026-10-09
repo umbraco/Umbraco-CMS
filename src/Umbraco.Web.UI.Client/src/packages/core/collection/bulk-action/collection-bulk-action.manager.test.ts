@@ -1,5 +1,5 @@
 import { UmbCollectionBulkActionManager } from './collection-bulk-action.manager.js';
-import { umbExtensionsRegistry } from '../../extension-registry/index.js';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';

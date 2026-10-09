@@ -37,13 +37,19 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
     {
     }
 
+    /// <summary>
+    /// Gets the cache policy as <see cref="FullDataSetRepositoryCachePolicy{TEntity, TId}"/> for predicate-based lookups.
+    /// Returns null when caching is disabled (e.g. <see cref="AppCaches.NoCache"/>).
+    /// </summary>
+    private FullDataSetRepositoryCachePolicy<ILogViewerQuery, int>? TypedCachePolicy
+        => CachePolicy as FullDataSetRepositoryCachePolicy<ILogViewerQuery, int>;
+
     /// <summary>Retrieves a log viewer query by its name.</summary>
     /// <param name="name">The name of the log viewer query to retrieve.</param>
     /// <returns>The log viewer query with the specified name, or null if not found.</returns>
     public ILogViewerQuery? GetByName(string name) =>
-
-        // use the underlying GetAll which will force cache all log queries
-        GetMany().FirstOrDefault(x => x.Name == name);
+        TypedCachePolicy?.FindCached(x => x.Name == name, PerformGetAll)
+        ?? GetMany().FirstOrDefault(x => x.Name == name);
 
     protected override IRepositoryCachePolicy<ILogViewerQuery, int> CreateCachePolicy() =>
         new FullDataSetRepositoryCachePolicy<ILogViewerQuery, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
@@ -120,9 +126,11 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
         Database.Update(dto);
     }
 
+    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
+    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
+    // internally and clones only the matched entity. This override exists only as a required
+    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
     protected override ILogViewerQuery? PerformGet(int id) =>
-
-        // use the underlying GetAll which will force cache all log queries
         GetMany().FirstOrDefault(x => x.Id == id);
 
     private static ILogViewerQuery ConvertFromDto(LogViewerQueryDto dto)
@@ -135,10 +143,10 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
     internal sealed class LogViewerQueryModelFactory
     {
         /// <summary>
-        /// Creates an <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.LogViewerQueryRepository.ILogViewerQuery" /> instance from the specified <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.LogViewerQueryRepository.LogViewerQueryDto" />.
+        /// Creates an <see cref="ILogViewerQuery" /> instance from the specified <see cref="LogViewerQueryDto" />.
         /// </summary>
         /// <param name="dto">The DTO containing the log viewer query information.</param>
-        /// <returns>A new <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.LogViewerQueryRepository.ILogViewerQuery" /> instance.</returns>
+        /// <returns>A new <see cref="ILogViewerQuery" /> instance.</returns>
         public ILogViewerQuery BuildEntity(LogViewerQueryDto dto)
         {
             var logViewerQuery = new LogViewerQuery(dto.Name, dto.Query) { Id = dto.Id };

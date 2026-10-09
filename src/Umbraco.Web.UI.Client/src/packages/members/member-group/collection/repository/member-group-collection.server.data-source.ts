@@ -1,18 +1,18 @@
-import type { UmbMemberGroupCollectionFilterModel } from '../types.js';
-import type { UmbMemberGroupDetailModel } from '../../types.js';
+import type { UmbMemberGroupCollectionFilterModel, UmbMemberGroupCollectionItemModel } from '../types.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { MemberGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import { MemberGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
- * A data source that fetches the member collection data from the server.
+ * A data source that fetches the member group collection data from the server.
  * @class UmbMemberGroupCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
-export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDataSource<UmbMemberGroupDetailModel> {
+export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDataSource<UmbMemberGroupCollectionItemModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -25,13 +25,18 @@ export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDa
 	}
 
 	/**
-	 * Gets the member collection filtered by the given filter.
-	 * @param {UmbMemberGroupCollectionFilterModel} filter
-	 * @returns {*}
+	 * Gets the member group collection filtered by the given filter.
+	 * @param {UmbMemberGroupCollectionFilterModel} query The filter to apply to the collection.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbMemberGroupCollectionItemModel>>>} The member group collection.
 	 * @memberof UmbMemberGroupCollectionServerDataSource
 	 */
-	async getCollection(query: UmbMemberGroupCollectionFilterModel) {
-		const { data, error } = await tryExecute(this.#host, MemberGroupService.getMemberGroup({ query }));
+	async getCollection(
+		query: UmbMemberGroupCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbMemberGroupCollectionItemModel>>> {
+		const { data, error } = await tryExecute(
+			this.#host,
+			MemberGroupService.getMemberGroup({ query: { skip: query.skip, take: query.take } }),
+		);
 
 		if (error) {
 			return { error };
@@ -43,14 +48,13 @@ export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDa
 
 		const { items, total } = data;
 
-		const mappedItems: Array<UmbMemberGroupDetailModel> = items.map((item: MemberGroupResponseModel) => {
-			const memberDetail: UmbMemberGroupDetailModel = {
+		const mappedItems: Array<UmbMemberGroupCollectionItemModel> = items.map((item: MemberGroupResponseModel) => {
+			return {
 				entityType: UMB_MEMBER_GROUP_ENTITY_TYPE,
 				unique: item.id,
 				name: item.name,
+				icon: 'icon-users',
 			};
-
-			return memberDetail;
 		});
 
 		return { data: { items: mappedItems, total } };

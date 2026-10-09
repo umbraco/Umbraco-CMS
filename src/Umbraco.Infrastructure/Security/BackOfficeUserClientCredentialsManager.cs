@@ -69,7 +69,7 @@ public sealed class BackOfficeUserClientCredentialsManager : ClientCredentialsMa
     /// </summary>
     /// <param name="userKey">The unique identifier of the back office user.</param>
     /// <param name="clientId">The client ID of the credentials to delete.</param>
-    /// <returns>An <see cref="Attempt\{BackOfficeUserClientCredentialsOperationStatus\}"/> indicating the result of the delete operation.</returns>
+    /// <returns>An <see cref="Attempt{BackOfficeUserClientCredentialsOperationStatus}"/> indicating the result of the delete operation.</returns>
     public async Task<Attempt<BackOfficeUserClientCredentialsOperationStatus>> DeleteAsync(Guid userKey, string clientId)
     {
         clientId = SafeClientId(clientId);

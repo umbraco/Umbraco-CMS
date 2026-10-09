@@ -11,9 +11,7 @@ import type {
 import '../components/code-editor.element.js';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-const elementName = 'umb-property-editor-ui-code-editor';
-
-@customElement(elementName)
+@customElement('umb-property-editor-ui-code-editor')
 export class UmbPropertyEditorUICodeEditorElement
 	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
@@ -96,6 +94,6 @@ export { UmbPropertyEditorUICodeEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPropertyEditorUICodeEditorElement;
+		'umb-property-editor-ui-code-editor': UmbPropertyEditorUICodeEditorElement;
 	}
 }

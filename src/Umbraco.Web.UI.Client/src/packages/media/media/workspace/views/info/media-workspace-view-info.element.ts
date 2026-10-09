@@ -1,16 +1,16 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../media-workspace.context-token.js';
-import { TimeOptions } from '../../../audit-log/info-app/utils.js';
 import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbMediaTypeItemModel } from '@umbraco-cms/backoffice/media-type';
-import { UMB_MEDIA_TYPE_ENTITY_TYPE, UmbMediaTypeItemRepository } from '@umbraco-cms/backoffice/media-type';
+import { UmbMediaTypeItemRepository, UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
+import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
-import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import type { UmbMediaTypeItemModel } from '@umbraco-cms/backoffice/media-type';
 
 @customElement('umb-media-workspace-view-info')
 export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
@@ -169,7 +169,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize key="content_createDate"></umb-localize></strong>
 				<span>
-					<umb-localize-date .date=${this._createDate} .options=${TimeOptions}></umb-localize-date>
+					<umb-localize-date .date=${this._createDate} .options=${UMB_DATE_TIME_FORMAT_OPTIONS}></umb-localize-date>
 				</span>
 			</div>
 		`;
@@ -181,7 +181,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize key="content_updateDate"></umb-localize></strong>
 				<span>
-					<umb-localize-date .date=${this._updateDate} .options=${TimeOptions}></umb-localize-date>
+					<umb-localize-date .date=${this._updateDate} .options=${UMB_DATE_TIME_FORMAT_OPTIONS}></umb-localize-date>
 				</span>
 			</div>
 		`;

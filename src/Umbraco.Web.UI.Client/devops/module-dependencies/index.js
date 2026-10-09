@@ -4,7 +4,8 @@ import { createImportMap } from '../importmap/index.js';
 
 const ILLEGAL_CORE_IMPORTS_THRESHOLD = 5;
 const SELF_IMPORTS_THRESHOLD = 0;
-const BIDIRECTIONAL_IMPORTS_THRESHOLD = 15;
+const CORE_MODULES_BIDIRECTIONAL_IMPORTS_THRESHOLD = 16;
+const PACKAGES_MODULES_BIDIRECTIONAL_IMPORTS_THRESHOLD = 14;
 
 const clientProjectRoot = path.resolve(import.meta.dirname, '../../');
 const modulePrefix = '@umbraco-cms/backoffice/';
@@ -187,13 +188,13 @@ function reportSelfImportsFromModules() {
 	console.log(`\n\n`);
 }
 
-function reportBidirectionalModuleImports() {
-	console.error(`🔍 Scanning all modules for bidirectional imports...`);
+function reportBidirectionalModuleImports(modules, label, threshold) {
+	console.error(`🔍 Scanning all ${label} modules for bidirectional imports...`);
 	console.log(`\n`);
 
 	let entries = [];
 
-	packageModules.forEach(([alias, path]) => {
+	modules.forEach(([alias, path]) => {
 		const importsInModule = getUmbracoModuleImportsInModule(alias);
 
 		// Check imports for all the modules
@@ -216,16 +217,12 @@ function reportBidirectionalModuleImports() {
 		console.error(`🚨 ${moduleA} and ${moduleB} are importing each other`);
 	});
 
-	if (total > BIDIRECTIONAL_IMPORTS_THRESHOLD) {
-		throw new Error(
-			`Bidirectional imports found in ${total} modules. ${total - BIDIRECTIONAL_IMPORTS_THRESHOLD} more than the threshold.`,
-		);
+	if (total > threshold) {
+		throw new Error(`Bidirectional imports found in ${total} modules. ${total - threshold} more than the threshold.`);
 	} else if (total === 0) {
 		console.log(`✅ Success! No bidirectional imports found.`);
 	} else {
-		console.log(
-			`✅ Success! Still (${total}) under the threshold of ${BIDIRECTIONAL_IMPORTS_THRESHOLD} bidirectional imports.`,
-		);
+		console.log(`✅ Success! Still (${total}) under the threshold of ${threshold} bidirectional imports.`);
 	}
 
 	console.log(`\n\n`);
@@ -234,7 +231,8 @@ function reportBidirectionalModuleImports() {
 function report() {
 	reportIllegalImportsFromCore();
 	reportSelfImportsFromModules();
-	reportBidirectionalModuleImports();
+	reportBidirectionalModuleImports(coreModules, 'Core', CORE_MODULES_BIDIRECTIONAL_IMPORTS_THRESHOLD);
+	reportBidirectionalModuleImports(packageModules, 'Packages', PACKAGES_MODULES_BIDIRECTIONAL_IMPORTS_THRESHOLD);
 }
 
 report();

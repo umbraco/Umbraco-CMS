@@ -46,13 +46,21 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 
 		this.#paginationManager.setPageSize(50);
 
-		this.observe(this.#paginationManager.currentPage, (number) => (this._currentPageNumber = number));
-		this.observe(this.#paginationManager.totalPages, (number) => (this._totalPages = number));
+		this.observe(this.#paginationManager.currentPage, (number) => (this._currentPageNumber = number), null);
+		this.observe(this.#paginationManager.totalPages, (number) => (this._totalPages = number), null);
 
 		this.consumeContext(UMB_RELATION_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.#requestRelations();
 			this.#observeDetails();
+			this.observe(
+				instance?.unique,
+				(unique) => {
+					if (unique) {
+						this.#requestRelations();
+					}
+				},
+				'_observeUnique',
+			);
 		});
 	}
 
@@ -72,6 +80,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 				this._isBidirectional = isBidirectional;
 				this._isDependency = isDependency;
 			},
+			'_observeDetails',
 		);
 	}
 
@@ -170,7 +179,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 	}
 
 	#renderRelations() {
-		if (this._loading) return html`<uui-loader></uui-loader>`;
+		if (this._loading) return html`<umb-view-loader></umb-view-loader>`;
 		return html`
 			<div>
 				<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
@@ -218,13 +227,8 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 				grid-template-columns: 1fr 350px;
 			}
 
-			uui-loader {
-				text-align: center;
-			}
-
 			uui-pagination {
 				margin-top: var(--uui-size-layout-1);
-				display: block;
 			}
 		`,
 	];

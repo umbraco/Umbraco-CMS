@@ -2,7 +2,9 @@ import type { UmbTreeItemModel } from '../types.js';
 import type { UmbTreeStore } from './tree-store.interface.js';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 // TODO: remove Unique from name when we have switched to uniques
 /**
@@ -11,7 +13,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @description - Entity Tree Store
  */
 export class UmbUniqueTreeStore extends UmbStoreBase<UmbTreeItemModel> implements UmbTreeStore<UmbTreeItemModel> {
-	constructor(host: UmbControllerHost, storeAlias: string) {
+	constructor(host: UmbControllerHost, storeAlias: UmbContextToken<any> | string) {
 		super(host, storeAlias, new UmbArrayState<UmbTreeItemModel>([], (x) => x.unique));
 	}
 
@@ -23,11 +25,11 @@ export class UmbUniqueTreeStore extends UmbStoreBase<UmbTreeItemModel> implement
 
 	/**
 	 * Returns an observable to observe the children of a given parent
-	 * @param {(string | null)} parentUnique
-	 * @returns {*}
+	 * @param {(string | null)} parentUnique - The unique of the parent
+	 * @returns {Observable<Array<UmbTreeItemModel>>} An observable of the children
 	 * @memberof UmbUniqueTreeStore
 	 */
-	childrenOf(parentUnique: string | null) {
+	childrenOf(parentUnique: string | null): Observable<Array<UmbTreeItemModel>> {
 		return this._data.asObservablePart((items) => items.filter((item) => item.parent.unique === parentUnique));
 	}
 }

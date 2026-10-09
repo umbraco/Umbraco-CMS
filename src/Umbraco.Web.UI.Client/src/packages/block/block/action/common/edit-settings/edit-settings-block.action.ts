@@ -1,0 +1,47 @@
+import type { MetaBlockActionDefaultKind } from '../../default/types.js';
+import type { UmbBlockActionArgs } from '../../types.js';
+import { UmbBlockActionBase } from '../../block-action-base.js';
+import { UMB_BLOCK_ENTRY_CONTEXT } from '../../../context/block-entry.context-token.js';
+import { UmbDataPathGeneratorForBlockElementData } from '../../../validation/index.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME } from '../../../constants.js';
+
+/**
+ * Block action that navigates to the block's settings editor workspace.
+ * Exposes the workspace edit path via `getHref()` and the settings validation data path via `getValidationDataPath()`.
+ */
+export class UmbEditSettingsBlockAction extends UmbBlockActionBase<MetaBlockActionDefaultKind> {
+	#context?: typeof UMB_BLOCK_ENTRY_CONTEXT.TYPE;
+	#contextReady: Promise<void>;
+	#resolveContext!: () => void;
+
+	constructor(host: UmbControllerHost, args: UmbBlockActionArgs<MetaBlockActionDefaultKind>) {
+		super(host, args);
+
+		this.#contextReady = new Promise<void>((resolve) => {
+			this.#resolveContext = resolve;
+		});
+
+		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
+			this.#context = context;
+			this.#resolveContext();
+		});
+	}
+
+	async getHrefObservable(): Promise<Observable<string | undefined> | undefined> {
+		await this.#contextReady;
+		return this.#context?.workspaceEditSettingsPath;
+	}
+
+	async getValidationDataPathObservable(): Promise<Observable<string | undefined> | undefined> {
+		await this.#contextReady;
+		if (!this.#context) return undefined;
+		return mergeObservables([this.#context.settingsKey], ([settingsKey]) => {
+			if (!settingsKey) return undefined;
+			return UmbDataPathGeneratorForBlockElementData(UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME, { key: settingsKey });
+		});
+	}
+}
+
+export { UmbEditSettingsBlockAction as api };

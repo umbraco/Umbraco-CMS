@@ -1,6 +1,6 @@
 import type { UmbModalContext } from '../../context/index.js';
 import type { UmbConfirmModalData, UmbConfirmModalValue } from './confirm-modal.token.js';
-import { html, customElement, property, css, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
@@ -23,9 +23,7 @@ export class UmbConfirmModalElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-dialog-layout class="uui-text" .headline=${this.localize.string(this.data?.headline) ?? null}>
-				${typeof this.data?.content === 'string'
-					? unsafeHTML(this.localize.string(this.data?.content))
-					: this.data?.content}
+				${typeof this.data?.content === 'string' ? this.localize.htmlString(this.data?.content) : this.data?.content}
 
 				<uui-button
 					slot="actions"

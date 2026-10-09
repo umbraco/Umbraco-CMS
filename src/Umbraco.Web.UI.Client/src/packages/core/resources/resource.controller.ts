@@ -2,6 +2,7 @@ import { isApiError, isCancelablePromise, isCancelError, isProblemDetailsLike } 
 import { UmbApiError, UmbCancelError } from './umb-error.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbPeekErrorArgs } from '@umbraco-cms/backoffice/notification';
 
 export class UmbResourceController<T = unknown> extends UmbControllerBase {
 	/**
@@ -19,8 +20,8 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 	/**
 	 * Maps any error to an UmbError.
 	 * @internal
-	 * @param {*} error The error to map
-	 * @returns {*} The mapped error
+	 * @param {unknown} error The error to map
+	 * @returns {UmbApiError | UmbCancelError} The mapped error
 	 */
 	mapToUmbError(error: unknown): UmbApiError | UmbCancelError {
 		if (isProblemDetailsLike(error)) {
@@ -31,8 +32,26 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 			return UmbCancelError.fromLegacyCancelError(error);
 		} else if (UmbCancelError.isUmbCancelError(error)) {
 			return error;
+		} else if (error instanceof DOMException && error.name === 'AbortError') {
+			return new UmbCancelError(error.message);
 		} else if (UmbApiError.isUmbApiError(error)) {
 			return error;
+		} else if (error instanceof TypeError) {
+			// The fetch() promise rejects with a TypeError when it never received a response at all, e.g. a DNS
+			// failure, a refused/reset connection, or a proxy (such as Cloudflare) dropping the connection on a
+			// long-running request. This is distinct from an HTTP error response, which resolves normally.
+			// This check is intentionally broad: an unrelated TypeError thrown elsewhere in the same promise
+			// chain would also land here and be reported as "Connection lost", since this method has no way
+			// to distinguish it from a genuine fetch() rejection.
+			// See https://github.com/umbraco/Umbraco-CMS/issues/16041
+			return new UmbApiError('Connection lost', 0, null, {
+				status: 0,
+				title: 'Connection lost',
+				detail: `The connection to the server was lost while the request was in progress (${error.message}). If you were saving or publishing, it may have completed on the server — please check before trying again.`,
+				errors: undefined,
+				type: 'NetworkError',
+				stack: error.stack,
+			});
 		}
 
 		// If the error is not recognizable, for example if it has no ProblemDetails body, we will return a generic UmbApiError.
@@ -73,15 +92,27 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 		this.cancel();
 	}
 
-	protected async _peekError(headline: string, message: string, details: unknown) {
+	/**
+	 * Show an error peek notification to the user.
+	 * @param args - The error notification details.
+	 */
+	protected async _peekError(args: UmbPeekErrorArgs): Promise<void>;
+	/**
+	 * @deprecated Use the overload accepting {@link UmbPeekErrorArgs} instead. Scheduled for removal in Umbraco 19.
+	 */
+	protected async _peekError(headline: string, message: string, errors?: Record<string, string[]>): Promise<void>;
+	protected async _peekError(
+		headlineOrArgs: string | UmbPeekErrorArgs,
+		message?: string,
+		errors?: Record<string, string[]>,
+	): Promise<void> {
+		const args: UmbPeekErrorArgs =
+			typeof headlineOrArgs === 'object' ? headlineOrArgs : { headline: headlineOrArgs, message: message!, errors };
+
 		// Store the host for usage in the following async context
 		const host = this._host;
 
 		// This late importing is done to avoid circular reference
-		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, {
-			headline,
-			message,
-			details,
-		});
+		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, args);
 	}
 }

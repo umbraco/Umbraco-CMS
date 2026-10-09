@@ -19,7 +19,7 @@ test('can create a empty script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.script.clickActionsMenuAtRoot();
-  await umbracoUi.script.clickCreateOptionsActionMenuOption();
+  await umbracoUi.script.clickCreateActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.enterScriptName(scriptName);
   await umbracoUi.script.clickSaveButtonAndWaitForScriptToBeCreated();
@@ -36,7 +36,7 @@ test('can create a script with content', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.script.clickActionsMenuAtRoot();
-  await umbracoUi.script.clickCreateOptionsActionMenuOption();
+  await umbracoUi.script.clickCreateActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.enterScriptName(scriptName);
   await umbracoUi.script.enterScriptContent(scriptContent);
@@ -102,7 +102,7 @@ test('cannot create a script with an empty name', {tag: '@release'}, async ({umb
 
   // Act
   await umbracoUi.script.clickActionsMenuAtRoot();
-  await umbracoUi.script.clickCreateOptionsActionMenuOption();
+  await umbracoUi.script.clickCreateActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.clickSaveButton();
 

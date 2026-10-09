@@ -1,4 +1,5 @@
-import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../entity-action/default/default.action.kind.js';
+import UmbRenameEntityAction from './rename-server-file.action.js';
+import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbExtensionManifestKind = {
@@ -10,7 +11,7 @@ export const manifest: UmbExtensionManifestKind = {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
 		kind: 'renameServerFile',
-		api: () => import('./rename-server-file.action.js'),
+		api: UmbRenameEntityAction,
 		weight: 200,
 		forEntityTypes: [],
 		meta: {

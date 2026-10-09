@@ -51,6 +51,8 @@ internal partial class UserService : RepositoryService, IUserService
     private readonly IUserRepository _userRepository;
     private readonly ContentSettings _contentSettings;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IBackOfficeUserReader _backOfficeUserReader;
+    private readonly ILogger<UserService> _logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserService" /> class.
@@ -74,6 +76,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="isoCodeValidator">The validator for ISO codes.</param>
     /// <param name="forgotPasswordSender">The sender for forgot password emails.</param>
     /// <param name="userIdKeyResolver">The resolver for user ID to key mappings.</param>
+    /// <param name="backOfficeUserReader">The shared reader used for back office user lookups.</param>
     public UserService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -93,7 +96,8 @@ internal partial class UserService : RepositoryService, IUserService
         IOptions<ContentSettings> contentSettings,
         IIsoCodeValidator isoCodeValidator,
         IUserForgotPasswordSender forgotPasswordSender,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IBackOfficeUserReader backOfficeUserReader)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -109,6 +113,8 @@ internal partial class UserService : RepositoryService, IUserService
         _isoCodeValidator = isoCodeValidator;
         _forgotPasswordSender = forgotPasswordSender;
         _userIdKeyResolver = userIdKeyResolver;
+        _backOfficeUserReader = backOfficeUserReader;
+        _logger = loggerFactory.CreateLogger<UserService>();
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
@@ -566,11 +572,7 @@ internal partial class UserService : RepositoryService, IUserService
 
         if (identityCreationResult.Succeded is false)
         {
-            // If we fail from something in Identity we can't know exactly why, so we have to resolve to returning an unknown failure.
-            // But there should be more information in the message.
-            return Attempt.FailWithStatus(
-                UserOperationStatus.UnknownFailure,
-                new UserCreationResult { Error = new ValidationResult(identityCreationResult.ErrorMessage) });
+            return MapCreationFailure(identityCreationResult);
         }
 
         // The user is now created, so we can fetch it to map it to a result model with our generated password.
@@ -604,12 +606,37 @@ internal partial class UserService : RepositoryService, IUserService
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, creationResult);
     }
 
-    /// <inheritdoc/>
-    public async Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail)
+    private static Attempt<UserCreationResult, UserOperationStatus> MapCreationFailure(IdentityCreationResult identityCreationResult)
     {
-        if (_forgotPasswordSender.CanSend() is false)
+        if (identityCreationResult.CancelledByNotification)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.CancelledByNotification, new UserCreationResult());
+        }
+
+        // If we fail from something in Identity we can't know exactly why, so we have to resolve to returning an unknown failure.
+        // But there should be more information in the message.
+        return Attempt.FailWithStatus(
+            UserOperationStatus.UnknownFailure,
+            new UserCreationResult { Error = new ValidationResult(identityCreationResult.ErrorMessage) });
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("Please use the overload taking a cancellation token. Scheduled for removal in Umbraco 19.")]
+    public Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail)
+        => SendResetPasswordEmailAsync(userEmail, CancellationToken.None);
+
+    /// <inheritdoc/>
+    public async Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail, CancellationToken cancellationToken)
+    {
+        if (_forgotPasswordSender.IsPasswordResetConfigured() is false)
         {
             return Attempt.Fail(UserOperationStatus.CannotPasswordReset);
+        }
+
+        // Checked before the user lookup so the outcome is the same whether or not the email belongs to a user.
+        if (await _forgotPasswordSender.IsPasswordResetAvailableAsync(cancellationToken) is false)
+        {
+            return Attempt.Fail(UserOperationStatus.PasswordResetUnavailable);
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -629,6 +656,11 @@ internal partial class UserService : RepositoryService, IUserService
         Attempt<Uri, UserOperationStatus> uriAttempt = await uriProvider.CreateForgotPasswordUriAsync(user);
         if (uriAttempt.Success is false)
         {
+            _logger.LogWarning(
+                "Could not create the password reset link for user {UserId} {UserKey}. Status: {Status}.",
+                user.Id,
+                user.Key,
+                uriAttempt.Status);
             return Attempt.Fail(uriAttempt.Status);
         }
 
@@ -637,7 +669,15 @@ internal partial class UserService : RepositoryService, IUserService
             ForgotPasswordUri = uriAttempt.Result,
             Recipient = user,
         };
-        await _forgotPasswordSender.SendForgotPassword(message);
+        try
+        {
+            await _forgotPasswordSender.SendForgotPassword(message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Could not send the password reset message to user {UserId} {UserKey}.", user.Id, user.Key);
+            return Attempt.Fail(UserOperationStatus.UnknownFailure);
+        }
 
         userManager.NotifyForgotPasswordRequested(new ClaimsPrincipal(), user.Id.ToString()); //A bit of a hack, but since this method will be used without a signed in user, there is no real principal anyway.
 
@@ -949,7 +989,39 @@ internal partial class UserService : RepositoryService, IUserService
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Success, updated);
+    }
 
+    /// <inheritdoc/>
+    public async Task<Attempt<IUser?, UserOperationStatus>> UpdateProfileAsync(Guid userKey, UserUpdateProfileModel model)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        IUser? existingUser = await userStore.GetAsync(userKey);
+
+        if (existingUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, existingUser);
+        }
+
+        UserOperationStatus validationStatus = ValidateUserProfileUpdateModel(model);
+        if (validationStatus is not UserOperationStatus.Success)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(validationStatus, existingUser);
+        }
+
+        IUser updated = MapUserProfileUpdate(model, existingUser);
+        UserOperationStatus saveStatus = await userStore.SaveAsync(updated);
+
+        if (saveStatus is not UserOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(saveStatus, existingUser);
+        }
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Success, updated);
     }
 
     /// <inheritdoc/>
@@ -971,12 +1043,10 @@ internal partial class UserService : RepositoryService, IUserService
             return UserOperationStatus.AvatarFileNotFound;
         }
 
-        const string allowedAvatarFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
-
         // This shouldn't really be necessary since we're just gonna use it to generate a hash, but that's how it was.
         var avatarFileName = avatarTemporaryFile.FileName.ToSafeFileName(_shortStringHelper);
-        var extension = Path.GetExtension(avatarFileName)[1..];
-        if(allowedAvatarFileTypes.Contains(extension) is false || _contentSettings.DisallowedUploadedFileExtensions.Contains(extension))
+        var extension = avatarFileName.GetFileExtension().TrimStart(Constants.CharArrays.Period);
+        if (_contentSettings.IsAllowedImageFileType(extension) is false)
         {
             return UserOperationStatus.InvalidAvatar;
         }
@@ -1079,6 +1149,35 @@ internal partial class UserService : RepositoryService, IUserService
         }
 
         return UserOperationStatus.Success;
+    }
+
+    /// <summary>
+    ///     Validates a user profile update model.
+    /// </summary>
+    /// <param name="model">The profile update model to validate.</param>
+    /// <returns>The <see cref="UserOperationStatus" /> indicating validation result.</returns>
+    private UserOperationStatus ValidateUserProfileUpdateModel(UserUpdateProfileModel model)
+    {
+        if (_isoCodeValidator.IsValid(model.LanguageIsoCode) is false)
+        {
+            return UserOperationStatus.InvalidIsoCode;
+        }
+
+        return UserOperationStatus.Success;
+    }
+
+    /// <summary>
+    ///     Maps user profile update model properties to an existing user.
+    /// </summary>
+    /// <param name="source">The source update profile model.</param>
+    /// <param name="target">The target user to update.</param>
+    /// <returns>The updated <see cref="IUser" />.</returns>
+    private IUser MapUserProfileUpdate(
+        UserUpdateProfileModel source,
+        IUser target)
+    {
+        target.Language = source.LanguageIsoCode;
+        return target;
     }
 
     /// <summary>
@@ -1443,7 +1542,7 @@ internal partial class UserService : RepositoryService, IUserService
             // the Id is associated with audit trails, versions etc. and can't be removed.
             if (user.LastLoginDate is not null && user.LastLoginDate != default(DateTime))
             {
-                return UserOperationStatus.CannotDelete;
+                return UserOperationStatus.CannotDeleteUserWithLoginHistory;
             }
 
             user.IsApproved = false;
@@ -1695,10 +1794,7 @@ internal partial class UserService : RepositoryService, IUserService
             return Array.Empty<IUser>();
         }
 
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetAllInGroupAsync(groupId.Value).GetAwaiter().GetResult();
+        return _backOfficeUserReader.GetAllInGroup(groupId.Value);
     }
 
     /// <inheritdoc/>
@@ -1739,30 +1835,15 @@ internal partial class UserService : RepositoryService, IUserService
 
     /// <inheritdoc/>
     public IUser? GetUserById(int id)
-    {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetAsync(id).GetAwaiter().GetResult();
-    }
+        => _backOfficeUserReader.GetById(id);
 
     /// <inheritdoc/>
     public Task<IUser?> GetAsync(Guid key)
-    {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetAsync(key);
-    }
+        => Task.FromResult(_backOfficeUserReader.GetByKey(key));
 
     /// <inheritdoc/>
     public Task<IEnumerable<IUser>> GetAsync(IEnumerable<Guid> keys)
-    {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetUsersAsync(keys.ToArray());
-    }
+        => Task.FromResult(_backOfficeUserReader.GetManyByKey(keys));
 
     /// <inheritdoc/>
     public async Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLinkedLoginsAsync(Guid userKey)
@@ -1787,12 +1868,7 @@ internal partial class UserService : RepositoryService, IUserService
 
     /// <inheritdoc/>
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
-    {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetUsersAsync(ids).GetAwaiter().GetResult();
-    }
+        => ids is null ? Enumerable.Empty<IUser>() : _backOfficeUserReader.GetManyById(ids);
 
     /// <inheritdoc/>
     public void ReplaceUserGroupPermissions(int groupId, ISet<string> permissions, params int[] entityIds)
@@ -2055,6 +2131,11 @@ internal partial class UserService : RepositoryService, IUserService
         Dictionary<Guid, int> nodes,
         IEnumerable<UmbracoObjectTypes> objectTypes)
     {
+        if (nodes.Count == 0)
+        {
+            return Attempt.SucceedWithStatus(UserOperationStatus.Success, Enumerable.Empty<NodePermissions>());
+        }
+
         IUser? user = await GetAsync(userKey);
         if (user is null)
         {

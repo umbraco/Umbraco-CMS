@@ -2,6 +2,7 @@ import { UmbLanguageCollectionRepository } from '../collection/index.js';
 import type { UmbLanguageDetailModel } from '../types.js';
 import type { UmbAppLanguageContext } from '../global-contexts/index.js';
 import { UMB_APP_LANGUAGE_CONTEXT } from '../constants.js';
+import { sortLanguages } from '../utils.js';
 import type {
 	UUIComboboxListElement,
 	UUIComboboxListEvent,
@@ -84,11 +85,11 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	async #observeLanguages() {
-		const { data } = await this.#collectionRepository.requestCollection({});
+		const { data } = await this.#collectionRepository.requestAllItems();
 
 		// TODO: listen to changes
 		if (data) {
-			this._languages = data.items;
+			this._languages = [...data.items].sort(sortLanguages);
 			this.#checkForLanguageAccess();
 		}
 	}

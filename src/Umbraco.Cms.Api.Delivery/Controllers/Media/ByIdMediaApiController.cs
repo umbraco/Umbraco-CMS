@@ -39,6 +39,7 @@ public class ByIdMediaApiController : MediaApiControllerBase
             return NotFound();
         }
 
+        SetOutputCacheMedia(media);
         return Ok(BuildApiMediaWithCrops(media));
     }
 }

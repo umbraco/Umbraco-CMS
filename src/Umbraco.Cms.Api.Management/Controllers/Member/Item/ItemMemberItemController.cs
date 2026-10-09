@@ -1,11 +1,11 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
-using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.Item;
@@ -17,18 +17,37 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member.Item;
 [ApiVersion("1.0")]
 public class ItemMemberItemController : MemberItemControllerBase
 {
-    private readonly IEntityService _entityService;
-    private readonly IMemberPresentationFactory _memberPresentationFactory;
+    private readonly IMemberPresentationService _memberPresentationService;
+
+    // TODO (V19): Remove the unnecessary parameters provided to the constructor.
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ItemMemberItemController"/> class, which manages member item operations in the API.
+    /// Initializes a new instance of the <see cref="ItemMemberItemController"/> class.
     /// </summary>
     /// <param name="entityService">Service used for entity operations and retrieval.</param>
     /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models.</param>
-    public ItemMemberItemController(IEntityService entityService, IMemberPresentationFactory memberPresentationFactory)
+    /// <param name="memberPresentationService">Service for resolving members across both content and external stores.</param>
+    [ActivatorUtilitiesConstructor]
+    public ItemMemberItemController(
+        IEntityService entityService,
+        IMemberPresentationFactory memberPresentationFactory,
+        IMemberPresentationService memberPresentationService)
     {
-        _entityService = entityService;
-        _memberPresentationFactory = memberPresentationFactory;
+        _memberPresentationService = memberPresentationService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ItemMemberItemController"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public ItemMemberItemController(
+        IEntityService entityService,
+        IMemberPresentationFactory memberPresentationFactory)
+        : this(
+            entityService,
+            memberPresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IMemberPresentationService>())
+    {
     }
 
     [HttpGet]
@@ -36,20 +55,16 @@ public class ItemMemberItemController : MemberItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<MemberItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of member items.")]
     [EndpointDescription("Gets a collection of member items identified by the provided Ids.")]
-    public Task<IActionResult> Item(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         if (ids.Count is 0)
         {
-            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<MemberItemResponseModel>()));
+            return Ok(Enumerable.Empty<MemberItemResponseModel>());
         }
 
-        IEnumerable<IMemberEntitySlim> members = _entityService
-            .GetAll(UmbracoObjectTypes.Member, ids.ToArray())
-            .OfType<IMemberEntitySlim>();
-
-        IEnumerable<MemberItemResponseModel> responseModels = members.Select(_memberPresentationFactory.CreateItemResponseModel);
-        return Task.FromResult<IActionResult>(Ok(responseModels));
+        IEnumerable<MemberItemResponseModel> responseModels = await _memberPresentationService.CreateItemResponseModelsAsync(ids);
+        return Ok(responseModels);
     }
 }

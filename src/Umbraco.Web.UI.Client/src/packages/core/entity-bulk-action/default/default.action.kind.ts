@@ -1,3 +1,4 @@
+import UmbEntityBulkActionDefaultElement from '../entity-bulk-action.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_ENTITY_BULK_ACTION_DEFAULT_KIND_MANIFEST: UmbExtensionManifestKind = {
@@ -9,7 +10,7 @@ export const UMB_ENTITY_BULK_ACTION_DEFAULT_KIND_MANIFEST: UmbExtensionManifestK
 		type: 'entityBulkAction',
 		kind: 'default',
 		weight: 1000,
-		element: () => import('../entity-bulk-action.element.js'),
+		element: UmbEntityBulkActionDefaultElement,
 		meta: {
 			icon: '',
 			label: 'Default Entity Bulk Action',

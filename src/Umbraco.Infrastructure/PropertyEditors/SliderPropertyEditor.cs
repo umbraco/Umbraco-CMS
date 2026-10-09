@@ -195,6 +195,11 @@ public class SliderPropertyEditor : DataEditor, IValueSchemaProvider
             protected const string ConfigurationKeyEnableRangeValue = "enableRange";
 
             /// <summary>
+            /// The configuration key for the minimum range value.
+            /// </summary>
+            protected const string ConfigurationKeyMinimumRangeValue = "minimumRange";
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="SliderPropertyConfigurationValidatorBase"/> class.
             /// </summary>
             protected SliderPropertyConfigurationValidatorBase(ILocalizedTextService localizedTextService) => LocalizedTextService = localizedTextService;
@@ -276,6 +281,25 @@ public class SliderPropertyEditor : DataEditor, IValueSchemaProvider
                         LocalizedTextService.Localize("validation", "invalidRange", [sliderRange.ToString()]),
                         ["value"]);
                 }
+
+                if (IsRangeSpanBelowMinimum(sliderConfiguration, sliderRange, out var effectiveMinimumRange))
+                {
+                    yield return new ValidationResult(
+                        LocalizedTextService.Localize("validation", "minimumRange", [sliderRange.ToString(), effectiveMinimumRange.ToString(CultureInfo.InvariantCulture)]),
+                        ["value"]);
+                }
+            }
+
+            /// <summary>
+            /// Checks whether the span between the range values is below the configured minimum range.
+            /// Negative minimumRange values are clamped to zero (treated as "no minimum range").
+            /// </summary>
+            private static bool IsRangeSpanBelowMinimum(SliderConfiguration configuration, SliderRange range, out decimal effectiveMinimumRange)
+            {
+                effectiveMinimumRange = Math.Max(configuration.MinimumRange, 0);
+                return configuration.EnableRange &&
+                    range.To >= range.From &&
+                    (range.To - range.From) < effectiveMinimumRange;
             }
         }
 
@@ -309,14 +333,14 @@ public class SliderPropertyEditor : DataEditor, IValueSchemaProvider
                 if (sliderRange.From < sliderConfiguration.MinimumValue)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [sliderRange.From.ToString(), sliderConfiguration.MinimumValue.ToString()]),
+                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [sliderRange.From.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MinimumValue.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
 
                 if (sliderConfiguration.MaximumValue != 0 && sliderRange.To > sliderConfiguration.MaximumValue)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [sliderRange.To.ToString(), sliderConfiguration.MaximumValue.ToString()]),
+                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [sliderRange.To.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MaximumValue.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
             }
@@ -352,7 +376,7 @@ public class SliderPropertyEditor : DataEditor, IValueSchemaProvider
                     ValidationHelper.IsValueValidForStep(sliderRange.To, sliderConfiguration.MinimumValue, sliderConfiguration.Step) is false)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "invalidStep", [sliderRange.ToString(), sliderConfiguration.Step.ToString(), sliderConfiguration.MinimumValue.ToString()]),
+                        LocalizedTextService.Localize("validation", "invalidStep", [sliderRange.ToString(), sliderConfiguration.Step.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MinimumValue.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
             }

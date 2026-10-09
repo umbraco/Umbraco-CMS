@@ -23,6 +23,9 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 	@state()
 	private _collection?: string | null;
 
+	@state()
+	private _isElement?: boolean;
+
 	constructor() {
 		super();
 
@@ -40,6 +43,8 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 			(allowedAtRoot) => (this._allowedAtRoot = allowedAtRoot),
 			'_allowedAtRootObserver',
 		);
+
+		this.observe(this.#workspaceContext.isElement, (isElement) => (this._isElement = isElement), '_isElementObserver');
 
 		this.observe(
 			this.#workspaceContext.allowedContentTypes,
@@ -71,6 +76,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 						<uui-toggle
 							label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}
 							?checked=${this._allowedAtRoot}
+							?disabled=${this._isElement}
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setAllowedAtRoot((e.target as UUIToggleElement).checked);
 							}}></uui-toggle>
@@ -79,18 +85,30 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 				<umb-property-layout alias="ChildNodeType" label=${this.localize.term('contentTypeEditor_childNodesHeading')}>
 					<div slot="description">${this.localize.term('contentTypeEditor_childNodesDescription')}</div>
 					<div slot="editor">
-						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
-						<umb-input-document-type
-							.documentTypesOnly=${true}
-							.selection=${this._allowedContentTypeUniques ?? []}
-							@change="${(e: CustomEvent & { target: UmbInputDocumentTypeElement }) => {
-								const sortedContentTypesList: Array<UmbContentTypeSortModel> = e.target.selection.map((id, index) => ({
-									contentType: { unique: id },
-									sortOrder: index,
-								}));
-								this.#workspaceContext?.setAllowedContentTypes(sortedContentTypesList);
-							}}">
-						</umb-input-document-type>
+						${this._isElement
+							? html`
+									<div class="not-applicable-message">
+										<umb-localize key="contentTypeEditor_elementDoesNotSupport">
+											This is not applicable for an Element type.
+										</umb-localize>
+									</div>
+								`
+							: html`
+									<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
+									<umb-input-document-type
+										.documentTypesOnly=${true}
+										.selection=${this._allowedContentTypeUniques ?? []}
+										@change="${(e: CustomEvent & { target: UmbInputDocumentTypeElement }) => {
+											const sortedContentTypesList: Array<UmbContentTypeSortModel> = e.target.selection.map(
+												(id, index) => ({
+													contentType: { unique: id },
+													sortOrder: index,
+												}),
+											);
+											this.#workspaceContext?.setAllowedContentTypes(sortedContentTypesList);
+										}}">
+									</umb-input-document-type>
+								`}
 					</div>
 				</umb-property-layout>
 			</uui-box>
@@ -98,14 +116,24 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 				<umb-property-layout alias="collection" label="${this.localize.term('contentTypeEditor_collection')}">
 					<div slot="description">${this.localize.term('contentTypeEditor_collectionDescription')}</div>
 					<div slot="editor">
-						<umb-input-content-type-collection-configuration
-							default-value="c0808dd3-8133-4e4b-8ce8-e2bea84a96a4"
-							.value=${this._collection ?? undefined}
-							@change=${(e: CustomEvent) => {
-								const unique = (e.target as UmbInputContentTypeCollectionConfigurationElement).value as string;
-								this.#workspaceContext?.setCollection({ unique });
-							}}>
-						</umb-input-content-type-collection-configuration>
+						${this._isElement
+							? html`
+									<div class="not-applicable-message">
+										<umb-localize key="contentTypeEditor_elementDoesNotSupport">
+											This is not applicable for an Element type.
+										</umb-localize>
+									</div>
+								`
+							: html`
+									<umb-input-content-type-collection-configuration
+										default-value="c0808dd3-8133-4e4b-8ce8-e2bea84a96a4"
+										.value=${this._collection ?? undefined}
+										@change=${(e: CustomEvent) => {
+											const unique = (e.target as UmbInputContentTypeCollectionConfigurationElement).value as string;
+											this.#workspaceContext?.setCollection({ unique });
+										}}>
+									</umb-input-content-type-collection-configuration>
+								`}
 					</div>
 				</umb-property-layout>
 			</uui-box>
@@ -131,6 +159,11 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 			// TODO: is this necessary?
 			uui-toggle {
 				display: flex;
+			}
+
+			.not-applicable-message {
+				color: var(--uui-color-text-alt);
+				font-style: italic;
 			}
 		`,
 	];

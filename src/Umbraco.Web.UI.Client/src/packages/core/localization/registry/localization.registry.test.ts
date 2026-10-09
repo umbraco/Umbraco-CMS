@@ -1,6 +1,7 @@
 import { UmbLocalizationRegistry } from './localization.registry.js';
 import { aTimeout, expect } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api';
 import type { ManifestLocalization } from '../extensions/localization.extension.js';
 
 //#region Localizations
@@ -141,8 +142,8 @@ describe('UmbLocalizeController', () => {
 		expect(registry.localizations.size).to.equal(3, 'Should have registered the 3rd language (da)');
 	});
 
-	it('should set the document language and direction', async () => {
-		expect(document.documentElement.lang).to.equal(english.meta.culture);
+	it('should set the manager language and document direction', async () => {
+		expect(umbLocalizationManager.documentLanguage).to.equal(english.meta.culture);
 		expect(document.documentElement.dir).to.equal(english.meta.direction);
 	});
 
@@ -204,15 +205,15 @@ describe('UmbLocalizeController', () => {
 	});
 
 	it('should be able to switch to the fallback language', async () => {
-		// Verify that the document language and direction is set correctly to the default language
-		expect(document.documentElement.lang).to.equal(english.meta.culture);
+		// Verify that the manager language and document direction is set correctly to the default language
+		expect(umbLocalizationManager.documentLanguage).to.equal(english.meta.culture);
 		expect(document.documentElement.dir).to.equal(english.meta.direction);
 
 		// Switch to the fallback language, which is the UK version of English
 		registry.loadLanguage('en');
 		await aTimeout(0);
 
-		expect(document.documentElement.lang).to.equal('en');
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-gb');
 		expect(document.documentElement.dir).to.equal('ltr');
 
 		const current = registry.localizations.get(englishUk.meta.culture);
@@ -222,7 +223,7 @@ describe('UmbLocalizeController', () => {
 		registry.loadLanguage('en-us');
 		await aTimeout(0);
 
-		expect(document.documentElement.lang).to.equal('en-us');
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-us');
 		expect(document.documentElement.dir).to.equal('ltr');
 
 		const newCurrent = registry.localizations.get(english.meta.culture);
@@ -250,5 +251,176 @@ describe('UmbLocalizeController', () => {
 		// Check that both the regional and the base language is loaded.
 		expect(registry.localizations.has(danishRegional.meta.culture), 'expected "da-dk" to be present').to.be.true;
 		expect(registry.localizations.has(danish.meta.culture), 'expected "da" to be present').to.be.true;
+	});
+});
+
+describe('UmbLocalizationRegistry initialization', () => {
+	// The fixture extensions are registered when the suite above runs; they are global
+	// to the extension registry, so they are already available here too.
+	let registry: UmbLocalizationRegistry;
+
+	afterEach(() => {
+		registry?.destroy();
+		umbLocalizationManager.localizations.clear();
+	});
+
+	it('loads the language a host element passes via loadLanguage()', async () => {
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+		registry.loadLanguage('da-dk');
+		await aTimeout(0);
+
+		expect(registry.localizations.has('da-dk'), 'expected the requested locale to be loaded').to.be.true;
+	});
+
+	it('always loads the English fallback dictionary alongside the active language', async () => {
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+		registry.loadLanguage('da-dk');
+		await aTimeout(0);
+
+		expect(registry.localizations.has('da-dk'), 'expected active "da-dk" to be loaded').to.be.true;
+		expect(registry.localizations.has('en'), 'expected fallback "en" to be loaded').to.be.true;
+	});
+
+	it('starts on the default culture when no host has called loadLanguage', async () => {
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+		await aTimeout(0);
+
+		expect(registry.localizations.has('en'), 'expected default "en" to be loaded').to.be.true;
+	});
+
+	it('falls back to the default culture when loadLanguage is called with empty or invalid input', async () => {
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+		registry.loadLanguage('');
+		await aTimeout(0);
+
+		expect(registry.localizations.has('en'), 'expected default "en" to be loaded').to.be.true;
+	});
+});
+
+describe('UmbLocalizationRegistry formatting locale', () => {
+	let registry: UmbLocalizationRegistry;
+
+	beforeEach(() => {
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+	});
+
+	afterEach(() => {
+		registry.destroy();
+		umbLocalizationManager.localizations.clear();
+	});
+
+	it('corrects a language whose default region does not match the dictionary we ship', async () => {
+		registry.loadLanguage('en');
+		await aTimeout(0);
+
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-gb');
+	});
+
+	it('still resolves terms from the dictionary registered under the requested culture', async () => {
+		registry.loadLanguage('en');
+		await aTimeout(0);
+
+		expect(registry.localizations.get('en')).to.have.property('general_color', 'Colour');
+	});
+
+	it('keeps a region requested by the consumer', async () => {
+		registry.loadLanguage('en-US');
+		await aTimeout(0);
+
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-us');
+	});
+
+	it('keeps a requested region that has no dictionary of its own', async () => {
+		registry.loadLanguage('en-AU');
+		await aTimeout(0);
+
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-au');
+	});
+
+	it('leaves a language with no correction on the requested locale', async () => {
+		registry.loadLanguage('da');
+		await aTimeout(0);
+
+		expect(umbLocalizationManager.documentLanguage).to.equal('da');
+	});
+
+	it('corrects a bare en when switching from an explicitly requested region', async () => {
+		registry.loadLanguage('en-GB');
+		await aTimeout(0);
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-gb');
+
+		registry.loadLanguage('en');
+		await aTimeout(0);
+
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-gb');
+	});
+});
+
+describe('UmbLocalizationRegistry with a failing extension', () => {
+	const broken: ManifestLocalization = {
+		type: 'localization',
+		alias: 'test.en-us.broken',
+		name: 'Test English (US) Broken',
+		weight: 50,
+		meta: {
+			culture: 'en-us',
+			localizations: {
+				general: {
+					fromBrokenInline: 'Inline from broken',
+				},
+			},
+		},
+		js: () => Promise.reject(new TypeError('Failed to fetch dynamically imported module')),
+	};
+
+	let registry: UmbLocalizationRegistry;
+	let originalConsoleError: typeof console.error;
+	let loggedErrors: unknown[][];
+
+	beforeEach(() => {
+		originalConsoleError = console.error;
+		loggedErrors = [];
+		console.error = (...args: unknown[]) => loggedErrors.push(args);
+		umbExtensionsRegistry.register(broken);
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+	});
+
+	afterEach(() => {
+		registry.destroy();
+		umbExtensionsRegistry.unregister(broken.alias);
+		umbLocalizationManager.localizations.clear();
+		console.error = originalConsoleError;
+	});
+
+	it('still registers the dictionaries of the other extensions', async () => {
+		registry.loadLanguage('en-us');
+		await aTimeout(0);
+
+		expect(registry.localizations.get('en-us')).to.have.property('general_close', 'Close');
+		expect(registry.localizations.get('en')).to.have.property('general_color', 'Colour');
+	});
+
+	it('keeps the inline localizations of the failing extension', async () => {
+		registry.loadLanguage('en-us');
+		await aTimeout(0);
+
+		expect(registry.localizations.get('en-us')).to.have.property('general_fromBrokenInline', 'Inline from broken');
+	});
+
+	it('logs the alias of the failing extension', async () => {
+		registry.loadLanguage('en-us');
+		await aTimeout(0);
+
+		expect(loggedErrors.some(([message]) => String(message).includes(broken.alias))).to.be.true;
+	});
+
+	it('still loads a language requested afterwards', async () => {
+		registry.loadLanguage('en-us');
+		await aTimeout(0);
+
+		registry.loadLanguage('da');
+		await aTimeout(0);
+
+		expect(registry.localizations.get('da')).to.have.property('general_close', 'Luk');
 	});
 });

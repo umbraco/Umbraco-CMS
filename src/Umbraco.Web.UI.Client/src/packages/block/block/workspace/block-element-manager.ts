@@ -1,14 +1,10 @@
 import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
+import { UmbDataPathGeneratorForBlockElementData } from '../validation/data-path-generator-for-element-data.function.js';
 import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
 import type { UmbBlockWorkspaceContext } from './block-workspace.context.js';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import {
-	type Observable,
-	UmbClassState,
-	appendToFrozenArray,
-	mergeObservables,
-} from '@umbraco-cms/backoffice/observable-api';
+import { type Observable, UmbClassState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
@@ -17,6 +13,8 @@ import { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 import {
 	UmbContentValidationToHintsManager,
 	UmbElementWorkspaceDataManager,
+	umbAppendContentValue,
+	umbExtractVariantValues,
 	type UmbElementPropertyDataOwner,
 } from '@umbraco-cms/backoffice/content';
 import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
@@ -61,6 +59,25 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		new UmbDocumentTypeDetailRepository(this),
 	);
 
+	// The values resolved to a single entry per property, matching the current variant. [NL]
+	readonly variantValues = mergeObservables(
+		[this.structure.contentTypeProperties, this.values, this.variantId],
+		([properties, values, variantId]) => {
+			if (!variantId) {
+				return [];
+			}
+			const propertyVariantIds = properties.map((property) => ({
+				alias: property.alias,
+				variantId: this.#createPropertyVariantId(property, variantId),
+			}));
+			return umbExtractVariantValues(propertyVariantIds, values);
+		},
+	);
+	#variantValuesSnapshot: Array<UmbBlockDataValueModel> = [];
+	getVariantValues() {
+		return this.#variantValuesSnapshot;
+	}
+
 	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
 	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
 
@@ -96,22 +113,38 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
 
-		this.observe(this.contentTypeId, (id) => {
-			if (id) {
-				this.structure.loadType(id);
-			}
-		});
+		this.observe(
+			this.contentTypeId,
+			(id) => {
+				if (id) {
+					this.structure.loadType(id);
+				}
+			},
+			null,
+		);
 
-		this.observe(this.unique, (key) => {
-			if (key) {
-				this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.key == '${key}')]`);
-			}
-		});
+		this.observe(
+			this.unique,
+			(key) => {
+				if (key) {
+					this.validation.setDataPath(UmbDataPathGeneratorForBlockElementData(dataPathPropertyName, { key }));
+				}
+			},
+			null,
+		);
 
 		this.observe(
 			this.structure.contentTypeDataTypeUniques,
 			(dataTypeUniques: Array<string>) => {
 				this.#dataTypeItemManager.setUniques(dataTypeUniques);
+			},
+			null,
+		);
+
+		this.observe(
+			this.variantValues,
+			(resolvedValues) => {
+				this.#variantValuesSnapshot = resolvedValues;
 			},
 			null,
 		);
@@ -240,7 +273,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 		const currentData = this.getData();
 		if (currentData) {
-			const values = appendToFrozenArray(
+			const values = umbAppendContentValue(
 				currentData.values ?? [],
 				entry,
 				(x) => x.alias === alias && variantId!.compare(x),

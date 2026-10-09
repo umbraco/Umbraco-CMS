@@ -4,8 +4,9 @@ export const manifest: UmbExtensionManifest = {
 	name: 'Dimensions Property Editor UI',
 	element: () => import('./property-editor-ui-dimensions.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Dimensions',
 		icon: 'icon-fullscreen-alt',
-		group: 'common',
+		group: 'Common',
 	},
 };

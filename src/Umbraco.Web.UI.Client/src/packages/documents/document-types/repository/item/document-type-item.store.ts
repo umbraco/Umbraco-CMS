@@ -5,7 +5,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbDocumentTypeItemStore
- * @augments {UmbStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Document Type items
  */
 
@@ -16,7 +16,7 @@ export class UmbDocumentTypeItemStore extends UmbItemStoreBase<UmbDocumentTypeIt
 	 * @memberof UmbDocumentTypeItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT);
 	}
 }
 

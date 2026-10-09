@@ -19,7 +19,7 @@ public class UpdateDataTypeControllerTests : ManagementApiUserGroupTestBase<Upda
     private Guid _dataTypeId;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var dataType = new DataTypeBuilder()
             .WithId(0)

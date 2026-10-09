@@ -22,6 +22,6 @@ public class UpdateToOpenIddictV5 : MigrationBase
 
     protected override void Migrate()
     {
-        _efCoreMigrationExecutor.ExecuteSingleMigrationAsync(EFCoreMigration.UpdateOpenIddictToV5);
+        _efCoreMigrationExecutor.ExecuteSingleMigrationAsync(EFCoreMigration.UpdateOpenIddictToV5).GetAwaiter().GetResult();
     }
 }

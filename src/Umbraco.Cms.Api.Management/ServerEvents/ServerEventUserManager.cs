@@ -34,6 +34,12 @@ internal sealed class ServerEventUserManager : IServerEventUserManager
     {
         SeverEventAuthorizationResult authorizationResult = await _serverEventAuthorizationService.AuthorizeAsync(user);
 
+        Guid? userKey = user.Identity?.GetUserKey();
+        if (userKey is not null)
+        {
+            _userConnectionManager.SetAuthorizedEventSources(userKey.Value, authorizationResult.AuthorizedEventSources);
+        }
+
         foreach (var authorizedEventSource in authorizationResult.AuthorizedEventSources)
         {
            await _eventHub.Groups.AddToGroupAsync(connectionId, authorizedEventSource);
@@ -61,6 +67,8 @@ internal sealed class ServerEventUserManager : IServerEventUserManager
         }
 
         SeverEventAuthorizationResult authorizationResult = await _serverEventAuthorizationService.AuthorizeAsync(user);
+
+        _userConnectionManager.SetAuthorizedEventSources(userKey.Value, authorizationResult.AuthorizedEventSources);
 
         // Add the user to the authorized groups, and remove them from the unauthorized groups.
         // Note that it's safe to add a user to a group multiple times, so we don't have ot worry about that.

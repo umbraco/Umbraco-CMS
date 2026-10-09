@@ -77,7 +77,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
             return null;
         }
 
-        contentPath = contentPath.EnsureStartsWith("/");
+        contentPath = contentPath.EnsureStartsWith('/');
 
         IPublishedContent? root = GetRoot(content, isPreview);
         if (root is null)
@@ -89,7 +89,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 
         if (_globalSettings.HideTopLevelNodeFromPath == false)
         {
-            contentPath = contentPath.TrimStart(rootPath.EnsureStartsWith("/")).EnsureStartsWith("/");
+            contentPath = contentPath.TrimStart(rootPath.EnsureStartsWith('/')).EnsureStartsWith('/');
         }
 
         return new ApiContentRoute(contentPath, new ApiContentStartItem(root.Key, rootPath));
@@ -108,7 +108,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         var contentPath = _apiContentPathProvider.GetContentPath(content, culture);
 
         // in some scenarios the published content is actually routable, but due to the built-in handling of i.e. lacking culture setup
-        // the URL provider resolves the content URL as empty string or "#". since the Delivery API handles routing explicitly,
+        // the URL provider resolves the content URL as empty or unrouetable. since the Delivery API handles routing explicitly,
         // we can perform fallback to the content route.
         if (IsInvalidContentPath(contentPath))
         {
@@ -131,7 +131,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 
     private string ContentPreviewPath(IPublishedContent content) => $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}{(_requestSettings.AddTrailingSlash ? "/" : string.Empty)}";
 
-    private static bool IsInvalidContentPath(string? path) => path.IsNullOrWhiteSpace() || "#".Equals(path);
+    private static bool IsInvalidContentPath(string? path) => path.IsNullOrWhiteSpace() || Constants.Routing.Unroutable.Equals(path);
 
     private IPublishedContent? GetRoot(IPublishedContent content, bool isPreview)
     {

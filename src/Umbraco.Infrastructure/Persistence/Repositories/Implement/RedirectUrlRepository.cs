@@ -196,7 +196,7 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
     /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
     /// <param name="pageSize">The number of items per page.</param>
     /// <param name="total">Outputs the total number of redirect URLs available.</param>
-    /// <returns>An enumerable collection of redirect URLs for the specified page.</returns
+    /// <returns>An enumerable collection of redirect URLs for the specified page.</returns>
     public IEnumerable<IRedirectUrl> GetAllUrls(int rootContentId, long pageIndex, int pageSize, out long total)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
@@ -217,7 +217,7 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
     /// <summary>
     /// Searches for redirect URLs whose URL contains the specified search term, with results paged according to the given page index and size.
     /// </summary>
-    /// <param name="searchTerm">The term to search for within redirect URLs. The search is case-insensitive and matches any part of the URL.</param>
+    /// <param name="searchTerm">The term to search for within redirect URLs. The search matches any part of the URL, with case sensitivity determined by the database collation.</param>
     /// <param name="pageIndex">The zero-based index of the page of results to retrieve.</param>
     /// <param name="pageSize">The number of redirect URLs to include in a single page of results.</param>
     /// <param name="total">When this method returns, contains the total number of redirect URLs matching the search term.</param>
@@ -226,7 +226,7 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
     {
         var wcPlaceholder = SqlSyntax.GetWildcardPlaceholder();
         Sql<ISqlContext> sql = GetBaseQuery(false)
-            .WhereLike<RedirectUrlDto>(x => x.Url, wcPlaceholder + searchTerm.Trim().ToLowerInvariant() + wcPlaceholder)
+            .WhereLike<RedirectUrlDto>(x => x.Url, wcPlaceholder + searchTerm.Trim() + wcPlaceholder)
             .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
         Page<RedirectUrlDto> result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
         total = Convert.ToInt32(result.TotalItems);
@@ -249,14 +249,24 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
 
     protected override IEnumerable<IRedirectUrl> PerformGetAll(params Guid[]? ids)
     {
-        if (ids?.Length > Constants.Sql.MaxParameterCount)
+        if (ids is null || ids.Length == 0)
         {
-            throw new NotSupportedException(
-                $"This repository does not support more than {Constants.Sql.MaxParameterCount} ids.");
+            return Database.Fetch<RedirectUrlDto>(GetBaseQuery(false))
+                .WhereNotNull()
+                .Select(Map)
+                .WhereNotNull();
         }
 
-        Sql<ISqlContext> sql = GetBaseQuery(false).WhereIn<RedirectUrlDto>(x => x.Id, ids);
-        List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
+        // Batch the WhereIn fetch so we never exceed SQL Server's 2100 parameter limit.
+        // EntityRepositoryBase.GetMany already groups IDs, but we keep the batching here as
+        // a defensive measure for safety and consistency at the repository boundary.
+        var dtos = new List<RedirectUrlDto>(ids.Length);
+        foreach (IEnumerable<Guid> group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = GetBaseQuery(false).WhereIn<RedirectUrlDto>(x => x.Id, group);
+            dtos.AddRange(Database.Fetch<RedirectUrlDto>(sql));
+        }
+
         return dtos.WhereNotNull().Select(Map).WhereNotNull();
     }
 

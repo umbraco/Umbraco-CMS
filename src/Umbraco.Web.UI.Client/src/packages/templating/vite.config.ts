@@ -17,7 +17,6 @@ export default defineConfig({
 			'stylesheets/index': 'stylesheets/index.ts',
 			'templates/index': 'templates/index.ts',
 			'umbraco-package': 'umbraco-package.ts',
-			manifests: 'manifests.ts',
 		},
 	}),
 });

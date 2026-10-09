@@ -56,7 +56,7 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
     /// <param name="url">The URL of the image.</param>
     /// <param name="crop">The crop information to apply to the image, or <c>null</c> if not specified.</param>
     /// <param name="preferFocalPoint">If <c>true</c>, prefer using the focal point over crop coordinates when both are available.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Core.PropertyEditors.ValueConverters.ImageUrlGenerationOptions"/> instance configured with either the focal point, crop coordinates, or default settings based on the input parameters.</returns>
+    /// <returns>An <see cref="ImageUrlGenerationOptions"/> instance configured with either the focal point, crop coordinates, or default settings based on the input parameters.</returns>
     public ImageUrlGenerationOptions GetCropBaseOptions(string? url, ImageCropperCrop? crop, bool preferFocalPoint)
     {
         if ((preferFocalPoint && HasFocalPoint()) || (crop is not null && crop.Coordinates is null && HasFocalPoint()))

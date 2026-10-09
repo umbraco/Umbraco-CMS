@@ -193,60 +193,6 @@ test('can create a document type with multiple tabs', {tag: '@release'}, async (
   expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, secondDataTypeName, secondDataType.id, secondTabName, secondGroupName)).toBeTruthy();
 });
 
-test('can create a document type with a composition', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const compositionDocumentTypeName = 'CompositionDocumentType';
-  await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
-  await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
-  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
-
-  // Act
-  await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
-  await umbracoUi.documentType.clickCompositionsButton();
-  await umbracoUi.documentType.clickModalMenuItemWithName(compositionDocumentTypeName);
-  await umbracoUi.documentType.clickSubmitButton();
-  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
-
-  // Assert
-  expect(umbracoUi.documentType.doesGroupHaveValue(groupName)).toBeTruthy();
-  // Checks if the composition in the document type is correct
-  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.compositions[0].documentType.id).toBe(compositionDocumentTypeId);
-
-  // Clean
-  await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
-});
-
-test('can remove a composition from a document type', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const compositionDocumentTypeName = 'CompositionDocumentType';
-  await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
-  await umbracoApi.documentType.createDocumentTypeWithAComposition(documentTypeName, compositionDocumentTypeId);
-  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
-
-  // Act
-  await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
-  await umbracoUi.documentType.clickCompositionsButton();
-  await umbracoUi.documentType.clickModalMenuItemWithName(compositionDocumentTypeName);
-  await umbracoUi.documentType.clickSubmitButton();
-  await umbracoUi.documentType.clickConfirmToSubmitButton();
-  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
-
-  // Assert
-  await umbracoUi.documentType.isGroupVisible(groupName, false);
-  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.compositions).toEqual([]);
-
-  // Clean
-  await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
-});
-
 test('can reorder groups in a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -375,6 +321,28 @@ test('can enable validation for a property in a document type', {tag: '@release'
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.properties[0].validation.regEx).toBe(regex);
   expect(documentTypeData.properties[0].validation.regExMessage).toBe(regexMessage);
+});
+
+// Tests regression issue: https://github.com/umbraco/Umbraco-CMS/issues/22916
+test('preserves the selected validation option when re-opening a property in a document type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const numberPresetRegex = '^[0-9]*$';
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+
+  // Act — set Number preset validation and save.
+  await umbracoUi.documentType.clickEditorSettingsButton();
+  await umbracoUi.documentType.selectValidationOption(numberPresetRegex);
+  await umbracoUi.documentType.clickSubmitButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
+
+  // Re-open the property settings.
+  await umbracoUi.documentType.clickEditorSettingsButton();
+
+  // Assert — the dropdown still reflects the saved Number preset, not "No validation".
+  await umbracoUi.documentType.doesSelectedValidationOptionHaveValue(numberPresetRegex);
 });
 
 test('can allow vary by culture for a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

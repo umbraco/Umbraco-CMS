@@ -1,15 +1,21 @@
 import type { UmbIntegerPropertyEditorUiValue } from './types.js';
+import { umbResolveNumberPresetValue } from './resolve-number-preset-value.function.js';
 import type { UmbPropertyValuePreset } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 
-export class UmbIntegerPropertyValuePreset
-	implements UmbPropertyValuePreset<UmbIntegerPropertyEditorUiValue, UmbPropertyEditorConfig>
-{
+export class UmbIntegerPropertyValuePreset implements UmbPropertyValuePreset<
+	UmbIntegerPropertyEditorUiValue,
+	UmbPropertyEditorConfig
+> {
 	async processValue(value: undefined | UmbIntegerPropertyEditorUiValue, config: UmbPropertyEditorConfig) {
-		const min = Number(config.find((x) => x.alias === 'min')?.value ?? 0);
-		const minVerified = isNaN(min) ? 0 : Math.round(min);
-
-		return value !== undefined ? value : minVerified;
+		if (value !== undefined && value !== null) {
+			return value;
+		}
+		const fallbackValue = umbResolveNumberPresetValue(config);
+		if (fallbackValue !== undefined) {
+			return Math.round(fallbackValue);
+		}
+		return undefined;
 	}
 
 	destroy(): void {}

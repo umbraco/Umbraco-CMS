@@ -6,9 +6,11 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Document Type Picker Property Editor UI',
 	element: () => import('./property-editor-ui-document-type-picker.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Document Type Picker',
 		icon: 'icon-document-dashed-line',
-		group: 'advanced',
+		group: '#propertyEditorUIGroups_advanced',
+		keywords: ['doctype', 'type', 'element', 'schema', 'pick'],
 		supportsReadOnly: true,
 		settings: {
 			properties: [

@@ -1,4 +1,5 @@
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
+import { UmbDocumentVariantState } from '../../../variant-state.js';
+import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { isNotPublishedMandatory } from '../../utils.js';
 import type {
 	UmbDocumentPublishWithDescendantsModalData,
@@ -96,7 +97,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline=${this.localize.term('buttons_publishDescendants')}>
+		return html`<uui-dialog-layout headline=${this.localize.term('content_saveAndPublishDescendantsModalTitle')}>
 			<p id="subtitle">
 				${this._options.length === 1
 					? html`<umb-localize

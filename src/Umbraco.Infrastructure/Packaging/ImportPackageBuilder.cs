@@ -2,6 +2,7 @@ using System.Xml.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -20,7 +21,7 @@ internal sealed class ImportPackageBuilder : ExpressionBuilderBase<ImportPackage
     /// <param name="packagingService">An instance of <see cref="IPackagingService"/> used for package operations.</param>
     /// <param name="mediaService">An instance of <see cref="IMediaService"/> for managing media items.</param>
     /// <param name="mediaFileManager">The <see cref="MediaFileManager"/> responsible for handling media files.</param>
-    /// <param name="mediaUrlGenerators">A collection of <see cref="MediaUrlGenerator"/> used to generate media URLs.</param>
+    /// <param name="mediaUrlGenerators">A collection of <see cref="IMediaUrlGenerator"/> used to generate media URLs.</param>
     /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> used for string manipulation and formatting.</param>
     /// <param name="contentTypeBaseServiceProvider">The <see cref="IContentTypeBaseServiceProvider"/> for accessing content type services.</param>
     /// <param name="context">The <see cref="IMigrationContext"/> providing context for the migration process.</param>

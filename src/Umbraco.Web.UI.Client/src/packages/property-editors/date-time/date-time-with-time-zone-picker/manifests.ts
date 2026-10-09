@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.DateTimeWithTimeZone.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,10 +8,28 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Date Time with Time Zone Picker Property Editor UI',
 		element: () => import('./property-editor-ui-date-time-with-time-zone-picker.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Date Time (with time zone)',
 			propertyEditorSchemaAlias: 'Umbraco.DateTimeWithTimeZone',
 			icon: 'icon-calendar-alt',
-			group: 'date',
+			group: '#propertyEditorUIGroups_date',
+			keywords: [
+				'date',
+				'time',
+				'timezone',
+				'schedule',
+				'global',
+				'opening hours',
+				'publish',
+				'webinar',
+				'international',
+				'utc',
+				'expiry',
+				'start',
+				'end',
+				'appointment',
+				'deadline',
+			],
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -53,4 +72,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

@@ -93,6 +93,15 @@ public interface IUserService : IMembershipUserService
     Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
 
     /// <summary>
+    ///     Updates the current user.
+    /// </summary>
+    /// <param name="userKey">The key of the user.</param>
+    /// <param name="model">The model containing the updated user details.</param>
+    /// <returns>An attempt containing the updated <see cref="IUser"/> if successful, as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
+    // TODO V19: Remove default implementation
+    Task<Attempt<IUser?, UserOperationStatus>> UpdateProfileAsync(Guid userKey, UserUpdateProfileModel model) => throw new NotImplementedException();
+
+    /// <summary>
     ///     Sets the avatar for a user from a temporary file.
     /// </summary>
     /// <param name="userKey">The unique key of the user.</param>
@@ -440,7 +449,25 @@ public interface IUserService : IMembershipUserService
     /// </summary>
     /// <param name="userEmail">The email address of the user.</param>
     /// <returns>An attempt indicating if the operation was successful as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
+    [Obsolete("Please use the overload taking a cancellation token. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail);
+
+    /// <summary>
+    ///     Sends an email with a link to reset user's password.
+    /// </summary>
+    /// <param name="userEmail">The email address of the user.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>An attempt indicating if the operation was successful as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
+    /// <remarks>
+    ///     <see cref="UserOperationStatus.PasswordResetUnavailable"/> is determined before the user is looked up, so it does not
+    ///     reveal whether the email belongs to a user. A failure to send the message is logged and returned as
+    ///     <see cref="UserOperationStatus.UnknownFailure"/> rather than thrown.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation when the obsolete overload is removed.
+    Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail, CancellationToken cancellationToken)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => SendResetPasswordEmailAsync(userEmail).WaitAsync(cancellationToken);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Resends an invitation email to a user.

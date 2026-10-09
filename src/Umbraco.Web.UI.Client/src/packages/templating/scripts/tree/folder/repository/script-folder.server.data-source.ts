@@ -6,7 +6,11 @@ import { ScriptService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDetailDataSource,
+	UmbDataSourceResponse,
+	UmbDataSourceErrorResponse,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for Script folders that fetches data from the server
@@ -28,11 +32,11 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 
 	/**
 	 * Creates a scaffold for a Script folder
-	 * @param {Partial<UmbFolderModel>} [preset]
-	 * @returns {*}
+	 * @param {Partial<UmbFolderModel>} [preset] - Initial data to seed the scaffold with
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The scaffolded Script folder
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
-	async createScaffold(preset?: Partial<UmbFolderModel>) {
+	async createScaffold(preset?: Partial<UmbFolderModel>): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		const scaffold: UmbFolderModel = {
 			entityType: UMB_SCRIPT_FOLDER_ENTITY_TYPE,
 			unique: UmbId.new(),
@@ -45,8 +49,8 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 
 	/**
 	 * Fetches a Script folder from the server
-	 * @param {string} unique
-	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
+	 * @param {string} unique - The unique identifier of the Script folder
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The Script folder
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -78,8 +82,8 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 
 	/**
 	 * Creates a Script folder on the server
-	 * @param {UmbFolderModel} model
-	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
+	 * @param {UmbFolderModel} model - The Script folder to create
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The created Script folder
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -111,11 +115,11 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 
 	/**
 	 * Deletes a Script folder on the server
-	 * @param {string} unique
-	 * @returns {UmbDataSourceErrorResponse}
-	 * @memberof UmbScriptServerDataSource
+	 * @param {string} unique - The unique identifier of the Script folder
+	 * @returns {UmbDataSourceErrorResponse} The result of the delete operation
+	 * @memberof UmbScriptFolderServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);

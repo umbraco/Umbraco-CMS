@@ -27,10 +27,13 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
 
     private IDictionaryRepository CreateRepository() => GetRequiredService<IDictionaryRepository>();
 
-    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache, bool enableValueSearch = false)
+    private IDictionaryRepository CreateRepositoryWithCache(
+        AppCaches cache,
+        bool enableValueSearch = false,
+        DictionaryKeySearchMode keySearchMode = DictionaryKeySearchMode.StartsWith)
     {
         var dictionarySettingsMonitor = new Mock<IOptionsMonitor<DictionarySettings>>();
-        dictionarySettingsMonitor.Setup(x => x.CurrentValue).Returns(new DictionarySettings { EnableValueSearch = enableValueSearch });
+        dictionarySettingsMonitor.Setup(x => x.CurrentValue).Returns(new DictionarySettings { EnableValueSearch = enableValueSearch, KeySearchMode = keySearchMode });
 
         // Create a repository with a real runtime cache.
         return new DictionaryRepository(
@@ -546,6 +549,65 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    /// <summary>
+    /// Verifies that <see cref="IDictionaryRepository.GetDictionaryItemDescendants"/> returns each
+    /// dictionary item exactly once when items have multiple translations.
+    /// </summary>
+    /// <remarks>
+    /// Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22640.
+    /// The underlying SQL left-joins cmsDictionary with cmsLanguageText (one row per
+    /// translation) and relies on NPoco's FetchOneToMany to collapse them back into a
+    /// single dictionary item. FetchOneToMany only merges adjacent rows that share the
+    /// same primary key, so the SQL must order rows such that translations for the same
+    /// dictionary item are contiguous. Without that ordering, items with multiple
+    /// translations get yielded multiple times.
+    /// </remarks>
+    [Test]
+    public async Task GetDictionaryItemDescendants_With_Multiple_Translations_Returns_Each_Item_Exactly_Once()
+    {
+        var languageService = GetRequiredService<ILanguageService>();
+        var languageDe = new Language("de-DE", "German (Germany)");
+        await languageService.CreateAsync(languageDe, Constants.Security.SuperUserKey);
+        var languageFr = new Language("fr-FR", "French (France)");
+        await languageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
+
+        var languageEn = await languageService.GetAsync("en-US");
+        var languageDk = await languageService.GetAsync("da-DK");
+
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
+        var additionalKeys = new[] { "Header", "Footer", "Sidebar", "Title", "Subtitle" };
+        foreach (var key in additionalKeys)
+        {
+            await dictionaryItemService.CreateAsync(
+                new DictionaryItem(key)
+                {
+                    Translations =
+                    [
+                        new DictionaryTranslation(languageEn, $"{key} (en)"),
+                        new DictionaryTranslation(languageDk, $"{key} (dk)"),
+                        new DictionaryTranslation(languageDe, $"{key} (de)"),
+                        new DictionaryTranslation(languageFr, $"{key} (fr)"),
+                    ],
+                },
+                Constants.Security.SuperUserKey);
+        }
+
+        using (ScopeProvider.CreateScope())
+        {
+            var repository = CreateRepository();
+
+            var results = repository.GetDictionaryItemDescendants(null).ToArray();
+
+            // 2 items from CreateTestData ("Read More", "Article") + the 5 items added above.
+            var expectedKeys = new[] { "Read More", "Article" }.Concat(additionalKeys).OrderBy(x => x).ToArray();
+            Assert.Multiple(() =>
+            {
+                Assert.That(results.Select(x => x.ItemKey).OrderBy(x => x), Is.EqualTo(expectedKeys));
+                Assert.That(results.Select(x => x.Key).Distinct().Count(), Is.EqualTo(results.Length), "Each dictionary item should appear exactly once.");
+            });
+        }
+    }
+
     [Test]
     public void GetDictionaryItemDescendants_WithValueSearch_Disabled_Does_Not_Return_Items_Matching_Only_Translation_Value()
     {
@@ -588,6 +650,142 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             Assert.That(translatedIsoCodes, Does.Contain("en-US"));
             Assert.That(translatedIsoCodes, Does.Contain("da-DK"));
         }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetDictionaryItemDescendants_With_KeySearchMode_Contains_Matches_Filter_Anywhere_In_Key(bool enableValueSearch)
+    {
+        // Arrange
+        await CreateItemWithFilterTermInsideKey();
+        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch, DictionaryKeySearchMode.Contains);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act
+            var results = repository.GetDictionaryItemDescendants(null, "Bravo").ToArray();
+
+            // Assert
+            Assert.That(results.Select(x => x.ItemKey), Is.EqualTo(new[] { "AlphaBravoCharlie" }));
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetDictionaryItemDescendants_With_KeySearchMode_StartsWith_Matches_Filter_Only_At_Start_Of_Key(bool enableValueSearch)
+    {
+        // Arrange
+        await CreateItemWithFilterTermInsideKey();
+        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch, DictionaryKeySearchMode.StartsWith);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act
+            var matchedInsideKey = repository.GetDictionaryItemDescendants(null, "Bravo").ToArray();
+            var matchedAtStartOfKey = repository.GetDictionaryItemDescendants(null, "Alpha").ToArray();
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(matchedInsideKey, Is.Empty);
+                Assert.That(matchedAtStartOfKey.Select(x => x.ItemKey), Is.EqualTo(new[] { "AlphaBravoCharlie" }));
+            });
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetDictionaryItemDescendants_Of_Parent_With_KeySearchMode_Contains_Matches_Filter_Anywhere_In_Key(bool enableValueSearch)
+    {
+        // Arrange
+        var parentKey = await CreateChildItemWithFilterTermInsideKey();
+        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch, DictionaryKeySearchMode.Contains);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act
+            var results = repository.GetDictionaryItemDescendants(parentKey, "Bravo").ToArray();
+
+            // Assert
+            Assert.That(results.Select(x => x.ItemKey), Is.EqualTo(new[] { "AlphaBravoCharlie" }));
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetDictionaryItemDescendants_Of_Parent_With_KeySearchMode_StartsWith_Matches_Filter_Only_At_Start_Of_Key(bool enableValueSearch)
+    {
+        // Arrange
+        var parentKey = await CreateChildItemWithFilterTermInsideKey();
+        var repository = CreateRepositoryWithCache(AppCaches.Create(Mock.Of<IRequestCache>()), enableValueSearch, DictionaryKeySearchMode.StartsWith);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act
+            var matchedInsideKey = repository.GetDictionaryItemDescendants(parentKey, "Bravo").ToArray();
+            var matchedAtStartOfKey = repository.GetDictionaryItemDescendants(parentKey, "Alpha").ToArray();
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(matchedInsideKey, Is.Empty);
+                Assert.That(matchedAtStartOfKey.Select(x => x.ItemKey), Is.EqualTo(new[] { "AlphaBravoCharlie" }));
+            });
+        }
+    }
+
+    /// <summary>
+    /// Creates a dictionary item whose key contains "Bravo" at a position other than the start, and whose
+    /// translation value contains neither "Bravo" nor "Alpha" so that only a key match can satisfy those filters.
+    /// </summary>
+    private async Task CreateItemWithFilterTermInsideKey()
+    {
+        var languageService = GetRequiredService<ILanguageService>();
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
+
+        await dictionaryItemService.CreateAsync(
+            new DictionaryItem("AlphaBravoCharlie")
+            {
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(await languageService.GetAsync("en-US"), "Delta")
+                }
+            },
+            Constants.Security.SuperUserKey);
+    }
+
+    /// <summary>
+    /// Creates the same item as <see cref="CreateItemWithFilterTermInsideKey" />, but as the child of another
+    /// item, so that the filter is applied by the recursive descendant query rather than the flat one.
+    /// </summary>
+    /// <returns>The key of the parent dictionary item.</returns>
+    private async Task<Guid> CreateChildItemWithFilterTermInsideKey()
+    {
+        var languageService = GetRequiredService<ILanguageService>();
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
+
+        var parentKey = (await dictionaryItemService.CreateAsync(
+            new DictionaryItem("Omega")
+            {
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(await languageService.GetAsync("en-US"), "Omega")
+                }
+            },
+            Constants.Security.SuperUserKey)).Result.Key;
+
+        await dictionaryItemService.CreateAsync(
+            new DictionaryItem("AlphaBravoCharlie")
+            {
+                ParentId = parentKey,
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(await languageService.GetAsync("en-US"), "Delta")
+                }
+            },
+            Constants.Security.SuperUserKey);
+
+        return parentKey;
     }
 
     public async Task CreateTestData()

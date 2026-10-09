@@ -28,7 +28,7 @@ export class UmbExtensionApiInitializer<
 	/**
 	 * The api that is created for this extension.
 	 * @readonly
-	 * @type {(class | undefined)}
+	 * @type {ExtensionApiInterface | undefined}
 	 */
 	public get api() {
 		return this.#api;
@@ -36,7 +36,7 @@ export class UmbExtensionApiInitializer<
 
 	/**
 	 * The props that are passed to the class.
-	 * @type {Record<string, any>}
+	 * @type {Record<string, unknown>}
 	 * @memberof UmbExtensionApiController
 	 * @example
 	 * ```ts
@@ -83,7 +83,7 @@ export class UmbExtensionApiInitializer<
 	};
 	*/
 
-	protected async _conditionsAreGood() {
+	protected async _conditionsAreGood(signal: AbortSignal) {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
 		const newApi = await createExtensionApi<ExtensionApiInterface>(
@@ -91,10 +91,19 @@ export class UmbExtensionApiInitializer<
 			manifest as unknown as ManifestApi<ExtensionApiInterface>,
 			this.#constructorArguments as any,
 		);
-		if (!this._isConditionsPositive) {
-			// We are not positive anymore, so we will back out of this creation.
+
+		if (signal.aborted || !this._isConditionsPositive) {
+			newApi?.destroy?.();
 			return false;
 		}
+		// A previous _conditionsAreGood() on this same initializer may have already
+		// assigned this.#api and resolved before us. Without cleanup that instance would
+		// keep running until this._host is destroyed — not a hard leak, but any
+		// subscriptions / context consumers / async setup it started stay alive.
+		if (this.#api && this.#api !== newApi) {
+			this.#api.destroy?.();
+		}
+
 		this.#api = newApi;
 
 		if (this.#api) {

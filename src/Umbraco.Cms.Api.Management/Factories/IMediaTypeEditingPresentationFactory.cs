@@ -17,10 +17,10 @@ public interface IMediaTypeEditingPresentationFactory
     MediaTypeCreateModel MapCreateModel(CreateMediaTypeRequestModel requestModel);
 
     /// <summary>
-    /// Maps the given <see cref="Umbraco.Cms.Api.Management.Models.UpdateMediaTypeRequestModel"/> to a <see cref="Umbraco.Cms.Api.Management.Models.MediaTypeUpdateModel"/>.
+    /// Maps the given <see cref="UpdateMediaTypeRequestModel"/> to a <see cref="MediaTypeUpdateModel"/>.
     /// </summary>
     /// <param name="requestModel">The update request model containing media type data.</param>
-    /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.MediaTypeUpdateModel"/> representing the updated media type.</returns>
+    /// <returns>A <see cref="MediaTypeUpdateModel"/> representing the updated media type.</returns>
     MediaTypeUpdateModel MapUpdateModel(UpdateMediaTypeRequestModel requestModel);
 
     /// <summary>

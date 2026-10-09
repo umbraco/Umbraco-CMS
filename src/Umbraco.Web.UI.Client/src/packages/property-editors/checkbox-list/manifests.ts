@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.CheckboxList.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,10 +8,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Checkbox List Property Editor UI',
 		element: () => import('./property-editor-ui-checkbox-list.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Checkbox List',
 			propertyEditorSchemaAlias: 'Umbraco.CheckBoxList',
 			icon: 'icon-bulleted-list',
-			group: 'lists',
+			group: '#propertyEditorUIGroups_lists',
+			keywords: ['select', 'multi', 'options', 'features', 'categories', 'checklist'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -25,4 +28,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

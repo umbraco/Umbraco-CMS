@@ -20,7 +20,7 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create an empty partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.partialView.clickActionsMenuAtRoot();
-  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
+  await umbracoUi.partialView.clickCreateActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
   await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeCreated();
@@ -38,7 +38,7 @@ test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) =
 
   // Act
   await umbracoUi.partialView.clickActionsMenuAtRoot();
-  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
+  await umbracoUi.partialView.clickCreateActionMenuOption();
   await umbracoUi.partialView.clickNewPartialViewFromSnippetButton();
   await umbracoUi.partialView.clickBreadcrumbButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
@@ -195,7 +195,6 @@ test('can insert dictionary item into a partial view', async ({umbracoApi, umbra
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
   await umbracoUi.partialView.insertDictionaryItem(dictionaryName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the dictionary item to be inserted
   await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeUpdated();
 
   // Assert
@@ -212,7 +211,6 @@ test('can insert value into a partial view', async ({umbracoApi, umbracoUi}) => 
 
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
   await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeUpdated();
 
@@ -274,7 +272,7 @@ test('can show returned items in query builder ', async ({umbracoApi, umbracoUi}
 test('cannot create a partial view with an empty name', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.partialView.clickActionsMenuAtRoot();
-  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
+  await umbracoUi.partialView.clickCreateActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.clickSaveButton();
 

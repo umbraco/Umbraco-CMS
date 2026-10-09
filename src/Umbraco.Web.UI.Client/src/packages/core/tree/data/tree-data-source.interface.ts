@@ -29,14 +29,14 @@ export interface UmbTreeDataSource<
 > {
 	/**
 	 * Gets the root items of the tree.
-	 * @returns {*}  {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>}
+	 * @returns {Promise<UmbDataSourceResponse<UmbTargetPagedModel<TreeItemType>>>} The root items of the tree.
 	 * @memberof UmbTreeDataSource
 	 */
 	getRootItems(args: TreeRootItemsRequestArgsType): Promise<UmbDataSourceResponse<UmbTargetPagedModel<TreeItemType>>>;
 
 	/**
 	 * Gets the children of the given parent item.
-	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>}
+	 * @returns {Promise<UmbDataSourceResponse<UmbTargetPagedModel<TreeItemType>>>}
 	 * @memberof UmbTreeDataSource
 	 */
 	getChildrenOf(args: TreeChildrenOfRequestArgsType): Promise<UmbDataSourceResponse<UmbTargetPagedModel<TreeItemType>>>;

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<umbPackage>
+  <info>
+    <package>
+      <name>Content with non default template</name>
+    </package>
+  </info>
+  <Documents>
+    <DocumentSet importMode="root">
+      <pageHome id="1059" key="c6273e30-baa6-4b5a-af72-6ba037b0b607" parentID="-1" level="1" creatorID="-1" sortOrder="0" createDate="2026-07-07T14:19:55" updateDate="2026-07-07T14:19:55" nodeName="Home" urlName="home" path="-1,1059" isDoc="" nodeType="1056" nodeTypeAlias="pageHome" creatorName="Admin" writerName="Admin" writerID="-1" template="99999" templateAlias="nonDefaultTemplate" isPublished="true">
+        <text><![CDATA[4324234]]></text>
+      </pageHome>
+    </DocumentSet>
+  </Documents>
+  <DocumentTypes>
+    <DocumentType>
+      <Info>
+        <Name>Page Home</Name>
+        <Alias>pageHome</Alias>
+        <Key>3bb19945-b5c3-4932-83c9-9e16b838dc3c</Key>
+        <Icon>icon-home</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>True</AllowAtRoot>
+        <ListView></ListView>
+        <IsElement>False</IsElement>
+        <Variations>Nothing</Variations>
+        <Compositions />
+        <AllowedTemplates>
+          <Template>defaultTemplate</Template>
+          <Template>nonDefaultTemplate</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>defaultTemplate</DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Text</Name>
+          <Alias>text</Alias>
+          <Key>51aed9ac-73f9-4d03-b103-959e49999131</Key>
+          <Type>Umbraco.TextArea</Type>
+          <Definition>c6bac0dd-4ab9-45b1-8e30-e4b619ee5da3</Definition>
+          <SortOrder>0</SortOrder>
+          <Mandatory>False</Mandatory>
+          <LabelOnTop>False</LabelOnTop>
+          <Description><![CDATA[]]></Description>
+          <Variations>Nothing</Variations>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs />
+      <HistoryCleanupPolicy preventCleanup="false" />
+    </DocumentType>
+  </DocumentTypes>
+  <MediaTypes />
+  <Templates>
+    <Template>
+      <Name>Default Template</Name>
+      <Key>019f3cf2-77cd-78ef-a295-da57cd511b0d</Key>
+      <Alias>defaultTemplate</Alias>
+      <Design><![CDATA[@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = null;
+}]]></Design>
+    </Template>
+    <Template>
+      <Name>Non Default Template</Name>
+      <Key>a254bb81-6f4a-4c6a-b363-cfa3f81076a0</Key>
+      <Alias>nonDefaultTemplate</Alias>
+      <Design><![CDATA[@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = null;
+}]]></Design>
+    </Template>
+  </Templates>
+  <Stylesheets />
+  <Scripts />
+  <PartialViews />
+  <DictionaryItems />
+  <Languages />
+  <DataTypes />
+  <MediaItems />
+</umbPackage>

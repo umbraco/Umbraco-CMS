@@ -233,8 +233,32 @@ export class UmbExtensionRegistry<
 	 * @memberof UmbExtensionRegistry
 	 */
 	registerMany(manifests: Array<ManifestTypes | ManifestKind<ManifestTypes>>): void {
-		// we have to register extensions individually, so we ensure a manifest is valid before continuing to the next one
-		manifests.forEach((manifest) => this.register(manifest));
+		const toAdd: ManifestTypes[] = [];
+
+		for (const manifest of manifests) {
+			// TODO: refactor this so this code is not duplicated between this and single extension register
+			if (!this.#validateExtension(manifest)) continue;
+
+			if (manifest.type === 'kind') {
+				this.defineKind(manifest as ManifestKind<ManifestTypes>);
+				continue;
+			}
+
+			// TODO: Revisit this, it could use the isExtensionApproved, but this code also checks alias duplication against the toAdd array. [NL]
+			if (!this.#acceptExtension(manifest as ManifestTypes)) continue;
+
+			const alias = (manifest as ManifestTypes).alias;
+			if (this._extensions.getValue().find((e) => e.alias === alias) || toAdd.find((e) => e.alias === alias)) {
+				console.error(`Extension with alias ${alias} is already registered`);
+				continue;
+			}
+
+			toAdd.push(this.#appendAdditionalConditions(manifest as ManifestTypes));
+		}
+
+		if (toAdd.length) {
+			this._extensions.setValue([...this._extensions.getValue(), ...toAdd]);
+		}
 	}
 
 	/**

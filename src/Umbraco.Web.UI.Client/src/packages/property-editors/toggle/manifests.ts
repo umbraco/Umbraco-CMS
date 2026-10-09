@@ -1,4 +1,5 @@
 import { manifest as trueFalseSchemaManifest } from './Umbraco.TrueFalse.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -14,10 +15,35 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Toggle Property Editor UI',
 		element: () => import('./property-editor-ui-toggle.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Toggle',
 			propertyEditorSchemaAlias: 'Umbraco.TrueFalse',
 			icon: 'icon-checkbox',
-			group: 'common',
+			group: '#propertyEditorUIGroups_common',
+			keywords: [
+				'boolean',
+				'switch',
+				'flag',
+				'enabled',
+				'disabled',
+				'show',
+				'hide',
+				'active',
+				'inactive',
+				'deactivated',
+				'visible',
+				'invisible',
+				'featured',
+				'left',
+				'right',
+				'yes',
+				'no',
+				'on',
+				'off',
+				'checkbox',
+				'required',
+				'include',
+			],
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -65,4 +91,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	trueFalseSchemaManifest,
+	...valueSummaryManifests,
 ];

@@ -119,7 +119,7 @@ export class UmbPropertyEditorUIDatePickerElement
 
 	/**
 	 * Formats the value depending on the input type.
-	 * @param value
+	 * @param {string} value - The value to format.
 	 */
 	#formatValue(value: string) {
 		this._inputValue = undefined;

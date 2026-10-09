@@ -50,8 +50,9 @@ export interface UmbEntityVariantOptionModel<VariantType extends UmbEntityVarian
 
 /** @deprecated use `UmbEntityVariantOptionModel` instead */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbVariantOptionModel<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel>
-	extends UmbEntityVariantOptionModel<VariantType> {}
+export interface UmbVariantOptionModel<
+	VariantType extends UmbEntityVariantModel = UmbEntityVariantModel,
+> extends UmbEntityVariantOptionModel<VariantType> {}
 
 export interface UmbEntityVariantPublishModel {
 	variantId: UmbVariantId;

@@ -117,7 +117,7 @@ public class IdentityMapDefinition : IMapDefinition
         target.Kind = source.Kind;
     }
 
-    // Umbraco.Code.MapAll -Id -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -ConcurrencyStamp -NormalizedEmail -NormalizedUserName -Roles
+    // Umbraco.Code.MapAll -Id -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -ConcurrencyStamp -NormalizedEmail -NormalizedUserName -Roles -IsExternalOnly -ProfileData
     private void Map(IMember source, MemberIdentityUser target)
     {
         target.Email = source.Email;

@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './context/document-workspace.context-token.js';
 import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -95,14 +95,14 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			? html`<div id="splitViews">
 						${repeat(
 							this._variants,
-							(view) =>
-								view.index + '_' + (view.culture ?? '') + '_' + (view.segment ?? '') + '_' + this._variants!.length,
+							(view) => view.index,
 							(view) => html`
 								<umb-workspace-split-view
 									.loading=${this._loading}
 									.displayNavigation=${view.index === this._variants!.length - 1}
 									.overrides=${this._overrides}
-									.splitViewIndex=${view.index}>
+									.splitViewIndex=${view.index}
+									.hasCustomVariantSelector=${true}>
 									<umb-icon slot="icon" name=${ifDefined(this._icon)}></umb-icon>
 									<umb-document-workspace-split-view-variant-selector
 										slot="variant-selector"></umb-document-workspace-split-view-variant-selector>

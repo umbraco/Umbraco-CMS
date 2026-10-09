@@ -88,12 +88,12 @@ public class ContentFinderByRedirectUrl : IContentFinder
         }
 
         IPublishedContent? content = umbracoContext.Content?.GetById(redirectUrl.ContentId);
-        var url = content == null ? "#" : content.Url(_publishedUrlProvider, redirectUrl.Culture);
-        if (url.StartsWith("#"))
+        var url = content == null ? Constants.Routing.Unroutable : content.Url(_publishedUrlProvider, redirectUrl.Culture);
+        if (url.StartsWith(Constants.Routing.Unroutable))
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Route {Route} matches content {ContentId} which has no URL.", route, redirectUrl.ContentId);
+                _logger.LogDebug("Route {Route} matches content {ContentId} (key {ContentKey}) which has no URL.", route, redirectUrl.ContentId, redirectUrl.ContentKey);
             }
 
             return false;
@@ -103,7 +103,7 @@ public class ContentFinderByRedirectUrl : IContentFinder
         url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("Route {Route} matches content {ContentId} with URL '{Url}', redirecting.", route, content?.Id, url);
+            _logger.LogDebug("Route {Route} matches content {ContentId} (key {ContentKey}) with URL '{Url}', redirecting.", route, content?.Id, content?.Key, url);
         }
 
         frequest

@@ -1,0 +1,575 @@
+using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Tests.Common.Builders;
+
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
+
+public partial class ContentEditingServiceTests
+{
+    [Test]
+    public async Task Can_CreateAndPublish_Invariant_Content()
+    {
+        var contentType = CreateInvariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = "Test Create And Publish" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title" },
+                new PropertyValueModel { Alias = "text", Value = "The text" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        VerifyCreateAndPublish(result.Result.Content);
+
+        // re-get and re-test
+        VerifyCreateAndPublish(await ContentEditingService.GetAsync(result.Result.Content!.Key));
+
+        void VerifyCreateAndPublish(IContent? content)
+        {
+            Assert.IsNotNull(content);
+            Assert.IsTrue(content.HasIdentity);
+            Assert.IsTrue(content.Published);
+            Assert.AreEqual("Test Create And Publish", content.Name);
+            Assert.AreEqual("The title", content.GetValue<string>("title", published: true));
+            Assert.AreEqual("The text", content.GetValue<string>("text", published: true));
+        }
+    }
+
+    [Test]
+    public async Task Can_CreateAndPublish_Culture_Variant_All_Cultures()
+    {
+        var contentType = await CreateVariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The English Title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The Danish Title", Culture = "da-DK" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Danish Name" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string> { "en-US", "da-DK" }, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        VerifyCreateAndPublish(result.Result.Content);
+
+        // re-get and re-test
+        VerifyCreateAndPublish(await ContentEditingService.GetAsync(result.Result.Content!.Key));
+
+        void VerifyCreateAndPublish(IContent? content)
+        {
+            Assert.IsNotNull(content);
+            Assert.IsTrue(content.Published);
+            Assert.IsTrue(content.IsCulturePublished("en-US"));
+            Assert.IsTrue(content.IsCulturePublished("da-DK"));
+            Assert.AreEqual("English Name", content.GetCultureName("en-US"));
+            Assert.AreEqual("Danish Name", content.GetCultureName("da-DK"));
+            Assert.AreEqual("The Invariant Title", content.GetValue<string>("invariantTitle"));
+            Assert.AreEqual("The English Title", content.GetValue<string>("variantTitle", "en-US", published: true));
+            Assert.AreEqual("The Danish Title", content.GetValue<string>("variantTitle", "da-DK", published: true));
+        }
+    }
+
+    [Test]
+    public async Task Can_CreateAndPublish_Culture_Variant_Single_Culture()
+    {
+        var contentType = await CreateVariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The English Title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The Danish Title", Culture = "da-DK" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Danish Name" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string> { "en-US" }, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        VerifyCreateAndPublish(result.Result.Content);
+
+        // re-get and re-test
+        VerifyCreateAndPublish(await ContentEditingService.GetAsync(result.Result.Content!.Key));
+
+        void VerifyCreateAndPublish(IContent? content)
+        {
+            Assert.IsNotNull(content);
+            Assert.IsTrue(content.IsCulturePublished("en-US"));
+            Assert.IsFalse(content.IsCulturePublished("da-DK"));
+
+            // both values should still be saved
+            Assert.AreEqual("The English Title", content.GetValue<string>("variantTitle", "en-US", published: true));
+            Assert.AreEqual("The Danish Title", content.GetValue<string>("variantTitle", "da-DK"));
+        }
+    }
+
+    [Test]
+    public async Task Can_CreateAndPublish_With_Template()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            TemplateKey = template.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = "With Template" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title" },
+                new PropertyValueModel { Alias = "bodyText", Value = "The body" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        var content = result.Result.Content!;
+        Assert.IsTrue(content.Published);
+        Assert.AreEqual(template.Id, content.TemplateId);
+    }
+
+    [Test]
+    public async Task Can_CreateAndPublish_With_Explicit_Key()
+    {
+        var contentType = CreateInvariantContentType();
+        var explicitKey = Guid.NewGuid();
+
+        var createModel = new ContentCreateModel
+        {
+            Key = explicitKey,
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = "Explicit Key" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        var content = result.Result.Content!;
+        Assert.IsTrue(content.Published);
+        Assert.AreEqual(explicitKey, content.Key);
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_Without_Content_Type()
+    {
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = Guid.NewGuid(),
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = "Test" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeNotFound, result.Status.ContentEditingOperationStatus);
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_Non_Existing_Parent()
+    {
+        var contentType = CreateInvariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Guid.NewGuid(),
+            Variants =
+            [
+                new VariantModel { Name = "Test" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, result.Status.ContentEditingOperationStatus);
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_Non_Existing_Template()
+    {
+        var contentType = CreateInvariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            TemplateKey = Guid.NewGuid(),
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = "Test" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.TemplateNotFound, result.Status.ContentEditingOperationStatus);
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_Disallowed_Template()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        // content type without allowed templates
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            TemplateKey = template.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = "Test" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.TemplateNotAllowed, result.Status.ContentEditingOperationStatus);
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_Invariant_Without_Name()
+    {
+        var contentType = CreateInvariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status.ContentEditingOperationStatus);
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_Invalid_Culture()
+    {
+        var contentType = await CreateVariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "Invariant" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "English", Culture = "en-us" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-us", Name = "English" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status.ContentEditingOperationStatus);
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_Under_Unpublished_Parent()
+    {
+        var contentType = await CreateTextPageContentTypeAsync();
+        var (root, _) = await CreateRootAndChildAsync(contentType);
+        Assert.IsFalse(root.Published);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = root.Key,
+            Variants = [new VariantModel { Name = "The Grandchild" }],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
+            Assert.AreEqual(ContentPublishingOperationStatus.PathNotPublished, result.Status.ContentPublishingOperationStatus);
+        });
+
+        // the save is part of the same operation, so the document exists even though it could not be published
+        var created = await ContentEditingService.GetAsync(result.Result.Content!.Key);
+        Assert.IsNotNull(created);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("The Grandchild", created.Name);
+            Assert.IsFalse(created.Published);
+        });
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_Invalid_Property_Values()
+    {
+        var contentType = CreateInvariantContentType();
+
+        // "title" is mandatory, so publishing is rejected while saving is not
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Name = "The Page" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = null },
+                new PropertyValueModel { Alias = "text", Value = "The text" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
+            Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status.ContentPublishingOperationStatus);
+
+            // the reason the publish was rejected must reach the caller, both as aliases and as validation errors
+            Assert.AreEqual(new[] { "title" }, result.Result.InvalidPropertyAliases.ToArray());
+            Assert.IsNotEmpty(result.Result.ValidationResult.ValidationErrors);
+            Assert.IsTrue(result.Result.ValidationResult.ValidationErrors.Any(error => error.Alias == "title"));
+        });
+
+        var created = await ContentEditingService.GetAsync(result.Result.Content!.Key);
+        Assert.IsNotNull(created);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("The Page", created.Name);
+            Assert.IsFalse(created.Published);
+            Assert.AreEqual("The text", created.GetValue<string>("text"));
+        });
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_When_Saving_Notification_Is_Cancelled()
+    {
+        var contentType = CreateInvariantContentType();
+        ContentEditingNotificationHandler.SavingContent = notification => notification.Cancel = true;
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Name = "The Page" }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The title" }],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.CancelledByNotification, result.Status.ContentEditingOperationStatus);
+            Assert.IsNull(result.Status.ContentPublishingOperationStatus);
+        });
+
+        // nothing was persisted, so the outcome belongs to the save rather than the publish
+        Assert.IsNull(await ContentEditingService.GetAsync(result.Result.Content!.Key));
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_When_Publishing_Notification_Is_Cancelled()
+    {
+        var contentType = CreateInvariantContentType();
+        ContentEditingNotificationHandler.PublishingContent = notification => notification.Cancel = true;
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Name = "The Page" }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The title" }],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            // the publishing notification is raised before the document is persisted, so a cancel here loses the
+            // save too - which is why both cancel points report against the editing status
+            Assert.AreEqual(ContentEditingOperationStatus.CancelledByNotification, result.Status.ContentEditingOperationStatus);
+            Assert.IsNull(result.Status.ContentPublishingOperationStatus);
+        });
+
+        Assert.IsNull(await ContentEditingService.GetAsync(result.Result.Content!.Key));
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_Under_Unpublished_Parent_With_Obsolete_Overload()
+    {
+        var contentType = await CreateTextPageContentTypeAsync();
+        var (root, _) = await CreateRootAndChildAsync(contentType);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = root.Key,
+            Variants = [new VariantModel { Name = "The Grandchild" }],
+        };
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, [], Constants.Security.SuperUserKey);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // the obsolete overload cannot express a publish failure, so it keeps collapsing to "unknown"
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Unknown, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_Cultures_For_An_Invariant_Content_Type()
+    {
+        var contentType = CreateInvariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Name = "The Page" }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The title" }],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string> { "en-US" }, Constants.Security.SuperUserKey);
+
+        // Cultures cannot be published for an invariant content type. The publish is never attempted, so the outcome
+        // belongs to the save - reported rather than surfacing as an unknown error.
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status.ContentEditingOperationStatus);
+            Assert.IsNull(result.Status.ContentPublishingOperationStatus);
+        });
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_A_Wildcard_Culture()
+    {
+        var contentType = await CreateVariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Culture = "en-US", Name = "English" }],
+            Properties = [new PropertyValueModel { Alias = "variantTitle", Value = "English title", Culture = "en-US" }],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string> { "*" }, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status.ContentEditingOperationStatus);
+            Assert.IsNull(result.Status.ContentPublishingOperationStatus);
+        });
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_An_Unconfigured_Culture()
+    {
+        var contentType = await CreateVariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Culture = "en-US", Name = "English" }],
+            Properties = [new PropertyValueModel { Alias = "variantTitle", Value = "English title", Culture = "en-US" }],
+        };
+
+        // publishing a culture that is not a configured language would otherwise silently publish nothing
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string> { "zz-ZZ" }, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status.ContentEditingOperationStatus);
+            Assert.IsNull(result.Status.ContentPublishingOperationStatus);
+        });
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_An_Over_Long_Name()
+    {
+        var contentType = CreateInvariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Name = new string('x', 256) }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The title" }],
+        };
+
+        var result = await ContentEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status.ContentEditingOperationStatus);
+            Assert.IsNull(result.Status.ContentPublishingOperationStatus);
+        });
+    }
+}

@@ -113,6 +113,46 @@ public class ContentTests
         Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos")); // it's true now since we've updated a name
     }
 
+    [TestCase("en-us", "en-US")]
+    [TestCase("en-GB", "en-GB")]
+    public void Can_Set_Culture_Info_With_Normalized_Culture_Code_Casing(string culture, string expectedCulture)
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("contentType")
+            .WithContentVariation(ContentVariation.Culture)
+            .Build();
+        var content = new ContentBuilder()
+            .WithId(1)
+            .WithVersionId(1)
+            .WithName("content")
+            .WithContentType(contentType)
+            .Build();
+
+        content.SetCultureInfo(culture, "name", DateTime.UtcNow);
+
+        Assert.AreEqual(expectedCulture, content.CultureInfos[culture].Culture);
+    }
+
+    [TestCase("en-us", "en-US")]
+    [TestCase("en-GB", "en-GB")]
+    public void Can_Set_Publish_Info_With_Normalized_Culture_Code_Casing(string culture, string expectedCulture)
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("contentType")
+            .WithContentVariation(ContentVariation.Culture)
+            .Build();
+        var content = new ContentBuilder()
+            .WithId(1)
+            .WithVersionId(1)
+            .WithName("content")
+            .WithContentType(contentType)
+            .Build();
+
+        content.SetPublishInfo(culture, "name", DateTime.UtcNow);
+
+        Assert.AreEqual(expectedCulture, content.PublishCultureInfos[culture].Culture);
+    }
+
     [Test]
     public void Get_Non_Grouped_Properties()
     {

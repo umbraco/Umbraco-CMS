@@ -27,6 +27,7 @@ internal sealed class EFCoreDetachableScope<TDbContext> : EFCoreScope<TDbContext
     /// <param name="scopeContext">The scope context (must be null for detachable scopes).</param>
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="dbContextFactory">The DbContext factory.</param>
+    /// <param name="shareUmbracoConnection">Whether to share the NPoco connection and transaction.</param>
     /// <param name="repositoryCacheMode">The repository cache mode.</param>
     /// <param name="scopeFileSystems">Whether to scope file systems.</param>
     public EFCoreDetachableScope(
@@ -38,6 +39,7 @@ internal sealed class EFCoreDetachableScope<TDbContext> : EFCoreScope<TDbContext
         IScopeContext? scopeContext,
         IEventAggregator eventAggregator,
         IDbContextFactory<TDbContext> dbContextFactory,
+        bool shareUmbracoConnection = true,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null)
         : base(
@@ -49,6 +51,7 @@ internal sealed class EFCoreDetachableScope<TDbContext> : EFCoreScope<TDbContext
             scopeContext,
             eventAggregator,
             dbContextFactory,
+            shareUmbracoConnection,
             repositoryCacheMode,
             scopeFileSystems)
     {

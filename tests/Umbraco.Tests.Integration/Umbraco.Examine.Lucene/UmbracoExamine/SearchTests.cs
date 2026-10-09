@@ -21,7 +21,7 @@ internal sealed class SearchTests : ExamineBaseTest
     private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
 
     [SetUp]
-    public void Setup()
+    public new void Setup()
     {
         DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
     }

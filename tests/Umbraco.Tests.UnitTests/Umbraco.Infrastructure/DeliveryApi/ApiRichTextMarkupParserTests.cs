@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -16,6 +17,7 @@ public class ApiRichTextMarkupParserTests
 {
     private Mock<IApiContentRouteBuilder> _apiContentRouteBuilder;
     private Mock<IApiMediaUrlProvider> _apiMediaUrlProvider;
+    private Mock<IImageUrlTokenGenerator> _imageUrlTokenGenerator;
 
     [Test]
     public void Can_Parse_Legacy_LocalLinks()
@@ -77,6 +79,35 @@ public class ApiRichTextMarkupParserTests
         var expectedOutput =
             $@"<p>Rich text outside of the blocks with a link to <a href=""/self/"" title=""itself"" data-destination-id=""{key1:D}"" data-destination-type=""someAlias"" data-start-item-path=""self"" data-start-item-id=""eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"" data-link-type=""{LinkType.Content}"">itself</a><br><br></p>
 <p>and to the <a href=""/other/"" title=""other page"" data-destination-id=""{key2:D}"" data-destination-type=""someAliasTwo"" data-start-item-path=""other"" data-start-item-id=""cc143afe-4cbf-46e5-b399-c9f451384373"" data-link-type=""{LinkType.Content}"">other page</a></p>";
+
+        var parsedHtml = parser.Parse(html);
+
+        Assert.AreEqual(expectedOutput, parsedHtml);
+    }
+
+    // PascalCase type — historic mis-cased values written by the (now fixed) ConvertLocalLinks migration for Umbraco 15 (see #22597).
+    [Test]
+    public void Can_Parse_LocalLinks_With_PascalCase_Type()
+    {
+        var key1 = Guid.Parse("eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f");
+        var data1 = new MockData()
+            .WithKey(key1)
+            .WithContentTypeAlias("someAlias")
+            .WithRoutePath("/self/")
+            .WithRouteStartPath("self");
+
+        var mockData = new Dictionary<Guid, MockData>
+        {
+            { key1, data1 },
+        };
+
+        var parser = BuildDefaultSut(mockData);
+
+        var html =
+            @"<p>Rich text outside of the blocks with a link to <a type=""Document"" href=""/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}"" title=""itself"">itself</a></p>";
+
+        var expectedOutput =
+            $@"<p>Rich text outside of the blocks with a link to <a href=""/self/"" title=""itself"" data-destination-id=""{key1:D}"" data-destination-type=""someAlias"" data-start-item-path=""self"" data-start-item-id=""eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"" data-link-type=""{LinkType.Content}"">itself</a></p>";
 
         var parsedHtml = parser.Parse(html);
 
@@ -149,6 +180,66 @@ public class ApiRichTextMarkupParserTests
         Assert.AreEqual(expectedOutput, parsedHtml);
     }
 
+    [Test]
+    public void Can_Parse_Inline_LocalImages_With_Cache_Buster()
+    {
+        var key1 = Guid.Parse("395bdc0e8f4d4ad4af7f3a3f6265651e");
+        var data1 = new MockData()
+            .WithKey(key1)
+            .WithMediaUrl("https://localhost:44331/media/bdofwokn/77gtp8fbrxmgkefatp10aw.webp?rand=1234");
+
+        var mockData = new Dictionary<Guid, MockData>
+        {
+            { key1, data1 },
+        };
+        var parser = BuildDefaultSut(mockData);
+
+        var markup =
+            @"<p>An image</p>\n<p><img src=""?rmode=max&amp;width=500&amp;height=500"" alt="""" width=""500"" height=""500"" data-udi=""umb://media/395bdc0e8f4d4ad4af7f3a3f6265651e""></p>";
+
+        var expectedOutput =
+            @"<p>An image</p>\n<p><img src=""https://localhost:44331/media/bdofwokn/77gtp8fbrxmgkefatp10aw.webp?rand=1234&rmode=max&amp;width=500&amp;height=500"" alt="""" width=""500"" height=""500""></p>";
+
+        var parsedHtml = parser.Parse(markup);
+
+        Assert.AreEqual(expectedOutput, parsedHtml);
+    }
+
+    [Test]
+    public void LocalImages_Are_ReSigned_Via_TokenGenerator()
+    {
+        // Verifies the token generator is given the rebuilt src (provider URL + persisted query string)
+        // and that its return value replaces the src attribute. The signer is responsible for handling
+        // any HTML-entity encoding in the query string (RTE markup typically uses &amp;).
+        var key1 = Guid.Parse("395bdc0e8f4d4ad4af7f3a3f6265651e");
+        var data1 = new MockData()
+            .WithKey(key1)
+            .WithMediaUrl("https://localhost:44331/media/bdofwokn/77gtp8fbrxmgkefatp10aw.webp");
+
+        var mockData = new Dictionary<Guid, MockData>
+        {
+            { key1, data1 },
+        };
+        var parser = BuildDefaultSut(mockData);
+
+        // override the no-op behaviour set up in BuildDefaultSut to verify the call shape
+        _imageUrlTokenGenerator.Reset();
+        _imageUrlTokenGenerator
+            .Setup(g => g.RefreshSignature(It.IsAny<string>()))
+            .Returns<string>(_ => "FRESH_URL");
+
+        var html =
+            @"<p><img src=""/media/bdofwokn/77gtp8fbrxmgkefatp10aw.webp?width=500&amp;hmac=stale"" data-udi=""umb://media/395bdc0e8f4d4ad4af7f3a3f6265651e""></p>";
+
+        var parsedHtml = parser.Parse(html);
+
+        // The signer receives the raw attribute value as returned by HtmlAgilityPack (entities not decoded).
+        _imageUrlTokenGenerator.Verify(
+            g => g.RefreshSignature("https://localhost:44331/media/bdofwokn/77gtp8fbrxmgkefatp10aw.webp?width=500&amp;hmac=stale"),
+            Times.Once);
+        StringAssert.Contains(@"src=""FRESH_URL""", parsedHtml);
+    }
+
     private ApiRichTextMarkupParser BuildDefaultSut(Dictionary<Guid, MockData> mockData)
     {
         var contentCacheMock = new Mock<IPublishedContentCache>();
@@ -172,11 +263,16 @@ public class ApiRichTextMarkupParserTests
         _apiContentRouteBuilder.Setup(acrb => acrb.Build(It.IsAny<IPublishedContent>(), It.IsAny<string>()))
             .Returns<IPublishedContent, string>((content, culture) => mockData[content.Key].ApiContentRoute);
 
+        _imageUrlTokenGenerator = new Mock<IImageUrlTokenGenerator>();
+        _imageUrlTokenGenerator.Setup(g => g.RefreshSignature(It.IsAny<string>()))
+            .Returns<string>(url => url);
+
         return new ApiRichTextMarkupParser(
             _apiContentRouteBuilder.Object,
             _apiMediaUrlProvider.Object,
             contentCacheMock.Object,
             mediaCacheMock.Object,
+            _imageUrlTokenGenerator.Object,
             Mock.Of<ILogger<ApiRichTextMarkupParser>>());
     }
 

@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Dictionary Table Collection View',
 		element: () => import('./table/dictionary-table-collection-view.element.js'),
 		meta: {
-			label: 'Table',
+			label: '#collection_tableViewLabel',
 			icon: 'icon-table',
 			pathName: 'table',
 		},

@@ -415,6 +415,40 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 			expect(result.data?.items).to.have.lengthOf(2);
 		});
 
+		it('returns all items when the number of IDs exceeds the batch size (chunked requests)', async () => {
+			const requestedIdBatches: Array<Array<string>> = [];
+			mockReadMany = async (ids: Array<string>) => {
+				requestedIdBatches.push([...ids]);
+				return {
+					data: {
+						items: ids.map((id) => ({ id, name: `Item ${id}` })),
+					},
+				};
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			// 45 IDs forces UmbItemDataApiGetRequestController to chunk the request (batch size is 40).
+			const ids = Array.from({ length: 45 }, (_, index) => `item-${index}`);
+
+			const result = await manager.readMany(ids);
+
+			// The request should have been split into more than one chunk.
+			expect(requestedIdBatches.length).to.be.greaterThan(1);
+
+			// Every requested item must be returned, regardless of which chunk it was fetched in.
+			expect(result.data?.items).to.have.lengthOf(45);
+			expect(result.data?.items.map((item) => item.id)).to.include.members(ids);
+		});
+
 		it('uses cached items and only fetches non-cached items when connected', async () => {
 			mockServerEventContext.setIsConnected(true);
 
@@ -843,6 +877,30 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 			expect(updateCalled).to.be.true;
 			expect(updateId).to.equal('item-1');
 			expect(updateData).to.deep.equal({ name: 'Updated Name' });
+			expect(result.data).to.deep.equal({ id: 'item-1', name: 'Updated Item' });
+		});
+
+		it('returns the updated item from the server when the cache still holds the item from before the update', async () => {
+			mockServerEventContext.setIsConnected(true);
+			mockRead = async (id: string) => ({ data: { id, name: 'Updated Item' } });
+
+			// The server event that invalidates this entry has not arrived yet.
+			dataCache.set('item-1', { id: 'item-1', name: 'Item Before Update' });
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			// Wait for context observation
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			const result = await manager.update('item-1', { name: 'Updated Name' });
+
 			expect(result.data).to.deep.equal({ id: 'item-1', name: 'Updated Item' });
 		});
 

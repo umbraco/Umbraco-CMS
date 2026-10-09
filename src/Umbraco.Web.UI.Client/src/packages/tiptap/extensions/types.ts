@@ -35,7 +35,7 @@ export interface UmbTiptapExtensionArgs {
 	/**
 	 * The data type configuration for the property editor that the editor is used for.
 	 * You can populate this manually if you are using the editor outside of a property editor with the {@link UmbPropertyEditorConfigCollection} object.
-	 * @remark This is only available when the editor is used in a property editor or populated manually.
+	 * @remarks This is only available when the editor is used in a property editor or populated manually.
 	 */
 	configuration?: UmbPropertyEditorConfigCollection;
 }
@@ -48,11 +48,18 @@ export interface UmbTiptapToolbarElementApi extends UmbApi, UmbTiptapExtensionAr
 
 	/**
 	 * Executes the toolbar element action.
+	 * @param {Editor} editor The editor instance.
+	 * @param {...unknown} args Extra arguments, whose shape depends on the toolbar kind — e.g. the `menu` and `styleMenu`
+	 * kinds pass the invoked `MetaTiptapToolbarMenuItem` as the first argument.
 	 */
 	execute(editor?: Editor, ...args: Array<unknown>): void;
 
 	/**
 	 * Checks if the toolbar element is active.
+	 * @param {Editor} editor The editor instance.
+	 * @param {...unknown} args Extra arguments, whose shape depends on the toolbar kind — e.g. the `menu` and `styleMenu`
+	 * kinds pass the `MetaTiptapToolbarMenuItem` to check as the first argument.
+	 * @returns {boolean} Returns true if the toolbar element is active.
 	 */
 	isActive(editor?: Editor, ...args: Array<unknown>): boolean;
 

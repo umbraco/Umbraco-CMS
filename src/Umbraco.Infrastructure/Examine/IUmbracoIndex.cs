@@ -29,4 +29,10 @@ public interface IUmbracoIndex : IIndex, IIndexStats
     ///     To retain backwards compatability, the default value is true
     /// </remarks>
     bool SupportProtectedContent { get; }
+
+    /// <summary>
+    ///     The name of the index field that contains the unique entity key (GUID).
+    ///     Used by the backoffice Examine dashboard to construct edit links for search results.
+    /// </summary>
+    string UniqueKeyFieldName => UmbracoExamineFieldNames.NodeKeyFieldName;
 }

@@ -15,8 +15,8 @@ public class RebuildCacheMigration : MigrationBase
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_1_0.RebuildCacheMigration"/> class.
     /// </summary>
     /// <param name="context">The migration context. <see cref="Umbraco.Cms.Infrastructure.Migrations.IMigrationContext"/></param>
-    /// <param name="documentCacheService">The document cache service. <see cref="Umbraco.Cms.Core.Cache.IDocumentCacheService"/></param>
-    /// <param name="mediaCacheService">The media cache service. <see cref="Umbraco.Cms.Core.Cache.IMediaCacheService"/></param>
+    /// <param name="documentCacheService">The document cache service. <see cref="IDocumentCacheService"/></param>
+    /// <param name="mediaCacheService">The media cache service. <see cref="IMediaCacheService"/></param>
     public RebuildCacheMigration(IMigrationContext context, IDocumentCacheService documentCacheService, IMediaCacheService mediaCacheService) : base(context)
     {
         _documentCacheService = documentCacheService;

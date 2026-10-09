@@ -1,5 +1,10 @@
 import { EventMessageTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
+/**
+ * Checks if a value is a valid UmbNotificationsEventModel object.
+ * @param {unknown} notification - The value to check.
+ * @returns {boolean} True if the value is a valid UmbNotificationsEventModel object.
+ */
 function objectIsUmbNotification(notification: unknown): notification is UmbNotificationsEventModel {
 	if (typeof notification !== 'object' || notification === null) {
 		return false;

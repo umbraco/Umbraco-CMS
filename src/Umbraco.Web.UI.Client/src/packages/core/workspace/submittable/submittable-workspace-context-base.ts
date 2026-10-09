@@ -25,7 +25,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	/**
 	 * Appends a validation context to the workspace.
-	 * @param context
+	 * @param {UmbValidationController} context - The validation context to append.
 	 */
 	addValidationContext(context: UmbValidationController) {
 		this.#validationContexts.push(context);
@@ -51,7 +51,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	//isDirty = this.#isNew.asObservable();
 
 	constructor(host: UmbControllerHost, workspaceAlias: string) {
-		super(host, UMB_WORKSPACE_CONTEXT.toString());
+		super(host, UMB_WORKSPACE_CONTEXT);
 		this.workspaceAlias = workspaceAlias;
 		// TODO: Consider if we can move this consumption to #resolveSubmit, just as a getContext, but it depends if others use the modalContext prop.. [NL]
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
@@ -80,11 +80,24 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	}
 
 	/**
-	 * If a Workspace has multiple validation contexts, then this method can be overwritten to return the correct one.
-	 * @returns Promise that resolves to void when the validation is complete.
+	 * Validates all validation contexts of this workspace.
+	 * @returns {Promise<Array<void>>} Promise that resolves to void when the validation is complete.
 	 */
 	public async validate(): Promise<Array<void>> {
 		return await Promise.all(this.#validationContexts.map((context) => context.validate()));
+	}
+
+	protected hasValidationMessages(): boolean {
+		return this.#validationContexts.some((context) => context.messages.getNotFilteredMessages().length > 0);
+	}
+
+	/**
+	 * Evaluate the Validation Mode, If there are no validation messages (including filtered/other-variant messages), then the validation state is reset for all validation contexts in this workspace.
+	 * Call this when a workspace submission is complete.
+	 */
+	protected evaluateValidationMode(): void {
+		if (this.hasValidationMessages()) return;
+		this.#validationContexts.forEach((context) => context.reset());
 	}
 
 	public async requestSubmit(): Promise<void> {
@@ -154,12 +167,11 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	#completeSubmit = () => {
 		this.#resolveSubmit();
+		this.evaluateValidationMode();
 
-		// Calling reset on the validation context here. [NL]
-		// TODO: Capture the validation messages on open, and then reset to that.
-		//this.validation.reset();
-
-		this._closeModal();
+		if (!this.hasValidationMessages()) {
+			this._closeModal();
+		}
 	};
 
 	protected _closeModal() {

@@ -16,7 +16,7 @@ export class UmbStylesheetItemStore extends UmbItemStoreBase<UmbStylesheetItemMo
 	 * @memberof UmbStylesheetItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_STYLESHEET_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_STYLESHEET_ITEM_STORE_CONTEXT);
 	}
 }
 

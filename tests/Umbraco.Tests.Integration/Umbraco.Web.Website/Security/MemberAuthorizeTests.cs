@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -19,112 +20,153 @@ using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Website.Controllers;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Security
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Security;
+
+internal sealed class MemberAuthorizeTests : UmbracoTestServerTestBase
 {
-    internal sealed class MemberAuthorizeTests : UmbracoTestServerTestBase
+    private Mock<IMemberManager> _memberManagerMock = new();
+
+    protected override void ConfigureTestServices(IServiceCollection services)
     {
-        private Mock<IMemberManager> _memberManagerMock = new();
-
-        protected override void ConfigureTestServices(IServiceCollection services)
-        {
-            _memberManagerMock = new Mock<IMemberManager>();
-            services.Remove(new ServiceDescriptor(typeof(IMemberManager), typeof(MemberManager), ServiceLifetime.Scoped));
-            services.Remove(new ServiceDescriptor(typeof(MemberManager), ServiceLifetime.Scoped));
-            services.AddScoped(_ => _memberManagerMock.Object);
-        }
-
-        [Test]
-        [LongRunning]
-        public async Task Secure_SurfaceController_Should_Return_Redirect_WhenNotLoggedIn()
-        {
-            _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(false);
-
-            var url = PrepareSurfaceControllerUrl<TestSurfaceController>(x => x.Secure());
-
-            var response = await Client.GetAsync(url);
-
-            var cookieAuthenticationOptions = Services.GetService<IOptions<CookieAuthenticationOptions>>();
-            Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
-            Assert.AreEqual(cookieAuthenticationOptions.Value.AccessDeniedPath.ToString(), response.Headers.Location?.AbsolutePath);
-        }
-
-        [Test]
-        [LongRunning]
-        public async Task Secure_SurfaceController_Should_Return_Redirect_WhenNotAuthorized()
-        {
-            _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(true);
-            _memberManagerMock.Setup(x => x.IsMemberAuthorizedAsync(
-                    It.IsAny<IEnumerable<string>>(),
-                    It.IsAny<IEnumerable<string>>(),
-                    It.IsAny<IEnumerable<int>>()))
-                .ReturnsAsync(false);
-
-            var url = PrepareSurfaceControllerUrl<TestSurfaceController>(x => x.Secure());
-
-            var response = await Client.GetAsync(url);
-
-            var cookieAuthenticationOptions = Services.GetService<IOptions<CookieAuthenticationOptions>>();
-            Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
-            Assert.AreEqual(cookieAuthenticationOptions.Value.AccessDeniedPath.ToString(), response.Headers.Location?.AbsolutePath);
-        }
-
-        [Test]
-        [LongRunning]
-        public async Task Secure_ApiController_Should_Return_Unauthorized_WhenNotLoggedIn()
-        {
-            _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(false);
-            var url = PrepareApiControllerUrl<TestApiController>(x => x.Secure());
-
-            var response = await Client.GetAsync(url);
-
-            Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
-        }
-
-        [Test]
-        [LongRunning]
-        public async Task Secure_ApiController_Should_Return_Forbidden_WhenNotAuthorized()
-        {
-            _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(true);
-            _memberManagerMock.Setup(x => x.IsMemberAuthorizedAsync(
-                     It.IsAny<IEnumerable<string>>(),
-                     It.IsAny<IEnumerable<string>>(),
-                     It.IsAny<IEnumerable<int>>()))
-                .ReturnsAsync(false);
-
-            var url = PrepareApiControllerUrl<TestApiController>(x => x.Secure());
-
-            var response = await Client.GetAsync(url);
-
-            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
-        }
+        _memberManagerMock = new Mock<IMemberManager>();
+        services.RemoveAll<IMemberManager>();
+        services.RemoveAll<MemberManager>();
+        services.AddScoped(_ => _memberManagerMock.Object);
     }
 
-    public class TestSurfaceController : SurfaceController
+    [Test]
+    [LongRunning]
+    public async Task Secure_SurfaceController_Should_Return_Redirect_WhenNotLoggedIn()
     {
-        public TestSurfaceController(
-            IUmbracoContextAccessor umbracoContextAccessor,
-            IUmbracoDatabaseFactory databaseFactory,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger profilingLogger,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(
-                umbracoContextAccessor,
-                databaseFactory,
-                services,
-                appCaches,
-                profilingLogger,
-                publishedUrlProvider)
-        {
-        }
+        _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(false);
 
-        [UmbracoMemberAuthorize]
-        public IActionResult Secure() => NoContent();
+        var url = PrepareSurfaceControllerUrl<TestSurfaceController>(x => x.Secure());
+
+        var response = await Client.GetAsync(url);
+
+        var cookieAuthenticationOptions = Services.GetService<IOptions<CookieAuthenticationOptions>>();
+        Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.AreEqual(cookieAuthenticationOptions.Value.AccessDeniedPath.ToString(), response.Headers.Location?.AbsolutePath);
     }
 
-    public class TestApiController : UmbracoApiController
+    [Test]
+    [LongRunning]
+    public async Task Secure_SurfaceController_Should_Return_Redirect_WhenNotAuthorized()
     {
-        [UmbracoMemberAuthorize]
-        public IActionResult Secure() => NoContent();
+        _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(true);
+        _memberManagerMock.Setup(x => x.IsMemberAuthorizedAsync(
+                It.IsAny<IEnumerable<string>>(),
+                It.IsAny<IEnumerable<string>>(),
+                It.IsAny<IEnumerable<int>>()))
+            .ReturnsAsync(false);
+
+        var url = PrepareSurfaceControllerUrl<TestSurfaceController>(x => x.Secure());
+
+        var response = await Client.GetAsync(url);
+
+        var cookieAuthenticationOptions = Services.GetService<IOptions<CookieAuthenticationOptions>>();
+        Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.AreEqual(cookieAuthenticationOptions.Value.AccessDeniedPath.ToString(), response.Headers.Location?.AbsolutePath);
     }
+
+    [Test]
+    [LongRunning]
+    public async Task Secure_ApiController_Should_Return_Unauthorized_WhenNotLoggedIn()
+    {
+        _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(false);
+        var url = PrepareApiControllerUrl<TestApiController>(x => x.Secure());
+
+        var response = await Client.GetAsync(url);
+
+        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Secure_ApiController_Should_Return_Forbidden_WhenNotAuthorized()
+    {
+        _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(true);
+        _memberManagerMock.Setup(x => x.IsMemberAuthorizedAsync(
+                 It.IsAny<IEnumerable<string>>(),
+                 It.IsAny<IEnumerable<string>>(),
+                 It.IsAny<IEnumerable<int>>()))
+            .ReturnsAsync(false);
+
+        var url = PrepareApiControllerUrl<TestApiController>(x => x.Secure());
+
+        var response = await Client.GetAsync(url);
+
+        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Secure_StandardApiController_Should_Return_Unauthorized_WhenNotLoggedIn()
+    {
+        _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(false);
+
+        var url = PrepareUrl("/test/standard-api/secure");
+
+        var response = await Client.GetAsync(url);
+
+        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Secure_StandardApiController_Should_Return_Forbidden_WhenNotAuthorized()
+    {
+        _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(true);
+        _memberManagerMock.Setup(x => x.IsMemberAuthorizedAsync(
+                It.IsAny<IEnumerable<string>>(),
+                It.IsAny<IEnumerable<string>>(),
+                It.IsAny<IEnumerable<int>>()))
+            .ReturnsAsync(false);
+
+        var url = PrepareUrl("/test/standard-api/secure");
+
+        var response = await Client.GetAsync(url);
+
+        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+}
+
+public class TestSurfaceController : SurfaceController
+{
+    public TestSurfaceController(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IUmbracoDatabaseFactory databaseFactory,
+        ServiceContext services,
+        AppCaches appCaches,
+        IProfilingLogger profilingLogger,
+        IPublishedUrlProvider publishedUrlProvider)
+        : base(
+            umbracoContextAccessor,
+            databaseFactory,
+            services,
+            appCaches,
+            profilingLogger,
+            publishedUrlProvider)
+    {
+    }
+
+    [UmbracoMemberAuthorize]
+    public IActionResult Secure() => NoContent();
+}
+
+#pragma warning disable CS0618 // Type or member is obsolete
+public class TestApiController : UmbracoApiController
+#pragma warning restore CS0618 // Type or member is obsolete
+{
+    [UmbracoMemberAuthorize]
+    public IActionResult Secure() => NoContent();
+}
+
+[ApiController]
+[Route("test/standard-api")]
+public class TestStandardApiController : ControllerBase
+{
+    [UmbracoMemberAuthorize]
+    [HttpGet("secure")]
+    public IActionResult Secure() => NoContent();
 }

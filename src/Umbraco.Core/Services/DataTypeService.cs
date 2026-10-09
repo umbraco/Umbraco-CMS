@@ -682,9 +682,9 @@ namespace Umbraco.Cms.Core.Services.Implement
                 throw new ArgumentException("Cannot save datatype with empty name.");
             }
 
-            if (dataType.Name != null && dataType.Name.Length > 255)
+            if (dataType.Name != null && dataType.Name.Length > Constants.Validation.MaxNameLength)
             {
-                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
             }
 
             Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
@@ -1025,7 +1025,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidName, dataType);
             }
 
-            if (dataType.Name is { Length: > 255 })
+            if (dataType.Name is { Length: > Constants.Validation.MaxNameLength })
             {
                 return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidName, dataType);
             }
@@ -1041,11 +1041,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, dataType);
         }
 
-        /// <summary>
-        ///     Gets a data type from the repository by its unique key.
-        /// </summary>
-        /// <param name="id">The unique key of the data type.</param>
-        /// <returns>The data type, or null if not found.</returns>
         /// <summary>
         ///     Creates an audit entry for a data type operation.
         /// </summary>

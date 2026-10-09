@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public interface IPasswordConfigurationPresentationFactory
 {
     /// <summary>
-    /// Creates and returns a <see cref="Umbraco.Cms.Api.Management.Models.PasswordConfigurationResponseModel" /> representing the current password configuration.
+    /// Creates and returns a <see cref="PasswordConfigurationResponseModel" /> representing the current password configuration.
     /// </summary>
     /// <returns>The password configuration response model.</returns>
     PasswordConfigurationResponseModel CreatePasswordConfigurationResponseModel();

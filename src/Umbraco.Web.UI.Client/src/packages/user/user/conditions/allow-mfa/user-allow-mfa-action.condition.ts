@@ -12,8 +12,7 @@ export class UmbUserAllowMfaActionCondition extends UmbConditionBase<never> {
 		this.#init();
 	}
 
-	async #init() {
-		await this.#configRepository.initialized;
+	#init() {
 		this.observe(
 			observeMultiple([
 				this.#configRepository.part('allowTwoFactor'),

@@ -172,7 +172,7 @@ export class UmbModalContext<
 
 	/**
 	 * Closes this modal
-	 * @param reason
+	 * @param {UmbModalRejectReason} [reason] - The reason for rejecting the modal
 	 * @public
 	 * @memberof UmbModalContext
 	 */
@@ -193,7 +193,7 @@ export class UmbModalContext<
 
 	/**
 	 * Gives a Promise which will be resolved when this modal is submitted.
-	 * @returns {Promise<ModalValue>}
+	 * @returns {Promise<ModalValue>} A promise resolved with the modal's value on submit
 	 * @public
 	 * @memberof UmbModalContext
 	 */
@@ -203,7 +203,7 @@ export class UmbModalContext<
 
 	/**
 	 * Gives the current value of this modal.
-	 * @returns {ModalValue}
+	 * @returns {ModalValue} The current value
 	 * @public
 	 * @memberof UmbModalContext
 	 */
@@ -213,7 +213,7 @@ export class UmbModalContext<
 
 	/**
 	 * Sets the current value of this modal.
-	 * @param value
+	 * @param {ModalValue} value - The new value
 	 * @public
 	 * @memberof UmbModalContext
 	 */
@@ -223,7 +223,7 @@ export class UmbModalContext<
 
 	/**
 	 * Updates the current value of this modal.
-	 * @param partialValue
+	 * @param {Partial<ModalValue>} partialValue - The partial value to merge into the current value
 	 * @public
 	 * @memberof UmbModalContext
 	 */
@@ -233,7 +233,7 @@ export class UmbModalContext<
 
 	/**
 	 * Updates the size this modal.
-	 * @param size
+	 * @param {UUIModalSidebarSize} size - The new modal size
 	 * @public
 	 * @memberof UmbModalContext
 	 */

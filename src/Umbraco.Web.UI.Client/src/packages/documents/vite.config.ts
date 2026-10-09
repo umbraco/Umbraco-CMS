@@ -14,7 +14,6 @@ export default defineConfig({
 			'document-blueprints/index': 'document-blueprints/index.ts',
 			'document-types/index': 'document-types/index.ts',
 			'documents/index': 'documents/index.ts',
-			manifests: 'manifests.ts',
 			'umbraco-package': 'umbraco-package.ts',
 		},
 	}),

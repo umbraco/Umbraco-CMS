@@ -26,13 +26,13 @@ public class UpdateNotificationsController : DocumentControllerBase
     private readonly INotificationService _notificationService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    [ActivatorUtilitiesConstructor]
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateNotificationsController"/> class, which manages update notifications for documents.
     /// </summary>
     /// <param name="contentEditingService">Service used for editing content.</param>
     /// <param name="notificationService">Service responsible for handling notifications.</param>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security features.</param>
+    [ActivatorUtilitiesConstructor]
     public UpdateNotificationsController(IAuthorizationService authorizationService, IContentEditingService contentEditingService, INotificationService notificationService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _authorizationService = authorizationService;

@@ -59,6 +59,27 @@ internal struct LazyCompressedString
 
     public static implicit operator string(LazyCompressedString l) => l.ToString();
 
+    /// <summary>
+    ///     Returns an approximate byte count for this value without decompressing it: the compressed byte
+    ///     length while still compressed, otherwise the approximate UTF-16 byte size (character count × 2) of
+    ///     the already-decompressed string. Computed and returned as a <see cref="long" /> so a very large
+    ///     string cannot overflow the multiplication. Never triggers decompression and never throws — intended
+    ///     for cheap size diagnostics. Returning UTF-16 bytes here keeps the decompressed estimate consistent
+    ///     with how plain strings are sized elsewhere.
+    /// </summary>
+    public long GetApproximateByteCount()
+    {
+        lock (_locker)
+        {
+            if (_bytes is not null)
+            {
+                return _bytes.Length;
+            }
+
+            return _str is null ? 0 : (long)_str.Length * 2;
+        }
+    }
+
     public byte[] GetBytes()
     {
         if (_bytes == null)

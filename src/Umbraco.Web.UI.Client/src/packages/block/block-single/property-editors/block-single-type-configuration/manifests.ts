@@ -6,8 +6,9 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Block Single Type Configuration Property Editor UI',
 	element: () => import('./property-editor-ui-block-single-type-configuration.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Block Single Type Configuration',
 		icon: 'icon-autofill',
-		group: 'common',
+		group: '#propertyEditorUIGroups_common',
 	},
 };

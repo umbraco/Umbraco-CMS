@@ -16,8 +16,11 @@ export interface MetaWorkspace {
 	entityType: string;
 }
 
-export interface ManifestWorkspaceRoutableKind
-	extends ManifestWorkspace<MetaWorkspaceRoutableKind, UmbControllerHostElement, UmbRoutableWorkspaceContext> {
+export interface ManifestWorkspaceRoutableKind extends ManifestWorkspace<
+	MetaWorkspaceRoutableKind,
+	UmbControllerHostElement,
+	UmbRoutableWorkspaceContext
+> {
 	type: 'workspace';
 	kind: 'routable';
 }

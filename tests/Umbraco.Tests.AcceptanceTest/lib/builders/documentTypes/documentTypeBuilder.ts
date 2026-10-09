@@ -136,6 +136,11 @@ export class DocumentTypeBuilder {
     return this;
   }
 
+  withFolderId(folderId: string) {
+    this.folderId = folderId;
+    return this;
+  }
+
   build() {
     this.id = ensureIdExists(this.id);
 

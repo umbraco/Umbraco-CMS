@@ -18,6 +18,8 @@ import type {
 	UmbLocalizationSetKey,
 } from './localization.manager.js';
 import { umbLocalizationManager } from './localization.manager.js';
+import { unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import type { LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -39,9 +41,9 @@ const LocalizationControllerAlias = Symbol();
  * }
  * ```
  */
-export class UmbLocalizationController<LocalizationSetType extends UmbLocalizationSetBase = UmbLocalizationSet>
-	implements UmbController
-{
+export class UmbLocalizationController<
+	LocalizationSetType extends UmbLocalizationSetBase = UmbLocalizationSet,
+> implements UmbController {
 	#host;
 	#hostEl?: HTMLElement & Partial<Pick<LitElement, 'requestUpdate'>>;
 	readonly controllerAlias = LocalizationControllerAlias;
@@ -113,8 +115,9 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * Looks up a localization entry for the given key.
 	 * Searches in order: primary (regional) → secondary (language) → fallback (en).
 	 * Also tracks the key usage for reactive updates.
+	 * @template K
 	 * @param {string} key - the localization key to look up.
-	 * @returns {any} - the localization entry (string or function), or null if not found.
+	 * @returns {LocalizationSetType[K] | null} - the localization entry (string or function), or null if not found.
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	#lookupTerm<K extends keyof LocalizationSetType>(key: K): any {
@@ -138,7 +141,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 
 	/**
 	 * Processes a localization entry (string or function) with the provided arguments.
-	 * @param {any} term - the localization entry to process.
+	 * @param {string | ((...args: unknown[]) => string)} term - the localization entry to process.
 	 * @param {unknown[]} args - the arguments to apply to the term.
 	 * @returns {string} - the processed term as a string.
 	 */
@@ -226,7 +229,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * Outputs a localized date in the specified format.
 	 * @param {Date} dateToFormat - the date to format.
 	 * @param {Intl.DateTimeFormatOptions} options - the options to use when formatting the date.
-	 * @returns {string}
+	 * @returns {string} - the formatted date.
 	 */
 	date(dateToFormat: Date | string, options?: Intl.DateTimeFormatOptions): string {
 		dateToFormat = new Date(dateToFormat);
@@ -236,7 +239,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	/**
 	 * Outputs a localized date with time using short date and medium time format.
 	 * @param {Date | string} dateToFormat - the date to format.
-	 * @returns {string}
+	 * @returns {string} - the formatted date and time.
 	 */
 	dateTime(dateToFormat: Date | string): string {
 		dateToFormat = new Date(dateToFormat);
@@ -350,5 +353,26 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		});
 
 		return localizedText;
+	}
+
+	/**
+	 * Like {@link string}, but returns a Lit `unsafeHTML` directive with all arguments escaped via {@link escapeHTML}.
+	 * Use when the localized value itself contains HTML markup that must be rendered (otherwise prefer {@link string}, which Lit escapes natively).
+	 * Pass a `#key` to look up a term, or any string for inline replacement.
+	 * @param {string | undefined} text - text to translate (terms prefixed with `#`).
+	 * @param {unknown[]} args - arguments to interpolate. Each argument is HTML-escaped before being inserted into the term.
+	 * @returns {unknown} a Lit directive result that renders the localized HTML safely inline in a Lit template.
+	 * @example
+	 * ```ts
+	 * html`<p>${this.localize.htmlString('#defaultdialogs_confirmdelete', userControlledName)}</p>`
+	 * ```
+	 */
+	htmlString(text: string | undefined, ...args: unknown[]) {
+		// `escapeHTML` short-circuits on non-strings, so we stringify first to also escape values
+		// like `{ toString: () => '<script>...' }`. `undefined` is preserved so `string()` can
+		// keep the original placeholder unmatched (existing semantics). A plain object with no
+		// custom `toString` safely degrades to the literal "[object Object]" here.
+		const escapedArgs = args.map((a) => (a === undefined ? a : escapeHTML(String(a))));
+		return unsafeHTML(this.string(text, ...escapedArgs));
 	}
 }

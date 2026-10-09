@@ -1,8 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { UMB_WORKSPACE_VIEW_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
 
 @customElement('example-hint-workspace-view')

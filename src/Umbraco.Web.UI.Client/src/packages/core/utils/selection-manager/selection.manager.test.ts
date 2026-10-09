@@ -275,4 +275,44 @@ describe('UmbSelectionManager', () => {
 			expect(manager.getSelection()).to.deep.equal(['1']);
 		});
 	});
+
+	describe('Null unique (root item)', () => {
+		it('selects null', () => {
+			manager.select(null);
+			expect(manager.getSelection()).to.deep.equal([null]);
+		});
+
+		it('deselects null', () => {
+			manager.select(null);
+			manager.deselect(null);
+			expect(manager.getSelection()).to.deep.equal([]);
+		});
+
+		it('reports null as selected', () => {
+			manager.select(null);
+			expect(manager.isSelected(null)).to.equal(true);
+		});
+
+		it('replaces null with a string in single selection', () => {
+			manager.setMultiple(false);
+			manager.select(null);
+			manager.select('1');
+			expect(manager.getSelection()).to.deep.equal(['1']);
+			expect(manager.isSelected(null)).to.equal(false);
+		});
+
+		it('replaces a string with null in single selection', () => {
+			manager.setMultiple(false);
+			manager.select('1');
+			manager.select(null);
+			expect(manager.getSelection()).to.deep.equal([null]);
+			expect(manager.isSelected('1')).to.equal(false);
+		});
+
+		it('sets selection with null via setSelection in single mode', () => {
+			manager.setMultiple(false);
+			manager.setSelection([null]);
+			expect(manager.getSelection()).to.deep.equal([null]);
+		});
+	});
 });

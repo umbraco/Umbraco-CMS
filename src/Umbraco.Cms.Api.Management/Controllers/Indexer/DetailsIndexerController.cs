@@ -2,8 +2,11 @@ using Asp.Versioning;
 using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Indexer;
+using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 
@@ -15,18 +18,39 @@ public class DetailsIndexerController : IndexerControllerBase
 {
     private readonly IIndexPresentationFactory _indexPresentationFactory;
     private readonly IExamineManager _examineManager;
+    private readonly IMemberIndexAuthorizer _memberIndexAuthorizer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DetailsIndexerController"/> class.
     /// </summary>
     /// <param name="indexPresentationFactory">Factory used to create index presentation models.</param>
     /// <param name="examineManager">The <see cref="IExamineManager"/> instance used for managing indexers.</param>
+    /// <param name="memberIndexAuthorizer">The <see cref="IMemberIndexAuthorizer"/> used to authorize access to member data.</param>
+    [ActivatorUtilitiesConstructor]
     public DetailsIndexerController(
         IIndexPresentationFactory indexPresentationFactory,
-        IExamineManager examineManager)
+        IExamineManager examineManager,
+        IMemberIndexAuthorizer memberIndexAuthorizer)
     {
         _indexPresentationFactory = indexPresentationFactory;
         _examineManager = examineManager;
+        _memberIndexAuthorizer = memberIndexAuthorizer;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DetailsIndexerController"/> class.
+    /// </summary>
+    /// <param name="indexPresentationFactory">Factory used to create index presentation models.</param>
+    /// <param name="examineManager">The <see cref="IExamineManager"/> instance used for managing indexers.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public DetailsIndexerController(
+        IIndexPresentationFactory indexPresentationFactory,
+        IExamineManager examineManager)
+        : this(
+            indexPresentationFactory,
+            examineManager,
+            StaticServiceProvider.Instance.GetRequiredService<IMemberIndexAuthorizer>())
+    {
     }
 
     /// <summary>
@@ -49,6 +73,14 @@ public class DetailsIndexerController : IndexerControllerBase
     {
         if (_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
+            // Member index diagnostics expose member property aliases and counts, so they additionally
+            // require access to the members section.
+            if (_memberIndexAuthorizer.IsMemberIndex(index)
+                && await _memberIndexAuthorizer.HasAccessAsync(User) is false)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden);
+            }
+
             return await _indexPresentationFactory.CreateAsync(index);
         }
 

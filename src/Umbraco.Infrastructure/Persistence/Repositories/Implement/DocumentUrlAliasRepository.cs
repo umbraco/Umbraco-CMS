@@ -37,8 +37,10 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
     {
         IEnumerable<Guid> documentKeys = aliases.Select(x => x.DocumentKey).Distinct();
 
+        // DistinctBy guards against any caller passing duplicate (UniqueId, LanguageId, Alias) tuples.
         var dtoDictionary = aliases
             .Select(BuildDto)
+            .DistinctBy(x => (x.UniqueId, x.LanguageId, x.Alias))
             .ToDictionary(x => (x.UniqueId, x.LanguageId, x.Alias));
 
         var toDelete = new List<int>();
@@ -73,7 +75,10 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
         // do the deletes and inserts
         if (toDelete.Count > 0)
         {
-            Database.DeleteMany<DocumentUrlAliasDto>().Where(x => toDelete.Contains(x.Id)).Execute();
+            foreach (IEnumerable<int> group in toDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                Database.DeleteMany<DocumentUrlAliasDto>().Where(x => group.Contains(x.Id)).Execute();
+            }
         }
 
         Database.InsertBulk(toInsert.Values);
@@ -100,9 +105,18 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
     }
 
     /// <inheritdoc/>
+    public void DeleteAll()
+        => Database.Execute(Database.SqlContext.Sql().Delete<DocumentUrlAliasDto>());
+
+    /// <inheritdoc/>
     /// <remarks>
     /// This gets all document aliases directly from property data (using an optimized SQL query).
     /// This is more efficient than loading all IContent objects.
+    /// Aliases are routing data for the published site, so this reads the published version's property
+    /// data (joined via <see cref="DocumentVersionDto"/>) rather than the current/draft version - a draft
+    /// edit to an alias must not affect routing until the document is actually published. Unpublishing a document
+    /// clears the document's published flag but leaves its last published version flagged, so the document's own
+    /// flag is checked as well.
     /// </remarks>
     public IEnumerable<DocumentUrlAliasRaw> GetAllDocumentUrlAliases()
     {
@@ -112,9 +126,12 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
             .From<PropertyDataDto>("pd")
             .InnerJoin<PropertyTypeDto>("pt").On<PropertyDataDto, PropertyTypeDto>((pd, pt) => pd.PropertyTypeId == pt.Id, "pd", "pt")
             .InnerJoin<ContentVersionDto>("cv").On<PropertyDataDto, ContentVersionDto>((pd, cv) => pd.VersionId == cv.Id, "pd", "cv")
+            .InnerJoin<DocumentVersionDto>("dv").On<ContentVersionDto, DocumentVersionDto>((cv, dv) => cv.Id == dv.Id, "cv", "dv")
             .InnerJoin<NodeDto>("n").On<ContentVersionDto, NodeDto>((cv, n) => cv.NodeId == n.NodeId, "cv", "n")
+            .InnerJoin<DocumentDto>("d").On<NodeDto, DocumentDto>((n, d) => n.NodeId == d.NodeId, "n", "d")
             .Where<PropertyTypeDto>(pt => pt.Alias == Constants.Conventions.Content.UrlAlias, "pt")
-            .Where<ContentVersionDto>(cv => cv.Current == true, "cv")
+            .Where<DocumentVersionDto>(dv => dv.Published == true, "dv")
+            .Where<DocumentDto>(d => d.Published == true, "d")
             .Where<NodeDto>(n => n.Trashed == false, "n")
             .Where<NodeDto>(n => n.NodeObjectType == Constants.ObjectTypes.Document, "n") // Exclude blueprints
             .Append($"AND (pd.{QuotedColName("textValue")} IS NOT NULL OR pd.{QuotedColName("varcharValue")} IS NOT NULL)");

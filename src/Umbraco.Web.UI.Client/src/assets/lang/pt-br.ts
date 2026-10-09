@@ -183,6 +183,8 @@ export default {
 		logoff: 'Sair',
 		logout: 'Logout',
 		next: 'Próximo',
+		noResults: 'Nenhum resultado',
+		noResultsFor: (query: string) => `Nenhum resultado para "${query}".`,
 		password: 'Senha',
 		pleasewait: 'Um momento por favor...',
 		previous: 'Prévio',
@@ -405,6 +407,17 @@ export default {
 		sortHelp:
 			'Arraste os diferentes itens para cima ou para baixo para definir como os mesmos serão arranjados. Ou clique no título da coluna para classificar a coleção completa de itens',
 		sortPleaseWait: 'Favor esperar. Itens estão sendo classificados, isto pode demorar um tempo.',
+		sortByFieldHeadline: 'Classificar por campo',
+		sortByFieldSentence: 'Classificar todos os itens filhos por',
+		sortByFieldDirectionLabel: 'Direção',
+		sortByFieldAscending: 'Crescente',
+		sortByFieldDescending: 'Decrescente',
+		sortByFieldNameOption: 'Nome',
+		sortByFieldCreateDateOption: 'Criado',
+		sortByFieldUpdateDateOption: 'Última edição',
+		sortIndividuallyHeadline: 'Classificar individualmente',
+		sortByFieldCultureSentence: 'em',
+		sortByFieldCultureLabel: 'Idioma',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'Publicação foi cancelada por add-in de terceiros',
@@ -553,5 +566,10 @@ export default {
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Selecionar tudo',
+	},
+	picker: {
+		browseTab: 'Procurar',
+		searchTab: 'Pesquisar',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
 	},
 } as UmbLocalizationDictionary;

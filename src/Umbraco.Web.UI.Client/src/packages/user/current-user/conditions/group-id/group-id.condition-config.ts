@@ -1,8 +1,9 @@
 import type { UMB_CURRENT_USER_GROUP_ID_CONDITION_ALIAS } from './constants.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
-export interface UmbCurrentUserGroupIdConditionConfig
-	extends UmbConditionConfigBase<typeof UMB_CURRENT_USER_GROUP_ID_CONDITION_ALIAS> {
+export interface UmbCurrentUserGroupIdConditionConfig extends UmbConditionConfigBase<
+	typeof UMB_CURRENT_USER_GROUP_ID_CONDITION_ALIAS
+> {
 	/**
 	 * The user group that the current user must be a member of to pass the condition.
 	 * @examples ['guid1']

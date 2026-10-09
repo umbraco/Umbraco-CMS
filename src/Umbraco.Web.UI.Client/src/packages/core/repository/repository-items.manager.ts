@@ -131,7 +131,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 
 	/**
 	 * @deprecated - This is resolved by setUniques, no need to update statuses.
-	 * @param unique {string} - The unique identifier of the item to remove the status of.
+	 * @param {string} unique - The unique identifier of the item to remove the status of.
 	 */
 	removeStatus(unique: string) {
 		new UmbDeprecation({

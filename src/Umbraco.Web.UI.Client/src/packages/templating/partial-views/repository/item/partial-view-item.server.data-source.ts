@@ -2,7 +2,7 @@ import { UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } fro
 import type { UmbPartialViewItemModel } from '../../types.js';
 import { UmbManagementApiPartialViewItemDataRequestManager } from './partial-view-item.server.request-manager.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse, UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
@@ -19,11 +19,11 @@ export class UmbPartialViewItemServerDataSource
 
 	/**
 	 * Fetches the items for the given uniques from the server
-	 * @param {Array<string>} uniques
-	 * @returns {*}
+	 * @param {Array<string>} uniques - The uniques of the partial views to fetch
+	 * @returns {UmbDataSourceResponse<Array<UmbPartialViewItemModel>>} The requested partial view items, or an error
 	 * @memberof UmbPartialViewItemServerDataSource
 	 */
-	async getItems(uniques: Array<string>) {
+	async getItems(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbPartialViewItemModel>>> {
 		if (!uniques) throw new Error('Uniques are missing');
 
 		const paths = uniques

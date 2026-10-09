@@ -13,7 +13,7 @@ import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api'
 /**
  * A data source for the Dictionary tree that fetches data from the server
  * @class UmbDictionaryTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @augments {UmbTreeServerDataSourceBase}
  */
 export class UmbDictionaryTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	NamedEntityTreeItemResponseModel,

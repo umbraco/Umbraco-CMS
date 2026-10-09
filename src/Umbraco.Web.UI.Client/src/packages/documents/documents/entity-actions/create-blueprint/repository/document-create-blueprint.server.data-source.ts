@@ -6,7 +6,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * A data source for the Document Create Blueprint that fetches data from the server
  * @class UmbDocumentCreateBlueprintServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbDocumentCreateBlueprintServerDataSource {
 	#host: UmbControllerHost;
@@ -22,8 +21,7 @@ export class UmbDocumentCreateBlueprintServerDataSource {
 
 	/**
 	 * Fetches the Culture and Hostnames for the given Document unique
-	 * @param {string} unique
-	 * @param body
+	 * @param {CreateDocumentBlueprintFromDocumentRequestModel} body - The blueprint request body
 	 * @memberof UmbDocumentCreateBlueprintServerDataSource
 	 */
 	async create(body: CreateDocumentBlueprintFromDocumentRequestModel) {

@@ -1,0 +1,12 @@
+{
+  "name": "Late Auth Provider (test)",
+  "allowPublicAccess": true,
+  "extensions": [
+    {
+      "type": "appEntryPoint",
+      "alias": "Test.LateAuthProvider.EntryPoint",
+      "name": "Late Auth Provider Entry Point",
+      "js": "/App_Plugins/LateAuthProvider/entry-point.js"
+    }
+  ]
+}

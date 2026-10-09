@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
@@ -373,5 +374,52 @@ public class CoreConfigurationTests : UmbracoIntegrationTestBase
             services.Any(s => s.ServiceType == typeof(IBackOfficeEnabledMarker)),
             Is.False,
             "IBackOfficeEnabledMarker should NOT be registered in delivery-only scenario");
+    }
+
+    /// <summary>
+    /// Verifies that calling AddWebComponents() explicitly after AddBackOffice() is safe.
+    /// Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22344.
+    /// </summary>
+    [Test]
+    public void AddWebComponents_IsIdempotent()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(InMemoryConfiguration)
+            .Build();
+
+        services.AddSingleton<IConfiguration>(configuration);
+
+        TypeLoader typeLoader = services.AddTypeLoader(
+            GetType().Assembly,
+            TestHelper.ConsoleLoggerFactory,
+            configuration);
+
+        var builder = new UmbracoBuilder(
+            services,
+            configuration,
+            typeLoader,
+            TestHelper.ConsoleLoggerFactory,
+            TestHelper.Profiler,
+            AppCaches.NoCache);
+
+        // Act - This is the exact chain from the issue that caused duplicate health check crash.
+        // AddBackOffice() calls AddCore() which calls AddWebComponents() internally,
+        // so the explicit AddWebComponents() call is a duplicate.
+        builder
+            .AddBackOffice()
+            .AddWebsite()
+            .AddDeliveryApi()
+            .AddWebComponents()
+            .AddUmbracoSqlServerSupport()
+            .AddUmbracoSqliteSupport();
+
+        builder.Build();
+
+        // Assert - Verify health checks can be resolved without duplicate name errors.
+        // The duplicate "umbraco-ready" registration caused ArgumentException at host startup.
+        var provider = services.BuildServiceProvider();
+        Assert.DoesNotThrow(() => provider.GetRequiredService<HealthCheckService>());
     }
 }

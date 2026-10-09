@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
@@ -157,7 +158,10 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
                         .WhereIn<DictionaryDto>(x => x.Parent, group);
 
                     ApplyFilterToQuery(sql, filter);
-                    sql.OrderBy<DictionaryDto>(x => x.UniqueId);
+
+                    // FetchOneToMany only merges adjacent rows that share the same primary key,
+                    // so order by it to keep each dictionary item's translations contiguous.
+                    sql.OrderBy<DictionaryDto>(x => x.PrimaryKey);
 
                     return Database
                         .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
@@ -171,6 +175,10 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
                 .Where<DictionaryDto>(x => x.PrimaryKey > 0);
 
             ApplyFilterToQuery(sql, filter);
+
+            // FetchOneToMany only merges adjacent rows that share the same primary key,
+            // so order by it to keep each dictionary item's translations contiguous.
+            sql.OrderBy<DictionaryDto>(x => x.PrimaryKey);
 
             return Database
                 .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
@@ -198,20 +206,31 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             return;
         }
 
-        if (_dictionarySettings.CurrentValue.EnableValueSearch)
+        DictionarySettings settings = _dictionarySettings.CurrentValue;
+
+        // Resolve search mode forms. The key is matched as a LIKE pattern when combined with the translation
+        // values in raw SQL, and as a predicate when matched on its own.
+        (string Pattern, Expression<Func<DictionaryDto, bool>> Predicate) keyMatch = settings.KeySearchMode switch
+        {
+            DictionaryKeySearchMode.Contains => ($"%{filter}%", x => x.Key.Contains(filter)),
+            DictionaryKeySearchMode.StartsWith => ($"{filter}%", x => x.Key.StartsWith(filter)),
+            _ => throw new ArgumentOutOfRangeException(nameof(settings.KeySearchMode), settings.KeySearchMode, null),
+        };
+
+        if (settings.EnableValueSearch)
         {
             // Search in both keys and values
             // Use a subquery to find dictionary items that have matching translations
             // Then fetch ALL translations for those items
             sql.Where(
                 $"({QuotedColumn("key")} LIKE @0 OR {QuotedColumn("id")} IN (SELECT DISTINCT {QuoteColumnName("UniqueId")} FROM {QuoteTableName(LanguageTextDto.TableName)} WHERE {QuoteColumnName("value")} LIKE @1))",
-                $"{filter}%",
+                keyMatch.Pattern,
                 $"%{filter}%");
         }
         else
         {
             // Search only in keys
-            sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
+            sql.Where(keyMatch.Predicate);
         }
     }
 
@@ -252,7 +271,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
             .Where(GetBaseWhereClause(), new { id })
-            .OrderBy<DictionaryDto>(x => x.UniqueId);
+            .OrderBy<DictionaryDto>(x => x.PrimaryKey);
 
         DictionaryDto? dto = Database
             .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
@@ -369,6 +388,9 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
                 sql.WhereIn<DictionaryDto>(x => x.UniqueId, ids);
             }
 
+            // FetchOneToMany requires translations for the same dictionary item to be contiguous.
+            sql.OrderBy<DictionaryDto>(x => x.PrimaryKey);
+
             return Database
                 .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
                 .Select(ConvertToEntity);
@@ -456,6 +478,9 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
                 sql.WhereIn<DictionaryDto>(x => x.Key, ids);
             }
 
+            // FetchOneToMany requires translations for the same dictionary item to be contiguous.
+            sql.OrderBy<DictionaryDto>(x => x.PrimaryKey);
+
             return Database
                 .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
                 .Select(ConvertToEntity);
@@ -470,6 +495,9 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             sql.WhereIn<DictionaryDto>(x => x.PrimaryKey, ids);
         }
 
+        // FetchOneToMany requires translations for the same dictionary item to be contiguous.
+        sql.OrderBy<DictionaryDto>(x => x.PrimaryKey);
+
         IDictionary<int, ILanguage> languageIsoCodeById = GetLanguagesById();
 
         return Database
@@ -482,7 +510,9 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         Sql<ISqlContext> sqlClause = GetBaseQuery(false);
         var translator = new SqlTranslator<IDictionaryItem>(sqlClause, query);
         Sql<ISqlContext> sql = translator.Translate();
-        sql.OrderBy<DictionaryDto>(x => x.UniqueId);
+
+        // FetchOneToMany requires translations for the same dictionary item to be contiguous.
+        sql.OrderBy<DictionaryDto>(x => x.PrimaryKey);
 
         IDictionary<int, ILanguage> languageIsoCodeById = GetLanguagesById();
 

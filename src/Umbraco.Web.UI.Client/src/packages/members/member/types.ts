@@ -25,6 +25,7 @@ export interface UmbMemberDetailModel extends UmbContentDetailModel {
 	};
 	newPassword?: string;
 	oldPassword?: string;
+	profileData: string | null;
 	unique: string;
 	username: string;
 	values: Array<UmbMemberValueModel>;

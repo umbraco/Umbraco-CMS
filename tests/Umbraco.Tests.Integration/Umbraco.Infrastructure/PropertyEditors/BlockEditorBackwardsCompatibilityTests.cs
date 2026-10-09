@@ -125,8 +125,9 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
         {
             Assert.AreEqual(2, toEditor.Expose.Count);
 
-            Assert.AreEqual("1304e1ddac87439684fe8a399231cb3d", toEditor.Expose[0].ContentKey.ToString("N"));
-            Assert.AreEqual("0a4a416e547d464fabcc6f345c17809a", toEditor.Expose[1].ContentKey.ToString("N"));
+            CollectionAssert.AreEquivalent(
+                new[] { "1304e1ddac87439684fe8a399231cb3d", "0a4a416e547d464fabcc6f345c17809a" },
+                toEditor.Expose.Select(e => e.ContentKey.ToString("N")));
         });
     }
 
@@ -270,10 +271,69 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
         {
             Assert.AreEqual(4, toEditor.Expose.Count);
 
-            Assert.AreEqual("1304e1ddac87439684fe8a399231cb3d", toEditor.Expose[0].ContentKey.ToString("N"));
-            Assert.AreEqual("0a4a416e547d464fabcc6f345c17809a", toEditor.Expose[1].ContentKey.ToString("N"));
-            Assert.AreEqual("5fc866c590be4d01a28a979472a1ffee", toEditor.Expose[2].ContentKey.ToString("N"));
-            Assert.AreEqual("264536b65b0f4641aa43d4bfb515831d", toEditor.Expose[3].ContentKey.ToString("N"));
+            CollectionAssert.AreEquivalent(
+                new[]
+                {
+                    "1304e1ddac87439684fe8a399231cb3d",
+                    "0a4a416e547d464fabcc6f345c17809a",
+                    "5fc866c590be4d01a28a979472a1ffee",
+                    "264536b65b0f4641aa43d4bfb515831d",
+                },
+                toEditor.Expose.Select(e => e.ContentKey.ToString("N")));
+        });
+    }
+
+    [TestCase]
+    public async Task RichTextWithPropertyLessBlocksIsBackwardsCompatible()
+    {
+        var elementType = await CreatePropertyLessElementType();
+        var richTextDataType = await CreateRichTextDataType(elementType);
+        var contentType = await CreateContentType(richTextDataType);
+
+        var json = $$"""
+                     {
+                         "markup": "<p><umb-rte-block data-content-udi=\"umb://element/1304e1ddac87439684fe8a399231cb3d\"></umb-rte-block></p>",
+                         "blocks": {
+                             "layout": {
+                                 "{{Constants.PropertyEditors.Aliases.RichText}}": [
+                                     {
+                                         "contentUdi": "umb://element/1304e1ddac87439684fe8a399231cb3d"
+                                     }
+                                 ]
+                             },
+                             "contentData": [
+                                 {
+                                     "contentTypeKey": "{{elementType.Key}}",
+                                     "udi": "umb://element/1304e1ddac87439684fe8a399231cb3d"
+                                 }
+                             ],
+                             "settingsData": []
+                         }
+                     }
+                     """;
+
+        var contentBuilder = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Home");
+
+        var content = contentBuilder.Build();
+        content.Properties["blocks"]!.SetValue(json);
+        ContentService.Save(content);
+
+        var toEditor = richTextDataType.Editor!.GetValueEditor().ToEditor(content.Properties["blocks"]!) as RichTextEditorValue;
+        Assert.IsNotNull(toEditor);
+        Assert.IsNotNull(toEditor.Blocks);
+
+        Assert.AreEqual(1, toEditor.Blocks.ContentData.Count);
+        Assert.AreEqual("1304e1ddac87439684fe8a399231cb3d", toEditor.Blocks.ContentData[0].Key.ToString("N"));
+        Assert.IsEmpty(toEditor.Blocks.ContentData[0].Values);
+
+        // The block has no properties, so historically it was never exposed on upgrade and rendered
+        // as unpublished (#23379). It must now be exposed to preserve its published state.
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, toEditor.Blocks.Expose.Count);
+            Assert.AreEqual("1304e1ddac87439684fe8a399231cb3d", toEditor.Blocks.Expose[0].ContentKey.ToString("N"));
         });
     }
 
@@ -304,6 +364,18 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
             .WithValueStorageType(ValueStorageType.Nvarchar)
             .Done()
+            .Build();
+
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        return elementType;
+    }
+
+    private async Task<IContentType> CreatePropertyLessElementType()
+    {
+        var elementType = new ContentTypeBuilder()
+            .WithAlias("myPropertyLessElementType")
+            .WithName("My Property-less Element Type")
+            .WithIsElement(true)
             .Build();
 
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);

@@ -1,0 +1,15 @@
+parameters:
+  - name: workingDirectory
+    type: string
+
+steps:
+  - bash: |
+      echo "##[command]Install nbgv"
+      dotnet tool install --tool-path . nbgv
+      echo "##[command]Running nbgv get-version"
+      PACKAGE_VERSION=$(nbgv get-version -v NpmPackageVersion)
+      echo "##[command]Running npm version"
+      echo "##[debug]Version: $PACKAGE_VERSION"
+      cd ${{ parameters.workingDirectory }}
+      npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
+    displayName: Set NPM Version

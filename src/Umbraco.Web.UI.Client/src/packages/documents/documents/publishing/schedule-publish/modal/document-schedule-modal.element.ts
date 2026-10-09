@@ -1,4 +1,5 @@
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
+import { UmbDocumentVariantState } from '../../../variant-state.js';
+import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { isNotPublishedMandatory } from '../../utils.js';
 import { UmbDocumentVariantLanguagePickerElement } from '../../../modals/index.js';
 import type {
@@ -75,7 +76,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 				this.requestUpdate();
 			},
-			'_selection',
+			null,
 		);
 	}
 
@@ -159,7 +160,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline=${this.localize.term('general_scheduledPublishing')}>
+		return html`<uui-dialog-layout headline=${this.localize.term('content_saveAndScheduleModalTitle')}>
 			${this.#renderOptions()}
 
 			<div slot="actions">

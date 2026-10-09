@@ -72,14 +72,14 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
     protected override int PerformCount(IQuery<IServerRegistration>? query) =>
         throw new NotSupportedException("This repository does not support this method.");
 
+    // Note: PerformExists(int) and PerformGet(int) are passed as callbacks to the cache
+    // policy, but FullDataSetRepositoryCachePolicy never invokes them — it uses GetAllCached()
+    // internally. These overrides exist only as required implementations of the abstract base
+    // and as fallbacks for non-FullDataSet policies.
     protected override bool PerformExists(int id) =>
-
-        // use the underlying GetAll which force-caches all registrations
         GetMany().Any(x => x.Id == id);
 
     protected override IServerRegistration? PerformGet(int id) =>
-
-        // use the underlying GetAll which force-caches all registrations
         GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IEnumerable<IServerRegistration> PerformGetAll(params int[]? ids) =>

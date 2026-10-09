@@ -54,6 +54,7 @@ test('can create a media type folder using create options', {tag: '@release'}, a
 test('can create a media type in a folder using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.mediaType.createFolder(mediaTypeFolderName);
+  await umbracoUi.mediaType.reloadMediaTypeTree();
   await umbracoUi.mediaType.goToMediaType(mediaTypeFolderName);
 
   // Act
@@ -74,6 +75,7 @@ test('can create a media type folder in a folder using create options', async ({
   const childFolderName = 'Test Child Folder';
   await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
   await umbracoApi.mediaType.createFolder(mediaTypeFolderName);
+  await umbracoUi.mediaType.reloadMediaTypeTree();
   await umbracoUi.mediaType.goToMediaType(mediaTypeFolderName);
 
   // Act

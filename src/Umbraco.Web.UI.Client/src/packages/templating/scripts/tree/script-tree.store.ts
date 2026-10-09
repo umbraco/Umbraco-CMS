@@ -15,7 +15,7 @@ export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 	 * @memberof UmbScriptTreeStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_SCRIPT_TREE_STORE_CONTEXT.toString());
+		super(host, UMB_SCRIPT_TREE_STORE_CONTEXT);
 	}
 }
 

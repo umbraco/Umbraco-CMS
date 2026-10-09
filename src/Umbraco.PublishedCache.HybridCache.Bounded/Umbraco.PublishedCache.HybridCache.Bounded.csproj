@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Umbraco.Cms.PublishedCache.HybridCache.Bounded</PackageId>
+    <Title>Umbraco CMS - Published cache - HybridCache - Bounded local cache</Title>
+    <Description>Optional add-on that makes the Umbraco in-process (L0) published-content cache bounded and scan-resistant (W-TinyLFU). Install this package and set Umbraco:CMS:Cache:Entry:Document:MaximumLocalCacheItems / ...Media.MaximumLocalCacheItems to enable it.</Description>
+    <RootNamespace>Umbraco.Cms.Infrastructure.HybridCache.Bounded</RootNamespace>
+
+    <!-- TODO: New package with no published baseline to diff against; re-enable once a baseline version ships. -->
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BitFaster.Caching" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
+  </ItemGroup>
+</Project>

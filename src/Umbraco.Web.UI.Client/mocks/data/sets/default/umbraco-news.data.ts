@@ -1,0 +1,88 @@
+import type { NewsDashboardItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+
+export const data: Array<NewsDashboardItemResponseModel> = [
+	{
+		priority: 'High',
+		header: 'Welcome to the Umbraco Backoffice Preview!',
+		body: `
+			<p>Explore the latest features and improvements in our new backoffice experience.<br>We value your feedback to help us shape the future of Umbraco.</p>
+			<strong>Note:</strong> This is a preview version of the Umbraco Backoffice, it is not a real Umbraco instance.
+		`,
+		buttonText: 'Read more about Umbraco CMS',
+		imageUrl: '',
+		imageAltText: '',
+		url: 'https://umbraco.com/products/umbraco-cms/',
+	},
+	{
+		priority: 'Medium',
+		header: 'News item 1',
+		body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus.</p>',
+		buttonText: 'See more',
+		imageUrl: '/umbraco/backoffice/assets/umb-pattern-pink.png',
+		imageAltText: '',
+		url: 'https://umbraco.com',
+	},
+	{
+		priority: 'Medium',
+		header: 'News item 2',
+		body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus.</p>',
+		buttonText: 'See more',
+		imageUrl: '/umbraco/backoffice/assets/umb-pattern-blue.png',
+		imageAltText: '',
+		url: 'https://umbraco.com',
+	},
+	{
+		priority: 'Medium',
+		header: 'News item 3',
+		body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus.</p>',
+		buttonText: 'See more',
+		imageUrl: '/umbraco/backoffice/assets/umb-pattern-pink.png',
+		imageAltText: '',
+		url: 'https://umbraco.com',
+	},
+	{
+		priority: 'Medium',
+		header: 'News item 4',
+		body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus.</p>',
+		buttonText: 'See more',
+		imageUrl: '/umbraco/backoffice/assets/umb-pattern-blue.png',
+		imageAltText: '',
+		url: 'https://umbraco.com',
+	},
+	{
+		priority: 'Normal',
+		header: 'Article 1',
+		body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris.</p>',
+		buttonText: 'See more',
+		imageUrl: '',
+		imageAltText: '',
+		url: 'https://umbraco.com',
+	},
+	{
+		priority: 'Normal',
+		header: 'Article 2',
+		body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris.</p>',
+		buttonText: 'See more',
+		imageUrl: '',
+		imageAltText: '',
+		url: 'https://umbraco.com',
+	},
+	{
+		priority: 'Normal',
+		header: 'Article 3',
+		body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris.</p>',
+		buttonText: 'See more',
+		imageUrl: '',
+		imageAltText: '',
+		url: 'https://umbraco.com',
+	},
+	{
+		priority: 'Normal',
+		header: 'Article 4',
+		body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris.</p>',
+		buttonText: 'See more',
+		imageUrl: '',
+		imageAltText: '',
+		url: 'https://umbraco.com',
+	},
+];

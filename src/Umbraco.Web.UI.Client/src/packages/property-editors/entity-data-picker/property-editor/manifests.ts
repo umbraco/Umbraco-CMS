@@ -8,9 +8,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Entity Data Picker Property Editor UI',
 		element: () => import('./entity-data-picker-property-editor-ui.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Entity Data Picker',
 			icon: 'icon-page-add',
-			group: 'pickers',
+			group: '#propertyEditorUIGroups_pickers',
+			keywords: ['select', 'entity', 'data', 'source', 'pick'],
 			propertyEditorSchemaAlias: 'Umbraco.EntityDataPicker',
 			supportsReadOnly: true,
 			supportsDataSource: {

@@ -7,9 +7,10 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		name: 'Tiptap Statusbar Property Editor UI',
 		element: () => import('./property-editor-ui-tiptap-statusbar-configuration.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Tiptap Statusbar Configuration',
 			icon: 'icon-autofill',
-			group: 'common',
+			group: '#propertyEditorUIGroups_common',
 		},
 	},
 ];

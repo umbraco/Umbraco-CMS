@@ -12,6 +12,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
 {
     private readonly IElementsCache _elementsCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
 
     /// <summary>
@@ -20,10 +21,12 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     public PublishedContentFactory(
         IElementsCache elementsCache,
         IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         IPublishedContentTypeCache publishedContentTypeCache)
     {
         _elementsCache = elementsCache;
         _variationContextAccessor = variationContextAccessor;
+        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
         _publishedContentTypeCache = publishedContentTypeCache;
     }
 
@@ -97,7 +100,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             contentType,
             null,
             contentData);
-        return new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor);
+        return new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor, _propertyRenderingContextAccessor);
     }
 
     private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
@@ -143,7 +146,8 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
                 node,
                 preview,
                 _elementsCache,
-                _variationContextAccessor);
+                _variationContextAccessor,
+                _propertyRenderingContextAccessor);
     }
 
     private static IPublishedContent? GetPublishedContentAsDraft(IPublishedContent? content) =>

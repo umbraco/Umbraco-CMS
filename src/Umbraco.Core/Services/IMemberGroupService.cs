@@ -75,6 +75,28 @@ public interface IMemberGroupService : IService
     Task<IMemberGroup?> GetAsync(Guid key);
 
     /// <summary>
+    ///     Gets member groups by their keys.
+    /// </summary>
+    /// <param name="keys">The keys of the member groups to get.</param>
+    /// <returns>An enumerable list of matching <see cref="IMemberGroup" /> objects.</returns>
+    /// <remarks>
+    ///     The default implementation fetches all groups and filters in-memory. Implementations
+    ///     backed by a query-capable store may provide a more efficient override.
+    /// </remarks>
+    // TODO (V19): Remove default implementation.
+    async Task<IEnumerable<IMemberGroup>> GetAsync(IEnumerable<Guid> keys)
+    {
+        ICollection<Guid> keySet = keys as ICollection<Guid> ?? keys.ToArray();
+        if (keySet.Count == 0)
+        {
+            return [];
+        }
+
+        IEnumerable<IMemberGroup> all = await GetAllAsync();
+        return all.Where(x => keySet.Contains(x.Key));
+    }
+
+    /// <summary>
     ///     Gets all member groups
     /// </summary>
     /// <returns>An enumerable list of <see cref="IMemberGroup" /> objects.</returns>

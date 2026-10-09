@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -13,8 +14,17 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     and implements both <see cref="IMediaNavigationQueryService"/> and <see cref="IMediaNavigationManagementService"/>
 ///     to provide a complete set of navigation operations for media content.
 /// </remarks>
-internal sealed class MediaNavigationService : ContentNavigationServiceBase<IMediaType, IMediaTypeService>, IMediaNavigationQueryService, IMediaNavigationManagementService
+internal sealed class MediaNavigationService : ContentNavigationServiceBase<IMediaType, IMediaTypeService>, IMediaNavigationQueryService, IMediaNavigationManagementService, IMemoryCacheSizeReporter
 {
+    /// <inheritdoc />
+    public string CacheName => "Media navigation";
+
+    /// <inheritdoc />
+    public long GetApproximateCount() => GetNavigationNodeCount();
+
+    /// <inheritdoc />
+    public long? GetApproximateBytes() => GetNavigationApproximateBytes();
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaNavigationService"/> class.
     /// </summary>
@@ -27,10 +37,16 @@ internal sealed class MediaNavigationService : ContentNavigationServiceBase<IMed
     }
 
     /// <inheritdoc />
+    protected override int TreeLockId => Constants.Locks.MediaTree;
+
+    /// <inheritdoc />
+    protected override Guid ObjectTypeKey => Constants.ObjectTypes.Media;
+
+    /// <inheritdoc />
     public override async Task RebuildAsync()
-        => await HandleRebuildAsync(Constants.Locks.MediaTree, Constants.ObjectTypes.Media, false);
+        => await HandleRebuildAsync(trashed: false);
 
     /// <inheritdoc />
     public override async Task RebuildBinAsync()
-        => await HandleRebuildAsync(Constants.Locks.MediaTree, Constants.ObjectTypes.Media, true);
+        => await HandleRebuildAsync(trashed: true);
 }

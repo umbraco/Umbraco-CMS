@@ -1,10 +1,13 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -17,20 +20,39 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member.References;
 [ApiVersion("1.0")]
 public class ReferencedByMemberController : MemberControllerBase
 {
-    private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
+    private readonly IMemberReferenceService _memberReferenceService;
+
+    // TODO (V19): Remove the unnecessary parameters provided to the constructor.
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReferencedByMemberController"/> class.
     /// </summary>
     /// <param name="trackedReferencesService">An implementation of <see cref="ITrackedReferencesService"/> used to manage tracked references.</param>
     /// <param name="relationTypePresentationFactory">An implementation of <see cref="IRelationTypePresentationFactory"/> used to create relation type presentations.</param>
+    /// <param name="memberReferenceService">Service for retrieving paged references to a member.</param>
+    [ActivatorUtilitiesConstructor]
+    public ReferencedByMemberController(
+        ITrackedReferencesService trackedReferencesService,
+        IRelationTypePresentationFactory relationTypePresentationFactory,
+        IMemberReferenceService memberReferenceService)
+    {
+        _relationTypePresentationFactory = relationTypePresentationFactory;
+        _memberReferenceService = memberReferenceService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferencedByMemberController"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ReferencedByMemberController(
         ITrackedReferencesService trackedReferencesService,
         IRelationTypePresentationFactory relationTypePresentationFactory)
+        : this(
+            trackedReferencesService,
+            relationTypePresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IMemberReferenceService>())
     {
-        _trackedReferencesService = trackedReferencesService;
-        _relationTypePresentationFactory = relationTypePresentationFactory;
     }
 
     /// <summary>
@@ -52,12 +74,12 @@ public class ReferencedByMemberController : MemberControllerBase
         int skip = 0,
         int take = 20)
     {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
+        Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> result = await _memberReferenceService.GetPagedReferencesAsync(id, skip, take);
 
         var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
         {
-            Total = relationItems.Total,
-            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
+            Total = result.Result.Total,
+            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(result.Result.Items),
         };
 
         return pagedViewModel;
@@ -87,17 +109,17 @@ public class ReferencedByMemberController : MemberControllerBase
         int skip = 0,
         int take = 20)
     {
-        Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> relationItemsAttempt = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, UmbracoObjectTypes.Member, skip, take, true);
+        Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> result = await _memberReferenceService.GetPagedReferencesAsync(id, skip, take);
 
-        if (relationItemsAttempt.Success is false)
+        if (result.Success is false)
         {
-            return GetReferencesOperationStatusResult(relationItemsAttempt.Status);
+            return GetReferencesOperationStatusResult(result.Status);
         }
 
         var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
         {
-            Total = relationItemsAttempt.Result.Total,
-            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItemsAttempt.Result.Items),
+            Total = result.Result.Total,
+            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(result.Result.Items),
         };
 
         return Ok(pagedViewModel);

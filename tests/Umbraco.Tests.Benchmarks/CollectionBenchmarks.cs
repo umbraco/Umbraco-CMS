@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Benchmarks
         public int[] NativeArrayToArray() => Array.ConvertAll(_shortArray, value => _shortArray.Length ^ value);
 
         /// <summary>
-        /// Use LINQ to convert an array, with type checks, extra allocations & extra branches that the branch predictor has to keep track of
+        /// Use LINQ to convert an array, with type checks, extra allocations &amp; extra branches that the branch predictor has to keep track of
         /// </summary>
         /// <returns>Something to not optimize it away.</returns>
         [Benchmark]

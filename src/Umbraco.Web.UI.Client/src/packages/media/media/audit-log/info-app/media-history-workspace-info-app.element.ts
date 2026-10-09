@@ -1,11 +1,11 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbMediaAuditLogModel } from '../types.js';
 import { UmbMediaAuditLogRepository } from '../repository/index.js';
-import { getMediaHistoryTagStyleAndText, TimeOptions } from './utils.js';
+import { getMediaHistoryTagStyleAndText } from './utils.js';
 import { css, html, customElement, state, nothing, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
@@ -35,8 +35,8 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 		super();
 
 		this.#pagination.setPageSize(10);
-		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number));
-		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number));
+		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number), null);
+		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number), null);
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -115,7 +115,7 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 
 							return html`<umb-history-item
 								.name=${user?.name ?? 'Unknown'}
-								.detail=${this.localize.date(item.timestamp, TimeOptions)}>
+								.detail=${this.localize.date(item.timestamp, UMB_DATE_TIME_FORMAT_OPTIONS)}>
 								<umb-user-avatar
 									slot="avatar"
 									.name=${user?.name}
@@ -183,9 +183,6 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 			}
 
 			uui-pagination {
-				flex: 1;
-				display: flex;
-				justify-content: center;
 				margin-top: var(--uui-size-layout-1);
 			}
 		`,

@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.DateOnly.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,12 +8,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Date Only Picker Property Editor UI',
 		element: () => import('./property-editor-ui-date-only-picker.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Date Only',
 			propertyEditorSchemaAlias: 'Umbraco.DateOnly',
 			icon: 'icon-calendar-alt',
-			group: 'date',
+			group: '#propertyEditorUIGroups_date',
+			keywords: ['date', 'calendar', 'birthday', 'deadline', 'day', 'anniversary', 'expiry', 'start', 'end', 'release'],
 			supportsReadOnly: true,
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

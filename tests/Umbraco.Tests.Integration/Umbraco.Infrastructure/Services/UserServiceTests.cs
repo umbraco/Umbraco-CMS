@@ -225,7 +225,8 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         // test that the correct number of permissions are returned for each group
         Assert.AreEqual(2, permissions[content[0].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count());
         Assert.AreEqual(1, permissions[content[0].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count());
-        Assert.AreEqual(defaultPermissionCount,
+        Assert.AreEqual(
+            defaultPermissionCount,
             permissions[content[0].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count());
 
         // test permissions contains content[1]
@@ -239,7 +240,8 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         // test that the correct number of permissions are returned for each group
         Assert.AreEqual(1, permissions[content[1].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count());
         Assert.AreEqual(1, permissions[content[1].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count());
-        Assert.AreEqual(defaultPermissionCount,
+        Assert.AreEqual(
+            defaultPermissionCount,
             permissions[content[1].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count());
 
         // test permissions contains content[2]
@@ -252,9 +254,11 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         // test that the correct number of permissions are returned for each group
         Assert.AreEqual(1, permissions[content[2].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count());
-        Assert.AreEqual(defaultPermissionCount,
+        Assert.AreEqual(
+            defaultPermissionCount,
             permissions[content[2].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count());
-        Assert.AreEqual(defaultPermissionCount,
+        Assert.AreEqual(
+            defaultPermissionCount,
             permissions[content[2].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count());
     }
 
@@ -735,7 +739,8 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
     [Test]
     public void Count_All_Online_Users()
     {
-        var users = UserBuilder.CreateMulipleUsers(10,
+        var users = UserBuilder.CreateMulipleUsers(
+            10,
             (i, member) => member.LastLoginDate = DateTime.UtcNow.AddMinutes(i * -2));
         UserService.Save(users);
 

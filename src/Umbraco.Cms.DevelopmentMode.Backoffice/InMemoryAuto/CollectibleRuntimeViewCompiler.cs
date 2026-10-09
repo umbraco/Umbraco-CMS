@@ -391,7 +391,7 @@ internal sealed class CollectibleRuntimeViewCompiler : IViewCompiler
 
         foreach (var message in messages ?? Enumerable.Empty<string>())
         {
-            _logger.LogError(compilationException, "Compilation error occured with message: {ErrorMessage}", message);
+            _logger.LogError(compilationException, "Compilation error occurred with message: {ErrorMessage}", message);
         }
     }
 

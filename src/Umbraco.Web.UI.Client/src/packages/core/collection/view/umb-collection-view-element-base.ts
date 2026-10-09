@@ -1,6 +1,6 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
-import type { UmbCollectionItemModel } from '../types.js';
-import { state } from '@umbraco-cms/backoffice/external/lit';
+import type { ManifestCollectionView, UmbCollectionItemModel } from '../types.js';
+import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -9,7 +9,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  */
 export abstract class UmbCollectionViewElementBase<
 	CollectionItemType extends UmbCollectionItemModel = UmbCollectionItemModel,
+	ManifestType extends Omit<ManifestCollectionView, 'meta'> = ManifestCollectionView,
 > extends UmbLitElement {
+	@property({ attribute: false })
+	manifest?: ManifestType | undefined;
+
 	@state()
 	protected _items: Array<CollectionItemType> = [];
 
@@ -27,6 +31,9 @@ export abstract class UmbCollectionViewElementBase<
 
 	@state()
 	protected _loading = false;
+
+	@state()
+	protected _hideItemActions = false;
 
 	@state()
 	protected _itemHrefs: Map<string, string> = new Map();
@@ -63,6 +70,12 @@ export abstract class UmbCollectionViewElementBase<
 				this.#collectionContext?.selection.multiple,
 				(multiple) => (this._multiple = multiple ?? false),
 				'umbCollectionSelectionMultipleObserver',
+			);
+
+			this.observe(
+				this.#collectionContext?.hideItemActions,
+				(hideItemActions) => (this._hideItemActions = hideItemActions ?? false),
+				'umbCollectionHideItemActionsObserver',
 			);
 
 			this.observe(

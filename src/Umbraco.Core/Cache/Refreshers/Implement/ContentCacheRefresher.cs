@@ -183,6 +183,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 var pathid = "," + payload.Id + ",";
                 isolatedCache.ClearOfType<IContent>((k, v) => v.Path?.Contains(pathid) ?? false);
             }
+
+            HandleIdKeyMap(payload);
         }
 
         base.RefreshInternal(payloads);
@@ -202,13 +204,23 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 idsRemoved.Add(payload.Id);
             }
 
-            HandleMemoryCache(payload);
-            HandleRouting(payload);
+            // For Remove payloads, clean up routing caches before navigation removes the node from the tree (HandleRouting needs
+            // the navigation structure to find descendants).
+            if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+            {
+                HandleRouting(payload);
+            }
 
             HandleNavigation(payload);
             HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
 
-            HandleIdKeyMap(payload);
+            HandleMemoryCache(payload);
+
+            // For non-Remove payloads, run routing after publish status and memory cache are populated.
+            if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove) is false)
+            {
+                HandleRouting(payload);
+            }
         }
 
         // Clear partial view cache when published content changes.
@@ -261,25 +273,26 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
-            if (_documentNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys))
+            var inMainTree = _documentNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys);
+            var inBin = inMainTree is false && _documentNavigationQueryService.TryGetDescendantsKeysInBin(key, out descendantsKeys);
+
+            if (inMainTree || inBin)
             {
                 var branchKeys = descendantsKeys.ToList();
                 branchKeys.Add(key);
 
-                // If the branch is unpublished, we need to remove it from cache instead of refreshing it
-                if (IsBranchUnpublished(payload))
+                // Remove from cache if the branch is in the bin or being unpublished; otherwise refresh.
+                var removeFromCache = inBin || IsBranchUnpublished(payload);
+
+                foreach (Guid branchKey in branchKeys)
                 {
-                    foreach (Guid branchKey in branchKeys)
+                    if (removeFromCache)
                     {
                         _documentCacheService.RemoveFromMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
+                        continue;
                     }
-                }
-                else
-                {
-                    foreach (Guid branchKey in branchKeys)
-                    {
-                        _documentCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
-                    }
+
+                    _documentCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
                 }
             }
         }
@@ -309,7 +322,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         {
             Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
 
-            // Note that we need to clear the navigation service as the last thing.
+            // Remove routing must run before HandleNavigation removes the node from the navigation tree,
+            // since we need the tree structure to resolve descendant keys.
             if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeys(key, out IEnumerable<Guid>? descendantsOrSelfKeys))
             {
                 _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeys).GetAwaiter().GetResult();
@@ -331,15 +345,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
             Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
-            _documentUrlService.CreateOrUpdateUrlSegmentsAsync(key).GetAwaiter().GetResult();
-            _documentUrlAliasService.CreateOrUpdateAliasesAsync(key).GetAwaiter().GetResult();
+            _documentUrlService.UpdateUrlSegmentCacheAsync(key).GetAwaiter().GetResult();
+            _documentUrlAliasService.UpdateAliasCacheAsync(key).GetAwaiter().GetResult();
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
             Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
-            _documentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(key).GetAwaiter().GetResult();
-            _documentUrlAliasService.CreateOrUpdateAliasesWithDescendantsAsync(key).GetAwaiter().GetResult();
+            _documentUrlService.UpdateUrlSegmentCacheWithDescendantsAsync(key).GetAwaiter().GetResult();
+            _documentUrlAliasService.UpdateAliasCacheWithDescendantsAsync(key).GetAwaiter().GetResult();
         }
     }
 
@@ -557,6 +571,11 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         /// <summary>
         /// Gets the unique GUID key associated with the entity, or null if no key is assigned.
         /// </summary>
+        /// <remarks>
+        /// Required when <see cref="ChangeTypes"/> includes <see cref="TreeChangeTypes.Remove"/>: the refresher clears the
+        /// id/key map for a removed entity before the published-cache refresh runs, and the removed entity can no longer be
+        /// looked up in the database, so the key cannot be resolved from <see cref="Id"/> alone.
+        /// </remarks>
         public Guid? Key { get; init; }
 
         /// <summary>

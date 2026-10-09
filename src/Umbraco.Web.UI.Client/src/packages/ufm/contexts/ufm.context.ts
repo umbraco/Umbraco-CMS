@@ -75,7 +75,7 @@ export class UmbUfmContext extends UmbContextBase {
 
 	/**
 	 * Get a filter by its alias.
-	 * @param alias The alias of the filter to retrieve.
+	 * @param {string} alias The alias of the filter to retrieve.
 	 * @returns {UmbUfmFilterFunction} The filter function associated with the alias, or undefined if not found.
 	 */
 	public getFilterByAlias(alias: string): UmbUfmFilterFunction {
@@ -84,8 +84,8 @@ export class UmbUfmContext extends UmbContextBase {
 
 	/**
 	 * Parse markdown content, optionally inline.
-	 * @param markdown The markdown string to parse.
-	 * @param inline If true, parse inline markdown; otherwise, parse block markdown.
+	 * @param {string} markdown The markdown string to parse.
+	 * @param {boolean} inline If true, parse inline markdown; otherwise, parse block markdown.
 	 * @returns {Promise<string>} A promise that resolves to the parsed HTML string.
 	 */
 	public async parse(markdown: string, inline: boolean): Promise<string> {

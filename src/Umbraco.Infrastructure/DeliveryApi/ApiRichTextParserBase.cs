@@ -43,7 +43,7 @@ internal abstract partial class ApiRichTextParserBase
             return ReplaceStatus.NoMatch;
         }
 
-        if (Guid.TryParse(match.Groups["guid"].Value, out Guid guid) is false)
+        if (Guid.TryParse(match.Groups["guid"].ValueSpan, out Guid guid) is false)
         {
             return ReplaceStatus.NoMatch;
         }

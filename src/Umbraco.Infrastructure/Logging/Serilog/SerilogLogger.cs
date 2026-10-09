@@ -141,7 +141,6 @@ public class SerilogLogger : IDisposable
     /// </summary>
     /// <param name="reporting">The <see cref="Type"/> representing the component reporting the error.</param>
     /// <param name="exception">The <see cref="Exception"/> instance to log.</param>
-    /// <param name="message">The error message describing the context of the exception.</param>
     public void Error(Type reporting, Exception exception)
     {
         ILogger logger = LoggerFor(reporting);
@@ -160,8 +159,8 @@ public class SerilogLogger : IDisposable
     /// Logs an error message for the specified reporting type, including an exception and a message.
     /// </summary>
     /// <param name="reporting">The <see cref="Type"/> that is reporting the error.</param>
-    /// <param name="exception">The <see cref="Exception"/> associated with the error.</param>
-    /// <param name="message">The error message to log.</param>
+    /// <param name="messageTemplate">A message template describing the error, which may include placeholders for property values.</param>
+    /// <param name="propertyValues">An array of objects to format the message template.</param>
     public void Error(Type reporting, string messageTemplate, params object[] propertyValues) =>
         LoggerFor(reporting).Error(messageTemplate, propertyValues);
 

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 
@@ -17,6 +18,7 @@ public static class ContentRepositoryExtensions
     /// <param name="date">The date to associate with this culture information.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="name" /> or <paramref name="culture" /> is null.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="name" /> or <paramref name="culture" /> is empty or whitespace.</exception>
+    /// <exception cref="CultureNotFoundException">Thrown when <paramref name="culture" /> is not a valid culture code.</exception>
     public static void SetCultureInfo(this IContentBase content, string? culture, string? name, DateTime date)
     {
         if (name == null)
@@ -43,7 +45,7 @@ public static class ContentRepositoryExtensions
                 nameof(culture));
         }
 
-        content.CultureInfos?.AddOrUpdate(culture, name, date);
+        content.CultureInfos?.AddOrUpdate(culture.EnsureCultureCode()!, name, date);
     }
 
     /// <summary>
@@ -261,6 +263,7 @@ public static class ContentRepositoryExtensions
     /// <param name="date">The publish date to associate with this culture.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="name" /> or <paramref name="culture" /> is null.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="name" /> or <paramref name="culture" /> is empty or whitespace.</exception>
+    /// <exception cref="CultureNotFoundException">Thrown when <paramref name="culture" /> is not a valid culture code.</exception>
     public static void SetPublishInfo(this IContent content, string? culture, string? name, DateTime date)
     {
         if (name == null)
@@ -287,7 +290,7 @@ public static class ContentRepositoryExtensions
                 nameof(culture));
         }
 
-        content.PublishCultureInfos?.AddOrUpdate(culture, name, date);
+        content.PublishCultureInfos?.AddOrUpdate(culture.EnsureCultureCode()!, name, date);
     }
 
     /// <summary>
@@ -454,7 +457,24 @@ public static class ContentRepositoryExtensions
     ///     Clears all publish culture information from the content item.
     /// </summary>
     /// <param name="content">The content item to clear publish information from.</param>
-    public static void ClearPublishInfos(this IContent content) => content.PublishCultureInfos = null;
+    public static void ClearPublishInfos(this IContent content)
+    {
+        if (content.PublishCultureInfos is null)
+        {
+            return;
+        }
+
+        // Pass each published culture through ClearPublishInfo([culture]) to ensure correct change tracking.
+        var cultures = content.PublishCultureInfos.Values.Select(c => c.Culture).ToArray();
+        foreach (var culture in cultures)
+        {
+            content.ClearPublishInfo(culture);
+        }
+
+        // Following #22799 the explicit calls to `ClearPublishInfo` for each culture cause the unpublish in all cultures.
+        // `PublishCultureInfos` is set to null purely to retain previous behaviour at a property level.
+        content.PublishCultureInfos = null;
+    }
 
     /// <summary>
     ///     Returns false if the culture is already unpublished

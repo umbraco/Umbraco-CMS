@@ -4,31 +4,32 @@ import {expect} from "@playwright/test";
 // Content Name
 const contentName = 'ContentName';
 let contentId = null;
-
 // Document Type
 const documentTypeName = 'DocumentTypeName';
 let documentTypeId = null;
 const documentTypeGroupName = 'DocumentGroup';
-
 // Block List
 const blockListName = 'BlockListName';
 let blockListId = null;
-
 // Element Type
 const blockName = 'BlockName';
 let elementTypeId = null;
 const elementGroupName = 'ElementGroup';
-
 // Property Editor
 const propertyEditorName = 'ProperyEditorInBlockName';
 let propertyEditorId = null;
 const optionValues = ['testOption1', 'testOption2'];
+
+test.beforeEach(async ({umbracoUi}) => {
+  await umbracoUi.goToBackOffice();
+});
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(blockName);
   await umbracoApi.dataType.ensureNameNotExists(blockListName);
+  await umbracoApi.dataType.ensureNameNotExists(propertyEditorName);
 });
 
 test('cannot publish a block list with a mandatory radiobox without a value', async ({umbracoApi, umbracoUi}) => {
@@ -38,8 +39,6 @@ test('cannot publish a block list with a mandatory radiobox without a value', as
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName);
   contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
@@ -66,8 +65,6 @@ test('cannot publish a block list with a mandatory checkbox list without a value
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName);
   contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
@@ -94,8 +91,6 @@ test('cannot publish a block list with a mandatory dropdown without a value', as
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName);
   contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
@@ -132,7 +127,6 @@ test('cannot update a variant block list with invalid text', {tag: '@release'}, 
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName, true, true);
   // Creates content
   contentId = await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -161,4 +155,35 @@ test('cannot update a variant block list with invalid text', {tag: '@release'}, 
   expect(blockListValue).toBeTruthy();
   await umbracoUi.content.clickEditBlockListEntryWithName(blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringElementDataTypeName, correctPropertyValue);
+});
+
+test('cannot publish a block list with an empty mandatory multi url picker until a link is added', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  propertyEditorId = await umbracoApi.dataType.createDefaultMultiUrlPickerDataType(propertyEditorName);
+  elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
+  blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName);
+  contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickBlockElementWithName(blockName);
+  // Do not add any links, try to create - validation error appears
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
+  // Add a manual link - validation error disappears
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickManualLinkButton();
+  await umbracoUi.content.enterLink('https://docs.umbraco.com');
+  await umbracoUi.content.enterLinkTitle('Umbraco Documentation');
+  await umbracoUi.content.clickLinkPickerAddButton();
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  await umbracoUi.content.isErrorNotificationVisible(false);
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
 });

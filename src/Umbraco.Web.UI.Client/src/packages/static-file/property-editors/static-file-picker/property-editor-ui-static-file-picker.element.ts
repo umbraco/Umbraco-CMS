@@ -1,3 +1,4 @@
+import type { UmbStaticFileItemModel } from '../../repository/item/types.js';
 import type { UmbInputStaticFileElement } from '../../components/index.js';
 import type {
 	UmbPropertyEditorUiElement,
@@ -52,6 +53,8 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 	@state()
 	private _limitMax: number = Infinity;
 
+	protected pickableFilter?: (item: UmbStaticFileItemModel) => boolean;
+
 	private _onChange(event: CustomEvent) {
 		if (this.#singleItemMode) {
 			this._value = (event.target as UmbInputStaticFileElement).selection[0];
@@ -65,6 +68,7 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 	override render() {
 		return html`
 			<umb-input-static-file
+				.pickableFilter=${this.pickableFilter}
 				.selection=${this._value ? (Array.isArray(this._value) ? this._value : [this._value]) : []}
 				.min=${this._limitMin ?? 0}
 				.max=${this._limitMax ?? Infinity}

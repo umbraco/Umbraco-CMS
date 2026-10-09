@@ -121,7 +121,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Migration failed for data type: {dataTypeName} (id: {dataTypeId}, editor alias: {dataTypeEditorAlias})", dataTypeDto.NodeDto?.Text, dataTypeDto.NodeId, dataTypeDto.EditorAlias);
+                _logger.LogError(ex, "Migration failed for data type: {dataTypeName} (id: {dataTypeId}, key: {dataTypeKey}, editor alias: {dataTypeEditorAlias})", dataTypeDto.NodeDto?.Text, dataTypeDto.NodeId, dataTypeDto.NodeDto?.UniqueId, dataTypeDto.EditorAlias);
             }
 
             if (updated && configurationData is not null)

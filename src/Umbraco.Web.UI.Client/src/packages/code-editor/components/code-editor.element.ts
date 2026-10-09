@@ -6,6 +6,7 @@ import {
 	type CodeEditorLanguage,
 	type CodeEditorSearchOptions,
 	type UmbCodeEditorHost,
+	type UmbCodeEditorRange,
 } from '../models/index.js';
 import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 import type { PropertyValues, Ref } from '@umbraco-cms/backoffice/external/lit';
@@ -22,8 +23,6 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const elementName = 'umb-code-editor';
-
 /**
  * A custom element that renders a code editor. Code editor is based on the Monaco Editor library.
  * The element will listen to the theme context and update the theme accordingly.
@@ -36,7 +35,7 @@ const elementName = 'umb-code-editor';
  * @fires change - Fired when the entire model of editor is replaced.
  * @fires loaded - Fired when the editor is loaded and ready to use.
  */
-@customElement(elementName)
+@customElement('umb-code-editor')
 export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditorHost {
 	#containerRef: Ref<HTMLElement> = createRef();
 
@@ -125,6 +124,13 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	wordWrap = false;
 
 	/**
+	 * Whether to enable auto-height mode where the editor grows to fit content.
+	 * @memberof UmbCodeEditorElement
+	 */
+	@property({ type: Boolean, attribute: 'auto-height' })
+	autoHeight = false;
+
+	/**
 	 * Whether to enable folding. Default is true.
 	 * @memberof UmbCodeEditorElement
 	 */
@@ -160,8 +166,30 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		// Options
 		this.#editor = new UmbCodeEditorController(this, this.#constructorOptions());
 
+		if (this.autoHeight) {
+			this.#setupAutoHeight();
+		}
+
 		this._loading = false;
 		this.dispatchEvent(new UmbCodeEditorLoadedEvent());
+	}
+
+	#setupAutoHeight() {
+		const monacoEditor = this.#editor?.monacoEditor;
+		if (!monacoEditor) return;
+
+		monacoEditor.onDidContentSizeChange((e) => {
+			if (e.contentHeightChanged) {
+				const contentHeight = monacoEditor.getContentHeight();
+				this.container.style.height = `${contentHeight}px`;
+				monacoEditor.layout();
+			}
+		});
+
+		// Set initial height
+		const contentHeight = monacoEditor.getContentHeight();
+		this.container.style.height = `${contentHeight}px`;
+		monacoEditor.layout();
 	}
 
 	protected override updated(_changedProperties: PropertyValues<this>): void {
@@ -174,6 +202,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 			_changedProperties.has('readonly') ||
 			_changedProperties.has('code') ||
 			_changedProperties.has('label') ||
+			_changedProperties.has('autoHeight') ||
 			_changedProperties.has('disableFolding')
 		) {
 			this.#editor?.updateOptions(this.#constructorOptions());
@@ -190,6 +219,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 			wordWrap: this.wordWrap ? 'on' : 'off',
 			readOnly: this.readonly,
 			folding: !this.disableFolding,
+			autoHeight: this.autoHeight,
 			value: this.code,
 		};
 	}
@@ -209,7 +239,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Inserts text at the current cursor position.
-	 * @param {string} text
+	 * @param {string} text The text to insert.
 	 * @memberof UmbCodeEditorElement
 	 */
 	insert(text: string) {
@@ -218,12 +248,15 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Finds all occurrence of the given string or matches the given regular expression.
-	 * @param {string} text
-	 * @param searchOptions
-	 * @returns {*}
+	 * @param {string} text The string or pattern to search for.
+	 * @param {CodeEditorSearchOptions} searchOptions The options to use when searching.
+	 * @returns {(UmbCodeEditorRange[] | undefined)} The ranges of the found matches.
 	 * @memberof UmbCodeEditorElement
 	 */
-	find(text: string, searchOptions: CodeEditorSearchOptions = <CodeEditorSearchOptions>{}) {
+	find(
+		text: string,
+		searchOptions: CodeEditorSearchOptions = <CodeEditorSearchOptions>{},
+	): UmbCodeEditorRange[] | undefined {
 		return this.#editor?.find(text, searchOptions);
 	}
 
@@ -248,6 +281,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		css`
 			:host {
 				display: block;
+				overflow: hidden;
 			}
 
 			#loader-container {
@@ -277,6 +311,6 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbCodeEditorElement;
+		'umb-code-editor': UmbCodeEditorElement;
 	}
 }

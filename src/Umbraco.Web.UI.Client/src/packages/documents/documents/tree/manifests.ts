@@ -1,15 +1,18 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_TREE_ALIAS, UMB_DOCUMENT_TREE_REPOSITORY_ALIAS } from './constants.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
 import { UmbDocumentTreeStore } from './document-tree.store.js';
 
-export const UMB_DOCUMENT_TREE_REPOSITORY_ALIAS = 'Umb.Repository.Document.Tree';
 /**
  * @deprecated Use {@link UMB_DOCUMENT_TREE_REPOSITORY_ALIAS} instead. This will be removed in Umbraco 18.
  */
 export const UMB_DOCUMENT_TREE_STORE_ALIAS = 'Umb.Store.Document.Tree';
-export const UMB_DOCUMENT_TREE_ALIAS = 'Umb.Tree.Document';
+import { manifests as viewManifests } from './views/manifests.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<UmbExtensionManifest> = [
+export { UMB_DOCUMENT_TREE_ALIAS, UMB_DOCUMENT_TREE_REPOSITORY_ALIAS } from './constants.js';
+
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'repository',
 		alias: UMB_DOCUMENT_TREE_REPOSITORY_ALIAS,
@@ -47,5 +50,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Document Tree Root',
 		forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE],
 	},
+	...viewManifests,
 	...reloadTreeItemChildrenManifests,
 ];

@@ -61,7 +61,7 @@
     <key alias="parentCultureNotPublished">Bu kültür yayınlandı, ancak '%0%' üst öğe üzerinde yayınlanmadığı için görünmüyor</key>
     <key alias="parentNotPublishedAnomaly">Bu belge yayınlandı, ancak önbellekte yok</key>
     <key alias="getUrlException">URL alınamadı</key>
-    <key alias="routeError">Bu belge yayınlandı, ancak url'si %0% içeriğiyle çakışacak</key>
+    <key alias="routeError">Bu belge yayınlandı, ancak url'si '%0%' içeriğiyle çakışacak</key>
     <key alias="routeErrorCannotRoute">Bu belge yayınlandı, ancak url'si yönlendirilemez</key>
   </area>
   <area alias="member">

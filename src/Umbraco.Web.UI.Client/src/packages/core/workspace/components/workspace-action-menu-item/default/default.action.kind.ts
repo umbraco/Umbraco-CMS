@@ -1,3 +1,4 @@
+import UmbWorkspaceActionMenuItemElement from './workspace-action-menu-item.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbExtensionManifestKind = {
@@ -9,7 +10,7 @@ export const manifest: UmbExtensionManifestKind = {
 		type: 'workspaceActionMenuItem',
 		kind: 'default',
 		weight: 1000,
-		element: () => import('./workspace-action-menu-item.element.js'),
+		element: UmbWorkspaceActionMenuItemElement,
 		meta: {
 			icon: '',
 			label: '(Missing label in manifest)',

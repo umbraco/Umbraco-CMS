@@ -15,7 +15,7 @@ export class UserApiHelper {
     const response = await this.getAll();
     const json = await response.json();
 
-    for (const sb of json.items) {
+    for (const sb of this.api.itemsOf(json)) {
       if (sb.name === name) {
         if (sb.id !== null) {
           // It takes a while to create the user, so if we delete it too fast. We get a DB lock
@@ -42,7 +42,7 @@ export class UserApiHelper {
     const response = await this.getAll();
     const json = await response.json();
 
-    for (const sb of json.items) {
+    for (const sb of this.api.itemsOf(json)) {
       if (sb.name === name) {
         return true;
       }
@@ -64,7 +64,7 @@ export class UserApiHelper {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/user?skip=0&take=10000');
     const json = await response.json();
 
-    for (const sb of json.items) {
+    for (const sb of this.api.itemsOf(json)) {
       if (sb.name === name) {
         if (sb.id !== null) {
           const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/user/' + sb.id);
@@ -77,7 +77,7 @@ export class UserApiHelper {
 
   async create(userData) {
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/user', userData);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async update(id: string, userData) {
@@ -93,7 +93,7 @@ export class UserApiHelper {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/user?skip=0&take=10000');
     const json = await response.json();
 
-    for (const sb of json.items) {
+    for (const sb of this.api.itemsOf(json)) {
       if (sb.name === name) {
         if (sb.id !== null) {
           await this.page.waitForTimeout(500);
@@ -144,6 +144,17 @@ export class UserApiHelper {
       "userIds": ids.map(id => ({id}))
     };
     return await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/user/unlock', users);
+  }
+
+  async lockOutByFailedLogins(userEmail: string, attempts: number = 5) {
+    const loginUrl = this.api.baseUrl + '/umbraco/management/api/v1/security/back-office/login';
+    for (let i = 0; i < attempts; i++) {
+      await this.page.request.post(loginUrl, {
+        headers: {'Content-Type': 'application/json'},
+        data: {username: userEmail, password: 'WrongPassword!'},
+        ignoreHTTPSErrors: true
+      });
+    }
   }
 
   async getCurrentUser() {
@@ -299,4 +310,9 @@ export class UserApiHelper {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/filter/user?skip=0&take=100&userGroupIds=' + userGroupIds);
     return await response.json();
   }
+
+  async getCurrentUserStatus(){                                                                                                                                                                                                   
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/user/current');                                                                                                                                              
+    return response.status();                                                                                                                                                                                                                       
+  } 
 }

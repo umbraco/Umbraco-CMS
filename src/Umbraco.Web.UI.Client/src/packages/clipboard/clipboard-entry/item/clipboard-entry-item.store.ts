@@ -5,7 +5,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbClipboardEntryItemStore
- * @augments {UmbStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Clipboard Entry items
  */
 
@@ -16,7 +16,7 @@ export class UmbClipboardEntryItemStore extends UmbItemStoreBase<UmbClipboardEnt
 	 * @memberof UmbClipboardEntryItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_CLIPBOARD_ENTRY_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_CLIPBOARD_ENTRY_ITEM_STORE_CONTEXT);
 	}
 }
 

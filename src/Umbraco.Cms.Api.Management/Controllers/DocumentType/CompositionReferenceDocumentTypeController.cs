@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
@@ -50,14 +51,14 @@ public class CompositionReferenceDocumentTypeController : DocumentTypeController
     [EndpointDescription("Gets a collection of document types that reference the specified document type as a composition.")]
     public async Task<IActionResult> CompositionReferences(CancellationToken cancellationToken, Guid id)
     {
-        var contentType = await _contentTypeService.GetAsync(id);
+        IContentType? contentType = await _contentTypeService.GetAsync(id);
 
         if (contentType is null)
         {
             return OperationStatusResult(ContentTypeOperationStatus.NotFound);
         }
 
-        IEnumerable<IContentType> composedOf = _contentTypeService.GetComposedOf(contentType.Id);
+        IEnumerable<IContentType> composedOf = _contentTypeService.GetComposedOf(contentType.Id, ComposedOfType.Composition);
         List<DocumentTypeCompositionResponseModel> responseModels = _umbracoMapper.MapEnumerable<IContentType, DocumentTypeCompositionResponseModel>(composedOf);
 
         return Ok(responseModels);

@@ -268,18 +268,27 @@ public static class DictionaryExtensions
         }
 
         var builder = new StringBuilder();
+        bool first = true;
         foreach (KeyValuePair<string, object?> i in d)
         {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                builder.Append('&');
+            }
+
             builder.Append(WebUtility.UrlEncode(i.Key));
             builder.Append('=');
             if (i.Value != null)
             {
                 builder.Append(WebUtility.UrlEncode(i.Value.ToString()));
             }
-            builder.Append('&');
         }
 
-        return builder.ToString().TrimEnd(Constants.CharArrays.Ampersand);
+        return builder.ToString();
     }
 
     /// <summary>The get entry ignore case.</summary>

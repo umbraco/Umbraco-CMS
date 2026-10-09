@@ -57,9 +57,6 @@ test('can delete a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
 
   // Act
-  // This wait is currently necessary as the action button is clicked before it is "ready"
-  // TODO: Remove the wait and fix the 'clickActionButton'
-  await umbracoUi.memberGroup.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickDeleteButton();
   await umbracoUi.user.clickConfirmToDeleteButtonAndWaitForUserToBeDeleted();
@@ -383,8 +380,6 @@ test('can see if the user has the correct access based on content start nodes', 
 
   // Act
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
-  // Currently this wait is necessary
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
 
   // Assert
   await umbracoUi.user.doesUserHaveAccessToContentNode(documentName);
@@ -425,9 +420,6 @@ test('can change password for a user', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
 
   // Act
-  // This wait is currently necessary as the action button is clicked before it is "ready"
-  // TODO: Remove the wait and fix the 'clickActionButton'
-  await umbracoUi.memberGroup.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickChangePasswordButton();
   await umbracoUi.user.updatePassword(userPassword);
@@ -472,9 +464,6 @@ test('can enable a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.goToUserWithName(newTestUser);
 
   // Act
-  // This wait is currently necessary as the action button is clicked before it is "ready"
-  // TODO: Remove the wait and fix the 'clickActionButton'
-  await umbracoUi.memberGroup.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickEnableButton();
   await umbracoUi.user.clickConfirmEnableButton();
@@ -547,8 +536,6 @@ test('can search for a user', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.searchInUserSection(nameOfTheUser);
 
   // Assert
-  // Wait for filtering to be done
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   const userData = await umbracoApi.user.filterByText(nameOfTheUser);
   await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
   await umbracoUi.user.doesUserSectionContainUserWithText(nameOfTheUser);
@@ -567,8 +554,6 @@ test('can filter by status', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.filterByStatusName(inactiveStatus);
 
   // Assert
-  // Wait for filtering to be done
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   const userData = await umbracoApi.user.filterByUserStates(inactiveStatus);
   await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
   await umbracoUi.user.doesUserSectionContainUserWithText(nameOfTheUser);
@@ -587,8 +572,6 @@ test('can filter by user groups', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.filterByGroupName(defaultUserGroupName);
 
   // Assert
-  // Wait for filtering to be done
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   const userData = await umbracoApi.user.filterByUserGroupIds(userGroup.id);
   await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
   await umbracoUi.user.doesUserSectionContainUserWithText(defaultUserGroupName);
@@ -606,9 +589,6 @@ test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.orderByNewestUser();
 
   // Assert
-  // Wait for filtering to be done
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
-
   await umbracoUi.user.doesUserSectionContainUserAmount(userCount);
   await umbracoUi.user.isUserWithNameTheFirstUserInList(nameOfTheUser);
 });

@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -56,4 +57,20 @@ public interface IMemberEditingService
     /// <param name="userKey">The unique key of the user performing the delete operation.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="Attempt{TResult,TStatus}" /> with the deleted member and status.</returns>
     Task<Attempt<IMember?, MemberEditingStatus>> DeleteAsync(Guid key, Guid userKey);
+
+    /// <summary>
+    ///     Checks whether the specified key belongs to an external-only member.
+    /// </summary>
+    /// <param name="key">The unique key to check.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is <c>true</c> if the key belongs to an external-only member; otherwise, <c>false</c>.</returns>
+    // TODO (V19): Remove the default implementation.
+    Task<bool> IsExternalMemberAsync(Guid key) => Task.FromResult(false);
+
+    /// <summary>
+    ///     Gets an external-only member by its unique key.
+    /// </summary>
+    /// <param name="key">The unique key of the external member.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="ExternalMemberIdentity"/> if found; otherwise, <c>null</c>.</returns>
+    // TODO (V19): Remove the default implementation.
+    Task<ExternalMemberIdentity?> GetExternalMemberAsync(Guid key) => Task.FromResult<ExternalMemberIdentity?>(null);
 }

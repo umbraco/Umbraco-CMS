@@ -1,3 +1,4 @@
+import { manifests as valueSummaryManifests } from '../value-summary/manifests.js';
 import { UMB_USER_COLLECTION_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as collectionActionManifests } from './action/manifests.js';
 import { manifests as collectionMenuManifests } from './menu/manifests.js';
@@ -26,4 +27,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...collectionViewManifests,
 	...itemManifests,
 	...filterManifests,
+	...valueSummaryManifests,
 ];

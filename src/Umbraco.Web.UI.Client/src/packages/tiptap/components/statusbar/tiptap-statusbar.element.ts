@@ -1,4 +1,6 @@
 import type { UmbTiptapStatusbarValue } from '../types.js';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via {@link} in JSDoc below
+import type { UmbInputTiptapElement } from '../input-tiptap/input-tiptap.element.js';
 import type { Editor } from '../../externals.js';
 import { css, customElement, html, nothing, property, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/utils';
@@ -21,9 +23,6 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 	#extensionsController?: UmbExtensionsElementInitializer;
 
 	#lookup: Map<string, unknown> = new Map();
-
-	@property({ type: Boolean, reflect: true })
-	readonly = false;
 
 	@property({ attribute: false })
 	editor?: Editor;
@@ -107,10 +106,6 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 	}
 
 	static override readonly styles = css`
-		:host([readonly]) {
-			display: none;
-		}
-
 		:host {
 			--uui-button-height: var(--uui-size-layout-2);
 

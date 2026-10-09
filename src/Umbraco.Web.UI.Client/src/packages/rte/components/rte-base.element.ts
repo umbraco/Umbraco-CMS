@@ -100,10 +100,22 @@ export abstract class UmbPropertyEditorUiRteElementBase
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
-	 * @default false
+	 * @default
+	 * @returns {boolean} Whether the input is readonly.
 	 */
 	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+		if (this.#readonly) {
+			this.#managerContext.readOnlyState.fallbackToPermitted();
+		} else {
+			this.#managerContext.readOnlyState.fallbackToNotPermitted();
+		}
+	}
+	#readonly = false;
 
 	@property({ type: Boolean })
 	mandatory?: boolean;

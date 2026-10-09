@@ -28,7 +28,7 @@ internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryA
     /// Builds a collection of field definitions used for the delivery API content index.
     /// </summary>
     /// <returns>
-    /// A <see cref="Umbraco.Cms.Infrastructure.Examine.FieldDefinitionCollection"/> containing the generated field definitions.
+    /// A <see cref="FieldDefinitionCollection"/> containing the generated field definitions.
     /// </returns>
     public FieldDefinitionCollection Build()
     {

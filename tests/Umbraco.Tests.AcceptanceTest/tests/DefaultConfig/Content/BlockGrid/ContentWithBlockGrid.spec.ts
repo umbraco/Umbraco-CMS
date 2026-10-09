@@ -424,3 +424,34 @@ test('can move away from a content node with a block grid after making no change
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
 });
 
+
+test('can navigate away from content with a block grid value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDefaultDocumentWithABlockGridEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed block grid value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDefaultDocumentWithABlockGridEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickDeleteBlockGridBlockButton();
+  await umbracoUi.content.clickConfirmToDeleteButton();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});

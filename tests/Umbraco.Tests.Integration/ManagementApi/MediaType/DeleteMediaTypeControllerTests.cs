@@ -15,7 +15,7 @@ public class DeleteMediaTypeControllerTests : ManagementApiUserGroupTestBase<Del
     private Guid _mediaTypeKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         _mediaTypeKey = Guid.NewGuid();
         MediaTypeCreateModel mediaTypeCreateModel = new() { Name = "Test", Alias = "test", Key = _mediaTypeKey };

@@ -9,6 +9,22 @@ import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 
 const MAX_RETRIES = 3;
 
+/**
+ * HTTP statuses used by proxies/gateways (nginx, ALB, IIS ARR, Cloudflare's 524/598, etc.) to report that
+ * the origin server *received* the request but didn't respond before the proxy gave up waiting. The action
+ * may still complete (or have completed) on the server.
+ * @see https://github.com/umbraco/Umbraco-CMS/issues/16041
+ */
+const GATEWAY_TIMEOUT_STATUSES = new Set([504, 524, 598]);
+
+/**
+ * HTTP statuses used by proxies/gateways to report that they could not establish or complete a connection
+ * to the origin server at all (TCP/TLS/DNS failure) — the request never reached the server, so the action
+ * cannot have been performed.
+ * @see https://github.com/umbraco/Umbraco-CMS/issues/16041
+ */
+const GATEWAY_UNREACHABLE_STATUSES = new Set([521, 522, 523, 525, 526, 530, 599]);
+
 export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
 	 * Store pending requests that received a 401 response and are waiting for re-authentication.
@@ -43,6 +59,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		// Add the default observables to the instance
 		this.handleUnauthorizedAuthRetry();
 		// Add the default interceptors to the client
+		// TODO: Investigate whether some of these interceptors (e.g. addUmbGeneratedResourceInterceptor,
+		// addForbiddenResponseInterceptor, addUmbNotificationsInterceptor, addErrorInterceptor) belong
+		// somewhere else, since they are not auth-specific.
 		this.addAuthResponseInterceptor(client);
 		this.addForbiddenResponseInterceptor(client);
 		this.addUmbGeneratedResourceInterceptor(client);
@@ -103,6 +122,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					requestConfig,
 					retry: async () => {
 						const { data, response: retryResponse } = await client.request(requestConfig as never);
+
+						if (!retryResponse) {
+							throw new Error('The retried request did not produce a response.');
+						}
 
 						return this.#createResponse(data, retryResponse);
 					},
@@ -194,6 +217,34 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				return this.#createResponse(notFoundProblemDetails, response);
 			}
 
+			// Special handling for proxy/gateway timeouts. These respond with their own (usually non-JSON) error
+			// page instead of ours, so without this the request would surface as a generic, unhelpful server error.
+			if (GATEWAY_TIMEOUT_STATUSES.has(response.status)) {
+				const timeoutProblemDetails: UmbProblemDetails = {
+					status: response.status,
+					title: 'The request timed out',
+					detail: `A proxy or gateway between your browser and the server sent your request through, but didn't receive a response in time (HTTP ${response.status}). The action you performed may still have completed on the server — please check before trying again.`,
+					errors: undefined,
+					type: 'GatewayTimeout',
+					stack: undefined,
+				};
+				return this.#createResponse(timeoutProblemDetails, response);
+			}
+
+			// Special handling for proxies/gateways that could not reach the server at all (as opposed to
+			// GATEWAY_TIMEOUT_STATUSES, where the server received the request but didn't respond in time).
+			if (GATEWAY_UNREACHABLE_STATUSES.has(response.status)) {
+				const unreachableProblemDetails: UmbProblemDetails = {
+					status: response.status,
+					title: 'The server could not be reached',
+					detail: `A proxy or gateway between your browser and the server could not connect to it (HTTP ${response.status}). Your request was not received, so no action was performed — please try again once the connection issue is resolved.`,
+					errors: undefined,
+					type: 'GatewayUnreachable',
+					stack: undefined,
+				};
+				return this.#createResponse(unreachableProblemDetails, response);
+			}
+
 			// For all other errors, we will build a ProblemDetails object
 			let problemDetails: UmbProblemDetails = {
 				status: response.status,
@@ -226,7 +277,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any. Removes the umb-notifications from the headers.
+	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any.
 	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 * @internal
 	 */
@@ -247,7 +298,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					this.#peekError(
 						notification.category,
 						notification.message,
-						null,
+						undefined,
 						extractUmbNotificationColor(notification.type),
 					);
 				}
@@ -285,9 +336,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 				// Notify about non-GET 401s after successful re-auth
 				if (this.#nonGet401Requests.length > 0) {
-					const errors: Record<string, string> = {};
+					const errors: Record<string, string[]> = {};
 					this.#nonGet401Requests.forEach((req) => {
-						errors[`${req.request.method} ${req.request.url}`] = `Request failed with 401 Unauthorized.`;
+						errors[`${req.request.method} ${req.request.url}`] = ['Request failed with 401 Unauthorized.'];
 					});
 					this.#peekError(
 						'Some actions were not completed',
@@ -313,10 +364,13 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		const contentType = isString ? 'text/plain' : 'application/json';
 		const responseBody = isString ? body : JSON.stringify(body);
 
-		// Construct new headers but preserve "X-" headers from the original response
+		// Construct new headers but preserve "X-" headers and Umbraco's own "Umb-" headers from the original
+		// response, so interceptors running after the one that rebuilt it can still read them.
+		// @see https://github.com/umbraco/Umbraco-CMS/issues/23589
 		const headersOverride: Record<string, string> = {};
 		originalResponse.headers.forEach((value, key) => {
-			if (key.toLowerCase().startsWith('x-')) {
+			const name = key.toLowerCase();
+			if (name.startsWith('x-') || name.startsWith('umb-')) {
 				headersOverride[key] = value;
 			}
 		});
@@ -335,10 +389,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 * Helper to show a notification error.
 	 * @param {string} headline The headline of the error notification.
 	 * @param {string} message The message of the error notification.
-	 * @param {unknown} details Additional details to show in the notification.
+	 * @param {Record<string, string[]>} [errors] Validation errors keyed by field name.
 	 * @param {UmbNotificationColor} [color] The color of the notification.
 	 */
-	async #peekError(headline: string, message: string, details: unknown, color?: UmbNotificationColor) {
+	async #peekError(headline: string, message: string, errors?: Record<string, string[]>, color?: UmbNotificationColor) {
 		// Store the host for usage in the following async context
 		const host = this._host;
 
@@ -346,7 +400,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, {
 			headline,
 			message,
-			details,
+			errors,
 			color,
 		});
 	}

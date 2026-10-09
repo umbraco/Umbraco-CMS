@@ -24,7 +24,7 @@ export class UmbMemberValidationServerDataSource {
 	 * Validate a new Member on the server
 	 * @param {UmbMemberDetailModel} model - Member Model
 	 * @param {UmbEntityUnique} parentUnique - Parent Unique
-	 * @returns {*} - The response from the server
+	 * @returns {Promise<UmbDataSourceResponse<string>>} - The response from the server
 	 */
 	async validateCreate(
 		model: UmbMemberDetailModel,
@@ -65,7 +65,7 @@ export class UmbMemberValidationServerDataSource {
 	 * Validate a existing Member
 	 * @param {UmbMemberDetailModel} model - Member Model
 	 * @param {Array<UmbVariantId>} variantIds - Variant Ids
-	 * @returns {Promise<*>} - The response from the server
+	 * @returns {Promise<UmbDataSourceResponse<string>>} - The response from the server
 	 */
 	async validateUpdate(
 		model: UmbMemberDetailModel,

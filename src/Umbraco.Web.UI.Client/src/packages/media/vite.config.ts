@@ -17,7 +17,6 @@ export default defineConfig({
 			'media-types/index': 'media-types/index.ts',
 			'media/index': 'media/index.ts',
 			'umbraco-package': 'umbraco-package.ts',
-			manifests: 'manifests.ts',
 		},
 	}),
 });

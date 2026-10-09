@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
@@ -43,6 +44,7 @@ public static partial class UmbracoBuilderExtensions
         // register the special idk map
         builder.Services.AddUnique<IIdKeyMap, IdKeyMap>();
         builder.Services.AddUnique<IUserIdKeyResolver, UserIdKeyResolver>();
+        builder.Services.AddUnique<IBackOfficeUserReader, BackOfficeUserReader>();
 
         builder.Services.AddUnique<IAuditService, AuditService>();
         builder.Services.AddUnique<IAuditEntryService, AuditEntryService>();
@@ -87,6 +89,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IContentSearchService, ContentSearchService>();
         builder.Services.AddUnique<IMediaSearchService, MediaSearchService>();
         builder.Services.AddUnique<IDistributedJobService, DistributedJobService>();
+        builder.Services.AddUnique<IMemberFilterService, MemberFilterService>();
         builder.Services.AddUnique<IPropertyEditorSchemaService, PropertyEditorSchemaService>();
 
 #pragma warning disable CS0618 // Type or member is obsolete

@@ -218,12 +218,12 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         => _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 
     /// <summary>
-    /// Creates a list of <see cref="Umbraco.Cms.Api.Management.Models.Content.CulturePublishScheduleModel"/> instances from the specified <see cref="Umbraco.Cms.Api.Management.Models.Content.PublishDocumentRequestModel"/>.
+    /// Creates a list of <see cref="CulturePublishScheduleModel"/> instances from the specified <see cref="PublishDocumentRequestModel"/>.
     /// Validates the publish and unpublish times for each culture's schedule, ensuring they are in the future and that unpublish times are after publish times.
-    /// Returns an <see cref="Umbraco.Cms.Core.Models.Attempt"/> containing the resulting list and a <see cref="Umbraco.Cms.Api.Management.Models.Content.ContentPublishingOperationStatus"/> indicating the outcome of the validation.
+    /// Returns an <see cref="Attempt"/> containing the resulting list and a <see cref="ContentPublishingOperationStatus"/> indicating the outcome of the validation.
     /// </summary>
     /// <param name="requestModel">The request model containing culture-specific publish schedules to process.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Core.Models.Attempt"/> with a list of <see cref="Umbraco.Cms.Api.Management.Models.Content.CulturePublishScheduleModel"/> and the validation status.</returns>
+    /// <returns>An <see cref="Attempt"/> with a list of <see cref="CulturePublishScheduleModel"/> and the validation status.</returns>
     public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
     {
         var model = new List<CulturePublishScheduleModel>();

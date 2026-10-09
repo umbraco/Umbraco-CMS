@@ -1,1 +1,1 @@
-export type { UmbMediaItemModel } from './item/types.js';
+export type * from './item/types.js';

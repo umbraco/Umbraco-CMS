@@ -6,8 +6,9 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Media Type Picker Property Editor UI',
 	element: () => import('./property-editor-ui-media-type-picker.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Media Type Picker',
 		icon: 'icon-media-dashed-line',
-		group: 'advanced',
+		group: '#propertyEditorUIGroups_advanced',
 	},
 };

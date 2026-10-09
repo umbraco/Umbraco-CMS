@@ -104,6 +104,32 @@ describe('UmbClipboardLocalStorageManager', () => {
 		});
 	});
 
+	describe('insecure contexts', () => {
+		it('stores and retrieves entries when crypto.subtle is unavailable', async () => {
+			// http://<ip> origins are insecure contexts where the browser removes crypto.subtle;
+			// simulate that by shadowing the globals for the duration of the test.
+			// isSecureContext is an own property of window, so its descriptor must be restored;
+			// crypto.subtle is a prototype getter, so deleting the shadowing own property suffices.
+			const originalIsSecureContext = Object.getOwnPropertyDescriptor(window, 'isSecureContext');
+			Object.defineProperty(window, 'isSecureContext', { value: false, configurable: true });
+			Object.defineProperty(window.crypto, 'subtle', { value: undefined, configurable: true });
+			try {
+				const insecureManager = new UmbClipboardLocalStorageManager(hostElement);
+				await insecureManager.setEntries(clipboardEntries);
+				const { entries, total } = await insecureManager.getEntries();
+				expect(entries).to.deep.equal(clipboardEntries);
+				expect(total).to.equal(clipboardEntries.length);
+			} finally {
+				if (originalIsSecureContext) {
+					Object.defineProperty(window, 'isSecureContext', originalIsSecureContext);
+				} else {
+					delete (window as { isSecureContext?: boolean }).isSecureContext;
+				}
+				delete (window.crypto as { subtle?: SubtleCrypto }).subtle;
+			}
+		});
+	});
+
 	describe('setEntries', () => {
 		it('sets entries in local storage', async () => {
 			const newEntry: UmbClipboardEntryDetailModel = {

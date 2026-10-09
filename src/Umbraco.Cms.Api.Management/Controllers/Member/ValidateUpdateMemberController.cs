@@ -20,7 +20,7 @@ public class ValidateUpdateMemberController : MemberControllerBase
     private readonly IMemberEditingPresentationFactory _memberEditingPresentationFactory;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Member.ValidateUpdateMemberController"/> class.
+    /// Initializes a new instance of the <see cref="ValidateUpdateMemberController"/> class.
     /// </summary>
     /// <param name="memberEditingService">The <see cref="IMemberEditingService"/> used for member editing operations.</param>
     /// <param name="memberEditingPresentationFactory">The <see cref="IMemberEditingPresentationFactory"/> used to create member editing presentations.</param>
@@ -44,6 +44,12 @@ public class ValidateUpdateMemberController : MemberControllerBase
         Guid id,
         UpdateMemberRequestModel requestModel)
     {
+        // External-only members cannot be updated through this endpoint.
+        if (await _memberEditingService.IsExternalMemberAsync(id))
+        {
+            return ExternalMemberCannotBeModified();
+        }
+
         MemberUpdateModel model = _memberEditingPresentationFactory.MapUpdateModel(requestModel);
         Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _memberEditingService.ValidateUpdateAsync(id, model);
 

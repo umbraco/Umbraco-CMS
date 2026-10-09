@@ -1,4 +1,5 @@
 import { manifest as memberPickerSchemaManifest } from './Umbraco.MemberPicker.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,12 +8,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Member Picker Property Editor UI',
 		element: () => import('./property-editor-ui-member-picker.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Member Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MemberPicker',
 			icon: 'icon-user',
-			group: 'people',
+			group: '#propertyEditorUIGroups_people',
+			keywords: ['select', 'member', 'person', 'subscriber', 'customer', 'account', 'profile', 'contact', 'author'],
 			supportsReadOnly: true,
 		},
 	},
 	memberPickerSchemaManifest,
+	...valueSummaryManifests,
 ];

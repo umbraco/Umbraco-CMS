@@ -2,7 +2,7 @@ import type { UmbContentDetailModel } from '../types.js';
 import { UmbElementWorkspaceDataManager } from './element-data-manager.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
-import { UmbVariantId, umbVariantObjectCompare, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbVariantObjectSortCompare, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
 export class UmbContentWorkspaceDataManager<
 	ModelType extends UmbContentDetailModel,
@@ -17,27 +17,6 @@ export class UmbContentWorkspaceDataManager<
 	constructor(host: UmbControllerHost, variantScaffold?: ModelVariantType) {
 		super(host);
 		this.#variantScaffold = variantScaffold;
-	}
-
-	protected override _sortCurrentData<GivenType extends Partial<ModelType> = Partial<ModelType>>(
-		persistedData: Partial<ModelType>,
-		currentData: GivenType,
-	): GivenType {
-		currentData = super._sortCurrentData(persistedData, currentData);
-		// Sort the variants in the same order as the persisted data:
-		const persistedVariants = persistedData.variants;
-		if (persistedVariants && currentData.variants) {
-			return {
-				...currentData,
-				variants: [...currentData.variants].sort(function (a, b) {
-					return (
-						persistedVariants.findIndex((x) => umbVariantObjectCompare(x, a)) -
-						persistedVariants.findIndex((x) => umbVariantObjectCompare(x, b))
-					);
-				}),
-			};
-		}
-		return currentData;
 	}
 
 	/**
@@ -113,7 +92,7 @@ export class UmbContentWorkspaceDataManager<
 				...update,
 			} as ModelVariantType,
 			(x) => variantId.compare(x),
-		) as Array<ModelVariantType>;
+		).sort(umbVariantObjectSortCompare) as Array<ModelVariantType>;
 		this.updateCurrent({ variants: newVariants } as unknown as ModelType);
 	}
 
@@ -150,7 +129,9 @@ export class UmbContentWorkspaceDataManager<
 		});
 
 		const changedProperties = current?.values.map((value) => {
-			const persistedValues = persisted?.values.find((x) => UmbVariantId.Create(value).compare(x));
+			const persistedValues = persisted?.values.find(
+				(x) => x.alias === value.alias && UmbVariantId.Create(value).compare(x),
+			);
 			return {
 				culture: value.culture,
 				segment: value.segment,

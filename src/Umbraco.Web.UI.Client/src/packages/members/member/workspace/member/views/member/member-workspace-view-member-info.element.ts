@@ -2,7 +2,7 @@ import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-tok
 import { UmbMemberKind, type UmbMemberKindType } from '../../../../utils/index.js';
 import { TimeFormatOptions } from './utils.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
@@ -96,6 +96,10 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 		return this.#renderGeneralSection();
 	}
 
+	#isExternalOnly() {
+		return this._memberKind === UmbMemberKind.EXTERNAL_ONLY;
+	}
+
 	#renderGeneralSection() {
 		return html`
 			<umb-stack look="compact">
@@ -107,24 +111,28 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 					<h4><umb-localize key="content_updateDate">Last edited</umb-localize></h4>
 					<span> ${this._updateDate} </span>
 				</div>
-				<div>
-					<h4><umb-localize key="content_membertype">Member Type</umb-localize></h4>
-					<uui-ref-node
-						standalone
-						.name=${this._memberTypeName}
-						href=${ifDefined(
-							this._hasSettingsAccess ? this._editMemberTypePath + 'edit/' + this._memberTypeUnique : undefined,
-						)}
-						?readonly=${!this._hasSettingsAccess}>
-						<umb-icon slot="icon" .name=${this._memberTypeIcon}></umb-icon>
-					</uui-ref-node>
-				</div>
+				${this.#isExternalOnly()
+					? nothing
+					: html`<div>
+							<h4><umb-localize key="content_membertype">Member Type</umb-localize></h4>
+							<uui-ref-node
+								standalone
+								.name=${this._memberTypeName}
+								href=${ifDefined(
+									this._hasSettingsAccess ? this._editMemberTypePath + 'edit/' + this._memberTypeUnique : undefined,
+								)}
+								?readonly=${!this._hasSettingsAccess}>
+								<umb-icon slot="icon" .name=${this._memberTypeIcon}></umb-icon>
+							</uui-ref-node>
+						</div>`}
 				<div>
 					<h4><umb-localize key="member_kind"></umb-localize></h4>
 					<span
 						>${this._memberKind === UmbMemberKind.API
 							? this.localize.term('member_memberKindApi')
-							: this.localize.term('member_memberKindDefault')}</span
+							: this._memberKind === UmbMemberKind.EXTERNAL_ONLY
+								? this.localize.term('member_memberKindExternalOnly')
+								: this.localize.term('member_memberKindDefault')}</span
 					>
 				</div>
 				<div>

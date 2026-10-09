@@ -33,7 +33,11 @@ export class UmbClipboardEntryPickerModalElement extends UmbModalBaseElement<
 				@selection-change=${this.#onSelectionChange}></umb-clipboard-entry-picker>
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
-				<uui-button label=${this.localize.term('general_submit')} look="primary" color="positive" @click=${this.#submit}></uui-button>
+				<uui-button
+					label=${this.localize.term('general_submit')}
+					look="primary"
+					color="positive"
+					@click=${this.#submit}></uui-button>
 			</div>
 		</umb-body-layout>`;
 	}

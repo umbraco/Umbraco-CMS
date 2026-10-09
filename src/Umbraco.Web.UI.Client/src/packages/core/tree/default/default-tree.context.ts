@@ -1,5 +1,7 @@
+import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
 import { UmbTreeItemActiveManager } from '../active-manager/tree-active-manager.js';
 import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
+import { UmbTreeViewManager } from '../view/tree-view.manager.js';
 import { UmbTreeItemChildrenManager } from '../tree-item/tree-item-children.manager.js';
 import { UmbTreeItemTargetExpansionManager } from '../tree-item/tree-item-expansion.manager.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
@@ -12,40 +14,70 @@ import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 export class UmbDefaultTreeContext<
-		TreeItemType extends UmbTreeItemModel,
-		TreeRootType extends UmbTreeRootModel,
-		RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
-	>
+	TreeItemType extends UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel,
+	RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+>
 	extends UmbContextBase
 	implements UmbTreeContext<TreeItemType, TreeRootType, RequestArgsType>
 {
 	#treeRoot = new UmbObjectState<TreeRootType | undefined>(undefined);
 	public readonly treeRoot = this.#treeRoot.asObservable();
 
+	#entityContext = new UmbEntityContext(this);
+
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly expansion = new UmbTreeExpansionManager(this);
+	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
+	public readonly view = new UmbTreeViewManager(this, { interactionMemoryManager: this.interactionMemory });
 
 	#hideTreeRoot = new UmbBooleanState(false);
 	public readonly hideTreeRoot = this.#hideTreeRoot.asObservable();
+
+	#hideTreeItemActions = new UmbBooleanState(false);
+	public readonly hideTreeItemActions = this.#hideTreeItemActions.asObservable();
+
+	#selectOnly = new UmbBooleanState(undefined);
+	public readonly selectOnly = this.#selectOnly.asObservable();
+
+	#selectOnlyConfig?: boolean;
+
+	#isMenu = new UmbBooleanState(undefined);
+	public readonly isMenu = this.#isMenu.asObservable();
+
+	#drillable = new UmbBooleanState(false);
+	/**
+	 * Whether opening an item takes the user into it. A property of the host, so it is the same for every item in the
+	 * tree.
+	 *
+	 * Off unless the host declares otherwise: a tree that can do no more than expand and collapse is the common case,
+	 * and the one where offering to drill into an item would strand everything below it.
+	 */
+	public readonly drillable = this.#drillable.asObservable();
 
 	#expandTreeRoot = new UmbBooleanState(undefined);
 	public readonly expandTreeRoot = this.#expandTreeRoot.asObservable();
 
 	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType, RequestArgsType>(this);
 	public readonly rootItems = this.#treeItemChildrenManager.children;
+	public readonly currentPageItems = this.#treeItemChildrenManager.currentPageChildren;
 	public readonly hasChildren = this.#treeItemChildrenManager.hasChildren;
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
 	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
 	public readonly startNode = this.#treeItemChildrenManager.startNode;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly additionalRequestArgs = this.#treeItemChildrenManager.additionalRequestArgs;
+	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
 	public readonly isLoadingPrevChildren = this.#treeItemChildrenManager.isLoadingPrevChildren;
 	public readonly isLoadingNextChildren = this.#treeItemChildrenManager.isLoadingNextChildren;
 
@@ -72,9 +104,18 @@ export class UmbDefaultTreeContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_CONTEXT);
-		this.#treeItemChildrenManager.setTakeSize(50);
-		// always load the tree root because we need the root entity to reload the entire tree
-		this.#loadTreeRoot();
+		this.#treeItemChildrenManager.setTakeSize(100);
+
+		// Auto-enable selectOnly when a selection exists and it was not explicitly set.
+		this.observe(
+			this.selection.selection,
+			(selection) => {
+				if (this.#selectOnlyConfig === undefined) {
+					this.#selectOnly.setValue((selection?.length ?? 0) > 0);
+				}
+			},
+			null,
+		);
 	}
 
 	// TODO: find a generic way to do this
@@ -87,12 +128,15 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Sets the manifest
-	 * @param {ManifestTree} manifest
+	 * @param {ManifestTree} manifest - The tree manifest
 	 * @memberof UmbDefaultTreeContext
 	 */
 	public set manifest(manifest: ManifestTree | undefined) {
 		if (this.#manifest === manifest) return;
 		this.#manifest = manifest;
+		if (manifest?.alias) {
+			this.view.setTreeAlias(manifest.alias);
+		}
 		this.#observeRepository(this.#manifest?.meta.repositoryAlias);
 	}
 	public get manifest() {
@@ -101,7 +145,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Returns the manifest.
-	 * @returns {ManifestTree}
+	 * @returns {ManifestTree} The tree manifest
 	 * @memberof UmbDefaultTreeContext
 	 * @deprecated Use the `.manifest` property instead.
 	 */
@@ -116,6 +160,13 @@ export class UmbDefaultTreeContext<
 
 	public getRepository() {
 		return this.#repository;
+	}
+
+	public open(item: TreeItemType): void {
+		// The tree root has a null unique and is not a navigable target, so opening it is a no-op.
+		const unique = item.unique as UmbEntityUnique;
+		if (unique === null || unique === undefined) return;
+		this.getHostElement().dispatchEvent(new UmbTreeItemOpenEvent({ unique, entityType: item.entityType }));
 	}
 
 	/**
@@ -136,21 +187,24 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Reloads the tree
+	 * @param {number} pageNumber - The page number to load
 	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
 	 */
+	public loadPage = (pageNumber: number): Promise<void> => this.#treeItemChildrenManager.loadPage(pageNumber);
+
 	public loadMore = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
 
 	/**
 	 * Load previous items of the tree item
-	 * @memberof UmbTreeItemContextBase
+	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
 	 */
 	public loadPrevItems = (): Promise<void> => this.#treeItemChildrenManager.loadPrevChildren();
 
 	/**
 	 * Load next items of the tree item
-	 * @memberof UmbTreeItemContextBase
+	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
 	 */
 	public loadNextItems = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
@@ -160,14 +214,21 @@ export class UmbDefaultTreeContext<
 
 		const hasStartNode = this.getStartNode();
 		const hideTreeRoot = this.getHideTreeRoot();
-		if (hasStartNode || hideTreeRoot) {
+
+		// Always load the tree root entity, even when the root node is hidden or we are drilled
+		// into a start node. The root entity is required to wire up the target/expansion handling
+		// at root level: the tree's expansion manager only starts observing once it has been given
+		// the root tree item, which is what lets a deep-link / breadcrumb target paginate the root.
+		this.#loadTreeRoot(reload);
+
+		// Load children when drilled into a node, when the root is hidden, or when
+		// the root is pre-expanded — all cases where children must be immediately visible.
+		if (hasStartNode || hideTreeRoot || this.getExpandTreeRoot()) {
 			if (reload) {
 				this.#treeItemChildrenManager.reloadChildren();
 			} else {
 				this.#treeItemChildrenManager.loadChildren();
 			}
-		} else {
-			this.#loadTreeRoot(reload);
 		}
 	}
 
@@ -180,6 +241,10 @@ export class UmbDefaultTreeContext<
 			this.#treeRoot.setValue(data);
 			this.#treeItemChildrenManager.setTreeItem(data);
 			this.#treeItemExpansionManager.setTreeItem(data);
+			if (!this.getStartNode()) {
+				this.#entityContext.setEntityType(data.entityType);
+				this.#entityContext.setUnique(data.unique);
+			}
 			this.pagination.setTotalItems(1);
 
 			if (!reload) {
@@ -190,12 +255,57 @@ export class UmbDefaultTreeContext<
 		}
 	}
 
+	setHideTreeItemActions(value: boolean) {
+		this.#hideTreeItemActions.setValue(value);
+	}
+
+	getHideTreeItemActions(): boolean {
+		return this.#hideTreeItemActions.getValue();
+	}
+
+	setSelectOnly(value: boolean | undefined) {
+		this.#selectOnlyConfig = value;
+		// If undefined (auto-detect), compute from current selection so re-renders don't reset the auto-detected state.
+		this.#selectOnly.setValue(value ?? (this.selection.getSelection()?.length ?? 0) > 0);
+	}
+
+	getSelectOnly(): boolean {
+		return this.#selectOnly.getValue() ?? false;
+	}
+
+	setIsMenu(value: boolean) {
+		this.#isMenu.setValue(value);
+	}
+
+	getIsMenu(): boolean {
+		return this.#isMenu.getValue() ?? false;
+	}
+
+	/**
+	 * Sets whether opening an item takes the user into it.
+	 * @param {boolean} value - True when the host acts on `UmbTreeItemOpenEvent`.
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setDrillable(value: boolean) {
+		this.#drillable.setValue(value);
+	}
+
+	/**
+	 * Returns whether opening an item takes the user into it.
+	 * @returns {boolean} True when the host acts on `UmbTreeItemOpenEvent`.
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getDrillable(): boolean {
+		return this.#drillable.getValue();
+	}
+
 	/**
 	 * Sets the hideTreeRoot config
 	 * @param {boolean} hideTreeRoot - Whether to hide the tree root
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setHideTreeRoot(hideTreeRoot: boolean) {
+		if (this.getHideTreeRoot() === hideTreeRoot) return;
 		this.#hideTreeRoot.setValue(hideTreeRoot);
 		// we need to reset the tree if this config changes
 		this.#clearTree();
@@ -204,7 +314,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Gets the hideTreeRoot config
-	 * @returns {boolean}
+	 * @returns {boolean} - Whether the tree root is hidden
 	 * @memberof UmbDefaultTreeContext
 	 */
 	getHideTreeRoot(): boolean {
@@ -213,11 +323,18 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Sets the startNode config
-	 * @param {UmbTreeStartNode} startNode
+	 * @param {UmbTreeStartNode} startNode - The start node
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setStartNode(startNode: UmbTreeStartNode | undefined) {
+		const current = this.getStartNode();
+		if (current?.unique === startNode?.unique && current?.entityType === startNode?.entityType) return;
+
 		this.#treeItemChildrenManager.setStartNode(startNode);
+		if (startNode) {
+			this.#entityContext.setEntityType(startNode.entityType);
+			this.#entityContext.setUnique(startNode.unique);
+		}
 		// we need to reset the tree if this config changes
 		this.#clearTree();
 		this.loadTree();
@@ -238,6 +355,7 @@ export class UmbDefaultTreeContext<
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setFoldersOnly(foldersOnly: boolean) {
+		if (this.getFoldersOnly() === foldersOnly) return;
 		this.#treeItemChildrenManager.setFoldersOnly(foldersOnly);
 		// we need to reset the tree if this config changes
 		this.#clearTree();
@@ -255,7 +373,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Updates the requestArgs config and reloads the tree.
-	 * @param args
+	 * @param {Partial<RequestArgsType>} args - The request args to merge in
 	 */
 	public updateAdditionalRequestArgs(args: Partial<RequestArgsType>) {
 		this.#treeItemChildrenManager.setAdditionalRequestArgs(args);

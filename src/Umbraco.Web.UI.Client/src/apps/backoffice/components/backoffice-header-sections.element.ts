@@ -112,7 +112,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		const label = this.localize.string(manifest?.meta.label || manifest?.name);
 		return html`<uui-tab
 			data-mark="section-link:${manifest.alias}"
-			.href=${this.#getSectionPath(manifest)}
+			href=${this.#getSectionPath(manifest)}
 			label=${ifDefined(label)}
 			?active=${this._currentSectionAlias === manifest.alias}
 			@click=${(event: PointerEvent) => this.#onSectionClick(event, manifest)}></uui-tab>`;

@@ -28,7 +28,6 @@ public class InviteUriProvider : IInviteUriProvider
         IHttpContextAccessor httpContextAccessor,
         IHostingEnvironment hostingEnvironment)
     {
-
         _userManager = userManager;
         _httpContextAccessor = httpContextAccessor;
         _hostingEnvironment = hostingEnvironment;
@@ -43,27 +42,34 @@ public class InviteUriProvider : IInviteUriProvider
     /// </returns>
     public async Task<Attempt<Uri, UserOperationStatus>> CreateInviteUriAsync(IUser invitee)
     {
-        Attempt<string, UserOperationStatus> tokenAttempt = await _userManager.GenerateEmailConfirmationTokenAsync(invitee);
-
-        if (tokenAttempt.Success is false)
-        {
-            return Attempt.FailWithStatus(tokenAttempt.Status, new Uri(string.Empty));
-        }
-
-        HttpRequest? request = _httpContextAccessor.HttpContext?.Request;
-        if (request is null)
+        if (_httpContextAccessor.HttpContext is null)
         {
             throw new NotSupportedException("Needs a HttpContext");
         }
 
-        var uriBuilder = new UriBuilder(_hostingEnvironment.ApplicationMainUrl);
-        uriBuilder.Path = BackOfficeLoginController.LoginPath;
-        uriBuilder.Query = QueryString.Create(new KeyValuePair<string, string?>[]
+        Uri? appUrl = _hostingEnvironment.ApplicationMainUrl;
+        if (appUrl is null)
         {
-            new ("flow", "invite-user"),
-            new ("userId", invitee.Key.ToString()),
-            new ("inviteCode", tokenAttempt.Result.ToUrlBase64()),
-        }).ToUriComponent();
+            return Attempt.FailWithStatus<Uri, UserOperationStatus>(UserOperationStatus.ApplicationUrlNotConfigured, default!);
+        }
+
+        Attempt<string, UserOperationStatus> tokenAttempt = await _userManager.GenerateEmailConfirmationTokenAsync(invitee);
+
+        if (tokenAttempt.Success is false)
+        {
+            return Attempt.FailWithStatus<Uri, UserOperationStatus>(tokenAttempt.Status, default!);
+        }
+
+        var uriBuilder = new UriBuilder(appUrl)
+        {
+            Path = BackOfficeLoginController.LoginPath,
+            Query = QueryString.Create(new KeyValuePair<string, string?>[]
+            {
+                new ("flow", "invite-user"),
+                new ("userId", invitee.Key.ToString()),
+                new ("inviteCode", tokenAttempt.Result.ToUrlBase64()),
+            }).ToUriComponent()
+        };
 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, uriBuilder.Uri);
     }

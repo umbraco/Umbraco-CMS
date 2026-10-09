@@ -102,7 +102,9 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         {
             var isVariant = c.ContentType.VariesByCulture();
 
-            var urlValue = _documentUrlService.GetUrlSegment(c.Key, defaultCulture, false); // Always add invariant urlName
+            var urlValue = _documentUrlService.IsInitialized
+                ? _documentUrlService.GetUrlSegment(c.Key, defaultCulture, false)
+                : c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, defaultCulture); // Fallback when DocumentUrlService is not yet initialized (e.g. during upgrade)
             var values = new Dictionary<string, IEnumerable<object?>>
             {
                 { "icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },
@@ -146,7 +148,9 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
 
                 foreach (var culture in c.AvailableCultures)
                 {
-                    var variantUrl = c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, culture);
+                    var variantUrl = _documentUrlService.IsInitialized
+                        ? _documentUrlService.GetUrlSegment(c.Key, culture, false)
+                        : c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, culture);
                     var lowerCulture = culture.ToLowerInvariant();
                     values[$"urlName_{lowerCulture}"] = variantUrl?.Yield() ?? Enumerable.Empty<string>();
                     values[$"nodeName_{lowerCulture}"] = (PublishedValuesOnly
@@ -176,7 +180,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Failed to add property '{PropertyAlias}' to index for content {ContentId}", property.Alias, c.Id);
+                        _logger.LogError(ex, "Failed to add property '{PropertyAlias}' to index for content {ContentId} (key {ContentKey})", property.Alias, c.Id, c.Key);
                         throw;
                     }
                 }
@@ -192,9 +196,10 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                         {
                             _logger.LogError(
                                 ex,
-                                "Failed to add property '{PropertyAlias}' to index for content {ContentId} in culture {Culture}",
+                                "Failed to add property '{PropertyAlias}' to index for content {ContentId} (key {ContentKey}) in culture {Culture}",
                                 property.Alias,
                                 c.Id,
+                                c.Key,
                                 culture);
                             throw;
                         }

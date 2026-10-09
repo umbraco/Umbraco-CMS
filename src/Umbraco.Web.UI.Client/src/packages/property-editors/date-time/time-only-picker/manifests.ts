@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.TimeOnly.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,10 +8,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Time Only Picker Property Editor UI',
 		element: () => import('./property-editor-ui-time-only-picker.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Time Only',
 			propertyEditorSchemaAlias: 'Umbraco.TimeOnly',
 			icon: 'icon-time',
-			group: 'date',
+			group: '#propertyEditorUIGroups_date',
+			keywords: ['time', 'clock', 'hour', 'schedule', 'duration', 'opening', 'closing', 'start', 'end', 'minute'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -39,4 +42,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

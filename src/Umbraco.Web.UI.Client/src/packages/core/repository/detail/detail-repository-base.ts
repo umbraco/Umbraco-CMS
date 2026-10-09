@@ -1,5 +1,9 @@
 import { UmbRepositoryBase } from '../repository-base.js';
-import type { UmbRepositoryResponse, UmbRepositoryResponseWithAsObservable } from '../types.js';
+import type {
+	UmbRepositoryErrorResponse,
+	UmbRepositoryResponse,
+	UmbRepositoryResponseWithAsObservable,
+} from '../types.js';
 import type { UmbDetailDataSource, UmbDetailDataSourceConstructor } from './detail-data-source.interface.js';
 import type { UmbDetailRepository } from './detail-repository.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -8,11 +12,12 @@ import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export abstract class UmbDetailRepositoryBase<
-		DetailModelType extends UmbEntityModel,
-		UmbDetailDataSourceType extends UmbDetailDataSource<DetailModelType> = UmbDetailDataSource<DetailModelType>,
-	>
+	DetailModelType extends UmbEntityModel,
+	UmbDetailDataSourceType extends UmbDetailDataSource<DetailModelType> = UmbDetailDataSource<DetailModelType>,
+>
 	extends UmbRepositoryBase
 	implements UmbDetailRepository<DetailModelType>, UmbApi
 {
@@ -44,8 +49,8 @@ export abstract class UmbDetailRepositoryBase<
 
 	/**
 	 * Creates a scaffold
-	 * @param {UmbDeepPartialObject<DetailModelType>} [preset]
-	 * @returns {*}
+	 * @param {UmbDeepPartialObject<DetailModelType>} [preset] - Partial data to seed the scaffold with
+	 * @returns {Promise<UmbRepositoryResponse<DetailModelType>>} The scaffolded detail data
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async createScaffold(
@@ -56,8 +61,8 @@ export abstract class UmbDetailRepositoryBase<
 
 	/**
 	 * Requests the detail for the given unique
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the detail
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<DetailModelType | undefined>>} The requested detail data
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async requestByUnique(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType | undefined>> {
@@ -79,9 +84,9 @@ export abstract class UmbDetailRepositoryBase<
 
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
-	 * @param {DetailModelType} model
-	 * @param {string | null} [parentUnique]
-	 * @returns {*}
+	 * @param {DetailModelType} model - The data to create
+	 * @param {string | null} [parentUnique] - The unique of the parent, if any
+	 * @returns {Promise<UmbRepositoryResponse<DetailModelType>>} The created detail data
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async create(model: DetailModelType, parentUnique: string | null): Promise<UmbRepositoryResponse<DetailModelType>> {
@@ -99,8 +104,8 @@ export abstract class UmbDetailRepositoryBase<
 
 	/**
 	 * Saves the given data
-	 * @param {DetailModelType} model
-	 * @returns {*}
+	 * @param {DetailModelType} model - The data to save
+	 * @returns {Promise<UmbRepositoryResponse<DetailModelType>>} The saved detail data
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async save(model: DetailModelType) {
@@ -119,11 +124,11 @@ export abstract class UmbDetailRepositoryBase<
 
 	/**
 	 * Deletes the detail for the given unique
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the detail to delete
+	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the delete request
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbRepositoryErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
@@ -138,11 +143,11 @@ export abstract class UmbDetailRepositoryBase<
 
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the detail
+	 * @returns {Promise<Observable<DetailModelType | undefined>>} An observable of the detail data
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async byUnique(unique: string) {
+	async byUnique(unique: string): Promise<Observable<DetailModelType | undefined>> {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 		return this.#detailStore!.byUnique(unique);

@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.Tags.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,12 +8,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Tags Property Editor UI',
 		element: () => import('./property-editor-ui-tags.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Tags',
 			propertyEditorSchemaAlias: 'Umbraco.Tags',
 			icon: 'icon-tags',
-			group: 'common',
+			group: '#propertyEditorUIGroups_common',
+			keywords: ['tag', 'label', 'category', 'keyword', 'metadata', 'topics', 'terms', 'taxonomy'],
 			supportsReadOnly: true,
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

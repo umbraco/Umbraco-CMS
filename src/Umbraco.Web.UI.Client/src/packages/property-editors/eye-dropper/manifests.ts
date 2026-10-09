@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.ColorPicker.EyeDropper.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,9 +8,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Eye Dropper Color Picker Property Editor UI',
 		element: () => import('./property-editor-ui-eye-dropper.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Eye Dropper Color Picker',
 			icon: 'icon-colorpicker',
-			group: 'pickers',
+			group: '#propertyEditorUIGroups_pickers',
+			keywords: ['color', 'colour', 'hex', 'palette', 'hue', 'pick'],
 			propertyEditorSchemaAlias: 'Umbraco.ColorPicker.EyeDropper',
 			settings: {
 				properties: [
@@ -30,4 +33,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Core.Preview;
 /// This implementation is used as a placeholder when preview functionality is not configured or available.
 /// All operations return failed attempts.
 /// </remarks>
+[Obsolete("This has been deprecated and will be removed in Umbraco 19.")]
 public class NoopPreviewTokenGenerator : IPreviewTokenGenerator
 {
     /// <inheritdoc />

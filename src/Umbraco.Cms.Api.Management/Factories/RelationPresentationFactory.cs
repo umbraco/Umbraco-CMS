@@ -60,9 +60,9 @@ public class RelationPresentationFactory : IRelationPresentationFactory
     }
 
     /// <summary>
-    /// Creates multiple <see cref="Umbraco.Cms.Api.Management.Models.RelationResponseModel"/> instances from the given relations.
+    /// Creates multiple <see cref="RelationResponseModel"/> instances from the given relations.
     /// </summary>
     /// <param name="relations">The collection of relations to convert.</param>
-    /// <returns>An enumerable of <see cref="Umbraco.Cms.Api.Management.Models.RelationResponseModel"/>.</returns>
+    /// <returns>An enumerable of <see cref="RelationResponseModel"/>.</returns>
     public IEnumerable<RelationResponseModel> CreateMultiple(IEnumerable<IRelation> relations) => relations.Select(Create);
 }

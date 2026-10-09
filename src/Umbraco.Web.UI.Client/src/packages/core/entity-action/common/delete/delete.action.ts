@@ -8,6 +8,7 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export class UmbDeleteEntityAction<
 	MetaKind extends MetaEntityActionDeleteKind = MetaEntityActionDeleteKind,
@@ -42,7 +43,7 @@ export class UmbDeleteEntityAction<
 		// TODO: handle items with variants
 		await umbConfirmModal(this, {
 			headline,
-			content: this.#localize.string(message, item.name),
+			content: html`${this.#localize.htmlString(message, item.name)}`,
 			color: 'danger',
 			confirmLabel: '#general_delete',
 		});
@@ -69,19 +70,19 @@ export class UmbDeleteEntityAction<
 			throw new Error('Action event context not found.');
 		}
 
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			unique: this.args.unique,
-			entityType: this.args.entityType,
-		});
-
-		actionEventContext.dispatchEvent(event);
-
 		const deletedEvent = new UmbEntityDeletedEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,
 		});
 
 		actionEventContext.dispatchEvent(deletedEvent);
+
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
+
+		actionEventContext.dispatchEvent(event);
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		if (notificationContext) {

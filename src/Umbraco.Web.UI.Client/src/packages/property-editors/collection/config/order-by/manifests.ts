@@ -6,8 +6,9 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Collection Column Configuration Property Editor UI',
 	element: () => import('./order-by.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Collection Order By',
 		icon: 'icon-autofill',
-		group: 'lists',
+		group: '#propertyEditorUIGroups_lists',
 	},
 };
