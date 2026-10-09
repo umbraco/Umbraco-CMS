@@ -49,8 +49,7 @@ public class ResetPasswordController : SecurityControllerBase
 
         // If this feature is switched off in configuration, the UI will be amended to not make the request to reset password available.
         // So this is just a server-side secondary check.
-        // ApplicationUrlNotConfigured is also surfaced since it is a server-wide configuration issue, not user-specific.
-        // PasswordResetUnavailable is surfaced as it's determined before the user lookup, so it's the same for every email.
+        // ApplicationUrlNotConfigured and PasswordResetUnavailable are surfaced as they're determined before the user lookup, so they're the same for every email.
         // Regardless of other status values, it will just return Ok, so you can't use this endpoint to determine whether the email exists in the system.
         return result.Result switch
         {

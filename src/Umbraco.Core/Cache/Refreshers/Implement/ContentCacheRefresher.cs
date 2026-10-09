@@ -38,6 +38,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly ICacheManager _cacheManager;
     private readonly IDocumentPublishStatusManagementService _publishStatusManagementService;
     private readonly IIdKeyMap _idKeyMap;
+    private IPublishedContentTypeCache? _publishedContentTypeCache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
@@ -195,6 +196,11 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     {
     }
 
+    // TODO (V19): Inject IPublishedContentTypeCache through the constructor. In 18.x a constructor taking it would be
+    // ambiguous for the container next to the obsolete constructor taking both publish status services.
+    private IPublishedContentTypeCache PublishedContentTypeCache
+        => _publishedContentTypeCache ??= StaticServiceProvider.Instance.GetRequiredService<IPublishedContentTypeCache>();
+
     #region Indirect
 
     /// <summary>
@@ -273,6 +279,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     /// <inheritdoc/>
     public override void Refresh(JsonPayload[] payloads)
     {
+        // A "refresh all" is the signal that the in-memory published caches are being rebuilt from the database
+        // cache. Published content types are cached independently of the content they describe, so they have to
+        // be dropped here too - otherwise the rebuilt content is projected through the same definitions as
+        // before and the reload has no effect on anything the content type governs.
+        if (payloads.Any(x => x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)))
+        {
+            PublishedContentTypeCache.ClearAll();
+        }
+
         var idsRemoved = new HashSet<int>();
 
         foreach (JsonPayload payload in payloads)
