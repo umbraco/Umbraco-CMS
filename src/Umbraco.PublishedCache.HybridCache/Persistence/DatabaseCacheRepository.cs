@@ -1684,24 +1684,37 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     private void InsertNewRows(List<ContentNuDto> items)
     {
         string C(string s) => SqlSyntax.GetQuotedColumnName(s);
-        var tableName = ContentNuDto.TableName;
+        var tableName = QuoteTableName(ContentNuDto.TableName);
         var nodeId = C(ContentNuDto.NodeIdColumnName);
         var published = C("published");
 
         foreach (ContentNuDto dto in items)
         {
+            // Null values are left out rather than passed as untyped NULL parameters, which some providers
+            // cannot convert to the binary column type.
+            var columns = new List<string> { nodeId, published, C("rv") };
+            var values = new List<object> { dto.NodeId, dto.Published, dto.Rv };
+            if (dto.Data is not null)
+            {
+                columns.Add(C("data"));
+                values.Add(dto.Data);
+            }
+
+            if (dto.RawData is not null)
+            {
+                columns.Add(C("dataRaw"));
+                values.Add(dto.RawData);
+            }
+
+            var parameters = string.Join(", ", values.Select((_, i) => $"@{i}"));
             Database.Execute(
-                $@"INSERT INTO [{tableName}] ({nodeId}, {published}, {C("data")}, {C("dataRaw")}, {C("rv")})
-                SELECT @0, @1, @2, @3, @4
+                $@"INSERT INTO {tableName} ({string.Join(", ", columns)})
+                SELECT {parameters}
                 WHERE NOT EXISTS (
-                    SELECT 1 FROM [{tableName}]
+                    SELECT 1 FROM {tableName}
                     WHERE {nodeId} = @0 AND {published} = @1
                 )",
-                dto.NodeId,
-                dto.Published,
-                (object?)dto.Data ?? DBNull.Value,
-                (object?)dto.RawData ?? DBNull.Value,
-                dto.Rv);
+                values.ToArray());
         }
     }
 
