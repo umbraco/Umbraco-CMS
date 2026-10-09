@@ -345,7 +345,7 @@ public class ConvertLocalLinks : MigrationBase
             .OrderBy<PropertyDataDto>(propertyData => propertyData.Id);
     }
 
-    private Sql<ISqlContext> BuildPropertyDataSql(IPropertyType propertyType, Sql<ISqlContext> selectSql)
+    private static Sql<ISqlContext> BuildPropertyDataSql(IPropertyType propertyType, Sql<ISqlContext> selectSql)
         => selectSql
             .From<PropertyDataDto>()
             .InnerJoin<ContentVersionDto>()
