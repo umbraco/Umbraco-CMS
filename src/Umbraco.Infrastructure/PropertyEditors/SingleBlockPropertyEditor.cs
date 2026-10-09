@@ -140,8 +140,16 @@ public class SingleBlockPropertyEditor : DataEditor
             Validators.Add(new SingleBlockValidator(BlockEditorValues, textService));
         }
 
-        // A stored value is not guaranteed to hold exactly one block (e.g. one written by a Block List), so the
-        // layout is carried over as-is and left for validation to report.
+        /// <summary>
+        /// Creates a single block value holding the specified layout.
+        /// </summary>
+        /// <param name="layout">The layout items.</param>
+        /// <returns>The single block value.</returns>
+        /// <remarks>
+        /// A stored value is not guaranteed to hold exactly one block - for example, a value written by another block
+        /// editor whose layout this editor supports - so every layout item is carried over, and any surplus is left for
+        /// validation to report.
+        /// </remarks>
         protected override SingleBlockValue CreateWithLayout(IEnumerable<SingleBlockLayoutItem> layout)
         {
             var value = new SingleBlockValue();

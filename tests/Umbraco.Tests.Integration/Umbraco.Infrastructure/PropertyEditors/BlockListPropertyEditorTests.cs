@@ -422,18 +422,18 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
                     ContentTypeKey = elementType.Key,
                     Values =
                     [
-                        new ()
+                        new()
                         {
                             Alias = "singleLineText",
-                            Value = "The single line text"
-                        }
-                    ]
+                            Value = "The single line text",
+                        },
+                    ],
                 }
             ],
             Expose =
             [
-                new (contentElementKey, null, null)
-            ]
+                new(contentElementKey, null, null),
+            ],
         };
 
         var content = new ContentBuilder()

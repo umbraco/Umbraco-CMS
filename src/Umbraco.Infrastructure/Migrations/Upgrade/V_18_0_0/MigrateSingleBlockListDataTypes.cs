@@ -57,9 +57,11 @@ public class MigrateSingleBlockListDataTypes : AsyncMigrationBase
     /// <inheritdoc />
     protected override async Task MigrateAsync()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         IDataType[] singleBlockListDataTypes = (await _dataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.BlockList))
             .Where(dataType => dataType.ConfigurationObject is BlockListConfiguration { UseSingleBlockMode: true, ValidationLimit.Max: 1 })
             .ToArray();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         if (singleBlockListDataTypes.Length == 0)
         {
@@ -82,9 +84,9 @@ public class MigrateSingleBlockListDataTypes : AsyncMigrationBase
             await Database.ExecuteAsync(sql);
         }
 
-        // the element type cache, and the isolated/runtime caches it is built from in the default implementation,
+        // The element type cache, and the isolated/runtime caches it is built from in the default implementation,
         // still describe the data types as they were before the update - as does the data type configuration cache,
-        // which is backed by its own memory cache rather than the application caches
+        // which is backed by its own memory cache rather than the application caches.
         _elementTypeCache.ClearAll();
         _appCaches.IsolatedCaches.ClearAllCaches();
         _appCaches.RuntimeCache.Clear();
