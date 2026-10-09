@@ -13,6 +13,7 @@ import {
   MultipleMemberPickerDataTypeBuilder,
   ContentPickerDataTypeBuilder,
   BlockGridDataTypeBuilder,
+  SingleBlockDataTypeBuilder,
   ImageCropperDataTypeBuilder,
   MediaPickerDataTypeBuilder,
   RadioboxDataTypeBuilder,
@@ -361,6 +362,33 @@ export class DataTypeApiHelper {
       .build();
 
     return await this.save(blockList);
+  }
+
+  async createSingleBlockDataTypeWithABlock(name: string, contentElementTypeId: string) {
+    await this.ensureNameNotExists(name);
+
+    const singleBlock = new SingleBlockDataTypeBuilder()
+      .withName(name)
+      .addBlock()
+        .withContentElementTypeKey(contentElementTypeId)
+        .done()
+      .build();
+
+    return await this.save(singleBlock);
+  }
+
+  async createSingleBlockDataTypeWithContentAndSettingsElementType(name: string, contentElementTypeId: string, settingsElementTypeId: string) {
+    await this.ensureNameNotExists(name);
+
+    const singleBlock = new SingleBlockDataTypeBuilder()
+      .withName(name)
+      .addBlock()
+        .withContentElementTypeKey(contentElementTypeId)
+        .withSettingsElementTypeKey(settingsElementTypeId)
+        .done()
+      .build();
+
+    return await this.save(singleBlock);
   }
 
   async createBlockListDataTypeWithContentAndSettingsElementType(name: string, contentElementTypeId: string, settingsElementTypeId: string) {
@@ -1734,6 +1762,31 @@ export class DataTypeApiHelper {
       .build();
 
     return await this.save(richTextEditor);
+  }
+
+  async createRichTextEditorWithBlocks(richTextEditorName: string, contentElementTypeIds: string[], settingsElementTypeId: string = '') {
+    await this.ensureNameNotExists(richTextEditorName);
+
+    const richTextEditor = new TiptapDataTypeBuilder()
+      .withName(richTextEditorName);
+    for (const contentElementTypeId of contentElementTypeIds) {
+      richTextEditor
+        .addBlock()
+          .withContentElementTypeKey(contentElementTypeId)
+          .withSettingsElementTypeKey(settingsElementTypeId)
+          .done();
+    }
+    richTextEditor
+      .addExtension()
+        .withBlock(true)
+        .done()
+      .addToolbarRow()
+        .addToolbarGroup()
+          .withBlockPicker(true)
+          .done()
+        .done();
+
+    return await this.save(richTextEditor.build());
   }
 
   async createRichTextEditorWithABlockWithBlockSettings(richTextEditorName: string, contentElementTypeId: string, label: string = "", backgroundColor: string = "", iconColor: string = "", thumbnail: string = "", editorSize: string = "", settingsElementTypeId: string = "", displayInline: boolean = false) {
