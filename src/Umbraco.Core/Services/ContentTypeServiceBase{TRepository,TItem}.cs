@@ -358,10 +358,14 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
         var changes = new List<ContentTypeChange<TItem>>();
 
+        // Shared by every content type in the batch, so a deriving type reached from more than one of them is
+        // the same instance each time, and AddChange merges its changes into a single entry.
+        ILookup<int, TItem>? directReferencingTypes = null;
+
         // Track which types genuinely need a raw cmsContentNu rebuild vs. which only had a property removed.
         // A type can appear via more than one path (e.g. a batch save touching a composition, where the same
-        // type is both saved directly and returned by GetComposedOf as a different instance), so we key these
-        // by Id — not entity reference — and resolve the RawDataUnaffected flag once at the end: it is only
+        // type is both saved directly and returned by the composition traversal as a different instance), so we
+        // key these by Id — not entity reference — and resolve the RawDataUnaffected flag once at the end: it is only
         // safe when *nothing* required a rebuild for that Id.
         var rebuildRequiredIds = new HashSet<int>();
         var rawDataUnaffectedCandidateIds = new HashSet<int>();
@@ -469,7 +473,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             // from its composition aliases (which IPublishedContent.IsComposedOf reads).
             if (hasPropertyMainImpact || hasAnyPropertyBeenAdded || hasAliasChanged)
             {
-                foreach (TItem c in GetComposedOfTransitive(contentType.Id))
+                directReferencingTypes ??= GetDirectReferencingTypes();
+                foreach (TItem c in GetComposedOfTransitive(contentType.Id, directReferencingTypes))
                 {
                     if (hasPropertyMainImpact)
                     {
@@ -726,10 +731,30 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     }
 
     /// <summary>
+    /// Builds a lookup from each content type id to the content types that directly reference it as a composition
+    /// (or as the content type they inherit from).
+    /// </summary>
+    /// <returns>The lookup of directly referencing content types, keyed by referenced content type id.</returns>
+    /// <remarks>
+    /// Every call takes a fresh snapshot of all content types, and the full dataset cache policy deep clones each
+    /// of them, so build this once per unit of work and share it.
+    /// </remarks>
+    private ILookup<int, TItem> GetDirectReferencingTypes() =>
+        GetAll()
+            .SelectMany(
+                contentType => contentType.ContentTypeComposition,
+                (contentType, referenced) => (ReferencedId: referenced.Id, ContentType: contentType))
+            .ToLookup(x => x.ReferencedId, x => x.ContentType);
+
+    /// <summary>
     /// Gets every content type whose effective property set derives from the specified content type, directly
     /// or indirectly.
     /// </summary>
     /// <param name="id">The identifier of the content type.</param>
+    /// <param name="directReferencingTypes">
+    /// The content types that directly reference each content type, as built by
+    /// <see cref="GetDirectReferencingTypes" />.
+    /// </param>
     /// <returns>The content types deriving from the specified content type.</returns>
     /// <remarks>
     /// Inheritance is stored as composition, so a single traversal of the composition graph covers both axes.
@@ -739,19 +764,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <see cref="IContentTypeComposition.CompositionAliases()" />), so a change to one content type is a change
     /// to everything deriving from it, not just to its direct consumers.
     /// </remarks>
-    private TItem[] GetComposedOfTransitive(int id)
+    private static TItem[] GetComposedOfTransitive(int id, ILookup<int, TItem> directReferencingTypes)
     {
-        // GetAll is cheap, repository has a full dataset cache policy
-        IEnumerable<TItem> allContentTypes = GetAll();
-
-        // build a "referenced id -> types that directly reference it" lookup once, so the traversal is O(n + d)
-        // rather than rescanning every content type for each type found
-        ILookup<int, TItem> directReferencingTypes = allContentTypes
-            .SelectMany(
-                contentType => contentType.ContentTypeComposition,
-                (contentType, referenced) => (ReferencedId: referenced.Id, ContentType: contentType))
-            .ToLookup(x => x.ReferencedId, x => x.ContentType);
-
         var composedOf = new Dictionary<int, TItem>();
         var remaining = new Stack<int>();
         remaining.Push(id);

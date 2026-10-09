@@ -196,6 +196,42 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
         Assert.That(ReadDraftBlobSignature(TextpageId), Is.EqualTo(blobBefore), "Adding a property must not rebuild the stored blob.");
     }
 
+    /// <summary>
+    ///     A content type deriving from several content types saved in the same batch is one content type, so it
+    ///     must surface as a single change however many of them it is reached from.
+    /// </summary>
+    [Test]
+    public async Task Batch_Save_Reports_A_Single_Change_For_A_Type_Deriving_From_Several_Saved_Types()
+    {
+        var compositionA = await CreateContentType("compositionA", "compPropA");
+        var compositionB = await CreateContentType("compositionB", "compPropB");
+        var composing = await CreateContentType("composingType", "ownProp", compositionA);
+        composing.AddContentType(compositionB);
+        await ContentTypeService.UpdateAsync(composing, Constants.Security.SuperUserKey);
+
+        _capturedContentTypeChanges.Clear();
+
+        // Act - add a property to both compositions, saved together as a single batch.
+        AddTextBoxProperty(compositionA, "addedPropA");
+        AddTextBoxProperty(compositionB, "addedPropB");
+#pragma warning disable CS0618 // Type or member is obsolete
+        ContentTypeService.Save([compositionA, compositionB]);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // Assert
+        Assert.That(ChangeTypesFor(composing.Id), Has.Count.EqualTo(1));
+    }
+
+    private void AddTextBoxProperty(IContentType contentType, string propertyAlias) =>
+        contentType.AddPropertyType(
+            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, propertyAlias)
+            {
+                Name = propertyAlias,
+                DataTypeId = Constants.DataTypes.Textbox,
+            },
+            "content",
+            "Content");
+
     private IReadOnlyList<ContentTypeChangeTypes> ChangeTypesFor(int contentTypeId) =>
         _capturedContentTypeChanges.Where(c => c.Item.Id == contentTypeId).Select(c => c.ChangeTypes).ToList();
 
