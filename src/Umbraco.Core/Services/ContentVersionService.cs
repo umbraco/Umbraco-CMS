@@ -154,6 +154,18 @@ internal sealed class ContentVersionService : IContentVersionService
             return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound);
         }
 
+        IContent? content = _contentService.GetById(version.ContentId);
+        if (content is null)
+        {
+            return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.ContentNotFound);
+        }
+
+        // A culture can only be rolled back for content that varies by culture.
+        if (culture is not null && content.ContentType.VariesByCulture() is false)
+        {
+            return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.InvalidCulture);
+        }
+
         OperationResult rollBackResult = _contentService.Rollback(
             version.ContentId,
             version.VersionId,

@@ -56,6 +56,7 @@ export class UmbDocumentRollbackRepository extends UmbControllerBase implements 
 					})),
 					values: data.values.map((v) => ({
 						culture: v.culture ?? null,
+						segment: v.segment ?? null,
 						alias: v.alias,
 						value: v.value,
 					})),
