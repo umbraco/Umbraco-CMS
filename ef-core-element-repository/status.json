@@ -2,7 +2,7 @@
   "campaign": "Element repository and service from NPoco to EF Core",
   "targetBranch": "v18/feature/ef-core-repositories",
   "planFile": ".claude/campaign/ef-core-element-repository/CAMPAIGN.md",
-  "updated": "08-10-2026",
+  "updated": "09-10-2026",
   "artifact": {
     "url": "https://claude.ai/artifact/Q5Bttu57VfLyS1ajt7nKtU",
     "title": "Element Repository Campaign"
@@ -286,6 +286,10 @@
     }
   ],
   "log": [
+    {
+      "date": "09-10-2026",
+      "text": "v19/dev merged into v18/feature/ef-core-repositories (3472374c025, fixes the backoffice build); merged into PR 1 branch (a3492a660c2). Integration: 4790 passed, 23 failed (all the known relation-stub baseline)."
+    },
     {
       "date": "08-10-2026",
       "text": "PR 1 review round 1 answered: mapping round-trip test added (7899d8c9b21); CS0061 and Id-on-interface comments answered without code changes."
