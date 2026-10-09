@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Routing;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -638,7 +639,8 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             publishedContentStatusFilteringService,
             domainCache,
             urlSegmentProviders,
-            documentUrlService.Object);
+            documentUrlService.Object,
+            GetRequiredService<IUmbracoContextFactory>());
     }
 
     private void CreateExistingRedirect()
