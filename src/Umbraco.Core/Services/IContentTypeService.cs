@@ -20,9 +20,7 @@ public interface IContentTypeService : IContentTypeBaseService<IContentType>
     ///     The container is not itself configurable; <paramref name="parentKey" /> is passed to the registered
     ///     <see cref="Filters.IContentTypeFilter" /> implementations so they can narrow the result for that context.
     /// </remarks>
-    // TODO (V20): Remove the default implementation.
-    Task<PagedModel<IContentType>> GetAllAllowedForBlueprintsAsync(Guid? parentKey, int skip, int take)
-        => Task.FromResult(new PagedModel<IContentType>());
+    Task<PagedModel<IContentType>> GetAllAllowedForBlueprintsAsync(Guid? parentKey, int skip, int take);
 
     /// <summary>
     ///     Gets all property type aliases.
