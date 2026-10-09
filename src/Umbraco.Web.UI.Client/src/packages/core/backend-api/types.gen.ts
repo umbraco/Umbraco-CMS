@@ -102,6 +102,11 @@ export type BatchResponseModelDocumentTypeResponseModel = {
     items: Array<DocumentTypeResponseModel>;
 };
 
+export type BatchResponseModelElementResponseModel = {
+    total: number;
+    items: Array<ElementResponseModel>;
+};
+
 export type BatchResponseModelMediaTypeResponseModel = {
     total: number;
     items: Array<MediaTypeResponseModel>;
@@ -9004,6 +9009,35 @@ export type GetElementAreReferencedResponses = {
 };
 
 export type GetElementAreReferencedResponse = GetElementAreReferencedResponses[keyof GetElementAreReferencedResponses];
+
+export type GetElementBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/element/batch';
+};
+
+export type GetElementBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetElementBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelElementResponseModel;
+};
+
+export type GetElementBatchResponse = GetElementBatchResponses[keyof GetElementBatchResponses];
 
 export type GetElementConfigurationData = {
     body?: never;

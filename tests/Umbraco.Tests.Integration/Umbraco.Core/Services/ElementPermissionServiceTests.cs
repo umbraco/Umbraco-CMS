@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -19,7 +20,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 /// <summary>
 ///     Integration tests for <see cref="IElementPermissionService.GetPermissionsAsync"/> proving equivalence
 ///     with the legacy <c>IUserService.GetPermissionsForPath</c> algorithm that the
-///     <c>ElementPermissionMapper</c> used before being routed through the permission service.
+///     <c>ElementPermissionMapper</c> used before being routed through the permission service, and for
+///     <see cref="IElementPermissionService.FilterAuthorizedAccessAsync"/> proving equivalence with the
+///     single-key <see cref="IElementPermissionService.AuthorizeAccessAsync(IUser, Guid, string)"/> check.
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -82,6 +85,46 @@ internal sealed class ElementPermissionServiceTests : UmbracoIntegrationTest
         Assert.That(viaService[0].Permissions, Contains.Item(ActionElementUpdate.ActionLetter));
 
         Assert.That(viaService[0].Permissions, Is.EquivalentTo(viaPath));
+    }
+
+    [Test]
+    public async Task FilterAuthorizedAccessAsync_Is_Equivalent_To_Single_Key_AuthorizeAccessAsync_For_Mixed_Keys()
+    {
+        // Arrange
+        var permittedKey = await CreateElement();
+        var deniedKey = await CreateElement();
+        var nonExistentKey = Guid.NewGuid();
+
+        var user = await CreateUserInGroup(
+            granularPermissions: [ActionElementBrowse.ActionLetter],
+            defaultPermissions: [],
+            elementKey: permittedKey);
+
+        var permissionsToCheck = new HashSet<string> { ActionElementBrowse.ActionLetter };
+
+        // Act
+        ISet<Guid> filtered = await ElementPermissionService.FilterAuthorizedAccessAsync(
+            user,
+            [permittedKey, deniedKey, nonExistentKey],
+            permissionsToCheck);
+
+        // Assert - the invariant this endpoint's filtering rests on: a key survives filtering
+        // if and only if the single-key authorization check for it succeeds.
+        foreach (Guid key in new[] { permittedKey, deniedKey, nonExistentKey })
+        {
+            ElementAuthorizationStatus status = await ElementPermissionService.AuthorizeAccessAsync(
+                user,
+                key,
+                ActionElementBrowse.ActionLetter);
+            var expectedAuthorized = status == ElementAuthorizationStatus.Success;
+
+            Assert.That(
+                filtered.Contains(key),
+                Is.EqualTo(expectedAuthorized),
+                $"Equivalence broke for key {key} (single-key status: {status}).");
+        }
+
+        Assert.That(filtered, Is.EquivalentTo(new[] { permittedKey }));
     }
 
     private async Task<Guid> CreateElement()
