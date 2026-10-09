@@ -534,6 +534,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'content_scheduledPublishDocumentation',
 	'content_scheduledPublishing',
 	'content_scheduledPublishServerTime',
+	'content_scheduleForAllLanguages',
 	'content_schedulePublishHelp',
 	'content_segmentHasContent',
 	'content_segmentNoContent',
