@@ -1073,6 +1073,10 @@ export class LibraryUiHelper extends UiBaseLocators {
     await this.isVisible(this.elementReadOnly, isVisible);
   }
 
+  async doesElementNameInputHaveValue(name: string) {
+    await expect(this.elementNameTxt).toHaveValue(name, {timeout: ConstantHelper.timeout.long});
+  }
+
   async isElementNameInputEditable(isEditable: boolean = true) {
     await this.waitForVisible(this.elementNameTxt);
     await expect(this.elementNameTxt).toBeEditable({editable: isEditable});

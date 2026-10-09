@@ -8,6 +8,7 @@ export class UserGroupBuilder {
   sections: string[];
   languages: string[];
   hasAccessToAllLanguages: boolean;
+  hasAccessToInvariantForVariant: boolean;
   documentStartNodeId: string;
   documentRootAccess: boolean;
   mediaStartNodeId: string;
@@ -45,6 +46,11 @@ export class UserGroupBuilder {
 
   withHasAccessToAllLanguages(hasAccessToAllLanguages: boolean) {
     this.hasAccessToAllLanguages = hasAccessToAllLanguages;
+    return this;
+  }
+
+  withHasAccessToInvariantForVariant(hasAccessToInvariantForVariant: boolean) {
+    this.hasAccessToInvariantForVariant = hasAccessToInvariantForVariant;
     return this;
   }
 
@@ -103,6 +109,7 @@ export class UserGroupBuilder {
       sections: this.sections || [],
       languages: this.languages || [],
       hasAccessToAllLanguages: this.hasAccessToAllLanguages || false,
+      hasAccessToInvariantForVariant: this.hasAccessToInvariantForVariant || false,
       documentStartNode: this.documentStartNodeId ? {id: this.documentStartNodeId} : null,
       documentRootAccess: this.documentRootAccess || false,
       mediaStartNode: this.mediaStartNodeId ? {id: this.mediaStartNodeId} : null,

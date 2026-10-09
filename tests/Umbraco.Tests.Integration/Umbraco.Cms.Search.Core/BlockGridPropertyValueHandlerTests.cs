@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -38,14 +36,6 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .CreateAsync(new Language("de-DE", "German (Germany)"), Constants.Security.SuperUserKey);
 
         IndexerAndSearcher.Reset();
-    }
-
-    protected override void ConfigureTestServices(IServiceCollection services)
-    {
-        base.ConfigureTestServices(services);
-
-        // this is necessary to test publishing of invariant block level properties without publishing the default language
-        services.Configure<ContentSettings>(options => options.AllowEditInvariantFromNonDefault = true);
     }
 
     [Test]

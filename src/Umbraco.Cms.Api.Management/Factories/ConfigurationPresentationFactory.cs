@@ -53,7 +53,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         {
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-            AllowEditInvariantFromNonDefault = _contentSettings.AllowEditInvariantFromNonDefault,
         };
 
     /// <summary>
@@ -107,6 +106,5 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         {
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-            AllowEditInvariantFromNonDefault = _contentSettings.AllowEditInvariantFromNonDefault,
         };
 }

@@ -13,6 +13,7 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 	private _values: Array<UmbPropertyValueData> = [
 		{ alias: 'sections', value: [] },
 		{ alias: 'languageAccess', value: { rootAccess: false, startNodes: [] } },
+		{ alias: 'invariantForVariantAccess', value: false },
 		{ alias: 'documentAccess', value: { rootAccess: false, startNodes: [] } },
 		{ alias: 'mediaAccess', value: { rootAccess: false, startNodes: [] } },
 		{ alias: 'elementAccess', value: { rootAccess: false, startNodes: [] } },
@@ -35,6 +36,12 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 						startNodes: (languages ?? []).map((unique) => ({ unique })),
 					}),
 				'_observeLanguageAccess',
+			);
+
+			this.observe(
+				instance.hasAccessToInvariantForVariant,
+				(value) => this.#setValue('invariantForVariantAccess', value ?? false),
+				'_observeInvariantForVariantAccess',
 			);
 
 			this.observe(
@@ -84,6 +91,13 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 			| undefined;
 		if (languageAccess) this.#workspaceContext?.setLanguageAccess(languageAccess);
 
+		const invariantForVariantAccess = values.find((entry) => entry.alias === 'invariantForVariantAccess')?.value as
+			| boolean
+			| undefined;
+		if (invariantForVariantAccess !== undefined) {
+			this.#workspaceContext?.setHasAccessToInvariantForVariant(invariantForVariantAccess);
+		}
+
 		const documentAccess = values.find((entry) => entry.alias === 'documentAccess')?.value as
 			| UmbStartNodeAccessValue
 			| undefined;
@@ -114,6 +128,13 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 				description: this.localize.term('user_languagesHelp'),
 				propertyEditorUiAlias: 'Umb.PropertyEditorUi.LanguageAccess',
 				config: [{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllLanguages') }],
+			},
+			{
+				alias: 'invariantForVariantAccess',
+				label: this.localize.term('user_allowAccessToInvariantForVariant'),
+				description: this.localize.term('user_invariantForVariantHelp'),
+				propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+				config: [{ alias: 'ariaLabel', value: this.localize.term('user_allowAccessToInvariantForVariant') }],
 			},
 			{
 				alias: 'documentAccess',

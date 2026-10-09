@@ -2177,6 +2177,8 @@ export default {
 		sectionsHelp: 'Tilføj sektioner for at give brugerne adgang',
 		allowAccessToAllLanguages: 'Tillad adgang til alle sprog',
 		allowAccessToAllDocuments: 'Tillad adgang til alle dokumenter',
+		allowAccessToInvariantForVariant: 'Tillad redigering af delt indhold',
+		invariantForVariantHelp: 'Tillader redigering af indhold delt på tværs af sprogvarianter. *Gælder ikke for indhold, der ikke varierer efter sprog.*',
 		allowAccessToAllMedia: 'Tillad adgang til alle medier',
 		selectUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';

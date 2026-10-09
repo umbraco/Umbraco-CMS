@@ -79,13 +79,10 @@ public class PropertyValidationService : IPropertyValidationService
         }
 
         // only validate culture invariant properties if
-        // - AllowEditInvariantFromNonDefault is true, or
-        // - the default language is being validated, or
+        // - the validation context indicates invariant properties should be validated, or
         // - the underlying data editor supports partial property value merging (e.g. block level variance)
-        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
         if (propertyType.VariesByCulture() is false
-            && _contentSettings.AllowEditInvariantFromNonDefault is false
-            && validationContext.CulturesBeingValidated.InvariantContains(defaultCulture) is false
+            && validationContext.ValidateInvariantProperties is false
             && dataEditor.CanMergePartialPropertyValues(propertyType) is false)
         {
             return [];
@@ -207,7 +204,8 @@ public class PropertyValidationService : IPropertyValidationService
         {
             Culture = validationContext.Culture?.NullOrWhiteSpaceAsNull(),
             Segment = validationContext.Segment?.NullOrWhiteSpaceAsNull(),
-            CulturesBeingValidated = validationContext.CulturesBeingValidated
+            CulturesBeingValidated = validationContext.CulturesBeingValidated,
+            ValidateInvariantProperties = validationContext.ValidateInvariantProperties,
         };
 
         var culture = validationContext.Culture;

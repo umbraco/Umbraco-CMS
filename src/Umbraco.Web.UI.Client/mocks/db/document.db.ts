@@ -48,7 +48,6 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 
 	getConfiguration(): DocumentConfigurationResponseModel {
 		return {
-			allowEditInvariantFromNonDefault: true,
 			disableDeleteWhenReferenced: true,
 			disableUnpublishWhenReferenced: true,
 		};

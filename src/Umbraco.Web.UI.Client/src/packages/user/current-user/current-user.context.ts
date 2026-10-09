@@ -23,6 +23,9 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	readonly email = this.#currentUser.asObservablePart((user) => user?.email);
 	readonly fallbackPermissions = this.#currentUser.asObservablePart((user) => user?.fallbackPermissions);
 	readonly hasAccessToAllLanguages = this.#currentUser.asObservablePart((user) => user?.hasAccessToAllLanguages);
+	readonly hasAccessToInvariantForVariant = this.#currentUser.asObservablePart(
+		(user) => user?.hasAccessToInvariantForVariant,
+	);
 	readonly hasAccessToSensitiveData = this.#currentUser.asObservablePart((user) => user?.hasAccessToSensitiveData);
 	readonly hasDocumentRootAccess = this.#currentUser.asObservablePart((user) => user?.hasDocumentRootAccess);
 	readonly hasElementRootAccess = this.#currentUser.asObservablePart((user) => user?.hasElementRootAccess);

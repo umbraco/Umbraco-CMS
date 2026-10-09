@@ -236,6 +236,16 @@ public static class UserExtensions
     }
 
     /// <summary>
+    ///     Gets a value indicating whether the user can edit invariant (shared) property data on variant content.
+    ///     The permission is aggregated across the user's groups: a single group granting it is sufficient.
+    ///     The permission is not consulted when editing invariant content types.
+    /// </summary>
+    /// <param name="user">The user to check.</param>
+    /// <returns><c>true</c> if any of the user's groups grants invariant-for-variant access; otherwise, <c>false</c>.</returns>
+    public static bool HasAccessToInvariantForVariant(this IUser user)
+        => user.Groups.Any(x => x.HasAccessToInvariantForVariant);
+
+    /// <summary>
     ///     Calculates the content start node IDs for the user, combining user and group start nodes.
     /// </summary>
     /// <param name="user">The user to calculate start nodes for.</param>

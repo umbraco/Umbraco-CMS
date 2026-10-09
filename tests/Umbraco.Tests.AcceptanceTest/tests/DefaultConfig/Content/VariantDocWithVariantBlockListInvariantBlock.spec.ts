@@ -2,11 +2,11 @@ import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 /**
  * Test Scenarios: Block List Variance Combinations
- * Configuration: AllowEditInvariantFromNonDefault = false (default)
+ * Runs as a user with invariant-for-variant access.
  *
  * Key principle:
  * - Variant Block List = each language has its own blocks = properties editable in all languages
- * - Invariant Block List = blocks shared across languages = AllowEditInvariantFromNonDefault applies
+ * - Invariant Block List = blocks shared across languages = invariant-for-variant access applies
  */
 
 const documentTypeName = 'TestDocType';

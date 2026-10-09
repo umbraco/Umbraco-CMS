@@ -202,6 +202,76 @@ export class UserGroupApiHelper {
     return await this.create(userGroup);
   }
 
+  async createUserGroupWithLanguages(name: string, isoCodes: string[], hasAccessToInvariantForVariant: boolean = false) {
+    await this.ensureNameNotExists(name);
+
+    const builder = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.content)
+      .withDocumentRootAccess(true)
+      .withHasAccessToAllLanguages(false)
+      .withHasAccessToInvariantForVariant(hasAccessToInvariantForVariant);
+    for (const isoCode of isoCodes) {
+      builder.addLanguage(isoCode);
+    }
+    const userGroup = builder
+      .addFallbackPermission()
+        .withReadDocumentPermission(true)
+        .withUpdateDocumentPermission(true)
+        .withReadPropertyValueDocumentPermission(true)
+        .withPublishDocumentPermission(true)
+        .withWritePropertyValueDocumentPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
+  async createUserGroupWithLanguagesAndElementAccess(name: string, isoCodes: string[], hasAccessToInvariantForVariant: boolean = false) {
+    await this.ensureNameNotExists(name);
+
+    const builder = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.library)
+      .withElementRootAccess(true)
+      .withHasAccessToAllLanguages(false)
+      .withHasAccessToInvariantForVariant(hasAccessToInvariantForVariant);
+    for (const isoCode of isoCodes) {
+      builder.addLanguage(isoCode);
+    }
+    const userGroup = builder
+      .addFallbackPermission()
+        .withReadElementPermission(true)
+        .withUpdateElementPermission(true)
+        .withPublishElementPermission(true)
+        .withReadElementContainerPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
+  async createUserGroupWithAllLanguages(name: string, hasAccessToInvariantForVariant: boolean = false) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.content)
+      .withDocumentRootAccess(true)
+      .withHasAccessToAllLanguages(true)
+      .withHasAccessToInvariantForVariant(hasAccessToInvariantForVariant)
+      .addFallbackPermission()
+        .withReadDocumentPermission(true)
+        .withUpdateDocumentPermission(true)
+        .withReadPropertyValueDocumentPermission(true)
+        .withPublishDocumentPermission(true)
+        .withWritePropertyValueDocumentPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
   async createUserGroupWithLanguageAndContentSection(name: string, languageName: string) {
     await this.ensureNameNotExists(name);
 
@@ -387,6 +457,26 @@ export class UserGroupApiHelper {
       .addFallbackPermission()
         .withUpdateDocumentPermission(enabled)
         .withReadDocumentPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
+  async createUserGroupWithInvariantForVariantAccess(name: string, hasAccessToInvariantForVariant: boolean) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.content)
+      .withDocumentRootAccess(true)
+      .withHasAccessToAllLanguages(true)
+      .withHasAccessToInvariantForVariant(hasAccessToInvariantForVariant)
+      .addFallbackPermission()
+        .withUpdateDocumentPermission(true)
+        .withReadDocumentPermission(true)
+        .withWritePropertyValueDocumentPermission(true)
+        .withReadPropertyValueDocumentPermission(true)
         .done()
       .build();
 
