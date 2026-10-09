@@ -6,6 +6,9 @@ export interface UmbContentPublishModalData<
 > extends UmbContentVariantPickerData<VariantOptionModelType> {
 	headline?: string;
 	confirmLabel?: string;
+	unique?: string;
+	itemRepositoryAlias?: string;
+	referenceRepositoryAlias?: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

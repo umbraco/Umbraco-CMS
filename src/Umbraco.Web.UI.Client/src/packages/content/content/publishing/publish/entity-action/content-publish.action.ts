@@ -40,6 +40,9 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 				options,
 				pickableFilter: (option) =>
 					this.#isLanguagePickable(option, currentUserAllowedLanguages, currentUserHasAccessToAllLanguages),
+				unique,
+				itemRepositoryAlias: this.args.meta.itemRepositoryAlias,
+				referenceRepositoryAlias: this.args.meta.referenceRepositoryAlias,
 			},
 			value: { selection },
 		}).catch(() => undefined);

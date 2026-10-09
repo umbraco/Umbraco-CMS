@@ -12,6 +12,9 @@ export interface UmbElementScheduleSelectionModel {
 export interface UmbElementScheduleModalData extends UmbElementVariantPickerData {
 	activeVariants: Array<string>;
 	prevalues: Array<UmbElementScheduleSelectionModel>;
+	unique?: string;
+	itemRepositoryAlias?: string;
+	referenceRepositoryAlias?: string;
 }
 
 export interface UmbElementScheduleModalValue {
