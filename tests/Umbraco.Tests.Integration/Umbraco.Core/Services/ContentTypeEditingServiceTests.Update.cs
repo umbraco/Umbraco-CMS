@@ -868,6 +868,101 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
     [Test]
+    public async Task Adding_A_Property_Refreshes_The_Content_Types_Composed_Of_It()
+    {
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel("Composition", "composition"),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var createModel = ContentTypeCreateModel("Test", "test");
+        createModel.Compositions = new[]
+        {
+            new Composition { Key = compositionContentType.Key, CompositionType = CompositionType.Composition },
+        };
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel("Composition", "composition");
+        updateModel.Properties = new[] { ContentTypePropertyTypeModel("Test Property", "testProperty") };
+
+        var result = await ContentTypeEditingService.UpdateAsync(compositionContentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // The composing content type now exposes the added property, so it has to be refreshed alongside the
+        // content type the property was added to. The new alias has no stored value, so neither needs a rebuild.
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, refreshedPayloads!.Length);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, compositionContentType.Id, ContentTypeChangeTypes.PropertyAdded);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
+            Assert.IsFalse(refreshedPayloads.Any(x => x.ChangeTypes.RequiresRawDataRebuild()), "no payload should require a raw data rebuild");
+        });
+    }
+
+    [Test]
+    public async Task Changing_Property_Variation_Rebuilds_Every_Content_Type_Deriving_From_It()
+    {
+        var (root, middle, leaf) = await CreateInheritanceChainAsync(variesByCulture: true);
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var container = ContentTypePropertyContainerModel(key: root.PropertyGroups.Single().Key);
+        var propertyTypeModel = ContentTypePropertyTypeModel("rootProperty", "rootProperty", containerKey: container.Key);
+        propertyTypeModel.VariesByCulture = true;
+        var updateModel = ContentTypeUpdateModel("Root", alias: root.Alias, propertyTypes: [propertyTypeModel], containers: [container]);
+        updateModel.VariesByCulture = true;
+
+        var result = await ContentTypeEditingService.UpdateAsync(root, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, result.Status.ToString());
+
+        // The stored values change shape on every type that inherits the property, at any depth.
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, refreshedPayloads!.Length);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, root.Id, ContentTypeChangeTypes.PropertyVariationChanged);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, middle.Id, ContentTypeChangeTypes.RefreshMain);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, leaf.Id, ContentTypeChangeTypes.RefreshMain);
+        });
+    }
+
+    [Test]
+    public async Task Removing_A_Property_Refreshes_Every_Content_Type_Deriving_From_It_Without_A_Rebuild()
+    {
+        var (root, middle, leaf) = await CreateInheritanceChainAsync();
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel(
+            "Root",
+            alias: root.Alias,
+            propertyTypes: [],
+            containers: [ContentTypePropertyContainerModel(key: root.PropertyGroups.Single().Key)]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(root, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, result.Status.ToString());
+
+        // Every type that inherited the property loses it, at any depth, but the orphaned stored value is never
+        // read again, so none of them needs a rebuild.
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, refreshedPayloads!.Length);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, root.Id, ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.RawDataUnaffected);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, middle.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, leaf.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
+        });
+    }
+
+    [Test]
     public async Task Can_Remove_Compositions()
     {
         var propertyType1 = ContentTypePropertyTypeModel("Test Property 1", "testProperty1");
@@ -1525,13 +1620,15 @@ internal sealed partial class ContentTypeEditingServiceTests
     {
         Assert.IsNotNull(refreshedPayloads);
         Assert.AreEqual(1, refreshedPayloads.Length);
-        Assert.Multiple(() =>
-        {
-            var payload = refreshedPayloads.First();
-            Assert.AreEqual(expectedContentTypeId, payload.Id);
-            Assert.AreEqual(expectedChangeTypes, payload.ChangeTypes);
-            Assert.AreEqual(nameof(IContentType), payload.ItemType);
-        });
+        Assert.Multiple(() => AssertContentTypeRefreshPayloadFor(refreshedPayloads, expectedContentTypeId, expectedChangeTypes));
+    }
+
+    private static void AssertContentTypeRefreshPayloadFor(ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads, int expectedContentTypeId, ContentTypeChangeTypes expectedChangeTypes)
+    {
+        ContentTypeCacheRefresher.JsonPayload? payload = refreshedPayloads.SingleOrDefault(x => x.Id == expectedContentTypeId);
+        Assert.IsNotNull(payload, $"expected a single payload for content type {expectedContentTypeId}");
+        Assert.AreEqual(expectedChangeTypes, payload!.ChangeTypes);
+        Assert.AreEqual(nameof(IContentType), payload.ItemType);
     }
 
     [Test]
@@ -1804,6 +1901,23 @@ internal sealed partial class ContentTypeEditingServiceTests
             propertyTypes: properties,
             containers: containers,
             compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentKey }]);
+    }
+
+    private async Task<(IContentType Root, IContentType Middle, IContentType Leaf)> CreateInheritanceChainAsync(bool variesByCulture = false)
+    {
+        var rootModel = CompositionModelWithProperty("Root", "rootProperty");
+        rootModel.VariesByCulture = variesByCulture;
+        var root = (await ContentTypeEditingService.CreateAsync(rootModel, Constants.Security.SuperUserKey)).Result!;
+
+        var middleModel = ChildModelInheriting("Middle", root.Key);
+        middleModel.VariesByCulture = variesByCulture;
+        var middle = (await ContentTypeEditingService.CreateAsync(middleModel, Constants.Security.SuperUserKey)).Result!;
+
+        var leafModel = ChildModelInheriting("Leaf", middle.Key);
+        leafModel.VariesByCulture = variesByCulture;
+        var leaf = (await ContentTypeEditingService.CreateAsync(leafModel, Constants.Security.SuperUserKey)).Result!;
+
+        return (root, middle, leaf);
     }
 
     private ContentTypeCreateModel CompositionModelWithProperty(string name, string propertyAlias)
