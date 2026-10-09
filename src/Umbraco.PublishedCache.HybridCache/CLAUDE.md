@@ -3,7 +3,7 @@
 Published content caching layer for Umbraco CMS using Microsoft's HybridCache (in-memory + optional distributed cache). Provides high-performance content delivery with cache seeding, serialization, and notification-based invalidation.
 
 **Project Type**: Class Library (NuGet package)
-**Target Framework**: net10.0
+**Target Framework**: net11.0
 **Package ID**: Umbraco.Cms.PublishedCache.HybridCache
 **Namespace**: Umbraco.Cms.Infrastructure.HybridCache
 **Dependencies**: Umbraco.Core, Umbraco.Infrastructure, Microsoft.Extensions.Caching.Hybrid, MessagePack, K4os.Compression.LZ4

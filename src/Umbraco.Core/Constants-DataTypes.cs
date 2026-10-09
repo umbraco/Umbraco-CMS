@@ -188,12 +188,6 @@ public static partial class Constants
             public const string RelatedLinks = "B4E3535A-1753-47E2-8568-602CF8CFEE6F";
 
             /// <summary>
-            ///     Guid for Member as string
-            /// </summary>
-            [Obsolete("Use the constant defined in Umbraco.Core.Constants.MemberTypes.Guids.Member. Scheduled for removal in Umbraco 19.")]
-            public const string Member = MemberTypes.Guids.Member;
-
-            /// <summary>
             ///     Guid for Image Cropper as string
             /// </summary>
             public const string ImageCropper = "1df9f033-e6d4-451f-b8d2-e0cbc50a836f";
@@ -377,12 +371,6 @@ public static partial class Constants
             ///     Guid for Related Links
             /// </summary>
             public static readonly Guid RelatedLinksGuid = new(RelatedLinks);
-
-            /// <summary>
-            ///     Guid for Member
-            /// </summary>
-            [Obsolete("Use the constant defined in Umbraco.Core.Constants.MemberTypes.Guids.MemberGuid. Scheduled for removal in Umbraco 19.")]
-            public static readonly Guid MemberGuid = new(Member);
 
             /// <summary>
             ///     Guid for Image Cropper

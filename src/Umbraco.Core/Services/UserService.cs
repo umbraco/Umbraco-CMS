@@ -52,6 +52,7 @@ internal partial class UserService : RepositoryService, IUserService
     private readonly ContentSettings _contentSettings;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IBackOfficeUserReader _backOfficeUserReader;
+    private readonly ILogger<UserService> _logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserService" /> class.
@@ -113,6 +114,7 @@ internal partial class UserService : RepositoryService, IUserService
         _forgotPasswordSender = forgotPasswordSender;
         _userIdKeyResolver = userIdKeyResolver;
         _backOfficeUserReader = backOfficeUserReader;
+        _logger = loggerFactory.CreateLogger<UserService>();
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
@@ -412,7 +414,17 @@ internal partial class UserService : RepositoryService, IUserService
                     throw new ArgumentOutOfRangeException(nameof(matchType));
             }
 
-            return _userRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Email);
+            return _userRepository.GetPagedResultsByQuery(
+                query,
+                pageIndex,
+                pageSize,
+                out totalRecords,
+                dto => dto.Email,
+                Direction.Ascending,
+                includeUserGroups: null,
+                excludeUserGroups: null,
+                userState: null,
+                userKinds: null);
         }
     }
 
@@ -444,7 +456,17 @@ internal partial class UserService : RepositoryService, IUserService
                     throw new ArgumentOutOfRangeException(nameof(matchType));
             }
 
-            return _userRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Username);
+            return _userRepository.GetPagedResultsByQuery(
+                query,
+                pageIndex,
+                pageSize,
+                out totalRecords,
+                dto => dto.Username,
+                Direction.Ascending,
+                includeUserGroups: null,
+                excludeUserGroups: null,
+                userState: null,
+                userKinds: null);
         }
     }
 
@@ -619,11 +641,22 @@ internal partial class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail)
+    [Obsolete("Please use the overload taking a cancellation token. Scheduled for removal in Umbraco 19.")]
+    public Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail)
+        => SendResetPasswordEmailAsync(userEmail, CancellationToken.None);
+
+    /// <inheritdoc/>
+    public async Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail, CancellationToken cancellationToken)
     {
-        if (_forgotPasswordSender.CanSend() is false)
+        if (_forgotPasswordSender.IsPasswordResetConfigured() is false)
         {
             return Attempt.Fail(UserOperationStatus.CannotPasswordReset);
+        }
+
+        // Checked before the user lookup so the outcome is the same whether or not the email belongs to a user.
+        if (await _forgotPasswordSender.IsPasswordResetAvailableAsync(cancellationToken) is false)
+        {
+            return Attempt.Fail(UserOperationStatus.PasswordResetUnavailable);
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -643,6 +676,11 @@ internal partial class UserService : RepositoryService, IUserService
         Attempt<Uri, UserOperationStatus> uriAttempt = await uriProvider.CreateForgotPasswordUriAsync(user);
         if (uriAttempt.Success is false)
         {
+            _logger.LogWarning(
+                "Could not create the password reset link for user {UserId} {UserKey}. Status: {Status}.",
+                user.Id,
+                user.Key,
+                uriAttempt.Status);
             return Attempt.Fail(uriAttempt.Status);
         }
 
@@ -651,7 +689,15 @@ internal partial class UserService : RepositoryService, IUserService
             ForgotPasswordUri = uriAttempt.Result,
             Recipient = user,
         };
-        await _forgotPasswordSender.SendForgotPassword(message);
+        try
+        {
+            await _forgotPasswordSender.SendForgotPassword(message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Could not send the password reset message to user {UserId} {UserKey}.", user.Id, user.Key);
+            return Attempt.Fail(UserOperationStatus.UnknownFailure);
+        }
 
         userManager.NotifyForgotPasswordRequested(new ClaimsPrincipal(), user.Id.ToString()); //A bit of a hack, but since this method will be used without a signed in user, there is no real principal anyway.
 
@@ -1301,9 +1347,12 @@ internal partial class UserService : RepositoryService, IUserService
             pageSize,
             out long totalRecords,
             x => x.Username,
+            Direction.Ascending,
+            includeUserGroups: null,
             excludeUserGroups: excludeUserGroupAliases.ToArray(),
-            filter: query,
-            userState: baseFilter.IncludeUserStates?.ToArray());
+            userState: baseFilter.IncludeUserStates?.ToArray(),
+            userKinds: null,
+            filter: query);
 
         var pagedResult = new PagedModel<IUser> { Items = result, Total = totalRecords };
 
@@ -1407,6 +1456,7 @@ internal partial class UserService : RepositoryService, IUserService
             includedUserGroupAliases?.ToArray(),
             excludedUserGroupAliases?.ToArray(),
             includeUserStates?.ToArray(),
+            mergedFilter.IncludeUserKinds?.ToArray(),
             baseQuery);
 
         scope.Complete();
@@ -1763,7 +1813,7 @@ internal partial class UserService : RepositoryService, IUserService
                     throw new IndexOutOfRangeException("The orderBy parameter " + orderBy + " is not valid");
             }
 
-            return _userRepository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, sort, orderDirection, includeUserGroups, excludeUserGroups, userState, filter);
+            return _userRepository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, sort, orderDirection, includeUserGroups, excludeUserGroups, userState, userKinds: null, filter: filter);
         }
     }
 
@@ -1772,7 +1822,17 @@ internal partial class UserService : RepositoryService, IUserService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _userRepository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Name);
+            return _userRepository.GetPagedResultsByQuery(
+                null,
+                pageIndex,
+                pageSize,
+                out totalRecords,
+                member => member.Name,
+                Direction.Ascending,
+                includeUserGroups: null,
+                excludeUserGroups: null,
+                userState: null,
+                userKinds: null);
         }
     }
 

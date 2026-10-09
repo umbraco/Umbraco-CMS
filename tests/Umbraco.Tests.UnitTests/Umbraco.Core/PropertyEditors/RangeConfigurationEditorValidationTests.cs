@@ -19,9 +19,13 @@ public class RangeConfigurationEditorValidationTests
     [
         new object[] { new IntegerConfigurationEditor(IOHelper), "validationRange" },
         new object[] { new DecimalConfigurationEditor(IOHelper), "validationRange" },
+        new object[] { new SliderConfigurationEditor(IOHelper), "validationRange" },
+        new object[] { new RangeSliderConfigurationEditor(IOHelper), "validationRange" },
         new object[] { new MediaPicker3ConfigurationEditor(IOHelper), "validationLimit" },
         new object[] { new MultiUrlPickerConfigurationEditor(IOHelper), "validationLimit" },
         new object[] { new MultiNodePickerConfigurationEditor(IOHelper), "validationLimit" },
+        new object[] { new MultipleDocumentPickerConfigurationEditor(IOHelper), "validationLimit" },
+        new object[] { new MultipleMemberPickerConfigurationEditor(IOHelper), "validationLimit" },
     ];
 
     [TestCaseSource(nameof(Editors))]

@@ -34,36 +34,6 @@ public class ReferencedByMediaController : MediaControllerBase
     }
 
     /// <summary>
-    /// Retrieves a paged list of media items that reference the specified media item.
-    /// </summary>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <param name="id">The unique identifier of the media item for which referencing items are retrieved.</param>
-    /// <param name="skip">The number of items to skip before starting to collect the result set (used for paging).</param>
-    /// <param name="take">The maximum number of items to return (used for paging).</param>
-    /// <returns>A task representing the asynchronous operation. The result contains a <see cref="PagedViewModel{IReferenceResponseModel}"/> with media items that reference the specified item.</returns>
-    /// <remarks>
-    /// This method is obsolete. Use <c>ReferencedBy2</c> instead. Scheduled for removal in Umbraco 19, when <c>ReferencedBy2</c> will be renamed back to <c>ReferencedBy</c>.
-    /// </remarks>
-    [Obsolete("Use the ReferencedBy2 action method instead. Scheduled for removal in Umbraco 19, when ReferencedBy2 will be renamed back to ReferencedBy.")]
-    [NonAction]
-    public async Task<ActionResult<PagedViewModel<IReferenceResponseModel>>> ReferencedBy(
-        CancellationToken cancellationToken,
-        Guid id,
-        int skip = 0,
-        int take = 20)
-    {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
-
-        var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
-        {
-            Total = relationItems.Total,
-            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
-        };
-
-        return pagedViewModel;
-    }
-
-    /// <summary>
     ///     Retrieves a paginated list of items that reference the specified media item.
     /// </summary>
     /// <remarks>
@@ -81,7 +51,7 @@ public class ReferencedByMediaController : MediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Gets a collection of items that reference a media item.")]
     [EndpointDescription("Gets a paginated collection of items that reference the media item identified by the provided Id.")]
-    public async Task<IActionResult> ReferencedBy2(
+    public async Task<IActionResult> ReferencedBy(
         CancellationToken cancellationToken,
         Guid id,
         int skip = 0,

@@ -32,6 +32,12 @@ internal abstract class MigrateMinMaxToRangeMigrationBase : AsyncMigrationBase
     protected abstract string EditorAlias { get; }
 
     /// <summary>
+    ///     Gets the property editor aliases of the data types to migrate, for editors whose configuration is shared by
+    ///     more than one property editor. Defaults to <see cref="EditorAlias" /> alone.
+    /// </summary>
+    protected virtual IReadOnlyCollection<string> EditorAliases => [EditorAlias];
+
+    /// <summary>
     ///     Migrates a single data type's configuration in place.
     /// </summary>
     /// <param name="configuration">The data type configuration to migrate in place.</param>
@@ -45,7 +51,7 @@ internal abstract class MigrateMinMaxToRangeMigrationBase : AsyncMigrationBase
             Database.SqlContext.Sql()
                 .Select<DataTypeDto>()
                 .From<DataTypeDto>()
-                .Where<DataTypeDto>(x => x.EditorAlias == EditorAlias));
+                .WhereIn<DataTypeDto>(x => x.EditorAlias, EditorAliases));
 
         var migrated = 0;
         var unchanged = 0;
@@ -71,7 +77,7 @@ internal abstract class MigrateMinMaxToRangeMigrationBase : AsyncMigrationBase
                     exception,
                     "Could not parse the configuration of data type {DataTypeId} for editor {EditorAlias}; skipping its range migration.",
                     dataTypeDto.NodeId,
-                    EditorAlias);
+                    dataTypeDto.EditorAlias);
                 continue;
             }
 
@@ -81,7 +87,7 @@ internal abstract class MigrateMinMaxToRangeMigrationBase : AsyncMigrationBase
                 Logger.LogWarning(
                     "The configuration of data type {DataTypeId} for editor {EditorAlias} is not a JSON object; skipping its range migration.",
                     dataTypeDto.NodeId,
-                    EditorAlias);
+                    dataTypeDto.EditorAlias);
                 continue;
             }
 
@@ -93,7 +99,7 @@ internal abstract class MigrateMinMaxToRangeMigrationBase : AsyncMigrationBase
                     Logger.LogDebug(
                         "No range configuration to migrate for data type {DataTypeId} of editor {EditorAlias}.",
                         dataTypeDto.NodeId,
-                        EditorAlias);
+                        dataTypeDto.EditorAlias);
                 }
 
                 continue;
@@ -107,8 +113,8 @@ internal abstract class MigrateMinMaxToRangeMigrationBase : AsyncMigrationBase
         }
 
         Logger.LogInformation(
-            "Range configuration migration for editor {EditorAlias} complete: migrated {Migrated} of {Total} data type(s) ({Unchanged} unchanged, {Unparseable} could not be parsed).",
-            EditorAlias,
+            "Range configuration migration for editor(s) {EditorAliases} complete: migrated {Migrated} of {Total} data type(s) ({Unchanged} unchanged, {Unparseable} could not be parsed).",
+            string.Join(", ", EditorAliases),
             migrated,
             dataTypeDtos.Count,
             unchanged,

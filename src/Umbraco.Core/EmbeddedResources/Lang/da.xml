@@ -67,8 +67,12 @@
     </key>
     <key alias="parentNotPublishedAnomaly">Ups: dette dokument er udgivet, men er ikke i cachen (intern fejl)</key>
     <key alias="getUrlException">Kunne ikke hente URL'en</key>
-    <key alias="routeError">Dette dokument er udgivet, men dets URL ville kollidere med indholdet %0%</key>
+    <key alias="routeError">Dette dokument er udgivet, men dets URL ville kollidere med indholdet '%0%'</key>
     <key alias="routeErrorCannotRoute">Dette dokument er udgivet, men dets URL kan ikke genereres</key>
+    <key alias="unroutableContentWarningHeader">Indhold udgivet</key>
+    <key alias="unroutableContentWarning">Dokumentet har ingen URL. Flere detaljer findes under "Info".</key>
+    <key alias="unroutableContentWarningWithReason">Dokumentet har ingen URL. %0% Flere detaljer findes under "Info".</key>
+    <key alias="routeErrorNoDomainForCulture">Dette dokument er udgivet på '%0%', men har ingen URL, fordi det ikke er standardsproget, og der ikke er tildelt et værtsnavn til det</key>
   </area>
   <area alias="member">
   </area>

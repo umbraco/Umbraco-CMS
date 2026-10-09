@@ -15,6 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Toggle Property Editor UI',
 		element: () => import('./property-editor-ui-toggle.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Toggle',
 			propertyEditorSchemaAlias: 'Umbraco.TrueFalse',
 			icon: 'icon-checkbox',

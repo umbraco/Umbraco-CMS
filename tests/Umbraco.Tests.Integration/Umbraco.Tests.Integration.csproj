@@ -46,7 +46,6 @@
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache.Bounded\Umbraco.PublishedCache.HybridCache.Bounded.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Cms.Search.BackOffice\Umbraco.Cms.Search.BackOffice.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms.Search.Provider.Examine\Umbraco.Cms.Search.Provider.Examine.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
   </ItemGroup>
@@ -435,34 +434,34 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Umbraco.Search.Core\InvariantContentStructureTests.Published.cs">
+    <Compile Update="Umbraco.Cms.Search.Core\InvariantContentStructureTests.Published.cs">
       <DependentUpon>InvariantContentStructureTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Search.Core\InvariantContentStructureTests.Draft.cs">
+    <Compile Update="Umbraco.Cms.Search.Core\InvariantContentStructureTests.Draft.cs">
       <DependentUpon>InvariantContentStructureTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Search.Core\InvariantContentTests.Published.cs">
+    <Compile Update="Umbraco.Cms.Search.Core\InvariantContentTests.Published.cs">
       <DependentUpon>InvariantContentTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Search.Core\InvariantContentTests.Draft.cs">
+    <Compile Update="Umbraco.Cms.Search.Core\InvariantContentTests.Draft.cs">
       <DependentUpon>InvariantContentTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Search.Core\PublishedContentCacheRefresherTests.Variant.cs">
+    <Compile Update="Umbraco.Cms.Search.Core\PublishedContentCacheRefresherTests.Variant.cs">
       <DependentUpon>PublishedContentCacheRefresherTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Search.Core\PublishedContentCacheRefresherTests.Invariant.cs">
+    <Compile Update="Umbraco.Cms.Search.Core\PublishedContentCacheRefresherTests.Invariant.cs">
       <DependentUpon>PublishedContentCacheRefresherTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Search.BackOffice\IndexedEntitySearchServiceTests.Content.cs">
+    <Compile Update="Umbraco.Core\Services\IndexedEntitySearchServiceTests.Content.cs">
       <DependentUpon>IndexedEntitySearchServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Search.BackOffice\IndexedEntitySearchServiceTests.Media.cs">
+    <Compile Update="Umbraco.Core\Services\IndexedEntitySearchServiceTests.Media.cs">
       <DependentUpon>IndexedEntitySearchServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Search.BackOffice\ContentSearchServiceTests.Content.cs">
+    <Compile Update="Umbraco.Core\Services\ContentSearchServiceTests.Content.cs">
       <DependentUpon>ContentSearchServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Search.BackOffice\ContentSearchServiceTests.Media.cs">
+    <Compile Update="Umbraco.Core\Services\ContentSearchServiceTests.Media.cs">
       <DependentUpon>ContentSearchServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>

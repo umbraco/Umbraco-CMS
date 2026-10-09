@@ -4,6 +4,8 @@ import {expect} from "@playwright/test";
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const customDataTypeName = 'Custom Block Grid';
+const customRTEDataTypeName = 'TestRTETiptap';
+const customElementTypeName = 'BlockGridWithRTEElement';
 const elementTypeName = 'BlockGridElement';
 const propertyInBlock = 'Textstring';
 const groupName = 'testGroup';
@@ -21,6 +23,9 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
+  await umbracoApi.language.ensureNameNotExists('Danish');
 });
 
 test('can create content with an empty block grid', async ({umbracoApi, umbracoUi}) => {
@@ -307,8 +312,6 @@ test('can add a block element with inline editing mode enabled', async ({umbraco
 test('can add an invariant block element with an invariant RTE Tiptap in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const inputText = 'This is block test';
-  const customRTEDataTypeName = 'TestRTETiptap';
-  const customElementTypeName = 'BlockGridWithRTEElement';
   const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
   const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
   const customDataTypeId = await umbracoApi.dataType.createBlockGridWithPermissions(customDataTypeName, customElementTypeId, true, true);
@@ -332,16 +335,11 @@ test('can add an invariant block element with an invariant RTE Tiptap in the con
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockGridValue).toBeTruthy();
 
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
 });
 
 test('can add a variant block element with variant RTE Tiptap in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const inputText = 'This is block test';
-  const customRTEDataTypeName = 'TestRTETiptap';
-  const customElementTypeName = 'BlockGridWithRTEElement';
   await umbracoApi.language.createDanishLanguage();
   const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
   const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
@@ -366,17 +364,11 @@ test('can add a variant block element with variant RTE Tiptap in the content', a
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockGridValue).toBeTruthy();
 
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
-  await umbracoApi.language.ensureNameNotExists('Danish');
 });
 
 test('can add a variant block element with invariant RTE Tiptap in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const inputText = 'This is block test';
-  const customRTEDataTypeName = 'TestRTETiptap';
-  const customElementTypeName = 'BlockGridWithRTEElement';
   await umbracoApi.language.createDanishLanguage();
   const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
   const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
@@ -401,10 +393,6 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
   const blockGridValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockGrid")?.value;
   expect(blockGridValue).toBeTruthy();
 
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
-  await umbracoApi.language.ensureNameNotExists('Danish');
 });
 
 // Tests regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20680
@@ -425,3 +413,34 @@ test('can move away from a content node with a block grid after making no change
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
 });
 
+
+test('can navigate away from content with a block grid value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDefaultDocumentWithABlockGridEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed block grid value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDefaultDocumentWithABlockGridEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickDeleteBlockGridBlockButton();
+  await umbracoUi.content.clickConfirmToDeleteButton();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});

@@ -4,7 +4,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices;
 
@@ -52,31 +51,6 @@ public abstract class RecurringHostedServiceBase : BackgroundService
         _delay = delay;
         _timeProvider = timeProvider;
     }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RecurringHostedServiceBase" /> class.
-    /// </summary>
-    /// <param name="logger">Logger.</param>
-    /// <param name="period">Timespan representing how often the task should recur.</param>
-    /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs.</param>
-    [Obsolete("Use the constructor accepting TimeProvider. Scheduled for removal in Umbraco 19.")]
-    protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay)
-        : this(logger, period, delay, TimeProvider.System)
-    { }
-
-    /// <summary>
-    /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optional configuration for the first run time is available.
-    /// </summary>
-    /// <param name="firstRunTime">The configured time to first run the task in crontab format.</param>
-    /// <param name="cronTabParser">An instance of <see cref="ICronTabParser" />.</param>
-    /// <param name="logger">The logger.</param>
-    /// <param name="defaultDelay">The default delay to use when a first run time is not configured.</param>
-    /// <returns>
-    /// The delay before first running the recurring task.
-    /// </returns>
-    [Obsolete("Use DelayCalculator.GetDelay instead. Scheduled for removal in Umbraco 19.")]
-    protected static TimeSpan GetDelay(string firstRunTime, ICronTabParser cronTabParser, ILogger logger, TimeSpan defaultDelay)
-        => BackgroundJobs.DelayCalculator.GetDelay(firstRunTime, cronTabParser, logger, defaultDelay);
 
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -242,32 +216,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <returns>
     /// A task representing the asynchronous operation.
     /// </returns>
-    public virtual Task PerformExecuteAsync(CancellationToken stoppingToken)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => PerformExecuteAsync(null);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <summary>
-    /// Implements the work of the recurring task.
-    /// </summary>
-    /// <param name="state">The task state.</param>
-    /// <returns>
-    /// A task representing the asynchronous operation.
-    /// </returns>
-    /// <remarks>
-    /// This overload does not receive a <see cref="CancellationToken" />, so shutdown cancellation is not propagated to the implementation.
-    /// </remarks>
-    [Obsolete("Override PerformExecuteAsync(CancellationToken) instead. Scheduled for removal in Umbraco 19.")]
-    public virtual Task PerformExecuteAsync(object? state)
-        => Task.CompletedTask;
-
-    /// <summary>
-    /// Executes the task.
-    /// </summary>
-    /// <param name="state">The task state.</param>
-    [Obsolete("No longer used. The base class now uses BackgroundService.ExecuteAsync(CancellationToken). Scheduled for removal in Umbraco 19.")]
-    public virtual void ExecuteAsync(object? state)
-    { }
+    public abstract Task PerformExecuteAsync(CancellationToken stoppingToken);
 
     /// <summary>
     /// Computes the delay before the next execution, subtracting the elapsed execution time from the period to prevent drift.

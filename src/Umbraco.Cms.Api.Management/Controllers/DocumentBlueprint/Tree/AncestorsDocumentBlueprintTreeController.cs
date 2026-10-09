@@ -18,10 +18,12 @@ public class AncestorsDocumentBlueprintTreeController : DocumentBlueprintTreeCon
     /// Initializes a new instance of the <see cref="AncestorsDocumentBlueprintTreeController"/> class, which manages the retrieval of ancestor document blueprint tree nodes.
     /// </summary>
     /// <param name="entityService">Service used for entity operations within the document blueprint tree.</param>
+    /// <param name="entitySearchService">The <see cref="IEntitySearchService"/> used to search entities.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used to map between identifiers and keys.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for tree nodes.</param>
     /// <param name="documentPresentationFactory">Factory responsible for creating document presentation models.</param>
-    public AncestorsDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
-    : base(entityService, flagProviders, documentPresentationFactory)
+    public AncestorsDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IDocumentPresentationFactory documentPresentationFactory)
+    : base(entityService, flagProviders, entitySearchService, idKeyMap, documentPresentationFactory)
     {
     }
 

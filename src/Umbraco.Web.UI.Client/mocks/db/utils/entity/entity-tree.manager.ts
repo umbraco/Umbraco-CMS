@@ -40,8 +40,8 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		return this.#pagedTreeResult({ items, skip, take });
 	}
 
-	getAncestorsOf({ descendantId }: { descendantId: string }): Array<T> {
-		const items = [];
+	getAncestorsOf({ descendantId }: { descendantId: string }) {
+		const items: Array<T> = [];
 		let currentId: string | undefined = descendantId;
 		while (currentId) {
 			const item = this.#db.read(currentId);
@@ -49,7 +49,7 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 			items.push(item);
 			currentId = item.parent?.id;
 		}
-		return items.reverse();
+		return items.reverse().map((item) => this.#treeItemMapper(item));
 	}
 
 	#pagedTreeResult({ items, skip, take }: { items: Array<T>; skip: number; take: number }) {

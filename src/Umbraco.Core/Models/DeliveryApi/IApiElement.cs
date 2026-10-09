@@ -15,8 +15,7 @@ public interface IApiElement
     /// <summary>
     ///     Gets the name of the element.
     /// </summary>
-    // TODO (V19): Remove the default implementations from this interface.
-    string? Name => null;
+    string? Name { get; }
 
     /// <summary>
     ///     Gets the content type alias of the element.

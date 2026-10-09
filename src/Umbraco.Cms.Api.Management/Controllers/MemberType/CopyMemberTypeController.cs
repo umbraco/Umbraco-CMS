@@ -28,18 +28,6 @@ public class CopyMemberTypeController : MemberTypeControllerBase
         => _memberTypeService = memberTypeService;
 
     /// <summary>
-    /// Creates a copy of the specified member type.
-    /// </summary>
-    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
-    /// <param name="id">The unique identifier of the member type to copy.</param>
-    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
-    [Obsolete("Please use the overload that includes all parameters. Scheduled for removal in Umbraco 19.")]
-    [NonAction]
-    public async Task<IActionResult> Copy(
-        CancellationToken cancellationToken,
-        Guid id) => await Copy(cancellationToken, id, null);
-
-    /// <summary>
     /// Copies a member type with the specified ID, optionally using the provided copy options.
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>

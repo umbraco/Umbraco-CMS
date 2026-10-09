@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
@@ -23,7 +22,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
         public async Task Executes_And_Cleans_Files()
         {
             TempFileCleanupJob sut = CreateTempFileCleanupJob();
-            await sut.RunJobAsync();
+            await sut.RunJobAsync(CancellationToken.None);
             VerifyFilesCleaned();
         }
 

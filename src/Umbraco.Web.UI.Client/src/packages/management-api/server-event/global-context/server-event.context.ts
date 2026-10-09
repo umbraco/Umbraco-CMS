@@ -9,13 +9,14 @@ import {
 	type HubConnection,
 	type IHttpConnectionOptions,
 } from '@umbraco-cms/backoffice/external/signalr';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SERVER_CONTEXT, UmbSignalRReconnectPolicy } from '@umbraco-cms/backoffice/server';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { filter, Subject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbManagementApiServerEventContext extends UmbContextBase {
 	#connection?: HubConnection;
+	#connectionGeneration = 0;
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#serverContext?: typeof UMB_SERVER_CONTEXT.TYPE;
 
@@ -72,16 +73,32 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 			if (isAuthorized === undefined) return;
 
 			if (isAuthorized) {
-				this.#initHubConnection();
+				this.#initHubConnection().catch((error) => {
+					this.#isConnected.setValue(false);
+					console.error('Failed to initialize the server event hub connection', error);
+				});
 			} else {
+				this.#connectionGeneration++;
 				this.#isConnected.setValue(false);
-				this.#connection?.stop();
+				const connection = this.#connection;
 				this.#connection = undefined;
+				connection?.stop();
 			}
 		});
 	}
 
-	#initHubConnection() {
+	async #initHubConnection() {
+		// Each call supersedes any earlier one, so an init that is still awaiting the previous stop must not
+		// go on to build a connection once a newer init or a logout has happened.
+		const generation = ++this.#connectionGeneration;
+
+		if (this.#connection) {
+			const previousConnection = this.#connection;
+			this.#connection = undefined;
+			await previousConnection.stop();
+			if (generation !== this.#connectionGeneration) return;
+		}
+
 		const serverURL = this.#serverContext?.getServerUrl();
 
 		if (!serverURL) {
@@ -100,9 +117,21 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 			hubOptions.transport = HttpTransportType.WebSockets;
 		}
 
-		this.#connection = new HubConnectionBuilder().withUrl(serverEventHubUrl, hubOptions).build();
+		const connection = new HubConnectionBuilder()
+			.withUrl(serverEventHubUrl, hubOptions)
+			.withAutomaticReconnect(new UmbSignalRReconnectPolicy())
+			.build();
+		this.#connection = connection;
 
-		this.#connection.on('notify', (payload) => {
+		// A superseded connection can still report state changes while it winds down; only the active one
+		// may update isConnected.
+		const setIsConnected = (isConnected: boolean) => {
+			if (this.#connection === connection) {
+				this.#isConnected.setValue(isConnected);
+			}
+		};
+
+		connection.on('notify', (payload) => {
 			const event: UmbManagementApiServerEventModel = {
 				...payload,
 				clientTimestamp: new Date().toISOString(),
@@ -111,12 +140,17 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 			this.#events.next(event);
 		});
 
-		this.#connection
-			.start()
-			.then(() => this.#isConnected.setValue(true))
-			.catch(() => this.#isConnected.setValue(false));
+		// While reconnecting we treat the connection as down so cache invalidation consumers refetch
+		// rather than trust a cache that may have missed events during the gap.
+		connection.onreconnecting(() => setIsConnected(false));
+		connection.onreconnected(() => setIsConnected(true));
 
-		this.#connection.onclose(() => this.#isConnected.setValue(false));
+		connection
+			.start()
+			.then(() => setIsConnected(true))
+			.catch(() => setIsConnected(false));
+
+		connection.onclose(() => setIsConnected(false));
 	}
 }
 

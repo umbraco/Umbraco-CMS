@@ -479,6 +479,32 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
+    /// <inheritdoc/>
+    public IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases, bool loadTemplates = true)
+    {
+        Guid[] idsA = ids.Distinct().ToArray();
+        if (idsA.Length == 0)
+        {
+            return Enumerable.Empty<TContent>();
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds);
+
+        var index = new Dictionary<Guid, TContent>(idsA.Length);
+        foreach (IEnumerable<Guid> group in idsA.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            List<Guid> groupKeys = group.ToList();
+            IQuery<TContent>? query = Query<TContent>()?.Where(x => groupKeys.Contains(x.Key));
+            foreach (TContent item in _contentRepository.GetPage(query, 0, groupKeys.Count, out _, propertyAliases, null, Ordering.By("sortOrder"), loadTemplates))
+            {
+                index[item.Key] = item;
+            }
+        }
+
+        return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+    }
+
     /// <inheritdoc />
     public IEnumerable<TContent> GetPagedOfType(
         int contentTypeId,
@@ -671,10 +697,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 $"Cannot save (un)publishing content with name: {content.Name} - and state: {content.PublishedState}, use the dedicated SavePublished method.");
         }
 
-        if (content.Name != null && content.Name.Length > 255)
+        if (content.Name != null && content.Name.Length > Constants.Validation.MaxNameLength)
         {
             throw new InvalidOperationException(
-                $"Content with the name {content.Name} cannot be more than 255 characters in length.");
+                $"Content with the name {content.Name} cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -833,9 +859,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, content);
         }
 
-        if (content.Name != null && content.Name.Length > 255)
+        if (content.Name != null && content.Name.Length > Constants.Validation.MaxNameLength)
         {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
 
         PublishedState publishedState = content.PublishedState;
@@ -1028,10 +1054,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     private static void EnsureNameLengthIsValid(TContent content)
     {
-        const int MaxContentNameLength = 255;
-        if (content.Name?.Length > MaxContentNameLength)
+        if (content.Name?.Length > Constants.Validation.MaxNameLength)
         {
-            throw new InvalidOperationException($"Name cannot be more than {MaxContentNameLength} characters in length.");
+            throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
     }
 

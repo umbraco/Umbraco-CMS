@@ -117,12 +117,6 @@ public sealed class InternalPublishedContent : IPublishedContent
     public bool IsPublished(string? culture = null) => true;
 
     /// <inheritdoc />
-    [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 19.")]
-    public IEnumerable<IPublishedContent> ChildrenForAllCultures => this.Children(
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
-
-    /// <inheritdoc />
     public IPublishedContentType ContentType { get; set; }
 
     /// <inheritdoc />

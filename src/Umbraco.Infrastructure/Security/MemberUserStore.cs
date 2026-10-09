@@ -1,8 +1,6 @@
 using System.Data;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -63,37 +61,6 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         _twoFactorLoginService = twoFactorLoginService;
         _memberCache = memberCache;
         _externalMemberService = externalMemberService ?? throw new ArgumentNullException(nameof(externalMemberService));
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MemberUserStore" /> class for the members identity store
-    /// </summary>
-    /// <param name="memberService">The member service</param>
-    /// <param name="mapper">The mapper for properties</param>
-    /// <param name="scopeProvider">The scope provider</param>
-    /// <param name="describer">The error describer</param>
-    /// <param name="externalLoginService">The external login service</param>
-    /// <param name="twoFactorLoginService">The two factor login service</param>
-    /// <param name="memberCache">The published member cache for resolving member content.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public MemberUserStore(
-        IMemberService memberService,
-        IUmbracoMapper mapper,
-        ICoreScopeProvider scopeProvider,
-        IdentityErrorDescriber describer,
-        IExternalLoginWithKeyService externalLoginService,
-        ITwoFactorLoginService twoFactorLoginService,
-        IPublishedMemberCache memberCache)
-        : this(
-            memberService,
-            mapper,
-            scopeProvider,
-            describer,
-            externalLoginService,
-            twoFactorLoginService,
-            memberCache,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalMemberService>())
-    {
     }
 
     /// <inheritdoc />

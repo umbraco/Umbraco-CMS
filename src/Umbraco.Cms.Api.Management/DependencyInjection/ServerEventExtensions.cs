@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Api.Management.ServerEvents.AccessFilters;
@@ -82,6 +81,9 @@ internal static class ServerEventExtensions
         builder.AddNotificationAsyncHandler<ContentTypeChangedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaTypeChangedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MemberTypeChangedNotification, ServerEventSender>();
+
+        builder.AddNotificationAsyncHandler<IndexRebuildStartingNotification, IndexRebuildServerEventNotificationHandler>();
+        builder.AddNotificationAsyncHandler<IndexRebuildCompletedNotification, IndexRebuildServerEventNotificationHandler>();
 
         return builder;
     }

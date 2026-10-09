@@ -7,24 +7,24 @@ using Examine.Search;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Search.Core.Extensions;
-using Umbraco.Cms.Search.Core.Models.Searching;
-using Umbraco.Cms.Search.Core.Models.Searching.Faceting;
-using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
-using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
+using Umbraco.Cms.Core.Search.Querying;
+using Umbraco.Cms.Core.Search.Querying.Faceting;
+using Umbraco.Cms.Core.Search.Querying.Filtering;
+using Umbraco.Cms.Core.Search.Querying.Sorting;
 using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Umbraco.Cms.Search.Provider.Examine.Extensions;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Search.Provider.Examine.Models.Searching.Filtering;
 using Umbraco.Extensions;
-using FacetResult = Umbraco.Cms.Search.Core.Models.Searching.Faceting.FacetResult;
-using SearchResult = Umbraco.Cms.Search.Core.Models.Searching.SearchResult;
+using FacetResult = Umbraco.Cms.Core.Search.Querying.Faceting.FacetResult;
+using SearchResult = Umbraco.Cms.Core.Search.Querying.SearchResult;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 
 /// <summary>
-/// Implements <see cref="Umbraco.Cms.Search.Core.Services.ISearcher"/> against Examine/Lucene, translating core
+/// Implements <see cref="Umbraco.Cms.Core.Search.ISearcher"/> against Examine/Lucene, translating core
 /// <see cref="Filter"/>, <see cref="Facet"/>, and <see cref="Sorter"/> types into Examine query operations.
 /// </summary>
 public class Searcher : IExamineSearcher
@@ -132,7 +132,14 @@ public class Searcher : IExamineSearcher
                 //    documents with "whatever" because the wildcard is applied at the end of the query.
                 // to counter for these cases, we split the query into multiple terms and apply wildcard search to each
                 // term with AND grouping.
-                var terms = query.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                // the clauses built below append a wildcard to each term, so a term that already begins with a
+                // wildcard character would yield a leading-wildcard query, which Lucene rejects outright. such a
+                // term carries no text to match on, so drop it rather than fail the whole search.
+                var terms = query
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(term => term.TrimStart('*', '?'))
+                    .Where(term => term.Length > 0)
+                    .ToArray();
                 foreach (var term in terms)
                 {
                     searchQuery.And().Group(nestedQuery => CreateAggregatedTextQuery(nestedQuery, term, segment));

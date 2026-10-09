@@ -1,75 +1,26 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-///     Represents a property editor for label properties.
+///     Represents a property editor for label properties holding a string.
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.Label,
+    ValueType = ValueTypes.String,
     ValueEditorIsReusable = true)]
-public class LabelPropertyEditor : DataEditor, IValueSchemaProvider
+public class LabelPropertyEditor : LabelPropertyEditorBase
 {
-    private readonly IIOHelper _ioHelper;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="LabelPropertyEditor" /> class.
     /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
+    /// <param name="ioHelper">The IO helper.</param>
     public LabelPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
-        : base(dataValueEditorFactory)
+        : base(dataValueEditorFactory, ioHelper)
     {
-        _ioHelper = ioHelper;
-        SupportsReadOnly = true;
-    }
-
-    /// <inheritdoc />
-    public Type? GetValueType(object? configuration) => typeof(string);
-
-    /// <inheritdoc />
-    public JsonObject? GetValueSchema(object? configuration) => new()
-    {
-        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
-        ["type"] = new JsonArray("string", "null"),
-        ["description"] = "Read-only value, any value provided will be ignored",
-    };
-
-    /// <inheritdoc />
-    protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<LabelPropertyValueEditor>(Attribute!);
-
-    /// <inheritdoc />
-    protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new LabelConfigurationEditor(_ioHelper);
-
-    /// <summary>
-    /// Provides the property value editor for label properties.
-    /// </summary>
-    internal sealed class LabelPropertyValueEditor : DataValueEditor
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LabelPropertyValueEditor"/> class.
-        /// </summary>
-        /// <param name="shortStringHelper">The short string helper.</param>
-        /// <param name="jsonSerializer">The JSON serializer.</param>
-        /// <param name="ioHelper">The IO helper.</param>
-        /// <param name="attribute">The data editor attribute.</param>
-        public LabelPropertyValueEditor(
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer,
-            IIOHelper ioHelper,
-            DataEditorAttribute attribute)
-            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
-        {
-        }
-
-        /// <inheritdoc />
-        public override bool IsReadOnly => true;
     }
 }

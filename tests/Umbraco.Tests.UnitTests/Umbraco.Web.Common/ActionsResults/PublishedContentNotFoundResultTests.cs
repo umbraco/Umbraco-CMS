@@ -68,7 +68,7 @@ public class PublishedContentNotFoundResultTests
         IUmbracoContext umbracoContext = Mock.Of<IUmbracoContext>(c
             => c.OriginalRequestUrl == new Uri("https://example.com/no-such-page"));
 
-        await new PublishedContentNotFoundResult(umbracoContext).ExecuteResultAsync(context);
+        await new PublishedContentNotFoundResult(umbracoContext, settings.NotFoundViewPath).ExecuteResultAsync(context);
 
         return context;
     }

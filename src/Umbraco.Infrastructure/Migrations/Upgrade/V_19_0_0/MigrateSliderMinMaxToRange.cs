@@ -7,7 +7,8 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 
 /// <summary>
-///     Converts the Slider editor's <c>minVal</c>/<c>maxVal</c> configuration into a single <c>validationRange</c> range.
+///     Converts the Slider and Range Slider editors' <c>minVal</c>/<c>maxVal</c> configuration into a single
+///     <c>validationRange</c> range.
 ///     The minimum is preserved as-is (a value of zero is a real lower bound); a maximum of zero means "no maximum".
 /// </summary>
 internal sealed class MigrateSliderMinMaxToRange : MigrateMinMaxToRangeMigrationBase
@@ -23,6 +24,10 @@ internal sealed class MigrateSliderMinMaxToRange : MigrateMinMaxToRangeMigration
 
     /// <inheritdoc />
     protected override string EditorAlias => Constants.PropertyEditors.Aliases.Slider;
+
+    /// <inheritdoc />
+    protected override IReadOnlyCollection<string> EditorAliases =>
+        [Constants.PropertyEditors.Aliases.Slider, Constants.PropertyEditors.Aliases.RangeSlider];
 
     /// <inheritdoc />
     protected override bool TryMigrateConfiguration(JsonObject configuration)

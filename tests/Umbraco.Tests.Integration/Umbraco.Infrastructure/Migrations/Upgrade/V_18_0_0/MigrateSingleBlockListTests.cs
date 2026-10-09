@@ -2,12 +2,14 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -16,6 +18,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList;
@@ -25,14 +28,24 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Upgrade.V_18_0_0;
 
 /// <summary>
-/// Tests for the conversion of single block mode Block Lists performed by <see cref="MigrateSingleBlockList" />,
-/// covering the nested case reported in https://github.com/umbraco/Umbraco-CMS/issues/23596.
+/// Tests for the migration of single block mode Block Lists to the single block property editor.
 /// </summary>
+/// <remarks>
+/// <para>
+/// The upgrade runs <see cref="MigrateSingleBlockListDataTypes" />, which only switches the data types; the stored
+/// values are left in the block list format, which must remain readable by the single block property editor wherever
+/// the value is stored - including nested in other block editors (https://github.com/umbraco/Umbraco-CMS/issues/23596).
+/// </para>
+/// <para>
+/// The paging tests cover the obsolete <see cref="MigrateSingleBlockList" />, which also converts the stored values
+/// and can still be run explicitly. As the single block property editor reads both formats, those tests assert the
+/// stored format itself rather than whether the value can be read.
+/// </para>
+/// </remarks>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
@@ -42,6 +55,8 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
     private const string TextPropertyAlias = "text";
     private const string InnerTextValue = "The inner text";
     private const string OuterTextValue = "The outer text";
+
+    private readonly RecordingLogger _migrationLogger = new();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -70,6 +85,12 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             new DeepCloneAppCache(new ObjectCacheAppCache()),
             NoAppCache.Instance,
             new IsolatedCaches(_ => new DeepCloneAppCache(new ObjectCacheAppCache()))));
+
+        // The harness logger factory is registered after this runs and defaults to NullLoggerFactory, so the
+        // closed generic the migration is constructed with is the seam to record what it logged.
+#pragma warning disable CS0618 // Type or member is obsolete
+        builder.Services.AddUnique<ILogger<MigrateSingleBlockList>>(_ => _migrationLogger);
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     [Test]
@@ -93,13 +114,18 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         Content content = SaveContent(
             schema,
             BuildOuterValueJson(schema, outerBlockKey, BuildNestedSingleBlockListJson(schema, innerBlockKey)));
+        var valueBeforeMigration = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
 
         await ExecuteMigrationAsync();
 
-        await AssertDataTypeIsSingleBlockAsync(schema.NestedDataType.Id);
+        await AssertDataTypeIsSingleBlockAsync(schema.NestedDataType);
+        await AssertStoredValueIsUnchangedAsync(content.Id, OuterPropertyAlias, valueBeforeMigration);
 
         BlockItemData outerBlock = await GetStoredOuterBlockAsync(schema, content.Id, outerBlockKey);
-        AssertNestedValueIsConvertedSingleBlock(schema, outerBlock, innerBlockKey);
+        AssertNestedValueIsReadableAsSingleBlock(schema, outerBlock, innerBlockKey);
+
+        BlockItemData outerEditorBlock = await GetOuterEditorBlockAsync(schema, content.Key, outerBlockKey);
+        AssertIsInnerSingleBlock(schema, GetNestedEditorValue(outerEditorBlock), innerBlockKey);
     }
 
     [Test]
@@ -118,11 +144,17 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                 schema,
                 outerBlockKey,
                 ToPascalCasedPropertyNames(BuildNestedSingleBlockListJson(schema, innerBlockKey)))));
+        var valueBeforeMigration = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
 
         await ExecuteMigrationAsync();
 
+        await AssertStoredValueIsUnchangedAsync(content.Id, OuterPropertyAlias, valueBeforeMigration);
+
         BlockItemData outerBlock = await GetStoredOuterBlockAsync(schema, content.Id, outerBlockKey);
-        AssertNestedValueIsConvertedSingleBlock(schema, outerBlock, innerBlockKey);
+        AssertNestedValueIsReadableAsSingleBlock(schema, outerBlock, innerBlockKey);
+
+        BlockItemData outerEditorBlock = await GetOuterEditorBlockAsync(schema, content.Key, outerBlockKey);
+        AssertIsInnerSingleBlock(schema, GetNestedEditorValue(outerEditorBlock), innerBlockKey);
     }
 
     [Test]
@@ -141,14 +173,22 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             BuildNestedSingleBlockListJson(schema, innerBlockKey)));
 
         Content content = SaveContent(schema, BuildOuterValueJson(schema, outerBlockKey, intermediateJson));
+        var valueBeforeMigration = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
 
         await ExecuteMigrationAsync();
+
+        await AssertStoredValueIsUnchangedAsync(content.Id, OuterPropertyAlias, valueBeforeMigration);
 
         BlockItemData outerBlock = await GetStoredOuterBlockAsync(schema, content.Id, outerBlockKey);
         var intermediateValue = JsonSerializer.Deserialize<BlockListValue>(GetNestedValueJson(outerBlock))!;
         BlockItemData intermediateBlock = intermediateValue.ContentData.Single(x => x.Key == intermediateBlockKey);
+        AssertNestedValueIsReadableAsSingleBlock(schema, intermediateBlock, innerBlockKey);
 
-        AssertNestedValueIsConvertedSingleBlock(schema, intermediateBlock, innerBlockKey);
+        BlockItemData outerEditorBlock = await GetOuterEditorBlockAsync(schema, content.Key, outerBlockKey);
+        var intermediateEditorValue = outerEditorBlock.Values.Single(x => x.Alias == NestedPropertyAlias).Value as BlockListValue;
+        Assert.That(intermediateEditorValue, Is.Not.Null);
+        BlockItemData intermediateEditorBlock = intermediateEditorValue!.ContentData.Single(x => x.Key == intermediateBlockKey);
+        AssertIsInnerSingleBlock(schema, GetNestedEditorValue(intermediateEditorBlock), innerBlockKey);
     }
 
     [Test]
@@ -168,13 +208,21 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             pageContentType,
             "Top level page",
             BuildNestedSingleBlockListJson(schema, innerBlockKey));
+        var valueBeforeMigration = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
 
         await ExecuteMigrationAsync();
 
-        var storedValue = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
-        Assert.That(storedValue, Is.Not.Null.And.Not.Empty);
+        await AssertDataTypeIsSingleBlockAsync(schema.NestedDataType);
+        await AssertStoredValueIsUnchangedAsync(content.Id, OuterPropertyAlias, valueBeforeMigration);
 
-        AssertIsInnerSingleBlock(schema, JsonSerializer.Deserialize<SingleBlockValue>(storedValue!), innerBlockKey);
+        AssertIsInnerSingleBlock(schema, JsonSerializer.Deserialize<SingleBlockValue>(valueBeforeMigration!), innerBlockKey);
+
+        IContent migratedContent = ContentService.GetById(content.Key)!;
+        IDataType migratedDataType = (await DataTypeService.GetAsync(schema.NestedDataType.Key))!;
+        AssertIsInnerSingleBlock(
+            schema,
+            migratedDataType.Editor!.GetValueEditor().ToEditor(migratedContent.Properties[OuterPropertyAlias]!) as SingleBlockValue,
+            innerBlockKey);
     }
 
     [Test]
@@ -194,11 +242,12 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
 
         await ExecuteMigrationAsync();
 
-        BlockItemData outerBlock = await GetStoredOuterBlockAsync(schema, content.Id, outerBlockKey);
+        BlockItemData outerEditorBlock = await GetOuterEditorBlockAsync(schema, content.Key, outerBlockKey);
 
         Assert.That(
-            outerBlock.Values.Single(x => x.Alias == TextPropertyAlias).Value,
+            outerEditorBlock.Values.Single(x => x.Alias == TextPropertyAlias).Value,
             Is.EqualTo(OuterTextValue));
+        AssertIsInnerSingleBlock(schema, GetNestedEditorValue(outerEditorBlock), innerBlockKey);
     }
 
     [Test]
@@ -207,18 +256,264 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         TestSchema schema = await CreateSchemaAsync();
         var outerBlockKey = Guid.NewGuid();
 
-        // A single block mode Block List holding no block at all: neither the layout lookup nor the access of the
-        // first layout item in the conversion may throw.
+        // A single block mode Block List holding no block at all.
         Content content = SaveContent(
             schema,
             BuildOuterValueJson(schema, outerBlockKey, JsonSerializer.Serialize(new BlockListValue())));
+        var valueBeforeMigration = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
 
         await ExecuteMigrationAsync();
 
-        // There is nothing to convert, so the value is left as it was - but the upgrade completes and the containing
-        // block is still there.
-        BlockItemData outerBlock = await GetStoredOuterBlockAsync(schema, content.Id, outerBlockKey);
-        Assert.That(outerBlock.Values.Select(x => x.Alias), Does.Contain(NestedPropertyAlias));
+        await AssertDataTypeIsSingleBlockAsync(schema.NestedDataType);
+        await AssertStoredValueIsUnchangedAsync(content.Id, OuterPropertyAlias, valueBeforeMigration);
+
+        BlockItemData outerEditorBlock = await GetOuterEditorBlockAsync(schema, content.Key, outerBlockKey);
+        Assert.That(outerEditorBlock.Values.Select(x => x.Alias), Does.Contain(NestedPropertyAlias));
+    }
+
+    [Test]
+    public async Task Does_Not_Migrate_Block_List_Not_In_Single_Block_Mode()
+    {
+        TestSchema schema = await CreateSchemaAsync();
+
+        await ExecuteMigrationAsync();
+
+        await AssertDataTypeIsSingleBlockAsync(schema.NestedDataType);
+
+        IDataType migratedContainerDataType = (await DataTypeService.GetAsync(schema.ContainerDataType.Key))!;
+        Assert.That(migratedContainerDataType.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.BlockList));
+    }
+
+    [Test]
+    public async Task Can_Migrate_All_Property_Data_Rows_When_They_Span_Multiple_Pages()
+    {
+        _migrationLogger.Clear();
+
+        TestSchema schema = await CreateSchemaAsync();
+
+        // The single block mode Block List is the document type's own property, so each content item contributes
+        // exactly one property data row and the page boundaries are predictable.
+        IContentType pageContentType = await CreateContentTypeAsync(
+            "topLevelPage",
+            OuterPropertyAlias,
+            schema.NestedDataType.Id,
+            Constants.PropertyEditors.Aliases.BlockList);
+
+        var contentByInnerBlockKey = new Dictionary<Guid, Content>();
+        for (var i = 0; i < 5; i++)
+        {
+            var innerBlockKey = Guid.NewGuid();
+            contentByInnerBlockKey[innerBlockKey] = SaveContent(
+                pageContentType,
+                $"Top level page {i}",
+                BuildNestedSingleBlockListJson(schema, innerBlockKey));
+        }
+
+        // A row holding no string value at all must not be fetched, let alone converted.
+        Content valuelessContent = SaveContent(
+            pageContentType,
+            "Top level page without a value",
+            BuildNestedSingleBlockListJson(schema, Guid.NewGuid()));
+        await ClearStoredValueAsync(valuelessContent.Id, OuterPropertyAlias);
+
+        await ExecuteMigrationAsync<PageSizeOfTwoMigrateSingleBlockList>();
+
+        foreach ((Guid innerBlockKey, Content content) in contentByInnerBlockKey)
+        {
+            var storedValue = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
+            Assert.That(storedValue, Is.Not.Null.And.Not.Empty);
+
+            AssertIsStoredInSingleBlockFormat(storedValue!);
+            AssertIsInnerSingleBlock(schema, JsonSerializer.Deserialize<SingleBlockValue>(storedValue!), innerBlockKey);
+        }
+
+        Assert.That(
+            await GetStoredValueAsync(valuelessContent.Id, OuterPropertyAlias),
+            Is.Null,
+            "A row with no stored value was rewritten by the migration.");
+
+        // Five of the six rows, so the valueless one was excluded by the query rather than fetched and skipped.
+        Assert.That(
+            _migrationLogger.MessagesMatching("property data values for property"),
+            Has.One.StartsWith("Migrating 5 property data values"));
+
+        // Five convertible rows at two per page: the work really was paged, rather than fetched in one go.
+        Assert.That(
+            _migrationLogger.MessagesMatching("properties converted, saving"),
+            Is.EqualTo(new[]
+            {
+                "  - 2 properties converted, saving...",
+                "  - 2 properties converted, saving...",
+                "  - 1 properties converted, saving...",
+            }));
+    }
+
+    [Test]
+    public async Task Can_Migrate_Rows_After_A_Whole_Page_In_Which_Nothing_Converted()
+    {
+        _migrationLogger.Clear();
+
+        TestSchema schema = await CreateSchemaAsync();
+
+        // One property data row per content item, so the page boundaries follow creation order.
+        IContentType pageContentType = await CreateContentTypeAsync(
+            "topLevelPage",
+            OuterPropertyAlias,
+            schema.NestedDataType.Id,
+            Constants.PropertyEditors.Aliases.BlockList);
+
+        // Six rows at two per page, with the middle page holding nothing to convert: that page issues no update at
+        // all, so the rows after it are only reached if the paging cursor advances past a page it did not write.
+        var convertibleInnerBlockKeys = new List<Guid>();
+        var pages = new[] { true, true, false, false, true, true };
+        var unconvertibleContent = new List<Content>();
+
+        foreach ((bool convertible, int index) in pages.Select((convertible, index) => (convertible, index)))
+        {
+            if (convertible)
+            {
+                var innerBlockKey = Guid.NewGuid();
+                convertibleInnerBlockKeys.Add(innerBlockKey);
+                SaveContent(pageContentType, $"Top level page {index}", BuildNestedSingleBlockListJson(schema, innerBlockKey));
+                continue;
+            }
+
+            // A single block mode Block List holding no block: fetched, but there is nothing to convert.
+            unconvertibleContent.Add(SaveContent(
+                pageContentType,
+                $"Top level page {index} with nothing to convert",
+                JsonSerializer.Serialize(new BlockListValue())));
+        }
+
+        var storedValuesBeforeMigration = new List<string?>();
+        foreach (Content content in unconvertibleContent)
+        {
+            storedValuesBeforeMigration.Add(await GetStoredValueAsync(content.Id, OuterPropertyAlias));
+        }
+
+        await ExecuteMigrationAsync<PageSizeOfTwoMigrateSingleBlockList>();
+
+        // Every convertible row converted, including the two that sit after the page that converted nothing.
+        var storedValues = new List<string?>();
+        foreach (Content content in ContentService.GetRootContent().Where(x => x.ContentTypeId == pageContentType.Id))
+        {
+            storedValues.Add(await GetStoredValueAsync(content.Id, OuterPropertyAlias));
+        }
+
+        foreach (Guid innerBlockKey in convertibleInnerBlockKeys)
+        {
+            var converted = storedValues
+                .WhereNotNull()
+                .Where(IsStoredInSingleBlockFormat)
+                .Select(JsonSerializer.Deserialize<SingleBlockValue>)
+                .WhereNotNull()
+                .SingleOrDefault(x => x.GetLayouts()?.Any(layout => layout.ContentKey == innerBlockKey) ?? false);
+
+            Assert.That(
+                converted,
+                Is.Not.Null,
+                $"The block {innerBlockKey} was not converted - a row was skipped along with the page that converted nothing.");
+            AssertIsInnerSingleBlock(schema, converted, innerBlockKey);
+        }
+
+        // The rows with nothing to convert were left exactly as they were.
+        for (var i = 0; i < unconvertibleContent.Count; i++)
+        {
+            Assert.That(
+                await GetStoredValueAsync(unconvertibleContent[i].Id, OuterPropertyAlias),
+                Is.EqualTo(storedValuesBeforeMigration[i]));
+        }
+
+        Assert.Multiple(() =>
+        {
+            // Two pages saved two rows each, and the middle page saved nothing rather than being skipped over.
+            Assert.That(
+                _migrationLogger.MessagesMatching("properties converted, saving"),
+                Is.EqualTo(new[]
+                {
+                    "  - 2 properties converted, saving...",
+                    "  - 2 properties converted, saving...",
+                }));
+
+            // Having nothing to convert is a normal outcome, not a failed conversion.
+            Assert.That(_migrationLogger.MessagesAtLevel(LogLevel.Error), Is.Empty);
+        });
+    }
+
+    [Test]
+    public async Task Can_Migrate_Property_Data_Of_Multiple_Property_Types_Whose_Rows_Interleave()
+    {
+        TestSchema schema = await CreateSchemaAsync();
+
+        // A second document type sharing the same container data type, so both contribute property data under the
+        // same property editor alias but under a different property type.
+        IContentType secondPageContentType = await CreateContentTypeAsync(
+            "secondPage",
+            OuterPropertyAlias,
+            schema.ContainerDataType.Id,
+            schema.ContainerDataType.EditorAlias);
+
+        // Saved alternately so the two property types' property data rows interleave by id. That is what makes this
+        // catch a paging cursor that is not reset between property types: were each property type's rows contiguous,
+        // the second type's rows would all sit above the first type's final cursor and the bug would be invisible.
+        var expected = new List<(Content Content, Guid OuterBlockKey, Guid InnerBlockKey)>();
+        for (var i = 0; i < 4; i++)
+        {
+            var outerBlockKey = Guid.NewGuid();
+            var innerBlockKey = Guid.NewGuid();
+
+            Content content = SaveContent(
+                i % 2 == 0 ? schema.PageContentType : secondPageContentType,
+                $"Page {i}",
+                BuildOuterValueJson(schema, outerBlockKey, BuildNestedSingleBlockListJson(schema, innerBlockKey)));
+
+            expected.Add((content, outerBlockKey, innerBlockKey));
+        }
+
+        await ExecuteMigrationAsync<PageSizeOfTwoMigrateSingleBlockList>();
+
+        foreach ((Content content, Guid outerBlockKey, Guid innerBlockKey) in expected)
+        {
+            BlockItemData outerBlock = await GetStoredOuterBlockAsync(schema, content.Id, outerBlockKey);
+            AssertNestedValueIsConvertedSingleBlock(schema, outerBlock, innerBlockKey);
+        }
+    }
+
+    [Test]
+    public async Task Can_Migrate_A_Page_Holding_Both_Convertible_And_Unconvertible_Values()
+    {
+        _migrationLogger.Clear();
+
+        TestSchema schema = await CreateSchemaAsync();
+
+        var convertibleOuterBlockKey = Guid.NewGuid();
+        var innerBlockKey = Guid.NewGuid();
+        Content convertible = SaveContent(
+            schema,
+            BuildOuterValueJson(
+                schema,
+                convertibleOuterBlockKey,
+                BuildNestedSingleBlockListJson(schema, innerBlockKey)));
+
+        // Shares a page with the value above, and holds nothing to convert.
+        var emptyOuterBlockKey = Guid.NewGuid();
+        Content empty = SaveContent(
+            schema,
+            BuildOuterValueJson(schema, emptyOuterBlockKey, JsonSerializer.Serialize(new BlockListValue())));
+        var emptyValueBeforeMigration = await GetStoredValueAsync(empty.Id, OuterPropertyAlias);
+
+        await ExecuteMigrationAsync<PageSizeOfTwoMigrateSingleBlockList>();
+
+        BlockItemData convertedOuterBlock = await GetStoredOuterBlockAsync(schema, convertible.Id, convertibleOuterBlockKey);
+        AssertNestedValueIsConvertedSingleBlock(schema, convertedOuterBlock, innerBlockKey);
+
+        Assert.That(
+            await GetStoredValueAsync(empty.Id, OuterPropertyAlias),
+            Is.EqualTo(emptyValueBeforeMigration),
+            "A value with nothing to convert was rewritten.");
+
+        // Having nothing to convert is a normal outcome, and must not be reported as a failed conversion.
+        Assert.That(_migrationLogger.MessagesAtLevel(LogLevel.Error), Is.Empty);
     }
 
     private async Task<TestSchema> CreateSchemaAsync(
@@ -268,6 +563,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             intermediateElementType,
             outerElementType,
             nestedDataType,
+            containerDataType,
             pageContentType);
     }
 
@@ -464,7 +760,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                         Constants.PropertyEditors.Aliases.BlockList,
                         new BlockListLayoutItem { ContentKey = outerBlockKey }),
                     ContentData = [outerBlock],
-                    Expose = [new BlockItemVariation(outerBlockKey, null, null)],
+                    Expose = [new BlockItemVariation(outerBlockKey, null)],
                 });
             case ContainerEditor.BlockGrid:
                 return JsonSerializer.Serialize(new BlockGridValue
@@ -473,7 +769,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                         Constants.PropertyEditors.Aliases.BlockGrid,
                         new BlockGridLayoutItem { ContentKey = outerBlockKey, ColumnSpan = 12, RowSpan = 1 }),
                     ContentData = [outerBlock],
-                    Expose = [new BlockItemVariation(outerBlockKey, null, null)],
+                    Expose = [new BlockItemVariation(outerBlockKey, null)],
                 });
             case ContainerEditor.RichText:
                 return JsonSerializer.Serialize(new RichTextEditorValue
@@ -485,7 +781,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                             Constants.PropertyEditors.Aliases.RichText,
                             new RichTextBlockLayoutItem { ContentKey = outerBlockKey }),
                         ContentData = [outerBlock],
-                        Expose = [new BlockItemVariation(outerBlockKey, null, null)],
+                        Expose = [new BlockItemVariation(outerBlockKey, null)],
                     },
                 });
             default:
@@ -504,7 +800,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                 Constants.PropertyEditors.Aliases.BlockList,
                 new BlockListLayoutItem { ContentKey = blockKey }),
             ContentData = [BuildBlockItemData(blockKey, elementType, propertyAlias, propertyValue)],
-            Expose = [new BlockItemVariation(blockKey, null, null)],
+            Expose = [new BlockItemVariation(blockKey, null)],
         };
 
     private static BlockItemData BuildBlockItemData(
@@ -550,11 +846,14 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         return content;
     }
 
-    private async Task ExecuteMigrationAsync()
+    private Task ExecuteMigrationAsync() => ExecuteMigrationAsync<MigrateSingleBlockListDataTypes>();
+
+    private async Task ExecuteMigrationAsync<TMigration>()
+        where TMigration : AsyncMigrationBase
     {
         MigrationPlan plan = new MigrationPlan(nameof(MigrateSingleBlockListTests))
             .From(string.Empty)
-            .To<MigrateSingleBlockList>("done");
+            .To<TMigration>("done");
 
         var executor = new MigrationPlanExecutor(
             GetRequiredService<ICoreScopeProvider>(),
@@ -574,17 +873,20 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         Assert.That(result.Successful, Is.True, result.Exception?.ToString());
     }
 
-    private async Task AssertDataTypeIsSingleBlockAsync(int dataTypeId)
+    private async Task AssertDataTypeIsSingleBlockAsync(IDataType dataType)
     {
         using Cms.Infrastructure.Scoping.IScope scope = ScopeProvider.CreateScope();
 
         Sql<ISqlContext> sql = scope.Database.SqlContext.Sql()
             .Select<DataTypeDto>()
             .From<DataTypeDto>()
-            .Where<DataTypeDto>(dataType => dataType.NodeId == dataTypeId);
+            .Where<DataTypeDto>(x => x.NodeId == dataType.Id);
 
         DataTypeDto dto = await scope.Database.FirstAsync<DataTypeDto>(sql);
         scope.Complete();
+
+        // Read through the service as well, so a stale repository cache would show.
+        IDataType? migratedDataType = await DataTypeService.GetAsync(dataType.Key);
 
         Assert.Multiple(() =>
         {
@@ -593,7 +895,54 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             // The alias the backoffice registers the single block editor UI under - a data type left pointing at
             // anything else has no editor in the backoffice.
             Assert.That(dto.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.BlockSingle"));
+
+            Assert.That(migratedDataType?.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.SingleBlock));
         });
+    }
+
+    private async Task AssertStoredValueIsUnchangedAsync(int contentId, string propertyAlias, string? valueBeforeMigration)
+    {
+        Assert.That(valueBeforeMigration, Is.Not.Null.And.Not.Empty);
+        Assert.That(
+            await GetStoredValueAsync(contentId, propertyAlias),
+            Is.EqualTo(valueBeforeMigration),
+            "The migration must only switch the data types, not rewrite stored values.");
+    }
+
+    /// <summary>
+    /// Maps the stored container value to the editor, which resolves the value editor of every nested block property
+    /// from its (migrated) data type - as the backoffice does when the content is opened.
+    /// </summary>
+    private async Task<BlockItemData> GetOuterEditorBlockAsync(TestSchema schema, Guid contentKey, Guid outerBlockKey)
+    {
+        IContent content = ContentService.GetById(contentKey)!;
+        IDataType containerDataType = (await DataTypeService.GetAsync(
+            schema.PageContentType.PropertyTypes.Single(x => x.Alias == OuterPropertyAlias).DataTypeKey))!;
+
+        var editorValue = containerDataType.Editor!.GetValueEditor().ToEditor(content.Properties[OuterPropertyAlias]!);
+
+        BlockValue? outerValue = editorValue switch
+        {
+            BlockValue blockValue => blockValue,
+            RichTextEditorValue richTextEditorValue => richTextEditorValue.Blocks,
+            _ => null,
+        };
+
+        Assert.That(outerValue, Is.Not.Null, $"Unexpected editor value: {editorValue}");
+
+        return outerValue!.ContentData.SingleOrDefault(x => x.Key == outerBlockKey)
+               ?? throw new AssertionException($"The block {outerBlockKey} is missing from the editor value.");
+    }
+
+    private static SingleBlockValue? GetNestedEditorValue(BlockItemData containingBlock)
+    {
+        var nestedValue = containingBlock.Values.Single(x => x.Alias == NestedPropertyAlias).Value;
+        Assert.That(
+            nestedValue,
+            Is.InstanceOf<SingleBlockValue>(),
+            "The nested value was not mapped to the editor by the single block property editor.");
+
+        return nestedValue as SingleBlockValue;
     }
 
     private async Task<BlockItemData> GetStoredOuterBlockAsync(TestSchema schema, int contentId, Guid outerBlockKey)
@@ -616,6 +965,36 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                    $"The block {outerBlockKey} is no longer present in the migrated value: {storedValue}");
     }
 
+    /// <summary>
+    /// Nulls out a stored property value directly, to produce a row that holds nothing the migration could convert.
+    /// </summary>
+    private async Task ClearStoredValueAsync(int contentId, string propertyAlias)
+    {
+        using Cms.Infrastructure.Scoping.IScope scope = ScopeProvider.CreateScope();
+
+        // Built rather than hand written, so the reserved word in "umbracoContentVersion.current" is quoted the way
+        // the configured provider needs it.
+        Sql<ISqlContext> selectSql = scope.Database.SqlContext.Sql()
+            .Select<PropertyDataDto>(propertyData => propertyData.Id)
+            .From<PropertyDataDto>()
+            .InnerJoin<PropertyTypeDto>()
+            .On<PropertyDataDto, PropertyTypeDto>(pd => pd.PropertyTypeId, pt => pt.Id)
+            .InnerJoin<ContentVersionDto>()
+            .On<PropertyDataDto, ContentVersionDto>(pd => pd.VersionId, cv => cv.Id)
+            .Where<PropertyTypeDto>(pt => pt.Alias == propertyAlias)
+            .Where<ContentVersionDto>(cv => cv.NodeId == contentId && cv.Current);
+
+        var propertyDataId = (await scope.Database.FetchAsync<int>(selectSql)).Single();
+
+        var affected = await scope.Database.ExecuteAsync(
+            "UPDATE umbracoPropertyData SET textValue = NULL, varcharValue = NULL WHERE id = @0",
+            propertyDataId);
+
+        Assert.That(affected, Is.EqualTo(1));
+
+        scope.Complete();
+    }
+
     private async Task<string?> GetStoredValueAsync(int contentId, string propertyAlias)
     {
         using Cms.Infrastructure.Scoping.IScope scope = ScopeProvider.CreateScope();
@@ -636,7 +1015,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         return dtos.Single().TextValue;
     }
 
-    private void AssertNestedValueIsConvertedSingleBlock(
+    private void AssertNestedValueIsReadableAsSingleBlock(
         TestSchema schema,
         BlockItemData containingBlock,
         Guid innerBlockKey)
@@ -646,10 +1025,31 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         AssertIsInnerSingleBlock(schema, JsonSerializer.Deserialize<SingleBlockValue>(nestedJson), innerBlockKey);
     }
 
+    private void AssertNestedValueIsConvertedSingleBlock(
+        TestSchema schema,
+        BlockItemData containingBlock,
+        Guid innerBlockKey)
+    {
+        var nestedJson = GetNestedValueJson(containingBlock);
+
+        AssertIsStoredInSingleBlockFormat(nestedJson);
+        AssertIsInnerSingleBlock(schema, JsonSerializer.Deserialize<SingleBlockValue>(nestedJson), innerBlockKey);
+    }
+
+    private static bool IsStoredInSingleBlockFormat(string json)
+        => json.Contains($"\"{Constants.PropertyEditors.Aliases.SingleBlock}\"")
+           && json.Contains($"\"{Constants.PropertyEditors.Aliases.BlockList}\"") is false;
+
+    private static void AssertIsStoredInSingleBlockFormat(string json)
+        => Assert.That(
+            IsStoredInSingleBlockFormat(json),
+            Is.True,
+            $"The value is not stored in the single block format - it was not converted: {json}");
+
     private static string GetNestedValueJson(BlockItemData containingBlock)
     {
         var nestedValue = containingBlock.Values.Single(x => x.Alias == NestedPropertyAlias).Value;
-        Assert.That(nestedValue, Is.Not.Null, "The nested value was overwritten with null by the migration.");
+        Assert.That(nestedValue, Is.Not.Null, "The nested value was overwritten with null.");
 
         var nestedJson = nestedValue as string;
         Assert.That(nestedJson, Is.Not.Null.And.Not.Empty);
@@ -665,7 +1065,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         Assert.That(
             layoutItems,
             Is.Not.Null,
-            $"The value holds no \"{Constants.PropertyEditors.Aliases.SingleBlock}\" layout - it was not converted.");
+            "The value holds no layout the single block property editor can read.");
         Assert.That(layoutItems!.Length, Is.EqualTo(1));
         Assert.That(layoutItems[0].ContentKey, Is.EqualTo(innerBlockKey));
 
@@ -694,7 +1094,97 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         IContentType? IntermediateElementType,
         IContentType OuterElementType,
         IDataType NestedDataType,
+        IDataType ContainerDataType,
         IContentType PageContentType);
+
+    /// <summary>
+    /// Runs the migration two property data rows at a time, so the paging loop can be exercised with a handful of
+    /// content items rather than the thousands the production page size would need.
+    /// </summary>
+    /// <remarks>
+    /// Migrations are activated with <see cref="ActivatorUtilities" />, which cannot use an inherited constructor,
+    /// hence the forwarding one. Only one is declared so the activation stays unambiguous.
+    /// </remarks>
+    private sealed class PageSizeOfTwoMigrateSingleBlockList : MigrateSingleBlockList
+    {
+        public PageSizeOfTwoMigrateSingleBlockList(IMigrationContext context, IServiceProvider serviceProvider)
+            : base(
+                context,
+                serviceProvider.GetRequiredService<IUmbracoContextFactory>(),
+                serviceProvider.GetRequiredService<ILanguageService>(),
+                serviceProvider.GetRequiredService<IContentTypeService>(),
+                serviceProvider.GetRequiredService<IMediaTypeService>(),
+                serviceProvider.GetRequiredService<IMemberTypeService>(),
+                serviceProvider.GetRequiredService<IDataTypeService>(),
+                serviceProvider.GetRequiredService<ILogger<MigrateSingleBlockList>>(),
+                serviceProvider.GetRequiredService<ICoreScopeProvider>(),
+                serviceProvider.GetRequiredService<SingleBlockListProcessor>(),
+                serviceProvider.GetRequiredService<IJsonSerializer>(),
+                serviceProvider.GetRequiredService<SingleBlockListConfigurationCache>(),
+                serviceProvider.GetRequiredService<IDataValueEditorFactory>(),
+                serviceProvider.GetRequiredService<IIOHelper>(),
+                serviceProvider.GetRequiredService<IBlockEditorElementTypeCache>(),
+                serviceProvider.GetRequiredService<AppCaches>(),
+                serviceProvider.GetRequiredService<IDataTypeConfigurationCache>())
+        {
+        }
+
+        internal override int PageSize => 2;
+    }
+
+    /// <summary>
+    /// Captures what the migration logged, which is the only place some of its behaviour is observable - the page
+    /// boundaries it actually used, and whether a value was skipped or refused.
+    /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete
+    private sealed class RecordingLogger : ILogger<MigrateSingleBlockList>
+#pragma warning restore CS0618 // Type or member is obsolete
+    {
+        private readonly List<(LogLevel Level, string Message)> _entries = new();
+
+        public IDisposable? BeginScope<TState>(TState state)
+            where TState : notnull
+            => null;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            lock (_entries)
+            {
+                _entries.Add((logLevel, formatter(state, exception)));
+            }
+        }
+
+        public void Clear()
+        {
+            lock (_entries)
+            {
+                _entries.Clear();
+            }
+        }
+
+        public string[] MessagesMatching(string fragment)
+        {
+            lock (_entries)
+            {
+                return _entries.Where(x => x.Message.Contains(fragment)).Select(x => x.Message).ToArray();
+            }
+        }
+
+        public string[] MessagesAtLevel(LogLevel level)
+        {
+            lock (_entries)
+            {
+                return _entries.Where(x => x.Level == level).Select(x => x.Message).ToArray();
+            }
+        }
+    }
 
     private sealed class NoopDatabaseCacheRebuilder : IDatabaseCacheRebuilder
     {

@@ -22,6 +22,15 @@ export interface UmbCollectionConfiguration {
 	orderDirection?: string;
 	pageSize?: number;
 	noItemsLabel?: string;
+	/**
+	 * Suppresses the per-item action menu. Set it where an action on an item would not make sense in the surroundings,
+	 * such as a picker, so that actions registered by anyone are suppressed rather than only the ones we know about.
+	 */
+	hideItemActions?: boolean;
+	/**
+	 * Suppresses the collection action bundle in the toolbar, on the same terms as `hideItemActions`.
+	 */
+	hideCollectionActions?: boolean;
 	userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 	selectionConfiguration?: UmbCollectionSelectionConfiguration;
 	bulkActionConfiguration?: UmbCollectionBulkActionConfiguration;

@@ -1,8 +1,4 @@
 parameters:
-  - name: nodeVersion
-    type: string
-    default: ''
-
   - name: npm_config_cache
     type: string
     default: ''
@@ -20,10 +16,12 @@ parameters:
     default: ''
 
 steps:
-  - task: NodeTool@0
-    displayName: Use Node.js $(nodeVersion)
+  - task: UseNode@1
+    displayName: Use Node.js
+    retryCountOnTaskFailure: 3
     inputs:
-      versionSpec: $(nodeVersion)
+      versionSource: 'fromFile'
+      versionFilePath: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/.nvmrc
 
   - pwsh: |
       "UMBRACO_USER_LOGIN=${{ parameters.PlaywrightUserEmail }}

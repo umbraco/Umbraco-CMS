@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.IO.MediaPathSchemes;
 /// <remarks>
 ///     <para>Path is "{combinedGuid}/{filename}" where combinedGuid is a combination of itemGuid and propertyGuid.</para>
 /// </remarks>
-public class CombinedGuidsMediaPathScheme : IMediaPathScheme
+public class CombinedGuidsMediaPathScheme : MediaPathSchemeBase, IMediaPathScheme
 {
     /// <inheritdoc />
     public bool SupportsGuid7 => true;
@@ -25,4 +25,8 @@ public class CombinedGuidsMediaPathScheme : IMediaPathScheme
 
     /// <inheritdoc />
     public string GetDeleteDirectory(MediaFileManager fileSystem, string filepath) => Path.GetDirectoryName(filepath)!;
+
+    /// <inheritdoc />
+    public bool IsFilePathOwnedBy(MediaFileManager fileManager, string filepath, Guid itemGuid, Guid propertyGuid)
+        => IsFilePathOwnedByInternal(fileManager, filepath, itemGuid, propertyGuid);
 }

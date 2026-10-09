@@ -63,7 +63,7 @@ public class CreateAndPublishElementControllerTests : ManagementApiUserGroupTest
             Values = [],
             Variants =
             [
-                new ElementVariantRequestModel { Culture = null, Segment = null, Name = "Test Element Instance" }
+                new ElementVariantRequestModel { Culture = null, Name = "Test Element Instance" }
             ],
             CulturesToPublish = [],
         };

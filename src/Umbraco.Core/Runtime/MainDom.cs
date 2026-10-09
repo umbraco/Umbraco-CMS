@@ -1,9 +1,7 @@
 using System.Security.Cryptography;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
@@ -44,17 +42,6 @@ namespace Umbraco.Cms.Core.Runtime
         #endregion
 
         #region Ctor
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MainDom"/> class.
-        /// </summary>
-        /// <param name="logger">The logger instance.</param>
-        /// <param name="systemLock">The distributed lock implementation.</param>
-        [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-        public MainDom(ILogger<MainDom> logger, IMainDomLock systemLock)
-            : this(logger, systemLock, StaticServiceProvider.Instance.GetRequiredService<IOptions<GlobalSettings>>())
-        {
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainDom"/> class.

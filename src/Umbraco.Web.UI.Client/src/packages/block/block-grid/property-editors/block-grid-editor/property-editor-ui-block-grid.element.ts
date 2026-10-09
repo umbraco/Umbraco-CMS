@@ -96,8 +96,8 @@ export class UmbPropertyEditorUIBlockGridElement
 			super.value = undefined;
 			// Clear manager state so blocks are actually removed
 			this.#managerContext.setLayouts([]);
-			this.#managerContext.setContents([]);
-			this.#managerContext.setSettings([]);
+			this.#managerContext.setContents(undefined);
+			this.#managerContext.setSettings(undefined);
 			this.#managerContext.setExposes([]);
 			return;
 		}

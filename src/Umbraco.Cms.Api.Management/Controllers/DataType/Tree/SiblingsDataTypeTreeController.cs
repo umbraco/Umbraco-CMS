@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -13,8 +12,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 /// </summary>
 public class SiblingsDataTypeTreeController : DataTypeTreeControllerBase
 {
-    public SiblingsDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
-        : base(entityService, flagProviders, dataTypeService)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SiblingsDataTypeTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for tree nodes.</param>
+    /// <param name="entitySearchService">Service for searching entities.</param>
+    /// <param name="idKeyMap">Maps between integer identifiers and keys.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    public SiblingsDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IDataTypeService dataTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, dataTypeService)
     {
     }
 

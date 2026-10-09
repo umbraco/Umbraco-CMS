@@ -3,8 +3,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Nodes;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -90,23 +88,6 @@ public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
             _jsonSerializer = jsonSerializer;
             _dataTypeService = dataTypeService;
             _idKeyMap = idKeyMap;
-        }
-
-        [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-        public TagPropertyValueEditor(
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer,
-            IIOHelper ioHelper,
-            DataEditorAttribute attribute,
-            IDataTypeService dataTypeService)
-            : this(
-                shortStringHelper,
-                jsonSerializer,
-                ioHelper,
-                attribute,
-                dataTypeService,
-                StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-        {
         }
 
         /// <inheritdoc />

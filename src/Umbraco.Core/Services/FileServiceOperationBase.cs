@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -53,36 +51,6 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
         _auditService = auditService;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileServiceOperationBase{TRepository, TEntity, TOperationStatus}"/> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="repository">The file repository.</param>
-    /// <param name="logger">The logger.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="auditRepository">The audit repository.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    protected FileServiceOperationBase(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        TRepository repository,
-        ILogger<StylesheetService> logger,
-        IUserIdKeyResolver userIdKeyResolver,
-        IAuditRepository auditRepository)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            repository,
-            logger,
-            userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>())
-    {
     }
 
     /// <summary>

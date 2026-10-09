@@ -51,4 +51,24 @@ internal sealed class MigrateSliderMinMaxToRangeTests : MigrateMinMaxToRangeTest
             Assert.That(Max(config, "validationRange"), Is.Null);
         });
     }
+
+    [Test]
+    public async Task Combines_Range_Slider_Into_ValidationRange()
+    {
+        var id = await CreateDataTypeWithRawConfig(
+            Constants.PropertyEditors.Aliases.RangeSlider,
+            """{ "minVal": 10, "maxVal": 90, "step": 1, "minimumRange": 5 }""");
+
+        await RunMigration<MigrateSliderMinMaxToRange>();
+
+        JsonObject config = await GetRawConfig(id);
+        Assert.Multiple(() =>
+        {
+            Assert.That(config.ContainsKey("minVal"), Is.False);
+            Assert.That(config.ContainsKey("maxVal"), Is.False);
+            Assert.That(Min(config, "validationRange"), Is.EqualTo(10));
+            Assert.That(Max(config, "validationRange"), Is.EqualTo(90));
+            Assert.That(config["minimumRange"]?.GetValue<decimal>(), Is.EqualTo(5));
+        });
+    }
 }

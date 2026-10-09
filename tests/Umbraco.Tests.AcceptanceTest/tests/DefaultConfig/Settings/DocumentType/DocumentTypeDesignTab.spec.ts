@@ -323,6 +323,28 @@ test('can enable validation for a property in a document type', {tag: '@release'
   expect(documentTypeData.properties[0].validation.regExMessage).toBe(regexMessage);
 });
 
+// Tests regression issue: https://github.com/umbraco/Umbraco-CMS/issues/22916
+test('preserves the selected validation option when re-opening a property in a document type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const numberPresetRegex = '^[0-9]*$';
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+
+  // Act — set Number preset validation and save.
+  await umbracoUi.documentType.clickEditorSettingsButton();
+  await umbracoUi.documentType.selectValidationOption(numberPresetRegex);
+  await umbracoUi.documentType.clickSubmitButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
+
+  // Re-open the property settings.
+  await umbracoUi.documentType.clickEditorSettingsButton();
+
+  // Assert — the dropdown still reflects the saved Number preset, not "No validation".
+  await umbracoUi.documentType.doesSelectedValidationOptionHaveValue(numberPresetRegex);
+});
+
 test('can allow vary by culture for a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

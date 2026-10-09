@@ -1,14 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ElementVersion;
 
@@ -20,18 +27,39 @@ public class AllElementVersionController : ElementVersionControllerBase
 {
     private readonly IElementVersionService _elementVersionService;
     private readonly IElementVersionPresentationFactory _elementVersionPresentationFactory;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AllElementVersionController"/> class.
     /// </summary>
     /// <param name="elementVersionService">Service for managing element versions.</param>
     /// <param name="elementVersionPresentationFactory">Factory for creating element version presentation models.</param>
+    /// <param name="authorizationService">Service for handling authorization checks for the current user.</param>
+    [ActivatorUtilitiesConstructor]
     public AllElementVersionController(
         IElementVersionService elementVersionService,
-        IElementVersionPresentationFactory elementVersionPresentationFactory)
+        IElementVersionPresentationFactory elementVersionPresentationFactory,
+        IAuthorizationService authorizationService)
     {
         _elementVersionService = elementVersionService;
         _elementVersionPresentationFactory = elementVersionPresentationFactory;
+        _authorizationService = authorizationService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllElementVersionController"/> class.
+    /// </summary>
+    /// <param name="elementVersionService">Service for managing element versions.</param>
+    /// <param name="elementVersionPresentationFactory">Factory for creating element version presentation models.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
+    public AllElementVersionController(
+        IElementVersionService elementVersionService,
+        IElementVersionPresentationFactory elementVersionPresentationFactory)
+        : this(
+            elementVersionService,
+            elementVersionPresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
+    {
     }
 
     /// <summary>
@@ -57,6 +85,16 @@ public class AllElementVersionController : ElementVersionControllerBase
         int skip = 0,
         int take = 100)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ElementPermissionResource.WithKeys(ActionElementBrowse.ActionLetter, elementId),
+            AuthorizationPolicies.ElementPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
         Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus> attempt =
             await _elementVersionService.GetPagedContentVersionsAsync(elementId, culture, skip, take);
 

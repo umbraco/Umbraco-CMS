@@ -2,15 +2,21 @@ import type { UmbUserDetailModel, UmbUserStartNodesModel, UmbUserStateEnum } fro
 import type { UmbUserDetailRepository } from '../../repository/index.js';
 import { UMB_USER_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
+import { UMB_USER_ROOT_WORKSPACE_PATH, UMB_EDIT_USER_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UmbUserAvatarRepository } from '../../repository/avatar/index.js';
 import { UmbUserConfigRepository } from '../../repository/config/index.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
-import { UmbEntityNamedDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEntityNamedDetailWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbStartNodeAccessValue } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 type EntityType = UmbUserDetailModel;
 
@@ -63,6 +69,11 @@ export class UmbUserWorkspaceContext
 		]);
 	}
 
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_USER_ROOT_WORKSPACE_PATH;
+		return UMB_EDIT_USER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+	}
+
 	override async load(unique: string) {
 		const response = await super.load(unique);
 
@@ -109,6 +120,31 @@ export class UmbUserWorkspaceContext
 
 	updateProperty<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
 		this._data.updateCurrent({ [propertyName]: value });
+	}
+
+	setUserGroups(uniques: Array<UmbReferenceByUnique>) {
+		this.updateProperty('userGroupUniques', uniques);
+	}
+
+	setDocumentAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			hasDocumentRootAccess: value.rootAccess,
+			documentStartNodeUniques: value.startNodes,
+		});
+	}
+
+	setMediaAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			hasMediaRootAccess: value.rootAccess,
+			mediaStartNodeUniques: value.startNodes,
+		});
+	}
+
+	setElementAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			hasElementRootAccess: value.rootAccess,
+			elementStartNodeUniques: value.startNodes,
+		});
 	}
 
 	// TODO: implement upload progress

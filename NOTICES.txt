@@ -204,14 +204,6 @@ Copyright: 2018+, Alexandre Mutel. All rights reserved.
 
 ---
 
-Markdown: A library for parsing and compiling Markdown
-
-URL: https://github.com/hey-red/Markdown
-License: MIT License
-Copyright: 2018 red
-
----
-
 marked: A markdown parser and compiler
 
 URL: https://marked.js.org/

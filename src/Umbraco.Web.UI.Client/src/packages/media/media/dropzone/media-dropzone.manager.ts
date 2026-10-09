@@ -232,8 +232,8 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		if (allowed) return allowed;
 
 		// Request information on this media type.
-		const { data } = await this.#mediaTypeStructure.requestAllowedChildrenOf(mediaTypeUnique, parentUnique);
-		if (!data) throw new Error('Parent media type does not exist');
+		const { data } = await this.#mediaTypeStructure.requestAllAllowedChildrenOf(mediaTypeUnique, parentUnique);
+		if (!data) throw new Error('Could not retrieve the media types allowed under the parent media type');
 
 		this.#allowedChildrenOf.appendOne({ mediaTypeUnique, allowedChildren: data.items });
 		return data.items;
@@ -254,7 +254,7 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		const preset: Partial<UmbMediaDetailModel> = {
 			unique: item.unique,
 			mediaType: { unique: mediaTypeUnique, collection: null },
-			variants: [{ culture: null, segment: null, createDate: null, updateDate: null, flags: [], name }],
+			variants: [{ culture: null, createDate: null, updateDate: null, flags: [], name }],
 			values: item.temporaryFile ? [umbracoFile] : undefined,
 		};
 		const { data } = await this.#mediaDetailRepository.createScaffold(preset);

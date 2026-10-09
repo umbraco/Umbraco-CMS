@@ -244,7 +244,8 @@ const collectDiskIcons = async (icons) => {
 
 const writeIconsToDisk = (icons) => {
 	icons.forEach((icon) => {
-		const optimizedResult = optimize(icon.svg);
+		const svg = icon.svg.replace(/<title\b[^>]*>[\s\S]*?<\/title>/gi, '');
+		const optimizedResult = optimize(svg);
 
 		const content = 'export default `' + optimizedResult.data + '`;';
 

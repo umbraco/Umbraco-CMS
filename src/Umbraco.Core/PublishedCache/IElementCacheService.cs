@@ -35,12 +35,7 @@ public interface IElementCacheService : IContentCacheService
     /// async path. The default implementation always returns <c>false</c> so the caller takes the
     /// async path.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    bool TryGetCached(Guid key, bool preview, out IPublishedElement? element)
-    {
-        element = null;
-        return false;
-    }
+    bool TryGetCached(Guid key, bool preview, out IPublishedElement? element);
 
     /// <summary>
     /// Refreshes the cache entry for the specified element.

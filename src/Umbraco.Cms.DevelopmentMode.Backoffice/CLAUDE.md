@@ -7,7 +7,7 @@ Development-time library enabling **InMemoryAuto** ModelsBuilder mode with runti
 ## 1. Architecture
 
 **Type**: Class Library (NuGet Package)
-**Target Framework**: .NET 10.0
+**Target Framework**: .NET 11.0
 **Purpose**: Enable hot-reload of ModelsBuilder models during development
 
 ### Key Technologies
@@ -42,7 +42,6 @@ Umbraco.Cms.DevelopmentMode.Backoffice/
     ├── UmbracoCompilationException.cs     # Custom exception with CompilationFailures
     ├── ModelsBuilderAssemblyAttribute.cs  # Marks InMemory assemblies
     ├── ModelsBuilderBindingErrorHandler.cs # Handles model binding version mismatches
-    ├── InMemoryModelsBuilderModeValidator.cs # Validates runtime mode configuration
     └── ModelsModeConstants.cs             # "InMemoryAuto" constant
 ```
 
@@ -138,8 +137,6 @@ Reports detailed error messages including assembly versions.
 
 ## 4. Security
 
-**Runtime Mode Validation**: `InMemoryModelsBuilderModeValidator.cs` prevents `InMemoryAuto` mode outside `BackofficeDevelopment` runtime mode.
-
 **Temp File Location**: Models compiled to `~/umbraco/Data/TEMP/InMemoryAuto/` - ensure this directory isn't web-accessible.
 
 ---
@@ -185,9 +182,6 @@ Action<RazorViewEngine>? clearCacheMethod = ReflectionUtilities.EmitMethod<Actio
     "CMS": {
       "Runtime": {
         "Mode": "BackofficeDevelopment"
-      },
-      "ModelsBuilder": {
-        "ModelsMode": "InMemoryAuto"
       }
     }
   }
@@ -195,8 +189,10 @@ Action<RazorViewEngine>? clearCacheMethod = ReflectionUtilities.EmitMethod<Actio
 ```
 
 **Requirements**:
-- `RuntimeMode` must be `BackofficeDevelopment`
-- `ModelsMode` must be `InMemoryAuto`
+- `RuntimeMode` must be `BackofficeDevelopment` — this package registers nothing outside it
+- `ModelsMode` needs no entry: this package raises an unconfigured mode to `InMemoryAuto`, since core defaults to the `Nothing` it can satisfy alone. Configuring any other mode is honoured and leaves models to whatever provides that mode
+
+**Runtime mode validation**: `InMemoryAuto` in force with no factory able to generate models at runtime fails the boot, from `InMemoryModelsBuilderModeValidator` in `Umbraco.Infrastructure`. It asks the `IPublishedModelFactory` in force, so registering one here is what satisfies it — as would any other component supplying one.
 
 ---
 

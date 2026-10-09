@@ -101,25 +101,10 @@ public class UmbracoOperationIdTransformer : IOpenApiOperationTransformer
             // A minor version such as "1.1" leaks a dot into the operation ID, which is not valid in
             // generated client identifiers. Substitute rather than remove, so "1.1" becomes "1_1" and
             // cannot collide with an existing "11" (or "1.11" with "11.1").
-            // Scoped to the Management API on purpose: this handler also serves the Delivery API, whose
-            // 2.0 endpoints have published operation IDs like "GetContent2.0". Renaming those would be a
-            // breaking change for headless consumers generating clients from the Delivery spec.
-            // TODO (V19): drop the namespace check and apply this to the Delivery API too, as a
-            // documented breaking change.
-            if (IsManagementApi(controllerActionDescriptor))
-            {
-                version = OperationIdRegexes.NonAlphanumericRegex().Replace(version, "_");
-            }
+            version = OperationIdRegexes.NonAlphanumericRegex().Replace(version, "_");
         }
 
         // Return the operation ID with the formatted http method verb in front, e.g. GetTrackedReferenceById
         return $"{httpMethod}{formattedOperationId.ToFirstUpper()}{version}";
     }
-
-    /// <summary>
-    ///     Determines whether the action belongs to the Management API, as opposed to another API served by
-    ///     this handler (currently the Delivery API).
-    /// </summary>
-    private static bool IsManagementApi(ControllerActionDescriptor controllerActionDescriptor)
-        => controllerActionDescriptor.ControllerTypeInfo.Namespace?.StartsWith("Umbraco.Cms.Api.Management") is true;
 }

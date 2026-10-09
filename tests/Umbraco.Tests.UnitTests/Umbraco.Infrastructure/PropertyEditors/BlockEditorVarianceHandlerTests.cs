@@ -71,7 +71,7 @@ public class BlockEditorVarianceHandlerTests
         var element = PublishedElement(ContentVariation.Culture);
         var blockValue = new BlockListValue
         {
-            Expose = [new() { ContentKey = element.Key, Culture = null, Segment = null }],
+            Expose = [new() { ContentKey = element.Key, Culture = null }],
         };
 
         var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue);
@@ -137,19 +137,15 @@ public class BlockEditorVarianceHandlerTests
         {
             Expose =
             [
-                new() { ContentKey = element.Key, Culture = "da-DK", Segment = "danish" },
-                new() { ContentKey = element.Key, Culture = "en-US", Segment = "english" },
+                new() { ContentKey = element.Key, Culture = "da-DK" },
+                new() { ContentKey = element.Key, Culture = "en-US" },
             ],
         };
 
         var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, "en-US");
 
         var variation = result.Single();
-        Assert.Multiple(() =>
-        {
-            Assert.IsNull(variation.Culture);
-            Assert.AreEqual("english", variation.Segment);
-        });
+        Assert.IsNull(variation.Culture);
     }
 
     [Test]
@@ -161,18 +157,14 @@ public class BlockEditorVarianceHandlerTests
         {
             Expose =
             [
-                new() { ContentKey = element.Key, Culture = "da-DK", Segment = "danish" },
+                new() { ContentKey = element.Key, Culture = "da-DK" },
             ],
         };
 
         var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, "en-US");
 
         var variation = result.Single();
-        Assert.Multiple(() =>
-        {
-            Assert.IsNull(variation.Culture);
-            Assert.AreEqual("danish", variation.Segment);
-        });
+        Assert.IsNull(variation.Culture);
     }
 
     [Test]
@@ -216,26 +208,6 @@ public class BlockEditorVarianceHandlerTests
     }
 
     [Test]
-    public async Task AlignedExposeVarianceAsync_Preserves_Segment_When_Assigning_Culture()
-    {
-        var owner = PublishedElement(ContentVariation.CultureAndSegment);
-        var element = PublishedElement(ContentVariation.CultureAndSegment);
-        var blockValue = new BlockListValue
-        {
-            Expose = [new() { ContentKey = element.Key, Culture = null, Segment = "my-segment" }],
-        };
-
-        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue);
-
-        var variation = result.Single();
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual("da-DK", variation.Culture);
-            Assert.AreEqual("my-segment", variation.Segment);
-        });
-    }
-
-    [Test]
     public void AlignExposeVariance_Can_Align_Invariance()
     {
         var owner = PublishedElement(ContentVariation.Nothing);
@@ -264,7 +236,6 @@ public class BlockEditorVarianceHandlerTests
         {
             var alignedExpose = blockValue.Expose.First();
             Assert.AreEqual("en-US", alignedExpose.Culture);
-            Assert.AreEqual("segment-one", alignedExpose.Segment);
         });
     }
 
@@ -375,27 +346,6 @@ public class BlockEditorVarianceHandlerTests
 
         Assert.AreEqual(1, blockValue.Expose.Count);
         Assert.IsNull(blockValue.Expose.First().Culture);
-    }
-
-    [Test]
-    public void AlignExposeVariance_Retains_Segments_For_Block_Without_Values()
-    {
-        var owner = PublishedElement(ContentVariation.Nothing);
-        var contentDataKey = Guid.NewGuid();
-        var expose = CreateBlockItemVariations(
-            (contentDataKey, "da-DK", "segment-one"),
-            (contentDataKey, "da-DK", "segment-two"));
-        var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, [], expose);
-
-        ExecuteAlignExposeVariance(owner, blockValue);
-
-        Assert.AreEqual(2, blockValue.Expose.Count);
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(blockValue.Expose.All(e => e.Culture is null));
-            Assert.IsTrue(blockValue.Expose.Any(e => e.Segment == "segment-one"));
-            Assert.IsTrue(blockValue.Expose.Any(e => e.Segment == "segment-two"));
-        });
     }
 
     [Test]
@@ -677,7 +627,6 @@ public class BlockEditorVarianceHandlerTests
         {
             ContentKey = c.contentKey,
             Culture = c.culture,
-            Segment = c.segment,
         }).ToList();
 
     private static BlockListValue CreateBlockListValue(Guid contentDataKey, Guid contentTypeKey, List<BlockPropertyValue> values, List<BlockItemVariation> expose) =>

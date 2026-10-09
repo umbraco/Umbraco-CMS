@@ -31,8 +31,6 @@ internal sealed class UmbracoOperationIdTransformerTests
             },
             "PutDocumentByIdValidate1_1").SetName("Substitutes the dot in a minor API version");
 
-        // The Delivery API's operation IDs are published to headless consumers, so they keep the dot
-        // until a major. See the TODO in UmbracoOperationIdTransformer.
         yield return new TestCaseData(
             new OperationIdCase
             {
@@ -41,7 +39,7 @@ internal sealed class UmbracoOperationIdTransformerTests
                 MethodName = nameof(TestController.DeliveryVersion),
                 ControllerType = typeof(QueryContentApiController),
             },
-            "GetContent2.0").SetName("Leaves the Delivery API version suffix untouched");
+            "GetContent2_0").SetName("Substitutes the dot in a Delivery API version");
 
         yield return new TestCaseData(
             new OperationIdCase

@@ -26,9 +26,7 @@ public class MarkdownEditorValueConverterTests : PropertyValueConverterTests
     {
         var linkParser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
         var urlParser = new HtmlUrlParser(Mock.Of<IOptionsMonitor<ContentSettings>>(), Mock.Of<ILogger<HtmlUrlParser>>(), Mock.Of<IProfilingLogger>(), Mock.Of<IIOHelper>());
-#pragma warning disable CS0618 // Type or member is obsolete
-        var valueConverter = new MarkdownEditorValueConverter(linkParser, urlParser, new HeyRedMarkdownToHtmlConverter());
-#pragma warning restore CS0618 // Type or member is obsolete
+        var valueConverter = new MarkdownEditorValueConverter(linkParser, urlParser, new MarkdigMarkdownToHtmlConverter());
 
         Assert.AreEqual(typeof(string), valueConverter.GetDeliveryApiPropertyValueType(Mock.Of<IPublishedPropertyType>()));
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), Mock.Of<IPublishedPropertyType>(), PropertyCacheLevel.Element, inter, false, false);

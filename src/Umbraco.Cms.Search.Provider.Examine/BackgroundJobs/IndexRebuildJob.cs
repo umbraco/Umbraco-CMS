@@ -1,12 +1,12 @@
 using Examine;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Search.Configuration;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
-using Umbraco.Cms.Search.Core.Models.Configuration;
-using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Search.Provider.Examine.Services;
-using IndexOptions = Umbraco.Cms.Search.Core.Configuration.IndexOptions;
+using IndexOptions = Umbraco.Cms.Core.Search.Configuration.IndexOptions;
 
 namespace Umbraco.Cms.Search.Provider.Examine.BackgroundJobs;
 

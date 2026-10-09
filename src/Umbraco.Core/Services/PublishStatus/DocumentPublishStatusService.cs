@@ -12,11 +12,7 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 public class DocumentPublishStatusService :
     PublishStatusService,
     IDocumentPublishStatusQueryService,
-    IDocumentPublishStatusManagementService,
-#pragma warning disable CS0618 // Type or member is obsolete
-    IPublishStatusManagementService,
-    IPublishStatusQueryService
-#pragma warning restore CS0618 // Type or member is obsolete
+    IDocumentPublishStatusManagementService
 {
     private readonly IPublishStatusRepository _publishStatusRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;

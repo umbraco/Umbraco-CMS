@@ -3,7 +3,7 @@
 Static assets and Razor views for Umbraco CMS. This is a Razor Class Library (RCL) that packages all backoffice, login, and website assets for deployment.
 
 **Project Type**: Razor Class Library (NuGet package)
-**Target Framework**: net10.0
+**Target Framework**: net11.0
 **SDK**: Microsoft.NET.Sdk.Razor
 
 ---

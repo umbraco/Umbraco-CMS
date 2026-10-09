@@ -3,7 +3,7 @@
 SQLite database provider for Umbraco CMS using NPoco ORM. Provides SQLite-specific SQL syntax, type mappers, distributed locking, and connection interceptors.
 
 **Project Type**: Class Library (NuGet package)
-**Target Framework**: net10.0
+**Target Framework**: net11.0
 **Dependencies**: Umbraco.Infrastructure, Microsoft.Data.Sqlite
 
 **Note**: This is the **legacy NPoco-based** SQLite provider. For EF Core SQLite support, see `Umbraco.Cms.Persistence.EFCore.Sqlite`.

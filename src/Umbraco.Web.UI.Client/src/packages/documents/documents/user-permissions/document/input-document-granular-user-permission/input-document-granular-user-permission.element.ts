@@ -1,6 +1,7 @@
 import type { UmbDocumentUserPermissionModel } from '../types.js';
 import { UmbDocumentItemRepository } from '../../../item/index.js';
 import type { UmbDocumentItemModel } from '../../../item/types.js';
+import type { UmbDocumentTreeItemModel } from '../../../tree/types.js';
 import { UMB_DOCUMENT_PICKER_MODAL } from '../../../constants.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -84,8 +85,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 			data: {
 				hideTreeRoot: true,
 				// prevent already selected items to be picked again
-				// TODO: this type is wrong. It should be the tree item type
-				pickableFilter: (treeItem: UmbDocumentItemModel) =>
+				pickableFilter: (treeItem: UmbDocumentTreeItemModel) =>
 					!this._items?.map((i) => i.unique).includes(treeItem.unique),
 			},
 		});

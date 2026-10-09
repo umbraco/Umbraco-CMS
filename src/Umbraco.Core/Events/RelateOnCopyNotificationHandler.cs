@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -12,9 +10,7 @@ namespace Umbraco.Cms.Core.Events;
 /// <summary>
 ///     Handles the <see cref="ContentCopiedNotification" /> to create a relation between the original and copied content.
 /// </summary>
-public class RelateOnCopyNotificationHandler :
-    INotificationHandler<ContentCopiedNotification>,
-    INotificationAsyncHandler<ContentCopiedNotification>
+public class RelateOnCopyNotificationHandler : INotificationAsyncHandler<ContentCopiedNotification>
 {
     private readonly IAuditService _auditService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
@@ -34,22 +30,6 @@ public class RelateOnCopyNotificationHandler :
         _relationService = relationService;
         _auditService = auditService;
         _userIdKeyResolver = userIdKeyResolver;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RelateOnCopyNotificationHandler" /> class.
-    /// </summary>
-    /// <param name="relationService">The relation service.</param>
-    /// <param name="auditService">The audit service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public RelateOnCopyNotificationHandler(
-        IRelationService relationService,
-        IAuditService auditService)
-        : this(
-            relationService,
-            auditService,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
     }
 
     /// <inheritdoc />
@@ -87,9 +67,4 @@ public class RelateOnCopyNotificationHandler :
             UmbracoObjectTypes.Document.GetName() ?? string.Empty,
             $"Copied content with Id: '{notification.Copy.Id}' related to original content with Id: '{notification.Original.Id}'");
     }
-
-    /// <inheritdoc />
-    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in Umbraco 19.")]
-    public void Handle(ContentCopiedNotification notification) =>
-        HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 }

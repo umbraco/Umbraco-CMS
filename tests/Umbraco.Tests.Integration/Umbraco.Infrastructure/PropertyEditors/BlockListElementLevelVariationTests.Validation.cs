@@ -1,8 +1,11 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
@@ -43,8 +46,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -143,8 +146,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -212,8 +215,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -267,8 +270,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -327,8 +330,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -455,8 +458,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -538,8 +541,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -590,7 +593,7 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" }
                 ],
                 Properties =
                 [
@@ -645,7 +648,7 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" }
                 ],
                 Properties =
                 [
@@ -662,5 +665,100 @@ internal partial class BlockListElementLevelVariationTests
             Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
             Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'variantText' && @.culture == null && @.segment == null)].value"));
         });
+    }
+
+    [Test]
+    public async Task Does_Not_Validate_Invariant_Block_Values_For_Segments_Of_Another_Culture()
+    {
+        var elementType = await CreateSegmentLeakElementType();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+
+        // the "blocks" property varies by culture, so validation runs with a concrete context culture
+        var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType, ContentVariation.Culture);
+
+        var contentKey = Guid.NewGuid();
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            contentKey,
+            Guid.NewGuid(),
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    // the mandatory, culture invariant + segment variant property only has a default segment value
+                    new() { Alias = "segmentText", Value = "Content value, default segment", Culture = null, Segment = null },
+
+                    // segment "s1" exists *only* on a da-DK value of a culture + segment variant property
+                    new() { Alias = "cultureSegmentText", Value = "Content value, da-DK/s1", Culture = "da-DK", Segment = "s1" },
+                },
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "segmentText", Value = "Settings value, default segment", Culture = null, Segment = null },
+                },
+                null,
+                null));
+
+        // expose the block for both cultures, so exposure cannot be the reason for a skipped/added validation
+        blockListValue.Expose =
+        [
+            new() { ContentKey = contentKey, Culture = "en-US" },
+            new() { ContentKey = contentKey, Culture = "da-DK" },
+        ];
+
+        var result = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants =
+                [
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" },
+                ],
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue), Culture = "en-US" },
+                ],
+            },
+            contentType,
+            ["en-US"]);
+
+        var errors = result.ValidationErrors.ToArray();
+
+        // "segmentText" is culture invariant and has a value for the default segment. Segment "s1" is only
+        // populated for a da-DK value, so there is no "s1" override of the invariant values to validate.
+        Assert.IsEmpty(
+            errors,
+            "Expected no validation errors, got: "
+            + string.Join(", ", errors.Select(error => $"[culture={error.Culture ?? "null"}, segment={error.Segment ?? "null"}, path={error.JsonPath}]")));
+    }
+
+    private async Task<IContentType> CreateSegmentLeakElementType()
+    {
+        var elementType = new ContentTypeBuilder()
+            .WithAlias("segmentLeakElementType")
+            .WithName("Segment Leak Element Type")
+            .WithIsElement(true)
+            .WithAllowedInLibrary(true)
+            .WithContentVariation(ContentVariation.CultureAndSegment)
+            .AddPropertyType()
+                .WithAlias("segmentText")
+                .WithName("Segment text")
+                .WithMandatory(true)
+                .WithDataTypeId(Constants.DataTypes.Textbox)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                .WithValueStorageType(ValueStorageType.Nvarchar)
+                .WithVariations(ContentVariation.Segment)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("cultureSegmentText")
+                .WithName("Culture and segment text")
+                .WithDataTypeId(Constants.DataTypes.Textbox)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                .WithValueStorageType(ValueStorageType.Nvarchar)
+                .WithVariations(ContentVariation.CultureAndSegment)
+                .Done()
+            .Build();
+
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        return elementType;
     }
 }

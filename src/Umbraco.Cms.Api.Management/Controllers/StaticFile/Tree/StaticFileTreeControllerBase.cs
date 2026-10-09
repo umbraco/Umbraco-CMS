@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.FileSystem;
-using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 
@@ -16,44 +14,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 [ApiExplorerSettings(GroupName = "Static File")]
 public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 {
-    private readonly IFileSystemTreeService _fileSystemTreeService;
-    private static readonly string[] _allowedRootFolders = { $"{Path.DirectorySeparatorChar}App_Plugins", $"{Path.DirectorySeparatorChar}wwwroot" };
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="StaticFileTreeControllerBase"/> class with the specified file system and tree service.
+    /// Initializes a new instance of the <see cref="StaticFileTreeControllerBase"/> class.
     /// </summary>
-    /// <param name="physicalFileSystem">The physical file system used for file operations.</param>
-    /// <param name="fileSystemTreeService">The service used to manage the file system tree structure.</param>
-    public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem, IPhysicalFileSystemTreeService fileSystemTreeService)
-        : base (fileSystemTreeService)
+    /// <param name="fileSystemTreeService">The service used to read the static file tree, restricted to the allowed root folders.</param>
+    public StaticFileTreeControllerBase(IPhysicalFileSystemTreeService fileSystemTreeService)
+        : base(fileSystemTreeService)
     {
-        FileSystem = physicalFileSystem;
-        _fileSystemTreeService = fileSystemTreeService;
     }
-
-    [Obsolete("Has been moved to the individual services. Scheduled to be removed in Umbraco 19.")]
-    protected override IFileSystem FileSystem { get; }
-
-    [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 19.")]
-    protected override string[] GetDirectories(string path) =>
-        IsTreeRootPath(path)
-            ? _allowedRootFolders
-            : IsAllowedPath(path)
-                ? _fileSystemTreeService.GetDirectories(path)
-                : Array.Empty<string>();
-
-    [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 19.")]
-    protected override string[] GetFiles(string path)
-        => IsTreeRootPath(path) || IsAllowedPath(path) == false
-            ? Array.Empty<string>()
-            : _fileSystemTreeService.GetFiles(path);
-
-    protected override FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
-        => IsAllowedPath(path)
-            ? _fileSystemTreeService.GetAncestorModels(path, includeSelf)
-            : Array.Empty<FileSystemTreeItemPresentationModel>();
-
-    private bool IsTreeRootPath(string path) => path == Path.DirectorySeparatorChar.ToString();
-
-    private bool IsAllowedPath(string path) => _allowedRootFolders.Contains(path) || _allowedRootFolders.Any(folder => path.StartsWith($"{folder}{Path.DirectorySeparatorChar}"));
 }

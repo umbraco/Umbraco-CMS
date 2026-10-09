@@ -1,9 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -30,23 +27,14 @@ namespace Umbraco.Cms.Core.Handlers;
 ///     </para>
 /// </remarks>
 public sealed class AuditNotificationsHandler :
-    INotificationHandler<MemberSavedNotification>,
     INotificationAsyncHandler<MemberSavedNotification>,
-    INotificationHandler<MemberDeletedNotification>,
     INotificationAsyncHandler<MemberDeletedNotification>,
-    INotificationHandler<AssignedMemberRolesNotification>,
     INotificationAsyncHandler<AssignedMemberRolesNotification>,
-    INotificationHandler<RemovedMemberRolesNotification>,
     INotificationAsyncHandler<RemovedMemberRolesNotification>,
-    INotificationHandler<ExportedMemberNotification>,
     INotificationAsyncHandler<ExportedMemberNotification>,
-    INotificationHandler<UserSavedNotification>,
     INotificationAsyncHandler<UserSavedNotification>,
-    INotificationHandler<UserDeletedNotification>,
     INotificationAsyncHandler<UserDeletedNotification>,
-    INotificationHandler<UserGroupWithUsersSavedNotification>,
     INotificationAsyncHandler<UserGroupWithUsersSavedNotification>,
-    INotificationHandler<AssignedUserGroupPermissionsNotification>,
     INotificationAsyncHandler<AssignedUserGroupPermissionsNotification>,
     INotificationAsyncHandler<ExternalMemberSavedNotification>,
     INotificationAsyncHandler<ExternalMemberDeletedNotification>,
@@ -90,72 +78,6 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="AuditNotificationsHandler"/> class.
-    /// </summary>
-    /// <param name="auditService">The audit service (no longer used).</param>
-    /// <param name="userService">The user service.</param>
-    /// <param name="entityService">The entity service.</param>
-    /// <param name="ipResolver">The IP address resolver.</param>
-    /// <param name="globalSettings">The global settings (no longer used).</param>
-    /// <param name="backOfficeSecurityAccessor">The back office security accessor.</param>
-    /// <param name="memberService">The member service.</param>
-    /// <param name="userGroupService">The user group service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public AuditNotificationsHandler(
-        IAuditService auditService,
-        IUserService userService,
-        IEntityService entityService,
-        IIpResolver ipResolver,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IMemberService memberService,
-        IUserGroupService userGroupService)
-        : this(
-            StaticServiceProvider.Instance.GetRequiredService<IAuditEntryService>(),
-            userService,
-            entityService,
-            ipResolver,
-            backOfficeSecurityAccessor,
-            memberService,
-            userGroupService)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="AuditNotificationsHandler"/> class.
-    /// </summary>
-    /// <param name="auditEntryService">The audit entry service for writing audit records.</param>
-    /// <param name="auditService">The audit service (no longer used).</param>
-    /// <param name="userService">The user service.</param>
-    /// <param name="entityService">The entity service.</param>
-    /// <param name="ipResolver">The IP address resolver.</param>
-    /// <param name="globalSettings">The global settings (no longer used).</param>
-    /// <param name="backOfficeSecurityAccessor">The back office security accessor.</param>
-    /// <param name="memberService">The member service.</param>
-    /// <param name="userGroupService">The user group service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public AuditNotificationsHandler(
-        IAuditEntryService auditEntryService,
-        IAuditService auditService,
-        IUserService userService,
-        IEntityService entityService,
-        IIpResolver ipResolver,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IMemberService memberService,
-        IUserGroupService userGroupService)
-        : this(
-            auditEntryService,
-            userService,
-            entityService,
-            ipResolver,
-            backOfficeSecurityAccessor,
-            memberService,
-            userGroupService)
-    {
-    }
-
-    /// <summary>
     ///     Gets the current user performing the action from the back office security context.
     /// </summary>
     /// <returns>The current user, or <c>null</c> if no user is authenticated.</returns>
@@ -189,11 +111,6 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public void Handle(AssignedMemberRolesNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
     public async Task HandleAsync(
         AssignedUserGroupPermissionsNotification notification,
         CancellationToken cancellationToken)
@@ -216,11 +133,6 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public void Handle(AssignedUserGroupPermissionsNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
     public async Task HandleAsync(ExportedMemberNotification notification, CancellationToken cancellationToken)
     {
         IUser? performingUser = await GetCurrentPerformingUser();
@@ -233,11 +145,6 @@ public sealed class AuditNotificationsHandler :
             "umbraco/member/exported",
             "exported member data");
     }
-
-    /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public void Handle(ExportedMemberNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     public async Task HandleAsync(MemberDeletedNotification notification, CancellationToken cancellationToken)
@@ -254,11 +161,6 @@ public sealed class AuditNotificationsHandler :
                 $"delete member id:{FormatDetails(member)}");
         }
     }
-
-    /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public void Handle(MemberDeletedNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     public async Task HandleAsync(MemberSavedNotification notification, CancellationToken cancellationToken)
@@ -279,11 +181,6 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public void Handle(MemberSavedNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
     public async Task HandleAsync(RemovedMemberRolesNotification notification, CancellationToken cancellationToken)
     {
         IUser? performingUser = await GetCurrentPerformingUser();
@@ -301,11 +198,6 @@ public sealed class AuditNotificationsHandler :
                 $"roles modified, removed {roles}");
         }
     }
-
-    /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public void Handle(RemovedMemberRolesNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     public async Task HandleAsync(ExternalMemberSavedNotification notification, CancellationToken cancellationToken)
@@ -386,11 +278,6 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public void Handle(UserDeletedNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
     public async Task HandleAsync(UserGroupWithUsersSavedNotification notification, CancellationToken cancellationToken)
     {
         IUser? performingUser = await GetCurrentPerformingUser();
@@ -454,11 +341,6 @@ public sealed class AuditNotificationsHandler :
     }
 
     /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public void Handle(UserGroupWithUsersSavedNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
     public async Task HandleAsync(UserSavedNotification notification, CancellationToken cancellationToken)
     {
         IUser? performingUser = await GetCurrentPerformingUser();
@@ -479,11 +361,6 @@ public sealed class AuditNotificationsHandler :
                 $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}{(groups == null ? string.Empty : "; groups assigned: " + groups)}");
         }
     }
-
-    /// <inheritdoc />
-    [Obsolete("Use HandleAsync() instead. Scheduled for removal in Umbraco 19.")]
-    public void Handle(UserSavedNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Writes an audit entry for the specified action.

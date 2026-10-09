@@ -59,20 +59,6 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 		const tipTapElement = event.target;
 		const markup = tipTapElement.value;
 
-		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
-		const usedContentKeys: string[] = [];
-
-		// Regex matching all block elements in the markup, and extracting the content key. It's the same as the one used on the backend.
-		const regex = new RegExp(
-			/<umb-rte-block(?:-inline)?(?: class="(?:.[^"]*)")? data-content-key="(?<key>.[^"]*)">(?:<!--Umbraco-Block-->)?<\/umb-rte-block(?:-inline)?>/gi,
-		);
-		let blockElement: RegExpExecArray | null;
-		while ((blockElement = regex.exec(markup)) !== null) {
-			if (blockElement.groups?.key) {
-				usedContentKeys.push(blockElement.groups.key);
-			}
-		}
-
 		if (this.value) {
 			this.value = {
 				...this.value,
@@ -91,7 +77,7 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 		}
 
 		// lets run this one after we set the value, to make sure we don't reset the value.
-		this._filterUnusedBlocks(usedContentKeys);
+		this._filterUnusedBlocksFromMarkup(markup);
 
 		this._fireChangeEvent();
 	}

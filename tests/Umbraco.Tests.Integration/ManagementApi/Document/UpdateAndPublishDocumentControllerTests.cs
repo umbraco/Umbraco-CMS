@@ -87,7 +87,7 @@ public class UpdateAndPublishDocumentControllerTests : ManagementApiUserGroupTes
         {
             Variants =
             [
-                new() { Culture = null, Segment = null, Name = "The new name", },
+                new() { Culture = null, Name = "The new name", },
             ],
             CulturesToPublish = [],
         };

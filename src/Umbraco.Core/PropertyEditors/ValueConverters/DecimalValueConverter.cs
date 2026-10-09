@@ -1,5 +1,6 @@
 using System.Globalization;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
@@ -46,7 +47,7 @@ public class DecimalValueConverter : PropertyValueConverterBase
         // is it a double?
         if (source is double sourceDouble)
         {
-            return Convert.ToDecimal(sourceDouble);
+            return sourceDouble.ToShortestDecimal();
         }
 
         // is it an integer?

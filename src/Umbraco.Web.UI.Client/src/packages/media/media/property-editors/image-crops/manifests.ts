@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Image Crops Property Editor UI',
 	element: () => import('./property-editor-ui-image-crops.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Image Crops Configuration',
 		icon: 'icon-autofill',
 		group: '#propertyEditorUIGroups_common',

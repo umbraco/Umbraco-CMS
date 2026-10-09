@@ -11,11 +11,6 @@ public class VariantModel
     public string? Culture { get; set; }
 
     /// <summary>
-    ///     Gets or sets the segment identifier for this variant, or <c>null</c> for non-segmented content.
-    /// </summary>
-    public string? Segment { get; set; }
-
-    /// <summary>
     ///     Gets or sets the name of the content for this variant.
     /// </summary>
     public required string Name { get; set; }

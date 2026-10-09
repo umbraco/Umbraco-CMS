@@ -64,7 +64,7 @@ public class CreateMediaControllerTests : ManagementApiUserGroupTestBase<CreateM
             {
                 MediaType = new ReferenceByIdModel(_folderMediaTypeKey),  Variants = new MediaVariantRequestModel[]
                 {
-                    new() { Culture = null, Segment = null, Name = "The en-US name", },
+                    new() { Culture = null, Name = "The en-US name", },
                 },
             };
 

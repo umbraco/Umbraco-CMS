@@ -139,8 +139,6 @@ public class MarkdownToHtmlConverterTests
         }
     }
 
-#pragma warning disable CS0618 // Type or member is obsolete
     private static MarkdownToHtmlConverter CreateConverter() =>
-        new(new HeyRedMarkdownToHtmlConverter());
-#pragma warning restore CS0618 // Type or member is obsolete
+        new(new MarkdigMarkdownToHtmlConverter());
 }

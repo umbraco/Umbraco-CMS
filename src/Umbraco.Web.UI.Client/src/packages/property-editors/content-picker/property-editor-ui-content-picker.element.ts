@@ -1,4 +1,3 @@
-import { UmbContentPickerDynamicRootRepository } from './dynamic-root/repository/index.js';
 import type { UmbInputContentElement } from './components/input-content/index.js';
 import type { UmbContentPickerSource, UmbContentPickerSourceType } from './types.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
@@ -6,8 +5,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
+import { UMB_DOCUMENT_ENTITY_TYPE, UmbDocumentDynamicRootResolver } from '@umbraco-cms/backoffice/document';
 import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
 import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
@@ -16,9 +14,8 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
-import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 // import of local component
 import './components/input-content/index.js';
@@ -77,7 +74,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
 
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
-	#dynamicRootRepository = new UmbContentPickerDynamicRootRepository(this);
+	#dynamicRootResolver = new UmbDocumentDynamicRootResolver(this);
 
 	#entityTypeDictionary: { [type in UmbContentPickerSourceType]: string } = {
 		content: UMB_DOCUMENT_ENTITY_TYPE,
@@ -120,8 +117,9 @@ export class UmbPropertyEditorUIContentPickerElement
 			}
 		}
 
-		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
-		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
+		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
+		this._min = this.#parseInt(minMax?.min, 0);
+		this._max = this.#parseInt(minMax?.max, Infinity);
 
 		this._allowedContentTypeUniques = config.getValueByAlias('filter');
 
@@ -141,7 +139,7 @@ export class UmbPropertyEditorUIContentPickerElement
 
 		if (this._min && this._max && this._min > this._max) {
 			console.warn(
-				`Property (Content Picker) has been misconfigured, 'minNumber' is greater than 'maxNumber'. Please correct your data type configuration.`,
+				`Property (Content Picker) has been misconfigured, the minimum is greater than the maximum. Please correct your data type configuration.`,
 				this,
 			);
 		}
@@ -154,31 +152,10 @@ export class UmbPropertyEditorUIContentPickerElement
 	async #setPickerRootUnique() {
 		// If we have a root unique value, we don't need to fetch it from the dynamic root
 		if (this._rootUnique) return;
-		if (!this.#dynamicRoot) return;
 
-		// Use passContextAliasMatches to skip past block element workspaces and find the document workspace.
-		const workspaceContext = await this.getContext(UMB_CONTENT_WORKSPACE_CONTEXT, {
-			passContextAliasMatches: true,
-		}).catch(() => undefined);
-
-		// For new documents, the unique is a client-generated GUID that doesn't exist in the DB.
-		// The backend expects null for CurrentKey when creating new content and falls back to ParentKey.
-		const isNew =
-			workspaceContext &&
-			'getIsNew' in workspaceContext &&
-			(workspaceContext as UmbSubmittableWorkspaceContext).getIsNew() === true;
-
-		const unique = isNew ? null : (workspaceContext?.getUnique() ?? null);
-
-		// Use parent entity context to get the parent unique. Its observable starts as undefined,
-		// so asPromise() properly waits for the async structure loading to complete.
-		const parentContext = await this.getContext(UMB_PARENT_ENTITY_CONTEXT);
-		const parent = await this.observe(parentContext?.parent, () => {})?.asPromise();
-		const parentUnique = parent?.unique ?? null;
-
-		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
-		if (result && result.length > 0) {
-			this._rootUnique = result[0];
+		const resolved = await this.#dynamicRootResolver.resolveStartNodeUnique(this.#dynamicRoot);
+		if (resolved) {
+			this._rootUnique = resolved;
 		}
 	}
 

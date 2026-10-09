@@ -3,7 +3,11 @@
 
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -11,6 +15,8 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -24,6 +30,44 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
     private CancellationToken CancellationToken => CancellationToken.None;
 
     private CacheRefresherCollection CacheRefreshers => GetRequiredService<CacheRefresherCollection>();
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        base.CustomTestSetup(builder);
+        builder.AddNotificationHandler<UserCacheRefresherNotification, UserCacheRefresherNotificationHandler>();
+    }
+
+    [TearDown]
+    public void ClearNotificationHandler() => UserCacheRefresherNotificationHandler.Refreshing = null;
+
+    [Test]
+    public void Does_Not_Hold_A_Scope_While_Refreshing_Caches()
+    {
+        var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
+
+        CreateAndDeliveryMultipleInstructions(sut);
+
+        var notified = false;
+        IScope? ambientScope = null;
+        UserCacheRefresherNotificationHandler.Refreshing = _ =>
+        {
+            if (notified)
+            {
+                return;
+            }
+
+            notified = true;
+            ambientScope = ScopeAccessor.AmbientScope;
+        };
+
+        sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(notified, "The cache refresher was never notified, so the assertion below proves nothing.");
+            Assert.IsNull(ambientScope, "The read transaction was still open while the caches were being refreshed.");
+        });
+    }
 
     [Test]
     public void Confirms_Cold_Boot_Required_When_Instructions_Exist_And_None_Have_Been_Synced()
@@ -288,6 +332,32 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(2, lastSynced);
     }
 
+    [Test]
+    public void ProcessInternalInstructions_Does_Not_Run_The_Published_Cache_Refresh()
+    {
+        var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
+
+        // A payload instruction: only Refresh raises the notification, RefreshInternal does not.
+        var payload = GetRequiredService<UserCacheRefresher>().Serialize(new UserCacheRefresher.JsonPayload
+        {
+            Key = Constants.Security.SuperUserKey,
+        });
+        sut.DeliverInstructions(
+            [new RefreshInstruction(UserCacheRefresher.UniqueId, RefreshMethodType.RefreshByJson, Guid.Empty, 0, null!, payload)],
+            AlternateIdentity);
+
+        var notified = 0;
+        UserCacheRefresherNotificationHandler.Refreshing = _ => notified++;
+
+        sut.ProcessInternalInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
+
+        Assert.That(notified, Is.EqualTo(0), "ProcessInternalInstructions raised the cache refresher notification, which only Refresh raises.");
+
+        sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
+
+        Assert.That(notified, Is.EqualTo(1));
+    }
+
     private void CreateAndDeliveryMultipleInstructions(CacheInstructionService sut)
     {
         for (var i = 0; i < 3; i++)
@@ -295,5 +365,12 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
             var instructions = CreateInstructions();
             sut.DeliverInstructions(instructions, i == 2 ? LocalIdentity : AlternateIdentity);
         }
+    }
+
+    internal sealed class UserCacheRefresherNotificationHandler : INotificationHandler<UserCacheRefresherNotification>
+    {
+        public static Action<UserCacheRefresherNotification>? Refreshing { get; set; }
+
+        public void Handle(UserCacheRefresherNotification notification) => Refreshing?.Invoke(notification);
     }
 }

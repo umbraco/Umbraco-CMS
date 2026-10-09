@@ -23,8 +23,9 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbExpandVariantIdsWithSegmentOptions } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { apiErrorWasNotified } from '@umbraco-cms/backoffice/resources';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -148,6 +149,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			data: {
 				options,
 				activeVariants: selected,
+				currentVariant: this.#getCurrentScheduleVariant(options),
 				pickableFilter: this.#publishableVariantsFilter,
 				prevalues: options.map((option) => ({
 					unique: option.unique,
@@ -162,7 +164,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		if (!result?.selection.length) return;
 
 		// Map to the correct format for the API (UmbDocumentVariantPublishModel)
-		const variants =
+		const cultureVariants =
 			result?.selection.map<UmbDocumentVariantPublishModel>((x) => ({
 				variantId: UmbVariantId.FromString(x.unique),
 				schedule: {
@@ -171,9 +173,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				},
 			})) ?? [];
 
-		if (!variants.length) return;
+		if (!cultureVariants.length) return;
 
-		const variantIds = variants.map((x) => x.variantId);
+		let variantIds = cultureVariants.map((x) => x.variantId);
+		variantIds = umbExpandVariantIdsWithSegmentOptions(
+			variantIds,
+			await this.#documentWorkspaceContext.getVariantOptions(),
+		);
+
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
@@ -190,7 +197,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
 
 					// Schedule the document
-					const { error } = await this.#publishingRepository.publish(unique, variants);
+					const { error } = await this.#publishingRepository.publish(unique, cultureVariants);
 					if (error) {
 						throw error;
 					}
@@ -282,11 +289,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		if (!result?.selection.length) return;
 
 		// Map to variantIds
-		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+		let variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
 		if (!variantIds.length) return;
 
 		const workspaceContext = this.#documentWorkspaceContext;
+
+		variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, await workspaceContext.getVariantOptions());
 		const saveData = await workspaceContext.constructSaveData(variantIds);
 
 		try {
@@ -498,6 +507,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		// User has committed to publishing (modal closed with a selection, or no modal needed).
 		notifyWorkspaceActionStarting(executionOptions);
 
+		if (this.#documentWorkspaceContext.getVariesBySegment()) {
+			variantIds = umbExpandVariantIdsWithSegmentOptions(
+				variantIds,
+				await this.#documentWorkspaceContext.getVariantOptions(),
+			);
+		}
+
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
@@ -508,9 +524,11 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				// Notify only on the publish path. The validation-failure path below already
 				// notifies, so a shared top-level .catch would fire a second, contradictory toast. [JOV]
 				return this.#performSaveAndPublish(variantIds, saveData).catch((error) => {
-					this.#notificationContext?.peek('danger', {
-						data: { message: this.#localize.term('speechBubbles_editContentPublishedFailed') },
-					});
+					// When the server reported why, the user has already seen it. Repeating a generic failure here
+					// would contradict it - and mislead, as a rejected publish still leaves the save in effect.
+					if (!apiErrorWasNotified(error?.cause)) {
+						this.#notify('danger', 'speechBubbles_editContentPublishedFailed');
+					}
 					return Promise.reject(error);
 				});
 			},
@@ -536,14 +554,26 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				return await this.#documentWorkspaceContext!.loadWithoutPersist();
 			} catch {
 				reloadAfterPublishFailed = true;
-				return saveData;
+				return { ...saveData, unique: this.#documentWorkspaceContext!.getUnique() ?? saveData.unique };
 			}
 		};
 
 		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData, {
 			create: async (data, ids, parent) => {
-				const { error } = await this.#publishingRepository.createAndPublish(data, ids, parent.unique);
+				const { data: createdUnique, error } = await this.#publishingRepository.createAndPublish(
+					data,
+					ids,
+					parent.unique,
+				);
 				if (error) throw new Error('Error creating and publishing document', { cause: error });
+
+				// The server may have assigned a different unique than the one this workspace scaffolded with
+				// (e.g. a Saving notification handler assigning its own key). The reload below reads by the
+				// workspace's current unique, so it must be updated to the actual persisted one first.
+				if (createdUnique) {
+					this.#documentWorkspaceContext!.setUnique(createdUnique);
+				}
+
 				return loadAfterPublish();
 			},
 			update: async (data, ids) => {
@@ -569,7 +599,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		await this.#loadAndProcessLastPublished();
 
-		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		// Re-read the unique: for a new document, the server may have assigned a different one than the
+		// workspace scaffolded with, and `performCreateOrUpdate` above will have re-synced it if so.
+		const persistedUnique = this.#documentWorkspaceContext.getUnique() ?? unique;
+		const event = new UmbRequestReloadStructureForEntityEvent({ unique: persistedUnique, entityType });
 		this.#eventContext?.dispatchEvent(event);
 	}
 
@@ -610,6 +643,19 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			options,
 			selected,
 		};
+	}
+
+	#getCurrentScheduleVariant(options: Array<UmbDocumentVariantOptionModel>): string | undefined {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+		// The schedule dialog lists cultures only, so an active segment variant resolves to its culture.
+		const activeCultures = this.#documentWorkspaceContext.splitView
+			.getActiveVariants()
+			.map((x) => UmbVariantId.Create(x).toSegmentInvariant().toString());
+
+		return activeCultures.find((unique) => {
+			const option = options.find((o) => o.unique === unique);
+			return !!option && this.#publishableVariantsFilter(option);
+		});
 	}
 
 	#getPublishVariantsSelection() {

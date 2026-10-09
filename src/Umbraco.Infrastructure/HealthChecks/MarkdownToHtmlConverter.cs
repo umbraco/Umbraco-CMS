@@ -20,16 +20,6 @@ public class MarkdownToHtmlConverter : IMarkdownToHtmlConverter
     public MarkdownToHtmlConverter(Core.Strings.IMarkdownToHtmlConverter markdownToHtmlConverter) => _markdownToHtmlConverter = markdownToHtmlConverter;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MarkdownToHtmlConverter"/> class.
-    /// This is the parameterless constructor.
-    /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MarkdownToHtmlConverter()
-        : this(StaticServiceProvider.Instance.GetRequiredService<Core.Strings.IMarkdownToHtmlConverter>())
-    {
-    }
-
-    /// <summary>
     /// Converts the specified health check results to an HTML string by first generating a Markdown representation
     /// of the results (according to the given verbosity), converting that Markdown to HTML, and then applying additional HTML highlighting.
     /// </summary>

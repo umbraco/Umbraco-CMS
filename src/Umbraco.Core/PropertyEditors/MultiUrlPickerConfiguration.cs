@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Represents the configuration for the multi URL picker property editor.
 /// </summary>
-public class MultiUrlPickerConfiguration : IIgnoreUserStartNodesConfig
+public class MultiUrlPickerConfiguration : UrlPickerConfigurationBase
 {
     /// <summary>
     /// Gets or sets the validation limits for the number of URLs that can be selected.
@@ -34,8 +34,4 @@ public class MultiUrlPickerConfiguration : IIgnoreUserStartNodesConfig
         get => ValidationLimit.Max ?? 0;
         set => ValidationLimit.Max = value == 0 ? null : value;
     }
-
-    /// <inheritdoc />
-    [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes)]
-    public bool IgnoreUserStartNodes { get; set; }
 }

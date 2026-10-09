@@ -168,8 +168,8 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							this._isElement && !this._allowedInLibrary,
 							() => html`
 								<div class="info-message">
-									<umb-localize key="contentTypeEditor_elementDoesNotSupport">
-										This is not applicable for an Element type.
+									<umb-localize key="contentTypeEditor_elementTypeOnlyAllowedInLibrarySupport">
+										This is only applicable for an Element Type that is allowed in the Library.
 									</umb-localize>
 								</div>
 							`,

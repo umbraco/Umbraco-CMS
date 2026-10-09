@@ -1,5 +1,5 @@
 import type { UmbInputMemberElement } from '../../components/index.js';
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -16,8 +16,15 @@ export class UmbPropertyEditorUIMemberPickerElement
 	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
-	@property({ attribute: false })
-	public config?: UmbPropertyEditorConfigCollection;
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		if (!config) return;
+
+		const filter = config.getValueByAlias<string>('filter');
+		this._allowedMemberTypes = filter ? filter.split(',').filter(Boolean) : undefined;
+	}
+
+	@state()
+	private _allowedMemberTypes?: Array<string>;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -45,6 +52,7 @@ export class UmbPropertyEditorUIMemberPickerElement
 		return html`<umb-input-member
 			min="0"
 			max="1"
+			.allowedContentTypeIds=${this._allowedMemberTypes}
 			.value=${this.value}
 			@change=${this.#onChange}
 			?required=${this.mandatory}

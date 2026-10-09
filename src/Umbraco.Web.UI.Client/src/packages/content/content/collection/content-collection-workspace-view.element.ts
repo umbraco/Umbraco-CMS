@@ -1,4 +1,4 @@
-import { UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT } from './content-collection-workspace.context-token.js';
+import { UMB_CONTENT_COLLECTION_CONFIGURATION_CONTEXT } from './configuration/content-collection-configuration.context-token.js';
 import { customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbCollectionWorkspaceViewInteractionMemoryController } from '@umbraco-cms/backoffice/collection';
@@ -29,12 +29,18 @@ export class UmbContentCollectionWorkspaceViewElement extends UmbLitElement impl
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._collectionAlias = workspaceContext?.collection.getCollectionAlias();
-			this.#workspaceViewInteractionMemory.setCollectionAlias(this._collectionAlias);
+		this.consumeContext(UMB_CONTENT_COLLECTION_CONFIGURATION_CONTEXT, (configurationContext) => {
+			this.observe(
+				configurationContext?.collectionAlias,
+				(collectionAlias) => {
+					this._collectionAlias = collectionAlias;
+					this.#workspaceViewInteractionMemory.setCollectionAlias(collectionAlias);
+				},
+				'_observeCollectionAlias',
+			);
 
 			this.observe(
-				workspaceContext?.collection.collectionConfig,
+				configurationContext?.collectionConfig,
 				(config) => {
 					if (config) {
 						this._config = config;

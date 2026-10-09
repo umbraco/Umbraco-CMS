@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -24,23 +22,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<DocumentBlueprintTreeItemResponseModel>
 {
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentBlueprintTreeControllerBase"/> class, providing required services for managing document blueprint trees.
-    /// </summary>
-    /// <param name="entityService">The service used to interact with entities in the system.</param>
-    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
-    /// <param name="documentPresentationFactory">The factory responsible for creating document presentation models.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public DocumentBlueprintTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
-        : this(
-            entityService,
-            flagProviders,
-            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
-            documentPresentationFactory)
-    {
-    }
 
     public DocumentBlueprintTreeControllerBase(
         IEntityService entityService,
@@ -66,19 +47,17 @@ public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<Docu
         }
     }
 
-    protected override async Task<DocumentBlueprintTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentId, IEntitySlim[] entities)
+    protected override async Task<DocumentBlueprintTreeItemResponseModel> MapTreeItemViewModelAsync(Guid? parentKey, IEntitySlim entity)
     {
-        IEnumerable<Task<DocumentBlueprintTreeItemResponseModel>> tasks = entities.Select(async entity =>
-        {
-            DocumentBlueprintTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentId, entity);
-            if (entity is IDocumentEntitySlim documentEntitySlim)
-            {
-                responseModel.HasChildren = false;
-                responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
-            }
-            return responseModel;
-        });
+        DocumentBlueprintTreeItemResponseModel responseModel = await base.MapTreeItemViewModelAsync(parentKey, entity);
 
-        return await Task.WhenAll(tasks);
+        if (responseModel.IsFolder is false && entity is IDocumentEntitySlim documentEntitySlim)
+        {
+            responseModel.HasChildren = false;
+            responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
+            responseModel.Variants = await _documentPresentationFactory.CreateVariantsItemResponseModelsAsync(documentEntitySlim);
+        }
+
+        return responseModel;
     }
 }

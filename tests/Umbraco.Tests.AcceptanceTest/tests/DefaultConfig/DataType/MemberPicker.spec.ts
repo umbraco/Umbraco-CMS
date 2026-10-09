@@ -1,4 +1,4 @@
-import {test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Member Picker';
@@ -12,7 +12,8 @@ test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Assert
-  await umbracoUi.dataType.doesSettingsContainText('There is no configuration for this property editor.');
+  await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.memberPickerSettings);
+  await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.memberPickerSettings);
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
   const dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);

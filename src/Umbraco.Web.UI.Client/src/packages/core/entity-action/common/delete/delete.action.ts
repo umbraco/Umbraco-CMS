@@ -70,19 +70,19 @@ export class UmbDeleteEntityAction<
 			throw new Error('Action event context not found.');
 		}
 
-		const event = new UmbRequestReloadStructureForEntityEvent({
-			unique: this.args.unique,
-			entityType: this.args.entityType,
-		});
-
-		actionEventContext.dispatchEvent(event);
-
 		const deletedEvent = new UmbEntityDeletedEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,
 		});
 
 		actionEventContext.dispatchEvent(deletedEvent);
+
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
+
+		actionEventContext.dispatchEvent(event);
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		if (notificationContext) {

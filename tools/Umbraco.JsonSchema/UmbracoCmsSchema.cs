@@ -22,7 +22,7 @@ internal sealed class UmbracoCmsSchema
 
         public required DeliveryApiSettings DeliveryApi { get; set; }
 
-        public required CoreDebugSettings Debug { get; set; }
+        public required DebugSettings Debug { get; set; }
 
         public required ExceptionFilterSettings ExceptionFilter { get; set; }
 
@@ -62,8 +62,6 @@ internal sealed class UmbracoCmsSchema
 
         public required LegacyPasswordMigrationSettings LegacyPasswordMigration { get; set; }
 
-        public required HelpPageSettings HelpPage { get; set; }
-
         public required InstallDefaultDataNamedOptions InstallDefaultData { get; set; }
 
         public required DataTypesSettings DataTypes { get; set; }
@@ -81,16 +79,6 @@ internal sealed class UmbracoCmsSchema
         public required WebsiteSettings Website { get; set; }
 
         public required SignalRSettings SignalR { get; set; }
-
-        public required SearchDefinition Search { get; set; }
-    }
-
-    /// <summary>
-    /// Configuration of Umbraco Search.
-    /// </summary>
-    public class SearchDefinition
-    {
-        public required ExamineSearchProviderSettings Examine { get; set; }
     }
 
     public class InstallDefaultDataNamedOptions

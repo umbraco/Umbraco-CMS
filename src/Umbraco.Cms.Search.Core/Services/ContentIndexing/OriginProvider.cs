@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
+﻿using Umbraco.Cms.Core.Search.Indexing;
+
+namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
 /// <summary>
 /// Default implementation of <see cref="IOriginProvider"/>. Generates a random origin identifier once per process.

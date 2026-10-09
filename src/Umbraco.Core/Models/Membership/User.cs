@@ -112,35 +112,6 @@ public class User : EntityBase, IUser, IProfile
     /// <summary>
     /// Initializes a new instance of the <see cref="User"/> class for an existing user.
     /// </summary>
-    /// <param name="globalSettings">The global settings for default values.</param>
-    /// <param name="id">The unique identifier for the user.</param>
-    /// <param name="name">The display name of the user.</param>
-    /// <param name="email">The email address of the user.</param>
-    /// <param name="username">The username for the user.</param>
-    /// <param name="rawPasswordValue">The raw password value for the user.</param>
-    /// <param name="passwordConfig">The password configuration for the user.</param>
-    /// <param name="userGroups">The user groups the user belongs to.</param>
-    /// <param name="startContentIds">The starting content node identifiers.</param>
-    /// <param name="startMediaIds">The starting media node identifiers.</param>
-    [Obsolete("Use the constructor that includes startElementIds. Scheduled for removal in Umbraco 19.")]
-    public User(
-        GlobalSettings globalSettings,
-        int id,
-        string? name,
-        string email,
-        string? username,
-        string? rawPasswordValue,
-        string? passwordConfig,
-        IEnumerable<IReadOnlyUserGroup> userGroups,
-        int[] startContentIds,
-        int[] startMediaIds)
-        : this(globalSettings, id, name, email, username, rawPasswordValue, passwordConfig, userGroups, startContentIds, startMediaIds, [])
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="User"/> class for an existing user.
-    /// </summary>
     /// <param name="globalSettings">The global settings.</param>
     /// <param name="id">The identifier.</param>
     /// <param name="name">The name.</param>

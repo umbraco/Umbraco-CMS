@@ -97,7 +97,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 			nameColumn,
 			...(this.#hasDescriptions ? [descriptionColumn] : []),
 			...manifestColumns,
-			entityActionsColumn,
+			...(this._hideItemActions ? [] : [entityActionsColumn]),
 		];
 	}
 
@@ -114,7 +114,12 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 				selectOnly: this._selectOnly,
 			};
 		}
-		if (changedProperties.has('_items') || changedProperties.has('_itemHrefs') || changedProperties.has('manifest')) {
+		if (
+			changedProperties.has('_items') ||
+			changedProperties.has('_itemHrefs') ||
+			changedProperties.has('manifest') ||
+			changedProperties.has('_hideItemActions')
+		) {
 			this.#createTableRows();
 		}
 	}

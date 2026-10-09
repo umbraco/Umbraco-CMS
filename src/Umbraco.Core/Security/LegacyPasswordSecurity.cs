@@ -71,6 +71,11 @@ public class LegacyPasswordSecurity
             // This can happen if the length of the password is wrong and a salt cannot be extracted.
             return false;
         }
+        catch (FormatException)
+        {
+            // The extracted salt is not valid base64, so the stored value was never produced by this hasher.
+            return false;
+        }
     }
 
     /// <summary>

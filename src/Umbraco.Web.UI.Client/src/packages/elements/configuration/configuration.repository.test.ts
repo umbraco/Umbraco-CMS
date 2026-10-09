@@ -1,5 +1,6 @@
 import { useMockHandlers, resetMockHandlers } from '../../../../mocks/index.js';
-import { UmbElementConfigurationRepository, resetUmbElementConfigurationCache } from './configuration.repository.js';
+import { _resetElementConfigurationCacheForTesting } from './configuration.cache.js';
+import { UmbElementConfigurationRepository } from './configuration.repository.js';
 import type { UmbElementConfigurationModel } from './types.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -26,7 +27,7 @@ describe('UmbElementConfigurationRepository', () => {
 
 	beforeEach(() => {
 		requestCount = 0;
-		resetUmbElementConfigurationCache();
+		_resetElementConfigurationCacheForTesting();
 		host = new UmbTestElementConfigurationRepositoryHostElement();
 		document.body.appendChild(host);
 		repository = new UmbElementConfigurationRepository(host);

@@ -222,11 +222,11 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	 * Delete a block by requesting its removal through the pending deletion mechanism.
 	 * This enables undo support by removing the HTML element first via Tiptap,
 	 * which triggers _filterUnusedBlocks to store block data before removal.
-	 * @param {string} contentKey - The content key of the block to delete.
+	 * @param {string} layoutKey - The layout key of the block to delete.
 	 */
-	override async delete(contentKey: string) {
+	override async delete(layoutKey: string) {
 		await this._retrieveManager;
-		this._manager?.requestPendingDeletion(contentKey);
+		this._manager?.requestPendingDeletion(layoutKey);
 	}
 
 	async #insertFromRtePropertyValues(

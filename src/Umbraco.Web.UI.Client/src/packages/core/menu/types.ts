@@ -15,5 +15,8 @@ export interface UmbStructureItemModel extends UmbStructureItemModelBase {
 }
 
 export interface UmbVariantStructureItemModel extends UmbStructureItemModelBase {
-	variants: Array<{ name: string; culture: string | null; segment: string | null }>;
+	/** The item's flat, culture-agnostic name. Used to display non-variant items (e.g. folders) alongside variant ones. */
+	name?: string;
+	isFolder?: boolean;
+	variants: Array<{ name: string; culture: string | null }>;
 }

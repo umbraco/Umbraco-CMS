@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbExpandVariantIdsWithSegmentOptions } from '@umbraco-cms/backoffice/variant';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
 import { TEST_MANIFESTS, UmbTestDocumentWorkspaceHostElement } from './document-workspace-context.test-utils.js';
@@ -8,6 +8,7 @@ import { UmbDocumentServerDataSource } from '../../repository/detail/document-de
 import { UmbDocumentPublishingServerDataSource } from '../../publishing/repository/document-publishing.server.data-source.js';
 
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
+const SEGMENT_VARIANT_DOCUMENT_ID = 'variant-documents-segment-variant-document-id';
 const EN_US = UmbVariantId.Create({ culture: 'en-US', segment: null });
 const DA = UmbVariantId.Create({ culture: 'da', segment: null });
 
@@ -25,6 +26,7 @@ async function saveAndPublish(
 	publishingDataSource: UmbDocumentPublishingServerDataSource,
 	variantIds: Array<UmbVariantId>,
 ) {
+	variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, await context.getVariantOptions());
 	const saveData = await context.constructSaveData(variantIds);
 	await context.performCreateOrUpdate(variantIds, saveData, {
 		update: async (data, ids) => {
@@ -120,5 +122,45 @@ describe('UmbDocumentWorkspaceContext (save & publish data state)', () => {
 
 		expect(updateAndPublishCalls, 'update-and-publish called once').to.equal(1);
 		expect(updateCalls, 'the plain update (save-only) endpoint is not called').to.equal(0);
+	});
+});
+
+describe('UmbDocumentWorkspaceContext (save & publish data state, segment variance)', () => {
+	let hostElement: UmbTestDocumentWorkspaceHostElement;
+	let context: UmbDocumentWorkspaceContext;
+	let publishingDataSource: UmbDocumentPublishingServerDataSource;
+
+	before(() => {
+		umbExtensionsRegistry.registerMany(TEST_MANIFESTS);
+	});
+
+	after(() => {
+		umbExtensionsRegistry.unregisterMany(TEST_MANIFESTS.map((m) => m.alias));
+	});
+
+	beforeEach(async () => {
+		await useMockSet('documents');
+		hostElement = new UmbTestDocumentWorkspaceHostElement();
+		document.body.appendChild(hostElement);
+		await hostElement.init();
+		context = new UmbDocumentWorkspaceContext(hostElement);
+		publishingDataSource = new UmbDocumentPublishingServerDataSource(hostElement);
+		await context.load(SEGMENT_VARIANT_DOCUMENT_ID);
+	});
+
+	afterEach(() => {
+		document.body.innerHTML = '';
+	});
+
+	it('transfers every segment of the saved culture, not just the explicitly selected variant', async () => {
+		const s1 = UmbVariantId.Create({ culture: null, segment: 's1' });
+		await context.setPropertyValue('segmentText', 'Updated segment 1 text', s1);
+
+		// Only the default (culture-invariant, segment-invariant) variant is ever offered for selection when a
+		// document does not vary by culture; segments of that culture are carried along transparently.
+		await saveAndPublish(context, publishingDataSource, [UmbVariantId.CreateInvariant()]);
+
+		expect(context.getPropertyValue('segmentText', s1)).to.equal('Updated segment 1 text');
+		expect(context.getHasUnpersistedChanges(), 'no unpersisted changes remain after the save').to.be.false;
 	});
 });

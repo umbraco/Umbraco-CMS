@@ -189,10 +189,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 
 			.check-result-description {
 				display: flex;
-			}
-
-			.check-result-description span {
-				width: 36px;
+				gap: var(--uui-size-space-5);
 			}
 
 			uui-icon {

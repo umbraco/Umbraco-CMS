@@ -1,6 +1,6 @@
 import type { UmbElementEntityType } from './entity.js';
 import type { UmbElementVariantState } from './variant-state.js';
-import type { UmbContentDetailModel, UmbContentValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbContentDetailModel, UmbEntryValueModel } from '@umbraco-cms/backoffice/content';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 export type * from './audit-log/types.js';
@@ -35,7 +35,7 @@ export interface UmbElementVariantModel extends UmbEntityVariantModel {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbElementValueModel<ValueType = unknown> extends UmbContentValueModel<ValueType> {}
+export interface UmbElementValueModel<ValueType = unknown> extends UmbEntryValueModel<ValueType> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbElementVariantOptionModel extends UmbEntityVariantOptionModel<UmbElementVariantModel> {}

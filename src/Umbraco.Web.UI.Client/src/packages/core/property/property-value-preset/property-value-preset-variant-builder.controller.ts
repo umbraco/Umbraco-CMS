@@ -7,9 +7,9 @@ import type {
 } from './types.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbEntryValueModel } from '@umbraco-cms/backoffice/content';
 
-type ReturnType = UmbElementValueModel;
+type ReturnType = UmbEntryValueModel;
 
 export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyValuePresetBuilderController<ReturnType> {
 	#cultures: Array<null | string> = [];

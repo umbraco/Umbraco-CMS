@@ -38,23 +38,8 @@ public interface IDocumentCacheService : IContentCacheService
     /// <remarks>
     /// Used to materialise sets of keys (e.g. children/descendants) without the per-item database
     /// round trip and scope of repeated <see cref="GetByKeyAsync"/> calls when the cache is cold.
-    /// The default implementation falls back to per-key retrieval so existing implementations keep working.
     /// </remarks>
-    // TODO (V19): Remove the default implementation and reference to it in the remarks.
-    async Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
-    {
-        var result = new List<IPublishedContent>(keys.Count);
-        foreach (Guid key in keys)
-        {
-            IPublishedContent? content = await GetByKeyAsync(key, preview);
-            if (content is not null)
-            {
-                result.Add(content);
-            }
-        }
-
-        return result;
-    }
+    Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null);
 
     /// <summary>
     /// Attempts to retrieve a content item from the in-memory converted-content cache without
@@ -70,12 +55,7 @@ public interface IDocumentCacheService : IContentCacheService
     /// the caller falls back to the existing async path. The default implementation always
     /// returns <c>false</c> so the caller takes the async path.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    bool TryGetCached(Guid key, bool preview, out IPublishedContent? content)
-    {
-        content = null;
-        return false;
-    }
+    bool TryGetCached(Guid key, bool preview, out IPublishedContent? content);
 
     /// <summary>
     /// Determines whether content with the specified identifier exists in the cache.

@@ -1,4 +1,4 @@
-import type UmbBlockElementManager from '../../block-element-manager.js';
+import type UmbBlockElementManager from '../../context/block-element-manager.js';
 import { html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';

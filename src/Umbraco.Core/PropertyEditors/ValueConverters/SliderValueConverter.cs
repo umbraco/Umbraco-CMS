@@ -1,90 +1,44 @@
-using System.Globalization;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 /// <summary>
-/// The slider property value converter.
+/// The value converter for the slider property editor holding a single value.
 /// </summary>
-/// <seealso cref="Umbraco.Cms.Core.PropertyEditors.PropertyValueConverterBase" />
+/// <seealso cref="SliderValueConverterBase" />
 [DefaultPropertyValueConverter]
-public class SliderValueConverter : PropertyValueConverterBase
+public class SliderValueConverter : SliderValueConverterBase
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SliderValueConverter" /> class.
-    /// </summary>
-    public SliderValueConverter()
-    { }
-
     /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.Slider);
 
     /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-        => IsRange(propertyType) ? typeof(Range<decimal>) : typeof(decimal);
-
-    /// <inheritdoc />
-    public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
-        => PropertyCacheLevel.Element;
+        => typeof(decimal);
 
     /// <inheritdoc />
     public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
-    {
-        bool isRange = IsRange(propertyType);
+        => ReadDecimal(source?.ToString());
 
-        var sourceString = source?.ToString();
-
-        return isRange
-            ? HandleRange(sourceString)
-            : HandleDecimal(sourceString);
-    }
-
-    private static Range<decimal> HandleRange(string? sourceString)
-    {
-        if (sourceString is null)
-        {
-            return new Range<decimal>();
-        }
-
-        string[] rangeRawValues = sourceString.Split(Constants.CharArrays.Comma);
-
-        if (TryParseDecimal(rangeRawValues[0], out var minimum))
-        {
-            if (rangeRawValues.Length == 1)
-            {
-                // Configuration is probably changed from single to range, return range with same min/max
-                return new Range<decimal>
-                {
-                    Minimum = minimum,
-                    Maximum = minimum
-                };
-            }
-
-            if (rangeRawValues.Length == 2 && TryParseDecimal(rangeRawValues[1], out var maximum))
-            {
-                return new Range<decimal>
-                {
-                    Minimum = minimum,
-                    Maximum = maximum
-                };
-            }
-        }
-
-        return new Range<decimal>();
-    }
-
-    private static decimal HandleDecimal(string? sourceString)
+    /// <summary>
+    /// Reads a single value from the stored value.
+    /// </summary>
+    /// <remarks>
+    /// A range is read as a single value too, as a data type that was a range slider before the two editors were
+    /// separated still holds values written in that shape.
+    /// </remarks>
+    /// <param name="sourceString">The stored value.</param>
+    /// <returns>The value the stored value holds, or the default when it holds none.</returns>
+    private static decimal ReadDecimal(string? sourceString)
     {
         if (string.IsNullOrEmpty(sourceString))
         {
             return default;
         }
 
-        // This used to be a range slider, so we'll assign the minimum value as the new value
+        // The value was stored by the range slider, so the lower end of the range is the value.
         if (sourceString.Contains(','))
         {
             var minimumValueRepresentation = sourceString.Split(Constants.CharArrays.Comma)[0];
@@ -101,14 +55,4 @@ public class SliderValueConverter : PropertyValueConverterBase
 
         return default;
     }
-
-    /// <summary>
-    /// Helper method for parsing a double consistently
-    /// </summary>
-    private static bool TryParseDecimal(string? representation, out decimal value)
-        => decimal.TryParse(representation, NumberStyles.Number, CultureInfo.InvariantCulture, out value);
-
-
-    private static bool IsRange(IPublishedPropertyType propertyType)
-        => propertyType.DataType.ConfigurationAs<SliderConfiguration>()?.EnableRange == true;
 }

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -30,7 +31,7 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
 
     protected delegate void ValueViewModelMapping(IDataEditor propertyEditor, TValueViewModel variantViewModel);
 
-    protected delegate void VariantViewModelMapping(string? culture, string? segment, TVariantViewModel variantViewModel);
+    protected delegate void VariantViewModelMapping(string? culture, TVariantViewModel variantViewModel);
 
     protected IEnumerable<TValueViewModel> MapValueViewModels(
         IEnumerable<IProperty> properties,
@@ -76,32 +77,30 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                     return variantViewModel;
                 }))
             .WhereNotNull()
+            .OrderByCultureSegmentAndAlias()
             .ToArray();
     }
 
     protected IEnumerable<TVariantViewModel> MapVariantViewModels(TContent source, VariantViewModelMapping? additionalVariantMapping = null)
     {
-        IPropertyValue[] propertyValues = source.Properties.SelectMany(propertyCollection => propertyCollection.Values).ToArray();
         var cultures = source.AvailableCultures.DefaultIfEmpty(null).ToArray();
-        // the default segment (null) must always be included in the view model - both for variant and invariant documents
-        var segments = propertyValues.Select(property => property.Segment).Union([null]).Distinct().ToArray();
 
         return cultures
-            .SelectMany(culture => segments.Select(segment =>
+            .Select(culture =>
             {
                 var variantViewModel = new TVariantViewModel
                 {
                     Culture = culture,
-                    Segment = segment,
                     Name = source.GetCultureName(culture) ?? string.Empty,
                     CreateDate = source.CreateDate, // apparently there is no culture specific creation date
                     UpdateDate = culture == null
                         ? source.UpdateDate
                         : source.GetUpdateDate(culture) ?? source.UpdateDate,
                 };
-                additionalVariantMapping?.Invoke(culture, segment, variantViewModel);
+                additionalVariantMapping?.Invoke(culture, variantViewModel);
                 return variantViewModel;
-            }))
+            })
+            .OrderBy(variant => variant.Culture, StringComparer.Ordinal)
             .ToArray();
     }
 

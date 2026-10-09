@@ -2,10 +2,9 @@
 using Examine.Lucene;
 using Lucene.Net.Index;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Extensions;
-using CoreConstants = Umbraco.Cms.Search.Core.Constants;
+using CoreConstants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Configuration;
 
@@ -128,19 +127,19 @@ internal sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirec
     private FieldOptions.Field[] CoreSystemFieldsOptions()
         =>
         [
-            new() { PropertyName = CoreConstants.FieldNames.Id, FieldValues = FieldValues.Keywords },
-            new() { PropertyName = CoreConstants.FieldNames.ParentId, FieldValues = FieldValues.Keywords },
-            new() { PropertyName = CoreConstants.FieldNames.PathIds, FieldValues = FieldValues.Keywords },
-            new() { PropertyName = CoreConstants.FieldNames.ContentTypeId, FieldValues = FieldValues.Keywords },
-            new() { PropertyName = CoreConstants.FieldNames.CreateDate, FieldValues = FieldValues.DateTimeOffsets },
-            new() { PropertyName = CoreConstants.FieldNames.UpdateDate, FieldValues = FieldValues.DateTimeOffsets },
-            new() { PropertyName = CoreConstants.FieldNames.Level, FieldValues = FieldValues.Integers },
-            new() { PropertyName = CoreConstants.FieldNames.ObjectType, FieldValues = FieldValues.Keywords },
-            new() { PropertyName = CoreConstants.FieldNames.SortOrder, FieldValues = FieldValues.Integers },
-            new() { PropertyName = CoreConstants.FieldNames.Name, FieldValues = FieldValues.TextsR1, Sortable = true },
+            new() { PropertyName = CoreConstants.Search.FieldNames.Id, FieldValues = FieldValues.Keywords },
+            new() { PropertyName = CoreConstants.Search.FieldNames.ParentId, FieldValues = FieldValues.Keywords },
+            new() { PropertyName = CoreConstants.Search.FieldNames.PathIds, FieldValues = FieldValues.Keywords },
+            new() { PropertyName = CoreConstants.Search.FieldNames.ContentTypeId, FieldValues = FieldValues.Keywords },
+            new() { PropertyName = CoreConstants.Search.FieldNames.CreateDate, FieldValues = FieldValues.DateTimeOffsets },
+            new() { PropertyName = CoreConstants.Search.FieldNames.UpdateDate, FieldValues = FieldValues.DateTimeOffsets },
+            new() { PropertyName = CoreConstants.Search.FieldNames.Level, FieldValues = FieldValues.Integers },
+            new() { PropertyName = CoreConstants.Search.FieldNames.ObjectType, FieldValues = FieldValues.Keywords },
+            new() { PropertyName = CoreConstants.Search.FieldNames.SortOrder, FieldValues = FieldValues.Integers },
+            new() { PropertyName = CoreConstants.Search.FieldNames.Name, FieldValues = FieldValues.TextsR1, Sortable = true },
             // the name keyword bucket enables exact name matching (e.g. Delivery API "name:" Is-filters)
-            new() { PropertyName = CoreConstants.FieldNames.Name, FieldValues = FieldValues.Keywords },
-            new() { PropertyName = CoreConstants.FieldNames.Tags, FieldValues = FieldValues.Keywords },
+            new() { PropertyName = CoreConstants.Search.FieldNames.Name, FieldValues = FieldValues.Keywords },
+            new() { PropertyName = CoreConstants.Search.FieldNames.Tags, FieldValues = FieldValues.Keywords },
         ];
 
     private FieldOptions.Field[] ExamineSystemFieldsOptions()

@@ -34,35 +34,6 @@ public class ReferencedDescendantsDocumentController : DocumentControllerBase
     }
 
     /// <summary>
-    /// [Obsolete] Retrieves a paged list of documents that are referenced as descendants by the specified document ID.
-    /// </summary>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <param name="id">The unique identifier of the document whose referenced descendants are to be retrieved.</param>
-    /// <param name="skip">The number of items to skip for paging.</param>
-    /// <param name="take">The maximum number of items to return for paging.</param>
-    /// <returns>A task representing the asynchronous operation. The result contains an <see cref="ActionResult{T}"/> with a <see cref="PagedViewModel{ReferenceByIdModel}"/> of referenced descendant documents.</returns>
-    /// <remarks>
-    /// This method is obsolete. Use <c>ReferencedDescendants2</c> instead. Scheduled for removal in Umbraco 19.
-    /// </remarks>
-    [Obsolete("Use the ReferencedDescendants2 action method instead. Scheduled for removal in Umbraco 19, when ReferencedDescendants2 will be renamed back to ReferencedDescendants.")]
-    [NonAction]
-    public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> ReferencedDescendants(
-    CancellationToken cancellationToken,
-    Guid id,
-    int skip = 0,
-    int take = 20)
-    {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesSkipTakeService.GetPagedDescendantsInReferencesAsync(id, skip, take, true);
-        var pagedViewModel = new PagedViewModel<ReferenceByIdModel>
-        {
-            Total = relationItems.Total,
-            Items = _umbracoMapper.MapEnumerable<RelationItemModel, ReferenceByIdModel>(relationItems.Items),
-        };
-
-        return pagedViewModel;
-    }
-
-    /// <summary>
     ///     Gets a paged list of descendant nodes of the specified item that are involved in any kind of relation.
     /// </summary>
     /// <remarks>
@@ -80,7 +51,7 @@ public class ReferencedDescendantsDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Gets document descendants that are referenced.")]
     [EndpointDescription("Gets a paginated collection of descendant documents that are referenced by other content.")]
-    public async Task<IActionResult> ReferencedDescendants2(
+    public async Task<IActionResult> ReferencedDescendants(
         CancellationToken cancellationToken,
         Guid id,
         int skip = 0,

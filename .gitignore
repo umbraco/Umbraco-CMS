@@ -54,6 +54,7 @@ tools/docfx/
 # Local config
 .claude/*
 !.claude/skills/
+!.claude/plans/
 !.claude/settings.json
 .env.local
 
@@ -113,6 +114,7 @@ trace.zip
 /src/Umbraco.Cms.Targets/tasks/
 /src/Umbraco.Cms.Targets/appsettings-schema.*.json
 /src/Umbraco.Cms.Targets/umbraco-package-schema.json
+/src/Umbraco.Cms.Search.Provider.Examine/appsettings-schema.*.json
 /src/Umbraco.Web.UI/appsettings-schema.json
 /src/Umbraco.Web.UI/appsettings-schema.*.json
 /src/Umbraco.Web.UI/umbraco-package-schema.json

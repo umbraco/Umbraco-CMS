@@ -1,0 +1,713 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.TemporaryFile;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+/// <summary>
+/// Represents a media picker property editor.
+/// </summary>
+/// <remarks>
+/// There is one media picker editor per number of items a picker holds - a single item or several - so that the
+/// type a media picker property yields follows from the editor rather than from the configuration of the data type
+/// it is used through. Both are edited and stored the same way, which is what this base holds.
+/// </remarks>
+public abstract class MediaPickerPropertyEditorBase : DataEditor, IValueSchemaProvider
+{
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaPickerPropertyEditorBase" /> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">Factory used to create data value editors for the media picker property editor.</param>
+    protected MediaPickerPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory)
+        : base(dataValueEditorFactory)
+        => SupportsReadOnly = true;
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(string); // JSON string representation
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration)
+    {
+        var config = configuration as MediaPickerConfigurationBase;
+
+        // Build the item schema for individual media items
+        var itemSchema = new JsonObject
+        {
+            ["type"] = "object",
+            ["required"] = new JsonArray("key", "mediaKey"),
+            ["properties"] = new JsonObject
+            {
+                ["key"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
+                ["mediaKey"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
+                ["mediaTypeAlias"] = new JsonObject { ["type"] = "string" },
+                ["crops"] = BuildCropsSchema(config),
+                ["focalPoint"] = BuildFocalPointSchema(config),
+            },
+        };
+
+        // Build the array schema
+        var schema = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("array", "null"),
+            ["items"] = itemSchema,
+        };
+
+        // Add min/max items constraints from configuration
+        if (config is MediaPicker3Configuration { ValidationLimit: var validationLimit })
+        {
+            if (validationLimit.Min is int min && min > 0)
+            {
+                schema["minItems"] = min;
+            }
+
+            if (validationLimit.Max is int max && max > 0)
+            {
+                schema["maxItems"] = max;
+            }
+        }
+
+        if (config is SingleMediaPickerConfiguration)
+        {
+            schema["maxItems"] = 1;
+        }
+
+        return schema;
+    }
+
+    private static JsonObject BuildCropsSchema(MediaPickerConfigurationBase? config)
+    {
+        var cropItemSchema = new JsonObject
+        {
+            ["type"] = "object",
+            ["properties"] = new JsonObject
+            {
+                ["alias"] = new JsonObject { ["type"] = "string" },
+                ["width"] = new JsonObject { ["type"] = "integer" },
+                ["height"] = new JsonObject { ["type"] = "integer" },
+                ["coordinates"] = new JsonObject
+                {
+                    ["oneOf"] = new JsonArray
+                    {
+                        new JsonObject { ["type"] = "null" },
+                        new JsonObject
+                        {
+                            ["type"] = "object",
+                            ["properties"] = new JsonObject
+                            {
+                                ["x1"] = new JsonObject { ["type"] = "number" },
+                                ["y1"] = new JsonObject { ["type"] = "number" },
+                                ["x2"] = new JsonObject { ["type"] = "number" },
+                                ["y2"] = new JsonObject { ["type"] = "number" },
+                            },
+                        },
+                    },
+                },
+            },
+        };
+
+        // If crops are configured, add enum constraint for crop aliases
+        if (config?.Crops is { Length: > 0 })
+        {
+            var cropAliases = new JsonArray();
+            foreach (var crop in config.Crops.Where(crop => !string.IsNullOrEmpty(crop.Alias)))
+            {
+                cropAliases.Add(JsonValue.Create(crop.Alias));
+            }
+
+            if (cropAliases.Count > 0)
+            {
+                var aliasProperty = cropItemSchema["properties"]!["alias"]!.AsObject();
+                aliasProperty["enum"] = cropAliases;
+            }
+        }
+
+        return new JsonObject
+        {
+            ["type"] = new JsonArray("array", "null"),
+            ["items"] = cropItemSchema,
+        };
+    }
+
+    private static JsonObject BuildFocalPointSchema(MediaPickerConfigurationBase? config)
+    {
+        // If focal point is disabled, always null
+        if (config?.EnableLocalFocalPoint == false)
+        {
+            return new JsonObject { ["type"] = "null" };
+        }
+
+        return new JsonObject
+        {
+            ["oneOf"] = new JsonArray
+            {
+                new JsonObject { ["type"] = "null" },
+                new JsonObject
+                {
+                    ["type"] = "object",
+                    ["properties"] = new JsonObject
+                    {
+                        ["left"] = new JsonObject { ["type"] = "number", ["minimum"] = 0, ["maximum"] = 1 },
+                        ["top"] = new JsonObject { ["type"] = "number", ["minimum"] = 0, ["maximum"] = 1 },
+                    },
+                },
+            },
+        };
+    }
+
+    /// <inheritdoc />
+    protected override IDataValueEditor CreateValueEditor() =>
+        DataValueEditorFactory.Create<MediaPickerPropertyValueEditor>(Attribute!);
+
+    /// <summary>
+    /// Defines the value editor for the media picker property editor.
+    /// </summary>
+    internal sealed class MediaPickerPropertyValueEditor : DataValueEditor, IDataValueReference, ICacheReferencedEntities
+    {
+        private readonly IDataTypeConfigurationCache _dataTypeReadCache;
+        private readonly IJsonSerializer _jsonSerializer;
+        private readonly IMediaImportService _mediaImportService;
+        private readonly IMediaService _mediaService;
+        private readonly ITemporaryFileService _temporaryFileService;
+        private readonly IScopeProvider _scopeProvider;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+        private readonly AppCaches _appCaches;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MediaPickerPropertyValueEditor"/> class.
+        /// </summary>
+        /// <remarks>
+        /// Note on <c>FromEditor()</c> and <c>ToEditor()</c> methods:
+        /// The data is intentionally stored in the database as a raw JSON string without transformation.
+        /// </remarks>
+        /// <param name="shortStringHelper">Provides string manipulation and formatting utilities.</param>
+        /// <param name="jsonSerializer">Handles JSON serialization and deserialization.</param>
+        /// <param name="ioHelper">Provides IO-related helper methods.</param>
+        /// <param name="attribute">The data editor attribute associated with this property editor.</param>
+        /// <param name="mediaImportService">Service for importing media files.</param>
+        /// <param name="mediaService">Service for managing media items.</param>
+        /// <param name="temporaryFileService">Service for handling temporary files.</param>
+        /// <param name="scopeProvider">Provides scope management for database operations.</param>
+        /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+        /// <param name="dataTypeReadCache">Cache for data type configuration.</param>
+        /// <param name="localizedTextService">Service for retrieving localized text resources.</param>
+        /// <param name="mediaTypeService">Service for managing media types.</param>
+        /// <param name="mediaNavigationQueryService">Service for querying media navigation structures.</param>
+        /// <param name="appCaches">Provides application-level caching.</param>
+        public MediaPickerPropertyValueEditor(
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute,
+            IMediaImportService mediaImportService,
+            IMediaService mediaService,
+            ITemporaryFileService temporaryFileService,
+            IScopeProvider scopeProvider,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IDataTypeConfigurationCache dataTypeReadCache,
+            ILocalizedTextService localizedTextService,
+            IMediaTypeService mediaTypeService,
+            IMediaNavigationQueryService mediaNavigationQueryService,
+            AppCaches appCaches)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
+        {
+            _jsonSerializer = jsonSerializer;
+            _mediaImportService = mediaImportService;
+            _mediaService = mediaService;
+            _temporaryFileService = temporaryFileService;
+            _scopeProvider = scopeProvider;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+            _dataTypeReadCache = dataTypeReadCache;
+            _appCaches = appCaches;
+
+            var validators = new TypedJsonValidatorRunner<List<MediaWithCropsDto>, MediaPickerConfigurationBase>(
+                jsonSerializer,
+                new MinMaxValidator(localizedTextService),
+                new AllowedTypeValidator(localizedTextService, _mediaService, new AllowedMediaTypeHelper(mediaTypeService, appCaches)),
+                new StartNodeValidator(localizedTextService, mediaNavigationQueryService));
+
+            Validators.Add(validators);
+        }
+
+        /// <inheritdoc/>
+        public void CacheReferencedEntities(IEnumerable<object> values)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (CacheReferencedEntitiesSuppression.IsSuppressed)
+            {
+                return;
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+            var mediaKeys = values
+                .SelectMany(value => Deserialize(_jsonSerializer, value))
+                .Select(dto => dto.MediaKey)
+                .Distinct()
+                .Where(x => IsMediaAlreadyCached(x, _appCaches.RequestCache) is false)
+                .ToList();
+            if (mediaKeys.Count == 0)
+            {
+                return;
+            }
+
+            IEnumerable<IMedia> mediaItems = _mediaService.GetByIds(mediaKeys);
+            foreach (IMedia media in mediaItems)
+            {
+                CacheMediaById(media, _appCaches.RequestCache);
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
+        {
+            foreach (MediaWithCropsDto dto in Deserialize(_jsonSerializer, value))
+            {
+                yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Media, dto.MediaKey));
+            }
+        }
+
+        /// <inheritdoc/>
+        public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
+        {
+            var value = property.GetValue(culture, segment);
+
+            var dtos = Deserialize(_jsonSerializer, value).ToList();
+            dtos = UpdateMediaTypeAliases(dtos);
+
+            MediaPickerConfigurationBase? configuration = _dataTypeReadCache.GetConfigurationAs<MediaPickerConfigurationBase>(property.PropertyType.DataTypeKey);
+            if (configuration is not null)
+            {
+                foreach (MediaWithCropsDto dto in dtos)
+                {
+                    dto.ApplyConfiguration(configuration);
+                }
+            }
+
+            return dtos;
+        }
+
+        /// <inheritdoc/>
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+        {
+            if (editorValue.Value is null ||
+                _jsonSerializer.TryDeserialize(editorValue.Value, out List<MediaWithCropsDto>? mediaWithCropsDtos) is false)
+            {
+                return base.FromEditor(editorValue, currentValue);
+            }
+
+            if (editorValue.DataTypeConfiguration is MediaPickerConfigurationBase configuration)
+            {
+                // handle temporary media uploads
+                mediaWithCropsDtos = HandleTemporaryMediaUploads(mediaWithCropsDtos, configuration);
+            }
+
+            foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
+            {
+                mediaWithCropsDto.Prune();
+            }
+
+            return _jsonSerializer.Serialize(mediaWithCropsDtos);
+        }
+
+        /// <summary>
+        /// Deserializes the provided JSON value into a list of <see cref="MediaWithCropsDto"/>.
+        /// </summary>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
+        /// <param name="value">The stored JSON value.</param>
+        /// <returns>The picked media items and their crops.</returns>
+        internal static IEnumerable<MediaWithCropsDto> Deserialize(IJsonSerializer jsonSerializer, object? value)
+        {
+            var rawJson = value is string str ? str : value?.ToString();
+            if (string.IsNullOrWhiteSpace(rawJson))
+            {
+                yield break;
+            }
+
+            if (!rawJson.DetectIsJson())
+            {
+                // Old comma seperated UDI format
+                foreach (var udiStr in rawJson.Split(Constants.CharArrays.Comma))
+                {
+                    if (UdiParser.TryParse(udiStr, out Udi? udi) && udi is GuidUdi guidUdi)
+                    {
+                        yield return new MediaWithCropsDto
+                        {
+                            Key = Guid.NewGuid(),
+                            MediaKey = guidUdi.Guid,
+                            Crops = Enumerable.Empty<ImageCropperValue.ImageCropperCrop>(),
+                            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = 0.5m, Top = 0.5m },
+                        };
+                    }
+                }
+            }
+            else
+            {
+                IEnumerable<MediaWithCropsDto>? dtos =
+                    jsonSerializer.Deserialize<IEnumerable<MediaWithCropsDto>>(rawJson);
+                if (dtos is not null)
+                {
+                    // New JSON format
+                    foreach (MediaWithCropsDto dto in dtos)
+                    {
+                        yield return dto;
+                    }
+                }
+            }
+        }
+
+        private List<MediaWithCropsDto> UpdateMediaTypeAliases(List<MediaWithCropsDto> mediaWithCropsDtos)
+        {
+            const string unknownMediaType = "UNKNOWN";
+
+            foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
+            {
+                IMedia? media = GetAndCacheMediaById(mediaWithCropsDto.MediaKey, _appCaches.RequestCache, _mediaService);
+                mediaWithCropsDto.MediaTypeAlias = media?.ContentType.Alias ?? unknownMediaType;
+            }
+
+            return mediaWithCropsDtos.Where(m => m.MediaTypeAlias != unknownMediaType).ToList();
+        }
+
+        private List<MediaWithCropsDto> HandleTemporaryMediaUploads(List<MediaWithCropsDto> mediaWithCropsDtos, MediaPickerConfigurationBase configuration)
+        {
+            var invalidDtos = new List<MediaWithCropsDto>();
+
+            foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
+            {
+                // if the media already exist, don't bother with it
+                if (GetAndCacheMediaById(mediaWithCropsDto.MediaKey, _appCaches.RequestCache, _mediaService) != null)
+                {
+                    continue;
+                }
+
+                // we'll assume that the media key is the key of a temporary file
+                TemporaryFileModel? temporaryFile = _temporaryFileService.GetAsync(mediaWithCropsDto.MediaKey).GetAwaiter().GetResult();
+                if (temporaryFile == null)
+                {
+                    // the temporary file is missing, don't process this item any further
+                    invalidDtos.Add(mediaWithCropsDto);
+                    continue;
+                }
+
+                Guid? startNodeGuid = configuration.StartNodeId;
+
+                // make sure we'll clean up the temporary file if the scope completes
+                using IScope scope = _scopeProvider.CreateScope();
+                _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFile.Key, _scopeProvider);
+
+                // create a new media using the temporary file - the media type is passed from the client, in case
+                // there are multiple allowed media types matching the file extension
+                using Stream fileStream = temporaryFile.OpenReadStream();
+                IMedia mediaFile = _mediaImportService
+                    .ImportAsync(temporaryFile.FileName, fileStream, startNodeGuid, mediaWithCropsDto.MediaTypeAlias, CurrentUserKey())
+                    .GetAwaiter()
+                    .GetResult();
+
+                mediaWithCropsDto.MediaKey = mediaFile.Key;
+                scope.Complete();
+            }
+
+            return mediaWithCropsDtos.Except(invalidDtos).ToList();
+        }
+
+        private Guid CurrentUserKey() => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key
+                                         ?? throw new InvalidOperationException("Could not obtain the current backoffice user");
+
+        /// <summary>
+        ///     Model/DTO that represents the JSON that the MediaPicker3 stores.
+        /// </summary>
+        internal sealed class MediaWithCropsDto
+        {
+            /// <summary>
+            /// Gets or sets the key.
+            /// </summary>
+            public Guid Key { get; set; }
+
+            /// <summary>
+            /// Gets or sets the media key.
+            /// </summary>
+            public Guid MediaKey { get; set; }
+
+            /// <summary>
+            /// Gets or sets the media type alias.
+            /// </summary>
+            public string MediaTypeAlias { get; set; } = string.Empty;
+
+            /// <summary>
+            /// Gets or sets the crops.
+            /// </summary>
+            public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; set; }
+
+            /// <summary>
+            /// Gets or sets the focal point.
+            /// </summary>
+            public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
+
+            /// <summary>
+            ///     Removes redundant crop data/default focal point.
+            /// </summary>
+            /// <remarks>
+            ///     Because the DTO uses the same JSON keys as the image cropper value for crops and focal point, we can re-use the
+            ///     prune method.
+            /// </remarks>
+            internal void Prune()
+            {
+                Crops = Crops?.Where(crop => crop.Coordinates != null).ToArray();
+                if (FocalPoint is { Top: 0.5m, Left: 0.5m })
+                {
+                    FocalPoint = null;
+                }
+            }
+
+            /// <summary>
+            ///     Applies the configuration to ensure only valid crops are kept and have the correct width/height.
+            /// </summary>
+            /// <param name="configuration">The configuration.</param>
+            public void ApplyConfiguration(MediaPickerConfigurationBase? configuration)
+            {
+                var crops = new List<ImageCropperValue.ImageCropperCrop>();
+
+                MediaPickerConfigurationBase.CropConfiguration[]? configuredCrops = configuration?.Crops;
+                if (configuredCrops != null)
+                {
+                    foreach (MediaPickerConfigurationBase.CropConfiguration configuredCrop in configuredCrops)
+                    {
+                        ImageCropperValue.ImageCropperCrop? crop =
+                            Crops?.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
+
+                        crops.Add(new ImageCropperValue.ImageCropperCrop
+                        {
+                            Alias = configuredCrop.Alias,
+                            Width = configuredCrop.Width,
+                            Height = configuredCrop.Height,
+                            Coordinates = crop?.Coordinates,
+                        });
+                    }
+                }
+
+                Crops = crops;
+
+                if (configuration?.EnableLocalFocalPoint == false)
+                {
+                    FocalPoint = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Validates the min/max configuration for the media picker property editor.
+        /// </summary>
+        internal sealed class MinMaxValidator : ITypedValidator<List<MediaWithCropsDto>, MediaPickerConfigurationBase>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MinMaxValidator"/> class.
+            /// </summary>
+            /// <param name="localizedTextService">The localized text service.</param>
+            public MinMaxValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
+
+            /// <inheritdoc/>
+            public IEnumerable<ValidationResult> Validate(
+                List<MediaWithCropsDto>? mediaWithCropsDtos,
+                MediaPickerConfigurationBase? mediaPickerConfiguration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                var validationResults = new List<ValidationResult>();
+
+                if (mediaWithCropsDtos is null || mediaPickerConfiguration is null)
+                {
+                    return validationResults;
+                }
+
+                if (mediaPickerConfiguration is SingleMediaPickerConfiguration && mediaWithCropsDtos.Count > 1)
+                {
+                    validationResults.Add(new ValidationResult(
+                        _localizedTextService.Localize("validation", "multipleMediaNotAllowed"),
+                        ["value"]));
+                }
+
+                if (mediaPickerConfiguration is not MediaPicker3Configuration { ValidationLimit: var validationLimit })
+                {
+                    return validationResults;
+                }
+
+                if (validationLimit.Min is not null && mediaWithCropsDtos.Count < validationLimit.Min)
+                {
+                    validationResults.Add(new ValidationResult(
+                        _localizedTextService.Localize(
+                            "validation",
+                            "entriesShort",
+                            [validationLimit.Min.ToString(), (validationLimit.Min - mediaWithCropsDtos.Count).ToString()
+                            ]),
+                        ["value"]));
+                }
+
+                if (validationLimit.Max is not null && mediaWithCropsDtos.Count > validationLimit.Max)
+                {
+                    validationResults.Add(new ValidationResult(
+                        _localizedTextService.Localize(
+                            "validation",
+                            "entriesExceed",
+                            [validationLimit.Max.ToString(), (mediaWithCropsDtos.Count - validationLimit.Max).ToString()
+                            ]),
+                        ["value"]));
+                }
+
+                return validationResults;
+            }
+        }
+
+        /// <summary>
+        /// Validates the allowed type configuration for the media picker property editor.
+        /// </summary>
+        internal sealed class AllowedTypeValidator : ITypedValidator<List<MediaWithCropsDto>, MediaPickerConfigurationBase>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+            private readonly IMediaService _mediaService;
+            private readonly AllowedMediaTypeHelper _allowedMediaTypeHelper;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="AllowedTypeValidator"/> class.
+            /// </summary>
+            /// <param name="localizedTextService">The localized text service.</param>
+            /// <param name="mediaService">The media service.</param>
+            /// <param name="allowedMediaTypeHelper">The helper deciding whether a media type is allowed.</param>
+            public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaService mediaService, AllowedMediaTypeHelper allowedMediaTypeHelper)
+            {
+                _localizedTextService = localizedTextService;
+                _mediaService = mediaService;
+                _allowedMediaTypeHelper = allowedMediaTypeHelper;
+            }
+
+            /// <inheritdoc/>
+            public IEnumerable<ValidationResult> Validate(
+                List<MediaWithCropsDto>? value,
+                MediaPickerConfigurationBase? configuration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                if (value is null || configuration is null)
+                {
+                    return [];
+                }
+
+                HashSet<string> allowedTypeKeys = AllowedMediaTypeHelper.ParseAllowedTypeKeys(configuration.Filter);
+
+                // No allowed types = all types are allowed
+                if (allowedTypeKeys.Count == 0)
+                {
+                    return [];
+                }
+
+                // We may or may not have explicit MediaTypeAlias values provided, depending on whether the operation is an update or a
+                // create. So let's make sure we have them all.
+                IEnumerable<string> providedTypeAliases = value
+                    .Where(x => x.MediaTypeAlias.IsNullOrWhiteSpace() is false)
+                    .Select(x => x.MediaTypeAlias);
+
+                Guid[] retrievedMediaKeys = value
+                    .Where(x => x.MediaTypeAlias.IsNullOrWhiteSpace())
+                    .Select(x => x.MediaKey)
+                    .Distinct()
+                    .ToArray();
+                IMedia[] retrievedMedia = _mediaService.GetByIds(retrievedMediaKeys).ToArray();
+
+                // If any of the media we had to look up (to resolve the type) could not be found, the selection
+                // references media that no longer exists, so the configured allowed types cannot be verified.
+                // Compare against the distinct requested keys so duplicates aren't reported as missing.
+                if (retrievedMedia.Length != retrievedMediaKeys.Length)
+                {
+                    return
+                    [
+                        new ValidationResult(
+                            _localizedTextService.Localize("validation", "missingMedia"),
+                            ["value"])
+                    ];
+                }
+
+                IEnumerable<string> retrievedTypeAliases = retrievedMedia
+                    .Select(x => x.ContentType.Alias);
+
+                IEnumerable<string> distinctTypeAliases = providedTypeAliases.Union(retrievedTypeAliases).Distinct();
+
+                foreach (var typeAlias in distinctTypeAliases)
+                {
+                    if (_allowedMediaTypeHelper.IsAllowed(typeAlias, allowedTypeKeys) is false)
+                    {
+                        return
+                        [
+                            new ValidationResult(
+                                _localizedTextService.Localize("validation", "invalidMediaType"),
+                                ["value"])
+                        ];
+                    }
+                }
+
+                return [];
+            }
+        }
+
+        /// <summary>
+        /// Validates the start node configuration for the media picker property editor.
+        /// </summary>
+        internal sealed class StartNodeValidator : ITypedValidator<List<MediaWithCropsDto>, MediaPickerConfigurationBase>
+        {
+            private readonly ILocalizedTextService _localizedTextService;
+            private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="StartNodeValidator"/> class.
+            /// </summary>
+            /// <param name="localizedTextService">Service used to provide localized text for validation messages.</param>
+            /// <param name="mediaNavigationQueryService">Service used to query and validate media navigation nodes.</param>
+            public StartNodeValidator(
+                ILocalizedTextService localizedTextService,
+                IMediaNavigationQueryService mediaNavigationQueryService)
+            {
+                _localizedTextService = localizedTextService;
+                _mediaNavigationQueryService = mediaNavigationQueryService;
+            }
+
+            /// <inheritdoc/>
+            public IEnumerable<ValidationResult> Validate(
+                List<MediaWithCropsDto>? value,
+                MediaPickerConfigurationBase? configuration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                if (value is null || configuration?.StartNodeId is null)
+                {
+                    return [];
+                }
+
+                if (ValidationHelper.HasValidStartNode(value.Select(x => x.MediaKey), configuration.StartNodeId.Value, _mediaNavigationQueryService) is false)
+                {
+                    return
+                    [
+                        new ValidationResult(
+                            _localizedTextService.Localize("validation", "invalidStartNode"),
+                            ["value"])
+                    ];
+                }
+
+                return [];
+            }
+        }
+    }
+}

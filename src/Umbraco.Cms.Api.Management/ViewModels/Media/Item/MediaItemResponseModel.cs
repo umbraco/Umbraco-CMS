@@ -28,6 +28,11 @@ public class MediaItemResponseModel : ItemResponseModelBase, IHasChildren
     public MediaTypeReferenceResponseModel MediaType { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the file extension, without the leading dot and in lowercase; <c>null</c> when there is no file.
+    /// </summary>
+    public string? Extension { get; set; }
+
+    /// <summary>
     /// Gets or sets the collection of language or culture variants for the media item.
     /// </summary>
     public IEnumerable<VariantItemResponseModel> Variants { get; set; } = Enumerable.Empty<VariantItemResponseModel>();

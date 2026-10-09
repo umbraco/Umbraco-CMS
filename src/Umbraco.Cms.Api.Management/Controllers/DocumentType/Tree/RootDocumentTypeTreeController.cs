@@ -19,10 +19,12 @@ public class RootDocumentTypeTreeController : DocumentTypeTreeControllerBase
     /// Initializes a new instance of the <see cref="RootDocumentTypeTreeController"/> class.
     /// </summary>
     /// <param name="entityService">An <see cref="IEntityService"/> instance used for managing entities within the system.</param>
+    /// <param name="entitySearchService">The <see cref="IEntitySearchService"/> used to search entities.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used to map between identifiers and keys.</param>
     /// <param name="flagProviders">A <see cref="FlagProviderCollection"/> containing providers for entity flags.</param>
     /// <param name="contentTypeService">An <see cref="IContentTypeService"/> instance used for managing content types.</param>
-    public RootDocumentTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
-        : base(entityService, flagProviders, contentTypeService)
+    public RootDocumentTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IContentTypeService contentTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, contentTypeService)
     {
     }
 

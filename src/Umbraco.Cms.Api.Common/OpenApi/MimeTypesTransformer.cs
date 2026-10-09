@@ -51,7 +51,7 @@ internal class MimeTypesTransformer : IOpenApiOperationTransformer
             {
                 // Replace content types entirely with what [Consumes] declares,
                 // preserving the schema from the existing entry.
-                OpenApiMediaType? existingMediaType = requestContent.Values.FirstOrDefault();
+                IOpenApiMediaType? existingMediaType = requestContent.Values.FirstOrDefault();
                 requestContent.Clear();
                 foreach (var contentType in explicitContentTypes)
                 {
@@ -76,7 +76,7 @@ internal class MimeTypesTransformer : IOpenApiOperationTransformer
         return Task.CompletedTask;
     }
 
-    private static void RemoveJsonEquivalentMimeTypes(IDictionary<string, OpenApiMediaType>? content)
+    private static void RemoveJsonEquivalentMimeTypes(IDictionary<string, IOpenApiMediaType>? content)
     {
         if (content?.ContainsKey(MediaTypeNames.Application.Json) != true)
         {

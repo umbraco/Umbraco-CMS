@@ -3,7 +3,7 @@
 SQLite-specific EF Core provider for Umbraco CMS. Contains SQLite migrations and provider setup for the EF Core persistence layer.
 
 **Project Type**: Class Library (NuGet package)
-**Target Framework**: net10.0
+**Target Framework**: net11.0
 **Dependencies**: Umbraco.Cms.Persistence.EFCore
 
 ---

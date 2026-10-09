@@ -45,9 +45,11 @@ public interface IElementEditingService
     /// <param name="culturesToPublish">The cultures to publish.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the creation result or an error status.</returns>
-    // TODO (V19): Remove default implementation.
-    Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ElementCreateModel createModel, string[] culturesToPublish, Guid userKey)
-        => throw new NotImplementedException();
+    /// <remarks>
+    ///     The returned status reports the outcome of the save and the publish separately, as the two can differ:
+    ///     a publish blocked by a business rule still leaves the save in effect.
+    /// </remarks>
+    Task<Attempt<ElementCreateResult, ContentEditingAndPublishingStatus>> CreateAndPublishAsync(ElementCreateModel createModel, ISet<string> culturesToPublish, Guid userKey);
 
     /// <summary>
     ///     Updates an existing element.
@@ -66,9 +68,11 @@ public interface IElementEditingService
     /// <param name="culturesToPublish">The cultures to publish.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the update result or an error status.</returns>
-    // TODO (V19): Remove default implementation.
-    Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ElementUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
-        => throw new NotImplementedException();
+    /// <remarks>
+    ///     The returned status reports the outcome of the save and the publish separately, as the two can differ:
+    ///     a publish blocked by a business rule still leaves the save in effect.
+    /// </remarks>
+    Task<Attempt<ElementUpdateResult, ContentEditingAndPublishingStatus>> UpdateAndPublishAsync(Guid key, ElementUpdateModel updateModel, ISet<string> culturesToPublish, Guid userKey);
 
     /// <summary>
     ///     Deletes an element whether it is in the recycle bin or not.

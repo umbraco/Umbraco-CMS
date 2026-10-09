@@ -69,10 +69,10 @@ public class RemoveLegacyExamineIndexFilesTests
         Assert.That(Directory.Exists(untouchedFolder), Is.True);
     }
 
-    [TestCase(Constants.IndexAliases.PublishedContent)]
-    [TestCase(Constants.IndexAliases.DraftContent)]
-    [TestCase(Constants.IndexAliases.DraftMedia)]
-    [TestCase(Constants.IndexAliases.DraftMembers)]
+    [TestCase(Constants.Search.IndexAliases.PublishedContent)]
+    [TestCase(Constants.Search.IndexAliases.DraftContent)]
+    [TestCase(Constants.Search.IndexAliases.DraftMedia)]
+    [TestCase(Constants.Search.IndexAliases.DraftMembers)]
     public async Task Does_Not_Delete_Folders_Matching_Current_Index_Aliases(string indexAlias)
     {
         var currentIndexFolder = Path.Combine(_examineIndexesPath, indexAlias);
@@ -93,7 +93,7 @@ public class RemoveLegacyExamineIndexFilesTests
         Directory.CreateDirectory(legacyFolder);
         File.WriteAllText(Path.Combine(legacyFolder, "segments.gen"), "test");
 
-        var currentIndexFolder = Path.Combine(_examineIndexesPath, Constants.IndexAliases.PublishedContent);
+        var currentIndexFolder = Path.Combine(_examineIndexesPath, Constants.Search.IndexAliases.PublishedContent);
         Directory.CreateDirectory(currentIndexFolder);
         File.WriteAllText(Path.Combine(currentIndexFolder, "segments.gen"), "test");
 

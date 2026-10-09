@@ -1,5 +1,5 @@
 import { UMB_BLOCK_MANAGER_CONTEXT } from '../context/block-manager.context-token.js';
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from './context/block-workspace.context-token.js';
 import { UmbBlockLanguageAccessWorkspaceController } from './block-workspace-language-access.controller.js';
 import { expect, fixture } from '@open-wc/testing';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';

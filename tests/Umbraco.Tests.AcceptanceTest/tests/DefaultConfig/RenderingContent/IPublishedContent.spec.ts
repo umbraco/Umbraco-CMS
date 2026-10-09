@@ -11,6 +11,14 @@ const secondDocumentTypeName = 'TestSecondType';
 // Template
 const templateName = 'TestTemplateForContent';
 
+test.beforeEach(async ({umbracoApi}) => {
+  await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.document.ensureNameNotExists(secondContentName);
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(secondDocumentTypeName);
+  await umbracoApi.template.ensureNameNotExists(templateName);
+});
+
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.document.ensureNameNotExists(secondContentName);

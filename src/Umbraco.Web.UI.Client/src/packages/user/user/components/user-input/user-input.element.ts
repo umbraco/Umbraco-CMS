@@ -32,6 +32,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 		},
 		identifier: 'Umb.SorterIdentifier.InputUser',
 		itemSelector: 'umb-entity-item-ref',
+		disabledItemSelector: '[error]',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -46,7 +47,22 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	public get readonly(): boolean {
+		return this.#readonly;
+	}
+	public set readonly(value: boolean) {
+		this.#readonly = value;
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
 
 	/**
 	 * Sets the input to required, meaning validation will fail if the value is empty.
@@ -93,6 +109,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	}
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		this.#updateSorterEnabled();
 	}
 
 	/**
@@ -196,7 +213,9 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 			<uui-ref-list>
 				${repeat(
 					this._statuses,
-					(status) => status.unique,
+					// Re-key on error state so the sorter re-evaluates `disabledItemSelector` when an item settles
+					// into "not found" — the sorter only checks this when an element is first mounted.
+					(status) => `${status.unique}:${status.state.type === 'error'}`,
 					(status) => this.#renderItem(status),
 				)}
 			</uui-ref-list>
@@ -215,7 +234,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 				.errorMessage=${status.state.error}
 				.errorDetail=${isError ? unique : undefined}
 				?standalone=${this.max === 1}
-				?readonly=${this.readonly}>
+				?readonly=${this.readonly || isError}>
 				<uui-action-bar slot="actions">
 					<uui-button
 						label=${this.localize.term('general_remove')}

@@ -24,14 +24,5 @@ namespace Umbraco.Extensions
         /// <param name="builder">The builder.</param>
         public static FlagProviderCollectionBuilder FlagProviders(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<FlagProviderCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the sign providers collection builder.
-        /// </summary>
-        /// <param name="builder">The Umbraco builder instance.</param>
-        /// <returns>The <see cref="FlagProviderCollectionBuilder"/> instance.</returns>
-        [Obsolete("Please use the correctly named FlagProviders. Scheduled for removal in Umbraco 19.")]
-        public static FlagProviderCollectionBuilder SignProviders(this IUmbracoBuilder builder)
-            => builder.FlagProviders();
     }
 }

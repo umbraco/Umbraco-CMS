@@ -1,12 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -32,22 +29,6 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
         _memberService = memberService;
         _memberCache = memberCache;
         _externalMemberService = externalMemberService;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MemberPickerValueConverter" /> class.
-    /// </summary>
-    /// <param name="memberService">The member service.</param>
-    /// <param name="memberCache">The published member cache.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public MemberPickerValueConverter(
-        IMemberService memberService,
-        IPublishedMemberCache memberCache)
-        : this(
-            memberService,
-            memberCache,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalMemberService>())
-    {
     }
 
     /// <inheritdoc />

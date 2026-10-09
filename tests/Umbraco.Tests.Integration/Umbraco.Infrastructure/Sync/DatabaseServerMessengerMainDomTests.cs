@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Notifications;
@@ -46,10 +47,10 @@ internal sealed class DatabaseServerMessengerMainDomTests : UmbracoIntegrationTe
         var maxInstructionIdBeforePublish = CacheInstructionService.GetMaxInstructionId();
 
         var template = TemplateBuilder.CreateTextPageTemplate("testPageTemplate");
-        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("testPage", "Test Page", defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var content = ContentBuilder.CreateSimpleContent(contentType, "Test Content");
         ContentService.Save(content);
 

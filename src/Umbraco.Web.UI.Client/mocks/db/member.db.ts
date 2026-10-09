@@ -96,7 +96,6 @@ const createDetailMockMapper = (request: CreateMemberRequestModel): UmbMockMembe
 		variants: request.variants.map((variantRequest) => {
 			return {
 				culture: variantRequest.culture,
-				segment: variantRequest.segment,
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,

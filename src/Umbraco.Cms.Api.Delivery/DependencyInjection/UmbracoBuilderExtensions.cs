@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Accessors;
 using Umbraco.Cms.Api.Delivery.Caching;
 using Umbraco.Cms.Api.Delivery.Configuration;
 using Umbraco.Cms.Api.Delivery.Handlers;
+using Umbraco.Cms.Api.Delivery.Indexing;
 using Umbraco.Cms.Api.Delivery.Json;
 using Umbraco.Cms.Api.Delivery.Rendering;
 using Umbraco.Cms.Api.Delivery.Routing;
@@ -24,8 +24,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Infrastructure.Security;
-using Umbraco.Cms.Web.Common.ApplicationBuilder;
+using Umbraco.Cms.Search.Core.DependencyInjection;
 
 namespace Umbraco.Extensions;
 
@@ -36,7 +37,8 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     /// <remarks>
     /// This method assumes that either <c>AddBackOffice()</c> or <c>AddCore()</c> has already been called.
-    /// It registers Delivery API-specific services such as controllers, output caching, and member authentication.
+    /// It registers Delivery API-specific services such as controllers, output caching, and member authentication,
+    /// and wires up Umbraco Search as the Delivery API's querying engine.
     /// </remarks>
     /// <param name="builder">The Umbraco builder.</param>
     /// <returns>The Umbraco builder.</returns>
@@ -82,6 +84,11 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<IMemberApplicationManager, MemberApplicationManager>();
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
         builder.Services.AddTransient<ICurrentMemberClaimsProvider, CurrentMemberClaimsProvider>();
+
+        // enable Umbraco Search as the querying engine for the Delivery API
+        builder.AddSearchCore();
+        builder.Services.AddUnique<IApiContentQueryProvider, DeliveryApiContentQueryProvider>();
+        builder.Services.AddTransient<IContentIndexer, DeliveryApiContentIndexer>();
 
         builder.AddUmbracoOpenApi();
         builder.AddUmbracoOpenApiDocument<ConfigureUmbracoDeliveryApiOpenApiOptions>(

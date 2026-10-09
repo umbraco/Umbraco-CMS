@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
@@ -632,6 +633,168 @@ public partial class ContentPublishingServiceTests
 
         // despite the failure to publish, the page should remain published
         VerifyIsPublished(Textpage.Key);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Content_With_Invalid_Value_In_Non_Default_Segment()
+    {
+        var contentType = await SetupSegmentVariantTest(ContentVariation.Segment);
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Segment Test")
+            .Build();
+        content.SetValue("title", "Valid default value");
+        content.SetValue("title", "Invalid seg-1 value", segment: "seg-1");
+        ContentService.Save(content);
+
+        var result = await ContentPublishingService.PublishAsync(content.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
+        Assert.Contains("title", result.Result.InvalidPropertyAliases.ToArray());
+        VerifyIsNotPublished(content.Key);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Content_With_Invalid_Value_In_Non_Default_Segment_For_Culture()
+    {
+        var contentType = await SetupSegmentVariantTest(ContentVariation.CultureAndSegment);
+        var langEn = (await LanguageService.GetAsync("en-US"))!;
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName(langEn.IsoCode, "Segment Culture Test")
+            .Build();
+        content.SetValue("title", "Valid default value", culture: langEn.IsoCode);
+        content.SetValue("title", "Invalid seg-1 value", culture: langEn.IsoCode, segment: "seg-1");
+        ContentService.Save(content);
+
+        var result = await ContentPublishingService.PublishAsync(
+            content.Key,
+            [new CulturePublishScheduleModel { Culture = langEn.IsoCode }],
+            Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
+        Assert.Contains("title", result.Result.InvalidPropertyAliases.ToArray());
+        VerifyIsNotPublished(content.Key);
+    }
+
+    [Test]
+    public async Task Can_Publish_Content_With_Valid_Values_In_All_Segments()
+    {
+        var contentType = await SetupSegmentVariantTest(ContentVariation.Segment);
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Segment Test")
+            .Build();
+        content.SetValue("title", "Valid default value");
+        content.SetValue("title", "Valid seg-1 value", segment: "seg-1");
+        content.SetValue("title", "Valid seg-2 value", segment: "seg-2");
+        ContentService.Save(content);
+
+        var result = await ContentPublishingService.PublishAsync(content.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
+        VerifyIsPublished(content.Key);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Branch_With_Invalid_Value_In_Non_Default_Segment_On_Root()
+    {
+        var contentType = await SetupSegmentVariantTest(ContentVariation.Segment);
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Segment Test")
+            .Build();
+        content.SetValue("title", "Valid default value");
+        content.SetValue("title", "Invalid seg-1 value", segment: "seg-1");
+        ContentService.Save(content);
+
+        var result = await ContentPublishingService.PublishBranchAsync(content.Key, _allCultures, PublishBranchFilter.Default, Constants.Security.SuperUserKey, false);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.FailedBranch, result.Status);
+        AssertBranchResultFailed(result.Result, (content.Key, ContentPublishingOperationStatus.ContentInvalid));
+        VerifyIsNotPublished(content.Key);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Branch_With_Invalid_Value_In_Non_Default_Segment_For_Culture_On_Root()
+    {
+        var contentType = await SetupSegmentVariantTest(ContentVariation.CultureAndSegment);
+        var langEn = (await LanguageService.GetAsync("en-US"))!;
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName(langEn.IsoCode, "Segment Culture Test")
+            .Build();
+        content.SetValue("title", "Valid default value", culture: langEn.IsoCode);
+        content.SetValue("title", "Invalid seg-1 value", culture: langEn.IsoCode, segment: "seg-1");
+        ContentService.Save(content);
+
+        var result = await ContentPublishingService.PublishBranchAsync(content.Key, [langEn.IsoCode], PublishBranchFilter.Default, Constants.Security.SuperUserKey, false);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.FailedBranch, result.Status);
+        AssertBranchResultFailed(result.Result, (content.Key, ContentPublishingOperationStatus.ContentInvalid));
+        VerifyIsNotPublished(content.Key);
+    }
+
+    [Test]
+    public async Task Can_Publish_Branch_With_Valid_Values_In_All_Segments_On_Root()
+    {
+        var contentType = await SetupSegmentVariantTest(ContentVariation.Segment);
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Segment Test")
+            .Build();
+        content.SetValue("title", "Valid default value");
+        content.SetValue("title", "Valid seg-1 value", segment: "seg-1");
+        ContentService.Save(content);
+
+        var result = await ContentPublishingService.PublishBranchAsync(content.Key, _allCultures, PublishBranchFilter.Default, Constants.Security.SuperUserKey, false);
+
+        Assert.IsTrue(result.Success);
+        AssertBranchResultSuccess(result.Result, content.Key);
+        VerifyIsPublished(content.Key);
+    }
+
+    [TestCase(PublishBranchFilter.Default, true)]
+    [TestCase(PublishBranchFilter.ForceRepublish, false)]
+    public async Task Publish_Branch_Validates_Unchanged_Published_Root_Only_When_Republishing(PublishBranchFilter publishBranchFilter, bool expectSuccess)
+    {
+        var contentType = await SetupSegmentVariantTest(ContentVariation.Segment);
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Segment Test")
+            .Build();
+        content.SetValue("title", "Valid default value");
+        content.SetValue("title", "Valid seg-1 value", segment: "seg-1");
+        ContentService.Save(content);
+
+        var publishResult = await ContentPublishingService.PublishAsync(content.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishResult.Success);
+
+        // invalidates the published seg-1 value without editing the content
+        contentType.PropertyTypes.First(pt => pt.Alias == "title").ValidationRegExp = "^Valid default.*$";
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var result = await ContentPublishingService.PublishBranchAsync(content.Key, _allCultures, publishBranchFilter, Constants.Security.SuperUserKey, false);
+
+        Assert.AreEqual(expectSuccess, result.Success);
+        if (expectSuccess is false)
+        {
+            AssertBranchResultFailed(result.Result, (content.Key, ContentPublishingOperationStatus.ContentInvalid));
+        }
+
+        VerifyIsPublished(content.Key);
     }
 
     [Test]
