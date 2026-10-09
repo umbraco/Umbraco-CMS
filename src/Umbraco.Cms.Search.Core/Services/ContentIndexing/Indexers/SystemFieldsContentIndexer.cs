@@ -103,7 +103,7 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
             return true;
         }
 
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(content.ParentId, objectType);
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(content.ParentId, AncestorObjectType(objectType));
         if (parentKeyAttempt.Success is false)
         {
             _logger.LogWarning(
@@ -139,7 +139,7 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
         IEnumerable<int> ancestorIds = content.AncestorIds();
         foreach (var ancestorId in ancestorIds)
         {
-            Attempt<Guid> attempt = _idKeyMap.GetKeyForId(ancestorId, objectType);
+            Attempt<Guid> attempt = _idKeyMap.GetKeyForId(ancestorId, AncestorObjectType(objectType));
             if (attempt.Success is false)
             {
                 _logger.LogWarning(
@@ -193,9 +193,17 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
     }
 
     private Guid? GetRecycleBinId(UmbracoObjectTypes objectType)
-        => objectType is UmbracoObjectTypes.Document
-            ? Cms.Core.Constants.System.RecycleBinContentKey
-            : objectType is UmbracoObjectTypes.Media
-                ? Cms.Core.Constants.System.RecycleBinMediaKey
-                : null;
+        => objectType switch
+        {
+            UmbracoObjectTypes.Document => Cms.Core.Constants.System.RecycleBinContentKey,
+            UmbracoObjectTypes.Media => Cms.Core.Constants.System.RecycleBinMediaKey,
+            UmbracoObjectTypes.Element => Cms.Core.Constants.System.RecycleBinElementKey,
+            _ => null,
+        };
+
+    // elements are organised in element containers, so their ancestors are containers rather than elements
+    private static UmbracoObjectTypes AncestorObjectType(UmbracoObjectTypes objectType)
+        => objectType is UmbracoObjectTypes.Element
+            ? UmbracoObjectTypes.ElementContainer
+            : objectType;
 }

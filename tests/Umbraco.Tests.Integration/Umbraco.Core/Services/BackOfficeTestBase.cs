@@ -1,7 +1,9 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -37,7 +39,89 @@ public abstract class BackOfficeTestBase : TestBase
 
         await SetupMedia();
 
+        await SetupElements();
+
         _fixtureIsInitialized = true;
+    }
+
+    protected IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
+
+    protected IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
+
+    /// <summary>
+    /// Gets the element containers at the library root, in creation order. Each holds ten library elements.
+    /// </summary>
+    protected EntityContainer[] ElementContainers { get; private set; } = [];
+
+    /// <summary>
+    /// Gets the element type of the library elements created at the library root.
+    /// </summary>
+    protected IContentType RootLibraryElementType { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets the element type of the library elements created inside the element containers.
+    /// </summary>
+    protected IContentType ChildLibraryElementType { get; private set; } = null!;
+
+    private async Task SetupElements()
+    {
+        RootLibraryElementType = await CreateLibraryElementType("rootLibraryElementType");
+        ChildLibraryElementType = await CreateLibraryElementType("childLibraryElementType");
+
+        var containers = new List<EntityContainer>();
+        for (var i = 0; i < 3; i++)
+        {
+            await CreateLibraryElement(RootLibraryElementType, null, $"Root element {i}", $"library root title single{i}libroot");
+
+            EntityContainer container = (await ElementContainerService.CreateAsync(Guid.NewGuid(), $"Folder {i}", null, Constants.Security.SuperUserKey)).Result
+                                        ?? throw new InvalidOperationException("Could not create element container");
+            containers.Add(container);
+
+            for (var j = 0; j < 10; j++)
+            {
+                await CreateLibraryElement(
+                    ChildLibraryElementType,
+                    container.Key,
+                    $"Element {j}",
+                    $"library child title single{j}libchild triple{j / 3}libchild shared{i}lib");
+            }
+        }
+
+        ElementContainers = containers.ToArray();
+    }
+
+    private async Task<IContentType> CreateLibraryElementType(string alias)
+    {
+        IContentType elementType = new ContentTypeBuilder()
+            .WithAlias(alias)
+            .WithIsElement(true)
+            .WithAllowedInLibrary(true)
+            .WithAllowAsRoot(true)
+            .AddPropertyType()
+            .WithAlias("title")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        return elementType;
+    }
+
+    private async Task CreateLibraryElement(IContentType elementType, Guid? containerKey, string name, string title)
+    {
+        Attempt<ElementCreateResult, ContentEditingOperationStatus> result = await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = elementType.Key,
+                ParentKey = containerKey,
+                Variants = [new VariantModel { Name = name }],
+                Properties = [new PropertyValueModel { Alias = "title", Value = title }],
+            },
+            Constants.Security.SuperUserKey);
+        if (result.Success is false)
+        {
+            throw new InvalidOperationException($"Could not create library element: {result.Status}");
+        }
     }
 
     private async Task SetupContent()

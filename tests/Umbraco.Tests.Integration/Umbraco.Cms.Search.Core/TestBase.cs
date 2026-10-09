@@ -27,6 +27,7 @@ public abstract class TestBase : UmbracoIntegrationTest
         public const string DraftContent = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftContent;
         public const string Media = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMedia;
         public const string Member = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMembers;
+        public const string Elements = global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftElements;
     }
 
     protected TestIndexerAndSearcher IndexerAndSearcher { get; } = new();
@@ -51,6 +52,7 @@ public abstract class TestBase : UmbracoIntegrationTest
             options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(IndexAliases.DraftContent, UmbracoObjectTypes.Document);
             options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(IndexAliases.Media, UmbracoObjectTypes.Media);
             options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(IndexAliases.Member, UmbracoObjectTypes.Member);
+            options.RegisterContentIndex<IIndexer, ISearcher, IDraftElementChangeStrategy>(IndexAliases.Elements, UmbracoObjectTypes.Element);
         });
 
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();

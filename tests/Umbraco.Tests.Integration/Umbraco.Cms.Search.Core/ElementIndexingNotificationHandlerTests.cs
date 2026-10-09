@@ -142,13 +142,13 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
         draftElement.SetValue("textValue", "Draft-only text");
         ElementService.Save(draftElement);
 
-        Assert.That(countingService.HandleCallCount, Is.Zero, "A draft-only element save must not trigger a reindex of documents referencing it.");
+        Assert.That(countingService.DocumentHandleCallCount, Is.Zero, "A draft-only element save must not trigger a reindex of documents referencing it.");
         AssertPublishedBlocksTextsContain("Original text");
 
         // publishing the same change must trigger the reindex
         ElementService.Publish(ElementService.GetById(element.Key)!, ["*"]);
 
-        Assert.That(countingService.HandleCallCount, Is.GreaterThan(0), "Publishing the element must trigger a reindex of documents referencing it.");
+        Assert.That(countingService.DocumentHandleCallCount, Is.GreaterThan(0), "Publishing the element must trigger a reindex of documents referencing it.");
         AssertPublishedBlocksTextsContain("Draft-only text");
     }
 
@@ -569,14 +569,21 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
 
         public CountingContentIndexingService(ContentIndexingService inner) => _inner = inner;
 
-        public int HandleCallCount { get; private set; }
+        public int DocumentHandleCallCount { get; private set; }
 
-        public void Reset() => HandleCallCount = 0;
+        public void Reset() => DocumentHandleCallCount = 0;
 
         public void Handle(IEnumerable<ContentChange> changes, string origin)
         {
-            HandleCallCount++;
-            _inner.Handle(changes, origin);
+            ContentChange[] changesAsArray = changes as ContentChange[] ?? changes.ToArray();
+
+            // element changes feed the element index, not the documents referencing the element
+            if (changesAsArray.Any(change => change.ObjectType is UmbracoObjectTypes.Document))
+            {
+                DocumentHandleCallCount++;
+            }
+
+            _inner.Handle(changesAsArray, origin);
         }
 
         public void Rebuild(string indexAlias, string origin) => _inner.Rebuild(indexAlias, origin);

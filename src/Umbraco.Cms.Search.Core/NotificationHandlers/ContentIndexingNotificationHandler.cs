@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Search.Core.Cache.Content;
+using Umbraco.Cms.Search.Core.Cache.Element;
 using Umbraco.Cms.Search.Core.Cache.Media;
 using Umbraco.Cms.Search.Core.Cache.Member;
 using Umbraco.Extensions;
@@ -10,13 +11,14 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Search.Core.NotificationHandlers;
 
 /// <summary>
-/// Reacts to draft/published content, media and member cache refresher notifications by re-indexing the affected items.
+/// Reacts to draft/published content, media, member and element cache refresher notifications by re-indexing the affected items.
 /// </summary>
 internal sealed class ContentIndexingNotificationHandler : IndexingNotificationHandlerBase,
     INotificationHandler<PublishedContentCacheRefresherNotification>,
     INotificationHandler<DraftContentCacheRefresherNotification>,
     INotificationHandler<DraftMediaCacheRefresherNotification>,
-    INotificationHandler<DraftMemberCacheRefresherNotification>
+    INotificationHandler<DraftMemberCacheRefresherNotification>,
+    INotificationHandler<DraftElementCacheRefresherNotification>
 {
     private readonly IContentIndexingService _contentIndexingService;
 
@@ -88,6 +90,20 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
         ExecuteDeferred(() => _contentIndexingService.Handle(changes, origin));
     }
 
+    /// <summary>
+    /// Re-indexes elements affected by the notified changes.
+    /// </summary>
+    /// <param name="notification">The notification describing the element changes to react to.</param>
+    public void Handle(DraftElementCacheRefresherNotification notification)
+    {
+        DraftElementCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<DraftElementCacheRefresher.JsonPayload>(notification, out var origin);
+
+        ContentChange[] changes = ElementChanges(
+            payloads.Select(payload => (payload.ElementKey, payload.ChangeTypes)));
+
+        ExecuteDeferred(() => _contentIndexingService.Handle(changes, origin));
+    }
+
     private ContentChange[] PublishedDocumentChanges(IEnumerable<(Guid ContentId, TreeChangeTypes ChangeTypes)> payloads)
         => GetContentChanges(
             payloads,
@@ -107,6 +123,11 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
         => GetContentChanges(
             payloads,
             (contentKey, changeImpact) => ContentChange.Member(contentKey, changeImpact, ContentState.Draft));
+
+    private ContentChange[] ElementChanges(IEnumerable<(Guid ContentId, TreeChangeTypes ChangeTypes)> payloads)
+        => GetContentChanges(
+            payloads,
+            (contentKey, changeImpact) => ContentChange.Element(contentKey, changeImpact, ContentState.Draft));
 
     private ContentChange[] GetContentChanges(IEnumerable<(Guid ContentId, TreeChangeTypes ChangeTypes)> payloads, Func<Guid, ChangeImpact, ContentChange> contentChangeFactory)
         => payloads

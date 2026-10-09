@@ -61,6 +61,7 @@ public static class UmbracoBuilderExtensions
             builder.AddActiveAndShadowIndex(Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent);
             builder.AddActiveAndShadowIndex(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMedia);
             builder.AddActiveAndShadowIndex(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMembers);
+            builder.AddActiveAndShadowIndex(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftElements);
 
             builder.Services.AddSingleton<IActiveIndexManager, ActiveIndexManager>();
 
@@ -74,6 +75,7 @@ public static class UmbracoBuilderExtensions
             builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent, _ => { });
             builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMedia, _ => { });
             builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMembers, _ => { });
+            builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftElements, _ => { });
 
             builder.Services.AddSingleton<IActiveIndexManager, NoopActiveIndexManager>();
         }
