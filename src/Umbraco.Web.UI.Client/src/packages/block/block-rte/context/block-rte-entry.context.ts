@@ -36,7 +36,7 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 	}
 
 	protected override _needsLegacyLabelRenderer(): boolean {
-		// RTE Block entry element owns the canonical `<umb-ufm-render>` (via <umb-ref-rte-block>)
+		// The RTE block entry element renders the canonical `<umb-ufm-render>` (projected into <umb-ref-rte-block>'s name slot)
 		// and pushes resolved text via `setName()`. No hidden virtual renderer needed.
 		return false;
 	}
