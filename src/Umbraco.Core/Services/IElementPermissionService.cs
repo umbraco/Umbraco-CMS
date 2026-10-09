@@ -106,7 +106,7 @@ public interface IElementPermissionService
     /// <param name="elementKeys">The identifiers of the elements to check for access.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into the subset of <paramref name="elementKeys"/> the user is authorized to access.</returns>
-    // TODO (V21): Remove the default implementation.
+    // TODO (V20): Remove the default implementation.
     async Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> elementKeys, ISet<string> permissionsToCheck)
     {
         var authorizedKeys = new HashSet<Guid>();
