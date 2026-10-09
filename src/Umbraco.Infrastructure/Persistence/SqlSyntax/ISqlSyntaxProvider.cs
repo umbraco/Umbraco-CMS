@@ -376,6 +376,16 @@ public interface ISqlSyntaxProvider
     string Format(ColumnDefinition column, string tableName, out IEnumerable<string> sqls);
 
     /// <summary>
+    /// Formats the SQL statement that alters an existing column to match the specified <see cref="ColumnDefinition"/>.
+    /// </summary>
+    /// <param name="tableName">The name of the table containing the column.</param>
+    /// <param name="column">The new definition of the column.</param>
+    /// <returns>A SQL statement that alters the column.</returns>
+    // TODO (V20): Remove the default implementation.
+    string FormatAlterColumn(string? tableName, ColumnDefinition column)
+        => string.Format(AlterColumn, GetQuotedTableName(tableName), Format(column));
+
+    /// <summary>
     /// Formats the specified <see cref="IndexDefinition"/> into its corresponding SQL statement.
     /// </summary>
     /// <param name="index">The <see cref="IndexDefinition"/> to format.</param>
