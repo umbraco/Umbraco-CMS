@@ -404,7 +404,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var blockListContentType = await CreateBlockListContentType(elementType);
 
@@ -483,7 +483,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
     {
         var nestedElementType = ContentTypeBuilder.CreateAllTypesContentType("myNestedElementType", "My Nested Element Type");
         nestedElementType.IsElement = true;
-        ContentTypeService.Save(nestedElementType);
+        await ContentTypeService.CreateAsync(nestedElementType, Constants.Security.SuperUserKey);
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
 
         var rootElementType = new ContentTypeBuilder()
@@ -505,7 +505,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
                 .WithValueStorageType(ValueStorageType.Ntext)
                 .Done()
             .Build();
-        ContentTypeService.Save(rootElementType);
+        await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
 
         var blockListContentType = await CreateBlockListContentType(rootElementType);
 
