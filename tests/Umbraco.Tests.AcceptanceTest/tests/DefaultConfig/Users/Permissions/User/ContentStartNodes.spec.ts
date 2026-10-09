@@ -1,4 +1,3 @@
-import {expect} from "@playwright/test";
 import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
 
 const testUser = ConstantHelper.testUserCredentials;
@@ -67,19 +66,14 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
   await umbracoUi.user.goToSection(ConstantHelper.sections.content, false);
 
   // Assert
-  // Get initial URL (should be on content section)
-  const initialUrl = umbracoUi.page.url();
-
   await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
+  // A node the user cannot access is rendered disabled, so clicking it must not open its workspace.
   await umbracoUi.content.goToContentWithName(rootDocumentName, false);
-
-  // Assert - URL should not have changed (no navigation occurred)
-  const currentUrl = umbracoUi.page.url();
-  expect(currentUrl).toBe(initialUrl);
-
   await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentOneName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentTwoName, false);
+  // Checked after the tree interaction so a navigation triggered by the click would already have landed.
+  await umbracoUi.content.isDocumentWorkspaceVisible(false);
 });
 
 test('see no-access view when deep-linking to restricted document', async ({umbracoApi, umbracoUi}) => {

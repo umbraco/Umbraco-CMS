@@ -49,8 +49,7 @@ test('can see root media start node and children', {tag: '@release'}, async ({um
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
-test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
+test('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(userGroupName, childFolderOneId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -59,14 +58,17 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
 
   // Act
   await umbracoUi.user.goToSection(ConstantHelper.sections.media, false);
+  await umbracoUi.page.waitForURL('**/section/media/collection');
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
+  // A folder the user cannot access is rendered disabled, so clicking it must not open its workspace.
   await umbracoUi.media.goToMediaWithName(rootFolderName);
-  await umbracoUi.media.doesMediaWorkspaceHaveText('Access denied');
   await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName, false);
+  // Checked after the tree interaction so a navigation triggered by the click would already have landed.
+  await umbracoUi.media.isMediaWorkspaceVisible(false);
 });
 
 test('can not see any media when no media start nodes specified', async ({umbracoApi, umbracoUi}) => {

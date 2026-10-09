@@ -956,11 +956,15 @@ export class DataTypeApiHelper {
     const blockEditor = await this.getByName(blockGridName);
     // We need to get the GroupKey, so we can use it to find the blocks that use the Key.
     const blockGroupsValue = blockEditor.values.find(value => value.alias === 'blockGroups');
-    if (!blockGroupsValue || blockGroupsValue.value.length === 0) {
+    if (!blockGroupsValue?.value?.length) {
       return false;
     }
 
-    const blockGroupKey = blockGroupsValue.value.find(blockGroup => blockGroup.name === groupName).key;
+    const blockGroup = blockGroupsValue.value.find(blockGroup => blockGroup.name === groupName);
+    if (!blockGroup) {
+      return false;
+    }
+    const blockGroupKey = blockGroup.key;
     const blocksValue = blockEditor.values.find(value => value.alias === 'blocks');
     if (!blocksValue || blocksValue.value.length === 0) {
       return false;
@@ -970,6 +974,16 @@ export class DataTypeApiHelper {
     return elementTypeIds.every(id =>
       blocksWithGroupKey.some(block => block.contentElementTypeKey === id)
     );
+  }
+
+  async doesBlockGridContainGroupWithName(blockGridName: string, groupName: string) {
+    const blockEditor = await this.getByName(blockGridName);
+    const blockGroupsValue = blockEditor.values.find(value => value.alias === 'blockGroups');
+    if (!blockGroupsValue?.value?.length) {
+      return false;
+    }
+
+    return blockGroupsValue.value.some(blockGroup => blockGroup.name === groupName);
   }
 
   async doesBlockGridContainCreateButtonLabel(blockGridName: string, label: string) {
@@ -1152,14 +1166,14 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
-  async createImageMediaPickerDataType(name: string, minValue = 0, maxValue = 1, enableLocalFocalPoint = false, ignoreUserStartNodes = false) {
+  async createImageMediaPickerDataType(name: string, minValue = 0, maxValue = 1, enableLocalFocalPoint = false, ignoreUserStartNodes = false, multiple = false) {
     await this.ensureNameNotExists(name);
     const mediaType = await this.api.mediaType.getByName('Image');
 
     const dataType = new MediaPickerDataTypeBuilder()
       .withName(name)
       .withFilter(mediaType.id)
-      .withMultiple(false)
+      .withMultiple(multiple)
       .withMinValue(minValue)
       .withMaxValue(maxValue)
       .withEnableLocalFocalPoint(enableLocalFocalPoint)
@@ -1824,6 +1838,11 @@ export class DataTypeApiHelper {
     const dataType = await this.getByName(dataTypeName);
     const startNodeValue = dataType.values.find((item: any) => item.alias === 'startNode');
     return startNodeValue?.value?.dynamicRoot;
+  }
+
+  async doesDataTypeContainAlias(dataTypeName: string, alias: string, dataTypeData?) {
+    const dataType = dataTypeData || await this.getByName(dataTypeName);
+    return dataType.values.some(item => item.alias === alias);
   }
 
   async doesDataTypeHaveValue(dataTypeName: string, alias: string, value?: any, dataTypeData?) {

@@ -226,9 +226,9 @@ for (const mediaPicker of mediaPickerTypes) {
     if (!mediaPicker.type.includes('Multiple')) {
       expect(await umbracoApi.dataType.doesMediaPickerHaveMinAndMaxAmount(mediaPicker.type, 0, 1)).toBeTruthy();
     }
-    expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'startNodeId')).toBeFalsy();
-    expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'ignoreUserStartNodes')).toBeFalsy();
-    expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'crops')).toBeFalsy();
-    expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'enableLocalFocalPoint')).toBeFalsy();
+    expect(await umbracoApi.dataType.doesDataTypeContainAlias(mediaPicker.type, 'startNodeId')).toBeFalsy();
+    expect(await umbracoApi.dataType.doesDataTypeContainAlias(mediaPicker.type, 'ignoreUserStartNodes')).toBeFalsy();
+    expect(await umbracoApi.dataType.doesDataTypeContainAlias(mediaPicker.type, 'crops')).toBeFalsy();
+    expect(await umbracoApi.dataType.doesDataTypeContainAlias(mediaPicker.type, 'enableLocalFocalPoint')).toBeFalsy();
   });
 }

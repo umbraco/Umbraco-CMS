@@ -56,6 +56,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   private readonly sliderInput: Locator;
   private readonly tabItems: Locator;
   private readonly elementWorkspace: Locator;
+  private readonly elementFolderWorkspace: Locator;
   private readonly selectAVariantBtn: Locator;
   private readonly variantAddModeBtn: Locator;
   private readonly cultureVariant: Locator;
@@ -233,6 +234,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.sliderInput = page.locator('umb-property-editor-ui-slider #input');
     this.tabItems = page.locator('uui-tab');
     this.elementWorkspace = page.locator('umb-element-workspace-editor');
+    this.elementFolderWorkspace = page.locator('umb-element-folder-workspace-editor');
     this.selectAVariantBtn = page.getByRole('button', {name: 'Open version selector'});
     this.variantAddModeBtn = page.locator('.switch-button.add-mode').locator('.variant-name');
     this.cultureVariant = page.locator('.variant.culture-variant');
@@ -1136,6 +1138,10 @@ export class LibraryUiHelper extends UiBaseLocators {
     await this.containsText(this.elementWorkspace, text);
   }
 
+  async doesElementFolderWorkspaceHaveText(text: string) {
+    await this.containsText(this.elementFolderWorkspace, text);
+  }
+
   async clickDuplicateToButton() {
     await this.click(this.duplicateToBtn);
   }
@@ -1896,8 +1902,10 @@ export class LibraryUiHelper extends UiBaseLocators {
     await this.hasValue(propertyLocator, value);
   }
 
+  // The generic element endpoint also matches the tree/collection refreshes, which can resolve the wait
+  // before the trash request has landed, so match the trash request alone.
   async clickConfirmTrashButtonAndWaitForElementToBeTrashed() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.moveToRecycleBin, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
   }
 
   async clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied() {
@@ -1961,7 +1969,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickConfirmTrashButtonAndWaitForElementFolderToBeTrashed() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.elementFolder, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.moveToRecycleBin, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
   }
 
   async clickConfirmToUnpublishButtonAndWaitForElementToBeUnpublished() {
