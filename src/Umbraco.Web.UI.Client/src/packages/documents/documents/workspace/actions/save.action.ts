@@ -1,8 +1,7 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../context/document-workspace.context-token.js';
 import type UmbDocumentWorkspaceContext from '../context/document-workspace.context.js';
-import type { UmbDocumentVariantModel } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
+import { combineLatest, map, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbSaveWorkspaceAction,
@@ -34,32 +33,23 @@ export class UmbDocumentSaveWorkspaceAction
 
 	protected override _gotWorkspaceContext() {
 		super._gotWorkspaceContext();
-		this.observe(
-			this._workspaceContext?.variants,
-			(variants) => this.#observeWritableVariants(variants ?? []),
-			'saveWorkspaceActionVariantsObserver',
-		);
-	}
-
-	#observeWritableVariants(variants: Array<UmbDocumentVariantModel>) {
 		const workspaceContext = this._workspaceContext;
 		if (!workspaceContext) return;
 
-		const variantIds = variants.map((variant) => UmbVariantId.CreateFromPartial(variant));
-		// When the content varies by culture, the invariant (shared) data is handled as a variant of its own, saved on its own for existing content.
-		if (workspaceContext.getVariesByCulture()) {
-			variantIds.push(UmbVariantId.CreateInvariant());
-		}
-
 		this.observe(
-			combineLatest(variantIds.map((variantId) => workspaceContext.isWritableVariant(variantId))),
-			(writable) => {
-				const isNew = workspaceContext.getIsNew();
-				const hasWritableVariant = variantIds.some(
-					(variantId, index) =>
-						writable[index] && (isNew === false || !variantId.equal(UmbVariantId.CreateInvariant())),
-				);
-				if (hasWritableVariant) {
+			combineLatest([workspaceContext.variants, workspaceContext.variesByCulture, workspaceContext.isNew]).pipe(
+				switchMap(([variants, variesByCulture, isNew]) => {
+					const variantIds = variants.map((variant) => UmbVariantId.CreateFromPartial(variant));
+					// The shared data of culture-varying content can be saved on its own, but cannot create the content.
+					if (variesByCulture && isNew === false) {
+						variantIds.push(UmbVariantId.CreateInvariant());
+					}
+					return combineLatest(variantIds.map((variantId) => workspaceContext.isWritableVariant(variantId)));
+				}),
+				map((writable) => writable.some(Boolean)),
+			),
+			(canSave) => {
+				if (canSave) {
 					this.enable();
 				} else {
 					this.disable();
