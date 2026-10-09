@@ -1,17 +1,7 @@
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
-import type { UmbElementDetailModel, UmbElementValueModel } from '../types.js';
-import { UmbVariantId, umbVariantObjectCompare } from '@umbraco-cms/backoffice/variant';
+import type { UmbElementDetailModel } from '../types.js';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbEntityWorkspaceDataManager, type UmbWorkspaceDataManager } from '@umbraco-cms/backoffice/workspace';
-
-/**
- * Compares two element values by alias and variant.
- * @param {UmbElementValueModel} a The first value to compare.
- * @param {UmbElementValueModel} b The second value to compare.
- * @returns {boolean} True if the values have the same alias and variant.
- */
-function valueObjectCompare(a: UmbElementValueModel, b: UmbElementValueModel): boolean {
-	return a.alias === b.alias && umbVariantObjectCompare(a, b);
-}
 
 export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailModel>
 	extends UmbEntityWorkspaceDataManager<ModelType>
@@ -20,27 +10,6 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 	protected _varies?: boolean;
 	protected _variesByCulture?: boolean;
 	protected _variesBySegment?: boolean;
-
-	protected override _sortCurrentData<GivenType extends Partial<ModelType> = Partial<ModelType>>(
-		persistedData: Partial<ModelType>,
-		currentData: GivenType,
-	): GivenType {
-		currentData = super._sortCurrentData(persistedData, currentData);
-		// Sort the values in the same order as the persisted data:
-		const persistedValues = persistedData.values;
-		if (persistedValues && currentData.values) {
-			return {
-				...currentData,
-				values: [...currentData.values].sort(function (a, b) {
-					return (
-						persistedValues.findIndex((x) => valueObjectCompare(x, a)) -
-						persistedValues.findIndex((x) => valueObjectCompare(x, b))
-					);
-				}),
-			};
-		}
-		return currentData;
-	}
 
 	#updateLock = 0;
 	initiatePropertyValueChange() {

@@ -1463,6 +1463,7 @@ declare global {
 		login_passwordIsBlank: string;
 		login_passwordMinLength: string;
 		login_passwordMismatch: string;
+		login_passwordResetUnavailable: string;
 		login_receivedErrorFromServer: string;
 		login_rememberMe: string;
 		login_requestPasswordResetConfirmation: string;
@@ -2493,11 +2494,15 @@ declare global {
 		user_deleteUserConfirmation: string;
 		user_descriptionField: string;
 		user_disabled: string;
+		user_disableUserConfirmation: string;
+		user_disableUserHeadline: (name: string) => string;
 		user_documentType: string;
 		user_duplicateLogin: string;
 		user_editors: string;
 		user_emailDescription: (usernameIsEmail: boolean) => string;
 		user_emailRequired: string;
+		user_enableUserConfirmation: string;
+		user_enableUserHeadline: (name: string) => string;
 		user_entityPermissionsDescription: string;
 		user_entityPermissionsLabel: string;
 		user_excerptField: string;
@@ -2597,7 +2602,10 @@ declare global {
 		user_stateInactive: string;
 		user_stateInvited: string;
 		user_stateLockedOut: string;
+		user_type: string;
 		user_unknownFailure: string;
+		user_unlockUserConfirmation: string;
+		user_unlockUserHeadline: (name: string) => string;
 		user_updateDate: string;
 		user_userCreated: string;
 		user_userCreatedApiSuccessHelp: string;

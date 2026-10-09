@@ -437,3 +437,33 @@ test('can select a media file inside a folder as a media link', async ({umbracoA
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
 });
+
+test('can navigate away from content with a multi url picker value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, dataTypeName, link, linkTitle);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed multi url picker value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, dataTypeName, link, linkTitle);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.removeUrlPickerByName(linkTitle);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});
