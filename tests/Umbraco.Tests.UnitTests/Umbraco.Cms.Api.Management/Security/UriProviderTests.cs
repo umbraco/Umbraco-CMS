@@ -74,6 +74,37 @@ public class UriProviderTests
     }
 
     [Test]
+    public async Task CanCreateForgotPasswordUri_WithApplicationMainUrl_Succeeds()
+    {
+        _hostingEnvironment.Setup(h => h.ApplicationMainUrl).Returns(new Uri("https://my-site.com"));
+
+        var sut = new ForgotPasswordUriProvider(
+            _userManager.Object,
+            _hostingEnvironment.Object,
+            _httpContextAccessor.Object);
+
+        Attempt<UserOperationStatus> result = await sut.CanCreateForgotPasswordUriAsync();
+
+        Assert.IsTrue(result.Success);
+    }
+
+    [Test]
+    public async Task CanCreateForgotPasswordUri_WithoutApplicationMainUrl_FailsWithApplicationUrlNotConfigured()
+    {
+        _hostingEnvironment.Setup(h => h.ApplicationMainUrl).Returns((Uri?)null);
+
+        var sut = new ForgotPasswordUriProvider(
+            _userManager.Object,
+            _hostingEnvironment.Object,
+            _httpContextAccessor.Object);
+
+        Attempt<UserOperationStatus> result = await sut.CanCreateForgotPasswordUriAsync();
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserOperationStatus.ApplicationUrlNotConfigured, result.Result);
+    }
+
+    [Test]
     public async Task InviteUri_WithApplicationMainUrl_ReturnsAbsoluteUri()
     {
         var appUrl = new Uri("https://my-site.com");

@@ -67,4 +67,10 @@ public class ForgotPasswordUriProvider : IForgotPasswordUriProvider
 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, uriBuilder.Uri);
     }
+
+    /// <inheritdoc/>
+    public Task<Attempt<UserOperationStatus>> CanCreateForgotPasswordUriAsync()
+        => Task.FromResult(_hostingEnvironment.ApplicationMainUrl is null
+            ? Attempt.Fail(UserOperationStatus.ApplicationUrlNotConfigured)
+            : Attempt.Succeed(UserOperationStatus.Success));
 }
