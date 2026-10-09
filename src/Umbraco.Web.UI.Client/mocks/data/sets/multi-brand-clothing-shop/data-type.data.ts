@@ -20,6 +20,7 @@ const dataType = (
 	isFolder: false,
 	isDeletable: true,
 	canIgnoreStartNodes: false,
+	noAccess: false,
 	flags: [],
 	values,
 });

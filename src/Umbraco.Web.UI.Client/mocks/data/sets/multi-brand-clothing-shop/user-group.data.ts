@@ -42,6 +42,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
 		mediaRootAccess: true,
+		elementRootAccess: true,
 		aliasCanBeChanged: false,
 		isDeletable: false,
 		flags: [],

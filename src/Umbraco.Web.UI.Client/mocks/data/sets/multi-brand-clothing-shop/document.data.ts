@@ -1,5 +1,5 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { PublishableVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { littleOnesArticles, outdoorShopArticles, type UmbMbcsArticleRow } from './articles.data.js';
 import {
 	SITES,
@@ -98,7 +98,7 @@ interface UmbMbcsDocumentInit {
 	hasChildren: boolean;
 	values: Array<UmbMbcsValue>;
 	updateDate: string;
-	daState?: DocumentVariantStateModel;
+	daState?: PublishableVariantStateModel;
 	domains?: UmbMockDocumentModel['domains'];
 }
 
@@ -120,11 +120,11 @@ const createDocument = (init: UmbMbcsDocumentInit): UmbMockDocumentModel => ({
 	variants: CULTURES.map((culture) => {
 		const state =
 			culture === CULTURE_DA
-				? (init.daState ?? DocumentVariantStateModel.PUBLISHED)
-				: DocumentVariantStateModel.PUBLISHED;
+				? (init.daState ?? PublishableVariantStateModel.PUBLISHED)
+				: PublishableVariantStateModel.PUBLISHED;
 		return {
 			state,
-			publishDate: state === DocumentVariantStateModel.PUBLISHED ? init.updateDate : null,
+			publishDate: state === PublishableVariantStateModel.PUBLISHED ? init.updateDate : null,
 			culture,
 			segment: null,
 			name: init.name,
@@ -250,7 +250,7 @@ const buildProducts = (
 			name,
 			hasChildren: documents.length > 0,
 			updateDate,
-			daState: number % 17 === 0 ? DocumentVariantStateModel.DRAFT : DocumentVariantStateModel.PUBLISHED,
+			daState: number % 17 === 0 ? PublishableVariantStateModel.DRAFT : PublishableVariantStateModel.PUBLISHED,
 			values: [
 				...textareaValue('description', description),
 				...mediaPickerValue('picture', productImageId(site, categoryIndex)),
@@ -276,7 +276,7 @@ const buildProducts = (
 				name: productDocument.title,
 				hasChildren: false,
 				updateDate: `${productDocument.revisionDate}T10:00:00.000Z`,
-				daState: productDocument.isDraft ? DocumentVariantStateModel.DRAFT : DocumentVariantStateModel.PUBLISHED,
+				daState: productDocument.isDraft ? PublishableVariantStateModel.DRAFT : PublishableVariantStateModel.PUBLISHED,
 				values: [
 					...dropdownValue('documentCategory', productDocument.category),
 					...textareaValue('summary', productDocument.summary),

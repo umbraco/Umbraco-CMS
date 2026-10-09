@@ -27,6 +27,8 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		hasChildren: false,
 		isDeletable: false,
 		aliasCanBeChanged: false,
+		allowedInLibrary: false,
+		noAccess: false,
 	},
 	{
 		id: MEDIA_TYPE_IDS.image,
@@ -62,5 +64,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		hasChildren: false,
 		isDeletable: false,
 		aliasCanBeChanged: false,
+		allowedInLibrary: false,
+		noAccess: false,
 	},
 ];

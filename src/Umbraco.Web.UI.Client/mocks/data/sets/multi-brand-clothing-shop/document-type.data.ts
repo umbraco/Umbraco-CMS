@@ -70,6 +70,8 @@ const documentType = (options: UmbMbcsDocumentTypeOptions): UmbMockDocumentTypeM
 	allowedTemplates: [],
 	defaultTemplate: null,
 	allowedAsRoot: options.allowedAsRoot ?? false,
+	allowedInLibrary: false,
+	noAccess: false,
 	variesByCulture: true,
 	variesBySegment: false,
 	isElement: options.isElement ?? false,
