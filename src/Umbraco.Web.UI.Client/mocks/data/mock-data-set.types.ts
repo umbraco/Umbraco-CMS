@@ -272,6 +272,22 @@ export interface UmbMockDataSet {
 	templateQuerySettings?: TemplateQuerySettingsResponseModel;
 }
 
+/**
+ * Describes a mock data set and how to load it.
+ * Each set folder exports one of these from its `manifest.ts`.
+ */
+export interface UmbMockSetManifest {
+	alias: string;
+	label: string;
+	/** Icon name, as registered in the icon registry (e.g. `icon-home`). */
+	icon?: string;
+	/** Whether the set appears in the header app dropdown. Defaults to false. */
+	visible?: boolean;
+	/** Names of folders under `examples/` that are loaded whenever this set is active. */
+	examples?: Array<string>;
+	loader: () => Promise<UmbMockDataSet>;
+}
+
 // ============================================================================
 // Type-safe data key mapping
 // ============================================================================
