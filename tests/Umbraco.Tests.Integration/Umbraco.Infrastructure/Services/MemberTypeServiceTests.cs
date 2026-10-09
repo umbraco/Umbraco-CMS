@@ -163,4 +163,26 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
             Assert.IsTrue(result.Items.Any(x => x.Key == memberType2.Key));
         });
     }
+
+    [Test]
+    public async Task Can_Get_Subsequent_Page_Of_MemberTypes_Allowed_At_Root()
+    {
+        foreach (var alias in new[] { "typeOne", "typeTwo", "typeThree" })
+        {
+            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType(alias, alias);
+            await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        }
+
+        PagedModel<IMemberType> all = await MemberTypeService.GetAllAllowedAsRootAsync(0, 1000);
+        Assert.GreaterOrEqual(all.Total, 3);
+        Guid[] expectedKeys = all.Items.Skip(1).Take(2).Select(x => x.Key).ToArray();
+
+        PagedModel<IMemberType> result = await MemberTypeService.GetAllAllowedAsRootAsync(1, 2);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(all.Total, result.Total);
+            Assert.AreEqual(expectedKeys, result.Items.Select(x => x.Key).ToArray());
+        });
+    }
 }

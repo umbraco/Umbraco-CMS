@@ -259,9 +259,9 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
     public async Task<PagedModel<IRedirectUrl>> SearchUrlsAsync(string searchTerm, int skip, int take) =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            var term = searchTerm.Trim().ToLowerInvariant();
+            var pattern = $"%{searchTerm.Trim()}%";
 
-            IQueryable<RedirectUrlDto> query = db.RedirectUrls.Where(x => x.Url.Contains(term));
+            IQueryable<RedirectUrlDto> query = db.RedirectUrls.Where(x => EF.Functions.Like(x.Url, pattern));
 
             var total = await query.LongCountAsync();
 

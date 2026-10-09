@@ -23,6 +23,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 		},
 		identifier: 'Umb.SorterIdentifier.InputMember',
 		itemSelector: 'umb-entity-item-ref',
+		disabledItemSelector: '[error]',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -191,7 +192,9 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 			<uui-ref-list>
 				${repeat(
 					this._statuses,
-					(status) => status.unique,
+					// Re-key on error state so the sorter re-evaluates `disabledItemSelector` when an item settles
+					// into "not found" — the sorter only checks this when an element is first mounted.
+					(status) => `${status.unique}:${status.state.type === 'error'}`,
 					(status) => {
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
@@ -203,7 +206,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 								?error=${isError}
 								.errorMessage=${status.state.error}
 								.errorDetail=${isError ? unique : undefined}
-								?readonly=${this.readonly}
+								?readonly=${this.readonly || isError}
 								?standalone=${this.max === 1}>
 								${when(
 									!this.readonly,

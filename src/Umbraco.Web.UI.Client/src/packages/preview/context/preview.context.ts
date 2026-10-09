@@ -5,7 +5,6 @@ import { HubConnectionBuilder, HttpTransportType } from '@umbraco-cms/backoffice
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UMB_SERVER_CONTEXT, UmbSignalRReconnectPolicy } from '@umbraco-cms/backoffice/server';
 import type { HubConnection, IHttpConnectionOptions } from '@umbraco-cms/backoffice/external/signalr';
@@ -28,7 +27,6 @@ interface UmbPreviewUrlArgs {
 }
 
 export class UmbPreviewContext extends UmbContextBase {
-	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#connection?: HubConnection;
 	#currentArgs: UmbPreviewIframeArgs = {};
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
@@ -88,11 +86,6 @@ export class UmbPreviewContext extends UmbContextBase {
 			this.#initHubConnection();
 		});
 
-		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-			this.#authContext = authContext;
-			this.#initHubConnection();
-		});
-
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
 			this.#notificationContext = notificationContext;
 		});
@@ -113,8 +106,7 @@ export class UmbPreviewContext extends UmbContextBase {
 	}
 
 	async #initHubConnection() {
-		const authContext = this.#authContext;
-		if (!authContext || !this.#serverUrl) return;
+		if (!this.#serverUrl) return;
 
 		const previewHubUrl = `${this.#serverUrl}/umbraco/PreviewHub`;
 
@@ -127,9 +119,7 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		const skipNegotiation = this.#serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
 
-		const hubOptions: IHttpConnectionOptions = {
-			accessTokenFactory: () => authContext.getLatestToken(),
-		};
+		const hubOptions: IHttpConnectionOptions = {};
 
 		if (skipNegotiation) {
 			hubOptions.skipNegotiation = true;
