@@ -14,9 +14,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'menuItem',
-		kind: 'tree',
 		alias: UMB_DOCUMENT_MENU_ITEM_ALIAS,
 		name: 'Document Menu Item',
+		element: () => import('./document-menu-item.element.js'),
 		weight: 200,
 		meta: {
 			label: 'Documents',
