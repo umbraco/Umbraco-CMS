@@ -47,6 +47,7 @@ private _validateName(name: string): boolean {
 - The back-office session is a single httpOnly cookie (default `UMB_UCONTEXT`, via `Security:AuthCookieName`) — JavaScript cannot read it. No client-side tokens, no PKCE flow.
 - The cookie is the sole credential; every request sends it via `credentials: 'include'` (handled by `configureClient()`).
 - Boot probe: `UmbAuthContext` plain-fetches `user/current/configuration` (`credentials: 'include'`, `redirect: 'manual'`); a non-ok response means "not logged in". It bypasses the intercepted client — a 401 there would be queued for re-auth and hang boot.
+- Configured clients follow redirects, so endpoints may answer with a 3xx. An auth challenge redirected to the login page arrives as its 200 HTML; the API interceptor recognises it by the final URL and handles it like a 401. Don't set `redirect: 'manual'` on them: a 3xx becomes an opaque status-0 response nothing can read.
 - `keepAlive()` re-issues the cookie; sign-out clears it and redirects (no OpenIddict end-session).
 - OpenIddict remains server-side for API users only, never the back-office session.
 

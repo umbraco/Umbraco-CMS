@@ -122,8 +122,9 @@ describe('UmbAuthContext', () => {
 			expect(receivedConfig).to.have.property('credentials', 'include');
 			// Cookie auth carries no bearer token, so the auth callback is deliberately not set.
 			expect(receivedConfig.auth).to.be.undefined;
-			// The server's 302 to /login must not be followed; the interceptor handles the 401 instead.
-			expect(receivedConfig).to.have.property('redirect', 'manual');
+			// Redirects are followed, so endpoints can answer with a 3xx; the auth interceptor recognises a
+			// redirect to the login page instead.
+			expect(receivedConfig.redirect ?? 'follow').to.equal('follow');
 		});
 	});
 
