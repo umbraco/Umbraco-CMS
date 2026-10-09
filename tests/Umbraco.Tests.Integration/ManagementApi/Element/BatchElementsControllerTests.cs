@@ -43,30 +43,17 @@ public class BatchElementsControllerTests : ManagementApiUserGroupTestBase<Batch
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.OK };
 
-    // SensitiveData and Translator lack Library section access, but the batch endpoint is not gated on
-    // section access - an inaccessible id is simply omitted from the result rather than failing the request.
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel
-        => new() { ExpectedStatusCode = HttpStatusCode.OK };
+        => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel
-        => new() { ExpectedStatusCode = HttpStatusCode.OK };
+        => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.OK };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Unauthorized };
-
-    [Test]
-    public async Task As_Sensitive_Data_I_Get_No_Items()
-    {
-        var response = await AuthorizedRequest(Constants.Security.SensitiveDataGroupKey, "SensitiveData");
-        var body = await response.Content.ReadFromJsonAsync<BatchResponseModel<ElementResponseModel>>(JsonSerializerOptions);
-
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        Assert.AreEqual(0, body!.Total);
-        Assert.IsEmpty(body.Items);
-    }
 
     [Test]
     public async Task Batch_Returns_Only_The_Elements_The_Current_User_May_Browse()

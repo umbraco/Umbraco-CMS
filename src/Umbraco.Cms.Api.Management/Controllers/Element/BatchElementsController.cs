@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -11,6 +12,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
@@ -20,6 +22,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Element;
 [ApiVersion("1.0")]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Element)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Element))]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrElementsOrMediaOrMembers)]
 public class BatchElementsController : ManagementApiControllerBase
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
@@ -55,8 +58,8 @@ public class BatchElementsController : ManagementApiControllerBase
     /// An <see cref="IActionResult"/> containing a <see cref="BatchResponseModel{T}"/> of the authorized <see cref="ElementResponseModel"/> items.
     /// </returns>
     /// <remarks>
-    /// Ids the current user is not authorized to browse are silently omitted rather than failing the request -
-    /// this endpoint is not gated on Library section access, so a user without it simply receives no items.
+    /// Ids the current user is not authorized to browse are silently omitted rather than failing the request.
+    /// Available to users with access to any section that can render element references.
     /// </remarks>
     [HttpGet("batch")]
     [MapToApiVersion("1.0")]
