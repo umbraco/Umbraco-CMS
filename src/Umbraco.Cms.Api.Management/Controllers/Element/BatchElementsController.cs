@@ -46,6 +46,14 @@ public class BatchElementsController : ManagementApiControllerBase
         _elementPresentationFactory = elementPresentationFactory;
     }
 
+    /// <summary>
+    /// Gets multiple elements identified by the provided Ids.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="ids">The unique identifiers of the elements to retrieve.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> containing a <see cref="BatchResponseModel{T}"/> of the authorized <see cref="ElementResponseModel"/> items.
+    /// </returns>
     /// <remarks>
     /// Ids the current user is not authorized to browse are silently omitted rather than failing the request -
     /// this endpoint is not gated on Library section access, so a user without it simply receives no items.

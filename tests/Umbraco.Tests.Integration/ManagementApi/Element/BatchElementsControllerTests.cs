@@ -26,7 +26,7 @@ public class BatchElementsControllerTests : ManagementApiUserGroupTestBase<Batch
     private Guid _elementKey;
 
     [SetUp]
-    public async Task Setup()
+    public async Task SetUp()
     {
         _elementKey = await CreateElement("Test Element Instance");
     }
