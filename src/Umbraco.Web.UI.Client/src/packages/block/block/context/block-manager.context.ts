@@ -8,6 +8,7 @@ import type {
 import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
 import { UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL } from '../modals/transfer-to-element-library/transfer-to-element-library-modal.token.js';
 import { UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME, UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME } from '../constants.js';
+import { umbBlockExposeSortCompare } from '../utils/block-expose-sort-compare.function.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -122,7 +123,10 @@ export abstract class UmbBlockManagerContext<
 	// TODO: This is a bad seperation of concerns, this should be self initializing, not defined from the outside. [NL]
 	public readonly readOnlyState = new UmbReadOnlyVariantGuardManager(this);
 
-	readonly #exposes = new UmbArrayState(<Array<UmbBlockExposeModel>>[], (x) => x.contentKey + ':' + x.culture);
+	readonly #exposes = new UmbArrayState(
+		<Array<UmbBlockExposeModel>>[],
+		(x) => x.contentKey + ':' + x.culture,
+	).sortBy(umbBlockExposeSortCompare);
 	public readonly exposes = this.#exposes.asObservable();
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {

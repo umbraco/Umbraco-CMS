@@ -1,9 +1,9 @@
-import type { UmbContentLikeDetailModel, UmbEntryValueModel, UmbPotentialContentValueModel } from '../types.js';
-import { sortEntryValuesByCulture } from '../utils/sort-entry-values-by-culture.function.js';
+import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '../types.js';
+import { _sortContentValuesByVariant } from '../utils/sort-content-values-by-variant.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbVariantId, type UmbEntityVariantModel, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbVariantObjectSortCompare, type UmbEntityVariantModel, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 
 /**
  * @function defaultCompareVariantMethod
@@ -57,7 +57,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 				currentData.variants,
 				selectedVariants,
 				defaultCompareVariantMethod,
-			);
+			).sort(umbVariantObjectSortCompare);
 		}
 
 		this.destroy();
@@ -107,7 +107,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			)
 		).filter((x) => x !== undefined) as Array<T>;
 
-		return sortEntryValuesByCulture(values as unknown as Array<UmbEntryValueModel>) as unknown as Array<T>;
+		return _sortContentValuesByVariant(values);
 	}
 
 	/**

@@ -1420,6 +1420,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'login_passwordIsBlank',
 	'login_passwordMinLength',
 	'login_passwordMismatch',
+	'login_passwordResetUnavailable',
 	'login_receivedErrorFromServer',
 	'login_rememberMe',
 	'login_requestPasswordResetConfirmation',
