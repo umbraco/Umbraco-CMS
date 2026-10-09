@@ -59,6 +59,7 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerInputContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerInputContext.max;
@@ -103,13 +104,17 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 
 	@property({ type: Array, attribute: 'data-source-types' })
 	public set dataSourceTypes(value: Array<string>) {
@@ -185,12 +190,13 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 					(status) => {
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
+						const isError = status.state.type === 'error';
 						return html`<umb-entity-item-ref
 							id=${unique}
 							.item=${item}
-							?error=${status.state.type === 'error'}
+							?error=${isError}
 							.errorMessage=${status.state.error}
-							?readonly=${this.readonly}
+							?readonly=${this.readonly || isError}
 							?standalone=${this.max === 1}>
 							${when(
 								!this.readonly,

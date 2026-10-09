@@ -68,7 +68,6 @@ parameters:
     default: false
 
 variables:
-  nodeVersion: 20
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -104,13 +103,9 @@ stages:
             inputs:
               command: restore
               projects: $(solution)
-          - task: DotNetCoreCLI@2
+          - script: dotnet build $(solution) --configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
             name: build
             displayName: Run dotnet build and generate NuGet packages
-            inputs:
-              command: build
-              projects: $(solution)
-              arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
           # Publish compiled DLLs for C# API documentation generation
           # Separate artifact to avoid increasing build_output size for all builds
           - task: PublishPipelineArtifact@1
@@ -168,7 +163,6 @@ stages:
             fetchDepth: 500
           - template: templates/e2e-install.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               npm_config_cache: ${{ variables.npm_config_cache }}
           - template: templates/set-npm-version.yml
             parameters:
@@ -609,7 +603,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
@@ -687,7 +680,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
@@ -797,7 +789,7 @@ stages:
             lfs: false
             fetchDepth: 1
             fetchFilter: tree:0
-          - task: NodeTool@0
+          - task: UseNode@1
             displayName: Use Node.js
             retryCountOnTaskFailure: 3
             inputs:
@@ -832,7 +824,6 @@ stages:
             fetchFilter: tree:0
           - template: templates/e2e-install.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               npm_config_cache: ${{ variables.npm_config_cache }}
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
@@ -941,7 +932,7 @@ stages:
         pool: server
         timeoutInMinutes: 4320 # 3 days
         steps:
-          - task: ManualValidation@0
+          - task: ManualValidation@1
             displayName: Manual approval to push to NuGet
             inputs:
               notifyUsers: ''

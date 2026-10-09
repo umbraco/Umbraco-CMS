@@ -56,6 +56,14 @@ describe('UmbResourceController', () => {
 			expect(UmbCancelError.isUmbCancelError(result)).to.equal(true);
 		});
 
+		it('maps an AbortError from an aborted fetch to an UmbCancelError', () => {
+			const abortError = new DOMException('signal is aborted without reason', 'AbortError');
+
+			const result = controller.mapToUmbError(abortError);
+
+			expect(UmbCancelError.isUmbCancelError(result)).to.equal(true);
+		});
+
 		it('falls back to a generic Unknown error for unrecognizable non-Error values', () => {
 			const result = controller.mapToUmbError('some random string') as UmbApiError;
 

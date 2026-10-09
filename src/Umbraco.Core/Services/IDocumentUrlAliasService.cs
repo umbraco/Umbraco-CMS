@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core.Models;
+
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
@@ -5,6 +7,15 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IDocumentUrlAliasService
 {
+    /// <summary>
+    /// Gets a value indicating whether the service has been initialized and may persist aliases.
+    /// </summary>
+    /// <remarks>
+    /// False while the application is upgrading, when the alias table may not exist yet.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    bool IsInitialized => true;
+
     /// <summary>
     /// Initializes the service and ensures the alias cache is populated from the database.
     /// </summary>
@@ -39,6 +50,38 @@ public interface IDocumentUrlAliasService
     /// </summary>
     /// <param name="documentKey">The document key.</param>
     Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey);
+
+    /// <summary>
+    /// Persists the aliases of a document from the document itself, taking the locks that order the write against
+    /// saves and against <see cref="RebuildAllAliasesAsync"/>.
+    /// </summary>
+    /// <param name="document">The document whose aliases to persist.</param>
+    /// <returns>A task that completes when the aliases are persisted.</returns>
+    // TODO (V19): Remove the default implementation.
+    Task PersistAliasesAsync(IContent document)
+        => PersistAliasesAsync(document, contentTreeWriteLockHeld: false);
+
+    /// <summary>
+    /// Persists the aliases of a document from the document itself.
+    /// </summary>
+    /// <param name="document">The document whose aliases to persist.</param>
+    /// <param name="contentTreeWriteLockHeld">
+    /// True only when the caller holds the content tree write lock, as the transaction that persists
+    /// <paramref name="document"/> does; the write then needs no lock of its own. Any other caller passes false
+    /// and the implementation takes the content tree read lock and the alias write lock itself.
+    /// </param>
+    /// <remarks>
+    /// The CMS calls this from the document repository's refresh notification, inside the transaction that persists
+    /// <paramref name="document"/>. Only a change to the document's published state or trashed state can change its
+    /// aliases, so any other save is a no-op. Implementations must work from <paramref name="document"/> itself:
+    /// inside the content transaction the repository caches still hold the document as it was before the save, so
+    /// loading it by key would persist the previous aliases. The default implementation only keeps implementations
+    /// written before this member compiling; it is not a correct implementation of the contract.
+    /// </remarks>
+    /// <returns>A task that completes when the aliases are persisted.</returns>
+    // TODO (V19): Remove the default implementation.
+    Task PersistAliasesAsync(IContent document, bool contentTreeWriteLockHeld)
+        => CreateOrUpdateAliasesAsync(document.Key);
 
     /// <summary>
     /// Deletes all aliases from the cache for a collection of document keys.

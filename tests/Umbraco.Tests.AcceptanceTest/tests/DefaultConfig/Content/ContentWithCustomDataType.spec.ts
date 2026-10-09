@@ -303,3 +303,251 @@ test('can save content after changing the property editor of the custom data typ
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value).toContain(inputText);
 });
+
+test('can navigate away from content with a saved email address value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  customDataTypeName = 'Email Address';
+  const emailAddress = 'test@acceptance.test';
+  const customDataTypeId = await umbracoApi.dataType.createEmailAddressDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterTextstring(emailAddress);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed email address value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  customDataTypeName = 'Email Address';
+  const emailAddress = 'test@acceptance.test';
+  const customDataTypeId = await umbracoApi.dataType.createEmailAddressDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterTextstring(emailAddress);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});
+
+test('can navigate away from content with a saved decimal value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  customDataTypeName = 'Decimal';
+  const decimal = 3.9;
+  const customDataTypeId = await umbracoApi.dataType.createDecimalDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterDecimal(decimal);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed decimal value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  customDataTypeName = 'Decimal';
+  const decimal = 3.9;
+  const customDataTypeId = await umbracoApi.dataType.createDecimalDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterDecimal(decimal);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});
+
+test('can navigate away from content with a saved code editor value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  customDataTypeName = 'Code Editor';
+  const javascriptCode = 'const test = \'This is the acceptance test\';';
+  const customDataTypeId = await umbracoApi.dataType.createCodeEditorDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterCodeEditorValue(javascriptCode);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed code editor value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  customDataTypeName = 'Code Editor';
+  const javascriptCode = 'const test = \'This is the acceptance test\';';
+  const customDataTypeId = await umbracoApi.dataType.createCodeEditorDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterCodeEditorValue(javascriptCode);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});
+
+test('can navigate away from content with a saved markdown editor value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  customDataTypeName = 'Markdown Editor';
+  const inputText = '# This is test heading\r\n> This is test quote';
+  const customDataTypeId = await umbracoApi.dataType.createMarkdownEditorDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterMarkdownEditorValue(inputText);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed markdown editor value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  customDataTypeName = 'Markdown Editor';
+  const inputText = '# This is test heading\r\n> This is test quote';
+  const customDataTypeId = await umbracoApi.dataType.createMarkdownEditorDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterMarkdownEditorValue(inputText);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});
+
+test('can navigate away from content with a saved multiple text string value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  customDataTypeName = 'Multiple Text String';
+  const multipleTextStringValue = 'Test text string item';
+  const customDataTypeId = await umbracoApi.dataType.createMultipleTextStringDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.addMultipleTextStringItem(multipleTextStringValue);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed multiple text string value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  customDataTypeName = 'Multiple Text String';
+  const multipleTextStringValue = 'Test text string item';
+  const customDataTypeId = await umbracoApi.dataType.createMultipleTextStringDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.addMultipleTextStringItem(multipleTextStringValue);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});
+
+test('can navigate away from content with a saved slider value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  customDataTypeName = 'Slider';
+  const sliderValue = 10;
+  const expectedValue = {
+    "from": sliderValue,
+    "to": sliderValue
+  }
+  const customDataTypeId = await umbracoApi.dataType.createSliderDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.changeSliderValue(sliderValue.toString());
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed slider value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  customDataTypeName = 'Slider';
+  const sliderValue = 10;
+  const expectedValue = {
+    "from": sliderValue,
+    "to": sliderValue
+  }
+  const customDataTypeId = await umbracoApi.dataType.createSliderDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.changeSliderValue(sliderValue.toString());
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});

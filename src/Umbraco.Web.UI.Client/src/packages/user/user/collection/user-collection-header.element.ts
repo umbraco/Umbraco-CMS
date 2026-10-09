@@ -65,7 +65,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	}
 
 	async #requestUserGroups() {
-		const { data } = await this.#userGroupCollectionRepository.requestCollection();
+		const { data } = await this.#userGroupCollectionRepository.requestAllItems();
 
 		if (data) {
 			this._userGroups = data.items;

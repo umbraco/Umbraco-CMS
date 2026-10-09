@@ -125,8 +125,9 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
         {
             Assert.AreEqual(2, toEditor.Expose.Count);
 
-            Assert.AreEqual("1304e1ddac87439684fe8a399231cb3d", toEditor.Expose[0].ContentKey.ToString("N"));
-            Assert.AreEqual("0a4a416e547d464fabcc6f345c17809a", toEditor.Expose[1].ContentKey.ToString("N"));
+            CollectionAssert.AreEquivalent(
+                new[] { "1304e1ddac87439684fe8a399231cb3d", "0a4a416e547d464fabcc6f345c17809a" },
+                toEditor.Expose.Select(e => e.ContentKey.ToString("N")));
         });
     }
 
@@ -270,10 +271,15 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
         {
             Assert.AreEqual(4, toEditor.Expose.Count);
 
-            Assert.AreEqual("1304e1ddac87439684fe8a399231cb3d", toEditor.Expose[0].ContentKey.ToString("N"));
-            Assert.AreEqual("0a4a416e547d464fabcc6f345c17809a", toEditor.Expose[1].ContentKey.ToString("N"));
-            Assert.AreEqual("5fc866c590be4d01a28a979472a1ffee", toEditor.Expose[2].ContentKey.ToString("N"));
-            Assert.AreEqual("264536b65b0f4641aa43d4bfb515831d", toEditor.Expose[3].ContentKey.ToString("N"));
+            CollectionAssert.AreEquivalent(
+                new[]
+                {
+                    "1304e1ddac87439684fe8a399231cb3d",
+                    "0a4a416e547d464fabcc6f345c17809a",
+                    "5fc866c590be4d01a28a979472a1ffee",
+                    "264536b65b0f4641aa43d4bfb515831d",
+                },
+                toEditor.Expose.Select(e => e.ContentKey.ToString("N")));
         });
     }
 

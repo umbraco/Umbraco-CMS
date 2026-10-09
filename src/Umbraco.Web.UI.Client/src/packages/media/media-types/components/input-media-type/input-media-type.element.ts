@@ -65,6 +65,11 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		if (value === 1) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
 	}
 	public get max(): number {
 		return this.#pickerContext.max;

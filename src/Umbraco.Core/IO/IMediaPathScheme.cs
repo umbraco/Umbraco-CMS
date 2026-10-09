@@ -32,4 +32,25 @@ public interface IMediaPathScheme
     ///     <para>Can return null (or empty) when no directory should be deleted.</para>
     /// </remarks>
     string? GetDeleteDirectory(MediaFileManager fileSystem, string filepath);
+
+    /// <summary>
+    ///     Determines whether a media file path is one this scheme could have produced for the given content and
+    ///     property type.
+    /// </summary>
+    /// <param name="fileManager">The media filesystem.</param>
+    /// <param name="filepath">The filesystem-relative path of the file to check.</param>
+    /// <param name="itemGuid">The (content, media) item unique identifier the file is expected to belong to.</param>
+    /// <param name="propertyGuid">The property type unique identifier the file is expected to belong to.</param>
+    /// <returns>
+    ///     <c>true</c> if the path could belong to <paramref name="itemGuid" /> and <paramref name="propertyGuid" />;
+    ///     otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         Used before deleting or renaming a file referenced by a stored property value, to confirm the path
+    ///         belongs to the item being processed rather than one supplied by a client to target another item's file.
+    ///     </para>
+    /// </remarks>
+    // TODO (V19): Remove default implementation.
+    bool IsFilePathOwnedBy(MediaFileManager fileManager, string filepath, Guid itemGuid, Guid propertyGuid) => true;
 }
