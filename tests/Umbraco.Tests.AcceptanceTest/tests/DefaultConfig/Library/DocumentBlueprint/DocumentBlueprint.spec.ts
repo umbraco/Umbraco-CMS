@@ -4,17 +4,20 @@ import {expect} from "@playwright/test";
 const documentBlueprintName = 'TestDocumentBlueprints';
 const documentTypeName = 'DocumentTypeForBlueprint';
 const documentBlueprintFolderName = 'BlueprintFolder';
+const elementTypeName = 'ElementTypeForBlueprint';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
 test('can create a document blueprint from the library menu', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -34,6 +37,23 @@ test('can create a document blueprint from the library menu', {tag: '@smoke'}, a
   // Assert
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeTruthy();
   await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true);
+});
+
+test('cannot choose an element type when creating a document blueprint', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
+  await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.documentBlueprint.goToSection(ConstantHelper.sections.library);
+
+  // Act
+  await umbracoUi.documentBlueprint.clickActionsMenuAtRoot();
+  await umbracoUi.documentBlueprint.clickCreateActionMenuOption();
+  await umbracoUi.documentBlueprint.clickCreateNewDocumentBlueprintButton();
+
+  // Assert
+  await umbracoUi.documentBlueprint.isDocumentTypeVisibleForDocumentBlueprint(documentTypeName);
+  await umbracoUi.documentBlueprint.isDocumentTypeVisibleForDocumentBlueprint(elementTypeName, false);
 });
 
 test('can rename a document blueprint', async ({umbracoApi, umbracoUi}) => {
@@ -145,6 +165,35 @@ test('can create a document blueprint from the content menu in a folder', {tag: 
   const children = await umbracoApi.documentBlueprint.getChildren(folderId);
   expect(children.length).toBe(1);
   expect(children[0].name).toBe(documentBlueprintName);
+});
+
+test('can create a document blueprint from the content menu in a nested folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const childFolderName = 'ChildBlueprintFolder';
+  await umbracoApi.documentBlueprint.ensureNameNotExists(childFolderName);
+  const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
+  await umbracoApi.document.createDefaultDocument(documentBlueprintName, documentTypeId);
+  const parentFolderId = await umbracoApi.documentBlueprint.createFolder(documentBlueprintFolderName);
+  const childFolderId = await umbracoApi.documentBlueprint.createFolder(childFolderName, parentFolderId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(documentBlueprintName);
+  await umbracoUi.content.clickCreateBlueprintActionMenuOption();
+  // Both the blueprint root and the parent folder render collapsed.
+  await umbracoUi.content.openCaretButtonForName('Document Blueprints');
+  await umbracoUi.content.openCaretButtonForName(documentBlueprintFolderName);
+  await umbracoUi.content.clickModalMenuItemWithName(childFolderName);
+  await umbracoUi.content.clickSaveModalButtonAndWaitForDocumentBlueprintToBeCreated();
+
+  // Assert
+  const children = await umbracoApi.documentBlueprint.getChildren(childFolderId);
+  expect(children.length).toBe(1);
+  expect(children[0].name).toBe(documentBlueprintName);
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
 test('cannot save a document blueprint from the content menu without choosing a location', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {

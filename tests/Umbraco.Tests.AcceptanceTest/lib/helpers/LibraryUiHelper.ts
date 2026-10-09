@@ -8,6 +8,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   private readonly publishBtn: Locator;
   private readonly unpublishBtn: Locator;
   private readonly actionMenuForElementBtn: Locator;
+  private readonly elementSidebarHeader: Locator;
   private readonly textstringTxt: Locator;
   private readonly infoTab: Locator;
   private readonly linkElement: Locator;
@@ -203,7 +204,8 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.elementNameTxt = page.locator('#name-input input');
     this.publishBtn = page.getByLabel(/^Publish(…)?$/);
     this.unpublishBtn = page.getByLabel(/^Unpublish(…)?$/);
-    this.actionMenuForElementBtn = page.locator('[data-mark="section-sidebar-app:Umb.SidebarMenu.Element"]').getByTestId('open-dropdown');
+    this.elementSidebarHeader = page.locator('[data-mark="section-sidebar-app:Umb.SidebarMenu.Element"]');
+    this.actionMenuForElementBtn = this.elementSidebarHeader.getByTestId('open-dropdown');
     this.textstringTxt = page.locator('umb-property-editor-ui-text-box #input');
     this.reloadChildrenThreeDotsBtn = page.getByRole('button', {name: 'Reload children…'});
     this.elementTree = page.locator('umb-tree[alias="Umb.Tree.Element"]');
@@ -413,6 +415,10 @@ export class LibraryUiHelper extends UiBaseLocators {
   async clickSaveAndPublishButton() {
     await this.click(this.saveAndPublishBtn);
     await this.page.waitForTimeout(ConstantHelper.wait.short);
+  }
+
+  async isElementSidebarHeaderVisible(isVisible: boolean = true) {
+    return this.isVisible(this.elementSidebarHeader, isVisible);
   }
 
   async isSuccessStateVisibleForSaveAndPublishButton (isVisible: boolean = true){
