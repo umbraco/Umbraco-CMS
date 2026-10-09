@@ -8,9 +8,7 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 		id: 'the-simplest-document-id',
 		documentType: {
 			id: 'the-simplest-document-type-id',
-			icon: 'icon-document',
 		},
-		hasChildren: false,
 		isFolder: false,
 		parent: null,
 		name: 'The Simplest Document Blueprint',
@@ -42,9 +40,7 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 		id: 'forbidden',
 		documentType: {
 			id: 'the-simplest-document-type-id',
-			icon: 'icon-document',
 		},
-		hasChildren: false,
 		isFolder: false,
 		parent: null,
 		name: 'A Forbidden Document Blueprint',

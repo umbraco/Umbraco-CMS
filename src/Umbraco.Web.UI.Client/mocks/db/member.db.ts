@@ -64,9 +64,16 @@ class UmbMemberMockDB extends UmbEntityMockDbBase<UmbMockMemberModel> {
 
 		const paginatedItems = filteredItems.slice(filterOptions.skip, filterOptions.skip + filterOptions.take);
 
-		return { total: totalItems, items: paginatedItems };
+		return { total: totalItems, items: paginatedItems.map(detailResponseMapper) };
 	}
 }
+
+const memberTypeReference = (id: string) => {
+	const memberType = umbMemberTypeMockDb.read(id);
+	if (!memberType) throw new Error(`Member type with id ${id} not found`);
+
+	return { id: memberType.id, icon: memberType.icon };
+};
 
 const createDetailMockMapper = (request: CreateMemberRequestModel): UmbMockMemberModel => {
 	const memberType = umbMemberTypeMockDb.read(request.memberType.id);
@@ -86,10 +93,7 @@ const createDetailMockMapper = (request: CreateMemberRequestModel): UmbMockMembe
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
 		kind: MemberKindModel.DEFAULT,
-		memberType: {
-			id: memberType.id,
-			icon: memberType.icon,
-		},
+		memberType: { id: memberType.id },
 		username: request.username,
 		values: request.values as MemberValueResponseModel[],
 		flags: [],
@@ -118,7 +122,7 @@ const detailResponseMapper = (item: UmbMockMemberModel): MemberResponseModel => 
 		lastLockoutDate: item.lastLockoutDate,
 		lastLoginDate: item.lastLoginDate,
 		lastPasswordChangeDate: item.lastPasswordChangeDate,
-		memberType: item.memberType,
+		memberType: memberTypeReference(item.memberType.id),
 		username: item.username,
 		values: item.values,
 		variants: item.variants,
@@ -130,7 +134,7 @@ const itemResponseMapper = (item: UmbMockMemberModel): MemberItemResponseModel =
 	return {
 		id: item.id,
 		kind: item.kind,
-		memberType: item.memberType,
+		memberType: memberTypeReference(item.memberType.id),
 		variants: item.variants,
 		flags: item.flags,
 	};

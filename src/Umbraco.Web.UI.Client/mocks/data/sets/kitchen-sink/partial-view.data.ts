@@ -7,7 +7,6 @@ export const data: Array<UmbMockPartialViewModel> = [
 		path: '/blockgrid',
 		parent: null,
 		isFolder: true,
-		hasChildren: true,
 		content: '',
 	},
 	{
@@ -15,7 +14,6 @@ export const data: Array<UmbMockPartialViewModel> = [
 		path: '/blocklist',
 		parent: null,
 		isFolder: true,
-		hasChildren: true,
 		content: '',
 	},
 	{
@@ -25,7 +23,6 @@ export const data: Array<UmbMockPartialViewModel> = [
 			path: '/blockgrid',
 		},
 		isFolder: false,
-		hasChildren: false,
 		content: `@using Umbraco.Extensions
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridArea>
 
@@ -44,7 +41,6 @@ export const data: Array<UmbMockPartialViewModel> = [
 			path: '/blocklist',
 		},
 		isFolder: false,
-		hasChildren: false,
 		content: `@using Umbraco.Extensions
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>
 @{

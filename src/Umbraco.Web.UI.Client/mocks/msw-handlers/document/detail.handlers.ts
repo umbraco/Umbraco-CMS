@@ -1,6 +1,7 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 import type { UmbMockDocumentModel } from '../../data/mock-data-set.types.js';
 import { umbMockManager } from '../../mock-manager.js';
+import { resolveTrackedReferences } from '../../db/tracked-reference.resolver.js';
 import { umbDocumentMockDb } from '../../db/document.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
@@ -15,7 +16,7 @@ import type {
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 function getReferenceData() {
-	return umbMockManager.getDataSet().trackedReferenceItems ?? [];
+	return resolveTrackedReferences(umbMockManager.getDataSet().trackedReferenceItems ?? []);
 }
 
 export const detailHandlers = [

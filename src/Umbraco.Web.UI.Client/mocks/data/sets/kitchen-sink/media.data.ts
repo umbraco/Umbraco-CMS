@@ -2,7 +2,6 @@ import type { UmbMockMediaModel } from '../../mock-data-set.types.js';
 
 export const data: Array<UmbMockMediaModel> = [
 	{
-		hasChildren: true,
 		id: '5deac19f-5ca8-4b8c-a784-26593cec8d51',
 		createDate: '2023-02-20 15:33:36',
 		parent: null,
@@ -10,10 +9,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d',
-			icon: 'icon-folder',
-			collection: {
-				id: '3a0156c4-3b8c-4803-bdc1-6871faa83fff',
-			},
 		},
 		values: [],
 		variants: [
@@ -29,7 +24,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: '76c02ec8-6a82-4c47-95da-56f6628b58fb',
 		createDate: '2023-02-20 16:27:34',
 		parent: null,
@@ -37,7 +31,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'cc07b313-0843-4aa8-bbda-871c8da728c8',
-			icon: 'icon-picture',
 		},
 		values: [
 			{
@@ -86,7 +79,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: 'ee9c1205-4121-4610-b0b3-a522dfd3461d',
 		createDate: '2024-02-22 09:00:58',
 		parent: null,
@@ -94,7 +86,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'cc07b313-0843-4aa8-bbda-871c8da728c8',
-			icon: 'icon-picture',
 		},
 		values: [
 			{
@@ -143,7 +134,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: true,
 		id: '95a8b7fc-cfec-4fb4-bce2-2dd1bc4818b4',
 		createDate: '2023-02-20 15:33:40',
 		parent: {
@@ -153,10 +143,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d',
-			icon: 'icon-folder',
-			collection: {
-				id: '3a0156c4-3b8c-4803-bdc1-6871faa83fff',
-			},
 		},
 		values: [],
 		variants: [
@@ -172,7 +158,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: 'b44956af-620a-4e17-bbce-3987446fb2f1',
 		createDate: '2023-02-20 16:27:38',
 		parent: {
@@ -182,7 +167,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'cc07b313-0843-4aa8-bbda-871c8da728c8',
-			icon: 'icon-picture',
 		},
 		values: [
 			{
@@ -231,7 +215,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: true,
 		id: 'bb5e18f3-c2e8-4800-9d1f-5584d5173a5d',
 		createDate: '2023-02-20 15:33:49',
 		parent: {
@@ -241,10 +224,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d',
-			icon: 'icon-folder',
-			collection: {
-				id: '3a0156c4-3b8c-4803-bdc1-6871faa83fff',
-			},
 		},
 		values: [],
 		variants: [
@@ -260,7 +239,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: 'f06adb91-8cdd-408d-83dd-f7b833fc393c',
 		createDate: '2023-02-20 16:27:44',
 		parent: {
@@ -270,7 +248,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'cc07b313-0843-4aa8-bbda-871c8da728c8',
-			icon: 'icon-picture',
 		},
 		values: [
 			{
@@ -319,7 +296,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: 'a0651d98-14a9-4d92-8133-36f59b248d31',
 		createDate: '2023-02-20 16:27:47',
 		parent: {
@@ -329,7 +305,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'cc07b313-0843-4aa8-bbda-871c8da728c8',
-			icon: 'icon-picture',
 		},
 		values: [
 			{

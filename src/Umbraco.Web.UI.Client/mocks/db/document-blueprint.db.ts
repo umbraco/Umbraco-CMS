@@ -30,16 +30,22 @@ export class UmbDocumentBlueprintMockDB extends UmbEntityMockDbBase<UmbMockDocum
 	}
 }
 
-const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintTreeItemResponseModel => {
-	const documentType = umbDocumentTypeMockDb.read(model.documentType.id);
-	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
+const documentTypeReference = (id: string) => {
+	const documentType = umbDocumentTypeMockDb.read(id);
+	if (!documentType) throw new Error(`Document type with id ${id} not found`);
 
 	return {
-		documentType: {
-			icon: documentType.icon,
-			id: documentType.id,
-		},
-		hasChildren: model.hasChildren,
+		collection: documentType.collection,
+		icon: documentType.icon,
+		id: documentType.id,
+	};
+};
+
+const treeItemMapper = (
+	model: UmbMockDocumentBlueprintModel,
+): Omit<DocumentBlueprintTreeItemResponseModel, 'hasChildren'> => {
+	return {
+		documentType: documentTypeReference(model.documentType.id),
 		id: model.id,
 		isFolder: model.isFolder,
 		name: model.name,
@@ -58,12 +64,7 @@ const createMockDocumentBlueprintMapper = (
 	const now = new Date().toString();
 
 	return {
-		documentType: {
-			id: documentType.id,
-			icon: documentType.icon,
-			collection: undefined, // TODO: get list from doc type when ready
-		},
-		hasChildren: false,
+		documentType: { id: documentType.id },
 		id: request.id ? request.id : UmbId.new(),
 		isFolder: false,
 		name: request.variants[0].name,
@@ -88,7 +89,7 @@ const createMockDocumentBlueprintMapper = (
 
 const detailResponseMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintResponseModel => {
 	return {
-		documentType: model.documentType,
+		documentType: documentTypeReference(model.documentType.id),
 		id: model.id,
 		values: model.values,
 		variants: model.variants,
@@ -98,11 +99,7 @@ const detailResponseMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlu
 
 const itemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintItemResponseModel => {
 	return {
-		documentType: {
-			collection: model.documentType.collection,
-			icon: model.documentType.icon,
-			id: model.documentType.id,
-		},
+		documentType: documentTypeReference(model.documentType.id),
 		id: model.id,
 		name: model.name,
 		flags: model.flags,

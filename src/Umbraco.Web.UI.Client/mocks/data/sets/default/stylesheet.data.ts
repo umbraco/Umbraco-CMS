@@ -6,7 +6,6 @@ export const data: Array<UmbMockStylesheetModel> = [
 		path: '/rte-styles.css',
 		parent: null,
 		isFolder: false,
-		hasChildren: false,
 		content: `
 /** RTE Stylesheet */
 
@@ -35,7 +34,6 @@ h4 {
 		path: '/rte-styles-2.css',
 		parent: null,
 		isFolder: false,
-		hasChildren: false,
 		content: `
 /** RTE Stylesheet 2 */
 
@@ -60,7 +58,6 @@ span {
 		path: '/folder-for-website',
 		parent: null,
 		isFolder: true,
-		hasChildren: true,
 		content: '',
 	},
 	{
@@ -69,7 +66,6 @@ span {
 		parent: {
 			path: '/folder-for-website',
 		},
-		hasChildren: false,
 		isFolder: false,
 		content: `
 /** Website Stylesheet */
@@ -86,7 +82,6 @@ body {
 		path: '/forbidden',
 		parent: null,
 		isFolder: false,
-		hasChildren: false,
 		content: `console.log('You are not allowed to see this stylesheet!');`,
 	},
 ];

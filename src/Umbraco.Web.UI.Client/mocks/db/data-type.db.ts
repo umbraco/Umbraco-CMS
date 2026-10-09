@@ -63,10 +63,9 @@ class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
 	}
 }
 
-const treeItemMapper = (model: UmbMockDataTypeModel): DataTypeTreeItemResponseModel => {
+const treeItemMapper = (model: UmbMockDataTypeModel): Omit<DataTypeTreeItemResponseModel, 'hasChildren'> => {
 	return {
 		name: model.name,
-		hasChildren: model.hasChildren,
 		id: model.id,
 		parent: model.parent,
 		isFolder: model.isFolder,
@@ -81,7 +80,6 @@ const createFolderMockMapper = (request: CreateFolderRequestModel): UmbMockDataT
 		id: request.id ? request.id : UmbId.new(),
 		parent: request.parent,
 		isFolder: true,
-		hasChildren: false,
 		editorAlias: '',
 		editorUiAlias: '',
 		isDeletable: true,
@@ -101,7 +99,6 @@ const createDetailMockMapper = (request: CreateDataTypeRequestModel): UmbMockDat
 		values: request.values,
 		canIgnoreStartNodes: false,
 		isFolder: false,
-		hasChildren: false,
 		isDeletable: true,
 		flags: [],
 	};

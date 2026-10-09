@@ -13,7 +13,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: null,
 		isFolder: false,
 		properties: [

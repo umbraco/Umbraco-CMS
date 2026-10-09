@@ -23,7 +23,6 @@ const createDetailMockMapper = (request: CreateTemplateRequestModel): UmbMockTem
 		id: UmbId.new(),
 		parent: null,
 		name: request.name,
-		hasChildren: false,
 		alias: request.alias,
 		content: request.content,
 		flags: [],

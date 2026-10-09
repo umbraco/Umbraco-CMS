@@ -12,7 +12,7 @@ export interface UmbMockEntityTreeSource<T> {
 	create?(item: T): string | void;
 }
 
-export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: string } | null; hasChildren: boolean }> {
+export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: string } | null }> {
 	#db: UmbMockEntityTreeSource<T>;
 	#treeItemMapper: (item: T) => any;
 
@@ -49,20 +49,19 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 			items.push(item);
 			currentId = item.parent?.id;
 		}
-		return items.reverse().map((item) => this.#treeItemMapper(item));
+		return items.reverse().map((item) => this.#toTreeItem(item));
+	}
+
+	#toTreeItem(item: T) {
+		return {
+			...this.#treeItemMapper(item),
+			hasChildren: this._getVisibleItems().some((child) => child.parent?.id === item.id),
+		};
 	}
 
 	#pagedTreeResult({ items, skip, take }: { items: Array<T>; skip: number; take: number }) {
 		const paged = pagedResult(items, skip, take);
-		const treeItems = paged.items.map((item) => this.#treeItemMapper(item));
-		const treeItemsHasChildren = treeItems.map((item) => {
-			const children = this._getVisibleItems().filter((child) => child.parent?.id === item.id);
-			return {
-				...item,
-				hasChildren: children.length > 0,
-			};
-		});
-		return { items: treeItemsHasChildren, total: paged.total };
+		return { items: paged.items.map((item) => this.#toTreeItem(item)), total: paged.total };
 	}
 
 	/** Returns `null` (not a hollow empty result) when `targetId` isn't resolvable in this tree, so callers can respond with a proper "not found" instead of masking the failure. */
@@ -94,21 +93,16 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		const totalBefore = startIndex;
 		const totalAfter = allSiblings.length - endIndex;
 
-		const treeItems = slicedItems.map((item) => this.#treeItemMapper(item));
-		const treeItemsHasChildren = treeItems.map((item) => {
-			const children = this._getVisibleItems().filter((child) => child.parent?.id === item.id);
-			return { ...item, hasChildren: children.length > 0 };
-		});
-
-		return { items: treeItemsHasChildren, totalBefore, totalAfter };
+		return { items: slicedItems.map((item) => this.#toTreeItem(item)), totalBefore, totalAfter };
 	}
 
 	/** A `null`/`undefined` `destinationId` moves the items to the tree root. */
 	move(ids: Array<string>, destinationId: string | null | undefined) {
 		if (!this.#db.update) throw new Error('move() requires a DB with update() method');
 
-		const destinationItem = destinationId ? this.#db.read(destinationId) : undefined;
-		if (destinationId && !destinationItem) throw new Error(`Destination item with id ${destinationId} not found`);
+		if (destinationId && !this.#db.read(destinationId)) {
+			throw new Error(`Destination item with id ${destinationId} not found`);
+		}
 
 		const items: Array<any> = [];
 
@@ -126,11 +120,6 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		});
 
 		movedItems.forEach((movedItem: any) => this.#db.update!(movedItem.id, movedItem));
-
-		if (destinationItem) {
-			destinationItem.hasChildren = true;
-			this.#db.update(destinationItem.id, destinationItem);
-		}
 	}
 
 	/** A `null`/`undefined` `destinationId` copies the items to the tree root. */
@@ -138,8 +127,9 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		if (!this.#db.update || !this.#db.create)
 			throw new Error('copy() requires a DB with update() and create() methods');
 
-		const destinationItem = destinationId ? this.#db.read(destinationId) : undefined;
-		if (destinationId && !destinationItem) throw new Error(`Destination item with id ${destinationId} not found`);
+		if (destinationId && !this.#db.read(destinationId)) {
+			throw new Error(`Destination item with id ${destinationId} not found`);
+		}
 
 		// Notice we don't add numbers to the 'copy' name.
 		const items: Array<any> = [];
@@ -160,13 +150,7 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		});
 
 		copyItems.forEach((copyItem) => this.#db.create!(copyItem));
-		const newIds = copyItems.map((item) => item.id);
 
-		if (destinationItem) {
-			destinationItem.hasChildren = true;
-			this.#db.update(destinationItem.id, destinationItem);
-		}
-
-		return newIds;
+		return copyItems.map((item) => item.id);
 	}
 }

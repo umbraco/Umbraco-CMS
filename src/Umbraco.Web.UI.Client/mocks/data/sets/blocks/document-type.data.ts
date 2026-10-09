@@ -23,7 +23,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: true,
 		parent: null,
 		isFolder: true,
 		properties: [],
@@ -51,7 +50,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: true,
-		hasChildren: false,
 		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
 		isFolder: false,
 		properties: [
@@ -133,7 +131,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: true,
-		hasChildren: false,
 		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
 		isFolder: false,
 		properties: [
@@ -235,7 +232,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
 		isFolder: false,
 		properties: [

@@ -1,6 +1,7 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 import { umbMediaMockDb } from '../../db/media.db.js';
 import { umbMockManager } from '../../mock-manager.js';
+import { resolveTrackedReferences } from '../../db/tracked-reference.resolver.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateMediaRequestModel,
@@ -14,7 +15,7 @@ import type { UmbMediaDetailModel } from '@umbraco-cms/backoffice/media';
  *
  */
 function getReferenceData() {
-	return umbMockManager.getDataSet().trackedReferenceItems ?? [];
+	return resolveTrackedReferences(umbMockManager.getDataSet().trackedReferenceItems ?? []);
 }
 
 export const detailHandlers = [

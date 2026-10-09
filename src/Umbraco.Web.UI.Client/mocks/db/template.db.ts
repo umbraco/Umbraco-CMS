@@ -20,10 +20,9 @@ class UmbTemplateMockDB extends UmbEntityMockDbBase<UmbMockTemplateModel> {
 	}
 }
 
-const treeItemMapper = (model: UmbMockTemplateModel): NamedEntityTreeItemResponseModel => {
+const treeItemMapper = (model: UmbMockTemplateModel): Omit<NamedEntityTreeItemResponseModel, 'hasChildren'> => {
 	return {
 		name: model.name,
-		hasChildren: model.hasChildren,
 		id: model.id,
 		parent: model.parent,
 		flags: model.flags,

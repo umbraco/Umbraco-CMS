@@ -1,4 +1,5 @@
 import type { UmbMockRelationTypeModel, UmbMockRelationTypeItemModel } from '../data/mock-data-set.types.js';
+import { umbObjectTypeMockDb } from './object-type.db.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import type {
@@ -19,6 +20,8 @@ const createDetailMockMapper = (): UmbMockRelationTypeModel => {
 	throw new Error('Not possible to create a relation type');
 };
 
+const objectTypeReference = (id: string) => ({ id, name: umbObjectTypeMockDb.getById(id)?.name ?? null });
+
 const detailResponseMapper = (item: UmbMockRelationTypeModel): RelationTypeResponseModel => {
 	return {
 		id: item.id,
@@ -26,8 +29,8 @@ const detailResponseMapper = (item: UmbMockRelationTypeModel): RelationTypeRespo
 		isDependency: item.isDependency,
 		name: item.name,
 		alias: item.alias,
-		childObject: item.childObject,
-		parentObject: item.parentObject,
+		childObject: item.childObject ? objectTypeReference(item.childObject.id) : null,
+		parentObject: item.parentObject ? objectTypeReference(item.parentObject.id) : null,
 	};
 };
 

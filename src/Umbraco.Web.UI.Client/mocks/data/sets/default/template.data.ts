@@ -10,7 +10,6 @@ export const data: Array<UmbMockTemplateModel> = [
 		id: '2bf464b6-3aca-4388-b043-4eb439cc2643',
 		parent: null,
 		name: 'Doc 1',
-		hasChildren: false,
 		alias: 'Doc1',
 		flags: [],
 		content: `@using Umbraco.Extensions
@@ -31,7 +30,6 @@ export const data: Array<UmbMockTemplateModel> = [
 		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		parent: null,
 		name: 'Test',
-		hasChildren: true,
 		alias: 'Test',
 		flags: [],
 		content:
@@ -42,7 +40,6 @@ export const data: Array<UmbMockTemplateModel> = [
 		parent: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		masterTemplate: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		name: 'Child',
-		hasChildren: false,
 		alias: 'Test',
 		flags: [],
 		content:
@@ -53,7 +50,6 @@ export const data: Array<UmbMockTemplateModel> = [
 		parent: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		name: 'Has Master Template',
 		masterTemplate: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
-		hasChildren: false,
 		alias: 'hasMasterTemplate',
 		flags: [],
 		content:
@@ -63,7 +59,6 @@ export const data: Array<UmbMockTemplateModel> = [
 		id: 'forbidden',
 		parent: null,
 		name: 'Forbidden',
-		hasChildren: false,
 		alias: 'Forbidden',
 		flags: [],
 		content: `console.log('You are not allowed to see this template!');`,

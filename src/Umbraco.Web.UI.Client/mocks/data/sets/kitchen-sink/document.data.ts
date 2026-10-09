@@ -7,16 +7,13 @@ type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 const rawData = [
 	{
-		ancestors: [],
 		template: null,
 		id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
 		createDate: '2023-02-20 15:09:43',
 		parent: null,
 		documentType: {
 			id: '7184285e-9709-4e13-8c72-1fe52f024b28',
-			icon: 'icon-home color-black',
 		},
-		hasChildren: true,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -45,11 +42,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '17cd53f2-93b3-4e34-ade2-916e7a6639ed',
 		createDate: '2023-04-19 09:00:36',
@@ -58,9 +50,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '1addd0ad-0e34-4386-801b-79cf7beb8cf1',
-			icon: 'icon-grid color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -379,11 +369,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '39842212-489e-46ec-a63b-6eeff36c7156',
 		createDate: '2023-04-17 14:03:51',
@@ -392,9 +377,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '61c6b912-8fe8-4e10-a07b-4f777b99489b',
-			icon: 'icon-bulleted-list color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -587,11 +570,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: 'd98b0eaf-8a5d-4644-a2cc-861f94e56df1',
 		createDate: '2026-04-16 11:10:14.571705',
@@ -600,9 +578,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '9309d592-ebc7-4f72-a1bd-ebdabca4c643',
-			icon: 'icon-shape-square color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -665,11 +641,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '9dfcda46-88bf-4d69-bb2d-e94667051727',
 		createDate: '2023-02-27 08:32:56',
@@ -678,9 +649,7 @@ const rawData = [
 		},
 		documentType: {
 			id: 'b85bb884-ed5e-4f0b-8b10-8067090e8ada',
-			icon: 'icon-bulleted-list color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -709,11 +678,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '23b1bf0a-c56e-4b0c-a2a9-a83d0d9708ef',
 		createDate: '2023-02-20 16:20:02',
@@ -722,9 +686,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '015bc281-7410-40e2-81b5-b8f7c963bd61',
-			icon: 'icon-colorpicker color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -760,11 +722,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '58e300ad-868c-4a84-9915-2aef20ea681c',
 		createDate: '2023-02-20 16:20:08',
@@ -773,9 +730,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '13c10f78-bf14-411d-9444-751e4bd1b178',
-			icon: 'icon-autofill color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -832,11 +787,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '0865b2ab-ad7c-48d4-a8c6-608986a0e942',
 		createDate: '2023-02-20 16:20:15',
@@ -845,9 +795,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '41f34bb7-fd63-442f-8dcb-142df4246310',
-			icon: 'icon-time color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -890,11 +838,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '4babad2f-967a-49e1-9f92-407e95ff9df9',
 		createDate: '2023-02-20 16:20:20',
@@ -903,9 +846,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '9cff8f66-0e13-4617-ab9b-9f845ecc5e24',
-			icon: 'icon-autofill color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -941,11 +882,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: 'db2a48d5-5883-465f-b1d7-e012af2f16d0',
 		createDate: '2023-02-20 16:20:24',
@@ -954,9 +890,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '0180d16d-6a87-4631-9802-4e1b1f180bd4',
-			icon: 'icon-indent color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -992,11 +926,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '119f5ef0-31cf-4d59-9c98-2f3cbe2fa8df',
 		createDate: '2023-02-20 16:20:30',
@@ -1005,9 +934,7 @@ const rawData = [
 		},
 		documentType: {
 			id: 'fb88c3ab-40ee-4822-a63e-0edd97ad13f8',
-			icon: 'icon-message color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -1036,11 +963,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '2329915b-fb6b-4c2f-9179-8c16ba125cea',
 		createDate: '2023-02-20 16:20:39',
@@ -1049,9 +971,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '8856d507-76e0-47c7-8564-56467e717053',
-			icon: 'icon-colorpicker color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -1101,11 +1021,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: 'aa92afd0-8a54-4864-887c-7b36daee7e6c',
 		createDate: '2023-05-22 13:09:31',
@@ -1114,9 +1029,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '11b48beb-3fd0-4b72-800e-364f6e833dc7',
-			icon: 'icon-download-alt color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -1152,11 +1065,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '3702fd21-cad5-4eac-aa28-de44bf5a6246',
 		createDate: '2023-03-03 12:47:12',
@@ -1165,9 +1073,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '2a773487-9de7-403c-9207-54f4ace7f215',
-			icon: 'icon-crop color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -1231,11 +1137,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '7bf4865b-de55-4f85-bd2c-9cb8e6e482c3',
 		createDate: '2023-02-27 08:39:27',
@@ -1244,9 +1145,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '25dd3762-cfdd-43cd-b0a5-8f094f8a7fd2',
-			icon: 'icon-readonly color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -1267,11 +1166,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '9394af8f-d306-4778-9f03-2431eb8f5b6b',
 		createDate: '2023-02-20 16:20:45',
@@ -1280,9 +1174,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '99431793-6f52-48c7-af53-6bf04668aca2',
-			icon: 'icon-code color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -1340,11 +1232,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '15b092f0-66b5-40e5-aa1b-25b71b2bd81a',
 		createDate: '2023-02-20 16:20:55',
@@ -1353,9 +1240,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '7b61b708-aa42-4978-a86c-f20fd4749a58',
-			icon: 'icon-umb-media color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -1572,11 +1457,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '4e02a6bf-5ab6-4b55-8f06-c6d24e892f8c',
 		createDate: '2023-02-20 16:21:02',
@@ -1585,9 +1465,7 @@ const rawData = [
 		},
 		documentType: {
 			id: 'f7c73e80-e8f4-4ef6-a710-168d89991c7d',
-			icon: 'icon-users-alt color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -1617,11 +1495,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: 'a7823036-0486-44f5-af33-deb6780e07e6',
 		createDate: '2023-02-20 16:21:11',
@@ -1630,9 +1503,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '48a02560-7ce9-4be4-96e7-e4041cc19622',
-			icon: 'icon-user color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -1668,11 +1539,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '80954b94-1d32-4edd-9c01-105561a7415d',
 		createDate: '2023-02-20 16:22:41',
@@ -1681,9 +1547,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '727b819b-af42-443f-a752-c4c5cfd69313',
-			icon: 'icon-link color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -1836,11 +1700,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: 'a3a37004-139f-4254-ba56-3ed381b3007c',
 		createDate: '2023-02-20 16:22:48',
@@ -1849,9 +1708,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '7025ee6c-8d6c-4abd-8e32-2cab5fde6f90',
-			icon: 'icon-page-add color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -1973,11 +1830,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '17149c1e-44a8-4882-a088-6a1d84e0e86a',
 		createDate: '2023-02-20 16:22:56',
@@ -1986,9 +1838,7 @@ const rawData = [
 		},
 		documentType: {
 			id: 'cc827fc0-e385-494b-88f6-d4abb47b7081',
-			icon: 'icon-ordered-list color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -2038,11 +1888,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: 'c680be85-0bb7-4429-9d4a-73ffb83e427b',
 		createDate: '2023-02-20 16:23:03',
@@ -2051,9 +1896,7 @@ const rawData = [
 		},
 		documentType: {
 			id: 'f984a2dc-01c0-4974-a860-b41dfeacf2b5',
-			icon: 'icon-autofill color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -2103,11 +1946,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: 'a51f23dc-4684-465c-8f7d-7c6bb07ff000',
 		createDate: '2023-02-20 16:23:09',
@@ -2116,9 +1954,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '7b52f09a-3034-43d6-a83e-5f9fadfcc87d',
-			icon: 'icon-target color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -2147,11 +1983,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '464ca81d-30e0-4169-899a-0556303b878c',
 		createDate: '2023-02-20 16:23:17',
@@ -2160,9 +1991,7 @@ const rawData = [
 		},
 		documentType: {
 			id: 'fd62fafc-9cfd-470a-a260-93af5d1ed641',
-			icon: 'icon-browser-window color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -2245,11 +2074,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '8d291b82-6356-4e0d-b8dc-927c51bffe93',
 		createDate: '2023-02-20 16:23:23',
@@ -2258,9 +2082,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '23c4c503-bcdf-46a5-9ff9-fb78d9dba4ae',
-			icon: 'icon-navigation-horizontal color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -2317,11 +2139,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '2812b39b-b014-4ba1-9410-bb5b3f17ca04',
 		createDate: '2023-02-27 08:34:05',
@@ -2330,9 +2147,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '6dcde803-d22e-4fcf-85a3-3a03be080d3a',
-			icon: 'icon-tags color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -2368,11 +2183,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '9d856f1f-c37c-4e93-aa71-447aeb8fc47b',
 		createDate: '2023-02-20 16:23:29',
@@ -2381,9 +2191,7 @@ const rawData = [
 		},
 		documentType: {
 			id: 'af83a333-d5f9-4467-9013-9eaa8112a571',
-			icon: 'icon-application-window-alt color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -2433,11 +2241,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: 'df020cda-560b-42e4-9bba-3eed49ae0be6',
 		createDate: '2023-02-26 15:39:37',
@@ -2446,9 +2249,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '6717ef28-57a2-4cb4-80fe-ddc7a76da5f4',
-			icon: 'icon-autofill color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -2484,11 +2285,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '57257cd6-8100-4fbf-a734-f4147ce30701',
 		createDate: '2023-02-20 16:23:36',
@@ -2497,9 +2293,7 @@ const rawData = [
 		},
 		documentType: {
 			id: '373eaceb-e41e-4dd2-ae3f-b73fd11cf182',
-			icon: 'icon-checkbox color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -2549,11 +2343,6 @@ const rawData = [
 		flags: [],
 	},
 	{
-		ancestors: [
-			{
-				id: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
-			},
-		],
 		template: null,
 		id: '06e4bd2f-98f7-48cc-85e9-2a4b8cd668e8',
 		createDate: '2023-02-27 08:34:21',
@@ -2562,9 +2351,7 @@ const rawData = [
 		},
 		documentType: {
 			id: 'dc965257-84c2-4f27-b452-55e8b0f91a96',
-			icon: 'icon-user color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -2619,16 +2406,13 @@ export const data: Array<UmbMockDocumentModel> = [
 		})),
 	})),
 	{
-		ancestors: [{ id: HOME_DOCUMENT_ID }],
 		template: null,
 		id: ALL_DATA_TYPES_DOCUMENT_ID,
 		createDate: '2023-02-20 16:30:00',
 		parent: { id: HOME_DOCUMENT_ID },
 		documentType: {
 			id: ALL_DATA_TYPES_DOCUMENT_TYPE_ID,
-			icon: 'icon-documents color-green',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,

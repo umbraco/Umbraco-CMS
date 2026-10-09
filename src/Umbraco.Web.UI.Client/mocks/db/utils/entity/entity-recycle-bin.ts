@@ -8,7 +8,6 @@ type UmbMockRecycleBinnableModel = {
 	parent?: { id: string } | null;
 	originalParent?: { id: string } | null;
 	isTrashed: boolean;
-	hasChildren: boolean;
 	variants?: Array<UmbMockVariantWithState>;
 };
 

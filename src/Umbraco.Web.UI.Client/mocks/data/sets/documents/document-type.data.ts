@@ -32,7 +32,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: true,
 		parent: null,
 		isFolder: true,
 		properties: [],
@@ -58,7 +57,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: { id: COLLECTION_FOLDER_ID },
 		isFolder: false,
 		properties: [],
@@ -85,7 +83,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: { id: COLLECTION_FOLDER_ID },
 		isFolder: false,
 		properties: [
@@ -132,7 +129,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: null,
 		isFolder: false,
 		properties: [
@@ -179,7 +175,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: null,
 		isFolder: false,
 		properties: [
@@ -246,7 +241,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: true,
 		isElement: false,
-		hasChildren: false,
 		parent: null,
 		isFolder: false,
 		properties: [
@@ -313,7 +307,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: true,
 		parent: null,
 		isFolder: true,
 		properties: [],
@@ -339,7 +332,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: { id: COMPOSED_FOLDER_ID },
 		isFolder: false,
 		properties: [
@@ -388,7 +380,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: { id: COMPOSED_FOLDER_ID },
 		isFolder: false,
 		properties: [
@@ -455,7 +446,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: true,
 		isElement: false,
-		hasChildren: false,
 		parent: { id: COMPOSED_FOLDER_ID },
 		isFolder: false,
 		properties: [
@@ -525,7 +515,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: { id: COMPOSED_FOLDER_ID },
 		isFolder: false,
 		properties: [],
@@ -559,7 +548,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: { id: COMPOSED_FOLDER_ID },
 		isFolder: false,
 		properties: [],

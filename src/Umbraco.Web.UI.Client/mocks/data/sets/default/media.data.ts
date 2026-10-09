@@ -2,7 +2,6 @@ import type { UmbMockMediaModel } from '../../mock-data-set.types.js';
 
 export const data: Array<UmbMockMediaModel> = [
 	{
-		hasChildren: false,
 		id: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
 		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
@@ -10,7 +9,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-1-id',
-			icon: 'icon-picture',
 		},
 		values: [
 			{
@@ -39,7 +37,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: 'f2f81a40-c989-4b6b-84e2-057cecd3grd4',
 		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
@@ -47,7 +44,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-1-id',
-			icon: 'icon-picture',
 		},
 		values: [
 			{
@@ -76,7 +72,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: '69431027-8867-45bf-a93b-72bbdabfb177',
 		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
@@ -84,7 +79,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-1-id',
-			icon: 'icon-bug',
 		},
 		values: [
 			{
@@ -106,7 +100,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: true,
 		id: '69461027-8867-45bf-a93b-72bbdabfb177',
 		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
@@ -114,8 +107,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-1-id',
-			icon: 'icon-bug',
-			collection: { id: 'dt-collectionView' },
 		},
 		values: [],
 		variants: [
@@ -131,7 +122,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: true,
 		id: '69461027-8867-45bf-a93b-5224dabfb177',
 		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
@@ -139,8 +129,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-1-id',
-			icon: 'icon-bug',
-			collection: { id: 'dt-collectionView' },
 		},
 		values: [],
 		variants: [
@@ -156,7 +144,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: '69431027-8867-45s7-a93b-7uibdabfb177',
 		createDate: '2023-02-06T15:32:05.350038',
 		parent: { id: '69461027-8867-45bf-a93b-72bbdabfb177' },
@@ -164,7 +151,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-1-id',
-			icon: 'icon-bug',
 		},
 		values: [
 			{
@@ -186,7 +172,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: '69431027-8867-45s7-a93b-7uibdabf2147',
 		createDate: '2023-02-06T15:32:05.350038',
 		parent: { id: '69461027-8867-45bf-a93b-72bbdabfb177' },
@@ -194,7 +179,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-1-id',
-			icon: 'icon-bug',
 		},
 		values: [
 			{
@@ -216,7 +200,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: '694hdj27-8867-45s7-a93b-7uibdabf2147',
 		createDate: '2023-02-06T15:32:05.350038',
 		parent: { id: '69461027-8867-45bf-a93b-5224dabfb177' },
@@ -224,7 +207,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-1-id',
-			icon: 'icon-bug',
 		},
 		values: [
 			{
@@ -246,7 +228,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: '694hdj27-1237-45s7-a93b-7uibdabfas47',
 		createDate: '2023-02-06T15:32:05.350038',
 		parent: { id: '69461027-8867-45bf-a93b-5224dabfb177' },
@@ -254,7 +235,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-1-id',
-			icon: 'icon-bug',
 		},
 		values: [
 			{
@@ -276,7 +256,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: 'forbidden',
 		createDate: '2023-02-06T15:32:05.350038',
 		parent: null,
@@ -284,7 +263,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-1-id',
-			icon: 'icon-picture',
 		},
 		values: [
 			{
@@ -311,7 +289,6 @@ export const data: Array<UmbMockMediaModel> = [
 	// file extension label exists for. Their names carry no extension, as `toFriendlyName` leaves them on upload,
 	// so they also cover the label coming from the file rather than from the name.
 	{
-		hasChildren: false,
 		id: '9b4b5e4a-1f2c-4d3e-8a71-6c0d5e2f1a01',
 		extension: 'pdf',
 		createDate: '2026-09-01T10:15:00.000000',
@@ -320,7 +297,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-5-id',
-			icon: 'icon-document',
 		},
 		values: [],
 		variants: [
@@ -336,7 +312,6 @@ export const data: Array<UmbMockMediaModel> = [
 		flags: [],
 	},
 	{
-		hasChildren: false,
 		id: '9b4b5e4a-1f2c-4d3e-8a71-6c0d5e2f1a02',
 		extension: 'mov',
 		createDate: '2026-09-02T11:30:00.000000',
@@ -345,7 +320,6 @@ export const data: Array<UmbMockMediaModel> = [
 		isTrashed: false,
 		mediaType: {
 			id: 'media-type-4-id',
-			icon: 'icon-video',
 		},
 		values: [],
 		variants: [

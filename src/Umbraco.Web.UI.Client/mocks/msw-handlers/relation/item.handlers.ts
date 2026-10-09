@@ -10,9 +10,7 @@ export const itemHandlers = [
 		const takeParam = new URL(request.url).searchParams.get('take');
 		const take = takeParam ? Number.parseInt(takeParam) : undefined;
 
-		const response = umbRelationMockDb.get({ skip, take });
-		response.items = response.items.filter((item) => item.relationType.id === params.id);
-		response.total = response.items.length;
+		const response = umbRelationMockDb.getByRelationType(params.id as string, { skip, take });
 
 		return HttpResponse.json<GetRelationByRelationTypeIdResponse>(response);
 	}),

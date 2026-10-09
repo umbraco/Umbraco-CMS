@@ -56,17 +56,20 @@ export class UmbMediaMockDB extends UmbEntityMockDbBase<UmbMockMediaModel> {
 	}
 }
 
-const treeItemMapper = (model: UmbMockMediaModel): MediaTreeItemResponseModel => {
-	const mediaType = umbMediaTypeMockDb.read(model.mediaType.id);
-	if (!mediaType) throw new Error(`Media type with id ${model.mediaType.id} not found`);
+const mediaTypeReference = (id: string) => {
+	const mediaType = umbMediaTypeMockDb.read(id);
+	if (!mediaType) throw new Error(`Media type with id ${id} not found`);
 
 	return {
-		mediaType: {
-			collection: model.mediaType.collection,
-			icon: model.mediaType.icon,
-			id: model.mediaType.id,
-		},
-		hasChildren: model.hasChildren,
+		collection: mediaType.collection,
+		icon: mediaType.icon,
+		id: mediaType.id,
+	};
+};
+
+const treeItemMapper = (model: UmbMockMediaModel): Omit<MediaTreeItemResponseModel, 'hasChildren'> => {
+	return {
+		mediaType: mediaTypeReference(model.mediaType.id),
 		id: model.id,
 		isTrashed: model.isTrashed,
 		noAccess: model.noAccess,
@@ -85,12 +88,7 @@ const createMockMediaMapper = (request: CreateMediaRequestModel): UmbMockMediaMo
 	const now = new Date().toString();
 
 	return {
-		mediaType: {
-			id: mediaType.id,
-			icon: mediaType.icon,
-			collection: mediaType.collection,
-		},
-		hasChildren: false,
+		mediaType: { id: mediaType.id },
 		id: request.id ? request.id : UmbId.new(),
 		createDate: now,
 		isTrashed: false,
@@ -114,7 +112,7 @@ const createMockMediaMapper = (request: CreateMediaRequestModel): UmbMockMediaMo
 
 const detailResponseMapper = (model: UmbMockMediaModel): MediaResponseModel => {
 	return {
-		mediaType: model.mediaType,
+		mediaType: mediaTypeReference(model.mediaType.id),
 		id: model.id,
 		isTrashed: model.isTrashed,
 		values: model.values,
@@ -125,12 +123,8 @@ const detailResponseMapper = (model: UmbMockMediaModel): MediaResponseModel => {
 
 const itemMapper = (model: UmbMockMediaModel): MediaItemResponseModel => {
 	return {
-		mediaType: {
-			collection: model.mediaType.collection,
-			icon: model.mediaType.icon,
-			id: model.mediaType.id,
-		},
-		hasChildren: model.hasChildren,
+		mediaType: mediaTypeReference(model.mediaType.id),
+		hasChildren: umbMediaMockDb.hasChildren(model.id),
 		id: model.id,
 		isTrashed: model.isTrashed,
 		parent: model.parent,
@@ -141,20 +135,23 @@ const itemMapper = (model: UmbMockMediaModel): MediaItemResponseModel => {
 };
 
 const collectionMapper = (model: UmbMockMediaModel): MediaCollectionResponseModel => {
+	const mediaType = umbMediaTypeMockDb.read(model.mediaType.id);
+	if (!mediaType) throw new Error(`Media type with id ${model.mediaType.id} not found`);
+
 	return {
 		creator: null,
 		id: model.id,
 		mediaType: {
-			id: model.mediaType.id,
-			alias: '',
-			icon: model.mediaType.icon,
+			id: mediaType.id,
+			alias: mediaType.alias,
+			icon: mediaType.icon,
 		},
 		sortOrder: 0,
 		extension: model.extension,
 		values: model.values,
 		variants: model.variants,
 		flags: model.flags,
-		hasChildren: model.hasChildren,
+		hasChildren: umbMediaMockDb.hasChildren(model.id),
 	};
 };
 

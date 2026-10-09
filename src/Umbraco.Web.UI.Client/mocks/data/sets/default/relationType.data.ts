@@ -8,14 +8,8 @@ export const data: Array<UmbMockRelationTypeModel> = [
 		isBidirectional: true,
 		isDependency: false,
 		isDeletable: true,
-		childObject: {
-			id: 'child1',
-			name: 'Child Object 1',
-		},
-		parentObject: {
-			id: 'parent1',
-			name: 'Parent Object 1',
-		},
+		childObject: { id: '1' },
+		parentObject: { id: '4' },
 		flags: [],
 	},
 	{

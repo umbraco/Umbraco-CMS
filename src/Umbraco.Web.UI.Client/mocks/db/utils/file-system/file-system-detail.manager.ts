@@ -63,7 +63,6 @@ export class UmbMockFileSystemDetailManager<MockItemType extends FileResponseMod
 			path: path,
 			parent: request.parent || null,
 			isFolder: false,
-			hasChildren: false,
 		} as unknown as MockItemType;
 	};
 

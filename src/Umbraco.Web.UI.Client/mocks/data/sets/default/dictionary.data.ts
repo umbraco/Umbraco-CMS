@@ -5,7 +5,6 @@ export const data: Array<UmbMockDictionaryModel> = [
 		name: 'Forbidden',
 		id: 'forbidden',
 		parent: null,
-		hasChildren: false,
 		translatedIsoCodes: ['en-us'],
 		translations: [
 			{
@@ -23,7 +22,6 @@ export const data: Array<UmbMockDictionaryModel> = [
 		name: 'Hello',
 		id: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		parent: null,
-		hasChildren: false,
 		translatedIsoCodes: ['en-us'],
 		translations: [
 			{
@@ -41,7 +39,6 @@ export const data: Array<UmbMockDictionaryModel> = [
 		name: 'Hello again',
 		id: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
 		parent: null,
-		hasChildren: true,
 		translatedIsoCodes: ['en-us', 'da'],
 		translations: [
 			{
@@ -59,7 +56,6 @@ export const data: Array<UmbMockDictionaryModel> = [
 		name: 'Nested Hello again',
 		id: '438b8693-2156-482b-84af-ccdae0c2df6e',
 		parent: { id: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb' },
-		hasChildren: false,
 		translatedIsoCodes: ['en-us', 'da'],
 		translations: [
 			{

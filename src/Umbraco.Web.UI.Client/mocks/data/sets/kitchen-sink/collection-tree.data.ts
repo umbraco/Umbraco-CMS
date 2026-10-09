@@ -17,21 +17,17 @@ const addDocument = (
 	id: string,
 	name: string,
 	documentTypeId: string,
-	icon: string,
 	ancestorIds: Array<string>,
-	hasChildren: boolean,
 	values: UmbMockDocumentModel['values'] = [],
 ) => {
 	const parentId = ancestorIds[ancestorIds.length - 1];
 
 	documents.push({
-		ancestors: ancestorIds.map((ancestorId) => ({ id: ancestorId })),
 		template: null,
 		id,
 		createDate: DATE,
 		parent: parentId ? { id: parentId } : null,
-		documentType: { id: documentTypeId, icon },
-		hasChildren,
+		documentType: { id: documentTypeId },
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -65,9 +61,7 @@ addDocument(
 	ROOT_ID,
 	'Collection 1',
 	UMB_COLLECTION_DOCUMENT_TYPE_ID,
-	'icon-folder',
 	[],
-	true,
 	collectionValues('Collection 1', 'The root collection, holding two nested collections.', true),
 );
 
@@ -77,9 +71,7 @@ for (let collection = 1; collection <= NESTED_COLLECTION_COUNT; collection++) {
 		collectionId,
 		`Collection 1.${collection}`,
 		UMB_COLLECTION_DOCUMENT_TYPE_ID,
-		'icon-folder',
 		[ROOT_ID],
-		true,
 		collectionValues(
 			`Collection 1.${collection}`,
 			`Nested collection ${collection}, holding ${ITEMS_PER_COLLECTION} items.`,
@@ -92,9 +84,7 @@ for (let collection = 1; collection <= NESTED_COLLECTION_COUNT; collection++) {
 			`collection-1-${collection}-item-${item}`,
 			`Item 1.${collection}.${item}`,
 			UMB_COLLECTION_ITEM_DOCUMENT_TYPE_ID,
-			'icon-document',
 			[ROOT_ID, collectionId],
-			false,
 		);
 	}
 }

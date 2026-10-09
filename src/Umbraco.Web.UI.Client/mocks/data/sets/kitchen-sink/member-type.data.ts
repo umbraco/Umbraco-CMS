@@ -74,7 +74,6 @@ const rawData: Array<
 		],
 		compositions: [],
 		parent: null,
-		hasChildren: false,
 		hasListView: false,
 		isFolder: false,
 		flags: [],

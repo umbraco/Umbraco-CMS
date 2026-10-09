@@ -8,7 +8,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorAlias: 'Umbraco.TextBox',
 		editorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 		values: [],
-		hasChildren: false,
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,

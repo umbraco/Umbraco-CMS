@@ -4,7 +4,6 @@ import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/exter
 type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 const baseDocument = {
-	ancestors: [],
 	urls: [
 		{
 			culture: null,
@@ -17,9 +16,7 @@ const baseDocument = {
 	parent: null,
 	documentType: {
 		id: 'the-simplest-document-type-id',
-		icon: 'icon-document',
 	},
-	hasChildren: false,
 	noAccess: false,
 	isProtected: false,
 	isTrashed: false,
@@ -44,7 +41,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	baseDocument,
 	{
 		...baseDocument,
-		ancestors: [{ id: 'permissions-document-id' }],
 		id: 'permissions-0-document-id',
 		parent: { id: 'permissions-document-id' },
 		variants: baseDocument.variants.map((variant) => ({
@@ -57,7 +53,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		...baseDocument,
-		ancestors: [{ id: 'permissions-0-document-id' }],
 		id: 'permissions-0-1-document-id',
 		parent: { id: 'permissions-0-document-id' },
 		variants: baseDocument.variants.map((variant) => ({
@@ -70,7 +65,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		...baseDocument,
-		ancestors: [{ id: 'permissions-document-id' }],
 		id: 'permissions-1-document-id',
 		parent: { id: 'permissions-document-id' },
 		variants: baseDocument.variants.map((variant) => ({
@@ -82,8 +76,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		...baseDocument,
-		ancestors: [{ id: 'permissions-document-id' }],
-		hasChildren: true,
 		id: 'permissions-2-document-id',
 		parent: { id: 'permissions-document-id' },
 		variants: baseDocument.variants.map((variant) => ({
@@ -95,8 +87,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		...baseDocument,
-		ancestors: [{ id: 'permissions-document-id' }, { id: 'permissions-2-document-id' }],
-		hasChildren: true,
 		id: 'permission-2-1-document-id',
 		parent: { id: 'permissions-2-document-id' },
 		urls: [
@@ -113,7 +103,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		...baseDocument,
-		ancestors: [{ id: 'permissions-document-id' }, { id: 'permissions-2-document-id' }],
 		id: 'permissions-2-2-document-id',
 		parent: { id: 'permissions-2-document-id' },
 		urls: [
@@ -130,11 +119,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		...baseDocument,
-		ancestors: [
-			{ id: 'permissions-document-id' },
-			{ id: 'permissions-2-document-id' },
-			{ id: 'permissions-2-2-document-id' },
-		],
 		id: 'permission-2-2-1-document-id',
 		parent: { id: 'permissions-2-2-document-id' },
 		urls: [

@@ -35,7 +35,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: true,
 		parent: null,
 		isFolder: true,
 		properties: [],
@@ -61,7 +60,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: true,
 		parent: null,
 		isFolder: true,
 		properties: [],
@@ -87,7 +85,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: null,
 		isFolder: false,
 		properties: [
@@ -327,7 +324,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -412,7 +408,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: true,
-		hasChildren: false,
 		parent: {
 			id: 'a29519c1-1605-4811-8830-dde83e09d892',
 		},
@@ -473,7 +468,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -630,7 +624,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: true,
-		hasChildren: false,
 		parent: {
 			id: 'a29519c1-1605-4811-8830-dde83e09d892',
 		},
@@ -691,7 +684,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -800,7 +792,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -885,7 +876,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -970,7 +960,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -1031,7 +1020,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -1164,7 +1152,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -1321,7 +1308,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -1598,7 +1584,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -1659,7 +1644,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -1744,7 +1728,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -1925,7 +1908,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -2202,7 +2184,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -2335,7 +2316,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -2468,7 +2448,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -2529,7 +2508,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -2638,7 +2616,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -2795,7 +2772,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -2928,7 +2904,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -3061,7 +3036,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -3146,7 +3120,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -3207,7 +3180,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -3292,7 +3264,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -3377,7 +3348,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -3582,7 +3552,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -3667,7 +3636,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -3776,7 +3744,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -3861,7 +3828,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -3946,7 +3912,6 @@ const rawData: Array<
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: {
 			id: '25b36f28-5051-4073-a0c7-3887f6f8c695',
 		},
@@ -4020,7 +3985,6 @@ rawData.push({
 	variesByCulture: false,
 	variesBySegment: false,
 	isElement: false,
-	hasChildren: false,
 	parent: {
 		id: TEST_DOCUMENT_TYPES_FOLDER_ID,
 	},
@@ -4076,7 +4040,6 @@ rawData.push({
 	variesByCulture: false,
 	variesBySegment: false,
 	isElement: false,
-	hasChildren: false,
 	parent: null,
 	isFolder: false,
 	properties: [],
@@ -4119,7 +4082,6 @@ rawData.push(
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: null,
 		isFolder: false,
 		properties: [
@@ -4189,7 +4151,6 @@ rawData.push(
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		hasChildren: false,
 		parent: null,
 		isFolder: false,
 		properties: [],

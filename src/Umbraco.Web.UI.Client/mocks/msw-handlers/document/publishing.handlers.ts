@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 import { createProblemDetails } from '../../utils.js';
-import { umbDocumentMockDb } from '../../db/document.db.js';
+import { documentTypeReference, umbDocumentMockDb } from '../../db/document.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	PublishWithDescendantsResultModel,
@@ -82,7 +82,7 @@ export const publishingHandlers = [
 		if (!document) return new HttpResponse(null, { status: 404 });
 
 		const responseModel: GetDocumentByIdPublishedResponse = {
-			documentType: document.documentType,
+			documentType: documentTypeReference(document.documentType.id),
 			id: document.id,
 			isTrashed: document.isTrashed,
 			values: document.values,

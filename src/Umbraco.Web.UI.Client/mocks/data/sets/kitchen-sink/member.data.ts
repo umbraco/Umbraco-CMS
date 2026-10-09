@@ -15,7 +15,6 @@ const rawData = [
 		lastPasswordChangeDate: '2023-02-20 15:37:48',
 		memberType: {
 			id: 'd59be02f-1df9-4228-aa1e-01917d806cda',
-			icon: 'icon-user',
 		},
 		groups: ['4bff0fe9-6cf4-47cd-a87e-cd4a3a860c86'],
 		kind: 'Default',
@@ -50,7 +49,6 @@ const rawData = [
 		lastPasswordChangeDate: '2023-02-20 15:38:20',
 		memberType: {
 			id: 'd59be02f-1df9-4228-aa1e-01917d806cda',
-			icon: 'icon-user',
 		},
 		groups: ['015dd839-aace-4372-8238-5ec353c3a4d7'],
 		kind: 'Default',

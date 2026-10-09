@@ -43,7 +43,6 @@ const createDetailMockMapper = (request: CreateMemberTypeRequestModel): UmbMockM
 		variesBySegment: request.variesBySegment,
 		isElement: request.isElement,
 		compositions: request.compositions,
-		hasChildren: false,
 		parent: null,
 		hasListView: false,
 		isFolder: false,
@@ -71,7 +70,6 @@ const detailResponseMapper = (item: UmbMockMemberTypeModel): MemberTypeResponseM
 const memberTypeTreeItemMapper = (item: UmbMockMemberTypeModel): any => {
 	return {
 		name: item.name,
-		hasChildren: item.hasChildren,
 		id: item.id,
 		parent: item.parent,
 		isFolder: false,

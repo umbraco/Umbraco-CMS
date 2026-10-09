@@ -96,7 +96,6 @@ const createMockMediaTypeFolderMapper = (request: CreateFolderRequestModel): Umb
 		allowedMediaTypes: [],
 		compositions: [],
 		isFolder: true,
-		hasChildren: false,
 		collection: null,
 		isDeletable: false,
 		aliasCanBeChanged: false,
@@ -121,7 +120,6 @@ const createMockMediaTypeMapper = (request: CreateMediaTypeRequestModel): UmbMoc
 		compositions: request.compositions,
 		parent: request.parent ? { id: request.parent.id } : null,
 		isFolder: false,
-		hasChildren: false,
 		collection: null,
 		isDeletable: false,
 		aliasCanBeChanged: false,
@@ -150,10 +148,9 @@ const mediaTypeDetailMapper = (item: UmbMockMediaTypeModel): MediaTypeResponseMo
 	};
 };
 
-const mediaTypeTreeItemMapper = (item: UmbMockMediaTypeModel): MediaTypeTreeItemResponseModel => {
+const mediaTypeTreeItemMapper = (item: UmbMockMediaTypeModel): Omit<MediaTypeTreeItemResponseModel, 'hasChildren'> => {
 	return {
 		name: item.name,
-		hasChildren: item.hasChildren,
 		id: item.id,
 		parent: item.parent,
 		isFolder: item.isFolder,

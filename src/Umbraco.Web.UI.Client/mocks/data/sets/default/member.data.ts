@@ -13,7 +13,7 @@ export const data: Array<UmbMockMemberModel> = [
 		lastLockoutDate: null,
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
-		memberType: { id: 'member-type-1-id', icon: '' },
+		memberType: { id: 'member-type-1-id' },
 		username: 'member1',
 		values: [],
 		variants: [
@@ -39,7 +39,7 @@ export const data: Array<UmbMockMemberModel> = [
 		lastLockoutDate: null,
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
-		memberType: { id: 'member-type-1-id', icon: '' },
+		memberType: { id: 'member-type-1-id' },
 		username: 'member2',
 		values: [],
 		variants: [
@@ -65,7 +65,7 @@ export const data: Array<UmbMockMemberModel> = [
 		lastLockoutDate: null,
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
-		memberType: { id: 'member-type-1-id', icon: '' },
+		memberType: { id: 'member-type-1-id' },
 		username: 'member3',
 		values: [],
 		variants: [
@@ -91,7 +91,7 @@ export const data: Array<UmbMockMemberModel> = [
 		lastLockoutDate: null,
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
-		memberType: { id: 'member-type-1-id', icon: '' },
+		memberType: { id: 'member-type-1-id' },
 		username: 'forbidden',
 		values: [],
 		variants: [

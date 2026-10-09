@@ -15,12 +15,9 @@ export const data: Array<UmbMockDocumentModel> = [
 		id: 'b2481aeb-1fc3-4b9c-bdd3-5786771001a5',
 		createDate: '2024-01-15T10:00:00.000Z',
 		parent: null,
-		ancestors: [],
 		documentType: {
 			id: NESTED_BLOCK_LIST_DOCUMENT_TYPE_ID,
-			icon: 'icon-document',
 		},
-		hasChildren: false,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,

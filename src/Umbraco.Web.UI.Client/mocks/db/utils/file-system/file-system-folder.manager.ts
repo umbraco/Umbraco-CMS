@@ -18,7 +18,6 @@ export class UmbMockFileSystemFolderManager<
 			path,
 			parent: request.parent ? { path: request.parent.path } : null,
 			name: request.name,
-			hasChildren: false,
 			isFolder: true,
 			content: '',
 		} as unknown as MockItemType;

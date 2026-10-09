@@ -104,70 +104,111 @@ import type {
 // Model Type Definitions
 // ============================================================================
 
-export type UmbMockDataTypeModel = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
+/**
+ * Fields the mock DB computes from the other stored data when it builds a response, so they can never drift out of
+ * sync with it.
+ */
+type UmbMockDerivedKey = 'hasChildren' | 'ancestors';
 
-export type UmbMockDictionaryModel = DictionaryItemResponseModel &
-	NamedEntityTreeItemResponseModel &
-	DictionaryItemItemResponseModel &
-	DictionaryOverviewResponseModel;
+/**
+ * Strips the derived fields (and any reference field the mapper resolves from the DB it points at) from a composed
+ * response model.
+ */
+type UmbMockStored<T, ExtraKey extends PropertyKey = never> = Omit<T, UmbMockDerivedKey | ExtraKey>;
 
-export type UmbMockDocumentModel = DocumentResponseModel &
-	DocumentTreeItemResponseModel &
-	DocumentItemResponseModel & {
-		/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
-		originalParent?: { id: string } | null;
-	};
+/** A reference to a type entity. Only the id is stored; the rest (icon, collection, …) is read from the type DB. */
+type UmbMockTypeReference = { id: string };
 
-export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
-	DocumentBlueprintItemResponseModel &
-	DocumentBlueprintTreeItemResponseModel;
+export type UmbMockDataTypeModel = UmbMockStored<
+	DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel
+>;
 
-export type UmbMockDocumentTypeModel = DocumentTypeResponseModel &
-	DocumentTypeTreeItemResponseModel &
-	DocumentTypeItemResponseModel;
+export type UmbMockDictionaryModel = UmbMockStored<
+	DictionaryItemResponseModel &
+		NamedEntityTreeItemResponseModel &
+		DictionaryItemItemResponseModel &
+		DictionaryOverviewResponseModel
+>;
+
+export type UmbMockDocumentModel = UmbMockStored<
+	DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel,
+	'documentType'
+> & {
+	documentType: UmbMockTypeReference;
+	/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
+	originalParent?: { id: string } | null;
+};
+
+export type UmbMockDocumentBlueprintModel = UmbMockStored<
+	DocumentBlueprintResponseModel & DocumentBlueprintItemResponseModel & DocumentBlueprintTreeItemResponseModel,
+	'documentType'
+> & { documentType: UmbMockTypeReference };
+
+export type UmbMockDocumentTypeModel = UmbMockStored<
+	DocumentTypeResponseModel & DocumentTypeTreeItemResponseModel & DocumentTypeItemResponseModel
+>;
 
 export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseModel;
 
-export type UmbMockMediaModel = MediaResponseModel &
-	MediaTreeItemResponseModel &
-	MediaItemResponseModel & {
-		/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
-		originalParent?: { id: string } | null;
-	};
+export type UmbMockMediaModel = UmbMockStored<
+	MediaResponseModel & MediaTreeItemResponseModel & MediaItemResponseModel,
+	'mediaType'
+> & {
+	mediaType: UmbMockTypeReference;
+	/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
+	originalParent?: { id: string } | null;
+};
 
-export type UmbMockMediaTypeModel = MediaTypeResponseModel &
-	MediaTypeTreeItemResponseModel &
-	MediaTypeItemResponseModel;
+export type UmbMockMediaTypeModel = UmbMockStored<
+	MediaTypeResponseModel & MediaTypeTreeItemResponseModel & MediaTypeItemResponseModel
+>;
 
-export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
+export type UmbMockMemberModel = UmbMockStored<MemberResponseModel & MemberItemResponseModel, 'memberType'> & {
+	memberType: UmbMockTypeReference;
+};
 
 export type UmbMockMemberGroupModel = MemberGroupItemResponseModel;
 
-export type UmbMockMemberTypeModel = MemberTypeResponseModel &
-	MemberTypeTreeItemResponseModel &
-	MemberTypeItemResponseModel & {
-		hasListView: boolean;
-	};
+export type UmbMockMemberTypeModel = UmbMockStored<
+	MemberTypeResponseModel & MemberTypeTreeItemResponseModel & MemberTypeItemResponseModel
+> & {
+	hasListView: boolean;
+};
 
-export type UmbMockPartialViewModel = PartialViewResponseModel &
-	FileSystemTreeItemPresentationModel &
-	PartialViewItemResponseModel;
+export type UmbMockPartialViewModel = UmbMockStored<
+	PartialViewResponseModel & FileSystemTreeItemPresentationModel & PartialViewItemResponseModel
+>;
 
-export type UmbMockRelationModel = RelationResponseModel;
+/** The related entities are stored by id only; their names are read from the entity's own DB. */
+export type UmbMockRelationModel = Omit<RelationResponseModel, 'parent' | 'child'> & {
+	parent: { id: string };
+	child: { id: string };
+};
 
-export type UmbMockRelationTypeModel = RelationTypeResponseModel & RelationTypeItemResponseModel;
+/** The object types are stored by id only; their names are read from the object type DB. */
+export type UmbMockRelationTypeModel = Omit<
+	RelationTypeResponseModel & RelationTypeItemResponseModel,
+	'parentObject' | 'childObject'
+> & {
+	parentObject?: { id: string } | null;
+	childObject?: { id: string } | null;
+};
 
 export type UmbMockRelationTypeItemModel = RelationTypeItemResponseModel;
 
-export type UmbMockScriptModel = ScriptResponseModel & FileSystemTreeItemPresentationModel & ScriptItemResponseModel;
+export type UmbMockScriptModel = UmbMockStored<
+	ScriptResponseModel & FileSystemTreeItemPresentationModel & ScriptItemResponseModel
+>;
 
-export type UmbMockStaticFileModel = StaticFileItemResponseModel & FileSystemTreeItemPresentationModel;
+export type UmbMockStaticFileModel = UmbMockStored<StaticFileItemResponseModel & FileSystemTreeItemPresentationModel>;
 
-export type UmbMockStylesheetModel = StylesheetResponseModel &
-	FileSystemTreeItemPresentationModel &
-	StylesheetItemResponseModel;
+export type UmbMockStylesheetModel = UmbMockStored<
+	StylesheetResponseModel & FileSystemTreeItemPresentationModel & StylesheetItemResponseModel
+>;
 
-export type UmbMockTemplateModel = TemplateResponseModel & NamedEntityTreeItemResponseModel & TemplateItemResponseModel;
+export type UmbMockTemplateModel = UmbMockStored<
+	TemplateResponseModel & NamedEntityTreeItemResponseModel & TemplateItemResponseModel
+>;
 
 export type UmbMockUserModel = UserResponseModel & UserItemResponseModel;
 
@@ -181,11 +222,15 @@ export type UmbMockWebhookDeliveryModel = WebhookLogResponseModel;
 
 export type UmbMockAuditLogModel = AuditLogResponseModel;
 
+/**
+ * Entity references are stored as the id of the referencing entity only. The name, type and state are read from the
+ * entity's own DB, so the reference follows edits and deletes. `DefaultReferenceResponseModel` has no backing entity.
+ */
 export type UmbMockTrackedReferenceItemModel =
 	| DefaultReferenceResponseModel
-	| DocumentReferenceResponseModel
-	| MediaReferenceResponseModel
-	| MemberReferenceResponseModel;
+	| Pick<DocumentReferenceResponseModel, '$type' | 'id'>
+	| Pick<MediaReferenceResponseModel, '$type' | 'id'>
+	| Pick<MemberReferenceResponseModel, '$type' | 'id'>;
 
 // ============================================================================
 // Log Levels Type (matches the structure in log-viewer.data.ts)

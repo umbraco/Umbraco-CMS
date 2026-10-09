@@ -37,12 +37,11 @@ export class UmbDictionaryMockDB extends UmbEntityMockDbBase<UmbMockDictionaryMo
 	}
 }
 
-const treeItemMapper = (model: UmbMockDictionaryModel): NamedEntityTreeItemResponseModel => {
+const treeItemMapper = (model: UmbMockDictionaryModel): Omit<NamedEntityTreeItemResponseModel, 'hasChildren'> => {
 	return {
 		name: model.name,
 		id: model.id,
 		parent: model.parent,
-		hasChildren: model.hasChildren,
 		flags: model.flags,
 	};
 };
@@ -53,7 +52,6 @@ const createMockMapper = (request: CreateDictionaryItemRequestModel): UmbMockDic
 		id: request.id ? request.id : UmbId.new(),
 		parent: request.parent,
 		translations: request.translations,
-		hasChildren: false,
 		translatedIsoCodes: [],
 		flags: [],
 	};

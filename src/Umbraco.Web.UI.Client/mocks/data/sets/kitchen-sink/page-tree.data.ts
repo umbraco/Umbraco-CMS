@@ -19,22 +19,19 @@ const documents: Array<UmbMockDocumentModel> = [];
 
 const pageId = (path: Array<number>) => `empty-page-${path.join('-')}`;
 
-const addPage = (path: Array<number>, ancestorIds: Array<string>, hasChildren: boolean) => {
+const addPage = (path: Array<number>, ancestorIds: Array<string>) => {
 	const id = pageId(path);
 	const name = `Page ${path.join('.')}`;
 	const parentId = ancestorIds[ancestorIds.length - 1];
 
 	documents.push({
-		ancestors: ancestorIds.map((ancestorId) => ({ id: ancestorId })),
 		template: null,
 		id,
 		createDate: DATE,
 		parent: parentId ? { id: parentId } : null,
 		documentType: {
 			id: EMPTY_PAGE_DOCUMENT_TYPE_ID,
-			icon: 'icon-document',
 		},
-		hasChildren,
 		noAccess: false,
 		isProtected: false,
 		isTrashed: false,
@@ -68,7 +65,7 @@ const addChildren = (parentPath: Array<number>, parentAncestorIds: Array<string>
 		const path = [...parentPath, index];
 		const hasChildren = childrenBranch && index <= BRANCHING_SIBLING_COUNT;
 
-		addPage(path, ancestorIds, hasChildren);
+		addPage(path, ancestorIds);
 
 		if (hasChildren) {
 			addChildren(path, ancestorIds, BRANCH_CHILD_COUNT);
@@ -76,7 +73,7 @@ const addChildren = (parentPath: Array<number>, parentAncestorIds: Array<string>
 	}
 };
 
-addPage([1], [], true);
+addPage([1], []);
 addChildren([1], [], ROOT_CHILD_COUNT);
 
 export const data: Array<UmbMockDocumentModel> = documents;

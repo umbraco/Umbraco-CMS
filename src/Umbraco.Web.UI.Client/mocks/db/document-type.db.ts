@@ -89,7 +89,6 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 		allowedDocumentTypes: [],
 		compositions: [],
 		isFolder: true,
-		hasChildren: false,
 		allowedTemplates: [],
 		cleanup: {
 			preventCleanup: false,
@@ -117,7 +116,6 @@ const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): 
 		compositions: request.compositions,
 		parent: request.parent,
 		isFolder: false,
-		hasChildren: false,
 		allowedTemplates: [],
 		cleanup: {
 			preventCleanup: false,
@@ -149,10 +147,11 @@ const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeR
 	};
 };
 
-const documentTypeTreeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTypeTreeItemResponseModel => {
+const documentTypeTreeItemMapper = (
+	item: UmbMockDocumentTypeModel,
+): Omit<DocumentTypeTreeItemResponseModel, 'hasChildren'> => {
 	return {
 		name: item.name,
-		hasChildren: item.hasChildren,
 		id: item.id,
 		parent: item.parent,
 		isFolder: item.isFolder,

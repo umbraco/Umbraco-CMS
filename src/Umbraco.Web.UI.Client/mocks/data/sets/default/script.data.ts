@@ -6,7 +6,6 @@ export const data: Array<UmbMockScriptModel> = [
 		path: '/some-folder',
 		parent: null,
 		isFolder: true,
-		hasChildren: true,
 		content: '',
 	},
 	{
@@ -14,7 +13,6 @@ export const data: Array<UmbMockScriptModel> = [
 		path: '/another-folder',
 		parent: null,
 		isFolder: true,
-		hasChildren: true,
 		content: '',
 	},
 	{
@@ -22,7 +20,6 @@ export const data: Array<UmbMockScriptModel> = [
 		path: '/very important folder',
 		parent: null,
 		isFolder: true,
-		hasChildren: true,
 		content: '',
 	},
 	{
@@ -32,7 +29,6 @@ export const data: Array<UmbMockScriptModel> = [
 			path: '/some-folder',
 		},
 		isFolder: false,
-		hasChildren: false,
 		content: `function makeid(length) {
 			var result           = '';
 			var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -52,7 +48,6 @@ export const data: Array<UmbMockScriptModel> = [
 			path: '/some-folder',
 		},
 		isFolder: false,
-		hasChildren: false,
 		content: `var items = {
 			"item_1": "1",
 			"item_2": "2",
@@ -69,7 +64,6 @@ export const data: Array<UmbMockScriptModel> = [
 			path: '/another-folder',
 		},
 		isFolder: false,
-		hasChildren: false,
 		content: `var my_arr = [4, '', 0, 10, 7, '', false, 10];
 
 		my_arr = my_arr.filter(Boolean);
@@ -83,7 +77,6 @@ export const data: Array<UmbMockScriptModel> = [
 			path: '/very important folder',
 		},
 		isFolder: false,
-		hasChildren: false,
 		content: `const date_str = "07/20/2021";
 		const date = new Date(date_str);
 		const full_day_name = date.toLocaleDateString('default', { weekday: 'long' });
@@ -100,7 +93,6 @@ export const data: Array<UmbMockScriptModel> = [
 			path: '/very important folder',
 		},
 		isFolder: false,
-		hasChildren: false,
 		content: `// Define an object
 		const employee = {
 			"name": "John Deo",
@@ -120,7 +112,6 @@ export const data: Array<UmbMockScriptModel> = [
 			path: '/very important folder',
 		},
 		isFolder: false,
-		hasChildren: false,
 		content: `alert('hello file with dash');`,
 	},
 	{
@@ -128,7 +119,6 @@ export const data: Array<UmbMockScriptModel> = [
 		path: '/forbidden',
 		parent: null,
 		isFolder: false,
-		hasChildren: false,
 		content: `console.log('You are not allowed to see this script!');`,
 	},
 ];
