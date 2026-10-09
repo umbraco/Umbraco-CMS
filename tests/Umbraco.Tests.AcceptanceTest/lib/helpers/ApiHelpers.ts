@@ -37,6 +37,7 @@ import {MediaDeliveryApiHelper} from './differentAppSettingsHelpers/MediaDeliver
 import {ContentDeliveryApiHelper} from "./differentAppSettingsHelpers/ContentDeliveryApiHelper";
 import {SmtpApiHelper} from './SmtpApiHelper';
 import {ElementApiHelper} from "./ElementApiHelper";
+import {ServerApiHelper} from './ServerApiHelper';
 
 export class ApiHelpers {
   baseUrl: string = umbracoConfig.environment.baseUrl;
@@ -76,6 +77,7 @@ export class ApiHelpers {
   contentDeliveryApi: ContentDeliveryApiHelper;
   smtp: SmtpApiHelper;
   element: ElementApiHelper;
+  server: ServerApiHelper;
 
   constructor(page: Page) {
     this.page = page;
@@ -114,6 +116,7 @@ export class ApiHelpers {
     this.contentDeliveryApi = new ContentDeliveryApiHelper(this);
     this.smtp = new SmtpApiHelper(this);
     this.element = new ElementApiHelper(this);
+    this.server = new ServerApiHelper(this);
   }
 
   // Back-office auth is cookie-only: Playwright auto-sends the authentication cookie from the

@@ -6,6 +6,9 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Textstring';
 const text = 'This is the content with textstring';
 const customDataTypeName = 'Custom Textstring';
+const updatedText = 'This is the updated content with textstring';
+const danishContentName = 'Dansk Indhold';
+const danishText = 'Dette er dansk indhold';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -16,6 +19,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.language.ensureIsoCodeNotExists('da');
 });
 
 test('can create content with the textstring data type', async ({umbracoApi, umbracoUi}) => {
@@ -100,4 +104,91 @@ test('cannot input the text that exceeds the allowed amount of characters', {tag
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+});
+
+test('can navigate away from content with a textstring value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, text, dataTypeName);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed textstring value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, text, dataTypeName);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterTextstring(updatedText);
+
+  // Act
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+  await umbracoUi.content.clickDiscardChangesButton();
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value).toEqual(text);
+});
+
+test('can navigate away from variant content with a saved textstring value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.language.createDanishLanguage();
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'TestGroup', true, true);
+  await umbracoApi.document.createDocumentWithMultipleVariants(
+    contentName, documentTypeId, AliasHelper.toAlias(dataTypeName),
+    [
+      {isoCode: 'en-US', name: contentName, value: text},
+      {isoCode: 'da', name: danishContentName, value: danishText}
+    ]
+  );
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterTextstring(updatedText);
+  await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.content.clickContainerSaveButtonAndWaitForContentToBeUpdated();
+
+  // Act
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from variant content with a changed textstring value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.language.createDanishLanguage();
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'TestGroup', true, true);
+  await umbracoApi.document.createDocumentWithMultipleVariants(
+    contentName, documentTypeId, AliasHelper.toAlias(dataTypeName),
+    [
+      {isoCode: 'en-US', name: contentName, value: text},
+      {isoCode: 'da', name: danishContentName, value: danishText}
+    ]
+  );
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterTextstring(updatedText);
+
+  // Act
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
 });
