@@ -2,7 +2,7 @@ import type { UmbBlockExposeModel } from '../types.js';
 import { umbVariantObjectSortCompare } from '@umbraco-cms/backoffice/variant';
 
 /**
- * Compares two block expose entries by culture, segment, then content key, matching the order the
+ * Compares two block expose entries by culture, then content key, matching the order the
  * Management API returns block exposes in. Content keys are compared ordinally, which equals
  * the order of `Guid.CompareTo` as long as both sides use lowercase hexadecimal keys.
  * @param {UmbBlockExposeModel} a - The first expose to compare.

@@ -14,8 +14,7 @@ type TestModel = UmbContentDetailModel<TestVariant>;
 describe('UmbContentWorkspaceDataManager', () => {
 	let manager: UmbContentWorkspaceDataManager<TestModel>;
 
-	const variant = (culture: string | null, segment: string | null = null, name = 'name'): TestVariant =>
-		({ culture, segment, name }) as TestVariant;
+	const variant = (culture: string | null, name = 'name'): TestVariant => ({ culture, name }) as TestVariant;
 
 	const setup = (variants: Array<TestVariant>) => {
 		manager = new UmbContentWorkspaceDataManager<TestModel>(new UmbTestContentDataManagerHostElement(), variant(null));
