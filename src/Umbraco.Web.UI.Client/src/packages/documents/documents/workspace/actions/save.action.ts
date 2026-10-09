@@ -45,11 +45,11 @@ export class UmbDocumentSaveWorkspaceAction
 		const workspaceContext = this._workspaceContext;
 		if (!workspaceContext) return;
 
-		// The invariant (shared) data is handled as a variant of its own, saved on its own for existing content.
-		const variantIds = [
-			...variants.map((variant) => UmbVariantId.CreateFromPartial(variant)),
-			UmbVariantId.CreateInvariant(),
-		];
+		const variantIds = variants.map((variant) => UmbVariantId.CreateFromPartial(variant));
+		// When the content varies by culture, the invariant (shared) data is handled as a variant of its own, saved on its own for existing content.
+		if (workspaceContext.getVariesByCulture()) {
+			variantIds.push(UmbVariantId.CreateInvariant());
+		}
 
 		this.observe(
 			combineLatest(variantIds.map((variantId) => workspaceContext.isWritableVariant(variantId))),
