@@ -247,6 +247,28 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Create_Language_With_IsoCode_Without_Legacy_Windows_Lcid()
+    {
+        var languageEnNg = new LanguageBuilder()
+            .WithCultureInfo("en-NG")
+            .Build();
+        var result = await LanguageService.CreateAsync(languageEnNg, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        var createdLanguage = await LanguageService.GetAsync("en-NG");
+        Assert.NotNull(createdLanguage);
+    }
+
+    [Test]
+    public async Task Cannot_Create_Language_With_IsoCode_Unknown_To_The_Platform()
+    {
+        var unknownLanguage = new Language("xx-XX", "Unknown to the platform");
+        var result = await LanguageService.CreateAsync(unknownLanguage, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.InvalidIsoCode, result.Status);
+    }
+
+    [Test]
     public async Task Cannot_Create_Duplicate_Languages()
     {
         var isoCode = "en-AU";
