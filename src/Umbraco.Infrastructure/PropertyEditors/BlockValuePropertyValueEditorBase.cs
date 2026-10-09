@@ -317,7 +317,6 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         _blockEditorVarianceHandler.AlignExposeVariance(blockValue, culture);
         blockValue.Expose = blockValue.Expose
             .OrderBy(variation => variation.Culture, StringComparer.Ordinal)
-            .ThenBy(variation => variation.Segment, StringComparer.Ordinal)
             .ThenBy(variation => variation.ContentKey)
             .ToList();
     }
