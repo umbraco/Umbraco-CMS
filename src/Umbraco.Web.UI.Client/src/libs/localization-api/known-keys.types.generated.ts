@@ -1447,6 +1447,7 @@ declare global {
 		login_passwordIsBlank: string;
 		login_passwordMinLength: string;
 		login_passwordMismatch: string;
+		login_passwordResetUnavailable: string;
 		login_receivedErrorFromServer: string;
 		login_rememberMe: string;
 		login_requestPasswordResetConfirmation: string;
