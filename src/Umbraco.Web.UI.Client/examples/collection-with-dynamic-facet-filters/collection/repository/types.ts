@@ -3,6 +3,7 @@ import type { UmbCollectionFilterModel, UmbCollectionItemModel } from '@umbraco-
 export type ExampleDynamicFacetCollectionFilterModel = UmbCollectionFilterModel;
 
 export interface ExampleProductCollectionItemModel extends UmbCollectionItemModel {
+	name: string;
 	category: string;
 	sizes: Array<string>;
 	colors: Array<string>;
