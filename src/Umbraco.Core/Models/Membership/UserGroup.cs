@@ -39,6 +39,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private int? _startContentId;
     private int? _startMediaId;
     private int? _startElementId;
+    private int? _startDocumentBlueprintId;
 
     /// <summary>
     ///     Constructor to create a new user group
@@ -91,6 +92,14 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _startElementId;
         set => SetPropertyValueAndDetectChanges(value, ref _startElementId, nameof(StartElementId));
+    }
+
+    /// <inheritdoc />
+    [DataMember]
+    public int? StartDocumentBlueprintId
+    {
+        get => _startDocumentBlueprintId;
+        set => SetPropertyValueAndDetectChanges(value, ref _startDocumentBlueprintId, nameof(StartDocumentBlueprintId));
     }
 
     [DataMember]

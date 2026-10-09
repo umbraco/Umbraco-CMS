@@ -408,6 +408,8 @@ export default {
 		duplicateBlueprintMessage: 'Another Document Blueprint with the same name already exists',
 		blueprintDescription:
 			'A Document Blueprint is predefined content that an editor can select to use as the basis for creating new content',
+		noAccessToBlueprints:
+			'You do not have permission to manage Document Blueprints. Ask an administrator to give you access.',
 	},
 	entityDetail: {
 		notFoundTitle: (entityType: string) => {
@@ -2302,6 +2304,7 @@ export default {
 		allowAccessToAllLanguages: 'Allow access to all languages',
 		allowAccessToAllDocuments: 'Allow access to all documents',
 		allowAccessToAllElements: 'Allow access to all elements',
+		allowAccessToAllDocumentBlueprints: 'Allow access to all document blueprints',
 		allowAccessToAllMedia: 'Allow access to all media',
 		sectionsHelp: 'Add sections to give users access',
 		selectUserGroup: (multiple: boolean) => {
@@ -2395,6 +2398,9 @@ export default {
 		enableUserConfirmation: 'Are you sure you want to enable this user?',
 		unlockUserHeadline: (name: string) => `Unlock ${name}`,
 		unlockUserConfirmation: 'Are you sure you want to unlock this user?',
+		selectDocumentBlueprintStartNode: 'Select document blueprint start node',
+		selectDocumentBlueprintStartNodeDescription:
+			'Limit the document blueprints users can manage to a specific start node',
 	},
 	userPermissions: {
 		create: 'Create',

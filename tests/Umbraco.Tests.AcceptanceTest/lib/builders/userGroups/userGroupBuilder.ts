@@ -17,6 +17,8 @@ export class UserGroupBuilder {
   description: string;
   elementRootAccess: boolean;
   elementStartNodeId: string;
+  documentBlueprintRootAccess: boolean;
+  documentBlueprintStartNodeId: string;
 
   constructor() {
     this.sections = [];
@@ -95,6 +97,16 @@ export class UserGroupBuilder {
     return this;
   }
 
+  withDocumentBlueprintStartNodeId(documentBlueprintStartNodeId: string) {
+    this.documentBlueprintStartNodeId = documentBlueprintStartNodeId;
+    return this;
+  }
+
+  withDocumentBlueprintRootAccess(documentBlueprintRootAccess: boolean) {
+    this.documentBlueprintRootAccess = documentBlueprintRootAccess;
+    return this;
+  }
+
   build() {
     return {
       name: this.name || '',
@@ -112,6 +124,8 @@ export class UserGroupBuilder {
       description: this.description || '',
       elementStartNode: this.elementStartNodeId ? {id: this.elementStartNodeId} : null,
       elementRootAccess: this.elementRootAccess || false,
+      documentBlueprintStartNode: this.documentBlueprintStartNodeId ? {id: this.documentBlueprintStartNodeId} : null,
+      documentBlueprintRootAccess: this.documentBlueprintRootAccess || false,
     };
   }
 }

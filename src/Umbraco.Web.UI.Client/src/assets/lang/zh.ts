@@ -404,6 +404,7 @@ export default {
 		createdBlueprintMessage: "已从 '%0%' 创建文档蓝图",
 		duplicateBlueprintMessage: '已存在同名的文档蓝图',
 		blueprintDescription: '文档蓝图是预定义的内容，编辑者可选择将其作为创建新内容的基础',
+		noAccessToBlueprints: '您没有管理文档蓝图的权限。请联系管理员为您授予访问权限。',
 	},
 
 	entityDetail: {
@@ -2262,6 +2263,7 @@ export default {
 		languageHelp: '设置你在菜单和对话框中看到的语言',
 		allowAccessToAllDocuments: '允许访问所有文档',
 		allowAccessToAllElements: '允许访问所有元素',
+		allowAccessToAllDocumentBlueprints: '允许访问所有文档蓝图',
 		allowAccessToAllMedia: '允许访问所有媒体',
 		startnodes: '内容起始节点',
 		startnodehelp: '将内容树限制为特定的起始节点',
@@ -2271,6 +2273,8 @@ export default {
 		mediastartnodeshelp: '将媒体库限制为特定的起始节点',
 		selectElementStartNode: '选择元素起始节点',
 		selectElementStartNodeDescription: '将元素库限制为特定的起始节点',
+		selectDocumentBlueprintStartNode: '选择文档蓝图起始节点',
+		selectDocumentBlueprintStartNodeDescription: '将用户可管理的文档蓝图限制为特定的起始节点',
 		noStartNode: '未选择起始节点',
 		noStartNodes: '未选择起始节点',
 		selectUserGroup: (multiple: boolean) => (multiple ? '选择用户组' : '选择用户组'),

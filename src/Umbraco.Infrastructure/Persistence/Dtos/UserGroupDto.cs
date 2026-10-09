@@ -16,6 +16,8 @@ public class UserGroupDto
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
     public const string KeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameKey;
+    internal const string StartDocumentBlueprintIdColumnName = "startDocumentBlueprintId";
+    internal const string StartDocumentBlueprintIdForeignKeyName = "FK_startDocumentBlueprintId_umbracoNode_id";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserGroupDto"/> class with default values.
@@ -122,6 +124,15 @@ public class UserGroupDto
     [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(NodeDto), Name = "FK_startElementId_umbracoNode_id")]
     public int? StartElementId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the identifier of the container that defines the starting point for document blueprint
+    /// access for the user group. A null value indicates no access.
+    /// </summary>
+    [Column(StartDocumentBlueprintIdColumnName)]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [ForeignKey(typeof(NodeDto), Name = StartDocumentBlueprintIdForeignKeyName)]
+    public int? StartDocumentBlueprintId { get; set; }
 
     /// <summary>
     /// Gets or sets the collection of application associations for this user group.

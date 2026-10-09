@@ -2,14 +2,18 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
@@ -23,6 +27,7 @@ public class UpdateDocumentBlueprintController : DocumentBlueprintControllerBase
     private readonly IDocumentBlueprintEditingPresentationFactory _blueprintEditingPresentationFactory;
     private readonly IContentBlueprintEditingService _contentBlueprintEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.UpdateDocumentBlueprintController"/> class.
@@ -30,14 +35,37 @@ public class UpdateDocumentBlueprintController : DocumentBlueprintControllerBase
     /// <param name="blueprintEditingPresentationFactory">Factory used to create blueprint editing presentations.</param>
     /// <param name="contentBlueprintEditingService">Service responsible for content blueprint editing operations.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for the back office security context.</param>
+    /// <param name="authorizationService">The authorization service.</param>
+    [ActivatorUtilitiesConstructor]
     public UpdateDocumentBlueprintController(
         IDocumentBlueprintEditingPresentationFactory blueprintEditingPresentationFactory,
         IContentBlueprintEditingService contentBlueprintEditingService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IAuthorizationService authorizationService)
     {
         _blueprintEditingPresentationFactory = blueprintEditingPresentationFactory;
         _contentBlueprintEditingService = contentBlueprintEditingService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _authorizationService = authorizationService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateDocumentBlueprintController"/> class.
+    /// </summary>
+    /// <param name="blueprintEditingPresentationFactory">Factory used to create blueprint editing presentations.</param>
+    /// <param name="contentBlueprintEditingService">Service responsible for content blueprint editing operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for the back office security context.</param>
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
+    public UpdateDocumentBlueprintController(
+        IDocumentBlueprintEditingPresentationFactory blueprintEditingPresentationFactory,
+        IContentBlueprintEditingService contentBlueprintEditingService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        : this(
+            blueprintEditingPresentationFactory,
+            contentBlueprintEditingService,
+            backOfficeSecurityAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
+    {
     }
 
     /// <summary>
@@ -56,9 +84,18 @@ public class UpdateDocumentBlueprintController : DocumentBlueprintControllerBase
     [EndpointDescription("Updates a document blueprint identified by the provided Id with the details from the request model.")]
     public async Task<IActionResult> Update(CancellationToken cancellationToken, Guid id, UpdateDocumentBlueprintRequestModel requestModel)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            DocumentBlueprintPermissionResource.WithKeys(id),
+            AuthorizationPolicies.DocumentBlueprintPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
         ContentBlueprintUpdateModel model = _blueprintEditingPresentationFactory.MapUpdateModel(requestModel);
 
-        // We don't need to validate user access because we "only" require access to the Settings section to update blueprints
         Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await _contentBlueprintEditingService.UpdateAsync(id, model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success

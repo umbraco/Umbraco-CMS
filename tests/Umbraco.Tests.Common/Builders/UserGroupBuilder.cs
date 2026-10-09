@@ -38,6 +38,7 @@ public class UserGroupBuilder<TParent>
     private int? _startContentId;
     private int? _startMediaId;
     private int? _startElementId;
+    private int? _startDocumentBlueprintId;
     private string _suffix;
     private int? _userCount;
 
@@ -135,6 +136,12 @@ public class UserGroupBuilder<TParent>
         return this;
     }
 
+    public UserGroupBuilder<TParent> WithStartDocumentBlueprintId(int startDocumentBlueprintId)
+    {
+        _startDocumentBlueprintId = startDocumentBlueprintId;
+        return this;
+    }
+
     public IReadOnlyUserGroup BuildReadOnly(IUserGroup userGroup) =>
         Mock.Of<IReadOnlyUserGroup>(x =>
             x.Permissions == userGroup.Permissions &&
@@ -144,6 +151,7 @@ public class UserGroupBuilder<TParent>
             x.StartContentId == userGroup.StartContentId &&
             x.StartMediaId == userGroup.StartMediaId &&
             x.StartElementId == userGroup.StartElementId &&
+            x.StartDocumentBlueprintId == userGroup.StartDocumentBlueprintId &&
             x.AllowedSections == userGroup.AllowedSections &&
             x.Id == userGroup.Id &&
             x.Key == userGroup.Key);
@@ -158,6 +166,7 @@ public class UserGroupBuilder<TParent>
         var startContentId = _startContentId ?? -1;
         var startMediaId = _startMediaId ?? -1;
         var startElementId = _startElementId ?? -1;
+        var startDocumentBlueprintId = _startDocumentBlueprintId ?? -1;
         var icon = _icon ?? "icon-group";
 
         var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
@@ -169,6 +178,7 @@ public class UserGroupBuilder<TParent>
             StartContentId = startContentId,
             StartMediaId = startMediaId,
             StartElementId = startElementId,
+            StartDocumentBlueprintId = startDocumentBlueprintId,
             Permissions = _permissions,
         };
 

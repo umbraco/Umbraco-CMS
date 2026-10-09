@@ -33,5 +33,10 @@ public enum UserGroupAuthorizationStatus
     /// <summary>
     ///     The user does not have access to the Users section.
     /// </summary>
-    UnauthorizedMissingUsersSectionAccess
+    UnauthorizedMissingUsersSectionAccess,
+
+    /// <summary>
+    ///     The user does not have access to the document blueprint start node of the user group.
+    /// </summary>
+    UnauthorizedMissingDocumentBlueprintStartNodeAccess,
 }

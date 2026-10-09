@@ -25,7 +25,7 @@ public class CreateDocumentBlueprintFolderControllerTests
         => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel
-        => new() { ExpectedStatusCode = HttpStatusCode.Created };
+        => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Unauthorized };

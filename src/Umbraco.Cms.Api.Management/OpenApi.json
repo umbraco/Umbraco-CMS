@@ -8744,6 +8744,52 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/document-blueprint/folder": {
+      "get": {
+        "tags": [
+          "Document Blueprint"
+        ],
+        "summary": "Gets a collection of document blueprint folder items.",
+        "description": "Gets a collection of document blueprint folder items identified by the provided Ids.",
+        "operationId": "GetItemDocumentBlueprintFolder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FolderItemResponseModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/document-blueprint/ancestors": {
       "get": {
         "tags": [
@@ -40481,7 +40527,9 @@
           "mediaStartNodeIds",
           "hasMediaRootAccess",
           "elementStartNodeIds",
-          "hasElementRootAccess"
+          "hasElementRootAccess",
+          "documentBlueprintStartNodeIds",
+          "hasDocumentBlueprintRootAccess"
         ],
         "type": "object",
         "properties": {
@@ -40514,6 +40562,15 @@
             }
           },
           "hasElementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNodeIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceByIdModel"
+            }
+          },
+          "hasDocumentBlueprintRootAccess": {
             "type": "boolean"
           }
         }
@@ -42190,7 +42247,8 @@
           "permissions",
           "documentRootAccess",
           "mediaRootAccess",
-          "elementRootAccess"
+          "elementRootAccess",
+          "documentBlueprintRootAccess"
         ],
         "type": "object",
         "properties": {
@@ -42271,6 +42329,19 @@
             ]
           },
           "elementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "documentBlueprintRootAccess": {
             "type": "boolean"
           },
           "fallbackPermissions": {
@@ -42456,6 +42527,8 @@
           "hasMediaRootAccess",
           "elementStartNodeIds",
           "hasElementRootAccess",
+          "documentBlueprintStartNodeIds",
+          "hasDocumentBlueprintRootAccess",
           "avatarUrls",
           "languages",
           "hasAccessToAllLanguages",
@@ -42506,6 +42579,15 @@
             }
           },
           "hasElementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNodeIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceByIdModel"
+            }
+          },
+          "hasDocumentBlueprintRootAccess": {
             "type": "boolean"
           },
           "avatarUrls": {
@@ -53051,7 +53133,8 @@
           "permissions",
           "documentRootAccess",
           "mediaRootAccess",
-          "elementRootAccess"
+          "elementRootAccess",
+          "documentBlueprintRootAccess"
         ],
         "type": "object",
         "properties": {
@@ -53127,6 +53210,19 @@
           "elementRootAccess": {
             "type": "boolean"
           },
+          "documentBlueprintStartNode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "documentBlueprintRootAccess": {
+            "type": "boolean"
+          },
           "fallbackPermissions": {
             "type": "array",
             "items": {
@@ -53171,6 +53267,8 @@
           "hasMediaRootAccess",
           "elementStartNodeIds",
           "hasElementRootAccess",
+          "documentBlueprintStartNodeIds",
+          "hasDocumentBlueprintRootAccess",
           "email",
           "userName",
           "name",
@@ -53206,6 +53304,15 @@
             }
           },
           "hasElementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNodeIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceByIdModel"
+            }
+          },
+          "hasDocumentBlueprintRootAccess": {
             "type": "boolean"
           },
           "email": {
@@ -53454,7 +53561,8 @@
           "aliasCanBeChanged",
           "documentRootAccess",
           "mediaRootAccess",
-          "elementRootAccess"
+          "elementRootAccess",
+          "documentBlueprintRootAccess"
         ],
         "type": "object",
         "properties": {
@@ -53538,6 +53646,19 @@
             ]
           },
           "elementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "documentBlueprintRootAccess": {
             "type": "boolean"
           },
           "fallbackPermissions": {
@@ -53675,6 +53796,8 @@
           "hasMediaRootAccess",
           "elementStartNodeIds",
           "hasElementRootAccess",
+          "documentBlueprintStartNodeIds",
+          "hasDocumentBlueprintRootAccess",
           "avatarUrls",
           "state",
           "failedLoginAttempts",
@@ -53724,6 +53847,15 @@
             }
           },
           "hasElementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNodeIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceByIdModel"
+            }
+          },
+          "hasDocumentBlueprintRootAccess": {
             "type": "boolean"
           },
           "avatarUrls": {

@@ -52,6 +52,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         var mediaRootAccess = mediaStartNodeKey is null && userGroup.StartMediaId == Constants.System.Root;
         Guid? elementStartNodeKey = GetKeyFromId(userGroup.StartElementId, UmbracoObjectTypes.ElementContainer);
         var elementRootAccess = elementStartNodeKey is null && userGroup.StartElementId == Constants.System.Root;
+        Guid? documentBlueprintStartNodeKey = GetKeyFromId(userGroup.StartDocumentBlueprintId, UmbracoObjectTypes.DocumentBlueprintContainer);
+        var documentBlueprintRootAccess = documentBlueprintStartNodeKey is null && userGroup.StartDocumentBlueprintId == Constants.System.Root;
 
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
 
@@ -72,6 +74,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             MediaRootAccess = mediaRootAccess,
             ElementStartNode = ReferenceByIdModel.ReferenceOrNull(elementStartNodeKey),
             ElementRootAccess = elementRootAccess,
+            DocumentBlueprintStartNode = ReferenceByIdModel.ReferenceOrNull(documentBlueprintStartNodeKey),
+            DocumentBlueprintRootAccess = documentBlueprintRootAccess,
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
@@ -88,8 +92,13 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     {
         // TODO figure out how to reuse code from Task<UserGroupResponseModel> CreateAsync(IUserGroup userGroup) instead of copying
         Guid? contentStartNodeKey = GetKeyFromId(userGroup.StartContentId, UmbracoObjectTypes.Document);
+        var contentRootAccess = contentStartNodeKey is null && userGroup.StartContentId == Constants.System.Root;
         Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
+        var mediaRootAccess = mediaStartNodeKey is null && userGroup.StartMediaId == Constants.System.Root;
         Guid? elementStartNodeKey = GetKeyFromId(userGroup.StartElementId, UmbracoObjectTypes.ElementContainer);
+        var elementRootAccess = elementStartNodeKey is null && userGroup.StartElementId == Constants.System.Root;
+        Guid? documentBlueprintStartNodeKey = GetKeyFromId(userGroup.StartDocumentBlueprintId, UmbracoObjectTypes.DocumentBlueprintContainer);
+        var documentBlueprintRootAccess = documentBlueprintStartNodeKey is null && userGroup.StartDocumentBlueprintId == Constants.System.Root;
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
 
         if (languageIsoCodesMappingAttempt.Success is false)
@@ -104,8 +113,13 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Description = userGroup.Description ?? string.Empty,
             Alias = userGroup.Alias,
             DocumentStartNode = ReferenceByIdModel.ReferenceOrNull(contentStartNodeKey),
+            DocumentRootAccess = contentRootAccess,
             MediaStartNode = ReferenceByIdModel.ReferenceOrNull(mediaStartNodeKey),
+            MediaRootAccess = mediaRootAccess,
             ElementStartNode = ReferenceByIdModel.ReferenceOrNull(elementStartNodeKey),
+            ElementRootAccess = elementRootAccess,
+            DocumentBlueprintStartNode = ReferenceByIdModel.ReferenceOrNull(documentBlueprintStartNodeKey),
+            DocumentBlueprintRootAccess = documentBlueprintRootAccess,
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
@@ -310,6 +324,26 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         else
         {
             target.StartElementId = null;
+        }
+
+        if (source.DocumentBlueprintStartNode is not null)
+        {
+            var documentBlueprintId = GetIdFromKey(source.DocumentBlueprintStartNode.Id, UmbracoObjectTypes.DocumentBlueprintContainer);
+
+            if (documentBlueprintId is null)
+            {
+                return Attempt.Fail(UserGroupOperationStatus.DocumentBlueprintStartNodeKeyNotFound);
+            }
+
+            target.StartDocumentBlueprintId = documentBlueprintId;
+        }
+        else if (source.DocumentBlueprintRootAccess)
+        {
+            target.StartDocumentBlueprintId = Constants.System.Root;
+        }
+        else
+        {
+            target.StartDocumentBlueprintId = null;
         }
 
         return Attempt.Succeed(UserGroupOperationStatus.Success);
