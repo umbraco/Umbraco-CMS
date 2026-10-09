@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
@@ -256,7 +257,9 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
             ContentIndexingService,
             GetRequiredService<IRelationService>(),
             GetRequiredService<IOptions<IndexingSettings>>(),
-            GetRequiredService<IIndexDocumentService>());
+            GetRequiredService<IIndexDocumentService>(),
+            ContentService,
+            GetRequiredService<IDistributedContentIndexRefresher>());
 
         Guid[] referencingDocumentKeys = handler.FindDocumentKeysReferencingElements([leafElement.Id]);
 
@@ -341,6 +344,75 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
     }
 
     [Test]
+    public async Task Can_Remove_Element_Content_From_Referencing_Document_When_Published_Element_Is_Deleted()
+    {
+        var (contentType, elementType) = await SetupBlockListWithElementType();
+        Element element = await CreatePublishedElementReferencedByPublishedDocument(contentType, elementType);
+
+        ElementService.Delete(ElementService.GetById(element.Key)!);
+
+        AssertPublishedBlocksValueIsNull();
+    }
+
+    [Test]
+    public async Task Can_Remove_Element_Content_From_Referencing_Document_When_Element_Type_Is_Deleted()
+    {
+        var (contentType, elementType) = await SetupBlockListWithElementType();
+        await CreatePublishedElementReferencedByPublishedDocument(contentType, elementType);
+
+        Assert.That(await ContentTypeService.DeleteAsync(elementType.Key, Constants.Security.SuperUserKey), Is.EqualTo(ContentTypeOperationStatus.Success));
+
+        AssertPublishedBlocksValueIsNull();
+    }
+
+    [Test]
+    public async Task Can_Remove_Transitively_Referenced_Element_Content_From_Referencing_Document_When_Leaf_Element_Type_Is_Deleted()
+    {
+        var (contentType, intermediateElementType) = await SetupBlockListWithElementType();
+
+        IContentType leafElementType = new ContentTypeBuilder()
+            .WithAlias("leafElement")
+            .WithName("Leaf Element")
+            .WithIsElement(true)
+            .AddPropertyType()
+            .WithAlias("textValue")
+            .WithName("Text")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(leafElementType, Constants.Security.SuperUserKey);
+        await AddBlocksPropertyToElementType(intermediateElementType, leafElementType);
+
+        Element leafElement = new ElementBuilder()
+            .WithContentType(leafElementType)
+            .WithName("Leaf element")
+            .Build();
+        leafElement.SetValue("textValue", LeafText);
+        ElementService.Save(leafElement);
+        ElementService.Publish(leafElement, ["*"]);
+
+        Element intermediateElement = new ElementBuilder()
+            .WithContentType(intermediateElementType)
+            .WithName("Intermediate element")
+            .Build();
+        intermediateElement.SetValue("textValue", IntermediateText);
+        intermediateElement.SetValue("blocks", JsonSerializer.Serialize(ExternalBlockListValue(leafElement.Key)));
+        ElementService.Save(intermediateElement);
+        ElementService.Publish(intermediateElement, ["*"]);
+
+        Content document = CreatePageWithExternalBlockReference(contentType, intermediateElement.Key);
+        ContentService.Save(document);
+        ContentService.Publish(document, ["*"]);
+
+        AssertPublishedBlocksTextsContain(IntermediateText, LeafText);
+
+        Assert.That(await ContentTypeService.DeleteAsync(leafElementType.Key, Constants.Security.SuperUserKey), Is.EqualTo(ContentTypeOperationStatus.Success));
+
+        AssertPublishedBlocksTexts(absent: [LeafText], present: [IntermediateText]);
+    }
+
+    [Test]
     public async Task Can_Keep_Transitively_Referenced_Element_Content_Out_Of_Referencing_Document_When_Trashed_Leaf_Element_Is_Restored()
     {
         var structure = await SetupNestedExternalReferenceStructure();
@@ -412,7 +484,9 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
             ContentIndexingService,
             relationService,
             GetRequiredService<IOptions<IndexingSettings>>(),
-            GetRequiredService<IIndexDocumentService>());
+            GetRequiredService<IIndexDocumentService>(),
+            ContentService,
+            GetRequiredService<IDistributedContentIndexRefresher>());
 
         Guid[] referencingDocumentKeys = handler.FindDocumentKeysReferencingElements([element.Id]);
 
@@ -534,9 +608,28 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
         }
     }
 
-    // adds a second, self-referencing "blocks" property to the given element type, so an element of this type can
-    // itself externally reference another element of the same type - used to build a transitive reference chain.
-    private async Task AddBlocksPropertyToElementType(IContentType elementType)
+    private async Task<Element> CreatePublishedElementReferencedByPublishedDocument(IContentType contentType, IContentType elementType)
+    {
+        Element element = new ElementBuilder()
+            .WithContentType(elementType)
+            .WithName("Reusable element")
+            .Build();
+        element.SetValue("textValue", "Original text");
+        ElementService.Save(element);
+        ElementService.Publish(element, ["*"]);
+
+        Content content = CreatePageWithExternalBlockReference(contentType, element.Key);
+        ContentService.Save(content);
+        ContentService.Publish(content, ["*"]);
+
+        AssertPublishedBlocksTextsContain("Original text");
+
+        return element;
+    }
+
+    // adds a second "blocks" property to the given element type, so an element of this type can itself externally
+    // reference another element (of the same type unless otherwise specified) - used to build a transitive reference chain.
+    private async Task AddBlocksPropertyToElementType(IContentType elementType, IContentType? allowedElementType = null)
     {
         var blockListDataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList], ConfigurationEditorJsonSerializer)
         {
@@ -546,7 +639,7 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
                     "blocks",
                     new BlockListConfiguration.BlockConfiguration[]
                     {
-                        new() { ContentElementTypeKey = elementType.Key }
+                        new() { ContentElementTypeKey = (allowedElementType ?? elementType).Key }
                     }
                 }
             },

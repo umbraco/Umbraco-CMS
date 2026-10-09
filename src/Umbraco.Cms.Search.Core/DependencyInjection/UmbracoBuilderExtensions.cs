@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Search.Indexing.Collection;
@@ -7,10 +8,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 using Umbraco.Cms.Search.Core.Cache;
 using Umbraco.Cms.Search.Core.Cache.Content;
-using Umbraco.Cms.Search.Core.Cache.ContentType;
 using Umbraco.Cms.Search.Core.Cache.Element;
 using Umbraco.Cms.Search.Core.Cache.Index;
-using Umbraco.Cms.Search.Core.Cache.Language;
 using Umbraco.Cms.Search.Core.Cache.Media;
 using Umbraco.Cms.Search.Core.Cache.MediaType;
 using Umbraco.Cms.Search.Core.Cache.Member;
@@ -22,6 +21,8 @@ using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing.Indexers;
 using Umbraco.Extensions;
+using ContentTypeCacheRefresherNotification = Umbraco.Cms.Search.Core.Cache.ContentType.ContentTypeCacheRefresherNotification;
+using LanguageCacheRefresherNotification = Umbraco.Cms.Search.Core.Cache.Language.LanguageCacheRefresherNotification;
 
 namespace Umbraco.Cms.Search.Core.DependencyInjection;
 
@@ -104,6 +105,7 @@ public static class UmbracoBuilderExtensions
             .AddNotificationHandler<DraftMemberCacheRefresherNotification, ContentIndexingNotificationHandler>()
             .AddNotificationHandler<PublishedContentCacheRefresherNotification, ContentIndexingNotificationHandler>()
             .AddNotificationHandler<PublishedElementCacheRefresherNotification, ElementIndexingNotificationHandler>()
+            .AddNotificationHandler<ElementDeletingNotification, ElementIndexingNotificationHandler>()
             .AddNotificationAsyncHandler<PublicAccessDetailedCacheRefresherNotification, PublicAccessIndexingNotificationHandler>();
 
         builder
