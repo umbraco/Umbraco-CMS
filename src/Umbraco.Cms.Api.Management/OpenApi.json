@@ -51095,7 +51095,8 @@
           "version",
           "assemblyVersion",
           "baseUtcOffset",
-          "runtimeMode"
+          "runtimeMode",
+          "isDebugMode"
         ],
         "type": "object",
         "properties": {
@@ -51110,6 +51111,9 @@
           },
           "runtimeMode": {
             "$ref": "#/components/schemas/RuntimeModeModel"
+          },
+          "isDebugMode": {
+            "type": "boolean"
           }
         }
       },

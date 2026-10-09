@@ -2,6 +2,7 @@ import type { UmbBlockWorkspaceOriginData } from '../workspace/index.js';
 import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockExposeModel } from '../types.js';
 import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
 import { UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME, UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME } from '../constants.js';
+import { umbBlockExposeSortCompare } from '../utils/block-expose-sort-compare.function.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -98,7 +99,7 @@ export abstract class UmbBlockManagerContext<
 	readonly #exposes = new UmbArrayState(
 		<Array<UmbBlockExposeModel>>[],
 		(x) => x.contentKey + '_' + x.culture + '_' + x.segment,
-	);
+	).sortBy(umbBlockExposeSortCompare);
 	public readonly exposes = this.#exposes.asObservable();
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {

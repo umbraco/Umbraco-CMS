@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -76,6 +77,7 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                     return variantViewModel;
                 }))
             .WhereNotNull()
+            .OrderByCultureSegmentAndAlias()
             .ToArray();
     }
 
@@ -102,6 +104,7 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                 additionalVariantMapping?.Invoke(culture, segment, variantViewModel);
                 return variantViewModel;
             }))
+            .OrderByCultureAndSegment()
             .ToArray();
     }
 

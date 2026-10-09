@@ -1,0 +1,66 @@
+import type { UmbMockMediaTypeModel } from '../../mock-data-set.types.js';
+import { DATA_TYPE_IDS, MEDIA_TYPE_IDS, mbcsId } from './ids.js';
+
+const imageTabId = mbcsId('container', 100);
+
+export const data: Array<UmbMockMediaTypeModel> = [
+	{
+		id: MEDIA_TYPE_IDS.folder,
+		name: 'Folder',
+		parent: null,
+		description: null,
+		alias: 'Folder',
+		icon: 'icon-folder',
+		flags: [],
+		properties: [],
+		containers: [],
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		allowedMediaTypes: [
+			{ mediaType: { id: MEDIA_TYPE_IDS.folder }, sortOrder: 0 },
+			{ mediaType: { id: MEDIA_TYPE_IDS.image }, sortOrder: 1 },
+		],
+		compositions: [],
+		isFolder: true,
+		hasChildren: false,
+		isDeletable: false,
+		aliasCanBeChanged: false,
+	},
+	{
+		id: MEDIA_TYPE_IDS.image,
+		name: 'Image',
+		parent: null,
+		description: null,
+		alias: 'Image',
+		icon: 'icon-picture',
+		flags: [],
+		properties: [
+			{
+				id: mbcsId('property', 1000),
+				container: { id: imageTabId },
+				alias: 'umbracoFile',
+				name: 'Image',
+				description: null,
+				dataType: { id: DATA_TYPE_IDS.imageCropper },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: { mandatory: true, mandatoryMessage: null, regEx: null, regExMessage: null },
+				appearance: { labelOnTop: false },
+			},
+		],
+		containers: [{ id: imageTabId, parent: null, name: 'Image', type: 'Tab', sortOrder: 0 }],
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		allowedMediaTypes: [],
+		compositions: [],
+		isFolder: false,
+		hasChildren: false,
+		isDeletable: false,
+		aliasCanBeChanged: false,
+	},
+];
