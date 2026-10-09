@@ -38,6 +38,10 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
     await this.click(this.itemPickerModal.locator(`umb-ref-item[name="${documentTypeName}"]`));
   }
 
+  async isDocumentTypeVisibleForDocumentBlueprint(documentTypeName: string, isVisible: boolean = true) {
+    await this.isVisible(this.itemPickerModal.locator(`umb-ref-item[name="${documentTypeName}"]`), isVisible);
+  }
+
   async clickSaveButtonAndWaitForDocumentBlueprintToBeCreated() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, this.clickSaveButton(), ConstantHelper.statusCodes.created);
   }
