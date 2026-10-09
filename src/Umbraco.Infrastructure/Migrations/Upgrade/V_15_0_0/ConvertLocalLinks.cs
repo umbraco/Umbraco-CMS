@@ -199,20 +199,23 @@ public class ConvertLocalLinks : MigrationBase
                 propertyType.Key,
                 propertyEditorAlias);
 
-            // Process in pages to avoid loading all property data from the database into memory at once.
-            Sql<ISqlContext> sql = BuildPropertyDataSql(propertyType);
+            // Process in pages to avoid loading all property data from the database into memory at once. Pages are
+            // keyed on the row id rather than offset, so each page is a seek and page boundaries stay stable while
+            // rows are updated.
             long pageNumber = 1;
             long pageCount = (propertyDataCount + PageSize - 1) / PageSize;
-            int processedCount = 0;
-            while (processedCount < propertyDataCount)
+            var lastId = int.MinValue;
+            while (true)
             {
-                Page<PropertyDataDto> propertyDataDtoPage = Database.Page<PropertyDataDto>(pageNumber, PageSize, sql);
-                if (propertyDataDtoPage.Items.Count == 0)
+                List<PropertyDataDto> propertyDataDtos = Database.Fetch<PropertyDataDto>(BuildPropertyDataPageSql(propertyType, lastId));
+                if (propertyDataDtos.Count == 0)
                 {
                     break;
                 }
 
-                var updateBatchCollection = propertyDataDtoPage.Items
+                lastId = propertyDataDtos[^1].Id;
+
+                var updateBatchCollection = propertyDataDtos
                     .Select(propertyDataDto =>
                         UpdateBatch.For(propertyDataDto, Database.StartSnapshot(propertyDataDto)))
                     .ToList();
@@ -281,7 +284,6 @@ public class ConvertLocalLinks : MigrationBase
                     _logger.LogDebug("  - no properties to convert, continuing");
 
                     pageNumber++;
-                    processedCount += propertyDataDtoPage.Items.Count;
 
                     continue;
                 }
@@ -304,12 +306,18 @@ public class ConvertLocalLinks : MigrationBase
                     result);
 
                 pageNumber++;
-                processedCount += propertyDataDtoPage.Items.Count;
             }
         }
 
         return true;
     }
+
+    private Sql<ISqlContext> BuildPropertyDataPageSql(IPropertyType propertyType, int afterId)
+        => SqlSyntax.SelectTop(
+            BuildPropertyDataSql(propertyType)
+                .Where<PropertyDataDto>(propertyData => propertyData.Id > afterId)
+                .OrderBy<PropertyDataDto>(propertyData => propertyData.Id),
+            PageSize);
 
     private Sql<ISqlContext> BuildPropertyDataSql(IPropertyType propertyType, bool isCount = false)
     {
@@ -328,6 +336,21 @@ public class ConvertLocalLinks : MigrationBase
                 (propertyData, contentVersion, documentVersion) =>
                     (contentVersion.Current || documentVersion.Published)
                     && propertyData.PropertyTypeId == propertyType.Id);
+
+        // Only values that contain a legacy local link or a rich text block UDI can be changed by the local link
+        // processors, so skip everything else in the database rather than round-tripping it through the value
+        // editors. The match must remain a superset of every pattern the processors convert. The column is
+        // matched without wrapping it in a function, as the legacy ntext type does not support one.
+        var localLinkPattern = DatabaseType == DatabaseType.SQLite
+            ? "%locallink%" // SQLite's LIKE is case insensitive for ASCII characters.
+            : "%[lL][oO][cC][aA][lL][lL][iI][nN][kK]%"; // Case insensitive regardless of the database collation.
+        const string BlockUdiPattern = "%data-content-udi%";
+        var textValueColumn = $"{SqlSyntax.GetQuotedTableName(PropertyDataDto.TableName)}.{SqlSyntax.GetQuotedColumnName(PropertyDataDto.TextValueColumnName)}";
+        var varcharValueColumn = $"{SqlSyntax.GetQuotedTableName(PropertyDataDto.TableName)}.{SqlSyntax.GetQuotedColumnName(PropertyDataDto.VarcharValueColumnName)}";
+        sql = sql.Where(
+            $"({textValueColumn} LIKE @0 OR {textValueColumn} LIKE @1 OR {varcharValueColumn} LIKE @0 OR {varcharValueColumn} LIKE @1)",
+            localLinkPattern,
+            BlockUdiPattern);
 
         return sql;
     }
