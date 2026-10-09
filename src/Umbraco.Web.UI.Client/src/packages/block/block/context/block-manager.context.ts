@@ -35,6 +35,8 @@ import {
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
+import type { UmbElementDetailModel } from '@umbraco-cms/backoffice/element';
+import { UmbRepositoryDetailsManager } from '@umbraco-cms/backoffice/repository';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_VALIDATION_CONTEXT,
@@ -113,7 +115,7 @@ export abstract class UmbBlockManagerContext<
 		(x) => x.key,
 	);
 	#elementRepository = new UmbElementDetailRepository(this);
-	#pendingElementFetches = new Set<string>();
+	#externalContentManager = new UmbRepositoryDetailsManager<UmbElementDetailModel>(this, this.#elementRepository);
 
 	readonly #settings = new UmbArrayState<UmbBlockDataModel, string, undefined>(undefined, (x) => x.key);
 	// TODO: Remove ?? [] fallback in v.19 (or v.20)
@@ -234,7 +236,42 @@ export abstract class UmbBlockManagerContext<
 				const keys = layouts
 					.filter((layout) => layout.isExternalContent && layout.contentKey)
 					.map((layout) => layout.contentKey as string);
-				if (keys.length) this.#fetchExternalContent(keys);
+				// Multiple block instances may reference the same external content — request each unique only once.
+				this.#externalContentManager.setUniques([...new Set(keys)]);
+			},
+			null,
+		);
+
+		// Rebuild the external content state whenever the manager's (batched) entries change.
+		this.observe(
+			this.#externalContentManager.entries,
+			(entries) => {
+				this.#externalContentValues.setValue(
+					entries.map(
+						(data): UmbBlockDataModel => ({
+							key: data.unique,
+							contentTypeKey: data.documentType.unique,
+							values: data.values.map(
+								(v): UmbBlockDataValueModel => ({
+									alias: v.alias,
+									editorAlias: v.editorAlias,
+									culture: v.culture,
+									segment: v.segment,
+									value: v.value,
+								}),
+							),
+						}),
+					),
+				);
+				this.#externalContentVariants.setValue(
+					entries.map((data) => ({
+						key: data.unique,
+						variants: data.variants.map((v) => ({
+							culture: v.culture ?? null,
+							state: v.state ?? null,
+						})),
+					})),
+				);
 			},
 			null,
 		);
@@ -416,43 +453,6 @@ export abstract class UmbBlockManagerContext<
 				return match?.state ?? entry.variants[0]?.state ?? null;
 			},
 		);
-	}
-
-	// TODO: migrate to UmbRepositoryDetailsManager for true batched fetches [LK]
-	async #fetchExternalContent(keys: Array<string>) {
-		for (const key of keys) {
-			if (this.#pendingElementFetches.has(key)) continue;
-			if (this.#externalContentValues.getValue().some((x) => x.key === key)) continue;
-			this.#pendingElementFetches.add(key);
-			try {
-				const { data } = await this.#elementRepository.requestByUnique(key);
-				if (data) {
-					const blockData: UmbBlockDataModel = {
-						contentTypeKey: data.documentType.unique,
-						key: data.unique,
-						values: data.values.map(
-							(v): UmbBlockDataValueModel => ({
-								alias: v.alias,
-								editorAlias: v.editorAlias,
-								culture: v.culture,
-								segment: v.segment,
-								value: v.value,
-							}),
-						),
-					};
-					this.#externalContentValues.appendOne(blockData);
-					this.#externalContentVariants.appendOne({
-						key: data.unique,
-						variants: data.variants.map((v) => ({
-							culture: v.culture ?? null,
-							state: v.state ?? null,
-						})),
-					});
-				}
-			} finally {
-				this.#pendingElementFetches.delete(key);
-			}
-		}
 	}
 
 	settingsOf(key: string) {
@@ -662,8 +662,6 @@ export abstract class UmbBlockManagerContext<
 			contentKey: newContent.key,
 			isExternalContent: undefined,
 		} as Partial<BlockLayoutType>);
-		this.#externalContentValues.removeOne(elementKey);
-		this.#externalContentVariants.removeOne(elementKey);
 		// Only set expose if the content type structure is loaded (it may not be for external content
 		// whose type was not in the block type list)
 		if (this.getStructure(contentTypeKey)) {
