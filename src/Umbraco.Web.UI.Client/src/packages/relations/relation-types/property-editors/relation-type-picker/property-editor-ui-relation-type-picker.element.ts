@@ -1,0 +1,57 @@
+import type { UmbInputRelationTypeElement } from '../../components/input-relation-type/input-relation-type.element.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
+
+@customElement('umb-property-editor-ui-relation-type-picker')
+export class UmbPropertyEditorUIRelationTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	@property()
+	public value?: string;
+
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		if (!config) return;
+
+		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
+		this._min = minMax?.min ?? 0;
+		this._max = minMax?.max ?? Infinity;
+	}
+
+	@property({ type: Boolean, attribute: 'readonly' })
+	readonly = false;
+
+	@state()
+	private _min = 0;
+
+	@state()
+	private _max = Infinity;
+
+	#onChange(event: CustomEvent & { target: UmbInputRelationTypeElement }) {
+		this.value = event.target.value;
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	override render() {
+		return html`
+			<umb-input-relation-type
+				.min=${this._min}
+				.max=${this._max}
+				.value=${this.value}
+				.readonly=${this.readonly}
+				@change=${this.#onChange}>
+			</umb-input-relation-type>
+		`;
+	}
+}
+
+export default UmbPropertyEditorUIRelationTypePickerElement;
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-property-editor-ui-relation-type-picker': UmbPropertyEditorUIRelationTypePickerElement;
+	}
+}
