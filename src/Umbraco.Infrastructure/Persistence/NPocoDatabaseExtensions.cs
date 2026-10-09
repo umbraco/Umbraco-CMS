@@ -183,7 +183,7 @@ public static partial class NPocoDatabaseExtensions
             try
             {
                 // try to insert
-                await db.InsertAsync(poco);
+                await db.ExecuteInSavepointAsync(() => db.InsertAsync(poco));
                 return RecordPersistenceType.Insert;
             }
             catch (DbException)
