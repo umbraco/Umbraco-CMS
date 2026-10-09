@@ -4,6 +4,7 @@ import {URLPickerValueBuilder} from './urlPickerValueBuilder';
 import {ImageCropperValueBuilder} from './imageCropperValueBuilder';
 import {BlockGridValueBuilder} from './blockGridValueBuilder';
 import {BlockListValueBuilder} from './blockListValueBuilder';
+import {SingleBlockValueBuilder} from './singleBlockValueBuilder';
 
 export class DocumentValueBuilder {
   parentBuilder: DocumentBuilder;
@@ -19,6 +20,7 @@ export class DocumentValueBuilder {
   temporaryFileId: string;
   blockGridValueBuilder: BlockGridValueBuilder;
   blockListValueBuilder: BlockListValueBuilder;
+  singleBlockValueBuilder: SingleBlockValueBuilder;
 
   constructor(parentBuilder: DocumentBuilder) {
     this.parentBuilder = parentBuilder;
@@ -81,6 +83,12 @@ export class DocumentValueBuilder {
     return builder;
   }
 
+  addSingleBlockValue() {
+    const builder = new SingleBlockValueBuilder(this);
+    this.singleBlockValueBuilder = builder;
+    return builder;
+  }
+
   withEditorAlias(editorAlias: string) {
     this.editorAlias = editorAlias;
     return this;
@@ -122,6 +130,9 @@ export class DocumentValueBuilder {
       }
       if (this.blockListValueBuilder !== undefined) {
         value = this.blockListValueBuilder.getValue();
+      }
+      if (this.singleBlockValueBuilder !== undefined) {
+        value = this.singleBlockValueBuilder.getValue();
       }
     }
 

@@ -1,5 +1,6 @@
 ﻿import {expect} from "@playwright/test";
 import {ApiHelpers} from "../ApiHelpers";
+import {ConstantHelper} from '../ConstantHelper';
 
 export class ContentDeliveryApiHelper {
   api: ApiHelpers
@@ -62,6 +63,75 @@ export class ContentDeliveryApiHelper {
     }
 
     return await this.api.get(this.api.baseUrl + '/umbraco/delivery/api/v2/content' + query, undefined, extraHeaders);
+  }
+
+  async waitUntilContentQueryReturnsNames(filter: string | undefined, sort: string | undefined, expectedNames: string[], expectedTotal?: number, extraHeaders?: { [key: string]: string; }) {
+    const take = 100;
+    expect(expectedNames.length).toBeGreaterThan(0);
+    let contentItemsJson;
+    await expect
+      .poll(
+        async () => {
+          const response = await this.getContentItemsFromAQuery(extraHeaders, undefined, filter, sort, 0, take);
+          if (!response.ok()) {
+            return [`query failed with status ${response.status()}`];
+          }
+          contentItemsJson = await response.json();
+          if (contentItemsJson.total > take) {
+            return [`page does not hold every match: total ${contentItemsJson.total} exceeds take ${take}`];
+          }
+          const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
+          const missing = expectedNames.filter((name) => !returnedNames.includes(name));
+          if (missing.length > 0) {
+            return missing;
+          }
+          return expectedTotal === undefined || contentItemsJson.total === expectedTotal
+            ? []
+            : [`expected total ${expectedTotal}, got ${contentItemsJson.total}`];
+        },
+        {timeout: ConstantHelper.timeout.pageLoad},
+      )
+      .toEqual([]);
+    return contentItemsJson;
+  }
+
+  async waitUntilContentQueryExcludesNames(filter: string | undefined, sort: string | undefined, unexpectedNames: string[], extraHeaders?: { [key: string]: string; }) {
+    const take = 100;
+    expect(unexpectedNames.length).toBeGreaterThan(0);
+    let contentItemsJson;
+    await expect
+      .poll(
+        async () => {
+          const response = await this.getContentItemsFromAQuery(extraHeaders, undefined, filter, sort, 0, take);
+          if (!response.ok()) {
+            return [`query failed with status ${response.status()}`];
+          }
+          contentItemsJson = await response.json();
+          if (contentItemsJson.total > take) {
+            return [`page too small to prove absence: total ${contentItemsJson.total} exceeds take ${take}`];
+          }
+          const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
+          return unexpectedNames.filter((name) => returnedNames.includes(name));
+        },
+        {timeout: ConstantHelper.timeout.pageLoad},
+      )
+      .toEqual([]);
+    return contentItemsJson;
+  }
+
+  async waitUntilContentQueryTotalIs(filter: string | undefined, expectedTotal: number, extraHeaders?: { [key: string]: string; }) {
+    await expect
+      .poll(
+        async () => {
+          const response = await this.getContentItemsFromAQuery(extraHeaders, undefined, filter);
+          if (!response.ok()) {
+            return `query failed with status ${response.status()}`;
+          }
+          return (await response.json()).total;
+        },
+        {timeout: ConstantHelper.timeout.pageLoad},
+      )
+      .toBe(expectedTotal);
   }
 
   async verifyBasicPropertiesForContentItem(contentName: string, contentItemJson) {

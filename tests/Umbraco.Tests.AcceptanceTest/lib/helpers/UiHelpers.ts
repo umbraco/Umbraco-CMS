@@ -39,6 +39,7 @@ import {ExternalLoginUiHelpers} from "./differentAppSettingsHelpers/ExternalLogi
 import {LibraryUiHelper} from "./LibraryUiHelper";
 import {PreviewUiHelper} from "./PreviewUiHelper";
 import {BackofficeSearchUiHelper} from "./BackofficeSearchUiHelper";
+import {SearchManagementUiHelper} from './SearchManagementUiHelper';
 
 export class UiHelpers {
   page: Page;
@@ -80,6 +81,7 @@ export class UiHelpers {
   library: LibraryUiHelper;
   preview: PreviewUiHelper;
   backofficeSearch: BackofficeSearchUiHelper;
+  searchManagement: SearchManagementUiHelper;
   private readonly sectionLinks: Locator;
 
   constructor(page: Page) {
@@ -123,6 +125,7 @@ export class UiHelpers {
     this.library = new LibraryUiHelper(this.page);
     this.preview = new PreviewUiHelper(this.page);
     this.backofficeSearch = new BackofficeSearchUiHelper(this.page);
+    this.searchManagement = new SearchManagementUiHelper(this.page);
   }
 
   async goToBackOffice() {
