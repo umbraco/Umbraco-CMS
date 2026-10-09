@@ -5210,3 +5210,17 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 ];
+
+const LIST_VIEW_CONTENT_DATA_TYPE_ID = 'c0808dd3-8133-4e4b-8ce8-e2bea84a96a4';
+export const UMB_LIST_VIEW_CONTENT_FIRST_DATA_TYPE_ID = 'f2a6d4c8-1e75-4b39-8a0c-5d9e3b7f6a12';
+
+// The Content workspace view comes before the Collection view, so a document only opens in its collection when asked to.
+const listViewContent = data.find((dataType) => dataType.id === LIST_VIEW_CONTENT_DATA_TYPE_ID)!;
+data.push({
+	...listViewContent,
+	id: UMB_LIST_VIEW_CONTENT_FIRST_DATA_TYPE_ID,
+	name: 'List View - Content First',
+	values: listViewContent.values.map((value) =>
+		value.alias === 'showContentFirst' ? { ...value, value: true } : value,
+	),
+});

@@ -576,7 +576,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             return Attempt.Fail(ContentSaveOperationStatus.InvalidPublishedState);
         }
 
-        if (content.Name is { Length: > 255 })
+        if (content.Name is { Length: > Constants.Validation.MaxNameLength })
         {
             return Attempt.Fail(ContentSaveOperationStatus.InvalidName);
         }
@@ -739,9 +739,9 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, content);
         }
 
-        if (content.Name is { Length: > 255 })
+        if (content.Name is { Length: > Constants.Validation.MaxNameLength })
         {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
 
         PublishedState publishedState = content.PublishedState;
@@ -918,10 +918,9 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     private static void EnsureNameLengthIsValid(TContent content)
     {
-        const int MaxContentNameLength = 255;
-        if (content.Name?.Length > MaxContentNameLength)
+        if (content.Name?.Length > Constants.Validation.MaxNameLength)
         {
-            throw new InvalidOperationException($"Name cannot be more than {MaxContentNameLength} characters in length.");
+            throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
     }
 

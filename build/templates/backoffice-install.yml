@@ -9,7 +9,7 @@ steps:
     displayName: Free up disk space
     condition: eq(variables['Agent.OS'], 'Linux')
 
-  - task: NodeTool@0
+  - task: UseNode@1
     displayName: Use Node.js
     retryCountOnTaskFailure: 3
     inputs:

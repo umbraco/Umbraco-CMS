@@ -1,6 +1,6 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserStartNodesModel } from '../../../../types.js';
-import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -42,36 +42,52 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	}
 
 	#renderDocumentStartNodes() {
-		const uniques = this._calculatedStartNodes?.documentStartNodeUniques.map((reference) => reference.unique) || [];
+		if (!this._calculatedStartNodes) return nothing;
+		const uniques = this._calculatedStartNodes.documentStartNodeUniques.map((reference) => reference.unique);
+		const hasAccess = this._calculatedStartNodes.hasDocumentRootAccess || uniques.length > 0;
 		return html`
 			<umb-property-layout label=${this.localize.term('sections_content')} orientation="vertical">
 				<div slot="editor">
-					<umb-user-document-start-node readonly .uniques=${uniques}></umb-user-document-start-node>
+					${hasAccess
+						? html`<umb-user-document-start-node readonly .uniques=${uniques}></umb-user-document-start-node>`
+						: this.#renderNoStartNodes()}
 				</div>
 			</umb-property-layout>
 		`;
 	}
 
 	#renderElementStartNodes() {
-		const uniques = this._calculatedStartNodes?.elementStartNodeUniques.map((reference) => reference.unique) || [];
+		if (!this._calculatedStartNodes) return nothing;
+		const uniques = this._calculatedStartNodes.elementStartNodeUniques.map((reference) => reference.unique);
+		const hasAccess = this._calculatedStartNodes.hasElementRootAccess || uniques.length > 0;
 		return html`
 			<umb-property-layout label=${this.localize.term('general_elements')} orientation="vertical">
 				<div slot="editor">
-					<umb-user-element-start-node readonly .uniques=${uniques}></umb-user-element-start-node>
+					${hasAccess
+						? html`<umb-user-element-start-node readonly .uniques=${uniques}></umb-user-element-start-node>`
+						: this.#renderNoStartNodes()}
 				</div>
 			</umb-property-layout>
 		`;
 	}
 
 	#renderMediaStartNodes() {
-		const uniques = this._calculatedStartNodes?.mediaStartNodeUniques.map((reference) => reference.unique) || [];
+		if (!this._calculatedStartNodes) return nothing;
+		const uniques = this._calculatedStartNodes.mediaStartNodeUniques.map((reference) => reference.unique);
+		const hasAccess = this._calculatedStartNodes.hasMediaRootAccess || uniques.length > 0;
 		return html`
 			<umb-property-layout label=${this.localize.term('sections_media')} orientation="vertical">
 				<div slot="editor">
-					<umb-user-media-start-node readonly .uniques=${uniques}></umb-user-media-start-node>
+					${hasAccess
+						? html`<umb-user-media-start-node readonly .uniques=${uniques}></umb-user-media-start-node>`
+						: this.#renderNoStartNodes()}
 				</div>
 			</umb-property-layout>
 		`;
+	}
+
+	#renderNoStartNodes() {
+		return html`<div><umb-localize key="user_noStartNodes">No start nodes selected</umb-localize></div>`;
 	}
 
 	static override styles = [

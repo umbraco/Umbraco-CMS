@@ -15,6 +15,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		kind: 'table',
 		alias: 'Umb.TreeView.Document.Table',
 		name: 'Document Table Tree View',
+		element: () => import('./document-table-tree-view.element.js'),
 		forTrees: [UMB_DOCUMENT_TREE_ALIAS],
 		meta: {
 			columns: [

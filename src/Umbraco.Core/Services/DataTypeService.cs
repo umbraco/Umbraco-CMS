@@ -501,7 +501,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidName, dataType);
             }
 
-            if (dataType.Name is { Length: > 255 })
+            if (dataType.Name is { Length: > Constants.Validation.MaxNameLength })
             {
                 return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidName, dataType);
             }

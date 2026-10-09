@@ -741,7 +741,7 @@ public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentT
             return Attempt.Fail(ContentTypeOperationStatus.NameCannotBeEmpty);
         }
 
-        if (item.Name.Length > 255)
+        if (item.Name.Length > Constants.Validation.MaxNameLength)
         {
             return Attempt.Fail(ContentTypeOperationStatus.NameTooLong);
         }
@@ -1232,7 +1232,7 @@ public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentT
             TItem[] allowedChildren = (await GetManyAsync(sortedKeys)).ToArray();
             result = new PagedModel<TItem>
             {
-                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Take(take).Skip(skip),
+                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Skip(skip).Take(take),
                 Total = allowedChildren.Length,
             };
         }
