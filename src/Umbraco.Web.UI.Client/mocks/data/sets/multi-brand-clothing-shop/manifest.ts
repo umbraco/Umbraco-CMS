@@ -5,5 +5,6 @@ export const manifest: UmbMockSetManifest = {
 	label: 'Multi Brand Clothing Shop',
 	icon: 'icon-shopping-basket-alt-2',
 	visible: true,
+	examples: ['multi-brand-block-views'],
 	loader: () => import('./index.js') as Promise<UmbMockDataSet>,
 };

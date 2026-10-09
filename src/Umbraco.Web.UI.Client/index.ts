@@ -1,10 +1,13 @@
+import { manifests as mockSetManifests } from './mocks/data/sets/manifests.js';
 import { getSelectedExampleNames } from './mocks/examples.js';
 import { startMockServiceWorker } from './mocks/index.js';
 import { UmbAppElement } from '@umbraco-cms/backoffice/app';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-function getExamplePaths(): Array<string> {
-	const paths = [import.meta.env.VITE_EXAMPLE_PATH, ...getSelectedExampleNames().map((name) => `examples/${name}`)];
+function getExamplePaths(mockSet?: string): Array<string> {
+	const mockSetExamples = mockSetManifests.find((manifest) => manifest.alias === mockSet)?.examples ?? [];
+	const names = [...getSelectedExampleNames(), ...mockSetExamples];
+	const paths = [import.meta.env.VITE_EXAMPLE_PATH, ...names.map((name) => `examples/${name}`)];
 	return [...new Set(paths.filter(Boolean))];
 }
 
@@ -15,10 +18,11 @@ async function bootstrap() {
 	const appElement = new UmbAppElement();
 	appElement.backofficePath = '/';
 
+	let mockSet: string | undefined;
 	if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
 		appElement.bypassAuth = true;
 
-		const mockSet = localStorage.getItem('umb:mockSet') || import.meta.env.VITE_MOCK_SET || 'default';
+		mockSet = localStorage.getItem('umb:mockSet') || import.meta.env.VITE_MOCK_SET || 'default';
 		await startMockServiceWorker({
 			mockSet,
 			useCustomServiceWorker: true,
@@ -37,7 +41,7 @@ async function bootstrap() {
 	document.body.append(appElement);
 
 	// Example injector:
-	const examplePaths = getExamplePaths();
+	const examplePaths = getExamplePaths(mockSet);
 	Promise.allSettled(
 		examplePaths.map(async (path) => {
 			const js = await import(/* @vite-ignore */ './' + path + '/index.ts');

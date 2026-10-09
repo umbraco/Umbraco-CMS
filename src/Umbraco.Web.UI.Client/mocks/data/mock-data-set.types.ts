@@ -283,6 +283,8 @@ export interface UmbMockSetManifest {
 	icon?: string;
 	/** Whether the set appears in the header app dropdown. Defaults to false. */
 	visible?: boolean;
+	/** Names of folders under `examples/` that are loaded whenever this set is active. */
+	examples?: Array<string>;
 	loader: () => Promise<UmbMockDataSet>;
 }
 
