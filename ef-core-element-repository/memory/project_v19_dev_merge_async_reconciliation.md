@@ -32,3 +32,9 @@ Same pattern, new specifics worth knowing next time:
 - `AddUmbracoDbContext<T>` gained a required `shareUmbracoConnection` parameter upstream; our `UmbracoBuilder.Database.cs` call compiled into a confusing "string does not contain UseUmbracoDatabaseProvider" error until `shareUmbracoConnection: true` was passed.
 - Git auto-merge dropped `using Umbraco.Cms.Core.Configuration.Models;` from `TemplateService` because upstream removed it as unused while we still need it; `Attempt` in the Search.Core strategies needed `using Umbraco.Cms.Core;` back. Missing-using breaks are a fourth loss class next to the three in [[project_merge_audit_procedure]].
 - Cleanly merged new upstream tests needing the async port: 212 errors in 19 integration test files plus 4 unit test files; sync → async conversions were mechanical and were delegated.
+
+## 2026-10-09 merge (3472374c025, v19/dev 21e5b608bfe)
+- v19/dev itself was broken at the 2026-10-08 merge point (cookie auth removed `getLatestToken`, preview context still used it; fixed upstream in 2047ddbb15c). Local builds with `-p:UmbracoBuild=true` skip the frontend, so run `npm run build:for:cms` in Umbraco.Web.UI.Client before declaring a merge green.
+- EF Core redirect search must use `EF.Functions.Like`, not `Contains`: SQLite translates `Contains` to case-sensitive `instr()`.
+- Upstream's new tests (DocumentUrlAliasPersistenceTests etc.) arrive sync and need porting; that's where real behaviour coverage of our EF Core paths comes from, so port faithfully, never weaken.
+- Integration baseline after merge: 23 failures, all `GetParentEntitiesByChildIds depends on EntityRepository` in the four search fixtures.
