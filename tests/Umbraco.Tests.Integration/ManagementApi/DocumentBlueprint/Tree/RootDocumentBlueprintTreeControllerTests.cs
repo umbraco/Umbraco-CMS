@@ -17,7 +17,7 @@ public class RootDocumentBlueprintTreeControllerTests : ManagementApiUserGroupTe
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -32,7 +32,7 @@ public class RootDocumentBlueprintTreeControllerTests : ManagementApiUserGroupTe
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
