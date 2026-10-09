@@ -555,6 +555,7 @@ declare global {
 		content_scheduledPublishDocumentation: string;
 		content_scheduledPublishing: string;
 		content_scheduledPublishServerTime: string;
+		content_scheduleForAllLanguages: string;
 		content_schedulePublishHelp: string;
 		content_selectAllVariants: string;
 		content_sendForApproval: string;
