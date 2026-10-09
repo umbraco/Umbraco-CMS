@@ -14,8 +14,8 @@ import {
 
 export class UmbManagementApiMemberTypeDetailDataRequestManager extends UmbManagementApiDetailDataRequestManager<
 	MemberTypeResponseModel,
-	UpdateMemberTypeRequestModel,
-	CreateMemberTypeRequestModel
+	CreateMemberTypeRequestModel,
+	UpdateMemberTypeRequestModel
 > {
 	static #inflightRequestCache = new UmbManagementApiInFlightRequestCache<MemberTypeResponseModel>();
 
