@@ -426,7 +426,7 @@ public class ElementPermissionServiceTests
         var user = CreateUser(startElementId: UserStartNodeId);
 
         _entityServiceMock
-            .Setup(x => x.GetAllPaths(It.Is<IEnumerable<UmbracoObjectTypes>>(t => t.Contains(UmbracoObjectTypes.Element)), It.Is<Guid[]>(keys => keys.Contains(keyA) && keys.Contains(keyB))))
+            .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Element, It.Is<Guid[]>(keys => keys.Contains(keyA) && keys.Contains(keyB))))
             .Returns(
             [
                 CreateTreeEntityPath(keyA, ElementNodeId, ElementNodePath),
@@ -456,7 +456,7 @@ public class ElementPermissionServiceTests
         var user = CreateUser();
 
         _entityServiceMock
-            .Setup(x => x.GetAllPaths(It.Is<IEnumerable<UmbracoObjectTypes>>(t => t.Contains(UmbracoObjectTypes.Element)), It.Is<Guid[]>(keys => keys.Contains(keyA) && keys.Contains(keyB))))
+            .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Element, It.Is<Guid[]>(keys => keys.Contains(keyA) && keys.Contains(keyB))))
             .Returns(
             [
                 CreateTreeEntityPath(keyA, ElementNodeId, ElementNodePath),
@@ -486,7 +486,7 @@ public class ElementPermissionServiceTests
         var user = CreateUser();
 
         _entityServiceMock
-            .Setup(x => x.GetAllPaths(It.Is<IEnumerable<UmbracoObjectTypes>>(t => t.Contains(UmbracoObjectTypes.Element)), It.Is<Guid[]>(keys => keys.Contains(keyA) && keys.Contains(bogusKey))))
+            .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Element, It.Is<Guid[]>(keys => keys.Contains(keyA) && keys.Contains(bogusKey))))
             .Returns([CreateTreeEntityPath(keyA, ElementNodeId, ElementNodePath)]);
 
         SetupBatchPermissions(user, [ElementNodeId, UserStartNodeId, Constants.System.Root], ["A"]);

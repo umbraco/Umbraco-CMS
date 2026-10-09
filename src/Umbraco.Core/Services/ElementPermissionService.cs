@@ -228,7 +228,7 @@ internal sealed class ElementPermissionService : IElementPermissionService
         }
 
         // Retrieve paths in a single database query for all keys.
-        TreeEntityPath[] entityPaths = [.. _entityService.GetAllPaths([UmbracoObjectTypes.Element], keysArray)];
+        TreeEntityPath[] entityPaths = [.. _entityService.GetAllPaths(UmbracoObjectTypes.Element, keysArray)];
 
         if (entityPaths.Length == 0)
         {
