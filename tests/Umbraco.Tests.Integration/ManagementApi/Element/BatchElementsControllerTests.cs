@@ -87,6 +87,38 @@ public class BatchElementsControllerTests : ManagementApiUserGroupTestBase<Batch
         Assert.That(body.Items.Select(i => i.Id), Is.EquivalentTo(new[] { accessibleElementKey }));
     }
 
+    [Test]
+    public async Task Batch_Returns_Browsable_Elements_To_A_User_Without_Library_Access()
+    {
+        // Arrange - a group with sections that render element references but not Library, able to browse one of two elements.
+        var accessibleElementKey = _elementKey;
+        var inaccessibleElementKey = await CreateElement("Inaccessible Element Instance");
+
+        var userGroup = new UserGroupBuilder()
+            .WithName(Guid.NewGuid().ToString())
+            .WithAlias(Guid.NewGuid().ToString())
+            .WithAllowedSections([Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members])
+            .WithPermissions(new HashSet<string>())
+            .WithGranularPermissions(
+            [
+                new ElementGranularPermission { Key = accessibleElementKey, Permission = ActionElementBrowse.ActionLetter },
+            ])
+            .Build();
+        var createGroupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createGroupResult.Success, $"Failed to create user group with status {createGroupResult.Status}.");
+
+        await AuthenticateClientAsync(Client, $"{Guid.NewGuid()}@test.com", UserPassword, userGroup.Key);
+
+        // Act
+        var response = await Client.GetAsync($"{Url}?id={accessibleElementKey}&id={inaccessibleElementKey}");
+        var body = await response.Content.ReadFromJsonAsync<BatchResponseModel<ElementResponseModel>>(JsonSerializerOptions);
+
+        // Assert
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.AreEqual(1, body!.Total);
+        Assert.That(body.Items.Select(i => i.Id), Is.EquivalentTo(new[] { accessibleElementKey }));
+    }
+
     private async Task<Guid> CreateElement(string name)
     {
         var elementType = new ContentTypeBuilder()
