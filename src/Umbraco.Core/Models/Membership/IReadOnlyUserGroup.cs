@@ -58,6 +58,7 @@ public interface IReadOnlyUserGroup
     /// <remarks>
     ///     This is set to return true as default to avoid breaking changes.
     /// </remarks>
+    // TODO (V20): Remove default implementation.
     bool HasAccessToAllLanguages => true;
 
     /// <summary>
@@ -67,6 +68,7 @@ public interface IReadOnlyUserGroup
     /// <remarks>
     ///     This is set to return true as default to avoid breaking changes.
     /// </remarks>
+    // TODO (V20): Remove default implementation.
     bool HasAccessToInvariantForVariant => true;
 
     /// <summary>

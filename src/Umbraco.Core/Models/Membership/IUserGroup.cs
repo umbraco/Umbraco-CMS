@@ -42,9 +42,12 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     string? Description { get; set; }
 
     /// <summary>
-    ///     If this property is true it will give the group access to all languages
+    ///     If this property is true it will give the group access to all languages.
     /// </summary>
-    /// This is set to return true as default to avoid breaking changes
+    /// <remarks>
+    ///     This is set to return true as default to avoid breaking changes.
+    /// </remarks>
+    // TODO (V20): Remove default implementation.
     public bool HasAccessToAllLanguages
     {
         get => true;

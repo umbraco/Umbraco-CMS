@@ -2075,6 +2075,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return report;
     }
 
+    /// <summary>
+    ///     Gets the user performing an operation, so that their permissions can be applied to it.
+    /// </summary>
+    /// <param name="userId">The identifier of the user.</param>
+    /// <returns>The user.</returns>
+    /// <exception cref="ArgumentException">No user exists with the supplied identifier.</exception>
     protected IUser GetRequiredUser(int userId)
         => _userService.Value.GetUserById(userId)
            ?? throw new ArgumentException("Could not find the supplied user", nameof(userId));
