@@ -22,6 +22,7 @@ import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIA
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 import { UmbPreviewController } from '@umbraco-cms/backoffice/preview';
@@ -66,6 +67,7 @@ export class UmbDocumentWorkspaceContext
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#previewController = new UmbPreviewController(this);
+	#localize = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -305,8 +307,8 @@ export class UmbDocumentWorkspaceContext
 		await super._handleSave(executionOptions);
 	}
 
-	public async saveAndPreview(urlProviderAlias?: string): Promise<void> {
-		return await this.#handleSaveAndPreview(urlProviderAlias ?? 'umbDocumentUrlProvider');
+	public saveAndPreview(urlProviderAlias?: string): Promise<void> {
+		return this.#handleSaveAndPreview(urlProviderAlias ?? 'umbDocumentUrlProvider');
 	}
 
 	async #handleSaveAndPreview(urlProviderAlias: string) {
@@ -315,31 +317,59 @@ export class UmbDocumentWorkspaceContext
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
+		// Construct the preview window before performing any save or validation actions
+		// as the preview window needs to be ready within a very short time after the user initiates the preview action.
+		const previewWindow = window.open('', `umbpreview-${unique}`);
+		this.#showLoadingText(previewWindow);
+
 		let firstVariantId = UmbVariantId.CreateInvariant();
 
-		// Save document (the active variant) before previewing.
-		const { selected } = await this._determineVariantOptions();
-		if (selected.length > 0) {
-			firstVariantId = UmbVariantId.FromString(selected[0]);
-			const variantIds = [firstVariantId];
-			const saveData = await this._data.constructData(variantIds);
+		try {
+			// Save document (the active variant) before previewing.
+			const { selected } = await this._determineVariantOptions();
+			if (selected.length > 0) {
+				firstVariantId = UmbVariantId.FromString(selected[0]);
+				const variantIds = [firstVariantId];
+				const saveData = await this._data.constructData(variantIds);
 
-			// Run mandatory validation (checks for name, etc.)
-			await this.runMandatoryValidationForSaveData(saveData, variantIds);
+				// Run mandatory validation (checks for name, etc.)
+				await this.runMandatoryValidationForSaveData(saveData, variantIds);
 
-			// Ask server to validate and show validation tooltips (like the Save action does)
-			await this.askServerToValidate(saveData, variantIds);
+				// Ask server to validate and show validation tooltips (like the Save action does)
+				await this.askServerToValidate(saveData, variantIds);
 
-			// Perform save
-			await this.performCreateOrUpdate(variantIds, saveData);
+				// Perform save
+				await this.performCreateOrUpdate(variantIds, saveData);
+			}
+		} catch (error) {
+			// Mandatory validation can reject (a missing name, say), and then no preview follows —
+			// so the tab opened during the click has to be cleaned up.
+			previewWindow?.close();
+			throw error;
 		}
 
-		await this.#previewController.preview({
-			unique,
-			urlProviderAlias,
-			culture: firstVariantId.culture,
-			segment: firstVariantId.segment,
-		});
+		// Preview the document in the previously opened preview window.
+		await this.#previewController.preview(
+			{
+				unique,
+				urlProviderAlias,
+				culture: firstVariantId.culture,
+				segment: firstVariantId.segment,
+			},
+			previewWindow,
+		);
+	}
+
+	// A freshly opened tab stays blank until the save completes, so give it a placeholder.
+	// An already open preview tab (or a cross-origin one) is left untouched.
+	#showLoadingText(previewWindow: WindowProxy | null) {
+		try {
+			if (previewWindow?.location.href === 'about:blank') {
+				previewWindow.document.body.textContent = this.#localize.term('general_loading');
+			}
+		} catch {
+			// Cross-origin preview tab; it is already showing content.
+		}
 	}
 
 	public createPropertyDatasetContext(
