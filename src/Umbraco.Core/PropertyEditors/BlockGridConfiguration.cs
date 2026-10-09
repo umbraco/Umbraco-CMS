@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json.Serialization;
+
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
@@ -17,8 +19,8 @@ public class BlockGridConfiguration
     /// <summary>
     /// Gets or sets the validation limits for the number of blocks allowed.
     /// </summary>
-    [ConfigurationField("validationLimit")]
-    public NumberRange ValidationLimit { get; set; } = new NumberRange();
+    [ConfigurationField("validationLimit", Type = typeof(RangeConfigurationField))]
+    public PropertyEditors.NumberRange ValidationLimit { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the number of grid columns available in the Block Grid.
@@ -65,17 +67,9 @@ public class BlockGridConfiguration
     /// <summary>
     /// Represents a numeric range with optional minimum and maximum values.
     /// </summary>
-    public class NumberRange
+    [Obsolete("No longer used by Umbraco; use Umbraco.Cms.Core.PropertyEditors.NumberRange instead. Scheduled for removal in Umbraco 21.")]
+    public class NumberRange : PropertyEditors.NumberRange
     {
-        /// <summary>
-        /// Gets or sets the minimum value of the range.
-        /// </summary>
-        public int? Min { get; set; }
-
-        /// <summary>
-        /// Gets or sets the maximum value of the range.
-        /// </summary>
-        public int? Max { get; set; }
     }
 
     /// <summary>
@@ -104,13 +98,46 @@ public class BlockGridConfiguration
         public int? RowSpan { get; set; }
 
         /// <summary>
+        /// Gets or sets the validation limits for the number of blocks allowed in this area.
+        /// </summary>
+        public PropertyEditors.NumberRange? ValidationLimit { get; set; }
+
+        /// <summary>
         /// Gets or sets the minimum number of blocks allowed in this area.
         /// </summary>
-        public int? MinAllowed { get; set; }
+        [Obsolete("Use ValidationLimit instead. Scheduled for removal in Umbraco 21.")]
+        [JsonIgnore]
+        public int? MinAllowed
+        {
+            get => ValidationLimit?.Min;
+            set
+            {
+                if (value is null && ValidationLimit is null)
+                {
+                    return;
+                }
+
+                (ValidationLimit ??= new()).Min = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the maximum number of blocks allowed in this area.
         /// </summary>
-        public int? MaxAllowed { get; set; }
+        [Obsolete("Use ValidationLimit instead. Scheduled for removal in Umbraco 21.")]
+        [JsonIgnore]
+        public int? MaxAllowed
+        {
+            get => ValidationLimit?.Max;
+            set
+            {
+                if (value is null && ValidationLimit is null)
+                {
+                    return;
+                }
+
+                (ValidationLimit ??= new()).Max = value;
+            }
+        }
     }
 }

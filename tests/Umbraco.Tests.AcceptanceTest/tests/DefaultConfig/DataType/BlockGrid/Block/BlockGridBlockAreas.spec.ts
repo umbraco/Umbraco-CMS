@@ -172,7 +172,7 @@ test('can remove create button label for an area in a block', async ({umbracoApi
 test('can add min allowed for an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const areaAlias = 'TestArea';
-  const minAllowed = 3;
+  const minAllowed = 1;
   await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias);
 
   // Act
@@ -251,8 +251,7 @@ test('can remove max allowed for an area in a block', async ({umbracoApi, umbrac
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridEditorName, contentElementTypeId, areaAlias, maxAllowed)).toBeFalsy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently there is no frontend validation for min and max values
-test.skip('min can not be more than max an area in a block', async ({umbracoApi, umbracoUi}) => {
+test('min can not be more than max an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const areaAlias = 'TestArea';
   const minAllowed = 6;

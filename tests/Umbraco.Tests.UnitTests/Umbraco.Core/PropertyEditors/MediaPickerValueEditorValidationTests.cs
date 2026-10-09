@@ -229,7 +229,7 @@ internal class MediaPickerValueEditorValidationTests
     {
         var (valueEditor, mediaTypeServiceMock, _, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
-        valueEditor.ConfigurationObject = new MediaPicker3Configuration { ValidationLimit = new MediaPicker3Configuration.NumberRange { Min = min } };
+        valueEditor.ConfigurationObject = new MediaPicker3Configuration { ValidationLimit = new NumberRange { Min = min } };
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
@@ -247,7 +247,7 @@ internal class MediaPickerValueEditorValidationTests
     {
         var (valueEditor, mediaTypeServiceMock, _, mediaNavigationQueryServiceMock) = CreateValueEditor();
 
-        valueEditor.ConfigurationObject = new MediaPicker3Configuration { ValidationLimit = new MediaPicker3Configuration.NumberRange { Max = max } };
+        valueEditor.ConfigurationObject = new MediaPicker3Configuration { ValidationLimit = new NumberRange { Max = max } };
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
         ValidateResult(succeed, result);

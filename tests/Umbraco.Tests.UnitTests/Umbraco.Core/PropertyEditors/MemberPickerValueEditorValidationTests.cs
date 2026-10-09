@@ -98,7 +98,7 @@ internal sealed class MemberPickerValueEditorValidationTests
         var valueEditor = CreateMultipleValueEditor();
         valueEditor.ConfigurationObject = new MultipleMemberPickerConfiguration
         {
-            ValidationLimit = new MultipleMemberPickerConfiguration.NumberRange { Min = min },
+            ValidationLimit = new NumberRange { Min = min },
         };
 
         ValidateResult(succeed, valueEditor.Validate(Value(memberCount), false, null, PropertyValidationContext.Empty()));
@@ -112,7 +112,7 @@ internal sealed class MemberPickerValueEditorValidationTests
         var valueEditor = CreateMultipleValueEditor();
         valueEditor.ConfigurationObject = new MultipleMemberPickerConfiguration
         {
-            ValidationLimit = new MultipleMemberPickerConfiguration.NumberRange { Max = max },
+            ValidationLimit = new NumberRange { Max = max },
         };
 
         ValidateResult(succeed, valueEditor.Validate(Value(memberCount), false, null, PropertyValidationContext.Empty()));

@@ -54,8 +54,7 @@ public class ValueSchemaProviderTests
         var editor = CreateIntegerPropertyEditor();
         var config = new Dictionary<string, object>
         {
-            { "min", 10 },
-            { "max", 100 },
+            { "validationRange", new Dictionary<string, object> { { "min", 10 }, { "max", 100 } } },
         };
 
         // Act
@@ -74,7 +73,7 @@ public class ValueSchemaProviderTests
         var editor = CreateIntegerPropertyEditor();
         var config = new Dictionary<string, object>
         {
-            { "min", 0 },
+            { "validationRange", new Dictionary<string, object> { { "min", 0 } } },
             { "step", 5 },
         };
 
@@ -151,7 +150,7 @@ public class ValueSchemaProviderTests
                     Mock.Of<IIOHelper>(),
                     new DataEditorAttribute(Constants.PropertyEditors.Aliases.Integer)));
 
-        return new IntegerPropertyEditor(dataValueEditorFactory);
+        return new IntegerPropertyEditor(dataValueEditorFactory, Mock.Of<IIOHelper>());
     }
 
     private static ContentPickerPropertyEditor CreateContentPickerPropertyEditor()

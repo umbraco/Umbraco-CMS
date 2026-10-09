@@ -31,6 +31,24 @@ public abstract class DictionaryConfigurationValidatorBase
         return false;
     }
 
+    /// <summary>
+    /// Retrieves the minimum and maximum bounds of a range value from data type dictionary configuration.
+    /// </summary>
+    /// <param name="dataTypeConfiguration">The data type configuration.</param>
+    /// <param name="key">The configuration key holding the range value.</param>
+    /// <param name="min">The minimum bound, or <c>null</c> when unbounded or not present.</param>
+    /// <param name="max">The maximum bound, or <c>null</c> when unbounded or not present.</param>
+    /// <returns>True if the range configuration value was found.</returns>
+    protected static bool TryGetConfiguredRange(object? dataTypeConfiguration, string key, out decimal? min, out decimal? max)
+    {
+        min = null;
+        max = null;
+
+        return dataTypeConfiguration is IDictionary<string, object> configuration
+            && configuration.TryGetValue(key, out object? rangeValue)
+            && RangeConfigurationHelper.TryGetBounds(rangeValue, out min, out max);
+    }
+
     private static bool TryCastValue<TValue>(object? value, [NotNullWhen(true)] out TValue? castValue)
     {
         if (value is TValue valueAsType)

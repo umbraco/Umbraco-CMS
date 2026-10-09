@@ -32,7 +32,7 @@ internal sealed class MultipleDocumentPickerValueEditorValidationTests
         var valueEditor = CreateValueEditor();
         valueEditor.ConfigurationObject = new MultipleDocumentPickerConfiguration
         {
-            ValidationLimit = new MultipleDocumentPickerConfiguration.NumberRange { Min = min },
+            ValidationLimit = new NumberRange { Min = min },
         };
 
         IEnumerable<ValidationResult> result = valueEditor.Validate(
@@ -53,7 +53,7 @@ internal sealed class MultipleDocumentPickerValueEditorValidationTests
         var valueEditor = CreateValueEditor();
         valueEditor.ConfigurationObject = new MultipleDocumentPickerConfiguration
         {
-            ValidationLimit = new MultipleDocumentPickerConfiguration.NumberRange { Max = max },
+            ValidationLimit = new NumberRange { Max = max },
         };
 
         IEnumerable<ValidationResult> result = valueEditor.Validate(

@@ -1,5 +1,6 @@
 import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 export type * from './clipboard/types.js';
 
@@ -25,8 +26,7 @@ export interface UmbBlockGridTypeAreaType {
 	alias: string;
 	columnSpan?: number;
 	rowSpan?: number;
-	minAllowed?: number;
-	maxAllowed?: number;
+	validationLimit?: UmbNumberRangeValueType;
 	specifiedAllowance?: Array<UmbBlockGridTypeAreaTypePermission>;
 	createLabel?: string;
 }
