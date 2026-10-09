@@ -214,7 +214,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 // been switched over, so the alias still names the Block List editor - which yields null for a value
                 // that is already in single block shape, silently replacing the content. The override routes those
                 // values to the single block editor instead (https://github.com/umbraco/Umbraco-CMS/issues/23596).
-                // TODO (V22): Remove the override once the single block list migration it exists for is removed.
+                // TODO (V20): Remove the override along with the obsolete MigrateSingleBlockList it exists for.
                 IDataEditor? propertyEditor = _propertyEditors[
                     SingleBlockMigrationEditorAliasOverride.Resolve(
                         propertyType.DataTypeKey,
