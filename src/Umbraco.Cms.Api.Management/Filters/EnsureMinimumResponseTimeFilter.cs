@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Umbraco.Cms.Api.Management.Filters;
@@ -6,8 +5,18 @@ namespace Umbraco.Cms.Api.Management.Filters;
 internal abstract class EnsureMinimumResponseTimeFilter : IAsyncActionFilter
 {
     private readonly TimeSpan _minimumResponseTime;
+    private readonly TimeProvider _timeProvider;
 
-    protected EnsureMinimumResponseTimeFilter(TimeSpan minimumResponseTime) => _minimumResponseTime = minimumResponseTime;
+    protected EnsureMinimumResponseTimeFilter(TimeSpan minimumResponseTime)
+        : this(minimumResponseTime, TimeProvider.System)
+    {
+    }
+
+    protected EnsureMinimumResponseTimeFilter(TimeSpan minimumResponseTime, TimeProvider timeProvider)
+    {
+        _minimumResponseTime = minimumResponseTime;
+        _timeProvider = timeProvider;
+    }
 
     /// <summary>
     /// Ensures that the action execution takes at least a minimum amount of time by delaying the response if necessary.
@@ -17,17 +26,14 @@ internal abstract class EnsureMinimumResponseTimeFilter : IAsyncActionFilter
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var stopwatch = new Stopwatch();
-
-        stopwatch.Start();
+        var startTimestamp = _timeProvider.GetTimestamp();
         await next();
-        stopwatch.Stop();
 
-        TimeSpan forceWait = _minimumResponseTime.Subtract(stopwatch.Elapsed);
+        TimeSpan forceWait = _minimumResponseTime - _timeProvider.GetElapsedTime(startTimestamp);
 
-        if (forceWait.Microseconds > 0)
+        if (forceWait > TimeSpan.Zero)
         {
-            await Task.Delay(forceWait).ConfigureAwait(false);
+            await Task.Delay(forceWait, _timeProvider).ConfigureAwait(false);
         }
     }
 }
