@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Search.Querying.Faceting;
+using Umbraco.Cms.Api.Management.ViewModels.Search.Facets;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Search;
 
@@ -15,5 +15,5 @@ public class FacetResultResponseModel
     /// <summary>
     /// Gets or sets the facet values (buckets) and their match counts.
     /// </summary>
-    public required IEnumerable<FacetValue> Values { get; set; }
+    public required IEnumerable<IFacetValueResponseModel> Values { get; set; }
 }

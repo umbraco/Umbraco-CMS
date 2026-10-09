@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Search;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -21,6 +22,7 @@ public class SearchApiController : SearchControllerBase
     private readonly ISearcherResolver _searcherResolver;
     private readonly IEntityService _entityService;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly ISearchPresentationFactory _searchPresentationFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SearchApiController"/> class.
@@ -28,14 +30,17 @@ public class SearchApiController : SearchControllerBase
     /// <param name="searcherResolver">The resolver used to obtain the searcher for the requested index alias.</param>
     /// <param name="entityService">The service used to hydrate matching results with entity name and icon.</param>
     /// <param name="variationContextAccessor">The accessor used to set the culture context for rendering entity names.</param>
+    /// <param name="searchPresentationFactory">The factory used to convert between the search presentation models and the search query and result types.</param>
     public SearchApiController(
         ISearcherResolver searcherResolver,
         IEntityService entityService,
-        IVariationContextAccessor variationContextAccessor)
+        IVariationContextAccessor variationContextAccessor,
+        ISearchPresentationFactory searchPresentationFactory)
     {
         _searcherResolver = searcherResolver;
         _entityService = entityService;
         _variationContextAccessor = variationContextAccessor;
+        _searchPresentationFactory = searchPresentationFactory;
     }
 
     /// <summary>
@@ -46,6 +51,7 @@ public class SearchApiController : SearchControllerBase
     /// <param name="take">The maximum number of results to return.</param>
     /// <returns>The search results, or an error if the index alias is missing or could not be resolved.</returns>
     [HttpPost("search")]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType<SearchResultResponseModel>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -65,9 +71,9 @@ public class SearchApiController : SearchControllerBase
         SearchResult result = await searcher.SearchAsync(
             request.IndexAlias,
             request.Query,
-            request.Filters,
-            request.Facets,
-            request.Sorters,
+            request.Filters?.Select(_searchPresentationFactory.CreateFilter).ToArray(),
+            request.Facets?.Select(_searchPresentationFactory.CreateFacet).ToArray(),
+            request.Sorters?.Select(_searchPresentationFactory.CreateSorter).ToArray(),
             request.Culture,
             request.Segment,
             AccessContext.BypassProtection(),
@@ -84,7 +90,7 @@ public class SearchApiController : SearchControllerBase
             Facets = result.Facets.Select(f => new FacetResultResponseModel
             {
                 FieldName = f.FieldName,
-                Values = f.Values,
+                Values = f.Values.Select(_searchPresentationFactory.CreateFacetValueResponseModel).ToArray(),
             }),
         });
     }
