@@ -899,6 +899,65 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
     [Test]
+    public async Task Changing_Property_Variation_Rebuilds_Every_Content_Type_Deriving_From_It()
+    {
+        var (root, middle, leaf) = await CreateInheritanceChainAsync(variesByCulture: true);
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var container = ContentTypePropertyContainerModel(key: root.PropertyGroups.Single().Key);
+        var propertyTypeModel = ContentTypePropertyTypeModel("rootProperty", "rootProperty", containerKey: container.Key);
+        propertyTypeModel.VariesByCulture = true;
+        var updateModel = ContentTypeUpdateModel("Root", alias: root.Alias, propertyTypes: [propertyTypeModel], containers: [container]);
+        updateModel.VariesByCulture = true;
+
+        var result = await ContentTypeEditingService.UpdateAsync(root, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, result.Status.ToString());
+
+        // The stored values change shape on every type that inherits the property, at any depth.
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, refreshedPayloads!.Length);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, root.Id, ContentTypeChangeTypes.RefreshMain);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, middle.Id, ContentTypeChangeTypes.RefreshMain);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, leaf.Id, ContentTypeChangeTypes.RefreshMain);
+        });
+    }
+
+    [Test]
+    public async Task Removing_A_Property_Refreshes_Every_Content_Type_Deriving_From_It_Without_A_Rebuild()
+    {
+        var (root, middle, leaf) = await CreateInheritanceChainAsync();
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel(
+            "Root",
+            alias: root.Alias,
+            propertyTypes: [],
+            containers: [ContentTypePropertyContainerModel(key: root.PropertyGroups.Single().Key)]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(root, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, result.Status.ToString());
+
+        // Every type that inherited the property loses it, at any depth, but the orphaned stored value is never
+        // read again, so none of them needs a rebuild.
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, refreshedPayloads!.Length);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, root.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, middle.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, leaf.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
+        });
+    }
+
+    [Test]
     public async Task Can_Remove_Compositions()
     {
         var propertyType1 = ContentTypePropertyTypeModel("Test Property 1", "testProperty1");
@@ -1781,6 +1840,23 @@ internal sealed partial class ContentTypeEditingServiceTests
             propertyTypes: properties,
             containers: containers,
             compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentKey }]);
+    }
+
+    private async Task<(IContentType Root, IContentType Middle, IContentType Leaf)> CreateInheritanceChainAsync(bool variesByCulture = false)
+    {
+        var rootModel = CompositionModelWithProperty("Root", "rootProperty");
+        rootModel.VariesByCulture = variesByCulture;
+        var root = (await ContentTypeEditingService.CreateAsync(rootModel, Constants.Security.SuperUserKey)).Result!;
+
+        var middleModel = ChildModelInheriting("Middle", root.Key);
+        middleModel.VariesByCulture = variesByCulture;
+        var middle = (await ContentTypeEditingService.CreateAsync(middleModel, Constants.Security.SuperUserKey)).Result!;
+
+        var leafModel = ChildModelInheriting("Leaf", middle.Key);
+        leafModel.VariesByCulture = variesByCulture;
+        var leaf = (await ContentTypeEditingService.CreateAsync(leafModel, Constants.Security.SuperUserKey)).Result!;
+
+        return (root, middle, leaf);
     }
 
     private ContentTypeCreateModel CompositionModelWithProperty(string name, string propertyAlias)
