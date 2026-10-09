@@ -18,6 +18,11 @@ export interface UmbDocumentAncestorPublishCoverageModel {
 
 export interface UmbDocumentScheduleModalData extends UmbDocumentVariantPickerData {
 	activeVariants: Array<string>;
+	/**
+	 * The variant the editor is working on. Its dates are the source when scheduling every selected variant at once;
+	 * when omitted, that option is unavailable.
+	 */
+	currentVariant?: string;
 	prevalues: Array<UmbDocumentScheduleSelectionModel>;
 	/**
 	 * How the document's ancestors cover a scheduled publish, used to warn when it will fail or

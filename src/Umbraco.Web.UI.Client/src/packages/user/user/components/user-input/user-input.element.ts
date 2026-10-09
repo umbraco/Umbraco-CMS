@@ -47,7 +47,22 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	public get readonly(): boolean {
+		return this.#readonly;
+	}
+	public set readonly(value: boolean) {
+		this.#readonly = value;
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
 
 	/**
 	 * Sets the input to required, meaning validation will fail if the value is empty.
@@ -94,6 +109,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	}
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		this.#updateSorterEnabled();
 	}
 
 	/**

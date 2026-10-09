@@ -3,6 +3,7 @@ import type { UmbBlockDataModel } from '../types.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_VALIDATION_CONTEXT, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-test-block-manager-host')
@@ -48,7 +49,11 @@ describe('UmbBlockManagerContext', () => {
 		});
 
 		it('does not remove a content message on the first emission (baseline only)', () => {
-			validation.messages.addMessage('server', `${contentDataPath('a')}.values[?(@.alias == 'title')].value`, 'error-a');
+			validation.messages.addMessage(
+				'server',
+				`${contentDataPath('a')}.values[?(@.alias == 'title')].value`,
+				'error-a',
+			);
 
 			manager.setContents([blockData('a')]);
 
@@ -56,8 +61,16 @@ describe('UmbBlockManagerContext', () => {
 		});
 
 		it('removes the content message of a Block removed from the layout', () => {
-			validation.messages.addMessage('server', `${contentDataPath('a')}.values[?(@.alias == 'title')].value`, 'error-a');
-			validation.messages.addMessage('server', `${contentDataPath('b')}.values[?(@.alias == 'title')].value`, 'error-b');
+			validation.messages.addMessage(
+				'server',
+				`${contentDataPath('a')}.values[?(@.alias == 'title')].value`,
+				'error-a',
+			);
+			validation.messages.addMessage(
+				'server',
+				`${contentDataPath('b')}.values[?(@.alias == 'title')].value`,
+				'error-b',
+			);
 			manager.setContents([blockData('a'), blockData('b')]);
 
 			manager.removeOneContent('a');
@@ -67,7 +80,11 @@ describe('UmbBlockManagerContext', () => {
 		});
 
 		it('does not remove a content message when an unrelated Block is removed', () => {
-			validation.messages.addMessage('server', `${contentDataPath('a')}.values[?(@.alias == 'title')].value`, 'error-a');
+			validation.messages.addMessage(
+				'server',
+				`${contentDataPath('a')}.values[?(@.alias == 'title')].value`,
+				'error-a',
+			);
 			manager.setContents([blockData('a'), blockData('b')]);
 
 			manager.removeOneContent('b');
@@ -129,6 +146,26 @@ describe('UmbBlockManagerContext', () => {
 
 			foreignManager.destroy();
 			foreignValidation.destroy();
+		});
+	});
+	describe('expose ordering', () => {
+		it('keeps exposes sorted by culture, segment and content key regardless of insertion order', async () => {
+			const host = await fixture<UmbControllerHostElement>(
+				html`<umb-test-block-manager-host></umb-test-block-manager-host>`,
+			);
+			const manager = new UmbTestBlockManagerContext(host);
+
+			manager.setOneExpose('b', new UmbVariantId('en-us'));
+			manager.setOneExpose('a', new UmbVariantId('en-us'));
+			manager.setOneExpose('b', new UmbVariantId(null));
+
+			expect(manager.getExposes().map((x) => `${x.culture}|${x.contentKey}`)).to.deep.equal([
+				'null|b',
+				'en-us|a',
+				'en-us|b',
+			]);
+
+			manager.destroy();
 		});
 	});
 });
