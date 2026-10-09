@@ -1,6 +1,6 @@
 import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { isNotPublishedMandatory } from '../../utils.js';
+import { isNotPublishedMandatory, isSelectableForPublishing } from '../../utils.js';
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -62,15 +62,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
-		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
-		this._options =
-			this.data?.options.filter(
-				(option) =>
-					(option.variant && option.variant.state === null) ||
-					isNotPublishedMandatory(option) ||
-					option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
-			) ?? [];
+		this._options = this.data?.options.filter(isSelectableForPublishing) ?? [];
 
 		let selected = this.value?.selection ?? [];
 
