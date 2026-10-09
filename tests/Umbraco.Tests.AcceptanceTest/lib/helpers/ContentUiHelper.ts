@@ -875,6 +875,18 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.isMediaNameVisible(mediaPickerName, false);
   }
 
+  async dragMediaPickerItemBefore(draggedMediaId: string, targetMediaId: string) {
+    const draggedItem = this.page.getByTestId(`media:${draggedMediaId}`);
+    const targetItem = this.page.getByTestId(`media:${targetMediaId}`);
+    await this.dragAndDrop(draggedItem, targetItem, 0, -40, 20);
+  }
+
+  async doesMediaPickerHaveItemsInOrder(mediaIds: string[]) {
+    await expect.poll(async () => await this.page.locator('[data-mark^="media:"]').evaluateAll(
+      (items) => items.map((item) => item.getAttribute('data-mark')!.replace('media:', '')),
+    )).toEqual(mediaIds);
+  }
+
   async isMediaNameVisible(mediaName: string, isVisible: boolean = true) {
     return await this.isVisible(this.mediaCardItems.filter({hasText: mediaName}), isVisible);
   }

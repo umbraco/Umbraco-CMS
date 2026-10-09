@@ -4,5 +4,13 @@ import { manifest as kitchenSink } from './kitchen-sink/manifest.js';
 import { manifest as userPermissions } from './user-permissions/manifest.js';
 import { manifest as documents } from './documents/manifest.js';
 import { manifest as blocks } from './blocks/manifest.js';
+import { manifest as multiBrandClothingShop } from './multi-brand-clothing-shop/manifest.js';
 
-export const manifests: Array<UmbMockSetManifest> = [defaultSet, kitchenSink, userPermissions, documents, blocks];
+export const manifests: Array<UmbMockSetManifest> = [
+	defaultSet,
+	kitchenSink,
+	userPermissions,
+	documents,
+	blocks,
+	multiBrandClothingShop,
+];

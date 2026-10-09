@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Net;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Delivery.Controllers.Content;
+using Umbraco.Cms.Api.Management.Controllers.Server;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -34,11 +37,9 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest;
 /// <item><description>Delivery-only: AddCore() + AddWebsite() + AddDeliveryApi() (no backoffice)</description></item>
 /// <item><description>Core + Website: AddCore() + AddWebsite()</description></item>
 /// <item><description>Core + Delivery: AddCore() + AddDeliveryApi()</description></item>
+/// <item><description>Backoffice only: AddBackOffice() (no website)</description></item>
+/// <item><description>Backoffice + Delivery: AddBackOffice() + AddDeliveryApi() (no website)</description></item>
 /// </list>
-/// <para>
-/// Note: AddBackOffice() without AddWebsite() is not a supported scenario because
-/// the Management API depends on services registered by AddWebsite().
-/// </para>
 /// </remarks>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
@@ -202,6 +203,76 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
         // We don't care about the status code (could be 404, 200, etc.)
         Assert.That(response, Is.Not.Null, "Application should respond to requests");
         TestContext.WriteLine($"Full configuration: Received HTTP {(int)response.StatusCode} {response.StatusCode}");
+    }
+
+    /// <summary>
+    /// Verifies that the backoffice boots and serves APIs without website rendering.
+    /// </summary>
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task BackOfficeWithoutWebsite_BootsSuccessfully(bool includeDeliveryApi)
+    {
+        InMemoryConfiguration["Umbraco:CMS:DeliveryApi:Enabled"] = "true";
+
+        using var factory = CreateFactory(
+            configureUmbraco: builder =>
+            {
+                builder.AddBackOffice(mvcBuilder =>
+                {
+                    mvcBuilder.AddApplicationPart(typeof(StatusServerController).Assembly);
+
+                    if (includeDeliveryApi)
+                    {
+                        mvcBuilder.AddApplicationPart(typeof(QueryContentApiController).Assembly);
+                    }
+                });
+
+                if (includeDeliveryApi)
+                {
+                    builder.AddDeliveryApi();
+                }
+
+                builder
+                    .AddUmbracoSqlServerSupport()
+                    .AddUmbracoSqliteSupport()
+                    .AddComposers();
+            },
+            configureApp: app =>
+            {
+                app.UseUmbraco()
+                    .WithMiddleware(u =>
+                    {
+                        u.UseBackOffice();
+                    })
+                    .WithEndpoints(u =>
+                    {
+                        u.UseBackOfficeEndpoints();
+
+                        if (includeDeliveryApi)
+                        {
+                            u.UseDeliveryApiEndpoints();
+                        }
+                    });
+            });
+
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false,
+            BaseAddress = new Uri("https://localhost/", UriKind.Absolute),
+        });
+
+        using var websiteResponse = await client.GetAsync("/");
+        Assert.That(websiteResponse.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+
+        using var backofficeResponse = await client.GetAsync("/umbraco/management/api/v1/server/status");
+        Assert.That(backofficeResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        Assert.That(factory.Services.GetService<IBackOfficeEnabledMarker>(), Is.Not.Null);
+
+        if (includeDeliveryApi)
+        {
+            using var deliveryResponse = await client.GetAsync("/umbraco/delivery/api/v2/content");
+            Assert.That(deliveryResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
     }
 
     /// <summary>

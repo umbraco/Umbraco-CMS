@@ -14,11 +14,11 @@ namespace Umbraco.Cms.Infrastructure.Mail
     /// </summary>
     public class BasicSmtpEmailSenderClient : IEmailSenderClient
     {
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
 
         /// <inheritdoc />
         public BasicSmtpEmailSenderClient(IOptionsMonitor<GlobalSettings> globalSettings)
-            => _globalSettings = globalSettings.CurrentValue;
+            => _globalSettings = globalSettings;
 
         /// <inheritdoc />
         public async Task SendAsync(EmailMessage message)
@@ -27,24 +27,16 @@ namespace Umbraco.Cms.Infrastructure.Mail
         /// <inheritdoc />
         public async Task SendAsync(EmailMessage message, TimeSpan? expires)
         {
+            GlobalSettings globalSettings = _globalSettings.CurrentValue;
             using var client = new SmtpClient();
 
-            await client.ConnectAsync(
-                _globalSettings.Smtp!.Host!,
-                _globalSettings.Smtp.Port,
-                (SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
+            await ConnectAndAuthenticateAsync(client, globalSettings, CancellationToken.None);
 
-            if (!string.IsNullOrWhiteSpace(_globalSettings.Smtp.Username) &&
-                !string.IsNullOrWhiteSpace(_globalSettings.Smtp.Password))
+            var mimeMessage = message.ToMimeMessage(globalSettings.Smtp!.From);
+
+            if (globalSettings.IsSmtpExpiryConfigured)
             {
-                await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
-            }
-
-            var mimeMessage = message.ToMimeMessage(_globalSettings.Smtp!.From);
-
-            if (_globalSettings.IsSmtpExpiryConfigured)
-            {
-                expires ??= _globalSettings.Smtp.EmailExpiration;
+                expires ??= globalSettings.Smtp.EmailExpiration;
             }
 
             if (expires.HasValue)
@@ -53,13 +45,37 @@ namespace Umbraco.Cms.Infrastructure.Mail
                 mimeMessage.Headers.Add("Expires", DateTimeOffset.UtcNow.Add(expires.GetValueOrDefault()).ToString("R"));
             }
 
-            if (_globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)
+            if (globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)
             {
                 await client.SendAsync(mimeMessage);
             }
             else
             {
                 client.Send(mimeMessage);
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task VerifyConnectionAsync(CancellationToken cancellationToken = default)
+        {
+            using var client = new SmtpClient();
+
+            await ConnectAndAuthenticateAsync(client, _globalSettings.CurrentValue, cancellationToken);
+            await client.DisconnectAsync(true, cancellationToken);
+        }
+
+        private static async Task ConnectAndAuthenticateAsync(SmtpClient client, GlobalSettings globalSettings, CancellationToken cancellationToken)
+        {
+            await client.ConnectAsync(
+                globalSettings.Smtp!.Host!,
+                globalSettings.Smtp.Port,
+                (SecureSocketOptions)(int)globalSettings.Smtp.SecureSocketOptions,
+                cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(globalSettings.Smtp.Username) &&
+                !string.IsNullOrWhiteSpace(globalSettings.Smtp.Password))
+            {
+                await client.AuthenticateAsync(globalSettings.Smtp.Username, globalSettings.Smtp.Password, cancellationToken);
             }
         }
     }
