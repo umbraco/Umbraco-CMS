@@ -314,6 +314,7 @@ export default {
 		unpublishDate: 'Unpublish at',
 		removeDate: 'Clear date',
 		scheduledPublishing: 'Scheduled publishing',
+		scheduleForAllLanguages: 'Schedule for all selected languages',
 		setDate: 'Set date',
 		sortDone: 'Sort order is updated',
 		sortHelp:
@@ -1242,6 +1243,7 @@ export default {
 		userFailedLogin: "Oops! We couldn't log you in. Please check your credentials and try again.",
 		userLockedOut: 'Your account has been locked out. Please try again later.',
 		receivedErrorFromServer: 'Received an error from the server',
+		passwordResetUnavailable: 'Sorry, password reset is not currently available. Please try again later or contact your administrator.',
 		resetCodeExpired: 'The link you have clicked on is invalid or has expired',
 		userInviteWelcomeMessage:
 			"Hello there and welcome to Umbraco! In just 1 minute you'll be good to go, we just need you to setup a password.",

@@ -75,7 +75,7 @@ public class ElementControllerBaseTests
         IActionResult result = _controller.MapStatus(status, ["title", "bodyText"]);
 
         ProblemDetails problemDetails = AssertProblemDetails(result, StatusCodes.Status400BadRequest);
-        Assert.AreEqual("Invalid element", problemDetails.Title);
+        Assert.AreEqual("Validation failed", problemDetails.Title);
         Assert.IsTrue(problemDetails.Extensions.TryGetValue("invalidProperties", out var invalidProperties));
         Assert.AreEqual(new[] { "title", "bodyText" }, invalidProperties as IEnumerable<string>);
     }
