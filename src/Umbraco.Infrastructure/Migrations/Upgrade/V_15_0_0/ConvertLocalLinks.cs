@@ -118,6 +118,11 @@ public class ConvertLocalLinks : MigrationBase
     {
     }
 
+    /// <summary>
+    /// Gets the number of property data rows processed per page.
+    /// </summary>
+    internal virtual int PageSize => 10000;
+
     /// <inheritdoc/>
     protected override void Migrate()
     {
@@ -196,7 +201,6 @@ public class ConvertLocalLinks : MigrationBase
 
             // Process in pages to avoid loading all property data from the database into memory at once.
             Sql<ISqlContext> sql = BuildPropertyDataSql(propertyType);
-            const int PageSize = 10000;
             long pageNumber = 1;
             long pageCount = (propertyDataCount + PageSize - 1) / PageSize;
             int processedCount = 0;
