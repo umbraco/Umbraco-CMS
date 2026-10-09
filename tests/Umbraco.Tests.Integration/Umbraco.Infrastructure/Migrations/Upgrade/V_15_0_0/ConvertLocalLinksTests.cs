@@ -466,6 +466,27 @@ internal sealed class ConvertLocalLinksTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Converts_All_Values_When_Separated_By_Pages_Without_Values_To_Convert([Values] bool smallPages)
+    {
+        IContentType contentType = await CreateRichTextContentTypeAsync();
+        var expectedValuesById = new Dictionary<int, string>();
+        for (var i = 0; i < 9; i++)
+        {
+            var needsConversion = i is 0 or 7;
+            var legacyValue = needsConversion ? RichText($"<p>{i} {LegacyDocumentLink}</p>") : RichText($"<p>{i}</p>");
+            Content content = SaveContent(contentType, $"Page {i}", legacyValue);
+            expectedValuesById[content.Id] = needsConversion ? ConvertedRichText($"<p>{i} {ConvertedDocumentLink}</p>") : legacyValue;
+        }
+
+        await ExecuteMigrationAsync(smallPages);
+
+        foreach ((int contentId, string expectedValue) in expectedValuesById)
+        {
+            Assert.That(await GetStoredValueAsync(contentId), Is.EqualTo(expectedValue), $"Content {contentId}");
+        }
+    }
+
+    [Test]
     public async Task Running_The_Migration_Again_Makes_No_Further_Changes([Values] bool smallPages)
     {
         IContentType contentType = await CreateRichTextContentTypeAsync();

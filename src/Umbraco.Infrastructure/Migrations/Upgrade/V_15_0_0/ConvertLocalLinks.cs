@@ -186,7 +186,7 @@ public class ConvertLocalLinks : MigrationBase
                                            ?? throw new InvalidOperationException(
                                                "The data type value editor could not be fetched.");
 
-            long propertyDataCount = Database.ExecuteScalar<long>(BuildPropertyDataSql(propertyType, true));
+            long propertyDataCount = Database.ExecuteScalar<long>(BuildPropertyDataSql(propertyType, Sql().SelectCount()));
             if (propertyDataCount == 0)
             {
                 continue;
@@ -199,21 +199,17 @@ public class ConvertLocalLinks : MigrationBase
                 propertyType.Key,
                 propertyEditorAlias);
 
-            // Process in pages to avoid loading all property data from the database into memory at once. Pages are
-            // keyed on the row id rather than offset, so each page is a seek and page boundaries stay stable while
-            // rows are updated.
+            // Process in pages to avoid loading all property data from the database into memory at once. Each page is
+            // a window of consecutive row ids over all the property's data, so every query is bounded to one window
+            // however sparse the convertible values are, and page boundaries stay stable while rows are updated.
             long pageNumber = 1;
             long pageCount = (propertyDataCount + PageSize - 1) / PageSize;
             var lastId = int.MinValue;
-            while (true)
+            while (Database.ExecuteScalar<int?>(BuildPageEndIdSql(propertyType, lastId)) is int pageEndId)
             {
-                List<PropertyDataDto> propertyDataDtos = Database.Fetch<PropertyDataDto>(BuildPropertyDataPageSql(propertyType, lastId));
-                if (propertyDataDtos.Count == 0)
-                {
-                    break;
-                }
-
-                lastId = propertyDataDtos[^1].Id;
+                List<PropertyDataDto> propertyDataDtos = Database.Fetch<PropertyDataDto>(
+                    BuildConvertiblePropertyDataSql(propertyType, lastId, pageEndId));
+                lastId = pageEndId;
 
                 var updateBatchCollection = propertyDataDtos
                     .Select(propertyDataDto =>
@@ -312,20 +308,46 @@ public class ConvertLocalLinks : MigrationBase
         return true;
     }
 
-    private Sql<ISqlContext> BuildPropertyDataPageSql(IPropertyType propertyType, int afterId)
-        => SqlSyntax.SelectTop(
-            BuildPropertyDataSql(propertyType)
+    private Sql<ISqlContext> BuildPageEndIdSql(IPropertyType propertyType, int afterId)
+    {
+        var idColumn = PropertyDataColumn(PropertyDataDto.PrimaryKeyColumnName);
+        Sql<ISqlContext> pageIdsSql = SqlSyntax.SelectTop(
+            BuildPropertyDataSql(propertyType, Sql().Select(idColumn))
                 .Where<PropertyDataDto>(propertyData => propertyData.Id > afterId)
                 .OrderBy<PropertyDataDto>(propertyData => propertyData.Id),
             PageSize);
 
-    private Sql<ISqlContext> BuildPropertyDataSql(IPropertyType propertyType, bool isCount = false)
-    {
-        Sql<ISqlContext> sql = isCount
-            ? Sql().SelectCount()
-            : Sql().Select<PropertyDataDto>();
+        var pageIdColumn = SqlSyntax.GetQuotedColumnName(PropertyDataDto.PrimaryKeyColumnName);
+        return Sql($"SELECT MAX({pageIdColumn}) FROM ({pageIdsSql.SQL}) pageIds", pageIdsSql.Arguments);
+    }
 
-        sql = sql.From<PropertyDataDto>()
+    private Sql<ISqlContext> BuildConvertiblePropertyDataSql(IPropertyType propertyType, int afterId, int toId)
+    {
+        Sql<ISqlContext> sql = BuildPropertyDataSql(propertyType, Sql().Select<PropertyDataDto>())
+            .Where<PropertyDataDto>(propertyData => propertyData.Id > afterId && propertyData.Id <= toId);
+
+        // Only values that contain a legacy local link or a rich text block UDI can be changed by the local link
+        // processors, so skip everything else in the database rather than round-tripping it through the value
+        // editors. The match must remain a superset of every pattern the processors convert. The column is
+        // matched without wrapping it in a function, as the legacy ntext type does not support one.
+        var localLinkPattern = DatabaseType == DatabaseType.SQLite
+            ? "%locallink%" // SQLite's LIKE is case insensitive for ASCII characters.
+            : "%[lL][oO][cC][aA][lL][lL][iI][nN][kK]%"; // Case insensitive regardless of the database collation.
+        const string BlockUdiPattern = "%data-content-udi%";
+        var textValueColumn = PropertyDataColumn(PropertyDataDto.TextValueColumnName);
+        var varcharValueColumn = PropertyDataColumn(PropertyDataDto.VarcharValueColumnName);
+
+        return sql
+            .Where(
+                $"({textValueColumn} LIKE @0 OR {textValueColumn} LIKE @1 OR {varcharValueColumn} LIKE @0 OR {varcharValueColumn} LIKE @1)",
+                localLinkPattern,
+                BlockUdiPattern)
+            .OrderBy<PropertyDataDto>(propertyData => propertyData.Id);
+    }
+
+    private Sql<ISqlContext> BuildPropertyDataSql(IPropertyType propertyType, Sql<ISqlContext> selectSql)
+        => selectSql
+            .From<PropertyDataDto>()
             .InnerJoin<ContentVersionDto>()
             .On<PropertyDataDto, ContentVersionDto>((propertyData, contentVersion) =>
                 propertyData.VersionId == contentVersion.Id)
@@ -337,23 +359,8 @@ public class ConvertLocalLinks : MigrationBase
                     (contentVersion.Current || documentVersion.Published)
                     && propertyData.PropertyTypeId == propertyType.Id);
 
-        // Only values that contain a legacy local link or a rich text block UDI can be changed by the local link
-        // processors, so skip everything else in the database rather than round-tripping it through the value
-        // editors. The match must remain a superset of every pattern the processors convert. The column is
-        // matched without wrapping it in a function, as the legacy ntext type does not support one.
-        var localLinkPattern = DatabaseType == DatabaseType.SQLite
-            ? "%locallink%" // SQLite's LIKE is case insensitive for ASCII characters.
-            : "%[lL][oO][cC][aA][lL][lL][iI][nN][kK]%"; // Case insensitive regardless of the database collation.
-        const string BlockUdiPattern = "%data-content-udi%";
-        var textValueColumn = $"{SqlSyntax.GetQuotedTableName(PropertyDataDto.TableName)}.{SqlSyntax.GetQuotedColumnName(PropertyDataDto.TextValueColumnName)}";
-        var varcharValueColumn = $"{SqlSyntax.GetQuotedTableName(PropertyDataDto.TableName)}.{SqlSyntax.GetQuotedColumnName(PropertyDataDto.VarcharValueColumnName)}";
-        sql = sql.Where(
-            $"({textValueColumn} LIKE @0 OR {textValueColumn} LIKE @1 OR {varcharValueColumn} LIKE @0 OR {varcharValueColumn} LIKE @1)",
-            localLinkPattern,
-            BlockUdiPattern);
-
-        return sql;
-    }
+    private string PropertyDataColumn(string columnName)
+        => $"{SqlSyntax.GetQuotedTableName(PropertyDataDto.TableName)}.{SqlSyntax.GetQuotedColumnName(columnName)}";
 
     private bool ProcessPropertyDataDto(
         PropertyDataDto propertyDataDto,
