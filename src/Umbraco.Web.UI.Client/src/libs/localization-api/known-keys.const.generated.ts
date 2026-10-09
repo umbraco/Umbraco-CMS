@@ -1041,6 +1041,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'general_deleting',
 	'general_description',
 	'general_design',
+	'general_destination',
 	'general_details',
 	'general_dictionary',
 	'general_dimensions',

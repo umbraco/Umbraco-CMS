@@ -38,6 +38,7 @@ public partial class ContentBlueprintEditingServiceTests
             createContentResult.Result.Content!.Key,
             name,
             null,
+            null,
             Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
@@ -80,6 +81,7 @@ public partial class ContentBlueprintEditingServiceTests
             content.Key,
             name,
             key,
+            null,
             Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
@@ -113,6 +115,7 @@ public partial class ContentBlueprintEditingServiceTests
             content.Key,
             name,
             null,
+            null,
             Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
@@ -127,6 +130,7 @@ public partial class ContentBlueprintEditingServiceTests
             content.Key,
             name,
             null,
+            null,
             Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
@@ -136,5 +140,88 @@ public partial class ContentBlueprintEditingServiceTests
             Assert.IsNotNull(result2.Result);
         });
         Assert.IsNull(result2.Result.Content);
+    }
+
+    [Test]
+    public async Task Can_Create_From_Content_In_A_Folder()
+    {
+        var content = await CreateInvariantContent();
+
+        var containerKey = Guid.NewGuid();
+        var container = (await ContentBlueprintContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey)).Result;
+
+        var blueprintKey = Guid.NewGuid();
+        var result = await ContentBlueprintEditingService.CreateFromContentAsync(
+            content.Key,
+            "Test Create From Content Blueprint",
+            blueprintKey,
+            containerKey,
+            Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        });
+
+        // re-get to prove the placement was persisted
+        var blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
+        Assert.IsNotNull(blueprint);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(container!.Id, blueprint.ParentId);
+            Assert.AreEqual($"{container.Path},{blueprint.Id}", blueprint.Path);
+        });
+
+        var children = GetBlueprintChildren(containerKey);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, children.Length);
+            Assert.AreEqual(blueprintKey, children.First().Key);
+        });
+    }
+
+    [Test]
+    public async Task Can_Create_From_Content_At_Root_When_No_Parent_Is_Specified()
+    {
+        var content = await CreateInvariantContent();
+
+        var blueprintKey = Guid.NewGuid();
+        var result = await ContentBlueprintEditingService.CreateFromContentAsync(
+            content.Key,
+            "Test Create From Content Blueprint",
+            blueprintKey,
+            null,
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+
+        var blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
+        Assert.IsNotNull(blueprint);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(Constants.System.Root, blueprint.ParentId);
+            Assert.AreEqual($"{Constants.System.Root},{blueprint.Id}", blueprint.Path);
+        });
+    }
+
+    [Test]
+    public async Task Cannot_Create_From_Content_In_Non_Existent_Folder()
+    {
+        var content = await CreateInvariantContent();
+
+        var result = await ContentBlueprintEditingService.CreateFromContentAsync(
+            content.Key,
+            "Test Create From Content Blueprint",
+            null,
+            Guid.NewGuid(),
+            Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, result.Status);
+        });
+        Assert.IsNull(result.Result.Content);
     }
 }
