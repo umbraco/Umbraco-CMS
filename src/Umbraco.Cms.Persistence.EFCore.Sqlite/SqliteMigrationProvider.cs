@@ -71,6 +71,7 @@ public class SqliteMigrationProvider : IMigrationProvider
             EFCoreMigration.ReconcileDocumentRepositoryModel => typeof(Migrations.ReconcileDocumentRepositoryModel),
             EFCoreMigration.AddTemplateDto => typeof(Migrations.AddTemplateDto),
             EFCoreMigration.RemoveUserGroupDefaultPermissionsFromModel => typeof(Migrations.RemoveUserGroupDefaultPermissionsFromModel),
+            EFCoreMigration.AddElementDtos => typeof(Migrations.AddElementDtos),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }

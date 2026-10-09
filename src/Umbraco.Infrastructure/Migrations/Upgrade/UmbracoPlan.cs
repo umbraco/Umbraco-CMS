@@ -149,6 +149,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_19_0_0.ReconcileDocumentRepositoryModel>("{740529F1-B2FF-44C6-B4F8-5EA30D400C8A}");
         To<V_19_0_0.AddTemplateDto>("{F1A0FF0C-3BFB-462D-A387-99913767AF9E}");
         To<V_19_0_0.RemoveUserGroupDefaultPermissionsFromModel>("{F6C49C99-3805-4ED8-AA5B-39937DC4081C}");
+        To<V_19_0_0.AddElementDtos>("{1EC33267-3D0C-4D67-BC41-5AA5D0DFF3F2}");
     }
 
     /// <summary>

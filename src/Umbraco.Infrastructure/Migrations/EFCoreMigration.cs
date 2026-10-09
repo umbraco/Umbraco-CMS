@@ -29,4 +29,5 @@ public enum EFCoreMigration
     ReconcileDocumentRepositoryModel = 21,
     AddTemplateDto = 22,
     RemoveUserGroupDefaultPermissionsFromModel = 23,
+    AddElementDtos = 24,
 }

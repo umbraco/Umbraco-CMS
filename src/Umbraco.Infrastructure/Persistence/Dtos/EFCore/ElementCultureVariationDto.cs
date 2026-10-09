@@ -4,10 +4,10 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Configurations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
-[EntityTypeConfiguration(typeof(DocumentCultureVariationDtoConfiguration))]
-public class DocumentCultureVariationDto : ICultureVariationDto
+[EntityTypeConfiguration(typeof(ElementCultureVariationDtoConfiguration))]
+public class ElementCultureVariationDto : ICultureVariationDto
 {
-    public const string TableName = Constants.DatabaseSchema.Tables.DocumentCultureVariation;
+    public const string TableName = Constants.DatabaseSchema.Tables.ElementCultureVariation;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
     public const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
     public const string LanguageIdColumnName = "languageId";
@@ -17,7 +17,7 @@ public class DocumentCultureVariationDto : ICultureVariationDto
     public const string NameColumnName = "name";
 
     /// <summary>
-    /// Gets or sets the unique identifier for the document culture variation.
+    /// Gets or sets the unique identifier for the element culture variation.
     /// </summary>
     public int Id { get; set; }
 
@@ -27,12 +27,12 @@ public class DocumentCultureVariationDto : ICultureVariationDto
     public int NodeId { get; set; }
 
     /// <summary>
-    /// Gets or sets the language identifier associated with the document culture variation.
+    /// Gets or sets the language identifier associated with the element culture variation.
     /// </summary>
     public int LanguageId { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether this culture variation of the document has been edited.
+    /// Gets or sets a value indicating whether this culture variation of the element has been edited.
     /// </summary>
     public bool Edited { get; set; }
 
@@ -47,7 +47,7 @@ public class DocumentCultureVariationDto : ICultureVariationDto
     public bool Published { get; set; }
 
     /// <summary>
-    /// Gets or sets the denormalized name for the document's culture variation.
+    /// Gets or sets the denormalized name for the element's culture variation.
     /// </summary>
     public string? Name { get; set; }
 }
