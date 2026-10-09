@@ -112,11 +112,17 @@ export class UmbTestTreeRepository {
 	static root: UmbTreeRootModel = DEFAULT_TEST_ROOT;
 	static ancestors: Array<UmbTreeItemModel> = [];
 	static requestTreeItemAncestorsCalls: Array<UmbEntityModel> = [];
+	static createdCount = 0;
 
 	static reset() {
+		UmbTestTreeRepository.createdCount = 0;
 		UmbTestTreeRepository.root = DEFAULT_TEST_ROOT;
 		UmbTestTreeRepository.ancestors = [];
 		UmbTestTreeRepository.requestTreeItemAncestorsCalls = [];
+	}
+
+	constructor() {
+		UmbTestTreeRepository.createdCount++;
 	}
 
 	async requestTreeRoot() {
