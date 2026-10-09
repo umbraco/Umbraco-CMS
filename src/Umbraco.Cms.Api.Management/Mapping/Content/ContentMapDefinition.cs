@@ -81,24 +81,37 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
 
     protected IEnumerable<TVariantViewModel> MapVariantViewModels(TContent source, VariantViewModelMapping? additionalVariantMapping = null)
     {
-        var cultures = source.AvailableCultures.DefaultIfEmpty(null).ToArray();
+        var availableCultures = source.AvailableCultures.ToArray();
+        var cultures = availableCultures.DefaultIfEmpty(null).ToArray();
 
-        return cultures
-            .Select(culture =>
-            {
-                var variantViewModel = new TVariantViewModel
-                {
-                    Culture = culture,
-                    Name = source.GetCultureName(culture) ?? string.Empty,
-                    CreateDate = source.CreateDate, // apparently there is no culture specific creation date
-                    UpdateDate = culture == null
-                        ? source.UpdateDate
-                        : source.GetUpdateDate(culture) ?? source.UpdateDate,
-                };
-                additionalVariantMapping?.Invoke(culture, variantViewModel);
-                return variantViewModel;
-            })
-            .ToArray();
+        var variants = cultures
+            .Select(culture => CreateVariantViewModel(source, culture, additionalVariantMapping))
+            .ToList();
+
+        // for culture-varying publishable content (documents, elements), also include a single invariant
+        // (culture = null, segment = null) entry representing the content's invariant properties, distinct
+        // from any specific culture or segment. Media has no invariant-edited concept, so it's excluded.
+        if (availableCultures.Length > 0 && source is IPublishableContentBase)
+        {
+            variants.Add(CreateVariantViewModel(source, null,  additionalVariantMapping));
+        }
+
+        return variants;
+    }
+
+    private TVariantViewModel CreateVariantViewModel(TContent source, string? culture, VariantViewModelMapping? additionalVariantMapping)
+    {
+        var variantViewModel = new TVariantViewModel
+        {
+            Culture = culture,
+            Name = source.GetCultureName(culture) ?? string.Empty,
+            CreateDate = source.CreateDate, // apparently there is no culture specific creation date
+            UpdateDate = culture == null
+                ? source.UpdateDate
+                : source.GetUpdateDate(culture) ?? source.UpdateDate,
+        };
+        additionalVariantMapping?.Invoke(culture, variantViewModel);
+        return variantViewModel;
     }
 
     protected void MapContentScheduleCollection<TContentResponseModel, TPublishableVariantResponseModelBase>(ContentScheduleCollection source, TContentResponseModel target, MapperContext context)

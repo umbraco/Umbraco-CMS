@@ -83,6 +83,10 @@ public abstract class PublishableContentBase : ContentBase, IPublishableContentB
 
     /// <inheritdoc />
     [IgnoreDataMember]
+    public bool InvariantEdited { get; set; }
+
+    /// <inheritdoc />
+    [IgnoreDataMember]
     public DateTime? PublishDate { get; set; } // set by persistence
 
     /// <inheritdoc />
@@ -113,10 +117,23 @@ public abstract class PublishableContentBase : ContentBase, IPublishableContentB
         => !culture.IsNullOrWhiteSpace() && _publishInfos != null && _publishInfos.ContainsKey(culture);
 
     /// <inheritdoc />
-    public bool IsCultureEdited(string culture)
-        => IsCultureAvailable(culture) && // is available, and
-           (!IsCulturePublished(culture) || // is not published, or
-            (_editedCultures != null && _editedCultures.Contains(culture))); // is edited
+    public bool IsCultureEdited(string? culture)
+    {
+        var normalized = NormalizeCulture(culture);
+        if (normalized == Constants.System.InvariantCulture)
+        {
+            // invariant-edited is only tracked distinctly for content that varies by culture;
+            // for a wholly invariant content type, the flat Edited flag already is the precise signal
+            return ContentType.VariesByCulture() ? InvariantEdited : Edited;
+        }
+
+        return IsCultureAvailable(normalized) && // is available, and
+               (!IsCulturePublished(normalized) || // is not published, or
+                (_editedCultures != null && _editedCultures.Contains(normalized))); // is edited
+    }
+
+    private static string NormalizeCulture(string? culture)
+        => culture.IsNullOrWhiteSpace() ? Constants.System.InvariantCulture : culture;
 
     /// <inheritdoc />
     [IgnoreDataMember]

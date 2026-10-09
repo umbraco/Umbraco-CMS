@@ -395,6 +395,7 @@ internal sealed class ContentBaseFactory
 
             content.Published = dto.Published;
             content.Edited = dto.Edited;
+            content.InvariantEdited = dto.InvariantEdited;
 
             if (publishedVersionDto != null)
             {

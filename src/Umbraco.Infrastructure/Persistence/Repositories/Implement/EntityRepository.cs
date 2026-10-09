@@ -824,6 +824,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             e.CultureNames = edtos.Where(x => x.CultureAvailable).ToDictionary(x => x.IsoCode, x => x.Name);
             e.PublishedCultures = edtos.Where(x => x.CulturePublished).Select(x => x.IsoCode);
             e.EditedCultures = edtos.Where(x => x.CultureAvailable && x.CultureEdited).Select(x => x.IsoCode);
+            e.InvariantEdited = edtos.First().DocumentInvariantEdited;
         }
 
         return entitiesList;
@@ -842,7 +843,8 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                 x => Alias(
                     x.Published,
                     nameof(VariantInfoDto.DocumentPublished)),
-                x => Alias(x.Edited, nameof(VariantInfoDto.DocumentEdited)))
+                x => Alias(x.Edited, nameof(VariantInfoDto.DocumentEdited)),
+                x => Alias(x.InvariantEdited, nameof(VariantInfoDto.DocumentInvariantEdited)))
             .AndSelect<DocumentCultureVariationDto>(
                 "dcv",
                 x => Alias(x.Available, nameof(VariantInfoDto.CultureAvailable)),
@@ -879,7 +881,8 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                 x => Alias(
                     x.Published,
                     nameof(VariantInfoDto.DocumentPublished)),
-                x => Alias(x.Edited, nameof(VariantInfoDto.DocumentEdited)))
+                x => Alias(x.Edited, nameof(VariantInfoDto.DocumentEdited)),
+                x => Alias(x.InvariantEdited, nameof(VariantInfoDto.DocumentInvariantEdited)))
             .AndSelect<ElementCultureVariationDto>(
                 "dcv",
                 x => Alias(x.Available, nameof(VariantInfoDto.CultureAvailable)),
@@ -1379,6 +1382,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         /// Gets or sets a value indicating whether this document variant has been edited.
         /// </summary>
         public bool DocumentEdited { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether an invariant property of this document has been edited.
+        /// </summary>
+        public bool DocumentInvariantEdited { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this culture variant is available for the entity.

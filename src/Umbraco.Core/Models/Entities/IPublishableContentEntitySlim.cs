@@ -31,4 +31,13 @@ public interface IPublishableContentEntitySlim : IContentEntitySlim
     ///     Gets a value indicating whether the content has been edited.
     /// </summary>
     bool Edited { get; }
+
+    /// <summary>
+    ///     Gets a value indicating whether an invariant property has been edited.
+    /// </summary>
+    /// <remarks>
+    ///     Distinct from <see cref="Edited" />: this reflects only invariant property values, never
+    ///     a specific culture's own values.
+    /// </remarks>
+    bool InvariantEdited { get; }
 }
