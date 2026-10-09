@@ -45,7 +45,7 @@ jobs:
           label_trigger: "claude"
           base_branch: "main"
           additional_permissions: "actions: read"
-          claude_args: "--model claude-opus-5-5 --max-turns 50 --permission-mode acceptEdits --allowedTools 'mcp__github_inline_comment__create_inline_comment,Bash(gh:*),Bash(git:*),Bash(npm:*),Bash(dotnet:*)'"
+          claude_args: "--model claude-opus-5-5 --max-turns 50 --permission-mode acceptEdits --allowedTools 'mcp__github_inline_comment__create_inline_comment,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr comment:*),Bash(gh pr edit:*),Bash(gh pr create:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(gh issue edit:*),Bash(gh search issues:*),Bash(gh search prs:*),Bash(gh run view:*),Bash(gh run list:*),Bash(git:*),Bash(npm:*),Bash(dotnet:*)'"
           prompt: |
             You are an AI assistant for the Umbraco CMS repository, an open-source
             .NET CMS that welcomes community contributions.

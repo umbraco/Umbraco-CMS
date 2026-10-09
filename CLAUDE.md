@@ -499,7 +499,7 @@ Also triggers on issue assignment to `claude` or adding the `claude` label. Gate
 
 **Allowed tools**:
 - Auto-review: inline comments, `gh auth status`, `gh pr view/diff/comment/edit`, and `git diff/log/show/fetch`.
-- Interactive: inline comments, `gh`, `git`, `npm` and `dotnet`, plus file edits inside the checkout (`--permission-mode acceptEdits`). Node and .NET are set up from `.nvmrc` and `global.json`.
+- Interactive: inline comments, `git`, `npm` and `dotnet`, file edits inside the checkout (`--permission-mode acceptEdits`), and the `gh` commands for PRs, issues and runs that the requests need (`gh pr view/diff/checks/comment/edit/create`, `gh issue view/comment/edit`, `gh search issues/prs`, `gh run view/list`). Node and .NET are set up from `.nvmrc` and `global.json`.
 
 ### Labels
 
