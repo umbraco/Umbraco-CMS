@@ -2,6 +2,7 @@ import { UmbValidationInvalidEvent, UmbValidationValidEvent } from '../events/in
 import type { UmbFormControlMixinInterface } from '../mixins/index.js';
 import { css, customElement, html, property, repeat, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @description - Component for displaying one or more validation messages from UMB/UUI Form Control within the given scope.
@@ -76,7 +77,7 @@ export class UmbFormValidationMessageElement extends UmbLitElement {
 		return html`
 			<slot></slot>
 			<div id="messages">
-				${repeat(this._messages, (item) => html`<div>${unsafeHTML(item[1])}</div>`)}
+				${repeat(this._messages, (item) => html`<div>${unsafeHTML(sanitizeHTML(item[1]))}</div>`)}
 				<slot name="message"></slot>
 			</div>
 		`;
