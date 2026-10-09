@@ -10,6 +10,7 @@ export const UMB_ENTITY_ACTION_CONTENT_PUBLISH_KIND_MANIFEST: UmbExtensionManife
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
 		kind: 'contentPublish',
+		separatorBefore: true,
 		api: () => import('./content-publish.action.js'),
 		weight: 600,
 		forEntityTypes: [],

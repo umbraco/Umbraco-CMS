@@ -7,6 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Document.CultureAndHostnames',
+		separatorBefore: true,
 		name: 'Culture And Hostnames Document Entity Action',
 		weight: 400,
 		api: () => import('./culture-and-hostnames.action.js'),
