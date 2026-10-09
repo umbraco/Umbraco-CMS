@@ -9,6 +9,13 @@ export interface UmbDocumentScheduleSelectionModel {
 	schedule?: ScheduleRequestModel | null;
 }
 
+export interface UmbDocumentAncestorPublishCoverageModel {
+	/** Whether every ancestor is published in at least one culture, which publishing requires. */
+	isPathPublished: boolean;
+	/** The cultures published in every ancestor, or `null` when every ancestor is published invariantly. */
+	publishedCultures: Array<string> | null;
+}
+
 export interface UmbDocumentScheduleModalData extends UmbDocumentVariantPickerData {
 	activeVariants: Array<string>;
 	/**
@@ -17,6 +24,11 @@ export interface UmbDocumentScheduleModalData extends UmbDocumentVariantPickerDa
 	 */
 	currentVariant?: string;
 	prevalues: Array<UmbDocumentScheduleSelectionModel>;
+	/**
+	 * How the document's ancestors cover a scheduled publish, used to warn when it will fail or
+	 * won't be visible. `undefined` for a root document or when the lookup is unavailable.
+	 */
+	ancestorPublishCoverage?: UmbDocumentAncestorPublishCoverageModel;
 }
 
 export interface UmbDocumentScheduleModalValue {
