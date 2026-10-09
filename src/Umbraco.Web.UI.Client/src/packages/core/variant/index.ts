@@ -4,6 +4,7 @@ export * from './expand-variant-ids-with-segment-options.function.js';
 export * from './sort-variants.function.js';
 export * from './variant-id.class.js';
 export * from './variant-object-compare.function.js';
+export * from './variant-object-sort-compare.function.js';
 export * from './variant-resolver.js';
 
 export type * from './types.js';

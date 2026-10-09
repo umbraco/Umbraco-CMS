@@ -63,6 +63,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerContext.max;
@@ -113,13 +114,17 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 
 	/**
 	 * Sets the input to required, meaning validation will fail if the value is empty.

@@ -2,7 +2,7 @@ import type { UmbContentDetailModel } from '../types.js';
 import { UmbEntryWorkspaceDataManager } from './entry-data-manager.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
-import { UmbVariantId, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbVariantObjectSortCompare, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
 export class UmbContentWorkspaceDataManager<
 	ModelType extends UmbContentDetailModel,
@@ -91,7 +91,7 @@ export class UmbContentWorkspaceDataManager<
 				...update,
 			} as ModelVariantType,
 			(x) => variantId.culture === x.culture,
-		) as Array<ModelVariantType>;
+		).sort(umbVariantObjectSortCompare) as Array<ModelVariantType>;
 		this.updateCurrent({ variants: newVariants } as unknown as ModelType);
 	}
 

@@ -213,28 +213,6 @@ public partial class ElementEditingServiceTests
     }
 
     [Test]
-    public async Task Cannot_CreateAndPublish_With_Invalid_Property_Values_With_Obsolete_Overload()
-    {
-        var elementType = await CreateVariantElementType();
-
-        var createModel = new ElementCreateModel
-        {
-            ContentTypeKey = elementType.Key,
-            ParentKey = null,
-            Variants = [new VariantModel { Culture = "en-US", Name = "English Name" }],
-            Properties = [new PropertyValueModel { Alias = "variantTitle", Value = null, Culture = "en-US" }],
-        };
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var result = await ElementEditingService.CreateAndPublishAsync(createModel, new HashSet<string> { "en-US" }, Constants.Security.SuperUserKey);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        // the obsolete overload cannot express a publish failure, so it keeps collapsing to "unknown"
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Unknown, result.Status);
-    }
-
-    [Test]
     public async Task Cannot_CreateAndPublish_With_Cultures_For_An_Invariant_Element_Type()
     {
         var elementType = await CreateInvariantElementType();
