@@ -1,4 +1,5 @@
 import type { UmbBlockDataValueModel, UmbBlockExposeModel, UmbBlockValueDataPropertiesBaseType } from '../types.js';
+import { umbBlockExposeSortCompare } from '../utils/block-expose-sort-compare.function.js';
 import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 import type { UmbPropertyValueResolver } from '@umbraco-cms/backoffice/property';
 
@@ -47,7 +48,7 @@ export abstract class UmbBlockValueResolver<ValueType> implements UmbPropertyVal
 		value: ValueType,
 		variantsCallback: (values: Array<UmbBlockExposeModel>) => Promise<Array<UmbBlockExposeModel> | undefined>,
 	) {
-		const expose = (await variantsCallback(value.expose ?? [])) ?? [];
+		const expose = [...((await variantsCallback(value.expose ?? [])) ?? [])].sort(umbBlockExposeSortCompare);
 		return { ...value, expose };
 	}
 

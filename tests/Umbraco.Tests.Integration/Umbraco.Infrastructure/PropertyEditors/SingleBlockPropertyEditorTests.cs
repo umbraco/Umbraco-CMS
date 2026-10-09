@@ -728,6 +728,62 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         });
     }
 
+    [Test]
+    public async Task Merging_Variant_And_Invariant_Data_Preserves_All_Blocks_Of_A_Value_Holding_Multiple_Blocks()
+    {
+        (SingleBlockPropertyEditor editor, string value, Guid[] contentKeys) = await CreateValueHoldingMultipleBlocks();
+
+        var result = editor.MergeVariantInvariantPropertyValue(null, value, true, ["en-US"]);
+
+        AssertLayoutHoldsContentKeys(result, contentKeys);
+    }
+
+    [Test]
+    public async Task Merging_Partial_Value_For_Culture_Preserves_All_Blocks_Of_A_Value_Holding_Multiple_Blocks()
+    {
+        (SingleBlockPropertyEditor editor, string value, Guid[] contentKeys) = await CreateValueHoldingMultipleBlocks();
+
+        var result = editor.MergePartialPropertyValueForCulture(value, null, null);
+
+        AssertLayoutHoldsContentKeys(result, contentKeys);
+    }
+
+    // A value stored by a Block List can hold more than the one block a single block value is meant to hold.
+    private async Task<(SingleBlockPropertyEditor Editor, string Value, Guid[] ContentKeys)> CreateValueHoldingMultipleBlocks()
+    {
+        var elementType = ContentTypeBuilder.CreateMetaContentType();
+        elementType.IsElement = true;
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+
+        var singleBlockContentType = await CreateSingleBlockContentTypePage([elementType]);
+        var dataType = await DataTypeService.GetAsync(singleBlockContentType.PropertyTypes.First(propertyType => propertyType.Alias == "block").DataTypeKey);
+        var editor = dataType?.Editor as SingleBlockPropertyEditor;
+        Assert.IsNotNull(editor);
+
+        Guid[] contentKeys = [Guid.NewGuid(), Guid.NewGuid()];
+        var blockListValue = new BlockListValue(contentKeys.Select(key => new BlockListLayoutItem(key)))
+        {
+            ContentData = contentKeys.Select(key => new BlockItemData
+            {
+                Key = key,
+                ContentTypeAlias = elementType.Alias,
+                ContentTypeKey = elementType.Key,
+                Values = [new BlockPropertyValue { Alias = "metadescription", Value = $"Description {key}" }],
+            }).ToList(),
+            Expose = contentKeys.Select(key => new BlockItemVariation(key, null, null)).ToList(),
+        };
+
+        return (editor!, JsonSerializer.Serialize(blockListValue), contentKeys);
+    }
+
+    private void AssertLayoutHoldsContentKeys(object? mergedValue, Guid[] expectedContentKeys)
+    {
+        Assert.IsInstanceOf<string>(mergedValue);
+        var singleBlockValue = JsonSerializer.Deserialize<SingleBlockValue>((string)mergedValue!);
+        Assert.IsNotNull(singleBlockValue);
+        CollectionAssert.AreEqual(expectedContentKeys, singleBlockValue!.GetLayouts()?.Select(layout => layout.ContentKey));
+    }
+
     private async Task<IContentType> CreateSingleBlockContentTypePage(IContentType[] allowedElementTypes)
     {
         var singleBlockDataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.SingleBlock], ConfigurationEditorJsonSerializer)

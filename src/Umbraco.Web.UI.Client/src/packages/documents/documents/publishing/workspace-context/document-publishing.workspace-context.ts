@@ -149,6 +149,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			data: {
 				options,
 				activeVariants: selected,
+				currentVariant: this.#getCurrentScheduleVariant(options),
 				pickableFilter: this.#publishableVariantsFilter,
 				prevalues: options.map((option) => ({
 					unique: option.unique,
@@ -628,6 +629,19 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			options,
 			selected,
 		};
+	}
+
+	#getCurrentScheduleVariant(options: Array<UmbDocumentVariantOptionModel>): string | undefined {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+		// The schedule dialog lists cultures only, so an active segment variant resolves to its culture.
+		const activeCultures = this.#documentWorkspaceContext.splitView
+			.getActiveVariants()
+			.map((x) => UmbVariantId.Create(x).toSegmentInvariant().toString());
+
+		return activeCultures.find((unique) => {
+			const option = options.find((o) => o.unique === unique);
+			return !!option && this.#publishableVariantsFilter(option);
+		});
 	}
 
 	#getPublishVariantsSelection() {

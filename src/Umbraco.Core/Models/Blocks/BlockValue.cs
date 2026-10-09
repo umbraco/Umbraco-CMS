@@ -51,11 +51,22 @@ public abstract class BlockValue
     /// <summary>
     ///     Determines whether the specified block layout alias is supported.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         By default only the layout stored under <see cref="PropertyEditorAlias" /> is supported. Override this to also
+    ///         accept layouts written by other, compatible block editors - for example, a block value that can read values
+    ///         stored by another editor with the same layout structure, or by an editor it has replaced.
+    ///     </para>
+    ///     <para>
+    ///         A supported layout is read as the layout of <see cref="PropertyEditorAlias" />, and is written back under that
+    ///         alias when the value is serialized. A layout stored under <see cref="PropertyEditorAlias" /> always takes
+    ///         precedence over one stored under any other supported alias.
+    ///     </para>
+    /// </remarks>
     /// <param name="alias">The block layout alias.</param>
     /// <returns>
     ///     <c>true</c> if the specified block layout alias is supported; otherwise, <c>false</c>.
     /// </returns>
-    [Obsolete("Scheduled for removal in Umbraco 19.")]
     public virtual bool SupportsBlockLayoutAlias(string alias) => alias.Equals(PropertyEditorAlias);
 }
 
