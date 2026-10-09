@@ -1,5 +1,6 @@
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '../../../contexts/index.js';
 import type { UmbVariantDatasetWorkspaceContext } from '../../../contexts/index.js';
+import { UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT } from '../../../entity-detail/index.js';
 import { css, customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -12,6 +13,8 @@ import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu'
 const observeDefaultLanguageSymbol = Symbol();
 const observeCurrentLanguageSymbol = Symbol();
 const observeWorkspaceActiveVariantSymbol = Symbol();
+// Shared by the variant and named-detail name observers below - registering a second controller under the same
+// alias destroys the first, so this only works because a context can never satisfy both of their discriminators.
 const observeWorkspaceNameSymbol = Symbol();
 
 @customElement('umb-workspace-variant-menu-breadcrumb')
@@ -31,7 +34,8 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	@state()
 	private _appCurrentCulture?: string;
 
-	#workspaceContext?: UmbVariantDatasetWorkspaceContext;
+	#variantWorkspaceContext?: UmbVariantDatasetWorkspaceContext;
+	#namedDetailWorkspaceContext?: typeof UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT.TYPE;
 	#appLanguageContext?: UmbAppLanguageContext;
 	#menuStructureContext?: typeof UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT.TYPE;
 
@@ -58,8 +62,17 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
 			if (!instance) return;
-			this.#workspaceContext = instance;
+			this.#variantWorkspaceContext = instance;
 			this.#observeWorkspaceActiveVariant();
+			this.#observeStructure();
+		});
+
+		// Fallback name source for workspaces with no variance (e.g. folders), which have no variant context to
+		// supply the breadcrumb's last segment from.
+		this.consumeContext(UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT, (instance) => {
+			if (!instance) return;
+			this.#namedDetailWorkspaceContext = instance;
+			this.observe(instance.name, (value) => (this._name = value || ''), observeWorkspaceNameSymbol);
 			this.#observeStructure();
 		});
 
@@ -71,11 +84,11 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	}
 
 	#observeStructure() {
-		if (!this.#menuStructureContext || !this.#workspaceContext) return;
+		if (!this.#menuStructureContext) return;
+		if (!this.#variantWorkspaceContext && !this.#namedDetailWorkspaceContext) return;
 
 		this.observe(this.#menuStructureContext.structure, (value) => {
-			if (!this.#workspaceContext) return;
-			const unique = this.#workspaceContext.getUnique();
+			const unique = this.#variantWorkspaceContext?.getUnique() ?? this.#namedDetailWorkspaceContext?.getUnique();
 			// exclude the current unique from the structure. We append this with an observer of the name
 			this._structure = value.filter((structureItem) => structureItem.unique !== unique);
 		});
@@ -83,7 +96,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 	#observeWorkspaceActiveVariant() {
 		this.observe(
-			this.#workspaceContext?.splitView.firstActiveVariantInfo,
+			this.#variantWorkspaceContext?.splitView.firstActiveVariantInfo,
 			(variantInfo) => {
 				if (!variantInfo) return;
 				this._workspaceActiveVariantId = UmbVariantId.Create(variantInfo);
@@ -95,7 +108,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 	#observeActiveVariantName() {
 		this.observe(
-			this.#workspaceContext?.name(this._workspaceActiveVariantId),
+			this.#variantWorkspaceContext?.name(this._workspaceActiveVariantId),
 			(value) => (this._name = value || ''),
 			observeWorkspaceNameSymbol,
 		);
@@ -103,6 +116,11 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
 	#getItemVariantName(structureItem: UmbVariantStructureItemModel) {
+		// Folders aren't variant content, so they have no variants to match against - use their flat name directly.
+		if (structureItem.isFolder && structureItem.name) {
+			return structureItem.name;
+		}
+
 		// If the active workspace is a variant, we will try to find the matching variant name.
 		if (!this._workspaceActiveVariantId?.isInvariant()) {
 			const variant = structureItem.variants.find((variantId) => this._workspaceActiveVariantId?.compare(variantId));

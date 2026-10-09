@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Accepted Upload Types Property Editor UI',
 	element: () => import('./property-editor-ui-accepted-upload-types.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Accepted Upload Types',
 		icon: 'icon-ordered-list',
 		group: '#propertyEditorUIGroups_lists',

@@ -24,6 +24,8 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 > {
 	#elementTypeStructureRepository = new UmbElementTypeStructureRepository(this);
 
+	#createPermitted = false;
+
 	@state()
 	private _allowedElementTypes: Array<UmbAllowedElementTypeModel> = [];
 
@@ -42,6 +44,7 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 					allOf: [UMB_USER_PERMISSION_ELEMENT_CREATE],
 				},
 				onChange: (permitted: boolean) => {
+					this.#createPermitted = permitted;
 					if (permitted && this._allowedElementTypes.length === 0) {
 						this.#retrieveAllowedElementTypes();
 					}
@@ -58,7 +61,7 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		const parentUnique = this.data?.parent?.unique ?? null;
 		const { data } = await this.#elementTypeStructureRepository.requestAllowedChildrenOf(null, parentUnique);
 
-		if (data) {
+		if (data && this.#createPermitted) {
 			this._allowedElementTypes = data.items;
 		}
 	}

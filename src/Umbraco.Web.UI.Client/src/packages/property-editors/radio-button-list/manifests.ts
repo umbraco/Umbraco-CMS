@@ -7,6 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Radio Button List Property Editor UI',
 		element: () => import('./property-editor-ui-radio-button-list.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Radio Button List',
 			propertyEditorSchemaAlias: 'Umbraco.RadioButtonList',
 			icon: 'icon-target',

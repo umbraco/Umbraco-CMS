@@ -5,6 +5,7 @@ import { manifests as entityBulkActionManifests } from './entity-bulk-actions/ma
 import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as menuItemManifests } from './menu-item/manifests.js';
 import { manifests as modalManifests } from './modals/manifests.js';
+import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as sectionViewManifests } from './workspace/user-group-root/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
@@ -18,6 +19,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...menuManifests,
 	...menuItemManifests,
 	...modalManifests,
+	...propertyEditorManifests,
 	...repositoryManifests,
 	...sectionViewManifests,
 	...workspaceManifests,

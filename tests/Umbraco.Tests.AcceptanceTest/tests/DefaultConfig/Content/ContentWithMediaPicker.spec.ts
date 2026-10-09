@@ -12,6 +12,8 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
+  // Any leftover extra language turns Save and publish into a variant picker this spec never dismisses.
+  await umbracoApi.language.ensureOnlyDefaultLanguageExists();
   mediaFileId = await umbracoApi.media.createDefaultMediaFile(mediaFileName);
 });
 

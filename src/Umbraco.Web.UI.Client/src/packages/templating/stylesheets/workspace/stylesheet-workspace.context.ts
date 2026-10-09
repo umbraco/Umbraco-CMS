@@ -1,7 +1,9 @@
 import type { UmbStylesheetDetailRepository } from '../repository/stylesheet-detail.repository.js';
 import type { UmbStylesheetDetailModel } from '../types.js';
-import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
+import { UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '../entity.js';
 import { UMB_STYLESHEET_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_EDIT_STYLESHEET_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_EDIT_STYLESHEET_FOLDER_WORKSPACE_PATH_PATTERN } from '../tree/folder/workspace/paths.js';
 import { UMB_STYLESHEET_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbStylesheetWorkspaceEditorElement } from './stylesheet-workspace-editor.element.js';
 import {
@@ -13,6 +15,8 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
+import { UMB_SETTINGS_SECTION_PATH } from '@umbraco-cms/backoffice/settings';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbStylesheetWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbStylesheetDetailModel, UmbStylesheetDetailRepository>
@@ -59,6 +63,14 @@ export class UmbStylesheetWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_SETTINGS_SECTION_PATH;
+		if (entity.entityType === UMB_STYLESHEET_FOLDER_ENTITY_TYPE) {
+			return UMB_EDIT_STYLESHEET_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+		}
+		return UMB_EDIT_STYLESHEET_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	/**

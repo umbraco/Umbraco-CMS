@@ -65,7 +65,7 @@
     <key alias="parentCultureNotPublished">Mae'r diwylliant yma yn cyhoeddedig ond ddim yn weladwy oherwydd mae'n anghyhoeddedig ar rhiant '%0%'</key>
     <key alias="parentNotPublishedAnomaly">Mae'r ddogfen yma wedi'i gyhoeddi ond nid yw'n bodoli yn y storfa</key>
     <key alias="getUrlException">Ni ellir nôl y url</key>
-    <key alias="routeError">Mae'r ddogfen yma wedi'i gyhoeddi ond byddai'r url yn gwrthdaro gyda chynnwys %0%</key>
+    <key alias="routeError">Mae'r ddogfen yma wedi'i gyhoeddi ond byddai'r url yn gwrthdaro gyda chynnwys '%0%'</key>
     <key alias="routeErrorCannotRoute">Mae'r ddogfen yma wedi'i gyhoeddi ond mae'r url methu cael ei cyfeirio</key>
   </area>
   <area alias="member">

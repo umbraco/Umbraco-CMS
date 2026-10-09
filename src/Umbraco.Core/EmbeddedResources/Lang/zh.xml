@@ -64,7 +64,7 @@
     <key alias="parentNotPublished">该文档不可见，因为其上级 '%0%' 未发布。</key>
     <key alias="parentNotPublishedAnomaly">该文档已发布，但是没有更新至缓存（内部错误）</key>
     <key alias="getUrlException">无法获取 URL</key>
-    <key alias="routeError">此文档已发布，但其 URL 将与内容 %0% 冲突</key>
+    <key alias="routeError">此文档已发布，但其 URL 将与内容 '%0%' 冲突</key>
     <key alias="parentCultureNotPublished">此语言已发布，但因父级 "%0%" 未发布而不可见</key>
     <key alias="routeErrorCannotRoute">此文档已发布，但其 URL 无法路由</key>
   </area>

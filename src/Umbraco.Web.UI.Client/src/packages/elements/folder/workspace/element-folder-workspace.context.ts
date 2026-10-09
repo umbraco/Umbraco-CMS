@@ -6,13 +6,16 @@ import {
 	UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE,
 } from '../user-permissions/constants.js';
 import type { UmbElementFolderModel } from '../types.js';
+import { UMB_ELEMENT_RECYCLE_BIN_ROOT_WORKSPACE_PATH } from '../../recycle-bin/root/workspace/constants.js';
 import { UMB_ELEMENT_FOLDER_WORKSPACE_ALIAS } from './constants.js';
+import { UMB_EDIT_ELEMENT_FOLDER_WORKSPACE_PATH_PATTERN } from './paths.js';
 import { UmbElementFolderWorkspaceEditorElement } from './element-folder-editor.element.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbEntityNamedDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
-import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_LIBRARY_SECTION_PATH } from '@umbraco-cms/backoffice/library';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 export class UmbElementFolderWorkspaceContext
@@ -21,16 +24,12 @@ export class UmbElementFolderWorkspaceContext
 {
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
 
-	#isTrashedContext = new UmbIsTrashedEntityContext(this);
-
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			workspaceAlias: UMB_ELEMENT_FOLDER_WORKSPACE_ALIAS,
 			entityType: UMB_ELEMENT_FOLDER_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
 		});
-
-		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed), null);
 
 		this.#setupNameWritePermissions();
 
@@ -44,6 +43,15 @@ export class UmbElementFolderWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) {
+			return this._data.getCurrent()?.isTrashed
+				? UMB_ELEMENT_RECYCLE_BIN_ROOT_WORKSPACE_PATH
+				: UMB_LIBRARY_SECTION_PATH;
+		}
+		return UMB_EDIT_ELEMENT_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	#setupNameWritePermissions() {
@@ -69,22 +77,6 @@ export class UmbElementFolderWorkspaceContext
 				},
 			},
 		]);
-	}
-
-	#onTrashStateChange(isTrashed?: boolean) {
-		this.#isTrashedContext.setIsTrashed(isTrashed ?? false);
-
-		const guardUnique = 'UMB_PREVENT_TRASHED_FOLDER_RENAME';
-
-		if (isTrashed) {
-			this.nameWriteGuard.addRule({
-				unique: guardUnique,
-				permitted: false,
-				message: 'Cannot rename folders in the recycle bin.',
-			});
-		} else {
-			this.nameWriteGuard.removeRule(guardUnique);
-		}
 	}
 }
 

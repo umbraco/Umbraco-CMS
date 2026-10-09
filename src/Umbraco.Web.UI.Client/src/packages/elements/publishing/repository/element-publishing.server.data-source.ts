@@ -36,14 +36,14 @@ export class UmbElementPublishingServerDataSource {
 	 * @param {UmbElementDetailModel} model - Element Model
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after creating
 	 * @param {string | null} parentUnique - The unique of the parent to create under
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<string>>} The key of the created Element, which may differ from the one submitted
 	 * @memberof UmbElementPublishingServerDataSource
 	 */
 	async createAndPublish(
 		model: UmbElementDetailModel,
 		variantIds: Array<UmbVariantId>,
 		parentUnique: string | null = null,
-	) {
+	): Promise<UmbDataSourceResponse<string>> {
 		if (!model) throw new Error('Element is missing');
 		if (!model.unique) throw new Error('Element unique is missing');
 
@@ -55,7 +55,11 @@ export class UmbElementPublishingServerDataSource {
 		// 201 Created returns only the key (no element body). The workspace reloads after this to refresh
 		// its state, so we deliberately do NOT re-read the full element here — that would be a redundant
 		// round-trip on top of the reload.
-		return tryExecute(this.#host, ElementService.postElementCreateAndPublish({ body }));
+		const { data, error } = await tryExecute(this.#host, ElementService.postElementCreateAndPublish({ body }));
+
+		// The generated response type is `unknown` (Swagger has no schema for the empty 201 body), but the
+		// Umb-Generated-Resource interceptor rewrites it to the created element's key at runtime.
+		return { data: data as string | undefined, error };
 	}
 
 	/**

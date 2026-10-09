@@ -93,7 +93,7 @@ export class DictionaryUiHelper extends UiBaseLocators {
   }
 
   async isDictionaryTreeItemVisible(dictionaryName: string, isVisible: boolean = true) {
-    await this.isVisible(this.dictionaryTree.getByText(dictionaryName, {exact: true}), isVisible);
+    await this.isAnyVisible(this.dictionaryTree.getByText(dictionaryName, {exact: true}), isVisible);
   }
 
   async doesDictionaryCollectionContainText(text: string) {

@@ -27,7 +27,7 @@ test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'min', minimumValue)).toBeTruthy();
+  await expect.poll(() => umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'min', minimumValue)).toBeTruthy();
 });
 
 test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
@@ -41,7 +41,7 @@ test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'max', maximumValue)).toBeTruthy();
+  await expect.poll(() => umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'max', maximumValue)).toBeTruthy();
 });
 
 test('can update step size value', async ({umbracoApi, umbracoUi}) => {
@@ -55,7 +55,7 @@ test('can update step size value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
+  await expect.poll(() => umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
 });
 
 // Skip this test as currently this setting is removed.

@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Static Image File Picker Property Editor UI',
 	element: () => import('./property-editor-ui-static-image-file-picker.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Static Image File Picker',
 		icon: 'icon-picture',
 		group: '#propertyEditorUIGroups_common',

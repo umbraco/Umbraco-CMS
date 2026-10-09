@@ -6,7 +6,12 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbHintController, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import { extractJsonQueryProps, type UmbValidationController } from '@umbraco-cms/backoffice/validation';
+import {
+	extractFirstJsonQueryContaining,
+	extractJsonQueryProps,
+	umbGetFirstJsonPathBracket,
+	type UmbValidationController,
+} from '@umbraco-cms/backoffice/validation';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /*
@@ -60,12 +65,25 @@ export class UmbContentValidationToHintsManager<
 					if (this.#hintedMsgs.has(message.key)) return;
 
 					// Get the value between [ and ] of message.path:
-					const query = getValueBetweenBrackets(message.path);
+					const query = umbGetFirstJsonPathBracket(message.path);
 					if (!query) return;
 					const queryProps = extractJsonQueryProps(query);
 
 					const alias = queryProps.alias;
-					const variantId = UmbVariantId.CreateFromPartial(queryProps);
+					// Find the first query of this path that contains a culture or segment property, notice this can be several joints into the json path:
+					const queryWithCulture = extractFirstJsonQueryContaining(
+						message.path,
+						(props) => props.culture !== undefined,
+					);
+					const queryWithSegment = extractFirstJsonQueryContaining(
+						message.path,
+						(props) => props.segment !== undefined,
+					);
+					// If no specific culture or segment are found, we will use null for both culture and segment, which will be treated as invariant:
+					const variantId = UmbVariantId.CreateFromPartial({
+						culture: queryWithCulture?.culture ?? null,
+						segment: queryWithSegment?.segment ?? null,
+					});
 
 					structure.getPropertyStructureByAlias(alias).then((property) => {
 						if (!property) return;
@@ -94,29 +112,16 @@ export class UmbContentValidationToHintsManager<
 						this.#hintedMsgs.add(message.key);
 					});
 				});
+				const removeKeys: Array<string> = [];
 				this.#hintedMsgs.forEach((key) => {
 					if (!messages.some((msg) => msg.key === key)) {
 						this.#hintedMsgs.delete(key);
-						hints.removeOne(key);
+						removeKeys.push(key);
 					}
 				});
+				hints.remove(removeKeys);
 			},
 			null,
 		);
 	}
-}
-
-/**
- * Extracts the value between the first pair of square brackets in a path string.
- * @param {string} path - The path string to extract the value from.
- * @returns {string | null} The extracted value, or null if no brackets are found.
- */
-function getValueBetweenBrackets(path: string): string | null {
-	const start = path.indexOf('[');
-	if (start === -1) return null;
-
-	const end = path.indexOf(']', start + 1);
-	if (end === -1) return null;
-
-	return path.substring(start + 1, end);
 }

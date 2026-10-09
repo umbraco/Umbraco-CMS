@@ -160,7 +160,7 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 
 	override render() {
 		if (!this.item) return nothing;
-		const href = this.selectable ? undefined : this.href;
+		const href = this.selectOnly ? undefined : this.href;
 		return html`
 			<uui-card-content-node
 				.name=${this._name}

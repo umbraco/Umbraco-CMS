@@ -81,7 +81,7 @@ const menuStructure: ManifestWorkspaceContextMenuStructureKind = {
 	kind: 'menuStructure',
 	alias: 'Umb.Context.ElementFolder.Menu.Structure',
 	name: 'Element Folder Menu Structure Workspace Context',
-	api: () => import('./element-folder-menu-structure.context.js'),
+	api: () => import('../../workspace/element-menu-structure.context.js'),
 	meta: {
 		menuItemAlias: UMB_ELEMENT_MENU_ITEM_ALIAS,
 	},
@@ -95,7 +95,7 @@ const menuStructure: ManifestWorkspaceContextMenuStructureKind = {
 
 const workspaceFooterApp: ManifestWorkspaceFooterApp = {
 	type: 'workspaceFooterApp',
-	kind: 'menuBreadcrumb',
+	kind: 'variantMenuBreadcrumb',
 	alias: 'Umb.WorkspaceFooterApp.ElementFolder.Breadcrumb',
 	name: 'Element Folder Breadcrumb Workspace Footer App',
 	conditions: [
