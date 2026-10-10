@@ -225,6 +225,24 @@ public interface ISqlSyntaxProvider
     /// <returns>A string representing the SQL WHERE clause fragment for a wildcard comparison on the specified column.</returns>
     string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
 
+    /// <summary>
+    ///     Escapes the LIKE wildcard characters in a value, so that a pattern built from it matches the value literally.
+    /// </summary>
+    /// <param name="value">The text to match literally.</param>
+    /// <returns>The value with its wildcard and escape characters escaped.</returns>
+    /// <remarks>
+    ///     A comparison using the escaped value must be followed by <see cref="GetLikeEscapeClause" />.
+    /// </remarks>
+    // TODO (V18): Remove the default implementation.
+    string EscapeLikeValue(string value) => value.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_");
+
+    /// <summary>
+    ///     Gets the <c>ESCAPE</c> clause that follows a LIKE comparison with a value escaped by <see cref="EscapeLikeValue" />.
+    /// </summary>
+    /// <returns>The <c>ESCAPE</c> clause.</returns>
+    // TODO (V18): Remove the default implementation.
+    string GetLikeEscapeClause() => @"ESCAPE '\'";
+
     /// <summary>Concatenates the specified string arguments into a single string using the SQL syntax appropriate for the database.</summary>
     /// <param name="args">The string arguments to concatenate.</param>
     /// <returns>A string representing the SQL concatenation of the arguments.</returns>

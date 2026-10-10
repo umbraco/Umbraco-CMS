@@ -268,6 +268,13 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
         $"upper({column}) LIKE upper(@{paramIndex})";
 
+    /// <inheritdoc />
+    public virtual string EscapeLikeValue(string value)
+        => value.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_");
+
+    /// <inheritdoc />
+    public virtual string GetLikeEscapeClause() => @"ESCAPE '\'";
+
     /// <summary>
     /// Generates a SQL expression that concatenates the specified arguments using the SQL CONCAT function.
     /// </summary>

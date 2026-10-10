@@ -826,32 +826,37 @@ internal abstract class ExpressionVisitorBase
             case "StartsWith":
             case nameof(StringExtensions.InvariantStartsWith):
             case nameof(SqlExpressionExtensions.SqlStartsWith):
-                SqlParameters.Add(RemoveQuote(val) + SqlSyntax.GetWildcardPlaceholder());
+                SqlParameters.Add(EscapeLikeValue(val) + SqlSyntax.GetWildcardPlaceholder());
                 return Visited
                     ? string.Empty
-                    : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
+                    : GetEscapedWildcardComparison(col, columnType);
 
             case "EndsWith":
             case nameof(StringExtensions.InvariantEndsWith):
             case nameof(SqlExpressionExtensions.SqlEndsWith):
-                SqlParameters.Add(SqlSyntax.GetWildcardPlaceholder() + RemoveQuote(val));
+                SqlParameters.Add(SqlSyntax.GetWildcardPlaceholder() + EscapeLikeValue(val));
                 return Visited
                     ? string.Empty
-                    : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
+                    : GetEscapedWildcardComparison(col, columnType);
 
             case "Contains":
             case nameof(StringExtensions.InvariantContains):
             case nameof(SqlExpressionExtensions.SqlContains):
                 var wildcardPlaceholder = SqlSyntax.GetWildcardPlaceholder();
-                SqlParameters.Add(wildcardPlaceholder + RemoveQuote(val) + wildcardPlaceholder);
+                SqlParameters.Add(wildcardPlaceholder + EscapeLikeValue(val) + wildcardPlaceholder);
                 return Visited
                     ? string.Empty
-                    : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
+                    : GetEscapedWildcardComparison(col, columnType);
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(verb));
         }
     }
+
+    private string EscapeLikeValue(string val) => SqlSyntax.EscapeLikeValue(RemoveQuote(val) ?? string.Empty);
+
+    private string GetEscapedWildcardComparison(string col, TextColumnType columnType)
+        => $"{SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType)} {SqlSyntax.GetLikeEscapeClause()}";
 
     protected virtual string? RemoveQuote(string? exp)
     {
