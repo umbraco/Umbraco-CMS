@@ -5,8 +5,10 @@ using Serilog;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions;
 
@@ -155,6 +157,10 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     /// </summary>
     /// <param name="builder">The DbContext options builder.</param>
     /// <param name="serviceProvider">The service provider to resolve connection string settings from.</param>
+    /// <remarks>
+    /// A registered <see cref="IEFCoreDatabaseProviderSetup" /> for the configured provider name takes precedence over
+    /// the providers supported by <see cref="UseDatabaseProvider" />.
+    /// </remarks>
     public static void UseUmbracoDatabaseProvider(this DbContextOptionsBuilder builder, IServiceProvider serviceProvider)
     {
         ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
@@ -175,6 +181,14 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         if (string.IsNullOrEmpty(connectionStrings.ConnectionString))
         {
             Log.Warning("No database provider was set. Connection string is null");
+            return;
+        }
+
+        IEFCoreDatabaseProviderSetup? providerSetup = serviceProvider.GetServices<IEFCoreDatabaseProviderSetup>()
+            .FirstOrDefault(x => x.ProviderName.CompareProviderNames(connectionStrings.ProviderName));
+        if (providerSetup is not null)
+        {
+            providerSetup.Setup(builder, connectionStrings.ConnectionString);
             return;
         }
 
