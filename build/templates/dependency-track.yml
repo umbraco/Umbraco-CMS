@@ -88,6 +88,7 @@ jobs:
           dtrackURI: $(DT_API_URI)
           dtrackAPIKey: $(DT_API_KEY)
           dtrackProjAutoCreate: true
+          dtrackProjClassifier: APPLICATION
           dtrackProjName: '${{ parameters.projectName }}-${{ project.name }}'
           dtrackProjVersion: ${{ parameters.umbracoVersion }}
           dtrackParentProjName: ${{ parameters.projectName }}
