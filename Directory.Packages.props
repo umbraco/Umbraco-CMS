@@ -42,7 +42,7 @@
   </ItemGroup>
   <!-- Umbraco packages -->
   <ItemGroup>
-    <PackageVersion Include="Umbraco.JsonSchema.Extensions" Version="0.4.3" />
+    <PackageVersion Include="Umbraco.JsonSchema.Extensions" Version="0.5.0" />
   </ItemGroup>
   <!-- Third-party packages -->
   <ItemGroup>
@@ -50,8 +50,8 @@
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.2.1" />
     <PackageVersion Include="BitFaster.Caching" Version="2.6.1" />
     <PackageVersion Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
-    <PackageVersion Include="Examine" Version="3.10.0" />
-    <PackageVersion Include="Examine.Core" Version="3.10.0" />
+    <PackageVersion Include="Examine" Version="3.10.1" />
+    <PackageVersion Include="Examine.Core" Version="3.10.1" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.13.0" />
     <PackageVersion Include="JsonPatch.Net" Version="3.3.0" />
     <PackageVersion Include="K4os.Compression.LZ4" Version="1.3.8" />
@@ -64,9 +64,9 @@
     <PackageVersion Include="ncrontab" Version="3.4.0" />
     <PackageVersion Include="NPoco" Version="6.3.0" />
     <PackageVersion Include="NPoco.SqlServer" Version="6.3.0" />
-    <PackageVersion Include="OpenIddict.Abstractions" Version="7.7.1" />
-    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.7.1" />
-    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.7.1" />
+    <PackageVersion Include="OpenIddict.Abstractions" Version="7.7.2" />
+    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.7.2" />
+    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.7.2" />
     <PackageVersion Include="Serilog" Version="4.4.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Process" Version="3.0.0" />
@@ -79,9 +79,20 @@
     <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="Serilog.Sinks.Map" Version="2.0.0" />
+    <!--
+      HOLD at 3.1.12 - do not bump. SixLabors.ImageSharp 3.2.0+ ships an MSBuild target
+      (SixLabors_ValidateLicense, BeforeTargets="CoreCompile") that fails a Release build
+      outright unless a SixLaborsLicenseKey/SixLaborsLicenseFile or a sixlabors.lic file is
+      present - there is no free/OSS exemption. 3.1.12 predates that target.
+    -->
     <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.12" />
+    <!--
+      HOLD at 3.2.0 - do not bump. SixLabors.ImageSharp.Web 3.3.0+ introduces the same
+      SixLabors_ValidateLicense build-time gate as SixLabors.ImageSharp 3.2.0+ above - it
+      fails Release builds without a purchased license. 3.2.0 predates that target.
+    -->
     <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.2.0" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.3.0" />
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
