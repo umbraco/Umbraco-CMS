@@ -47,7 +47,7 @@ public static partial class NPocoDatabaseExtensions
         var tableName = database.DatabaseType.EscapeTableName(pocoData.TableInfo.TableName);
         var columnNames = string.Join(
             ", ",
-            columns.Select(c => tableName + "." + database.DatabaseType.EscapeSqlIdentifier(c.Key)));
+            columns.Select(c => database.DatabaseType.EscapeSqlIdentifier(c.Key)));
 
         // example:
         // assume 4168 records, each record containing 8 fields, ie 8 command parameters
