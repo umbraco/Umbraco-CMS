@@ -976,7 +976,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// Gets the SQL expression that converts an integer to a zero-padded, orderable string representation.
     /// This is typically used to ensure that integer values are sorted correctly as strings in SQL queries.
     /// </summary>
-    public virtual string ConvertIntegerToOrderableString => "REPLACE(STR({0}, 8), SPACE(1), '0')";
+    /// <remarks>Offsets the value into the non-negative range so every integer has the same number of digits.</remarks>
+    public virtual string ConvertIntegerToOrderableString => "RIGHT('0000000000' + CAST(CAST({0} AS BIGINT) + 2147483648 AS VARCHAR(10)), 10)";
 
     /// <summary>
     /// Gets the SQL expression that converts a date value to an ISO 8601 string (format 120),
@@ -989,7 +990,11 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// Gets the SQL expression used to convert a decimal value into a string format that preserves numeric ordering when sorted lexicographically.
     /// This is typically used to ensure that decimal values are correctly ordered in string-based SQL operations.
     /// </summary>
-    public virtual string ConvertDecimalToOrderableString => "REPLACE(STR({0}, 20, 9), SPACE(1), '0')";
+    /// <remarks>
+    ///     Offsets the value into the non-negative range and formats it with a fixed number of digits on both sides of
+    ///     the decimal point, which covers the default decimal column definition.
+    /// </remarks>
+    public virtual string ConvertDecimalToOrderableString => "RIGHT('0000000000000000000000' + CAST(CAST({0} + 100000000000 AS DECIMAL(21,9)) AS VARCHAR(22)), 22)";
 
     /// <summary>
     /// Gets the SQL expression used to convert a uniqueidentifier value to its string representation (nvarchar(36)).

@@ -188,10 +188,15 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     public override string TruncateTable => "DELETE FROM {0}";
 
     /// <inheritdoc />
-    public override string ConvertIntegerToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
+    /// <remarks>Offsets the value into the non-negative range so every integer has the same number of digits.</remarks>
+    public override string ConvertIntegerToOrderableString => "printf('%010d', {0} + 2147483648)";
 
     /// <inheritdoc />
-    public override string ConvertDecimalToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
+    /// <remarks>
+    ///     Decimals are stored as text, so the integer and fractional parts are padded as text, which keeps every
+    ///     digit of the stored value.
+    /// </remarks>
+    public override string ConvertDecimalToOrderableString { get; } = BuildConvertDecimalToOrderableString();
 
     /// <inheritdoc />
     public override string ConvertDateToOrderableString => "{0}";
@@ -238,6 +243,30 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     {
         ColumnAttribute? attr = column.FirstAttribute<ColumnAttribute>();
         return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
+    }
+
+    private static string BuildConvertDecimalToOrderableString()
+    {
+        // Wide enough for any System.Decimal: 29 integer digits and 28 fractional digits.
+        const string absolute = "ltrim({0}, '-')";
+        const string point = "instr(" + absolute + ", '.')";
+        const string integerPart = "CASE " + point + " WHEN 0 THEN " + absolute + " ELSE substr(" + absolute + ", 1, " + point + " - 1) END";
+        const string fractionalPart = "CASE " + point + " WHEN 0 THEN '' ELSE substr(" + absolute + ", " + point + " + 1) END";
+        const string digits = "replace(printf('%29s', " + integerPart + "), ' ', '0') || substr(" + fractionalPart + " || '0000000000000000000000000000', 1, 28)";
+
+        // Negative values sort below the others, in reverse order of their digits.
+        var complementedDigits = digits;
+        for (var digit = 0; digit <= 9; digit++)
+        {
+            complementedDigits = $"replace({complementedDigits}, '{digit}', '{(char)('a' + digit)}')";
+        }
+
+        for (var digit = 0; digit <= 9; digit++)
+        {
+            complementedDigits = $"replace({complementedDigits}, '{(char)('a' + digit)}', '{9 - digit}')";
+        }
+
+        return "CASE WHEN substr({0}, 1, 1) = '-' THEN '0' || " + complementedDigits + " ELSE '1' || " + digits + " END";
     }
 
     /// <inheritdoc />
