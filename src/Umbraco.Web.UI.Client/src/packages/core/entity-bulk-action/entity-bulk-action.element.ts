@@ -31,7 +31,10 @@ export class UmbEntityBulkActionDefaultElement<
 			// The action did not complete, so it must not be announced as executed: consumers treat that
 			// event as "done" and tear down the selection — and with it this element — which would cut short
 			// any notification the failure is still presenting.
-			console.error('Error executing action:', error);
+			// A dismissed modal rejects with a reason rather than an Error; that is a cancellation, not a failure.
+			if (error instanceof Error) {
+				console.error('Error executing action:', error);
+			}
 			return;
 		}
 
