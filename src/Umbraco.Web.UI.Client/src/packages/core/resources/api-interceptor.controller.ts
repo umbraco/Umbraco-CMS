@@ -297,7 +297,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			return response;
 		});
 
-		client.interceptors.error.use((error, response) => {
+		client.interceptors.error?.use((error, response) => {
 			if (!response || !isProblemDetailsLike(error) || this.#getUmbNotifications(response).length === 0) {
 				return error;
 			}
