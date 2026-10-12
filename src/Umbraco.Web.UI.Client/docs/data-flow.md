@@ -102,7 +102,7 @@ if (error || !data) {
 - Returns `{ error }` on failure (never throws)
 - Automatically shows error notifications to the user
 - Silently handles 401/403/404 (UI is expected to handle these)
-- Returns `{ error: UmbCancelError }` without a notification as soon as `abortSignal` aborts, or when the request rejects with an `AbortError`. Pass the same signal to the request (for example `umbHttpClient.get({ url, signal })`) to stop the fetch itself
+- Returns `{ error: UmbCancelError }` without a notification as soon as `abortSignal` aborts, or when the request rejects with an `AbortError` or a `TimeoutError` (from `AbortSignal.timeout()`). A request aborted with a custom reason rejects with that reason, which is reported as an error unless the signal is also passed as `abortSignal`. Pass the same signal to the request (for example `umbHttpClient.get({ url, signal })`) to stop the fetch itself
 
 ---
 
