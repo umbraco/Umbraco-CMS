@@ -6,7 +6,6 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 const CURRENT_VIEW_MEMORY_UNIQUE = 'UmbCollectionCurrentView';
 
@@ -60,12 +59,14 @@ describe('UmbCollectionViewManager', () => {
 			it('has a currentView property', () => {
 				expect(manager).to.have.property('currentView').to.be.an.instanceOf(Observable);
 			});
+		});
 
-			it('has a routes property', () => {
+		describe('deprecated properties', () => {
+			it('still has a routes property', () => {
 				expect(manager).to.have.property('routes').to.be.an.instanceOf(Observable);
 			});
 
-			it('has a rootPathName property', () => {
+			it('still has a rootPathName property', () => {
 				expect(manager).to.have.property('rootPathName').to.be.an.instanceOf(Observable);
 			});
 		});
@@ -114,11 +115,8 @@ describe('UmbCollectionViewManager', () => {
 		};
 
 		const getLandingViewAlias = async (memorizingManager: UmbCollectionViewManager) => {
-			let routes: Array<UmbRoute> = [];
-			const subscription = memorizingManager.routes.subscribe((value) => (routes = value));
 			await aTimeout(100);
-			subscription.unsubscribe();
-			return routes.find((route) => route.path === '')?.unique;
+			return memorizingManager.getCurrentView()?.alias;
 		};
 
 		beforeEach(() => {
@@ -159,46 +157,27 @@ describe('UmbCollectionViewManager', () => {
 		});
 	});
 
+	describe('Landing view', () => {
+		it('lands on the configured default view once the views have loaded', async () => {
+			await aTimeout(100);
+			expect(manager.getCurrentView()?.alias).to.equal(VIEW_2_ALIAS);
+		});
+
+		it('keeps the current view when the available views change', async () => {
+			await aTimeout(100);
+			manager.setCurrentView(views[0]);
+			manager.setConfig(config);
+			await aTimeout(100);
+			expect(manager.getCurrentView()?.alias).to.equal(VIEW_1_ALIAS);
+		});
+	});
+
 	/* TODO: look into why these test dosn't wait for the observable to update
 	describe('Views', () => {
 		it('updates the observable', (done) => {
 			manager.views.subscribe((value) => {
 				setTimeout(() => {
 					expect(value).to.have.lengthOf(2);
-					done();
-				}, 60);
-			});
-		});
-	});
-
-	describe('Routes', () => {
-		it('updates the observable', (done) => {
-			manager.routes.subscribe((value) => {
-				setTimeout(() => {
-					expect(value).to.have.lengthOf(3);
-					done();
-				}, 60);
-			});
-		});
-
-		it('includes the views as routes', (done) => {
-			manager.routes.subscribe((value) => {
-				setTimeout(() => {
-					expect(value[0].path).to.equal(views[0].meta.pathName);
-					expect(value[1].path).to.equal(views[1].meta.pathName);
-					done();
-				}, 60);
-			});
-		});
-
-		it('has a catch all route to the default view', (done) => {
-			manager.routes.subscribe((value) => {
-				setTimeout(() => {
-					expect(value[2].path).to.equal('');
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
-					// TODO: Fix this type error
-					expect(value[2].redirectTo).to.equal(config.defaultViewAlias);
 					done();
 				}, 60);
 			});

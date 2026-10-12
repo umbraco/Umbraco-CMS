@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 /// <summary>
 /// Represents the base response model for an item in the recycle bin.
 /// </summary>
-public abstract class RecycleBinItemResponseModelBase
+public abstract class RecycleBinItemResponseModelBase : IHasChildren
 {
     /// <summary>
     /// Gets or sets the unique identifier of the recycle bin item.
@@ -19,9 +19,7 @@ public abstract class RecycleBinItemResponseModelBase
     /// </summary>
     public DateTimeOffset CreateDate { get; set; }
 
-    /// <summary>
-    /// Gets or sets a value indicating whether the recycle bin item has child items.
-    /// </summary>
+    /// <inheritdoc />
     [Required]
     public bool HasChildren { get; set; }
 

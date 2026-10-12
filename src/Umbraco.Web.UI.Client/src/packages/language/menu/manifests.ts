@@ -1,3 +1,5 @@
+import { UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_LANGUAGE_WORKSPACE_ALIAS } from '../workspace/language/constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -9,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: '#treeHeaders_languages',
 			icon: 'icon-globe',
-			entityType: 'language-root',
+			entityType: UMB_LANGUAGE_ROOT_ENTITY_TYPE,
 			menus: ['Umb.Menu.StructureSettings'],
 		},
 	},
@@ -21,7 +23,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: 'Umb.Workspace.Language',
+				match: UMB_LANGUAGE_WORKSPACE_ALIAS,
 			},
 		],
 	},
@@ -33,7 +35,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: 'Umb.Workspace.Language',
+				match: UMB_LANGUAGE_WORKSPACE_ALIAS,
 			},
 		],
 	},

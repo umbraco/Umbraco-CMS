@@ -4,6 +4,7 @@ import {expect} from "@playwright/test";
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Approved Color';
+const customDataTypeName = 'CustomApprovedColor';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -14,6 +15,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can create content with the approved color data type', async ({umbracoApi, umbracoUi}) => {
@@ -82,3 +84,39 @@ test('can create content with the custom approved color data type', {tag: '@rele
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
+
+test('can navigate away from content with a approved color value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const colorValue = 'd73737';
+  const colorLabel = 'Test Label';
+  const customDataTypeId = await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(customDataTypeName, colorLabel, colorValue);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), {label: colorLabel, value: '#' + colorValue});
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed approved color value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const colorValue = 'd73737';
+  const colorLabel = 'Test Label';
+  const customDataTypeId = await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(customDataTypeName, colorLabel, colorValue);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), {label: colorLabel, value: '#' + colorValue});
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickApprovedColorByValue(colorValue);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});

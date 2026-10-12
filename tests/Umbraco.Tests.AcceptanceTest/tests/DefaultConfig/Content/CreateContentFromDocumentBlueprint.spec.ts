@@ -82,8 +82,8 @@ test('can create content using a variant document blueprint', async ({umbracoApi
   expect(await umbracoApi.document.doesNameExist(documentBlueprintName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(documentBlueprintName);
   expect(contentData.values[0].value).toBe(textContent);
-  expect(contentData.variants[0].name).toBe(documentBlueprintName);
-  expect(contentData.variants[1].name).toBe(documentBlueprintDanishName);
+  expect(contentData.variants[0].name).toBe(documentBlueprintDanishName);
+  expect(contentData.variants[1].name).toBe(documentBlueprintName);
 
   // Clean
   await umbracoApi.language.ensureNameNotExists('Danish');
@@ -136,8 +136,8 @@ test('can create content with different name using a variant document blueprint'
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value).toBe(textContent);
-  expect(contentData.variants[0].name).toBe(contentName);
-  expect(contentData.variants[1].name).toBe(documentBlueprintDanishName);
+  expect(contentData.variants[0].name).toBe(documentBlueprintDanishName);
+  expect(contentData.variants[1].name).toBe(contentName);
 
   // Clean
   await umbracoApi.language.ensureNameNotExists('Danish');

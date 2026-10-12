@@ -1,0 +1,75 @@
+import { UmbPropertyActionMenuElement } from './property-action-menu.element.js';
+import type { ManifestPropertyAction } from '../../property-action.extension.js';
+import { UmbPropertyActionBase } from '../../property-action-base.js';
+import { expect, fixture, html, waitUntil } from '@open-wc/testing';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+
+@customElement('umb-test-property-action-menu-action')
+class UmbTestPropertyActionElement extends UmbControllerHostElementMixin(HTMLElement) {}
+
+class UmbTestPropertyActionApi extends UmbPropertyActionBase {
+	override async execute() {}
+}
+
+const PROPERTY_EDITOR_UI_ALIAS = 'Umb.Test.PropertyActionMenu';
+
+describe('UmbPropertyActionMenuElement', () => {
+	let aliases: Array<string> = [];
+
+	async function renderSequence(actions: Array<{ alias: string; weight: number; separatorBefore?: boolean }>) {
+		aliases = actions.map((a) => a.alias);
+		umbExtensionsRegistry.registerMany(
+			actions.map(
+				(action): ManifestPropertyAction => ({
+					type: 'propertyAction',
+					alias: action.alias,
+					name: action.alias,
+					weight: action.weight,
+					separatorBefore: action.separatorBefore,
+					forPropertyEditorUis: [PROPERTY_EDITOR_UI_ALIAS],
+					elementName: 'umb-test-property-action-menu-action',
+					api: UmbTestPropertyActionApi,
+					meta: {},
+				}),
+			),
+		);
+		const element = await fixture<UmbPropertyActionMenuElement>(
+			html`<umb-property-action-menu .propertyEditorUiAlias=${PROPERTY_EDITOR_UI_ALIAS}></umb-property-action-menu>`,
+		);
+		const read = () =>
+			Array.from(element.shadowRoot?.querySelector('umb-popover-layout')?.children ?? []).map((child) =>
+				child.getAttribute('role') === 'separator'
+					? '|'
+					: child instanceof UmbTestPropertyActionElement
+						? (child as any).manifest.alias
+						: child.tagName,
+			);
+		await waitUntil(() => read().filter((entry) => entry !== '|').length === actions.length);
+		return read();
+	}
+
+	afterEach(() => {
+		umbExtensionsRegistry.unregisterMany(aliases);
+	});
+
+	it('renders no separators when no action sets separatorBefore', async () => {
+		expect(
+			await renderSequence([
+				{ alias: 'a', weight: 2 },
+				{ alias: 'b', weight: 1 },
+			]),
+		).to.deep.equal(['a', 'b']);
+	});
+
+	it('renders a separator above each action that sets separatorBefore, except the first', async () => {
+		expect(
+			await renderSequence([
+				{ alias: 'a', weight: 3, separatorBefore: true },
+				{ alias: 'b', weight: 2 },
+				{ alias: 'c', weight: 1, separatorBefore: true },
+			]),
+		).to.deep.equal(['a', 'b', '|', 'c']);
+	});
+});

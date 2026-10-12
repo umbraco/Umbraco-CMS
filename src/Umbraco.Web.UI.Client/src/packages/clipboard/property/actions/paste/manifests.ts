@@ -14,7 +14,7 @@ export const UMB_PROPERTY_ACTION_PASTE_FROM_CLIPBOARD_KIND_MANIFEST: UmbExtensio
 		weight: 1190,
 		meta: {
 			icon: 'icon-clipboard-paste',
-			label: 'Replace',
+			label: '#actions_replace',
 		},
 	},
 };

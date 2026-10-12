@@ -880,6 +880,30 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 			expect(result.data).to.deep.equal({ id: 'item-1', name: 'Updated Item' });
 		});
 
+		it('returns the updated item from the server when the cache still holds the item from before the update', async () => {
+			mockServerEventContext.setIsConnected(true);
+			mockRead = async (id: string) => ({ data: { id, name: 'Updated Item' } });
+
+			// The server event that invalidates this entry has not arrived yet.
+			dataCache.set('item-1', { id: 'item-1', name: 'Item Before Update' });
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			// Wait for context observation
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			const result = await manager.update('item-1', { name: 'Updated Name' });
+
+			expect(result.data).to.deep.equal({ id: 'item-1', name: 'Updated Item' });
+		});
+
 		it('returns an error if the update API fails', async () => {
 			const mockError = { name: 'ApiError', message: 'Update failed' };
 			mockUpdate = async () => {

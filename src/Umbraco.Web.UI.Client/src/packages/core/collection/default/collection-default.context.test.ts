@@ -3,6 +3,7 @@ import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbCollectionFilterModel } from '../collection-filter-model.interface.js';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 const FILTER_MEMORY_UNIQUE = 'UmbCollectionFilter';
 const ORDER_MEMORY_UNIQUE = 'UmbCollectionOrder';
@@ -27,6 +28,50 @@ class UmbTestCollectionContext extends UmbDefaultCollectionContext<any, UmbTestC
 
 const PAGE_SIZE = 10;
 const DEFAULT_VIEW_ALIAS = 'Umb.CollectionView.Test';
+
+describe('UmbDefaultCollectionContext action affordances', () => {
+	let hostElement: UmbTestControllerHostElement;
+	let context: UmbTestCollectionContext;
+
+	const readOnce = <T>(observable: Observable<T>): T => {
+		let value!: T;
+		observable.subscribe((emitted) => (value = emitted)).unsubscribe();
+		return value;
+	};
+
+	beforeEach(() => {
+		hostElement = new UmbTestControllerHostElement();
+		context = new UmbTestCollectionContext(hostElement, DEFAULT_VIEW_ALIAS);
+	});
+
+	it('shows actions when the configuration does not say otherwise', () => {
+		context.setConfig({ pageSize: PAGE_SIZE });
+
+		expect(readOnce(context.hideItemActions)).to.be.false;
+		expect(readOnce(context.hideCollectionActions)).to.be.false;
+	});
+
+	it('hides the item actions when configured to', () => {
+		context.setConfig({ pageSize: PAGE_SIZE, hideItemActions: true });
+
+		expect(readOnce(context.hideItemActions)).to.be.true;
+		expect(readOnce(context.hideCollectionActions)).to.be.false;
+	});
+
+	it('hides the collection actions when configured to', () => {
+		context.setConfig({ pageSize: PAGE_SIZE, hideCollectionActions: true });
+
+		expect(readOnce(context.hideCollectionActions)).to.be.true;
+		expect(readOnce(context.hideItemActions)).to.be.false;
+	});
+
+	it('does not change what a click on an item does when actions are hidden', () => {
+		// Whether actions render and what selecting does are separate axes, so hiding actions must not imply select-only.
+		context.setConfig({ pageSize: PAGE_SIZE, hideItemActions: true, hideCollectionActions: true });
+
+		expect(readOnce(context.selectOnly)).to.be.false;
+	});
+});
 
 describe('UmbDefaultCollectionContext interaction memory', () => {
 	let hostElement: UmbTestControllerHostElement;

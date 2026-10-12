@@ -1,4 +1,3 @@
-import { UMB_USER_GROUP_ROOT_WORKSPACE_PATH } from '../../paths.js';
 import type { UmbUserGroupDetailModel } from '../../types.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context-token.js';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
@@ -87,7 +86,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-entity-detail-workspace-editor .backPath=${UMB_USER_GROUP_ROOT_WORKSPACE_PATH}>
+			<umb-entity-detail-workspace-editor show-back-to-parent-button>
 				${this.#renderHeader()}
 			</umb-entity-detail-workspace-editor>
 		`;

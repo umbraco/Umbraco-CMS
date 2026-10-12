@@ -119,6 +119,8 @@ Review each changed file holistically. Think like a senior developer reading a c
 
 For each changed file, reason about: What does this code do? Is it correct? What's missing — validation, error handling, notifications, cleanup, edge cases? Could this break anything for consumers?
 
+**Unused usings (C# only):** flag a `using` directive only if this diff adds it, or removes the last code that used it — pre-existing unused usings are out of scope. Only flag when confident: a namespace can be used without appearing by name (extension methods, attributes, `<see cref>`, LINQ query syntax, `using static`, aliases, `#if` blocks). Report them as one Suggestion listing `file: namespace` pairs, per root `CLAUDE.md` §11; this is the one stylistic finding that is allowed.
+
 #### 4b. Validate against documentation and patterns
 
 Use a **docs-first** approach: classify the code by what it does, check it against documented conventions, and only fall back to sibling comparison when docs don't cover the pattern.

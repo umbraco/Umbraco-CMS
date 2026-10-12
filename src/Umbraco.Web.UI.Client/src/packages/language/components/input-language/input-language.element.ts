@@ -19,6 +19,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 		},
 		identifier: 'Umb.SorterIdentifier.InputLanguage',
 		itemSelector: 'umb-entity-item-ref',
+		disabledItemSelector: '[error]',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -58,6 +59,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerContext.max;
@@ -105,13 +107,17 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 
 	@state()
 	private _items: Array<UmbLanguageItemModel> = [];
@@ -177,7 +183,9 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 			<uui-ref-list>
 				${repeat(
 					this._statuses,
-					(status) => status.unique,
+					// Re-key on error state so the sorter re-evaluates `disabledItemSelector` when an item settles
+					// into "not found" — the sorter only checks this when an element is first mounted.
+					(status) => `${status.unique}:${status.state.type === 'error'}`,
 					(status) => {
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
@@ -189,7 +197,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 								?error=${isError}
 								.errorMessage=${status.state.error}
 								.errorDetail=${isError ? unique : undefined}
-								?readonly=${this.readonly}
+								?readonly=${this.readonly || isError}
 								?standalone=${this.max === 1}>
 								${when(
 									!this.readonly,

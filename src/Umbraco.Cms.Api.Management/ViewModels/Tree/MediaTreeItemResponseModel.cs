@@ -14,6 +14,11 @@ public class MediaTreeItemResponseModel : ContentTreeItemResponseModel
     public MediaTypeReferenceResponseModel MediaType { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the file extension, without the leading dot and in lowercase; <c>null</c> when there is no file.
+    /// </summary>
+    public string? Extension { get; set; }
+
+    /// <summary>
     /// Gets or sets the collection of variant items for the media tree item.
     /// </summary>
     public IEnumerable<VariantItemResponseModel> Variants { get; set; } = Enumerable.Empty<VariantItemResponseModel>();

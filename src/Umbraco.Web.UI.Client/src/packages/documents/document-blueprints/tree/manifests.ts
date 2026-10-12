@@ -3,19 +3,23 @@ import {
 	UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
 	UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
 } from '../entity.js';
+import { UMB_DOCUMENT_BLUEPRINT_ROOT_WORKSPACE_ALIAS } from '../constants.js';
 import {
 	UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS,
 	UMB_DOCUMENT_BLUEPRINT_TREE_REPOSITORY_ALIAS,
 	UMB_DOCUMENT_BLUEPRINT_TREE_STORE_ALIAS,
-	UMB_DOCUMENT_BLUEPRINT_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
 } from './constants.js';
 import { UmbDocumentBlueprintTreeStore } from './document-blueprint-tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
+import { UMB_DOCUMENT_BLUEPRINT_FOLDER_WORKSPACE_ALIAS } from './folder/workspace/constants.js';
 import { manifests as reloadManifests } from './reload-tree-item-children/manifests.js';
 import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
+import { manifests as viewManifests } from './views/manifests.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_TREE_ALIAS_CONDITION } from '@umbraco-cms/backoffice/tree';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<UmbExtensionManifest> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'repository',
 		alias: UMB_DOCUMENT_BLUEPRINT_TREE_REPOSITORY_ALIAS,
@@ -49,34 +53,39 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	{
-		type: 'workspace',
-		kind: 'default',
-		alias: 'Umb.Workspace.DocumentBlueprint.Root',
-		name: 'Document Blueprint Root Workspace',
-		meta: {
-			entityType: UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
-			headline: '#treeHeaders_contentBlueprints',
-		},
+		type: 'treeAction',
+		kind: 'create',
+		name: 'Document Blueprint Tree Create Action',
+		alias: 'Umb.TreeAction.DocumentBlueprint.Create',
+		conditions: [
+			{
+				alias: UMB_TREE_ALIAS_CONDITION,
+				match: UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS,
+			},
+		],
 	},
 	{
 		type: 'workspaceView',
-		kind: 'collection',
+		kind: 'tree',
+		// TODO (V20): rename alias to 'Umb.WorkspaceView.DocumentBlueprint.Tree' — kept as the old
+		// TreeItemChildrenCollection alias so existing plugin conditions/overrides don't break.
 		alias: 'Umb.WorkspaceView.DocumentBlueprint.TreeItemChildrenCollection',
-		name: 'Document Blueprint Tree Item Children Collection Workspace View',
+		name: 'Document Blueprint Tree Item Children Workspace View',
 		meta: {
-			label: '#general_items',
-			pathname: 'items',
-			icon: 'icon-grid',
-			collectionAlias: UMB_DOCUMENT_BLUEPRINT_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
+			label: '#tree_children',
+			pathname: 'children',
+			icon: 'icon-bulleted-list',
+			treeAlias: UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS,
 		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				oneOf: ['Umb.Workspace.DocumentBlueprint.Root', 'Umb.Workspace.DocumentBlueprint.Folder'],
+				oneOf: [UMB_DOCUMENT_BLUEPRINT_ROOT_WORKSPACE_ALIAS, UMB_DOCUMENT_BLUEPRINT_FOLDER_WORKSPACE_ALIAS],
 			},
 		],
 	},
 	...reloadManifests,
 	...folderManifests,
 	...treeItemChildrenManifests,
+	...viewManifests,
 ];

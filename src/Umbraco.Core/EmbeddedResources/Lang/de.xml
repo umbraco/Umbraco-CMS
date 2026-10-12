@@ -68,8 +68,12 @@
     </key>
     <key alias="parentNotPublishedAnomaly">Ups! Dieses Dokument ist veröffentlicht aber nicht im internen Cache aufzufinden: Systemfehler.</key>
     <key alias="getUrlException">Der URL wurde nicht gefunden</key>
-    <key alias="routeError">Dieses Dokument wurde veröffentlicht, aber sein URL würde mit Inhalt %0% kollidieren</key>
+    <key alias="routeError">Dieses Dokument wurde veröffentlicht, aber sein URL würde mit Inhalt '%0%' kollidieren</key>
     <key alias="routeErrorCannotRoute">Dieses Dokument wurde veröffentlicht, aber sein URL kann nicht aufgelöst (routed) werden</key>
+    <key alias="unroutableContentWarningHeader">Inhalt veröffentlicht</key>
+    <key alias="unroutableContentWarning">Das Dokument hat keine URL. Weitere Details finden Sie unter "Info".</key>
+    <key alias="unroutableContentWarningWithReason">Das Dokument hat keine URL. %0% Weitere Details finden Sie unter "Info".</key>
+    <key alias="routeErrorNoDomainForCulture">Dieses Dokument ist in '%0%' veröffentlicht, hat aber keine URL, da es nicht die Standardsprache ist und ihr kein Hostname zugewiesen wurde</key>
   </area>
   <area alias="member">
     <key alias="duplicateMemberLogin">Ein Mitglied mit diesem Login existiert bereits.</key>

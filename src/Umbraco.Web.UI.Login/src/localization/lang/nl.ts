@@ -25,6 +25,7 @@ export default {
     userFailedLogin: 'Oeps! We konden je niet inloggen. Controleer je inloggegevens en probeer het opnieuw.',
     userLockedOut: 'Je account is geblokkeerd. Probeer het later opnieuw.',
     receivedErrorFromServer: 'Een error ontvangen van de server',
+    passwordResetUnavailable: 'Het opnieuw instellen van het wachtwoord is momenteel helaas niet beschikbaar. Probeer het later opnieuw of neem contact op met je beheerder.',
     resetCodeExpired: 'De link die je hebt aangeklikt is niet (meer) geldig.',
     userInviteWelcomeMessage: 'Hallo en welkom in Umbraco! Binnen ongeveer één minuut kan je aan de slag. Je moet enkel je wachtwoord instellen.',
     userInviteExpiredMessage: 'Welkom bij Umbraco! Helaas is je uitnodiging vervallen. Vraag aan je administrator om de uitnodiging opnieuw te versturen.',

@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Stylesheet Picker Property Editor UI',
 	js: () => import('./property-editor-ui-stylesheet-picker.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Stylesheet Picker',
 		icon: 'icon-document',
 		group: '#propertyEditorUIGroups_common',

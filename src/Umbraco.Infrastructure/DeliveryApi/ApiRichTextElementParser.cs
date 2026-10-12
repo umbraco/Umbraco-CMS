@@ -122,7 +122,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             .ToArray();
 
         var tag = TagName(element);
-        var attributes = element.Attributes.ToDictionary(a => a.Name, a => a.Value as object);
+        var attributes = element.Attributes.ToDictionary(a => a.Name, a => (object)(a.Value ?? string.Empty));
 
         ReplaceLocalLinks(contentCache, mediaCache, attributes);
 

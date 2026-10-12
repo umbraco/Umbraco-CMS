@@ -1,4 +1,5 @@
 import { Extension } from '../../externals.js';
+import { hasClassNames, splitClassNames } from '../../utils/class-names.function.js';
 import type { Attributes } from '../../externals.js';
 
 declare module '@tiptap/core' {
@@ -48,26 +49,23 @@ export const HtmlClassAttribute = Extension.create<UmbTiptapHtmlClassAttributeOp
 					if (!className) return false;
 					const types = type ? [type] : this.options.types;
 
-					const toggleClasses = className.split(/\s+/).filter((c) => c);
+					const toggleClasses = splitClassNames(className);
 					if (toggleClasses.length === 0) {
 						return true;
 					}
 
+					// One decision for the whole command: deciding per type would let one type lose the classes while
+					// another gains them, so the toggle would never settle on or off across a selection spanning both.
+					const removeToggleClasses = types.some((t) =>
+						hasClassNames(editor.getAttributes(t)?.class as string | undefined, className),
+					);
+
 					return types
 						.map((t) => {
-							const existingClass = (editor.getAttributes(t)?.class as string) ?? '';
-							const classes = existingClass.split(/\s+/).filter((c) => c);
-							const hasAllToggleClasses = toggleClasses.every((c) => classes.includes(c));
-
-							let newClasses: Array<string>;
-							if (hasAllToggleClasses) {
-								// All toggle classes present: remove them
-								newClasses = classes.filter((c) => !toggleClasses.includes(c));
-							} else {
-								// Not all toggle classes present: add missing ones
-								const toAdd = toggleClasses.filter((c) => !classes.includes(c));
-								newClasses = [...classes, ...toAdd];
-							}
+							const classes = splitClassNames(editor.getAttributes(t)?.class as string | undefined);
+							const newClasses = removeToggleClasses
+								? classes.filter((c) => !toggleClasses.includes(c))
+								: [...classes, ...toggleClasses.filter((c) => !classes.includes(c))];
 
 							if (newClasses.length === 0) {
 								// No classes left, remove the attribute entirely

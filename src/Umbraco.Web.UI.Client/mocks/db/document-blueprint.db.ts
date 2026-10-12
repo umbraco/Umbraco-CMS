@@ -45,6 +45,7 @@ const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprint
 		name: model.name,
 		parent: model.parent,
 		flags: model.flags,
+		variants: model.isFolder ? [] : model.variants,
 	};
 };
 

@@ -25,6 +25,7 @@ export default {
     userFailedLogin: 'Hoppsan! Vi kunde inte logga in dig. Vänligen kontrollera dina uppgifter och försök igen.',
     userLockedOut: 'Ditt konto har låsts. Vänligen försök igen senare.',
     receivedErrorFromServer: 'Ett fel uppstod på servern',
+    passwordResetUnavailable: 'Tyvärr är återställning av lösenord inte tillgänglig just nu. Försök igen senare eller kontakta din administratör.',
     resetCodeExpired: 'Länken du har klickat på är ogiltig eller har gått ut',
     userInviteWelcomeMessage: 'Hej och välkommen till Umbraco! Inom bara 1 minut är du redo att börja, vi behöver bara att du ställer in ett lösenord.',
     userInviteExpiredMessage: 'Välkommen till Umbraco! Tyvärr har din inbjudan gått ut. Vänligen kontakta din administratör och be dem skicka den igen.',

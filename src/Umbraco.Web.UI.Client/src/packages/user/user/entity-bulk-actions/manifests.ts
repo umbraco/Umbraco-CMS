@@ -30,7 +30,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./enable/enable.action.js'),
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
-			label: 'Enable',
+			label: '#actions_enable',
 		},
 		conditions: [
 			{
@@ -47,7 +47,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./unlock/unlock.action.js'),
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
-			label: 'Unlock',
+			label: '#actions_unlock',
 		},
 		conditions: [
 			{
@@ -64,7 +64,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./disable/disable.action.js'),
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
-			label: 'Disable',
+			label: '#actions_disable',
 		},
 		conditions: [
 			{

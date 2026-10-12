@@ -5,6 +5,7 @@ import { detailHandlers } from './detail.handlers.js';
 import { collectionHandlers } from './collection.handlers.js';
 import { imagingHandlers } from './imaging.handlers.js';
 import { urlHandlers } from './url.handlers.js';
+import { moveHandlers } from './move.handlers.js';
 
 export const handlers = [
 	...recycleBinHandlers,
@@ -14,4 +15,5 @@ export const handlers = [
 	...detailHandlers,
 	...collectionHandlers,
 	...imagingHandlers,
+	...moveHandlers,
 ];

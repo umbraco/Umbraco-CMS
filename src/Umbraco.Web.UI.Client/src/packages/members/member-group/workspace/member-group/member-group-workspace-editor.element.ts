@@ -1,4 +1,3 @@
-import { UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH } from '../../paths.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -7,7 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return html`
-			<umb-entity-detail-workspace-editor .backPath=${UMB_MEMBER_GROUP_ROOT_WORKSPACE_PATH}>
+			<umb-entity-detail-workspace-editor show-back-to-parent-button>
 				<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>
 			</umb-entity-detail-workspace-editor>
 		`;

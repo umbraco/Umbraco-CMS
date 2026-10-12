@@ -1,5 +1,6 @@
 import { manifest as defaultSectionManifest } from './default/default.section.kind.js';
 import { manifests as sectionUserPermissionConditionManifests } from './conditions/manifests.js';
+import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 import UmbSectionPickerModalElement from './section-picker-modal/section-picker-modal.element.js';
@@ -14,6 +15,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	},
 	defaultSectionManifest,
 	...sectionUserPermissionConditionManifests,
+	...propertyEditorManifests,
 	...repositoryManifests,
 	...valueSummaryManifests,
 ];

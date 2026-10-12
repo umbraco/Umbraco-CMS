@@ -77,4 +77,9 @@ public class MemberFilterItem
     ///     Gets or sets the member kind.
     /// </summary>
     public MemberKind Kind { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the keys of the member groups the member belongs to.
+    /// </summary>
+    public IEnumerable<Guid> Groups { get; set; } = Enumerable.Empty<Guid>();
 }

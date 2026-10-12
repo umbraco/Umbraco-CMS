@@ -5,6 +5,7 @@ import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityNamedItemManager } from './utils/entity/entity-named-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
+import { pagedResult } from './utils/paged-result.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	DataTypeChangeModeModel,
@@ -42,19 +43,19 @@ class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel
 		super('documentType', data);
 	}
 
-	getAllowedChildren(id: string): PagedAllowedDocumentTypeModel {
+	getAllowedChildren(id: string, skip = 0, take = 100): PagedAllowedDocumentTypeModel {
 		const documentType = this.detail.read(id);
 		const allowedDocumentTypes = documentType.allowedDocumentTypes.map((sortModel: DocumentTypeSortModel) =>
 			this.detail.read(sortModel.documentType.id),
 		);
 		const mappedItems = allowedDocumentTypes.map((item: UmbMockDocumentTypeModel) => allowedDocumentTypeMapper(item));
-		return { items: mappedItems, total: mappedItems.length };
+		return pagedResult(mappedItems, skip, take);
 	}
 
-	getAllowedAtRoot(): PagedAllowedDocumentTypeModel {
+	getAllowedAtRoot(skip = 0, take = 100): PagedAllowedDocumentTypeModel {
 		const mockItems = this.data.filter((item) => item.allowedAsRoot);
 		const mappedItems = mockItems.map((item) => allowedDocumentTypeMapper(item));
-		return { items: mappedItems, total: mappedItems.length };
+		return pagedResult(mappedItems, skip, take);
 	}
 
 	getAllowedParents(id: string): DocumentTypeAllowedParentsResponseModel {

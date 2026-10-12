@@ -18,10 +18,10 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 /// <summary>
-/// Integration tests that verify the end-to-end behavior of
-/// <see cref="DocumentUrlServiceContentTreeChangeNotificationHandler"/>:
-/// the handler writes URL segments and aliases to the database on publish,
-/// while the cache-only variants (<c>UpdateUrlSegmentCacheAsync</c> /
+/// Integration tests that verify the end-to-end behavior of the URL persistence on publish:
+/// <see cref="DocumentUrlServiceContentTreeChangeNotificationHandler"/> writes URL segments to the database after
+/// the commit and <see cref="DocumentUrlAliasContentRefreshNotificationHandler"/> writes URL aliases inside the
+/// content transaction, while the cache-only variants (<c>UpdateUrlSegmentCacheAsync</c> /
 /// <c>UpdateAliasCacheAsync</c> etc.) leave the database unchanged.
 /// </summary>
 [TestFixture]
@@ -52,14 +52,21 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
 
     private Content RootPage { get; set; } = null!;
 
+    private MutableServerRoleAccessor _serverRoleAccessor = null!;
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
+        _serverRoleAccessor = new MutableServerRoleAccessor();
+        builder.Services.AddUnique<IServerRoleAccessor>(_serverRoleAccessor);
         builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlAliasServiceInitializerNotificationHandler>();
         // DocumentUrlServiceContentTreeChangeNotificationHandler is globally registered via UmbracoBuilder.cs
     }
+
+    [TearDown]
+    public void ResetServerRole() => _serverRoleAccessor.CurrentServerRole = ServerRole.Single;
 
     [SetUp]
     public async Task SetUpTestData()
@@ -229,6 +236,40 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
     }
 
     /// <summary>
+    /// The elected <see cref="ServerRole.Subscriber"/> role can be held by an instance that serves the backoffice,
+    /// for example a second backoffice replica behind a load balancer, or the surviving instance during a rolling
+    /// deployment. A publish handled there is the only write anyone makes for that change (other servers only
+    /// refresh their in-memory cache from the instruction), so it must still persist URL segments and aliases;
+    /// otherwise the document is unroutable on every server after its next restart.
+    /// </summary>
+    [Test]
+    public void Publish_OnElectedSubscriber_StillWritesUrlSegmentsAndAliasesToDatabase()
+    {
+        _serverRoleAccessor.CurrentServerRole = ServerRole.Subscriber;
+
+        var page = ContentBuilder.CreateSimpleContent(ContentType, "Subscriber Page", RootPage.Id);
+        page.SetValue(Constants.Conventions.Content.UrlAlias, "subscriber-alias");
+        ContentService.Save(page, -1);
+        ContentService.Publish(page, []);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                GetDbSegments(page.Key).Any(s => s.IsDraft is false),
+                Is.True,
+                "The published URL segment must be persisted when the publish is handled by an instance holding the Subscriber role.");
+            Assert.That(
+                GetDbSegments(page.Key).Any(s => s.IsDraft),
+                Is.True,
+                "The draft URL segment must be persisted when the publish is handled by an instance holding the Subscriber role.");
+            Assert.That(
+                GetDbAliases(page.Key).Any(a => a.Alias == "subscriber-alias"),
+                Is.True,
+                "URL aliases must be persisted when the publish is handled by an instance holding the Subscriber role.");
+        });
+    }
+
+    /// <summary>
     /// When a content type variation change is dispatched under a scoped notification publisher restricted to
     /// <see cref="IDistributedCacheNotificationHandler"/> (as Umbraco Deploy does on its restore/import scopes),
     /// <see cref="DocumentUrlServiceContentTypeChangedNotificationHandler"/> must still rebuild and persist URL
@@ -323,7 +364,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
     /// the alias to the database without any manual call to <c>CreateOrUpdateAliasesAsync</c>.
     /// </summary>
     [Test]
-    public void Publish_WithUrlAlias_WritesAliasesToDatabase_ViaNotificationHandler()
+    public void Publish_WithUrlAlias_WritesAliasesToDatabase_InsideTheContentTransaction()
     {
         var page = ContentBuilder.CreateSimpleContent(ContentType, "Alias Page", RootPage.Id);
         page.SetValue(Constants.Conventions.Content.UrlAlias, "my-integration-alias");
@@ -331,11 +372,22 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         ContentService.Publish(page, []);
 
         var aliases = GetDbAliases(page.Key);
+        int publishedCacheRows;
+        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        {
+            publishedCacheRows = scope.Database.ExecuteScalar<int>(
+                $"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.NodeData} WHERE nodeId = @0",
+                page.Id);
+        }
 
         Assert.That(
             aliases,
             Is.Not.Empty,
-            "The ContentTreeChangeNotification handler must write URL aliases to the database on publish.");
+            "The URL aliases must be written to the database as part of the publish.");
+        Assert.That(
+            publishedCacheRows,
+            Is.GreaterThan(0),
+            "The published content cache row is written from the same ContentRefreshNotification and must be there too.");
         Assert.That(
             aliases.Any(a => a.Alias == "my-integration-alias"),
             Is.True,
@@ -577,5 +629,10 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
                 Does.Contain(child.Key),
                 "Child alias must be resolvable after UpdateAliasCacheWithDescendantsAsync.");
         });
+    }
+
+    private sealed class MutableServerRoleAccessor : IServerRoleAccessor
+    {
+        public ServerRole CurrentServerRole { get; set; } = ServerRole.Single;
     }
 }

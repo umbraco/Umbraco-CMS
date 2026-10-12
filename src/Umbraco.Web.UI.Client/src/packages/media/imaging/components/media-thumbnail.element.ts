@@ -10,7 +10,7 @@ import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
  * Displays a thumbnail for a media item, with optional server-side cropping and transparency support.
  * This is the recommended component for rendering media images in the backoffice.
  * @element umb-media-thumbnail
- * @cssprop [--umb-media-thumbnail-background] - Background shown behind the image. Defaults to a checkerboard
+ * @cssprop --umb-media-thumbnail-background - Background shown behind the image. Defaults to a checkerboard
  * pattern that reveals transparency; set to `none` for a transparent background.
  * @csspart img - The underlying `<img>` element.
  */
@@ -63,6 +63,13 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 	 */
 	@property({ type: String })
 	icon = 'icon-picture';
+
+	/**
+	 * The file extension to label the fallback icon with, without the leading dot.
+	 * @description Rendered only when there is no preview image.
+	 */
+	@property({ type: String, attribute: 'file-ext' })
+	fileExt?: string;
 
 	/**
 	 * The `loading` state of the thumbnail.
@@ -154,14 +161,18 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 			this._thumbnailUrl,
 			(url) =>
 				html`<img
-					id="figure"
+					id="image"
 					part="img"
 					src=${url}
 					alt=${this.alt}
 					loading=${this.loading}
 					decoding="async"
 					draggable="false" />`,
-			() => html`<umb-icon id="icon" name=${this.icon}></umb-icon>`,
+			() =>
+				html`<umb-icon id="icon" name=${this.icon}></umb-icon> ${when(
+						this.fileExt,
+						(fileExt) => html`<small id="file-ext">${fileExt}</small>`,
+					)}`,
 		);
 	}
 
@@ -188,6 +199,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				position: relative;
 				overflow: hidden;
 				display: flex;
+				flex-direction: column;
 				justify-content: center;
 				align-items: center;
 				width: 100%;
@@ -199,7 +211,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				margin-bottom: 1em;
 			}
 
-			#figure {
+			#image {
 				display: block;
 				width: 100%;
 				height: 100%;
@@ -218,6 +230,27 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				width: 100%;
 				height: 100%;
 				font-size: var(--uui-size-8);
+			}
+
+			/* Filling the box is only right while the icon is alone in it. */
+			#icon:has(+ #file-ext) {
+				height: auto;
+			}
+
+			#file-ext {
+				flex: none;
+				max-width: 10ch;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				margin-top: var(--uui-size-space-2);
+				padding: 0 var(--uui-size-space-2);
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-surface-alt);
+				font-size: var(--uui-type-small-size);
+				font-weight: 700;
+				line-height: 1.5;
+				text-transform: uppercase;
+				white-space: nowrap;
 			}
 		`,
 	];

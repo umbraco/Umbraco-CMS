@@ -182,6 +182,7 @@ export class UmbBodyLayoutElement extends LitElement {
 			#header-slot {
 				padding: 0 var(--uui-size-layout-1);
 				flex-grow: 1;
+				flex-basis: 0;
 			}
 			:host([header-no-padding]) #header-slot {
 				padding: 0;

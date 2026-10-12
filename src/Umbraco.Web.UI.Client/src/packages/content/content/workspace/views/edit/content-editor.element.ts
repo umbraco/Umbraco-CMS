@@ -47,7 +47,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	private _routerPath?: string;
 
 	@state()
-	private _activePath = '';
+	private _activePath?: string;
 
 	@state()
 	private _hintMap: Map<string | null, UmbVariantHint> = new Map();
@@ -170,7 +170,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 
 			if (viewAlias === null) {
 				// for the root tab, we need to filter hints, so in this case we do accept everything that is not in a tab: [NL]
-				view.hints.setPathFilter((paths) => paths[0].includes('tab/') === false);
+				view.hints.setPathFilter((paths) => paths[0]?.includes('tab/') === false);
 			}
 
 			view.setTitle(tabName);
@@ -241,7 +241,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 						this._routerPath = event.target.absoluteRouterPath;
 					}}
 					@change=${(event: UmbRouterSlotChangeEvent) => {
-						this._activePath = event.target.absoluteActiveViewPath || '';
+						this._activePath = event.target.localActiveViewPath;
 					}}>
 				</umb-router-slot>
 			</umb-body-layout>
@@ -251,10 +251,11 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	#renderTab(path: string | null, name: string, index = 0) {
 		const hint = this._hintMap.get(path);
 		const fullPath = this._routerPath + '/' + (path ? path : 'root');
+		const fullActivePath = this._routerPath + '/' + this._activePath;
 		const active =
-			fullPath === this._activePath ||
-			(!this._hasRootGroups && index === 0 && this._routerPath + '/' === this._activePath) ||
-			(this._hasRootGroups && index === 0 && path === null && this._routerPath + '/' === this._activePath);
+			fullPath === fullActivePath ||
+			(!this._hasRootGroups && index === 0 && this._routerPath + '/' === fullActivePath) ||
+			(this._hasRootGroups && index === 0 && path === null && this._routerPath + '/' === fullActivePath);
 		return html`<uui-tab
 			label=${this.localize.string(name ?? '#general_unnamed')}
 			.active=${active}

@@ -29,6 +29,7 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
 {
     private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
     private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockGridEditorValues;
+    private readonly ILogger<FileUploadContentDeletedNotificationHandler> _logger;
     private ContentSettings _contentSettings;
 
     /// <summary>
@@ -44,6 +45,7 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     {
         _blockListEditorValues = new(new BlockListEditorDataConverter(jsonSerializer), elementTypeCache, logger);
         _blockGridEditorValues = new(new BlockGridEditorDataConverter(jsonSerializer), elementTypeCache, logger);
+        _logger = logger;
 
         _contentSettings = contentSettngs.CurrentValue;
         contentSettngs.OnChange(x => _contentSettings = x);
@@ -137,57 +139,89 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     {
         var paths = new List<string>();
 
-        foreach (IProperty? property in entities.SelectMany(x => x.Properties))
+        foreach (IContentBase entity in entities)
         {
-            if (IsUploadFieldPropertyType(property.PropertyType))
+            foreach (IProperty property in entity.Properties)
             {
-                paths.AddRange(GetPathsFromUploadFieldProperty(property));
-
-                continue;
-            }
-
-            if (IsBlockListPropertyType(property.PropertyType))
-            {
-                paths.AddRange(GetPathsFromBlockProperty(property, _blockListEditorValues));
-
-                continue;
-            }
-
-            if (IsBlockGridPropertyType(property.PropertyType))
-            {
-                paths.AddRange(GetPathsFromBlockProperty(property, _blockGridEditorValues));
-
-                continue;
-            }
-
-            if (IsRichTextPropertyType(property.PropertyType))
-            {
-                paths.AddRange(GetPathsFromRichTextProperty(property));
-
-                continue;
+                CollectContainedFilePaths(paths, entity.Key, property);
             }
         }
 
         return paths.Distinct().ToList().AsReadOnly();
     }
 
-    private IEnumerable<string> GetPathsFromUploadFieldProperty(IProperty property)
+    private void CollectContainedFilePaths(List<string> paths, Guid contentKey, IProperty property)
+    {
+        if (IsUploadFieldPropertyType(property.PropertyType))
+        {
+            paths.AddRange(GetPathsFromUploadFieldProperty(property, contentKey));
+
+            return;
+        }
+
+        if (IsBlockListPropertyType(property.PropertyType))
+        {
+            paths.AddRange(GetPathsFromBlockProperty(property, contentKey, _blockListEditorValues));
+
+            return;
+        }
+
+        if (IsBlockGridPropertyType(property.PropertyType))
+        {
+            paths.AddRange(GetPathsFromBlockProperty(property, contentKey, _blockGridEditorValues));
+
+            return;
+        }
+
+        if (IsRichTextPropertyType(property.PropertyType))
+        {
+            paths.AddRange(GetPathsFromRichTextProperty(property, contentKey));
+        }
+    }
+
+    private IEnumerable<string> GetPathsFromUploadFieldProperty(IProperty property, Guid contentKey)
     {
         foreach (IPropertyValue propertyValue in property.Values)
         {
-            if (propertyValue.PublishedValue != null && propertyValue.PublishedValue is string publishedUrl && !string.IsNullOrWhiteSpace(publishedUrl))
+            if (propertyValue.PublishedValue is string publishedUrl && !string.IsNullOrWhiteSpace(publishedUrl))
             {
-                yield return MediaFileManager.FileSystem.GetRelativePath(publishedUrl);
+                var publishedPath = MediaFileManager.FileSystem.GetRelativePath(publishedUrl);
+                if (IsOwnedFile(publishedPath, contentKey, property.PropertyType.Key))
+                {
+                    yield return publishedPath;
+                }
             }
 
-            if (propertyValue.EditedValue != null && propertyValue.EditedValue is string editedUrl && !string.IsNullOrWhiteSpace(editedUrl))
+            if (propertyValue.EditedValue is string editedUrl && !string.IsNullOrWhiteSpace(editedUrl))
             {
-                yield return MediaFileManager.FileSystem.GetRelativePath(editedUrl);
+                var editedPath = MediaFileManager.FileSystem.GetRelativePath(editedUrl);
+                if (IsOwnedFile(editedPath, contentKey, property.PropertyType.Key))
+                {
+                    yield return editedPath;
+                }
             }
         }
     }
 
-    private IReadOnlyCollection<string> GetPathsFromBlockProperty<TValue, TLayout>(IProperty property, BlockEditorValues<TValue, TLayout> blockEditorValues)
+    private bool IsOwnedFile(string relativePath, Guid contentKey, Guid propertyTypeKey)
+    {
+        if (MediaFileManager.IsFileOwnedBy(relativePath, contentKey, propertyTypeKey))
+        {
+            return true;
+        }
+
+        // The stored path does not resolve to one this content and property type could own, so it references
+        // another item's file. Exclude it from the delete/rename operation - the value may have been tampered
+        // with to target a file the acting user is not authorized to affect.
+        _logger.LogWarning(
+            "Skipping media file operation for path '{Path}' on content {ContentKey}: the path does not belong to property type {PropertyTypeKey}.",
+            relativePath,
+            contentKey,
+            propertyTypeKey);
+        return false;
+    }
+
+    private IReadOnlyCollection<string> GetPathsFromBlockProperty<TValue, TLayout>(IProperty property, Guid contentKey, BlockEditorValues<TValue, TLayout> blockEditorValues)
         where TValue : BlockValue<TLayout>, new()
         where TLayout : class, IBlockLayoutItem, new()
     {
@@ -195,14 +229,14 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
 
         foreach (IPropertyValue blockPropertyValue in property.Values)
         {
-            paths.AddRange(GetPathsFromBlockValue(GetBlockEditorData(blockPropertyValue.PublishedValue, blockEditorValues)?.BlockValue));
-            paths.AddRange(GetPathsFromBlockValue(GetBlockEditorData(blockPropertyValue.EditedValue, blockEditorValues)?.BlockValue));
+            paths.AddRange(GetPathsFromBlockValue(GetBlockEditorData(blockPropertyValue.PublishedValue, blockEditorValues)?.BlockValue, contentKey));
+            paths.AddRange(GetPathsFromBlockValue(GetBlockEditorData(blockPropertyValue.EditedValue, blockEditorValues)?.BlockValue, contentKey));
         }
 
         return paths;
     }
 
-    private IReadOnlyCollection<string> GetPathsFromBlockValue(BlockValue? blockValue)
+    private IReadOnlyCollection<string> GetPathsFromBlockValue(BlockValue? blockValue, Guid contentKey)
     {
         var paths = new List<string>();
 
@@ -238,28 +272,35 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
                     continue;
                 }
 
-                paths.Add(MediaFileManager.FileSystem.GetRelativePath(originalValue.Src));
+                // The file for a block-nested upload is stored under the owning content key and the block's
+                // property type key (see BlockValuePropertyValueEditorBase.FromEditor), so verify ownership
+                // against those before allowing a destructive operation on the path.
+                var uploadPath = MediaFileManager.FileSystem.GetRelativePath(originalValue.Src);
+                if (IsOwnedFile(uploadPath, contentKey, propertyType.Key))
+                {
+                    paths.Add(uploadPath);
+                }
 
                 continue;
             }
 
             if (IsBlockListPropertyType(propertyType))
             {
-                paths.AddRange(GetPathsFromBlockPropertyValue(blockPropertyValue, _blockListEditorValues));
+                paths.AddRange(GetPathsFromBlockPropertyValue(blockPropertyValue, contentKey, _blockListEditorValues));
 
                 continue;
             }
 
             if (IsBlockGridPropertyType(propertyType))
             {
-                paths.AddRange(GetPathsFromBlockPropertyValue(blockPropertyValue, _blockGridEditorValues));
+                paths.AddRange(GetPathsFromBlockPropertyValue(blockPropertyValue, contentKey, _blockGridEditorValues));
 
                 continue;
             }
 
             if (IsRichTextPropertyType(propertyType))
             {
-                paths.AddRange(GetPathsFromRichTextPropertyValue(blockPropertyValue));
+                paths.AddRange(GetPathsFromRichTextPropertyValue(blockPropertyValue, contentKey));
 
                 continue;
             }
@@ -268,16 +309,16 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
         return paths;
     }
 
-    private IReadOnlyCollection<string> GetPathsFromBlockPropertyValue<TValue, TLayout>(BlockPropertyValue blockItemDataValue, BlockEditorValues<TValue, TLayout> blockEditorValues)
+    private IReadOnlyCollection<string> GetPathsFromBlockPropertyValue<TValue, TLayout>(BlockPropertyValue blockItemDataValue, Guid contentKey, BlockEditorValues<TValue, TLayout> blockEditorValues)
         where TValue : BlockValue<TLayout>, new()
         where TLayout : class, IBlockLayoutItem, new()
     {
         BlockEditorData<TValue, TLayout>? blockItemEditorDataValue = GetBlockEditorData(blockItemDataValue.Value, blockEditorValues);
 
-        return GetPathsFromBlockValue(blockItemEditorDataValue?.BlockValue);
+        return GetPathsFromBlockValue(blockItemEditorDataValue?.BlockValue, contentKey);
     }
 
-    private IReadOnlyCollection<string> GetPathsFromRichTextProperty(IProperty property)
+    private IReadOnlyCollection<string> GetPathsFromRichTextProperty(IProperty property, Guid contentKey)
     {
         var paths = new List<string>();
 
@@ -287,19 +328,19 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
             return paths;
         }
 
-        paths.AddRange(GetPathsFromBlockValue(GetRichTextBlockValue(propertyValue.PublishedValue)));
-        paths.AddRange(GetPathsFromBlockValue(GetRichTextBlockValue(propertyValue.EditedValue)));
+        paths.AddRange(GetPathsFromBlockValue(GetRichTextBlockValue(propertyValue.PublishedValue), contentKey));
+        paths.AddRange(GetPathsFromBlockValue(GetRichTextBlockValue(propertyValue.EditedValue), contentKey));
 
         return paths;
     }
 
-    private IReadOnlyCollection<string> GetPathsFromRichTextPropertyValue(BlockPropertyValue blockItemDataValue)
+    private IReadOnlyCollection<string> GetPathsFromRichTextPropertyValue(BlockPropertyValue blockItemDataValue, Guid contentKey)
     {
         RichTextEditorValue? richTextEditorValue = GetRichTextEditorValue(blockItemDataValue.Value);
 
         // Ensure the property type is populated on all blocks.
         richTextEditorValue?.EnsurePropertyTypePopulatedOnBlocks(ElementTypeCache);
 
-        return GetPathsFromBlockValue(richTextEditorValue?.Blocks);
+        return GetPathsFromBlockValue(richTextEditorValue?.Blocks, contentKey);
     }
 }

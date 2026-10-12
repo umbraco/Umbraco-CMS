@@ -8,6 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Media Picker Property Editor UI',
 		element: () => import('./property-editor-ui-media-picker.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Media Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MediaPicker3',
 			icon: 'icon-picture',

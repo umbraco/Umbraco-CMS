@@ -57,6 +57,7 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 				.value=${this._query}
 				label=${this.localize.term('general_search')}
 				placeholder=${this.localize.term('placeholders_search')}
+				data-mark="picker:search-input"
 				@input=${this.#onInput}>
 				<div slot="prepend">
 					${this._searching

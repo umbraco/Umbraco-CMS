@@ -5,10 +5,10 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 @customElement('umb-folder-workspace-editor')
 export class UmbFolderWorkspaceEditorElement extends UmbLitElement {
 	override render() {
-		return html`<umb-workspace-editor>
+		return html`<umb-entity-detail-workspace-editor>
 			<umb-icon id="icon" slot="header" name="icon-folder"></umb-icon>
 			<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>
-		</umb-workspace-editor>`;
+		</umb-entity-detail-workspace-editor>`;
 	}
 
 	static override styles = [
