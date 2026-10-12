@@ -7,6 +7,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 
 /**
  *
@@ -44,16 +45,22 @@ export class UmbDocumentTypeStructureServerDataSource
 	}
 }
 
-const getAllowedChildrenOf = (unique: string | null, parentContentUnique: string | null) => {
+const getAllowedChildrenOf = (
+	unique: string | null,
+	parentContentUnique: string | null,
+	paging?: UmbOffsetPaginationRequestModel,
+) => {
 	if (unique) {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentTypeService.getDocumentTypeByIdAllowedChildren({
 			path: { id: unique },
-			query: { parentContentKey: parentContentUnique ?? undefined },
+			query: { parentContentKey: parentContentUnique ?? undefined, skip: paging?.skip, take: paging?.take },
 		});
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentTypeService.getDocumentTypeAllowedAtRoot({});
+		return DocumentTypeService.getDocumentTypeAllowedAtRoot({
+			query: { skip: paging?.skip, take: paging?.take },
+		});
 	}
 };
 

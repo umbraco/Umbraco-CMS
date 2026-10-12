@@ -14,67 +14,27 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Web.Common.ModelsBuilder;
 
 /// <summary>
-///     Handles <see cref="UmbracoApplicationStartingNotification" /> and <see cref="ServerVariablesParsingNotification" />
-///     notifications to initialize MB
+///     Handles the <see cref="TemplateSavingNotification" /> notification to type templates created for a
+///     content type with that content type's model.
 /// </summary>
 internal sealed class ModelsBuilderNotificationHandler :
-    INotificationHandler<ServerVariablesParsingNotification>,
     INotificationHandler<TemplateSavingNotification>
 {
     private readonly ModelsBuilderSettings _config;
     private readonly IDefaultViewContentProvider _defaultViewContentProvider;
-    private readonly IModelsBuilderDashboardProvider _modelsBuilderDashboardProvider;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IShortStringHelper _shortStringHelper;
 
     public ModelsBuilderNotificationHandler(
         IOptions<ModelsBuilderSettings> config,
         IShortStringHelper shortStringHelper,
-        IModelsBuilderDashboardProvider modelsBuilderDashboardProvider,
         IDefaultViewContentProvider defaultViewContentProvider,
         IPublishedModelFactory publishedModelFactory)
     {
         _config = config.Value;
         _shortStringHelper = shortStringHelper;
-        _modelsBuilderDashboardProvider = modelsBuilderDashboardProvider;
         _defaultViewContentProvider = defaultViewContentProvider;
         _publishedModelFactory = publishedModelFactory;
-    }
-
-    /// <summary>
-    ///     Handles the <see cref="ServerVariablesParsingNotification" /> notification to add custom urls and MB mode
-    /// </summary>
-    public void Handle(ServerVariablesParsingNotification notification)
-    {
-        IDictionary<string, object> serverVars = notification.ServerVariables;
-
-        if (!serverVars.TryGetValue("umbracoUrls", out object? umbracoUrlsObject))
-        {
-            throw new ArgumentException("Missing umbracoUrls.");
-        }
-
-        if (umbracoUrlsObject == null)
-        {
-            throw new ArgumentException("Null umbracoUrls");
-        }
-
-        if (!(umbracoUrlsObject is Dictionary<string, object?> umbracoUrls))
-        {
-            throw new ArgumentException("Invalid umbracoUrls");
-        }
-
-        if (!serverVars.TryGetValue("umbracoPlugins", out object? umbracoPluginsObject))
-        {
-            throw new ArgumentException("Missing umbracoPlugins.");
-        }
-
-        if (!(umbracoPluginsObject is Dictionary<string, object> umbracoPlugins))
-        {
-            throw new ArgumentException("Invalid umbracoPlugins");
-        }
-
-        umbracoUrls["modelsBuilderBaseUrl"] = _modelsBuilderDashboardProvider.GetUrl();
-        umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
     }
 
     /// <summary>
@@ -133,12 +93,5 @@ internal sealed class ModelsBuilderNotificationHandler :
                 template.Content = markup;
             }
         }
-    }
-
-    private Dictionary<string, object> GetModelsBuilderSettings()
-    {
-        var settings = new Dictionary<string, object> { { "mode", _config.ModelsMode } };
-
-        return settings;
     }
 }

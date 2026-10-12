@@ -193,7 +193,7 @@ public class DocumentUrlAliasServiceTests
     #region CreateOrUpdateAliasesAsync Tests
 
     /// <summary>
-    /// For invariant content the alias property value is stored once, with <c>NullableLanguageId = null</c>,
+    /// For invariant content the alias property value is stored once, with <c>LanguageId = null</c>,
     /// irrespective of how many languages are configured.
     /// </summary>
     [Test]

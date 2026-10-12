@@ -78,11 +78,11 @@ public class CreateAndPublishDocumentController : CreateDocumentControllerBase
             }
 
             ContentCreateModel model = _documentEditingPresentationFactory.MapCreateModel(requestModel);
-            Attempt<ContentCreateResult, ContentEditingOperationStatus> result =
-                await _contentEditingService.CreateAndPublishAsync(model, requestModel.CulturesToPublish, CurrentUserKey(_backOfficeSecurityAccessor));
+            Attempt<ContentCreateResult, ContentEditingAndPublishingStatus> result =
+                await _contentEditingService.CreateAndPublishAsync(model, requestModel.CulturesToPublish.ToHashSet(), CurrentUserKey(_backOfficeSecurityAccessor));
 
             return result.Success
                 ? CreatedAtId<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result.Content!.Key)
-                : ContentEditingOperationStatusResult(result.Status);
+                : DocumentEditingAndPublishingOperationStatusResult(result.Status, result.Result.InvalidPropertyAliases);
         });
 }

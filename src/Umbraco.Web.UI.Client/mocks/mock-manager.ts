@@ -48,6 +48,11 @@ class UmbMockManager {
 			loader: () => import('./data/sets/blocks-reusable-content/index.js') as Promise<UmbMockDataSet>,
 			visible: true,
 		},
+		multiBrandClothingShop: {
+			label: 'Multi Brand Clothing Shop',
+			loader: () => import('./data/sets/multi-brand-clothing-shop/index.js') as Promise<UmbMockDataSet>,
+			visible: true,
+		},
 	};
 
 	/**

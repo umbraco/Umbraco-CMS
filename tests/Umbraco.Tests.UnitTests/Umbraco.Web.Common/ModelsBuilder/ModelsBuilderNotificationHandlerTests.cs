@@ -81,7 +81,6 @@ public class ModelsBuilderNotificationHandlerTests
         return new ModelsBuilderNotificationHandler(
             new OptionsWrapper<ModelsBuilderSettings>(settings),
             ShortStringHelper,
-            Mock.Of<IModelsBuilderDashboardProvider>(),
             defaultViewContentProvider.Object,
             CreatePublishedModelFactory(liveFactoryEnabled));
     }
