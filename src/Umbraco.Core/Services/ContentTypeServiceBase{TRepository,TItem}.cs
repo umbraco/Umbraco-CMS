@@ -344,12 +344,13 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     {
         // find all content types impacted by the changes,
         // - content type alias changed
-        // - content type property removed, or alias changed
-        // - content type composition removed (not testing if composition had properties...)
+        // - content type property removed, added, or alias changed
+        // - content type composition removed or added (not testing if composition had properties...)
         // - content type variation changed
         // - property type variation changed
         //
-        // because these are the changes that would impact the raw content data
+        // because these are the changes that alter the set of property types a content type exposes,
+        // and so the set exposed by every content type that derives from it
 
         // note
         // this is meant to run *after* uow.Commit() so must use WasPropertyDirty() everywhere
@@ -357,10 +358,14 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
         var changes = new List<ContentTypeChange<TItem>>();
 
+        // Shared by every content type in the batch, so a deriving type reached from more than one of them is
+        // the same instance each time, and AddChange merges its changes into a single entry.
+        ILookup<int, TItem>? directReferencingTypes = null;
+
         // Track which types genuinely need a raw cmsContentNu rebuild vs. which only had a property removed.
         // A type can appear via more than one path (e.g. a batch save touching a composition, where the same
-        // type is both saved directly and returned by GetComposedOf as a different instance), so we key these
-        // by Id — not entity reference — and resolve the RawDataUnaffected flag once at the end: it is only
+        // type is both saved directly and returned by the composition traversal as a different instance), so we
+        // key these by Id — not entity reference — and resolve the RawDataUnaffected flag once at the end: it is only
         // safe when *nothing* required a rebuild for that Id.
         var rebuildRequiredIds = new HashSet<int>();
         var rawDataUnaffectedCandidateIds = new HashSet<int>();
@@ -416,31 +421,34 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             // does. See the rawDataAffected calculation.
             var hasCompositionChanged = dirty.WasPropertyDirty("ContentTypeComposition");
 
+            // added properties?
+            var hasAnyPropertyBeenAdded = contentType.PropertyTypes.Any(propertyType => propertyType.WasPropertyDirty("Id"));
+
             // main impact on properties?
             var hasPropertyMainImpact = hasContentTypeVariationChanged || hasAnyPropertyVariationChanged
                                                                        || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias
                                                                        || hasCompositionChanged;
 
+            // The raw cmsContentNu blob is keyed by property alias, so a structural change only requires a
+            // rebuild when it re-keys existing stored values or lets a stale value resolve to a different
+            // property. It does NOT when the only structural change is:
+            //  - a property removal - the orphaned value simply stops resolving and is never read again, or
+            //  - a composition being added - its new aliases have no stored value yet.
+            // In those cases clearing the converted content cache is enough (the content type cache is
+            // refreshed regardless). An alias or variation change, a composition removal, or a property
+            // removal combined with a composition change (which can reintroduce the removed alias behind a
+            // different property type) all re-key or revive stored values and therefore need a rebuild.
+            var rawDataAffected =
+                hasAliasChanged ||
+                hasAnyPropertyChangedAlias ||
+                hasContentTypeVariationChanged ||
+                hasAnyPropertyVariationChanged ||
+                hasAnyCompositionBeenRemoved ||
+                (hasAnyPropertyBeenRemoved && hasCompositionChanged);
+            var rawDataUnaffected = rawDataAffected is false;
+
             if (hasAliasChanged || hasPropertyMainImpact)
             {
-                // The raw cmsContentNu blob is keyed by property alias, so a structural change only requires a
-                // rebuild when it re-keys existing stored values or lets a stale value resolve to a different
-                // property. It does NOT when the only structural change is:
-                //  - a property removal - the orphaned value simply stops resolving and is never read again, or
-                //  - a composition being added - its new aliases have no stored value yet.
-                // In those cases clearing the converted content cache is enough (the content type cache is
-                // refreshed regardless). An alias or variation change, a composition removal, or a property
-                // removal combined with a composition change (which can reintroduce the removed alias behind a
-                // different property type) all re-key or revive stored values and therefore need a rebuild.
-                var rawDataAffected =
-                    hasAliasChanged ||
-                    hasAnyPropertyChangedAlias ||
-                    hasContentTypeVariationChanged ||
-                    hasAnyPropertyVariationChanged ||
-                    hasAnyCompositionBeenRemoved ||
-                    (hasAnyPropertyBeenRemoved && hasCompositionChanged);
-                var rawDataUnaffected = rawDataAffected is false;
-
                 // add that one, as a main change
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);
                 (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(contentType.Id);
@@ -451,21 +459,38 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 {
                     AddChange(changes, contentType, ContentTypeChangeTypes.VariationChanged);
                 }
-
-                if (hasPropertyMainImpact)
-                {
-                    foreach (TItem c in GetComposedOf(contentType.Id))
-                    {
-                        // Composing types inherit the same property change, so they share its rebuild requirement.
-                        AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
-                        (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(c.Id);
-                    }
-                }
             }
             else
             {
                 // add that one, as an other change
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
+            }
+
+            // A content type that derives from this one - through composition or inheritance, at any depth -
+            // resolves its published content type from this one's alias and property types, so any change to
+            // either has to refresh the whole closure beneath it. Left stale, a deriving type keeps projecting
+            // content through a property set the content type no longer has, and keeps reporting the old alias
+            // from its composition aliases (which IPublishedContent.IsComposedOf reads).
+            if (hasPropertyMainImpact || hasAnyPropertyBeenAdded || hasAliasChanged)
+            {
+                directReferencingTypes ??= GetDirectReferencingTypes();
+                foreach (TItem c in GetComposedOfTransitive(contentType.Id, directReferencingTypes))
+                {
+                    if (hasPropertyMainImpact)
+                    {
+                        // Deriving types inherit the same property change, so they share its rebuild requirement.
+                        AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
+                        (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(c.Id);
+                    }
+                    else
+                    {
+                        // Neither a property addition nor a content type alias change re-keys anything the
+                        // deriving types have stored - the added alias has no value yet, and the stored blob is
+                        // keyed by property alias, not content type alias. They only need their content type and
+                        // converted content caches cleared, not a rebuild.
+                        AddChange(changes, c, ContentTypeChangeTypes.RefreshOther);
+                    }
+                }
             }
         }
 
@@ -703,6 +728,63 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         // TODO: still, because it uses the cache, race conditions!
         IEnumerable<TItem> allContentTypes = GetAll();
         return GetComposedOf(id, allContentTypes);
+    }
+
+    /// <summary>
+    /// Builds a lookup from each content type id to the content types that directly reference it as a composition
+    /// (or as the content type they inherit from).
+    /// </summary>
+    /// <returns>The lookup of directly referencing content types, keyed by referenced content type id.</returns>
+    /// <remarks>
+    /// Every call takes a fresh snapshot of all content types, and the full dataset cache policy deep clones each
+    /// of them, so build this once per unit of work and share it.
+    /// </remarks>
+    private ILookup<int, TItem> GetDirectReferencingTypes() =>
+        GetAll()
+            .SelectMany(
+                contentType => contentType.ContentTypeComposition,
+                (contentType, referenced) => (ReferencedId: referenced.Id, ContentType: contentType))
+            .ToLookup(x => x.ReferencedId, x => x.ContentType);
+
+    /// <summary>
+    /// Gets every content type whose effective property set derives from the specified content type, directly
+    /// or indirectly.
+    /// </summary>
+    /// <param name="id">The identifier of the content type.</param>
+    /// <param name="directReferencingTypes">
+    /// The content types that directly reference each content type, as built by
+    /// <see cref="GetDirectReferencingTypes" />.
+    /// </param>
+    /// <returns>The content types deriving from the specified content type.</returns>
+    /// <remarks>
+    /// Inheritance is stored as composition, so a single traversal of the composition graph covers both axes.
+    /// It has to be transitive because a content type resolves both its property types and its composition
+    /// aliases recursively through its compositions (see
+    /// <see cref="IContentTypeComposition.CompositionPropertyTypes" /> and
+    /// <see cref="IContentTypeComposition.CompositionAliases()" />), so a change to one content type is a change
+    /// to everything deriving from it, not just to its direct consumers.
+    /// </remarks>
+    private static TItem[] GetComposedOfTransitive(int id, ILookup<int, TItem> directReferencingTypes)
+    {
+        var composedOf = new Dictionary<int, TItem>();
+        var remaining = new Stack<int>();
+        remaining.Push(id);
+
+        while (remaining.Count > 0)
+        {
+            foreach (TItem contentType in directReferencingTypes[remaining.Pop()])
+            {
+                // TryAdd doubles as the guard against cycles in the composition graph
+                if (composedOf.TryAdd(contentType.Id, contentType) is false)
+                {
+                    continue;
+                }
+
+                remaining.Push(contentType.Id);
+            }
+        }
+
+        return [.. composedOf.Values];
     }
 
     /// <inheritdoc />
