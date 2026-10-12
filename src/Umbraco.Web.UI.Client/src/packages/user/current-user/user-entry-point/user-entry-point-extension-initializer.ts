@@ -45,7 +45,7 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 				(isAuthorized) => {
 					this.#isAuthorized = isAuthorized === true;
 					if (this.#isAuthorized) {
-						this.#loadCurrentUser();
+						void this.#loadCurrentUser();
 					} else {
 						// The context keeps the previous user once authorization is lost, and the next sign-in may be
 						// a different user, so drop its cached load and only count a load completed for the new session.
@@ -62,7 +62,7 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (currentUserContext) => {
 			this.#currentUserContext = currentUserContext;
 			if (this.#isAuthorized) {
-				this.#loadCurrentUser();
+				void this.#loadCurrentUser();
 			}
 			this.observe(
 				currentUserContext?.currentUser,
