@@ -102,4 +102,19 @@ public interface IDataEditor : IDiscoverable
     ///     in which case the caller should fall back to flagging <paramref name="defaultCulture"/> as edited.
     /// </returns>
     IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture) => [];
+
+    /// <summary>
+    ///     Determines whether an edited and a published property value represent the same content, so that
+    ///     publishing the edited value would not change what is published.
+    /// </summary>
+    /// <param name="editedValue">The edited property value.</param>
+    /// <param name="publishedValue">The published property value.</param>
+    /// <returns><c>true</c> if the values represent the same content; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     The values are equivalent when they are equal. Editors whose stored format can represent the same content
+    ///     in more than one way may compare the values by their content instead, for example regardless of the order
+    ///     of nested values.
+    /// </remarks>
+    // TODO (V18): Remove the default implementation.
+    bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue) => object.Equals(editedValue, publishedValue);
 }

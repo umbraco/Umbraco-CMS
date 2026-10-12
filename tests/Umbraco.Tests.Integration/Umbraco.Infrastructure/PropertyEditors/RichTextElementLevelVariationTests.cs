@@ -2,7 +2,6 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -776,38 +775,30 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     }
 
     [Test]
-    public async Task Publishing_Merges_Block_Values_In_Canonical_Order_Regardless_Of_The_Published_Value_Order()
+    public async Task Rich_Text_Values_Are_Equivalent_Only_When_They_Differ_In_The_Order_Of_Block_Values_And_Exposes()
     {
         var elementType = CreateElementType(ContentVariation.Culture);
         var rteDataType = await CreateRichTextDataType(elementType);
-
-        // values stored in a non-canonical order (as persisted before the canonical ordering was introduced)
         var richTextValue = CreateRichTextValue(elementType);
-        richTextValue.Blocks!.ContentData[0].Values =
-        [
-            new() { Alias = "variantText", Value = "The first content value in English", Culture = "en-US" },
-            new() { Alias = "variantText", Value = "The first content value in Danish", Culture = "da-DK" },
-            new() { Alias = "invariantText", Value = "The first invariant content value" },
-        ];
         var publishedValue = JsonSerializer.Serialize(richTextValue);
 
-        var editedValue = JsonSerializer.Deserialize<RichTextEditorValue>(publishedValue)!;
-        editedValue.Blocks!.ContentData[0].Values.Single(v => v.Culture == "en-US").Value = "The second content value in English";
+        var reorderedValue = JsonSerializer.Deserialize<RichTextEditorValue>(publishedValue)!;
+        reorderedValue.Blocks!.ContentData[0].Values = reorderedValue.Blocks.ContentData[0].Values.Reverse().ToList();
+        reorderedValue.Blocks.Expose = reorderedValue.Blocks.Expose.Reverse().ToList();
+
+        var changedMarkupValue = JsonSerializer.Deserialize<RichTextEditorValue>(publishedValue)!;
+        changedMarkupValue.Markup = changedMarkupValue.Markup.Replace("The end.", "The new end.");
+
+        var changedBlockValue = JsonSerializer.Deserialize<RichTextEditorValue>(publishedValue)!;
+        changedBlockValue.Blocks!.ContentData[0].Values[0].Value = "#1: The second invariant content value";
 
         var dataEditor = rteDataType.Editor!;
-        var mergedValue = dataEditor.MergePartialPropertyValueForCulture(JsonSerializer.Serialize(editedValue), publishedValue, null);
-        mergedValue = dataEditor.MergePartialPropertyValueForCulture(JsonSerializer.Serialize(editedValue), mergedValue, "en-US");
-        mergedValue = dataEditor.MergePartialPropertyValueForCulture(JsonSerializer.Serialize(editedValue), mergedValue, "da-DK");
-
-        var mergedRichTextValue = JsonSerializer.Deserialize<RichTextEditorValue>((string)mergedValue!)!;
-        CollectionAssert.AreEqual(
-            new (string?, string)[]
-            {
-                (null, "invariantText"),
-                ("da-DK", "variantText"),
-                ("en-US", "variantText"),
-            },
-            mergedRichTextValue.Blocks!.ContentData[0].Values.Select(v => (v.Culture, v.Alias)));
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(reorderedValue), publishedValue), "Reordered block values and exposes must be equivalent.");
+            Assert.IsFalse(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(changedMarkupValue), publishedValue), "Changed markup must not be equivalent.");
+            Assert.IsFalse(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(changedBlockValue), publishedValue), "A changed block value must not be equivalent.");
+        });
     }
 
     private async Task<IDataType> CreateRichTextDataType(IContentType elementType)

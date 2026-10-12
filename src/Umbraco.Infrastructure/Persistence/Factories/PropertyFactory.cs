@@ -68,8 +68,9 @@ internal static class PropertyFactory
     /// <param name="properties">The properties to map</param>
     /// <param name="languageRepository"></param>
     /// <param name="propertyEditors">
-    ///     The collection of registered property editors, used to determine which specific culture(s) an edit
-    ///     applies to when a property is culture-invariant but its data editor carries per-culture nested data.
+    ///     The collection of registered property editors, used to determine whether an edited value differs from the
+    ///     published value, and which specific culture(s) an edit applies to when a property is culture-invariant but
+    ///     its data editor carries per-culture nested data.
     /// </param>
     /// <param name="edited">out parameter indicating that one or more properties have been edited</param>
     /// <param name="editedCultures">
@@ -106,6 +107,8 @@ internal static class PropertyFactory
                     editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 }
 
+                propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor);
+
                 // publishing = deal with edit and published values
                 foreach (IPropertyValue propertyValue in property.Values)
                 {
@@ -138,10 +141,8 @@ internal static class PropertyFactory
                         continue;
                     }
 
-                    // use explicit equals here, else object comparison fails at comparing eg strings
-                    var sameValues = propertyValue?.PublishedValue == null
-                        ? propertyValue?.EditedValue == null
-                        : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
+                    var sameValues = dataEditor?.ArePropertyValuesEquivalent(propertyValue.EditedValue, propertyValue.PublishedValue)
+                        ?? Equals(propertyValue.EditedValue, propertyValue.PublishedValue);
 
                     edited |= !sameValues;
 
@@ -164,8 +165,7 @@ internal static class PropertyFactory
                             // culture) - ask it which specific culture(s) actually changed, instead of
                             // blindly attributing the edit to the default culture.
                             string[]? changedCultures = null;
-                            if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor) &&
-                                dataEditor.CanMergePartialPropertyValues(property.PropertyType))
+                            if (dataEditor is not null && dataEditor.CanMergePartialPropertyValues(property.PropertyType))
                             {
                                 changedCultures = dataEditor
                                     .GetChangedCulturesForPartialPropertyValues(

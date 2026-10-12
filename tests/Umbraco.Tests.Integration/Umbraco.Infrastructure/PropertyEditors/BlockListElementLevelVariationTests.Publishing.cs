@@ -3,7 +3,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
@@ -3279,15 +3278,13 @@ internal partial class BlockListElementLevelVariationTests
         AssertNoCultureIsEdited(content.Key);
     }
 
-    [TestCase("en-US", "da-DK")]
-    [TestCase("da-DK", "en-US")]
-    public async Task Publishing_Merges_Block_Values_In_Canonical_Order_Regardless_Of_The_Published_Value_Order(string firstCultureToMerge, string secondCultureToMerge)
+    [Test]
+    public async Task Saving_Unchanged_Block_Values_In_Another_Order_Than_Published_Does_Not_Leave_Content_Edited()
     {
         var elementType = CreateHeadlineAndBodyTextElementType();
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        // values stored in a non-canonical order (as persisted before the canonical ordering was introduced)
         var content = CreateContent(
             contentType,
             elementType,
@@ -3299,27 +3296,159 @@ internal partial class BlockListElementLevelVariationTests
                 new() { Alias = "bodyText", Value = "Body text in Danish", Culture = "da-DK" },
             },
             [],
-            publishContent: false);
-        var publishedValue = (string)content.Properties["blocks"]!.GetValue()!;
+            publishContent: true);
+        AssertNoCultureIsEdited(content.Key);
 
-        var editedBlockListValue = JsonSerializer.Deserialize<BlockListValue>(publishedValue);
-        editedBlockListValue.ContentData[0].Values.Single(v => v.Alias == "headline" && v.Culture == firstCultureToMerge).Value = "Updated headline";
-        var editedValue = JsonSerializer.Serialize(editedBlockListValue);
+        var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        blockListValue.ContentData[0].Values = blockListValue.ContentData[0].Values.Reverse().ToList();
+        blockListValue.Expose = blockListValue.Expose.Reverse().ToList();
+        await UpdateBlocksAsync(content, blockListValue);
+
+        AssertNoCultureIsEdited(content.Key);
+    }
+
+    [Test]
+    public void Block_Values_That_Differ_Only_In_The_Order_Of_Values_And_Exposes_Are_Equivalent()
+    {
+        var elementType = CreateHeadlineAndBodyTextElementType();
+        var contentKey = Guid.NewGuid();
+        var settingsKey = Guid.NewGuid();
+
+        var publishedValue = BlockListPropertyValue(
+            elementType,
+            contentKey,
+            settingsKey,
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "headline", Value = "Headline in English", Culture = "en-US" },
+                    new() { Alias = "bodyText", Value = "Body text in English", Culture = "en-US" },
+                    new() { Alias = "headline", Value = "Headline in Danish", Culture = "da-DK" },
+                },
+                [],
+                null,
+                null));
+        var editedValue = BlockListPropertyValue(
+            elementType,
+            contentKey,
+            settingsKey,
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "headline", Value = "Headline in Danish", Culture = "da-DK" },
+                    new() { Alias = "bodyText", Value = "Body text in English", Culture = "en-US" },
+                    new() { Alias = "headline", Value = "Headline in English", Culture = "en-US" },
+                },
+                [],
+                null,
+                null));
+        CollectionAssert.AreNotEqual(
+            publishedValue.Expose.Select(e => e.Culture),
+            editedValue.Expose.Select(e => e.Culture));
 
         IDataEditor dataEditor = PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList]!;
-        var mergedValue = dataEditor.MergePartialPropertyValueForCulture(editedValue, publishedValue, firstCultureToMerge);
-        mergedValue = dataEditor.MergePartialPropertyValueForCulture(editedValue, mergedValue, secondCultureToMerge);
+        Assert.IsTrue(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(editedValue), JsonSerializer.Serialize(publishedValue)));
+    }
 
-        var mergedBlockListValue = JsonSerializer.Deserialize<BlockListValue>((string)mergedValue!);
-        CollectionAssert.AreEqual(
-            new[]
-            {
-                ("da-DK", "bodyText"),
-                ("da-DK", "headline"),
-                ("en-US", "bodyText"),
-                ("en-US", "headline"),
-            },
-            mergedBlockListValue.ContentData[0].Values.Select(v => (v.Culture, v.Alias)));
+    [Test]
+    public void Block_Values_With_Different_Content_Are_Not_Equivalent()
+    {
+        var elementType = CreateHeadlineAndBodyTextElementType();
+        var firstBlock = (Guid.NewGuid(), Guid.NewGuid(), new BlockProperty(
+            new List<BlockPropertyValue> { new() { Alias = "headline", Value = "First headline", Culture = "en-US" } },
+            [],
+            null,
+            null));
+        var secondBlock = (Guid.NewGuid(), Guid.NewGuid(), new BlockProperty(
+            new List<BlockPropertyValue> { new() { Alias = "headline", Value = "Second headline", Culture = "en-US" } },
+            [],
+            null,
+            null));
+        var publishedValue = JsonSerializer.Serialize(BlockListPropertyValue(elementType, [firstBlock, secondBlock]));
+
+        var editedValueWithChangedValue = JsonSerializer.Deserialize<BlockListValue>(publishedValue)!;
+        editedValueWithChangedValue.ContentData[0].Values[0].Value = "Updated headline";
+        var editedValueWithReorderedBlocks = BlockListPropertyValue(elementType, [secondBlock, firstBlock]);
+        var editedValueWithRemovedExpose = JsonSerializer.Deserialize<BlockListValue>(publishedValue)!;
+        editedValueWithRemovedExpose.Expose.RemoveAt(0);
+
+        IDataEditor dataEditor = PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList]!;
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(editedValueWithChangedValue), publishedValue), "A changed block value must not be equivalent.");
+            Assert.IsFalse(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(editedValueWithReorderedBlocks), publishedValue), "Reordered blocks must not be equivalent.");
+            Assert.IsFalse(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(editedValueWithRemovedExpose), publishedValue), "A removed exposure must not be equivalent.");
+        });
+    }
+
+    [Test]
+    public async Task Nested_Block_Values_That_Differ_Only_In_The_Order_Of_Values_Are_Equivalent()
+    {
+        var (rootElementType, nestedElementType) = await CreateElementTypeWithValidationAndNestedBlocksAsync();
+        var rootContentKey = Guid.NewGuid();
+        var rootSettingsKey = Guid.NewGuid();
+        var nestedContentKey = Guid.NewGuid();
+        var nestedSettingsKey = Guid.NewGuid();
+
+        var publishedValue = BlockListPropertyValue(
+            rootElementType,
+            rootContentKey,
+            rootSettingsKey,
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new()
+                    {
+                        Alias = "nestedBlocks",
+                        Value = BlockListPropertyValue(
+                            nestedElementType,
+                            nestedContentKey,
+                            nestedSettingsKey,
+                            new BlockProperty(
+                                new List<BlockPropertyValue>
+                                {
+                                    new() { Alias = "variantText", Value = "Valid nested value in English", Culture = "en-US" },
+                                    new() { Alias = "variantText", Value = "Valid nested value in Danish", Culture = "da-DK" },
+                                },
+                                [],
+                                null,
+                                null)),
+                    },
+                },
+                [],
+                null,
+                null));
+        var editedValue = BlockListPropertyValue(
+            rootElementType,
+            rootContentKey,
+            rootSettingsKey,
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new()
+                    {
+                        Alias = "nestedBlocks",
+                        Value = BlockListPropertyValue(
+                            nestedElementType,
+                            nestedContentKey,
+                            nestedSettingsKey,
+                            new BlockProperty(
+                                new List<BlockPropertyValue>
+                                {
+                                    new() { Alias = "variantText", Value = "Valid nested value in Danish", Culture = "da-DK" },
+                                    new() { Alias = "variantText", Value = "Valid nested value in English", Culture = "en-US" },
+                                },
+                                [],
+                                null,
+                                null)),
+                    },
+                },
+                [],
+                null,
+                null));
+
+        IDataEditor dataEditor = PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList]!;
+        Assert.IsTrue(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(editedValue), JsonSerializer.Serialize(publishedValue)));
     }
 
     private IContentType CreateHeadlineAndBodyTextElementType()
