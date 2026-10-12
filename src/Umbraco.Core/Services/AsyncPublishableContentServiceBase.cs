@@ -2,7 +2,9 @@ using System.Collections.Immutable;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -36,7 +38,24 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly Lazy<IUserService> _userService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AsyncPublishableContentServiceBase{TContent}"/> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="contentTypeRepository">The backing content type repository.</param>
+    /// <param name="asyncContentRepository">The backing content repository.</param>
+    /// <param name="languageRepository">The language repository.</param>
+    /// <param name="propertyValidationService">The property validation service.</param>
+    /// <param name="cultureImpactFactory">The culture impact factory.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="propertyEditorCollection">The property editor collection.</param>
+    /// <param name="idKeyMap">The ID key map.</param>
+    /// <param name="userService">The user service, resolved lazily to avoid a circular dependency.</param>
     protected AsyncPublishableContentServiceBase(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -49,7 +68,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
         PropertyEditorCollection propertyEditorCollection,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        Lazy<IUserService> userService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _auditService = auditService;
@@ -61,6 +81,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         _userIdKeyResolver = userIdKeyResolver;
         _propertyEditorCollection = propertyEditorCollection;
         _idKeyMap = idKeyMap;
+        _userService = userService;
     }
 
     protected abstract UmbracoObjectTypes ContentObjectType { get; }
@@ -73,6 +94,21 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     protected abstract ILogger<AsyncPublishableContentServiceBase<TContent>> Logger { get; }
 
+    /// <summary>
+    ///     Persists the pending changes of a content item, publishing or unpublishing it as its published state dictates.
+    /// </summary>
+    /// <param name="scope">The scope to persist within.</param>
+    /// <param name="content">The content item to persist.</param>
+    /// <param name="eventMessages">The event messages to report to.</param>
+    /// <param name="allLangs">All languages.</param>
+    /// <param name="notificationState">The notification state to pass on to notifications.</param>
+    /// <param name="userId">The identifier of the user performing the operation.</param>
+    /// <param name="includeInvariantForVariant">
+    ///     Whether publishing includes invariant properties of variant content. When <c>null</c>, it is determined by the
+    ///     invariant-for-variant permission of the user identified by <paramref name="userId"/>.
+    /// </param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The result of the operation.</returns>
     protected virtual Task<PublishResult> CommitContentChangesAsync(
         ICoreScope scope,
         TContent content,
@@ -80,8 +116,17 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         IReadOnlyCollection<ILanguage> allLangs,
         IDictionary<string, object?>? notificationState,
         int userId,
+        bool? includeInvariantForVariant,
         CancellationToken cancellationToken)
-        => CommitContentChangesInternalAsync(scope, content, eventMessages, allLangs, notificationState, userId, cancellationToken);
+        => CommitContentChangesInternalAsync(
+            scope,
+            content,
+            eventMessages,
+            allLangs,
+            notificationState,
+            userId,
+            cancellationToken,
+            includeInvariantForVariant: includeInvariantForVariant);
 
     protected abstract Task DeleteLockedAsync(ICoreScope scope, TContent content, EventMessages evtMsgs, CancellationToken cancellationToken);
 
@@ -706,13 +751,16 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         int userId = await _userIdKeyResolver.GetAsync(userKey);
-        return await PublishAsync(content, cultures, userId, cancellationToken);
+        IUser user = await _userService.Value.GetRequiredUserAsync(userKey);
+        return await PublishAsync(content, cultures, userId, user.HasAccessToInvariantForVariant(), cancellationToken);
     }
 
     // Takes the resolved int id directly so an internal caller that already holds one (e.g. a content
     // version's WriterId) doesn't have to round-trip it through a Guid lookup - that round trip is lossy
-    // for a writer id with no matching user (it has no Guid to resolve to or from).
-    private async Task<PublishResult> PublishAsync(TContent content, string[] cultures, int userId, CancellationToken cancellationToken)
+    // for a writer id with no matching user (it has no Guid to resolve to or from). For the same reason the
+    // invariant-for-variant decision is passed in rather than read from the user: scheduled publishing has
+    // no acting user to read it from.
+    private async Task<PublishResult> PublishAsync(TContent content, string[] cultures, int userId, bool includeInvariantForVariant, CancellationToken cancellationToken)
     {
         if (content is null)
         {
@@ -780,7 +828,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         // this will create the correct culture impact even if culture is * or null
         IEnumerable<CultureImpact?> impacts =
-            cultures.Select(culture => _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content));
+            cultures.Select(culture => _cultureImpactFactory.Create(culture, content, includeInvariantForVariant));
 
         // publish the culture(s)
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -793,7 +841,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         // Change state to publishing
         content.PublishedState = PublishedState.Publishing;
 
-        PublishResult result = await CommitContentChangesAsync(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId, cancellationToken);
+        PublishResult result = await CommitContentChangesAsync(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId, includeInvariantForVariant, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -834,6 +882,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         int userId = await _userIdKeyResolver.GetAsync(userKey);
+        IUser user = await _userService.Value.GetRequiredUserAsync(userKey);
+        var includeInvariantForVariant = user.HasAccessToInvariantForVariant();
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
@@ -849,7 +899,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         IEnumerable<CultureImpact> impacts =
-            culturesToPublish.Select(x => _cultureImpactFactory.ImpactExplicit(x, IsDefaultCulture(allLangs, x)));
+            culturesToPublish.Select(x => _cultureImpactFactory.ImpactExplicit(x, includeInvariantForVariant));
 
         // publish the culture(s)
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -858,7 +908,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
         }
 
-        PublishResult result = await CommitContentChangesInternalAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken, raiseSavedNotification: true);
+        PublishResult result = await CommitContentChangesInternalAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken, raiseSavedNotification: true, includeInvariantForVariant: includeInvariantForVariant);
         scope.Complete();
         return result;
     }
@@ -890,6 +940,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         EnsureNameLengthIsValid(content);
 
         int userId = await _userIdKeyResolver.GetAsync(userKey);
+        IUser user = await _userService.Value.GetRequiredUserAsync(userKey);
+        var includeInvariantForVariant = user.HasAccessToInvariantForVariant();
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
@@ -905,13 +957,13 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         // this will create the correct culture impact even if culture is * or null
-        var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+        var impact = _cultureImpactFactory.Create(culture, content, includeInvariantForVariant);
 
         // publish the culture(s)
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
         content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
 
-        PublishResult result = await CommitContentChangesInternalAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken, raiseSavedNotification: true);
+        PublishResult result = await CommitContentChangesInternalAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken, raiseSavedNotification: true, includeInvariantForVariant: includeInvariantForVariant);
         scope.Complete();
         return result;
     }
@@ -1013,7 +1065,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 // We are however unpublishing all cultures, so we will set this to unpublishing.
                 content.UnpublishCulture(culture);
                 content.PublishedState = PublishedState.Unpublishing;
-                PublishResult result = await CommitContentChangesAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken);
+                PublishResult result = await CommitContentChangesAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, includeInvariantForVariant: null, cancellationToken);
                 scope.Complete();
                 return result;
             }
@@ -1027,7 +1079,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 var removed = content.UnpublishCulture(culture);
 
                 // Save and publish any changes
-                PublishResult result = await CommitContentChangesAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken);
+                PublishResult result = await CommitContentChangesAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, includeInvariantForVariant: null, cancellationToken);
 
                 scope.Complete();
 
@@ -1102,7 +1154,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     }
 
                     await _asyncContentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
-                    PublishResult result = await CommitContentChangesAsync(scope, d, evtMsgs, await allLangs.Value, savingNotification.State, d.WriterId, cancellationToken);
+                    PublishResult result = await CommitContentChangesAsync(scope, d, evtMsgs, await allLangs.Value, savingNotification.State, d.WriterId, includeInvariantForVariant: true, cancellationToken);
                     if (result is { Success: false })
                     {
                         Logger.LogError(null, "Failed to publish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
@@ -1180,7 +1232,12 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
-                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(await allLangs.Value, culture));
+
+                        // NOTE: hardcoding allowEditInvariantForVariant as true works for now, but it will need replacing if we ever introduce
+                        //       "invariance as opt-in" for save/publish/schedule operations.
+                        //       The writer's permission can't be used instead: the writer is the last user to save the content,
+                        //       not the user who scheduled it.
+                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, includeInvariantForVariant: true);
                         var tryPublish = d.PublishCulture(impact, date, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties is { Length: > 0 })
@@ -1212,7 +1269,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     else
                     {
                         await _asyncContentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
-                        result = await CommitContentChangesAsync(scope, d, evtMsgs, await allLangs.Value, savingNotification.State, d.WriterId, cancellationToken);
+                        result = await CommitContentChangesAsync(scope, d, evtMsgs, await allLangs.Value, savingNotification.State, d.WriterId, includeInvariantForVariant: true, cancellationToken);
                     }
 
                     if (result is { Success: false })
@@ -1240,7 +1297,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                         // Uses the int-userId overload directly, matching the CommitContentChangesAsync calls
                         // elsewhere in this method: WriterId is passed through as-is, with no Guid round trip
                         // that would be lossy for a writer id with no matching user.
-                        result = await PublishAsync(d, [.. d.AvailableCultures], d.WriterId, cancellationToken);
+                        result = await PublishAsync(d, [.. d.AvailableCultures], d.WriterId, includeInvariantForVariant: true, cancellationToken);
                     }
 
                     if (result is { Success: false })
@@ -1275,6 +1332,10 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     ///     points enable it, because they combine a save and a publish and the paired "saved" notification still
     ///     has to fire.
     /// </param>
+    /// <param name="includeInvariantForVariant">
+    ///     Whether publishing includes invariant properties of variant content. When <c>null</c>, it is determined by the
+    ///     invariant-for-variant permission of the user identified by <paramref name="userId"/>.
+    /// </param>
     /// <returns></returns>
     /// <remarks>
     ///     <para>
@@ -1294,7 +1355,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         CancellationToken cancellationToken,
         bool branchOne = false,
         bool branchRoot = false,
-        bool raiseSavedNotification = false)
+        bool raiseSavedNotification = false,
+        bool? includeInvariantForVariant = null)
     {
         if (scope is null)
         {
@@ -1380,6 +1442,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 eventMessages,
                 allLangs,
                 notificationState,
+                userId,
+                includeInvariantForVariant,
                 cancellationToken);
 
             if (publishResult.Success)
@@ -1787,8 +1851,15 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     protected static bool HasUnsavedChanges(TContent content) => content.HasIdentity is false || content.IsDirty();
 
-    protected static bool IsDefaultCulture(IReadOnlyCollection<ILanguage>? langs, string culture) =>
-        langs?.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture)) ?? false;
+    /// <summary>
+    ///     Gets the user performing an operation, so that their permissions can be applied to it.
+    /// </summary>
+    /// <param name="userId">The identifier of the user.</param>
+    /// <returns>The user.</returns>
+    /// <exception cref="ArgumentException">No user exists with the supplied identifier.</exception>
+    protected IUser GetRequiredUser(int userId)
+        => _userService.Value.GetUserById(userId)
+           ?? throw new ArgumentException("Could not find the supplied user", nameof(userId));
 
     /// <inheritdoc />
     public abstract Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken);
@@ -1936,17 +2007,23 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         EventMessages evtMsgs,
         IReadOnlyCollection<ILanguage> allLangs,
         IDictionary<string, object?>? notificationState,
+        int userId,
+        bool? includeInvariantForVariant,
         CancellationToken cancellationToken)
     {
         var variesByCulture = content.ContentType.VariesByCulture();
 
         // If it's null it's invariant
-        CultureImpact[] impactsToPublish = culturesPublishing is null
-                ? [_cultureImpactFactory.ImpactInvariant()]
-            : [.. culturesPublishing.Select(x =>
-                _cultureImpactFactory.ImpactExplicit(
-                        x,
-                        allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory)))];
+        CultureImpact[] impactsToPublish;
+        if (culturesPublishing is null)
+        {
+            impactsToPublish = [_cultureImpactFactory.ImpactInvariant()];
+        }
+        else
+        {
+            var includeInvariant = includeInvariantForVariant ?? GetRequiredUser(userId).HasAccessToInvariantForVariant();
+            impactsToPublish = [.. culturesPublishing.Select(x => _cultureImpactFactory.ImpactExplicit(x, includeInvariant))];
+        }
 
         // publish the culture(s)
         var publishTime = DateTime.UtcNow;

@@ -54,6 +54,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <param name="relationService">The relation service.</param>
     /// <param name="documentRepository">The document repository.</param>
     /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
+    /// <param name="userService">The user service, resolved lazily to avoid a circular dependency.</param>
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -70,7 +71,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
         IDocumentRepository documentRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository)
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        Lazy<IUserService> userService)
         : base(
             provider,
             loggerFactory,
@@ -83,7 +85,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             cultureImpactFactory,
             userIdKeyResolver,
             propertyEditorCollection,
-            idKeyMap)
+            idKeyMap,
+            userService)
     {
         _documentRepository = documentRepository;
         _documentBlueprintRepository = documentBlueprintRepository;
@@ -463,7 +466,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     }
 
     // utility 'PublishCultures' func used by SaveAndPublishBranch
-    private bool PublishBranch_PublishCultures(IContent content, HashSet<string> culturesToPublish, IReadOnlyCollection<ILanguage> allLangs)
+    private bool PublishBranch_PublishCultures(IContent content, HashSet<string> culturesToPublish, IUser user)
     {
         // variant content type - publish specified cultures
         // invariant content type - publish only the invariant culture
@@ -473,7 +476,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         {
             return culturesToPublish.All(culture =>
             {
-                CultureImpact? impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+                CultureImpact? impact = _cultureImpactFactory.Create(culture, content, includeInvariantForVariant: user.HasAccessToInvariantForVariant());
                 return content.PublishCulture(impact, publishTime, _propertyEditorCollection) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
@@ -592,7 +595,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     internal async Task<IEnumerable<PublishResult>> PublishBranchAsync(
         IContent document,
         Func<IContent, HashSet<string>?> shouldPublish,
-        Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>, bool> publishCultures,
+        Func<IContent, HashSet<string>, IUser, bool> publishCultures,
         int userId,
         CancellationToken cancellationToken)
     {
@@ -612,6 +615,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            IUser user = GetRequiredUser(userId);
+
             scope.WriteLock(Constants.Locks.ContentTree);
 
             var allLangs = (await _languageRepository.GetAllAsync(cancellationToken)).ToList();
@@ -647,7 +652,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             // deal with the branch root - if it fails, abort
             HashSet<string>? culturesToPublish = shouldPublish(document);
             (PublishResult? result, IDictionary<string, object?>? notificationState) =
-                await PublishBranchItemAsync(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, cancellationToken);
+                await PublishBranchItemAsync(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, user, allLangs, cancellationToken);
             if (result is not null)
             {
                 results.Add(result);
@@ -687,7 +692,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
                     // no need to check path here, parent has to be published here
                     culturesToPublish = shouldPublish(d);
-                    (result, _) = await PublishBranchItemAsync(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, cancellationToken);
+                    (result, _) = await PublishBranchItemAsync(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, user, allLangs, cancellationToken);
                     if (result is not null)
                     {
                         results.Add(result);
@@ -740,12 +745,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         ICoreScope scope,
         IContent document,
         HashSet<string>? culturesToPublish,
-        Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>,
-            bool> publishCultures,
+        Func<IContent, HashSet<string>, IUser, bool> publishCultures,
         bool isRoot,
         ICollection<IContent> publishedDocuments,
         EventMessages evtMsgs,
-        int userId,
+        IUser user,
         IReadOnlyCollection<ILanguage> allLangs,
         CancellationToken cancellationToken)
     {
@@ -777,13 +781,13 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         }
 
         // publish & check if values are valid
-        if (!publishCultures(document, culturesToPublish, allLangs))
+        if (!publishCultures(document, culturesToPublish, user))
         {
             // TODO: Based on this callback behavior there is no way to know which properties may have been invalid if this failed, see other results of FailedPublishContentInvalid
             return (new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document), savingNotification.State);
         }
 
-        PublishResult result = await CommitContentChangesInternalAsync(scope, document, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken, branchOne: true, branchRoot: isRoot);
+        PublishResult result = await CommitContentChangesInternalAsync(scope, document, evtMsgs, allLangs, savingNotification.State, user.Id, cancellationToken, branchOne: true, branchRoot: isRoot);
         if (result.Success)
         {
             publishedDocuments.Add(document);

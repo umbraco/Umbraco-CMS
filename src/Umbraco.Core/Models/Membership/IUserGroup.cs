@@ -42,10 +42,27 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     string? Description { get; set; }
 
     /// <summary>
-    ///     If this property is true it will give the group access to all languages
+    ///     If this property is true it will give the group access to all languages.
     /// </summary>
-    /// This is set to return true as default to avoid breaking changes
+    /// <remarks>
+    ///     This is set to return true as default to avoid breaking changes.
+    /// </remarks>
+    // TODO (V20): Remove default implementation.
     public bool HasAccessToAllLanguages
+    {
+        get => true;
+        set { /* This is NoOp to avoid breaking changes */ }
+    }
+
+    /// <summary>
+    ///     If this property is true it will allow the group to edit invariant (shared) property data
+    ///     on variant content. The permission is not consulted when editing invariant content types.
+    /// </summary>
+    /// <remarks>
+    ///     This is set to return true as default to avoid breaking changes.
+    /// </remarks>
+    // TODO (V20): Remove default implementation.
+    public bool HasAccessToInvariantForVariant
     {
         get => true;
         set { /* This is NoOp to avoid breaking changes */ }

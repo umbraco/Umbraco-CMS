@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -66,5 +65,9 @@ public class UmbracoPremigrationPlan : MigrationPlan
         // Languages are read through EF Core before the main plan runs (e.g. to initialize the publish status cache),
         // and the EF Core model maps the language key, so the column must exist first.
         To<V_18_0_0.AddLanguageKeyColumn>("{350AD6F2-B64F-46FF-BE9F-0991B196EBBF}");
+
+        // To 19.0.0
+        // The user group repository reads and writes this column, and migrations in the main plan load and save user groups.
+        To<V_19_0_0.AddHasAccessToInvariantForVariantColumnToUserGroup>("{550AD0E5-2AAA-4D51-BAE1-7ACCB4822F21}");
     }
 }

@@ -70,6 +70,7 @@ public class SqlServerMigrationProvider : IMigrationProvider
             EFCoreMigration.ReconcileDocumentRepositoryModel => typeof(Migrations.ReconcileDocumentRepositoryModel),
             EFCoreMigration.AddTemplateDto => typeof(Migrations.AddTemplateDto),
             EFCoreMigration.RemoveUserGroupDefaultPermissionsFromModel => typeof(Migrations.RemoveUserGroupDefaultPermissionsFromModel),
+            EFCoreMigration.AddHasAccessToInvariantForVariantToModel => typeof(Migrations.AddHasAccessToInvariantForVariantToModel),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }

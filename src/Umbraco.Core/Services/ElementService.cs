@@ -40,7 +40,8 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         IUserIdKeyResolver userIdKeyResolver,
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap,
-        IShortStringHelper shortStringHelper)
+        IShortStringHelper shortStringHelper,
+        Lazy<IUserService> userService)
         : base(
             provider,
             loggerFactory,
@@ -53,7 +54,8 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
             cultureImpactFactory,
             userIdKeyResolver,
             propertyEditorCollection,
-            idKeyMap)
+            idKeyMap,
+            userService)
     {
         _elementRepository = elementRepository;
         _shortStringHelper = shortStringHelper;

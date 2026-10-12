@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
@@ -70,9 +68,9 @@ internal abstract class BlockEditorElementVariationTestBase : UmbracoIntegration
     public async Task SetUp() => await LanguageService.CreateAsync(
         new Language("da-DK", "Danish"), Constants.Security.SuperUserKey);
 
-    protected void PublishContent(IContent content, string[] culturesToPublish)
+    protected void PublishContent(IContent content, string[] culturesToPublish, Guid? userKey = null)
     {
-        var publishResult = ContentService.PublishAsync(content, culturesToPublish, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
+        var publishResult = ContentService.PublishAsync(content, culturesToPublish, userKey ?? Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.IsTrue(publishResult.Success);
         DocumentCacheService.RefreshContentAsync(content).GetAwaiter().GetResult();
     }

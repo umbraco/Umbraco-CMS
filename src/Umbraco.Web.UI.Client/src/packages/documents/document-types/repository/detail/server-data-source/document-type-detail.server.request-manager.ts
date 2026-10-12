@@ -14,8 +14,8 @@ import {
 
 export class UmbManagementApiDocumentTypeDetailDataRequestManager extends UmbManagementApiDetailDataRequestManager<
 	DocumentTypeResponseModel,
-	UpdateDocumentTypeRequestModel,
-	CreateDocumentTypeRequestModel
+	CreateDocumentTypeRequestModel,
+	UpdateDocumentTypeRequestModel
 > {
 	static #inflightRequestCache = new UmbManagementApiInFlightRequestCache<DocumentTypeResponseModel>();
 
