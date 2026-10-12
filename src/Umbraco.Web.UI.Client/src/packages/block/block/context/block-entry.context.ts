@@ -336,11 +336,6 @@ export abstract class UmbBlockEntryContext<
 	private readonly _settingsDataContentTypeKey = this.#settings.asObservablePart((x) =>
 		x ? (x.contentTypeKey ?? undefined) : null,
 	);
-	/**
-	 * @deprecated Use {@link UmbBlockEntryContext#_settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
-	 */
-	// eslint-disable-next-line
-	private readonly settingsDataContentTypeKey = this._settingsDataContentTypeKey;
 
 	#settingsValuesObservable?: Observable<UmbBlockDataType | undefined>;
 	public async settingsValues() {

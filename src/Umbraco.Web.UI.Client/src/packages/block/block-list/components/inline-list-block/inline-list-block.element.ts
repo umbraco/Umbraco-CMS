@@ -8,26 +8,19 @@ import {
 } from '@umbraco-cms/backoffice/block';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContextBoundary } from '@umbraco-cms/backoffice/context-api';
 import { UMB_VIEW_CONTEXT } from '@umbraco-cms/backoffice/view';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
-import type {
-	UmbBlockDataType,
-	UMB_BLOCK_WORKSPACE_CONTEXT,
-	UmbBlockLabelUfmValueType,
-} from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataType, UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
 
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
 };
-
-let hasWarnedLabelDeprecation = false;
 
 /**
  * @element umb-inline-list-block
@@ -38,29 +31,6 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	#manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#blockContext?: typeof UMB_BLOCK_LIST_ENTRY_CONTEXT.TYPE;
 	#contentKey?: string;
-
-	/**
-	 * @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 19.
-	 */
-	@property({ type: String, reflect: false })
-	public set label(value: string | undefined) {
-		if (value !== undefined && value !== this._label) {
-			if (!hasWarnedLabelDeprecation) {
-				hasWarnedLabelDeprecation = true;
-				new UmbDeprecation({
-					deprecated: 'umb-inline-list-block.label property',
-					solution: 'Project a `<umb-ufm-render>` into the `name` slot instead.',
-					removeInVersion: '19.0.0',
-				}).warn();
-			}
-		}
-		this._label = value;
-	}
-	public get label(): string | undefined {
-		return this._label;
-	}
-	@state()
-	private _label?: string;
 
 	@property({ type: String, reflect: false })
 	icon?: string;
@@ -98,14 +68,6 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 
 	@state()
 	private _variantName?: string;
-
-	@state()
-	private _hasNameSlotContent = false;
-
-	#onNameSlotChange = (event: Event) => {
-		const slot = event.target as HTMLSlotElement;
-		this._hasNameSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
-	};
 
 	constructor() {
 		super();
@@ -231,19 +193,13 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
-		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<span id="content">
 				<span id="icon">
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
 				<div id="info">
-					<slot name="name" @slotchange=${this.#onNameSlotChange}></slot>
-					${when(
-						!this._hasNameSlotContent && this._label !== undefined,
-						() =>
-							html`<umb-ufm-render id="name" inline .markdown=${this._label} .value=${blockValue}></umb-ufm-render>`,
-					)}
+					<slot name="name"></slot>
 				</div>
 			</span>
 			${when(this.unpublished, () => this.#renderDraftTag())}
