@@ -1,4 +1,5 @@
 import {
+	UmbTestSectionContext,
 	UmbTestSectionSidebarMenuContext,
 	UmbTestSubmittableTreeEntityWorkspaceContext,
 } from './menu-tree-structure-workspace-context.test-utils.js';
@@ -8,7 +9,7 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export { UmbTestSubmittableTreeEntityWorkspaceContext, UmbTestSectionSidebarMenuContext };
+export { UmbTestSubmittableTreeEntityWorkspaceContext, UmbTestSectionSidebarMenuContext, UmbTestSectionContext };
 
 @customElement('umb-test-menu-variant-structure-controller-host')
 export class UmbTestMenuVariantStructureControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -64,11 +65,12 @@ export const createTestVariantTreeRepositoryManifest = (alias: string): Manifest
 export function createTestVariantAncestorItem(
 	entity: UmbEntityModel,
 	name = entity.unique ?? 'unnamed',
+	isFolder = false,
 ): UmbTestVariantTreeItemModel {
 	return {
 		...entity,
 		name,
-		isFolder: false,
+		isFolder,
 		hasChildren: false,
 		parent: { unique: null, entityType: 'test-root-entity-type' },
 		variants: [{ name, culture: null, segment: null }],

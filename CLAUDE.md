@@ -392,6 +392,20 @@ public interface IMyService
 - `.editorconfig` - Code style rules
 - `.globalconfig` - Roslyn analyzer rules
 
+### SBOM Generation & License Policy (Azure Pipelines)
+
+`build/azure-pipelines.yml` generates a CycloneDX SBOM per project (Backend/NuGet, Login UI, Backoffice, E2E), each in its own job in the `Dependency_Track` stage, via **`umbraco-sbom`** (the `Umbraco.Internal.Sbom` .NET 10 global tool), not plain `dotnet CycloneDX` / `@cyclonedx/cyclonedx-npm`. It adds license-policy enforcement over CycloneDX. Repo (private): https://github.com/umbraco/Umbraco.Internal.Sbom — README has the full flag/exit-code/policy reference.
+
+When editing those steps:
+
+- **Output filenames and artifacts** (`bom-dotnet.xml`, `bom-login.xml`, `bom-backoffice.xml`, `bom-e2e.xml`) are mapped to Dependency-Track projects in the stage's `build/templates/dependency-track.yml` parameters — keep them in step.
+- **Usage**: `umbraco-sbom <path> --output-file <full-path> [policy flags]`. Only `--output-file` plus policy flags (`--allow-package`, `--allow-commercial`, `--allow-copyleft`, `--fail-on-unknown`, `--policy-allow-file`) exist.
+- **Commercial packages** need `--allow-package`, else **exit 50**. Backend uses `nuget:SixLabors.*` (covers both `SixLabors.ImageSharp` and `.ImageSharp.Web`).
+- **`isLatest`**: DT allows one latest version per project name, and projects are `Umbraco-CMS` (children `Umbraco-CMS-Backend` etc.) versioned by major. Only a stable public release of `main`'s major (read from `main`'s `version.json` at upload time) is marked latest; older-major releases upload with `false`.
+- **Exit 10** = success-with-warnings (unresolved licenses; SBOM still written). Each step tolerates it: `if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }; exit 0`.
+- **Every BOM job** needs a `UseDotNet@2` (`useGlobalJson: true`) step before the tool install (the .NET 10 tool needs the SDK, including in the otherwise Node-only frontend jobs).
+- **Backend** must restore before scanning: `umbraco-sbom` needs every project in the solution restored, including the two the solution restore skips (`Umbraco.Tests.AcceptanceTest.UmbracoProject`, `Umbraco.JsonSchema`).
+
 ### Persistence Layer - NPoco and EF Core
 
 The repository contains BOTH (actively supported):
@@ -495,9 +509,11 @@ Responds to `@claude` mentions on PRs and issues. The trigger phrase is stripped
 - `@claude label` → applies labels
 - `@claude` (empty) → defaults to `review` on PRs, `help` on issues
 
-Also triggers on issue assignment to `claude` or adding the `claude` label. Gated: only runs when `@claude` appears in the comment/issue body. Max 25 turns.
+Also triggers on issue assignment to `claude` or adding the `claude` label. Gated: only runs when `@claude` appears in the comment/issue body. Max 50 turns.
 
-**Allowed Bash tools**: `gh`, `git`, `npm`, `dotnet` (interactive only; auto-review allows `gh` and `git`).
+**Allowed tools**:
+- Auto-review: inline comments, `gh auth status`, `gh pr view/diff/comment/edit`, and `git diff/log/show/fetch`.
+- Interactive: inline comments, `git`, `npm` and `dotnet`, file edits inside the checkout (`--permission-mode acceptEdits`), and the `gh` commands for PRs, issues and runs that the requests need (`gh pr view/diff/checks/comment/edit/create`, `gh issue view/comment/edit`, `gh search issues/prs`, `gh run view/list`). Node and .NET are set up from `.nvmrc` and `global.json`.
 
 ### Labels
 
@@ -527,6 +543,8 @@ Labels are only added, never removed. Claude applies only labels it is confident
 
 - **Checkout required** — the action internally runs `git fetch origin main` for trusted file restoration. Without `actions/checkout`, it fails with `fatal: not a git repository`.
 - **`id-token: write` permission** — required for OIDC token exchange with the Claude GitHub App.
+- **Workflow files must match `main`** — the action skips, with a warning, when the workflow file it runs from differs from the version on the default branch. A PR that changes `claude-review.yml` can't review itself, and reviews on other branches skip until the change has been merged up to `main`.
+- **Mode decides the default tools** — `track_progress: true` runs the auto-review in tag mode, where the action adds read tools, file edits inside the checkout and its own commit tools. With a `prompt` and no progress tracking, the interactive and issue-deduplication workflows run in agent mode, where only `--allowedTools` applies: read-only tools always work, but file edits need `--permission-mode acceptEdits`.
 - **Trigger phrase stripping** — the action strips `@claude` from comments before passing to Claude. Prompts must reference commands without the prefix (e.g., `review` not `@claude review`).
 - **PR number injection** — the interactive workflow injects the PR/issue number into the prompt via `${{ github.event.issue.number }}` since Claude can't discover it from `gh pr view` when checked out on `main`.
 
@@ -562,6 +580,7 @@ For integration tests that exercise caching or cache refreshers, see `tests/Umbr
 
 - **Fresh build before trusting a green.** Never treat `--no-build` or cached/incremental output as proof a change compiles or passes — a stale run can mask a compile error. Rebuild before reporting build or test state. (Integration tests have a related false-green trap — see `tests/Umbraco.Tests.Integration/CLAUDE.md`.)
 - **Grep the branch you think you're on.** A search only supports a claim against the branch actually checked out, so confirm HEAD is where you expect before drawing a conclusion from a grep. Easy to get wrong whenever the tree moves under you — reviewing a PR head, switching worktrees, or mid merge-up/rebase.
+- **Remove unused usings — touched files only.** Before handing back C# changes, remove unused `using` directives (IDE0005) from the `.cs` files the change adds or modifies, and never sweep other files (unrelated churn causes merge-up conflicts). Run it per affected project, not the solution, which is slow to load: `dotnet format style <project>.csproj --diagnostics IDE0005 --severity info --include <files>`, then rebuild (a using may only be needed under an `#if` symbol).
 
 ---
 

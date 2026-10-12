@@ -106,3 +106,37 @@ test('can not publish a mandatory dropdown with an empty value', {tag: '@release
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value).toEqual([optionValues[0]]);
 });
+
+test('can navigate away from content with a dropdown value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const optionValues = ['testOption1', 'testOption2'];
+  const customDataTypeId = await umbracoApi.dataType.createDropdownDataType(customDataTypeName, false, optionValues);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), [optionValues[0]]);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed dropdown value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const optionValues = ['testOption1', 'testOption2'];
+  const customDataTypeId = await umbracoApi.dataType.createDropdownDataType(customDataTypeName, false, optionValues);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), [optionValues[0]]);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.chooseDropdownOption([optionValues[1]]);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});

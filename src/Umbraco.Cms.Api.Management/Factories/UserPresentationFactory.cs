@@ -233,7 +233,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         Task.FromResult(new UserConfigurationResponseModel
         {
             // You should not be able to invite users if any providers has deny local login set.
-            CanInviteUsers = _emailSender.CanSendRequiredEmail() && _externalLoginProviders.HasDenyLocalLogin() is false,
+            CanInviteUsers = _emailSender.IsEmailConfigured() && _externalLoginProviders.HasDenyLocalLogin() is false,
             UsernameIsEmail = _securitySettings.UsernameIsEmail,
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
 

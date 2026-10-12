@@ -304,6 +304,11 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         MapBlockItemDataToEditor(property, blockValue.ContentData, culture, segment);
         MapBlockItemDataToEditor(property, blockValue.SettingsData, culture, segment);
         _blockEditorVarianceHandler.AlignExposeVariance(blockValue, culture);
+        blockValue.Expose = blockValue.Expose
+            .OrderBy(variation => variation.Culture, StringComparer.Ordinal)
+            .ThenBy(variation => variation.Segment, StringComparer.Ordinal)
+            .ThenBy(variation => variation.ContentKey)
+            .ToList();
     }
 
     protected IEnumerable<Guid> ConfiguredElementTypeKeys(IBlockConfiguration configuration)
@@ -327,7 +332,11 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             // to be friendly we'll map the values onto the culture being aligned - falling back to the default language -
             // instead of performing a hard reset of the property values (which would likely be the most correct thing to
             // do from a data point of view).
-            item.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult();
+            item.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult()
+                .OrderBy(value => value.Culture, StringComparer.Ordinal)
+                .ThenBy(value => value.Segment, StringComparer.Ordinal)
+                .ThenBy(value => value.Alias, StringComparer.Ordinal)
+                .ToList();
             foreach (BlockPropertyValue blockPropertyValue in item.Values)
             {
                 IPropertyType? propertyType = blockPropertyValue.PropertyType;
@@ -531,8 +540,12 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
             foreach (BlockPropertyValue targetBlockPropertyValue in targetBlockItem.Values)
             {
+                // The segment has to take part in the match, or a segment variant value would be restored from
+                // another segment of the same culture.
                 BlockPropertyValue? sourceBlockPropertyValue = sourceBlockItem?.Values.FirstOrDefault(v
-                    => v.Alias == targetBlockPropertyValue.Alias && v.Culture == targetBlockPropertyValue.Culture);
+                    => v.Alias == targetBlockPropertyValue.Alias
+                       && v.Culture == targetBlockPropertyValue.Culture
+                       && v.Segment == targetBlockPropertyValue.Segment);
 
                 // todo double check if this path can have an invariant value, but it shouldn't right???
                 // => it can be a null culture, but we shouldn't do anything? as the invariant section should have done it already
@@ -900,6 +913,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         foreach (BlockItemData sourceBlockItem in sourceBlockItems)
         {
             BlockItemData? targetBlockItem = targetBlockItems.FirstOrDefault(i => i.Key == sourceBlockItem.Key);
+            var targetBlockItemExisted = targetBlockItem is not null;
             if (targetBlockItem is null)
             {
                 targetBlockItem = new BlockItemData(
@@ -949,6 +963,13 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     ? sourceBlockPropertyValue.Value
                     : mergingDataEditor!.MergePartialPropertyValueForCulture(sourceBlockPropertyValue.Value, targetBlockPropertyValue.Value, culture);
             }
+
+            // Remove any values that are present in the target, but no longer present in the source,
+            // to ensure they're not contained in any future publish.
+            if (targetBlockItemExisted)
+            {
+                RemoveValuesMissingFromSource(sourceBlockItem, targetBlockItem, culture);
+            }
         }
 
         // After merging, remove stale values when property variation changed.
@@ -966,6 +987,30 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             });
         }
     }
+
+    // Removes target values that have no corresponding entries in the source, scoped to the culture currently
+    // being merged. A value that itself doesn't vary by culture but nests further partial-mergeable data
+    // (e.g. blocks within blocks) is always reconciled here, mirroring the additive merge's equivalent exemption
+    // above; any other value is only removed when it belongs to the culture currently being published.
+    private void RemoveValuesMissingFromSource(BlockItemData sourceBlockItem, BlockItemData targetBlockItem, string? culture)
+        => targetBlockItem.Values.RemoveAll(targetBlockPropertyValue =>
+        {
+            var sourceHasValue = sourceBlockItem.Values.Any(v =>
+                v.Alias == targetBlockPropertyValue.Alias &&
+                v.Culture == targetBlockPropertyValue.Culture &&
+                v.Segment == targetBlockPropertyValue.Segment);
+            if (sourceHasValue)
+            {
+                return false;
+            }
+
+            IDataEditor? mergingDataEditor = null;
+            var shouldPerformPartialMerge = targetBlockPropertyValue.PropertyType is not null
+                              && _propertyEditors.TryGet(targetBlockPropertyValue.PropertyType.PropertyEditorAlias, out mergingDataEditor)
+                              && mergingDataEditor.CanMergePartialPropertyValues(targetBlockPropertyValue.PropertyType);
+
+            return shouldPerformPartialMerge || targetBlockPropertyValue.Culture == culture;
+        });
 
     /// <summary>
     /// Sorts block item values by culture to ensure consistent JSON serialization order.

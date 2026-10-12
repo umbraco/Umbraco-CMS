@@ -5,6 +5,8 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 
 @customElement('umb-test-menu-structure-controller-host')
 export class UmbTestMenuStructureControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -144,6 +146,21 @@ export function createTestAncestorItem(entity: UmbEntityModel, name = entity.uni
 		hasChildren: false,
 		parent: { unique: null, entityType: 'test-root-entity-type' },
 	} as unknown as UmbTreeItemModel;
+}
+
+/**
+ * A minimal `UmbSectionContext` stand-in, providing a fixed pathname for `getItemHref` link generation.
+ */
+export class UmbTestSectionContext extends UmbContextBase {
+	static readonly PATHNAME = 'test-section';
+
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_SECTION_CONTEXT);
+	}
+
+	getPathname() {
+		return UmbTestSectionContext.PATHNAME;
+	}
 }
 
 /**
