@@ -1,7 +1,3 @@
-using Umbraco.Cms.Api.Management.ViewModels.Search.Facets;
-using Umbraco.Cms.Api.Management.ViewModels.Search.Filters;
-using Umbraco.Cms.Api.Management.ViewModels.Search.Sorters;
-
 namespace Umbraco.Cms.Api.Management.ViewModels.Search;
 
 /// <summary>
@@ -18,21 +14,6 @@ public class SearchRequestModel
     /// Gets or sets the full-text search query.
     /// </summary>
     public string? Query { get; set; }
-
-    /// <summary>
-    /// Gets or sets the filters to apply.
-    /// </summary>
-    public IEnumerable<IFilterRequestModel>? Filters { get; set; }
-
-    /// <summary>
-    /// Gets or sets the facets to request.
-    /// </summary>
-    public IEnumerable<IFacetRequestModel>? Facets { get; set; }
-
-    /// <summary>
-    /// Gets or sets the sorters to apply.
-    /// </summary>
-    public IEnumerable<ISorterRequestModel>? Sorters { get; set; }
 
     /// <summary>
     /// Gets or sets the culture to search within.

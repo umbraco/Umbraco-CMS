@@ -81,8 +81,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddSegment()
                 .AddExport()
                 .AddImport()
-                .AddNewsDashboard()
-                .AddSearch();
+                .AddNewsDashboard();
 
             services
                 .ConfigureOptions<ConfigureApiBehaviorOptions>()

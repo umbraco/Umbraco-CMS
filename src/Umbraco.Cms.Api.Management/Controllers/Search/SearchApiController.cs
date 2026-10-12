@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Search;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -22,7 +21,6 @@ public class SearchApiController : SearchControllerBase
     private readonly ISearcherResolver _searcherResolver;
     private readonly IEntityService _entityService;
     private readonly IVariationContextAccessor _variationContextAccessor;
-    private readonly ISearchPresentationFactory _searchPresentationFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SearchApiController"/> class.
@@ -30,23 +28,20 @@ public class SearchApiController : SearchControllerBase
     /// <param name="searcherResolver">The resolver used to obtain the searcher for the requested index alias.</param>
     /// <param name="entityService">The service used to hydrate matching results with entity name and icon.</param>
     /// <param name="variationContextAccessor">The accessor used to set the culture context for rendering entity names.</param>
-    /// <param name="searchPresentationFactory">The factory used to convert between the search presentation models and the search query and result types.</param>
     public SearchApiController(
         ISearcherResolver searcherResolver,
         IEntityService entityService,
-        IVariationContextAccessor variationContextAccessor,
-        ISearchPresentationFactory searchPresentationFactory)
+        IVariationContextAccessor variationContextAccessor)
     {
         _searcherResolver = searcherResolver;
         _entityService = entityService;
         _variationContextAccessor = variationContextAccessor;
-        _searchPresentationFactory = searchPresentationFactory;
     }
 
     /// <summary>
     /// Executes a search against the index specified in the request.
     /// </summary>
-    /// <param name="request">The search request, including index alias, query, filters, facets and sorters.</param>
+    /// <param name="request">The search request, including index alias, query, culture and segment.</param>
     /// <param name="skip">The number of results to skip for pagination.</param>
     /// <param name="take">The maximum number of results to return.</param>
     /// <returns>The search results, or an error if the index alias is missing or could not be resolved.</returns>
@@ -71,14 +66,11 @@ public class SearchApiController : SearchControllerBase
         SearchResult result = await searcher.SearchAsync(
             request.IndexAlias,
             request.Query,
-            request.Filters?.Select(_searchPresentationFactory.CreateFilter).ToArray(),
-            request.Facets?.Select(_searchPresentationFactory.CreateFacet).ToArray(),
-            request.Sorters?.Select(_searchPresentationFactory.CreateSorter).ToArray(),
-            request.Culture,
-            request.Segment,
-            AccessContext.BypassProtection(),
-            skip,
-            take);
+            culture: request.Culture,
+            segment: request.Segment,
+            accessContext: AccessContext.BypassProtection(),
+            skip: skip,
+            take: take);
 
         // set the variation context so EntityService renders the correct culture variant
         _variationContextAccessor.VariationContext = new VariationContext(request.Culture);
@@ -87,11 +79,6 @@ public class SearchApiController : SearchControllerBase
         {
             Total = result.Total,
             Documents = CreateSearchDocumentResponseModels(result.Documents),
-            Facets = result.Facets.Select(f => new FacetResultResponseModel
-            {
-                FieldName = f.FieldName,
-                Values = f.Values.Select(_searchPresentationFactory.CreateFacetValueResponseModel).ToArray(),
-            }),
         });
     }
 
