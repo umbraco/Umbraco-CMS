@@ -641,11 +641,6 @@ internal partial class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
-    [Obsolete("Please use the overload taking a cancellation token. Scheduled for removal in Umbraco 19.")]
-    public Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail)
-        => SendResetPasswordEmailAsync(userEmail, CancellationToken.None);
-
-    /// <inheritdoc/>
     public async Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail, CancellationToken cancellationToken)
     {
         if (_forgotPasswordSender.IsPasswordResetConfigured() is false)
