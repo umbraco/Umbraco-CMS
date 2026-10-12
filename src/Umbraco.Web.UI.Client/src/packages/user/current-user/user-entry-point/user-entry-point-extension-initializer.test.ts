@@ -33,6 +33,8 @@ class UmbTestCurrentUserContext {
 	#currentUser = new UmbObjectState<{ unique: string } | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable().pipe(filter((user) => !!user));
 	loadOnDemand = true;
+	loadDelayMs = 0;
+	signedInUser = 'test-user';
 	constructor(host: UmbElement) {
 		this.#host = host;
 	}
@@ -40,10 +42,15 @@ class UmbTestCurrentUserContext {
 		return this.#host;
 	}
 	async load() {
-		if (this.loadOnDemand) this.setUser('test-user');
+		const user = this.signedInUser;
+		if (this.loadDelayMs) await aTimeout(this.loadDelayMs);
+		if (this.loadOnDemand) this.setUser(user);
 	}
 	setUser(unique: string) {
 		this.#currentUser.setValue({ unique });
+	}
+	getUnique() {
+		return this.#currentUser.getValue()?.unique;
 	}
 }
 
@@ -71,6 +78,25 @@ function createManifest(
 					loadDelayMs,
 				),
 			),
+	};
+}
+
+function createUserReadingManifest(
+	alias: string,
+	currentUserContext: UmbTestCurrentUserContext,
+	seenUsers: Array<string | undefined>,
+): ManifestUserEntryPoint {
+	return {
+		type: 'userEntryPoint',
+		alias,
+		name: alias,
+		js: () =>
+			Promise.resolve({
+				onInit: () => {
+					seenUsers.push(currentUserContext.getUnique());
+				},
+				onUnload: () => {},
+			}),
 	};
 }
 
@@ -138,6 +164,51 @@ describe('UmbUserEntryPointExtensionInitializer', () => {
 
 		authContext.setAuthorized(true);
 		await aTimeout(50);
+		expect(calls.init).to.equal(2);
+	});
+
+	it('runs onInit on re-authorization only once the current user for the new session has loaded', async () => {
+		const seenUsers: Array<string | undefined> = [];
+		registry.register(createUserReadingManifest('Umb.Test.ReadsUser', currentUserContext, seenUsers));
+		currentUserContext.loadDelayMs = 30;
+		currentUserContext.signedInUser = 'first-user';
+		authContext.setAuthorized(true);
+		await aTimeout(80);
+		expect(seenUsers).to.deep.equal(['first-user']);
+
+		authContext.setAuthorized(false);
+		currentUserContext.signedInUser = 'second-user';
+		authContext.setAuthorized(true);
+		await aTimeout(80);
+		expect(seenUsers).to.deep.equal(['first-user', 'second-user']);
+	});
+
+	it('does not count a user load that started before authorization was lost', async () => {
+		const seenUsers: Array<string | undefined> = [];
+		registry.register(createUserReadingManifest('Umb.Test.ReadsUser', currentUserContext, seenUsers));
+		currentUserContext.loadDelayMs = 30;
+		currentUserContext.signedInUser = 'first-user';
+		authContext.setAuthorized(true);
+		await aTimeout(10);
+
+		authContext.setAuthorized(false);
+		currentUserContext.signedInUser = 'second-user';
+		authContext.setAuthorized(true);
+		await aTimeout(80);
+		expect(seenUsers).to.deep.equal(['second-user']);
+	});
+
+	it('runs onInit once on re-authorization when the same user loads again', async () => {
+		registry.register(createManifest('Umb.Test.A', calls));
+		currentUserContext.loadDelayMs = 30;
+		authContext.setAuthorized(true);
+		await aTimeout(80);
+		expect(calls.init).to.equal(1);
+
+		authContext.setAuthorized(false);
+		expect(calls.unload).to.equal(1);
+		authContext.setAuthorized(true);
+		await aTimeout(80);
 		expect(calls.init).to.equal(2);
 	});
 
