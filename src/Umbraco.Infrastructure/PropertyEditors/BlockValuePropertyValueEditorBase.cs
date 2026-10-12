@@ -309,11 +309,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         MapBlockItemDataToEditor(property, blockValue.ContentData, culture, segment);
         MapBlockItemDataToEditor(property, blockValue.SettingsData, culture, segment);
         _blockEditorVarianceHandler.AlignExposeVariance(blockValue, culture);
-        blockValue.Expose = blockValue.Expose
-            .OrderBy(variation => variation.Culture, StringComparer.Ordinal)
-            .ThenBy(variation => variation.Segment, StringComparer.Ordinal)
-            .ThenBy(variation => variation.ContentKey)
-            .ToList();
+        blockValue.Expose = InCanonicalOrder(blockValue.Expose);
     }
 
     protected IEnumerable<Guid> ConfiguredElementTypeKeys(IBlockConfiguration configuration)
@@ -1015,8 +1011,9 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         });
 
     /// <summary>
-    /// Sorts block item values into their canonical order: by culture, then by segment, then by property alias,
-    /// using ordinal comparison with invariant (<c>null</c>) first.
+    /// Sorts a block value into its canonical order: block item values by culture, then by segment, then by property
+    /// alias, and exposes by culture, then by segment, then by content key. Strings are compared ordinally, with
+    /// invariant (<c>null</c>) first.
     /// </summary>
     /// <remarks>
     /// Every block value that is persisted must be in this order, whichever path produced it. The edited state is
@@ -1027,6 +1024,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     {
         SortBlockItemValuesByCulture(blockValue.ContentData);
         SortBlockItemValuesByCulture(blockValue.SettingsData);
+        blockValue.Expose = InCanonicalOrder(blockValue.Expose);
     }
 
     private static void SortBlockItemValuesByCulture(List<BlockItemData> blockItemData)
@@ -1042,5 +1040,12 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             .OrderBy(value => value.Culture, StringComparer.Ordinal)
             .ThenBy(value => value.Segment, StringComparer.Ordinal)
             .ThenBy(value => value.Alias, StringComparer.Ordinal)
+            .ToList();
+
+    private static List<BlockItemVariation> InCanonicalOrder(IEnumerable<BlockItemVariation> exposes)
+        => exposes
+            .OrderBy(variation => variation.Culture, StringComparer.Ordinal)
+            .ThenBy(variation => variation.Segment, StringComparer.Ordinal)
+            .ThenBy(variation => variation.ContentKey)
             .ToList();
 }

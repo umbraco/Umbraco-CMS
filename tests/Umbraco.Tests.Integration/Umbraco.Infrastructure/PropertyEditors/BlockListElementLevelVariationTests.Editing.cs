@@ -1881,4 +1881,38 @@ internal partial class BlockListElementLevelVariationTests
             },
             mergedBlockListValue.ContentData[0].Values.Select(v => (v.Culture, v.Value?.ToString())));
     }
+
+    [Test]
+    public async Task Saving_Stores_Block_Expose_In_Canonical_Order()
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "variantText", Value = "The content value in Danish", Culture = "da-DK" },
+                new() { Alias = "variantText", Value = "The content value in English", Culture = "en-US" },
+            },
+            [],
+            publishContent: false);
+
+        var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        var contentKey = blockListValue.ContentData[0].Key;
+        blockListValue.Expose =
+        [
+            new BlockItemVariation(contentKey, "en-US", null),
+            new BlockItemVariation(contentKey, "da-DK", null),
+        ];
+        await UpdateBlocksAsync(content, blockListValue);
+
+        content = ContentService.GetById(content.Key)!;
+        var savedBlockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        CollectionAssert.AreEqual(
+            new[] { "da-DK", "en-US" },
+            savedBlockListValue.Expose.Select(e => e.Culture));
+    }
 }
