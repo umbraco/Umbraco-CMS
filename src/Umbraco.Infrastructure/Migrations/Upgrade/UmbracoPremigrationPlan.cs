@@ -62,5 +62,9 @@ public class UmbracoPremigrationPlan : MigrationPlan
         // To 18.0.0
         To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
         To<V_18_0_0.AddAllowedInLibraryToContentType>("{31C0D92A-49DD-47EC-B2A7-932A58FF224E}");
+
+        // To 19.0.0
+        // The user group repository reads and writes this column, and migrations in the main plan load and save user groups.
+        To<V_19_0_0.AddHasAccessToInvariantForVariantColumnToUserGroup>("{550AD0E5-2AAA-4D51-BAE1-7ACCB4822F21}");
     }
 }

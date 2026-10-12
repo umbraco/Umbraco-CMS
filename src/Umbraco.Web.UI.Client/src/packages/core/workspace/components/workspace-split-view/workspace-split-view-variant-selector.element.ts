@@ -12,6 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
@@ -69,6 +70,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	private _readOnlyCultures: Array<string | null> = [];
 
 	@state()
+	private _nameReadOnlyCultures: Array<string | null> = [];
+
+	@state()
 	private _variesByCulture = false;
 
 	@state()
@@ -106,6 +110,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			this.#observeVariants(workspaceContext);
 			this.#observeActiveVariants(workspaceContext);
 			this.#observeReadOnlyCultures(workspaceContext);
+			this.#observeNameReadOnlyCultures(workspaceContext);
 			this.#observeCurrentVariant();
 
 			this.observe(
@@ -302,7 +307,17 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	}
 
 	#observeReadOnlyCultures(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
-		if (workspaceContext) {
+		if (workspaceContext?.isWritableVariant) {
+			this.observe(
+				createObservablePart(workspaceContext.variantOptions, (options) =>
+					options.map((option) => UmbVariantId.Create(option)),
+				),
+				(variantIds) => {
+					this.#observeWritableVariants(workspaceContext, variantIds);
+				},
+				'_observeReadOnlyCultures',
+			);
+		} else if (workspaceContext) {
 			this.observe(
 				workspaceContext.readOnlyGuard.isPermittedForObservableVariants(
 					createObservablePart(workspaceContext.variantOptions, (options) =>
@@ -317,6 +332,42 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		} else {
 			this._readOnlyCultures = [];
 			this.removeUmbControllerByAlias('_observeReadOnlyCultures');
+		}
+	}
+
+	#observeWritableVariants(workspaceContext: UmbVariantDatasetWorkspaceContext, variantIds: Array<UmbVariantId>) {
+		if (variantIds.length === 0) {
+			this._readOnlyCultures = [];
+			this.removeUmbControllerByAlias('_observeWritableVariants');
+			return;
+		}
+		this.observe(
+			combineLatest(variantIds.map((variantId) => workspaceContext.isWritableVariant!(variantId))),
+			(writable) => {
+				this._readOnlyCultures = variantIds
+					.filter((_, index) => !writable[index])
+					.map((variantId) => variantId.culture);
+			},
+			'_observeWritableVariants',
+		);
+	}
+
+	#observeNameReadOnlyCultures(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
+		const nameWriteGuard = workspaceContext?.nameWriteGuard;
+		if (workspaceContext && nameWriteGuard) {
+			this.observe(
+				observeMultiple([workspaceContext.variantOptions, nameWriteGuard.rules]),
+				([variantOptions]) => {
+					this._nameReadOnlyCultures = variantOptions
+						.map((option) => UmbVariantId.Create(option))
+						.filter((variantId) => !nameWriteGuard.getIsPermittedForName(variantId))
+						.map((variantId) => variantId.culture);
+				},
+				'_observeNameWriteGuard',
+			);
+		} else {
+			this._nameReadOnlyCultures = [];
+			this.removeUmbControllerByAlias('_observeNameWriteGuard');
 		}
 	}
 
@@ -366,6 +417,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#isReadOnlyCulture(culture: string | null) {
 		return this._readOnlyCultures.includes(culture);
+	}
+
+	#isNameReadOnlyCulture(culture: string | null) {
+		return this._nameReadOnlyCultures.includes(culture);
 	}
 
 	#isSegmentVariantOption(variantOption: VariantOptionModelType | undefined) {
@@ -420,6 +475,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				@input=${this.#handleInput}
 				required
 				?readonly=${this.#isReadOnlyCulture(this._activeVariant?.culture ?? null) ||
+				this.#isNameReadOnlyCulture(this._activeVariant?.culture ?? null) ||
 				this.#isSegmentVariantOption(this._activeVariant)}
 				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
 				${ref(this.#focusInput)}>

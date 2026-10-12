@@ -26,6 +26,9 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	@state()
 	private _isInvariant = false;
 
+	@state()
+	private _hasSelection = false;
+
 	readonly #pickableFilter = (option: UmbEntityVariantOptionModel) => {
 		if (!option.variant || option.variant.state === UmbPublishableVariantState.NOT_CREATED) {
 			return false;
@@ -73,6 +76,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	readonly #handleSelectionChange = (selection: Array<string>) => {
 		const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
 		this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
+		this._hasSelection = selection.length > 0;
 	};
 
 	#submit() {
@@ -110,7 +114,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 							: this.localize.term('buttons_saveAndPublish')}"
 						look="primary"
 						color="positive"
-						?disabled=${this._hasNotSelectedMandatory}
+						?disabled=${this._hasNotSelectedMandatory || (!this._isInvariant && !this._hasSelection)}
 						@click=${this.#submit}></uui-button>
 				</div>
 			</uui-dialog-layout>

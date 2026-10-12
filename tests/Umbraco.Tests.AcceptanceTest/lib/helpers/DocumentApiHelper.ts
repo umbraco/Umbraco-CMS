@@ -16,6 +16,11 @@ export class DocumentApiHelper {
     return await response.json();
   }
 
+  async getPublished(id: string) {
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id + '/published');
+    return await response.json();
+  }
+
   async waitUntilIndexed(query: string, id: string) {
     await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.documentSearch, query, id);
   }
@@ -588,6 +593,71 @@ export class DocumentApiHelper {
         name: variant.name,
         culture: variant.isoCode,
         segment: null,
+      });
+    }
+
+    return await this.create(document);
+  }
+
+  async createDocumentWithMultipleVariantsAndVaryingAndSharedValues(documentName: string, documentTypeId: string, varyingPropertyName: string, sharedPropertyName: string, cultureVariants: {isoCode: string, name: string, value: string}[], sharedValue: string) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .build();
+
+    for (const variant of cultureVariants) {
+      document.variants.push({
+        name: variant.name,
+        culture: variant.isoCode,
+        segment: null
+      });
+
+      document.values.push({
+        alias: AliasHelper.toAlias(varyingPropertyName),
+        value: variant.value,
+        culture: variant.isoCode,
+        segment: null,
+        editorAlias: 'Umbraco.TextBox',
+        entityType: 'document-property-value'
+      });
+    }
+
+    document.values.push({
+      alias: AliasHelper.toAlias(sharedPropertyName),
+      value: sharedValue,
+      culture: null,
+      segment: null,
+      editorAlias: 'Umbraco.TextBox',
+      entityType: 'document-property-value'
+    });
+
+    return await this.create(document);
+  }
+
+  async createDocumentWithMultipleVariantsAndTextValues(documentName: string, documentTypeId: string, cultureVariants: {isoCode: string, name: string}[], values: {propertyName: string, culture: string | null, value: string}[]) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .build();
+
+    for (const variant of cultureVariants) {
+      document.variants.push({
+        name: variant.name,
+        culture: variant.isoCode,
+        segment: null
+      });
+    }
+
+    for (const value of values) {
+      document.values.push({
+        alias: AliasHelper.toAlias(value.propertyName),
+        value: value.value,
+        culture: value.culture,
+        segment: null,
+        editorAlias: 'Umbraco.TextBox',
+        entityType: 'document-property-value'
       });
     }
 

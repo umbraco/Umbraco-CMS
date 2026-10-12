@@ -39,6 +39,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
     /// <param name="languageService">The language service.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
+    /// <param name="userService">The user service.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="longRunningOperationService">The long running operation service.</param>
     /// <param name="umbracoContextFactory">The Umbraco context factory.</param>
@@ -51,6 +52,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
+        IUserService userService,
         ILogger<ContentPublishingService> logger,
         ILongRunningOperationService longRunningOperationService,
         IUmbracoContextFactory umbracoContextFactory)
@@ -63,6 +65,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
             languageService,
             optionsMonitor,
             relationService,
+            userService,
             logger)
     {
         _coreScopeProvider = coreScopeProvider;
@@ -150,7 +153,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
         var rootCulturesToValidate = await GetRootCulturesToValidateAsync(content, culturesToPublish, publishBranchFilter);
         if (rootCulturesToValidate.Length > 0)
         {
-            ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, rootCulturesToValidate);
+            ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, rootCulturesToValidate, userKey);
             if (validationResult.ValidationErrors.Any())
             {
                 scope.Complete();

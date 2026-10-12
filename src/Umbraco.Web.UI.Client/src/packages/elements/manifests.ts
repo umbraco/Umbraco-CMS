@@ -1,3 +1,4 @@
+import { manifests as languageAccessManifests } from './language-access/manifests.js';
 import { manifests as auditLogManifests } from './audit-log/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as configurationManifests } from './configuration/manifests.js';
@@ -30,6 +31,7 @@ const backofficeEntryPoint: UmbExtensionManifest = {
 
 export const manifests: Array<UmbExtensionManifest> = [
 	backofficeEntryPoint,
+	...languageAccessManifests,
 	...auditLogManifests,
 	...collectionManifests,
 	...configurationManifests,

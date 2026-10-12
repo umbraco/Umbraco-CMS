@@ -79,6 +79,13 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 			.some((userGroup) => userGroup.hasAccessToAllLanguages);
 	}
 
+	getHasAccessToInvariantForVariant(userGroupIds: Array<{ id: string }>): boolean {
+		const ids = new Set(userGroupIds.map((reference) => reference.id));
+		return this.data
+			.filter((userGroup) => ids.has(userGroup.id))
+			.some((userGroup) => userGroup.hasAccessToInvariantForVariant);
+	}
+
 	getAllowedLanguages(userGroupIds: Array<{ id: string }>): string[] {
 		const ids = new Set(userGroupIds.map((reference) => reference.id));
 		const languages = this.data
@@ -125,6 +132,7 @@ const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupMo
 		elementRootAccess: item.elementRootAccess,
 		elementStartNode: item.elementStartNode,
 		hasAccessToAllLanguages: item.hasAccessToAllLanguages,
+		hasAccessToInvariantForVariant: item.hasAccessToInvariantForVariant,
 		icon: item.icon,
 		id: UmbId.new(),
 		languages: item.languages,
@@ -148,6 +156,7 @@ const detailResponseMapper = (item: UmbMockUserGroupModel): UserGroupResponseMod
 		elementRootAccess: item.elementRootAccess,
 		elementStartNode: item.elementStartNode,
 		hasAccessToAllLanguages: item.hasAccessToAllLanguages,
+		hasAccessToInvariantForVariant: item.hasAccessToInvariantForVariant,
 		icon: item.icon,
 		id: item.id,
 		languages: item.languages,
