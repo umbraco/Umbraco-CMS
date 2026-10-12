@@ -112,6 +112,49 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     protected abstract TEntityDto BuildEntityDto(TEntity entity);
 
     /// <summary>
+    ///     Builds the join every read query of this repository starts from, over nodes and content versions the
+    ///     caller has already filtered: the entity, content and entity-specific version rows joined on the node
+    ///     and version ids, and the LEFT JOINed content type, published version and parent node.
+    /// </summary>
+    /// <remarks>
+    ///     Implementations keep the joins concrete to their own tables; everything downstream of the row is
+    ///     shared. Project with object-initializer syntax only, as
+    ///     <see cref="ContentJoinRow{TEntityDto,TContentVersionDto}" /> explains.
+    /// </remarks>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="nodes">The nodes to read, already filtered by the caller.</param>
+    /// <param name="contentVersions">The content versions to join each node with, already filtered by the caller.</param>
+    /// <returns>One row per node and version pair.</returns>
+    protected abstract IQueryable<ContentJoinRow<TEntityDto, TContentVersionDto>> BuildBaseQuery(
+        UmbracoDbContext db,
+        IQueryable<NodeDto> nodes,
+        IQueryable<ContentVersionDto> contentVersions);
+
+    /// <summary>
+    ///     Builds the join every read query of this repository starts from, joining each node with its current version.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="nodes">The nodes to read, already filtered by the caller.</param>
+    /// <returns>One row per node.</returns>
+    protected IQueryable<ContentJoinRow<TEntityDto, TContentVersionDto>> BuildBaseQuery(UmbracoDbContext db, IQueryable<NodeDto> nodes) =>
+        BuildBaseQuery(db, nodes, db.ContentVersions.Where(contentVersion => contentVersion.Current));
+
+    /// <summary>
+    ///     Gets the single shared projection from the join shape into the row entity assembly consumes; every read
+    ///     query ends with <c>.Select(ToContentRow)</c> instead of restating this construction.
+    /// </summary>
+    protected static Expression<Func<ContentJoinRow<TEntityDto, TContentVersionDto>, ContentRow<TEntityDto, TContentVersionDto>>> ToContentRow { get; } =
+        joined => new ContentRow<TEntityDto, TContentVersionDto>(
+            joined.Node,
+            joined.Entity,
+            joined.Content,
+            joined.ContentVersion,
+            joined.EntityVersion,
+            joined.PublishedContentVersion,
+            joined.PublishedEntityVersion,
+            joined.ParentNode == null ? (Guid?)null : joined.ParentNode.UniqueId);
+
+    /// <summary>
     ///     Deletes the versions of a node that predate <paramref name="versionDate" />, sparing the published one.
     /// </summary>
     /// <remarks>
