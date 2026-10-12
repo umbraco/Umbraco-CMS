@@ -15,7 +15,7 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261008103922_AddElementDtos";
+    public override string LastMigrationId => "20261012093337_AddElementDtos";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -2216,6 +2216,12 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
                 b.Property<bool>("HasAccessToAllLanguages")
                     .HasColumnType("INTEGER")
                     .HasColumnName("hasAccessToAllLanguages");
+
+                b.Property<bool>("HasAccessToInvariantForVariant")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("INTEGER")
+                    .HasDefaultValue(false)
+                    .HasColumnName("hasAccessToInvariantForVariant");
 
                 b.Property<string>("Icon")
                     .HasColumnType("TEXT")

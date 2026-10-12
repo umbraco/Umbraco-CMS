@@ -1,5 +1,5 @@
 import type { UmbEntryValueModel } from '../types.js';
-import { sortEntryValuesByCulture } from './sort-entry-values-by-culture.function.js';
+import { _sortContentValuesByVariant } from './sort-content-values-by-variant.function.js';
 
 /**
  * Inserts or replaces an entry value in a frozen array of entry values.
@@ -21,7 +21,7 @@ export function umbEntryAppendValue<T extends UmbEntryValueModel>(
 	const indexToReplace = data.findIndex((x) => getUniqueMethod(x) === unique);
 
 	if (indexToReplace === -1) {
-		return sortEntryValuesByCulture([...data, entry]);
+		return _sortContentValuesByVariant([...data, entry]);
 	}
 
 	const values = [...data];

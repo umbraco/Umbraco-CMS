@@ -26,6 +26,9 @@ export class UmbUserGroupWorkspaceContext
 	readonly hasAccessToAllLanguages = this._data.createObservablePartOfCurrent(
 		(data) => data?.hasAccessToAllLanguages || false,
 	);
+	readonly hasAccessToInvariantForVariant = this._data.createObservablePartOfCurrent(
+		(data) => data?.hasAccessToInvariantForVariant ?? false,
+	);
 	readonly documentStartNode = this._data.createObservablePartOfCurrent((data) => data?.documentStartNode || null);
 	readonly documentRootAccess = this._data.createObservablePartOfCurrent((data) => data?.documentRootAccess || false);
 	readonly elementStartNode = this._data.createObservablePartOfCurrent((data) => data?.elementStartNode || null);
@@ -141,6 +144,15 @@ export class UmbUserGroupWorkspaceContext
 			hasAccessToAllLanguages: value.rootAccess,
 			languages: value.startNodes.map((startNode) => startNode.unique),
 		});
+	}
+
+	/**
+	 * Sets whether the user group can edit invariant (shared) property data on variant content.
+	 * @param {boolean} value - Whether the user group has invariant-for-variant access.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setHasAccessToInvariantForVariant(value: boolean) {
+		this.updateProperty('hasAccessToInvariantForVariant', value);
 	}
 
 	/**

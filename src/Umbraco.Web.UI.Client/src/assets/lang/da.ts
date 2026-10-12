@@ -286,6 +286,7 @@ export default {
 			'Klik <em>Udgiv med undersider</em> for at udgive <strong>de valgte sprog</strong> og de samme sprog for sider under og dermed gøre deres indhold offentligt tilgængelige.',
 		releaseDate: 'Udgivelsesdato',
 		unpublishDate: 'Afpubliceringsdato',
+		scheduleForAllLanguages: 'Planlæg for alle valgte sprog',
 		removeDate: 'Fjern dato',
 		setDate: 'Vælg dato',
 		sortDone: 'Sorteringsrækkefølgen er opdateret',
@@ -1189,6 +1190,7 @@ export default {
 		userFailedLogin: 'Ups! Vi kunne ikke logge dig ind. Tjek at dit brugernavn og adgangskode er korrekt og prøv igen.',
 		userLockedOut: 'Din konto er blevet låst. Prøv igen senere.',
 		receivedErrorFromServer: 'Der skete en fejl på serveren',
+		passwordResetUnavailable: 'Beklager, nulstilling af adgangskode er ikke tilgængelig i øjeblikket. Prøv igen senere, eller kontakt din administrator.',
 		resetCodeExpired: 'Det link, du har klikket på, er ugyldigt eller udløbet',
 		userInviteWelcomeMessage:
 			'Hej og velkommen til Umbraco! På bare 1 minut vil du være klar til at komme i gang, vi skal bare have dig til at oprette en adgangskode.',
@@ -2175,6 +2177,8 @@ export default {
 		sectionsHelp: 'Tilføj sektioner for at give brugerne adgang',
 		allowAccessToAllLanguages: 'Tillad adgang til alle sprog',
 		allowAccessToAllDocuments: 'Tillad adgang til alle dokumenter',
+		allowAccessToInvariantForVariant: 'Tillad redigering af delt indhold',
+		invariantForVariantHelp: 'Tillader redigering af indhold delt på tværs af sprogvarianter. *Gælder ikke for indhold, der ikke varierer efter sprog.*',
 		allowAccessToAllMedia: 'Tillad adgang til alle medier',
 		selectUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';

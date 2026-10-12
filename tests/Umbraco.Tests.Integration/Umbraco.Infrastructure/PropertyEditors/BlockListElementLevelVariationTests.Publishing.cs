@@ -3,13 +3,11 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
@@ -1174,7 +1172,6 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase("variantText", "en-US", new[] { "en-US" })]
     [TestCase("variantText", "da-DK", new[] { "en-US", "da-DK" })]
     [TestCase("variantText", "da-DK", new[] { "da-DK" })]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Removing_Block_Property_Value_Is_Propagated_To_Published_Value(string removedAlias, string? removedCulture, string[] culturesToPublish)
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -1779,7 +1776,6 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Publish_Invariant_Properties_Without_Default_Culture_With_AllowEditInvariantFromNonDefault()
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -1907,7 +1903,9 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        PublishContent(content, contentType, ["da-DK"]);
+        var userKey = (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key;
+
+        PublishContent(content, contentType, ["da-DK"], userKey);
 
         AssertPropertyValues("en-US", 0);
 

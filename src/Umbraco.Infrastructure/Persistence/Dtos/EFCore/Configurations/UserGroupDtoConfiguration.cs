@@ -44,6 +44,10 @@ public class UserGroupDtoConfiguration : IEntityTypeConfiguration<UserGroupDto>
         builder.Property(x => x.HasAccessToAllLanguages)
             .HasColumnName("hasAccessToAllLanguages");
 
+        builder.Property(x => x.HasAccessToInvariantForVariant)
+            .HasColumnName("hasAccessToInvariantForVariant")
+            .HasDefaultValue(false);
+
         builder.Property(x => x.StartContentId)
             .HasColumnName("startContentId");
 

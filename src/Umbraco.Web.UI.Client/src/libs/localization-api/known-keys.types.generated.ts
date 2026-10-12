@@ -561,6 +561,7 @@ declare global {
 		content_scheduledPublishDocumentation: string;
 		content_scheduledPublishing: string;
 		content_scheduledPublishServerTime: string;
+		content_scheduleForAllLanguages: string;
 		content_schedulePublishHelp: string;
 		content_segmentHasContent: string;
 		content_segmentNoContent: string;
@@ -1447,6 +1448,7 @@ declare global {
 		login_passwordIsBlank: string;
 		login_passwordMinLength: string;
 		login_passwordMismatch: string;
+		login_passwordResetUnavailable: string;
 		login_receivedErrorFromServer: string;
 		login_rememberMe: string;
 		login_requestPasswordResetConfirmation: string;
@@ -2507,6 +2509,7 @@ declare global {
 		user_allowAccessToAllElements: string;
 		user_allowAccessToAllLanguages: string;
 		user_allowAccessToAllMedia: string;
+		user_allowAccessToInvariantForVariant: string;
 		user_andMore: string;
 		user_assignAccess: string;
 		user_avatarDeleteSuccess: string;
@@ -2551,6 +2554,7 @@ declare global {
 		user_granularRightsDescription: string;
 		user_granularRightsLabel: string;
 		user_groupsHelp: string;
+		user_invariantForVariantHelp: string;
 		user_invite: string;
 		user_inviteAnotherUser: string;
 		user_inviteUser: string;

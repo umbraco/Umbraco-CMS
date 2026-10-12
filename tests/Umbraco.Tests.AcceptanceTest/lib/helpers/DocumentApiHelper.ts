@@ -16,6 +16,11 @@ export class DocumentApiHelper {
     return await response.json();
   }
 
+  async getPublished(id: string) {
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id + '/published');
+    return await response.json();
+  }
+
   async waitUntilIndexed(query: string, id: string) {
     await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.documentSearch, query, id);
   }
@@ -222,6 +227,23 @@ export class DocumentApiHelper {
       .addValue()
         .withAlias(AliasHelper.toAlias(dataTypeName))
         .withValue(textContent)
+        .done()
+      .build();
+
+    return await this.create(document);
+  }
+
+  async createDocumentWithPropertyValue(documentName: string, documentTypeId: string, propertyAlias: string, value: any) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentName)
+        .done()
+      .addValue()
+        .withAlias(propertyAlias)
+        .withValue(value)
         .done()
       .build();
 
@@ -571,6 +593,71 @@ export class DocumentApiHelper {
         name: variant.name,
         culture: variant.isoCode,
         segment: null,
+      });
+    }
+
+    return await this.create(document);
+  }
+
+  async createDocumentWithMultipleVariantsAndVaryingAndSharedValues(documentName: string, documentTypeId: string, varyingPropertyName: string, sharedPropertyName: string, cultureVariants: {isoCode: string, name: string, value: string}[], sharedValue: string) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .build();
+
+    for (const variant of cultureVariants) {
+      document.variants.push({
+        name: variant.name,
+        culture: variant.isoCode,
+        segment: null
+      });
+
+      document.values.push({
+        alias: AliasHelper.toAlias(varyingPropertyName),
+        value: variant.value,
+        culture: variant.isoCode,
+        segment: null,
+        editorAlias: 'Umbraco.TextBox',
+        entityType: 'document-property-value'
+      });
+    }
+
+    document.values.push({
+      alias: AliasHelper.toAlias(sharedPropertyName),
+      value: sharedValue,
+      culture: null,
+      segment: null,
+      editorAlias: 'Umbraco.TextBox',
+      entityType: 'document-property-value'
+    });
+
+    return await this.create(document);
+  }
+
+  async createDocumentWithMultipleVariantsAndTextValues(documentName: string, documentTypeId: string, cultureVariants: {isoCode: string, name: string}[], values: {propertyName: string, culture: string | null, value: string}[]) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .build();
+
+    for (const variant of cultureVariants) {
+      document.variants.push({
+        name: variant.name,
+        culture: variant.isoCode,
+        segment: null
+      });
+    }
+
+    for (const value of values) {
+      document.values.push({
+        alias: AliasHelper.toAlias(value.propertyName),
+        value: value.value,
+        culture: value.culture,
+        segment: null,
+        editorAlias: 'Umbraco.TextBox',
+        entityType: 'document-property-value'
       });
     }
 
@@ -2000,6 +2087,70 @@ export class DocumentApiHelper {
     });
 
     const document = blockListBuilder.done().done().build();
+
+    return await this.create(document);
+  }
+
+  /**
+   * Creates a culture-variant document whose invariant Block Grid property already holds blocks with
+   * a value per culture, plus a matching expose entry per block and culture.
+   * @param documentName - name given to every variant
+   * @param documentTypeId - the document type, expected to vary by culture
+   * @param blockGridPropertyAlias - alias of the (invariant) block grid property
+   * @param elementTypeId - content element type of every block, expected to vary by culture
+   * @param blockPropertyAlias - alias of the variant property inside the element type
+   * @param blockPropertyEditorAlias - property editor alias of that property
+   * @param cultures - the cultures to create variants for
+   * @param blockValuesPerCulture - one entry per block, mapping culture to that block's value
+   */
+  async createDocumentWithBlockGridBlocksInCultures(
+    documentName: string,
+    documentTypeId: string,
+    blockGridPropertyAlias: string,
+    elementTypeId: string,
+    blockPropertyAlias: string,
+    blockPropertyEditorAlias: string,
+    cultures: Array<string>,
+    blockValuesPerCulture: Array<Record<string, string>>) {
+    await this.ensureNameNotExists(documentName);
+
+    const crypto = require('crypto');
+    const blockKeys = blockValuesPerCulture.map(() => crypto.randomUUID());
+
+    const documentBuilder = new DocumentBuilder().withDocumentTypeId(documentTypeId);
+
+    for (const culture of cultures) {
+      documentBuilder.addVariant().withName(documentName).withCulture(culture).done();
+    }
+
+    const blockGridBuilder = documentBuilder.addValue().withAlias(blockGridPropertyAlias).addBlockGridValue();
+
+    blockValuesPerCulture.forEach((valuesByCulture, index) => {
+      const contentDataBuilder = blockGridBuilder
+        .addContentData()
+        .withContentTypeKey(elementTypeId)
+        .withKey(blockKeys[index]);
+
+      for (const [culture, value] of Object.entries(valuesByCulture)) {
+        contentDataBuilder
+          .addContentDataValue()
+          .withAlias(blockPropertyAlias)
+          .withEditorAlias(blockPropertyEditorAlias)
+          .withCulture(culture)
+          .withValue(value)
+          .done();
+      }
+
+      contentDataBuilder.done();
+
+      for (const culture of Object.keys(valuesByCulture)) {
+        blockGridBuilder.addExpose().withContentKey(blockKeys[index]).withCulture(culture).done();
+      }
+
+      blockGridBuilder.addLayout().withContentKey(blockKeys[index]).done();
+    });
+
+    const document = blockGridBuilder.done().done().build();
 
     return await this.create(document);
   }
