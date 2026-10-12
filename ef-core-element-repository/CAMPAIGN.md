@@ -133,12 +133,12 @@ Reference points to copy from:
 
 ## 4a. Known-failing baseline (verified 08-10-2026)
 
-Four search fixtures fail on `v18/feature/ef-core-repositories` today, before any element work:
+Four search fixtures fail on `v18/feature/ef-core-repositories` today, before any element work (23 tests; counts re-verified 12-10-2026 on `95111fe68ac` and on PR 1's tip, one case in each of the first two fixtures passes):
 
 | Fixture (`tests/Umbraco.Tests.Integration/Umbraco.Cms.Search.Core/`) | Tests |
 |---|---|
-| `ElementIndexingNotificationHandlerTests` | 13 |
-| `ExternalBlockElementIndexingTests` | 4 |
+| `ElementIndexingNotificationHandlerTests` | 12 |
+| `ExternalBlockElementIndexingTests` | 3 |
 | `ExternalBlockElementVarianceTests` | 7 |
 | `ExternalElementReindexOnRepublishTests` | 1 |
 
