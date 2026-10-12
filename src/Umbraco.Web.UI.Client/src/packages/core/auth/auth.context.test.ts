@@ -127,7 +127,7 @@ describe('UmbAuthContext', () => {
 				buildUrl: () => '',
 				getConfig: () => ({}),
 				request: () => Promise.resolve({}) as never,
-				interceptors: { request: { use: () => {} }, response: { use: () => {} } },
+				interceptors: { request: { use: () => {} }, response: { use: () => {} }, error: { use: () => {} } },
 				setConfig: (config: Record<string, unknown>) => {
 					receivedConfig = config;
 					return config;

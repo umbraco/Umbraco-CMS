@@ -9,10 +9,10 @@ import { UmbApiError, UmbCancelError } from '../umb-error.js';
 const IGNORED_ERROR_CODES = new Set([401, 403, 404]);
 
 /**
- * Operation statuses that are ignored for notifications.
- * These are operation statuses where the server already sends a notification
- * via the Umb-Notifications response header, so we avoid showing a duplicate
- * notification from the ProblemDetails body.
+ * Operation statuses that are ignored for notifications when the server notified about them itself.
+ * A notification handler that cancels an operation can explain why in the Umb-Notifications response header,
+ * which makes the ProblemDetails body a duplicate. Without that explanation, the ProblemDetails body is all
+ * the user gets.
  */
 const IGNORED_OPERATION_STATUSES = new Set(['CancelledByNotification']);
 
@@ -46,6 +46,8 @@ export function apiErrorWasNotified(error: unknown): boolean {
 	}
 
 	return !(
-		error.problemDetails.operationStatus && IGNORED_OPERATION_STATUSES.has(error.problemDetails.operationStatus)
+		error.problemDetails.operationStatus &&
+		IGNORED_OPERATION_STATUSES.has(error.problemDetails.operationStatus) &&
+		error.problemDetails.notifiedByServer
 	);
 }
