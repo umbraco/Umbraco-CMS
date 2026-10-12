@@ -29,6 +29,22 @@ internal sealed partial class UserServiceCrudTests
         senderMock.Verify(x => x.SendForgotPassword(It.IsAny<UserForgotPasswordMessage>()), Times.Never);
     }
 
+    [TestCase(ResetPasswordUserEmail)]
+    [TestCase("unknown@test.com")]
+    public async Task Reset_Password_Link_Unavailable_Status_Does_Not_Depend_On_Whether_User_Exists(string email)
+    {
+        GetRequiredService<TestForgotPasswordUriProviderState>().CanCreateStatus = UserOperationStatus.ApplicationUrlNotConfigured;
+        var senderMock = CreateForgotPasswordSenderMock(canSendNow: true);
+        var userService = CreateUserService(forgotPasswordSender: senderMock.Object);
+        await CreateResetPasswordUser(userService);
+
+        var result = await userService.SendResetPasswordEmailAsync(email, CancellationToken.None);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserOperationStatus.ApplicationUrlNotConfigured, result.Result);
+        senderMock.Verify(x => x.SendForgotPassword(It.IsAny<UserForgotPasswordMessage>()), Times.Never);
+    }
+
     [Test]
     public async Task Reset_Password_Send_Failure_Is_Returned_As_Failed_Attempt()
     {
