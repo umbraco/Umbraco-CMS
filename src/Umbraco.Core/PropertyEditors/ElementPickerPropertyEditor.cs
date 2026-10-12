@@ -77,6 +77,15 @@ public class ElementPickerPropertyEditor : DataEditor
         }
 
         /// <inheritdoc/>
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+        {
+            var value = property.GetValue(culture, segment);
+            return value is null || (value is string stringValue && string.IsNullOrWhiteSpace(stringValue))
+                ? null
+                : base.ToEditor(property, culture, segment);
+        }
+
+        /// <inheritdoc/>
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
             var asString = value as string ?? value?.ToString();

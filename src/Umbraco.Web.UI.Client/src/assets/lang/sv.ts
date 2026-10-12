@@ -798,6 +798,7 @@ export default {
 		userFailedLogin: 'Hoppsan! Vi kunde inte logga in dig. Vänligen kontrollera dina uppgifter och försök igen.',
 		userLockedOut: 'Ditt konto har låsts. Vänligen försök igen senare.',
 		receivedErrorFromServer: 'Ett fel uppstod på servern',
+		passwordResetUnavailable: 'Tyvärr är återställning av lösenord inte tillgänglig just nu. Försök igen senare eller kontakta din administratör.',
 		resetCodeExpired: 'Länken du har klickat på är ogiltig eller har gått ut',
 		userInviteWelcomeMessage:
 			'Hej och välkommen till Umbraco! Inom bara 1 minut är du redo att börja, vi behöver bara att du ställer in ett lösenord.',
@@ -1329,6 +1330,7 @@ export default {
 		stateLockedOut: 'Utlåst',
 		stateInvited: 'Inbjuden',
 		stateInactive: 'Inaktiv',
+		type: 'Typ',
 		sortNameAscending: 'Namn (A-Z)',
 		sortNameDescending: 'Namn (Z-A)',
 		startnode: 'Startnod för innehåll',

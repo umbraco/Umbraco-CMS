@@ -1,4 +1,9 @@
 import { UMB_ELEMENT_COLLECTION_ALIAS } from '../constants.js';
+import {
+	UMB_ELEMENT_OR_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_CREATE,
+} from '../../constants.js';
+import { UMB_USER_PERMISSION_ELEMENT_FOLDER_CREATE } from '../../folder/user-permissions/constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
@@ -14,6 +19,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#general_create',
 		},
 		conditions: [
+			{
+				alias: UMB_ELEMENT_OR_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
+				element: { allOf: [UMB_USER_PERMISSION_ELEMENT_CREATE] },
+				folder: { allOf: [UMB_USER_PERMISSION_ELEMENT_FOLDER_CREATE] },
+			},
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: UMB_ELEMENT_COLLECTION_ALIAS,

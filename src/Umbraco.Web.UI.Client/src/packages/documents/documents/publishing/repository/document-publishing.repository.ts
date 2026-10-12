@@ -15,7 +15,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * @param {UmbDocumentDetailModel} model - The Document to create
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after creating
 	 * @param {string | null} parentUnique - The unique of the parent to create under
-	 * @returns {Promise<UmbRepositoryResponse<unknown>>} The result of the create and publish request
+	 * @returns {Promise<UmbRepositoryResponse<string>>} The key of the created Document, which may differ from the one submitted
 	 * @memberof UmbDocumentPublishingRepository
 	 */
 	async createAndPublish(

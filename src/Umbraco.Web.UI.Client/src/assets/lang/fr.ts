@@ -1712,6 +1712,7 @@ export default {
 		stateLockedOut: 'Bloqué',
 		stateInvited: 'Invité',
 		stateInactive: 'Inactif',
+		type: 'Type',
 		sortNameAscending: 'Nom (A-Z)',
 		sortNameDescending: 'Nom (Z-A)',
 		sortCreateDateAscending: 'Plus ancien',

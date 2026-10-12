@@ -561,6 +561,7 @@ declare global {
 		content_scheduledPublishDocumentation: string;
 		content_scheduledPublishing: string;
 		content_scheduledPublishServerTime: string;
+		content_scheduleForAllLanguages: string;
 		content_schedulePublishHelp: string;
 		content_segmentHasContent: string;
 		content_segmentNoContent: string;
@@ -1447,6 +1448,7 @@ declare global {
 		login_passwordIsBlank: string;
 		login_passwordMinLength: string;
 		login_passwordMismatch: string;
+		login_passwordResetUnavailable: string;
 		login_receivedErrorFromServer: string;
 		login_rememberMe: string;
 		login_requestPasswordResetConfirmation: string;
@@ -2642,6 +2644,7 @@ declare global {
 		user_stateInactive: string;
 		user_stateInvited: string;
 		user_stateLockedOut: string;
+		user_type: string;
 		user_unknownFailure: string;
 		user_unlockUserConfirmation: string;
 		user_unlockUserHeadline: (name: string) => string;

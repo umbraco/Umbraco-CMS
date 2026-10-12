@@ -697,10 +697,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 $"Cannot save (un)publishing content with name: {content.Name} - and state: {content.PublishedState}, use the dedicated SavePublished method.");
         }
 
-        if (content.Name != null && content.Name.Length > 255)
+        if (content.Name != null && content.Name.Length > Constants.Validation.MaxNameLength)
         {
             throw new InvalidOperationException(
-                $"Content with the name {content.Name} cannot be more than 255 characters in length.");
+                $"Content with the name {content.Name} cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -859,9 +859,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, content);
         }
 
-        if (content.Name != null && content.Name.Length > 255)
+        if (content.Name != null && content.Name.Length > Constants.Validation.MaxNameLength)
         {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
 
         PublishedState publishedState = content.PublishedState;
@@ -1054,10 +1054,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     private static void EnsureNameLengthIsValid(TContent content)
     {
-        const int MaxContentNameLength = 255;
-        if (content.Name?.Length > MaxContentNameLength)
+        if (content.Name?.Length > Constants.Validation.MaxNameLength)
         {
-            throw new InvalidOperationException($"Name cannot be more than {MaxContentNameLength} characters in length.");
+            throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
     }
 

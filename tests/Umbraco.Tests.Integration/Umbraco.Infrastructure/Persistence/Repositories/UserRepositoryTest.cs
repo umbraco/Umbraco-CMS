@@ -335,7 +335,10 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                     out var totalRecs,
                     user => user.Id,
                     Direction.Ascending,
+                    includeUserGroups: null,
                     excludeUserGroups: new[] { DatabaseDataCreator.TranslatorGroupAlias },
+                    userState: null,
+                    userKinds: null,
                     filter: provider.CreateQuery<IUser>().Where(x => x.Id > -1));
 
                 // Assert
@@ -374,6 +377,8 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                     Direction.Ascending,
                     new[] { Constants.Security.AdminGroupAlias, DatabaseDataCreator.SensitiveDataGroupAlias },
                     new[] { DatabaseDataCreator.TranslatorGroupAlias },
+                    userState: null,
+                    userKinds: null,
                     filter: provider.CreateQuery<IUser>().Where(x => x.Id == -1));
 
                 // Assert
@@ -439,7 +444,10 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 out var activeTotal,
                 user => user.Id,
                 Direction.Ascending,
-                userState: new[] { UserState.Active }).ToArray();
+                includeUserGroups: null,
+                excludeUserGroups: null,
+                userState: new[] { UserState.Active },
+                userKinds: null).ToArray();
 
             Assert.AreEqual(1, activeTotal);
             Assert.AreEqual(1, activeResults.Length);
@@ -453,7 +461,10 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 out var disabledTotal,
                 user => user.Id,
                 Direction.Ascending,
-                userState: new[] { UserState.Disabled }).ToArray();
+                includeUserGroups: null,
+                excludeUserGroups: null,
+                userState: new[] { UserState.Disabled },
+                userKinds: null).ToArray();
 
             Assert.AreEqual(1, disabledTotal);
             Assert.AreEqual(1, disabledResults.Length);
@@ -467,7 +478,10 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 out var lockedOutTotal,
                 user => user.Id,
                 Direction.Ascending,
-                userState: new[] { UserState.LockedOut }).ToArray();
+                includeUserGroups: null,
+                excludeUserGroups: null,
+                userState: new[] { UserState.LockedOut },
+                userKinds: null).ToArray();
 
             Assert.AreEqual(1, lockedOutTotal);
             Assert.AreEqual(1, lockedOutResults.Length);
@@ -481,10 +495,99 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 out var multiStateTotal,
                 user => user.Id,
                 Direction.Ascending,
-                userState: new[] { UserState.Active, UserState.Disabled }).ToArray();
+                includeUserGroups: null,
+                excludeUserGroups: null,
+                userState: new[] { UserState.Active, UserState.Disabled },
+                userKinds: null).ToArray();
 
             Assert.AreEqual(2, multiStateTotal);
             Assert.AreEqual(2, multiStateResults.Length);
+        }
+    }
+
+    [Test]
+    public void Can_Get_Paged_Results_Filtered_By_User_Kind()
+    {
+        ICoreScopeProvider provider = ScopeProvider;
+        using (var scope = provider.CreateCoreScope())
+        {
+            var repository = CreateRepository(provider);
+
+            var defaultUser = new UserBuilder()
+                .WithoutIdentity()
+                .WithName("DefaultUser")
+                .WithLogin("DefaultUser", "password123")
+                .WithEmail("default@test.com")
+                .WithIsApproved(true)
+                .WithIsLockedOut(false)
+                .WithLastLoginDate(DateTime.UtcNow.AddDays(-1))
+                .Build();
+            defaultUser.Kind = UserKind.Default;
+            repository.Save(defaultUser);
+
+            var apiUser = new UserBuilder()
+                .WithoutIdentity()
+                .WithName("ApiUser")
+                .WithLogin("ApiUser", "password123")
+                .WithEmail("api@test.com")
+                .WithIsApproved(true)
+                .WithIsLockedOut(false)
+                .WithLastLoginDate(DateTime.UtcNow.AddDays(-1))
+                .Build();
+            apiUser.Kind = UserKind.Api;
+            repository.Save(apiUser);
+
+            // Test filtering by Default kind - should include the default user (and the seeded
+            // administrator, who is also a Default kind user) but not the API user.
+            var defaultResults = repository.GetPagedResultsByQuery(
+                null,
+                0,
+                10,
+                out var defaultTotal,
+                user => user.Id,
+                Direction.Ascending,
+                includeUserGroups: null,
+                excludeUserGroups: null,
+                userState: null,
+                userKinds: new[] { UserKind.Default }).ToArray();
+
+            Assert.AreEqual(2, defaultTotal);
+            Assert.IsTrue(defaultResults.Any(x => x.Name == "DefaultUser"));
+            Assert.IsFalse(defaultResults.Any(x => x.Name == "ApiUser"));
+
+            // Test filtering by Api kind - should only return the API user.
+            var apiResults = repository.GetPagedResultsByQuery(
+                null,
+                0,
+                10,
+                out var apiTotal,
+                user => user.Id,
+                Direction.Ascending,
+                includeUserGroups: null,
+                excludeUserGroups: null,
+                userState: null,
+                userKinds: new[] { UserKind.Api }).ToArray();
+
+            Assert.AreEqual(1, apiTotal);
+            Assert.AreEqual(1, apiResults.Length);
+            Assert.AreEqual("ApiUser", apiResults[0].Name);
+
+            // Test with no kind filter - should return all users regardless of kind.
+            var allResults = repository.GetPagedResultsByQuery(
+                null,
+                0,
+                10,
+                out var allTotal,
+                user => user.Id,
+                Direction.Ascending,
+                includeUserGroups: null,
+                excludeUserGroups: null,
+                userState: null,
+                userKinds: null).ToArray();
+
+            Assert.AreEqual(3, allTotal);
+            Assert.IsTrue(allResults.Any(x => x.Name == "DefaultUser"));
+            Assert.IsTrue(allResults.Any(x => x.Name == "ApiUser"));
         }
     }
 
