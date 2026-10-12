@@ -2,7 +2,7 @@
   "campaign": "Element repository and service from NPoco to EF Core",
   "targetBranch": "v18/feature/ef-core-repositories",
   "planFile": ".claude/campaign/ef-core-element-repository/CAMPAIGN.md",
-  "updated": "08-10-2026",
+  "updated": "12-10-2026",
   "artifact": {
     "url": "https://claude.ai/artifact/Q5Bttu57VfLyS1ajt7nKtU",
     "title": "Element Repository Campaign"
@@ -75,7 +75,7 @@
         }
       ],
       "acceptance": "Solution builds; snapshots list umbracoElement, umbracoElementVersion, umbracoElementCultureVariation; migration-plan tests pass.",
-      "notes": "Commits c7b7aa1951b (ICultureVariationDto), a8eb63bbdbc (element DTOs, customizer, DbSets), 0648b879a95 (AddElementDtos migration). Migrations 20261008103850 (SQL Server) / 20261008103922 (SQLite), plan step {1EC33267-3D0C-4D67-BC41-5AA5D0DFF3F2}. Unit 7316 and integration 748 passed. Review round 1: Copilot CS0061 claim rejected (public class may implement internal interface); ElementDtoMappingTests added (7899d8c9b21), proven to fail on swapped column mappings."
+      "notes": "Commits c7b7aa1951b (ICultureVariationDto), a8eb63bbdbc (element DTOs, customizer, DbSets), 0648b879a95 (AddElementDtos migration). Migrations 20261008103850 (SQL Server) / 20261008103922 (SQLite), plan step {1EC33267-3D0C-4D67-BC41-5AA5D0DFF3F2}. Unit 7316 and integration 748 passed. Review round 1: Copilot CS0061 claim rejected (public class may implement internal interface); ElementDtoMappingTests added (7899d8c9b21), proven to fail on swapped column mappings. 12-10-2026: v19/dev merge-up merged into the PR branch (aa952e94477); AddElementDtos regenerated as 20261012093329 (SQL Server) / 20261012093337 (SQLite) behind AddHasAccessToInvariantForVariantToModel (enum 24; AddElementDtos is 25), has-pending-model-changes clean on both providers, 75 unit and 478 integration tests passed."
     },
     {
       "id": 2,
@@ -214,6 +214,10 @@
           "done": false
         },
         {
+          "text": "Version-delete notification hooks on the async engine (ElementDeletedVersionsNotification proven to fire, red first)",
+          "done": false
+        },
+        {
           "text": "IElementService aligned with IContentService (IContentServiceBase question settled)",
           "done": false
         },
@@ -286,6 +290,18 @@
     }
   ],
   "log": [
+    {
+      "date": "12-10-2026",
+      "text": "Plan re-checked after the merge-up: inventory, anchors and PR 1 notes updated; PR 5 gains the version-delete notification hooks (the async engine hardcodes the Content-flavoured notifications like the sync base); merge-up checklist now includes the hand port into AsyncPublishableContentServiceBase."
+    },
+    {
+      "date": "12-10-2026",
+      "text": "v19/dev merged into v18/feature/ef-core-repositories (95111fe68ac; invariant-for-variant permission ported into the async engine by hand) and into PR 1 (aa952e94477; AddElementDtos regenerated on top of the shared user-group migration)."
+    },
+    {
+      "date": "09-10-2026",
+      "text": "v19/dev merged into v18/feature/ef-core-repositories (3472374c025, fixes the backoffice build); merged into PR 1 branch (a3492a660c2). Integration: 4790 passed, 23 failed (all the known relation-stub baseline)."
+    },
     {
       "date": "08-10-2026",
       "text": "PR 1 review round 1 answered: mapping round-trip test added (7899d8c9b21); CS0061 and Id-on-interface comments answered without code changes."
