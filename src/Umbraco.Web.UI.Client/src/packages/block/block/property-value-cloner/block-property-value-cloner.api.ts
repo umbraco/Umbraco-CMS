@@ -55,28 +55,31 @@ export abstract class UmbBlockPropertyValueCloner<
 		const contentKey = layoutEntry.contentKey;
 		const settingsKey = layoutEntry.settingsKey;
 
-		// Generate new key and contentKey:
 		clonedLayoutEntry.key = UmbId.new();
-		const newContentKey = UmbId.new();
-		clonedLayoutEntry.contentKey = newContentKey;
 
-		// Replace contentKeys in contentData
-		this.#contentData = this.#contentData?.map((contentData) => {
-			if (contentData.key === contentKey) {
-				return { ...contentData, key: newContentKey };
-			}
-			return contentData;
-		});
+		// External content is referenced by its contentKey, so the key must be kept:
+		if (!layoutEntry.isExternalContent) {
+			const newContentKey = UmbId.new();
+			clonedLayoutEntry.contentKey = newContentKey;
 
-		// Replace contentKey in expose:
-		this.#expose = this.#expose?.map((expose) => {
-			if (expose.contentKey === contentKey) {
-				return { ...expose, contentKey: newContentKey };
-			}
-			return expose;
-		});
+			// Replace contentKeys in contentData
+			this.#contentData = this.#contentData?.map((contentData) => {
+				if (contentData.key === contentKey) {
+					return { ...contentData, key: newContentKey };
+				}
+				return contentData;
+			});
 
-		this.#contentIdUpdatedCallback?.(contentKey, newContentKey);
+			// Replace contentKey in expose:
+			this.#expose = this.#expose?.map((expose) => {
+				if (expose.contentKey === contentKey) {
+					return { ...expose, contentKey: newContentKey };
+				}
+				return expose;
+			});
+
+			this.#contentIdUpdatedCallback?.(contentKey, newContentKey);
+		}
 
 		if (settingsKey) {
 			const newSettingsKey = UmbId.new();

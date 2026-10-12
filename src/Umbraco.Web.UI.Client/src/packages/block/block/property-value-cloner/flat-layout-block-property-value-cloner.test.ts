@@ -90,5 +90,39 @@ describe('FlatLayoutBlockPropertyValueCloner', () => {
 			expect(result.value?.settingsData[0].key).to.not.be.equal('settings-1');
 			expect(result.value?.settingsData[0].key).to.be.equal(newSettingsKey);
 		});
+
+		it('keeps the contentKey of external content while generating a new layout key', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbPropertyValueCloneController(ctrlHost);
+
+			const value = {
+				editorAlias: 'block-test-editor',
+				alias: 'test',
+				culture: null,
+				segment: null,
+				value: {
+					layout: {
+						TestEditor: [
+							{
+								key: 'layout-1',
+								contentKey: 'external-content-1',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+						],
+					},
+					contentData: [],
+					settingsData: [],
+					expose: [],
+				},
+			};
+
+			const result = (await ctrl.clone(value)) as { value: UmbBlockValueType | undefined };
+			const layoutEntry = result.value?.layout.TestEditor?.[0];
+
+			expect(layoutEntry?.contentKey).to.be.equal('external-content-1');
+			expect(layoutEntry?.key).to.not.be.equal('layout-1');
+			expect(layoutEntry?.isExternalContent).to.be.true;
+		});
 	});
 });
