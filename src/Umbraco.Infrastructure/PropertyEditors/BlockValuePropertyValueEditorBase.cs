@@ -304,6 +304,11 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         MapBlockItemDataToEditor(property, blockValue.ContentData, culture, segment);
         MapBlockItemDataToEditor(property, blockValue.SettingsData, culture, segment);
         _blockEditorVarianceHandler.AlignExposeVariance(blockValue, culture);
+        blockValue.Expose = blockValue.Expose
+            .OrderBy(variation => variation.Culture, StringComparer.Ordinal)
+            .ThenBy(variation => variation.Segment, StringComparer.Ordinal)
+            .ThenBy(variation => variation.ContentKey)
+            .ToList();
     }
 
     protected IEnumerable<Guid> ConfiguredElementTypeKeys(IBlockConfiguration configuration)
@@ -327,7 +332,11 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             // to be friendly we'll map the values onto the culture being aligned - falling back to the default language -
             // instead of performing a hard reset of the property values (which would likely be the most correct thing to
             // do from a data point of view).
-            item.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult();
+            item.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult()
+                .OrderBy(value => value.Culture, StringComparer.Ordinal)
+                .ThenBy(value => value.Segment, StringComparer.Ordinal)
+                .ThenBy(value => value.Alias, StringComparer.Ordinal)
+                .ToList();
             foreach (BlockPropertyValue blockPropertyValue in item.Values)
             {
                 IPropertyType? propertyType = blockPropertyValue.PropertyType;

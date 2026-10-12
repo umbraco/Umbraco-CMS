@@ -12,6 +12,8 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbStartNodeAccessValue } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -112,6 +114,24 @@ export class UmbUserWorkspaceContext
 
 	updateProperty<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
 		this._data.updateCurrent({ [propertyName]: value });
+	}
+
+	setUserGroups(uniques: Array<UmbReferenceByUnique>) {
+		this.updateProperty('userGroupUniques', uniques);
+	}
+
+	setDocumentAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			hasDocumentRootAccess: value.rootAccess,
+			documentStartNodeUniques: value.startNodes,
+		});
+	}
+
+	setMediaAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			hasMediaRootAccess: value.rootAccess,
+			mediaStartNodeUniques: value.startNodes,
+		});
 	}
 
 	// TODO: implement upload progress

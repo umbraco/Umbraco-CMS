@@ -167,6 +167,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly inlineCreateBtn: Locator;
   private readonly removeAt: Locator;
   private readonly selectAllCheckbox: Locator;
+  private readonly scheduleForAllLanguagesCheckbox: Locator;
   private readonly confirmToPublishBtn: Locator;
   private readonly tiptapStatusbarWordCount: Locator;
   private readonly tiptapStatusbarElementPath: Locator;
@@ -410,6 +411,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.publishAt = this.generalItem.filter({hasText: 'Publish at'}).locator('umb-localize-date');
     this.removeAt = this.generalItem.filter({hasText: 'Remove at'}).locator('umb-localize-date');
     this.selectAllCheckbox = this.documentScheduleModal.locator('[label="Select all"]');
+    this.scheduleForAllLanguagesCheckbox = this.documentScheduleModal.locator('[label="Schedule for all selected languages"]');
     this.confirmToPublishBtn = page.locator('umb-content-publish-modal').getByLabel('Publish');
     // Publish with descendants
     this.documentPublishWithDescendantsModal = page.locator('umb-document-publish-with-descendants-modal');
@@ -748,16 +750,17 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async changeTemplate(oldTemplate: string, newTemplate: string) {
     await this.clickEditTemplateByName(oldTemplate);
-    // The picker lists templates as buttons, so match by button role/name (getByLabel does not resolve
-    // a button reliably). The modal re-renders continuously so the button never reports "stable";
-    // force the click once it is visible rather than waiting out an animation that never settles.
-    await this.click(this.sidebarModal.getByRole('button', {name: newTemplate, exact: true}), {force: true});
-    await this.clickChooseModalButton();
+    // The picker submits as soon as a template is picked, so there is no Choose step.
+    await this.click(this.sidebarModal.locator(`umb-ref-item[name="${newTemplate}"]`));
   }
 
   async isTemplateNameDisabled(templateName: string) {
     await this.isVisible(this.sidebarModal.getByLabel(templateName));
     await this.isDisabled(this.sidebarModal.getByLabel(templateName));
+  }
+
+  async isTemplateNameVisibleInPicker(templateName: string, isVisible: boolean = true) {
+    await this.isVisible(this.sidebarModal.locator(`umb-ref-item[name="${templateName}"]`), isVisible);
   }
 
   // Culture and Hostnames
@@ -872,6 +875,18 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.page.locator(`[name="${mediaPickerName}"] [label="Remove"] svg`));
     await this.clickConfirmRemoveButton();
     await this.isMediaNameVisible(mediaPickerName, false);
+  }
+
+  async dragMediaPickerItemBefore(draggedMediaId: string, targetMediaId: string) {
+    const draggedItem = this.page.getByTestId(`media:${draggedMediaId}`);
+    const targetItem = this.page.getByTestId(`media:${targetMediaId}`);
+    await this.dragAndDrop(draggedItem, targetItem, 0, -40, 20);
+  }
+
+  async doesMediaPickerHaveItemsInOrder(mediaIds: string[]) {
+    await expect.poll(async () => await this.page.locator('[data-mark^="media:"]').evaluateAll(
+      (items) => items.map((item) => item.getAttribute('data-mark')!.replace('media:', '')),
+    )).toEqual(mediaIds);
   }
 
   async isMediaNameVisible(mediaName: string, isVisible: boolean = true) {
@@ -1864,6 +1879,15 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.selectAllCheckbox);
     // Confirm the toggle registered so rapid consecutive toggles don't lose a click.
     await expect(selectAllInput).toBeChecked({checked: !wasChecked});
+  }
+
+  async clickScheduleForAllLanguagesCheckbox() {
+    await this.click(this.scheduleForAllLanguagesCheckbox);
+  }
+
+  async doesPublishTimeHaveValue(time: string, index: number = 0) {
+    const publishAtInput = this.documentScheduleModal.locator('.publish-date').nth(index).locator('uui-form-layout-item').first().locator('#input');
+    await expect(publishAtInput).toHaveValue(time);
   }
 
   async doesSchedulePublishModalButtonContainDisabledTag(hasDisabledTag: boolean = false) {

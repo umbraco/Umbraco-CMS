@@ -1214,9 +1214,24 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return Constants.Routing.Unroutable;
         }
 
-        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
+        if (isDraft is false)
         {
-            return Constants.Routing.Unroutable;
+            if (string.IsNullOrWhiteSpace(culture))
+            {
+                if (_publishStatusQueryService.IsDocumentPublishedInAnyCulture(documentKey) is false
+                    || _publishStatusQueryService.HasPublishedAncestorPath(documentKey) is false)
+                {
+                    return Constants.Routing.Unroutable;
+                }
+            }
+            else
+            {
+                if (_publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false
+                    || _publishStatusQueryService.HasPublishedAncestorPath(documentKey, culture) is false)
+                {
+                    return Constants.Routing.Unroutable;
+                }
+            }
         }
 
         string cultureOrDefault = GetCultureOrDefault(culture);

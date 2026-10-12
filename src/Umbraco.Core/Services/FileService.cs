@@ -529,9 +529,9 @@ public class FileService : RepositoryService, IFileService
         // mimic old service behavior
         ArgumentException.ThrowIfNullOrEmpty(name);
         ArgumentException.ThrowIfNullOrEmpty(alias);
-        if (name.Length > 255)
+        if (name.Length > Constants.Validation.MaxNameLength)
         {
-            throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be more than 255 characters in length.");
+            throw new ArgumentOutOfRangeException(nameof(name), $"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
 
         Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
@@ -605,10 +605,10 @@ public class FileService : RepositoryService, IFileService
             throw new ArgumentNullException(nameof(template));
         }
 
-        if (string.IsNullOrWhiteSpace(template.Name) || template.Name.Length > 255)
+        if (string.IsNullOrWhiteSpace(template.Name) || template.Name.Length > Constants.Validation.MaxNameLength)
         {
             throw new InvalidOperationException(
-                "Name cannot be null, empty, contain only white-space characters or be more than 255 characters in length.");
+                $"Name cannot be null, empty, contain only white-space characters or be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
 
         Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();

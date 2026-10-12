@@ -16,6 +16,24 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Script.CodeEditor',
+		name: 'Script Workspace Code Editor View',
+		element: () => import('./views/code-editor/script-code-editor-workspace-view.element.js'),
+		weight: 700,
+		meta: {
+			label: '#scripts_tabCode',
+			pathname: 'code',
+			icon: 'icon-brackets',
+		},
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_SCRIPT_WORKSPACE_ALIAS,
+			},
+		],
+	},
+	{
 		type: 'workspaceAction',
 		kind: 'default',
 		alias: UMB_SAVE_SCRIPT_WORKSPACE_ACTION_ALIAS,

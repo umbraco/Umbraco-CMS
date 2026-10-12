@@ -166,8 +166,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			// Only when there is a area key we should create a validator, otherwise it is the root entries element, which is taking part of the Property Editor Form Control. [NL]
 			// Currently there is no server validation for areas. So we can leave out the data path for it for now. [NL]
 			this.#controlValidator = new UmbFormControlValidator(this, this);
-
-			//new UmbBindServerValidationToFormControl(this, this, "$.values.[?(@.alias == 'my-input-alias')].value");
 		}
 	}
 	public get areaKey(): string | null | undefined {
@@ -425,7 +423,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				)}
 			</div>
 			${when(this._allowedBlockTypes && this._allowedBlockTypes.length > 0, () => this.#renderCreateButtonGroup())}
-			${when(this._areaKey, () => html`<uui-form-validation-message .for=${this}></uui-form-validation-message>`)}
+			${when(this._areaKey, () => html`<umb-form-validation-message .for=${this}></umb-form-validation-message>`)}
 		`;
 	}
 
