@@ -1,4 +1,3 @@
-import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from '../server-event/constants.js';
 import type { UmbManagementApiInFlightRequestCache } from '../inflight-request/cache.js';
 import type { UmbManagementApiDetailDataCache } from './cache.js';
 import {
@@ -40,8 +39,6 @@ export class UmbManagementApiDetailDataRequestManager<
 	#update;
 	#delete;
 	#readMany;
-	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
-	#isConnectedToServerEvents = false;
 
 	constructor(
 		host: UmbControllerHost,
@@ -61,11 +58,6 @@ export class UmbManagementApiDetailDataRequestManager<
 
 		this.#dataCache = args.dataCache;
 		this.#inflightRequestCache = args.inflightRequestCache;
-
-		this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
-			this.#serverEventContext = context;
-			this.#observeServerEvents();
-		});
 	}
 
 	/**
@@ -97,7 +89,7 @@ export class UmbManagementApiDetailDataRequestManager<
 		const inflightCacheKey = `read:${id}`;
 
 		// Only read from the cache when we are connected to the server events
-		if (this.#isConnectedToServerEvents && this.#dataCache.has(id)) {
+		if (this.#dataCache.serverEventsConnected && this.#dataCache.has(id)) {
 			data = this.#dataCache.get(id);
 		} else {
 			const hasInflightRequest = this.#inflightRequestCache.has(inflightCacheKey);
@@ -117,7 +109,7 @@ export class UmbManagementApiDetailDataRequestManager<
 			try {
 				const { data: serverData, error: serverError } = await request;
 
-				if (this.#isConnectedToServerEvents && serverData) {
+				if (this.#dataCache.serverEventsConnected && serverData) {
 					this.#dataCache.set(id, serverData);
 				}
 
@@ -149,7 +141,7 @@ export class UmbManagementApiDetailDataRequestManager<
 		let cacheItems: Array<DetailResponseModelType> = [];
 
 		// Only read from the cache when we are connected to the server events
-		if (this.#isConnectedToServerEvents) {
+		if (this.#dataCache.serverEventsConnected) {
 			const cachedIds = ids.filter((id) => this.#dataCache.has(id));
 			cacheItems = cachedIds
 				.map((id) => this.#dataCache.get(id))
@@ -200,7 +192,7 @@ export class UmbManagementApiDetailDataRequestManager<
 				const serverItems = serverData ?? [];
 				error = serverError;
 
-				if (this.#isConnectedToServerEvents) {
+				if (this.#dataCache.serverEventsConnected) {
 					serverItems.forEach((item) => this.#dataCache.set(item.id, item));
 				}
 
@@ -272,28 +264,10 @@ export class UmbManagementApiDetailDataRequestManager<
 		const { error } = await tryExecute(this, this.#delete(id));
 
 		// Only update the cache when we are connected to the server events
-		if (this.#isConnectedToServerEvents && !error) {
+		if (this.#dataCache.serverEventsConnected && !error) {
 			this.#dataCache.delete(id);
 		}
 
 		return { error };
-	}
-
-	#observeServerEvents() {
-		this.observe(
-			this.#serverEventContext?.isConnected,
-			(isConnected) => {
-				/* We purposefully ignore the initial value of isConnected.
-				We only care about whether the connection is established or not (true/false) */
-				if (isConnected === undefined) return;
-				this.#isConnectedToServerEvents = isConnected;
-
-				// Clear the cache if we lose connection to the server events
-				if (this.#isConnectedToServerEvents === false) {
-					this.#dataCache.clear();
-				}
-			},
-			'umbObserveServerEventsConnection',
-		);
 	}
 }
