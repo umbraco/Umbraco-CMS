@@ -1164,6 +1164,54 @@ internal sealed class ServerEventSenderTests
     }
 
     [Test]
+    public async Task HandleAsync_ElementMovedNotification_RoutesUpdatedEventForOriginalAndNewPath()
+    {
+        // Arrange
+        var entityKey = Guid.NewGuid();
+        var entity = Mock.Of<IElement>(e => e.Key == entityKey && e.Path == "-1,6,10");
+        var notification = new ElementMovedNotification(
+            new MoveEventInfo<IElement>(entity, "-1,5,10", Guid.NewGuid()),
+            new EventMessages());
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(recordingRouter.RoutedEvents.Select(x => x.EventType), Is.All.EqualTo(Constants.ServerEvents.EventType.Updated));
+            Assert.That(recordingRouter.RoutedEvents.Select(x => x.EventSource), Is.All.EqualTo(Constants.ServerEvents.EventSource.Element));
+            Assert.That(recordingRouter.RoutedEvents.Select(x => x.Key), Is.All.EqualTo(entityKey));
+            Assert.That(recordingRouter.RoutedContexts.Select(x => x.EntityPath), Is.EquivalentTo(new[] { "-1,6,10", "-1,5,10" }));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_ElementMovedNotification_WithUnchangedPath_RoutesSingleUpdatedEvent()
+    {
+        // Arrange
+        var entityKey = Guid.NewGuid();
+        var entity = Mock.Of<IElement>(e => e.Key == entityKey && e.Path == "-1,5,10");
+        var notification = new ElementMovedNotification(
+            new MoveEventInfo<IElement>(entity, "-1,5,10", Guid.NewGuid()),
+            new EventMessages());
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.Element);
+        Assert.That(recordingRouter.RoutedContexts[0].EntityPath, Is.EqualTo("-1,5,10"));
+    }
+
+    [Test]
     public async Task HandleAsync_EntityContainerSavedNotification_ForElementContainer_RoutesCreatedEvent()
     {
         // Arrange
@@ -1219,12 +1267,12 @@ internal sealed class ServerEventSenderTests
     }
 
     [Test]
-    public async Task HandleAsync_EntityContainerMovedNotification_ForElementContainer_RoutesUpdatedEvent()
+    public async Task HandleAsync_EntityContainerMovedNotification_ForElementContainer_RoutesUpdatedEventForOriginalAndNewPath()
     {
         // Arrange
-        var container = new EntityContainer(Constants.ObjectTypes.Element) { Key = Guid.NewGuid() };
+        var container = new EntityContainer(Constants.ObjectTypes.Element) { Key = Guid.NewGuid(), Path = "-1,6,10" };
         var notification = new EntityContainerMovedNotification(
-            new MoveEventInfo<EntityContainer>(container, "-1,5", -1),
+            new MoveEventInfo<EntityContainer>(container, "-1,5,10", Guid.NewGuid()),
             new EventMessages());
 
         var recordingRouter = new RecordingServerEventRouter();
@@ -1234,7 +1282,14 @@ internal sealed class ServerEventSenderTests
         await serverEventSender.HandleAsync(notification, CancellationToken.None);
 
         // Assert
-        AssertPrimaryRoutedEvent(recordingRouter, container.Key, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.ElementContainer);
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(recordingRouter.RoutedEvents.Select(x => x.EventType), Is.All.EqualTo(Constants.ServerEvents.EventType.Updated));
+            Assert.That(recordingRouter.RoutedEvents.Select(x => x.EventSource), Is.All.EqualTo(Constants.ServerEvents.EventSource.ElementContainer));
+            Assert.That(recordingRouter.RoutedEvents.Select(x => x.Key), Is.All.EqualTo(container.Key));
+            Assert.That(recordingRouter.RoutedContexts.Select(x => x.EntityPath), Is.EquivalentTo(new[] { "-1,6,10", "-1,5,10" }));
+        });
     }
 
     [Test]
@@ -1270,7 +1325,7 @@ internal sealed class ServerEventSenderTests
         // Act
         await serverEventSender.HandleAsync(new EntityContainerSavedNotification(container, messages), CancellationToken.None);
         await serverEventSender.HandleAsync(new EntityContainerDeletedNotification(container, messages), CancellationToken.None);
-        await serverEventSender.HandleAsync(new EntityContainerMovedNotification(new MoveEventInfo<EntityContainer>(container, "-1,5", -1), messages), CancellationToken.None);
+        await serverEventSender.HandleAsync(new EntityContainerMovedNotification(new MoveEventInfo<EntityContainer>(container, "-1,5", Guid.NewGuid()), messages), CancellationToken.None);
         await serverEventSender.HandleAsync(new EntityContainerMovedToRecycleBinNotification(new MoveToRecycleBinEventInfo<EntityContainer>(container, "-1,5"), messages), CancellationToken.None);
 
         // Assert
