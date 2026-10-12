@@ -32,6 +32,7 @@ internal static class ServerEventExtensions
         builder.AddNotificationAsyncHandler<ContentSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ContentSavedBlueprintNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ElementSavedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<EntityContainerSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ContentTypeSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaTypeSavedNotification, ServerEventSender>();
@@ -56,6 +57,7 @@ internal static class ServerEventExtensions
         builder.AddNotificationAsyncHandler<ContentDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ContentDeletedBlueprintNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ElementDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<EntityContainerDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ContentTypeDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, ServerEventSender>();
@@ -80,11 +82,13 @@ internal static class ServerEventExtensions
         builder.AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ElementMovedToRecycleBinNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<EntityContainerMovedToRecycleBinNotification, ServerEventSender>();
 
         builder.AddNotificationAsyncHandler<ElementPublishedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ElementUnpublishedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ElementRolledBackNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ElementMovedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<EntityContainerMovedNotification, ServerEventSender>();
 
         builder.AddNotificationAsyncHandler<ContentTypeChangedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaTypeChangedNotification, ServerEventSender>();

@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.ServerEvents.AccessFilters;
 
 /// <summary>
-/// Gates element server events by the recipient's element start-node access.
+/// Gates element and element container server events by the recipient's element start-node access.
 /// </summary>
 public sealed class ElementServerEventAccessFilter : EntityStartNodeAccessFilter
 {
@@ -22,7 +22,7 @@ public sealed class ElementServerEventAccessFilter : EntityStartNodeAccessFilter
     }
 
     /// <inheritdoc />
-    public override IEnumerable<string> FilteredEventSources => [Constants.ServerEvents.EventSource.Element];
+    public override IEnumerable<string> FilteredEventSources => [Constants.ServerEvents.EventSource.Element, Constants.ServerEvents.EventSource.ElementContainer];
 
     /// <inheritdoc />
     protected override int RecycleBinId => Constants.System.RecycleBinElement;

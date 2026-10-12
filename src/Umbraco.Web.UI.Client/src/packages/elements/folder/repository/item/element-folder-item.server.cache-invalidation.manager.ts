@@ -7,7 +7,7 @@ export class UmbManagementApiElementFolderItemDataCacheInvalidationManager exten
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			dataCache: elementFolderItemCache,
-			eventSources: ['Umbraco:CMS:ElementFolder'],
+			eventSources: ['Umbraco:CMS:ElementContainer'],
 		});
 	}
 }

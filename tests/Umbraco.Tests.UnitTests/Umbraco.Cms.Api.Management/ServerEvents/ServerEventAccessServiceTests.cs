@@ -165,6 +165,16 @@ public class ServerEventAccessServiceTests
     }
 
     [Test]
+    public void Element_Filter_Applies_To_Element_And_Element_Container_Sources()
+    {
+        var filter = new ElementServerEventAccessFilter(CreateEntityServiceMock().Object, AppCaches.Disabled);
+
+        Assert.That(
+            filter.FilteredEventSources,
+            Is.EquivalentTo(new[] { Constants.ServerEvents.EventSource.Element, Constants.ServerEvents.EventSource.ElementContainer }));
+    }
+
+    [Test]
     public async Task Cannot_Grant_Element_Access_Without_Entity_Path()
     {
         var entityService = CreateEntityServiceMock();

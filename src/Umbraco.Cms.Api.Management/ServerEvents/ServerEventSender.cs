@@ -40,6 +40,10 @@ internal sealed class ServerEventSender :
     IDistributedCacheAsyncNotificationHandler<ElementRolledBackNotification>,
     IDistributedCacheAsyncNotificationHandler<ElementSavedNotification>,
     IDistributedCacheAsyncNotificationHandler<ElementUnpublishedNotification>,
+    IDistributedCacheAsyncNotificationHandler<EntityContainerDeletedNotification>,
+    IDistributedCacheAsyncNotificationHandler<EntityContainerMovedNotification>,
+    IDistributedCacheAsyncNotificationHandler<EntityContainerMovedToRecycleBinNotification>,
+    IDistributedCacheAsyncNotificationHandler<EntityContainerSavedNotification>,
     IDistributedCacheAsyncNotificationHandler<LanguageDeletedNotification>,
     IDistributedCacheAsyncNotificationHandler<LanguageSavedNotification>,
     IDistributedCacheAsyncNotificationHandler<MediaDeletedNotification>,
@@ -263,6 +267,38 @@ internal sealed class ServerEventSender :
     /// <inheritdoc/>
     public Task HandleAsync(IEnumerable<ElementUnpublishedNotification> notifications, CancellationToken cancellationToken)
         => NotifyUpdatedAsync(Constants.ServerEvents.EventSource.Element, notifications.SelectMany(x => x.UnpublishedEntities));
+
+    /// <inheritdoc/>
+    public Task HandleAsync(EntityContainerDeletedNotification notification, CancellationToken cancellationToken)
+        => NotifyDeletedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, [notification]);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(IEnumerable<EntityContainerDeletedNotification> notifications, CancellationToken cancellationToken)
+        => NotifyDeletedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, notifications);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(EntityContainerMovedNotification notification, CancellationToken cancellationToken)
+        => NotifyUpdatedAsync(Constants.ServerEvents.EventSource.ElementContainer, notification.MoveInfoCollection.Select(x => x.Entity).Where(IsElementContainer));
+
+    /// <inheritdoc/>
+    public Task HandleAsync(IEnumerable<EntityContainerMovedNotification> notifications, CancellationToken cancellationToken)
+        => NotifyUpdatedAsync(Constants.ServerEvents.EventSource.ElementContainer, notifications.SelectMany(x => x.MoveInfoCollection).Select(x => x.Entity).Where(IsElementContainer));
+
+    /// <inheritdoc/>
+    public Task HandleAsync(EntityContainerMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+        => NotifyTrashedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, [notification]);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(IEnumerable<EntityContainerMovedToRecycleBinNotification> notifications, CancellationToken cancellationToken)
+        => NotifyTrashedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, notifications);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(EntityContainerSavedNotification notification, CancellationToken cancellationToken)
+        => NotifySavedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, [notification]);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(IEnumerable<EntityContainerSavedNotification> notifications, CancellationToken cancellationToken)
+        => NotifySavedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, notifications);
 
     /// <inheritdoc/>
     public Task HandleAsync(LanguageDeletedNotification notification, CancellationToken cancellationToken)
@@ -559,13 +595,21 @@ internal sealed class ServerEventSender :
         }
     }
 
-    private async Task NotifyDeletedAsync<T>(string source, params IEnumerable<DeletedNotification<T>> notifications)
+    // Container notifications are shared by every container type, so only element containers are relevant here.
+    private static bool IsElementContainer(EntityContainer container)
+        => container.ContainedObjectType == Constants.ObjectTypes.Element;
+
+    private Task NotifyDeletedAsync<T>(string source, params IEnumerable<DeletedNotification<T>> notifications)
+        where T : IEntity
+        => NotifyDeletedAsync(source, _ => true, notifications);
+
+    private async Task NotifyDeletedAsync<T>(string source, Func<T, bool> filter, IEnumerable<DeletedNotification<T>> notifications)
         where T : IEntity
     {
         var seen = new HashSet<Guid>();
         foreach (DeletedNotification<T> notification in notifications)
         {
-            foreach (T entity in notification.DeletedEntities)
+            foreach (T entity in notification.DeletedEntities.Where(filter))
             {
                 if (seen.Add(entity.Key))
                 {
@@ -575,13 +619,17 @@ internal sealed class ServerEventSender :
         }
     }
 
-    private async Task NotifyTrashedAsync<T>(string source, params IEnumerable<MovedToRecycleBinNotification<T>> notifications)
+    private Task NotifyTrashedAsync<T>(string source, params IEnumerable<MovedToRecycleBinNotification<T>> notifications)
+        where T : IEntity
+        => NotifyTrashedAsync(source, _ => true, notifications);
+
+    private async Task NotifyTrashedAsync<T>(string source, Func<T, bool> filter, IEnumerable<MovedToRecycleBinNotification<T>> notifications)
         where T : IEntity
     {
         var seen = new HashSet<Guid>();
         foreach (MovedToRecycleBinNotification<T> notification in notifications)
         {
-            foreach (MoveToRecycleBinEventInfo<T> movedEvent in notification.MoveInfoCollection)
+            foreach (MoveToRecycleBinEventInfo<T> movedEvent in notification.MoveInfoCollection.Where(x => filter(x.Entity)))
             {
                 if (seen.Add(movedEvent.Entity.Key))
                 {
@@ -634,13 +682,17 @@ internal sealed class ServerEventSender :
         }
     }
 
-    private async Task NotifySavedAsync<T>(string source, params IEnumerable<SavedNotification<T>> notifications)
+    private Task NotifySavedAsync<T>(string source, params IEnumerable<SavedNotification<T>> notifications)
+        where T : IEntity
+        => NotifySavedAsync(source, _ => true, notifications);
+
+    private async Task NotifySavedAsync<T>(string source, Func<T, bool> filter, IEnumerable<SavedNotification<T>> notifications)
         where T : IEntity
     {
         var seen = new HashSet<Guid>();
         foreach (SavedNotification<T> notification in notifications)
         {
-            foreach (T entity in notification.SavedEntities)
+            foreach (T entity in notification.SavedEntities.Where(filter))
             {
                 if (seen.Add(entity.Key))
                 {

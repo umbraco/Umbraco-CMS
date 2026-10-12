@@ -5,7 +5,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.ServerEvents.Authorizers;
 
 /// <summary>
-/// Provides authorization logic for element-related events in the server event system.
+/// Provides authorization logic for element and element container events in the server event system.
 /// </summary>
 public class ElementEventAuthorizer : EventSourcePolicyAuthorizer
 {
@@ -20,7 +20,7 @@ public class ElementEventAuthorizer : EventSourcePolicyAuthorizer
     /// <summary>
     /// Gets the collection of event sources that this authorizer can authorize.
     /// </summary>
-    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.Element];
+    public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.Element, Constants.ServerEvents.EventSource.ElementContainer];
 
     protected override string Policy => AuthorizationPolicies.TreeAccessDocumentsOrElementsOrMediaOrMembers;
 }
