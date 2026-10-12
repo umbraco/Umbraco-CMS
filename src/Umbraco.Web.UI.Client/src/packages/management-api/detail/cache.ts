@@ -79,10 +79,10 @@ export class UmbManagementApiDetailDataCache<DetailDataModelType> {
 
 	/**
 	 * Whether server events are connected, which is the condition under which cached entries
-	 * can be trusted — server events are what invalidates them.
-	 * This lives on the cache rather than on each consumer because the cache is shared: a
-	 * consumer constructed later inherits the known state instead of re-deriving it from an
-	 * asynchronous context lookup, during which it would otherwise bypass the cache.
+	 * can be trusted, as server events are what invalidate them.
+	 * The cache's invalidation manager owns this state for the lifetime of the app, so every
+	 * consumer reads the same value, including one constructed after the connection changed.
+	 * Without an invalidation manager it stays false, and consumers read from the server.
 	 * @returns {boolean} - True if server events are connected, false otherwise
 	 * @memberof UmbManagementApiDetailDataCache
 	 */
@@ -91,7 +91,8 @@ export class UmbManagementApiDetailDataCache<DetailDataModelType> {
 	}
 
 	/**
-	 * Sets whether server events are connected, clearing the cache when they are not
+	 * Sets whether server events are connected, clearing the cache when they are not.
+	 * Called by the cache's invalidation manager.
 	 * @param {boolean} value - True if server events are connected, false otherwise
 	 * @memberof UmbManagementApiDetailDataCache
 	 */

@@ -1,4 +1,3 @@
-import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from '../server-event/constants.js';
 import type { UmbManagementApiInFlightRequestCache } from '../inflight-request/cache.js';
 import type { UmbManagementApiDetailDataCache } from './cache.js';
 import {
@@ -40,7 +39,6 @@ export class UmbManagementApiDetailDataRequestManager<
 	#update;
 	#delete;
 	#readMany;
-	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 
 	constructor(
 		host: UmbControllerHost,
@@ -60,11 +58,6 @@ export class UmbManagementApiDetailDataRequestManager<
 
 		this.#dataCache = args.dataCache;
 		this.#inflightRequestCache = args.inflightRequestCache;
-
-		this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
-			this.#serverEventContext = context;
-			this.#observeServerEvents();
-		});
 	}
 
 	/**
@@ -276,18 +269,5 @@ export class UmbManagementApiDetailDataRequestManager<
 		}
 
 		return { error };
-	}
-
-	#observeServerEvents() {
-		this.observe(
-			this.#serverEventContext?.isConnected,
-			(isConnected) => {
-				/* We purposefully ignore the initial value of isConnected.
-				We only care about whether the connection is established or not (true/false) */
-				if (isConnected === undefined) return;
-				this.#dataCache.setServerEventsConnected(isConnected);
-			},
-			'umbObserveServerEventsConnection',
-		);
 	}
 }
