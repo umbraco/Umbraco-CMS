@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -3923,6 +3924,8 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     [Test]
     public void Can_Save_Invariant_Siblings_With_Names_Differing_Beyond_Url_Segment_Length()
     {
+        AssertNamesShareUrlSegment(null);
+
         var contentType = ContentTypeService.Get("umbTextpage")!;
 
         var parent = new Content("root", Constants.System.Root, contentType);
@@ -3947,6 +3950,8 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             .Build();
         await LanguageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
 
+        AssertNamesShareUrlSegment(langUk.IsoCode);
+
         var contentType = ContentTypeService.Get("umbTextpage")!;
         contentType.Variations = ContentVariation.Culture;
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
@@ -3969,6 +3974,15 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     // 239 characters, so with the default 240 character URL segment limit, any trailing suffix is truncated away.
     private static string NameTruncatedBeforeUrlSegmentSuffix => string.Join(" ", Enumerable.Repeat("Word", 48));
+
+    private void AssertNamesShareUrlSegment(string? culture)
+    {
+        IShortStringHelper shortStringHelper = GetRequiredService<IShortStringHelper>();
+        Assert.AreEqual(
+            shortStringHelper.CleanStringForUrlSegment($"{NameTruncatedBeforeUrlSegmentSuffix} (12/26)", culture),
+            shortStringHelper.CleanStringForUrlSegment($"{NameTruncatedBeforeUrlSegmentSuffix} (13/26)", culture),
+            "Precondition: the names must share a URL segment for this test to exercise the fallback.");
+    }
 
     [Test]
     [LongRunning]
