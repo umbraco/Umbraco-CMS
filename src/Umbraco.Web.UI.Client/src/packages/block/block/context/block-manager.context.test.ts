@@ -1,7 +1,8 @@
 import { UmbBlockManagerContext } from './block-manager.context.js';
 import type { UmbBlockDataModel } from '../types.js';
-import { expect, fixture, html } from '@open-wc/testing';
+import { expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbElementDetailRepository, type UmbElementDetailModel } from '@umbraco-cms/backoffice/element';
 import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_VALIDATION_CONTEXT, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
@@ -148,6 +149,64 @@ describe('UmbBlockManagerContext', () => {
 			foreignValidation.destroy();
 		});
 	});
+	describe('external content', () => {
+		let host: UmbControllerHostElement;
+		let manager: UmbTestBlockManagerContext;
+		let requestedBatches: Array<Array<string>>;
+		const originalRequestByUniques = UmbElementDetailRepository.prototype.requestByUniques;
+
+		const layout = (key: string, contentKey: string) => ({ key, contentKey, isExternalContent: true });
+
+		beforeEach(async () => {
+			requestedBatches = [];
+			UmbElementDetailRepository.prototype.requestByUniques = async function (uniques: Array<string>) {
+				requestedBatches.push(uniques);
+				return {
+					data: uniques.map((unique) => ({
+						unique,
+						documentType: { unique: 'test-element-type' },
+						values: [],
+						variants: [],
+					})) as unknown as Array<UmbElementDetailModel>,
+				};
+			};
+
+			host = await fixture(html`<umb-test-block-manager-host></umb-test-block-manager-host>`);
+			manager = new UmbTestBlockManagerContext(host);
+		});
+
+		afterEach(() => {
+			UmbElementDetailRepository.prototype.requestByUniques = originalRequestByUniques;
+			manager.destroy();
+		});
+
+		const hasContent = (key: string) => {
+			let found = false;
+			const observer = manager.observe(manager.contentOf(key), (content) => (found = !!content), null);
+			observer.destroy();
+			return found;
+		};
+
+		it('requests each referenced element once in a single batch, even when several blocks reference it', async () => {
+			manager.setLayouts([layout('l1', 'e1'), layout('l2', 'e1'), layout('l3', 'e2')]);
+
+			await waitUntil(() => hasContent('e1') && hasContent('e2'));
+
+			expect(requestedBatches.flat().sort()).to.deep.equal(['e1', 'e2']);
+			expect(requestedBatches).to.have.length(1);
+		});
+
+		it('drops the external content once no layout references it anymore', async () => {
+			manager.setLayouts([layout('l1', 'e1'), layout('l2', 'e2')]);
+			await waitUntil(() => hasContent('e1') && hasContent('e2'));
+
+			manager.setLayouts([layout('l2', 'e2')]);
+
+			await waitUntil(() => !hasContent('e1'));
+			expect(hasContent('e2')).to.be.true;
+		});
+	});
+
 	describe('expose ordering', () => {
 		it('keeps exposes sorted by culture, segment and content key regardless of insertion order', async () => {
 			const host = await fixture<UmbControllerHostElement>(
