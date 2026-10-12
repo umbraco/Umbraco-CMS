@@ -10,6 +10,7 @@ import { setStoredPath } from '@umbraco-cms/backoffice/utils';
 export class UmbAppAuthController extends UmbControllerBase {
 	#retrievedModal: Promise<unknown>;
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+	#timedOutRequest?: Promise<boolean>;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -21,8 +22,12 @@ export class UmbAppAuthController extends UmbControllerBase {
 			this.observe(
 				context?.timeoutSignal,
 				() => {
+					// One sign-in flow per session end: a timeout signalled while it is open joins it
+					if (this.#timedOutRequest) return;
 					console.log('[UmbAppAuthController] Authorization timed out, starting authorization flow');
-					this.makeAuthorizationRequest('timedOut');
+					this.#timedOutRequest = this.makeAuthorizationRequest('timedOut').finally(() => {
+						this.#timedOutRequest = undefined;
+					});
 				},
 				'_authState',
 			);
