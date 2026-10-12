@@ -1,5 +1,6 @@
 import { UmbAuthContext } from './auth.context.js';
-import { aTimeout, expect } from '@open-wc/testing';
+import { createClient, createConfig } from '../backend-api/client/index.js';
+import { aTimeout, expect, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -460,6 +461,99 @@ describe('UmbAuthContext', () => {
 
 			expect(await context.validateToken()).to.be.true;
 			expect(fetchCalls.length, 'a later refresh must still reach /token').to.be.greaterThan(callsBefore);
+		});
+	});
+
+	describe('Session end', () => {
+		const apiUrl = 'http://localhost/umbraco/management/api/v1/user/current';
+		const realFetch = window.fetch;
+		let fetchCalls: Array<string>;
+		let channel: BroadcastChannel;
+		// A token refresh succeeds, and API calls get a 401 until a refresh or a new sign-in has
+		// happened, so a request that is handled as if the session were still active shows up here.
+		let serverAcceptsApiCalls: boolean;
+
+		const tokenCalls = () => fetchCalls.filter((url) => url.endsWith('/token')).length;
+
+		const jsonResponse = (body: unknown) =>
+			new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+
+		beforeEach(async () => {
+			document.body.appendChild(hostElement);
+			fetchCalls = [];
+			serverAcceptsApiCalls = false;
+			window.fetch = ((input: RequestInfo | URL) => {
+				const url = input instanceof Request ? input.url : input.toString();
+				fetchCalls.push(url);
+				if (url.endsWith('/token')) {
+					serverAcceptsApiCalls = true;
+					return Promise.resolve(jsonResponse({ access_token: '[redacted]', expires_in: 300, token_type: 'Bearer' }));
+				}
+				if (url.endsWith('/revoke')) {
+					// Held, so sign-out never reaches its redirect, which would navigate the test page away
+					return new Promise<Response>(() => {});
+				}
+				return Promise.resolve(
+					serverAcceptsApiCalls ? jsonResponse({ id: 'user' }) : new Response(null, { status: 401 }),
+				);
+			}) as typeof window.fetch;
+
+			// A session whose access token has expired, as it has by the time the session times out
+			channel = new BroadcastChannel('umb:auth');
+			const now = Math.floor(Date.now() / 1000);
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now - 60, expiresAt: now + 240 });
+			await waitUntil(() => context.getIsAuthorized());
+		});
+
+		afterEach(() => {
+			window.fetch = realFetch;
+			channel.close();
+			hostElement.remove();
+		});
+
+		it('does not refresh the token for a request made after the session timed out', async () => {
+			context.timeOut();
+
+			await context.getLatestToken();
+
+			expect(tokenCalls()).to.equal(0);
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
+		it('does not refresh the token for a request made once sign-out has started', async () => {
+			void context.signOut();
+
+			await context.getLatestToken();
+
+			expect(tokenCalls()).to.equal(0);
+		});
+
+		it('holds a request made after the session timed out until the user signs in again', async () => {
+			const client = createClient(createConfig());
+			context.configureClient(client);
+			context.timeOut();
+
+			let settled = false;
+			const request = client
+				.get({ url: '/umbraco/management/api/v1/user/current', security: [{ scheme: 'bearer', type: 'http' }] })
+				.finally(() => {
+					settled = true;
+				});
+
+			await waitUntil(() => fetchCalls.includes(apiUrl));
+			await aTimeout(50);
+			expect(settled, 'the request must wait for the next sign-in').to.be.false;
+			expect(tokenCalls()).to.equal(0);
+			expect(context.getIsAuthorized()).to.be.false;
+
+			// The user signs in again at the overlay, and the sign-in popup announces the new session
+			serverAcceptsApiCalls = true;
+			channel.postMessage({ type: 'authorized', expiresIn: 300, issuedAt: Math.floor(Date.now() / 1000) });
+
+			const { response } = await request;
+			expect(response?.status).to.equal(200);
+			expect(context.getIsAuthorized()).to.be.true;
+			expect(tokenCalls()).to.equal(0);
 		});
 	});
 });

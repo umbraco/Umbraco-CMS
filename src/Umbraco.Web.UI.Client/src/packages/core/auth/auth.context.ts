@@ -52,9 +52,10 @@ export class UmbAuthContext extends UmbContextBase {
 	#session = new UmbObjectState<UmbAuthSession | undefined>(undefined);
 	readonly session$ = this.#session.asObservable();
 
-	// Set when a refresh was definitively rejected by the server (e.g. invalid_grant).
-	// Distinguishes "no session yet" from "session is dead" so concurrent and subsequent
-	// API requests don't each fire their own doomed /token call. Cleared when a new
+	// Set when the session has ended: a refresh was definitively rejected by the server
+	// (e.g. invalid_grant), the user timed out, or sign-out started. Distinguishes "no session
+	// yet" from "session is dead" so concurrent and subsequent API requests neither fire their
+	// own doomed /token call nor make the ended session active again. Cleared when a new
 	// session is established (login, peer tab, completed re-authentication).
 	#sessionDead = false;
 
@@ -613,9 +614,12 @@ export class UmbAuthContext extends UmbContextBase {
 	/**
 	 * Handles the case where the user has timed out, i.e. the token has expired.
 	 * This will clear the token storage and set the user as unauthorized.
+	 * The session stays ended until the user signs in again: requests made after this
+	 * point do not refresh the token.
 	 * @memberof UmbAuthContext
 	 */
 	timeOut() {
+		this.#sessionDead = true;
 		this.#session.setValue(undefined);
 		this.#isAuthorized.setValue(false);
 		this.#isTimeout.next();
@@ -626,6 +630,9 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @memberof UmbAuthContext
 	 */
 	async signOut(): Promise<void> {
+		// The session ends here: requests made while signing out must not refresh the token
+		this.#sessionDead = true;
+
 		// Revoke the token (best-effort)
 		await this.#client.revokeToken().catch(() => {});
 
