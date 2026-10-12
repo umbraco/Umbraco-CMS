@@ -68,7 +68,7 @@ internal sealed class DocumentRepositoryOrderingTests
 
     private static List<int> ApplyOrderingAndGetNodeIds(Ordering? ordering, List<ContentJoinRow<DocumentDto, DocumentVersionDto>>? rows = null)
     {
-        IOrderedQueryable<ContentJoinRow<DocumentDto, DocumentVersionDto>> ordered = DocumentRepository.ApplyDocumentOrdering(
+        IOrderedQueryable<ContentJoinRow<DocumentDto, DocumentVersionDto>> ordered = DocumentRepository.ApplyOrdering(
             (rows ?? CreateTiedRows()).AsQueryable(),
             _users.AsQueryable(),
             ordering);
@@ -77,7 +77,7 @@ internal sealed class DocumentRepositoryOrderingTests
     }
 
     [Test]
-    public void ApplyDocumentOrdering_DefaultSortOrderTied_BreaksTieByAscendingNodeId()
+    public void ApplyOrdering_DefaultSortOrderTied_BreaksTieByAscendingNodeId()
     {
         // No explicit ordering falls through to the sortOrderSelector branch — the branch every
         // GetChildrenCoreAsync/GetDescendantsCoreAsync/GetPagedRecycleBinAsync caller hits by default.
@@ -88,7 +88,7 @@ internal sealed class DocumentRepositoryOrderingTests
     }
 
     [Test]
-    public void ApplyDocumentOrdering_NameOrderingTied_BreaksTieByAscendingNodeId()
+    public void ApplyOrdering_NameOrderingTied_BreaksTieByAscendingNodeId()
     {
         List<int> nodeIds = ApplyOrderingAndGetNodeIds(Ordering.By("name"));
 
@@ -97,7 +97,7 @@ internal sealed class DocumentRepositoryOrderingTests
     }
 
     [Test]
-    public void ApplyDocumentOrdering_OrderingById_DoesNotAddARedundantSecondTiebreak()
+    public void ApplyOrdering_OrderingById_DoesNotAddARedundantSecondTiebreak()
     {
         // Ordering directly by "id" already produces a unique order — ThenBy(idSelector) would be a
         // harmless no-op if applied, but the production code explicitly skips it for this case.
@@ -107,7 +107,7 @@ internal sealed class DocumentRepositoryOrderingTests
     }
 
     [Test]
-    public void ApplyDocumentOrdering_PathOrderingTied_BreaksTieByAscendingNodeId()
+    public void ApplyOrdering_PathOrderingTied_BreaksTieByAscendingNodeId()
     {
         // A real node's Path always includes its own NodeId, so two real rows can never share a Path —
         // this tie is only constructible here, against a synthetic in-memory sequence.
@@ -119,7 +119,7 @@ internal sealed class DocumentRepositoryOrderingTests
     }
 
     [Test]
-    public void ApplyDocumentOrdering_UnknownField_IsRejected()
+    public void ApplyOrdering_UnknownField_IsRejected()
     {
         Assert.Throws<NotSupportedException>(
             () => ApplyOrderingAndGetNodeIds(Ordering.By("somethingNobodySupports")),
@@ -130,7 +130,7 @@ internal sealed class DocumentRepositoryOrderingTests
     [TestCase("owner", Direction.Descending, new[] { 100, 200 })]
     [TestCase("updater", Direction.Ascending, new[] { 100, 200 })]
     [TestCase("updater", Direction.Descending, new[] { 200, 100 })]
-    public void ApplyDocumentOrdering_ByUser_OrdersByUserNameNotUserId(string orderBy, Direction direction, int[] expectedNodeIds)
+    public void ApplyOrdering_ByUser_OrdersByUserNameNotUserId(string orderBy, Direction direction, int[] expectedNodeIds)
     {
         List<int> nodeIds = ApplyOrderingAndGetNodeIds(Ordering.By(orderBy, direction), CreateRowsWithDistinctCreatorAndWriter());
 

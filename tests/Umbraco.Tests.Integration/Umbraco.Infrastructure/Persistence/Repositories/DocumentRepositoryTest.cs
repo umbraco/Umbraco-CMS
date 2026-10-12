@@ -954,7 +954,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     {
         // Root's own umbracoNode row carries Constants.System.RootSystemKey as its UniqueId, a real
         // non-null Guid - NOT the semantic null ParentKey contracts to. GetVersionAsync's shared
-        // parent-node join (via BuildBaseQuery/ToDocumentRow) must not let it leak through.
+        // parent-node join (via BuildBaseQuery/ToContentRow) must not let it leak through.
         var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
 
         using var scope = NewScopeProvider.CreateScope();
@@ -1337,8 +1337,8 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task GetChildrenAsync_OrderedByContentTypeAlias_SortsByContentTypeAlias()
     {
-        // Exercises ApplyDocumentOrdering's "contenttypealias" arm specifically. The ContentType join
-        // became a LEFT JOIN (DocumentJoinRow.ContentType is nullable) when the per-method join chains
+        // Exercises ApplyOrdering's "contenttypealias" arm specifically. The ContentType join
+        // became a LEFT JOIN (ContentJoinRow.ContentType is nullable) when the per-method join chains
         // were consolidated, so the selector is now a null-guarded ternary rather than a guaranteed-non-null
         // property access - this is the one arm no other test in this file or DocumentRepositoryOrderingTests
         // exercises, so a regression here (e.g. simplifying the ternary to `?.`, which cannot appear inside
