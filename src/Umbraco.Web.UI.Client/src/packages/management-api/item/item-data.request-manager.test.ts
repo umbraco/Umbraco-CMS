@@ -1,12 +1,15 @@
 import { UmbManagementApiItemDataRequestManager } from './item-data.request-manager.js';
 import { UmbManagementApiItemDataCache } from './cache.js';
+import { UmbManagementApiItemDataCacheInvalidationManager } from './cache-invalidation.manager.js';
 import { UmbManagementApiInFlightRequestCache } from '../inflight-request/cache.js';
 import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from '../server-event/constants.js';
+import type { UmbManagementApiServerEventModel } from '../server-event/types.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
 
 interface TestItemModel {
 	id: string;
@@ -22,6 +25,10 @@ class MockServerEventContext {
 		this.#isConnected.setValue(value);
 	}
 
+	byEventSourcesAndEventTypes() {
+		return new Subject<UmbManagementApiServerEventModel>().asObservable();
+	}
+
 	getHostElement() {
 		return undefined as unknown as Element;
 	}
@@ -34,6 +41,7 @@ describe('UmbManagementApiItemDataRequestManager', () => {
 	let hostElement: UmbTestItemRequestManagerHostElement;
 	let manager: UmbManagementApiItemDataRequestManager<TestItemModel>;
 	let dataCache: UmbManagementApiItemDataCache<TestItemModel>;
+	let invalidationManager: UmbManagementApiItemDataCacheInvalidationManager<TestItemModel>;
 	let inflightRequestCache: UmbManagementApiInFlightRequestCache<TestItemModel>;
 	let mockServerEventContext: MockServerEventContext;
 
@@ -56,6 +64,12 @@ describe('UmbManagementApiItemDataRequestManager', () => {
 		dataCache = new UmbManagementApiItemDataCache<TestItemModel>();
 		inflightRequestCache = new UmbManagementApiInFlightRequestCache<TestItemModel>();
 
+		// Each cache has an app-lifetime invalidation manager, constructed by its package's entry point
+		invalidationManager = new UmbManagementApiItemDataCacheInvalidationManager(hostElement, {
+			dataCache,
+			eventSources: ['Umbraco:CMS:Test'],
+		});
+
 		// Set up mock API function
 		mockGetItems = async (ids: Array<string>) => ({
 			data: ids.map((id) => ({ id, name: `Item ${id}` })),
@@ -75,6 +89,7 @@ describe('UmbManagementApiItemDataRequestManager', () => {
 
 	afterEach(() => {
 		manager.destroy();
+		invalidationManager.destroy();
 		document.body.innerHTML = '';
 	});
 
@@ -431,6 +446,37 @@ describe('UmbManagementApiItemDataRequestManager', () => {
 			expect(result.data).to.have.lengthOf(2);
 
 			rebuiltManager.destroy();
+		});
+
+		it('does not serve entries cached before a disconnect to a request manager constructed afterwards', async () => {
+			mockServerEventContext.setIsConnected(true);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			dataCache.set('item-1', { id: 'item-1', name: 'Cached Item 1' });
+
+			// The connection drops while no request manager is alive
+			manager.destroy();
+			mockServerEventContext.setIsConnected(false);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			let getItemsCalled = false;
+			mockGetItems = async (ids: Array<string>) => {
+				getItemsCalled = true;
+				return { data: ids.map((id) => ({ id, name: `Fresh Item ${id}` })) };
+			};
+
+			manager = new UmbManagementApiItemDataRequestManager(hostElement, {
+				getItems: mockGetItems,
+				dataCache,
+				inflightRequestCache,
+				getUniqueMethod: (item) => item.id,
+			});
+
+			const result = await manager.getItems(['item-1']);
+
+			expect(getItemsCalled, 'expected the entry cached before the disconnect to be read from the server').to.be.true;
+			expect(result.data?.[0]?.name).to.equal('Fresh Item item-1');
+			expect(dataCache.has('item-1'), 'expected the disconnect to clear the cache').to.be.false;
 		});
 	});
 
