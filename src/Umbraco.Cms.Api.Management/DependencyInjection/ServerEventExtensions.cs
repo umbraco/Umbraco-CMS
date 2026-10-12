@@ -31,6 +31,7 @@ internal static class ServerEventExtensions
     {
         builder.AddNotificationAsyncHandler<ContentSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ContentSavedBlueprintNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ElementSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ContentTypeSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaSavedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaTypeSavedNotification, ServerEventSender>();
@@ -54,6 +55,7 @@ internal static class ServerEventExtensions
 
         builder.AddNotificationAsyncHandler<ContentDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ContentDeletedBlueprintNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ElementDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ContentTypeDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, ServerEventSender>();
@@ -77,6 +79,12 @@ internal static class ServerEventExtensions
 
         builder.AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ElementMovedToRecycleBinNotification, ServerEventSender>();
+
+        builder.AddNotificationAsyncHandler<ElementPublishedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ElementUnpublishedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ElementRolledBackNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ElementMovedNotification, ServerEventSender>();
 
         builder.AddNotificationAsyncHandler<ContentTypeChangedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaTypeChangedNotification, ServerEventSender>();
@@ -92,6 +100,7 @@ internal static class ServerEventExtensions
     {
         builder.EventSourceAuthorizers()
             .Append<DocumentEventAuthorizer>()
+            .Append<ElementEventAuthorizer>()
             .Append<DocumentBlueprintEventAuthorizer>()
             .Append<DocumentTypeEventAuthorizer>()
             .Append<MediaEventAuthorizer>()
@@ -120,6 +129,7 @@ internal static class ServerEventExtensions
     {
         builder.ServerEventAccessFilters()
             .Append<DocumentServerEventAccessFilter>()
+            .Append<ElementServerEventAccessFilter>()
             .Append<MediaServerEventAccessFilter>();
         return builder;
     }
