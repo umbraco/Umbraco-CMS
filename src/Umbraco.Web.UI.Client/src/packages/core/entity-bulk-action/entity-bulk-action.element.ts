@@ -24,8 +24,14 @@ export class UmbEntityBulkActionDefaultElement<
 	async #onClick(event: PointerEvent) {
 		if (!this.api) return;
 		event.stopPropagation();
-		await this.api.execute().catch(() => {});
-		this.dispatchEvent(new UmbActionExecutedEvent());
+
+		try {
+			await this.api.execute();
+			this.dispatchEvent(new UmbActionExecutedEvent());
+		} catch {
+			// Only a completed action is reported as executed. Listeners may unmount this element in response,
+			// and a failed action can still be reporting its error through it.
+		}
 	}
 
 	override render() {
