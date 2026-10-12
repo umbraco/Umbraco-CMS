@@ -17,7 +17,6 @@ export class UmbElementConfigurationServerDataSource extends UmbControllerBase {
 			const mappedData: UmbElementConfigurationModel = {
 				disableDeleteWhenReferenced: data.disableDeleteWhenReferenced,
 				disableUnpublishWhenReferenced: data.disableUnpublishWhenReferenced,
-				allowEditInvariantFromNonDefault: data.allowEditInvariantFromNonDefault,
 			};
 
 			return { data: mappedData };

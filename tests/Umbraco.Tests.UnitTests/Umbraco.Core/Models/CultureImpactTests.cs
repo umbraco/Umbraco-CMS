@@ -3,10 +3,8 @@
 
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
@@ -45,12 +43,10 @@ public class CultureImpactTests
 
         Assert.AreEqual(impact.Culture, "*");
 
-        Assert.IsTrue(impact.ImpactsInvariantProperties);
         Assert.IsFalse(impact.ImpactsAlsoInvariantProperties);
         Assert.IsFalse(impact.ImpactsOnlyInvariantCulture);
         Assert.IsFalse(impact.ImpactsExplicitCulture);
         Assert.IsTrue(impact.ImpactsAllCultures);
-        Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
     }
 
     [Test]
@@ -60,84 +56,47 @@ public class CultureImpactTests
 
         Assert.AreEqual(impact.Culture, null);
 
-        Assert.IsTrue(impact.ImpactsInvariantProperties);
         Assert.IsFalse(impact.ImpactsAlsoInvariantProperties);
         Assert.IsTrue(impact.ImpactsOnlyInvariantCulture);
         Assert.IsFalse(impact.ImpactsExplicitCulture);
         Assert.IsFalse(impact.ImpactsAllCultures);
-        Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
     }
 
-    [Test]
-    public void Explicit_Default_Culture()
+    [TestCase(true)]
+    [TestCase(false)]
+    public void Explicit_Culture(bool allowEditInvariantForVariant)
     {
-        var impact = BasicImpactFactory.ImpactExplicit("en-US", true);
+        var impact = BasicImpactFactory.ImpactExplicit("en-US", allowEditInvariantForVariant);
 
         Assert.AreEqual(impact.Culture, "en-US");
 
-        Assert.IsTrue(impact.ImpactsInvariantProperties);
-        Assert.IsTrue(impact.ImpactsAlsoInvariantProperties);
+        Assert.AreEqual(allowEditInvariantForVariant, impact.ImpactsAlsoInvariantProperties);
         Assert.IsFalse(impact.ImpactsOnlyInvariantCulture);
         Assert.IsTrue(impact.ImpactsExplicitCulture);
         Assert.IsFalse(impact.ImpactsAllCultures);
-        Assert.IsTrue(impact.ImpactsOnlyDefaultCulture);
     }
 
-    [Test]
-    public void Explicit_NonDefault_Culture()
-    {
-        var impact = BasicImpactFactory.ImpactExplicit("en-US", false);
-
-        Assert.AreEqual(impact.Culture, "en-US");
-
-        Assert.IsFalse(impact.ImpactsInvariantProperties);
-        Assert.IsFalse(impact.ImpactsAlsoInvariantProperties);
-        Assert.IsFalse(impact.ImpactsOnlyInvariantCulture);
-        Assert.IsTrue(impact.ImpactsExplicitCulture);
-        Assert.IsFalse(impact.ImpactsAllCultures);
-        Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
-    }
-
-    [Test]
-    public void TryCreate_Explicit_Default_Culture()
+    [TestCase(true)]
+    [TestCase(false)]
+    public void TryCreate_Explicit_Culture(bool allowEditInvariantForVariant)
     {
         var success =
-            BasicImpactFactory.TryCreate("en-US", true, ContentVariation.Culture, false, false, out var impact);
+            BasicImpactFactory.TryCreate("en-US", ContentVariation.Culture, false, allowEditInvariantForVariant, out var impact);
         Assert.IsTrue(success);
 
         Assert.IsNotNull(impact);
         Assert.AreEqual(impact.Culture, "en-US");
 
-        Assert.IsTrue(impact.ImpactsInvariantProperties);
-        Assert.IsTrue(impact.ImpactsAlsoInvariantProperties);
+        Assert.AreEqual(allowEditInvariantForVariant, impact.ImpactsAlsoInvariantProperties);
         Assert.IsFalse(impact.ImpactsOnlyInvariantCulture);
         Assert.IsTrue(impact.ImpactsExplicitCulture);
         Assert.IsFalse(impact.ImpactsAllCultures);
-        Assert.IsTrue(impact.ImpactsOnlyDefaultCulture);
-    }
-
-    [Test]
-    public void TryCreate_Explicit_NonDefault_Culture()
-    {
-        var success =
-            BasicImpactFactory.TryCreate("en-US", false, ContentVariation.Culture, false, false, out var impact);
-        Assert.IsTrue(success);
-
-        Assert.IsNotNull(impact);
-        Assert.AreEqual(impact.Culture, "en-US");
-
-        Assert.IsFalse(impact.ImpactsInvariantProperties);
-        Assert.IsFalse(impact.ImpactsAlsoInvariantProperties);
-        Assert.IsFalse(impact.ImpactsOnlyInvariantCulture);
-        Assert.IsTrue(impact.ImpactsExplicitCulture);
-        Assert.IsFalse(impact.ImpactsAllCultures);
-        Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
     }
 
     [Test]
     public void TryCreate_AllCultures_For_Invariant()
     {
-        var success = BasicImpactFactory.TryCreate("*", false, ContentVariation.Nothing, false, false, out var impact);
+        var success = BasicImpactFactory.TryCreate("*", ContentVariation.Nothing, false, false, out var impact);
         Assert.IsTrue(success);
 
         Assert.IsNotNull(impact);
@@ -149,7 +108,7 @@ public class CultureImpactTests
     [Test]
     public void TryCreate_AllCultures_For_Variant()
     {
-        var success = BasicImpactFactory.TryCreate("*", false, ContentVariation.Culture, false, false, out var impact);
+        var success = BasicImpactFactory.TryCreate("*", ContentVariation.Culture, false, false, out var impact);
         Assert.IsTrue(success);
 
         Assert.IsNotNull(impact);
@@ -161,14 +120,14 @@ public class CultureImpactTests
     [Test]
     public void TryCreate_Invariant_For_Variant()
     {
-        var success = BasicImpactFactory.TryCreate(null, false, ContentVariation.Culture, false, false, out var impact);
+        var success = BasicImpactFactory.TryCreate(null, ContentVariation.Culture, false, false, out var impact);
         Assert.IsFalse(success);
     }
 
     [Test]
     public void TryCreate_Invariant_For_Invariant()
     {
-        var success = BasicImpactFactory.TryCreate(null, false, ContentVariation.Nothing, false, false, out var impact);
+        var success = BasicImpactFactory.TryCreate(null,  ContentVariation.Nothing, false, false, out var impact);
         Assert.IsTrue(success);
 
         Assert.AreSame(BasicImpactFactory.ImpactInvariant(), impact);
@@ -177,21 +136,13 @@ public class CultureImpactTests
     [Test]
     [TestCase(true)]
     [TestCase(false)]
-    public void Edit_Invariant_From_Non_Default_Impacts_Invariant_Properties(bool allowEditInvariantFromNonDefault)
+    public void Edit_Invariant_From_Variant_Impacts_Invariant_Properties(bool allowEditInvariantFromVariant)
     {
-        var sut = CreateCultureImpactService(new ContentSettings
-        {
-            AllowEditInvariantFromNonDefault = allowEditInvariantFromNonDefault
-        });
-        var impact = sut.ImpactExplicit("da", false);
+        var sut = CreateCultureImpactService();
+        var impact = sut.ImpactExplicit("da", allowEditInvariantFromVariant);
 
-        Assert.AreEqual(allowEditInvariantFromNonDefault, impact.ImpactsAlsoInvariantProperties);
+        Assert.AreEqual(allowEditInvariantFromVariant, impact.ImpactsAlsoInvariantProperties);
     }
 
-    private CultureImpactFactory CreateCultureImpactService(ContentSettings contentSettings = null)
-    {
-        contentSettings ??= new ContentSettings { AllowEditInvariantFromNonDefault = false, };
-
-        return new CultureImpactFactory(new TestOptionsMonitor<ContentSettings>(contentSettings));
-    }
+    private CultureImpactFactory CreateCultureImpactService() => new CultureImpactFactory();
 }
