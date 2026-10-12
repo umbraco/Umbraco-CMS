@@ -26,8 +26,7 @@ const IGNORED_OPERATION_STATUSES = new Set(['CancelledByNotification']);
  * @returns {boolean} True when a notification is shown for this error, false when it is suppressed.
  */
 export function apiErrorWasNotified(error: unknown): boolean {
-	// The UmbError type guards read `.name` off the argument, so anything that is not an object has to be
-	// rejected first. It also cannot have come from tryExecute, so nothing was notified for it.
+	// Anything that is not an object cannot have come from tryExecute, so nothing was notified for it.
 	if (error === null || typeof error !== 'object') {
 		return false;
 	}
