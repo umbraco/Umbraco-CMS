@@ -31,9 +31,16 @@ describe('apiErrorWasNotified', () => {
 		});
 	});
 
-	it('reports that a cancelled-by-notification operation was not notified', () => {
-		// The server already messaged the user via the Umb-Notifications header.
-		expect(apiErrorWasNotified(apiError({ status: 400, operationStatus: 'CancelledByNotification' }))).to.be.false;
+	it('reports that a cancelled operation was not notified when the server notified about it', () => {
+		expect(
+			apiErrorWasNotified(
+				apiError({ status: 400, operationStatus: 'CancelledByNotification', notifiedByServer: true }),
+			),
+		).to.be.false;
+	});
+
+	it('reports that a cancelled operation was notified when the server did not notify about it', () => {
+		expect(apiErrorWasNotified(apiError({ status: 400, operationStatus: 'CancelledByNotification' }))).to.be.true;
 	});
 
 	it('reports that another operation status was notified', () => {
