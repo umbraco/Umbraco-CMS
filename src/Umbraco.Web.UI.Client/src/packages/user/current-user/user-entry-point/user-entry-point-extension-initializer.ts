@@ -48,7 +48,8 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 						this.#loadCurrentUser();
 					} else {
 						// The context keeps the previous user once authorization is lost, and the next sign-in may be
-						// a different user, so only a load completed for the new session counts.
+						// a different user, so drop its cached load and only count a load completed for the new session.
+						this.#currentUserContext?.invalidate();
 						this.#isUserLoaded = false;
 						this.#userLoad = undefined;
 					}

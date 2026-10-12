@@ -41,10 +41,17 @@ class UmbTestCurrentUserContext {
 	getHostElement() {
 		return this.#host;
 	}
-	async load() {
+	#loadPromise?: Promise<void>;
+	load() {
+		return (this.#loadPromise ??= this.#load());
+	}
+	async #load() {
 		const user = this.signedInUser;
 		if (this.loadDelayMs) await aTimeout(this.loadDelayMs);
 		if (this.loadOnDemand) this.setUser(user);
+	}
+	invalidate() {
+		this.#loadPromise = undefined;
 	}
 	setUser(unique: string) {
 		this.#currentUser.setValue({ unique });
@@ -180,6 +187,20 @@ describe('UmbUserEntryPointExtensionInitializer', () => {
 		currentUserContext.signedInUser = 'second-user';
 		authContext.setAuthorized(true);
 		await aTimeout(80);
+		expect(seenUsers).to.deep.equal(['first-user', 'second-user']);
+	});
+
+	it('fetches the current user again on re-authorization instead of reusing the cached load', async () => {
+		const seenUsers: Array<string | undefined> = [];
+		registry.register(createUserReadingManifest('Umb.Test.ReadsUser', currentUserContext, seenUsers));
+		currentUserContext.signedInUser = 'first-user';
+		authContext.setAuthorized(true);
+		await aTimeout(50);
+
+		authContext.setAuthorized(false);
+		currentUserContext.signedInUser = 'second-user';
+		authContext.setAuthorized(true);
+		await aTimeout(50);
 		expect(seenUsers).to.deep.equal(['first-user', 'second-user']);
 	});
 
