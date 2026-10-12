@@ -81,35 +81,36 @@
       "id": 2,
       "slug": "hoist-read-path",
       "title": "Hoist the generic read path out of DocumentRepository",
-      "status": "planned",
-      "branch": "",
-      "pr": "",
-      "prUrl": "",
+      "status": "in-review",
+      "branch": "v20/feature/ef-core-element-repository-2-hoist-read-path",
+      "pr": "24175",
+      "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24175",
       "dependsOn": [],
       "summary": "Generic ContentJoinRow and BuildBaseQuery hook; GetAsync/GetMany/children/descendants/recycle bin/versions/ordering/assembly move into AsyncPublishableContentRepositoryBase. Zero behaviour change.",
       "tasks": [
         {
           "text": "Spike: generic row + BuildBaseQuery + GetAsync green on SQLite and SQL Server",
-          "done": false
+          "done": true
         },
         {
           "text": "Assembly, property loading, variations, ordering hoisted",
-          "done": false
+          "done": true
         },
         {
           "text": "Children, descendants, root, recycle bin, paged-of-types, versions hoisted",
-          "done": false
+          "done": true
         },
         {
           "text": "Template handling isolated behind a virtual post-assembly hook on DocumentRepository",
-          "done": false
+          "done": true
         },
         {
           "text": "Document fixtures green with unchanged counts; snapshots untouched",
-          "done": false
+          "done": true
         }
       ],
-      "acceptance": "DocumentRepositoryTest, DocumentBlueprintRepositoryTest, DocumentRepositoryUrlSegmentTests, ContentServiceTests and unit tests green with the same counts; no snapshot diff."
+      "acceptance": "DocumentRepositoryTest, DocumentBlueprintRepositoryTest, DocumentRepositoryUrlSegmentTests, ContentServiceTests and unit tests green with the same counts; no snapshot diff.",
+      "notes": "Implemented 12-10-2026; commits 4b93bb37671 (spike) and 8966625748b (hoist). Stacked on PR 1's branch, so the PR diff includes #24134 until it merges. DocumentRepository.cs 2530 -> 1374 lines; AsyncPublishableContentRepositoryBase 644 -> 1701; AsyncContentRepositoryBase 500 -> 710; new ContentJoinRow.cs/ContentRow.cs. Fixture counts unchanged against the baseline: DocumentRepositoryTest 189 (SQLite and SQL Server), DocumentBlueprintRepositoryTest 4 (both), ContentServiceTests 207, HybridCache document fixtures 128 + 1 skipped, unit project 7409 + 6 skipped. Snapshots untouched. Independent review: approve after fixes (content-type key resolution made kind-agnostic, cancellation threaded, db-first parameter order). Ordering-branch consolidation deferred (section 8)."
     },
     {
       "id": 3,
@@ -290,6 +291,22 @@
     }
   ],
   "log": [
+    {
+      "date": "12-10-2026",
+      "text": "PR 2 opened as draft #24175 against v18/feature/ef-core-repositories (stacked on PR 1's branch)."
+    },
+    {
+      "date": "12-10-2026",
+      "text": "PR 2 implementation complete and reviewed: read path hoisted in four phases, every fixture at its baseline count on both providers, snapshots untouched. Awaiting the commit/PR step."
+    },
+    {
+      "date": "12-10-2026",
+      "text": "PR 2 spike green on both providers: generic ContentJoinRow/ContentRow, the BuildBaseQuery hook and the generic ToContentRow projection translate on SQLite and SQL Server (DocumentRepositoryTest 189/189 on each). Hoisting the rest in three phases."
+    },
+    {
+      "date": "12-10-2026",
+      "text": "PR 2 started on v20/feature/ef-core-element-repository-2-hoist-read-path, cut from PR 1's branch (aa952e94477) at the user's request."
+    },
     {
       "date": "12-10-2026",
       "text": "Plan re-checked after the merge-up: inventory, anchors and PR 1 notes updated; PR 5 gains the version-delete notification hooks (the async engine hardcodes the Content-flavoured notifications like the sync base); merge-up checklist now includes the hand port into AsyncPublishableContentServiceBase."
