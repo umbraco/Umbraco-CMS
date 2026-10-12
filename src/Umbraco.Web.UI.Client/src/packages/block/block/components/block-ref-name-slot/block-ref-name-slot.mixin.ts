@@ -3,6 +3,9 @@ import { html, ifDefined, property, state, when } from '@umbraco-cms/backoffice/
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 
+/**
+ * Contract of an element that renders a `name` slot, falling back to the deprecated `label` property.
+ */
 export interface UmbBlockRefNameSlot {
 	/** @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 20. */
 	label: string | undefined;
@@ -14,7 +17,6 @@ export interface UmbBlockRefNameSlot {
 export declare abstract class UmbBlockRefNameSlotElement extends HTMLElement implements UmbBlockRefNameSlot {
 	/** @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 20. */
 	label: string | undefined;
-	protected _hasNameSlotContent: boolean;
 
 	/**
 	 * Renders the `name` slot, falling back to `label` (via `<umb-ufm-render>`) while nothing is slotted.

@@ -298,7 +298,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	#renderUfm() {
-		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved);
+		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved, 'name');
 	}
 
 	#renderHiddenUfm() {

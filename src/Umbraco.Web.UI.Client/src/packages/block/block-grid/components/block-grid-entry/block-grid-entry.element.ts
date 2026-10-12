@@ -393,7 +393,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderUfm() {
-		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved);
+		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved, 'name');
 	}
 
 	#renderHiddenUfm() {

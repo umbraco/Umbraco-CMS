@@ -278,7 +278,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderUfm() {
-		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved);
+		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved, 'name');
 	}
 
 	#renderHiddenUfm() {
