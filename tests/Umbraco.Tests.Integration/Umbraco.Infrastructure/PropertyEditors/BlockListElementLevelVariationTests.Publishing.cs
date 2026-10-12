@@ -3238,4 +3238,140 @@ internal partial class BlockListElementLevelVariationTests
             Assert.IsFalse(content.IsCultureEdited("en-US"), "English content did not change and must not be flagged as edited.");
         });
     }
+
+    [Test]
+    public async Task Publishing_Block_Values_Added_After_The_First_Publish_Does_Not_Leave_Content_Edited()
+    {
+        var elementType = CreateHeadlineAndBodyTextElementType();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "headline", Value = "Headline in English", Culture = "en-US" },
+                new() { Alias = "headline", Value = "Headline in Danish", Culture = "da-DK" },
+            },
+            [],
+            publishContent: false);
+
+        var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        await UpdateBlocksAsync(content, blockListValue);
+        content = ContentService.GetById(content.Key)!;
+        PublishContent(content, contentType, ["en-US", "da-DK"]);
+        AssertNoCultureIsEdited(content.Key);
+
+        // the second property is only filled in after the first publish, so the published value has no entries for
+        // it yet; the values are submitted in canonical order, as the backoffice does
+        blockListValue.ContentData[0].Values =
+        [
+            new() { Alias = "bodyText", Value = "Body text in Danish", Culture = "da-DK" },
+            new() { Alias = "headline", Value = "Headline in Danish", Culture = "da-DK" },
+            new() { Alias = "bodyText", Value = "Body text in English", Culture = "en-US" },
+            new() { Alias = "headline", Value = "Headline in English", Culture = "en-US" },
+        ];
+        await UpdateBlocksAsync(content, blockListValue);
+        content = ContentService.GetById(content.Key)!;
+        PublishContent(content, contentType, ["en-US", "da-DK"]);
+
+        AssertNoCultureIsEdited(content.Key);
+    }
+
+    [TestCase("en-US", "da-DK")]
+    [TestCase("da-DK", "en-US")]
+    public async Task Publishing_Merges_Block_Values_In_Canonical_Order_Regardless_Of_The_Published_Value_Order(string firstCultureToMerge, string secondCultureToMerge)
+    {
+        var elementType = CreateHeadlineAndBodyTextElementType();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        // values stored in a non-canonical order (as persisted before the canonical ordering was introduced)
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "headline", Value = "Headline in English", Culture = "en-US" },
+                new() { Alias = "bodyText", Value = "Body text in English", Culture = "en-US" },
+                new() { Alias = "headline", Value = "Headline in Danish", Culture = "da-DK" },
+                new() { Alias = "bodyText", Value = "Body text in Danish", Culture = "da-DK" },
+            },
+            [],
+            publishContent: false);
+        var publishedValue = (string)content.Properties["blocks"]!.GetValue()!;
+
+        var editedBlockListValue = JsonSerializer.Deserialize<BlockListValue>(publishedValue);
+        editedBlockListValue.ContentData[0].Values.Single(v => v.Alias == "headline" && v.Culture == firstCultureToMerge).Value = "Updated headline";
+        var editedValue = JsonSerializer.Serialize(editedBlockListValue);
+
+        IDataEditor dataEditor = PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList]!;
+        var mergedValue = dataEditor.MergePartialPropertyValueForCulture(editedValue, publishedValue, firstCultureToMerge);
+        mergedValue = dataEditor.MergePartialPropertyValueForCulture(editedValue, mergedValue, secondCultureToMerge);
+
+        var mergedBlockListValue = JsonSerializer.Deserialize<BlockListValue>((string)mergedValue!);
+        CollectionAssert.AreEqual(
+            new[]
+            {
+                ("da-DK", "bodyText"),
+                ("da-DK", "headline"),
+                ("en-US", "bodyText"),
+                ("en-US", "headline"),
+            },
+            mergedBlockListValue.ContentData[0].Values.Select(v => (v.Culture, v.Alias)));
+    }
+
+    private IContentType CreateHeadlineAndBodyTextElementType()
+    {
+        var elementType = new ContentTypeBuilder()
+            .WithAlias("myHeadlineAndBodyTextElementType")
+            .WithName("My Headline And Body Text Element Type")
+            .WithIsElement(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+                .WithAlias("headline")
+                .WithName("Headline")
+                .WithDataTypeId(Constants.DataTypes.Textbox)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                .WithValueStorageType(ValueStorageType.Nvarchar)
+                .WithVariations(ContentVariation.Culture)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("bodyText")
+                .WithName("Body text")
+                .WithDataTypeId(Constants.DataTypes.Textbox)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                .WithValueStorageType(ValueStorageType.Nvarchar)
+                .WithVariations(ContentVariation.Culture)
+                .Done()
+            .Build();
+        ContentTypeService.Save(elementType);
+        return elementType;
+    }
+
+    private async Task UpdateBlocksAsync(IContent content, BlockListValue blockListValue)
+    {
+        var updateModel = new ContentUpdateModel
+        {
+            Properties = [new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }],
+            Variants =
+            [
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" },
+            ],
+        };
+        var updateResult = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateResult.Success);
+    }
+
+    private void AssertNoCultureIsEdited(Guid contentKey)
+    {
+        var content = ContentService.GetById(contentKey)!;
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(content.IsCultureEdited("en-US"), "English must not be flagged as edited after publishing all cultures.");
+            Assert.IsFalse(content.IsCultureEdited("da-DK"), "Danish must not be flagged as edited after publishing all cultures.");
+        });
+    }
 }

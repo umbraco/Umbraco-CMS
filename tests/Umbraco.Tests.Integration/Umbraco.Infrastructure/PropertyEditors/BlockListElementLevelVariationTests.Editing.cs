@@ -1828,4 +1828,57 @@ internal partial class BlockListElementLevelVariationTests
 
         listValue.Expose.RemoveAll(exposeItem => exposeItem.ContentKey == blockKey);
     }
+
+    [TestCase("da-DK")]
+    [TestCase("en-US")]
+    public void Merging_With_Limited_Language_Access_Keeps_Block_Values_In_Canonical_Order(string editorCulture)
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var contentElementKey = Guid.NewGuid();
+        var settingsElementKey = Guid.NewGuid();
+
+        var currentValue = BlockListPropertyValue(
+            elementType,
+            contentElementKey,
+            settingsElementKey,
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "variantText", Value = "The first content value in Danish", Culture = "da-DK" },
+                    new() { Alias = "variantText", Value = "The first content value in English", Culture = "en-US" },
+                },
+                [],
+                null,
+                null));
+
+        // Create a partial block editor value for the editor language only
+        var editedValue = BlockListPropertyValue(
+            elementType,
+            contentElementKey,
+            settingsElementKey,
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "variantText", Value = "The second content value", Culture = editorCulture },
+                },
+                [],
+                null,
+                null));
+
+        IDataEditor dataEditor = PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList]!;
+        var mergedValue = dataEditor.MergeVariantInvariantPropertyValue(
+            JsonSerializer.Serialize(currentValue),
+            JsonSerializer.Serialize(editedValue),
+            canUpdateInvariantData: true,
+            allowedCultures: [editorCulture]);
+
+        var mergedBlockListValue = JsonSerializer.Deserialize<BlockListValue>((string)mergedValue!);
+        CollectionAssert.AreEqual(
+            new[]
+            {
+                ("da-DK", editorCulture is "da-DK" ? "The second content value" : "The first content value in Danish"),
+                ("en-US", editorCulture is "en-US" ? "The second content value" : "The first content value in English"),
+            },
+            mergedBlockListValue.ContentData[0].Values.Select(v => (v.Culture, v.Value?.ToString())));
+    }
 }

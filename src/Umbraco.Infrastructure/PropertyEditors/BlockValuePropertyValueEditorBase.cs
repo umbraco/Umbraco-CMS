@@ -187,6 +187,11 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             editedBlockValue?.SettingsData ?? [],
             currentBlockValue?.SettingsData ?? [],
             contentKey);
+
+        if (editedBlockValue is not null)
+        {
+            SortBlockItemValuesByCulture(editedBlockValue);
+        }
     }
 
     private void MapBlockItemDataFromEditor(List<BlockItemData> editedItems, List<BlockItemData> currentItems, Guid contentKey)
@@ -332,11 +337,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             // to be friendly we'll map the values onto the culture being aligned - falling back to the default language -
             // instead of performing a hard reset of the property values (which would likely be the most correct thing to
             // do from a data point of view).
-            item.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult()
-                .OrderBy(value => value.Culture, StringComparer.Ordinal)
-                .ThenBy(value => value.Segment, StringComparer.Ordinal)
-                .ThenBy(value => value.Alias, StringComparer.Ordinal)
-                .ToList();
+            item.Values = InCanonicalOrder(_blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult());
             foreach (BlockPropertyValue blockPropertyValue in item.Values)
             {
                 IPropertyType? propertyType = blockPropertyValue.PropertyType;
@@ -484,6 +485,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             target.BlockValue.Expose.Add(missingSourceExpose);
         }
 
+        SortBlockItemValuesByCulture(target.BlockValue);
         return target.BlockValue;
     }
 
@@ -650,7 +652,6 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             ?? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(sourceBlockEditorValues.Layout));
 
         TValue mergeResult = MergeBlockEditorDataForCulture(sourceBlockEditorValues.BlockValue, targetBlockEditorValues.BlockValue, culture);
-        SortBlockItemValuesByCulture(mergeResult);
         return _jsonSerializer.Serialize(mergeResult);
     }
 
@@ -900,6 +901,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         MergePartialPropertyValueForCulture(sourceBlockValue.ContentData, targetBlockValue.ContentData, culture);
         MergePartialPropertyValueForCulture(sourceBlockValue.SettingsData, targetBlockValue.SettingsData, culture);
+        SortBlockItemValuesByCulture(targetBlockValue);
 
         return targetBlockValue;
     }
@@ -1013,10 +1015,14 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         });
 
     /// <summary>
-    /// Sorts block item values by culture to ensure consistent JSON serialization order.
-    /// This prevents false positives in edited state detection where PublishedValue and EditedValue
-    /// differ only in culture order.
+    /// Sorts block item values into their canonical order: by culture, then by segment, then by property alias,
+    /// using ordinal comparison with invariant (<c>null</c>) first.
     /// </summary>
+    /// <remarks>
+    /// Every block value that is persisted must be in this order, whichever path produced it. The edited state is
+    /// detected by comparing the serialized edited and published values, so values that differ only in order would
+    /// otherwise be reported as edited.
+    /// </remarks>
     protected static void SortBlockItemValuesByCulture(TValue blockValue)
     {
         SortBlockItemValuesByCulture(blockValue.ContentData);
@@ -1027,7 +1033,14 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     {
         foreach (BlockItemData item in blockItemData)
         {
-            item.Values = [.. item.Values.OrderBy(v => v.Culture, StringComparer.OrdinalIgnoreCase)];
+            item.Values = InCanonicalOrder(item.Values);
         }
     }
+
+    private static List<BlockPropertyValue> InCanonicalOrder(IEnumerable<BlockPropertyValue> values)
+        => values
+            .OrderBy(value => value.Culture, StringComparer.Ordinal)
+            .ThenBy(value => value.Segment, StringComparer.Ordinal)
+            .ThenBy(value => value.Alias, StringComparer.Ordinal)
+            .ToList();
 }

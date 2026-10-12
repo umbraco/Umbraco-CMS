@@ -122,7 +122,6 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
             return null;
         }
 
-        SortBlockItemValuesByCulture(blockEditorData.BlockValue);
         return JsonSerializer.Serialize(blockEditorData.BlockValue);
     }
 
