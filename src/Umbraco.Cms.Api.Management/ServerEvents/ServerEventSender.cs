@@ -75,6 +75,11 @@ internal sealed class ServerEventSender :
     IDistributedCacheAsyncNotificationHandler<WebhookDeletedNotification>,
     IDistributedCacheAsyncNotificationHandler<WebhookSavedNotification>
 {
+    private static readonly IReadOnlyDictionary<Guid, string> _containerEventSources = new Dictionary<Guid, string>
+    {
+        [Constants.ObjectTypes.Element] = Constants.ServerEvents.EventSource.ElementContainer,
+    };
+
     private readonly IServerEventRouter _serverEventRouter;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IEntityService _entityService;
@@ -233,27 +238,27 @@ internal sealed class ServerEventSender :
 
     /// <inheritdoc/>
     public Task HandleAsync(EntityContainerDeletedNotification notification, CancellationToken cancellationToken)
-        => NotifyDeletedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, [notification]);
+        => NotifyContainersDeletedAsync(notification);
 
     /// <inheritdoc/>
     public Task HandleAsync(IEnumerable<EntityContainerDeletedNotification> notifications, CancellationToken cancellationToken)
-        => NotifyDeletedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, notifications);
+        => NotifyContainersDeletedAsync(notifications);
 
     /// <inheritdoc/>
     public Task HandleAsync(EntityContainerMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
-        => NotifyTrashedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, [notification]);
+        => NotifyContainersTrashedAsync(notification);
 
     /// <inheritdoc/>
     public Task HandleAsync(IEnumerable<EntityContainerMovedToRecycleBinNotification> notifications, CancellationToken cancellationToken)
-        => NotifyTrashedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, notifications);
+        => NotifyContainersTrashedAsync(notifications);
 
     /// <inheritdoc/>
     public Task HandleAsync(EntityContainerSavedNotification notification, CancellationToken cancellationToken)
-        => NotifySavedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, [notification]);
+        => NotifyContainersSavedAsync(notification);
 
     /// <inheritdoc/>
     public Task HandleAsync(IEnumerable<EntityContainerSavedNotification> notifications, CancellationToken cancellationToken)
-        => NotifySavedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, notifications);
+        => NotifyContainersSavedAsync(notifications);
 
     /// <inheritdoc/>
     public Task HandleAsync(LanguageDeletedNotification notification, CancellationToken cancellationToken)
@@ -550,21 +555,54 @@ internal sealed class ServerEventSender :
         }
     }
 
-    // Container notifications are shared by every container type, so only element containers are relevant here.
-    private static bool IsElementContainer(EntityContainer container)
-        => container.ContainedObjectType == Constants.ObjectTypes.Element;
+    // Container notifications are shared by every container type, so each container is announced on the
+    // source for the type it contains. Container types without a source are not announced.
+    private static string? GetContainerEventSource(EntityContainer container)
+        => _containerEventSources.GetValueOrDefault(container.ContainedObjectType);
 
-    private Task NotifyDeletedAsync<T>(string source, params IEnumerable<DeletedNotification<T>> notifications)
-        where T : IEntity
-        => NotifyDeletedAsync(source, _ => true, notifications);
+    private async Task NotifyContainersDeletedAsync(params IEnumerable<EntityContainerDeletedNotification> notifications)
+    {
+        var seen = new HashSet<Guid>();
+        foreach (EntityContainer container in notifications.SelectMany(x => x.DeletedEntities))
+        {
+            if (seen.Add(container.Key) && GetContainerEventSource(container) is { } source)
+            {
+                await RouteDeletedEvent(source, container);
+            }
+        }
+    }
 
-    private async Task NotifyDeletedAsync<T>(string source, Func<T, bool> filter, IEnumerable<DeletedNotification<T>> notifications)
+    private async Task NotifyContainersTrashedAsync(params IEnumerable<EntityContainerMovedToRecycleBinNotification> notifications)
+    {
+        var seen = new HashSet<Guid>();
+        foreach (MoveToRecycleBinEventInfo<EntityContainer> movedEvent in notifications.SelectMany(x => x.MoveInfoCollection))
+        {
+            if (seen.Add(movedEvent.Entity.Key) && GetContainerEventSource(movedEvent.Entity) is { } source)
+            {
+                await RouteTrashedEvent(source, movedEvent);
+            }
+        }
+    }
+
+    private async Task NotifyContainersSavedAsync(params IEnumerable<EntityContainerSavedNotification> notifications)
+    {
+        var seen = new HashSet<Guid>();
+        foreach (EntityContainer container in notifications.SelectMany(x => x.SavedEntities))
+        {
+            if (seen.Add(container.Key) && GetContainerEventSource(container) is { } source)
+            {
+                await RouteCreatedOrUpdatedEvent(source, container);
+            }
+        }
+    }
+
+    private async Task NotifyDeletedAsync<T>(string source, params IEnumerable<DeletedNotification<T>> notifications)
         where T : IEntity
     {
         var seen = new HashSet<Guid>();
         foreach (DeletedNotification<T> notification in notifications)
         {
-            foreach (T entity in notification.DeletedEntities.Where(filter))
+            foreach (T entity in notification.DeletedEntities)
             {
                 if (seen.Add(entity.Key))
                 {
@@ -574,32 +612,17 @@ internal sealed class ServerEventSender :
         }
     }
 
-    private Task NotifyTrashedAsync<T>(string source, params IEnumerable<MovedToRecycleBinNotification<T>> notifications)
-        where T : IEntity
-        => NotifyTrashedAsync(source, _ => true, notifications);
-
-    private async Task NotifyTrashedAsync<T>(string source, Func<T, bool> filter, IEnumerable<MovedToRecycleBinNotification<T>> notifications)
+    private async Task NotifyTrashedAsync<T>(string source, params IEnumerable<MovedToRecycleBinNotification<T>> notifications)
         where T : IEntity
     {
         var seen = new HashSet<Guid>();
         foreach (MovedToRecycleBinNotification<T> notification in notifications)
         {
-            foreach (MoveToRecycleBinEventInfo<T> movedEvent in notification.MoveInfoCollection.Where(x => filter(x.Entity)))
+            foreach (MoveToRecycleBinEventInfo<T> movedEvent in notification.MoveInfoCollection)
             {
                 if (seen.Add(movedEvent.Entity.Key))
                 {
-                    await _serverEventRouter.RouteEventAsync(
-                        new ServerEvent
-                        {
-                            EventType = Constants.ServerEvents.EventType.Trashed,
-                            EventSource = source,
-                            Key = movedEvent.Entity.Key,
-                        },
-
-                        // Use the pre-trash path: after the move the entity's own Path is under the
-                        // recycle bin, which HasPathAccess rejects for every non-root user, so start-node
-                        // recipients would never be told their content or media was trashed.
-                        new ServerEventRoutingContext { EntityPath = movedEvent.OriginalPath });
+                    await RouteTrashedEvent(source, movedEvent);
                 }
             }
         }
@@ -617,17 +640,13 @@ internal sealed class ServerEventSender :
         }
     }
 
-    private Task NotifySavedAsync<T>(string source, params IEnumerable<SavedNotification<T>> notifications)
-        where T : IEntity
-        => NotifySavedAsync(source, _ => true, notifications);
-
-    private async Task NotifySavedAsync<T>(string source, Func<T, bool> filter, IEnumerable<SavedNotification<T>> notifications)
+    private async Task NotifySavedAsync<T>(string source, params IEnumerable<SavedNotification<T>> notifications)
         where T : IEntity
     {
         var seen = new HashSet<Guid>();
         foreach (SavedNotification<T> notification in notifications)
         {
-            foreach (T entity in notification.SavedEntities.Where(filter))
+            foreach (T entity in notification.SavedEntities)
             {
                 if (seen.Add(entity.Key))
                 {
@@ -722,6 +741,21 @@ internal sealed class ServerEventSender :
                 user.Key);
         }
     }
+
+    private async Task RouteTrashedEvent<T>(string source, MoveToRecycleBinEventInfo<T> movedEvent)
+        where T : IEntity
+        => await _serverEventRouter.RouteEventAsync(
+            new ServerEvent
+            {
+                EventType = Constants.ServerEvents.EventType.Trashed,
+                EventSource = source,
+                Key = movedEvent.Entity.Key,
+            },
+
+            // Use the pre-trash path: after the move the entity's own Path is under the
+            // recycle bin, which HasPathAccess rejects for every non-root user, so start-node
+            // recipients would never be told their content or media was trashed.
+            new ServerEventRoutingContext { EntityPath = movedEvent.OriginalPath });
 
     private async Task RouteDeletedEvent<T>(string source, T entity)
         where T : IEntity
