@@ -570,8 +570,21 @@ export class LibraryUiHelper extends UiBaseLocators {
     return elementId;
   }
 
+  /**
+   * Resolves on the `PUT .../element/{id}` or `.../element/{id}/update-and-publish` response. The
+   * workspace first validates via `PUT .../element/{id}/validate`, which also returns 200 and would
+   * satisfy the substring waiter before the save has landed.
+   */
+  private async waitForElementUpdateAfterExecutingPromise(action: Promise<void>) {
+    const responsePromise = this.page.waitForResponse(
+      (resp) => resp.request().method() === ConstantHelper.httpMethods.put && resp.status() === ConstantHelper.statusCodes.ok && /\/api\/v1\/element\/[^/?]+(\/update-and-publish)?$/.test(resp.url().split('?')[0]),
+    );
+    const [response] = await Promise.all([responsePromise, action]);
+    return response.url().split('?')[0].split('/').pop();
+  }
+
   async clickSaveModalButtonAndWaitForElementToBeUpdated(){
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveModalButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
+    return await this.waitForElementUpdateAfterExecutingPromise(this.clickSaveModalButton());
   }
 
   async clickSaveAndPublishButtonAndWaitForElementToBeCreated(){
@@ -583,11 +596,11 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForElementToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveButtonForElement(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementUpdateAfterExecutingPromise(this.clickSaveButtonForElement());
   }
 
   async clickSaveAndPublishButtonAndWaitForElementToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveAndPublishButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementUpdateAfterExecutingPromise(this.clickSaveAndPublishButton());
   }
 
   async clickSaveAndPublishButtonAndWaitForElementToBePublished() {
@@ -599,7 +612,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickContainerSaveButtonAndWaitForElementToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickContainerSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementUpdateAfterExecutingPromise(this.clickContainerSaveButton());
   }
 
   async clickContainerSaveAndPublishButtonAndWaitForElementToBePublished() {
