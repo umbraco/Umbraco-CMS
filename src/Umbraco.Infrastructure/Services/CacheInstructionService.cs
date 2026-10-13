@@ -158,7 +158,7 @@ namespace Umbraco.Cms
             {
                 using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                 {
-                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.AllCaches, ref lastId);
+                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.AllCaches, ref lastId, out _);
                     return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
                 }
             }
@@ -173,15 +173,20 @@ namespace Umbraco.Cms
                 {
                     using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                     {
-                        _repositoryCacheVersionService.SetCachesSyncedAsync().GetAwaiter().GetResult();
+                        IReadOnlyCollection<RepositoryCacheVersion> cacheVersions = _repositoryCacheVersionService.GetCacheVersionsAsync().GetAwaiter().GetResult();
                         var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
                         var previousLastId = lastId;
-                        var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.AllCaches, ref lastId);
+                        var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.AllCaches, ref lastId, out var processedAllPending);
 
                         if (lastId > 0 && lastId != previousLastId)
                         {
                             _lastSyncedManager.SaveLastSyncedExternalAsync(lastId).GetAwaiter().GetResult();
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                        }
+
+                        if (processedAllPending)
+                        {
+                            _repositoryCacheVersionService.SetCachesSyncedAsync(cacheVersions).GetAwaiter().GetResult();
                         }
 
                         return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
@@ -197,7 +202,10 @@ namespace Umbraco.Cms
             ///     <see cref="IJsonCacheRefresher.RefreshInternal(string)" />, id-based instructions run their in-memory
             ///     refresh, and <see cref="ILastSyncedManager" /> keeps the internal checkpoint in memory. Whether the whole
             ///     call stays lock-free depends on each refresher honouring that contract in its own
-            ///     <c>RefreshInternal</c>; the in-tree refreshers do.
+            ///     <c>RefreshInternal</c>; the in-tree refreshers do. The cache versions are read before the instructions
+            ///     and adopted only once every pending instruction has been processed, so a read arriving while
+            ///     instructions are being processed still finds its cache out of date and syncs itself; a full page of
+            ///     pending instructions leaves the versions unadopted until the remainder is processed.
             /// </remarks>
             public ProcessInstructionsResult ProcessInternalInstructions(
                 CacheRefresherCollection cacheRefreshers,
@@ -206,14 +214,19 @@ namespace Umbraco.Cms
             {
                 using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing isolated caches from database..."))
                 {
-                    _repositoryCacheVersionService.SetCachesSyncedAsync().GetAwaiter().GetResult();
+                    IReadOnlyCollection<RepositoryCacheVersion> cacheVersions = _repositoryCacheVersionService.GetCacheVersionsAsync().GetAwaiter().GetResult();
                     var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
                     var previousLastId = lastId;
-                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.IsolatedCachesOnly, ref lastId);
+                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.IsolatedCachesOnly, ref lastId, out var processedAllPending);
 
                     if (lastId > 0 && lastId != previousLastId)
                     {
                         _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                    }
+
+                    if (processedAllPending)
+                    {
+                        _repositoryCacheVersionService.SetCachesSyncedAsync(cacheVersions).GetAwaiter().GetResult();
                     }
 
                     return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
@@ -238,8 +251,12 @@ namespace Umbraco.Cms
             /// <remarks>
             ///     All state is per call; concurrent calls re-run the same idempotent refreshes.
             /// </remarks>
+            /// <param name="processedAllPending">
+            ///     Whether every instruction pending at the time of the read was processed: false when the page of pending
+            ///     instructions was full, so more may remain, or when processing was interrupted.
+            /// </param>
             /// <returns>Number of instructions processed.</returns>
-            private int ProcessDatabaseInstructions(CacheRefresherCollection cacheRefreshers, CancellationToken cancellationToken, string localIdentity, RefreshTarget target, ref int lastId)
+            private int ProcessDatabaseInstructions(CacheRefresherCollection cacheRefreshers, CancellationToken cancellationToken, string localIdentity, RefreshTarget target, ref int lastId, out bool processedAllPending)
             {
                 // NOTE:
                 // We 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that
@@ -276,6 +293,9 @@ namespace Umbraco.Cms
                         .ToList();
                 }
 
+                var pageIsFull = pendingInstructions.Count == MaxInstructionsToRetrieve;
+                var interrupted = false;
+
                 lastId = 0;
                 foreach (CacheInstruction instruction in pendingInstructions)
                 {
@@ -283,6 +303,7 @@ namespace Umbraco.Cms
                     // continue processing anything otherwise we'll hold up the app domain shutdown.
                     if (cancellationToken.IsCancellationRequested)
                     {
+                        interrupted = true;
                         break;
                     }
 
@@ -320,12 +341,14 @@ namespace Umbraco.Cms
                     {
                         _logger.LogInformation(
                             "The current batch of instructions was not processed, app is shutting down");
+                        interrupted = true;
                         break;
                     }
 
                     numberOfInstructionsProcessed++;
                 }
 
+                processedAllPending = pageIsFull is false && interrupted is false;
                 return numberOfInstructionsProcessed;
             }
 
