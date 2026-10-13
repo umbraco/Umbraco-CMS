@@ -14,7 +14,6 @@ public sealed class BlockEditorConverter
 {
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
     private readonly IPublishedModelFactory _publishedModelFactory;
-    private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
     private readonly IBlockElementService _blockElementService;
 
@@ -22,10 +21,10 @@ public sealed class BlockEditorConverter
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.PropertyEditors.ValueConverters.BlockEditorConverter"/> class.
     /// </summary>
     /// <param name="publishedContentTypeCache">Provides access to cached published content types for efficient lookup.</param>
-    /// <param name="cacheManager">Manages caching for property editor values and related data.</param>
     /// <param name="publishedModelFactory">Factory for creating strongly typed published content models.</param>
-    /// <param name="variationContextAccessor">Accessor for the current variation context, used for culture and segment variations.</param>
+    /// <param name="variationContextAccessor">Unused. Variance is resolved by <paramref name="blockEditorVarianceHandler"/>.</param>
     /// <param name="blockEditorVarianceHandler">Handles variance logic specific to block editor properties.</param>
+    /// <param name="blockElementService">Builds the published element for a block from its stored data.</param>
     public BlockEditorConverter(
         IPublishedContentTypeCache publishedContentTypeCache,
         IPublishedModelFactory publishedModelFactory,
@@ -35,7 +34,6 @@ public sealed class BlockEditorConverter
     {
         _publishedContentTypeCache = publishedContentTypeCache;
         _publishedModelFactory = publishedModelFactory;
-        _variationContextAccessor = variationContextAccessor;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
         _blockElementService = blockElementService;
     }
@@ -50,7 +48,22 @@ public sealed class BlockEditorConverter
     /// <returns>
     /// An <see cref="IPublishedElement"/> representing the converted block if the conversion is successful and the data is valid; otherwise, <c>null</c> if the content type is not found, is not an element type, or the key is missing or invalid.
     /// </returns>
+    [Obsolete("Please use the overload that takes the culture of the owning property value. Scheduled for removal in Umbraco 19.")]
     public IPublishedElement? ConvertToElement(IPublishedElement owner, BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
+        => ConvertToElement(owner, data, referenceCacheLevel, preview, owningPropertyCulture: null);
+
+    /// <summary>
+    /// Converts a <see cref="BlockItemData"/> instance into an <see cref="IPublishedElement"/> for use in the block editor.
+    /// </summary>
+    /// <param name="owner">The parent <see cref="IPublishedElement"/> that owns the block element, used for context such as culture and segment variations.</param>
+    /// <param name="data">The <see cref="BlockItemData"/> representing the block to convert.</param>
+    /// <param name="referenceCacheLevel">The <see cref="PropertyCacheLevel"/> to use for resolving references during conversion.</param>
+    /// <param name="preview">If <c>true</c>, conversion is performed in preview mode; otherwise, in published mode.</param>
+    /// <param name="owningPropertyCulture">The culture of the stored property value <paramref name="data"/> was loaded from, or <c>null</c> when the property holding the block value does not vary by culture.</param>
+    /// <returns>
+    /// An <see cref="IPublishedElement"/> representing the converted block if the conversion is successful and the data is valid; otherwise, <c>null</c> if the content type is not found, is not an element type, or the key is missing or invalid.
+    /// </returns>
+    public IPublishedElement? ConvertToElement(IPublishedElement owner, BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview, string? owningPropertyCulture)
     {
         // Only convert element types - content types will cause an exception when PublishedModelFactory creates the model
         IPublishedContentType? publishedContentType = _publishedContentTypeCache.Get(PublishedItemType.Element, data.ContentTypeKey);
@@ -59,32 +72,12 @@ public sealed class BlockEditorConverter
             return null;
         }
 
-        VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
-
-        var propertyTypesByAlias = publishedContentType
-            .PropertyTypes
-            .ToDictionary(propertyType => propertyType.Alias);
-
-        var alignedProperties = new List<BlockPropertyValue>();
-
-        foreach (BlockPropertyValue property in data.Values)
-        {
-            if (!propertyTypesByAlias.TryGetValue(property.Alias, out IPublishedPropertyType? propertyType))
-            {
-                continue;
-            }
-
-            // if case changes have been made to the content or element type variation since the parent content was published,
-            // we need to align those changes for the block properties - unlike for root level properties, where these
-            // things are handled when a content type is saved.
-            BlockPropertyValue? alignedProperty = _blockEditorVarianceHandler.AlignedPropertyVarianceAsync(property, propertyType, owner).GetAwaiter().GetResult();
-            if (alignedProperty is null)
-            {
-                continue;
-            }
-
-            alignedProperties.Add(alignedProperty);
-        }
+        // if changes have been made to the content or element type variation since the parent content was published,
+        // we need to align those changes for the block properties - unlike for root level properties, where these
+        // things are handled when a content type is saved.
+        IList<BlockPropertyValue> alignedProperties = _blockEditorVarianceHandler
+            .AlignedPropertyVarianceAsync(data.Values, publishedContentType, owner, owningPropertyCulture)
+            .GetAwaiter().GetResult();
 
         var alignedData = new BlockItemData
         {

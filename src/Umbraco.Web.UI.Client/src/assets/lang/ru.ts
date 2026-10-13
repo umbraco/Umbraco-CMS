@@ -1100,6 +1100,17 @@ export default {
 		sortHelp:
 			'Перетаскивайте элементы на нужное место вверх или вниз для определения необходимого Вам порядка сортировки. Также можно использовать заголовки столбцов, чтобы отсортировать все элементы сразу.',
 		sortPleaseWait: 'Пожалуйста, подождите... Страницы сортируются, это может занять некоторое время.',
+		sortByFieldHeadline: 'Сортировать по полю',
+		sortByFieldSentence: 'Сортировать все дочерние элементы по',
+		sortByFieldDirectionLabel: 'Направление',
+		sortByFieldAscending: 'По возрастанию',
+		sortByFieldDescending: 'По убыванию',
+		sortByFieldNameOption: 'Имя',
+		sortByFieldCreateDateOption: 'Создано',
+		sortByFieldUpdateDateOption: 'Последнее изменение',
+		sortIndividuallyHeadline: 'Сортировать по отдельности',
+		sortByFieldCultureSentence: 'на языке',
+		sortByFieldCultureLabel: 'Язык',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'Процесс публикации был отменен установленным пакетом дополнений.',
@@ -1436,6 +1447,7 @@ export default {
 		updateDate: 'Время последнего изменения',
 		username: 'Имя пользователя',
 		usergroup: 'Группа пользователей',
+		type: 'Тип',
 		userInvited: ' был приглашен',
 		userInvitedSuccessHelp:
 			'Новому пользователю было отправлено приглашение, в котором содержатся инструкции для входа в панель Umbraco.',

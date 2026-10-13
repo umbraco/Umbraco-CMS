@@ -35,12 +35,7 @@ export class MediaTypeUiHelper extends UiBaseLocators {
   }
 
   async isMediaTypeTreeItemVisible(name: string, isVisible: boolean = true) {
-    const hasShowChildren = await this.mediaTypeTreeRoot.getAttribute('show-children') !== null;
-
-    if (!hasShowChildren) {
-      await this.click(this.mediaTypeTreeRoot.locator(this.caretBtn).first());
-    }
-
+    await this.expandTreeRoot(this.mediaTypeTreeRoot);
     await this.isTreeItemVisible(name, isVisible);
   }
 
@@ -74,7 +69,7 @@ export class MediaTypeUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForMediaTypeToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.mediaType, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.mediaType, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
   }
 
   async clickConfirmToDeleteButtonAndWaitForMediaTypeToBeDeleted() {

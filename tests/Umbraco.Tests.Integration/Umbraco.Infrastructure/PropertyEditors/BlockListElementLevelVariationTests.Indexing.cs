@@ -399,7 +399,7 @@ internal partial class BlockListElementLevelVariationTests
         if (initialVaryByCulture is false)
         {
             elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = ContentVariation.Nothing;
-            await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+            await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
         }
 
         var blockListDataType = await CreateBlockListDataType(elementType);
@@ -418,7 +418,7 @@ internal partial class BlockListElementLevelVariationTests
 
         // update the element type property according to the test case
         elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = initialVaryByCulture ? ContentVariation.Nothing : ContentVariation.Culture;
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         var editor = blockListDataType.Editor!;
         var indexValues = editor.PropertyIndexValueFactory.GetIndexValues(

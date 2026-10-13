@@ -1,11 +1,13 @@
-using Lucene.Net.Util;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
@@ -17,9 +19,10 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
 {
     private readonly IPublicAccessService _publicAccessService;
     private readonly IEntityService _entityService;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.DocumentCollectionPresentationFactory"/> class,
+    /// Initializes a new instance of the <see cref="DocumentCollectionPresentationFactory"/> class,
     /// which is responsible for creating document collection presentation models.
     /// </summary>
     /// <param name="mapper">The Umbraco mapper instance used for mapping entities to presentation models.</param>
@@ -27,12 +30,40 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
     /// <param name="publicAccessService">The service used to manage public access permissions for documents.</param>
     /// <param name="entityService">The service used to interact with Umbraco entities.</param>
     /// <param name="userService">The service used to manage user information and permissions.</param>
-    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService, IUserService userService)
+    /// <param name="documentNavigationQueryService">The service used to resolve which documents have children.</param>
+    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService, IUserService userService, IDocumentNavigationQueryService documentNavigationQueryService)
         : base(mapper, flagProviders, userService)
     {
         _publicAccessService = publicAccessService;
         _entityService = entityService;
+        _documentNavigationQueryService = documentNavigationQueryService;
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentCollectionPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="mapper">The Umbraco mapper instance used for mapping entities to presentation models.</param>
+    /// <param name="flagProviders">The collection of flag providers used to supply additional document flags.</param>
+    /// <param name="publicAccessService">The service used to manage public access permissions for documents.</param>
+    /// <param name="entityService">The service used to interact with Umbraco entities.</param>
+    /// <param name="userService">The service used to manage user information and permissions.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService, IUserService userService)
+        : this(
+            mapper,
+            flagProviders,
+            publicAccessService,
+            entityService,
+            userService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
+    {
+    }
+
+    /// <inheritdoc/>
+    protected override INavigationQueryService? NavigationQueryService => _documentNavigationQueryService;
+
+    /// <inheritdoc/>
+    protected override IRecycleBinNavigationQueryService? RecycleBinNavigationQueryService => _documentNavigationQueryService;
 
     /// <inheritdoc/>
     protected override Task SetUnmappedProperties(ListViewPagedModel<IContent> contentCollection, List<DocumentCollectionResponseModel> collectionResponseModels)

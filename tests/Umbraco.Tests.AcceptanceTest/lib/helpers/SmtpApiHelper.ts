@@ -1,4 +1,6 @@
+import {expect} from "@playwright/test";
 import {ApiHelpers} from "./ApiHelpers";
+import {ConstantHelper} from "./ConstantHelper";
 
 export class SmtpApiHelper {
   api: ApiHelpers;
@@ -58,8 +60,10 @@ export class SmtpApiHelper {
     return match ? match[0] : null;
   }
 
-  async doesNotificationEmailWithSubjectExist(actionName: string, contentName: string) {
-    const expectedSubject = `Notification about ${actionName} performed on ${contentName}`
-    return this.findEmailBySubject(expectedSubject);
+  async doesNotificationEmailWithSubjectExist(actionName: string, contentName: string, timeout: number = ConstantHelper.timeout.veryLong) {
+    const expectedSubject = `Notification about ${actionName} performed on ${contentName}`;
+    let email;
+    await expect.poll(async () => email = await this.findEmailBySubject(expectedSubject), {timeout}).toBeTruthy();
+    return email;
   }
 }

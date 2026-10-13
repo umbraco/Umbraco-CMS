@@ -246,6 +246,7 @@ export default {
 		type: 'Type',
 		unpublish: 'Avpubliser',
 		unpublishDate: 'Dato for avpublisering',
+		scheduleForAllLanguages: 'Planlegg for alle valgte språk',
 		unpublished: 'Avpublisert',
 		updatedBy: 'Oppdatert av',
 		updateDate: 'Sist endret',
@@ -751,6 +752,7 @@ export default {
 		userFailedLogin: 'Oops! Vi kunne ikke logge deg inn. Vennligst sjekk legitimasjonen din og prøv igjen.',
 		userLockedOut: 'Kontoen din er låst. Vennligst prøv igjen senere.',
 		receivedErrorFromServer: 'Mottok en feil fra serveren',
+		passwordResetUnavailable: 'Beklager, tilbakestilling av passord er ikke tilgjengelig for øyeblikket. Prøv igjen senere, eller kontakt administratoren din.',
 		resetCodeExpired: 'Lenken du har klikket på er ugyldig eller har utløpt',
 		userInviteWelcomeMessage:
 			'Hei og velkommen til Umbraco! Om bare 1 minutt er du klar til å starte, vi trenger bare at du setter et passord.',
@@ -917,6 +919,17 @@ export default {
 		sortHelp:
 			'Dra elementene opp eller ned for å arrangere dem. Du kan også klikke kolonneoverskriftene for å sortere alt på en gang.',
 		sortPleaseWait: 'Vennligst vent. Elementene blir sortert, dette kan ta litt tid.',
+		sortByFieldHeadline: 'Sorter etter felt',
+		sortByFieldSentence: 'Sorter alle underelementer etter',
+		sortByFieldDirectionLabel: 'Retning',
+		sortByFieldAscending: 'Stigende',
+		sortByFieldDescending: 'Synkende',
+		sortByFieldNameOption: 'Navn',
+		sortByFieldCreateDateOption: 'Opprettet',
+		sortByFieldUpdateDateOption: 'Sist endret',
+		sortIndividuallyHeadline: 'Sorter individuelt',
+		sortByFieldCultureSentence: 'på',
+		sortByFieldCultureLabel: 'Språk',
 	},
 	speechBubbles: {
 		editMultiContentPublishedPartialText: '%0% av %1% dokumenter publisert.',
@@ -1196,10 +1209,6 @@ export default {
 		deselectAllLogLevelFilters: 'Opphev alle',
 	},
 	welcomeDashboard: {
-		ourUmbracoHeadline: 'Our Umbraco - Fellesskap for Umbraco',
-		ourUmbracoDescription:
-			"På 'Our Umbraco', den offisielle fellesskapssiden, finner du all informasjon relatert til Umbraco. Enten du trenger svar på et spørsmål, kule plugins eller en guide til hvordan du gjør noe i Umbraco, er verdens beste og vennligste fellesskap bare et klikk unna.",
-		ourUmbracoButton: 'Besøk Our Umbraco',
 		documentationHeadline: 'Dokumentasjon',
 		documentationDescription: 'Finn svarene på alle dine Umbraco-spørsmål',
 		communityHeadline: 'Fellesskap',

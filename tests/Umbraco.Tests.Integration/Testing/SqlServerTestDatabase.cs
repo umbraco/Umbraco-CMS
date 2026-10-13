@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Concurrent;
@@ -11,6 +11,8 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.SqlServer;
 
 // ReSharper disable ConvertToUsingDeclaration
+using static Umbraco.Cms.Persistence.SqlServer.TSqlQuoting;
+
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
 /// <remarks>
@@ -67,7 +69,7 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase
             connection.Open();
             using (var command = connection.CreateCommand())
             {
-                SetCommand(command, $@"CREATE DATABASE {LocalDb.QuotedName(meta.Name)}");
+                SetCommand(command, $@"CREATE DATABASE {QuotedName(meta.Name)}");
                 command.ExecuteNonQuery();
             }
         }
@@ -88,13 +90,13 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase
                 }
 
                 var sql = $@"
-                        ALTER DATABASE {LocalDb.QuotedName(meta.Name)}
+                        ALTER DATABASE {QuotedName(meta.Name)}
                         SET SINGLE_USER
                         WITH ROLLBACK IMMEDIATE";
                 SetCommand(command, sql);
                 command.ExecuteNonQuery();
 
-                SetCommand(command, $@"DROP DATABASE {LocalDb.QuotedName(meta.Name)}");
+                SetCommand(command, $@"DROP DATABASE {QuotedName(meta.Name)}");
                 command.ExecuteNonQuery();
             }
         }

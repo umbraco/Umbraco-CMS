@@ -23,6 +23,7 @@ public class BasicAuthLoginControllerTests
     private Mock<IBackOfficeSignInManager> _signInManagerMock = null!;
     private Mock<ITwoFactorLoginService> _twoFactorServiceMock = null!;
     private Mock<IBasicAuthService> _basicAuthServiceMock = null!;
+    private ServiceProvider _serviceProvider = null!;
     private BasicAuthLoginController _controller = null!;
 
     [SetUp]
@@ -40,11 +41,16 @@ public class BasicAuthLoginControllerTests
         services.AddAntiforgery();
         services.AddLogging();
         services.AddControllersWithViews();
-        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        _serviceProvider = services.BuildServiceProvider();
 
-        var httpContext = new DefaultHttpContext { RequestServices = serviceProvider };
+        _controller = CreateController(new BasicAuthSettings());
+    }
 
-        _controller = new BasicAuthLoginController(Options.Create(new BasicAuthSettings()))
+    private BasicAuthLoginController CreateController(BasicAuthSettings settings)
+    {
+        var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider };
+
+        return new BasicAuthLoginController(Options.Create(settings))
         {
             ControllerContext = new ControllerContext
             {
@@ -283,6 +289,39 @@ public class BasicAuthLoginControllerTests
         Assert.That(model!.ReturnPath, Is.EqualTo("/page"));
         Assert.IsNull(model.ErrorMessage);
         Assert.That(model.ProviderNames, Is.EquivalentTo(new[] { "UmbracoUserAppAuthenticator" }));
+    }
+
+    /// <summary>
+    /// Verifies that both entry points to the 2FA form honour the configured view path: the initial GET
+    /// render and the re-render after an invalid code.
+    /// </summary>
+    [TestCase(true, TestName = "TwoFactor_Get_UsesConfiguredTwoFactorViewPath")]
+    [TestCase(false, TestName = "TwoFactor_Post_InvalidCode_UsesConfiguredTwoFactorViewPath")]
+    public async Task TwoFactor_UsesConfiguredTwoFactorViewPath(bool initialRender)
+    {
+        const string CustomTwoFactorViewPath = "/Views/CustomTwoFactor.cshtml";
+
+        BasicAuthLoginController controller =
+            CreateController(new BasicAuthSettings { TwoFactorViewPath = CustomTwoFactorViewPath });
+
+        var user = CreateBackOfficeUser();
+        _signInManagerMock
+            .Setup(x => x.GetTwoFactorAuthenticationUserAsync())
+            .ReturnsAsync(user);
+        _twoFactorServiceMock
+            .Setup(x => x.GetEnabledTwoFactorProviderNamesAsync(user.Key))
+            .ReturnsAsync(["UmbracoUserAppAuthenticator"]);
+        _signInManagerMock
+            .Setup(x => x.TwoFactorSignInAsync("UmbracoUserAppAuthenticator", "000000", false, false))
+            .ReturnsAsync(SignInResult.Failed);
+
+        IActionResult result = initialRender
+            ? await controller.TwoFactor("/page")
+            : await controller.TwoFactor("UmbracoUserAppAuthenticator", "000000", "/page");
+
+        var viewResult = result as ViewResult;
+        Assert.IsNotNull(viewResult);
+        Assert.That(viewResult!.ViewName, Is.EqualTo(CustomTwoFactorViewPath));
     }
 
     /// <summary>

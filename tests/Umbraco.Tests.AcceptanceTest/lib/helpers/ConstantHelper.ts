@@ -45,6 +45,7 @@
     invalidEmail: 'Invalid email',
     emptyManualLinkPicker: 'Please enter an URL or Anchor.',
     needMoreItems: 'This field needs more items',
+    minimumTwoEntriesRequiresOneMore: 'Minimum 2 entries, requires 1 more.',
   }
 
   public static readonly inputTypes = {
@@ -247,7 +248,7 @@
 
   public static readonly trashDeleteDialogMessage = {
     referenceHeadline: 'The following items depend on this',
-    bulkReferenceHeadline: 'The following items are used by other content.',
+    bulkReferenceHeadline: 'The following items are used by other content',
     descendingReferenceHeadline: 'The following descending items have dependencies'
   }
 
@@ -310,6 +311,7 @@
     dictionary: '/umbraco/management/api/v1/dictionary',
     dictionaryImport: '/umbraco/management/api/v1/dictionary/import',
     language: '/umbraco/management/api/v1/language',
+    logViewerSavedSearch: '/umbraco/management/api/v1/log-viewer/saved-search',
     media: '/umbraco/management/api/v1/media',
     mediaType: '/umbraco/management/api/v1/media-type',
     memberType: '/umbraco/management/api/v1/member-type',

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -55,6 +56,7 @@ using Umbraco.Cms.Web.Common.Preview;
 using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Cms.Web.Common.Repositories;
 using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Cms.Web.Common.TagHelpers;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -217,7 +219,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
         builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
         builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
+#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
         builder.Services.AddUnique<IPreviewTokenGenerator, UserBasedPreviewTokenGenerator>();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         return builder;
     }
@@ -327,6 +331,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IMarchal, AspNetCoreMarchal>();
 
         builder.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
+
+        builder.Services.AddTransient<ITagHelperComponent, PreviewBadgeTagHelperComponent>();
 
         builder.Services.AddSingleton<IPartialViewBlockEngine, PartialViewBlockEngine>();
 

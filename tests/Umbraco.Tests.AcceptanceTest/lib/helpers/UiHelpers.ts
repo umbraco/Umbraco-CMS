@@ -1,4 +1,5 @@
-import {Page} from "@playwright/test"
+import {expect, Locator, Page} from "@playwright/test";
+import {ConstantHelper} from "./ConstantHelper";
 import {StylesheetUiHelper} from "./StylesheetUiHelper";
 import {umbracoConfig} from "../umbraco.config";
 import {PartialViewUiHelper} from "./PartialViewUiHelper";
@@ -81,9 +82,11 @@ export class UiHelpers {
   library: LibraryUiHelper;
   preview: PreviewUiHelper;
   backofficeSearch: BackofficeSearchUiHelper;
+  private readonly sectionLinks: Locator;
 
   constructor(page: Page) {
     this.page = page;
+    this.sectionLinks = page.getByTestId('section-links');
     this.stylesheet = new StylesheetUiHelper(this.page);
     this.partialView = new PartialViewUiHelper(this.page);
     this.script = new ScriptUiHelper(this.page);
@@ -135,6 +138,7 @@ export class UiHelpers {
 
   async reloadPage() {
     await this.page.reload();
+    await expect(this.sectionLinks).toBeVisible({timeout: ConstantHelper.timeout.navigation});
   }
 
   async goBackPage() {

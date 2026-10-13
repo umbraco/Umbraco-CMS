@@ -474,6 +474,23 @@ export class BasePage {
   }
 
   /**
+   * Asserts visibility across every match, for a locator that may legitimately match more than one
+   * element. Unlike `.first()`, `isVisible=false` here means no match is visible.
+   * @param locator - The element(s) to check
+   * @param isVisible - Whether at least one match must be visible (default: true)
+   * @param timeout - Maximum time to wait in milliseconds
+   */
+  protected async isAnyVisible(locator: Locator, isVisible: boolean = true, timeout?: number): Promise<void> {
+    const visibleMatches = locator.filter({visible: true});
+    const effectiveTimeout = timeout ?? ConstantHelper.timeout.medium;
+    if (isVisible) {
+      await expect(visibleMatches).not.toHaveCount(0, {timeout: effectiveTimeout});
+      return;
+    }
+    await expect(visibleMatches).toHaveCount(0, {timeout: effectiveTimeout});
+  }
+
+  /**
    * Asserts that an element is enabled.
    * @param locator - The element to check
    */

@@ -1097,6 +1097,17 @@ export default {
 		sortHelp:
 			'Перетягуйте елементи на потрібне місце вгору або вниз для визначення потрібного порядку сортування. Також можна використовувати заголовки стовпців, щоб відсортувати всі елементи одразу.',
 		sortPleaseWait: 'Зачекайте, будь ласка... Сторінки сортуються, це може зайняти деякий час.',
+		sortByFieldHeadline: 'Сортувати за полем',
+		sortByFieldSentence: 'Сортувати всі дочірні елементи за',
+		sortByFieldDirectionLabel: 'Напрямок',
+		sortByFieldAscending: 'За зростанням',
+		sortByFieldDescending: 'За спаданням',
+		sortByFieldNameOption: 'Ім’я',
+		sortByFieldCreateDateOption: 'Створено',
+		sortByFieldUpdateDateOption: 'Останнє редагування',
+		sortIndividuallyHeadline: 'Сортувати окремо',
+		sortByFieldCultureSentence: 'мовою',
+		sortByFieldCultureLabel: 'Мова',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'Процес публікації скасовано встановленим пакетом доповнень.',
@@ -1433,6 +1444,7 @@ export default {
 		updateDate: 'Час останнього оновлення',
 		username: "Ім'я користувача",
 		usergroup: 'Група користувачів',
+		type: 'Тип',
 		userInvited: ' був запрошений',
 		userInvitedSuccessHelp:
 			'Новому користувачеві було надіслано запрошення, яке містить інструкції для входу в панель Umbraco.',

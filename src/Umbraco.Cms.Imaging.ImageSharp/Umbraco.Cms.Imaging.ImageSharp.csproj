@@ -2,6 +2,8 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Imaging - ImageSharp</Title>
     <Description>Adds imaging support using ImageSharp/ImageSharp.Web to Umbraco CMS.</Description>
+    <!-- Validated at build time by the Six Labors packages; see SIXLABORS-LICENSE.md. -->
+    <SixLaborsLicenseFile>$(MSBuildThisFileDirectory)sixlabors.lic</SixLaborsLicenseFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="SixLabors.ImageSharp" />
