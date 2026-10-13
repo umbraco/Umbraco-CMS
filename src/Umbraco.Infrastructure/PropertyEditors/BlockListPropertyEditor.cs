@@ -61,6 +61,13 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
         return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue, defaultCulture);
     }
 
+    /// <inheritdoc />
+    public override bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue)
+    {
+        var valueEditor = (BlockListEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.ArePropertyValuesEquivalent(editedValue, publishedValue);
+    }
+
     /// <inheritdoc/>
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new BlockListConfigurationEditor(_ioHelper);

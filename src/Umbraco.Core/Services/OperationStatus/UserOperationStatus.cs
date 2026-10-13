@@ -201,4 +201,9 @@ public enum UserOperationStatus
     ///     The operation failed because the user has login history, and therefore might be referenced in audit logs etc.
     /// </summary>
     CannotDeleteUserWithLoginHistory,
+
+    /// <summary>
+    ///     The operation failed because password reset is enabled, but the configured sender cannot currently deliver messages.
+    /// </summary>
+    PasswordResetUnavailable,
 }
