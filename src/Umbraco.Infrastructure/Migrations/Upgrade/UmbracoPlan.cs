@@ -151,6 +151,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_19_0_0.AddTemplateDto>("{F1A0FF0C-3BFB-462D-A387-99913767AF9E}");
         To<V_19_0_0.RemoveUserGroupDefaultPermissionsFromModel>("{F6C49C99-3805-4ED8-AA5B-39937DC4081C}");
         To<V_19_0_0.AddHasAccessToInvariantForVariantToModel>("{A08A7C9C-2EDD-4457-8C9F-9D1EAF4FB325}");
+        To<V_19_0_0.AddElementDtos>("{1EC33267-3D0C-4D67-BC41-5AA5D0DFF3F2}");
     }
 
     /// <summary>

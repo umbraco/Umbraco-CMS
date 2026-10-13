@@ -72,6 +72,7 @@ public class SqliteMigrationProvider : IMigrationProvider
             EFCoreMigration.AddTemplateDto => typeof(Migrations.AddTemplateDto),
             EFCoreMigration.RemoveUserGroupDefaultPermissionsFromModel => typeof(Migrations.RemoveUserGroupDefaultPermissionsFromModel),
             EFCoreMigration.AddHasAccessToInvariantForVariantToModel => typeof(Migrations.AddHasAccessToInvariantForVariantToModel),
+            EFCoreMigration.AddElementDtos => typeof(Migrations.AddElementDtos),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }

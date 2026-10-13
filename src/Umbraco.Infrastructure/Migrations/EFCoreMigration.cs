@@ -30,4 +30,5 @@ public enum EFCoreMigration
     AddTemplateDto = 22,
     RemoveUserGroupDefaultPermissionsFromModel = 23,
     AddHasAccessToInvariantForVariantToModel = 24,
+    AddElementDtos = 25,
 }

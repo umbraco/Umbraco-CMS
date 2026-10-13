@@ -16,7 +16,7 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261012090805_AddHasAccessToInvariantForVariantToModel";
+    public override string LastMigrationId => "20261012093329_AddElementDtos";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -1089,6 +1089,96 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
                     .IsUnique();
 
                 b.ToTable("umbracoDomain");
+            });
+
+        modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ElementCultureVariationDto", b =>
+            {
+                var id = b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int")
+                    .HasColumnName("id");
+
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(id);
+
+                b.Property<bool>("Available")
+                    .HasColumnType("bit")
+                    .HasColumnName("available");
+
+                b.Property<bool>("Edited")
+                    .HasColumnType("bit")
+                    .HasColumnName("edited");
+
+                b.Property<int>("LanguageId")
+                    .HasColumnType("int")
+                    .HasColumnName("languageId");
+
+                b.Property<string>("Name")
+                    .HasColumnType("nvarchar(max)")
+                    .HasColumnName("name");
+
+                b.Property<int>("NodeId")
+                    .HasColumnType("int")
+                    .HasColumnName("nodeId");
+
+                b.Property<bool>("Published")
+                    .HasColumnType("bit")
+                    .HasColumnName("published");
+
+                b.HasKey("Id");
+
+                b.HasIndex("LanguageId")
+                    .HasDatabaseName("IX_umbracoElementCultureVariation_LanguageId");
+
+                b.HasIndex("NodeId", "LanguageId")
+                    .IsUnique()
+                    .HasDatabaseName("IX_umbracoElementCultureVariation_NodeId");
+
+                b.ToTable("umbracoElementCultureVariation");
+            });
+
+        modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ElementDto", b =>
+            {
+                b.Property<int>("NodeId")
+                    .HasColumnType("int")
+                    .HasColumnName("nodeId");
+
+                b.Property<bool>("Edited")
+                    .HasColumnType("bit")
+                    .HasColumnName("edited");
+
+                b.Property<bool>("Published")
+                    .HasColumnType("bit")
+                    .HasColumnName("published");
+
+                b.HasKey("NodeId");
+
+                b.HasIndex("Published")
+                    .HasDatabaseName("IX_umbracoElement_Published");
+
+                b.ToTable("umbracoElement");
+            });
+
+        modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ElementVersionDto", b =>
+            {
+                b.Property<int>("Id")
+                    .HasColumnType("int")
+                    .HasColumnName("id");
+
+                b.Property<bool>("Published")
+                    .HasColumnType("bit")
+                    .HasColumnName("published");
+
+                b.HasKey("Id");
+
+                var index = b.HasIndex("Published")
+                    .HasDatabaseName("IX_umbracoElementVersion_published");
+
+                SqlServerIndexBuilderExtensions.IncludeProperties(index, new[] { "Id" });
+
+                b.HasIndex("Id", "Published")
+                    .HasDatabaseName("IX_umbracoElementVersion_id_published");
+
+                b.ToTable("umbracoElementVersion");
             });
 
         modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.KeyValueDto", b =>
@@ -2527,6 +2617,39 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
             });
 
         modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DocumentVersionDto", b =>
+            {
+                b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentVersionDto", null)
+                    .WithMany()
+                    .HasForeignKey("Id")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
+            });
+
+        modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ElementCultureVariationDto", b =>
+            {
+                b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", null)
+                    .WithMany()
+                    .HasForeignKey("LanguageId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
+
+                b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
+                    .WithMany()
+                    .HasForeignKey("NodeId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
+            });
+
+        modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ElementDto", b =>
+            {
+                b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentDto", null)
+                    .WithMany()
+                    .HasForeignKey("NodeId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
+            });
+
+        modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ElementVersionDto", b =>
             {
                 b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentVersionDto", null)
                     .WithMany()
