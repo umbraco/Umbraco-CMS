@@ -84,7 +84,7 @@ public class DomainCacheService : IDomainCacheService
     public IEnumerable<Domain> GetAssigned(int documentId, bool includeWildcards = false)
     {
         InitializeIfMissing();
-        IEnumerable<Domain> list = _domains.Values.Where(x => x.ContentId == documentId);
+        IEnumerable<Domain> list = _domains.Select(x => x.Value).Where(x => x.ContentId == documentId);
         if (includeWildcards == false)
         {
             list = list.Where(x => x.IsWildcard == false);
