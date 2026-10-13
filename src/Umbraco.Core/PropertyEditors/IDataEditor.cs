@@ -115,6 +115,6 @@ public interface IDataEditor : IDiscoverable
     ///     in more than one way may compare the values by their content instead, for example regardless of the order
     ///     of nested values.
     /// </remarks>
-    // TODO (V18): Remove the default implementation.
+    // TODO (V19): Remove the default implementation.
     bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue) => object.Equals(editedValue, publishedValue);
 }

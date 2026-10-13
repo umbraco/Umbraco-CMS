@@ -775,7 +775,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
     }
 
     [Test]
-    public async Task Rich_Text_Values_Are_Equivalent_Only_When_They_Differ_In_The_Order_Of_Block_Values_And_Exposes()
+    public async Task Rich_Text_Values_Are_Equivalent_When_They_Differ_Only_In_The_Order_Of_Block_Values_And_Exposes()
     {
         var elementType = CreateElementType(ContentVariation.Culture);
         var rteDataType = await CreateRichTextDataType(elementType);
