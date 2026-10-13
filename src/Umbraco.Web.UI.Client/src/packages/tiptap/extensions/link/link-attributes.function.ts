@@ -132,7 +132,7 @@ function ensureHttpProtocol(url: string | null | undefined) {
  */
 function transformURLToMailto(url: string | null | undefined) {
 	if (!url) return null;
-	if (url?.includes('@') && !url.includes('//') && !url.includes(':')) {
+	if (url.includes('@') && !/\/\/|:/.test(url)) {
 		url = `mailto:${url}`;
 	}
 	return url;
