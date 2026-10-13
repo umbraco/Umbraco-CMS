@@ -6,7 +6,7 @@ import type {
 	UmbBlockTransferToElementLibraryModalData,
 	UmbBlockTransferToElementLibraryModalValue,
 } from './transfer-to-element-library-modal.token.js';
-import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -139,6 +139,8 @@ export class UmbBlockTransferToElementLibraryModalElement extends UmbModalBaseEl
 
 	override render() {
 		const treeProps = { hideTreeItemActions: true, foldersOnly: true };
+		const canTransfer =
+			!!this._name.trim() && this._hasSelectedLocation && !this._isCheckingLocation && !this._locationError;
 		return html`
 			<umb-body-layout headline=${this.localize.term('blockEditor_transferToElementLibrary')}>
 				<uui-box>
@@ -153,14 +155,17 @@ export class UmbBlockTransferToElementLibraryModalElement extends UmbModalBaseEl
 						</uui-input>
 					</umb-property-layout>
 					<umb-property-layout label="#general_choose" orientation="vertical" mandatory>
-						<umb-tree
-							slot="editor"
-							alias="Umb.Tree.Element"
-							.props=${treeProps}
-							@selected=${this.#onFolderSelected}
-							@deselected=${this.#onFolderDeselected}>
-						</umb-tree>
-						${this._locationError ? html`<small>${this._locationError}</small>` : nothing}
+						<div slot="editor">
+							<umb-tree
+								alias="Umb.Tree.Element"
+								.props=${treeProps}
+								@selected=${this.#onFolderSelected}
+								@deselected=${this.#onFolderDeselected}>
+							</umb-tree>
+							<umb-form-validation-message>
+								${when(this._locationError, () => html`<span slot="message">${this._locationError}</span>`)}
+							</umb-form-validation-message>
+						</div>
 					</umb-property-layout>
 				</uui-box>
 				<uui-button
@@ -172,10 +177,8 @@ export class UmbBlockTransferToElementLibraryModalElement extends UmbModalBaseEl
 					label=${this.localize.term('blockEditor_transferToElementLibrary')}
 					look="primary"
 					color="positive"
-					?disabled=${!this._name.trim() ||
-					!this._hasSelectedLocation ||
-					this._isCheckingLocation ||
-					!!this._locationError}
+					state=${ifDefined(this._isCheckingLocation ? 'waiting' : undefined)}
+					?disabled=${!canTransfer}
 					@click=${this.#onTransfer}></uui-button>
 			</umb-body-layout>
 		`;
