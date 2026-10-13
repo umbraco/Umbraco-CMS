@@ -84,12 +84,6 @@ internal static class ServerEventExtensions
         builder.AddNotificationAsyncHandler<ElementMovedToRecycleBinNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<EntityContainerMovedToRecycleBinNotification, ServerEventSender>();
 
-        builder.AddNotificationAsyncHandler<ElementPublishedNotification, ServerEventSender>();
-        builder.AddNotificationAsyncHandler<ElementUnpublishedNotification, ServerEventSender>();
-        builder.AddNotificationAsyncHandler<ElementRolledBackNotification, ServerEventSender>();
-        builder.AddNotificationAsyncHandler<ElementMovedNotification, ServerEventSender>();
-        builder.AddNotificationAsyncHandler<EntityContainerMovedNotification, ServerEventSender>();
-
         builder.AddNotificationAsyncHandler<ContentTypeChangedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaTypeChangedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MemberTypeChangedNotification, ServerEventSender>();

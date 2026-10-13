@@ -34,14 +34,9 @@ internal sealed class ServerEventSender :
     IDistributedCacheAsyncNotificationHandler<DomainDeletedNotification>,
     IDistributedCacheAsyncNotificationHandler<DomainSavedNotification>,
     IDistributedCacheAsyncNotificationHandler<ElementDeletedNotification>,
-    IDistributedCacheAsyncNotificationHandler<ElementMovedNotification>,
     IDistributedCacheAsyncNotificationHandler<ElementMovedToRecycleBinNotification>,
-    IDistributedCacheAsyncNotificationHandler<ElementPublishedNotification>,
-    IDistributedCacheAsyncNotificationHandler<ElementRolledBackNotification>,
     IDistributedCacheAsyncNotificationHandler<ElementSavedNotification>,
-    IDistributedCacheAsyncNotificationHandler<ElementUnpublishedNotification>,
     IDistributedCacheAsyncNotificationHandler<EntityContainerDeletedNotification>,
-    IDistributedCacheAsyncNotificationHandler<EntityContainerMovedNotification>,
     IDistributedCacheAsyncNotificationHandler<EntityContainerMovedToRecycleBinNotification>,
     IDistributedCacheAsyncNotificationHandler<EntityContainerSavedNotification>,
     IDistributedCacheAsyncNotificationHandler<LanguageDeletedNotification>,
@@ -221,36 +216,12 @@ internal sealed class ServerEventSender :
         => NotifyDeletedAsync(Constants.ServerEvents.EventSource.Element, notifications);
 
     /// <inheritdoc/>
-    public Task HandleAsync(ElementMovedNotification notification, CancellationToken cancellationToken)
-        => NotifyMovedAsync(Constants.ServerEvents.EventSource.Element, notification.MoveInfoCollection);
-
-    /// <inheritdoc/>
-    public Task HandleAsync(IEnumerable<ElementMovedNotification> notifications, CancellationToken cancellationToken)
-        => NotifyMovedAsync(Constants.ServerEvents.EventSource.Element, notifications.SelectMany(x => x.MoveInfoCollection));
-
-    /// <inheritdoc/>
     public Task HandleAsync(ElementMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
         => NotifyTrashedAsync(Constants.ServerEvents.EventSource.Element, notification);
 
     /// <inheritdoc/>
     public Task HandleAsync(IEnumerable<ElementMovedToRecycleBinNotification> notifications, CancellationToken cancellationToken)
         => NotifyTrashedAsync(Constants.ServerEvents.EventSource.Element, notifications);
-
-    /// <inheritdoc/>
-    public Task HandleAsync(ElementPublishedNotification notification, CancellationToken cancellationToken)
-        => NotifyUpdatedAsync(Constants.ServerEvents.EventSource.Element, notification.PublishedEntities);
-
-    /// <inheritdoc/>
-    public Task HandleAsync(IEnumerable<ElementPublishedNotification> notifications, CancellationToken cancellationToken)
-        => NotifyUpdatedAsync(Constants.ServerEvents.EventSource.Element, notifications.SelectMany(x => x.PublishedEntities));
-
-    /// <inheritdoc/>
-    public Task HandleAsync(ElementRolledBackNotification notification, CancellationToken cancellationToken)
-        => NotifyUpdatedAsync(Constants.ServerEvents.EventSource.Element, [notification.Entity]);
-
-    /// <inheritdoc/>
-    public Task HandleAsync(IEnumerable<ElementRolledBackNotification> notifications, CancellationToken cancellationToken)
-        => NotifyUpdatedAsync(Constants.ServerEvents.EventSource.Element, notifications.Select(x => x.Entity));
 
     /// <inheritdoc/>
     public Task HandleAsync(ElementSavedNotification notification, CancellationToken cancellationToken)
@@ -261,28 +232,12 @@ internal sealed class ServerEventSender :
         => NotifySavedAsync(Constants.ServerEvents.EventSource.Element, notifications);
 
     /// <inheritdoc/>
-    public Task HandleAsync(ElementUnpublishedNotification notification, CancellationToken cancellationToken)
-        => NotifyUpdatedAsync(Constants.ServerEvents.EventSource.Element, notification.UnpublishedEntities);
-
-    /// <inheritdoc/>
-    public Task HandleAsync(IEnumerable<ElementUnpublishedNotification> notifications, CancellationToken cancellationToken)
-        => NotifyUpdatedAsync(Constants.ServerEvents.EventSource.Element, notifications.SelectMany(x => x.UnpublishedEntities));
-
-    /// <inheritdoc/>
     public Task HandleAsync(EntityContainerDeletedNotification notification, CancellationToken cancellationToken)
         => NotifyDeletedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, [notification]);
 
     /// <inheritdoc/>
     public Task HandleAsync(IEnumerable<EntityContainerDeletedNotification> notifications, CancellationToken cancellationToken)
         => NotifyDeletedAsync<EntityContainer>(Constants.ServerEvents.EventSource.ElementContainer, IsElementContainer, notifications);
-
-    /// <inheritdoc/>
-    public Task HandleAsync(EntityContainerMovedNotification notification, CancellationToken cancellationToken)
-        => NotifyMovedAsync(Constants.ServerEvents.EventSource.ElementContainer, notification.MoveInfoCollection.Where(x => IsElementContainer(x.Entity)));
-
-    /// <inheritdoc/>
-    public Task HandleAsync(IEnumerable<EntityContainerMovedNotification> notifications, CancellationToken cancellationToken)
-        => NotifyMovedAsync(Constants.ServerEvents.EventSource.ElementContainer, notifications.SelectMany(x => x.MoveInfoCollection).Where(x => IsElementContainer(x.Entity)));
 
     /// <inheritdoc/>
     public Task HandleAsync(EntityContainerMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
@@ -646,54 +601,6 @@ internal sealed class ServerEventSender :
                         // recipients would never be told their content or media was trashed.
                         new ServerEventRoutingContext { EntityPath = movedEvent.OriginalPath });
                 }
-            }
-        }
-    }
-
-    private async Task NotifyUpdatedAsync<T>(string source, IEnumerable<T> entities)
-        where T : IEntity
-    {
-        var seen = new HashSet<Guid>();
-        foreach (T entity in entities)
-        {
-            if (seen.Add(entity.Key))
-            {
-                await _serverEventRouter.RouteEventAsync(
-                    new ServerEvent
-                    {
-                        EventType = Constants.ServerEvents.EventType.Updated,
-                        Key = entity.Key,
-                        EventSource = source,
-                    },
-                    new ServerEventRoutingContext { EntityPath = (entity as IUmbracoEntity)?.Path });
-            }
-        }
-    }
-
-    // Recipients are authorized against the entity's path, so a move is routed for both locations: a recipient whose
-    // access covers only the original location still needs to learn that the entity has left it.
-    private async Task NotifyMovedAsync<T>(string source, IEnumerable<MoveEventInfo<T>> moves)
-        where T : IEntity
-    {
-        var seen = new HashSet<Guid>();
-        foreach (MoveEventInfo<T> move in moves)
-        {
-            if (seen.Add(move.Entity.Key) is false)
-            {
-                continue;
-            }
-
-            var newPath = (move.Entity as IUmbracoEntity)?.Path;
-            foreach (var path in new[] { newPath, move.OriginalPath }.Distinct())
-            {
-                await _serverEventRouter.RouteEventAsync(
-                    new ServerEvent
-                    {
-                        EventType = Constants.ServerEvents.EventType.Updated,
-                        Key = move.Entity.Key,
-                        EventSource = source,
-                    },
-                    new ServerEventRoutingContext { EntityPath = path });
             }
         }
     }
