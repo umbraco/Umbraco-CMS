@@ -9,6 +9,11 @@ import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
 import { UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL } from '../modals/transfer-to-element-library/transfer-to-element-library-modal.token.js';
 import { UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME, UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME } from '../constants.js';
 import { umbBlockExposeSortCompare } from '../utils/block-expose-sort-compare.function.js';
+import {
+	umbGetBlockedTransferVariants,
+	umbResolveBlockTransferCultures,
+	type UmbBlockTransferLanguageAccess,
+} from '../utils/block-transfer-variants.function.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -26,16 +31,20 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
-import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { escapeHTML, UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import {
+	UmbPropertyValueFlatMapperController,
 	UmbPropertyValuePresetVariantBuilderController,
 	type UmbPropertyTypePresetModel,
 	type UmbPropertyTypePresetModelTypeModel,
 } from '@umbraco-cms/backoffice/property';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
-import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
-import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbElementDetailRepository, UmbElementPublishingRepository } from '@umbraco-cms/backoffice/element';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal, umbInfoModal } from '@umbraco-cms/backoffice/modal';
+import { UmbApiError } from '@umbraco-cms/backoffice/resources';
 import {
 	UMB_VALIDATION_CONTEXT,
 	UmbValidationCleanUpByUniqueManager,
@@ -50,6 +59,20 @@ export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseMo
 	content: UmbBlockDataModel;
 	settings?: UmbBlockDataModel;
 };
+
+const isPublishValidationError = (error: UmbApiError) =>
+	error.status === 400 &&
+	(Object.keys(error.problemDetails.errors ?? {}).length > 0 || 'invalidProperties' in error.problemDetails);
+
+export interface UmbBlockTransferToExternalContentResult {
+	/** The unique of the created Element. */
+	unique: string;
+	/**
+	 * Where the Element ended up: `published`, or `draft` when the block was not exposed in any culture.
+	 * Otherwise why it could not be published: `validation-failed` when the Element has invalid values, or `publish-failed`.
+	 */
+	status: 'published' | 'draft' | 'validation-failed' | 'publish-failed';
+}
 
 export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
@@ -113,6 +136,8 @@ export abstract class UmbBlockManagerContext<
 		(x) => x.key,
 	);
 	#elementRepository = new UmbElementDetailRepository(this);
+	#elementPublishingRepository = new UmbElementPublishingRepository(this);
+	readonly #localize = new UmbLocalizationController(this);
 	#pendingElementFetches = new Set<string>();
 
 	readonly #settings = new UmbArrayState<UmbBlockDataModel, string, undefined>(undefined, (x) => x.key);
@@ -575,37 +600,66 @@ export abstract class UmbBlockManagerContext<
 
 	/**
 	 * Request to transfer a local block's content to external content (Element Library).
+	 * The Element is created from all cultures the block holds data in, and published in the cultures the block is exposed in.
+	 * Nothing is transferred when the user lacks access to a language the block holds data in.
 	 * @param {string} key the block layout key.
 	 * @param name
+	 * @returns {Promise<UmbBlockTransferToExternalContentResult | undefined>} The outcome, or `undefined` when nothing was transferred.
 	 */
-	async requestTransferToExternalContent(key: string, name?: string) {
+	async requestTransferToExternalContent(
+		key: string,
+		name?: string,
+	): Promise<UmbBlockTransferToExternalContentResult | undefined> {
 		const layout = this._layouts.getValue().find((x) => x.key === key);
 		if (!layout) return;
 		const contentKey = layout.contentKey;
 		const content = this.getContentOf(contentKey);
 		if (!content) return;
 
+		await this.contentTypesLoaded;
+		const variesByCulture = this.getStructure(content.contentTypeKey)?.getVariesByCulture() ?? false;
+		const valueCultures = await this.#getValueCultures(content.values);
+
+		const access = await this.#getTransferLanguageAccess();
+		if (!access) return;
+
+		const blocked = umbGetBlockedTransferVariants({ valueCultures, variesByCulture, access });
+		if (blocked.cultures.length > 0 || blocked.invariant) {
+			await this.#showTransferNotPermitted(blocked);
+			return;
+		}
+
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT).catch(() => undefined);
 		if (!modalManager) return;
 		const result = await modalManager
-			.open(this, UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL, { data: { name } })
+			.open(this, UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL, {
+				data: { name, contentTypeKey: content.contentTypeKey },
+			})
 			.onSubmit()
 			.catch(() => undefined);
 		if (!result) return;
 
+		const { cultures, culturesToPublish } = umbResolveBlockTransferCultures({
+			valueCultures,
+			exposedCultures: this.getExposes()
+				.filter((x) => x.contentKey === contentKey)
+				.map((x) => x.culture),
+			variesByCulture,
+			fallbackCulture: this.getVariantId()?.culture,
+			access,
+		});
+
 		const { data: scaffold } = await this.#elementRepository.createScaffold({
 			documentType: { unique: content.contentTypeKey, collection: null },
 			values: content.values,
-			variants: [
-				{
-					culture: null,
-					state: null,
-					name: result.name,
-					publishDate: null,
-					createDate: null,
-					updateDate: null,
-				},
-			],
+			variants: cultures.map((culture) => ({
+				culture,
+				state: null,
+				name: result.name,
+				publishDate: null,
+				createDate: null,
+				updateDate: null,
+			})),
 		});
 		if (!scaffold) return;
 
@@ -618,6 +672,70 @@ export abstract class UmbBlockManagerContext<
 			contentKey: created.unique,
 			isExternalContent: true,
 		} as Partial<BlockLayoutType>);
+
+		return { unique: created.unique, status: await this.#publishTransferredElement(created.unique, culturesToPublish) };
+	}
+
+	async #getValueCultures(values: Array<UmbBlockDataValueModel>): Promise<Array<string | null>> {
+		const cultures = await new UmbPropertyValueFlatMapperController(this).flatMapMany(values, (property) =>
+			// Be aware that a value of `false` or `""` or `[]` is not captured here:
+			property.value ? property.culture : undefined,
+		);
+		return cultures.filter((culture): culture is string | null => culture !== undefined);
+	}
+
+	async #getTransferLanguageAccess(): Promise<UmbBlockTransferLanguageAccess | undefined> {
+		const context = await this.getContext(UMB_CURRENT_USER_CONTEXT).catch(() => undefined);
+		if (!context) return;
+		const user = await this.observe(context.currentUser).asPromise();
+		return {
+			hasAccessToAllLanguages: user.hasAccessToAllLanguages,
+			languages: user.languages,
+			hasAccessToInvariantForVariant: user.hasAccessToInvariantForVariant !== false,
+		};
+	}
+
+	async #showTransferNotPermitted(blocked: ReturnType<typeof umbGetBlockedTransferVariants>) {
+		const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT).catch(() => undefined);
+		// Resolves once the languages have loaded.
+		await appLanguageContext?.getMandatoryLanguages();
+		const languages = appLanguageContext ? await this.observe(appLanguageContext.languages).asPromise() : [];
+		const languageNames = blocked.cultures.map(
+			(culture) => languages.find((language) => language.unique === culture)?.name ?? culture,
+		);
+
+		const content: Array<string> = [];
+		if (languageNames.length > 0) {
+			content.push(
+				this.#localize.term(
+					'blockEditor_transferToElementLibraryLanguagesNotPermitted',
+					escapeHTML(languageNames.join(', ')),
+				),
+			);
+		}
+		if (blocked.invariant) {
+			content.push(this.#localize.term('blockEditor_transferToElementLibrarySharedNotPermitted'));
+		}
+
+		await umbInfoModal(this, {
+			headline: '#blockEditor_transferToElementLibraryNotPermitted',
+			content: content.join(' '),
+		}).catch(() => undefined);
+	}
+
+	async #publishTransferredElement(
+		unique: string,
+		culturesToPublish: Array<string | null>,
+	): Promise<UmbBlockTransferToExternalContentResult['status']> {
+		if (culturesToPublish.length === 0) return 'draft';
+
+		const { error } = await this.#elementPublishingRepository.publish(
+			unique,
+			culturesToPublish.map((culture) => ({ variantId: new UmbVariantId(culture) })),
+		);
+		if (!error) return 'published';
+
+		return UmbApiError.isUmbApiError(error) && isPublishValidationError(error) ? 'validation-failed' : 'publish-failed';
 	}
 
 	/**
