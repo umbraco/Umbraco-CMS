@@ -194,7 +194,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		const url = event.target.value as string;
 
 		let name: string | undefined;
-		if (url && !this.#userEditedTitle) {
+		if (url && !this.#userEditedTitle && !this._config.disableNameAutofill) {
 			if (URL.canParse(url)) {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
@@ -253,7 +253,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 		const link = {
 			icon,
-			name: this.#userEditedTitle ? this.value.link.name : name || this.value.link.name,
+			name:
+				this.#userEditedTitle || this._config.disableNameAutofill ? this.value.link.name : name || this.value.link.name,
 			type: unique ? type : undefined,
 			unique,
 			url: url ?? this.value.link.url,
