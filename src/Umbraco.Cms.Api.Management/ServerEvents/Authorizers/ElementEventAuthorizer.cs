@@ -22,5 +22,5 @@ public class ElementEventAuthorizer : EventSourcePolicyAuthorizer
     /// </summary>
     public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.Element, Constants.ServerEvents.EventSource.ElementContainer];
 
-    protected override string Policy => AuthorizationPolicies.TreeAccessDocumentsOrElementsOrMediaOrMembers;
+    protected override string Policy => AuthorizationPolicies.TreeAccessElements;
 }
