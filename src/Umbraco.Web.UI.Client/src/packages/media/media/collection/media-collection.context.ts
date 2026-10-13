@@ -36,8 +36,7 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 		this.#placeholders.setValue(placeholders);
 
 		this._items.setValue([...placeholders, ...items]);
-		this._totalItems.setValue(placeholders.length + items.length);
-		this.pagination.setTotalItems(placeholders.length + items.length);
+		this._setTotalItems(placeholders.length + items.length);
 	}
 
 	updatePlaceholderStatus(unique: string, status?: UmbFileDropzoneItemStatus) {
@@ -83,8 +82,7 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 			const placeholders = this.#placeholders.getValue();
 
 			this._items.setValue([...placeholders, ...data.items]);
-			this._totalItems.setValue(placeholders.length + data.total);
-			this.pagination.setTotalItems(placeholders.length + data.total);
+			this._setTotalItems(placeholders.length + data.total);
 		}
 
 		this._loading.setValue(false);

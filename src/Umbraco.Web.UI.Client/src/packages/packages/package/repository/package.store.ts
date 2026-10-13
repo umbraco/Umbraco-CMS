@@ -42,9 +42,9 @@ export class UmbPackageStore extends UmbStoreBase {
 	isPackagesLoaded = false;
 
 	/**
-	 * Creates an instance of PackageStore.
+	 * Creates an instance of UmbPackageStore.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof PackageStore
+	 * @memberof UmbPackageStore
 	 */
 	constructor(host: UmbControllerHost) {
 		// TODO: revisit this store. Is it ok to have multiple data sets?
@@ -54,7 +54,7 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	/**
 	 * Append items to the store
-	 * @param packages
+	 * @param {Array<UmbPackage>} packages - The packages to append
 	 */
 	override appendItems(packages: Array<UmbPackage>) {
 		this.#packages.next(packages);

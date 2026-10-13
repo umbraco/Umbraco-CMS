@@ -8,7 +8,7 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 /**
  * A data source for Document items that fetches data from the server
  * @class UmbDocumentItemServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @augments {UmbItemServerDataSourceBase}
  */
 export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase<
 	DocumentItemResponseModel,

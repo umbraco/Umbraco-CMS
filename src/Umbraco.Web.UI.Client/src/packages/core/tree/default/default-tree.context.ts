@@ -55,6 +55,16 @@ export class UmbDefaultTreeContext<
 	#isMenu = new UmbBooleanState(undefined);
 	public readonly isMenu = this.#isMenu.asObservable();
 
+	#drillable = new UmbBooleanState(false);
+	/**
+	 * Whether opening an item takes the user into it. A property of the host, so it is the same for every item in the
+	 * tree.
+	 *
+	 * Off unless the host declares otherwise: a tree that can do no more than expand and collapse is the common case,
+	 * and the one where offering to drill into an item would strand everything below it.
+	 */
+	public readonly drillable = this.#drillable.asObservable();
+
 	#expandTreeRoot = new UmbBooleanState(undefined);
 	public readonly expandTreeRoot = this.#expandTreeRoot.asObservable();
 
@@ -94,14 +104,18 @@ export class UmbDefaultTreeContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_CONTEXT);
-		this.#treeItemChildrenManager.setTakeSize(50);
+		this.#treeItemChildrenManager.setTakeSize(100);
 
 		// Auto-enable selectOnly when a selection exists and it was not explicitly set.
-		this.observe(this.selection.selection, (selection) => {
-			if (this.#selectOnlyConfig === undefined) {
-				this.#selectOnly.setValue((selection?.length ?? 0) > 0);
-			}
-		});
+		this.observe(
+			this.selection.selection,
+			(selection) => {
+				if (this.#selectOnlyConfig === undefined) {
+					this.#selectOnly.setValue((selection?.length ?? 0) > 0);
+				}
+			},
+			null,
+		);
 	}
 
 	// TODO: find a generic way to do this
@@ -114,7 +128,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Sets the manifest
-	 * @param {ManifestTree} manifest
+	 * @param {ManifestTree} manifest - The tree manifest
 	 * @memberof UmbDefaultTreeContext
 	 */
 	public set manifest(manifest: ManifestTree | undefined) {
@@ -131,7 +145,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Returns the manifest.
-	 * @returns {ManifestTree}
+	 * @returns {ManifestTree} The tree manifest
 	 * @memberof UmbDefaultTreeContext
 	 * @deprecated Use the `.manifest` property instead.
 	 */
@@ -173,7 +187,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Reloads the tree
-	 * @param pageNumber
+	 * @param {number} pageNumber - The page number to load
 	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
 	 */
@@ -183,14 +197,14 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Load previous items of the tree item
-	 * @memberof UmbTreeItemContextBase
+	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
 	 */
 	public loadPrevItems = (): Promise<void> => this.#treeItemChildrenManager.loadPrevChildren();
 
 	/**
 	 * Load next items of the tree item
-	 * @memberof UmbTreeItemContextBase
+	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
 	 */
 	public loadNextItems = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
@@ -268,11 +282,30 @@ export class UmbDefaultTreeContext<
 	}
 
 	/**
+	 * Sets whether opening an item takes the user into it.
+	 * @param {boolean} value - True when the host acts on `UmbTreeItemOpenEvent`.
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setDrillable(value: boolean) {
+		this.#drillable.setValue(value);
+	}
+
+	/**
+	 * Returns whether opening an item takes the user into it.
+	 * @returns {boolean} True when the host acts on `UmbTreeItemOpenEvent`.
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getDrillable(): boolean {
+		return this.#drillable.getValue();
+	}
+
+	/**
 	 * Sets the hideTreeRoot config
 	 * @param {boolean} hideTreeRoot - Whether to hide the tree root
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setHideTreeRoot(hideTreeRoot: boolean) {
+		if (this.getHideTreeRoot() === hideTreeRoot) return;
 		this.#hideTreeRoot.setValue(hideTreeRoot);
 		// we need to reset the tree if this config changes
 		this.#clearTree();
@@ -281,7 +314,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Gets the hideTreeRoot config
-	 * @returns {boolean}
+	 * @returns {boolean} - Whether the tree root is hidden
 	 * @memberof UmbDefaultTreeContext
 	 */
 	getHideTreeRoot(): boolean {
@@ -290,10 +323,13 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Sets the startNode config
-	 * @param {UmbTreeStartNode} startNode
+	 * @param {UmbTreeStartNode} startNode - The start node
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setStartNode(startNode: UmbTreeStartNode | undefined) {
+		const current = this.getStartNode();
+		if (current?.unique === startNode?.unique && current?.entityType === startNode?.entityType) return;
+
 		this.#treeItemChildrenManager.setStartNode(startNode);
 		if (startNode) {
 			this.#entityContext.setEntityType(startNode.entityType);
@@ -319,6 +355,7 @@ export class UmbDefaultTreeContext<
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setFoldersOnly(foldersOnly: boolean) {
+		if (this.getFoldersOnly() === foldersOnly) return;
 		this.#treeItemChildrenManager.setFoldersOnly(foldersOnly);
 		// we need to reset the tree if this config changes
 		this.#clearTree();
@@ -336,7 +373,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Updates the requestArgs config and reloads the tree.
-	 * @param args
+	 * @param {Partial<RequestArgsType>} args - The request args to merge in
 	 */
 	public updateAdditionalRequestArgs(args: Partial<RequestArgsType>) {
 		this.#treeItemChildrenManager.setAdditionalRequestArgs(args);

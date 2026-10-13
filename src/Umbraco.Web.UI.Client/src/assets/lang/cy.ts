@@ -306,6 +306,7 @@ export default {
 		isSensitiveValue:
 			"Mae'r gwerth yma'n gudd. Os ydych chi angen hawl i weld y gwerth yma, cysylltwch â gweinyddwr eich gwefan.",
 		isSensitiveValue_short: "Mae'r gwerth yma'n gudd.",
+		isSensitiveValueNotice: 'Os ydych chi angen hawl i weld y gwerthoedd cudd, cysylltwch â gweinyddwr eich gwefan.',
 		languagesToPublish: 'Pa ieithoedd yr hoffech chi eu cyhoeddi? ',
 		languagesToSendForApproval: 'Pa ieithoedd hoffech chi anfon am gymeradwyaeth?',
 		languagesToSchedule: 'Pa ieithoedd yr hoffech chi eu hamserlennu?',
@@ -345,6 +346,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Cliciwch i lanlwytho',
+		browseFilesAction: 'Pori ffeiliau',
+		dropFilesOr: 'Llusgwch a gollwng cyfryngau yma<br />neu',
 		orClickHereToUpload: 'neu cliciwch yma i ddewis ffeiliau',
 		disallowedFileType: "Ni ellir lanlwytho'r ffeil yma, nid yw math y ffeil yn wedi'i gymeradwyo",
 		maxFileSize: 'Maint ffeil uchaf',
@@ -807,6 +810,8 @@ export default {
 		new: 'Newydd',
 		next: 'Nesaf',
 		no: 'Na',
+		noResults: 'Ni ddarganfuwyd unrhyw ganlyniadau',
+		noResultsFor: (query: string) => `Ni ddarganfuwyd unrhyw ganlyniad ar gyfer "${query}".`,
 		of: 'o',
 		off: 'I ffwrdd',
 		ok: 'Iawn',
@@ -1844,6 +1849,10 @@ export default {
 		templatingGroup: 'Templedi',
 		thirdPartyGroup: 'Trydydd parti',
 		webhooks: 'Bachau gwe',
+	},
+	picker: {
+		browseTab: 'Pori',
+		searchTab: 'Chwilio',
 	},
 	update: {
 		updateAvailable: 'Diweddariad newydd yn barod',

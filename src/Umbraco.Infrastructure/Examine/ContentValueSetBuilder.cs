@@ -176,7 +176,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Failed to add property '{PropertyAlias}' to index for content {ContentId}", property.Alias, c.Id);
+                        _logger.LogError(ex, "Failed to add property '{PropertyAlias}' to index for content {ContentId} (key {ContentKey})", property.Alias, c.Id, c.Key);
                         throw;
                     }
                 }
@@ -192,9 +192,10 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                         {
                             _logger.LogError(
                                 ex,
-                                "Failed to add property '{PropertyAlias}' to index for content {ContentId} in culture {Culture}",
+                                "Failed to add property '{PropertyAlias}' to index for content {ContentId} (key {ContentKey}) in culture {Culture}",
                                 property.Alias,
                                 c.Id,
+                                c.Key,
                                 culture);
                             throw;
                         }

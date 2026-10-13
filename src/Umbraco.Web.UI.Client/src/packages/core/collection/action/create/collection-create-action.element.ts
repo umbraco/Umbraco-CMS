@@ -1,7 +1,7 @@
-import { customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbCreateCollectionActionApi } from './collection-create-action.api.js';
 import type { UmbCollectionCreateOption } from './types.js';
+import { customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-create-action-button')
 export class UmbCollectionCreateActionButtonElement extends UmbLitElement {

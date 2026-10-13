@@ -1,8 +1,8 @@
+import type { UmbContentPickerResolvedItem } from './value-summary.resolver.js';
 import { customElement, nothing, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import { UMB_DOCUMENT_ENTITY_TYPE, UmbDocumentItemDataResolver } from '@umbraco-cms/backoffice/document';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
-import type { UmbContentPickerResolvedItem } from './value-summary.resolver.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-content-picker-property-editor-value-summary')

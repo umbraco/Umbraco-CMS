@@ -179,9 +179,13 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	constructor() {
 		super();
 
-		this.observe(this.#itemManager.items, () => {
-			this.#populateCards();
-		});
+		this.observe(
+			this.#itemManager.items,
+			() => {
+				this.#populateCards();
+			},
+			null,
+		);
 
 		new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
 			.addAdditionalPath(':key')
@@ -229,9 +233,13 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				this._routeBuilder = routeBuilder;
 			});
 
-		this.observe(this.#pickerInputContext.selection, (selection) => {
-			this.#addItems(selection);
-		});
+		this.observe(
+			this.#pickerInputContext.selection,
+			(selection) => {
+				this.#addItems(selection);
+			},
+			null,
+		);
 
 		this.addValidator(
 			'valueMissing',

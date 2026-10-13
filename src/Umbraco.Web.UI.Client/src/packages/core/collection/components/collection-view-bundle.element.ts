@@ -5,7 +5,6 @@ import { css, customElement, html, nothing, query, repeat, state } from '@umbrac
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
 
@@ -27,9 +26,6 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	@state()
 	private _collectionRootPathName?: string;
 
-	@state()
-	private _entityUnique?: string;
-
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
 	constructor() {
@@ -44,10 +40,6 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
 			this.#collectionContext = context;
 			this.#observeCollection();
-		});
-
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
-			this._entityUnique = context?.getUnique() ?? '';
 		});
 	}
 
@@ -106,9 +98,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		}));
 	}
 
-	#onClick(view: UmbCollectionViewLayout) {
-		this.#collectionContext?.setLastSelectedView(this._entityUnique, view.alias);
-
+	#onClick() {
 		setTimeout(() => {
 			// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -144,7 +134,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 			<uui-menu-item
 				label=${view.label}
 				href="${this._collectionRootPathName}/${view.pathName}"
-				@click-label=${() => this.#onClick(view)}
+				@click-label=${() => this.#onClick()}
 				?active=${view.alias === this._currentView?.alias}>
 				<umb-icon slot="icon" name=${view.icon}></umb-icon>
 			</uui-menu-item>

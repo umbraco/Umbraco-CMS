@@ -17,7 +17,7 @@ export class UmbCancelError extends UmbError {
 
 	/**
 	 * Transforms a CancelError into an UmbCancelError.
-	 * @param {*} error The CancelError to transform.
+	 * @param {Error} error The CancelError to transform.
 	 * @returns {UmbCancelError} The transformed UmbCancelError.
 	 * @deprecated Use `UmbCancelError.isUmbCancelError` instead and map your object to `UmbCancelError` if needed.
 	 */
@@ -48,7 +48,7 @@ export class UmbApiError extends UmbError {
 
 	/**
 	 * Transforms an ApiError into an UmbApiError.
-	 * @param {*} error The ApiError to transform.
+	 * @param {Error & { body?: string; status?: number; request?: unknown }} error The ApiError to transform.
 	 * @returns {UmbApiError} The transformed UmbApiError.
 	 * @deprecated Use `UmbCancelError.isUmbApiError` instead and map your object to `UmbApiError` if needed.
 	 */

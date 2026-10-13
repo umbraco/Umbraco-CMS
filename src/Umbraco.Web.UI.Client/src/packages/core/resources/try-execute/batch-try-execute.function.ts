@@ -3,6 +3,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Batches promises and returns a promise that resolves to an array of results
+ * @template BatchEntryType
+ * @template PromiseResult
  * @param {UmbControllerHost} host - The host to use for the request and where notifications will be shown
  * @param {Array<Array<BatchEntryType>>} chunks - The array of chunks to process
  * @param {(chunk: Array<BatchEntryType>) => Promise<PromiseResult>} callback - The function to call for each chunk

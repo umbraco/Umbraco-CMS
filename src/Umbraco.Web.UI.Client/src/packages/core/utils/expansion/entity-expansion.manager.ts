@@ -132,7 +132,7 @@ export class UmbEntityExpansionManager<
 	/**
 	 * Gets an item from the expansion state
 	 * @param {EntryModelType} entity The entity to get
-	 * @returns {*}  {(Promise<UmbEntityExpansionEntryModel | undefined>)}
+	 * @returns {Promise<EntryModelType | undefined>} The expansion entry for the entity, if it exists.
 	 * @memberof UmbEntityExpansionManager
 	 */
 	public async getItem(entity: EntryModelType): Promise<EntryModelType | undefined> {

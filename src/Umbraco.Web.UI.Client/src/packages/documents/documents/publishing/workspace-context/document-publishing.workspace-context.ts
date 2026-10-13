@@ -10,9 +10,9 @@ import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
 import { UmbDocumentUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../constants.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
 import { UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
-import { UmbDocumentVariantState } from '../../variant-state.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -76,7 +76,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				this.#documentWorkspaceContext = context;
 				this.#documentWorkspaceContext?.view.shortcuts.addOne({
 					unique: UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE,
-					label: this.#localize.term('content_saveAndPublishShortcut'),
+					label: '#buttons_saveAndPublish',
 					key: 'p',
 					modifier: true,
 					action: () => this.saveAndPublish(),
@@ -235,7 +235,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	 * Convert a date string to a server time string in ISO format, example: 2021-01-01T12:00:00.000+00:00.
 	 * The input must be a valid date string, otherwise it will return null.
 	 * The output matches the DateTimeOffset format in C#.
-	 * @param dateString
+	 * @param {string | null | undefined} dateString - The date string to convert.
+	 * @returns {string | null} The ISO date string, or null if invalid.
 	 */
 	#convertToDateTimeOffset(dateString: string | null | undefined) {
 		if (!dateString || dateString.length === 0) {
@@ -343,7 +344,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		this.#eventContext?.dispatchEvent(new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique }));
 	}
 
-	/** Peeks a single-message notification, when a notification context is available. */
+	/**
+	 * Peeks a single-message notification, when a notification context is available.
+	 * @param {UmbNotificationColor} color - The notification color/severity.
+	 * @param {string} messageKey - The localization key for the message.
+	 * @param {...string} args - Arguments to interpolate into the localized message.
+	 */
 	#notify(color: UmbNotificationColor, messageKey: string, ...args: Array<string>): void {
 		this.#notificationContext?.peek(color, { data: { message: this.#localize.term(messageKey, ...args) } });
 	}
@@ -353,6 +359,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	 * server calls, so the save goes through the default persistence path first: it merges the response
 	 * into those variants only and dispatches the save events, leaving the workspace correctly saved
 	 * even when the publish leg fails afterwards.
+	 * @param {UmbDocumentPublishWithDescendantsArgs} args - The publish arguments.
 	 * @returns {Promise<boolean>} whether reading the document back after publishing failed
 	 */
 	async #saveAndPublishDescendants(args: UmbDocumentPublishWithDescendantsArgs): Promise<boolean> {
@@ -391,6 +398,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	/**
 	 * Save the selected variants without publishing them, for when validation rejects the publish.
 	 * Rejects even though the save succeeded, to symbolize that we did not publish. [NL]
+	 * @param {Array<UmbVariantId>} variantIds - The variants to save.
+	 * @param {UmbDocumentDetailModel} saveData - The data to save.
+	 * @param {unknown} reason - The reason the publish was rejected, rethrown after saving.
 	 */
 	async #saveWithoutPublishing(
 		variantIds: Array<UmbVariantId>,

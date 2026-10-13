@@ -3,7 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionApi, type UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 /**
- *
+ * @template {UmbApi} ApiType
  * @param {UmbControllerHost} host  - The host to parse on as the host to the extension api.
  * @param {string} alias - The alias of the extension api to create.
  * @param {Array<unknown>} constructorArgs - The constructor arguments to pass to the extension api, host will always be appended as the first argument, meaning these arguments will be second and so forth.

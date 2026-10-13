@@ -10,9 +10,7 @@
 /**
  * Deep partial object type, making objects and their properties optional, but only until a property of a different type is encountered.
  * This means if an object holds a property with an array that holds objects, the array will be made optional, but the properties of the objects inside the array will not be changed.
- * @type UmbDeepPartialObject
- * @generic T - The object to make partial.
- * @returns A type with all properties of objects made optional.
+ * @template T - The object to make partial.
  */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export type UmbDeepPartialObject<T> = T extends Function

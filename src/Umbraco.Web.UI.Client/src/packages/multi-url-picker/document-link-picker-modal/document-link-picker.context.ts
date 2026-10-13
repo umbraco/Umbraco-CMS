@@ -3,9 +3,14 @@ import { UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '@umbraco-cms/backoffice/docu
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
+import { UmbTreeItemPickerExpansionManager } from '@umbraco-cms/backoffice/tree';
 import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 
 export class UmbDocumentLinkPickerContext extends UmbPickerContext {
+	public readonly expansion = new UmbTreeItemPickerExpansionManager(this, {
+		interactionMemoryManager: this.interactionMemory,
+	});
+
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public languages = this.#languages.asObservable();
 

@@ -7,7 +7,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
  * @slot default - Slot footer items
  * @slot actions - Slot actions
  * @class UmbFooterLayout
- * @augments {UmbLitElement}
+ * @augments {LitElement}
  */
 @customElement('umb-footer-layout')
 export class UmbFooterLayoutElement extends LitElement {

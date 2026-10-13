@@ -30,7 +30,7 @@ export class UmbElementFolderWorkspaceContext
 			detailRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
 		});
 
-		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed));
+		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed), null);
 
 		this.#setupNameWritePermissions();
 

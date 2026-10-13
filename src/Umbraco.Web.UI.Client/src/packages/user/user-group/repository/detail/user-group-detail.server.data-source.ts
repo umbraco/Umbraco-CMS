@@ -6,14 +6,19 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbManagementApiDataMapper, type UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import {
+	UmbManagementApiDataMapper,
+	type UmbDataSourceErrorResponse,
+	type UmbDataSourceResponse,
+	type UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the User Group that fetches data from the server
  * @class UmbUserGroupServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbUserGroupServerDataSource
 	extends UmbControllerBase
@@ -23,8 +28,7 @@ export class UmbUserGroupServerDataSource
 
 	/**
 	 * Creates a new User Group scaffold
-	 * @param {(string | null)} parentUnique
-	 * @returns { CreateUserGroupRequestModel }
+	 * @returns {CreateUserGroupRequestModel} The User Group scaffold.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async createScaffold() {
@@ -55,11 +59,11 @@ export class UmbUserGroupServerDataSource
 
 	/**
 	 * Fetches a User Group with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique id of the User Group.
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>>} The User Group.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this, UserGroupService.getUserGroupById({ path: { id: unique } }));
@@ -111,11 +115,11 @@ export class UmbUserGroupServerDataSource
 
 	/**
 	 * Inserts a new User Group on the server
-	 * @param {UmbUserGroupDetailModel} model
-	 * @returns {*}
+	 * @param {UmbUserGroupDetailModel} model - The User Group to create.
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>>} The created User Group.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
-	async create(model: UmbUserGroupDetailModel) {
+	async create(model: UmbUserGroupDetailModel): Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>> {
 		if (!model) throw new Error('User Group is missing');
 
 		const permissionDataPromises = model.permissions.map(async (item) => {
@@ -163,12 +167,11 @@ export class UmbUserGroupServerDataSource
 
 	/**
 	 * Updates a UserGroup on the server
-	 * @param {UmbUserGroupDetailModel} UserGroup
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbUserGroupDetailModel} model - The User Group to update.
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>>} The updated User Group.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
-	async update(model: UmbUserGroupDetailModel) {
+	async update(model: UmbUserGroupDetailModel): Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		const permissionDataPromises = model.permissions.map(async (item) => {
@@ -217,11 +220,11 @@ export class UmbUserGroupServerDataSource
 
 	/**
 	 * Deletes a User Group on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique id of the User Group.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(

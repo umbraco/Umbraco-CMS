@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
-import type { UmbDocumentItemModel } from './types.js';
 import type { UmbDocumentSearchItemModel } from '../search/types.js';
+import type { UmbDocumentItemModel } from './types.js';
 import { UmbDocumentItemDataResolver } from './document-item-data-resolver.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -18,13 +18,12 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	public set item(value: UmbDocumentItemModel | undefined) {
 		this.#item.setData(value);
 		const ancestors = (value as UmbDocumentSearchItemModel | undefined)?.ancestors;
-		this._ancestorPath =
-			ancestors?.length
-				? ancestors
-						.map((a) => a.variants[0]?.name ?? '(Untitled)')
-						.filter(Boolean)
-						.join(' / ')
-				: '';
+		this._ancestorPath = ancestors?.length
+			? ancestors
+					.map((a) => a.variants[0]?.name ?? '(Untitled)')
+					.filter(Boolean)
+					.join(' / ')
+			: '';
 	}
 	public get item(): UmbDocumentItemModel | undefined {
 		return this.#item.getData();

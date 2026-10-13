@@ -9,6 +9,7 @@ import type {
 } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { UmbPagedModel, UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Repository for the document audit log
@@ -33,18 +34,20 @@ export class UmbDocumentAuditLogRepository
 
 	/**
 	 * Request the audit log for a document
-	 * @param {UmbAuditLogRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbAuditLogRequestArgs} args - The request arguments
+	 * @returns {Promise<UmbRepositoryResponse<UmbPagedModel<UmbDocumentAuditLogModel>>>} The audit log data
 	 * @memberof UmbDocumentAuditLogRepository
 	 */
-	async requestAuditLog(args: UmbAuditLogRequestArgs) {
+	async requestAuditLog(
+		args: UmbAuditLogRequestArgs,
+	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbDocumentAuditLogModel>>> {
 		return this.#dataSource.getAuditLog(args);
 	}
 
 	/**
 	 * Get the tag style and localization data for a given audit log type
-	 * @param {string} logType
-	 * @returns {UmbAuditLogTagData}
+	 * @param {string} logType - The audit log type
+	 * @returns {UmbAuditLogTagData} The tag style and localization data
 	 * @memberof UmbDocumentAuditLogRepository
 	 */
 	getTagStyleAndText(logType: string): UmbAuditLogTagData {

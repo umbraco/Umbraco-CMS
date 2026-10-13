@@ -39,7 +39,7 @@ export class UmbInteractionMemoryManager extends UmbControllerBase {
 	 * @param {UmbInteractionMemoryModel} memory - The memory item to add or update.
 	 * @memberof UmbInteractionMemoryManager
 	 */
-	setMemory(memory: UmbInteractionMemoryModel) {
+	setMemory(memory: UmbInteractionMemoryModel): void {
 		this.#memories.appendOne(memory);
 	}
 
@@ -48,8 +48,19 @@ export class UmbInteractionMemoryManager extends UmbControllerBase {
 	 * @param {string} unique - The unique identifier of the memory item.
 	 * @memberof UmbInteractionMemoryManager
 	 */
-	deleteMemory(unique: string) {
+	deleteMemory(unique: string): void {
 		this.#memories.removeOne(unique);
+	}
+
+	/**
+	 * Replace all memory items with the given list: items no longer present are removed, the rest are
+	 * added or updated. The underlying state only notifies observers when the content actually
+	 * changes, so this emits at most once regardless of how many items differ.
+	 * @param {Array<UmbInteractionMemoryModel>} memories - The authoritative list of memory items to hold.
+	 * @memberof UmbInteractionMemoryManager
+	 */
+	setMemories(memories: Array<UmbInteractionMemoryModel>): void {
+		this.#memories.setValue(memories);
 	}
 
 	/**
@@ -65,7 +76,7 @@ export class UmbInteractionMemoryManager extends UmbControllerBase {
 	 * Clear all memory items from the manager.
 	 * @memberof UmbInteractionMemoryManager
 	 */
-	clear() {
+	clear(): void {
 		this.#memories.clear();
 	}
 }

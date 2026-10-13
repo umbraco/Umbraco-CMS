@@ -98,7 +98,7 @@ export class UmbSplitPanelElement extends UmbLitElement {
 
 		// Update ARIA value for divider
 		const formatted = percentagePos.toFixed(0);
-		const ariaText = this.localize?.term('general_dividerPosition', [formatted]) ?? `Divider at ${formatted}%`;
+		const ariaText = this.localize?.term('general_dividerPosition', formatted) ?? `Divider at ${formatted}%`;
 
 		this.dividerTouchAreaElement.setAttribute('aria-valuetext', ariaText);
 	}

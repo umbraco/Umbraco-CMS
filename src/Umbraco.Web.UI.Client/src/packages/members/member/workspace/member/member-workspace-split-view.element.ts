@@ -28,9 +28,13 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 			this._workspaceContext = context;
 			this.#observeActiveVariantInfo();
 			this.#observeIcon();
-			this.observe(this._workspaceContext?.kind, (kind) => {
-				this._isExternalOnly = kind === UmbMemberKind.EXTERNAL_ONLY;
-			}, '_observeKind');
+			this.observe(
+				this._workspaceContext?.kind,
+				(kind) => {
+					this._isExternalOnly = kind === UmbMemberKind.EXTERNAL_ONLY;
+				},
+				'_observeKind',
+			);
 		});
 	}
 
@@ -70,7 +74,9 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 						)}
 					</div>
 
-					${this._isExternalOnly ? nothing : html`<umb-workspace-footer alias="Umb.Workspace.Member"></umb-workspace-footer>`}`
+					${this._isExternalOnly
+						? nothing
+						: html`<umb-workspace-footer alias="Umb.Workspace.Member"></umb-workspace-footer>`}`
 			: nothing;
 	}
 

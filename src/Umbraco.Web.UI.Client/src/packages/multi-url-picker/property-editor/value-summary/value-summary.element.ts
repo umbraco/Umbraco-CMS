@@ -1,6 +1,6 @@
+import type { UmbLinkPickerLink } from '../../link-picker-modal/index.js';
 import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
-import type { UmbLinkPickerLink } from '../../link-picker-modal/index.js';
 
 @customElement('umb-multi-url-picker-property-editor-value-summary')
 export class UmbMultiUrlPickerPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<

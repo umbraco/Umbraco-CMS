@@ -41,8 +41,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Template.ProductionMode',
 		name: 'Template Production Mode',
-		api: () =>
-			import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
+		api: () => import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
 		element: () =>
 			import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
 		weight: 60,

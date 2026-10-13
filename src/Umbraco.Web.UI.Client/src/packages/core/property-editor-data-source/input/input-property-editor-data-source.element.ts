@@ -142,18 +142,10 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlWithB
 			() => !!this.max && this.#pickerInputContext.getSelection().length > this.max,
 		);
 
-		this.observe(
-			this.#pickerInputContext.selection,
-			(selection) => (this.value = selection.join(',')),
-			'_observeSelection',
-		);
-		this.observe(
-			this.#pickerInputContext.selectedItems,
-			(selectedItems) => (this._items = selectedItems),
-			'_observerItems',
-		);
+		this.observe(this.#pickerInputContext.selection, (selection) => (this.value = selection.join(',')), null);
+		this.observe(this.#pickerInputContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
 
-		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), '_observerStatuses');
+		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), null);
 	}
 
 	protected override getFormElement() {

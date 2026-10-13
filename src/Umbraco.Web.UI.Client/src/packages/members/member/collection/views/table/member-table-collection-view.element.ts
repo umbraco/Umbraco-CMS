@@ -1,4 +1,4 @@
-import type { UmbMemberCollectionModel } from '../../types.js';
+import type { UmbMemberCollectionFilterModel, UmbMemberCollectionModel } from '../../types.js';
 import { UMB_MEMBER_COLLECTION_CONTEXT } from '../../member-collection.context-token.js';
 import type { UmbMemberCollectionContext } from '../../member-collection.context.js';
 import { UmbMemberKind } from '../../../utils/index.js';
@@ -102,6 +102,18 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 	#observeCollectionItems() {
 		if (!this.#collectionContext) return;
 		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
+
+		this.observe(
+			this.#collectionContext.filter,
+			(filter) => {
+				const { orderBy, orderDirection } = filter as UmbMemberCollectionFilterModel;
+				const column = Object.entries(this.#columnAliasToOrderBy).find(([, alias]) => alias === orderBy)?.[0];
+				if (!column) return;
+				this._orderingColumn = column;
+				this._orderingDesc = orderDirection === UmbDirection.DESCENDING;
+			},
+			'umbCollectionOrderingObserver',
+		);
 	}
 
 	async #createTableItems(members: Array<UmbMemberCollectionModel>) {

@@ -62,18 +62,18 @@ class UmbBindToValidationDirective extends AsyncDirective {
  * A Lit directive, which binds the validation state of the element to the Validation Context.
  *
  * The minimal binding can be established by just providing a host element:
- * @example:
+ * @example
  * ```js
  * html`<input ${umbBindToValidation(this)}>`;
  * ```
  * But can be extended with a dataPath, which is the path to the data holding the value. (if no server validation in this context, then this can be fictive and is then just used internal for remembering the validation state despite the element begin removed from the DOM.)
- * @example:
+ * @example
  * ```js
  * html`<input ${umbBindToValidation(this, '$.headline')}>`;
  * ```
  *
  * Additional the value can be provided, which is then used to remove a server validation state, if the value is changed.
- * @example:
+ * @example
  * ```js
  * html`<input ${umbBindToValidation(this, '$.headline', this.headlineValue)}>`;
  * ```

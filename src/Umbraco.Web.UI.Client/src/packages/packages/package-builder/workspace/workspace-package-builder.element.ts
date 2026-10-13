@@ -263,9 +263,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		return html`
 			<umb-property-layout label="Elements">
 				<div slot="editor">
-					<umb-input-element
-						.selection=${this._package.elementIds ?? []}
-						@change=${this.#onElementChange}>
+					<umb-input-element .selection=${this._package.elementIds ?? []} @change=${this.#onElementChange}>
 					</umb-input-element>
 				</div>
 			</umb-property-layout>

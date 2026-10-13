@@ -1547,6 +1547,18 @@ public class ContentNavigationServiceBaseTests
 
         // Assert
         Assert.IsFalse(result);
+
+        // The rejected key keeps the place it already had. No parent was passed above, so the add asked
+        // for the node at root level, yet the roots set is left as it was and the node stays under Root.
+        _navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+        var nodeExists = _navigationService.TryGetParentKey(Child1, out Guid? existingParentKey);
+
+        Assert.Multiple(() =>
+        {
+            CollectionAssert.AreEquivalent(new[] { Root }, rootKeys);
+            Assert.IsTrue(nodeExists);
+            Assert.AreEqual(Root, existingParentKey);
+        });
     }
 
     [Test]
@@ -1622,10 +1634,11 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    public void Cannot_Move_Node_When_Target_Parent_Does_Not_Exist()
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
+    public void Cannot_Move_Node_When_Target_Parent_Does_Not_Exist(Guid nodeToMove)
     {
         // Arrange
-        Guid nodeToMove = Child1;
         var nonExistentTargetParentKey = Guid.NewGuid();
 
         // Act
@@ -1633,6 +1646,11 @@ public class ContentNavigationServiceBaseTests
 
         // Assert
         Assert.IsFalse(result);
+
+        // A node that fails to move keeps the place it already had, so a root asked to move under a
+        // parent that turns out not to exist is still a root afterwards.
+        _navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+        CollectionAssert.AreEquivalent(new[] { Root }, rootKeys);
     }
 
     [Test]
@@ -2090,6 +2108,121 @@ public class ContentNavigationServiceBaseTests
         }
 
         Assert.IsEmpty(resolvedAliases, "Aliases were resolved through the content type service again, so not every concurrent write reached the alias map.");
+    }
+
+    [Test]
+    public async Task Concurrent_Root_Mutations_Do_Not_Corrupt_The_Roots_Set()
+    {
+        // Arrange
+        // Content operations write the roots sets from live request threads: trashing a root removes it
+        // from the main set and adds it to the bin's, emptying the bin removes it from the bin's, and
+        // moving a node to root adds it to the main set. Run in parallel, every one of those operations
+        // succeeds and every write lands, leaving the roots sets holding exactly the nodes that are
+        // roots. See #23577.
+        const int KeysPerThread = 256;
+        const int ThreadCount = 8;
+
+        var navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            Mock.Of<IContentTypeService>());
+
+        var contentTypeKey = Guid.NewGuid();
+
+        // Two disjoint workloads, so the roots sets are the only state shared between threads and the
+        // assertions speak only to them: one set of keys starts at root and is trashed then permanently
+        // deleted, the other starts under a parent and is promoted to root.
+        var keysToTrash = new Guid[ThreadCount][];
+        var keysToPromote = new Guid[ThreadCount][];
+        var untouchedRootKeys = new List<Guid>(ThreadCount * KeysPerThread);
+        for (var thread = 0; thread < ThreadCount; thread++)
+        {
+            keysToTrash[thread] = new Guid[KeysPerThread];
+            keysToPromote[thread] = new Guid[KeysPerThread];
+            for (var i = 0; i < KeysPerThread; i++)
+            {
+                var keyToTrash = Guid.NewGuid();
+                navigationService.Add(keyToTrash, contentTypeKey);
+                keysToTrash[thread][i] = keyToTrash;
+
+                // Each promoted key gets a parent of its own, so Move never mutates a NavigationNode
+                // shared with another thread and the roots set stays the only contended collection.
+                var parentKey = Guid.NewGuid();
+                navigationService.Add(parentKey, contentTypeKey);
+                untouchedRootKeys.Add(parentKey);
+
+                var keyToPromote = Guid.NewGuid();
+                navigationService.Add(keyToPromote, contentTypeKey, parentKey);
+                keysToPromote[thread][i] = keyToPromote;
+            }
+        }
+
+        var exceptions = new ConcurrentQueue<Exception>();
+        var failedOperations = new ConcurrentQueue<string>();
+
+        // All workers start together to maximise overlap on the roots sets, on dedicated threads so
+        // releasing the gate never waits on thread pool growth.
+        var startGate = new Barrier(ThreadCount);
+
+        // Act
+        Task workers = Task.WhenAll(Enumerable.Range(0, ThreadCount).Select(thread => Task.Factory.StartNew(
+            () =>
+            {
+                startGate.SignalAndWait();
+                for (var i = 0; i < KeysPerThread; i++)
+                {
+                    try
+                    {
+                        Guid keyToTrash = keysToTrash[thread][i];
+                        if (navigationService.MoveToBin(keyToTrash) is false)
+                        {
+                            failedOperations.Enqueue($"MoveToBin('{keyToTrash}')");
+                        }
+
+                        if (navigationService.RemoveFromBin(keyToTrash) is false)
+                        {
+                            failedOperations.Enqueue($"RemoveFromBin('{keyToTrash}')");
+                        }
+
+                        Guid keyToPromote = keysToPromote[thread][i];
+                        if (navigationService.Move(keyToPromote) is false)
+                        {
+                            failedOperations.Enqueue($"Move('{keyToPromote}')");
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        exceptions.Enqueue(exception);
+                    }
+                }
+            },
+            TaskCreationOptions.LongRunning)));
+
+        // Finishing inside this window is part of what is asserted, not just a guard against slowness:
+        // the writers are expected to keep making progress throughout, never to stall on each other.
+        Task completed = await Task.WhenAny(workers, Task.Delay(TimeSpan.FromSeconds(30)));
+
+        // Assert
+        // The gate is disposed once the workers are done rather than with `using`, so that it stays
+        // valid for as long as a worker could still be waiting on it.
+        Assert.Multiple(() =>
+        {
+            Assert.AreSame(workers, completed, "Concurrent root mutations did not finish; the roots set has likely livelocked.");
+            Assert.IsEmpty(exceptions, $"Concurrent root mutations threw: {exceptions.FirstOrDefault()}");
+            Assert.IsEmpty(failedOperations, $"Navigation operations reported failure: {failedOperations.FirstOrDefault()}");
+        });
+
+        // Surfaces any worker fault raised outside the per-iteration try (e.g. from the start gate).
+        await workers;
+        startGate.Dispose();
+
+        // The roots set now holds every promoted key, alongside the parents they were promoted away
+        // from, and none of the trashed keys — so each concurrent add and remove is accounted for,
+        // which holds whether or not any thread threw.
+        Assert.IsTrue(navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys));
+
+        Guid[] expectedRootKeys = [.. untouchedRootKeys, .. keysToPromote.SelectMany(keys => keys)];
+        CollectionAssert.AreEquivalent(expectedRootKeys, rootKeys, "The roots set does not hold exactly the expected roots, so a concurrent write was lost.");
     }
 
     private void CreateTestData()

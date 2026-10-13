@@ -10,19 +10,17 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffice/content-type';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Document Type Composition that fetches data from the server
  * @class UmbDocumentTypeCompositionServerDataSource
  */
-export class UmbDocumentTypeCompositionServerDataSource
-	implements
-		UmbContentTypeCompositionDataSource<
-			UmbDocumentTypeCompositionReferenceModel,
-			UmbDocumentTypeCompositionCompatibleModel,
-			UmbDocumentTypeAvailableCompositionRequestModel
-		>
-{
+export class UmbDocumentTypeCompositionServerDataSource implements UmbContentTypeCompositionDataSource<
+	UmbDocumentTypeCompositionReferenceModel,
+	UmbDocumentTypeCompositionCompatibleModel,
+	UmbDocumentTypeAvailableCompositionRequestModel
+> {
 	#host: UmbControllerHost;
 
 	/**
@@ -35,11 +33,11 @@ export class UmbDocumentTypeCompositionServerDataSource
 	}
 	/**
 	 * Fetches the compatible compositions for a document type from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the document type.
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbDocumentTypeCompositionReferenceModel>>>} The compositions referencing the document type.
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
-	async getReferences(unique: string) {
+	async getReferences(unique: string): Promise<UmbDataSourceResponse<Array<UmbDocumentTypeCompositionReferenceModel>>> {
 		const response = await tryExecute(
 			this.#host,
 			DocumentTypeService.getDocumentTypeByIdCompositionReferences({ path: { id: unique } }),
@@ -57,12 +55,13 @@ export class UmbDocumentTypeCompositionServerDataSource
 	}
 	/**
 	 * Updates the compositions for a document type on the server
-	 * @param {DocumentTypeCompositionRequestModel} body
-	 * @param args
-	 * @returns {*}
+	 * @param {UmbDocumentTypeAvailableCompositionRequestModel} args - The arguments to determine the available compositions.
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbDocumentTypeCompositionCompatibleModel>>>} The compatible compositions for the document type.
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
-	async availableCompositions(args: UmbDocumentTypeAvailableCompositionRequestModel) {
+	async availableCompositions(
+		args: UmbDocumentTypeAvailableCompositionRequestModel,
+	): Promise<UmbDataSourceResponse<Array<UmbDocumentTypeCompositionCompatibleModel>>> {
 		const body: DocumentTypeCompositionRequestModel = {
 			id: args.unique,
 			isElement: args.isElement,

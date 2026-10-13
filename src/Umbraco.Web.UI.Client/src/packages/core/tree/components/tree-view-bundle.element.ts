@@ -63,7 +63,7 @@ export class UmbTreeViewBundleElement extends UmbLitElement {
 		if (this._views.length <= 1) return nothing;
 
 		return html`
-			<uui-button compact popovertarget="tree-view-bundle-popover" label=${this.localize.term('general_switchView')}>
+			<uui-button compact popovertarget="tree-view-bundle-popover" label=${this.localize.term('general_changeView')}>
 				<umb-icon name=${this._currentView.meta.icon}></umb-icon>
 			</uui-button>
 			<uui-popover-container id="tree-view-bundle-popover" placement="bottom-end">

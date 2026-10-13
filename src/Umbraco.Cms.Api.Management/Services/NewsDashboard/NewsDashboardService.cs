@@ -25,12 +25,19 @@ public class NewsDashboardService : INewsDashboardService
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly GlobalSettings _globalSettings;
     private readonly INewsCacheDurationProvider _newsCacheDurationProvider;
-
-    private static readonly HttpClient _httpClient = new();
+    private readonly IHttpClientFactory _httpClientFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NewsDashboardService"/> class.
     /// </summary>
+    /// <param name="appCaches">Provides access to application-level caching mechanisms.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="siteIdentifierService">Service used to retrieve or manage the unique site identifier.</param>
+    /// <param name="logger">The logger used for logging diagnostic and operational information.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and operations.</param>
+    /// <param name="globalSettings">The global settings configuration options for the application.</param>
+    /// <param name="newsCacheDurationProvider">Provides the duration for which news content is cached.</param>
+    /// <param name="httpClientFactory">The factory used to create the client requesting the news content.</param>
     public NewsDashboardService(
         AppCaches appCaches,
         IUmbracoVersion umbracoVersion,
@@ -38,7 +45,8 @@ public class NewsDashboardService : INewsDashboardService
         ILogger<NewsDashboardService> logger,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IOptions<GlobalSettings> globalSettings,
-        INewsCacheDurationProvider newsCacheDurationProvider)
+        INewsCacheDurationProvider newsCacheDurationProvider,
+        IHttpClientFactory httpClientFactory)
     {
         _appCaches = appCaches;
         _umbracoVersion = umbracoVersion;
@@ -47,6 +55,7 @@ public class NewsDashboardService : INewsDashboardService
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _globalSettings = globalSettings.Value;
         _newsCacheDurationProvider = newsCacheDurationProvider;
+        _httpClientFactory = httpClientFactory;
     }
 
     /// <summary>
@@ -58,7 +67,38 @@ public class NewsDashboardService : INewsDashboardService
     /// <param name="logger">The logger used for logging diagnostic and operational information.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and operations.</param>
     /// <param name="globalSettings">The global settings configuration options for the application.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19")]
+    /// <param name="newsCacheDurationProvider">Provides the duration for which news content is cached.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public NewsDashboardService(
+        AppCaches appCaches,
+        IUmbracoVersion umbracoVersion,
+        ISiteIdentifierService siteIdentifierService,
+        ILogger<NewsDashboardService> logger,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IOptions<GlobalSettings> globalSettings,
+        INewsCacheDurationProvider newsCacheDurationProvider)
+        : this(
+            appCaches,
+            umbracoVersion,
+            siteIdentifierService,
+            logger,
+            backOfficeSecurityAccessor,
+            globalSettings,
+            newsCacheDurationProvider,
+            StaticServiceProvider.Instance.GetRequiredService<IHttpClientFactory>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NewsDashboardService"/> class.
+    /// </summary>
+    /// <param name="appCaches">Provides access to application-level caching mechanisms.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="siteIdentifierService">Service used to retrieve or manage the unique site identifier.</param>
+    /// <param name="logger">The logger used for logging diagnostic and operational information.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and operations.</param>
+    /// <param name="globalSettings">The global settings configuration options for the application.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public NewsDashboardService(
         AppCaches appCaches,
         IUmbracoVersion umbracoVersion,
@@ -66,14 +106,16 @@ public class NewsDashboardService : INewsDashboardService
         ILogger<NewsDashboardService> logger,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IOptions<GlobalSettings> globalSettings)
+#pragma warning disable CS0618 // Type or member is obsolete
         : this(
-        appCaches,
-        umbracoVersion,
-        siteIdentifierService,
-        logger,
-        backOfficeSecurityAccessor,
-        globalSettings,
-        StaticServiceProvider.Instance.GetRequiredService<INewsCacheDurationProvider>())
+            appCaches,
+            umbracoVersion,
+            siteIdentifierService,
+            logger,
+            backOfficeSecurityAccessor,
+            globalSettings,
+            StaticServiceProvider.Instance.GetRequiredService<INewsCacheDurationProvider>())
+#pragma warning restore CS0618 // Type or member is obsolete
     {
     }
 
@@ -99,7 +141,8 @@ public class NewsDashboardService : INewsDashboardService
 
         try
         {
-            var json = await _httpClient.GetStringAsync(url);
+            HttpClient httpClient = _httpClientFactory.CreateClient(Constants.HttpClients.News);
+            var json = await httpClient.GetStringAsync(url);
 
             if (TryMapModel(json, out NewsDashboardResponseModel? model))
             {

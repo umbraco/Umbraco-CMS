@@ -5,8 +5,7 @@ export interface UmbWorkspaceInfoAppElement extends HTMLElement {
 }
 
 export interface ManifestWorkspaceInfoApp<MetaType extends MetaWorkspaceInfoApp = MetaWorkspaceInfoApp>
-	extends ManifestElement<UmbWorkspaceInfoAppElement>,
-		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
+	extends ManifestElement<UmbWorkspaceInfoAppElement>, ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'workspaceInfoApp';
 	meta: MetaType;
 }

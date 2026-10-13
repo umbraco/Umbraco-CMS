@@ -40,6 +40,9 @@ public static class HtmlHelperRenderExtensions
         where T : notnull
         => viewContext.HttpContext.RequestServices.GetRequiredService<T>();
 
+    private static T? GetService<T>(IHtmlHelper htmlHelper)
+        => htmlHelper.ViewContext.HttpContext.RequestServices.GetService<T>();
+
     /// <summary>
     ///     Renders the markup for the profiler
     /// </summary>
@@ -88,7 +91,8 @@ public static class HtmlHelperRenderExtensions
                     contentSettings.PreviewBadge,
                     hostingEnvironment.GetBackOfficePath(),
                     WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
-                    umbracoContext.PublishedRequest?.PublishedContent?.Key);
+                    umbracoContext.PublishedRequest?.PublishedContent?.Key,
+                    GetService<ICspNonceService>(helper)?.GetNonceAttribute() ?? string.Empty);
             return new HtmlString(htmlBadge);
         }
 

@@ -141,7 +141,7 @@ internal interface IDatabaseCacheRepository
     IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType);
 
     /// <summary>
-    /// Rebuilds the caches for content, media, members and/or elements based on the content type ids specified.
+    /// Rebuilds the caches for content, media and/or elements based on the content type ids specified.
     /// </summary>
     /// <param name="contentTypeIds">
     ///     If not null will process content for the matching content types, if empty will process all
@@ -150,10 +150,6 @@ internal interface IDatabaseCacheRepository
     /// <param name="mediaTypeIds">
     ///     If not null will process content for the matching media types, if empty will process all
     ///     media.
-    /// </param>
-    /// <param name="memberTypeIds">
-    ///     If not null will process content for the matching members types, if empty will process all
-    ///     members.
     /// </param>
     /// <param name="elementTypeIds">
     ///     If not null will process content for the matching element types, if empty will process all
@@ -169,7 +165,6 @@ internal interface IDatabaseCacheRepository
     void Rebuild(
         IReadOnlyCollection<int>? contentTypeIds,
         IReadOnlyCollection<int>? mediaTypeIds,
-        IReadOnlyCollection<int>? memberTypeIds,
         IReadOnlyCollection<int>? elementTypeIds,
         Action<Action>? executeStep);
 

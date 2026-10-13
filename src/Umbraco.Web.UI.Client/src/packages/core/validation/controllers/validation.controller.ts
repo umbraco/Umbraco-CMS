@@ -80,7 +80,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 	/**
 	 * Add a path translator to this validation context.
-	 * @param translator
+	 * @param {UmbValidationMessageTranslator} translator - The translator to add.
 	 */
 	async addTranslator(translator: UmbValidationMessageTranslator) {
 		this.messages?.addTranslator(translator);
@@ -292,7 +292,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	/**
 	 * Get if this context is valid.
 	 * Notice this does not verify the validity.
-	 * @returns {boolean}
+	 * @returns {boolean} Whether this context is currently valid.
 	 */
 	get isValid(): boolean {
 		return this.#isValid;
@@ -302,7 +302,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * Add a validator to this context.
 	 * This validator will have to be valid for the context to be valid.
 	 * If the context is in validation mode, the validator will be validated immediately.
-	 * @param validator { UmbValidator } - The validator to add to this context.
+	 * @param {UmbValidator} validator - The validator to add to this context.
 	 */
 	addValidator(validator: UmbValidator): void {
 		if (this.#validators.includes(validator)) return;
@@ -318,7 +318,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 	/**
 	 * Remove a validator from this context.
-	 * @param validator {UmbValidator} - The validator to remove from this context.
+	 * @param {UmbValidator} validator - The validator to remove from this context.
 	 */
 	removeValidator(validator: UmbValidator): void {
 		const index = this.#validators.indexOf(validator);
@@ -335,7 +335,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	/**
 	 * Validate this context, all the validators of this context will be validated.
 	 * Notice its a recursive check meaning sub validation contexts also validates their validators.
-	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validation succeeded.
+	 * @returns {Promise<void>} A promise that resolves once validation completes.
 	 */
 	async validate(): Promise<void> {
 		this.#validationMode = true;

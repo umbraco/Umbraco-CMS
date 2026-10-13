@@ -11,7 +11,6 @@ export interface UmbMenuStructureWorkspaceContext extends UmbContext {
 	/**
 	 * Returns the href for a breadcrumb structure item, or `undefined` if the item should not be a link.
 	 * Used by the workspace breadcrumb element to generate clickable navigation links.
-	 *
 	 * @param structureItem The structure item to generate an href for.
 	 * @returns The href string, or `undefined` if the item should not be clickable.
 	 */

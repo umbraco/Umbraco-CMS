@@ -42,12 +42,20 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 				workspaceContext?.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
 			);
 		});
-		this.observe(this.#groupStructureHelper.childContainers, (groups) => {
-			this._groups = groups;
-		});
-		this.observe(this.#groupStructureHelper.hasProperties, (hasProperties) => {
-			this._hasProperties = hasProperties;
-		});
+		this.observe(
+			this.#groupStructureHelper.childContainers,
+			(groups) => {
+				this._groups = groups;
+			},
+			null,
+		);
+		this.observe(
+			this.#groupStructureHelper.hasProperties,
+			(hasProperties) => {
+				this._hasProperties = hasProperties;
+			},
+			null,
+		);
 	}
 
 	override render() {

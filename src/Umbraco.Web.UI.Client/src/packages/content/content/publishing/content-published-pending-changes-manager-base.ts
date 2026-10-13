@@ -1,8 +1,8 @@
 import type { UmbContentDetailModel } from '../types.js';
+import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbPublishedVariantWithPendingChanges } from './types.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import { jsonStringComparison, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
@@ -69,7 +69,7 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 
 	/**
 	 * Gets the variants with changes.
-	 * @returns {Array<UmbPublishedVariantWithPendingChanges>}
+	 * @returns {Array<UmbPublishedVariantWithPendingChanges>} The variants with pending changes.
 	 */
 	getVariantsWithChanges(): Array<UmbPublishedVariantWithPendingChanges> {
 		return this.#variantsWithChanges.getValue();
@@ -78,10 +78,12 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 	/**
 	 * Hook to clean data before comparison. Override to remove properties
 	 * that should not affect the pending-changes calculation.
+	 * @template {UmbEntityVariantModel} TVariantModel
+	 * @template {UmbContentDetailModel<TVariantModel>} TDetailModel
 	 * @param {TDetailModel} _mergedData - The merged data clone.
 	 * @param {TDetailModel} _publishedData - The published data clone.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	protected cleanDataBeforeComparison(_mergedData: TDetailModel, _publishedData: TDetailModel): void {
 		// No-op by default. Subclasses can override.
 	}

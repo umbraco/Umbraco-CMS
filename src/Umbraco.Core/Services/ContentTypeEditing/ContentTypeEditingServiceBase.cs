@@ -271,6 +271,13 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return operationStatus;
         }
 
+        // verify that no newly introduced property/composition alias collides with a property already effective on a descendant
+        operationStatus = ValidateDescendantPropertyAliases(contentType, model, allContentTypeCompositions);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return operationStatus;
+        }
+
         // verify that all property/container relationships (groups/tabs) are valid
         operationStatus = ValidateContainers(model, allContentTypeCompositions);
         if (operationStatus is not ContentTypeOperationStatus.Success)
@@ -279,7 +286,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
 
         // element types cannot vary by segment
-        if (model.IsElement && model.VariesBySegment)
+        if (model is { IsElement: true, VariesBySegment: true })
         {
             return ContentTypeOperationStatus.InvalidSegmentVariationForElementType;
         }
@@ -432,33 +439,25 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     /// <param name="model">The model to validate.</param>
     /// <param name="allContentTypeCompositions">All existing content type compositions.</param>
     /// <returns>The validation status.</returns>
-    private ContentTypeOperationStatus ValidateCompositions(TContentType? contentType, ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
+    private ContentTypeOperationStatus ValidateCompositions(
+        TContentType? contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
+        IContentTypeComposition[] allContentTypeCompositions)
     {
-        // get the content type keys we want to use for compositions
         Guid[] compositionKeys = KeysForCompositionTypes(model, CompositionType.Composition);
 
-        // if the content type keys are already set as compositions, don't perform any additional validation
-        // - this covers an edge case where compositions are configured for a content type before child content types are created
-        if (contentType is not null && contentType.ContentTypeComposition
-            .Select(c => c.Key)
-            .ContainsAll(compositionKeys))
-        {
-            return ContentTypeOperationStatus.Success;
-        }
-
-        // verify that all compositions keys are allowed
-        Guid[] allowedCompositionKeys = _contentTypeService.GetAvailableCompositeContentTypes(contentType, allContentTypeCompositions, isElement: model.IsElement)
+        Guid[] allowedCompositionKeys = _contentTypeService.GetAvailableCompositeContentTypes(
+                contentType,
+                allContentTypeCompositions,
+                isElement: model.IsElement)
             .Results
             .Where(x => x.Allowed)
             .Select(x => x.Composition.Key)
             .ToArray();
 
-        if (allowedCompositionKeys.ContainsAll(compositionKeys) is false)
-        {
-            return ContentTypeOperationStatus.InvalidComposition;
-        }
-
-        return ContentTypeOperationStatus.Success;
+        return allowedCompositionKeys.ContainsAll(compositionKeys) is false
+            ? ContentTypeOperationStatus.InvalidComposition
+            : ContentTypeOperationStatus.Success;
     }
 
     /// <summary>
@@ -484,6 +483,31 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
 
         return ContentTypeOperationStatus.Success;
+    }
+
+    /// <summary>
+    ///     Validates that no property alias on this content type's own properties collides with a property alias
+    ///     already effective on one of its descendants.
+    /// </summary>
+    /// <remarks>
+    ///     Descendants inherit this content type's properties (through tree inheritance and/or composition), so an
+    ///     alias that a descendant already defines would produce a duplicate effective alias on that descendant.
+    ///     <see cref="ValidateProperties"/> only guards the edited type's own model, so this handles the case where
+    ///     the edited type is itself inherited from or composed by others. Collisions caused by a newly selected
+    ///     composition are caught separately by <see cref="ValidateCompositions"/>.
+    /// </remarks>
+    private static ContentTypeOperationStatus ValidateDescendantPropertyAliases(
+        TContentType? contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
+        IContentTypeComposition[] allContentTypeCompositions)
+    {
+        HashSet<string> descendantPropertyAliases = contentType.GetPropertyAliasesReservedByDescendants(allContentTypeCompositions);
+
+        var collidesWithDescendants = model.Properties.Select(p => p.Alias).Any(descendantPropertyAliases.InvariantContains);
+
+        return collidesWithDescendants
+            ? ContentTypeOperationStatus.DuplicatePropertyTypeAlias
+            : ContentTypeOperationStatus.Success;
     }
 
     /// <summary>

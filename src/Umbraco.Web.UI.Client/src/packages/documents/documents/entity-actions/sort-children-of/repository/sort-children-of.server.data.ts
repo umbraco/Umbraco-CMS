@@ -6,7 +6,7 @@ import type { UmbSortChildrenOfArgs, UmbSortChildrenOfDataSource } from '@umbrac
 /**
  * A server data source for sorting children of a Document
  * @class UmbSortChildrenOfDocumentServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbSortChildrenOfDataSource}
  */
 export class UmbSortChildrenOfDocumentServerDataSource implements UmbSortChildrenOfDataSource {
 	#host: UmbControllerHost;
@@ -22,7 +22,7 @@ export class UmbSortChildrenOfDocumentServerDataSource implements UmbSortChildre
 
 	/**
 	 * Creates the Public Access for the given Document unique
-	 * @param {UmbSortChildrenOfArgs} args
+	 * @param {UmbSortChildrenOfArgs} args - The sort request arguments
 	 * @memberof UmbSortChildrenOfDocumentServerDataSource
 	 */
 	async sortChildrenOf(args: UmbSortChildrenOfArgs) {
