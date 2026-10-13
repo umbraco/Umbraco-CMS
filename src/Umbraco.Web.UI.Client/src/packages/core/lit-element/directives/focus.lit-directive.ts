@@ -4,10 +4,10 @@ import { AsyncDirective, directive, nothing, type ElementPart } from '@umbraco-c
  * test if a element has focus
  * this also returns true if the focused element is a child of the target.
  * @param {Element | null} current - The element to check, starting point of the recursive search
- * @param {HTMLElement} target - The element to test for focus
+ * @param {Element} target - The element to test for focus
  * @returns {boolean} bool
  */
-function hasFocus(current: any, target: HTMLElement): boolean {
+function hasFocus(current: any, target: Element): boolean {
 	if (current === target) {
 		return true;
 	}
