@@ -115,6 +115,35 @@ public class DocumentPublishStatusServiceAncestorPathTests
     }
 
     [Test]
+    public void Deep_Ancestor_Chain_Is_Walked_Without_Recursion()
+    {
+        // A recursive ancestor walk blows the stack well before this depth.
+        const int Depth = 50_000;
+
+        DocumentNavigationService nav = NewNavigationService();
+        var contentType = Guid.NewGuid();
+        var publish = new Dictionary<Guid, ISet<string>>();
+        var chain = new List<Guid>(Depth);
+
+        Guid? parent = null;
+        for (var i = 0; i < Depth; i++)
+        {
+            Guid key = Add(nav, contentType, parent);
+            publish[key] = Set("en-US");
+            chain.Add(key);
+            parent = key;
+        }
+
+        DocumentPublishStatusService svc = SeededService(nav, publish);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(svc.HasPublishedAncestorPath(chain[^1], "en-US"), "single-key: the deepest node has a fully published ancestor path");
+            Assert.AreEqual(Depth, svc.WhereAncestorPathPublished(chain, "en-US").Count(), "batch: every node in the chain has a fully published ancestor path");
+        });
+    }
+
+    [Test]
     public void Dangling_Ancestor_Excludes_The_Node()
     {
         var child = Guid.NewGuid();
