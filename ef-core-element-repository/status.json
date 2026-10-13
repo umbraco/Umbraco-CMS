@@ -2,7 +2,7 @@
   "campaign": "Element repository and service from NPoco to EF Core",
   "targetBranch": "v18/feature/ef-core-repositories",
   "planFile": ".claude/campaign/ef-core-element-repository/CAMPAIGN.md",
-  "updated": "12-10-2026",
+  "updated": "13-10-2026",
   "artifact": {
     "url": "https://claude.ai/artifact/Q5Bttu57VfLyS1ajt7nKtU",
     "title": "Element Repository Campaign"
@@ -291,6 +291,10 @@
     }
   ],
   "log": [
+    {
+      "date": "13-10-2026",
+      "text": "Office machine synced with the home session: campaign branches merged, memory pulled, local repo branches fast-forwarded. CI on #24134: build and unit/integration pass; Search Integration Tests (SQLite, Linux and macOS), CodeScene and SonarCloud fail, not yet investigated. #24175 (draft): CodeScene and SonarCloud fail."
+    },
     {
       "date": "12-10-2026",
       "text": "PR 2 opened as draft #24175 against v18/feature/ef-core-repositories (stacked on PR 1's branch)."
