@@ -3,6 +3,7 @@ import { UMB_LINK_PICKER_LINK_REF_ATTRIBUTE } from './constants.js';
 import type { UmbLinkPickerLinkRefLookup } from './types.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * Renders a picked link as a reference node.
@@ -209,6 +210,42 @@ export class UmbLinkPickerLinkRefElement extends UmbLitElement {
 			:host {
 				display: block;
 				position: relative;
+			}
+
+			:host::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				pointer-events: none;
+				inset: 0;
+				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
+
+				transition: border-color 240ms ease-in;
+			}
+
+			:host([drag-placeholder]) {
+				--uui-color-focus: transparent;
+			}
+
+			:host([drag-placeholder])::after {
+				display: block;
+				border-width: 2px;
+				border-color: var(--uui-color-interactive-emphasis);
+				animation: ${UUIBlinkAnimationValue};
+			}
+			:host([drag-placeholder])::before {
+				content: '';
+				position: absolute;
+				pointer-events: none;
+				inset: 0;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-interactive-emphasis);
+				opacity: 0.12;
+			}
+			:host([drag-placeholder]) > * {
+				transition: opacity 50ms 16ms;
+				opacity: 0;
 			}
 		`,
 	];
