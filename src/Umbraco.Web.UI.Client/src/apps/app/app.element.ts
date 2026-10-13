@@ -363,7 +363,10 @@ export class UmbAppElement extends UmbLitElement {
 		const currentUser = this.#currentUser;
 		currentUser.load().catch((error) => {
 			// Once a user has loaded, the backoffice may hold unsaved work, so only replace a shell without a user.
-			if (currentUser.getUnique()) return;
+			if (currentUser.getUnique()) {
+				console.error('[UmbAppElement] Failed to reload the current user', error);
+				return;
+			}
 			this.#errorPage(
 				'The current user could not be loaded. This might be due to a network issue or a server error.',
 				error,
