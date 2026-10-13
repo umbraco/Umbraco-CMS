@@ -292,6 +292,10 @@ describe('UmbUserEntryPointExtensionInitializer', () => {
 		authContext.setAuthorized(true);
 		await aTimeout(300);
 		expect(calls.init).to.equal(1);
+
+		authContext.setAuthorized(false);
+		await aTimeout(50);
+		expect(calls.unload).to.equal(1);
 	});
 
 	it('does not run onUnload on host destroy (the hook is session-scoped, not host-scoped)', async () => {
