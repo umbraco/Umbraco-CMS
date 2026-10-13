@@ -363,7 +363,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
         }
 
         // Batched to stay within SQL Server's 2100-parameter limit.
-        // allVersionIds can reach 2× the entity count (current + published version per entity).
+        // versionIds can reach 2× the entity count (current + published version per entity).
         var allPropertyData = new List<PropertyDataDto>();
         foreach (IEnumerable<int> batch in versionIds.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
