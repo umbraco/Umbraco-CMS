@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Notifications;
@@ -10,7 +8,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
@@ -23,10 +20,6 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
             .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>();
     }
-
-    public static void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
-        => builder.Services.Configure<ContentSettings>(config =>
-            config.AllowEditInvariantFromNonDefault = true);
 
     [Test]
     public async Task Can_Handle_Reusable_Element()
@@ -713,9 +706,6 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     [TestCase(true, false)]
     [TestCase(false, true)]
     [TestCase(false, false)]
-    // allow edit invariant from non-default to ensure invariant element properties are published
-    // even if the default language variant for the element is not published
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Only_Outputs_Published_Variants_Of_Reusable_Elements(bool publishElementInEnglish, bool publishElementInDanish)
     {
         var elementCulturesToPublish = new List<string>();

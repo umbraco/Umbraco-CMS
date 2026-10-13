@@ -276,14 +276,14 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 		const { options, selected } = await this.#determineVariantOptions();
 
-		// If there is only one variant, we don't need to open the modal.
+		// If there is only one variant and it may be published, we don't need to open the modal.
 		if (options.length === 0) {
 			throw new Error('No variants are available');
-		} else if (options.length === 1) {
+		} else if (options.length === 1 && this.#publishableVariantsFilter(options[0])) {
 			// If only one option we will skip ahead and save the element with the only variant available:
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
-			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
+			// Otherwise the modal lets the user pick which variants to publish, and shows the ones that may not be.
 			const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
@@ -408,11 +408,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 	}
 
 	#publishableVariantsFilter = (option: UmbElementVariantOptionModel) => {
-		const variantId = UmbVariantId.Create(option);
-		// If the read only guard is permitted it means the variant is read only
-		const isReadOnly = this.#elementWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(variantId);
-		// If the variant is read only, we can't publish it
-		return !isReadOnly;
+		return this.#elementWorkspaceContext!.getIsWritableVariant(UmbVariantId.Create(option));
 	};
 
 	async #determineVariantOptions(): Promise<{
@@ -430,10 +426,8 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		// Selected can contain entries that are not part of the options, therefor filter based on options.
 		selected = selected.filter((x) => options.some((o) => o.unique === x));
 
-		// Filter out read-only variants
-		selected = selected.filter(
-			(x) => this.#elementWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(new UmbVariantId(x)) === false,
-		);
+		// Filter out variants that cannot be written
+		selected = selected.filter((x) => this.#elementWorkspaceContext!.getIsWritableVariant(new UmbVariantId(x)));
 
 		return {
 			options,
