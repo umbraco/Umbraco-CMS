@@ -1206,6 +1206,29 @@ internal sealed class ServerEventSenderTests
     }
 
     [Test]
+    public async Task HandleAsync_EntityContainerNotifications_ForMixedContainerTypes_RoutesOnlyContainersWithAnEventSource()
+    {
+        // Arrange - a batch can hold notifications for several container types; each container is routed by its own type.
+        var elementContainer = new EntityContainer(Constants.ObjectTypes.Element) { Key = Guid.NewGuid() };
+        var documentTypeContainer = new EntityContainer(Constants.ObjectTypes.DocumentType) { Key = Guid.NewGuid() };
+        var messages = new EventMessages();
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(
+            [
+                new EntityContainerDeletedNotification(documentTypeContainer, messages),
+                new EntityContainerDeletedNotification(elementContainer, messages),
+            ],
+            CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, elementContainer.Key, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.ElementContainer);
+    }
+
+    [Test]
     public async Task HandleAsync_DataTypeDeletedNotification_RoutesDeletedEvent()
     {
         // Arrange
