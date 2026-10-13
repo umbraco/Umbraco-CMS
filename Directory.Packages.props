@@ -75,19 +75,8 @@
     <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="Serilog.Sinks.Map" Version="2.0.0" />
-    <!--
-      HOLD at 3.1.12 - do not bump. SixLabors.ImageSharp 3.2.0+ ships an MSBuild target
-      (SixLabors_ValidateLicense, BeforeTargets="CoreCompile") that fails a Release build
-      outright unless a SixLaborsLicenseKey/SixLaborsLicenseFile or a sixlabors.lic file is
-      present - there is no free/OSS exemption. 3.1.12 predates that target.
-    -->
-    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.12" />
-    <!--
-      HOLD at 3.2.0 - do not bump. SixLabors.ImageSharp.Web 3.3.0+ introduces the same
-      SixLabors_ValidateLicense build-time gate as SixLabors.ImageSharp 3.2.0+ above - it
-      fails Release builds without a purchased license. 3.2.0 predates that target.
-    -->
-    <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.2.0" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="3.2.0" />
+    <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.3.0" />
     <!-- When updating this version, also update templates/UmbracoExtension/Umbraco.Extension.csproj -->
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.3.0" />
   </ItemGroup>
