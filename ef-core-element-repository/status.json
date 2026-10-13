@@ -110,7 +110,7 @@
         }
       ],
       "acceptance": "DocumentRepositoryTest, DocumentBlueprintRepositoryTest, DocumentRepositoryUrlSegmentTests, ContentServiceTests and unit tests green with the same counts; no snapshot diff.",
-      "notes": "Implemented 12-10-2026; commits 4b93bb37671 (spike) and 8966625748b (hoist). Stacked on PR 1's branch, so the PR diff includes #24134 until it merges. DocumentRepository.cs 2530 -> 1374 lines; AsyncPublishableContentRepositoryBase 644 -> 1701; AsyncContentRepositoryBase 500 -> 710; new ContentJoinRow.cs/ContentRow.cs. Fixture counts unchanged against the baseline: DocumentRepositoryTest 189 (SQLite and SQL Server), DocumentBlueprintRepositoryTest 4 (both), ContentServiceTests 207, HybridCache document fixtures 128 + 1 skipped, unit project 7409 + 6 skipped. Snapshots untouched. Independent review: approve after fixes (content-type key resolution made kind-agnostic, cancellation threaded, db-first parameter order). Ordering-branch consolidation deferred (section 8)."
+      "notes": "Implemented 12-10-2026; commits 4b93bb37671 (spike) and 8966625748b (hoist). Stacked on PR 1's branch, so the PR diff includes #24134 until it merges. DocumentRepository.cs 2530 -> 1374 lines; AsyncPublishableContentRepositoryBase 644 -> 1701; AsyncContentRepositoryBase 500 -> 710; new ContentJoinRow.cs/ContentRow.cs. Fixture counts unchanged against the baseline: DocumentRepositoryTest 189 (SQLite and SQL Server), DocumentBlueprintRepositoryTest 4 (both), ContentServiceTests 207, HybridCache document fixtures 128 + 1 skipped, unit project 7409 + 6 skipped. Snapshots untouched. Independent review: approve after fixes (content-type key resolution made kind-agnostic, cancellation threaded, db-first parameter order). Ordering-branch consolidation deferred (section 8). 13-10-2026 second review (mechanical method-pair diff + independent reviewer): pure move confirmed, no behaviour change beyond cancellation now threading through assembly; added GetChildrenAsync_OrderedByPublished_SortsUnpublishedBeforePublished for the one untested ordering arm and fixed a stale comment."
     },
     {
       "id": "2b",
@@ -331,6 +331,10 @@
     }
   ],
   "log": [
+    {
+      "date": "13-10-2026",
+      "text": "PR 2 re-reviewed: pure move confirmed. Added the published-ordering test (proven red when the arm is broken) and a comment fix; pushed. Sonar duplication gate still fails on the deferred ordering-dispatch consolidation."
+    },
     {
       "date": "13-10-2026",
       "text": "PR 2b added between PR 2 and PR 3: build entities from ContentRow parts and remove the DTO-interface setters PR 2 introduced. Kept separate so PR 2 and PR 3 stay pure moves for review."
