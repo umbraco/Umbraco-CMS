@@ -22,6 +22,9 @@ class UmbTestUserGroupWorkspaceContext {
 	#languages = new UmbArrayState<string>([], (x) => x);
 	readonly languages = this.#languages.asObservable();
 
+	#hasAccessToInvariantForVariant = new UmbBooleanState(false);
+	readonly hasAccessToInvariantForVariant = this.#hasAccessToInvariantForVariant.asObservable();
+
 	#documentRootAccess = new UmbBooleanState(false);
 	readonly documentRootAccess = this.#documentRootAccess.asObservable();
 	#documentStartNode = new UmbObjectState<{ unique: string } | null>(null);
@@ -39,6 +42,7 @@ class UmbTestUserGroupWorkspaceContext {
 
 	readonly setSectionsCalls: Array<Array<string>> = [];
 	readonly setLanguageAccessCalls: Array<UmbStartNodeAccessValue> = [];
+	readonly setHasAccessToInvariantForVariantCalls: Array<boolean> = [];
 	readonly setDocumentAccessCalls: Array<UmbStartNodeAccessValue> = [];
 	readonly setMediaAccessCalls: Array<UmbStartNodeAccessValue> = [];
 	readonly setElementAccessCalls: Array<UmbStartNodeAccessValue> = [];
@@ -65,6 +69,10 @@ class UmbTestUserGroupWorkspaceContext {
 		this.#languages.setValue(value.startNodes.map((startNode) => startNode.unique));
 	}
 
+	setHasAccessToInvariantForVariantState(value: boolean) {
+		this.#hasAccessToInvariantForVariant.setValue(value);
+	}
+
 	setDocumentAccessState(value: UmbStartNodeAccessValue) {
 		this.#documentRootAccess.setValue(value.rootAccess);
 		this.#documentStartNode.setValue(value.startNodes[0] ? { unique: value.startNodes[0].unique } : null);
@@ -86,6 +94,10 @@ class UmbTestUserGroupWorkspaceContext {
 
 	setLanguageAccess(value: UmbStartNodeAccessValue) {
 		this.setLanguageAccessCalls.push(value);
+	}
+
+	setHasAccessToInvariantForVariant(value: boolean) {
+		this.setHasAccessToInvariantForVariantCalls.push(value);
 	}
 
 	setDocumentAccess(value: UmbStartNodeAccessValue) {
@@ -157,6 +169,13 @@ describe('UmbUserGroupWorkspaceAssignAccessElement', () => {
 			});
 		});
 
+		it('mirrors the invariant-for-variant access', async () => {
+			context.setHasAccessToInvariantForVariantState(true);
+			await aTimeout(0);
+
+			expect(await datasetValueByAlias('invariantForVariantAccess')).to.be.true;
+		});
+
 		it('merges document root access and the single start node into a single value', async () => {
 			context.setDocumentAccessState({ rootAccess: false, startNodes: [{ unique: 'doc-1' }] });
 			await aTimeout(0);
@@ -186,6 +205,7 @@ describe('UmbUserGroupWorkspaceAssignAccessElement', () => {
 			// echo back into a `set*` call, or an unrelated navigation will look like it has unpersisted changes.
 			context.setSectionsState(['content']);
 			context.setLanguageAccessState({ rootAccess: false, startNodes: [{ unique: 'en-us' }] });
+			context.setHasAccessToInvariantForVariantState(true);
 			context.setDocumentAccessState({ rootAccess: false, startNodes: [{ unique: 'doc-1' }] });
 			context.setMediaAccessState({ rootAccess: true, startNodes: [] });
 			context.setElementAccessState({ rootAccess: true, startNodes: [] });
@@ -193,7 +213,9 @@ describe('UmbUserGroupWorkspaceAssignAccessElement', () => {
 
 			expect(context.setSectionsCalls).to.be.empty;
 			expect(context.setLanguageAccessCalls).to.be.empty;
+			expect(context.setHasAccessToInvariantForVariantCalls).to.be.empty;
 			expect(context.setDocumentAccessCalls).to.be.empty;
+			expect(context.setMediaAccessCalls).to.be.empty;
 			expect(context.setElementAccessCalls).to.be.empty;
 		});
 	});
@@ -212,6 +234,13 @@ describe('UmbUserGroupWorkspaceAssignAccessElement', () => {
 			await aTimeout(0);
 
 			expect(context.setLanguageAccessCalls.at(-1)).to.deep.equal(value);
+		});
+
+		it('writes a changed invariant-for-variant access back to the workspace context', async () => {
+			dataset.setPropertyValue('invariantForVariantAccess', true);
+			await aTimeout(0);
+
+			expect(context.setHasAccessToInvariantForVariantCalls.at(-1)).to.be.true;
 		});
 
 		it('writes a changed document access value back to the workspace context', async () => {
