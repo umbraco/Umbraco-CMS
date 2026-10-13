@@ -68,6 +68,8 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 				currentUserContext?.currentUser,
 				(currentUser) => {
 					this.#hasUser = !!currentUser;
+					// The user may have loaded through another caller after this initializer's own load failed, so count that load.
+					if (this.#isAuthorized && !this.#isUserLoaded) void this.#loadCurrentUser();
 					this.#updateActive();
 				},
 				'umbObserveCurrentUser',
@@ -80,7 +82,12 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 		const userLoad = this.#currentUserContext?.load();
 		this.#userLoad = userLoad;
 		if (!userLoad) return;
-		await userLoad;
+		try {
+			await userLoad;
+		} catch {
+			// A failed load is not counted; the current user observer counts a later load that succeeds.
+			return;
+		}
 		if (userLoad !== this.#userLoad) return;
 		this.#isUserLoaded = true;
 		this.#updateActive();
