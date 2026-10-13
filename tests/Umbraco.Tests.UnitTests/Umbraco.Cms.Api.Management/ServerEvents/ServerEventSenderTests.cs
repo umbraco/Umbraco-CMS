@@ -1112,11 +1112,13 @@ internal sealed class ServerEventSenderTests
     }
 
     [Test]
-    public async Task HandleAsync_EntityContainerSavedNotification_ForElementContainer_RoutesCreatedEvent()
+    public async Task HandleAsync_EntityContainerSavedNotification_ForNewElementContainer_RoutesCreatedEvent()
     {
-        // Arrange
-        var now = DateTime.UtcNow;
-        var container = new EntityContainer(Constants.ObjectTypes.Element) { Key = Guid.NewGuid(), CreateDate = now, UpdateDate = now };
+        // Arrange - as persisted on insert: the identity is assigned and only the create date is set.
+        var container = new EntityContainer(Constants.ObjectTypes.Element) { Key = Guid.NewGuid() };
+        container.Id = 123;
+        container.CreateDate = DateTime.UtcNow;
+        container.ResetDirtyProperties();
 
         var recordingRouter = new RecordingServerEventRouter();
         var serverEventSender = CreateServerEventSender(recordingRouter);
@@ -1130,15 +1132,13 @@ internal sealed class ServerEventSenderTests
     }
 
     [Test]
-    public async Task HandleAsync_EntityContainerSavedNotification_ForElementContainer_RoutesUpdatedEvent()
+    public async Task HandleAsync_EntityContainerSavedNotification_ForExistingElementContainer_RoutesUpdatedEvent()
     {
-        // Arrange
-        var container = new EntityContainer(Constants.ObjectTypes.Element)
-        {
-            Key = Guid.NewGuid(),
-            CreateDate = DateTime.UtcNow.AddDays(-1),
-            UpdateDate = DateTime.UtcNow,
-        };
+        // Arrange - as loaded and renamed: containers do not track create or update dates, so both are unset.
+        var container = new EntityContainer(123, Guid.NewGuid(), Constants.System.Root, "-1,123", 1, 0, Constants.ObjectTypes.Element, "Folder", Constants.Security.SuperUserId);
+        container.ResetDirtyProperties(false);
+        container.Name = "Renamed folder";
+        container.ResetDirtyProperties();
 
         var recordingRouter = new RecordingServerEventRouter();
         var serverEventSender = CreateServerEventSender(recordingRouter);

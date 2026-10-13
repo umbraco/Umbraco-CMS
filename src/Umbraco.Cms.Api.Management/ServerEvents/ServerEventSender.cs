@@ -591,7 +591,9 @@ internal sealed class ServerEventSender :
         {
             if (seen.Add(container.Key) && GetContainerEventSource(container) is { } source)
             {
-                await RouteCreatedOrUpdatedEvent(source, container);
+                // Containers do not track an update date, so a new container is recognised by its identity
+                // having been assigned during the save.
+                await RouteSavedEvent(source, container, isNew: container.WasPropertyDirty(nameof(EntityContainer.Id)));
             }
         }
     }
@@ -768,12 +770,16 @@ internal sealed class ServerEventSender :
             },
             new ServerEventRoutingContext { EntityPath = (entity as IUmbracoEntity)?.Path });
 
-    private async Task RouteCreatedOrUpdatedEvent<T>(string source, T entity)
+    private Task RouteCreatedOrUpdatedEvent<T>(string source, T entity)
+        where T : IEntity
+        => RouteSavedEvent(source, entity, isNew: entity.CreateDate == entity.UpdateDate);
+
+    private async Task RouteSavedEvent<T>(string source, T entity, bool isNew)
         where T : IEntity
         => await _serverEventRouter.RouteEventAsync(
             new ServerEvent
             {
-                EventType = entity.CreateDate == entity.UpdateDate
+                EventType = isNew
                     ? Constants.ServerEvents.EventType.Created
                     : Constants.ServerEvents.EventType.Updated,
                 Key = entity.Key,
