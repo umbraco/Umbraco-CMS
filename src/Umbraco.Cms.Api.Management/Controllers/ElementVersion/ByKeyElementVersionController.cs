@@ -1,12 +1,19 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ElementVersion;
 
@@ -18,18 +25,39 @@ public class ByKeyElementVersionController : ElementVersionControllerBase
 {
     private readonly IElementVersionService _elementVersionService;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ByKeyElementVersionController"/> class.
     /// </summary>
     /// <param name="elementVersionService">Service for managing element versions.</param>
     /// <param name="umbracoMapper">Mapper for converting domain models to view models.</param>
+    /// <param name="authorizationService">Service for handling authorization checks for the current user.</param>
+    [ActivatorUtilitiesConstructor]
     public ByKeyElementVersionController(
         IElementVersionService elementVersionService,
-        IUmbracoMapper umbracoMapper)
+        IUmbracoMapper umbracoMapper,
+        IAuthorizationService authorizationService)
     {
         _elementVersionService = elementVersionService;
         _umbracoMapper = umbracoMapper;
+        _authorizationService = authorizationService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyElementVersionController"/> class.
+    /// </summary>
+    /// <param name="elementVersionService">Service for managing element versions.</param>
+    /// <param name="umbracoMapper">Mapper for converting domain models to view models.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
+    public ByKeyElementVersionController(
+        IElementVersionService elementVersionService,
+        IUmbracoMapper umbracoMapper)
+        : this(
+            elementVersionService,
+            umbracoMapper,
+            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
+    {
     }
 
     /// <summary>
@@ -49,9 +77,22 @@ public class ByKeyElementVersionController : ElementVersionControllerBase
     {
         Attempt<IElement?, ContentVersionOperationStatus> attempt =
             await _elementVersionService.GetAsync(id);
+        if (attempt.Success is false || attempt.Result is null)
+        {
+            return MapFailure(attempt.Status);
+        }
 
-        return attempt.Success
-            ? Ok(_umbracoMapper.Map<ElementVersionResponseModel>(attempt.Result))
-            : MapFailure(attempt.Status);
+        IElement element = attempt.Result;
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ElementPermissionResource.WithKeys(ActionElementBrowse.ActionLetter, element.Key),
+            AuthorizationPolicies.ElementPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
+        return Ok(_umbracoMapper.Map<ElementVersionResponseModel>(element));
     }
 }

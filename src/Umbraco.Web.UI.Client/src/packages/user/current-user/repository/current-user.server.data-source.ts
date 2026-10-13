@@ -49,6 +49,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 				email: data.email,
 				fallbackPermissions: data.fallbackPermissions,
 				hasAccessToAllLanguages: data.hasAccessToAllLanguages,
+				hasAccessToInvariantForVariant: data.hasAccessToInvariantForVariant,
 				hasAccessToSensitiveData: data.hasAccessToSensitiveData,
 				hasDocumentRootAccess: data.hasDocumentRootAccess,
 				hasMediaRootAccess: data.hasMediaRootAccess,

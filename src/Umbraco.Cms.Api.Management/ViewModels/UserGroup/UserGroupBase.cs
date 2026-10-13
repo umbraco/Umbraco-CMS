@@ -48,6 +48,14 @@ public class UserGroupBase
     public required bool HasAccessToAllLanguages { get; init; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the user group can edit invariant (shared) property data on variant content.
+    /// </summary>
+    /// <remarks>
+    /// The permission is not consulted when editing invariant content types — all users with access to the document can edit its properties in that case.
+    /// </remarks>
+    public required bool HasAccessToInvariantForVariant { get; init; }
+
+    /// <summary>
     /// Gets or sets the key of the document that should act as root node for the user group.
     /// <remarks>
     /// This can be overwritten by a different user group if a user is a member of multiple groups

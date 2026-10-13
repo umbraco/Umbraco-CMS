@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -24,6 +25,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     private readonly ILanguageService _languageService;
     private ContentSettings _contentSettings;
     private readonly IRelationService _relationService;
+    private readonly IUserService _userService;
     private readonly ILogger<ContentPublishingServiceBase<TContent, TContentService>> _logger;
 
     protected abstract int WriteLockId { get; }
@@ -37,6 +39,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
+        IUserService userService,
         ILogger<ContentPublishingServiceBase<TContent, TContentService>> logger)
     {
         _coreScopeProvider = coreScopeProvider;
@@ -46,6 +49,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         _contentTypeService = contentTypeService;
         _languageService = languageService;
         _relationService = relationService;
+        _userService = userService;
         _logger = logger;
         _contentSettings = optionsMonitor.CurrentValue;
         optionsMonitor.OnChange((contentSettings) =>
@@ -180,7 +184,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             }
         }
 
-        ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures);
+        ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures, userKey);
         if (validationResult.ValidationErrors.Any())
         {
             scope.Complete();
@@ -216,12 +220,12 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             return Attempt.FailWithStatus(ContentPublishingOperationStatus.NothingToPublish, new ContentPublishingResult());
         }
 
-        ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
+        ContentPublishingOperationStatus contentPublishingOperationStatus = result.ToContentPublishingOperationStatus();
         return contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
             ? Attempt.SucceedWithStatus(
-                ToContentPublishingOperationStatus(result),
+                result.ToContentPublishingOperationStatus(),
                 new ContentPublishingResult { Content = content })
-            : Attempt.FailWithStatus(ToContentPublishingOperationStatus(result), new ContentPublishingResult
+            : Attempt.FailWithStatus(result.ToContentPublishingOperationStatus(), new ContentPublishingResult
             {
                 Content = content,
                 InvalidPropertyAliases = result.InvalidProperties?.Select(property => property.Alias).ToArray()
@@ -232,8 +236,10 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     /// <summary>
     /// Validates the current (draft) property values of the content for the specified cultures, including all segment values.
     /// </summary>
-    protected async Task<ContentValidationResult> ValidateCurrentContentAsync(TContent content, string[] cultures)
+    protected async Task<ContentValidationResult> ValidateCurrentContentAsync(TContent content, string[] cultures, Guid userKey)
     {
+        IUser user = await _userService.GetRequiredUserAsync(userKey);
+
         IEnumerable<string?> effectiveCultures = content.ContentType.VariesByCulture()
             ? cultures.Union([null])
             : [null];
@@ -241,7 +247,6 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         // Would be better to be able to use a mapper/factory, but currently all that functionality is very much presentation logic.
         var model = new ContentUpdateModel()
         {
-            // NOTE KJA: this needs redoing; we need to make an informed decision whether to include invariant properties, depending on if editing invariant properties is allowed on all variants, or if the default language is included in cultures
             Properties = effectiveCultures.SelectMany(culture =>
                 content.Properties
                     .Where(property => property.PropertyType.VariesByCulture() == (culture is not null))
@@ -272,7 +277,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         };
 
         IContentType? contentType = _contentTypeService.Get(content.ContentType.Key)!;
-        ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType, cultures);
+        ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType, cultures, user.HasAccessToInvariantForVariant());
         return validationResult;
     }
 
@@ -354,10 +359,10 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         PublishResult result = _contentService.Unpublish(content, "*", userId);
         scope.Complete();
 
-        ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
+        ContentPublishingOperationStatus contentPublishingOperationStatus = result.ToContentPublishingOperationStatus();
         return Task.FromResult(contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
-            ? Attempt.Succeed(ToContentPublishingOperationStatus(result))
-            : Attempt.Fail(ToContentPublishingOperationStatus(result)));
+            ? Attempt.Succeed(result.ToContentPublishingOperationStatus())
+            : Attempt.Fail(result.ToContentPublishingOperationStatus()));
     }
 
     private async Task<Attempt<ContentPublishingOperationStatus>> UnpublishMultipleCultures(TContent content, ISet<string> cultures, int userId)
@@ -382,11 +387,11 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
 
             PublishResult result = _contentService.Unpublish(content, culture, userId);
 
-            ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
+            ContentPublishingOperationStatus contentPublishingOperationStatus = result.ToContentPublishingOperationStatus();
 
             if (contentPublishingOperationStatus is not ContentPublishingOperationStatus.Success)
             {
-                return Attempt.Fail(ToContentPublishingOperationStatus(result));
+                return Attempt.Fail(result.ToContentPublishingOperationStatus());
             }
         }
 
@@ -406,39 +411,9 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         PublishResult result = _contentService.Unpublish(content, null, userId);
         scope.Complete();
 
-        ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
+        ContentPublishingOperationStatus contentPublishingOperationStatus = result.ToContentPublishingOperationStatus();
         return Task.FromResult(contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
-            ? Attempt.Succeed(ToContentPublishingOperationStatus(result))
-            : Attempt.Fail(ToContentPublishingOperationStatus(result)));
+            ? Attempt.Succeed(result.ToContentPublishingOperationStatus())
+            : Attempt.Fail(result.ToContentPublishingOperationStatus()));
     }
-
-    protected static ContentPublishingOperationStatus ToContentPublishingOperationStatus(PublishResult publishResult)
-        => publishResult.Result switch
-        {
-            PublishResultType.SuccessPublish => ContentPublishingOperationStatus.Success,
-            PublishResultType.SuccessPublishCulture => ContentPublishingOperationStatus.Success,
-            PublishResultType.SuccessPublishAlready => ContentPublishingOperationStatus.Success,
-            PublishResultType.SuccessUnpublish => ContentPublishingOperationStatus.Success,
-            PublishResultType.SuccessUnpublishAlready => ContentPublishingOperationStatus.Success,
-            PublishResultType.SuccessUnpublishCulture => ContentPublishingOperationStatus.Success,
-            PublishResultType.SuccessUnpublishMandatoryCulture => ContentPublishingOperationStatus.Success,
-            PublishResultType.SuccessUnpublishLastCulture => ContentPublishingOperationStatus.Success,
-            PublishResultType.SuccessMixedCulture => ContentPublishingOperationStatus.Success,
-            // PublishResultType.FailedPublish => expr, <-- never used directly in a PublishResult
-            PublishResultType.FailedPublishPathNotPublished => ContentPublishingOperationStatus.PathNotPublished,
-            PublishResultType.FailedPublishHasExpired => ContentPublishingOperationStatus.HasExpired,
-            PublishResultType.FailedPublishAwaitingRelease => ContentPublishingOperationStatus.AwaitingRelease,
-            PublishResultType.FailedPublishCultureHasExpired => ContentPublishingOperationStatus.CultureHasExpired,
-            PublishResultType.FailedPublishCultureAwaitingRelease => ContentPublishingOperationStatus.CultureAwaitingRelease,
-            PublishResultType.FailedPublishIsTrashed => ContentPublishingOperationStatus.InTrash,
-            PublishResultType.FailedPublishCancelledByEvent => ContentPublishingOperationStatus.CancelledByEvent,
-            PublishResultType.FailedPublishContentInvalid => ContentPublishingOperationStatus.ContentInvalid,
-            PublishResultType.FailedPublishNothingToPublish => ContentPublishingOperationStatus.NothingToPublish,
-            PublishResultType.FailedPublishMandatoryCultureMissing => ContentPublishingOperationStatus.MandatoryCultureMissing,
-            PublishResultType.FailedPublishConcurrencyViolation => ContentPublishingOperationStatus.ConcurrencyViolation,
-            PublishResultType.FailedPublishUnsavedChanges => ContentPublishingOperationStatus.UnsavedChanges,
-            PublishResultType.FailedUnpublish => ContentPublishingOperationStatus.Failed,
-            PublishResultType.FailedUnpublishCancelledByEvent => ContentPublishingOperationStatus.CancelledByEvent,
-            _ => throw new ArgumentOutOfRangeException()
-        };
 }
