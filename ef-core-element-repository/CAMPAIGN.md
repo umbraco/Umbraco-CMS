@@ -155,7 +155,7 @@ Checkpoint: PR 5's acceptance runs these four fixtures and records the result in
 
 Branch naming: `v20/feature/ef-core-element-repository-<n>-<slug>` (the `v20` prefix reflects the release the work ships in), cut from the latest `origin/v18/feature/ef-core-repositories`. PR target: `v18/feature/ef-core-repositories`. New EF Core migrations stay in the `V_19_0_0` folder like every other migration on the integration branch; that folder name is inherited convention, not something to fix here. PR title prefix: `EF Core:` (matches `EF Core: Migrate template repository and service (#24114)`). Squash-merge. Each PR must build clean and leave the full integration suite green on its own; nothing may depend on an unmerged sibling PR except where stated.
 
-Dependency graph: PR 1 is independent and can run in parallel with PR 2. PR 3 depends on PR 2. PR 4 depends on PR 1 and PR 3. PR 5 depends on PR 4. PR 6 depends on PR 5.
+Dependency graph: PR 1 is independent and can run in parallel with PR 2. PR 2b depends on PR 2. PR 3 depends on PR 2b. PR 4 depends on PR 1 and PR 3. PR 5 depends on PR 4. PR 6 depends on PR 5.
 
 ### PR 0 (optional, independent): Relation parent and child entity lookups
 
@@ -190,6 +190,22 @@ Scope:
 - First commit of the PR is a spike: the generic row + `BuildBaseQuery` hook + `GetAsync` only, run on both providers, before hoisting the rest. If translation fails on either provider, stop and record the finding in §8 before changing approach.
 
 Acceptance: `DocumentRepositoryTest`, `DocumentBlueprintRepositoryTest`, `DocumentRepositoryUrlSegmentTests`, `ContentServiceTests`, `ContentServiceTests.SchedulePublish`, the HybridCache document fixtures, and the full unit test project all green with the same counts as before; snapshots untouched (`git diff --stat` on both `Migrations/` folders is empty); `DocumentRepository.cs` shrinks by roughly 900 to 1 200 lines.
+
+### PR 2b: Build publishable entities from row parts instead of a stitched DTO graph
+
+Small redesign PR between two move PRs, kept separate so PR 2 and PR 3 stay pure moves that reviewers can verify with move detection.
+
+Context: PR 2's shared assembly wires the DTO navigation members (`EntityVersion.ContentVersionDto`, `Entity.ContentDto`, `Entity.CurrentVersion`, `Entity.PublishedVersion`, `Content.NodeDto`) on every read, mimicking NPoco's `[Reference]`, only so `ContentBaseFactory.BuildEntity(EFCoreDtos.DocumentDto, …)` can walk the graph. That is why PR 2 added setters to `IPublishableContentDto` and `IContentVersionDto`. Everything else after assembly (the template hook, parent key) already reads the parts straight off `ContentRow`.
+
+Scope:
+- Change the hook to `protected abstract TEntity BuildEntity(ContentRow<TEntityDto, TContentVersionDto> row, IContentType? contentType)` and call it with the row.
+- Delete the navigation-member stitching in `AsyncPublishableContentRepositoryBase.AssembleEntitiesAsync`.
+- `ContentBaseFactory`: the EF Core document builder and `PopulatePublishableEntity` take the parts, not a graph: the entity DTO (for `NodeId`, `Published`, `Edited`), the `NodeDto`, the current `ContentVersionDto` and the published `ContentVersionDto?`. `PublishedVersionId` comes from the published content version's id (the same id as the published entity version row). The factory must not take `ContentRow`, which is an internal repository type.
+- `DocumentRepository.BuildEntity(row, …)` unpacks the row into those arguments.
+- Remove the setters from the navigation members of `IPublishableContentDto` and `IContentVersionDto`. The concrete DTO classes keep their public setters, which the write-path factory (`BuildDocumentDto`) uses.
+- Drop the dead write-path reassignments of `dto.CurrentVersion`/`dto.PublishedVersion` in `DocumentRepository.PersistUpdatedItemAsync` and `PersistNewVersionsAsync`, using locals instead. Nothing reads them afterwards except one `VersionDate` read in `PersistNewItemAsync`, which gets the same value from the original version because the new draft copies it. This leaves PR 3 a pure move.
+
+Acceptance: `DocumentRepositoryTest`, `DocumentBlueprintRepositoryTest`, `DocumentRepositoryUrlSegmentTests`, `ContentServiceTests` and the unit project at unchanged counts; a test asserting `PublishedVersionId`, `PublishDate`, `PublishName` and `PublisherId` for a published-then-edited document (red first if no existing test covers it); snapshots untouched; `grep -nE "\{ get; set; \}" IPublishableContentDto.cs IContentVersionDto.cs` returns nothing.
 
 ### PR 3: Hoist the generic write path out of `DocumentRepository`
 
@@ -285,6 +301,7 @@ Steps 2 and 10 to 11 of §6 are the points in each PR where this must happen. A 
 | 12-10-2026 | Upstream's obsolete forwarding constructors on `PublishableContentServiceBase` and `ElementService` were dropped on merge; `Lazy<IUserService>` is a plain constructor parameter on both engines. | Rule 1: no obsolete-constructor staging on this branch. |
 | 12-10-2026 | PR 5 gains the version-delete notification hook pair on the async engine. | The async engine hardcodes the Content-flavoured notifications exactly like the sync base, so moving `ElementService` onto it would otherwise preserve the known bug. |
 | 12-10-2026 | PR 2 spike passed on both providers, so the hoist-first design stands. The `BuildBaseQuery` hook takes a third parameter, `IQueryable<ContentVersionDto> contentVersions`, instead of the two-argument shape in §5: the version methods need a non-current version filter, and passing the pre-filtered versions keeps the hook free of an optional expression parameter. A two-argument overload on the base supplies the current-version default. `IPublishableContentDto` and `IContentVersionDto` gained setters on their navigation members so the shared assembly can wire them. | The generic `new ContentRow<TEntityDto, TContentVersionDto>(...)` projection and interface-member access on the type parameters (`Entity.Published`, `variation.NodeId`) translated without any provider-specific work; no finding to record against the approach. |
+| 13-10-2026 | New PR 2b between PR 2 and PR 3: `BuildEntity` takes the `ContentRow` and the factory takes the row's parts, the navigation-member stitching goes, and the setters PR 2 added to `IPublishableContentDto`/`IContentVersionDto` are removed again; the dead write-path reassignments go in the same PR. | Setters on the DTO contracts existed only to rebuild an object graph for one factory call. Kept out of PR 2 and PR 3 because editing inside moved blocks defeats move-detection review; as its own PR it is a small, easy review. |
 | 12-10-2026 | PR 2 leaves the ordering-branch block (custom-field / culture-name / default dispatch, the three local functions and the `PagedModel` return) repeated in the four paged methods on the base and in `GetByLevelAsync` on `DocumentRepository`. | Collapsing the five copies into one `protected GetPagedAsync(db, nodes, ...)` is a consolidation, not a hoist: it would end the mechanical method-pair verification the PR relies on and change the SQL shape of the content-type filter. Behaviour-neutral, so it is a small follow-up of its own (before or with PR 3), not part of this PR. |
 
 ## 9. Follow-up backlog (not this campaign)

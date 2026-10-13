@@ -113,6 +113,46 @@
       "notes": "Implemented 12-10-2026; commits 4b93bb37671 (spike) and 8966625748b (hoist). Stacked on PR 1's branch, so the PR diff includes #24134 until it merges. DocumentRepository.cs 2530 -> 1374 lines; AsyncPublishableContentRepositoryBase 644 -> 1701; AsyncContentRepositoryBase 500 -> 710; new ContentJoinRow.cs/ContentRow.cs. Fixture counts unchanged against the baseline: DocumentRepositoryTest 189 (SQLite and SQL Server), DocumentBlueprintRepositoryTest 4 (both), ContentServiceTests 207, HybridCache document fixtures 128 + 1 skipped, unit project 7409 + 6 skipped. Snapshots untouched. Independent review: approve after fixes (content-type key resolution made kind-agnostic, cancellation threaded, db-first parameter order). Ordering-branch consolidation deferred (section 8)."
     },
     {
+      "id": "2b",
+      "slug": "entity-from-row-parts",
+      "title": "Build publishable entities from row parts instead of a stitched DTO graph",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [
+        2
+      ],
+      "summary": "BuildEntity takes the ContentRow, the factory takes its parts, the navigation-member stitching and the setters PR 2 added to IPublishableContentDto/IContentVersionDto go, and the dead write-path reassignments are dropped so PR 3 stays a pure move.",
+      "tasks": [
+        {
+          "text": "BuildEntity(ContentRow, IContentType?) hook; stitching removed from AssembleEntitiesAsync",
+          "done": false
+        },
+        {
+          "text": "ContentBaseFactory EF Core builder takes entity DTO, node, current and published content versions",
+          "done": false
+        },
+        {
+          "text": "Setters removed from IPublishableContentDto and IContentVersionDto navigation members",
+          "done": false
+        },
+        {
+          "text": "Dead CurrentVersion/PublishedVersion reassignments in the write path replaced by locals",
+          "done": false
+        },
+        {
+          "text": "Published-version fields asserted for a published-then-edited document (red first if uncovered)",
+          "done": false
+        },
+        {
+          "text": "Document fixtures and unit project at unchanged counts; snapshots untouched",
+          "done": false
+        }
+      ],
+      "acceptance": "Unchanged fixture counts; no setters left on the two DTO interfaces; snapshots untouched."
+    },
+    {
       "id": 3,
       "slug": "hoist-write-path",
       "title": "Hoist the generic write path out of DocumentRepository",
@@ -121,7 +161,7 @@
       "pr": "",
       "prUrl": "",
       "dependsOn": [
-        2
+        "2b"
       ],
       "summary": "PersistNew/PersistUpdated, versions, property data, culture variations, sortable values, tags and flag flips move into the base; version-DTO building and default template become hooks.",
       "tasks": [
@@ -291,6 +331,10 @@
     }
   ],
   "log": [
+    {
+      "date": "13-10-2026",
+      "text": "PR 2b added between PR 2 and PR 3: build entities from ContentRow parts and remove the DTO-interface setters PR 2 introduced. Kept separate so PR 2 and PR 3 stay pure moves for review."
+    },
     {
       "date": "13-10-2026",
       "text": "Office machine synced with the home session: campaign branches merged, memory pulled, local repo branches fast-forwarded. CI on #24134: build and unit/integration pass; Search Integration Tests (SQLite, Linux and macOS), CodeScene and SonarCloud fail, not yet investigated. #24175 (draft): CodeScene and SonarCloud fail."
