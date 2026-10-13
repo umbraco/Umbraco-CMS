@@ -141,8 +141,10 @@ internal static class PropertyFactory
                         continue;
                     }
 
-                    var sameValues = dataEditor?.ArePropertyValuesEquivalent(propertyValue.EditedValue, propertyValue.PublishedValue)
-                        ?? Equals(propertyValue.EditedValue, propertyValue.PublishedValue);
+                    var sameValues = Equals(propertyValue.EditedValue, propertyValue.PublishedValue)
+                                     || (dataEditor?.ArePropertyValuesEquivalent(
+                                         propertyValue.EditedValue,
+                                         propertyValue.PublishedValue) ?? false);
 
                     edited |= !sameValues;
 
