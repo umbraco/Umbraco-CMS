@@ -1,6 +1,6 @@
 ---
 name: project_ef_core_element_repository_campaign
-description: "The Element NPoco-to-EF Core campaign (planned 08-10-2026) — where the plan, status file and progress artifact live, the six-PR shape, and the hoist-first design decision"
+description: "The Element NPoco-to-EF Core campaign (planned 08-10-2026) — where the plan, status file and progress artifact live, the six-PR shape, the hoist-first design decision, and what PR 2 (read-path hoist) established about EF Core translation and the hook shapes"
 metadata:
   node_type: memory
   type: project
@@ -54,3 +54,22 @@ git worktree add .claude/campaign campaign/ef-core-element-repository`; `sync-me
 `sync-memory.sh push` + commit of the folder at session end. Branches use the `v20/` prefix (ships in
 Umbraco 20); PR target stays `v18/feature/ef-core-repositories`; migrations stay in `V_19_0_0`. after PR 6: `git worktree remove .claude/campaign` and delete the branch. The first attempt committed the
 folder on the shared integration branch; reverted (local only) because coworkers use that branch. First branch: `v20/feature/ef-core-element-repository-1-element-dtos`.
+
+**PR 2 (read-path hoist, 12-10-2026, draft #24175, cut from PR 1's branch at the user's request, not from the integration branch; commits 4b93bb37671 spike + 8966625748b hoist):**
+- EF Core translated everything generic without provider-specific work: `new ContentRow<TEntityDto, TContentVersionDto>(...)` built
+  from a static expression on the generic base, and interface-member access on type parameters inside query lambdas
+  (`joined.Entity.Published`, `variation.NodeId` on `db.Set<TContentCultureVariationDto>()`). Both providers green.
+- Hook shapes that landed: `BuildBaseQuery(db, nodes, contentVersions)` (three-argument, the versions pre-filtered by the
+  caller; a two-argument overload supplies "current") and `OnEntitiesAssembledAsync(db, entities, rows, loadTemplates, ct)`
+  called after the build loop and before the dirty reset / ParentKey loop, so a hook may set members without the base
+  needing to know. Templates live only in `DocumentRepository`'s override.
+- Trap: adding a required trailing `CancellationToken` after existing optional parameters is CS1737. The fix on this
+  branch is to make the optional parameters required (token stays last), not to move the token forward.
+- Tests reach static base members through the derived class name (`DocumentRepository.ApplyOrdering(...)`), so the
+  ordering unit fixture needed no closed-generic alias.
+- A full `dotnet build umbraco.sln --no-incremental` rewrites `src/Umbraco.Web.UI.Client/src/libs/localization-api/known-keys.*.generated.ts`
+  and `src/Umbraco.Web.UI.Login/public/mockServiceWorker.js` besides the package-locks; `git checkout --` all of them.
+- Left for a follow-up by decision: the ordering-branch block (custom field / culture name / default) is still repeated in
+  five paged methods (four on the base, `GetByLevelAsync` on DocumentRepository); consolidating it is a behaviour-neutral
+  refactor but not a hoist, so it stayed out of the mechanically-verified PR.
+
