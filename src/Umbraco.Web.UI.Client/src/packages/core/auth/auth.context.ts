@@ -138,6 +138,8 @@ export class UmbAuthContext extends UmbContextBase {
 	 * (see `bindUser()`), or to a user who could not be determined. The new session is not applied:
 	 * the page holds client state that belongs to the previous user, so it has to start over rather than
 	 * show that state to the user who is signed in now. The app shell handles this by reloading the backoffice.
+	 * A user who cannot be determined (every lookup failed) is treated as a different user on purpose, so the
+	 * page also starts over, and discards unsaved work, when it is in fact the same user.
 	 * @internal
 	 */
 	readonly userChanged = this.#userChanged.asObservable();
