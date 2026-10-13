@@ -13,7 +13,8 @@ public class ElementEventAuthorizer : EventSourcePolicyAuthorizer
     /// Initializes a new instance of the <see cref="ElementEventAuthorizer"/> class with the specified authorization service.
     /// </summary>
     /// <param name="authorizationService">The service used to authorize element-related events.</param>
-    public ElementEventAuthorizer(IAuthorizationService authorizationService) : base(authorizationService)
+    public ElementEventAuthorizer(IAuthorizationService authorizationService)
+        : base(authorizationService)
     {
     }
 
@@ -22,5 +23,8 @@ public class ElementEventAuthorizer : EventSourcePolicyAuthorizer
     /// </summary>
     public override IEnumerable<string> AuthorizableEventSources => [Constants.ServerEvents.EventSource.Element, Constants.ServerEvents.EventSource.ElementContainer];
 
+    /// <summary>
+    /// Gets the authorization policy a user must satisfy to receive element and element container events.
+    /// </summary>
     protected override string Policy => AuthorizationPolicies.TreeAccessElements;
 }
