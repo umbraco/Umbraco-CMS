@@ -44,6 +44,7 @@
     invalidEmail: 'Invalid email',
     emptyManualLinkPicker: 'Please enter an URL or Anchor.',
     needMoreItems: 'This field needs more items',
+    minimumTwoEntriesRequiresOneMore: 'Minimum 2 entries, requires 1 more.',
   }
 
   public static readonly inputTypes = {
@@ -233,7 +234,7 @@
 
   public static readonly trashDeleteDialogMessage = {
     referenceHeadline: 'The following items depend on this',
-    bulkReferenceHeadline: 'The following items are used by other content.',
+    bulkReferenceHeadline: 'The following items are used by other content',
     descendingReferenceHeadline: 'The following descending items have dependencies'
   }
 

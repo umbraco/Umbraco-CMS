@@ -251,7 +251,7 @@
 		</key>
 		<key alias="parentNotPublishedAnomaly">Ups! Dieses Dokument ist veröffentlicht aber nicht im internen Cache aufzufinden: Systemfehler.</key>
 		<key alias="getUrlException">Der URL wurde nicht gefunden</key>
-		<key alias="routeError">Dieses Dokument wurde veröffentlicht, aber sein URL würde mit Inhalt %0% kollidieren</key>
+		<key alias="routeError">Dieses Dokument wurde veröffentlicht, aber sein URL würde mit Inhalt '%0%' kollidieren</key>
 		<key alias="routeErrorCannotRoute">Dieses Dokument wurde veröffentlicht, aber sein URL kann nicht aufgelöst (routed) werden</key>
 		<key alias="publish">Veröffentlichen</key>
 		<key alias="published">Veröffentlicht</key>
@@ -1552,14 +1552,6 @@
 		<key alias="settings">Einstellungen</key>
 		<key alias="translation">Übersetzung</key>
 		<key alias="users">Benutzer</key>
-	</area>
-	<area alias="help">
-		<key alias="tours">Touren</key>
-		<key alias="theBestUmbracoVideoTutorials">Die besten Umbraco-Video-Tutorials</key>
-		<key alias="umbracoForum">Besuche our.umbraco.com</key>
-		<key alias="umbracoTv">Besuche umbraco.tv</key>
-		<key alias="umbracoLearningBase">Schaue gratis Tutorials</key>
-		<key alias="umbracoLearningBaseDescription">von Umbraco Learning Base</key>
 	</area>
 	<area alias="settings">
 		<key alias="defaulttemplate">Standardvorlage</key>

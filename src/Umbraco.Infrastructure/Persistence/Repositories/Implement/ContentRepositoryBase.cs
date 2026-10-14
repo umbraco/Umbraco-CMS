@@ -1390,6 +1390,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 publishedVersionId,
                 entity.Properties,
                 LanguageRepository,
+                PropertyEditors,
                 out edited,
                 out editedCultures).ToList();
 
@@ -1429,7 +1430,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 propertyTypeToPropertyData[(p.PropertyTypeId, p.VersionId, p.LanguageId, p.Segment)] = p;
             }
 
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures).ToList();
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, PropertyEditors, out edited, out editedCultures).ToList();
 
             // Set sortable values for property editors that support custom sorting.
             SetEntitySortableValues(entity, propertyDataDtos);

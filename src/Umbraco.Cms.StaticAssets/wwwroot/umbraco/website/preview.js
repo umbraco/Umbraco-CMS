@@ -1,8 +1,9 @@
 !(() => {
   "use strict";
 
-  // Quick exit if within an iframe.
-  if (window.self !== window.top) return;
+  // Quick exit if within an iframe. Compared against `window` rather than `window.self`, because
+  // `self` is [Replaceable] — a site script assigning to it silently breaks this check (#23505).
+  if (window !== window.top) return;
 
   const styles = `
 .umbraco-preview-badge {
@@ -86,7 +87,27 @@
 
   class UmbWebsitePreviewElement extends HTMLElement {
     connectedCallback() {
-      this.#render();
+      if (!this.shadowRoot) {
+        this.#render();
+      }
+
+      // Re-shown on every connection: moving the host in the DOM closes the popover.
+      this.#show();
+    }
+
+    // Promotes the badge to the top layer, so host page stacking contexts cannot cover it.
+    #show() {
+      const badge = this.shadowRoot?.getElementById("umbracoPreviewBadge");
+
+      if (typeof badge?.showPopover !== "function" || badge.matches(":popover-open")) {
+        return;
+      }
+
+      try {
+        badge.showPopover();
+      } catch {
+        // Older browsers without popover support still render the badge in normal flow.
+      }
     }
 
     async #endPreview() {
@@ -140,5 +161,7 @@
     }
   }
 
-  window.customElements.define("umb-website-preview", UmbWebsitePreviewElement);
+  if (!window.customElements.get("umb-website-preview")) {
+    window.customElements.define("umb-website-preview", UmbWebsitePreviewElement);
+  }
 })();

@@ -99,4 +99,15 @@ public static class ConfigurationExtensions
     /// <param name="configuration">The configuration.</param>
     /// <returns>The ModelsBuilder mode string.</returns>
     public static string GetModelsMode(this IConfiguration configuration) => (configuration.GetSection(Constants.Configuration.ConfigModelsBuilder).Get<ModelsBuilderSettings>() ?? new ModelsBuilderSettings()).ModelsMode;
+
+    /// <summary>
+    /// Gets a value indicating whether a ModelsBuilder mode has been explicitly configured.
+    /// </summary>
+    /// <param name="configuration">The configuration.</param>
+    /// <returns><c>true</c> if a mode has been configured; otherwise, <c>false</c>, meaning the default applies.</returns>
+    /// <remarks>
+    /// <see cref="GetModelsMode"/> falls back to the default when nothing is configured, so it cannot answer this.
+    /// </remarks>
+    public static bool IsModelsModeConfigured(this IConfiguration configuration)
+        => configuration.GetSection(Constants.Configuration.ConfigModelsMode).Exists();
 }

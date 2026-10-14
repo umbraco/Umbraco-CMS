@@ -54,6 +54,20 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
         return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData, allowedCultures);
     }
 
+    /// <inheritdoc />
+    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
+    {
+        var valueEditor = (BlockListEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue, defaultCulture);
+    }
+
+    /// <inheritdoc />
+    public override bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue)
+    {
+        var valueEditor = (BlockListEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.ArePropertyValuesEquivalent(editedValue, publishedValue);
+    }
+
     /// <inheritdoc/>
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new BlockListConfigurationEditor(_ioHelper);

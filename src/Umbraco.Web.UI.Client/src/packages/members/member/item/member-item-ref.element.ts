@@ -7,7 +7,7 @@ import { customElement, html, ifDefined, nothing, property, state } from '@umbra
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_MODAL, umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-member-item-ref')
 export class UmbMemberItemRefElement extends UmbLitElement {
@@ -57,19 +57,25 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 			});
 	}
 
-	#getHref(item: UmbMemberItemModel) {
-		if (!this._editPath) return;
-		const path = UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
-		return `${this._editPath}/${path}`;
+	#getLink(item: UmbMemberItemModel) {
+		if (!item.unique) return;
+		return umbGenerateWorkspaceLink({
+			pattern: UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN,
+			params: { unique: item.unique },
+			routePath: this._editPath,
+		});
 	}
 
 	override render() {
 		if (!this.item) return nothing;
 
+		const link = this.#getLink(this.item);
+
 		return html`
 			<uui-ref-node-member
 				name=${this.item.name}
-				href=${ifDefined(this.#getHref(this.item))}
+				href=${ifDefined(link?.href)}
+				target=${ifDefined(link?.target)}
 				?readonly=${this.readonly || !this._userHasSectionAccess}
 				?standalone=${this.standalone}>
 				<slot name="actions" slot="actions"></slot>
