@@ -344,6 +344,10 @@
   "log": [
     {
       "date": "14-10-2026",
+      "text": "Pipeline note (two search jobs red on the baseline relation stubs) appended to the #24203 and #24205 descriptions after the user trimmed them."
+    },
+    {
+      "date": "14-10-2026",
       "text": "PR 3: independent review of the build-when-known commit approved; three nits applied (4898987cca0)."
     },
     {
