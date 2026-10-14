@@ -111,6 +111,25 @@ public class QueryTests : SearcherTestBase
             });
     }
 
+    // Every query term must match, so a term the analyzer leaves out of the index can never be
+    // satisfied. Common words must be indexed like any other word.
+    [TestCase("probe for the member")]
+    [TestCase("Probe For The Member")]
+    [TestCase("the")]
+    [TestCase("for")]
+    [TestCase("probe the")]
+    public async Task CanQueryByCommonWords(string query)
+    {
+        SearchResult result = await SearchAsync(query: query);
+
+        Assert.Multiple(
+            () =>
+            {
+                Assert.That(result.Total, Is.EqualTo(1));
+                Assert.That(result.Documents.First().Id, Is.EqualTo(DocumentIds[StopWordsDocumentNumber]));
+            });
+    }
+
     [TestCase(true)]
     [TestCase(false)]
     public async Task CanQueryMultipleDocumentsByCommonWord(bool even)
