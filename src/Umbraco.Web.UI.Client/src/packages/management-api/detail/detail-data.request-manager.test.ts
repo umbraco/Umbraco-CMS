@@ -1,12 +1,15 @@
 import { UmbManagementApiDetailDataRequestManager } from './detail-data.request-manager.js';
 import { UmbManagementApiDetailDataCache } from './cache.js';
+import { UmbManagementApiDetailDataCacheInvalidationManager } from './cache-invalidation.manager.js';
 import { UmbManagementApiInFlightRequestCache } from '../inflight-request/cache.js';
 import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from '../server-event/constants.js';
+import type { UmbManagementApiServerEventModel } from '../server-event/types.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
 
 interface TestDetailModel {
 	id: string;
@@ -30,6 +33,10 @@ class MockServerEventContext {
 		this.#isConnected.setValue(value);
 	}
 
+	byEventSourcesAndEventTypes() {
+		return new Subject<UmbManagementApiServerEventModel>().asObservable();
+	}
+
 	getHostElement() {
 		return undefined as unknown as Element;
 	}
@@ -42,6 +49,7 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 	let hostElement: UmbTestRequestManagerHostElement;
 	let manager: UmbManagementApiDetailDataRequestManager<TestDetailModel, TestCreateModel, TestUpdateModel>;
 	let dataCache: UmbManagementApiDetailDataCache<TestDetailModel>;
+	let invalidationManager: UmbManagementApiDetailDataCacheInvalidationManager<TestDetailModel>;
 	let inflightRequestCache: UmbManagementApiInFlightRequestCache<TestDetailModel>;
 	let mockServerEventContext: MockServerEventContext;
 
@@ -68,6 +76,12 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 		dataCache = new UmbManagementApiDetailDataCache<TestDetailModel>();
 		inflightRequestCache = new UmbManagementApiInFlightRequestCache<TestDetailModel>();
 
+		// Each cache has an app-lifetime invalidation manager, constructed by its package's entry point
+		invalidationManager = new UmbManagementApiDetailDataCacheInvalidationManager(hostElement, {
+			dataCache,
+			eventSources: ['Umbraco:CMS:Test'],
+		});
+
 		// Set up mock API functions
 		mockCreate = async (data: TestCreateModel) => ({ data: 'new-id' });
 		mockRead = async (id: string) => ({ data: { id, name: `Item ${id}` } });
@@ -91,6 +105,7 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 
 	afterEach(() => {
 		manager.destroy();
+		invalidationManager.destroy();
 		document.body.innerHTML = '';
 	});
 
@@ -1080,6 +1095,109 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 
 			// Cache should not be affected by undefined state
 			expect(dataCache.has('item-1')).to.be.true;
+		});
+
+		// A consumer rebuilt mid-session — e.g. a block manager after a workspace tab is
+		// remounted — constructs a fresh request manager and requests immediately. The
+		// connection is already established and the cache is already warm at that point,
+		// so the rebuild should cost nothing. (#23572)
+		it('reads from the cache when constructed while the connection is already established', async () => {
+			mockServerEventContext.setIsConnected(true);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			dataCache.set('item-1', { id: 'item-1', name: 'Cached Item 1' });
+			dataCache.set('item-2', { id: 'item-2', name: 'Cached Item 2' });
+
+			let readManyCalled = false;
+			mockReadMany = async (ids: Array<string>) => {
+				readManyCalled = true;
+				return { data: { items: ids.map((id) => ({ id, name: `Fresh Item ${id}` })) } };
+			};
+
+			const rebuiltManager = new UmbManagementApiDetailDataRequestManager<
+				TestDetailModel,
+				TestCreateModel,
+				TestUpdateModel
+			>(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			// Deliberately no wait: the production call path requests straight after construction.
+			const result = await rebuiltManager.readMany(['item-1', 'item-2']);
+
+			expect(readManyCalled, 'expected the warm cache to serve the request without a server call').to.be.false;
+			expect(result.data?.items).to.have.lengthOf(2);
+
+			rebuiltManager.destroy();
+		});
+
+		it('caches fetched data when constructed while the connection is already established', async () => {
+			mockServerEventContext.setIsConnected(true);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			mockReadMany = async (ids: Array<string>) => ({
+				data: { items: ids.map((id) => ({ id, name: `Fresh Item ${id}` })) },
+			});
+
+			const rebuiltManager = new UmbManagementApiDetailDataRequestManager<
+				TestDetailModel,
+				TestCreateModel,
+				TestUpdateModel
+			>(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			// Deliberately no wait, as above.
+			await rebuiltManager.readMany(['item-1']);
+
+			expect(dataCache.has('item-1'), 'expected the fetched item to be cached for later consumers').to.be.true;
+
+			rebuiltManager.destroy();
+		});
+
+		it('does not serve entries cached before a disconnect to a request manager constructed afterwards', async () => {
+			mockServerEventContext.setIsConnected(true);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			dataCache.set('item-1', { id: 'item-1', name: 'Cached Item 1' });
+
+			// The connection drops while no request manager is alive
+			manager.destroy();
+			mockServerEventContext.setIsConnected(false);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			let readCalled = false;
+			mockRead = async (id: string) => {
+				readCalled = true;
+				return { data: { id, name: `Fresh Item ${id}` } };
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			const result = await manager.read('item-1');
+
+			expect(readCalled, 'expected the entry cached before the disconnect to be read from the server').to.be.true;
+			expect(result.data?.name).to.equal('Fresh Item item-1');
+			expect(dataCache.has('item-1'), 'expected the disconnect to clear the cache').to.be.false;
 		});
 	});
 });
