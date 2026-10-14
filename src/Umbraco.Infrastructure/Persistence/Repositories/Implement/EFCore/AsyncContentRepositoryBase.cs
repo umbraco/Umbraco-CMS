@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
@@ -34,6 +35,10 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     where TEntity : class, IContentBase
     where TRepository : class, IRepository
 {
+    private readonly IIdKeyMap _idKeyMap;
+    private readonly ITagRepository _tagRepository;
+    private readonly IJsonSerializer _jsonSerializer;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="AsyncContentRepositoryBase{TEntity,TRepository}" /> class.
     /// </summary>
@@ -51,6 +56,9 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     /// <param name="eventAggregator">The event aggregator for unit-of-work notifications.</param>
     /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
     /// <param name="cacheSyncService">The cache synchronization service.</param>
+    /// <param name="idKeyMap">The id/key map, used to resolve data types for tag and sortable-value handling.</param>
+    /// <param name="tagRepository">The tag repository, used to persist tag values for tag-enabled properties on save.</param>
+    /// <param name="jsonSerializer">The JSON serializer, used to parse legacy JSON-stored tag values.</param>
     protected AsyncContentRepositoryBase(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
@@ -63,7 +71,10 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
         IDataTypeService dataTypeService,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IIdKeyMap idKeyMap,
+        ITagRepository tagRepository,
+        IJsonSerializer jsonSerializer)
         : base(
             scopeAccessor,
             appCaches,
@@ -78,6 +89,9 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
         DataValueReferenceFactories = dataValueReferenceFactories;
         DataTypeService = dataTypeService;
         EventAggregator = eventAggregator;
+        _idKeyMap = idKeyMap;
+        _tagRepository = tagRepository;
+        _jsonSerializer = jsonSerializer;
     }
 
     /// <summary>
@@ -707,4 +721,181 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     /// <param name="entity">The entity that was refreshed.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     protected abstract Task OnUowRefreshedEntityAsync(TEntity entity, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Replaces the tags stored for every tag-enabled property of the entity with the tags its current values
+    ///     yield.
+    /// </summary>
+    protected async Task SetEntityTagsAsync(TEntity entity)
+    {
+        foreach (IProperty property in entity.Properties)
+        {
+            if (PropertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? editor) is false)
+            {
+                continue;
+            }
+
+            if (editor.GetValueEditor() is not IDataValueTags tagsProvider)
+            {
+                // Support for legacy tag editors — everything from here down to the last continue can be
+                // removed when TagsPropertyEditorAttribute is removed.
+                TagConfiguration? tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeService, _idKeyMap);
+                if (tagConfiguration is null)
+                {
+                    continue;
+                }
+
+                if (property.PropertyType.VariesByCulture())
+                {
+                    var tags = new List<ITag>();
+                    foreach (IPropertyValue pvalue in property.Values)
+                    {
+                        IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, _idKeyMap, _jsonSerializer, pvalue.Culture);
+                        int? languageId = await LanguageRepository.GetIdByIsoCodeAsync(pvalue.Culture);
+                        IEnumerable<Tag> cultureTags = tagsValue.Select(tagText => new Tag { Group = tagConfiguration.Group, Text = tagText, LanguageId = languageId });
+                        tags.AddRange(cultureTags);
+                    }
+
+                    _tagRepository.Assign(entity.Id, property.PropertyTypeId, tags);
+                }
+                else
+                {
+                    IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, _idKeyMap, _jsonSerializer);
+                    IEnumerable<Tag> tags = tagsValue.Select(tagText => new Tag { Group = tagConfiguration.Group, Text = tagText });
+                    _tagRepository.Assign(entity.Id, property.PropertyTypeId, tags);
+                }
+
+                continue;
+            }
+
+            object? configurationObject = property.PropertyType.GetDataType(DataTypeService, _idKeyMap)?.ConfigurationObject;
+
+            if (property.PropertyType.VariesByCulture())
+            {
+                var tags = new List<ITag>();
+                foreach (IPropertyValue pvalue in property.Values)
+                {
+                    int? languageId = await LanguageRepository.GetIdByIsoCodeAsync(pvalue.Culture);
+                    tags.AddRange(tagsProvider.GetTags(pvalue.EditedValue, configurationObject, languageId));
+                }
+
+                _tagRepository.Assign(entity.Id, property.PropertyTypeId, tags);
+            }
+            else
+            {
+                IEnumerable<ITag> tags = tagsProvider.GetTags(property.GetValue(), configurationObject, null);
+                _tagRepository.Assign(entity.Id, property.PropertyTypeId, tags);
+            }
+        }
+    }
+
+    /// <summary>Removes every tag stored for the entity.</summary>
+    protected void ClearEntityTags(TEntity entity) => _tagRepository.RemoveAll(entity.Id);
+
+    /// <summary>
+    ///     Populates <see cref="PropertyDataDto.SortableValue" /> for any property whose editor implements
+    ///     <see cref="IDataValueSortable" />, so custom-field ordering (see <see cref="ResolveCustomFieldOrderedNodeIdsAsync" />)
+    ///     can prioritize it over the raw typed columns.
+    /// </summary>
+    protected void SetEntitySortableValues(TEntity entity, IEnumerable<PropertyDataDto> propertyDtos)
+    {
+        var dtosByPropertyTypeId = propertyDtos.GroupBy(dto => dto.PropertyTypeId).ToDictionary(group => group.Key, group => group.ToList());
+
+        foreach (IProperty property in entity.Properties)
+        {
+            if (PropertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? editor) is false)
+            {
+                continue;
+            }
+
+            if (editor.GetValueEditor() is not IDataValueSortable sortableProvider)
+            {
+                continue;
+            }
+
+            if (dtosByPropertyTypeId.TryGetValue(property.PropertyTypeId, out List<PropertyDataDto>? dtos) is false)
+            {
+                continue;
+            }
+
+            object? configurationObject = property.PropertyType.GetDataType(DataTypeService, _idKeyMap)?.ConfigurationObject;
+
+            foreach (PropertyDataDto dto in dtos)
+            {
+                object? value = dto.TextValue ?? dto.VarcharValue ?? (object?)dto.DateValue ?? dto.DecimalValue ?? dto.IntegerValue;
+                dto.SortableValue = sortableProvider.GetSortableValue(value, configurationObject);
+            }
+        }
+    }
+
+    /// <summary>Gets the node row of the given parent, the root included.</summary>
+    protected static Task<NodeDto> GetParentNodeDtoAsync(UmbracoDbContext db, int parentId) =>
+        db.Nodes.FirstAsync(node => node.NodeId == parentId);
+
+    /// <summary>
+    ///     Resolves the parent key a persisted entity carries. Root's node row exists (umbracoNode id -1) but carries
+    ///     <see cref="Constants.System.RootSystemKey" />, not the semantic "no parent" value ParentKey contracts to, so
+    ///     its key must not be taken from the row. Every other parent, the recycle bin included, carries the key the
+    ///     contract expects.
+    /// </summary>
+    protected static Guid? ResolveParentKey(int parentId, NodeDto parent) =>
+        parentId == Constants.System.Root ? null : parent.UniqueId;
+
+    /// <summary>Checks whether a sibling of this repository's kind already holds the given sort order.</summary>
+    protected Task<bool> SortorderExistsAsync(UmbracoDbContext db, int parentId, int sortOrder) =>
+        db.Nodes.AnyAsync(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentId && node.SortOrder == sortOrder);
+
+    /// <summary>Gets the next free sort order under the parent for this repository's kind, or <paramref name="first" /> when it has no children.</summary>
+    protected async Task<int> GetNewChildSortOrderAsync(UmbracoDbContext db, int parentId, int first)
+    {
+        int? maxSortOrder = await db.Nodes
+            .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentId)
+            .Select(node => (int?)node.SortOrder)
+            .MaxAsync();
+
+        return maxSortOrder + 1 ?? first;
+    }
+
+    /// <summary>
+    ///     Gets the node id reserved for the given key by an id-reservation placeholder, or 0 when none exists.
+    ///     Supports blueprint and import flows that pre-reserve a key-to-id mapping before the entity is created.
+    /// </summary>
+    protected static async Task<int> GetReservedIdAsync(UmbracoDbContext db, Guid uniqueId)
+    {
+        int? id = await db.Nodes
+            .Where(node => node.UniqueId == uniqueId && node.NodeObjectType == Constants.ObjectTypes.IdReservation)
+            .Select(node => (int?)node.NodeId)
+            .FirstOrDefaultAsync();
+
+        return id ?? 0;
+    }
+
+    /// <summary>
+    ///     Sanity-checks that a freshly built path is well-formed, mirroring NPoco's
+    ///     <c>NodeDto.ValidatePathWithException</c>, which is defined against the NPoco node type and so cannot be
+    ///     reused against the EF Core one.
+    /// </summary>
+    protected static void ValidatePath(NodeDto node)
+    {
+        if (node.NodeId == default && string.IsNullOrWhiteSpace(node.Path))
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(node.Path))
+        {
+            throw new InvalidDataException($"The content item {node.NodeId} has an empty path: {node.Path} with parentID: {node.ParentId}");
+        }
+
+        string[] pathParts = node.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+        if (pathParts.Length < 2)
+        {
+            throw new InvalidDataException($"The content item {node.NodeId} has an invalid path: {node.Path} with parentID: {node.ParentId}");
+        }
+
+        if (node.ParentId != default && pathParts[^2] != node.ParentId.ToInvariantString())
+        {
+            throw new InvalidDataException($"The content item {node.NodeId} has an invalid path: {node.Path} with parentID: {node.ParentId}");
+        }
+    }
 }
