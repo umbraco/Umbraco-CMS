@@ -1020,28 +1020,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
            && status.ContentPublishingOperationStatus is null or ContentPublishingOperationStatus.Success;
 
     /// <summary>
-    ///     Projects a combined status onto the editing status alone, for the save-only operations and for the obsolete
-    ///     overloads that predate the combined status.
+    ///     Projects a combined status onto the editing status alone, for the save-only operations.
     /// </summary>
-    // TODO (V19): Remove the collapse to "unknown" below when the obsolete CreateAndPublishAsync and
-    // UpdateAndPublishAsync overloads taking a string[] of cultures to publish are removed. The remaining callers -
-    // CreateAsync and UpdateAsync - do not publish, so their publishing status is always null and this method
-    // reduces to projecting the editing status.
     protected static Attempt<TResult, ContentEditingOperationStatus> ToEditingAttempt<TResult>(Attempt<TResult, ContentEditingAndPublishingStatus> attempt)
-    {
-        if (attempt.Success)
-        {
-            return Attempt.SucceedWithStatus(attempt.Status.ContentEditingOperationStatus, attempt.Result);
-        }
-
-        // The editing status cannot express a publish failure, so it collapses to "unknown" - which is precisely why the
-        // combined status exists. Retained here so the obsolete overloads keep behaving as they did.
-        ContentEditingOperationStatus status =
-            attempt.Status.ContentEditingOperationStatus is ContentEditingOperationStatus.Success
-            && attempt.Status.ContentPublishingOperationStatus is not null
-                ? ContentEditingOperationStatus.Unknown
-                : attempt.Status.ContentEditingOperationStatus;
-
-        return Attempt.FailWithStatus(status, attempt.Result);
-    }
+        => attempt.Success
+            ? Attempt.SucceedWithStatus(attempt.Status.ContentEditingOperationStatus, attempt.Result)
+            : Attempt.FailWithStatus(attempt.Status.ContentEditingOperationStatus, attempt.Result);
 }

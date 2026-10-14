@@ -641,11 +641,6 @@ internal partial class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
-    [Obsolete("Please use the overload taking a cancellation token. Scheduled for removal in Umbraco 19.")]
-    public Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail)
-        => SendResetPasswordEmailAsync(userEmail, CancellationToken.None);
-
-    /// <inheritdoc/>
     public async Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail, CancellationToken cancellationToken)
     {
         if (_forgotPasswordSender.IsPasswordResetConfigured() is false)
@@ -664,6 +659,13 @@ internal partial class UserService : RepositoryService, IUserService
 
         ICoreBackOfficeUserManager userManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
         IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+        IForgotPasswordUriProvider uriProvider = serviceScope.ServiceProvider.GetRequiredService<IForgotPasswordUriProvider>();
+
+        Attempt<UserOperationStatus> canCreateUriAttempt = await uriProvider.CanCreateForgotPasswordUriAsync();
+        if (canCreateUriAttempt.Success is false)
+        {
+            return Attempt.Fail(canCreateUriAttempt.Result);
+        }
 
         IUser? user = await userStore.GetByEmailAsync(userEmail);
 
@@ -672,7 +674,6 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.Fail(UserOperationStatus.UserNotFound);
         }
 
-        IForgotPasswordUriProvider uriProvider = serviceScope.ServiceProvider.GetRequiredService<IForgotPasswordUriProvider>();
         Attempt<Uri, UserOperationStatus> uriAttempt = await uriProvider.CreateForgotPasswordUriAsync(user);
         if (uriAttempt.Success is false)
         {

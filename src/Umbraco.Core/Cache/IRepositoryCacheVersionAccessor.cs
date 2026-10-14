@@ -31,15 +31,6 @@ public interface IRepositoryCacheVersionAccessor
     void VersionChanged(string cacheKey, Guid newVersion);
 
     /// <summary>
-    /// Notifies the accessor that caches have been synchronized.
-    /// </summary>
-    /// <remarks>
-    /// Clears the cached versions, so the next check reads them from the database again.
-    /// </remarks>
-    [Obsolete("Use the overload that takes the adopted versions. Scheduled for removal in Umbraco 19.")]
-    void CachesSynced();
-
-    /// <summary>
     /// Notifies the accessor that caches have been synchronized and which versions were adopted.
     /// </summary>
     /// <param name="adoptedVersions">The versions the local caches now hold.</param>
@@ -49,11 +40,7 @@ public interface IRepositoryCacheVersionAccessor
     /// checking the database version again would only trigger another sync for a version published after
     /// its locks were taken. The request-level cache is cleared, so a later root scope in the same request
     /// reads the current versions again. Clearing the scope-level cache instead would let a version published
-    /// mid-scope change that scope's view, so the default implementation throws rather than fall back to
-    /// <see cref="CachesSynced()" />.
+    /// mid-scope change that scope's view.
     /// </remarks>
-    /// <exception cref="NotImplementedException">Thrown when the implementation does not retain the adopted snapshot.</exception>
-    // TODO (V19): Remove the default implementation.
-    void CachesSynced(IEnumerable<RepositoryCacheVersion> adoptedVersions)
-        => throw new NotImplementedException($"{GetType().FullName} must implement {nameof(CachesSynced)}({nameof(IEnumerable<RepositoryCacheVersion>)}).");
+    void CachesSynced(IEnumerable<RepositoryCacheVersion> adoptedVersions);
 }
