@@ -304,13 +304,9 @@ internal class DocumentRepository
                     Id = item.VersionId,
                     TemplateId = entityVersionDto.TemplateId,
                     Published = false,
-                    ContentVersionDto = newContentVersionDto,
                 };
                 db.DocumentVersions.Add(newDocumentVersionDto);
                 await db.SaveChangesAsync();
-
-                dto.PublishedVersion = entityVersionDto;
-                dto.CurrentVersion = newDocumentVersionDto;
             }
 
             var versionToDelete = publishing ? item.PublishedVersionId : item.VersionId;
@@ -589,8 +585,8 @@ internal class DocumentRepository
     }
 
     /// <inheritdoc />
-    protected override IContent BuildEntity(DocumentDto entityDto, IContentType? contentType) =>
-        ContentBaseFactory.BuildEntity(entityDto, contentType);
+    protected override IContent BuildEntity(ContentRow<DocumentDto, DocumentVersionDto> row, IContentType? contentType) =>
+        ContentBaseFactory.BuildEntity(row.Entity, row.Node, row.ContentVersion, row.PublishedContentVersion, contentType);
 
     /// <inheritdoc />
     protected override DocumentDto BuildEntityDto(IContent entity) =>
@@ -1018,7 +1014,6 @@ internal class DocumentRepository
             // The pair just inserted (Current=false, Published=true) becomes the published version.
             // A second (Current=true, Published=false) pair is inserted for the new draft.
             item.PublishedVersionId = item.VersionId;
-            dto.PublishedVersion = documentVersionDto;
 
             var newContentVersionDto = new ContentVersionDto
             {
@@ -1037,12 +1032,9 @@ internal class DocumentRepository
                 Id = item.VersionId,
                 TemplateId = documentVersionDto.TemplateId,
                 Published = false,
-                ContentVersionDto = newContentVersionDto,
             };
             db.DocumentVersions.Add(newDocumentVersionDto);
             await db.SaveChangesAsync();
-
-            dto.CurrentVersion = newDocumentVersionDto;
         }
     }
 

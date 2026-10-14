@@ -30,9 +30,5 @@ public class ElementDtoConfiguration : IEntityTypeConfiguration<ElementDto>
         // IX_umbracoElement_Published
         builder.HasIndex(x => x.Published)
             .HasDatabaseName($"IX_{ElementDto.TableName}_Published");
-
-        builder.Ignore(x => x.ContentDto);
-        builder.Ignore(x => x.CurrentVersion);
-        builder.Ignore(x => x.PublishedVersion);
     }
 }

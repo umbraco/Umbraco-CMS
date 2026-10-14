@@ -35,7 +35,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     : AsyncContentRepositoryBase<TEntity, TRepository>, IAsyncPublishableContentRepository<TEntity>
     where TEntity : class, IPublishableContentBase
     where TRepository : class, IRepository
-    where TEntityDto : class, IPublishableContentDto<TContentVersionDto>
+    where TEntityDto : class, IPublishableContentDto
     where TContentVersionDto : class, IContentVersionDto
     where TContentCultureVariationDto : class, ICultureVariationDto, new()
 {
@@ -96,14 +96,14 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     protected IContentTypeRepository ContentTypeRepository { get; }
 
     /// <summary>
-    ///     Builds a domain entity from an EF Core <typeparamref name="TEntityDto" /> and its associated content type.
+    ///     Builds a domain entity from the rows a read query returned for one version of it and its content type.
     /// </summary>
-    /// <param name="entityDto">The primary entity DTO loaded from the database.</param>
+    /// <param name="row">The materialized row: the node, entity, content and version rows, plus the published version when one exists.</param>
     /// <param name="contentType">
     ///     The content type for the entity, or <see langword="null" /> if the content type could not be resolved.
     /// </param>
     /// <returns>The constructed domain entity.</returns>
-    protected abstract TEntity BuildEntity(TEntityDto entityDto, IContentType? contentType);
+    protected abstract TEntity BuildEntity(ContentRow<TEntityDto, TContentVersionDto> row, IContentType? contentType);
 
     /// <summary>
     ///     Builds the EF Core <typeparamref name="TEntityDto" /> representation of a domain entity for persistence.
@@ -660,7 +660,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         });
 
     /// <summary>
-    ///     Nodes of this repository's entity kind whose table-level "published" flag (<see cref="IPublishableContentDto{TVersionDto}.Published" />) is set.
+    ///     Nodes of this repository's entity kind whose table-level "published" flag (<see cref="IPublishableContentDto.Published" />) is set.
     /// </summary>
     /// <remarks>
     ///     Callers still need to filter by <c>NodeObjectTypeKey</c>/<c>Trashed</c> themselves —
@@ -1314,16 +1314,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         {
             contentTypeMap.TryGetValue(row.Content.ContentTypeId, out IContentType? contentType);
 
-            // Wire nav properties (mirrors what NPoco [Reference] does automatically)
-            row.Content.NodeDto = row.Node;
-            row.EntityVersion.ContentVersionDto = row.ContentVersion;
-            row.PublishedEntityVersion?.ContentVersionDto = row.PublishedContentVersion!;
-
-            row.Entity.ContentDto = row.Content;
-            row.Entity.CurrentVersion = row.EntityVersion;
-            row.Entity.PublishedVersion = row.PublishedEntityVersion;
-
-            TEntity entity = BuildEntity(row.Entity, contentType);
+            TEntity entity = BuildEntity(row, contentType);
 
             // Deliberately not gated on the entity's own published flag: an unpublished entity keeps its
             // published property values and names so it can be republished in exactly its previous state.

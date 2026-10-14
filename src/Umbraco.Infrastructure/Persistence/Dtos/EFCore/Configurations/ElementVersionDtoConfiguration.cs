@@ -32,7 +32,5 @@ public class ElementVersionDtoConfiguration : IEntityTypeConfiguration<ElementVe
         // Note: SQL Server included columns (Id) are added by SqlServerElementVersionDtoModelCustomizer.
         builder.HasIndex(x => x.Published)
             .HasDatabaseName($"IX_{ElementVersionDto.TableName}_published");
-
-        builder.Ignore(x => x.ContentVersionDto);
     }
 }

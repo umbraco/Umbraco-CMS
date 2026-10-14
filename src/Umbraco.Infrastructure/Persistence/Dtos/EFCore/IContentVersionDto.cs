@@ -12,10 +12,4 @@ internal interface IContentVersionDto
 
     /// <summary>Gets a value indicating whether this version is the published one.</summary>
     bool Published { get; }
-
-    /// <summary>
-    /// Gets or sets the shared content version row containing version metadata (name, date, writer).
-    /// Not a database column — populated by the repository after query.
-    /// </summary>
-    ContentVersionDto ContentVersionDto { get; set; }
 }

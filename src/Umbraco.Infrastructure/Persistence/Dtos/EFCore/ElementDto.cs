@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Configurations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
 [EntityTypeConfiguration(typeof(ElementDtoConfiguration))]
-public class ElementDto : IPublishableContentDto<ElementVersionDto>
+public class ElementDto : IPublishableContentDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Element;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
@@ -26,19 +26,4 @@ public class ElementDto : IPublishableContentDto<ElementVersionDto>
     /// Gets or sets a value indicating whether this element has been modified since it was last published or saved.
     /// </summary>
     public bool Edited { get; set; }
-
-    /// <summary>
-    /// Gets or sets the content row. Not a database column — populated by the repository after query.
-    /// </summary>
-    public ContentDto ContentDto { get; set; } = null!;
-
-    /// <summary>
-    /// Gets or sets the current (draft) version row. Not a database column — populated by the repository after query.
-    /// </summary>
-    public ElementVersionDto CurrentVersion { get; set; } = null!;
-
-    /// <summary>
-    /// Gets or sets the published version row. Not a database column — populated by the repository after query.
-    /// </summary>
-    public ElementVersionDto? PublishedVersion { get; set; }
 }

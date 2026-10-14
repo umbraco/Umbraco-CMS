@@ -25,29 +25,35 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Creates a <see cref="Content"/> entity from an EF Core <see cref="EFCoreDtos.DocumentDto"/> with its
-    ///     nav properties populated by the repository (mirrors the NPoco <see cref="BuildEntity(DocumentDto, IContentType?)"/> overload).
+    ///     Creates a <see cref="Content"/> entity from the EF Core rows a read query returns for one version of a
+    ///     document (mirrors the NPoco <see cref="BuildEntity(DocumentDto, IContentType?)"/> overload).
     /// </summary>
     /// <remarks>
     ///     Template IDs are NOT set by this method — the repository is responsible for assigning
     ///     <see cref="ITemplatedContent.TemplateId"/> and <see cref="ITemplatedContent.PublishTemplateId"/>
     ///     after calling this method, mirroring the NPoco <c>AddAdditionalTempContentMapping</c> pattern.
     /// </remarks>
-    /// <param name="dto">
-    ///     The EF Core <see cref="EFCoreDtos.DocumentDto"/> with <c>ContentDto</c>, <c>CurrentVersion</c>,
-    ///     and (optionally) <c>PublishedVersion</c> populated.
+    /// <param name="dto">The document row, read for its node id and its published and edited flags.</param>
+    /// <param name="node">The node row.</param>
+    /// <param name="contentVersion">The content version row of the version being built.</param>
+    /// <param name="publishedContentVersion">
+    ///     The content version row of the published version, or <c>null</c> if the document has never been published.
     /// </param>
     /// <param name="contentType">The content type, or <c>null</c> if it could not be resolved.</param>
-    /// <returns>A <see cref="Content"/> instance populated from the DTO.</returns>
-    public static Content BuildEntity(EFCoreDtos.DocumentDto dto, IContentType? contentType)
+    /// <returns>A <see cref="Content"/> instance populated from the rows.</returns>
+    public static Content BuildEntity(
+        EFCoreDtos.DocumentDto dto,
+        EFCoreDtos.NodeDto node,
+        EFCoreDtos.ContentVersionDto contentVersion,
+        EFCoreDtos.ContentVersionDto? publishedContentVersion,
+        IContentType? contentType)
     {
-        EFCoreDtos.ContentVersionDto currentVersion = dto.CurrentVersion.ContentVersionDto;
-        var entity = new Content(currentVersion.Text ?? string.Empty, dto.ContentDto.NodeDto.ParentId, contentType);
+        var entity = new Content(contentVersion.Text ?? string.Empty, node.ParentId, contentType);
 
         try
         {
             entity.DisableChangeTracking();
-            PopulatePublishableEntity(entity, dto);
+            PopulatePublishableEntity(entity, dto, node, contentVersion, publishedContentVersion);
             entity.ResetDirtyProperties(false);
             return entity;
         }
@@ -529,44 +535,42 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Populates <paramref name="content"/> from an EF Core <see cref="EFCoreDtos.IPublishableContentDto{TVersionDto}"/>.
-    ///     Does not manage change tracking — the calling <c>BuildEntity</c> method owns that lifecycle.
-    ///     This is the EF Core counterpart of <see cref="BuildPublishableEntity{TEntity,TVersionDto}"/>.
+    ///     Populates <paramref name="content"/> from the EF Core rows a read query returns for one version of a
+    ///     publishable entity. Does not manage change tracking — the calling <c>BuildEntity</c> method owns that
+    ///     lifecycle. This is the EF Core counterpart of <see cref="BuildPublishableEntity{TEntity,TVersionDto}"/>.
     /// </summary>
-    private static void PopulatePublishableEntity<TEntity, TVersionDto>(
+    private static void PopulatePublishableEntity<TEntity>(
         TEntity content,
-        EFCoreDtos.IPublishableContentDto<TVersionDto> dto)
+        EFCoreDtos.IPublishableContentDto dto,
+        EFCoreDtos.NodeDto node,
+        EFCoreDtos.ContentVersionDto contentVersion,
+        EFCoreDtos.ContentVersionDto? publishedContentVersion)
         where TEntity : PublishableContentBase
-        where TVersionDto : class, EFCoreDtos.IContentVersionDto
     {
-        EFCoreDtos.NodeDto nodeDto = dto.ContentDto.NodeDto;
-        EFCoreDtos.ContentVersionDto contentVersion = dto.CurrentVersion.ContentVersionDto;
-        TVersionDto? publishedVersion = dto.PublishedVersion;
-
         content.Id = dto.NodeId;
-        content.Key = nodeDto.UniqueId;
+        content.Key = node.UniqueId;
         content.VersionId = contentVersion.Id;
         content.Name = contentVersion.Text;
-        content.Path = nodeDto.Path;
-        content.Level = nodeDto.Level;
-        content.ParentId = nodeDto.ParentId;
-        content.SortOrder = nodeDto.SortOrder;
-        content.Trashed = nodeDto.Trashed;
-        content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
+        content.Path = node.Path;
+        content.Level = node.Level;
+        content.ParentId = node.ParentId;
+        content.SortOrder = node.SortOrder;
+        content.Trashed = node.Trashed;
+        content.CreatorId = node.UserId ?? Constants.Security.UnknownUserId;
         content.WriterId = contentVersion.UserId ?? Constants.Security.UnknownUserId;
-        content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+        content.CreateDate = node.CreateDate.EnsureUtc();
         content.UpdateDate = contentVersion.VersionDate.EnsureUtc();
         content.Published = dto.Published;
         content.Edited = dto.Edited;
 
-        if (publishedVersion is not null)
+        if (publishedContentVersion is not null)
         {
-            content.PublishedVersionId = publishedVersion.Id;
+            content.PublishedVersionId = publishedContentVersion.Id;
             if (dto.Published)
             {
-                content.PublishDate = publishedVersion.ContentVersionDto.VersionDate.EnsureUtc();
-                content.PublishName = publishedVersion.ContentVersionDto.Text;
-                content.PublisherId = publishedVersion.ContentVersionDto.UserId;
+                content.PublishDate = publishedContentVersion.VersionDate.EnsureUtc();
+                content.PublishName = publishedContentVersion.Text;
+                content.PublisherId = publishedContentVersion.UserId;
             }
         }
     }
