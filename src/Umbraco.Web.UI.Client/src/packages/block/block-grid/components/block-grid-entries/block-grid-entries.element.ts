@@ -423,7 +423,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				)}
 			</div>
 			${when(this._allowedBlockTypes && this._allowedBlockTypes.length > 0, () => this.#renderCreateButtonGroup())}
-			${when(this._areaKey, () => html`<uui-form-validation-message .for=${this}></uui-form-validation-message>`)}
+			${when(this._areaKey, () => html`<umb-form-validation-message .for=${this}></umb-form-validation-message>`)}
 		`;
 	}
 

@@ -1,6 +1,6 @@
 export default [{
 name: "icon-activity",
-keywords: ["pulse","action","motion","movement","exercise","fitness","healthcare","heart rate monitor","vital signs","vitals","emergency room","er","intensive care","hospital","defibrillator","earthquake","siesmic","magnitude","richter scale","aftershock","tremor","shockwave","audio","waveform","synthesizer","synthesiser","music"],
+keywords: ["pulse","action","motion","movement","exercise","fitness","healthcare","heart rate monitor","vital signs","vitals","emergency room","er","intensive care","hospital","defibrillator","earthquake","seismic","magnitude","richter scale","aftershock","tremor","shockwave","audio","waveform","synthesizer","synthesiser","music"],
 groups: ["medical","account","social","science","multimedia"],
 path: () => import("./icons/icon-activity.js"),
 },{
@@ -517,7 +517,7 @@ groups: ["shapes","gaming"],
 path: () => import("./icons/icon-clubs.js"),
 },{
 name: "icon-cocktail",
-keywords: ["cocktail","alcohol","beverage","bar","drink","glass"],
+keywords: ["cocktail","alcohol","beverage","bar","drink","glass","spirit","party","celebration","mixer"],
 groups: ["food-beverage"],
 path: () => import("./icons/icon-cocktail.js"),
 },{
@@ -640,7 +640,7 @@ groups: ["development"],
 path: () => import("./icons/icon-command.js"),
 },{
 name: "icon-company",
-keywords: ["city","cities","towns","companies","sky scrapers","buildings","offices","business","company","enterprise","skyscraper","organisation","organization"],
+keywords: ["city","cities","towns","companies","sky scrapers","buildings","offices"],
 groups: ["building","account","buildings"],
 path: () => import("./icons/icon-company.js"),
 },{
@@ -650,7 +650,7 @@ groups: ["files"],
 path: () => import("./icons/icon-compress.js"),
 },{
 name: "icon-connection",
-keywords: ["flash","camera","lightning","electricity","energy"],
+keywords: ["flash","camera","lightning","electricity","energy","power","quick"],
 groups: ["connectivity","devices","photography","weather"],
 path: () => import("./icons/icon-connection.js"),
 },{
@@ -757,7 +757,7 @@ path: () => import("./icons/icon-departure.js"),
 },{
 name: "icon-desktop",
 hidden: true,
-keywords: ["tv","screen","display","virtual machine","vm"],
+keywords: ["tv","computer","desktop","screen","display","external display","screen sharing","virtual machine","vm"],
 groups: ["connectivity","devices"],
 path: () => import("./icons/icon-desktop.js"),
 },{
@@ -824,7 +824,7 @@ groups: ["item","technology","hardware","development","devices"],
 path: () => import("./icons/icon-disk-image.js"),
 },{
 name: "icon-display",
-keywords: ["displays","monitors","screens","tvs","televisions","computers","pcs","tv","screen","display","virtual machine","vm"],
+keywords: ["displays","monitors","screens","tvs","televisions","computers","pcs","tv","computer","desktop","screen","display","external display","screen sharing","virtual machine","vm"],
 groups: ["item","technology","hardware","connectivity","devices"],
 path: () => import("./icons/icon-display.js"),
 },{
@@ -877,7 +877,7 @@ groups: ["arrows","files"],
 path: () => import("./icons/icon-download-alt.js"),
 },{
 name: "icon-download",
-keywords: ["tv","screen","display","desktop","download"],
+keywords: ["tv","computer","screen","display","desktop","external display","screen sharing","download","remote","cast"],
 groups: ["connectivity","devices"],
 path: () => import("./icons/icon-download.js"),
 },{
@@ -903,7 +903,7 @@ groups: ["item","design","cursors","tools","text"],
 path: () => import("./icons/icon-edit.js"),
 },{
 name: "icon-embed",
-keywords: ["tv","screen","display","desktop","video","movie","film","running","start","boot","virtual machine","vm"],
+keywords: ["tv","computer","screen","display","desktop","external display","screen sharing","video","movie","film","play","running","start","boot","virtual machine","vm"],
 groups: ["connectivity","devices","multimedia"],
 path: () => import("./icons/icon-embed.js"),
 },{
@@ -1011,7 +1011,7 @@ groups: ["development","navigation"],
 path: () => import("./icons/icon-flag.js"),
 },{
 name: "icon-flash",
-keywords: ["flash","camera","lightning","electricity","energy"],
+keywords: ["flash","camera","lightning","electricity","energy","power","quick"],
 groups: ["connectivity","devices","photography","weather"],
 path: () => import("./icons/icon-flash.js"),
 },{
@@ -1143,7 +1143,7 @@ groups: ["item","technology","hardware","connectivity","science"],
 path: () => import("./icons/icon-gps.js"),
 },{
 name: "icon-graduate",
-keywords: ["school","university","learn","study","mortarboard","education","ceremony","academic","hat","diploma","bachlor's","master's","doctorate"],
+keywords: ["school","university","learn","study","mortarboard","education","ceremony","academic","hat","diploma","bachelor's","master's","doctorate"],
 groups: ["buildings"],
 path: () => import("./icons/icon-graduate.js"),
 },{
@@ -1276,7 +1276,6 @@ groups: ["accessibility","medical"],
 path: () => import("./icons/icon-help.js"),
 },{
 name: "icon-history",
-keywords: ["time","redo","undo","rewind","timeline","version","time machine","backup","rotate","ccw"],
 groups: ["arrows","time"],
 path: () => import("./icons/icon-history.js"),
 },{
@@ -1297,7 +1296,7 @@ path: () => import("./icons/icon-hourglass.js"),
 },{
 name: "icon-imac",
 hidden: true,
-keywords: ["tv","screen","display","virtual machine","vm"],
+keywords: ["tv","computer","desktop","screen","display","external display","screen sharing","virtual machine","vm"],
 groups: ["connectivity","devices"],
 path: () => import("./icons/icon-imac.js"),
 },{
@@ -1341,13 +1340,13 @@ path: () => import("./icons/icon-invoice.js"),
 },{
 name: "icon-ipad",
 hidden: true,
-keywords: ["tablet","device"],
+keywords: ["tablet","device","mobile","screen","display","touchscreen","portable","responsive"],
 groups: ["devices"],
 path: () => import("./icons/icon-ipad.js"),
 },{
 name: "icon-iphone",
 hidden: true,
-keywords: ["mobiles","telephones","cellphones","cell phones","phone","cellphone","device","screen"],
+keywords: ["mobiles","telephones","cellphones","cell phones","phone","cellphone","device","mobile","screen","display","touchscreen","portable","responsive"],
 groups: ["item","household","phone","connectivity","devices"],
 related: ["icon-old-phone","icon-phone","icon-phone-ring"],
 path: () => import("./icons/icon-iphone.js"),
@@ -1425,7 +1424,7 @@ groups: ["item","photography"],
 path: () => import("./icons/icon-lense.js"),
 },{
 name: "icon-library",
-keywords: ["temple","institution","government","bank","building","capitol","finance","money","museum","art gallery","hall","institute","pediment","portico","columns","pillars","classical","architecture"],
+keywords: ["temple","institution","government","bank","building","capitol","finance","money","museum","art gallery","hall","institute","pediment","portico","doric","columns","pillars","classical","architecture","monument","site","history","historic","library","ancient","structure"],
 groups: ["building","finance","navigation","buildings"],
 related: ["icon-school"],
 path: () => import("./icons/icon-library.js"),
@@ -1618,7 +1617,7 @@ groups: ["data","development"],
 path: () => import("./icons/icon-mindmap.js"),
 },{
 name: "icon-mobile",
-keywords: ["phone","cellphone","device","screen"],
+keywords: ["phone","cellphone","device","mobile","screen","display","touchscreen","portable","responsive"],
 groups: ["connectivity","devices"],
 path: () => import("./icons/icon-mobile.js"),
 },{
@@ -1648,7 +1647,7 @@ groups: ["item","photography","multimedia"],
 path: () => import("./icons/icon-movie.js"),
 },{
 name: "icon-multiple-credit-cards",
-keywords: ["payments","debit cards","credit cards","contactless","cashless","loyalty cards","store cards","business cards","money","finance","pocket","credit","purchase","payment","shopping","retail","consumer","cc"],
+keywords: ["payments","debit cards","credit cards","contactless","cashless","loyalty cards","store cards","business cards","wallet","cards","banking","cash","debit","transport","money","finance","pocket","credit","purchase","payment","shopping","retail","consumer","cc"],
 groups: ["item","money","card","account","finance"],
 related: ["icon-credit-card","icon-credit-card-alt","icon-multiple-credit-cards"],
 path: () => import("./icons/icon-multiple-credit-cards.js"),
@@ -1939,7 +1938,7 @@ path: () => import("./icons/icon-pause.js"),
 },{
 name: "icon-pc",
 hidden: true,
-keywords: ["computers","servers","desktops","pcs","tv","screen","display","virtual machine","vm"],
+keywords: ["computers","servers","desktops","pcs","tv","computer","desktop","screen","display","external display","screen sharing","virtual machine","vm"],
 groups: ["item","technology","hardware","connectivity","devices"],
 path: () => import("./icons/icon-pc.js"),
 },{
@@ -2056,7 +2055,7 @@ groups: ["misc","game","development","layout","shapes"],
 path: () => import("./icons/icon-plugin.js"),
 },{
 name: "icon-podcast",
-keywords: ["person","users","people","audio","music","mic","talk","voice","subscribe","subscription","stream"],
+keywords: ["person","users","people"],
 groups: ["user","special","multimedia","social"],
 path: () => import("./icons/icon-podcast.js"),
 },{
@@ -2141,7 +2140,7 @@ groups: ["item","media","multimedia","photography","devices","communication"],
 path: () => import("./icons/icon-projector.js"),
 },{
 name: "icon-pulse",
-keywords: ["heartbeat","health","line charts","monitors","line graphs","pulse","action","motion","movement","exercise","fitness","healthcare","heart rate monitor","vital signs","vitals","emergency room","er","intensive care","hospital","defibrillator","earthquake","siesmic","magnitude","richter scale","aftershock","tremor","shockwave","audio","waveform","synthesizer","synthesiser","music"],
+keywords: ["heartbeat","health","line charts","monitors","line graphs","pulse","action","motion","movement","exercise","fitness","healthcare","heart rate monitor","vital signs","vitals","emergency room","er","intensive care","hospital","defibrillator","earthquake","seismic","magnitude","richter scale","aftershock","tremor","shockwave","audio","waveform","synthesizer","synthesiser","music"],
 groups: ["data","medical","account","social","science","multimedia"],
 path: () => import("./icons/icon-pulse.js"),
 },{
@@ -2241,7 +2240,7 @@ groups: ["item","household","math","devices"],
 path: () => import("./icons/icon-remote.js"),
 },{
 name: "icon-remove",
-keywords: ["minus","subtracts","lines","deletes","garbage","delete","remove","bin"],
+keywords: ["minus","subtracts","lines","deletes"],
 groups: ["maths","files","mail"],
 path: () => import("./icons/icon-remove.js"),
 },{
@@ -2306,7 +2305,7 @@ groups: ["item","tool","tools","design","layout"],
 path: () => import("./icons/icon-ruler.js"),
 },{
 name: "icon-satellite-dish",
-keywords: ["broadcasts","transmits","receiver","antenna","dish aerial","saucer"],
+keywords: ["broadcasts","transmits","receiver","antenna","dish aerial","saucer","communication","broadcast","signal"],
 groups: ["item","technology","hardware","connectivity","devices","multimedia"],
 path: () => import("./icons/icon-satellite-dish.js"),
 },{
@@ -2352,7 +2351,7 @@ related: ["icon-piracy"],
 path: () => import("./icons/icon-scull.js"),
 },{
 name: "icon-search",
-keywords: ["magnifying glass","find","scan","magnifier","lens"],
+keywords: ["magnifying glass","find","scan","magnifier","lens","locate","explore","discover","enlarge","zoom"],
 groups: ["item","household","text","social"],
 path: () => import("./icons/icon-search.js"),
 },{
@@ -2412,7 +2411,7 @@ groups: ["action","key","arrows","text","development","gaming"],
 path: () => import("./icons/icon-shift.js"),
 },{
 name: "icon-shipping-box",
-keywords: ["grid","grill","lines","storage","shipping","freight","supply chain","docker","environment","devops","code","coding"],
+keywords: ["grid","grill","lines","storage","shipping","freight","supply chain","environment","devops","code","coding"],
 groups: ["shape","box","development","transport","mail"],
 path: () => import("./icons/icon-shipping-box.js"),
 },{
@@ -2488,13 +2487,13 @@ path: () => import("./icons/icon-slideshow.js"),
 },{
 name: "icon-smiley-inverted",
 hidden: true,
-keywords: ["emojis","emoticons","faces","people","person","user","happy","happiness","emoji","face","good","emotion"],
+keywords: ["emojis","emoticons","faces","people","person","user","happy","happiness"],
 groups: ["user","emoji","account"],
 related: ["icon-smiley"],
 path: () => import("./icons/icon-smiley-inverted.js"),
 },{
 name: "icon-smiley",
-keywords: ["emojis","emoticons","faces","people","person","user","happy","happiness","emoji","face","good","emotion"],
+keywords: ["emojis","emoticons","faces","people","person","user","happy","happiness"],
 groups: ["user","emoji","account"],
 related: ["icon-smiley-inverted"],
 path: () => import("./icons/icon-smiley.js"),
@@ -2529,7 +2528,7 @@ related: ["icon-sound-medium","icon-sound-low","icon-sound","icon-sound-waves","
 path: () => import("./icons/icon-sound-off.js"),
 },{
 name: "icon-sound-waves",
-keywords: ["sounds","audio","music","water","sea","sound","hertz","wavelength","vibrate"],
+keywords: ["sounds","audio","music"],
 groups: ["item","media","weather","navigation","multimedia","sustainability"],
 path: () => import("./icons/icon-sound-waves.js"),
 },{
@@ -2627,7 +2626,7 @@ path: () => import("./icons/icon-store.js"),
 },{
 name: "icon-stream",
 hidden: true,
-keywords: ["circle","wave","sine","alternating current","pulse","action","motion","movement","exercise","fitness","healthcare","heart rate monitor","vital signs","vitals","emergency room","er","intensive care","hospital","defibrillator","earthquake","siesmic","magnitude","richter scale","aftershock","tremor","shockwave","audio","waveform","synthesizer","synthesiser","music"],
+keywords: ["circle","wave","sine","alternating current","pulse","action","motion","movement","exercise","fitness","healthcare","heart rate monitor","vital signs","vitals","emergency room","er","intensive care","hospital","defibrillator","earthquake","seismic","magnitude","richter scale","aftershock","tremor","shockwave","audio","waveform","synthesizer","synthesiser","music"],
 groups: ["misc","medical","social","science","multimedia"],
 path: () => import("./icons/icon-stream.js"),
 },{
@@ -2829,20 +2828,20 @@ path: () => import("./icons/icon-train.js"),
 },{
 name: "icon-trash-alt-2",
 hidden: true,
-keywords: ["bin","rubbish","garbage","delete","remove"],
+keywords: ["bin","rubbish"],
 groups: ["item","household","files","mail"],
 related: ["icon-trash","icon-trash-alt"],
 path: () => import("./icons/icon-trash-alt-2.js"),
 },{
 name: "icon-trash-alt",
 hidden: true,
-keywords: ["bin","rubbish","garbage","delete","remove"],
+keywords: ["bin","rubbish"],
 groups: ["item","household","files","mail"],
 related: ["icon-trash","icon-trash-alt-2"],
 path: () => import("./icons/icon-trash-alt.js"),
 },{
 name: "icon-trash",
-keywords: ["bin","rubbish","garbage","delete","remove"],
+keywords: ["bin","rubbish"],
 groups: ["item","household","files","mail"],
 related: ["icon-trash-alt","icon-trash-alt-2"],
 path: () => import("./icons/icon-trash.js"),
@@ -2858,7 +2857,7 @@ groups: ["charts","arrows"],
 path: () => import("./icons/icon-trending-up-down.js"),
 },{
 name: "icon-trophy",
-keywords: ["awards","cups","winnings","rewards","prize","sports","winner","achievement","award","champion","celebration","victory"],
+keywords: ["awards","cups","winnings","rewards","prize","sports","winner","achievement","award","champion","celebration","victory","competition","tournament","leaderboard","ranking","success","reward","cup","first","gold"],
 groups: ["item","award","sports","gaming"],
 related: ["icon-medal","icon-diploma","icon-diploma-alt"],
 path: () => import("./icons/icon-trophy.js"),
@@ -2876,7 +2875,7 @@ related: ["icon-tv"],
 path: () => import("./icons/icon-tv-old.js"),
 },{
 name: "icon-tv",
-keywords: ["telly","tv","monitor","display","screen","desktop","video","movie","film","running","start","boot","virtual machine","vm"],
+keywords: ["telly","tv","monitor","display","computer","screen","desktop","external display","screen sharing","video","movie","film","play","running","start","boot","virtual machine","vm"],
 groups: ["item","technology","connectivity","devices","multimedia"],
 related: ["icon-tv-old"],
 path: () => import("./icons/icon-tv.js"),
@@ -3316,7 +3315,7 @@ groups: ["shapes","files"],
 path: () => import("./icons/icon-layout-dislocated.js"),
 },{
 name: "icon-blend",
-keywords: ["mode","overlay","multiply","screen","opacity","transparency","alpha","filters","lenses","mixed","shades","tints","hues","saturation","brightness","overlap","colors","colours"],
+keywords: ["mode","overlay","multiply","screen","opacity","transparency","alpha","filters","lenses","mixed","shades","tints","hues","saturation","brightness","overlap","colors","colours","marriage","rings","couple","connection"],
 groups: ["design","photography","tools","development"],
 path: () => import("./icons/icon-blend.js"),
 },{
