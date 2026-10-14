@@ -153,7 +153,7 @@ internal class DocumentRepository
             if (item.ContentType.VariesByCulture())
             {
                 (List<ContentVersionCultureVariationDto> contentVariations, List<DocumentCultureVariationDto> entityVariations, editedCultures, _) =
-                    await ResolveCultureVariationChangesAsync(item, publishing, isNew: true, editedCultures, dto.CurrentVersion.ContentVersionDto.VersionDate);
+                    await ResolveCultureVariationChangesAsync(item, publishing, isNew: true, editedCultures, item.UpdateDate);
 
                 if (contentVariations.Count > 0)
                 {
