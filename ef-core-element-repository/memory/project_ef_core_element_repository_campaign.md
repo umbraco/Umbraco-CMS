@@ -81,8 +81,7 @@ folder on the shared integration branch; reverted (local only) because coworkers
 - Red-proof pattern that worked: point the factory at the draft version instead of the published one; `PublishName` is the unambiguous discriminator (`PublisherId` is the same writer on both rows, so it does not discriminate).
 
 **PR 3 (write-path hoist, 14-10-2026, branch `v20/feature/ef-core-element-repository-3-hoist-write-path` cut from PR 2b):**
-- Hooks: `BuildEntityRow(entity)`, `BuildEntityVersionRow(entity, publishing)` (reads `entity.VersionId`, so assign the id first), `UpdateEntityVersionRowAsync(db, row)`. Base composes `ContentWriteRow` from `ContentBaseFactory.BuildEFCoreNodeDto/ContentDto/ContentVersionDto` (internal).
+- Hooks: `BuildEntityRow(entity, published, edited)` (called after the node id and flags are decided), `BuildEntityVersionRow(entity, publishing)` (reads `entity.VersionId`, so assign the id first), `UpdateEntityVersionRowAsync(db, row)`. Base composes `ContentWriteRow` (node, content, content version only) from `ContentBaseFactory.BuildEFCoreNodeDto/ContentDto/ContentVersionDto` (internal). Rule the user set: never put setters on the EF Core DTO interfaces; build a row when its values are known instead of mutating it.
 - Trap: `db.Set<T>().Update(row)` on a row whose id the scope's context already tracks (inserted earlier in the same scope) throws "already being tracked"; use an update statement. The scope's DbContext lives across the whole unit of work, so Adds stay tracked.
 - Interface-member `SetProperty` on `db.Set<TEntityDto>()` translates (name binding to implicit implementations); no locals needed.
 - Templates: `ITemplatedContent` cast in generic code is the NPoco precedent, not a hook.
-- `IPublishableContentDto`/`IContentVersionDto` column members are `{ get; set; }` again (columns, not navigations).
