@@ -56,8 +56,7 @@ describe('apiErrorWasNotified', () => {
 		expect(apiErrorWasNotified(new Error('boom'))).to.be.true;
 	});
 
-	// The UmbError type guards read `.name` off the argument, so these would throw without the guard. They also
-	// never came from tryExecute, so nothing was notified for them.
+	// These never came from tryExecute, so nothing was notified for them.
 	it('reports that a missing or primitive error was not notified', () => {
 		expect(apiErrorWasNotified(undefined)).to.be.false;
 		expect(apiErrorWasNotified(null)).to.be.false;
