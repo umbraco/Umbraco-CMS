@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 /// <summary>
 ///     Defines the contract for an EF Core publishable content DTO — the EF Core counterpart of the NPoco
 ///     <c>IPublishableContentDto&lt;TVersionDto&gt;</c>, reduced to the columns the publishable repository base
-///     reads generically. The rows persisted alongside the entity row are passed separately, never aggregated here.
+///     reads and updates generically. The rows persisted alongside the entity row are passed separately, never aggregated here.
 /// </summary>
 internal interface IPublishableContentDto
 {

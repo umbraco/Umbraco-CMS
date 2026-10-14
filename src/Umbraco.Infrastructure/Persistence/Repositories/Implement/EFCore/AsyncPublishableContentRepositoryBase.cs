@@ -533,11 +533,11 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
             item.SanitizeEntityPropertiesForXmlStorage();
 
-            ContentWriteRow row = BuildWriteRow(item, publishing);
+            (NodeDto nodeDto, ContentDto contentDto, ContentVersionDto contentVersionDto) = BuildWriteRow(item, publishing);
 
-            await PersistNewNodeAsync(db, item, row.Node);
-            await PersistNewContentAsync(db, item, row.Content);
-            await PersistNewVersionsAsync(db, item, row.ContentVersion, publishing);
+            await PersistNewNodeAsync(db, item, nodeDto);
+            await PersistNewContentAsync(db, item, contentDto);
+            await PersistNewVersionsAsync(db, item, contentVersionDto, publishing);
 
             (bool edited, HashSet<string>? editedCultures) = await PersistNewPropertyDataAsync(db, item);
 
@@ -634,9 +634,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
                 }
             }
 
-            ContentWriteRow row = BuildWriteRow(item, publishing);
+            (NodeDto nodeDto, ContentDto contentDto, ContentVersionDto contentVersionDto) = BuildWriteRow(item, publishing);
 
-            NodeDto nodeDto = row.Node;
             ValidatePath(nodeDto);
             await db.Nodes.Where(node => node.NodeId == item.Id).ExecuteUpdateAsync(setters => setters
                 .SetProperty(node => node.Text, nodeDto.Text)
@@ -660,9 +659,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             }
 
             await db.Content.Where(content => content.NodeId == item.Id).ExecuteUpdateAsync(setters => setters
-                .SetProperty(content => content.ContentTypeId, row.Content.ContentTypeId));
+                .SetProperty(content => content.ContentTypeId, contentDto.ContentTypeId));
 
-            ContentVersionDto contentVersionDto = row.ContentVersion;
             TContentVersionDto entityVersionDto = BuildEntityVersionRow(item, publishing);
 
             // Preserve the existing flag — `version` is the ContentVersionDto fetched above for the
