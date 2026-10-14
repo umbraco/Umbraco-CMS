@@ -117,10 +117,10 @@
       "id": "2b",
       "slug": "entity-from-row-parts",
       "title": "Build publishable entities from row parts instead of a stitched DTO graph",
-      "status": "in-progress",
+      "status": "in-review",
       "branch": "v20/feature/ef-core-element-repository-2b-entity-from-row-parts",
-      "pr": "",
-      "prUrl": "",
+      "pr": "24203",
+      "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24203",
       "dependsOn": [
         2
       ],
@@ -152,11 +152,11 @@
         },
         {
           "text": "Document fixtures and unit project at unchanged counts; snapshots untouched",
-          "done": false
+          "done": true
         }
       ],
       "acceptance": "Unchanged fixture counts; IPublishableContentDto declares only NodeId/Published/Edited and IContentVersionDto only Id/Published; snapshots untouched.",
-      "notes": "Started 14-10-2026, cut from PR 2's branch (a17da3bd2d6) because it depends on the ContentRow hook; the PR diff includes #24175 until it merges. Implemented 14-10-2026 (uncommitted, awaiting the commit/PR step): BuildEntity(ContentRow, IContentType?) hook, factory takes DocumentDto + NodeDto + current/published ContentVersionDto, stitching and interface setters gone, write-path reassignments and the ignored ContentVersionDto initializers on the new draft row dropped. New test GetAsync_PublishedThenEdited_ExposesThePublishedVersionBesideTheDraft, proven red (PublishedVersionId, PublishName, PublishDate) with the factory pointed at the draft. Independent review: approve after one doc fix (stale 'populated by the repository after query' on the concrete DTOs, realigned on ContentDto, Document* and Element* too). Full solution build clean, snapshots untouched; full fixtures left for the pipeline. Option 2 taken 14-10-2026 after checking media/members (non-publishable, unaffected) and the ignored-member inventory: interfaces stripped to columns, IPublishableContentDto non-generic, element navigation members and DocumentDto.PublishedVersion deleted; DocumentDto.ContentDto/CurrentVersion, DocumentVersionDto.ContentVersionDto and ContentDto.NodeDto stay for PR 3's parts-based write hook. 16 files, +89/-125; build clean, 8 targeted tests green incl. ElementDtoMappingTests, snapshots untouched."
+      "notes": "Started 14-10-2026, cut from PR 2's branch (a17da3bd2d6) because it depends on the ContentRow hook; the PR diff includes #24175 until it merges. Implemented 14-10-2026 (uncommitted, awaiting the commit/PR step): BuildEntity(ContentRow, IContentType?) hook, factory takes DocumentDto + NodeDto + current/published ContentVersionDto, stitching and interface setters gone, write-path reassignments and the ignored ContentVersionDto initializers on the new draft row dropped. New test GetAsync_PublishedThenEdited_ExposesThePublishedVersionBesideTheDraft, proven red (PublishedVersionId, PublishName, PublishDate) with the factory pointed at the draft. Independent review: approve after one doc fix (stale 'populated by the repository after query' on the concrete DTOs, realigned on ContentDto, Document* and Element* too). Full solution build clean, snapshots untouched; full fixtures left for the pipeline. Option 2 taken 14-10-2026 after checking media/members (non-publishable, unaffected) and the ignored-member inventory: interfaces stripped to columns, IPublishableContentDto non-generic, element navigation members and DocumentDto.PublishedVersion deleted; DocumentDto.ContentDto/CurrentVersion, DocumentVersionDto.ContentVersionDto and ContentDto.NodeDto stay for PR 3's parts-based write hook. 16 files, +89/-125; build clean, 8 targeted tests green incl. ElementDtoMappingTests, snapshots untouched. Committed 14-10-2026 as 056b35cc66c (refactor, 15 files) + 08b3a8df761 (test); PR #24203 targets PR 2's branch (v20/feature/ef-core-element-repository-2-hoist-read-path), so its diff is PR 2b alone (16 files). A first push swept 48 untracked build-output files into the refactor commit; history rewritten locally and force-pushed with the user's approval before the PR was opened. The 'unchanged counts' task is left to the pipeline."
     },
     {
       "id": 3,
@@ -341,6 +341,10 @@
     }
   ],
   "log": [
+    {
+      "date": "14-10-2026",
+      "text": "PR 2b opened as #24203 against PR 2's branch (retarget to v18/feature/ef-core-repositories once #24175 merges)."
+    },
     {
       "date": "14-10-2026",
       "text": "PR 2b widened (option 2): navigation members removed from the DTO interfaces, IPublishableContentDto non-generic, never-read element members and DocumentDto.PublishedVersion deleted. PR 3 re-specified to build the write path from parts and delete the remaining Document navigation members plus ContentDto.NodeDto. Media/members checked: unaffected."
