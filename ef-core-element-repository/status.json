@@ -162,8 +162,8 @@
       "id": 3,
       "slug": "hoist-write-path",
       "title": "Hoist the generic write path out of DocumentRepository",
-      "status": "planned",
-      "branch": "",
+      "status": "in-progress",
+      "branch": "v20/feature/ef-core-element-repository-3-hoist-write-path",
       "pr": "",
       "prUrl": "",
       "dependsOn": [
@@ -172,35 +172,36 @@
       "summary": "Write hook returns row parts (no DTO graph); PersistNew/PersistUpdated, versions, property data, culture variations, sortable values, tags and flag flips move into the base; version-DTO building and default template become hooks; the last navigation members and ContentDto.NodeDto are deleted.",
       "tasks": [
         {
-          "text": "Parts-returning write hook replaces BuildEntityDto; DocumentDto.ContentDto/CurrentVersion, DocumentVersionDto.ContentVersionDto and ContentDto.NodeDto deleted with their Ignore lines",
-          "done": false
+          "text": "Parts-returning write path: ContentWriteRow composed by the base from BuildEntityRow/BuildEntityVersionRow; DocumentDto.ContentDto/CurrentVersion, DocumentVersionDto.ContentVersionDto and ContentDto.NodeDto deleted with their Ignore lines",
+          "done": true
         },
         {
           "text": "PersistNewItemAsync and helpers hoisted",
-          "done": false
+          "done": true
         },
         {
-          "text": "PersistUpdatedItemAsync, property-data reconcile, IsMoving fast path hoisted",
-          "done": false
+          "text": "PersistUpdatedItemAsync, property-data reconcile, IsMoving fast path hoisted; entity-version update behind UpdateEntityVersionRowAsync",
+          "done": true
         },
         {
           "text": "Culture-variation DTO building generic over ICultureVariationDto",
-          "done": false
+          "done": true
         },
         {
-          "text": "BuildVersionDto hook; default-template assignment stays Document-only",
-          "done": false
+          "text": "Templates generic through the ITemplatedContent cast (default template, publish-template flips)",
+          "done": true
         },
         {
-          "text": "IIdKeyMap, ITagRepository, IJsonSerializer moved into the base constructor",
-          "done": false
+          "text": "IIdKeyMap, ITagRepository, IJsonSerializer moved into the content base constructor; tags, sortable values, sort order, reserved id, path validation, parent key on AsyncContentRepositoryBase",
+          "done": true
         },
         {
-          "text": "Document fixtures green with unchanged counts",
+          "text": "Document fixtures green with unchanged counts (pipeline)",
           "done": false
         }
       ],
-      "acceptance": "Same as PR 2 plus every write-path test in DocumentRepositoryTest; DocumentRepository.cs is Document-only code."
+      "acceptance": "Same as PR 2 plus every write-path test in DocumentRepositoryTest; DocumentRepository.cs is Document-only code.",
+      "notes": "Started 14-10-2026, cut from PR 2b's branch (5cc4ce938aa); the PR diff includes #24175 and #24203 until they merge. Design: the base composes a ContentWriteRow (node, content, content version, entity version, entity row) from two per-kind hooks, BuildEntityRow(entity) and BuildEntityVersionRow(entity, publishing); templates stay generic through the ITemplatedContent capability cast exactly as the NPoco base does; the entity-version update becomes a full-row Update like NPoco's Database.Update. Implemented 14-10-2026 (uncommitted, awaiting the commit/PR step): DocumentRepository 1366 -> ~550 lines; every moved method diffed against its original (only row parts, hook calls, access modifiers and ITemplatedContent casts differ); 55 write-path and related tests green on SQLite; full solution build clean; snapshots untouched. A tracked full-row Update for the entity version failed ('already being tracked') and became the UpdateEntityVersionRowAsync hook. Independent review: no correctness findings; blank lines, param-doc altitude on the content base ('on save', not 'on publish'), one 'document' in generic code and four nits fixed."
     },
     {
       "id": 4,
@@ -341,6 +342,14 @@
     }
   ],
   "log": [
+    {
+      "date": "14-10-2026",
+      "text": "PR 3 implemented and reviewed: write path hoisted into the bases from row parts via three hooks; the last DTO navigation members are gone; 55 tests green, move verified mechanically. Awaiting the commit/PR step."
+    },
+    {
+      "date": "14-10-2026",
+      "text": "PR 3 started on v20/feature/ef-core-element-repository-3-hoist-write-path, cut from PR 2b's branch."
+    },
     {
       "date": "14-10-2026",
       "text": "PR 2b review round 1 answered: PersistNewItemAsync takes the version date from item.UpdateDate (5cc4ce938aa); PR description corrected."

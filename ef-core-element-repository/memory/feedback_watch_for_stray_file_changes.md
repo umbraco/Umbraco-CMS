@@ -18,3 +18,9 @@ Twice in one session, `git status` showed `.editorconfig` as modified with a sin
 1. Before every `git add`/`git commit`, run `git status --short` and scan for any file outside the set you intentionally touched — `git diff --stat` on specific paths won't surface a stray file at all.
 2. If something unexpected recurs (the same file, especially with a plausible-looking config value), don't just revert it silently a second time — say so explicitly and ask, since a recurring identical mutation is more likely to be a real signal (a tool trying to apply a fix, a linter suggestion, environment drift) than random noise.
 3. If it turns out to be wanted (as here), apply it properly and deliberately once you have the context, rather than leaving it to keep reappearing and getting reverted.
+
+**14-10-2026 addendum:** never stage with a directory pathspec (`git add src/`). This checkout carries untracked junk
+(`src/Umbraco.Web.UI/bin\Debug/` with a literal backslash, `src/Umbraco.Cms.Search.Core.Client/`) that a directory add
+sweeps into the commit; it put 48 build-output files into a pushed PR 2b commit and cost a history rewrite. Stage with
+`git add -u <dir>` (tracked files only) or explicit paths, and check `git show --stat HEAD | tail -1` against the
+expected file count before pushing. In zsh an unquoted `$FILES` is not word-split, so a space-joined list fails as one path.
