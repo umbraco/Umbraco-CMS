@@ -4,6 +4,12 @@ import type { UmbPropertyValueCloner } from '@umbraco-cms/backoffice/property';
 
 export type UmbBlockPropertyValueClonerArgs = {
 	contentIdUpdatedCallback?: (oldContentKey: string, newContentKey: string) => void;
+	/**
+	 * Called when a cloned layout entry gets a new key. Called for external content as well, and before `contentIdUpdatedCallback`.
+	 * @param oldLayoutKey - The key of the original layout entry.
+	 * @param newLayoutKey - The key of the cloned layout entry.
+	 * @param contentKey - The content key of the original layout entry, from before it is renewed.
+	 */
 	layoutKeyUpdatedCallback?: (oldLayoutKey: string | undefined, newLayoutKey: string, contentKey: string) => void;
 };
 
