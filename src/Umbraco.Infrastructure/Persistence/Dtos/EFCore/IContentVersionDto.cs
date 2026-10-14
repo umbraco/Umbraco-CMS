@@ -7,9 +7,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 /// </summary>
 internal interface IContentVersionDto
 {
-    /// <summary>Gets or sets the primary key, shared with <see cref="ContentVersionDto.Id" />.</summary>
-    int Id { get; set; }
+    /// <summary>Gets the primary key, shared with <see cref="ContentVersionDto.Id" />.</summary>
+    int Id { get; }
 
-    /// <summary>Gets or sets a value indicating whether this version is the published one.</summary>
-    bool Published { get; set; }
+    /// <summary>Gets a value indicating whether this version is the published one.</summary>
+    bool Published { get; }
 }

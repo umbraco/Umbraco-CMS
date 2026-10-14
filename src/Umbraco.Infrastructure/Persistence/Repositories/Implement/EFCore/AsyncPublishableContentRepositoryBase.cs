@@ -116,16 +116,20 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     protected abstract TEntity BuildEntity(ContentRow<TEntityDto, TContentVersionDto> row, IContentType? contentType);
 
     /// <summary>
-    ///     Builds the entity row (<typeparamref name="TEntityDto" />) persisted for a domain entity. The node, content
-    ///     and shared version rows are built by the base; this hook supplies only the kind-specific table row.
+    ///     Builds the entity row (<typeparamref name="TEntityDto" />) inserted for a new domain entity, once its node id
+    ///     and the published and edited flags being persisted are known. The node, content and shared version rows
+    ///     are built by the base; this hook supplies only the kind-specific table row.
     /// </summary>
-    /// <param name="entity">The domain entity being persisted.</param>
-    /// <returns>The entity row ready to be saved.</returns>
-    protected abstract TEntityDto BuildEntityRow(TEntity entity);
+    /// <param name="entity">The domain entity being persisted, with its id assigned.</param>
+    /// <param name="published">The published flag to persist; the entity still carries the value from before the save.</param>
+    /// <param name="edited">The edited flag to persist.</param>
+    /// <returns>The entity row ready to be inserted.</returns>
+    protected abstract TEntityDto BuildEntityRow(TEntity entity, bool published, bool edited);
 
     /// <summary>
     ///     Builds the entity-specific version row (<typeparamref name="TContentVersionDto" />) for the entity's current
-    ///     version, with <see cref="IContentVersionDto.Published" /> set to <paramref name="publishing" />.
+    ///     version, from <see cref="IContentBase.VersionId" /> and with <see cref="IContentVersionDto.Published" /> set
+    ///     to <paramref name="publishing" />. Called once the version id is assigned.
     /// </summary>
     /// <param name="entity">The domain entity whose current version is being persisted.</param>
     /// <param name="publishing">Whether that version is being published as part of the same save.</param>
@@ -141,13 +145,11 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// <param name="entityVersion">The row carrying the id and the values to write.</param>
     protected abstract Task UpdateEntityVersionRowAsync(UmbracoDbContext db, TContentVersionDto entityVersion);
 
-    private ContentWriteRow<TEntityDto, TContentVersionDto> BuildWriteRow(TEntity entity, bool publishing) =>
+    private ContentWriteRow BuildWriteRow(TEntity entity, bool publishing) =>
         new(
             ContentBaseFactory.BuildEFCoreNodeDto(entity, NodeObjectTypeKey),
             ContentBaseFactory.BuildEFCoreContentDto(entity),
-            ContentBaseFactory.BuildEFCoreContentVersionDto(entity, publishing),
-            BuildEntityVersionRow(entity, publishing),
-            BuildEntityRow(entity));
+            ContentBaseFactory.BuildEFCoreContentVersionDto(entity, publishing));
 
     /// <summary>
     ///     Builds the join every read query of this repository starts from, over nodes and content versions the
@@ -531,11 +533,11 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
             item.SanitizeEntityPropertiesForXmlStorage();
 
-            ContentWriteRow<TEntityDto, TContentVersionDto> row = BuildWriteRow(item, publishing);
+            ContentWriteRow row = BuildWriteRow(item, publishing);
 
             await PersistNewNodeAsync(db, item, row.Node);
             await PersistNewContentAsync(db, item, row.Content);
-            await PersistNewVersionsAsync(db, item, row.ContentVersion, row.EntityVersion);
+            await PersistNewVersionsAsync(db, item, row.ContentVersion, publishing);
 
             (bool edited, HashSet<string>? editedCultures) = await PersistNewPropertyDataAsync(db, item);
 
@@ -545,16 +547,11 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
                 edited = true;
             }
 
-            // at that point, when publishing, the entity still has its old Published value
-            // so we need to explicitly update the row to persist the correct value
-            if (publishing)
-            {
-                row.Entity.Published = true;
-            }
-
-            row.Entity.NodeId = item.Id;
-            item.Edited = row.Entity.Edited = !row.Entity.Published || edited; // if not published, always edited
-            db.Set<TEntityDto>().Add(row.Entity);
+            // at that point, when publishing, the entity still has its old Published value,
+            // so the value being persisted is decided here rather than read from the entity
+            bool published = publishing || item.Published;
+            item.Edited = edited = !published || edited; // if not published, always edited
+            db.Set<TEntityDto>().Add(BuildEntityRow(item, published, edited));
             await db.SaveChangesAsync();
 
             if (item.ContentType.VariesByCulture())
@@ -637,7 +634,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
                 }
             }
 
-            ContentWriteRow<TEntityDto, TContentVersionDto> row = BuildWriteRow(item, publishing);
+            ContentWriteRow row = BuildWriteRow(item, publishing);
 
             NodeDto nodeDto = row.Node;
             ValidatePath(nodeDto);
@@ -666,7 +663,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
                 .SetProperty(content => content.ContentTypeId, row.Content.ContentTypeId));
 
             ContentVersionDto contentVersionDto = row.ContentVersion;
-            TContentVersionDto entityVersionDto = row.EntityVersion;
+            TContentVersionDto entityVersionDto = BuildEntityVersionRow(item, publishing);
 
             // Preserve the existing flag — `version` is the ContentVersionDto fetched above for the
             // current-version assertion.
@@ -750,20 +747,18 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
                 await db.SaveChangesAsync();
             }
 
-            if (item is { PublishedState: PublishedState.Publishing })
+            bool published = item.PublishedState switch
             {
-                row.Entity.Published = true;
-            }
-            else if (item is { PublishedState: PublishedState.Unpublishing })
-            {
-                row.Entity.Published = false;
-            }
+                PublishedState.Publishing => true,
+                PublishedState.Unpublishing => false,
+                _ => item.Published,
+            };
 
-            item.Edited = row.Entity.Edited = !row.Entity.Published || edited; // if not published, always edited
+            item.Edited = edited = !published || edited; // if not published, always edited
 
             await db.Set<TEntityDto>().Where(entityDto => entityDto.NodeId == item.Id).ExecuteUpdateAsync(setters => setters
-                .SetProperty(entityDto => entityDto.Published, row.Entity.Published)
-                .SetProperty(entityDto => entityDto.Edited, row.Entity.Edited));
+                .SetProperty(entityDto => entityDto.Published, published)
+                .SetProperty(entityDto => entityDto.Edited, edited));
 
             // If entity is publishing, update tags; else leave tags there. This means that implicitly
             // unpublished, or trashed, entities *still* have tags in the database. Mirrors NPoco's
@@ -852,15 +847,14 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         await db.SaveChangesAsync();
     }
 
-    private async Task PersistNewVersionsAsync(UmbracoDbContext db, TEntity item, ContentVersionDto contentVersionDto, TContentVersionDto entityVersionDto)
+    private async Task PersistNewVersionsAsync(UmbracoDbContext db, TEntity item, ContentVersionDto contentVersionDto, bool publishing)
     {
         contentVersionDto.NodeId = item.Id;
         db.ContentVersions.Add(contentVersionDto);
         await db.SaveChangesAsync();
         item.VersionId = contentVersionDto.Id;
 
-        entityVersionDto.Id = item.VersionId;
-        db.Set<TContentVersionDto>().Add(entityVersionDto);
+        db.Set<TContentVersionDto>().Add(BuildEntityVersionRow(item, publishing));
         await db.SaveChangesAsync();
 
         if (item is { PublishedState: PublishedState.Publishing })

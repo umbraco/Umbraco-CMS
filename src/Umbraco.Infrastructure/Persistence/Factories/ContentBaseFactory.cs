@@ -369,17 +369,20 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds the EF Core <see cref="EFCoreDtos.DocumentDto"/> row for the specified <see cref="IContent"/> entity,
-    ///     for persistence via the EF Core write path (mirrors the entity part of <see cref="BuildDto(IContent, Guid)"/>).
-    ///     The node, content and version rows persisted alongside it are built separately.
+    ///     Builds the EF Core <see cref="EFCoreDtos.DocumentDto"/> row inserted for a new <see cref="IContent"/> entity
+    ///     (mirrors the entity part of <see cref="BuildDto(IContent, Guid)"/>). The node, content and version rows
+    ///     persisted alongside it are built separately.
     /// </summary>
-    /// <param name="entity">The content entity to convert into a row.</param>
-    /// <returns>An EF Core <see cref="EFCoreDtos.DocumentDto"/> representing the specified content entity.</returns>
-    internal static EFCoreDtos.DocumentDto BuildEFCoreDocumentDto(IContent entity) =>
+    /// <param name="entity">The content entity, with its id assigned.</param>
+    /// <param name="published">The published flag to persist.</param>
+    /// <param name="edited">The edited flag to persist.</param>
+    /// <returns>An EF Core <see cref="EFCoreDtos.DocumentDto"/> for the specified content entity.</returns>
+    internal static EFCoreDtos.DocumentDto BuildEFCoreDocumentDto(IContent entity, bool published, bool edited) =>
         new()
         {
             NodeId = entity.Id,
-            Published = entity.Published,
+            Published = published,
+            Edited = edited,
         };
 
     /// <summary>

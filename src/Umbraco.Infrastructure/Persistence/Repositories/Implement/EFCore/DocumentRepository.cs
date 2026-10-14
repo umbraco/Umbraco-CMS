@@ -304,8 +304,8 @@ internal class DocumentRepository
         ContentBaseFactory.BuildEntity(row.Entity, row.Node, row.ContentVersion, row.PublishedContentVersion, contentType);
 
     /// <inheritdoc />
-    protected override DocumentDto BuildEntityRow(IContent entity) =>
-        ContentBaseFactory.BuildEFCoreDocumentDto(entity);
+    protected override DocumentDto BuildEntityRow(IContent entity, bool published, bool edited) =>
+        ContentBaseFactory.BuildEFCoreDocumentDto(entity, published, edited);
 
     /// <inheritdoc />
     protected override DocumentVersionDto BuildEntityVersionRow(IContent entity, bool publishing) =>
