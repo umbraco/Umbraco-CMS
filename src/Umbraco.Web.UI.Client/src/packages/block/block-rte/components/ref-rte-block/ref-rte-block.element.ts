@@ -46,6 +46,7 @@ export class UmbRefRteBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElemen
 				<div class="selection-background" aria-hidden="true">&emsp;</div>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				${this.renderNameSlot(blockValue, 'name')}
+				${when(this.unpublished, () => this.#renderDraftTag())}
 			</uui-ref-node>
 		`;
 	}
