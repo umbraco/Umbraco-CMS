@@ -33,6 +33,5 @@ public class DocumentDtoConfiguration : IEntityTypeConfiguration<DocumentDto>
 
         builder.Ignore(x => x.ContentDto);
         builder.Ignore(x => x.CurrentVersion);
-        builder.Ignore(x => x.PublishedVersion);
     }
 }

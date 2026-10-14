@@ -28,7 +28,7 @@ public class DocumentVersionDto : IContentVersionDto
     public bool Published { get; set; }
 
     /// <summary>
-    /// Gets or sets the shared content version row. Not a database column — populated by the repository after query.
+    /// Gets or sets the shared content version row. Not a database column — populated by the factory that builds the DTO for a write.
     /// </summary>
     public ContentVersionDto ContentVersionDto { get; set; } = null!;
 }

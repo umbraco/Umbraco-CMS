@@ -22,7 +22,7 @@ public class ContentDto
     public int ContentTypeId { get; set; }
 
     /// <summary>
-    /// Gets or sets the node row. Not a database column — populated by the repository after query.
+    /// Gets or sets the node row. Not a database column — populated by the factory that builds the DTO for a write.
     /// </summary>
     public NodeDto NodeDto { get; set; } = null!;
 }

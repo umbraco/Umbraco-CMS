@@ -21,5 +21,5 @@ internal sealed record ContentRow<TEntityDto, TContentVersionDto>(
     ContentVersionDto? PublishedContentVersion,
     TContentVersionDto? PublishedEntityVersion,
     Guid? ParentUniqueId)
-    where TEntityDto : class, IPublishableContentDto<TContentVersionDto>
+    where TEntityDto : class, IPublishableContentDto
     where TContentVersionDto : class, IContentVersionDto;
