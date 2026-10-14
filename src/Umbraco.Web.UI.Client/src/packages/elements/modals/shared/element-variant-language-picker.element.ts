@@ -75,6 +75,11 @@ export class UmbElementVariantLanguagePickerElement extends UmbLitElement {
 		}
 	}
 
+	#hasSelectableOption() {
+		const isAllowed = this.selectionManager.getAllowLimitation();
+		return this.variantLanguageOptions.some((option) => isAllowed(option.unique));
+	}
+
 	#onSelectAllChange(event: Event) {
 		const allUniques = this.variantLanguageOptions.map((o) => o.unique);
 		const filter = this.selectionManager.getAllowLimitation();
@@ -105,7 +110,8 @@ export class UmbElementVariantLanguagePickerElement extends UmbLitElement {
 			<uui-checkbox
 				@change=${this.#onSelectAllChange}
 				label=${this.localize.term('general_selectAll')}
-				.checked=${this._isAllSelected}></uui-checkbox>
+				.checked=${this._isAllSelected}
+				?disabled=${!this.#hasSelectableOption()}></uui-checkbox>
 			${repeat(
 				this.variantLanguageOptions,
 				(option) => option.unique,

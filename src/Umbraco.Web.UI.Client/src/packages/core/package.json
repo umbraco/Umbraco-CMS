@@ -12,8 +12,8 @@
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
-		"lucide-static": "^1.8.0",
-		"simple-icons": "^16.16.0",
+		"lucide-static": "^1.52.0",
+		"simple-icons": "^16.34.0",
 		"svgo": "^4.0.2"
 	}
 }
