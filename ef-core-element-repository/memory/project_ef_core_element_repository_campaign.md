@@ -1,6 +1,6 @@
 ---
 name: project_ef_core_element_repository_campaign
-description: "The Element NPoco-to-EF Core campaign (planned 08-10-2026) — where the plan, status file and progress artifact live, the six-PR shape, the hoist-first design decision, and what PR 2 (read-path hoist) established about EF Core translation and the hook shapes"
+description: "The Element NPoco-to-EF Core campaign (planned 08-10-2026) — where the plan, status file and progress artifact live, the PR shape, the hoist-first design decision, what PR 2 established about EF Core translation and hook shapes, and the PR 2b rule that EF Core DTOs are plain rows built from parts"
 metadata:
   node_type: memory
   type: project
@@ -73,3 +73,9 @@ folder on the shared integration branch; reverted (local only) because coworkers
   five paged methods (four on the base, `GetByLevelAsync` on DocumentRepository); consolidating it is a behaviour-neutral
   refactor but not a hoist, so it stayed out of the mechanically-verified PR.
 
+
+**PR 2b (entities from row parts, 14-10-2026, branch `v20/feature/ef-core-element-repository-2b-entity-from-row-parts` cut from PR 2):**
+- Design rule now fixed for the whole EF Core content tier: DTOs are plain table rows; nothing stitches navigation members after a query, and factories take the rows as parameters (`BuildEntity(DocumentDto, NodeDto, ContentVersionDto, ContentVersionDto?, IContentType?)`). `IPublishableContentDto` is non-generic with only `NodeId/Published/Edited`; `IContentVersionDto` has only `Id/Published`. PR 3 must make the write hook return parts and delete `DocumentDto.ContentDto/CurrentVersion`, `DocumentVersionDto.ContentVersionDto`, `ContentDto.NodeDto`; PR 4's element factory follows the same shape.
+- Media/members checked: non-publishable, never touch `IPublishableContentDto`; NPoco version-cleanup base reads only `Id`/`Published`. Safe.
+- Removing ignored members (`builder.Ignore`) does not touch the model, so no migration and no snapshot diff.
+- Red-proof pattern that worked: point the factory at the draft version instead of the published one; `PublishName` is the unambiguous discriminator (`PublisherId` is the same writer on both rows, so it does not discriminate).
