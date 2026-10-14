@@ -24,7 +24,7 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 	}
 
 	async getCollection(filter: UmbUserGroupCollectionFilterModel) {
-		const filterText = filter.filter ?? filter.query ?? undefined;
+		const filterText = filter.filter ?? undefined;
 
 		const { data, error } = await tryExecute(
 			this.#host,
