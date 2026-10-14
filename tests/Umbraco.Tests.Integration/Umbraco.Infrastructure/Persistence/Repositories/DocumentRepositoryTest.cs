@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -22,7 +21,6 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -1404,6 +1402,39 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             .Where(c => c.Key == publishedChild.Key || c.Key == unpublishedChild.Key)
             .ToArray();
         Assert.That(items.Select(c => (c.Name, c.Published)), Is.EqualTo(new[] { ("Unpublished Child", false), ("Published Child", true) }));
+    }
+
+    [Test]
+    public async Task GetAsync_PublishedThenEdited_ExposesThePublishedVersionBesideTheDraft()
+    {
+        IContent content = ContentBuilder.CreateSimpleContent(_contentType, "Published Name", _publishedPage.Id);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        PublishResult publishResult = await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(publishResult.Success, Is.True, publishResult.Result.ToString());
+        int publishedVersionId = content.PublishedVersionId;
+        content.Name = "Edited Name";
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent? reloaded = await repository.GetAsync(content.Key, CancellationToken.None);
+        IContent? publishedVersion = await repository.GetVersionAsync(publishedVersionId, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(reloaded, Is.Not.Null);
+        Assert.That(publishedVersion, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(reloaded!.Published, Is.True);
+            Assert.That(reloaded.Edited, Is.True);
+            Assert.That(reloaded.Name, Is.EqualTo("Edited Name"));
+            Assert.That(reloaded.VersionId, Is.Not.EqualTo(publishedVersionId));
+            Assert.That(reloaded.PublishedVersionId, Is.EqualTo(publishedVersionId));
+            Assert.That(reloaded.PublishName, Is.EqualTo("Published Name"));
+            Assert.That(reloaded.PublisherId, Is.EqualTo(Constants.Security.SuperUserId));
+            Assert.That(reloaded.PublishDate, Is.EqualTo(publishedVersion!.UpdateDate));
+        });
     }
 
     /// <summary>
