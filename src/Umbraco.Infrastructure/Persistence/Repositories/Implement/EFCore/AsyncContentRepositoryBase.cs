@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -341,6 +342,215 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
         => parentKey.HasValue
             ? await ResolveNodeIdAsync(db, parentKey.Value, cancellationToken)
             : Constants.System.Root;
+
+    /// <summary>
+    ///     Loads the property data rows of the given versions, grouped by version id.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="versionIds">The version ids to load property data for.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load, <see langword="null" /> for every property, or empty for none.
+    /// </param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The property data rows keyed by version id.</returns>
+    protected static async Task<Dictionary<int, List<PropertyDataDto>>> LoadPropertyDataAsync(
+        UmbracoDbContext db, List<int> versionIds, string[]? propertyAliases, CancellationToken cancellationToken)
+    {
+        // Empty alias list means "no custom properties" — skip the query entirely.
+        if (propertyAliases is { Length: 0 })
+        {
+            return new Dictionary<int, List<PropertyDataDto>>();
+        }
+
+        // Batched to stay within SQL Server's 2100-parameter limit.
+        // versionIds can reach 2× the entity count (current + published version per entity).
+        var allPropertyData = new List<PropertyDataDto>();
+        foreach (IEnumerable<int> batch in versionIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            var batchIds = batch.ToList();
+
+            if (propertyAliases is { Length: > 0 })
+            {
+                List<string> aliases = new(propertyAliases);
+                allPropertyData.AddRange(await db.PropertyData
+                    .Where(propertyData => batchIds.Contains(propertyData.VersionId))
+                    .Join(
+                        db.PropertyTypes.Where(propertyType => propertyType.Alias != null && aliases.Contains(propertyType.Alias)),
+                        propertyData => propertyData.PropertyTypeId,
+                        propertyType => propertyType.Id,
+                        (propertyData, propertyType) => propertyData)
+                    .ToListAsync(cancellationToken));
+            }
+            else
+            {
+                allPropertyData.AddRange(await db.PropertyData
+                    .Where(propertyData => batchIds.Contains(propertyData.VersionId))
+                    .ToListAsync(cancellationToken));
+            }
+        }
+
+        return allPropertyData
+            .GroupBy(propertyData => propertyData.VersionId)
+            .ToDictionary(group => group.Key, group => group.ToList());
+    }
+
+    // Ties in the variant name are common - every node falling back to node.Text shares one - so the node id
+    // breaks them, keeping paged results stable and non-duplicated across separate fetches; the node id is
+    // appended after any user ordering for that reason (see http://issues.umbraco.org/issue/U4-8831).
+    // Internal so the tiebreak can be exercised directly against a sequence with tied names, which a
+    // database-backed test cannot reliably produce.
+    internal static IOrderedQueryable<TRow> ApplyVariantNameOrdering<TRow>(
+        IQueryable<TRow> source,
+        Expression<Func<TRow, string?>> variantNameSelector,
+        Expression<Func<TRow, int>> nodeIdSelector,
+        bool descending)
+        => descending
+            ? source.OrderByDescending(variantNameSelector).ThenBy(nodeIdSelector)
+            : source.OrderBy(variantNameSelector).ThenBy(nodeIdSelector);
+
+    // The four typed PropertyData value columns, plus the SortableValue override some property editors
+    // (e.g. IDataValueSortable) populate to take priority over the raw column. Mirrors the column
+    // priority in ContentRepositoryBase.ApplyCustomOrdering (NPoco), but compares each with its native
+    // .NET type instead of reformatting into a zero-padded string.
+    private sealed record PropertyOrderingValue(
+        string? SortableValue,
+        int? IntegerValue,
+        decimal? DecimalValue,
+        DateTime? DateValue,
+        string? VarcharValue);
+
+    /// <summary>
+    ///     Sorts, without paging, the full candidate node id set by the value of a custom property field.
+    /// </summary>
+    /// <remarks>
+    ///     Values are fetched via ordinary translatable LINQ (no raw SQL, no per-provider SQL fragments); the sort
+    ///     itself happens in memory, since no single SQL column can hold all four typed columns
+    ///     (int/decimal/date/varchar) plus the string SortableValue override in one comparable form.
+    /// </remarks>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="candidateNodeIds">The node ids to order, already filtered by the caller.</param>
+    /// <param name="alias">The alias of the property type to order by.</param>
+    /// <param name="culture">The culture whose variant values take part alongside the invariant ones.</param>
+    /// <param name="direction">The direction to order in.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>Every candidate node id, in the requested order.</returns>
+    protected static async Task<List<int>> ResolveCustomFieldOrderedNodeIdsAsync(
+        UmbracoDbContext db,
+        List<int> candidateNodeIds,
+        string alias,
+        string culture,
+        Direction direction,
+        CancellationToken cancellationToken)
+    {
+        int languageId = await db.Language
+            .Where(language => language.IsoCode == culture)
+            .Select(language => language.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var valueByNodeId = new Dictionary<int, PropertyOrderingValue>();
+        foreach (IEnumerable<int> batch in candidateNodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            var batchIds = batch.ToList();
+            var batchRows = await db.ContentVersions
+                .Where(contentVersion => contentVersion.Current && batchIds.Contains(contentVersion.NodeId))
+                .Join(
+                    db.PropertyData,
+                    contentVersion => contentVersion.Id,
+                    propertyData => propertyData.VersionId,
+                    (contentVersion, propertyData) => new { contentVersion.NodeId, propertyData })
+                .Join(
+                    db.PropertyTypes.Where(propertyType => propertyType.Alias == alias),
+                    joined => joined.propertyData.PropertyTypeId,
+                    propertyType => propertyType.Id,
+                    (joined, propertyType) => joined)
+                .Where(joined => joined.propertyData.LanguageId == null || joined.propertyData.LanguageId == languageId)
+                .Select(joined => new
+                {
+                    joined.NodeId,
+                    joined.propertyData.Id,
+                    joined.propertyData.SortableValue,
+                    joined.propertyData.IntegerValue,
+                    joined.propertyData.DecimalValue,
+                    joined.propertyData.DateValue,
+                    joined.propertyData.VarcharValue,
+                })
+                .ToListAsync(cancellationToken);
+
+            // Deterministic tie-break for the (rare) case of multiple PropertyData rows per node
+            // (e.g. segmented variants) — matches NPoco's equivalent ambiguity, not a new gap.
+            foreach (var group in batchRows.GroupBy(row => row.NodeId))
+            {
+                var row = group.OrderBy(row => row.Id).First();
+                valueByNodeId[group.Key] = new PropertyOrderingValue(row.SortableValue, row.IntegerValue, row.DecimalValue, row.DateValue, row.VarcharValue);
+            }
+        }
+
+        List<int> ordered = new(candidateNodeIds);
+        ordered.Sort((left, right) => CompareNodesByOrderingValue(left, right, valueByNodeId, direction));
+        return ordered;
+    }
+
+    // Nodes without a value sort first ascending / last descending, matching both SQL Server's and
+    // SQLite's default NULL placement — the same placement NPoco's LEFT JOIN implicitly relies on.
+    private static int CompareNodesByOrderingValue(
+        int leftNodeId,
+        int rightNodeId,
+        Dictionary<int, PropertyOrderingValue> valueByNodeId,
+        Direction direction)
+    {
+        bool hasLeft = valueByNodeId.TryGetValue(leftNodeId, out PropertyOrderingValue? left);
+        bool hasRight = valueByNodeId.TryGetValue(rightNodeId, out PropertyOrderingValue? right);
+
+        if (!hasLeft && !hasRight)
+        {
+            return leftNodeId.CompareTo(rightNodeId);
+        }
+
+        if (!hasLeft || !hasRight)
+        {
+            int missingFirst = !hasLeft ? -1 : 1;
+            return direction is Direction.Descending ? -missingFirst : missingFirst;
+        }
+
+        int comparison = CompareOrderingValues(left!, right!);
+        if (comparison == 0)
+        {
+            return leftNodeId.CompareTo(rightNodeId);
+        }
+
+        return direction is Direction.Descending ? -comparison : comparison;
+    }
+
+    // Column priority mirrors NPoco's CASE expression (ContentRepositoryBase.ApplyCustomOrdering):
+    // SortableValue overrides everything else, then IntegerValue, DecimalValue, DateValue, VarcharValue.
+    // Unlike NPoco — which collapses every row to one string and does a single flat ORDER BY — this forms
+    // a strict tier per row (whichever column is populated), so a mismatched pair (e.g. one row only has
+    // IntegerValue, another only has VarcharValue, because the alias is reused across content types with
+    // different storage types) compares by tier, not by NPoco's arbitrary cross-type string comparison.
+    private static int CompareOrderingValues(PropertyOrderingValue left, PropertyOrderingValue right)
+    {
+        if (left.SortableValue is not null || right.SortableValue is not null)
+        {
+            return string.CompareOrdinal(left.SortableValue ?? string.Empty, right.SortableValue ?? string.Empty);
+        }
+
+        if (left.IntegerValue is not null || right.IntegerValue is not null)
+        {
+            return Nullable.Compare(left.IntegerValue, right.IntegerValue);
+        }
+
+        if (left.DecimalValue is not null || right.DecimalValue is not null)
+        {
+            return Nullable.Compare(left.DecimalValue, right.DecimalValue);
+        }
+
+        if (left.DateValue is not null || right.DateValue is not null)
+        {
+            return Nullable.Compare(left.DateValue, right.DateValue);
+        }
+
+        return string.CompareOrdinal(left.VarcharValue ?? string.Empty, right.VarcharValue ?? string.Empty);
+    }
 
     /// <inheritdoc />
     public abstract Task<PagedModel<TEntity>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);

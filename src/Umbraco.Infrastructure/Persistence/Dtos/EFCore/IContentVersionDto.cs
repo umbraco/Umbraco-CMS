@@ -14,8 +14,8 @@ internal interface IContentVersionDto
     bool Published { get; }
 
     /// <summary>
-    /// Gets the shared content version row containing version metadata (name, date, writer).
+    /// Gets or sets the shared content version row containing version metadata (name, date, writer).
     /// Not a database column — populated by the repository after query.
     /// </summary>
-    ContentVersionDto ContentVersionDto { get; }
+    ContentVersionDto ContentVersionDto { get; set; }
 }

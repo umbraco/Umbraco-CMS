@@ -954,7 +954,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     {
         // Root's own umbracoNode row carries Constants.System.RootSystemKey as its UniqueId, a real
         // non-null Guid - NOT the semantic null ParentKey contracts to. GetVersionAsync's shared
-        // parent-node join (via BuildBaseQuery/ToDocumentRow) must not let it leak through.
+        // parent-node join (via BuildBaseQuery/ToContentRow) must not let it leak through.
         var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
 
         using var scope = NewScopeProvider.CreateScope();
@@ -1337,8 +1337,8 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task GetChildrenAsync_OrderedByContentTypeAlias_SortsByContentTypeAlias()
     {
-        // Exercises ApplyDocumentOrdering's "contenttypealias" arm specifically. The ContentType join
-        // became a LEFT JOIN (DocumentJoinRow.ContentType is nullable) when the per-method join chains
+        // Exercises ApplyOrdering's "contenttypealias" arm specifically. The ContentType join
+        // became a LEFT JOIN (ContentJoinRow.ContentType is nullable) when the per-method join chains
         // were consolidated, so the selector is now a null-guarded ternary rather than a guaranteed-non-null
         // property access - this is the one arm no other test in this file or DocumentRepositoryOrderingTests
         // exercises, so a regression here (e.g. simplifying the ternary to `?.`, which cannot appear inside
@@ -1377,6 +1377,33 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         string[] expectedAliasOrder = new[] { _contentType.Alias, secondContentType.Alias }.OrderBy(alias => alias, StringComparer.Ordinal).ToArray();
         Assert.That(items.Select(c => c.ContentType.Alias), Is.EqualTo(expectedAliasOrder),
             "items must sort by ascending content-type alias, proving the null-guarded ContentType join is actually used for ordering, not silently ignored");
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_OrderedByPublished_SortsUnpublishedBeforePublished()
+    {
+        // The "published" arm orders on the entity row's published flag through the generic projection, so this is
+        // the one ordering that reads a member of the entity type parameter. The published child is created first,
+        // so sort order (published, unpublished) and ascending published order (unpublished, published) disagree:
+        // if the arm fell through to the default ordering the items would come back in creation order.
+        IContent publishedChild = ContentBuilder.CreateSimpleContent(_contentType, "Published Child", _publishedPage.Id);
+        await ContentService.SaveAsync(publishedChild, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        PublishResult publishResult = await ContentService.PublishAsync(publishedChild, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(publishResult.Success, Is.True, publishResult.Result.ToString());
+        IContent unpublishedChild = ContentBuilder.CreateSimpleContent(_contentType, "Unpublished Child", _publishedPage.Id);
+        await ContentService.SaveAsync(unpublishedChild, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _publishedPage.Key, skip: 0, take: 100, propertyAliases: null, ordering: Ordering.By("published"), CancellationToken.None);
+        scope.Complete();
+
+        IContent[] items = result.Items
+            .Where(c => c.Key == publishedChild.Key || c.Key == unpublishedChild.Key)
+            .ToArray();
+        Assert.That(items.Select(c => (c.Name, c.Published)), Is.EqualTo(new[] { ("Unpublished Child", false), ("Published Child", true) }));
     }
 
     /// <summary>

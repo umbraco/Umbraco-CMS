@@ -24,11 +24,11 @@ internal interface IPublishableContentDto<TVersionDto>
     ///     Gets the content row, which carries <see cref="ContentDto.NodeDto" /> and
     ///     <see cref="ContentDto.ContentTypeId" />.
     /// </summary>
-    ContentDto ContentDto { get; }
+    ContentDto ContentDto { get; set; }
 
-    /// <summary>Gets the current (draft) version row.</summary>
-    TVersionDto CurrentVersion { get; }
+    /// <summary>Gets or sets the current (draft) version row.</summary>
+    TVersionDto CurrentVersion { get; set; }
 
-    /// <summary>Gets the published version row, or <c>null</c> if the content has never been published.</summary>
-    TVersionDto? PublishedVersion { get; }
+    /// <summary>Gets or sets the published version row, or <c>null</c> if the content has never been published.</summary>
+    TVersionDto? PublishedVersion { get; set; }
 }
