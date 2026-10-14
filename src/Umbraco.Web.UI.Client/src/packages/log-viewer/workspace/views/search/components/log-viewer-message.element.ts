@@ -126,6 +126,24 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		return queryString;
 	}
 
+	#getCopyText() {
+		const lines = [
+			`Timestamp: ${this.date?.toISOString() ?? this.timestamp}`,
+			`Level: ${this.level}`,
+			`Message: ${this.renderedMessage}`,
+		];
+
+		if (this.exception) {
+			lines.push('', 'Exception:', this.exception);
+		}
+
+		if (this.properties.length) {
+			lines.push('', 'Properties:', ...this.properties.map((property) => `${property.name}: ${property.value ?? ''}`));
+		}
+
+		return lines.join('\n');
+	}
+
 	#setOpen(event: Event) {
 		this.open = (event.target as HTMLDetailsElement).open;
 	}
@@ -198,6 +216,13 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 						`,
 					)}
 				</umb-dropdown>
+				<uui-button-copy-text
+					id="copy-button"
+					look="secondary"
+					label=${this.localize.term('general_copy')}
+					.text=${this.#getCopyText()}>
+					<umb-localize key="general_copy">Copy</umb-localize>
+				</uui-button-copy-text>
 			</details>
 		`;
 	}
@@ -291,6 +316,10 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			}
 			#search-button {
 				margin-left: var(--uui-size-layout-1);
+			}
+
+			#copy-button {
+				margin-left: var(--uui-size-space-2);
 			}
 
 			.property-name,
