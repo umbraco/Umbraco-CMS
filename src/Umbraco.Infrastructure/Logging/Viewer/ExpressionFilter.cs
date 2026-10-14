@@ -69,7 +69,7 @@ internal sealed class ExpressionFilter : ILogFilter
 
     private static Func<LogEvent, bool>? PerformMessageLikeFilter(string filterExpression, SerilogLegacyNameResolver serilogLegacyNameResolver)
     {
-        var filterSearch = $"@Message like '%{SerilogExpression.EscapeLikeExpressionContent(filterExpression)}%'";
+        var filterSearch = $"@Message like '%{SerilogExpression.EscapeLikeExpressionContent(filterExpression)}%' ci";
         if (SerilogExpression.TryCompile(filterSearch, null, serilogLegacyNameResolver, out CompiledExpression? compiled, out var error))
         {
             // `compiled` is a function that can be executed against `LogEvent`s:
