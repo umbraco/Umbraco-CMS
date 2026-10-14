@@ -117,8 +117,8 @@
       "id": "2b",
       "slug": "entity-from-row-parts",
       "title": "Build publishable entities from row parts instead of a stitched DTO graph",
-      "status": "planned",
-      "branch": "",
+      "status": "in-progress",
+      "branch": "v20/feature/ef-core-element-repository-2b-entity-from-row-parts",
       "pr": "",
       "prUrl": "",
       "dependsOn": [
@@ -128,30 +128,31 @@
       "tasks": [
         {
           "text": "BuildEntity(ContentRow, IContentType?) hook; stitching removed from AssembleEntitiesAsync",
-          "done": false
+          "done": true
         },
         {
           "text": "ContentBaseFactory EF Core builder takes entity DTO, node, current and published content versions",
-          "done": false
+          "done": true
         },
         {
           "text": "Setters removed from IPublishableContentDto and IContentVersionDto navigation members",
-          "done": false
+          "done": true
         },
         {
           "text": "Dead CurrentVersion/PublishedVersion reassignments in the write path replaced by locals",
-          "done": false
+          "done": true
         },
         {
           "text": "Published-version fields asserted for a published-then-edited document (red first if uncovered)",
-          "done": false
+          "done": true
         },
         {
           "text": "Document fixtures and unit project at unchanged counts; snapshots untouched",
           "done": false
         }
       ],
-      "acceptance": "Unchanged fixture counts; no setters left on the two DTO interfaces; snapshots untouched."
+      "acceptance": "Unchanged fixture counts; no setters left on the two DTO interfaces; snapshots untouched.",
+      "notes": "Started 14-10-2026, cut from PR 2's branch (a17da3bd2d6) because it depends on the ContentRow hook; the PR diff includes #24175 until it merges. Implemented 14-10-2026 (uncommitted, awaiting the commit/PR step): BuildEntity(ContentRow, IContentType?) hook, factory takes DocumentDto + NodeDto + current/published ContentVersionDto, stitching and interface setters gone, write-path reassignments and the ignored ContentVersionDto initializers on the new draft row dropped. New test GetAsync_PublishedThenEdited_ExposesThePublishedVersionBesideTheDraft, proven red (PublishedVersionId, PublishName, PublishDate) with the factory pointed at the draft. Independent review: approve after one doc fix (stale 'populated by the repository after query' on the concrete DTOs, realigned on ContentDto, Document* and Element* too). Full solution build clean, snapshots untouched; full fixtures left for the pipeline."
     },
     {
       "id": 3,
@@ -332,6 +333,14 @@
     }
   ],
   "log": [
+    {
+      "date": "14-10-2026",
+      "text": "PR 2b implemented and reviewed: entities built from ContentRow parts, DTO-interface setters removed, dead write-path reassignments dropped; new published-then-edited test red/green. Awaiting the commit/PR step."
+    },
+    {
+      "date": "14-10-2026",
+      "text": "PR 2b started on v20/feature/ef-core-element-repository-2b-entity-from-row-parts, cut from PR 2's branch."
+    },
     {
       "date": "14-10-2026",
       "text": "PR status refreshed: #24134 (PR 1) merged 13-10-2026 as c1a33ebee86 after approval. #24175 (PR 2) is open and ready for review, no human review yet; same CI picture as PR 1 (only the two search jobs red on the baseline stubs). Integration branch merged into the PR 2 branch (a17da3bd2d6) and pushed; the PR diff dropped from 32 to 9 files. Next: PR 2b once PR 2 lands."
