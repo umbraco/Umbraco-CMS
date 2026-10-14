@@ -59,6 +59,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerContext.max;
@@ -106,13 +107,17 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 
 	@state()
 	private _items: Array<UmbLanguageItemModel> = [];
