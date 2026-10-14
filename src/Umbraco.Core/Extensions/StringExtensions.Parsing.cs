@@ -46,10 +46,10 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    /// Converts a path string to an array of node IDs in reverse order (deepest to shallowest).
+    /// Converts a path string to an array of node IDs in path order (shallowest to deepest).
     /// </summary>
     /// <param name="path">The path string, expected as a comma-delimited collection of integers.</param>
-    /// <returns>An array of integers matching the provided path.</returns>
+    /// <returns>An array of integers matching the provided path. Segments that are not integers are skipped.</returns>
     /// <remarks>
     /// Parsing uses <see cref="CultureInfo.InvariantCulture"/> because paths persist the root
     /// marker as ASCII "-1", which fails to parse under cultures whose
@@ -58,23 +58,29 @@ public static partial class StringExtensions
     public static int[] GetIdsFromPath(this string path)
     {
         ReadOnlySpan<char> pathSpan = path.AsSpan();
+        if (pathSpan.IsEmpty)
+        {
+            return [];
+        }
+
+        // Every segment holds at most one id, so size the result once and only trim it when a segment is skipped.
+        var nodeIds = new int[pathSpan.Count(',') + 1];
+        var count = 0;
 
         // Using the explicit enumerator (while/MoveNext) over the SpanSplitEnumerator in a foreach loop to avoid any compiler
         // boxing of the ref struct enumerator.
         // This prevents potential InvalidProgramException across compilers/JITs ("Cannot create boxed ByRef-like values.").
-        MemoryExtensions.SpanSplitEnumerator<char> pathSegmentsEnumerator = pathSpan.Split(Constants.CharArrays.Comma);
-
-        List<int> nodeIds = [];
+        MemoryExtensions.SpanSplitEnumerator<char> pathSegmentsEnumerator = pathSpan.Split(',');
         while (pathSegmentsEnumerator.MoveNext())
         {
             Range rangeOfPathSegment = pathSegmentsEnumerator.Current;
             if (int.TryParse(pathSpan[rangeOfPathSegment], NumberStyles.Integer, CultureInfo.InvariantCulture, out int pathSegment))
             {
-                nodeIds.Add(pathSegment);
+                nodeIds[count++] = pathSegment;
             }
         }
 
-        return [.. nodeIds];
+        return count == nodeIds.Length ? nodeIds : nodeIds[..count];
     }
 
     /// <summary>
