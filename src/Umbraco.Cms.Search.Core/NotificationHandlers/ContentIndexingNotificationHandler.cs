@@ -99,7 +99,7 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
         DraftElementCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<DraftElementCacheRefresher.JsonPayload>(notification, out var origin);
 
         ContentChange[] changes = ElementChanges(
-            payloads.Select(payload => (payload.ElementKey, payload.ChangeTypes)));
+            payloads.Select(payload => (payload.Key, payload.ChangeTypes)));
 
         ExecuteDeferred(() => _contentIndexingService.Handle(changes, origin));
     }
@@ -127,7 +127,10 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
     private ContentChange[] ElementChanges(IEnumerable<(Guid ContentId, TreeChangeTypes ChangeTypes)> payloads)
         => GetContentChanges(
             payloads,
-            (contentKey, changeImpact) => ContentChange.Element(contentKey, changeImpact, ContentState.Draft));
+            (contentKey, changeImpact) => changeImpact is ChangeImpact.RefreshWithDescendants
+                // elements are leaves, so a change that affects descendants always targets an element container
+                ? ContentChange.ElementContainer(contentKey, changeImpact, ContentState.Draft)
+                : ContentChange.Element(contentKey, changeImpact, ContentState.Draft));
 
     private ContentChange[] GetContentChanges(IEnumerable<(Guid ContentId, TreeChangeTypes ChangeTypes)> payloads, Func<Guid, ChangeImpact, ContentChange> contentChangeFactory)
         => payloads

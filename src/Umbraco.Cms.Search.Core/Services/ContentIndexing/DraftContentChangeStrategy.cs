@@ -15,9 +15,9 @@ namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 /// content), and draft media/members/library elements (including trashed elements), regardless of publish state.
 /// </summary>
 /// <remarks>
-/// Library elements are always leaves, organised in element containers. A change for an element that affects
-/// descendants (<see cref="ChangeImpact.RefreshWithDescendants"/>) therefore targets an element container, and
-/// re-indexes every element beneath it.
+/// Library elements are always leaves, organised in element containers. Element containers are not indexed
+/// themselves; an element container change with <see cref="ChangeImpact.RefreshWithDescendants"/> re-indexes every
+/// element beneath the container.
 /// </remarks>
 internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, IDraftContentChangeStrategy
 {
@@ -72,14 +72,15 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
     {
         ContentIndexInfo[] indexInfosAsArray = indexInfos as ContentIndexInfo[] ?? indexInfos.ToArray();
 
+        ContentChange[] draftChanges = changes.Where(change => change.ContentState is ContentState.Draft).ToArray();
+
         // get the relevant changes for this change strategy
-        ContentChange[] changesAsArray = changes.Where(change =>
-                change.ContentState is ContentState.Draft
-                && change.ObjectType is UmbracoObjectTypes.Document or UmbracoObjectTypes.Media or UmbracoObjectTypes.Member or UmbracoObjectTypes.Element)
+        ContentChange[] changesAsArray = draftChanges.Where(change =>
+                change.ObjectType is UmbracoObjectTypes.Document or UmbracoObjectTypes.Media or UmbracoObjectTypes.Member or UmbracoObjectTypes.Element)
             .ToArray();
 
         var pendingRemovals = new List<ContentChange>();
-        foreach (ContentChange change in changesAsArray.Where(change => change.ContentState is ContentState.Draft))
+        foreach (ContentChange change in changesAsArray)
         {
             if (change.ChangeImpact is ChangeImpact.Remove)
             {
@@ -90,15 +91,6 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
                 IContentBase? content = GetContent(change);
                 if (content is null)
                 {
-                    if (change is { ObjectType: UmbracoObjectTypes.Element, ChangeImpact: ChangeImpact.RefreshWithDescendants })
-                    {
-                        await RemoveFromIndexAsync(indexInfosAsArray, pendingRemovals);
-                        pendingRemovals.Clear();
-
-                        await UpdateIndexForElementContainerDescendantsAsync(indexInfosAsArray, change.Id, cancellationToken);
-                        continue;
-                    }
-
                     pendingRemovals.Add(change);
                     continue;
                 }
@@ -115,6 +107,17 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         }
 
         await RemoveFromIndexAsync(indexInfosAsArray, pendingRemovals);
+
+        // element containers are not indexed themselves; a change to one re-indexes the elements beneath it
+        Guid[] elementContainerKeys = draftChanges
+            .Where(change => change is { ObjectType: UmbracoObjectTypes.ElementContainer, ChangeImpact: ChangeImpact.RefreshWithDescendants })
+            .Select(change => change.Id)
+            .Distinct()
+            .ToArray();
+        foreach (Guid elementContainerKey in elementContainerKeys)
+        {
+            await UpdateIndexForElementContainerDescendantsAsync(indexInfosAsArray, elementContainerKey, cancellationToken);
+        }
     }
 
     /// <inheritdoc />

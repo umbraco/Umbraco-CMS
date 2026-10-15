@@ -160,7 +160,7 @@ ContentIndexingService (orchestration)
 - `DraftContent` = `"Umb_Content"` - Draft content index
 - `DraftMedia` = `"Umb_Media"` - Media index
 - `DraftMembers` = `"Umb_Members"` - Members index
-- `DraftElements` = `"Umb_Elements"` - Library elements index (draft only; powers backoffice element search). Elements live in element containers, so their ancestor/parent keys resolve as `ElementContainer`, and a `RefreshBranch` element change targets a container key
+- `DraftElements` = `"Umb_Elements"` - Library elements index (draft only; powers backoffice element search). Elements live in element containers, so their ancestor/parent keys resolve as `ElementContainer`, and a `RefreshBranch` element change becomes a `ContentChange.ElementContainer` change for the container key
 
 **System Field Names** (see `Constants.FieldNames`):
 - All system fields are prefixed with `Umb_`
@@ -202,7 +202,7 @@ Content changes are tracked via notification handlers that trigger indexing:
 
 - `IContentChangeStrategy` - Base interface for tracking content state changes
 - `IPublishedContentChangeStrategy` - Tracks published content changes (for `Umb_PublishedContent` index)
-- `IDraftContentChangeStrategy` - Tracks draft content changes (for `Umb_Content`, `Umb_Media`, `Umb_Members` and `Umb_Elements` indexes). Library elements are leaves organised in element containers: an element `RefreshWithDescendants` change targets a container key, and element descendants/rebuilds are paged via `IEntityService`
+- `IDraftContentChangeStrategy` - Tracks draft content changes (for `Umb_Content`, `Umb_Media`, `Umb_Members` and `Umb_Elements` indexes). Library elements are leaves organised in element containers: containers are not indexed themselves, an `ElementContainer` change with `RefreshWithDescendants` re-indexes the elements beneath it, and element descendants/rebuilds are paged via `IEntityService`
 
 Index documents are persisted via `IndexDocumentRepository` using **MessagePack serialization** (with Lz4 compression) for efficient change detection — only actual field changes trigger re-indexing, not every save.
 

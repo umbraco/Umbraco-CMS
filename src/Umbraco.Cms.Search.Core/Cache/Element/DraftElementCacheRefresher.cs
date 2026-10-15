@@ -36,9 +36,9 @@ internal sealed class DraftElementCacheRefresher : PayloadCacheRefresherBase<Dra
     /// <summary>
     /// The payload broadcast for a single changed element or element container.
     /// </summary>
-    /// <param name="ElementKey">The key of the changed element, or of the element container whose descendants changed.</param>
+    /// <param name="Key">The key of the changed element, or of the element container whose descendants changed.</param>
     /// <param name="ChangeTypes">The kind of change that occurred.</param>
-    public record JsonPayload(Guid ElementKey, TreeChangeTypes ChangeTypes)
+    public record JsonPayload(Guid Key, TreeChangeTypes ChangeTypes)
     {
     }
 }
