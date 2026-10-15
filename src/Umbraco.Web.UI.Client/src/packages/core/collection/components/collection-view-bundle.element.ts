@@ -99,7 +99,11 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		if (this._views.length <= 1) return nothing;
 
 		return html`
-			<uui-button compact popovertarget="collection-view-bundle-popover" label="status">
+			<uui-button
+				compact
+				popovertarget="collection-view-bundle-popover"
+				label=${this.localize.term('general_switchView')}
+				data-mark="collection:switch-view">
 				<umb-icon name=${this._currentView.icon}></umb-icon>
 			</uui-button>
 			<uui-popover-container id="collection-view-bundle-popover" placement="bottom-end">
@@ -119,9 +123,10 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	#renderItem(view: UmbCollectionViewLayout) {
 		return html`
 			<uui-menu-item
-				label=${view.label}
+				label=${this.localize.string(view.label)}
 				@click-label=${() => this.#onClick(view)}
-				?active=${view.manifest.alias === this._currentView?.manifest.alias}>
+				?active=${view.manifest.alias === this._currentView?.manifest.alias}
+				data-mark="collection:switch-view:${view.manifest.alias}">
 				<umb-icon slot="icon" name=${view.icon}></umb-icon>
 			</uui-menu-item>
 		`;

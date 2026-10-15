@@ -58,10 +58,9 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	async #retrieveAllowedMediaTypesOf(unique: string | null, parentContentUnique: string | null) {
-		const { data } = await this.#mediaTypeStructureRepository.requestAllowedChildrenOf(unique, parentContentUnique);
+		const { data } = await this.#mediaTypeStructureRepository.requestAllAllowedChildrenOf(unique, parentContentUnique);
 
 		if (data) {
-			// TODO: implement pagination, or get 1000?
 			this._allowedMediaTypes = data.items;
 		}
 		this._loading = false;

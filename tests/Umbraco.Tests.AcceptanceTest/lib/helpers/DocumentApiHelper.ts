@@ -216,6 +216,23 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createDocumentWithPropertyValue(documentName: string, documentTypeId: string, propertyAlias: string, value: any) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentName)
+        .done()
+      .addValue()
+        .withAlias(propertyAlias)
+        .withValue(value)
+        .done()
+      .build();
+
+    return await this.create(document);
+  }
+
   async createDefaultDocumentWithParent(documentName: string, documentTypeId: string, parentId: string) {
     await this.ensureNameNotExists(documentName);
 
@@ -1895,6 +1912,70 @@ export class DocumentApiHelper {
     });
 
     const document = blockListBuilder.done().done().build();
+
+    return await this.create(document);
+  }
+
+  /**
+   * Creates a culture-variant document whose invariant Block Grid property already holds blocks with
+   * a value per culture, plus a matching expose entry per block and culture.
+   * @param documentName - name given to every variant
+   * @param documentTypeId - the document type, expected to vary by culture
+   * @param blockGridPropertyAlias - alias of the (invariant) block grid property
+   * @param elementTypeId - content element type of every block, expected to vary by culture
+   * @param blockPropertyAlias - alias of the variant property inside the element type
+   * @param blockPropertyEditorAlias - property editor alias of that property
+   * @param cultures - the cultures to create variants for
+   * @param blockValuesPerCulture - one entry per block, mapping culture to that block's value
+   */
+  async createDocumentWithBlockGridBlocksInCultures(
+    documentName: string,
+    documentTypeId: string,
+    blockGridPropertyAlias: string,
+    elementTypeId: string,
+    blockPropertyAlias: string,
+    blockPropertyEditorAlias: string,
+    cultures: Array<string>,
+    blockValuesPerCulture: Array<Record<string, string>>) {
+    await this.ensureNameNotExists(documentName);
+
+    const crypto = require('crypto');
+    const blockKeys = blockValuesPerCulture.map(() => crypto.randomUUID());
+
+    const documentBuilder = new DocumentBuilder().withDocumentTypeId(documentTypeId);
+
+    for (const culture of cultures) {
+      documentBuilder.addVariant().withName(documentName).withCulture(culture).done();
+    }
+
+    const blockGridBuilder = documentBuilder.addValue().withAlias(blockGridPropertyAlias).addBlockGridValue();
+
+    blockValuesPerCulture.forEach((valuesByCulture, index) => {
+      const contentDataBuilder = blockGridBuilder
+        .addContentData()
+        .withContentTypeKey(elementTypeId)
+        .withKey(blockKeys[index]);
+
+      for (const [culture, value] of Object.entries(valuesByCulture)) {
+        contentDataBuilder
+          .addContentDataValue()
+          .withAlias(blockPropertyAlias)
+          .withEditorAlias(blockPropertyEditorAlias)
+          .withCulture(culture)
+          .withValue(value)
+          .done();
+      }
+
+      contentDataBuilder.done();
+
+      for (const culture of Object.keys(valuesByCulture)) {
+        blockGridBuilder.addExpose().withContentKey(blockKeys[index]).withCulture(culture).done();
+      }
+
+      blockGridBuilder.addLayout().withContentKey(blockKeys[index]).done();
+    });
+
+    const document = blockGridBuilder.done().done().build();
 
     return await this.create(document);
   }

@@ -5,33 +5,54 @@ import { ProfilingService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-dashboard-performance-profiling')
 export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	@state()
 	private _profilingStatus = true;
 
-	// TODO: Get this from the management api configuration when available
 	@state()
-	private _isDebugMode = true;
+	private _isDebugMode?: boolean;
 
 	@state()
 	private _isLoading = true;
 
 	@query('#toggle')
-	private _toggle!: HTMLInputElement;
+	private _toggle?: HTMLInputElement;
 
 	@consumeContext({ context: UMB_NOTIFICATION_CONTEXT })
 	private _notificationContext: typeof UMB_NOTIFICATION_CONTEXT.TYPE | undefined;
 
+	#profilingStatusRequested = false;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(context?.isDebugMode, (isDebugMode) => {
+				this._isDebugMode = isDebugMode;
+
+				// The profiler can only be toggled in debug mode, so there is nothing to request otherwise.
+				if (isDebugMode && !this.#profilingStatusRequested) {
+					this.#profilingStatusRequested = true;
+					this.#requestProfilingStatus();
+				}
+			});
+		});
+	}
+
 	#setToggle(value: boolean) {
-		this._toggle.checked = value;
+		if (this._toggle) {
+			this._toggle.checked = value;
+		}
 		this._profilingStatus = value;
 		this._isLoading = false;
 	}
 
-	override async firstUpdated() {
+	async #requestProfilingStatus() {
 		const status = await this.#getProfilingStatus();
+		await this.updateComplete;
 		this.#setToggle(status);
 	}
 
@@ -121,9 +142,7 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('profiling_performanceProfiling')}>
-				${typeof this._profilingStatus === 'undefined'
-					? html`<uui-loader></uui-loader>`
-					: this.#renderProfilingStatus()}
+				${this._isDebugMode === undefined ? html`<uui-loader></uui-loader>` : this.#renderProfilingStatus()}
 			</uui-box>
 		`;
 	}

@@ -220,4 +220,7 @@ public class DataEditor : IDataEditor
 
     /// <inheritdoc />
     public virtual IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture) => [];
+
+    /// <inheritdoc />
+    public virtual bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue) => Equals(editedValue, publishedValue);
 }

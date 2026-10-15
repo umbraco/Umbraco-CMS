@@ -12,6 +12,7 @@ import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu
 import type { UmbVariantStructureItemModel } from './types.js';
 import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { aTimeout, expect } from '@open-wc/testing';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -109,6 +110,26 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 
 		const parentContext = await context.getContext(UMB_PARENT_ENTITY_CONTEXT);
 		expect(parentContext?.getParent()).to.deep.equal({ unique: 'parent-unique', entityType: 'test-entity-type' });
+	});
+
+	it('propagates name and isFolder onto each ancestor in the structure', async () => {
+		UmbTestVariantTreeRepository.ancestors = [
+			createTestVariantAncestorItem({ unique: 'folder-unique', entityType: 'test-folder-entity-type' }, 'My Folder', true),
+			createTestVariantAncestorItem({ unique: 'parent-unique', entityType: 'test-entity-type' }, 'My Item'),
+		];
+
+		dispatchReloadStructure();
+		await aTimeout(150);
+
+		const structure = await firstValueFrom(context.structure);
+		expect(structure.find((item) => item.unique === 'folder-unique')).to.deep.include({
+			name: 'My Folder',
+			isFolder: true,
+		});
+		expect(structure.find((item) => item.unique === 'parent-unique')).to.deep.include({
+			name: 'My Item',
+			isFolder: false,
+		});
 	});
 
 	describe('navigating to a different entity', () => {
