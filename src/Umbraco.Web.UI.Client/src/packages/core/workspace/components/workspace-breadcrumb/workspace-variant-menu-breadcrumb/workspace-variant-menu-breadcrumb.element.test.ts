@@ -212,7 +212,7 @@ describe('UmbWorkspaceVariantMenuBreadcrumbElement', () => {
 			it('uses the exact active-variant match, unparenthesized', async () => {
 				variantWorkspace.setActiveVariant('da');
 				menuStructureContext.setStructure([
-					structureItem({ unique: 'a', variants: [{ name: 'Item DA', culture: 'da', segment: null }] }),
+					structureItem({ unique: 'a', variants: [{ name: 'Item DA', culture: 'da' }] }),
 				]);
 				await render({ variantWorkspace });
 
@@ -227,8 +227,8 @@ describe('UmbWorkspaceVariantMenuBreadcrumbElement', () => {
 					structureItem({
 						unique: 'a',
 						variants: [
-							{ name: 'Decoy', culture: 'zz', segment: null },
-							{ name: 'Item EN', culture: 'en', segment: null },
+							{ name: 'Decoy', culture: 'zz' },
+							{ name: 'Item EN', culture: 'en' },
 						],
 					}),
 				]);
@@ -240,7 +240,7 @@ describe('UmbWorkspaceVariantMenuBreadcrumbElement', () => {
 			it('uses the app current culture unparenthesized when the active variant is invariant', async () => {
 				variantWorkspace.setActiveVariant(null);
 				menuStructureContext.setStructure([
-					structureItem({ unique: 'a', variants: [{ name: 'Item EN', culture: 'en', segment: null }] }),
+					structureItem({ unique: 'a', variants: [{ name: 'Item EN', culture: 'en' }] }),
 				]);
 				await render({ variantWorkspace });
 
@@ -255,8 +255,8 @@ describe('UmbWorkspaceVariantMenuBreadcrumbElement', () => {
 					structureItem({
 						unique: 'a',
 						variants: [
-							{ name: 'Decoy', culture: 'zz', segment: null },
-							{ name: 'Item FR', culture: 'fr', segment: null },
+							{ name: 'Decoy', culture: 'zz' },
+							{ name: 'Item FR', culture: 'fr' },
 						],
 					}),
 				]);
@@ -268,7 +268,7 @@ describe('UmbWorkspaceVariantMenuBreadcrumbElement', () => {
 			it('falls back to the invariant variant, unparenthesized', async () => {
 				variantWorkspace.setActiveVariant('da');
 				menuStructureContext.setStructure([
-					structureItem({ unique: 'a', variants: [{ name: 'Item Invariant', culture: null, segment: null }] }),
+					structureItem({ unique: 'a', variants: [{ name: 'Item Invariant', culture: null }] }),
 				]);
 				await render({ variantWorkspace });
 
@@ -278,7 +278,7 @@ describe('UmbWorkspaceVariantMenuBreadcrumbElement', () => {
 			it('falls back to the first variant, parenthesized, when nothing else matches', async () => {
 				variantWorkspace.setActiveVariant('da');
 				menuStructureContext.setStructure([
-					structureItem({ unique: 'a', variants: [{ name: 'ZZ Name', culture: 'zz', segment: null }] }),
+					structureItem({ unique: 'a', variants: [{ name: 'ZZ Name', culture: 'zz' }] }),
 				]);
 				await render({ variantWorkspace });
 
@@ -318,8 +318,8 @@ describe('UmbWorkspaceVariantMenuBreadcrumbElement', () => {
 		it('excludes the current item from the ancestor list', async () => {
 			variantWorkspace.setActiveVariant('da');
 			menuStructureContext.setStructure([
-				structureItem({ unique: 'ancestor', variants: [{ name: 'Ancestor', culture: 'da', segment: null }] }),
-				structureItem({ unique: 'current-unique', variants: [{ name: 'Current Item', culture: 'da', segment: null }] }),
+				structureItem({ unique: 'ancestor', variants: [{ name: 'Ancestor', culture: 'da' }] }),
+				structureItem({ unique: 'current-unique', variants: [{ name: 'Current Item', culture: 'da' }] }),
 			]);
 			await render({ variantWorkspace });
 
@@ -331,8 +331,8 @@ describe('UmbWorkspaceVariantMenuBreadcrumbElement', () => {
 			variantWorkspace.setActiveVariant('da');
 			menuStructureContext.hrefsByUnique.set('a', '/test/a');
 			menuStructureContext.setStructure([
-				structureItem({ unique: 'a', variants: [{ name: 'Item A', culture: 'da', segment: null }] }),
-				structureItem({ unique: 'b', variants: [{ name: 'Item B', culture: 'da', segment: null }] }),
+				structureItem({ unique: 'a', variants: [{ name: 'Item A', culture: 'da' }] }),
+				structureItem({ unique: 'b', variants: [{ name: 'Item B', culture: 'da' }] }),
 			]);
 			await render({ variantWorkspace });
 

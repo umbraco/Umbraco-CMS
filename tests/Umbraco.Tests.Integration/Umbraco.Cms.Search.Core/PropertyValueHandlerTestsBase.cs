@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core;
+﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -235,7 +235,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithDatabaseType(ValueStorageType.Nvarchar)
             .WithName("Drop-down (single)")
             .AddEditor()
-            .WithAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .Done()
             .Build();
         dropdownSingleDataType.ConfigurationData = new Dictionary<string, object>
@@ -250,7 +250,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithDatabaseType(ValueStorageType.Nvarchar)
             .WithName("Drop-down (multiple)")
             .AddEditor()
-            .WithAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .Done()
             .Build();
         dropdownMultipleDataType.ConfigurationData = new Dictionary<string, object>
@@ -393,12 +393,12 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .AddPropertyType()
             .WithAlias("dropdownSingleValue")
             .WithDataTypeId(dropdownSingleDataType.Id)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .Done()
             .AddPropertyType()
             .WithAlias("dropdownMultipleValue")
             .WithDataTypeId(dropdownMultipleDataType.Id)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .Done()
             .AddPropertyType()
             .WithAlias("radioButtonListValue")

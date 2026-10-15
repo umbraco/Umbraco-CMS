@@ -400,7 +400,7 @@ Repositories abstract API calls and provide clean interfaces for UI components. 
 
 ## Version & Dependencies
 
-- **Target Framework**: .NET 10.0
+- **Target Framework**: .NET 11.0
 - **Umbraco CMS**: built as part of this repository (project references)
 - **Examine**: Search provider implementation
 - **Versioning**: Uses Nerdbank.GitVersioning (see `version.json` at the repository root)

@@ -35,22 +35,8 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
         _domainCacheService = domainCache;
     }
 
-    /// <summary>
-    ///     Clears all domain caches
-    /// </summary>
-    private void RefreshDomains()
-    {
-        ClearAllIsolatedCacheByEntityType<IDomain>();
-
-        // note: must do what's above FIRST else the repositories still have the old cached
-        // content and when the PublishedCachesService is notified of changes it does not see
-        // the new content...
-        DomainCacheRefresher.JsonPayload[] payloads = new[]
-        {
-            new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll),
-        };
-        _domainCacheService.Refresh(payloads);
-    }
+    private static bool AffectsContent(JsonPayload[] payloads)
+        => payloads.Any(x => x.ChangeType is JsonPayload.LanguageChangeType.Remove or JsonPayload.LanguageChangeType.ChangeCulture);
 
     #region Json
 
@@ -171,10 +157,20 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
         // if this flag is set, we will tell the published snapshot service to refresh ALL content and evict ALL IContent items
         if (clearContent)
         {
-            // clear all domain caches
-            RefreshDomains();
+            ClearAllIsolatedCacheByEntityType<IDomain>();
             ContentCacheRefresher.RefreshContentTypes(AppCaches); // we need to evict all IContent items
         }
+    }
+
+    /// <inheritdoc />
+    public override void Refresh(JsonPayload[] payloads)
+    {
+        if (AffectsContent(payloads))
+        {
+            _domainCacheService.Refresh([new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll)]);
+        }
+
+        base.Refresh(payloads);
     }
 
 

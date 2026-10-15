@@ -1,4 +1,4 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from './context/block-workspace.context-token.js';
 import {
 	UMB_BLOCK_WORKSPACE_ALIAS,
 	UMB_BLOCK_WORKSPACE_VIEW_CONTENT,
@@ -57,7 +57,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'routable',
 		name: 'Block Workspace',
 		alias: UMB_BLOCK_WORKSPACE_ALIAS,
-		api: () => import('./block-workspace.context.js'),
+		api: () => import('./context/block-workspace.context.js'),
 		meta: {
 			entityType: 'block',
 		},

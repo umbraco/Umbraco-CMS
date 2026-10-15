@@ -140,4 +140,9 @@ public enum ContentTypeOperationStatus
     ///     Cannot change the element flag because the element type has existing element instances.
     /// </summary>
     InvalidElementFlagElementHasContent,
+
+    /// <summary>
+    ///     A property type varies in a way the content type itself does not.
+    /// </summary>
+    InvalidPropertyTypeVariation,
 }

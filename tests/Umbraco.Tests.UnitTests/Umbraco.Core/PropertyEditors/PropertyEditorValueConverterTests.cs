@@ -120,8 +120,8 @@ public class PropertyEditorValueConverterTests
     [TestCase("0", 0)]
     [TestCase(null, 0)]
     [TestCase("-1", -1)]
-    [TestCase("1.65", 1.65)]
-    [TestCase("-1.65", -1.65)]
+    [TestCase("1.65", "1.65")]
+    [TestCase("-1.65", "-1.65")]
     public void CanConvertDecimalAliasPropertyEditor(object value, decimal expected)
     {
         var converter = new DecimalValueConverter();

@@ -17,8 +17,9 @@ import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umb
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbExpandVariantIdsWithSegmentOptions } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { apiErrorWasNotified } from '@umbraco-cms/backoffice/resources';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { notifyWorkspaceActionStarting } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -181,7 +182,15 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 		if (!variants.length) return;
 
-		const variantIds = variants.map((x) => x.variantId);
+		let variantIds = variants.map((x) => x.variantId);
+
+		if (this.#elementWorkspaceContext.getVariesBySegment()) {
+			variantIds = umbExpandVariantIdsWithSegmentOptions(
+				variantIds,
+				await this.#elementWorkspaceContext.getVariantOptions(),
+			);
+		}
+
 		const saveData = await this.#elementWorkspaceContext.constructSaveData(variantIds);
 		await this.#elementWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#elementWorkspaceContext.askServerToValidate(saveData, variantIds);
@@ -267,14 +276,14 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 		const { options, selected } = await this.#determineVariantOptions();
 
-		// If there is only one variant, we don't need to open the modal.
+		// If there is only one variant and it may be published, we don't need to open the modal.
 		if (options.length === 0) {
 			throw new Error('No variants are available');
-		} else if (options.length === 1) {
+		} else if (options.length === 1 && this.#publishableVariantsFilter(options[0])) {
 			// If only one option we will skip ahead and save the element with the only variant available:
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
-			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
+			// Otherwise the modal lets the user pick which variants to publish, and shows the ones that may not be.
 			const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
@@ -292,6 +301,13 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		// User has committed to publishing (modal closed with a selection, or no modal needed).
 		notifyWorkspaceActionStarting(executionOptions);
 
+		if (this.#elementWorkspaceContext.getVariesBySegment()) {
+			variantIds = umbExpandVariantIdsWithSegmentOptions(
+				variantIds,
+				await this.#elementWorkspaceContext.getVariantOptions(),
+			);
+		}
+
 		const saveData = await this.#elementWorkspaceContext.constructSaveData(variantIds);
 		await this.#elementWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#elementWorkspaceContext.askServerToValidate(saveData, variantIds);
@@ -302,9 +318,13 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 				// Notify only on the publish path. The validation-failure path below already
 				// notifies, so a shared top-level .catch would fire a second, contradictory toast.
 				return this.#performSaveAndPublish(variantIds, saveData).catch((error) => {
-					this.#notificationContext?.peek('danger', {
-						data: { message: this.#localize.term('speechBubbles_editElementPublishedFailed') },
-					});
+					// When the server reported why, the user has already seen it. Repeating a generic failure here
+					// would contradict it - and mislead, as a rejected publish still leaves the save in effect.
+					if (!apiErrorWasNotified(error?.cause)) {
+						this.#notificationContext?.peek('danger', {
+							data: { message: this.#localize.term('speechBubbles_editElementPublishedFailed') },
+						});
+					}
 					return Promise.reject(error);
 				});
 			},
@@ -338,14 +358,26 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 				return await this.#elementWorkspaceContext!.loadWithoutPersist();
 			} catch {
 				reloadAfterPublishFailed = true;
-				return saveData;
+				return { ...saveData, unique: this.#elementWorkspaceContext!.getUnique() ?? saveData.unique };
 			}
 		};
 
 		await this.#elementWorkspaceContext.performCreateOrUpdate(variantIds, saveData, {
 			create: async (data, ids, parent) => {
-				const { error } = await this.#publishingRepository.createAndPublish(data, ids, parent.unique);
+				const { data: createdUnique, error } = await this.#publishingRepository.createAndPublish(
+					data,
+					ids,
+					parent.unique,
+				);
 				if (error) throw new Error('Error creating and publishing element', { cause: error });
+
+				// The server may have assigned a different unique than the one this workspace scaffolded with
+				// (e.g. a Saving notification handler assigning its own key). The reload below reads by the
+				// workspace's current unique, so it must be updated to the actual persisted one first.
+				if (createdUnique) {
+					this.#elementWorkspaceContext!.setUnique(createdUnique);
+				}
+
 				return loadAfterPublish();
 			},
 			update: async (data, ids) => {
@@ -376,11 +408,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 	}
 
 	#publishableVariantsFilter = (option: UmbElementVariantOptionModel) => {
-		const variantId = UmbVariantId.Create(option);
-		// If the read only guard is permitted it means the variant is read only
-		const isReadOnly = this.#elementWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(variantId);
-		// If the variant is read only, we can't publish it
-		return !isReadOnly;
+		return this.#elementWorkspaceContext!.getIsWritableVariant(UmbVariantId.Create(option));
 	};
 
 	async #determineVariantOptions(): Promise<{
@@ -398,10 +426,8 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		// Selected can contain entries that are not part of the options, therefor filter based on options.
 		selected = selected.filter((x) => options.some((o) => o.unique === x));
 
-		// Filter out read-only variants
-		selected = selected.filter(
-			(x) => this.#elementWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(new UmbVariantId(x)) === false,
-		);
+		// Filter out variants that cannot be written
+		selected = selected.filter((x) => this.#elementWorkspaceContext!.getIsWritableVariant(new UmbVariantId(x)));
 
 		return {
 			options,

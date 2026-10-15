@@ -3,10 +3,12 @@ import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const mediaTypeName = 'TestMediaType';
 const mediaTypeFolderName = 'TestMediaTypeFolder';
+const childFolderName = 'Test Child Folder';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName);
   await umbracoApi.mediaType.ensureNameNotExists(mediaTypeFolderName);
+  await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.mediaType.goToSection(ConstantHelper.sections.settings);
 });
@@ -14,82 +16,77 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName);
   await umbracoApi.mediaType.ensureNameNotExists(mediaTypeFolderName);
+  await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
 });
 
-test('can create a media type using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoUi.mediaType.clickMediaTypesMenu();
-
+test('can create a media type from the tree actions menu', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Act
-  await umbracoUi.mediaType.clickCreateActionWithOptionName('Media Type');
+  await umbracoUi.mediaType.clickActionsMenuAtRoot();
+  await umbracoUi.mediaType.clickCreateActionMenuOption();
+  await umbracoUi.mediaType.clickMediaTypeButton();
   await umbracoUi.mediaType.enterMediaTypeName(mediaTypeName);
   await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeCreated();
 
   // Assert
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
-  // Check if the created media type is displayed in the collection view and has correct icon
-  await umbracoUi.mediaType.clickMediaTypesMenu();
-  await umbracoUi.mediaType.doesCollectionTreeItemTableRowHaveName(mediaTypeName);
-  await umbracoUi.mediaType.doesCollectionTreeItemTableRowHaveIcon(mediaTypeName, 'icon-picture');
+  await umbracoUi.mediaType.reloadMediaTypeTree();
   await umbracoUi.mediaType.isMediaTypeTreeItemVisible(mediaTypeName);
+  await umbracoUi.mediaType.doesTreeItemHaveTheCorrectIcon(mediaTypeName, 'icon-picture');
 });
 
-test('can create a media type folder using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoUi.mediaType.clickMediaTypesMenu();
-
+test('can create a media type folder from the tree actions menu', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Act
-  await umbracoUi.mediaType.clickCreateActionWithOptionName('Folder');
+  await umbracoUi.mediaType.clickActionsMenuAtRoot();
+  await umbracoUi.mediaType.clickCreateActionMenuOption();
+  await umbracoUi.mediaType.clickFolderButton();
   await umbracoUi.mediaType.enterFolderName(mediaTypeFolderName);
   await umbracoUi.mediaType.clickConfirmCreateFolderButtonAndWaitForMediaTypeToBeCreated();
 
   // Assert
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeFolderName)).toBeTruthy();
-  // Check if the created media type is displayed in the collection view and has correct icon
-  await umbracoUi.mediaType.clickMediaTypesMenu();
-  await umbracoUi.mediaType.doesCollectionTreeItemTableRowHaveName(mediaTypeFolderName);
-  await umbracoUi.mediaType.doesCollectionTreeItemTableRowHaveIcon(mediaTypeFolderName, 'icon-folder');
+  await umbracoUi.mediaType.isMediaTypeTreeItemVisible(mediaTypeFolderName);
+  await umbracoUi.mediaType.doesTreeItemHaveTheCorrectIcon(mediaTypeFolderName, 'icon-folder');
 });
 
-test('can create a media type in a folder using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can create a media type in a folder from the tree actions menu', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.mediaType.createFolder(mediaTypeFolderName);
+  const mediaTypeFolderId = await umbracoApi.mediaType.createFolder(mediaTypeFolderName);
   await umbracoUi.mediaType.reloadMediaTypeTree();
-  await umbracoUi.mediaType.goToMediaType(mediaTypeFolderName);
 
   // Act
-  await umbracoUi.mediaType.clickCreateActionWithOptionName('Media Type');
+  await umbracoUi.mediaType.clickRootFolderCaretButton();
+  await umbracoUi.mediaType.clickActionsMenuForMediaType(mediaTypeFolderName);
+  await umbracoUi.mediaType.clickCreateActionMenuOption();
+  await umbracoUi.mediaType.clickMediaTypeButton();
   await umbracoUi.mediaType.enterMediaTypeName(mediaTypeName);
   await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeCreated();
 
   // Assert
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
-  // Check if the created media type is displayed in the collection view and has correct icon
+  await expect.poll(async () => (await umbracoApi.mediaType.getChildren(mediaTypeFolderId))[0]?.name).toBe(mediaTypeName);
   await umbracoUi.mediaType.goToMediaType(mediaTypeFolderName);
-  await umbracoUi.mediaType.doesCollectionTreeItemTableRowHaveName(mediaTypeName);
-  await umbracoUi.mediaType.doesCollectionTreeItemTableRowHaveIcon(mediaTypeName, 'icon-picture');
+  await umbracoUi.mediaType.doesTreeItemHaveTheCorrectIcon(mediaTypeName, 'icon-picture');
 });
 
-test('can create a media type folder in a folder using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a media type folder in a folder from the tree actions menu', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const childFolderName = 'Test Child Folder';
-  await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
-  await umbracoApi.mediaType.createFolder(mediaTypeFolderName);
+  const mediaTypeFolderId = await umbracoApi.mediaType.createFolder(mediaTypeFolderName);
   await umbracoUi.mediaType.reloadMediaTypeTree();
-  await umbracoUi.mediaType.goToMediaType(mediaTypeFolderName);
 
   // Act
-  await umbracoUi.mediaType.clickCreateActionWithOptionName('Folder');
+  await umbracoUi.mediaType.clickRootFolderCaretButton();
+  await umbracoUi.mediaType.clickActionsMenuForMediaType(mediaTypeFolderName);
+  await umbracoUi.mediaType.clickCreateActionMenuOption();
+  await umbracoUi.mediaType.clickFolderButton();
   await umbracoUi.mediaType.enterFolderName(childFolderName);
   await umbracoUi.mediaType.clickConfirmCreateFolderButtonAndWaitForMediaTypeToBeCreated();
 
   // Assert
   expect(await umbracoApi.mediaType.doesNameExist(childFolderName)).toBeTruthy();
-  // Check if the created media type is displayed in the collection view and has correct icon
-  await umbracoUi.mediaType.doesCollectionTreeItemTableRowHaveName(childFolderName);
-  await umbracoUi.mediaType.doesCollectionTreeItemTableRowHaveIcon(childFolderName, 'icon-folder');
-
-  // Clean
-  await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
+  await expect.poll(async () => {
+    const [child] = await umbracoApi.mediaType.getChildren(mediaTypeFolderId);
+    return {name: child?.name, isFolder: child?.isFolder};
+  }).toEqual({name: childFolderName, isFolder: true});
+  await umbracoUi.mediaType.openCaretButtonForName(mediaTypeFolderName);
+  await umbracoUi.mediaType.doesTreeItemHaveTheCorrectIcon(childFolderName, 'icon-folder');
 });
-

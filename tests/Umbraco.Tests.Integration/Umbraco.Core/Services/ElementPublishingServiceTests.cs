@@ -179,6 +179,44 @@ public partial class ElementPublishingServiceTests : UmbracoIntegrationTest
         return contentType;
     }
 
+    private async Task<IContentType> SetupSegmentVariantElementTypeAsync(ContentVariation variation)
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("segmentVariantElement")
+            .WithName("Segment Variant Element")
+            .WithIsElement(true)
+            .WithAllowedInLibrary(true)
+            .WithAllowAsRoot(true)
+            .WithContentVariation(variation)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSupportsPublishing(true)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("title")
+                .WithName("Title")
+                .WithVariations(variation)
+                .WithValidationRegExp("^Valid.*$")
+                .Done()
+            .Build();
+
+        var createAttempt = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        if (createAttempt.Success is false)
+        {
+            throw new Exception("Something unexpected went wrong setting up the test data structure");
+        }
+
+        contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 1, contentType.Alias)];
+        var updateAttempt = await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        if (updateAttempt.Success is false)
+        {
+            throw new Exception("Something unexpected went wrong setting up the test data structure");
+        }
+
+        return contentType;
+    }
+
     private async Task<IElement> CreateInvariantContentAsync(IContentType contentType, Guid? parentKey = null, string? titleValue = "Test title")
     {
         var documentKey = Guid.NewGuid();

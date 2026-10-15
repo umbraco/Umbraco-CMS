@@ -194,7 +194,7 @@ public sealed class BlockEditorVarianceHandler
         if (exposeVariation.VariesByCulture() && blockVariations.All(v => v.Culture is null))
         {
             var defaultCulture = await _languageService.GetDefaultIsoCodeAsync();
-            return blockVariations.Select(v => new BlockItemVariation(v.ContentKey, defaultCulture, v.Segment));
+            return blockVariations.Select(v => new BlockItemVariation(v.ContentKey, defaultCulture));
         }
 
         if (exposeVariation.VariesByCulture() is false && blockVariations.All(v => v.Culture is not null))
@@ -207,7 +207,7 @@ public sealed class BlockEditorVarianceHandler
             }
 
             return retainedVariations
-                .Select(v => new BlockItemVariation(v.ContentKey, null, v.Segment))
+                .Select(v => new BlockItemVariation(v.ContentKey, null))
                 .ToList();
         }
 
@@ -269,7 +269,7 @@ public sealed class BlockEditorVarianceHandler
             }
         }
 
-        blockValue.Expose = blockValue.Expose.DistinctBy(e => $"{e.ContentKey}.{e.Culture}.{e.Segment}").ToList();
+        blockValue.Expose = blockValue.Expose.DistinctBy(e => $"{e.ContentKey}.{e.Culture}").ToList();
     }
 
     /// <summary>
@@ -307,8 +307,8 @@ public sealed class BlockEditorVarianceHandler
         var omitNullCulture = contentData.Values.Any(v => v.Culture is not null);
         List<BlockItemVariation> alignedVariations = contentData.Values
             .Where(v => omitNullCulture is false || v.Culture is not null)
-            .DistinctBy(v => v.Culture + v.Segment)
-            .Select(v => new BlockItemVariation(contentData.Key, v.Culture, v.Segment))
+            .DistinctBy(v => v.Culture)
+            .Select(v => new BlockItemVariation(contentData.Key, v.Culture))
             .ToList();
 
         if (alignedVariations.Count > 0)
@@ -319,12 +319,7 @@ public sealed class BlockEditorVarianceHandler
         // a block without property values has no value variance to align against, so keep it exposed for the element
         // type's variance, retaining the segments it was exposed for
         var alignedCulture = elementType.VariesByCulture() ? culture : null;
-        return replacedVariations
-            .Where(v => v.ContentKey == contentData.Key)
-            .Select(v => v.Segment)
-            .DefaultIfEmpty(null)
-            .Distinct()
-            .Select(segment => new BlockItemVariation(contentData.Key, alignedCulture, segment));
+        return [new BlockItemVariation(contentData.Key, alignedCulture)];
     }
 
     private static bool VariesByCulture(BlockPropertyValue blockPropertyValue)

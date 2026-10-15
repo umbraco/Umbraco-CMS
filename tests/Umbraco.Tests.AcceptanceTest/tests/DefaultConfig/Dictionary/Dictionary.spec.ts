@@ -29,7 +29,7 @@ test('can create a dictionary item', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary, true, true);
   // Verify the dictionary item displays in the tree and in the list
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName);
-  expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
+  await expect.poll(() => umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
 });
 
 test('can delete a dictionary item', async ({umbracoApi, umbracoUi}) => {
@@ -70,7 +70,7 @@ test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({um
   expect(dictionaryChildren[0].name).toEqual(dictionaryName);
   await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary, true, true);
   // Verify the new dictionary item displays in the list
-  expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
+  await expect.poll(() => umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
   // Verify the new dictionary item displays in the tree
   await umbracoUi.dictionary.reloadTree(parentDictionaryName);
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName);
@@ -197,7 +197,7 @@ test('can search a dictionary item in list when have results', async ({umbracoAp
   await umbracoUi.dictionary.searchByKeywordInCollection(dictionaryName);
 
   // Assert
-  expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
+  await expect.poll(() => umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
 });
 
 test('can search a dictionary item in list when have no results', async ({umbracoApi, umbracoUi}) => {

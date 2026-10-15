@@ -1,6 +1,9 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Serialization;
+
+// The multi node tree picker is obsolete, but must keep working for the whole deprecation period.
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Serialization;
 
@@ -133,3 +136,5 @@ public class JsonTolerantNumberConverterFactoryTests
         });
     }
 }
+
+#pragma warning restore CS0618 // Type or member is obsolete

@@ -121,7 +121,7 @@ public class VariantBlockTests : SearcherTestBase
             ],
             Expose =
             [
-                new BlockItemVariation(contentElementKey, null, null)
+                new BlockItemVariation(contentElementKey, null)
             ],
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);

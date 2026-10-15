@@ -55,6 +55,10 @@ internal abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOpti
     /// <param name="options">The <see cref="OpenApiOptions"/> instance to configure.</param>
     protected virtual void ConfigureOpenApi(OpenApiOptions options)
     {
+        // The OpenAPI version is part of the contract consumed by generated clients, so it is fixed here rather than
+        // following the framework default, which moved to 3.2 in ASP.NET Core 11.
+        options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
+
         options.AddDocumentTransformer((document, _, _) =>
         {
             document.Info = new OpenApiInfo

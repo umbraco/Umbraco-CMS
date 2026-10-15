@@ -503,6 +503,7 @@ export type CreateUserGroupRequestModel = {
     sections: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    hasAccessToInvariantForVariant: boolean;
     documentStartNode?: null | ReferenceByIdModel;
     documentRootAccess: boolean;
     mediaStartNode?: null | ReferenceByIdModel;
@@ -565,6 +566,7 @@ export type CurrentUserResponseModel = {
     avatarUrls: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    hasAccessToInvariantForVariant: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<IPermissionPresentationModel>;
@@ -613,6 +615,7 @@ export type DatatypeConfigurationResponseModel = {
     canBeChanged: DataTypeChangeModeModel;
     documentListViewId: string;
     mediaListViewId: string;
+    offerDeprecatedPropertyEditors: boolean;
 };
 
 export type DataTypeItemResponseModel = {
@@ -749,7 +752,6 @@ export type DocumentCollectionResponseModel = {
 export type DocumentConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
-    allowEditInvariantFromNonDefault: boolean;
 };
 
 export type DocumentItemResponseModel = {
@@ -964,7 +966,6 @@ export type DocumentVariantItemResponseModel = {
 
 export type DocumentVariantRequestModel = {
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -978,7 +979,6 @@ export type DocumentVariantResponseModel = {
     createDate: string;
     updateDate: string;
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1046,7 +1046,6 @@ export type DynamicRootResponseModel = {
 export type ElementConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
-    allowEditInvariantFromNonDefault: boolean;
 };
 
 export type ElementItemResponseModel = {
@@ -1117,7 +1116,6 @@ export type ElementVariantItemResponseModel = {
 
 export type ElementVariantRequestModel = {
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1131,7 +1129,6 @@ export type ElementVariantResponseModel = {
     createDate: string;
     updateDate: string;
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1737,7 +1734,6 @@ export type MediaValueResponseModel = {
 
 export type MediaVariantRequestModel = {
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1745,7 +1741,6 @@ export type MediaVariantResponseModel = {
     createDate: string;
     updateDate: string;
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1902,7 +1897,6 @@ export type MemberValueResponseModel = {
 
 export type MemberVariantRequestModel = {
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -1910,7 +1904,6 @@ export type MemberVariantResponseModel = {
     createDate: string;
     updateDate: string;
     culture?: null | string;
-    segment?: null | string;
     name: string;
 };
 
@@ -2678,6 +2671,9 @@ export type SecurityConfigurationResponseModel = {
 export type SegmentResponseModel = {
     name: string;
     alias: string;
+    /**
+     * @deprecated
+     */
     cultures?: null | Array<string>;
 };
 
@@ -2699,6 +2695,7 @@ export type ServerInformationResponseModel = {
     assemblyVersion: string;
     baseUtcOffset: string;
     runtimeMode: RuntimeModeModel;
+    isDebugMode: boolean;
 };
 
 export type ServerStatusResponseModel = {
@@ -3277,6 +3274,7 @@ export type UpdateUserGroupRequestModel = {
     sections: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    hasAccessToInvariantForVariant: boolean;
     documentStartNode?: null | ReferenceByIdModel;
     documentRootAccess: boolean;
     mediaStartNode?: null | ReferenceByIdModel;
@@ -3323,7 +3321,7 @@ export type UpgradeSettingsResponseModel = {
     newState: string;
     newVersion: string;
     oldVersion: string;
-    reportUrl: null | string;
+    reportUrl: string;
 };
 
 export type UserConfigurationResponseModel = {
@@ -3380,6 +3378,7 @@ export type UserGroupResponseModel = {
     sections: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    hasAccessToInvariantForVariant: boolean;
     documentStartNode?: null | ReferenceByIdModel;
     documentRootAccess: boolean;
     mediaStartNode?: null | ReferenceByIdModel;
@@ -18053,6 +18052,7 @@ export type GetFilterUserData = {
         orderDirection?: DirectionModel;
         userGroupIds?: Array<string>;
         userStates?: Array<UserStateModel>;
+        userKinds?: Array<UserKindModel>;
         filter?: string;
     };
     url: '/umbraco/management/api/v1/filter/user';

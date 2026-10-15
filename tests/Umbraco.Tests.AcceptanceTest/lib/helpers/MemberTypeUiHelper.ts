@@ -31,12 +31,7 @@ export class MemberTypeUiHelper extends UiBaseLocators {
   }
 
   async isMemberTypeTreeItemVisible(name: string, isVisible: boolean = true) {
-    const hasShowChildren = await this.memberTypeTreeRoot.getAttribute('show-children') !== null;
-
-    if (!hasShowChildren) {
-      await this.click(this.memberTypeTreeRoot.locator(this.caretBtn).first());
-    }
-
+    await this.expandTreeRoot(this.memberTypeTreeRoot);
     await this.isTreeItemVisible(name, isVisible);
   }
 

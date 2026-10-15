@@ -1,7 +1,7 @@
 import {test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-const propertyEditorName = 'User Picker';
+const propertyEditorName = 'Single User Picker';
 const customDataTypeName = 'Custom User Picker';
 const editorAlias = 'Umbraco.UserPicker';
 const editorUiAlias = 'Umb.PropertyEditorUi.UserPicker';

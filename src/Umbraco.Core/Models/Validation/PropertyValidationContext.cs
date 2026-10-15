@@ -21,9 +21,16 @@ public sealed class PropertyValidationContext
     public required IEnumerable<string> CulturesBeingValidated { get; init; }
 
     /// <summary>
-    ///     Gets the collection of segments being validated.
+    ///     Gets a value indicating whether invariant (shared) properties should be validated in this context.
     /// </summary>
-    public required IEnumerable<string?> SegmentsBeingValidated { get; init; }
+    /// <remarks>
+    ///     Defaults to <c>true</c> so callers that don't populate it (migrations, internal consistency checks,
+    ///     system validations) behave permissively. Content-editing paths compute this as
+    ///     <c>content.ContentType.VariesByCulture() is false || user.HasAccessToInvariantForVariant()</c> —
+    ///     i.e. invariant content types always validate invariant properties, and variant content types only
+    ///     do so when the editing user holds the permission.
+    /// </remarks>
+    public bool ValidateInvariantProperties { get; init; } = true;
 
     /// <summary>
     ///     Creates an empty property validation context with no culture or segment.
@@ -31,7 +38,7 @@ public sealed class PropertyValidationContext
     /// <returns>An empty property validation context.</returns>
     public static PropertyValidationContext Empty() => new()
     {
-        Culture = null, Segment = null, CulturesBeingValidated = [], SegmentsBeingValidated = []
+        Culture = null, Segment = null, CulturesBeingValidated = []
     };
 
     /// <summary>
@@ -42,6 +49,6 @@ public sealed class PropertyValidationContext
     /// <returns>A property validation context for the specified culture and segment.</returns>
     public static PropertyValidationContext CultureAndSegment(string? culture, string? segment) => new()
     {
-        Culture = culture, Segment = segment, CulturesBeingValidated = [], SegmentsBeingValidated = []
+        Culture = culture, Segment = segment, CulturesBeingValidated = []
     };
 }

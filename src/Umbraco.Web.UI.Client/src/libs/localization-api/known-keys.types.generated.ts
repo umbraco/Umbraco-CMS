@@ -561,7 +561,10 @@ declare global {
 		content_scheduledPublishDocumentation: string;
 		content_scheduledPublishing: string;
 		content_scheduledPublishServerTime: string;
+		content_scheduleForAllLanguages: string;
 		content_schedulePublishHelp: string;
+		content_segmentHasContent: string;
+		content_segmentNoContent: string;
 		content_selectAllVariants: string;
 		content_sendForApproval: string;
 		content_setDate: string;
@@ -675,6 +678,7 @@ declare global {
 		contentTypeEditor_elementDoesNotSupport: string;
 		contentTypeEditor_elementHeading: string;
 		contentTypeEditor_elementType: string;
+		contentTypeEditor_elementTypeOnlyAllowedInLibrarySupport: string;
 		contentTypeEditor_elementTypeOnlySupport: string;
 		contentTypeEditor_enableListViewDescription: string;
 		contentTypeEditor_enableListViewHeading: string;
@@ -1444,6 +1448,7 @@ declare global {
 		login_passwordIsBlank: string;
 		login_passwordMinLength: string;
 		login_passwordMismatch: string;
+		login_passwordResetUnavailable: string;
 		login_receivedErrorFromServer: string;
 		login_rememberMe: string;
 		login_requestPasswordResetConfirmation: string;
@@ -1737,6 +1742,8 @@ declare global {
 		placeholders_usernameHint: string;
 		preview_connectionFailed: string;
 		preview_connectionLost: string;
+		preview_connectionReconnecting: string;
+		preview_connectionRestored: string;
 		preview_endLabel: string;
 		preview_endTitle: string;
 		preview_openWebsiteLabel: string;
@@ -1770,6 +1777,7 @@ declare global {
 		prompt_unsavedChangesWarning: string;
 		propertyActions_tooltipForPropertyActionsMenu: string;
 		propertyActions_tooltipForPropertyActionsMenuClose: string;
+		propertyEditorPicker_deprecatedLabel: string;
 		propertyEditorPicker_openPropertyEditorPicker: string;
 		propertyEditorPicker_selectAction: string;
 		propertyEditorPicker_title: string;
@@ -1934,6 +1942,7 @@ declare global {
 		rte_config_overlaySize_description: string;
 		rte_label: string;
 		scripts_editscript: string;
+		scripts_tabCode: string;
 		searchExamine_copyValue: string;
 		searchExamine_fieldCount: (count: number) => string;
 		searchExamine_fieldType: (type: string) => string;
@@ -2278,6 +2287,7 @@ declare global {
 		template_sectionMandatoryDesc: string;
 		template_sectionName: string;
 		template_systemFields: string;
+		template_tabCode: string;
 		template_template: string;
 		template_websiteRoot: string;
 		template_where: string;
@@ -2499,6 +2509,7 @@ declare global {
 		user_allowAccessToAllElements: string;
 		user_allowAccessToAllLanguages: string;
 		user_allowAccessToAllMedia: string;
+		user_allowAccessToInvariantForVariant: string;
 		user_andMore: string;
 		user_assignAccess: string;
 		user_avatarDeleteSuccess: string;
@@ -2526,11 +2537,15 @@ declare global {
 		user_deleteUserConfirmation: string;
 		user_descriptionField: string;
 		user_disabled: string;
+		user_disableUserConfirmation: string;
+		user_disableUserHeadline: (name: string) => string;
 		user_documentType: string;
 		user_duplicateLogin: string;
 		user_editors: string;
 		user_emailDescription: (usernameIsEmail: boolean) => string;
 		user_emailRequired: string;
+		user_enableUserConfirmation: string;
+		user_enableUserHeadline: (name: string) => string;
 		user_entityPermissionsDescription: string;
 		user_entityPermissionsLabel: string;
 		user_excerptField: string;
@@ -2539,6 +2554,7 @@ declare global {
 		user_granularRightsDescription: string;
 		user_granularRightsLabel: string;
 		user_groupsHelp: string;
+		user_invariantForVariantHelp: string;
 		user_invite: string;
 		user_inviteAnotherUser: string;
 		user_inviteUser: string;
@@ -2630,7 +2646,10 @@ declare global {
 		user_stateInactive: string;
 		user_stateInvited: string;
 		user_stateLockedOut: string;
+		user_type: string;
 		user_unknownFailure: string;
+		user_unlockUserConfirmation: string;
+		user_unlockUserHeadline: (name: string) => string;
 		user_updateDate: string;
 		user_userCreated: string;
 		user_userCreatedApiSuccessHelp: string;

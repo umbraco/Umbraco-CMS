@@ -74,7 +74,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         return contentType;
     }
 
-    protected async Task<IContentType> CreateVariantContentType(ContentVariation variation = ContentVariation.Culture, bool variantTitleAsMandatory = true)
+    protected async Task<IContentType> CreateVariantContentType(ContentVariation variation = ContentVariation.Culture, bool variantTitleAsMandatory = true, bool invariantTitleAsMandatory = false)
     {
         var language = new LanguageBuilder()
             .WithCultureInfo("da-DK")
@@ -94,6 +94,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
             .AddPropertyType()
                 .WithAlias("invariantTitle")
                 .WithName("Invariant Title")
+                .WithMandatory(invariantTitleAsMandatory)
                 .WithVariations(ContentVariation.Nothing)
                 .Done()
             .AddPropertyType()
@@ -177,9 +178,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
             ],
             Variants =
             [
-                new VariantModel { Segment = null, Name = "The Name" },
-                new VariantModel { Segment = "seg-1", Name = "The Name" },
-                new VariantModel { Segment = "seg-2", Name = "The Name" }
+                new VariantModel { Name = "The Name" }
             ],
         };
 
@@ -226,12 +225,8 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
             ]),
             Variants =
             [
-                new VariantModel { Name = "The Name", Culture = "en-US", Segment = null },
-                new VariantModel { Name = "The Name", Culture = "en-US", Segment = "seg-1" },
-                new VariantModel { Name = "The Name", Culture = "en-US", Segment = "seg-2" },
-                new VariantModel { Name = "The Name", Culture = "da-DK", Segment = null },
-                new VariantModel { Name = "The Name", Culture = "da-DK", Segment = "seg-1" },
-                new VariantModel { Name = "The Name", Culture = "da-DK", Segment = "seg-2" },
+                new VariantModel { Name = "The Name", Culture = "en-US" },
+                new VariantModel { Name = "The Name", Culture = "da-DK" },
             ],
         };
 

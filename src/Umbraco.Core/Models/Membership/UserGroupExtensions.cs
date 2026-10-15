@@ -36,7 +36,8 @@ public static class UserGroupExtensions
             group.AllowedSections,
             group.Permissions,
             group.GranularPermissions,
-            group.HasAccessToAllLanguages);
+            group.HasAccessToAllLanguages,
+            group.HasAccessToInvariantForVariant);
     }
 
     /// <summary>
