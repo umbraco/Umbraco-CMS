@@ -369,31 +369,50 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Creates an EF Core <see cref="EFCoreDtos.DocumentDto"/> instance from the specified <see cref="IContent"/>
-    ///     entity, for persistence via the EF Core write path (mirrors <see cref="BuildDto(IContent, Guid)"/>).
+    ///     Builds the EF Core <see cref="EFCoreDtos.DocumentDto"/> row inserted for a new <see cref="IContent"/> entity
+    ///     (mirrors the entity part of <see cref="BuildDto(IContent, Guid)"/>). The node, content and version rows
+    ///     persisted alongside it are built separately.
     /// </summary>
-    /// <param name="entity">The content entity to convert into a DTO.</param>
-    /// <param name="objectType">The unique identifier representing the object type.</param>
-    /// <param name="publishing">Whether the entity is being published as part of the same save.</param>
-    /// <returns>An EF Core <see cref="EFCoreDtos.DocumentDto"/> representing the specified content entity.</returns>
-    public static EFCoreDtos.DocumentDto BuildDocumentDto(IContent entity, Guid objectType, bool publishing) =>
+    /// <param name="entity">The content entity, with its id assigned.</param>
+    /// <param name="published">The published flag to persist.</param>
+    /// <param name="edited">The edited flag to persist.</param>
+    /// <returns>An EF Core <see cref="EFCoreDtos.DocumentDto"/> for the specified content entity.</returns>
+    internal static EFCoreDtos.DocumentDto BuildEFCoreDocumentDto(IContent entity, bool published, bool edited) =>
         new()
         {
             NodeId = entity.Id,
-            Published = entity.Published,
-            ContentDto = BuildEFCoreContentDto(entity, objectType),
-            CurrentVersion = BuildEFCoreDocumentVersionDto(entity, publishing),
+            Published = published,
+            Edited = edited,
         };
 
-    private static EFCoreDtos.ContentDto BuildEFCoreContentDto(IContentBase entity, Guid objectType) =>
+    /// <summary>
+    ///     Builds the EF Core <see cref="EFCoreDtos.DocumentVersionDto"/> row for the entity's current version.
+    /// </summary>
+    /// <param name="entity">The content entity whose current version is being persisted.</param>
+    /// <param name="publishing">Whether that version is being published as part of the same save.</param>
+    /// <returns>An EF Core <see cref="EFCoreDtos.DocumentVersionDto"/> for the entity's current version.</returns>
+    internal static EFCoreDtos.DocumentVersionDto BuildEFCoreDocumentVersionDto(IContent entity, bool publishing) =>
+        new()
+        {
+            Id = entity.VersionId,
+            TemplateId = entity.TemplateId,
+            Published = publishing,
+        };
+
+    /// <summary>
+    ///     Builds the EF Core <see cref="EFCoreDtos.ContentDto"/> row for the specified entity.
+    /// </summary>
+    internal static EFCoreDtos.ContentDto BuildEFCoreContentDto(IContentBase entity) =>
         new()
         {
             NodeId = entity.Id,
             ContentTypeId = entity.ContentTypeId,
-            NodeDto = BuildEFCoreNodeDto(entity, objectType),
         };
 
-    private static EFCoreDtos.NodeDto BuildEFCoreNodeDto(IContentBase entity, Guid objectType) =>
+    /// <summary>
+    ///     Builds the EF Core <see cref="EFCoreDtos.NodeDto"/> row for the specified entity.
+    /// </summary>
+    internal static EFCoreDtos.NodeDto BuildEFCoreNodeDto(IContentBase entity, Guid objectType) =>
         new()
         {
             NodeId = entity.Id,
@@ -411,9 +430,16 @@ internal sealed class ContentBaseFactory
             CreateDate = entity.CreateDate,
         };
 
-    // always build the current / VersionPk dto
-    // we're never going to build / save old versions (which are immutable)
-    private static EFCoreDtos.ContentVersionDto BuildEFCoreContentVersionDto(IContentBase entity) =>
+    /// <summary>
+    ///     Builds the EF Core <see cref="EFCoreDtos.ContentVersionDto"/> row for the entity's current version. Only the
+    ///     current version is ever built; older versions are immutable.
+    /// </summary>
+    /// <param name="entity">The entity whose current version is being persisted.</param>
+    /// <param name="publishing">
+    ///     Whether that version is being published as part of the same save, in which case it stops being the current
+    ///     draft and a new draft takes its place.
+    /// </param>
+    internal static EFCoreDtos.ContentVersionDto BuildEFCoreContentVersionDto(IContentBase entity, bool publishing) =>
         new()
         {
             Id = entity.VersionId,
@@ -421,25 +447,9 @@ internal sealed class ContentBaseFactory
             VersionDate = entity.UpdateDate,
             // See the UserId comment in BuildEFCoreNodeDto - EF Core bypasses the 0-to-null coalescing getter.
             UserId = entity.WriterId == 0 ? null : entity.WriterId,
-            Current = true, // always building the current one
+            Current = !publishing,
             Text = entity.Name,
         };
-
-    // always build the current / VersionPk dto
-    // we're never going to build / save old versions (which are immutable)
-    private static EFCoreDtos.DocumentVersionDto BuildEFCoreDocumentVersionDto(IContent entity, bool publishing)
-    {
-        EFCoreDtos.ContentVersionDto contentVersionDto = BuildEFCoreContentVersionDto(entity);
-        contentVersionDto.Current = !publishing;
-
-        return new EFCoreDtos.DocumentVersionDto
-        {
-            Id = entity.VersionId,
-            TemplateId = entity.TemplateId,
-            Published = publishing, // mirrors PersistNewItem's inline "if (publishing) entityVersionDto.Published = true;"
-            ContentVersionDto = contentVersionDto,
-        };
-    }
 
     // always build the current / VersionPk dto
     // we're never going to build / save old versions (which are immutable)

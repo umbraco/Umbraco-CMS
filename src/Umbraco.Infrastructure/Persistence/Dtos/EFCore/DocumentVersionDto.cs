@@ -26,9 +26,4 @@ public class DocumentVersionDto : IContentVersionDto
     /// Gets or sets a value indicating whether this document version is published.
     /// </summary>
     public bool Published { get; set; }
-
-    /// <summary>
-    /// Gets or sets the shared content version row. Not a database column — populated by the factory that builds the DTO for a write.
-    /// </summary>
-    public ContentVersionDto ContentVersionDto { get; set; } = null!;
 }
