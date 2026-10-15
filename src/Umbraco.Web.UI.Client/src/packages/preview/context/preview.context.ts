@@ -31,6 +31,7 @@ export class UmbPreviewContext extends UmbContextBase {
 	#currentArgs: UmbPreviewIframeArgs = {};
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#resizeController?: AbortController;
+	#serverContext?: typeof UMB_SERVER_CONTEXT.TYPE;
 	#serverUrl: string = '';
 
 	#previewRepository = new UmbPreviewRepository(this);
@@ -78,10 +79,11 @@ export class UmbPreviewContext extends UmbContextBase {
 			}
 
 			this.#serverUrl = serverUrl;
+			this.#serverContext = serverContext;
 
 			this.#setPreviewUrl({ serverUrl });
 
-			this.#initHubConnection(serverUrl, serverContext);
+			this.#initHubConnection();
 		});
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
@@ -103,8 +105,10 @@ export class UmbPreviewContext extends UmbContextBase {
 		}
 	}
 
-	async #initHubConnection(serverUrl: string, serverContext?: typeof UMB_SERVER_CONTEXT.TYPE) {
-		const previewHubUrl = `${serverUrl}/umbraco/PreviewHub`;
+	async #initHubConnection() {
+		if (!this.#serverUrl) return;
+
+		const previewHubUrl = `${this.#serverUrl}/umbraco/PreviewHub`;
 
 		// Clear the reference before stopping so the old connection's onclose handler stays silent.
 		if (this.#connection) {
@@ -113,7 +117,7 @@ export class UmbPreviewContext extends UmbContextBase {
 			await previousConnection.stop();
 		}
 
-		const skipNegotiation = serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
+		const skipNegotiation = this.#serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
 
 		const hubOptions: IHttpConnectionOptions = {};
 

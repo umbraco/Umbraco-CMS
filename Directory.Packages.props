@@ -38,7 +38,7 @@
   </ItemGroup>
   <!-- Umbraco packages -->
   <ItemGroup>
-    <PackageVersion Include="Umbraco.JsonSchema.Extensions" Version="0.4.3" />
+    <PackageVersion Include="Umbraco.JsonSchema.Extensions" Version="0.5.0" />
   </ItemGroup>
   <!-- Third-party packages -->
   <ItemGroup>
@@ -58,9 +58,9 @@
     <PackageVersion Include="ncrontab" Version="3.4.0" />
     <PackageVersion Include="NPoco" Version="6.3.0" />
     <PackageVersion Include="NPoco.SqlServer" Version="6.3.0" />
-    <PackageVersion Include="OpenIddict.Abstractions" Version="7.7.1" />
-    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.7.1" />
-    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.7.1" />
+    <PackageVersion Include="OpenIddict.Abstractions" Version="7.7.2" />
+    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.7.2" />
+    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.7.2" />
     <PackageVersion Include="Serilog" Version="4.4.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Process" Version="3.0.0" />

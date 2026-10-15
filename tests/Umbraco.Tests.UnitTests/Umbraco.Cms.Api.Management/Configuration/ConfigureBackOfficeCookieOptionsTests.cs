@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,6 +16,8 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Api.Management.Configuration;
+using Umbraco.Cms.Api.Management.Controllers;
+using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -171,43 +175,66 @@ public class ConfigureBackOfficeCookieOptionsTests
         Assert.Throws<ConfigurationException>(() => ConfigureOptions());
     }
 
-    // A Management API request is always JSON, so an unauthenticated one must get a status code rather
-    // than a 302 to the HTML login page. The exception is an explicit client_id, which is how Postman
-    // and Swagger UI start an authorization code flow and do need the redirect.
-    [TestCase("/umbraco/management/api/v1/document", null, 401)]
-    [TestCase("/umbraco/management/api/v1/document", "any-client-id", 302)]
-    [TestCase("/umbraco/not-management-api", null, 302)]
-    public void Can_Answer_Unauthorized_Request_With_Expected_Status(string path, string? clientId, int expectedStatusCode)
+    // Whether an unauthenticated request gets a status code or a redirect to the login page is decided
+    // by the endpoint's cookie redirect metadata, not by where the endpoint is routed.
+    [TestCase("/umbraco/management/api/v1/document", EndpointKind.Api, 401)]
+    [TestCase("/umbraco/some-package/api/v1/item", EndpointKind.Api, 401)]
+    [TestCase("/umbraco/management/api/v1/security/back-office/authorize", EndpointKind.ApiAllowingRedirect, 302)]
+    [TestCase("/umbraco/some-page", EndpointKind.Page, 302)]
+    [TestCase("/umbraco/some-page", EndpointKind.None, 302)]
+    public void Can_Answer_Unauthorized_Request_According_To_Endpoint_Metadata(string path, EndpointKind endpointKind, int expectedStatusCode)
     {
-        RedirectContext<CookieAuthenticationOptions> context = CreateRedirectContext(path, clientId);
+        RedirectContext<CookieAuthenticationOptions> context = CreateRedirectContext(path, endpointKind);
 
         ConfigureOptions().Events.OnRedirectToLogin(context);
 
         AssertRedirectOutcome(context, expectedStatusCode);
     }
 
-    [TestCase("/umbraco/management/api/v1/document", null, 403)]
-    [TestCase("/umbraco/management/api/v1/document", "any-client-id", 302)]
-    [TestCase("/umbraco/not-management-api", null, 302)]
-    public void Can_Answer_Forbidden_Request_With_Expected_Status(string path, string? clientId, int expectedStatusCode)
+    [TestCase("/umbraco/management/api/v1/document", EndpointKind.Api, 403)]
+    [TestCase("/umbraco/some-package/api/v1/item", EndpointKind.Api, 403)]
+    [TestCase("/umbraco/management/api/v1/security/back-office/authorize", EndpointKind.ApiAllowingRedirect, 302)]
+    [TestCase("/umbraco/some-page", EndpointKind.Page, 302)]
+    [TestCase("/umbraco/some-page", EndpointKind.None, 302)]
+    public void Can_Answer_Forbidden_Request_According_To_Endpoint_Metadata(string path, EndpointKind endpointKind, int expectedStatusCode)
     {
-        RedirectContext<CookieAuthenticationOptions> context = CreateRedirectContext(path, clientId);
+        RedirectContext<CookieAuthenticationOptions> context = CreateRedirectContext(path, endpointKind);
 
         ConfigureOptions().Events.OnRedirectToAccessDenied(context);
 
         AssertRedirectOutcome(context, expectedStatusCode);
     }
 
-    // The X-Requested-With header keeps forcing the status-code branch for non-API paths.
     [Test]
-    public void Can_Answer_Unauthorized_Xhr_Request_Outside_Management_Api_With_401()
+    public void Can_Answer_Unauthorized_Xhr_Request_To_Non_Api_Endpoint_With_401()
     {
-        RedirectContext<CookieAuthenticationOptions> context = CreateRedirectContext("/umbraco/login", clientId: null);
+        RedirectContext<CookieAuthenticationOptions> context = CreateRedirectContext("/umbraco/some-page", EndpointKind.Page);
         context.Request.Headers.XRequestedWith = "XMLHttpRequest";
 
         ConfigureOptions().Events.OnRedirectToLogin(context);
 
         AssertRedirectOutcome(context, 401);
+    }
+
+    [Test]
+    public void Management_Api_Controllers_Disable_Cookie_Redirects()
+        => Assert.That(
+            typeof(ManagementApiControllerBase).GetCustomAttributes(inherit: true).OfType<IDisableCookieRedirectMetadata>(),
+            Is.Not.Empty);
+
+    [Test]
+    public void Back_Office_Authorize_Endpoint_Allows_Cookie_Redirects()
+        => Assert.That(
+            typeof(BackOfficeController).GetMethod(nameof(BackOfficeController.Authorize))!
+                .GetCustomAttributes(inherit: true).OfType<IAllowCookieRedirectMetadata>(),
+            Is.Not.Empty);
+
+    public enum EndpointKind
+    {
+        None,
+        Page,
+        Api,
+        ApiAllowingRedirect,
     }
 
     private static void AssertRedirectOutcome(RedirectContext<CookieAuthenticationOptions> context, int expectedStatusCode)
@@ -217,13 +244,23 @@ public class ConfigureBackOfficeCookieOptionsTests
             Assert.That(context.Response.Headers.Location.ToString(), Is.EqualTo(context.RedirectUri));
         });
 
-    private RedirectContext<CookieAuthenticationOptions> CreateRedirectContext(string path, string? clientId)
+    private RedirectContext<CookieAuthenticationOptions> CreateRedirectContext(string path, EndpointKind endpointKind)
     {
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Path = path;
-        if (clientId is not null)
+
+        object[]? metadata = endpointKind switch
         {
-            httpContext.Request.QueryString = new QueryString($"?client_id={clientId}");
+            EndpointKind.None => null,
+            EndpointKind.Page => [],
+            EndpointKind.Api => [new ApiControllerAttribute()],
+            EndpointKind.ApiAllowingRedirect => [new ApiControllerAttribute(), new AllowCookieRedirectAttribute()],
+            _ => throw new ArgumentOutOfRangeException(nameof(endpointKind)),
+        };
+
+        if (metadata is not null)
+        {
+            httpContext.SetEndpoint(new Endpoint(null, new EndpointMetadataCollection(metadata), path));
         }
 
         var scheme = new AuthenticationScheme(

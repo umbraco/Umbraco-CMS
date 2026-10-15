@@ -14,12 +14,14 @@ namespace Umbraco.Cms.Core.Cache;
 ///     Ensures that distributed cache events are setup and the <see cref="IServerMessenger" /> is initialized
 /// </summary>
 public sealed class DatabaseServerMessengerNotificationHandler :
-    INotificationHandler<UmbracoApplicationStartingNotification>, INotificationHandler<UmbracoRequestEndNotification>
+    INotificationHandler<UmbracoApplicationStartingNotification>,
+    INotificationAsyncHandler<UmbracoRequestEndNotification>
 {
     private readonly IUmbracoDatabaseFactory _databaseFactory;
     private readonly ILogger<DatabaseServerMessengerNotificationHandler> _logger;
     private readonly IServerMessenger _messenger;
     private readonly IRuntimeState _runtimeState;
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DatabaseServerMessengerNotificationHandler" /> class.
@@ -28,12 +30,14 @@ public sealed class DatabaseServerMessengerNotificationHandler :
         IServerMessenger serverMessenger,
         IUmbracoDatabaseFactory databaseFactory,
         ILogger<DatabaseServerMessengerNotificationHandler> logger,
-        IRuntimeState runtimeState)
+        IRuntimeState runtimeState,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
     {
         _databaseFactory = databaseFactory;
         _logger = logger;
         _messenger = serverMessenger;
         _runtimeState = runtimeState;
+        _repositoryCacheVersionService = repositoryCacheVersionService;
     }
 
     /// <inheritdoc />
@@ -56,8 +60,19 @@ public sealed class DatabaseServerMessengerNotificationHandler :
     }
 
     /// <summary>
-    /// Handles the end of an Umbraco request by clearing the batch of distributed cache instructions.
+    /// Handles the end of an Umbraco request: writes the batched distributed cache instructions, then publishes the
+    /// repository cache versions deferred during the request.
     /// </summary>
     /// <param name="notification">The notification instance signaling the end of an Umbraco request.</param>
-    public void Handle(UmbracoRequestEndNotification notification) => _messenger?.SendMessages();
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <remarks>
+    /// The order matters. A server that sees a new cache version before the matching instruction syncs, finds
+    /// nothing to refresh and keeps its stale entries until the next periodic sync.
+    /// </remarks>
+    public async Task HandleAsync(UmbracoRequestEndNotification notification, CancellationToken cancellationToken)
+    {
+        _messenger?.SendMessages();
+        await _repositoryCacheVersionService.FlushCacheUpdatesAsync();
+    }
 }

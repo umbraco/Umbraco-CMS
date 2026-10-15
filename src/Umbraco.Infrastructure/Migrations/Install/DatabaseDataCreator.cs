@@ -1418,6 +1418,7 @@ internal sealed class DatabaseDataCreator
                 UpdateDate = DateTime.UtcNow,
                 Icon = "icon-medal",
                 HasAccessToAllLanguages = true,
+                HasAccessToInvariantForVariant = true,
             });
         _database.Insert(
             Constants.DatabaseSchema.Tables.UserGroup,
@@ -1437,6 +1438,7 @@ internal sealed class DatabaseDataCreator
                 UpdateDate = DateTime.UtcNow,
                 Icon = "icon-edit",
                 HasAccessToAllLanguages = true,
+                HasAccessToInvariantForVariant = true,
             });
         _database.Insert(
             Constants.DatabaseSchema.Tables.UserGroup,
@@ -1456,6 +1458,7 @@ internal sealed class DatabaseDataCreator
                 UpdateDate = DateTime.UtcNow,
                 Icon = "icon-tools",
                 HasAccessToAllLanguages = true,
+                HasAccessToInvariantForVariant = true,
             });
         _database.Insert(
             Constants.DatabaseSchema.Tables.UserGroup,
@@ -1475,6 +1478,7 @@ internal sealed class DatabaseDataCreator
                 UpdateDate = DateTime.UtcNow,
                 Icon = "icon-globe",
                 HasAccessToAllLanguages = true,
+                HasAccessToInvariantForVariant = true,
             });
         _database.Insert(
             Constants.DatabaseSchema.Tables.UserGroup,
@@ -1491,6 +1495,7 @@ internal sealed class DatabaseDataCreator
                 UpdateDate = DateTime.UtcNow,
                 Icon = "icon-lock",
                 HasAccessToAllLanguages = false,
+                HasAccessToInvariantForVariant = false,
             });
     }
 
