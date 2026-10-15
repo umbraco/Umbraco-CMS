@@ -1,29 +1,16 @@
-import { UMB_BLOCK_SINGLE_ENTRY_CONTEXT } from '../../context/index.js';
 import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
-import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
+/**
+ * @element umb-ref-single-block
+ * @slot name - Content rendered in the block's primary label area (the `name` slot of the inner `uui-ref-node`). The expected projection is a `<umb-ufm-render>` element owned by the parent block-single entry.
+ */
 @customElement('umb-ref-single-block')
-export class UmbRefSingleBlockElement extends UmbLitElement {
+export class UmbRefSingleBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElement) {
 	//
-	#blockContext?: typeof UMB_BLOCK_SINGLE_ENTRY_CONTEXT.TYPE;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_BLOCK_SINGLE_ENTRY_CONTEXT, (blockContext) => {
-			this.#blockContext = blockContext;
-		});
-	}
-
-	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
-		this.#blockContext?.setName(event.detail.text);
-	};
-
-	@property({ type: String, reflect: false })
-	label?: string;
-
 	@property({ type: String, reflect: false })
 	icon?: string;
 
@@ -54,13 +41,7 @@ export class UmbRefSingleBlockElement extends UmbLitElement {
 				.readonly=${!(this.config?.showContentEdit ?? false)}
 				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-				<umb-ufm-render
-					slot="name"
-					inline
-					.markdown=${this.label}
-					.value=${blockValue}
-					@umb-ufm-resolved=${this.#onUfmResolved}>
-				</umb-ufm-render>
+				${this.renderNameSlot(blockValue, 'name')}
 				${when(this.unpublished, () => this.#renderDraftTag())}
 			</uui-ref-node>
 		`;
@@ -77,7 +58,7 @@ export class UmbRefSingleBlockElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			uui-ref-node {
 				min-height: var(--uui-size-16);
@@ -89,7 +70,8 @@ export class UmbRefSingleBlockElement extends UmbLitElement {
 				vertical-align: text-top;
 			}
 			:host([unpublished]) umb-icon,
-			:host([unpublished]) umb-ufm-render {
+			:host([unpublished]) umb-ufm-render,
+			:host([unpublished]) ::slotted([slot='name']) {
 				opacity: 0.6;
 			}
 		`,

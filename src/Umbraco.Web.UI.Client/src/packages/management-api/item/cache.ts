@@ -12,6 +12,7 @@ interface UmbItemCacheEntryModel<ItemDataModelType> {
  */
 export class UmbManagementApiItemDataCache<ItemDataModelType> {
 	#entries: Map<string, UmbItemCacheEntryModel<ItemDataModelType>> = new Map();
+	#serverEventsConnected = false;
 
 	/**
 	 * Checks if an entry exists in the cache
@@ -74,5 +75,32 @@ export class UmbManagementApiItemDataCache<ItemDataModelType> {
 	 */
 	clear(): void {
 		this.#entries.clear();
+	}
+
+	/**
+	 * Whether server events are connected, which is the condition under which cached entries
+	 * can be trusted, as server events are what invalidate them.
+	 * The cache's invalidation manager owns this state for the lifetime of the app, so every
+	 * consumer reads the same value, including one constructed after the connection changed.
+	 * Without an invalidation manager it stays false, and consumers read from the server.
+	 * @returns {boolean} - True if server events are connected, false otherwise
+	 * @memberof UmbManagementApiItemDataCache
+	 */
+	get serverEventsConnected(): boolean {
+		return this.#serverEventsConnected;
+	}
+
+	/**
+	 * Sets whether server events are connected, clearing the cache when they are not.
+	 * Called by the cache's invalidation manager.
+	 * @param {boolean} value - True if server events are connected, false otherwise
+	 * @memberof UmbManagementApiItemDataCache
+	 */
+	setServerEventsConnected(value: boolean): void {
+		this.#serverEventsConnected = value;
+
+		if (value === false) {
+			this.clear();
+		}
 	}
 }
