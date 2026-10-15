@@ -1,9 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Configuration;
 using Umbraco.Cms.Core.Search.Indexing;
@@ -18,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 public class LibraryElementIndexingTests : ContentBaseTestBase
 {
-    private const string ElementsViaDraftContentStrategyIndexAlias = "Test_ElementsViaDraftContentStrategy";
+    private const string DocumentsAndElementsIndexAlias = "Test_DocumentsAndElements";
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -47,10 +48,11 @@ public class LibraryElementIndexingTests : ContentBaseTestBase
         // TestBase registers a no-op IIndexDocumentRepository, which bypasses the persisted change-detection
         // cache - use the real, database-backed repository so stale cached snapshots surface in these tests.
         builder.Services.AddUnique<IIndexDocumentRepository, IndexDocumentRepository>();
+        builder.AddNotificationHandler<ContentIndexingNotification, RecordingContentIndexingNotificationHandler>();
 
         builder.Services.Configure<IndexOptions>(options =>
         {
-            options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(ElementsViaDraftContentStrategyIndexAlias, UmbracoObjectTypes.Element);
+            options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(DocumentsAndElementsIndexAlias, UmbracoObjectTypes.Document, UmbracoObjectTypes.Element);
         });
     }
 
@@ -64,6 +66,7 @@ public class LibraryElementIndexingTests : ContentBaseTestBase
         await ElementContainerService.CreateAsync(OtherRootContainerKey, "Other root container", null, Constants.Security.SuperUserKey);
 
         IndexerAndSearcher.Reset();
+        RecordingContentIndexingNotificationHandler.Notifications.Clear();
     }
 
     [Test]
@@ -86,19 +89,35 @@ public class LibraryElementIndexingTests : ContentBaseTestBase
     }
 
     [Test]
-    public async Task Element_IsIndexed_OnlyByTheElementChangeStrategy()
+    public async Task Element_IsIndexed_InAnyDraftIndexContainingElements()
     {
         IElement element = await CreateElement(ChildContainerKey, "The title");
+
+        Assert.That(IndexerAndSearcher.Dump(DocumentsAndElementsIndexAlias).Select(document => document.Id), Does.Contain(element.Key));
 
         Attempt<EntityContainerOperationStatus> moveResult = await ElementContainerService.MoveAsync(ChildContainerKey, OtherRootContainerKey, Constants.Security.SuperUserKey);
         Assert.That(moveResult.Success, Is.True);
 
-        DistributedContentIndexRebuilder.Rebuild(ElementsViaDraftContentStrategyIndexAlias);
+        IndexerAndSearcher.Reset();
+        DistributedContentIndexRebuilder.Rebuild(DocumentsAndElementsIndexAlias);
+
+        TestIndexDocument document = IndexerAndSearcher.Dump(DocumentsAndElementsIndexAlias).Single(document => document.Id == element.Key);
+        VerifyDocumentStructureValues(document, element.Key, ChildContainerKey, [OtherRootContainerKey, ChildContainerKey, element.Key]);
+    }
+
+    [Test]
+    public async Task Element_IndexingNotification_CarriesTheElementObjectType()
+    {
+        IElement element = await CreateElement(ChildContainerKey, "The title");
+
+        ContentIndexingNotification[] notifications = RecordingContentIndexingNotificationHandler.Notifications
+            .Where(notification => notification.Id == element.Key)
+            .ToArray();
 
         Assert.Multiple(() =>
         {
-            Assert.That(ElementsIndex().Select(document => document.Id), Is.EquivalentTo(new[] { element.Key }));
-            Assert.That(IndexerAndSearcher.Dump(ElementsViaDraftContentStrategyIndexAlias), Is.Empty);
+            Assert.That(notifications.Select(notification => notification.IndexAlias), Is.EquivalentTo(new[] { IndexAliases.Elements, DocumentsAndElementsIndexAlias }));
+            Assert.That(notifications.Select(notification => notification.ObjectType), Is.All.EqualTo(UmbracoObjectTypes.Element));
         });
     }
 
@@ -480,5 +499,12 @@ public class LibraryElementIndexingTests : ContentBaseTestBase
             Constants.Security.SuperUserKey);
         Assert.That(result.Success, Is.True);
         return result.Result.Content!;
+    }
+
+    private class RecordingContentIndexingNotificationHandler : INotificationHandler<ContentIndexingNotification>
+    {
+        public static List<ContentIndexingNotification> Notifications { get; } = [];
+
+        public void Handle(ContentIndexingNotification notification) => Notifications.Add(notification);
     }
 }

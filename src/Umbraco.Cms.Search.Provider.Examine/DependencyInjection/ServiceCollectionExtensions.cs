@@ -43,7 +43,7 @@ internal static class ServiceCollectionExtensions
             options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IPublishedContentChangeStrategy>(Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent, UmbracoObjectTypes.Document);
             options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMedia, UmbracoObjectTypes.Media);
             options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMembers, UmbracoObjectTypes.Member);
-            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftElementChangeStrategy>(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftElements, UmbracoObjectTypes.Element);
+            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftElements, UmbracoObjectTypes.Element);
         });
     }
 }

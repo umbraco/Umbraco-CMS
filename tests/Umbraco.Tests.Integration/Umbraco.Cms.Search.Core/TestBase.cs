@@ -52,7 +52,7 @@ public abstract class TestBase : UmbracoIntegrationTest
             options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(IndexAliases.DraftContent, UmbracoObjectTypes.Document);
             options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(IndexAliases.Media, UmbracoObjectTypes.Media);
             options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(IndexAliases.Member, UmbracoObjectTypes.Member);
-            options.RegisterContentIndex<IIndexer, ISearcher, IDraftElementChangeStrategy>(IndexAliases.Elements, UmbracoObjectTypes.Element);
+            options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(IndexAliases.Elements, UmbracoObjectTypes.Element);
         });
 
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
