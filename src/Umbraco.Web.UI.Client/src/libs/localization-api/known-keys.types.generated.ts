@@ -339,7 +339,18 @@ declare global {
 		blockEditor_tabCreateEmpty: string;
 		blockEditor_tabLibrary: string;
 		blockEditor_thumbnail: string;
+		blockEditor_transferredToElementLibrary: string;
+		blockEditor_transferredToElementLibraryAsDraft: string;
 		blockEditor_transferToElementLibrary: string;
+		blockEditor_transferToElementLibraryLanguagesNotPermitted: string;
+		blockEditor_transferToElementLibraryLocationNotPermitted: string;
+		blockEditor_transferToElementLibraryLocationTypeNotAllowed: string;
+		blockEditor_transferToElementLibraryNotPermitted: string;
+		blockEditor_transferToElementLibraryNotPublished: string;
+		blockEditor_transferToElementLibraryNotPublishedHeadline: string;
+		blockEditor_transferToElementLibraryNotPublishedValidation: string;
+		blockEditor_transferToElementLibraryOpenElement: string;
+		blockEditor_transferToElementLibrarySharedNotPermitted: string;
 		blockEditor_unsupportedBlockDescription: string;
 		blockEditor_unsupportedBlockName: string;
 		blueprints_blankBlueprint: string;

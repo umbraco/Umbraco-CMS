@@ -3004,6 +3004,19 @@ export default {
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
 		tabLibrary: 'Library',
 		transferToElementLibrary: 'Transfer to Library',
+		transferredToElementLibrary: 'Transferred to Library',
+		transferredToElementLibraryAsDraft: 'Transferred to Library as draft',
+		transferToElementLibraryNotPublished: 'Transferred to Library, but not published',
+		transferToElementLibraryNotPublishedHeadline: 'Not published',
+		transferToElementLibraryNotPublishedValidation:
+			'The Element was added to the Library, but has validation errors that need fixing before it can be published.',
+		transferToElementLibraryOpenElement: 'Open Element',
+		transferToElementLibraryNotPermitted: 'Transfer not permitted',
+		transferToElementLibraryLanguagesNotPermitted:
+			'This Block has content in languages you do not have access to: <strong>%0%</strong>.',
+		transferToElementLibrarySharedNotPermitted: 'It also has shared content that you do not have access to edit.',
+		transferToElementLibraryLocationNotPermitted: 'You cannot create and publish Elements here.',
+		transferToElementLibraryLocationTypeNotAllowed: 'This Element Type is not allowed here.',
 		disconnectFromElementLibrary: 'Disconnect from Library',
 		disconnectFromElementLibraryConfirm:
 			'This will create a local copy of the Element content. The Library Element will not be affected.',
