@@ -38,7 +38,6 @@ export class UmbMoveDocumentServerDataSource implements UmbMoveDataSource {
 					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),
-			{ disableNotifications: true },
 		);
 	}
 }
