@@ -16,7 +16,7 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
 
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (context.MethodInfo.HasMapToApiAttribute(ApiName) == false)
+        if (context.ApiDescription.ActionDescriptor.HasMapToApiAttribute(ApiName) == false)
         {
             return;
         }
