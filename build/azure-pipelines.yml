@@ -930,6 +930,7 @@ stages:
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
               nuGetFeedType: "external"
               publishFeedCredentials: "NuGet - Umbraco.*"
+              allowPackageConflicts: true
 
   - stage: Deploy_Npm
     displayName: Npm release
