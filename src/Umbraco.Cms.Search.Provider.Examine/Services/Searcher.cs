@@ -142,8 +142,9 @@ public class Searcher : IExamineSearcher
                     .Where(term => term.Length > 0)
                     .ToArray();
 
-                // common words are optional whenever the query has other terms to match on: they add to the relevance
-                // where they are indexed, but cannot exclude a document from an index that was built without them.
+                // the default analyzer leaves common words out of the index, so requiring them would exclude every
+                // document. they are optional whenever the query has other terms to match on, and still add to the
+                // relevance where an analyzer does index them.
                 var hasSignificantTerms = terms.Any(term => IsStopWord(term) is false);
                 foreach (var term in terms)
                 {

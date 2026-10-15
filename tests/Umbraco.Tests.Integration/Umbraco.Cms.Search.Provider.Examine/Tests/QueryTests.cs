@@ -111,14 +111,11 @@ public class QueryTests : SearcherTestBase
             });
     }
 
-    // Every query term must match, so a term the analyzer leaves out of the index can never be
-    // satisfied. Common words must be indexed like any other word.
+    // The analyzer leaves common words out of the index, so they must not be required to match.
     [TestCase("probe for the member")]
     [TestCase("Probe For The Member")]
-    [TestCase("the")]
-    [TestCase("for")]
     [TestCase("probe the")]
-    public async Task CanQueryByCommonWords(string query)
+    public async Task CanQueryWithCommonWords(string query)
     {
         SearchResult result = await SearchAsync(query: query);
 
@@ -127,6 +124,19 @@ public class QueryTests : SearcherTestBase
             {
                 Assert.That(result.Total, Is.EqualTo(1));
                 Assert.That(result.Documents.First().Id, Is.EqualTo(DocumentIds[StopWordsDocumentNumber]));
+            });
+    }
+
+    [Test]
+    public async Task CommonWordsDoNotRelaxOtherQueryTerms()
+    {
+        SearchResult result = await SearchAsync(query: "even the");
+
+        Assert.Multiple(
+            () =>
+            {
+                Assert.That(result.Total, Is.EqualTo(50));
+                Assert.That(result.Documents.Select(d => d.Id), Is.EquivalentTo(OddOrEvenIds(true).Select(id => DocumentIds[id])));
             });
     }
 

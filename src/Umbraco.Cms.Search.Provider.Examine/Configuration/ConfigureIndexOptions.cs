@@ -1,7 +1,5 @@
 ﻿using Examine;
 using Examine.Lucene;
-using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Analysis.Util;
 using Lucene.Net.Index;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
@@ -42,11 +40,6 @@ internal sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirec
     {
         // None of the search indexes use the Taxonomy index, as we instead use the non-taxonomy types like (FacetInteger / FacetDouble) so disable it.
         options.UseTaxonomyIndex = false;
-
-        // The searcher requires every query term to match, so a word the analyzer drops from the index
-        // could never be found. Index all words (no stop words) so any word in a value can be queried.
-        options.Analyzer ??= new StandardAnalyzer(LuceneInfo.CurrentVersion, CharArraySet.EMPTY_SET);
-
         AddFields(options, ExamineSystemFieldsOptions(), (field, _) => field.PropertyName);
         AddFields(options, CoreSystemFieldsOptions(), (field, fieldValues) => FieldNameHelper.FieldName(field.PropertyName, fieldValues));
         AddFields(options, _fieldOptions.Fields, (field, fieldValues) => FieldNameHelper.FieldName(field.PropertyName, fieldValues));
