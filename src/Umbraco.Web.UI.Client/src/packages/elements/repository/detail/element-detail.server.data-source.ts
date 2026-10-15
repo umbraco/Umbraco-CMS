@@ -2,10 +2,12 @@ import type { UmbElementDetailModel } from '../../types.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { umbMapElementCreateRequestBody, umbMapElementUpdateRequestBody } from './element-detail-request.mappers.js';
 import { umbMapElementResponseToDetailModel } from './element-detail-response.mappers.js';
-import { UmbManagementApiElementDetailDataRequestManager } from './element-detail.server.request-manager.js';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse, UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Element that fetches data from the server
@@ -16,8 +18,6 @@ export class UmbElementServerDataSource
 	extends UmbControllerBase
 	implements UmbDetailDataSource<UmbElementDetailModel>
 {
-	#detailRequestManager = new UmbManagementApiElementDetailDataRequestManager(this);
-
 	/**
 	 * Creates a new Element scaffold
 	 * @param preset
@@ -48,16 +48,23 @@ export class UmbElementServerDataSource
 	 * @returns {*}
 	 * @memberof UmbElementServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbElementDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await this.#detailRequestManager.read(unique);
+		const { data, error } = await tryExecute(this, ElementService.getElementById({ path: { id: unique } }));
 
-		return { data: data ? umbMapElementResponseToDetailModel(data) : undefined, error };
+		if (error || !data) {
+			return { error };
+		}
+
+		const element = umbMapElementResponseToDetailModel(data);
+
+		return { data: element };
 	}
 
 	/**
-	 * Fetches multiple Elements by their unique IDs from the server
+	 * Fetches multiple Elements by their unique IDs from the server.
+	 * Elements the current user cannot access, or that do not exist, are omitted from the result.
 	 * @param {Array<string>} uniques - The unique IDs of the elements to fetch
 	 * @returns {*}
 	 * @memberof UmbElementServerDataSource
@@ -67,12 +74,17 @@ export class UmbElementServerDataSource
 			return { data: [] };
 		}
 
-		const { data, error } = await this.#detailRequestManager.readMany(uniques);
+		const getItemsController = new UmbItemDataApiGetRequestController(this, {
+			api: async (args) => ({
+				// eslint-disable-next-line local-rules/no-direct-api-import
+				data: (await ElementService.getElementBatch({ query: { id: args.uniques } })).data.items,
+			}),
+			uniques,
+		});
 
-		return {
-			data: data?.items?.map((item) => umbMapElementResponseToDetailModel(item)),
-			error,
-		};
+		const { data, error } = await getItemsController.request();
+
+		return { data: data?.map((item) => umbMapElementResponseToDetailModel(item)), error };
 	}
 
 	/**
@@ -88,9 +100,18 @@ export class UmbElementServerDataSource
 
 		const body = umbMapElementCreateRequestBody(model, parentUnique);
 
-		const { data, error } = await this.#detailRequestManager.create(body);
+		const { data, error } = await tryExecute(
+			this,
+			ElementService.postElement({
+				body,
+			}),
+		);
 
-		return { data: data ? umbMapElementResponseToDetailModel(data) : undefined, error };
+		if (data && typeof data === 'string') {
+			return this.read(data);
+		}
+
+		return { error };
 	}
 
 	/**
@@ -104,9 +125,19 @@ export class UmbElementServerDataSource
 
 		const body = umbMapElementUpdateRequestBody(model);
 
-		const { data, error } = await this.#detailRequestManager.update(model.unique, body);
+		const { error } = await tryExecute(
+			this,
+			ElementService.putElementById({
+				path: { id: model.unique },
+				body,
+			}),
+		);
 
-		return { data: data ? umbMapElementResponseToDetailModel(data) : undefined, error };
+		if (!error) {
+			return this.read(model.unique);
+		}
+
+		return { error };
 	}
 
 	/**
@@ -118,6 +149,6 @@ export class UmbElementServerDataSource
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return this.#detailRequestManager.delete(unique);
+		return tryExecute(this, ElementService.deleteRecycleBinElementById({ path: { id: unique } }));
 	}
 }
