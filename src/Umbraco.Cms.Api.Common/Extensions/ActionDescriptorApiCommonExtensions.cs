@@ -31,6 +31,8 @@ public static class ActionDescriptorApiCommonExtensions
     {
         IEnumerable<MapToApiAttribute> mapToApiAttributes = actionDescriptor?.EndpointMetadata?.OfType<MapToApiAttribute>() ?? [];
 
-        return mapToApiAttributes.SingleOrDefault()?.ApiName;
+        // Endpoint metadata is ordered from least to most specific, so an attribute added at runtime
+        // takes precedence over one declared on the controller.
+        return mapToApiAttributes.LastOrDefault()?.ApiName;
     }
 }
