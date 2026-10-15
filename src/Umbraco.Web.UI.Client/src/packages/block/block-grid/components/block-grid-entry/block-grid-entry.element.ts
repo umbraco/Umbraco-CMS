@@ -271,18 +271,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		this.observe(
-			this.#context.externalContentName,
-			(name) => {
-				this._externalContentName = name;
-				// The Element's name is its identity, so it takes over as the block's name/label instead of the block type's UFM label template.
-				if (name) {
-					this.#context.setName(name);
-				}
-				this.#updateBlockLabel();
-			},
-			null,
-		);
+		this.#observeExternalContentName();
 
 		// Data:
 		this.observe(
@@ -380,6 +369,21 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.#updateBlockViewProps({ label: this._externalContentName ?? this._label });
 	}
 
+	#observeExternalContentName() {
+		this.observe(
+			this.#context.externalContentName,
+			(name) => {
+				this._externalContentName = name;
+				// The Element's name is its identity, so it takes over as the block's name/label instead of the block type's UFM label template.
+				if (name) {
+					this.#context.setName(name);
+				}
+				this.#updateBlockLabel();
+			},
+			null,
+		);
+	}
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
@@ -456,6 +460,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	readonly #onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		if (this._externalContentName) return;
 		this.#context.setName(event.detail.text);
 	};
 

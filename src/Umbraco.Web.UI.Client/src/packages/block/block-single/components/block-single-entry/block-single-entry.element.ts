@@ -215,18 +215,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			},
 			null,
 		);
-		this.observe(
-			this.#context.externalContentName,
-			(name) => {
-				this._externalContentName = name;
-				// The Element's name is its identity, so it takes over as the block's name/label instead of the block type's UFM label template.
-				if (name) {
-					this.#context.setName(name);
-				}
-				this.#updateBlockLabel();
-			},
-			null,
-		);
+		this.#observeExternalContentName();
 		this.observe(
 			this.#context.unsupported,
 			(unsupported) => {
@@ -325,6 +314,21 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.#updateBlockViewProps({ label: this._externalContentName ?? this._label });
 	}
 
+	#observeExternalContentName() {
+		this.observe(
+			this.#context.externalContentName,
+			(name) => {
+				this._externalContentName = name;
+				// The Element's name is its identity, so it takes over as the block's name/label instead of the block type's UFM label template.
+				if (name) {
+					this.#context.setName(name);
+				}
+				this.#updateBlockLabel();
+			},
+			null,
+		);
+	}
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
@@ -361,6 +365,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	};
 
 	readonly #onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		if (this._externalContentName) return;
 		this.#context.setName(event.detail.text);
 	};
 

@@ -283,4 +283,49 @@ describe('UmbBlockManagerContext - external content (Library Elements)', () => {
 		await aTimeout(50);
 		expect(manager.getContentOf(ELEMENT_UNIQUE)).to.be.undefined;
 	});
+
+	describe('requests', () => {
+		const originalRequestByUnique = UmbElementDetailRepository.prototype.requestByUnique;
+		let requestCount: number;
+		let failFirstRequest: boolean;
+
+		beforeEach(() => {
+			requestCount = 0;
+			failFirstRequest = false;
+			UmbElementDetailRepository.prototype.requestByUnique = function (this: UmbElementDetailRepository, unique) {
+				requestCount++;
+				if (failFirstRequest && requestCount === 1) {
+					return Promise.resolve({ error: new Error('Request failed') }) as never;
+				}
+				return originalRequestByUnique.call(this, unique);
+			};
+		});
+
+		afterEach(() => {
+			UmbElementDetailRepository.prototype.requestByUnique = originalRequestByUnique;
+		});
+
+		it('requests an Element once, however many blocks reference it', async () => {
+			manager.insertExternalContent(ELEMENT_UNIQUE);
+			manager.insertExternalContent(ELEMENT_UNIQUE);
+
+			await firstValueFrom(manager.contentOf(ELEMENT_UNIQUE).pipe(filter((value) => value !== undefined)));
+			await aTimeout(50);
+			expect(requestCount).to.equal(1);
+		});
+
+		it('requests an Element again when its reference is removed and re-added after a failed request', async () => {
+			failFirstRequest = true;
+			manager.insertExternalContent(ELEMENT_UNIQUE);
+			await aTimeout(50);
+			expect(manager.getContentOf(ELEMENT_UNIQUE)).to.be.undefined;
+
+			manager.setLayouts([]);
+			manager.insertExternalContent(ELEMENT_UNIQUE);
+
+			const content = await firstValueFrom(manager.contentOf(ELEMENT_UNIQUE).pipe(filter((value) => value !== undefined)));
+			expect(content!.key).to.equal(ELEMENT_UNIQUE);
+			expect(requestCount).to.equal(2);
+		});
+	});
 });

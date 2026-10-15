@@ -274,10 +274,7 @@ export abstract class UmbBlockManagerContext<
 		this.observe(
 			this._layouts.asObservable(),
 			(layouts) => {
-				const keys = layouts
-					.filter((layout) => layout.isExternalContent && layout.contentKey)
-					.map((layout) => layout.contentKey as string);
-				this.#externalContentManager.setUniques(keys);
+				this.#externalContentManager.setUniques([...new Set(this._collectExternalContentKeys(layouts))]);
 			},
 			null,
 		);
@@ -446,6 +443,16 @@ export abstract class UmbBlockManagerContext<
 			],
 			([localContent, externalContent]) => localContent ?? externalContent ?? undefined,
 		);
+	}
+
+	/**
+	 * Collects the content keys of every layout entry marked as external content. Override to also reach
+	 * layout entries that are nested inside other entries.
+	 * @param {Array<BlockLayoutType>} layouts - the top-level layout entries.
+	 * @returns {Array<string>} the content keys of the external content layouts, one per reference.
+	 */
+	protected _collectExternalContentKeys(layouts: Array<BlockLayoutType>): Array<string> {
+		return layouts.filter((layout) => layout.isExternalContent && layout.contentKey).map((layout) => layout.contentKey);
 	}
 
 	/**
