@@ -36,6 +36,7 @@ public abstract class SearcherTestBase
         serviceCollection
             .AddExamineSearchProviderServicesForTest<TestIndex, TestInMemoryDirectoryFactory>()
             .AddLogging();
+        ConfigureServices(serviceCollection);
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -139,6 +140,10 @@ public abstract class SearcherTestBase
         {
             disposableServiceProvider.Dispose();
         }
+    }
+
+    protected virtual void ConfigureServices(IServiceCollection services)
+    {
     }
 
     protected async Task<SearchResult> SearchAsync(
