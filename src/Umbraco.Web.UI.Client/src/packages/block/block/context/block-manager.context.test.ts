@@ -196,6 +196,14 @@ describe('UmbBlockManagerContext', () => {
 			expect(requestedBatches).to.have.length(1);
 		});
 
+		it('only requests the content referenced by external layouts', async () => {
+			manager.setLayouts([layout('l1', 'e1'), { key: 'l2', contentKey: 'local-content' }]);
+
+			await waitUntil(() => hasContent('e1'));
+
+			expect(requestedBatches).to.deep.equal([['e1']]);
+		});
+
 		it('drops the external content once no layout references it anymore', async () => {
 			manager.setLayouts([layout('l1', 'e1'), layout('l2', 'e2')]);
 			await waitUntil(() => hasContent('e1') && hasContent('e2'));
