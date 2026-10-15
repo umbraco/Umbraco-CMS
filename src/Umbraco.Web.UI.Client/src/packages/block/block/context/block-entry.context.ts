@@ -82,6 +82,13 @@ export abstract class UmbBlockEntryContext<
 	#externalContentVariantState = new UmbStringState(undefined);
 	readonly externalContentVariantState = this.#externalContentVariantState.asObservable();
 
+	#externalContentName = new UmbStringState<string | undefined>(undefined);
+	/**
+	 * Observable of the name of the Element this block references, matching the current variant.
+	 * Undefined for local (non-external) blocks, or before the Element has resolved.
+	 */
+	readonly externalContentName = this.#externalContentName.asObservable();
+
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	protected readonly _variantId = this.#variantId.asObservable();
@@ -719,6 +726,15 @@ export abstract class UmbBlockEntryContext<
 				this.#externalContentVariantState.setValue(state ?? undefined);
 			},
 			'observeExternalContentVariantState',
+		);
+
+		// Observe the name of external content (from the Element it references), matching the current variant.
+		this.observe(
+			this._manager.externalContentNameOf(contentKey),
+			(name) => {
+				this.#externalContentName.setValue(name ?? undefined);
+			},
+			'observeExternalContentName',
 		);
 	}
 	#observeSettingsData() {

@@ -10,6 +10,10 @@ import { UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL } from '../modals/transfer-
 import { UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME, UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME } from '../constants.js';
 import { umbBlockExposeSortCompare } from '../utils/block-expose-sort-compare.function.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
+import {
+	findExternalContentVariant,
+	type UmbBlockManagerExternalContentVariantModel,
+} from './block-manager-external-content.function.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -34,8 +38,9 @@ import {
 } from '@umbraco-cms/backoffice/property';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
-import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
+import { UmbElementDetailRepository, type UmbElementDetailModel } from '@umbraco-cms/backoffice/element';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbRepositoryDetailsManager } from '@umbraco-cms/backoffice/repository';
 import {
 	UMB_VALIDATION_CONTEXT,
 	UmbValidationCleanUpByUniqueManager,
@@ -50,6 +55,42 @@ export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseMo
 	content: UmbBlockDataModel;
 	settings?: UmbBlockDataModel;
 };
+
+/**
+ * Maps a resolved Element to the block data shape used for local and external block content alike.
+ * @param {UmbElementDetailModel} element - the resolved Element.
+ * @returns {UmbBlockDataModel} the block data.
+ */
+function elementToBlockData(element: UmbElementDetailModel): UmbBlockDataModel {
+	return {
+		key: element.unique,
+		contentTypeKey: element.documentType.unique,
+		values: element.values.map(
+			(v): UmbBlockDataValueModel => ({
+				alias: v.alias,
+				editorAlias: v.editorAlias,
+				culture: v.culture,
+				segment: v.segment,
+				value: v.value,
+			}),
+		),
+	};
+}
+
+/**
+ * Maps a resolved Element's variant to the external content variant shape.
+ * @param {UmbElementDetailModel['variants'][number]} variant - the Element's variant.
+ * @returns {UmbBlockManagerExternalContentVariantModel} the external content variant.
+ */
+function elementVariantToExternalContentVariant(
+	variant: UmbElementDetailModel['variants'][number],
+): UmbBlockManagerExternalContentVariantModel {
+	return {
+		culture: variant.culture ?? null,
+		state: variant.state ?? null,
+		name: variant.name ?? null,
+	};
+}
 
 export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
@@ -109,11 +150,11 @@ export abstract class UmbBlockManagerContext<
 		([local, external]) => [...(local ?? []), ...(external ?? [])],
 	);
 	readonly #externalContentVariants = new UmbArrayState(
-		<Array<{ key: string; variants: Array<{ culture: string | null; state: string | null }> }>>[],
+		<Array<{ key: string; variants: Array<UmbBlockManagerExternalContentVariantModel> }>>[],
 		(x) => x.key,
 	);
 	#elementRepository = new UmbElementDetailRepository(this);
-	#pendingElementFetches = new Set<string>();
+	#externalContentManager = new UmbRepositoryDetailsManager<UmbElementDetailModel>(this, this.#elementRepository);
 
 	readonly #settings = new UmbArrayState<UmbBlockDataModel, string, undefined>(undefined, (x) => x.key);
 	// TODO: Remove ?? [] fallback in v.19 (or v.20)
@@ -227,14 +268,28 @@ export abstract class UmbBlockManagerContext<
 			null,
 		);
 
-		// Auto-resolve content for any layout marked as external, whenever layouts change.
+		// Keep the details manager's uniques in sync with any layout marked as external, so it resolves
+		// (and re-resolves on `UmbEntityUpdatedEvent`) the Elements those layouts reference, and drops any
+		// that are no longer referenced.
 		this.observe(
 			this._layouts.asObservable(),
 			(layouts) => {
-				const keys = layouts
-					.filter((layout) => layout.isExternalContent && layout.contentKey)
-					.map((layout) => layout.contentKey as string);
-				if (keys.length) this.#fetchExternalContent(keys);
+				this.#externalContentManager.setUniques([...new Set(this._collectExternalContentKeys(layouts))]);
+			},
+			null,
+		);
+
+		// Reflect the resolved Elements into the external content states whenever they change.
+		this.observe(
+			this.#externalContentManager.entries,
+			(entries) => {
+				this.#externalContentValues.setValue(entries.map(elementToBlockData));
+				this.#externalContentVariants.setValue(
+					entries.map((entry) => ({
+						key: entry.unique,
+						variants: entry.variants.map(elementVariantToExternalContentVariant),
+					})),
+				);
 			},
 			null,
 		);
@@ -391,6 +446,16 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	/**
+	 * Collects the content keys of every layout entry marked as external content. Override to also reach
+	 * layout entries that are nested inside other entries.
+	 * @param {Array<BlockLayoutType>} layouts - the top-level layout entries.
+	 * @returns {Array<string>} the content keys of the external content layouts, one per reference.
+	 */
+	protected _collectExternalContentKeys(layouts: Array<BlockLayoutType>): Array<string> {
+		return layouts.filter((layout) => layout.isExternalContent && layout.contentKey).map((layout) => layout.contentKey);
+	}
+
+	/**
 	 * Returns an observable that emits true when the layout for the given contentKey
 	 * has `isExternalContent` set (i.e., the block references external content).
 	 * @param key
@@ -409,50 +474,20 @@ export abstract class UmbBlockManagerContext<
 	externalContentStateOf(key: string) {
 		return mergeObservables(
 			[this.#externalContentVariants.asObservablePart((source) => source.find((x) => x.key === key)), this.variantId],
-			([entry, variantId]) => {
-				if (!entry?.variants.length) return null;
-				if (!variantId) return entry.variants[0]?.state ?? null;
-				const match = entry.variants.find((v) => v.culture === variantId.culture);
-				return match?.state ?? entry.variants[0]?.state ?? null;
-			},
+			([entry, variantId]) => findExternalContentVariant(entry?.variants, variantId)?.state ?? null,
 		);
 	}
 
-	// TODO: migrate to UmbRepositoryDetailsManager for true batched fetches [LK]
-	async #fetchExternalContent(keys: Array<string>) {
-		for (const key of keys) {
-			if (this.#pendingElementFetches.has(key)) continue;
-			if (this.#externalContentValues.getValue().some((x) => x.key === key)) continue;
-			this.#pendingElementFetches.add(key);
-			try {
-				const { data } = await this.#elementRepository.requestByUnique(key);
-				if (data) {
-					const blockData: UmbBlockDataModel = {
-						contentTypeKey: data.documentType.unique,
-						key: data.unique,
-						values: data.values.map(
-							(v): UmbBlockDataValueModel => ({
-								alias: v.alias,
-								editorAlias: v.editorAlias,
-								culture: v.culture,
-								segment: v.segment,
-								value: v.value,
-							}),
-						),
-					};
-					this.#externalContentValues.appendOne(blockData);
-					this.#externalContentVariants.appendOne({
-						key: data.unique,
-						variants: data.variants.map((v) => ({
-							culture: v.culture ?? null,
-							state: v.state ?? null,
-						})),
-					});
-				}
-			} finally {
-				this.#pendingElementFetches.delete(key);
-			}
-		}
+	/**
+	 * Returns an observable of the external content's name (from the Element it references), matching the
+	 * current variant. Emits null if the external content has not resolved yet, or is not external content.
+	 * @param key
+	 */
+	externalContentNameOf(key: string) {
+		return mergeObservables(
+			[this.#externalContentVariants.asObservablePart((source) => source.find((x) => x.key === key)), this.variantId],
+			([entry, variantId]) => findExternalContentVariant(entry?.variants, variantId)?.name ?? null,
+		);
 	}
 
 	settingsOf(key: string) {
