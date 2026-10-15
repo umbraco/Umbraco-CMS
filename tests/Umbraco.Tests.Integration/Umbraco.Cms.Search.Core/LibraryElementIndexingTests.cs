@@ -248,6 +248,24 @@ public class LibraryElementIndexingTests : ContentBaseTestBase
     }
 
     [Test]
+    public async Task ElementTypeChange_ReindexesOnlyElementsOfThatType_IncludingTrashed()
+    {
+        IContentType otherElementType = await CreateElementType(ContentVariation.Nothing);
+
+        IElement element = await CreateElement(ChildContainerKey, "The title");
+        IElement trashedElement = await CreateElement(ChildContainerKey, "Trashed");
+        Assert.That((await ElementEditingService.MoveToRecycleBinAsync(trashedElement.Key, Constants.Security.SuperUserKey)).Success, Is.True);
+        await CreateElement(ChildContainerKey, "Other type", otherElementType);
+        IndexerAndSearcher.Reset();
+
+        _elementType.RemovePropertyType("text");
+        Attempt<ContentTypeOperationStatus> result = await ContentTypeService.UpdateAsync(_elementType, Constants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True);
+
+        Assert.That(ElementsIndex().Select(document => document.Id), Is.EquivalentTo(new[] { element.Key, trashedElement.Key }));
+    }
+
+    [Test]
     public async Task Rebuild_ElementIndex_ContainsAllElements_IncludingTrashed()
     {
         IElement rootElement = await CreateElement(null, "Root element");
