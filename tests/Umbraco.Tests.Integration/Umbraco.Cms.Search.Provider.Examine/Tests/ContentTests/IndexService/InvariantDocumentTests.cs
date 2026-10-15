@@ -45,7 +45,7 @@ public class InvariantDocumentTests : IndexTestBase
     [Test]
     public async Task CanRemoveUnpublishedDocument()
     {
-        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(CoreConstants.Search.IndexAliases.PublishedContent, () =>
         {
             IContent content = ContentService.GetById(RootKey)!;
             ContentService.Unpublish(content);
@@ -53,7 +53,7 @@ public class InvariantDocumentTests : IndexTestBase
         });
 
 
-        IIndex index = GetIndex(CoreConstants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(CoreConstants.Search.IndexAliases.PublishedContent);
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results, Is.Empty);
     }
@@ -227,7 +227,7 @@ public class InvariantDocumentTests : IndexTestBase
                 })
             .Build();
 
-        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(CoreConstants.Search.IndexAliases.PublishedContent, () =>
         {
             ContentService.Save(root);
             ContentService.Publish(root, ["*"]);

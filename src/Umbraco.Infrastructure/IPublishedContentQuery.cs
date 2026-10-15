@@ -121,7 +121,7 @@ public interface IPublishedContentQuery
     /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
     /// <param name="indexName">
     ///     The name of the index to search (defaults to
-    ///     <see cref="Constants.IndexAliases.PublishedContent" />).
+    ///     <see cref="Constants.Search.IndexAliases.PublishedContent" />).
     /// </param>
     /// <returns>
     ///     The search results.
@@ -145,7 +145,7 @@ public interface IPublishedContentQuery
         int take,
         out long totalRecords,
         string culture = "*",
-        string indexName = Constants.IndexAliases.PublishedContent);
+        string indexName = Constants.Search.IndexAliases.PublishedContent);
 
     /// <summary>
     ///     Searches content.
@@ -154,7 +154,7 @@ public interface IPublishedContentQuery
     /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
     /// <param name="indexName">
     ///     The name of the index to search (defaults to
-    ///     <see cref="Constants.IndexAliases.PublishedContent" />).
+    ///     <see cref="Constants.Search.IndexAliases.PublishedContent" />).
     /// </param>
     /// <returns>
     ///     The search results.
@@ -168,5 +168,5 @@ public interface IPublishedContentQuery
     ///     </para>
     ///     <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
     /// </remarks>
-    IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = Constants.IndexAliases.PublishedContent);
+    IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = Constants.Search.IndexAliases.PublishedContent);
 }

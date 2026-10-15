@@ -16,7 +16,7 @@ public class MemberIndexServiceTests : IndexTestBase
     public async Task CanIndexAnyMember()
     {
         await CreateMemberAsync();
-        IIndex index = GetIndex(Constants.IndexAliases.DraftMembers);
+        IIndex index = GetIndex(Constants.Search.IndexAliases.DraftMembers);
 
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results.TotalItemCount, Is.EqualTo(1));
@@ -36,7 +36,7 @@ public class MemberIndexServiceTests : IndexTestBase
             .Build();
         await GetRequiredService<IMemberTypeService>().CreateAsync(memberType, Constants.Security.SuperUserKey);
 
-        await WaitForIndexing(Constants.IndexAliases.DraftMembers, () =>
+        await WaitForIndexing(Constants.Search.IndexAliases.DraftMembers, () =>
         {
             GetRequiredService<IMemberService>().Save(
                 new MemberBuilder()

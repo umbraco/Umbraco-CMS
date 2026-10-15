@@ -25,7 +25,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
     {
         Attempt<IMemberGroup?, MemberGroupOperationStatus> result = await MemberGroupService.CreateAsync(new MemberGroup { Name = "testGroup" });
 
-        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, async () =>
+        await WaitForIndexing(CoreConstants.Search.IndexAliases.PublishedContent, async () =>
         {
             await PublicAccessService.CreateAsync(
                 new PublicAccessEntrySlim
@@ -37,7 +37,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
                 });
         });
 
-        IIndex index = GetIndex(CoreConstants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(CoreConstants.Search.IndexAliases.PublishedContent);
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         IReadOnlyList<string> indexedAccessKeys = results.First().AllValues.First(x => x.Key == Constants.SystemFields.Protection).Value;
         Assert.That(indexedAccessKeys, Has.Count.EqualTo(1));
@@ -53,7 +53,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
         Attempt<IMemberGroup?, MemberGroupOperationStatus> group4 = await MemberGroupService.CreateAsync(new MemberGroup { Name = "testGroup 4" });
         Attempt<IMemberGroup?, MemberGroupOperationStatus> group5 = await MemberGroupService.CreateAsync(new MemberGroup { Name = "testGroup 5" });
 
-        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, async () =>
+        await WaitForIndexing(CoreConstants.Search.IndexAliases.PublishedContent, async () =>
         {
             await PublicAccessService.CreateAsync(
                 new PublicAccessEntrySlim
@@ -65,7 +65,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
                 });
         });
 
-        IIndex index = GetIndex(CoreConstants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(CoreConstants.Search.IndexAliases.PublishedContent);
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         IReadOnlyList<string> indexedAccessKeys = results.First().AllValues.First(x => x.Key == Constants.SystemFields.Protection).Value;
         Assert.That(indexedAccessKeys, Has.Count.EqualTo(5));
@@ -79,7 +79,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
     [Test]
     public void DoesNotIndexContentProtectionIfNoneExists()
     {
-        IIndex index = GetIndex(CoreConstants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(CoreConstants.Search.IndexAliases.PublishedContent);
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results.First().AllValues.SelectMany(x => x.Value), Does.Not.Contain(Constants.SystemFields.Protection));
     }
@@ -108,7 +108,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
                 })
             .Build();
 
-        await WaitForIndexing(CoreConstants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(CoreConstants.Search.IndexAliases.PublishedContent, () =>
         {
             SaveAndPublish(root);
             return Task.CompletedTask;

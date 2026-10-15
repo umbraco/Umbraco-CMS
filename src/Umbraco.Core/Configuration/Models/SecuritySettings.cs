@@ -39,11 +39,6 @@ public class SecuritySettings
     internal const bool StaticAllowPasswordReset = true;
 
     /// <summary>
-    ///     The default value for allowing edit of invariant properties from non-default language.
-    /// </summary>
-    internal const bool StaticAllowEditInvariantFromNonDefault = false;
-
-    /// <summary>
     ///     The default value for allowing concurrent logins.
     /// </summary>
     internal const bool StaticAllowConcurrentLogins = false;

@@ -102,6 +102,11 @@ export type BatchResponseModelDocumentTypeResponseModel = {
     items: Array<DocumentTypeResponseModel>;
 };
 
+export type BatchResponseModelElementResponseModel = {
+    total: number;
+    items: Array<ElementResponseModel>;
+};
+
 export type BatchResponseModelMediaTypeResponseModel = {
     total: number;
     items: Array<MediaTypeResponseModel>;
@@ -503,6 +508,7 @@ export type CreateUserGroupRequestModel = {
     sections: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    hasAccessToInvariantForVariant: boolean;
     documentStartNode?: null | ReferenceByIdModel;
     documentRootAccess: boolean;
     mediaStartNode?: null | ReferenceByIdModel;
@@ -565,6 +571,7 @@ export type CurrentUserResponseModel = {
     avatarUrls: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    hasAccessToInvariantForVariant: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<IPermissionPresentationModel>;
@@ -613,6 +620,7 @@ export type DatatypeConfigurationResponseModel = {
     canBeChanged: DataTypeChangeModeModel;
     documentListViewId: string;
     mediaListViewId: string;
+    offerDeprecatedPropertyEditors: boolean;
 };
 
 export type DataTypeItemResponseModel = {
@@ -749,7 +757,6 @@ export type DocumentCollectionResponseModel = {
 export type DocumentConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
-    allowEditInvariantFromNonDefault: boolean;
 };
 
 export type DocumentItemResponseModel = {
@@ -1044,7 +1051,6 @@ export type DynamicRootResponseModel = {
 export type ElementConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
-    allowEditInvariantFromNonDefault: boolean;
 };
 
 export type ElementItemResponseModel = {
@@ -1174,19 +1180,6 @@ export enum EventMessageTypeModel {
     WARNING = 'Warning'
 }
 
-export type FacetModel = {
-    fieldName: string;
-};
-
-export type FacetResultResponseModel = {
-    fieldName: string;
-    values: Array<FacetValueModel>;
-};
-
-export type FacetValueModel = {
-    count: number;
-};
-
 export type FetchResponseModelDataTypeSchemaItemResponseModel = {
     total: number;
     items: Array<DataTypeSchemaItemResponseModel>;
@@ -1202,11 +1195,6 @@ export type FileSystemTreeItemPresentationModel = {
     parent?: null | FileSystemFolderModel;
     isFolder: boolean;
     hasChildren: boolean;
-};
-
-export type FilterModel = {
-    fieldName: string;
-    negate: boolean;
 };
 
 export type FlagModel = {
@@ -2672,9 +2660,6 @@ export type SearchDocumentResponseModel = {
 export type SearchRequestModel = {
     indexAlias: string;
     query?: null | string;
-    filters?: null | Array<FilterModel>;
-    facets?: null | Array<FacetModel>;
-    sorters?: null | Array<SorterModel>;
     culture?: null | string;
     segment?: null | string;
 };
@@ -2682,7 +2667,6 @@ export type SearchRequestModel = {
 export type SearchResultResponseModel = {
     total: number;
     documents: Array<SearchDocumentResponseModel>;
-    facets: Array<FacetResultResponseModel>;
 };
 
 export type SecurityConfigurationResponseModel = {
@@ -2692,6 +2676,9 @@ export type SecurityConfigurationResponseModel = {
 export type SegmentResponseModel = {
     name: string;
     alias: string;
+    /**
+     * @deprecated
+     */
     cultures?: null | Array<string>;
 };
 
@@ -2713,6 +2700,7 @@ export type ServerInformationResponseModel = {
     assemblyVersion: string;
     baseUtcOffset: string;
     runtimeMode: RuntimeModeModel;
+    isDebugMode: boolean;
 };
 
 export type ServerStatusResponseModel = {
@@ -2734,11 +2722,6 @@ export type SignalRClientSettingsResponseModel = {
 export type SortDocumentChildrenByFieldRequestModel = {
     culture?: null | string;
     field: ContentSortFieldModel;
-    direction: DirectionModel;
-};
-
-export type SorterModel = {
-    fieldName: string;
     direction: DirectionModel;
 };
 
@@ -3296,6 +3279,7 @@ export type UpdateUserGroupRequestModel = {
     sections: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    hasAccessToInvariantForVariant: boolean;
     documentStartNode?: null | ReferenceByIdModel;
     documentRootAccess: boolean;
     mediaStartNode?: null | ReferenceByIdModel;
@@ -3342,7 +3326,7 @@ export type UpgradeSettingsResponseModel = {
     newState: string;
     newVersion: string;
     oldVersion: string;
-    reportUrl: null | string;
+    reportUrl: string;
 };
 
 export type UserConfigurationResponseModel = {
@@ -3399,6 +3383,7 @@ export type UserGroupResponseModel = {
     sections: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    hasAccessToInvariantForVariant: boolean;
     documentStartNode?: null | ReferenceByIdModel;
     documentRootAccess: boolean;
     mediaStartNode?: null | ReferenceByIdModel;
@@ -8999,6 +8984,35 @@ export type GetElementAreReferencedResponses = {
 };
 
 export type GetElementAreReferencedResponse = GetElementAreReferencedResponses[keyof GetElementAreReferencedResponses];
+
+export type GetElementBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/element/batch';
+};
+
+export type GetElementBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetElementBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelElementResponseModel;
+};
+
+export type GetElementBatchResponse = GetElementBatchResponses[keyof GetElementBatchResponses];
 
 export type GetElementConfigurationData = {
     body?: never;
@@ -18072,6 +18086,7 @@ export type GetFilterUserData = {
         orderDirection?: DirectionModel;
         userGroupIds?: Array<string>;
         userStates?: Array<UserStateModel>;
+        userKinds?: Array<UserKindModel>;
         filter?: string;
     };
     url: '/umbraco/management/api/v1/filter/user';

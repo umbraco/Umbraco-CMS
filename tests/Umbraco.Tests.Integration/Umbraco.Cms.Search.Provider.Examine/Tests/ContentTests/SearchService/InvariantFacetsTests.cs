@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -34,6 +34,22 @@ public class InvariantFacetsTests : SearcherTestBase
         {
             Assert.That(result.Facets, Is.Not.Empty);
             Assert.That(result.Facets.First().Values.First().Count, Is.EqualTo(2));
+        });
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task IntegerRangeFacetTreatsMissingBoundsAsUnbounded(bool publish)
+    {
+        await CreateCountDocuments([-5, 1, 2, 101]);
+
+        var indexAlias = GetIndexAlias(publish);
+        SearchResult result = await Searcher.SearchAsync(indexAlias, null, null, new List<Facet>() { new IntegerRangeFacet("count", [new IntegerRangeFacetRange("Below 100", null, 100), new IntegerRangeFacetRange("From 100", 100, null)]) }, null, null, null, null, 0, 100);
+        IntegerRangeFacetValue[] facetValues = result.Facets.Single().Values.OfType<IntegerRangeFacetValue>().ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.That(facetValues.Single(x => x.Key == "Below 100").Count, Is.EqualTo(3));
+            Assert.That(facetValues.Single(x => x.Key == "From 100").Count, Is.EqualTo(1));
         });
     }
 
@@ -148,6 +164,22 @@ public class InvariantFacetsTests : SearcherTestBase
         {
             Assert.That(result.Facets, Is.Not.Empty);
             Assert.That(result.Facets.First().Values.First().Count, Is.EqualTo(2));
+        });
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task DecimalRangeFacetTreatsMissingBoundsAsUnbounded(bool publish)
+    {
+        await CreateDecimalDocuments([-5.5, 1.5, 100.5]);
+
+        var indexAlias = GetIndexAlias(publish);
+        SearchResult result = await Searcher.SearchAsync(indexAlias, null, null, new List<Facet> { new DecimalRangeFacet("decimalproperty", [new DecimalRangeFacetRange("Below 100", null, 100), new DecimalRangeFacetRange("From 100", 100, null)]) }, null, null, null, null, 0, 100);
+        DecimalRangeFacetValue[] facetValues = result.Facets.Single().Values.OfType<DecimalRangeFacetValue>().ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.That(facetValues.Single(x => x.Key == "Below 100").Count, Is.EqualTo(2));
+            Assert.That(facetValues.Single(x => x.Key == "From 100").Count, Is.EqualTo(1));
         });
     }
 
@@ -360,7 +392,7 @@ public class InvariantFacetsTests : SearcherTestBase
             .AddPropertyType()
             .WithAlias("dropDown")
             .WithDataTypeId(Constants.DataTypes.DropDownSingle)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DropDownListFlexible)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MultipleDropDown)
             .Done()
             .Build();
         await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);

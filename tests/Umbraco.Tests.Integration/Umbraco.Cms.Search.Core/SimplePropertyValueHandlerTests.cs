@@ -125,7 +125,7 @@ public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
             var tagsAsCsvValue = document.Fields.FirstOrDefault(f => f.FieldName == "tagsAsCsvValue")?.Value.Keywords?.ToArray();
             CollectionAssert.AreEqual(tagsAsCsvValue, new[] { "Four", "Five", "Six" });
 
-            var allTagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.IndexFieldNames.Tags)?.Value.Keywords?.ToArray();
+            var allTagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.Search.FieldNames.Tags)?.Value.Keywords?.ToArray();
             CollectionAssert.AreEquivalent(allTagsValue, new[] { "One", "Two", "Three", "Four", "Five", "Six" });
 
             var multipleTextstringsValue = document.Fields.FirstOrDefault(f => f.FieldName == "multipleTextstringsValue")?.Value.Texts?.ToArray();

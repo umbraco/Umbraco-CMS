@@ -7,7 +7,7 @@ Headless content delivery REST API for Umbraco CMS. Enables frontend application
 ## 1. Architecture
 
 **Type**: Class Library (NuGet Package)
-**Target Framework**: .NET 10.0
+**Target Framework**: .NET 11.0
 **Purpose**: Content Delivery API for headless CMS scenarios
 
 ### Key Technologies

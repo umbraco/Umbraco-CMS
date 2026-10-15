@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Common.Configuration;
+using Umbraco.Cms.Api.Common.OpenApi;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
@@ -27,6 +30,7 @@ public static class MvcBuilderExtensions
             ILoggerFactory loggerFactory = provider.GetRequiredService<ILoggerFactory>();
             return new ConfigureMvcJsonOptions(settingsName, options, loggerFactory);
         });
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IApiDescriptionProvider, DistinctMediaTypesApiDescriptionProvider>());
         return builder;
     }
 }

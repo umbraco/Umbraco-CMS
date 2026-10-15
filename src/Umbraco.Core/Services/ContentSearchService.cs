@@ -30,7 +30,7 @@ public sealed class ContentSearchService : ContentSearchServiceBase<IContent>, I
     protected override UmbracoObjectTypes ObjectType => UmbracoObjectTypes.Document;
 
     /// <inheritdoc />
-    protected override string IndexAlias => Umbraco.Cms.Core.Constants.IndexAliases.DraftContent;
+    protected override string IndexAlias => Constants.Search.IndexAliases.DraftContent;
 
     /// <inheritdoc />
     protected override IEnumerable<IContent> SearchChildrenFromDatabase(int parentId, string[]? propertyAliases, Ordering? ordering, long pageNumber, int pageSize, bool loadTemplates, out long total)

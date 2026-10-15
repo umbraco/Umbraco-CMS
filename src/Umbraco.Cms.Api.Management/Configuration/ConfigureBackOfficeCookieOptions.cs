@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.Net.Http.Headers;
-using OpenIddict.Abstractions;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -24,9 +22,6 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 /// </summary>
 public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAuthenticationOptions>
 {
-    private static readonly PathString ManagementApiBasePath
-        = new($"/{Constants.System.UmbracoPathSegment}{Constants.Web.ManagementApiPath.TrimEnd('/')}");
-
     private readonly IDataProtectionProvider _dataProtection;
     private readonly GlobalSettings _globalSettings;
     private readonly IIpResolver _ipResolver;
@@ -119,7 +114,8 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             // https://github.com/dotnet/aspnetcore/blob/master/src/Security/Authentication/Cookies/src/CookieAuthenticationEvents.cs#L58
             // It would be possible to re-use the default behavior if any of these need to be set but that must be taken into account else
             // our back office requests will not function correctly. For now we don't need to set/configure any of these callbacks because
-            // the defaults work fine with our setup.
+            // the defaults work fine with our setup: they answer with a status code rather than a redirect for any endpoint carrying
+            // IDisableCookieRedirectMetadata (e.g. [ApiController]) unless it opts back in with IAllowCookieRedirectMetadata.
             OnValidatePrincipal = async ctx =>
             {
                 // We need to resolve the BackOfficeSecurityStampValidator per request as a requirement (even in aspnetcore they do this)
@@ -251,36 +247,6 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
 
                 return Task.CompletedTask;
             },
-            // FIXME: We want to change this over to using an attribute on the backoffice controllers
-            // See this for more: https://github.com/dotnet/aspnetcore/issues/63093#issuecomment-3201530217
-            OnRedirectToLogin = context =>
-            {
-                if (ShouldBeTreatedAsXhr(context.Request))
-                {
-                    context.Response.Headers.Location = context.RedirectUri;
-                    context.Response.StatusCode = 401;
-                }
-                else
-                {
-                    context.Response.Redirect(context.RedirectUri);
-                }
-
-                return Task.CompletedTask;
-            },
-            OnRedirectToAccessDenied = context =>
-            {
-                if (ShouldBeTreatedAsXhr(context.Request))
-                {
-                    context.Response.Headers.Location = context.RedirectUri;
-                    context.Response.StatusCode = 403;
-                }
-                else
-                {
-                    context.Response.Redirect(context.RedirectUri);
-                }
-
-                return Task.CompletedTask;
-            },
         };
     }
 
@@ -302,24 +268,4 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         mode = SameSiteMode.Unspecified;
         return false;
     }
-
-    private static bool IsManagementApiRequest(HttpRequest request)
-        => request.Path.StartsWithSegments(ManagementApiBasePath, StringComparison.OrdinalIgnoreCase);
-
-    private static bool HasClientId(HttpRequest request)
-        => request.Query.ContainsKey(OpenIddictConstants.Parameters.ClientId);
-
-    private static bool IsXhr(HttpRequest request) =>
-        string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal) ||
-        string.Equals(request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.Ordinal);
-
-    // Management API requests are always JSON, so an unauthenticated one must get a 401/403 — never a
-    // 302 to the HTML login page, which a fetch/JSON client can't follow meaningfully (it lands on
-    // login HTML and blows up downstream). The dual-scheme back-office policies now include this
-    // cookie scheme, so its challenge fires for API requests too; force the status-code branch for
-    // anything under the Management API path, regardless of the X-Requested-With header.
-    // The one exception is when an explicit client ID has been supplied in the request. This is the case
-    // when authorizing clients like Postman or Swagger UI.
-    private static bool ShouldBeTreatedAsXhr(HttpRequest request)
-        => IsXhr(request) || (IsManagementApiRequest(request) && HasClientId(request) is false);
 }

@@ -1908,6 +1908,7 @@ export default {
 		stateApproved: 'موافق عليه',
 		stateInvited: 'مدعو',
 		stateInactive: 'غير نشط',
+		type: 'النوع',
 		sortNameAscending: 'الاسم (A-Z)',
 		sortNameDescending: 'الاسم (Z-A)',
 		sortCreateDateDescending: 'الأحدث',

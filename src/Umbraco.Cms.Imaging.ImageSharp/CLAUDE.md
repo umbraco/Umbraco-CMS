@@ -7,13 +7,15 @@ Image processing library using **ImageSharp 4.x** and **ImageSharp.Web** for on-
 ## 1. Architecture
 
 **Type**: Class Library (NuGet Package)
-**Target Framework**: .NET 10.0
+**Target Framework**: .NET 11.0
 **Purpose**: Provide image manipulation via query string parameters
 
 ### Key Technologies
 
 - **SixLabors.ImageSharp** - Image processing library
 - **SixLabors.ImageSharp.Web** - ASP.NET Core middleware for query string-based image manipulation
+
+Both packages validate a licence key at build time; the key and its renewal details are in `SIXLABORS-LICENSE.md`.
 
 ### Dependencies
 

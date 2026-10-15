@@ -86,7 +86,14 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	 * @default undefined
 	 */
 	@property({ type: Number })
-	max?: number;
+	public set max(value: number | undefined) {
+		this.#max = value;
+		this.#updateSorterEnabled();
+	}
+	public get max(): number | undefined {
+		return this.#max;
+	}
+	#max?: number;
 
 	/**
 	 * Max validation message.
@@ -144,13 +151,17 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 	@property({ type: Boolean })
 	required = false;
 	@property({ type: String })

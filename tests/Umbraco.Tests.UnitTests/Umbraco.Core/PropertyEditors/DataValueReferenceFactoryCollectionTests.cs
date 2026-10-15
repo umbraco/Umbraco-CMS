@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging.Abstractions;
@@ -26,9 +26,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 public class DataValueReferenceFactoryCollectionTests
 {
     private IDataValueEditorFactory DataValueEditorFactory { get; } = Mock.Of<IDataValueEditorFactory>(
-        x => x.Create<MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor>(It.IsAny<DataEditorAttribute>())
+        x => x.Create<MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor>(It.IsAny<DataEditorAttribute>())
              ==
-             new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor(
+             new MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor(
                  Mock.Of<IShortStringHelper>(),
                  Mock.Of<IJsonSerializer>(),
                  Mock.Of<IIOHelper>(),
