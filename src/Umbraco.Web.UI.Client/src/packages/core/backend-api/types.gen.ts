@@ -1175,19 +1175,6 @@ export enum EventMessageTypeModel {
     WARNING = 'Warning'
 }
 
-export type FacetModel = {
-    fieldName: string;
-};
-
-export type FacetResultResponseModel = {
-    fieldName: string;
-    values: Array<FacetValueModel>;
-};
-
-export type FacetValueModel = {
-    count: number;
-};
-
 export type FetchResponseModelDataTypeSchemaItemResponseModel = {
     total: number;
     items: Array<DataTypeSchemaItemResponseModel>;
@@ -1203,11 +1190,6 @@ export type FileSystemTreeItemPresentationModel = {
     parent?: null | FileSystemFolderModel;
     isFolder: boolean;
     hasChildren: boolean;
-};
-
-export type FilterModel = {
-    fieldName: string;
-    negate: boolean;
 };
 
 export type FlagModel = {
@@ -2673,9 +2655,6 @@ export type SearchDocumentResponseModel = {
 export type SearchRequestModel = {
     indexAlias: string;
     query?: null | string;
-    filters?: null | Array<FilterModel>;
-    facets?: null | Array<FacetModel>;
-    sorters?: null | Array<SorterModel>;
     culture?: null | string;
     segment?: null | string;
 };
@@ -2683,7 +2662,6 @@ export type SearchRequestModel = {
 export type SearchResultResponseModel = {
     total: number;
     documents: Array<SearchDocumentResponseModel>;
-    facets: Array<FacetResultResponseModel>;
 };
 
 export type SecurityConfigurationResponseModel = {
@@ -2739,11 +2717,6 @@ export type SignalRClientSettingsResponseModel = {
 export type SortDocumentChildrenByFieldRequestModel = {
     culture?: null | string;
     field: ContentSortFieldModel;
-    direction: DirectionModel;
-};
-
-export type SorterModel = {
-    fieldName: string;
     direction: DirectionModel;
 };
 

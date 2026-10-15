@@ -45039,47 +45039,6 @@
           "Warning"
         ]
       },
-      "FacetModel": {
-        "required": [
-          "fieldName"
-        ],
-        "type": "object",
-        "properties": {
-          "fieldName": {
-            "type": "string"
-          }
-        }
-      },
-      "FacetResultResponseModel": {
-        "required": [
-          "fieldName",
-          "values"
-        ],
-        "type": "object",
-        "properties": {
-          "fieldName": {
-            "type": "string"
-          },
-          "values": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FacetValueModel"
-            }
-          }
-        }
-      },
-      "FacetValueModel": {
-        "required": [
-          "count"
-        ],
-        "type": "object",
-        "properties": {
-          "count": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "FetchResponseModelDataTypeSchemaItemResponseModel": {
         "required": [
           "total",
@@ -45139,21 +45098,6 @@
             "type": "boolean"
           },
           "hasChildren": {
-            "type": "boolean"
-          }
-        }
-      },
-      "FilterModel": {
-        "required": [
-          "fieldName",
-          "negate"
-        ],
-        "type": "object",
-        "properties": {
-          "fieldName": {
-            "type": "string"
-          },
-          "negate": {
             "type": "boolean"
           }
         }
@@ -50644,33 +50588,6 @@
               "string"
             ]
           },
-          "filters": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "items": {
-              "$ref": "#/components/schemas/FilterModel"
-            }
-          },
-          "facets": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "items": {
-              "$ref": "#/components/schemas/FacetModel"
-            }
-          },
-          "sorters": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "items": {
-              "$ref": "#/components/schemas/SorterModel"
-            }
-          },
           "culture": {
             "type": [
               "null",
@@ -50688,7 +50605,6 @@
       "SearchResultResponseModel": {
         "required": [
           "documents",
-          "facets",
           "total"
         ],
         "type": "object",
@@ -50701,12 +50617,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SearchDocumentResponseModel"
-            }
-          },
-          "facets": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FacetResultResponseModel"
             }
           }
         }
@@ -50879,21 +50789,6 @@
           },
           "field": {
             "$ref": "#/components/schemas/ContentSortFieldModel"
-          },
-          "direction": {
-            "$ref": "#/components/schemas/DirectionModel"
-          }
-        }
-      },
-      "SorterModel": {
-        "required": [
-          "fieldName",
-          "direction"
-        ],
-        "type": "object",
-        "properties": {
-          "fieldName": {
-            "type": "string"
           },
           "direction": {
             "$ref": "#/components/schemas/DirectionModel"
