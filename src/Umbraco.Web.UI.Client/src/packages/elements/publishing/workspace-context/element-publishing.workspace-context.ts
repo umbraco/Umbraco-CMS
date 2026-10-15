@@ -43,9 +43,8 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 	 * Tracks how many items reference this element, so the publish flow can decide whether the confirmation
 	 * dialog has anything to say for a single-variant element (it always has something to say once there are
 	 * multiple variants to choose between).
-	 * @memberof UmbElementPublishingWorkspaceContext
 	 */
-	public readonly referenceCount = new UmbEntityReferenceCountManager(this, {
+	readonly #referenceCount = new UmbEntityReferenceCountManager(this, {
 		referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
 	});
 
@@ -301,7 +300,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		// publish, shows the ones that may not be, and (for a single option) just the reference-awareness section.
 		const needsModal =
 			!this.#publishableVariantsFilter(options[0]) ||
-			(await umbNeedsPublishConfirmation(options.length, () => this.referenceCount.getTotalAsync()));
+			(await umbNeedsPublishConfirmation(options.length, () => this.#referenceCount.getTotalAsync()));
 
 		if (!needsModal) {
 			variantIds.push(UmbVariantId.Create(options[0]));
@@ -493,7 +492,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 				}
 
 				this.#currentUnique = unique;
-				this.referenceCount.setUnique(unique ?? undefined).catch(() => undefined);
+				this.#referenceCount.setUnique(unique ?? undefined).catch(() => undefined);
 
 				if (isNew === false && unique) {
 					this.#loadAndProcessLastPublished();

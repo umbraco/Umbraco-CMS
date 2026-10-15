@@ -2699,9 +2699,9 @@ export default {
 		listViewDialogWarning: 'The following items you are trying to %0% are used by other content.',
 		labelUsedByItems: 'Referenced by',
 		labelDescendantsWithReferences: 'Descendants with references',
-		labelDependsOnThis: 'The following items depend on this',
-		labelDependentDescendants: 'The following descending items have dependencies',
-		labelUsedByOtherContent: 'The following items are used by other content',
+		labelDependsOnThis: 'The following items depend on this:',
+		labelDependentDescendants: 'The following descending items have dependencies:',
+		labelUsedByOtherContent: 'The following items are used by other content:',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;

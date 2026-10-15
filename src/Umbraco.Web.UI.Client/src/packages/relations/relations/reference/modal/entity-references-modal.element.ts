@@ -50,7 +50,7 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 					() => html`
 						<div ?hidden=${!this._referencedByTotal}>
 							<p>
-								<umb-localize key="references_labelDependsOnThis">The following items depend on this</umb-localize>
+								<umb-localize key="references_labelDependsOnThis">The following items depend on this:</umb-localize>
 							</p>
 							<umb-entity-reference-list
 								.unique=${data.unique}
@@ -67,7 +67,7 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 						<div ?hidden=${!this._descendantsTotal}>
 							<p>
 								<umb-localize key="references_labelDependentDescendants"
-									>The following descending items have dependencies</umb-localize
+									>The following descending items have dependencies:</umb-localize
 								>
 							</p>
 							<umb-entity-reference-list
