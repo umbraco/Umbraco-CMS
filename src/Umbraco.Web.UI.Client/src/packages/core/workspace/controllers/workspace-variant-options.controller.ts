@@ -6,7 +6,7 @@ import {
 	type UmbEntityVariantOptionModel,
 } from '@umbraco-cms/backoffice/variant';
 import { mergeObservables, UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import { UMB_APP_LANGUAGE_CONTEXT, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { filter, map } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbWorkspaceVariantOptionsController<
@@ -25,9 +25,6 @@ export class UmbWorkspaceVariantOptionsController<
 	getLanguages(): Array<UmbLanguageDetailModel> | undefined {
 		return this.#languages.getValue();
 	}
-	setLanguages(languages: Array<UmbLanguageDetailModel> | undefined) {
-		this.#languages.setValue(languages);
-	}
 
 	#variantOptions = new UmbArrayState<Omit<VariantOptionModelType, 'language'>, string, undefined>(
 		undefined,
@@ -38,8 +35,16 @@ export class UmbWorkspaceVariantOptionsController<
 		[this.#variantOptions.asObservable(), this.languages],
 		([option, languages]) => {
 			if (option === undefined || languages === undefined) return undefined;
+			const defaultLang = languages?.find((x) => x.isDefault);
 			return option.map((opt) => {
+				if (!opt.culture) {
+					return { ...opt, language: defaultLang };
+				}
 				const lang = languages?.find((x) => x.unique === opt.culture);
+				if (!lang) {
+					console.log(languages);
+					throw new Error(`Language for culture ${opt.culture} could not be found.`);
+				}
 				return { ...opt, language: lang };
 			});
 		},
@@ -54,6 +59,18 @@ export class UmbWorkspaceVariantOptionsController<
 		variants: Observable<Array<VariantModelType>>,
 	) {
 		super(host);
+
+		// Languages are requested once per app session by UMB_APP_LANGUAGE_CONTEXT; every workspace observes
+		// that shared state instead of each issuing its own request for the full language collection.
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {
+			this.observe(
+				appLanguageContext?.languages,
+				(languages) => {
+					this.#languages.setValue(languages);
+				},
+				null,
+			);
+		});
 
 		this.observe(
 			mergeObservables([varyByCulture, varyBySegment, variants, this.languages], (sources) => sources),

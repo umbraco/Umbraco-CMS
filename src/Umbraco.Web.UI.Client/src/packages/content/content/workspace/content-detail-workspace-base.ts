@@ -7,6 +7,7 @@ import type { UmbContentPropertyDatasetContext } from '../property-dataset-conte
 import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
 import type { UmbContentCollectionWorkspaceContext } from '../collection/content-collection-workspace-context.interface.js';
 import { UmbEntryDataValueVariantsController } from '../controller/entry-data-value-variants.controller.js';
+import { umbEntryAppendValue } from '../utils/index.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { _resolveIsWritableVariant } from './content-writable-variant.function.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
@@ -37,7 +38,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_APP_LANGUAGE_CONTEXT, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
 	UmbVariantPropertyGuardManager,
@@ -64,7 +65,6 @@ import type {
 } from '@umbraco-cms/backoffice/variant';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import { umbEntryAppendValue } from '../utils/index.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -176,7 +176,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
 
 	public variantOptionsManager: UmbWorkspaceVariantOptionsController<VariantModelType, VariantOptionModelType>;
-	public readonly variantOptions: Observable<Array<VariantOptionModelType>>;
+	public readonly variantOptions: Observable<Array<VariantOptionModelType> | undefined>;
+	public readonly languages: Observable<Array<UmbLanguageDetailModel> | undefined>;
 
 	/**
 	 * @deprecated - Use the languages observable from the variant options manager instead.
@@ -198,7 +199,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return firstValueFrom(this.variantOptions);
 	}
 	async getCultureVariantOptions() {
-		return (await firstValueFrom(this.variantOptions)).filter((x) => !x.segment);
+		return (await firstValueFrom(this.variantOptions))?.filter((x) => !x.segment);
 	}
 
 	#variantValidationContexts: Array<UmbValidationController> = [];
@@ -254,6 +255,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.variants,
 		);
 		this.variantOptions = this.variantOptionsManager.variantOptions;
+		this.languages = this.variantOptionsManager.languages;
 
 		this.#collectionConfiguration.setCollectionAlias(args.collectionAlias);
 		this.observe(
@@ -281,7 +283,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.observe(
 			this.variantOptions,
 			(variantOptions) => {
-				variantOptions.forEach((variantOption) => {
+				variantOptions?.forEach((variantOption) => {
 					const missingThis = !this.#variantValidationContexts.some((x) => {
 						const variantId = x.getVariantId();
 						if (!variantId) return;
@@ -367,18 +369,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			},
 			null,
 		);
-
-		// Languages are requested once per app session by UMB_APP_LANGUAGE_CONTEXT; every workspace observes
-		// that shared state instead of each issuing its own request for the full language collection.
-		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {
-			this.observe(
-				appLanguageContext?.languages,
-				(languages) => {
-					this.variantOptionsManager.setLanguages(languages);
-				},
-				null,
-			);
-		});
 	}
 
 	/**
@@ -432,9 +422,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		// TODO: Let´s make sure we have all the various variant options available at this point... [NL]
 
-		const variantOptions = (await firstValueFrom(this.variantOptions)).map(
+		const variantOptions = (await firstValueFrom(this.variantOptions))?.map(
 			(o) => new UmbVariantId(o.culture, o.segment),
 		);
+		if (!variantOptions) {
+			throw new Error('Variant options could not be loaded.');
+		}
 		if (contentTypeVariesByCulture) {
 			variantOptions.push(UmbVariantId.CreateInvariant()); // Ensure invariant is included, when the contentType varies by culture, because we do not have a invariant-variant in our variant-options. [NL]
 		}
@@ -724,6 +717,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		if (missingVariants.length === 0) return;
 
 		const cultureOptions = await this.getCultureVariantOptions();
+		if (!cultureOptions) {
+			throw new Error('Culture variant options could not be loaded.');
+		}
 
 		// Filter away missingVariants that are not part of the cultureOptions:
 		const variantsToUpdate = missingVariants.filter((variant) => {
@@ -761,6 +757,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		selected: string[];
 	}> {
 		const options = await this.getCultureVariantOptions();
+		if (!options) {
+			throw new Error('Culture variant options could not be loaded.');
+		}
 
 		const activeVariants = this.splitView.getActiveVariants();
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
@@ -997,7 +996,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		notifyWorkspaceActionStarting(executionOptions);
 
 		if (this.getVariesBySegment()) {
-			variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, await this.getVariantOptions());
+			const variantOptions = await this.getVariantOptions();
+			if (!variantOptions) {
+				throw new Error('Variant options could not be loaded.');
+			}
+			variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, variantOptions);
 		}
 
 		const saveData = await this.constructSaveData(variantIds);
