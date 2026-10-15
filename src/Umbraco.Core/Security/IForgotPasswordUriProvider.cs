@@ -27,7 +27,5 @@ public interface IForgotPasswordUriProvider
     /// <remarks>
     ///     This is checked before the user is looked up, so the outcome must not depend on any particular user.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    Task<Attempt<UserOperationStatus>> CanCreateForgotPasswordUriAsync()
-        => Task.FromResult(Attempt.Succeed(UserOperationStatus.Success));
+    Task<Attempt<UserOperationStatus>> CanCreateForgotPasswordUriAsync();
 }
