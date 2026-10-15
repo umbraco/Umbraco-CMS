@@ -6298,7 +6298,7 @@ export class UserService {
     /**
      * Gets a filtered collection of users.
      *
-     * Filters users based on the provided criteria with support for pagination.
+     * Returns a paged collection of users matching the provided criteria — user groups, user states, user kinds (default or API users) and a name/username search term.
      */
     public static getFilterUser<ThrowOnError extends boolean = true>(options?: Options<GetFilterUserData, ThrowOnError>): RequestResult<GetFilterUserResponses, GetFilterUserErrors, ThrowOnError> {
         return (options?.client ?? client).get<GetFilterUserResponses, GetFilterUserErrors, ThrowOnError>({
