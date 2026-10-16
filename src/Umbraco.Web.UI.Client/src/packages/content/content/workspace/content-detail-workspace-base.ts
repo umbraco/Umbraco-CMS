@@ -257,6 +257,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.variantOptions = this.variantOptionsManager.variantOptions;
 		this.languages = this.variantOptionsManager.languages;
 
+		this.observe(this.variantOptions, (variantOptions) => (this.#writableVariantOptions = variantOptions ?? []), null);
+		this.observe(
+			this.structure.contentTypeProperties,
+			(properties) => (this.#writableVariantProperties = properties),
+			null,
+		);
+
 		this.#collectionConfiguration.setCollectionAlias(args.collectionAlias);
 		this.observe(
 			this.structure.ownerContentTypeObservablePart((x) => x?.collection?.unique),
