@@ -1,3 +1,4 @@
+using System.Globalization;
 using Bogus;
 using Examine;
 using Examine.Lucene.Providers;
@@ -94,6 +95,56 @@ internal sealed class IndexTest : ExamineBaseTest
             var key = $"{UmbracoExamineFieldNames.RawFieldPrefix}rte";
             Assert.IsTrue(result.Values.ContainsKey(key));
             Assert.Greater(result.Values[key].Length, luceneStringFieldMaxLength);
+        }
+    }
+
+    [TestCase("en-US")]
+    [TestCase("da-DK")]
+    [TestCase("ja-JP")]
+    public void GivenIndexingDocument_WhenPropertyHasNoFieldDefinition_NumbersAndDatesAreIndexedTheSameInEveryCulture(string culture)
+    {
+        var date = new DateTime(2026, 10, 16, 11, 30, 0);
+        CultureInfo? previousDefaultCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo previousCulture = CultureInfo.CurrentCulture;
+        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
+        try
+        {
+            using (GetSynchronousContentIndex(false, out var index, out _, out var contentValueSetBuilder))
+            {
+                index.CreateIndex();
+
+                var contentType = ContentTypeBuilder.CreateBasicContentType();
+                contentType.AddPropertyType(new PropertyType(TestHelper.ShortStringHelper, Constants.PropertyEditors.Aliases.Decimal, ValueStorageType.Decimal)
+                {
+                    Alias = "decimalproperty",
+                    Name = "Decimal",
+                });
+                contentType.AddPropertyType(new PropertyType(TestHelper.ShortStringHelper, Constants.PropertyEditors.Aliases.DateTime, ValueStorageType.Date)
+                {
+                    Alias = "dateproperty",
+                    Name = "Date",
+                });
+
+                var content = ContentBuilder.CreateBasicContent(contentType);
+                content.Id = 556;
+                content.Path = "-1,556";
+                content.Properties["decimalproperty"]!.SetValue(12.4552m);
+                content.Properties["dateproperty"]!.SetValue(date);
+
+                index.IndexItems(contentValueSetBuilder.GetValueSets(content));
+
+                ISearchResult result = index.Searcher.CreateQuery().Id(556).Execute().First();
+                Assert.Multiple(() =>
+                {
+                    Assert.That(result.AllValues["decimalproperty"], Has.Member("12.4552"));
+                    Assert.That(result.AllValues["dateproperty"], Has.Member(date.ToString(CultureInfo.InvariantCulture)));
+                });
+            }
+        }
+        finally
+        {
+            CultureInfo.DefaultThreadCurrentCulture = previousDefaultCulture;
+            CultureInfo.CurrentCulture = previousCulture;
         }
     }
 
