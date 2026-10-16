@@ -350,6 +350,7 @@ declare global {
 		blueprints_createdBlueprintHeading: string;
 		blueprints_createdBlueprintMessage: string;
 		blueprints_duplicateBlueprintMessage: string;
+		blueprints_noAccessToBlueprints: string;
 		blueprints_selectBlueprint: string;
 		bulk_copiedItem: string;
 		bulk_copiedItemOfItem: string;
@@ -2509,6 +2510,7 @@ declare global {
 		user_accessHelp: string;
 		user_addUsersToGroupError: string;
 		user_administrators: string;
+		user_allowAccessToAllDocumentBlueprints: string;
 		user_allowAccessToAllDocuments: string;
 		user_allowAccessToAllElements: string;
 		user_allowAccessToAllLanguages: string;
@@ -2629,6 +2631,8 @@ declare global {
 		user_resetPassword: string;
 		user_searchAllChildren: string;
 		user_sectionsHelp: string;
+		user_selectDocumentBlueprintStartNode: string;
+		user_selectDocumentBlueprintStartNodeDescription: string;
 		user_selectElementStartNode: string;
 		user_selectElementStartNodeDescription: string;
 		user_selectUserGroup: (multiple: boolean) => string;

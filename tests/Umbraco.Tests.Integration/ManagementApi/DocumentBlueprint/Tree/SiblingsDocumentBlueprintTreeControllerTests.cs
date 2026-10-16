@@ -69,7 +69,7 @@ public class SiblingsDocumentBlueprintTreeControllerTests : ManagementApiUserGro
         => new() { ExpectedStatusCode = HttpStatusCode.Forbidden };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel
-        => new() { ExpectedStatusCode = HttpStatusCode.OK };
+        => new() { ExpectedStatusCode = HttpStatusCode.NotFound };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.Unauthorized };
