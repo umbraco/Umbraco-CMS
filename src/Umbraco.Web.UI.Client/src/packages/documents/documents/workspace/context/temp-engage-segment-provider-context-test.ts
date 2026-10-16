@@ -24,11 +24,14 @@ export class UmbEngageSegmentProviderContextTest extends UmbControllerBase {
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspace) => {
 			this.#workspace?.incomingDataHook.remove(this.#onIncomingData);
 			this.#workspace = workspace;
-			if (!workspace) return;
-			const manager = workspace.variantOptionsManager;
+			if (!workspace) {
+				this.removeUmbControllerByAlias(observeCtrlAlias);
+				return;
+			}
 
 			workspace.incomingDataHook.add(this.#onIncomingData);
 
+			const manager = workspace.variantOptionsManager;
 			this.observe(
 				mergeObservables(
 					[this.#segments.asObservable(), workspace.variesByCulture, workspace.variesBySegment, manager.languages],
@@ -40,18 +43,21 @@ export class UmbEngageSegmentProviderContextTest extends UmbControllerBase {
 					}),
 				),
 				({ segments, variesByCulture, variesBySegment, languages }) => {
-					manager.remove(this.#addedUniques);
+					const oldUniques = this.#addedUniques;
 					this.#addedUniques = [];
 
-					if (variesByCulture === undefined || languages === undefined || !variesBySegment || segments === undefined)
+					if (variesByCulture === undefined || languages === undefined || !variesBySegment || segments === undefined) {
+						// Ensure old uniques are removed before adding new ones
+						manager.remove(oldUniques);
 						return;
+					}
 
 					const options = variesByCulture
 						? this.#getVaryByCultureSegmentOptions(segments, languages)
 						: this.#getNotCultureSegmentOptions(segments);
 
 					this.#addedUniques = options.map((o) => o.unique);
-					manager.add(options);
+					manager.replace(oldUniques, options);
 				},
 				observeCtrlAlias,
 			);

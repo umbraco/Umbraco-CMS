@@ -189,4 +189,11 @@ export class UmbWorkspaceVariantOptionsController<
 	public remove(uniques: Array<string>) {
 		this.#variantOptions.remove(uniques);
 	}
+
+	public replace(uniques: Array<string>, options: Array<Omit<VariantOptionModelType, 'language'>>) {
+		this.#variantOptions.mute();
+		this.remove(uniques);
+		this.add(options);
+		this.#variantOptions.unmute();
+	}
 }
