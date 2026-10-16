@@ -11,13 +11,14 @@ import type { UmbEntityVariantOptionModel } from './types.js';
  */
 export function umbExpandVariantIdsWithSegmentOptions(
 	variantIds: Array<UmbVariantId>,
-	variantOptions: Array<UmbEntityVariantOptionModel>,
+	variantOptions: Array<UmbEntityVariantOptionModel> | undefined,
 ): Array<UmbVariantId> {
 	return variantIds.flatMap((variantId) => {
 		if (variantId.segment !== null) return [variantId];
-		const segmentOptions = variantOptions
-			.filter((option) => option.culture === variantId.culture)
-			.map((option) => UmbVariantId.Create(option));
+		const segmentOptions =
+			variantOptions
+				?.filter((option) => option.culture === variantId.culture)
+				.map((option) => UmbVariantId.Create(option)) ?? [];
 		return segmentOptions.length > 0 ? segmentOptions : [variantId];
 	});
 }

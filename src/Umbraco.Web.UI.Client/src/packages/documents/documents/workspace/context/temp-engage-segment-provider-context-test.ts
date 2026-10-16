@@ -87,7 +87,6 @@ export class UmbEngageSegmentProviderContextTest extends UmbControllerBase {
 		return segments.map(
 			(segment) =>
 				({
-					variant: undefined,
 					culture,
 					segment: segment.alias,
 					segmentInfo: { alias: segment.alias, name: segment.name },

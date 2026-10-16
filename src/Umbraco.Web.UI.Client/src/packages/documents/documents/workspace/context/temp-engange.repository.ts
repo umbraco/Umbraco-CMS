@@ -1,4 +1,3 @@
-import type { UmbDocumentSegmentFilterModel } from './types.js';
 import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -8,12 +7,13 @@ export class UmbEngageSegmentRepository extends UmbRepositoryBase {
 	/**
 	 * Get available segment options for a document by its ID.
 	 * @param {string} unique The unique identifier of the document.
-	 * @param {UmbDocumentSegmentFilterModel} filter The filter options to apply.
+	 * @param {any} filter The filter options to apply.
 	 * @returns {Promise<UmbRepositoryResponse<UmbSegmentResponseModel>>} A promise that resolves with the available segment options.
 	 */
 	async getDocumentByIdSegmentOptions(
 		unique: string,
-		filter: UmbDocumentSegmentFilterModel,
+		// Insert the right type for your filter query...
+		filter: any,
 	): Promise<UmbRepositoryResponse<UmbSegmentResponseModel>> {
 		const { data, error } = await tryExecute(
 			this,
@@ -26,7 +26,6 @@ export class UmbEngageSegmentRepository extends UmbRepositoryBase {
 				const model: UmbSegmentModel = {
 					alias: item.alias,
 					name: item.name,
-
 					cultures: item.cultures,
 				};
 
