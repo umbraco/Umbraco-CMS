@@ -97,8 +97,8 @@ export class UmbEngageSegmentProviderContextTest extends UmbControllerBase {
 	}
 
 	override destroy() {
+		this.#workspace?.variantOptionsManager.remove(this.#addedUniques);
 		this.#workspace?.incomingDataHook.remove(this.#onIncomingData);
-		// TODO: consider removing any added variant options... [NL]
 		super.destroy();
 	}
 }
