@@ -6,6 +6,7 @@ import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-create-blueprint-modal')
 export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
@@ -23,7 +24,16 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 	private _blueprintName = '';
 
 	@state()
+	private _parentUnique: string | null = null;
+
+	@state()
+	private _hasSelectedLocation = false;
+
+	@state()
 	private _hasBlueprintAccess?: boolean;
+
+	@state()
+	private _hasRootAccess?: boolean;
 
 	constructor() {
 		super();
@@ -34,12 +44,15 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 			this.observe(
 				observeMultiple([context.hasDocumentBlueprintRootAccess, context.documentBlueprintStartNodeUniques]),
 				([hasRootAccess, startNodeUniques]) => {
-					this._hasBlueprintAccess = hasRootAccess === true || (startNodeUniques?.length ?? 0) > 0;
+					this._hasRootAccess = hasRootAccess === true;
+					this._hasBlueprintAccess = this._hasRootAccess || (startNodeUniques?.length ?? 0) > 0;
 				},
 				'_observeDocumentBlueprintAccess',
 			);
 		});
 	}
+
+	#selectableFilter = (item: { unique: string | null }) => item.unique !== null || this._hasRootAccess === true;
 
 	override firstUpdated() {
 		this.#documentUnique = this.data?.unique ?? '';
@@ -54,8 +67,23 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 		this._blueprintName = data.variants[0].name;
 	}
 
+	#onLocationSelected(event: UmbSelectedEvent) {
+		event.stopPropagation();
+		this._parentUnique = event.unique ?? null;
+		this._hasSelectedLocation = true;
+	}
+
+	#onLocationDeselected(event: UmbDeselectedEvent) {
+		event.stopPropagation();
+		this._parentUnique = null;
+		this._hasSelectedLocation = false;
+	}
+
 	async #handleSave() {
-		this.value = { name: this._blueprintName, parent: null };
+		this.value = {
+			name: this._blueprintName,
+			parent: this._parentUnique ? { id: this._parentUnique } : null,
+		};
 		this.modalContext?.submit();
 	}
 
@@ -68,7 +96,7 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 						() => html`<umb-localize id="no-access" key="blueprints_noAccessToBlueprints"></umb-localize>`,
 						() => html`
 							<umb-localize key="blueprints_blueprintDescription"></umb-localize>
-							<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical">
+							<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical" mandatory>
 								<div slot="editor">
 									<uui-input
 										id="name"
@@ -76,6 +104,24 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 										.value=${this._blueprintName}
 										@input=${(e: UUIInputEvent) => (this._blueprintName = e.target.value as string)}></uui-input>
 								</div>
+							</umb-property-layout>
+							<umb-property-layout label=${this.localize.term('general_destination')} orientation="vertical" mandatory>
+								${when(
+									this._hasRootAccess !== undefined,
+									() => html`
+										<umb-tree
+											slot="editor"
+											alias="Umb.Tree.DocumentBlueprint"
+											.props=${{
+												hideTreeItemActions: true,
+												foldersOnly: true,
+												selectableFilter: this.#selectableFilter,
+											}}
+											@selected=${this.#onLocationSelected}
+											@deselected=${this.#onLocationDeselected}>
+										</umb-tree>
+									`,
+								)}
 							</umb-property-layout>
 						`,
 					)}
@@ -90,8 +136,8 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 					id="save"
 					look="primary"
 					color="positive"
-					?disabled=${this._hasBlueprintAccess !== true}
 					label=${this.localize.term('buttons_save')}
+					?disabled=${this._hasBlueprintAccess !== true || !this._blueprintName.trim() || !this._hasSelectedLocation}
 					@click="${this.#handleSave}"></uui-button>
 			</umb-body-layout>
 		`;
