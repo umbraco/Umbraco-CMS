@@ -36,6 +36,13 @@ public sealed class ElementDto : IPublishableContentDto<ElementVersionDto>
     public bool Edited { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether an invariant property of this element has been edited since it was last published or saved.
+    /// </summary>
+    [Column(IPublishableContentDto<ElementVersionDto>.Columns.InvariantEdited)]
+    [Constraint(Default = "0")]
+    public bool InvariantEdited { get; set; }
+
+    /// <summary>
     /// Gets or sets the <see cref="ContentDto"/> instance that contains the content data associated with this element.
     /// </summary>
     [ResultColumn]
