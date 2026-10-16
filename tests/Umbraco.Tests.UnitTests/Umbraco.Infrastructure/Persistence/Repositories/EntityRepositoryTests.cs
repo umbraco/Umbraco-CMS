@@ -28,6 +28,14 @@ internal sealed class EntityRepositoryTests : BaseUsingSqlSyntax
         Assert.That(orderBy, Does.StartWith("ORDER BY [umbracoNode].[sortOrder] "));
     }
 
+    [Test]
+    public void The_Default_Ordering_Breaks_Sort_Order_Ties_By_Id()
+    {
+        var orderBy = GetOrderByClause(null);
+
+        Assert.That(orderBy.Replace("(", string.Empty).Replace(")", string.Empty), Is.EqualTo("ORDER BY [umbracoNode].[sortOrder], [umbracoNode].[id]"));
+    }
+
     private string GetOrderByClause(Ordering? ordering)
     {
         var database = new Mock<IUmbracoDatabase>();
