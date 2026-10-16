@@ -43,6 +43,11 @@ public static class MethodInfoApiCommonExtensions
     ///     <c>true</c> if the attribute is present and matches the specified API name,
     ///     or if the attribute is not present and the API name matches the default API name; otherwise, <c>false</c>.
     /// </returns>
+    /// <remarks>
+    ///     To take a <see cref="MapToApiAttribute"/> added at runtime into account, use
+    ///     <see cref="ActionDescriptorApiCommonExtensions.HasMapToApiAttribute(Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor, string)"/>
+    ///     instead.
+    /// </remarks>
     public static bool HasMapToApiAttribute(this MethodInfo methodInfo, string apiName)
     {
         var value = methodInfo.GetMapToApiAttributeValue();
