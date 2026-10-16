@@ -1,6 +1,6 @@
-import { UmbDocumentSegmentRepository } from '../../repository/index.js';
 import type { UmbDocumentDetailModel, UmbDocumentVariantOptionModel } from '../../types.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
+import { UmbEngageSegmentRepository } from './temp-engange.repository.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbHookMethod } from '@umbraco-cms/backoffice/hook-api';
 import type { UmbEntityDetailIncomingDataHookMeta } from '@umbraco-cms/backoffice/workspace';
@@ -13,7 +13,7 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 const observeCtrlAlias = Symbol();
 
 export class UmbEngageSegmentProviderContextTest extends UmbControllerBase {
-	#repository = new UmbDocumentSegmentRepository(this);
+	#repository = new UmbEngageSegmentRepository(this);
 	#segments = new UmbArrayState<UmbSegmentModel, string, undefined>(undefined, (x) => x.alias);
 	#addedUniques: Array<string> = [];
 	#workspace?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;

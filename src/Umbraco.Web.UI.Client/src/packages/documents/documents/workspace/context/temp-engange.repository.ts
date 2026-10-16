@@ -4,7 +4,7 @@ import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbSegmentModel, UmbSegmentResponseModel } from '@umbraco-cms/backoffice/segment';
 
-export class UmbDocumentSegmentRepository extends UmbRepositoryBase {
+export class UmbEngageSegmentRepository extends UmbRepositoryBase {
 	/**
 	 * Get available segment options for a document by its ID.
 	 * @param {string} unique The unique identifier of the document.
@@ -17,7 +17,7 @@ export class UmbDocumentSegmentRepository extends UmbRepositoryBase {
 	): Promise<UmbRepositoryResponse<UmbSegmentResponseModel>> {
 		const { data, error } = await tryExecute(
 			this,
-
+			// Insert your generated API call here:
 			DocumentService.getDocumentByIdAvailableSegmentOptions({ path: { id: unique }, query: filter }),
 		);
 
