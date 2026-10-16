@@ -32,6 +32,14 @@ internal sealed class EntityRepositoryTests : BaseUsingSqlSyntax
     public void Ordering_By_A_Name_That_Is_Not_A_Node_Field_Throws()
         => Assert.Throws<ArgumentException>(() => GetOrderByClause(Ordering.By("updateDate")));
 
+    [Test]
+    public void The_Default_Ordering_Breaks_Sort_Order_Ties_By_Id()
+    {
+        var orderBy = GetOrderByClause(null);
+
+        Assert.That(orderBy.Replace("(", string.Empty).Replace(")", string.Empty), Is.EqualTo("ORDER BY [umbracoNode].[sortOrder], [umbracoNode].[id]"));
+    }
+
     private string GetOrderByClause(Ordering? ordering)
     {
         var database = new Mock<IUmbracoDatabase>();
