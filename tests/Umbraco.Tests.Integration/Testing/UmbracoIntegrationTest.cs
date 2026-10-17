@@ -282,4 +282,15 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             viewFileSystem.DeleteFile(file);
         }
     }
+
+    protected void DeleteAllMediaFiles()
+    {
+        var mediaFileManager = GetRequiredService<MediaFileManager>();
+        var directories = mediaFileManager.FileSystem.GetDirectories(string.Empty);
+
+        foreach (var directory in directories)
+        {
+            mediaFileManager.FileSystem.DeleteDirectory(directory, true);
+        }
+    }
 }

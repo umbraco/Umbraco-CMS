@@ -2339,6 +2339,11 @@ const rawData = [
 						type: 'external',
 						url: 'https://umbraco.com',
 					},
+					{
+						name: 'Not Found',
+						type: 'document',
+						unique: 'deadbeef-0000-4000-8000-000000000007',
+					},
 				],
 			},
 			{

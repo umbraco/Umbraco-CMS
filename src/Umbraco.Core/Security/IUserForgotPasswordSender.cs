@@ -15,8 +15,23 @@ public interface IUserForgotPasswordSender
     Task SendForgotPassword(UserForgotPasswordMessage message);
 
     /// <summary>
-    ///     Determines whether the sender is configured and able to send messages.
+    ///     Determines whether password reset is enabled and the sender is configured to send messages.
     /// </summary>
-    /// <returns><c>true</c> if the sender can send messages; otherwise, <c>false</c>.</returns>
-    bool CanSend();
+    /// <returns><c>true</c> if password reset is configured; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     This checks configuration only and performs no I/O, so it is suitable for deciding whether to offer password reset.
+    ///     Use <see cref="IsPasswordResetAvailableAsync"/> immediately before sending to also check that messages can be delivered.
+    /// </remarks>
+    bool IsPasswordResetConfigured();
+
+    /// <summary>
+    ///     Determines whether password reset is configured and the sender can currently deliver messages.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns><c>true</c> if password reset messages can currently be delivered; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     Implementations may perform network I/O, so prefer <see cref="IsPasswordResetConfigured"/> unless a message is
+    ///     about to be sent.
+    /// </remarks>
+    Task<bool> IsPasswordResetAvailableAsync(CancellationToken cancellationToken = default);
 }

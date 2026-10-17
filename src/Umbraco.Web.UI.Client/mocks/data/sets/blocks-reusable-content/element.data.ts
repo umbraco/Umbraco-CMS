@@ -77,6 +77,82 @@ const elementTwoLibraryElement: UmbMockElementModel = {
 	noAccess: false,
 };
 
+const elementThreeLibraryElement: UmbMockElementModel = {
+	ancestors: [],
+	id: 'library-element-three-id',
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: null,
+	documentType: {
+		id: 'b818bb55-31e1-4537-9c42-17471a176089',
+		icon: 'icon-attachment color-deep-purple',
+	},
+	hasChildren: false,
+	isTrashed: false,
+	isFolder: false,
+	name: 'Element Three (Library)',
+	variants: [
+		{
+			state: UmbElementVariantState.PUBLISHED,
+			culture: null,
+			name: 'Element Three (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: '2024-01-15T10:00:00.000Z',
+			id: 'library-element-three',
+			flags: [],
+		},
+	],
+	values: [
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: null,
+			segment: null,
+			value: 'Reusable Element Three',
+		},
+	],
+	flags: [],
+	noAccess: false,
+};
+
+const elementFourLibraryElement: UmbMockElementModel = {
+	ancestors: [],
+	id: 'library-element-four-id',
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: null,
+	documentType: {
+		id: 'b818bb55-31e1-4537-9c42-17471a176089',
+		icon: 'icon-attachment color-deep-purple',
+	},
+	hasChildren: false,
+	isTrashed: false,
+	isFolder: false,
+	name: 'Element Four (Library)',
+	variants: [
+		{
+			state: UmbElementVariantState.PUBLISHED,
+			culture: null,
+			name: 'Element Four (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: '2024-01-15T10:00:00.000Z',
+			id: 'library-element-four',
+			flags: [],
+		},
+	],
+	values: [
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: null,
+			segment: null,
+			value: 'Reusable Element Four',
+		},
+	],
+	flags: [],
+	noAccess: false,
+};
+
 const variantLibraryElement: UmbMockElementModel = {
 	ancestors: [],
 	id: 'library-variant-element-id',
@@ -351,6 +427,8 @@ const emptyVariantsLibraryElement: UmbMockElementModel = {
 export const data: Array<UmbMockElementModel> = [
 	elementOneLibraryElement,
 	elementTwoLibraryElement,
+	elementThreeLibraryElement,
+	elementFourLibraryElement,
 	variantLibraryElement,
 	draftLibraryElement,
 	pendingChangesLibraryElement,
