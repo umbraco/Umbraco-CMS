@@ -4,6 +4,8 @@ using Namotion.Reflection;
 using NJsonSchema;
 using NJsonSchema.Generation;
 
+namespace Umbraco.JsonSchema;
+
 /// <inheritdoc />
 internal sealed class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
 {
@@ -23,13 +25,14 @@ internal sealed class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
                 IgnoreReadOnlyProperties = true,
             },
         })
-    { }
+    {
+    }
 
     /// <inheritdoc />
     private sealed class UmbracoSystemTextJsonReflectionService : SystemTextJsonReflectionService
     {
         /// <inheritdoc />
-        public override void GenerateProperties(JsonSchema schema, ContextualType contextualType, SystemTextJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
+        public override void GenerateProperties(NJsonSchema.JsonSchema schema, ContextualType contextualType, SystemTextJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
             // Populate schema properties
             base.GenerateProperties(schema, contextualType, settings, schemaGenerator, schemaResolver);
@@ -47,6 +50,28 @@ internal sealed class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
                     }
                 }
             }
+
+            // TimeSpan values are bound using TimeSpan.Parse, which doesn't accept the ISO 8601
+            // durations asserted by the format the base class infers, so remove it
+            // (https://github.com/umbraco/Umbraco-CMS/issues/23482).
+            foreach (ContextualPropertyInfo property in contextualType.Properties)
+            {
+                if (IsTimeSpan(property) is false)
+                {
+                    continue;
+                }
+
+                string propertyName = GetPropertyName(property, settings);
+
+                if (schema.Properties.TryGetValue(propertyName, out JsonSchemaProperty? propertySchema))
+                {
+                    propertySchema.Format = null;
+                }
+            }
         }
+
+        private static bool IsTimeSpan(ContextualPropertyInfo property) =>
+            property.PropertyInfo.PropertyType == typeof(TimeSpan) ||
+            property.PropertyInfo.PropertyType == typeof(TimeSpan?);
     }
 }
