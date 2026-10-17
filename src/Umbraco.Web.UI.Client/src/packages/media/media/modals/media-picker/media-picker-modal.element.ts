@@ -24,6 +24,7 @@ import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
@@ -525,8 +526,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('defaultdialogs_chooseMedia')}>
-				${this.#renderBody()} ${this.#renderBreadcrumb()}
+			<umb-body-layout header-fit-height>
+				${this.#renderHeader()} ${this.#renderBody()} ${this.#renderBreadcrumb()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -539,8 +540,19 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		`;
 	}
 
+	#renderHeader() {
+		return html`
+			<div id="picker-header" slot="header">
+				<h3 id="headline" title=${this.localize.term('defaultdialogs_chooseMedia')}>
+					${this.localize.term('defaultdialogs_chooseMedia')}
+				</h3>
+				${this.#renderToolbar()}
+			</div>
+		`;
+	}
+
 	#renderBody() {
-		return html` ${this.#renderToolbar()}
+		return html`
 			${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()}
 
 			<umb-dropzone-media
@@ -768,15 +780,37 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	static override styles = [
+		UmbTextStyles,
 		css`
+			#picker-header {
+				display: flex;
+				flex-direction: column;
+				align-self: stretch;
+				width: 100%;
+				min-width: 0;
+				box-sizing: border-box;
+			}
+
+			#headline {
+				display: flex;
+				align-items: center;
+				min-height: var(--umb-header-layout-height);
+				margin: 0;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
 			#toolbar {
 				display: flex;
+				flex-wrap: nowrap;
 				gap: var(--uui-size-6);
 				align-items: flex-start;
 				margin-bottom: var(--uui-size-3);
 			}
 			#search {
 				flex: 1;
+				min-width: 0;
 			}
 
 			#search uui-input {
