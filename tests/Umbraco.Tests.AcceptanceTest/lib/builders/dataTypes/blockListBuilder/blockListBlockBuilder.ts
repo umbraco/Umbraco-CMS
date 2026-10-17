@@ -1,7 +1,7 @@
 import {BlockListDataTypeBuilder} from '../blockListDataTypeBuilder';
 
-export class BlockListBlockBuilder {
-  parentBuilder: BlockListDataTypeBuilder;
+export class BlockListBlockBuilder<TParent = BlockListDataTypeBuilder> {
+  parentBuilder: TParent;
   contentElementTypeKey: string;
   label: string;
   editorSize: string;
@@ -12,7 +12,7 @@ export class BlockListBlockBuilder {
   forceHideContentEditorInOverlay: boolean;
   thumbnail: string;
 
-  constructor(parentBuilder: BlockListDataTypeBuilder) {
+  constructor(parentBuilder: TParent) {
     this.parentBuilder = parentBuilder;
     this.stylesheet = [];
   }
@@ -62,7 +62,7 @@ export class BlockListBlockBuilder {
     return this;
   }
 
-  done() {
+  done(): TParent {
     return this.parentBuilder;
   }
 

@@ -340,7 +340,8 @@
   public static readonly statusCodes = {
     ok: 200,
     created: 201,
-    forbidden: 403
+    forbidden: 403,
+    notFound: 404
   }
 
   public static readonly httpMethods = {
