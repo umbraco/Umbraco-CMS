@@ -443,6 +443,9 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		if (!this.#elementWorkspaceContext) throw new Error('Element workspace context is missing');
 
 		const allOptions = await firstValueFrom(this.#elementWorkspaceContext.variantOptions);
+		if (!allOptions) {
+			throw new Error('Failed to retrieve variant options');
+		}
 		const options = allOptions.filter((option) => option.segment === null);
 
 		let selected = this.#getPublishVariantsSelection();

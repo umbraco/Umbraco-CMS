@@ -3,6 +3,7 @@ import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { manifests as actionManifests } from './actions/manifests.js';
 import { UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION } from '@umbraco-cms/backoffice/content';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ELEMENT_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/element';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -14,6 +15,18 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 		},
+	},
+	{
+		type: 'workspaceContext',
+		name: 'Test Engage Segment Provider Workspace Context',
+		alias: 'Umb.WorkspaceContext.Document.EngageSegmentProviderTest',
+		api: () => import('./context/temp-engage-segment-provider-context-test.js'),
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				oneOf: [UMB_DOCUMENT_WORKSPACE_ALIAS, UMB_ELEMENT_WORKSPACE_ALIAS],
+			},
+		],
 	},
 	{
 		type: 'workspaceView',

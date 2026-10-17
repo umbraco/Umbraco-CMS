@@ -21,6 +21,8 @@ export abstract class UmbBaseExtensionInitializer<
 > extends UmbControllerBase {
 	//
 	#promiseResolvers: Array<() => void> = [];
+	#settledResolvers: Array<() => void> = [];
+	#isSettled = false;
 	#manifestObserver!: UmbObserverController<ManifestType | undefined>;
 	#extensionRegistry: UmbExtensionRegistry<ManifestCondition>;
 	#alias: string;
@@ -87,6 +89,7 @@ export abstract class UmbBaseExtensionInitializer<
 					this.#clearPermittedState();
 					this.#overwrites = [];
 					this.#cleanConditions();
+					this.#settle();
 				}
 			},
 			observeExtensionsCtrlAlias,
@@ -101,6 +104,27 @@ export abstract class UmbBaseExtensionInitializer<
 				this.#promiseResolvers.push(resolve);
 			}
 		});
+	}
+
+	/**
+	 * Resolves once this extension has had its first permission answer: either permitted, or its conditions
+	 * have all been created and evaluated as not permitting it. Later changes to the permission do not affect it.
+	 * @returns {Promise<void>} A promise that resolves when the first answer is known.
+	 */
+	asSettledPromise(): Promise<void> {
+		return new Promise((resolve) => {
+			if (this.#isSettled) {
+				resolve();
+			} else {
+				this.#settledResolvers.push(resolve);
+			}
+		});
+	}
+
+	#settle() {
+		this.#isSettled = true;
+		this.#settledResolvers.forEach((x) => x());
+		this.#settledResolvers = [];
 	}
 
 	#cleanConditions() {
@@ -238,19 +262,29 @@ export abstract class UmbBaseExtensionInitializer<
 		return undefined;
 	}
 
-	#checkConditionsAreGood() {
+	#hasAllConditionControllers() {
 		// Not good if we don't have a manifest.
 		if (this.#manifest === undefined) return false;
 		// Only good if conditions of manifest is equal to the amount of condition controllers (one for each condition). [NL]
 		const hasAllConditions = (this.#manifest.conditions ?? []).length === this.#conditionControllers.length;
 		if (hasAllConditions === false) return false;
 		// Compare all manifest conditions with the condition controllers configs to be sure we have the right ones, as we might end up in a state where we have the same amount of controllers as conditions, but they are not the right ones. [NL]
-		const allConditionsHaveControllers = (this.#manifest.conditions ?? []).every((condition) =>
+		return (this.#manifest.conditions ?? []).every((condition) =>
 			this.#conditionControllers.some((controller) => controller.config === condition),
 		);
-		if (allConditionsHaveControllers === false) return false;
+	}
+
+	#hasAllConditionsAnswered() {
+		return (
+			this.#hasAllConditionControllers() &&
+			this.#conditionControllers.every((controller) => controller.permitted !== undefined)
+		);
+	}
+
+	#checkConditionsAreGood() {
+		if (this.#hasAllConditionControllers() === false) return false;
 		// Only good if all the conditions are permitted:
-		return this.#conditionControllers.some((condition) => condition.permitted === false) === false;
+		return this.#conditionControllers.every((condition) => condition.permitted === true);
 	}
 
 	// The currently-pending `_conditionsAreGood()` promise and manifest, to detect if we can reuse it.
@@ -274,6 +308,10 @@ export abstract class UmbBaseExtensionInitializer<
 
 		if (this._isConditionsPositive === isPositive) {
 			// No change in the conditions, so we don't need to do anything, this is an optimization to prevent multiple calls to the callback when there is no change. [NL]
+			// A positive answer is settled by the pass that is making the extension permitted.
+			if (isPositive === false && this.#isPermitted !== undefined && this.#hasAllConditionsAnswered()) {
+				this.#settle();
+			}
 			return;
 		}
 		// We will collect old value here, but we need to re-collect it after a async method have been called, as it could have changed in the mean time. [NL]
@@ -336,6 +374,10 @@ export abstract class UmbBaseExtensionInitializer<
 			}
 			this.#onPermissionChanged?.(this.#isPermitted, this as any);
 		}
+		// Before all conditions have answered, a not-permitted state is only the starting point and not an answer.
+		if (this.#isPermitted !== undefined && this.#hasAllConditionsAnswered()) {
+			this.#settle();
+		}
 	};
 
 	protected abstract _conditionsAreGood(signal: AbortSignal): Promise<boolean>;
@@ -378,6 +420,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (!this.#extensionRegistry) return;
 		this.#manifest = undefined;
 		this.#promiseResolvers = [];
+		this.#settle();
 		// Abort any pending good-call so its subclass run refuses to commit (sees
 		// `signal.aborted`) instead of trying to assign into a destroyed initializer. [NL]
 		this.#abortPendingGoodCall();

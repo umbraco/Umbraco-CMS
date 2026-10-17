@@ -618,6 +618,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
 		const allOptions = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+		if (!allOptions) {
+			throw new Error('Failed to retrieve variant options');
+		}
 		const options = allOptions.filter((option) => option.segment === null);
 
 		// TODO: this is a temporary copy of the content-detail workspace context method.
