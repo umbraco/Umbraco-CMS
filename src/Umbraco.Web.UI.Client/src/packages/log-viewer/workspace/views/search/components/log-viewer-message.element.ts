@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { UUICopyTextEvent } from '@umbraco-cms/backoffice/external/uui';
 
 //TODO: check how to display EventId field in the message properties
 @customElement('umb-log-viewer-message')
@@ -126,6 +127,10 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		return queryString;
 	}
 
+	#onCopying(event: UUICopyTextEvent) {
+		event.text = this.#getCopyText();
+	}
+
 	#getCopyText() {
 		const lines = [
 			`Timestamp: ${this.date?.toISOString() ?? this.timestamp}`,
@@ -220,7 +225,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 					id="copy-button"
 					look="secondary"
 					label=${this.localize.term('general_copy')}
-					.text=${this.#getCopyText()}>
+					@copying=${this.#onCopying}>
 					<umb-localize key="general_copy">Copy</umb-localize>
 				</uui-button-copy-text>
 			</details>
