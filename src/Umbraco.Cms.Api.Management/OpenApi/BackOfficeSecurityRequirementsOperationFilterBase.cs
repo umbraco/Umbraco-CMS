@@ -16,13 +16,14 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
 
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (context.MethodInfo.HasMapToApiAttribute(ApiName) == false)
+        if (context.ApiDescription.ActionDescriptor.HasMapToApiAttribute(ApiName) == false)
         {
             return;
         }
 
-        if (!context.MethodInfo.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) &&
-            !(context.MethodInfo.DeclaringType?.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) ?? false))
+        IList<object> endpointMetadata = context.ApiDescription.ActionDescriptor.EndpointMetadata;
+
+        if (endpointMetadata.Any(x => x is AllowAnonymousAttribute) is false)
         {
             operation.Responses ??= new OpenApiResponses();
             operation.Responses.Add(
@@ -37,11 +38,9 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
             operation.Security.Add(new OpenApiSecurityRequirement { [schemaRef] = [] });
         }
 
-        // Assuming if and endpoint have more then one AuthorizeAttribute, there is a risk the user do not have access while still being authorized.
-        // The two is the simple two on ManagementApiControllerBase that just requires access to backoffice and feature flags
-        var numberOfAuthorizeAttributes =
-            context.MethodInfo.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute)
-            + context.MethodInfo.DeclaringType?.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute);
+        // If an endpoint has more AuthorizeAttributes than the two on ManagementApiControllerBase (backoffice access and feature flags),
+        // the user may be authenticated without having access.
+        var numberOfAuthorizeAttributes = endpointMetadata.Count(x => x is AuthorizeAttribute);
 
 
         var hasConstructorInjectingIAuthorizationService = context.MethodInfo.DeclaringType?.GetConstructors()
