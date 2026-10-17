@@ -4,10 +4,10 @@ import { AsyncDirective, directive, nothing, type ElementPart } from '@umbraco-c
  * test if a element has focus
  * this also returns true if the focused element is a child of the target.
  * @param {Element | null} current - The element to check, starting point of the recursive search
- * @param {HTMLElement} target - The element to test for focus
+ * @param {Element} target - The element to test for focus
  * @returns {boolean} bool
  */
-function hasFocus(current: any, target: HTMLElement): boolean {
+function hasFocus(current: any, target: Element): boolean {
 	if (current === target) {
 		return true;
 	}
@@ -27,6 +27,12 @@ class UmbFocusDirective extends AsyncDirective {
 	static #next?: HTMLElement;
 	#el?: HTMLElement;
 	#timeout?: number;
+	/**
+	 * Where the focus was when we last attempted to focus our element.
+	 * If it moved somewhere else in the meantime, the user (or another
+	 * command) took it, and we must not steal it back.
+	 */
+	#focusBeforeAttempt: Element | null = null;
 
 	override render() {
 		return nothing;
@@ -35,6 +41,7 @@ class UmbFocusDirective extends AsyncDirective {
 	override update(part: ElementPart) {
 		if (this.#el !== part.element) {
 			UmbFocusDirective.#next = this.#el = part.element as HTMLElement;
+			this.#focusBeforeAttempt = document.activeElement;
 			this.#setFocus();
 		}
 		return nothing;
@@ -57,6 +64,20 @@ class UmbFocusDirective extends AsyncDirective {
 		}
 		// If this is the next element to focus, then try to focus it.
 		if (this.#el && this.#el === UmbFocusDirective.#next) {
+			// The async focus may have landed between attempts — we're done.
+			if (hasFocus(document.activeElement, this.#el)) {
+				UmbFocusDirective.#next = undefined;
+				return;
+			}
+			// The element's focus() can be asynchronous (e.g. uui-input awaits its
+			// updateComplete), so the first attempt may have to be retried. If focus
+			// moved since our last attempt, someone else claimed it — stop retrying
+			// instead of pulling focus back from the user (see #24186).
+			if (this.#focusBeforeAttempt !== null && !hasFocus(document.activeElement, this.#focusBeforeAttempt)) {
+				UmbFocusDirective.#next = undefined;
+				return;
+			}
+			this.#focusBeforeAttempt = document.activeElement;
 			this.#el.focus();
 			if (hasFocus(document.activeElement, this.#el) === false) {
 				this.#timeout = setTimeout(this.#setFocus, 100) as unknown as number;
@@ -71,6 +92,7 @@ class UmbFocusDirective extends AsyncDirective {
 			UmbFocusDirective.#next = undefined;
 		}
 		this.#el = undefined;
+		this.#focusBeforeAttempt = null;
 	}
 
 	//override reconnected() {}
