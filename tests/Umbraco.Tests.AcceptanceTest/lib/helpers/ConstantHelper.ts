@@ -45,6 +45,7 @@
     invalidEmail: 'Invalid email',
     emptyManualLinkPicker: 'Please enter an URL or Anchor.',
     needMoreItems: 'This field needs more items',
+    maximumTwoEntriesOneTooMany: 'Maximum 2 entries, you have entered 1 too many.',
     minimumTwoEntriesRequiresOneMore: 'Minimum 2 entries, requires 1 more.',
   }
 
@@ -311,6 +312,7 @@
     dictionary: '/umbraco/management/api/v1/dictionary',
     dictionaryImport: '/umbraco/management/api/v1/dictionary/import',
     language: '/umbraco/management/api/v1/language',
+    logViewerLog: '/umbraco/management/api/v1/log-viewer/log',
     logViewerSavedSearch: '/umbraco/management/api/v1/log-viewer/saved-search',
     media: '/umbraco/management/api/v1/media',
     mediaType: '/umbraco/management/api/v1/media-type',
@@ -333,6 +335,7 @@
     recycleBinMedia: '/umbraco/management/api/v1/recycle-bin/media',
     recycleBinElement: '/umbraco/management/api/v1/recycle-bin/element',
     domains: '/domains',
+    moveToRecycleBin: '/move-to-recycle-bin',
     notifications: '/notifications',
     currentUser: '/umbraco/management/api/v1/user/current',
     revoke: '/umbraco/management/api/v1/security/back-office/revoke',

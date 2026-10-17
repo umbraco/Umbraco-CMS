@@ -68,26 +68,23 @@ test('can create a saved search', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
 });
 
-// TODO: unskip, currently flaky
-test.skip('can create a complex saved search', async ({umbracoApi, umbracoUi}) => {
+test('can create a complex saved search', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const searchName = 'ComplexTest';
   const search = "@Level='Fatal' or @Level='Error' or @Level='Warning'";
+  const allowedLevels = ['Fatal', 'Error', 'Warning'];
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
-  const logInformation = await umbracoApi.logViewer.getLevelCount();
-  const expectedLogCountFatal = logInformation.fatal;
-  const expectedLogCountError = logInformation.error;
-  const expectedLogCountWarning = logInformation.warning;
 
   // Act
   await umbracoUi.logViewer.clickSearchButton();
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
   await umbracoUi.logViewer.enterSearchKeyword(search);
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
-  // Checks if the complex search works before saving it.
-  await umbracoUi.logViewer.doesLogLevelCountMatch('Fatal', expectedLogCountFatal);
-  await umbracoUi.logViewer.doesLogLevelCountMatch('Error', expectedLogCountError);
-  await umbracoUi.logViewer.doesLogLevelCountMatch('Warning', expectedLogCountWarning);
+  // The viewer pages at 100 rows and a long-running instance can have far more than 100 matches, so the
+  // filter is verified by level membership rather than an exact count against an unbounded log total.
+  const renderedLevels = await umbracoUi.logViewer.getRenderedLogLevels();
+  expect(renderedLevels.length).toBeGreaterThan(0);
+  expect(renderedLevels.every(level => allowedLevels.includes(level.trim()))).toBeTruthy();
   await umbracoUi.logViewer.saveSearch(searchName);
 
   // Assert
@@ -136,48 +133,34 @@ test('can expand a log entry', async ({umbracoUi}) => {
   await umbracoUi.logViewer.doesDetailedLogHaveText('The token');
 });
 
-// Currently only works if the user is using the locale 'en-US' otherwise it will fail
-test.skip('can sort logs by timestamp', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const locale = 'en-US';
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true,
-  };
-
+test('can sort logs by timestamp', async ({umbracoUi}) => {
   //Act
   await umbracoUi.logViewer.clickSearchButton();
   // Sorts logs by timestamp
-  await umbracoUi.logViewer.clickSortLogByTimestampButton();
-  // Gets the last log from the log viewer
-  const lastLog = await umbracoApi.logViewer.getLog(0, 1, 'Descending');
-  const dateToFormat = new Date(lastLog.items[0].timestamp);
-  const lastLogTimestamp = new Intl.DateTimeFormat(locale, options).format(dateToFormat);
+  await umbracoUi.logViewer.clickSortLogByTimestampButton('Ascending');
 
   // Assert
-  await umbracoUi.logViewer.doesFirstLogHaveTimestamp(lastLogTimestamp);
+  await expect.poll(async () => {
+    const timestamps = (await umbracoUi.logViewer.getLogTimestamps()).map((timestamp) => new Date(timestamp).getTime());
+    return timestamps.every((timestamp, index) => index === 0 || timestamps[index - 1] <= timestamp);
+  }).toBe(true);
 });
 
-// Will fail if there is not enough logs.
-test.skip('can use pagination', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const secondPageLogs = await umbracoApi.logViewer.getLog(100, 100, 'Ascending');
-  const firstLogOnSecondPage = secondPageLogs.items[0].renderedMessage;
-
+test('can use pagination', async ({umbracoUi, page}) => {
   // Act
   await umbracoUi.logViewer.clickSearchButton();
+  const newestOnFirstPage = Math.max(...(await umbracoUi.logViewer.getLogTimestamps()).map((timestamp) => new Date(timestamp).getTime()));
   await umbracoUi.logViewer.clickPageNumber(2);
 
   // Assert
-  await umbracoUi.logViewer.doesFirstLogHaveMessage(firstLogOnSecondPage);
-  // TODO: Remove the comment below when the issue is resolved.
-  // At the time this test was created, the UI only highlights page 1. Uncomment the line below when the issue is resolved.
-  // await expect(page.getByLabel('Pagination navigation. Current page: 2.', {exact: true})).toBeVisible();
+  // Logs are newest-first and the instance keeps writing entries, which can shift page 1's tail onto page 2,
+  // so the only stable rule is that page 2 holds nothing as new as page 1's newest entry.
+  // Poll because the rows re-render in place and can still show page 1 before the page-2 fetch resolves.
+  await expect.poll(async () => {
+    const timestamps = (await umbracoUi.logViewer.getLogTimestamps()).map((timestamp) => new Date(timestamp).getTime());
+    return Math.max(...timestamps) < newestOnFirstPage;
+  }).toBe(true);
+  await expect(page.getByLabel('Pagination navigation. Current page: 2.', {exact: true})).toBeVisible();
 });
 
 test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
