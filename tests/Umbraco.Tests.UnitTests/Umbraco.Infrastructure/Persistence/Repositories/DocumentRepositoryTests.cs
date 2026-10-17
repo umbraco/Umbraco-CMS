@@ -167,6 +167,50 @@ internal sealed class DocumentRepositoryTests
         mock.Verify(x => x.CleanStringForUrlSegment(It.IsAny<string>(), "da-DK"), Times.AtLeastOnce);
     }
 
+    [Test]
+    public void EnsureUniqueUrlSegment_Returns_Name_Unchanged_When_No_Suffix_Produces_A_Distinct_Segment()
+    {
+        IShortStringHelper shortStringHelper = CreateTruncatingShortStringHelper(20);
+
+        // Both names produce the segment "a-long-title-that-di", and so does every "(N)" suffixed candidate.
+        SimilarNodeName[] siblings =
+        {
+            new() { Id = 1, Name = "A long title that differs at the end 1" },
+        };
+
+        var result = DocumentRepository.EnsureUniqueUrlSegment("A long title that differs at the end 2", 0, siblings, shortStringHelper);
+
+        Assert.AreEqual("A long title that differs at the end 2", result);
+    }
+
+    [Test]
+    public void EnsureUniqueUrlSegment_Appends_Suffix_When_It_Survives_Segment_Truncation()
+    {
+        IShortStringHelper shortStringHelper = CreateTruncatingShortStringHelper(20);
+
+        SimilarNodeName[] siblings =
+        {
+            new() { Id = 1, Name = "Title" },
+            new() { Id = 2, Name = "Title 1" },
+        };
+
+        var result = DocumentRepository.EnsureUniqueUrlSegment("Title.", 0, siblings, shortStringHelper);
+
+        Assert.AreEqual("Title. (2)", result);
+    }
+
+    private static IShortStringHelper CreateTruncatingShortStringHelper(int maxLength)
+    {
+        var mock = new Mock<IShortStringHelper>();
+        mock.Setup(x => x.CleanStringForUrlSegment(It.IsAny<string>(), It.IsAny<string?>()))
+            .Returns((string text, string? _) =>
+            {
+                var segment = CleanSegment(text);
+                return segment.Length <= maxLength ? segment : segment[..maxLength];
+            });
+        return mock.Object;
+    }
+
     /// <summary>
     /// Simplified URL segment cleaner that mimics DefaultShortStringHelper behavior:
     /// lowercase, keep letters/digits/underscores, replace spaces with hyphens, strip the rest.
