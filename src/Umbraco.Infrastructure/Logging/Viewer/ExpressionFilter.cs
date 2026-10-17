@@ -69,6 +69,7 @@ internal sealed class ExpressionFilter : ILogFilter
 
     private static Func<LogEvent, bool>? PerformMessageLikeFilter(string filterExpression, SerilogLegacyNameResolver serilogLegacyNameResolver)
     {
+        // The trailing `ci` modifier makes the like match case-insensitive, so plain-text searches ignore capitalisation.
         var filterSearch = $"@Message like '%{SerilogExpression.EscapeLikeExpressionContent(filterExpression)}%' ci";
         if (SerilogExpression.TryCompile(filterSearch, null, serilogLegacyNameResolver, out CompiledExpression? compiled, out var error))
         {
