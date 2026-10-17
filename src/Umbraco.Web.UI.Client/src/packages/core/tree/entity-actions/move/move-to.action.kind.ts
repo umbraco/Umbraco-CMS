@@ -11,6 +11,7 @@ export const manifest: UmbExtensionManifestKind = {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
 		kind: 'moveTo',
+		separatorBefore: true,
 		api: UmbMoveToEntityAction,
 		weight: 700,
 		forEntityTypes: [],

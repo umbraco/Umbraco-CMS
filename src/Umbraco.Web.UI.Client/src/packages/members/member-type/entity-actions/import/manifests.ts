@@ -7,6 +7,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.MemberType.Import',
+		weight: 999,
+		separatorBefore: true,
 		name: 'Export Member Type Entity Action',
 		forEntityTypes: [UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE],
 		api: () => import('./member-type-import.action.js'),
