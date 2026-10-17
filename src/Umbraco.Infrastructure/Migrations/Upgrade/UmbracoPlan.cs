@@ -116,6 +116,9 @@ public partial class UmbracoPlan : MigrationPlan
         // Re-run of the 17.6 index migration: it sits earlier in the chain than the final 18.0 state,
         // so sites already on 18.0.x skipped it. Idempotent, so other upgrade paths are unaffected.
         To<V_18_1_0.AddContentTypeIdIndexForContent>("{AE533AF6-4611-4E25-AA4D-89AEFA468E79}");
+
+        // To 18.4.0
+        To<V_18_4_0.AddStartElementIdForeignKeyToUserGroup>("{367FFFC4-D0E5-4A6B-98E5-2BAE76743C87}");
     }
 
     /// <summary>
