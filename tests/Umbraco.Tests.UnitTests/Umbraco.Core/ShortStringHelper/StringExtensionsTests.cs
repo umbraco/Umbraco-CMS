@@ -435,6 +435,12 @@ public class StringExtensionsTests
     [TestCase("-1,1234,", "-1,1234")]
     [TestCase("-1,,1234", "-1,1234")]
     [TestCase(",", "")]
+    [TestCase("1234", "1234")]
+    [TestCase(",1234", "1234")]
+    [TestCase(" ", "")]
+    [TestCase(" 1 , 2 ", "1,2")]
+    [TestCase("2147483648,1", "1")]
+    [TestCase("x,y", "")]
     public void GetIdsFromPath_ReturnsExpectedResult(string input, string expected)
     {
         var ids = input.GetIdsFromPath();
@@ -449,6 +455,12 @@ public class StringExtensionsTests
     [TestCase("-1,1234,", "1234,-1")]
     [TestCase("-1,,1234", "1234,-1")]
     [TestCase(",", "")]
+    [TestCase("1234", "1234")]
+    [TestCase(",1234", "1234")]
+    [TestCase(" ", "")]
+    [TestCase(" 1 , 2 ", "2,1")]
+    [TestCase("2147483648,1", "1")]
+    [TestCase("x,y", "")]
     public void GetIdsFromPathReversed_ReturnsExpectedResult(string input, string expected)
     {
         var ids = input.GetIdsFromPathReversed();
