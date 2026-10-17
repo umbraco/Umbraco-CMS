@@ -213,7 +213,7 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
     /// </summary>
     /// <param name="propertyType">The published property type.</param>
     /// <returns>The property cache level.</returns>
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.None;
 
     /// <summary>
     /// Determines the <see cref="PropertyCacheLevel"/> to use when expanding the property for the Delivery API.
