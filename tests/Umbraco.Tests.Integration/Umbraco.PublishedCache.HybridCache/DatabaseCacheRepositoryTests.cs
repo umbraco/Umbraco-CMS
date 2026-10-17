@@ -38,6 +38,9 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     public static void ConfigureSmallDeleteBatchSize(IUmbracoBuilder builder) =>
         builder.Services.PostConfigure<NuCacheSettings>(options => options.ContentTypeRebuildDeleteBatchSize = 2);
 
+    public static void ConfigureJsonSerializer(IUmbracoBuilder builder) =>
+        builder.Services.PostConfigure<NuCacheSettings>(options => options.NuCacheSerializerType = NuCacheSerializerType.JSON);
+
     private IDatabaseCacheRepository DatabaseCacheRepository => GetRequiredService<IDatabaseCacheRepository>();
 
     private IDocumentCacheService DocumentCacheService => GetRequiredService<IDocumentCacheService>();
@@ -176,6 +179,16 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    public void Rebuild_Keeps_A_Row_Written_While_It_Runs()
+        => AssertRebuildKeepsARowWrittenWhileItRuns();
+
+    // The JSON serializer stores no binary data, so the rebuilt rows leave the binary column empty.
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureJsonSerializer))]
+    public void Rebuild_Keeps_A_Row_Written_While_It_Runs_With_The_Json_Serializer()
+        => AssertRebuildKeepsARowWrittenWhileItRuns();
+
+    [Test]
     public void GetContentByContentTypeKey_With_Keys_Returns_Matching_Nodes()
     {
         // Exercises the batched ForNodes helpers (GetContentMetadataForNodes,
@@ -192,4 +205,52 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         Assert.That(returnedKeys, Does.Contain(Subpage2.Key));
         Assert.That(returnedKeys, Does.Contain(Subpage3.Key));
     }
+
+    private void AssertRebuildKeepsARowWrittenWhileItRuns()
+    {
+        DocumentCacheService.Rebuild([ContentType.Id]);
+
+        const string foregroundMarker = "FOREGROUND";
+        var contentTypeNodeIds = new[] { Textpage.Id, Subpage.Id, Subpage2.Id, Subpage3.Id };
+        var written = false;
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            IUmbracoDatabase database = ScopeAccessor.AmbientScope!.Database;
+            DatabaseCacheRepository.Rebuild([ContentType.Id], null, null, step =>
+            {
+                // A save between the rebuild's delete and its inserts writes a row the rebuild then conflicts with.
+                if (written is false && CountCacheRows(database, Textpage.Id) == 0)
+                {
+                    database.Insert(new ContentNuDto { NodeId = Textpage.Id, Published = false, Data = foregroundMarker, Rv = 1 });
+                    written = true;
+                }
+
+                step();
+            });
+            scope.Complete();
+        }
+
+        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        {
+            List<ContentNuDto> dtos = ScopeAccessor.AmbientScope!.Database.Fetch<ContentNuDto>(
+                SqlContext.Sql()
+                    .Select<ContentNuDto>()
+                    .From<ContentNuDto>()
+                    .WhereIn<ContentNuDto>(x => x.NodeId, contentTypeNodeIds));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(written, Is.True, "The rebuild never ran a step after deleting the rows.");
+                Assert.That(dtos.Select(x => x.NodeId).Distinct(), Is.EquivalentTo(contentTypeNodeIds));
+                Assert.That(dtos.Single(x => x.NodeId == Textpage.Id && x.Published is false).Data, Is.EqualTo(foregroundMarker));
+            });
+        }
+    }
+
+    private int CountCacheRows(IUmbracoDatabase database, int nodeId)
+        => database.ExecuteScalar<int>(
+            SqlContext.Sql()
+                .SelectCount()
+                .From<ContentNuDto>()
+                .Where<ContentNuDto>(x => x.NodeId == nodeId));
 }
