@@ -47,29 +47,54 @@ public sealed class RedirectTrackingHandler :
     /// This ensures that requests to previous URLs are redirected to the new locations.
     /// </summary>
     /// <param name="notification">The notification containing details about the moved content items.</param>
-    public void Handle(ContentMovedNotification notification) => CreateRedirectsForOldRoutes(notification);
+    public void Handle(ContentMovedNotification notification) => Handle(notification.Yield());
+
+    /// <summary>
+    /// Handles a batch of <see cref="ContentMovedNotification"/> by creating redirect entries for the old URLs of the moved content.
+    /// </summary>
+    /// <param name="notifications">The notifications containing details about the moved content items.</param>
+    public void Handle(IEnumerable<ContentMovedNotification> notifications) => CreateRedirectsForOldRoutes(notifications);
 
     /// <summary>
     /// Handles the content moved notification by creating redirects for old routes when content is moved.
     /// </summary>
     /// <param name="notification">The notification containing information about the moved content.</param>
-    public void Handle(ContentMovingNotification notification) =>
-        StoreOldRoutes(notification.MoveInfoCollection.Select(m => m.Entity), notification, isMove: true);
+    public void Handle(ContentMovingNotification notification) => Handle(notification.Yield());
+
+    /// <summary>
+    /// Handles a batch of <see cref="ContentMovingNotification"/> by storing the old routes of the content being moved.
+    /// </summary>
+    /// <param name="notifications">The notifications containing information about the content being moved.</param>
+    public void Handle(IEnumerable<ContentMovingNotification> notifications) =>
+        StoreOldRoutes(notifications, notification => notification.MoveInfoCollection.Select(m => m.Entity), isMove: true);
 
     /// <summary>
     /// Handles a <see cref="ContentPublishedNotification"/> to track and manage redirects when content is published.
     /// </summary>
     /// <param name="notification">The notification containing information about the published content.</param>
-    public void Handle(ContentPublishedNotification notification) => CreateRedirectsForOldRoutes(notification);
+    public void Handle(ContentPublishedNotification notification) => Handle(notification.Yield());
+
+    /// <summary>
+    /// Handles a batch of <see cref="ContentPublishedNotification"/> by creating redirect entries for the old URLs of the published content.
+    /// </summary>
+    /// <param name="notifications">The notifications containing information about the published content.</param>
+    public void Handle(IEnumerable<ContentPublishedNotification> notifications) => CreateRedirectsForOldRoutes(notifications);
 
     /// <summary>
     /// Handles the content moved notification to create redirects for old routes when content is moved.
     /// </summary>
     /// <param name="notification">The content moved notification.</param>
-    public void Handle(ContentPublishingNotification notification) =>
-        StoreOldRoutes(notification.PublishedEntities, notification, isMove: false);
+    public void Handle(ContentPublishingNotification notification) => Handle(notification.Yield());
 
-    private void StoreOldRoutes(IEnumerable<IContent> entities, IStatefulNotification notification, bool isMove)
+    /// <summary>
+    /// Handles a batch of <see cref="ContentPublishingNotification"/> by storing the old routes of the content being published.
+    /// </summary>
+    /// <param name="notifications">The notifications containing information about the content being published.</param>
+    public void Handle(IEnumerable<ContentPublishingNotification> notifications) =>
+        StoreOldRoutes(notifications, notification => notification.PublishedEntities, isMove: false);
+
+    private void StoreOldRoutes<TNotification>(IEnumerable<TNotification> notifications, Func<TNotification, IEnumerable<IContent>> getEntities, bool isMove)
+        where TNotification : IStatefulNotification
     {
         // Don't let the notification handlers kick in if redirect tracking is turned off in the config.
         if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking)
@@ -77,14 +102,21 @@ public sealed class RedirectTrackingHandler :
             return;
         }
 
-        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes = GetOldRoutes(notification);
-        foreach (IContent entity in entities)
+        // Share the old routes within the batch, so content already captured by an ancestor's traversal is skipped.
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>? oldRoutes = null;
+        foreach (TNotification notification in notifications)
         {
-            _redirectTracker.StoreOldRoute(entity, oldRoutes, isMove);
+            oldRoutes ??= GetOldRoutes(notification) ?? [];
+            notification.State[NotificationStateKey] = oldRoutes;
+
+            foreach (IContent entity in getEntities(notification))
+            {
+                _redirectTracker.StoreOldRoute(entity, oldRoutes, isMove);
+            }
         }
     }
 
-    private void CreateRedirectsForOldRoutes(IStatefulNotification notification)
+    private void CreateRedirectsForOldRoutes(IEnumerable<IStatefulNotification> notifications)
     {
         // Don't let the notification handlers kick in if redirect tracking is turned off in the config.
         if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking)
@@ -92,17 +124,27 @@ public sealed class RedirectTrackingHandler :
             return;
         }
 
-        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes = GetOldRoutes(notification);
+        // Notifications can share the same old routes (when stored as a batch), so only create the redirects once.
+        IEnumerable<Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>> storedOldRoutes = notifications
+            .Select(GetOldRoutes)
+            .OfType<Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>>()
+            .Distinct();
+
+        var oldRoutes = new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>();
+        foreach (Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> notificationOldRoutes in storedOldRoutes)
+        {
+            foreach (KeyValuePair<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoute in notificationOldRoutes)
+            {
+                // Keep the first stored route, which is the one before any of the changes in this batch.
+                oldRoutes.TryAdd(oldRoute.Key, oldRoute.Value);
+            }
+        }
+
         _redirectTracker.CreateRedirects(oldRoutes);
     }
 
-    private Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> GetOldRoutes(IStatefulNotification notification)
-    {
-        if (notification.State.ContainsKey(NotificationStateKey) == false)
-        {
-            notification.State[NotificationStateKey] = new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>();
-        }
-
-        return (Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>?)notification.State[NotificationStateKey]!;
-    }
+    private static Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>? GetOldRoutes(IStatefulNotification notification)
+        => notification.State.TryGetValue(NotificationStateKey, out var value)
+            ? value as Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
+            : null;
 }
