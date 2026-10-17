@@ -26,8 +26,10 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
 
+type UmbMediaTypeOption = UmbAllowedMediaTypeModel & { matchedFileExtension?: boolean };
+
 interface UmbMediaTypeOptionsResult {
-	options: Array<UmbAllowedMediaTypeModel>;
+	options: Array<UmbMediaTypeOption>;
 	availableMediaTypes: Array<UmbAllowedMediaTypeModel>;
 }
 
@@ -67,10 +69,8 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		if (!uploadableItems.length) return [];
 
 		if (uploadableItems.length === 1) {
-			// When there is only one item being uploaded, allow the user to pick the media type, if more than one is allowed.
 			this.#createOneMediaItem(uploadableItems[0]);
 		} else {
-			// When there are multiple items being uploaded, automatically pick the media types for each item. We probably want to allow the user to pick the media type in the future.
 			this.#createMediaItems(uploadableItems);
 		}
 
@@ -78,6 +78,9 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 	}
 
 	async #createMediaItems(uploadableItems: Array<UmbUploadableItem>) {
+		// Items offering the same media type choices share one pick, so the user is asked once per kind of item.
+		const pickedMediaTypes = new Map<string, string | undefined>();
+
 		for (const item of uploadableItems) {
 			const { options, availableMediaTypes } = await this.#getMediaTypeOptions(item);
 			if (!options.length) {
@@ -86,13 +89,13 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 				continue;
 			}
 
-			// Prefer a specific extension match over a fallback
-			const specificMatch = options.find((x) => x.matchedFileExtension === true);
-			const { unique: mediaTypeUnique, name: mediaTypeName } = specificMatch ?? options[0];
-
+			const mediaTypeUnique = await this.#resolveMediaTypeUnique(options, pickedMediaTypes);
 			if (!mediaTypeUnique) {
-				throw new Error('Media type unique is not defined');
+				this._updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
+				continue;
 			}
+
+			const mediaTypeName = options.find((o) => o.unique === mediaTypeUnique)?.name ?? '';
 
 			// Handle files and folders differently: a file is uploaded as temp then created as a media item, and a folder is created as a media item directly.
 			// Awaiting ensures parent folders exist on the server before their children are processed.
@@ -196,16 +199,13 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		// For example, if both "File" (which allows any extension) and "Article" (which only allows .pdf) are allowed,
 		// a .pdf file would match both but be auto-assigned to "Article" because it is a specific match, while a .docx
 		// file would be assigned to "File" because it has no specific matches.
-		const options = allowedChildren.reduce<Array<UmbAllowedMediaTypeModel & { matchedFileExtension?: boolean }>>(
-			(acc, child) => {
-				const match = availableMediaTypes.find((y) => y.unique === child.unique);
-				if (match) {
-					acc.push({ ...child, matchedFileExtension: match.matchedFileExtension });
-				}
-				return acc;
-			},
-			[],
-		);
+		const options = allowedChildren.reduce<Array<UmbMediaTypeOption>>((acc, child) => {
+			const match = availableMediaTypes.find((y) => y.unique === child.unique);
+			if (match) {
+				acc.push({ ...child, matchedFileExtension: match.matchedFileExtension });
+			}
+			return acc;
+		}, []);
 		return { options, availableMediaTypes };
 	}
 
@@ -263,13 +263,35 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		return data!;
 	}
 
+	async #resolveMediaTypeUnique(
+		options: Array<UmbMediaTypeOption>,
+		pickedMediaTypes?: Map<string, string | undefined>,
+	): Promise<string | undefined> {
+		if (options.length === 1) return options[0].unique ?? undefined;
+
+		// Prefer specific extension matches over catch-all fallbacks, and only ask when several specific matches remain.
+		const specificMatches = options.filter((x) => x.matchedFileExtension === true);
+		if (specificMatches.length === 1) return specificMatches[0].unique ?? undefined;
+		if (specificMatches.length === 0) return options[0].unique ?? undefined;
+
+		const pickerKey = specificMatches
+			.map((x) => x.unique)
+			.sort()
+			.join('|');
+		if (pickedMediaTypes?.has(pickerKey)) return pickedMediaTypes.get(pickerKey);
+
+		const mediaTypeUnique = await this.#showDialogMediaTypePicker(specificMatches);
+		pickedMediaTypes?.set(pickerKey, mediaTypeUnique);
+		return mediaTypeUnique;
+	}
+
 	async #showDialogMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>) {
 		const value = await umbOpenModal(this, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } }).catch(
 			() => undefined,
 		);
 		if (!value) return undefined; // cancelled
 		// Auto-pick: mediaTypeUnique is undefined → use the server's preferred type (first in the list)
-		return value.mediaTypeUnique ?? options[0]?.unique;
+		return value.mediaTypeUnique ?? options[0]?.unique ?? undefined;
 	}
 
 	async #createOneMediaItem(item: UmbUploadableItem) {
@@ -285,23 +307,7 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 			return this._updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED, message);
 		}
 
-		let mediaTypeUnique: string | null | undefined;
-		if (options.length > 1) {
-			// When multiple options are available, prefer specific extension matches over fallbacks
-			const specificMatches = options.filter((x) => x.matchedFileExtension === true);
-			if (specificMatches.length === 1) {
-				// Exactly one specific match — auto-select it (e.g., Article for .pdf when both Article and File are allowed)
-				mediaTypeUnique = specificMatches[0].unique;
-			} else if (specificMatches.length > 1) {
-				// Multiple specific matches — let the user pick from those
-				mediaTypeUnique = await this.#showDialogMediaTypePicker(specificMatches);
-			} else {
-				// All fallbacks — auto-select the first one
-				mediaTypeUnique = options[0].unique;
-			}
-		} else {
-			mediaTypeUnique = options[0].unique;
-		}
+		const mediaTypeUnique = await this.#resolveMediaTypeUnique(options);
 
 		if (!mediaTypeUnique) {
 			return this._updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
