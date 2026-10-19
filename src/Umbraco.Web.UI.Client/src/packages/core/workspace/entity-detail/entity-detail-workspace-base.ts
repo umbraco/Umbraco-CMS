@@ -392,7 +392,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	protected async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
-		await this.incomingDataHook.execute({ entityType: this.getEntityType(), unique: data.unique });
+		await this.incomingDataHook.execute({
+			entityType: this.getEntityType(),
+			unique: data.unique,
+		} as IncomingDataHookMetaType);
 		return data;
 	}
 
