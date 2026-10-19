@@ -3,12 +3,14 @@ import type {
 	UmbBlockDataModel,
 	UmbBlockDataValueModel,
 	UmbBlockExposeModel,
+	UmbBlockExternalContentFailureReason,
 	UmbBlockLayoutBaseModel,
 } from '../types.js';
 import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
 import { UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL } from '../modals/transfer-to-element-library/transfer-to-element-library-modal.token.js';
 import { UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME, UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME } from '../constants.js';
 import { umbBlockExposeSortCompare } from '../utils/block-expose-sort-compare.function.js';
+import { getExternalContentFailureReason } from '../utils/get-external-content-failure-reason.function.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -114,6 +116,11 @@ export abstract class UmbBlockManagerContext<
 		<Array<{ key: string; variants: Array<{ culture: string | null; state: string | null }> }>>[],
 		(x) => x.key,
 	);
+	readonly #externalContentFailures = new UmbArrayState(
+		<Array<{ key: string; reason: UmbBlockExternalContentFailureReason }>>[],
+		(x) => x.key,
+	);
+	#checkedExternalContentFailures = new Set<string>();
 	#elementRepository = new UmbElementDetailRepository(this);
 	#externalContentManager = new UmbRepositoryDetailsManager<UmbElementDetailModel>(this, this.#elementRepository);
 
@@ -272,6 +279,18 @@ export abstract class UmbBlockManagerContext<
 						})),
 					})),
 				);
+			},
+			null,
+		);
+
+		// The batched request only says that an element is missing, not why. Ask for each missing element on its own
+		// to tell a deleted element from one the current user may not access.
+		this.observe(
+			this.#externalContentManager.statuses,
+			(statuses) => {
+				statuses
+					.filter((status) => status.state.type === 'error')
+					.forEach((status) => this.#requestExternalContentFailure(status.unique));
 			},
 			null,
 		);
@@ -453,6 +472,26 @@ export abstract class UmbBlockManagerContext<
 				return match?.state ?? entry.variants[0]?.state ?? null;
 			},
 		);
+	}
+
+	/**
+	 * Returns an observable of why the external content is unavailable.
+	 * Emits `undefined` while the content is available or not yet resolved.
+	 * @param key The content key of the external content.
+	 */
+	externalContentFailureOf(key: string) {
+		return this.#externalContentFailures.asObservablePart((source) => source.find((x) => x.key === key)?.reason);
+	}
+
+	async #requestExternalContentFailure(key: string) {
+		if (this.#checkedExternalContentFailures.has(key)) return;
+		this.#checkedExternalContentFailures.add(key);
+
+		const { error } = await this.#elementRepository.requestByUnique(key);
+		const reason = getExternalContentFailureReason(error);
+		if (reason) {
+			this.#externalContentFailures.appendOne({ key, reason });
+		}
 	}
 
 	settingsOf(key: string) {
