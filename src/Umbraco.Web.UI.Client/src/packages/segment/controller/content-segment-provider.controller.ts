@@ -1,13 +1,13 @@
-import type { UmbDocumentDetailModel, UmbDocumentVariantOptionModel } from '../../types.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbHookMethod } from '@umbraco-cms/backoffice/hook-api';
 import type { UmbEntityDetailIncomingDataHookMeta } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, type UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { UmbSegmentCollectionRepository, type UmbSegmentModel } from '@umbraco-cms/backoffice/segment';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import type { UmbContentDetailModel } from '@umbraco-cms/backoffice/content';
 
 const observeCtrlAlias = Symbol();
 
@@ -17,12 +17,12 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 	#repository = new UmbSegmentCollectionRepository(this);
 	#segments = new UmbArrayState<UmbSegmentModel, string, undefined>(undefined, (x) => x.alias);
 	#addedUniques: Array<string> = [];
-	#workspace?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+	#workspace?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspace) => {
+		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (workspace) => {
 			this.#workspace?.incomingDataHook.remove(this.#onIncomingData);
 			this.#workspace = workspace;
 			if (!workspace) {
@@ -76,7 +76,7 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 		);
 	}
 
-	#onIncomingData: UmbHookMethod<UmbDocumentDetailModel, UmbEntityDetailIncomingDataHookMeta> = async (data) => {
+	#onIncomingData: UmbHookMethod<UmbContentDetailModel, UmbEntityDetailIncomingDataHookMeta> = async (data) => {
 		// What happens when we leave out the skip/take? [NL]
 		const { data: response } = await this.#repository.requestCollection({
 			skip: 0,
@@ -94,7 +94,7 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 					segment: segment.alias,
 					segmentInfo: { alias: segment.alias, name: segment.name },
 					unique: new UmbVariantId(culture, segment.alias).toString(),
-				}) as Omit<UmbDocumentVariantOptionModel, 'language'>,
+				}) as Omit<UmbEntityVariantOptionModel, 'language'>,
 		);
 	}
 
