@@ -402,18 +402,20 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
 		// TODO: replace with contentType when it gets implemented for content detail model [NL]
 		const contentTypeUnique: string | undefined = (data as any)[this.#contentTypePropertyName].unique;
-
-		await this.incomingDataHook.execute({
-			entityType: this.getEntityType(),
-			unique: data.unique,
-			contentType: { unique: contentTypeUnique },
-		});
-
 		if (!contentTypeUnique) {
 			throw new Error(`Could not find content type unique on property '${this.#contentTypePropertyName}'`);
 		}
+
+		const incoming = this.incomingDataHook.execute({
+			entityType: this.getEntityType(),
+			unique: data.unique,
+			contentType: contentTypeUnique ? { unique: contentTypeUnique } : undefined,
+		});
+
 		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
-		await this.structure.loadType(contentTypeUnique);
+		const loadType = await this.structure.loadType(contentTypeUnique);
+
+		await Promise.all([incoming, loadType]);
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
 		const contentTypeVariesByCulture = this.structure.getVariesByCulture();
