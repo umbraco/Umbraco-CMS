@@ -2,9 +2,11 @@ import { resolveStaleVariantRoute } from './resolve-stale-variant-route.function
 import type { UmbStaleVariantRouteResolverVariant } from './resolve-stale-variant-route.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * The accessors providing the current workspace state to {@link UmbWorkspaceStaleVariantRedirectController}.
+ * @deprecated Deprecated since v17.9. Scheduled for removal in Umbraco 19.
  */
 export interface UmbWorkspaceStaleVariantRedirectControllerArgs {
 	getWorkspaceRoute: () => string | undefined;
@@ -16,12 +18,21 @@ export interface UmbWorkspaceStaleVariantRedirectControllerArgs {
  * Redirects the workspace URL to the best matching variant when its variant part no longer maps to an
  * existing variant option — e.g. after the content type's variance changed. Re-validates on every
  * navigation, as closing a modal restores the pre-modal URL, which may hold a stale variant.
+ * @deprecated Deprecated since v17.9. A URL referring to a variant that does not exist should show Not Found
+ * rather than be redirected silently. Use `resolveStaleVariantRoute` when a specific action, such as changing
+ * the content type's variance, should move the URL to an existing variant. Scheduled for removal in Umbraco 19.
  */
 export class UmbWorkspaceStaleVariantRedirectController extends UmbControllerBase {
 	readonly #args: UmbWorkspaceStaleVariantRedirectControllerArgs;
 
 	constructor(host: UmbControllerHost, args: UmbWorkspaceStaleVariantRedirectControllerArgs) {
 		super(host);
+		new UmbDeprecation({
+			deprecated: 'UmbWorkspaceStaleVariantRedirectController is deprecated.',
+			removeInVersion: '19.0.0',
+			solution:
+				'Use resolveStaleVariantRoute when a specific action, such as changing the content type variance, should move the URL to an existing variant.',
+		}).warn();
 		this.#args = args;
 	}
 

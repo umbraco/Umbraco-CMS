@@ -160,7 +160,24 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 			unique,
 		});
 		this.#uniques.appendOne(unique);
-		// Notice in this case we do not have a observable from the repo, but it should maybe be fine that we just listen for ACTION EVENTS.
+		this.#observeAddedEntry(unique);
+	}
+
+	// Follows the store so a change saved elsewhere in this client is reflected right away, rather than only after
+	// the entity-updated event has re-requested it. The entry was not loaded through the store, so it may not be there:
+	async #observeAddedEntry(unique: string): Promise<void> {
+		await this.#init;
+		const observable = await this.repository?.byUnique?.(unique);
+		if (!observable || !this.getUniques().includes(unique)) return;
+		this.observe(
+			observable,
+			(data) => {
+				if (data) {
+					this.#entries.updateOne(unique, data);
+				}
+			},
+			'observeEntry_' + unique,
+		);
 	}
 
 	/**
