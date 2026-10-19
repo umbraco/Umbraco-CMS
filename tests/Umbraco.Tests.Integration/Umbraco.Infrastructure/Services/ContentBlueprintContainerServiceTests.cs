@@ -5,6 +5,8 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -260,5 +262,64 @@ internal sealed class ContentBlueprintContainerServiceTests : UmbracoIntegration
             Assert.IsFalse(result.Success);
             Assert.AreEqual(EntityContainerOperationStatus.NotFound, result.Status);
         });
+    }
+
+    [Test]
+    public async Task Can_Delete_Container_Set_As_User_Start_Node()
+    {
+        var userService = GetRequiredService<IUserService>();
+
+        EntityContainer container = (await ContentBlueprintContainerService.CreateAsync(null, "Start Node Container", null, Constants.Security.SuperUserKey)).Result;
+        Assert.IsNotNull(container);
+
+        var user = new UserBuilder()
+            .WithName("StartNodeUser")
+            .WithStartDocumentBlueprintId(container!.Id)
+            .Build();
+        userService.Save(user);
+
+        var deleteResult = await ContentBlueprintContainerService.DeleteAsync(container.Key, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(deleteResult.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, deleteResult.Status);
+        });
+
+        Assert.IsNull(await ContentBlueprintContainerService.GetAsync(container.Key));
+
+        // The user's start node reference should have been cleared.
+        var updatedUser = userService.GetUserById(user.Id);
+        Assert.IsNotNull(updatedUser);
+        Assert.IsFalse(updatedUser!.StartDocumentBlueprintIds?.Contains(container.Id) ?? false);
+    }
+
+    [Test]
+    public async Task Can_Delete_Container_Set_As_User_Group_Start_Node()
+    {
+        var userGroupService = GetRequiredService<IUserGroupService>();
+
+        EntityContainer container = (await ContentBlueprintContainerService.CreateAsync(null, "Start Node Container", null, Constants.Security.SuperUserKey)).Result;
+        Assert.IsNotNull(container);
+
+        var userGroup = new UserGroupBuilder()
+            .WithAlias(Guid.NewGuid().ToString("N"))
+            .WithStartDocumentBlueprintId(container!.Id)
+            .Build();
+        var groupResult = await userGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+        Assert.IsTrue(groupResult.Success);
+
+        var deleteResult = await ContentBlueprintContainerService.DeleteAsync(container.Key, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(deleteResult.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, deleteResult.Status);
+        });
+
+        Assert.IsNull(await ContentBlueprintContainerService.GetAsync(container.Key));
+
+        // The user group's start node reference should have been cleared.
+        var updatedGroup = await userGroupService.GetAsync(userGroup.Key);
+        Assert.IsNotNull(updatedGroup);
+        Assert.IsNull(updatedGroup!.StartDocumentBlueprintId);
     }
 }

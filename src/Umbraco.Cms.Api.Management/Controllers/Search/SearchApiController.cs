@@ -41,11 +41,12 @@ public class SearchApiController : SearchControllerBase
     /// <summary>
     /// Executes a search against the index specified in the request.
     /// </summary>
-    /// <param name="request">The search request, including index alias, query, filters, facets and sorters.</param>
+    /// <param name="request">The search request, including index alias, query, culture and segment.</param>
     /// <param name="skip">The number of results to skip for pagination.</param>
     /// <param name="take">The maximum number of results to return.</param>
     /// <returns>The search results, or an error if the index alias is missing or could not be resolved.</returns>
     [HttpPost("search")]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType<SearchResultResponseModel>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -65,14 +66,11 @@ public class SearchApiController : SearchControllerBase
         SearchResult result = await searcher.SearchAsync(
             request.IndexAlias,
             request.Query,
-            request.Filters,
-            request.Facets,
-            request.Sorters,
-            request.Culture,
-            request.Segment,
-            AccessContext.BypassProtection(),
-            skip,
-            take);
+            culture: request.Culture,
+            segment: request.Segment,
+            accessContext: AccessContext.BypassProtection(),
+            skip: skip,
+            take: take);
 
         // set the variation context so EntityService renders the correct culture variant
         _variationContextAccessor.VariationContext = new VariationContext(request.Culture);
@@ -81,11 +79,6 @@ public class SearchApiController : SearchControllerBase
         {
             Total = result.Total,
             Documents = CreateSearchDocumentResponseModels(result.Documents),
-            Facets = result.Facets.Select(f => new FacetResultResponseModel
-            {
-                FieldName = f.FieldName,
-                Values = f.Values,
-            }),
         });
     }
 

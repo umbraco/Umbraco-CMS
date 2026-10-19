@@ -35,9 +35,11 @@ export interface UmbUserDetailModel extends UmbUserStartNodesModel {
 
 export interface UmbUserStartNodesModel {
 	documentStartNodeUniques: Array<UmbReferenceByUnique>;
+	documentBlueprintStartNodeUniques: Array<UmbReferenceByUnique>;
 	elementStartNodeUniques: Array<UmbReferenceByUnique>;
 	hasDocumentRootAccess: boolean;
 	hasMediaRootAccess: boolean;
+	hasDocumentBlueprintRootAccess: boolean;
 	hasElementRootAccess: boolean;
 	mediaStartNodeUniques: Array<UmbReferenceByUnique>;
 }
