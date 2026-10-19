@@ -46,6 +46,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	private _variantOptions: Array<VariantOptionModelType> = [];
 
 	@state()
+	private _hasMoreThanOneVariantOption = false;
+
+	@state()
 	private _cultureVariantOptions: Array<VariantOptionModelType> = [];
 
 	@state()
@@ -166,6 +169,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			(variantOptions) => {
 				this._variantOptions = ((variantOptions ?? []) as VariantOptionModelType[]).sort(this._variantSorter);
 				this._cultureVariantOptions = this._variantOptions.filter((variant) => variant.segment === null);
+				this._hasMoreThanOneVariantOption = this._variantOptions.length > 1;
 			},
 			'_observeVariantOptions',
 		);
@@ -300,10 +304,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		}
 		// Is this already created or is it active/in process to be created.
 		return this.#isVariantActive(variantId);
-	}
-
-	#selectorIsEnabled() {
-		return this._variantOptions.length > 1;
 	}
 
 	#observeReadOnlyCultures(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
@@ -479,7 +479,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				this.#isSegmentVariantOption(this._activeVariant)}
 				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
 				${ref(this.#focusInput)}>
-				${this.#selectorIsEnabled()
+				${this._hasMoreThanOneVariantOption
 					? html`
 							<uui-button
 								id="toggle"
@@ -506,7 +506,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					: html`<span id="read-only-tag" slot="append"> ${this.#renderReadOnlyTag(null)} </span>`}
 			</uui-input>
 
-			${this.#selectorIsEnabled()
+			${this._hasMoreThanOneVariantOption
 				? html`
 						<uui-popover-container id="popover" @beforetoggle=${this.#onPopoverToggle} placement="bottom-end">
 							<div id="dropdown">
