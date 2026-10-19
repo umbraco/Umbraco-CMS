@@ -310,5 +310,26 @@ describe('UmbBlockManagerContext', () => {
 
 			expect(failureOf('a')).to.equal(undefined);
 		});
+
+		it('asks about one element only when a failure says nothing about availability', async () => {
+			respondWithStatus = 500;
+			manager.setLayouts([externalLayout('a'), externalLayout('b'), externalLayout('c')]);
+			await waitUntil(() => requestedKeys.includes('a'));
+			await settle();
+
+			expect(requestedKeys).to.deep.equal(['a']);
+		});
+
+		it('asks again once the statuses change after a failure that said nothing about availability', async () => {
+			respondWithStatus = 500;
+			manager.setLayouts([externalLayout('a')]);
+			await waitUntil(() => requestedKeys.includes('a'));
+			await settle();
+
+			respondWithStatus = 404;
+			manager.setLayouts([externalLayout('a'), externalLayout('b')]);
+
+			await waitUntil(() => failureOf('a') === 'deleted');
+		});
 	});
 });

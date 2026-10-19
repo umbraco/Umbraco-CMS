@@ -45,10 +45,13 @@ export class UmbBlockStateTagElement extends UmbLitElement {
 		css`
 			:host {
 				display: inline-flex;
+				vertical-align: text-top;
+			}
+
+			uui-tag {
 				margin-left: 0.5em;
 				margin-bottom: -0.3em;
 				margin-top: -0.3em;
-				vertical-align: text-top;
 			}
 		`,
 	];

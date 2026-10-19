@@ -120,7 +120,8 @@ export abstract class UmbBlockManagerContext<
 		<Array<{ key: string; reason: UmbBlockExternalContentFailureReason }>>[],
 		(x) => x.key,
 	);
-	#checkedExternalContentFailures = new Set<string>();
+	#unavailableExternalContentKeys = new Array<string>();
+	#isProbingExternalContentFailures = false;
 	#elementRepository = new UmbElementDetailRepository(this);
 	#externalContentManager = new UmbRepositoryDetailsManager<UmbElementDetailModel>(this, this.#elementRepository);
 
@@ -288,9 +289,11 @@ export abstract class UmbBlockManagerContext<
 		this.observe(
 			this.#externalContentManager.statuses,
 			(statuses) => {
-				statuses
-					.filter((status) => status.state.type === 'error')
-					.forEach((status) => this.#requestExternalContentFailure(status.unique));
+				this.#externalContentFailures.remove(
+					statuses.filter((status) => status.state.type === 'success').map((status) => status.unique),
+				);
+				this.#unavailableExternalContentKeys = statuses.filter((status) => status.state.type === 'error').map((status) => status.unique);
+				this.#requestExternalContentFailures();
 			},
 			null,
 		);
@@ -483,15 +486,31 @@ export abstract class UmbBlockManagerContext<
 		return this.#externalContentFailures.asObservablePart((source) => source.find((x) => x.key === key)?.reason);
 	}
 
-	async #requestExternalContentFailure(key: string) {
-		if (this.#checkedExternalContentFailures.has(key)) return;
-		this.#checkedExternalContentFailures.add(key);
+	async #requestExternalContentFailures() {
+		// One request at a time, so that a server that is down is asked once, not once per referenced element.
+		if (this.#isProbingExternalContentFailures) return;
+		this.#isProbingExternalContentFailures = true;
 
-		const { error } = await this.#elementRepository.requestByUnique(key);
-		const reason = getExternalContentFailureReason(error);
-		if (reason) {
-			this.#externalContentFailures.appendOne({ key, reason });
+		try {
+			let key = this.#nextUnexplainedExternalContentKey();
+			while (key) {
+				const { error } = await this.#elementRepository.requestByUnique(key);
+				const reason = getExternalContentFailureReason(error);
+				// A failure that says nothing about availability (the server being down, for example) is no reason to ask
+				// about the other elements as well. They are asked again the next time the statuses change.
+				if (!reason) return;
+
+				this.#externalContentFailures.appendOne({ key, reason });
+				key = this.#nextUnexplainedExternalContentKey();
+			}
+		} finally {
+			this.#isProbingExternalContentFailures = false;
 		}
+	}
+
+	#nextUnexplainedExternalContentKey() {
+		const explained = this.#externalContentFailures.getValue();
+		return this.#unavailableExternalContentKeys.find((key) => !explained.some((x) => x.key === key));
 	}
 
 	settingsOf(key: string) {
