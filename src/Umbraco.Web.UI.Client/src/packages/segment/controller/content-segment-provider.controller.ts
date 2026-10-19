@@ -17,7 +17,7 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 	#segments = new UmbArrayState<UmbSegmentModel, string, undefined>(undefined, (x) => x.alias);
 	#addedUniques: Array<string> = [];
 	#workspace?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
-	#currentUnique?: string | null;
+	#loadingSegments?: Promise<void>;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -76,19 +76,23 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 		);
 	}
 
-	#onIncomingData: UmbParallelHookMethod<UmbEntityDetailIncomingDataHookMeta> = async (meta) => {
-		if (this.#currentUnique === meta.unique) {
-			// we already have loaded segments, user must refresh for update.
-			return;
-		}
-		this.#currentUnique = meta.unique;
+	#onIncomingData: UmbParallelHookMethod<UmbEntityDetailIncomingDataHookMeta> = async () => {
+		// Segments do not depend on the entity, so they are requested once and shared by concurrent loads. A failed request is retried on the next load.
+		this.#loadingSegments ??= this.#loadSegments();
+		return this.#loadingSegments;
+	};
+
+	async #loadSegments() {
 		// What happens when we leave out the skip/take? [NL]
 		const { data: response } = await this.#repository.requestCollection({
 			skip: 0,
 			take: 9999,
 		});
-		this.#segments.setValue(response?.items ?? []);
-	};
+		if (!response) {
+			this.#loadingSegments = undefined;
+		}
+		this.#segments.setValue(response?.items);
+	}
 
 	#createOptions(segments: Array<UmbSegmentModel>, culture: string | null) {
 		return segments.map(
