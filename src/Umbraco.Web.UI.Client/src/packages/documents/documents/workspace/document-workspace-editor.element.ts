@@ -76,6 +76,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			(variants) => {
 				this.#variants = variants;
 				this.#generateRoutes();
+				this.#staleVariantRedirect.redirect();
 			},
 			'_observeVariants',
 		);
@@ -180,8 +181,6 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 						// If none then just use the first variant as a fallback.
 						variant = this.#variants?.[0];
 					}
-
-					console.log('redirect logic...');
 
 					history.replaceState({}, '', `${this.#workspaceRoute}/${variant?.unique}${view}`);
 				},
