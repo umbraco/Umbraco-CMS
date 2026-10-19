@@ -208,18 +208,6 @@ public interface IContentService : IPublishableContentService<IContent>
     IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent> filter, Ordering? ordering = null);
 
     /// <summary>
-    ///     Gets paged documents for specified content types.
-    /// </summary>
-    /// <param name="contentTypeIds">The content type identifiers.</param>
-    /// <param name="pageIndex">The page number.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <param name="totalRecords">Total number of documents.</param>
-    /// <param name="filter">Query filter.</param>
-    /// <param name="ordering">Ordering infos.</param>
-    /// <returns>The paged documents.</returns>
-    IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter, Ordering? ordering = null);
-
-    /// <summary>
     ///     Counts documents of a given document type.
     /// </summary>
     /// <param name="documentTypeAlias">The document type alias, or null for all types.</param>
