@@ -124,10 +124,7 @@ export class UmbBlockSingleEntriesContext extends UmbBlockEntriesContext<
 						throw new Error('Failed to create block');
 					}
 				} else if (value && 'library' in value) {
-					this._manager?.insertExternalContent(
-						value.library.elementKey,
-						data?.originData as UmbBlockSingleWorkspaceOriginData,
-					);
+					this._insertExternalContent(value.library.elementKey, data?.originData);
 				} else if (value && 'clipboard' in value && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 					if (!clipboardContext) {

@@ -254,13 +254,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			null,
 		);
 
-		this.observe(
-			observeMultiple([this.#context.allowedBlockTypes, this.#context.libraryAllowedElementTypeKeys]),
-			([allowedBlockTypes, libraryKeys]) => {
-				this._hasLibraryElements = allowedBlockTypes.some((x) => libraryKeys.includes(x.contentElementTypeKey));
-			},
-			null,
-		);
+		this.#observeHasLibraryElements();
 
 		this.observe(
 			this.#context.rangeLimits,
@@ -322,6 +316,16 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		});
 
 		new UmbFormControlValidator(this, this /*, this.#dataPath*/);
+	}
+
+	#observeHasLibraryElements() {
+		this.observe(
+			observeMultiple([this.#context.allowedBlockTypes, this.#context.libraryAllowedElementTypeKeys]),
+			([allowedBlockTypes, libraryKeys]) => {
+				this._hasLibraryElements = allowedBlockTypes.some((x) => libraryKeys.includes(x.contentElementTypeKey));
+			},
+			null,
+		);
 	}
 
 	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {
@@ -499,34 +503,38 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 
 	#renderLibraryButton() {
 		if (!this._hasLibraryElements) return nothing;
-		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
 
-		return html`
-			<uui-button
-				class="btnAction"
-				label=${this.localize.term('blockEditor_tabLibrary')}
-				look="placeholder"
-				href=${this._catalogueRouteBuilder?.({ view: 'library', index: -1 }) ?? ''}
-				?disabled=${this._isReadOnly}
-				title=${this.localize.term('blockEditor_tabLibrary')}>
-				<uui-icon name="icon-link"></uui-icon>
-			</uui-button>
-		`;
+		return this.#renderActionButton({
+			label: this.localize.term('blockEditor_tabLibrary'),
+			title: this.localize.term('blockEditor_tabLibrary'),
+			href: this._catalogueRouteBuilder?.({ view: 'library', index: -1 }),
+			icon: 'icon-link',
+		});
 	}
 
 	#renderPasteButton() {
 		if (this._areaKey) return nothing;
+
+		return this.#renderActionButton({
+			label: this.localize.term('content_createFromClipboard'),
+			title: this.localize.term('general_clipboard'),
+			href: this.#getPathForClipboard(-1),
+			icon: 'icon-clipboard-paste',
+		});
+	}
+
+	#renderActionButton({ label, title, href, icon }: { label: string; title: string; href?: string; icon: string }) {
 		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
 
 		return html`
 			<uui-button
 				class="btnAction"
-				label=${this.localize.term('content_createFromClipboard')}
+				label=${label}
 				look="placeholder"
-				href=${this.#getPathForClipboard(-1) ?? ''}
+				href=${href ?? ''}
 				?disabled=${this._isReadOnly}
-				title=${this.localize.term('general_clipboard')}>
-				<uui-icon name="icon-clipboard-paste"></uui-icon>
+				title=${title}>
+				<uui-icon name=${icon}></uui-icon>
 			</uui-button>
 		`;
 	}

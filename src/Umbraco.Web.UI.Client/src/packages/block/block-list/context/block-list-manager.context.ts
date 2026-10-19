@@ -72,7 +72,7 @@ export class UmbBlockListManagerContext<
 		settings: UmbBlockDataModel | undefined,
 		originData: UmbBlockListWorkspaceOriginData,
 	) {
-		this._layouts.appendOneAt(layoutEntry, originData.index ?? -1);
+		this.setOneLayout(layoutEntry, originData);
 		this.insertBlockData(layoutEntry, content, settings, originData);
 		this.notifyBlockInserted(layoutEntry, originData);
 

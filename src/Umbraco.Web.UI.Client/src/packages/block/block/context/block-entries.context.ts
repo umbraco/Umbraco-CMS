@@ -119,6 +119,10 @@ export abstract class UmbBlockEntriesContext<
 		return allowedKeys.filter((key) => blockTypeKeys.has(key));
 	}
 
+	protected _insertExternalContent(elementKey: string, originData?: UmbBlockWorkspaceOriginData) {
+		this._manager?.insertExternalContent(elementKey, originData as BlockOriginData | undefined);
+	}
+
 	public abstract create(
 		contentElementTypeKey: string,
 		layoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,

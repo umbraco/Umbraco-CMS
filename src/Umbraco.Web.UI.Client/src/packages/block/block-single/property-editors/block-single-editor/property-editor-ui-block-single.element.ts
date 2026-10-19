@@ -262,18 +262,22 @@ export class UmbPropertyEditorUIBlockSingleElement
 			null,
 		);
 
-		this.observe(
-			observeMultiple([this.#managerContext.blockTypes, this.#entriesContext.libraryAllowedElementTypeKeys]),
-			([blockTypes, libraryKeys]) => {
-				this._hasLibraryElements = blockTypes.some((x) => libraryKeys.includes(x.contentElementTypeKey));
-			},
-			null,
-		);
+		this.#observeHasLibraryElements();
 
 		this.observe(
 			this.#entriesContext.catalogueRouteBuilder,
 			(routeBuilder) => {
 				this._catalogueRouteBuilder = routeBuilder;
+			},
+			null,
+		);
+	}
+
+	#observeHasLibraryElements() {
+		this.observe(
+			observeMultiple([this.#managerContext.blockTypes, this.#entriesContext.libraryAllowedElementTypeKeys]),
+			([blockTypes, libraryKeys]) => {
+				this._hasLibraryElements = blockTypes.some((x) => libraryKeys.includes(x.contentElementTypeKey));
 			},
 			null,
 		);
