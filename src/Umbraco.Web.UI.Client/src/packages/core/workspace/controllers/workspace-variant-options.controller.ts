@@ -42,7 +42,6 @@ export class UmbWorkspaceVariantOptionsController<
 				}
 				const lang = languages?.find((x) => x.unique === opt.culture);
 				if (!lang) {
-					console.log(languages);
 					throw new Error(`Language for culture ${opt.culture} could not be found.`);
 				}
 				return { ...opt, language: lang };
