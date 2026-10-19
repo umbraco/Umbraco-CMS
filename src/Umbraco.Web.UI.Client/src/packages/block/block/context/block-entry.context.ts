@@ -939,7 +939,7 @@ export abstract class UmbBlockEntryContext<
 		}
 	}
 
-	async #reportTransferResult({ unique, status }: UmbBlockTransferToExternalContentResult) {
+	async #reportTransferResult({ unique, status, notified }: UmbBlockTransferToExternalContentResult) {
 		switch (status) {
 			case 'published':
 				return this.#peekTransferNotification(
@@ -952,6 +952,7 @@ export abstract class UmbBlockEntryContext<
 					this.localize.term('blockEditor_transferredToElementLibraryAsDraft'),
 				);
 			case 'publish-failed':
+				if (notified) return;
 				return this.#peekTransferNotification(
 					'warning',
 					this.localize.term('blockEditor_transferToElementLibraryNotPublished'),

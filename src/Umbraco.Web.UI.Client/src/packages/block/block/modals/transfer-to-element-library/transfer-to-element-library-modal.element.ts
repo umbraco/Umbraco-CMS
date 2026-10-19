@@ -76,7 +76,12 @@ export class UmbBlockTransferToElementLibraryModalElement extends UmbModalBaseEl
 		this._isCheckingLocation = true;
 		this._locationError = undefined;
 
-		const error = await this.#getLocationError(parentUnique);
+		let error: string | undefined;
+		try {
+			error = await this.#getLocationError(parentUnique);
+		} catch {
+			error = this.localize.term('blockEditor_transferToElementLibraryLocationNotPermitted');
+		}
 
 		// Ignore the outcome when another location was chosen in the meantime.
 		if (request !== this.#locationRequest) return;

@@ -46,7 +46,7 @@ import type { UmbElementDetailModel } from '@umbraco-cms/backoffice/element';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal, umbInfoModal } from '@umbraco-cms/backoffice/modal';
 import { UmbRepositoryDetailsManager } from '@umbraco-cms/backoffice/repository';
-import { UmbApiError } from '@umbraco-cms/backoffice/resources';
+import { UmbApiError, apiErrorWasNotified } from '@umbraco-cms/backoffice/resources';
 import {
 	UMB_VALIDATION_CONTEXT,
 	UmbValidationCleanUpByUniqueManager,
@@ -74,6 +74,8 @@ export interface UmbBlockTransferToExternalContentResult {
 	 * Otherwise why it could not be published: `validation-failed` when the Element has invalid values, or `publish-failed`.
 	 */
 	status: 'published' | 'draft' | 'validation-failed' | 'publish-failed';
+	/** Whether the failed publish was already reported to the user, so no further notification is needed. */
+	notified?: boolean;
 }
 
 export abstract class UmbBlockManagerContext<
@@ -150,10 +152,9 @@ export abstract class UmbBlockManagerContext<
 	// TODO: This is a bad seperation of concerns, this should be self initializing, not defined from the outside. [NL]
 	public readonly readOnlyState = new UmbReadOnlyVariantGuardManager(this);
 
-	readonly #exposes = new UmbArrayState(
-		<Array<UmbBlockExposeModel>>[],
-		(x) => x.contentKey + ':' + x.culture,
-	).sortBy(umbBlockExposeSortCompare);
+	readonly #exposes = new UmbArrayState(<Array<UmbBlockExposeModel>>[], (x) => x.contentKey + ':' + x.culture).sortBy(
+		umbBlockExposeSortCompare,
+	);
 	public readonly exposes = this.#exposes.asObservable();
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
@@ -673,7 +674,7 @@ export abstract class UmbBlockManagerContext<
 			isExternalContent: true,
 		} as Partial<BlockLayoutType>);
 
-		return { unique: created.unique, status: await this.#publishTransferredElement(created.unique, culturesToPublish) };
+		return { unique: created.unique, ...(await this.#publishTransferredElement(created.unique, culturesToPublish)) };
 	}
 
 	async #getValueCultures(values: Array<UmbBlockDataValueModel>): Promise<Array<string | null>> {
@@ -726,16 +727,17 @@ export abstract class UmbBlockManagerContext<
 	async #publishTransferredElement(
 		unique: string,
 		culturesToPublish: Array<string | null>,
-	): Promise<UmbBlockTransferToExternalContentResult['status']> {
-		if (culturesToPublish.length === 0) return 'draft';
+	): Promise<Omit<UmbBlockTransferToExternalContentResult, 'unique'>> {
+		if (culturesToPublish.length === 0) return { status: 'draft' };
 
 		const { error } = await this.#elementPublishingRepository.publish(
 			unique,
 			culturesToPublish.map((culture) => ({ variantId: new UmbVariantId(culture) })),
 		);
-		if (!error) return 'published';
+		if (!error) return { status: 'published' };
 
-		return UmbApiError.isUmbApiError(error) && isPublishValidationError(error) ? 'validation-failed' : 'publish-failed';
+		if (UmbApiError.isUmbApiError(error) && isPublishValidationError(error)) return { status: 'validation-failed' };
+		return { status: 'publish-failed', notified: apiErrorWasNotified(error) };
 	}
 
 	/**
@@ -788,6 +790,9 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	/**
+	 * @param key
+	 * @param propertyAlias
+	 * @param value
 	 * @deprecated this is not working, use the Property Dataset instead.
 	 */
 	// TODO: Deprecate and remove this.
@@ -795,6 +800,9 @@ export abstract class UmbBlockManagerContext<
 		this.#contents.updateOne(key, { [propertyAlias]: value });
 	}
 	/**
+	 * @param key
+	 * @param propertyAlias
+	 * @param value
 	 * @deprecated this is not working, use the Property Dataset instead.
 	 */
 	// TODO: Deprecate and remove this.
@@ -803,6 +811,8 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	/**
+	 * @param key
+	 * @param propertyAlias
 	 * @deprecated this is not working, use the Property Dataset instead.
 	 */
 	// TODO: Deprecate and remove this.
@@ -812,6 +822,8 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 	/**
+	 * @param key
+	 * @param propertyAlias
 	 * @deprecated this is not working, use the Property Dataset instead.
 	 */
 	// TODO: Deprecate and remove this.
