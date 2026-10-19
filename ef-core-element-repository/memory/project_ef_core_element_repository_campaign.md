@@ -85,3 +85,10 @@ folder on the shared integration branch; reverted (local only) because coworkers
 - Trap: `db.Set<T>().Update(row)` on a row whose id the scope's context already tracks (inserted earlier in the same scope) throws "already being tracked"; use an update statement. The scope's DbContext lives across the whole unit of work, so Adds stay tracked.
 - Interface-member `SetProperty` on `db.Set<TEntityDto>()` translates (name binding to implicit implementations); no locals needed.
 - Templates: `ITemplatedContent` cast in generic code is the NPoco precedent, not a hook.
+
+**State on 19-10-2026:** PR 1 (#24134) merged as `c1a33ebee86`; PR 2 (#24175) merged as `a4e27d26e0c` (14-10); PR 3
+(#24205) was merged on 15-10 into PR 2b's branch as `aec7ebf6e16`, so PR 2b (#24203, open against
+`v18/feature/ef-core-repositories`) now carries both the parts-based entity assembly and the write-path hoist and is the
+PR that lands them. Next after #24203 merges: PR 4 (`AsyncElementRepository`), cut from the integration branch. The
+integration branch has had no v19/dev merge-up since `95111fe68ac`.
+

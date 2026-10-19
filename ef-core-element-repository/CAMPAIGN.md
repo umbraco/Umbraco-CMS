@@ -176,7 +176,7 @@ Acceptance: solution builds; both snapshots list `umbracoElement`, `umbracoEleme
 
 Out of scope: no repository, no factory changes.
 
-Status 12-10-2026: implemented and in review as #24134. After the v19/dev merge-up the migration was regenerated on top of the shared `AddHasAccessToInvariantForVariantToModel` (enum 24): `AddElementDtos` is enum 25, timestamps `20261012093329` (SQL Server) / `20261012093337` (SQLite), plan GUID unchanged, both providers clean on `has-pending-model-changes`.
+Status 12-10-2026: implemented and in review as #24134 (merged 13-10-2026 as `c1a33ebee86`). After the v19/dev merge-up the migration was regenerated on top of the shared `AddHasAccessToInvariantForVariantToModel` (enum 24): `AddElementDtos` is enum 25, timestamps `20261012093329` (SQL Server) / `20261012093337` (SQLite), plan GUID unchanged, both providers clean on `has-pending-model-changes`.
 
 ### PR 2: Hoist the generic read path out of `DocumentRepository`
 
@@ -190,6 +190,8 @@ Scope:
 - First commit of the PR is a spike: the generic row + `BuildBaseQuery` hook + `GetAsync` only, run on both providers, before hoisting the rest. If translation fails on either provider, stop and record the finding in §8 before changing approach.
 
 Acceptance: `DocumentRepositoryTest`, `DocumentBlueprintRepositoryTest`, `DocumentRepositoryUrlSegmentTests`, `ContentServiceTests`, `ContentServiceTests.SchedulePublish`, the HybridCache document fixtures, and the full unit test project all green with the same counts as before; snapshots untouched (`git diff --stat` on both `Migrations/` folders is empty); `DocumentRepository.cs` shrinks by roughly 900 to 1 200 lines.
+
+Status 19-10-2026: merged 14-10-2026 as `a4e27d26e0c` (#24175).
 
 ### PR 2b: Build publishable entities from row parts instead of a stitched DTO graph
 
@@ -207,6 +209,8 @@ Scope:
 
 Acceptance: `DocumentRepositoryTest`, `DocumentBlueprintRepositoryTest`, `DocumentRepositoryUrlSegmentTests`, `ContentServiceTests` and the unit project at unchanged counts; a test asserting `PublishedVersionId`, `PublishDate`, `PublishName` and `PublisherId` for a published-then-edited document (red first if no existing test covers it); snapshots untouched (ignored members are not part of the model); `IPublishableContentDto` declares only `NodeId`, `Published`, `Edited` and `IContentVersionDto` only `Id`, `Published`.
 
+Status 19-10-2026: open as #24203 against `v18/feature/ef-core-repositories`; since 15-10-2026 the branch also carries PR 3 (#24205 was merged into it), so #24203 lands both.
+
 ### PR 3: Hoist the generic write path out of `DocumentRepository`
 
 Same discipline as PR 2, with one deliberate redesign carried over from PR 2b: the write path is built from row parts too, never from a DTO graph. Hoisting a method whose body walks `dto.ContentDto.NodeDto` or `dto.CurrentVersion.ContentVersionDto` is not allowed; those reads are replaced with the parts the hook returns, in the same PR, so the DTO interfaces never regain navigation members.
@@ -219,6 +223,8 @@ Scope:
 - `PersistEntitySpecificDeleteClausesAsync` already is an abstract hook; leave it.
 
 Acceptance: identical to PR 2, plus `DocumentRepositoryTest`'s write-path tests (tags, publish-on-save, culture variants, IsMoving fast path, sortable values) all green; `DocumentRepository.cs` ends around 600 to 800 lines, nearly all Document-only (templates, URL segments, permissions, level/ancestors, smells).
+
+Status 19-10-2026: #24205 merged 15-10-2026 as `aec7ebf6e16` into PR 2b's branch, its base at the time; it reaches the integration branch with #24203.
 
 ### PR 4: `AsyncElementRepository` (additive, no consumers switched)
 
