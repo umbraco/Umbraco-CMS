@@ -1,5 +1,5 @@
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbSequentialHookEntry, UmbSequentialHookMethod } from './types.js';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 type UmbSequentialHookEntryWithOrder<ValueType, MetaType extends Record<string, unknown>> = UmbSequentialHookEntry<
 	ValueType,
@@ -8,6 +8,12 @@ type UmbSequentialHookEntryWithOrder<ValueType, MetaType extends Record<string, 
 	order: number;
 };
 
+/**
+ * A hook whose methods run one after the other, each receiving the value returned by the previous one.
+ * Use it when the methods transform a value and the order matters.
+ * @template ValueType - The type of the value passed through the methods.
+ * @template MetaType - The type of the meta passed to every method.
+ */
 export class UmbSequentialHookController<
 	ValueType,
 	MetaType extends Record<string, unknown> = Record<string, unknown>,
@@ -32,6 +38,10 @@ export class UmbSequentialHookController<
 		this.#entries.splice(index === -1 ? this.#entries.length : index, 0, entry);
 	}
 
+	/**
+	 * Removes a method from the hook. Executions that are already running skip it if it has not run yet.
+	 * @param {UmbSequentialHookMethod} method - The method to remove.
+	 */
 	remove(method: UmbSequentialHookMethod<ValueType, MetaType>): void {
 		const index = this.#entries.findIndex((entry) => entry.method === method);
 		if (index !== -1) {
@@ -39,6 +49,12 @@ export class UmbSequentialHookController<
 		}
 	}
 
+	/**
+	 * Passes the value through all methods in order of weight, highest first.
+	 * @param {ValueType | Promise<ValueType>} data - The initial value.
+	 * @param {MetaType} meta - Passed to every method.
+	 * @returns {Promise<ValueType>} The value returned by the last method, or the initial value when there are no methods.
+	 */
 	async execute(data: ValueType | Promise<ValueType>, meta: MetaType): Promise<ValueType> {
 		let result = await data;
 		let previous: UmbSequentialHookEntryWithOrder<ValueType, MetaType> | undefined;

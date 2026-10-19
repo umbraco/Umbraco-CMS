@@ -9,6 +9,12 @@ import { mergeObservables, UmbArrayState, type Observable } from '@umbraco-cms/b
 import { UMB_APP_LANGUAGE_CONTEXT, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 
+/**
+ * Manages the variant options of a workspace: the options derived from the variation of the entity and the
+ * available languages, plus any options added by other extensions, like segments.
+ * @template VariantModelType - The variant model of the entity.
+ * @template VariantOptionModelType - The variant option model exposed to consumers.
+ */
 export class UmbWorkspaceVariantOptionsController<
 	VariantModelType extends UmbEntityVariantModel,
 	VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantModelType>,
@@ -31,6 +37,9 @@ export class UmbWorkspaceVariantOptionsController<
 		(x) => x.unique,
 	);
 
+	/**
+	 * The variant options with their language resolved. Emits `undefined` until the variation of the entity and the languages are known.
+	 */
 	public variantOptions = mergeObservables(
 		[this.#variantOptions.asObservable(), this.languages],
 		([option, languages]) => {
@@ -176,11 +185,9 @@ export class UmbWorkspaceVariantOptionsController<
 	#hasFilter?: boolean;
 
 	// TODO: Remove this feature in v.21
-	// eslint-disable-next-line @typescript-eslint/naming-convention, jsdoc/require-returns-check
 	/**
 	 * @deprecated - it is not possible to filter variant options from v.21.
-	 * @param filter - The filter function to apply to variant options.
-	 * @returns void
+	 * @param {(option: Omit<VariantOptionModelType, 'language'>) => boolean} filter - The filter function to apply to variant options.
 	 */
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _internal_setOptionFilter(filter: (filter: Omit<VariantOptionModelType, 'language'>) => boolean) {
@@ -189,14 +196,27 @@ export class UmbWorkspaceVariantOptionsController<
 		this.variantOptions = this.variantOptions.pipe(map((options) => options?.filter((option) => filter(option))));
 	}
 
+	/**
+	 * Adds options next to the ones derived from the entity. An option with a unique that already exists replaces it.
+	 * @param {Array<Omit<VariantOptionModelType, 'language'>>} options - The options to add. The language is resolved from the culture.
+	 */
 	public add(options: Array<Omit<VariantOptionModelType, 'language'>>) {
 		this.#variantOptions.append(options);
 	}
 
+	/**
+	 * Removes options by their unique.
+	 * @param {Array<string>} uniques - The uniques of the options to remove.
+	 */
 	public remove(uniques: Array<string>) {
 		this.#variantOptions.remove(uniques);
 	}
 
+	/**
+	 * Removes and adds options in one step, so consumers only see the end result.
+	 * @param {Array<string>} uniques - The uniques of the options to remove.
+	 * @param {Array<Omit<VariantOptionModelType, 'language'>>} options - The options to add.
+	 */
 	public replace(uniques: Array<string>, options: Array<Omit<VariantOptionModelType, 'language'>>) {
 		this.#variantOptions.mute();
 		this.remove(uniques);

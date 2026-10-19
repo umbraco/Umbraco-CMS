@@ -1,6 +1,11 @@
 import type { UmbParallelHookMethod } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
+/**
+ * A hook whose methods all run at the same time when executed. Use it when the methods are independent of
+ * each other and only the point where they have all finished matters.
+ * @template MetaType - The type of the meta passed to every method.
+ */
 export class UmbParallelHookController<MetaType> extends UmbControllerBase {
 	#methods: Array<UmbParallelHookMethod<MetaType>> = [];
 	// Starts a method in an execution that is running, one for each execution.
@@ -16,6 +21,10 @@ export class UmbParallelHookController<MetaType> extends UmbControllerBase {
 		this.#executions.forEach((start) => start(method));
 	}
 
+	/**
+	 * Removes a method from the hook. Executions that are already running are not affected.
+	 * @param {UmbParallelHookMethod} method - The method to remove.
+	 */
 	remove(method: UmbParallelHookMethod<MetaType>): void {
 		const index = this.#methods.indexOf(method);
 		if (index !== -1) {
@@ -27,6 +36,7 @@ export class UmbParallelHookController<MetaType> extends UmbControllerBase {
 	 * Runs all methods at once, and resolves when they have all finished, including methods added meanwhile.
 	 * If any method fails, the first failure is thrown once all of them have finished.
 	 * @param {MetaType} meta - Passed to every method.
+	 * @returns {Promise<void>} A promise that resolves when all methods have finished.
 	 */
 	async execute(meta: MetaType): Promise<void> {
 		const pending = new Set<Promise<void>>();
