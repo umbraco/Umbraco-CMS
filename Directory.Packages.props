@@ -78,7 +78,7 @@
     <PackageVersion Include="SixLabors.ImageSharp" Version="3.2.0" />
     <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.3.0" />
     <!-- When updating this version, also update templates/UmbracoExtension/Umbraco.Extension.csproj -->
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.3.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3" />
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
@@ -118,9 +118,9 @@
     <!--
       Microsoft.Data.Sqlite and Microsoft.EntityFrameworkCore.Sqlite (via SQLitePCLRaw.bundle_e_sqlite3)
       otherwise resolve the native SQLitePCLRaw.lib.e_sqlite3 down to a vulnerable 2.1.11
-      (GHSA-2m69-gcr7-jv3q). Pin forward to the patched 2.1.13 until the referencing packages raise
+      (GHSA-2m69-gcr7-jv3q). Pin forward to the patched 2.1.14 until the referencing packages raise
       their floor.
     -->
-    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.14" />
   </ItemGroup>
 </Project>
