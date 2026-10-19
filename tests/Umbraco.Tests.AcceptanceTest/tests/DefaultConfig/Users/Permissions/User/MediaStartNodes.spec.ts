@@ -1,4 +1,3 @@
-import {expect} from "@playwright/test";
 import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
 
 const testUser = ConstantHelper.testUserCredentials;
@@ -62,17 +61,13 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
   await umbracoUi.page.waitForURL('**/section/media/collection');
-  const initialUrl = umbracoUi.page.url();
-
+  // A folder the user cannot access is rendered disabled, so clicking it must not open its workspace.
   await umbracoUi.media.goToMediaWithName(rootFolderName);
-
-  // URL should not have changed (folder is visible but not accessible, so no navigation occurred)
-  const currentUrl = umbracoUi.page.url();
-  expect(currentUrl).toBe(initialUrl);
-
   await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName, false);
+  // Checked after the tree interaction so a navigation triggered by the click would already have landed.
+  await umbracoUi.media.isMediaWorkspaceVisible(false);
 });
 
 test('see no-access view when deep-linking to restricted media', async ({umbracoApi, umbracoUi}) => {

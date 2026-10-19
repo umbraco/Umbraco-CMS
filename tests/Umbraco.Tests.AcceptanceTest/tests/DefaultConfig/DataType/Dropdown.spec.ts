@@ -75,6 +75,6 @@ for (const dropdown of dropdowns) {
     expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
     expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(dropdown.type, 'multiple', dropdown.multipleChoice)).toBeTruthy();
-    expect(await umbracoApi.dataType.doesDataTypeHaveValue(dropdown.type, 'items')).toBeFalsy();
+    expect(await umbracoApi.dataType.doesDataTypeContainAlias(dropdown.type, 'items')).toBeFalsy();
   });
 }

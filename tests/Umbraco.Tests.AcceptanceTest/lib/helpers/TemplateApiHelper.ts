@@ -177,6 +177,16 @@ export class TemplateApiHelper {
     return this.createTemplateWithDisplayingValue(name, templateContent);
   }
 
+  async createTemplateWithDisplayingDateValue(name: string, valueAlias: string) {
+    const templateContent =
+      '\n@{' +
+      '\n\tif (Model.HasValue("' + valueAlias + '")){' +
+      '\n\t\t<p>@(Model.Value<DateTime>("' + valueAlias + '").ToShortDateString())</p>' +
+      '\n\t}' +
+      '\n}';
+    return this.createTemplateWithDisplayingValue(name, templateContent);
+  }
+
   async createTemplateWithDisplayingMulitpleStringValue(name: string, valueAlias: string) {
     const templateContent =
       '\n@if(Model.HasValue("' + valueAlias + '"))' +
