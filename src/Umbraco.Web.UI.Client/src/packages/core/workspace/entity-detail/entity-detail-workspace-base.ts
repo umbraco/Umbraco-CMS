@@ -76,15 +76,13 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	protected _detailRepository?: DetailRepositoryType;
 
 	/**
-	 * Awaited while an entity is being loaded or scaffolded, in parallel with the request for its data.
-	 * Anything the incoming data depends on being in place can be made ready here. All methods run at the same time,
-	 * so they must not depend on each other.
+	 * Awaited while an entity is being loaded or scaffolded, in parallel with the potential request for its data.
+	 * Anything that needs to take place during the initialization of the entity, like loading extensions and setup other hooks.
 	 */
 	public readonly initHook = new UmbParallelHookController<UmbEntityDetailInitHookMeta>(this);
 
 	/**
-	 * Runs on all incoming entity data before it is applied to the workspace, regardless of how it arrived.
-	 * Hook methods are awaited in order of weight and return the data, optionally changed.
+	 * Runs on all incoming entity data before it is processed and sent to the Workspace Data Manager.
 	 */
 	public readonly incomingDataHook = new UmbParallelHookController<IncomingDataHookMetaType>(this);
 
