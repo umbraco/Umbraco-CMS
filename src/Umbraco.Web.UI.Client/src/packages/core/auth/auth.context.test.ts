@@ -455,6 +455,70 @@ describe('UmbAuthContext', () => {
 				expect(context.getIsAuthorized()).to.be.false;
 			});
 		});
+
+		// The server sends both an ended session and a signed-in user it denies access to the login page.
+		describe('a request redirected to the login page', () => {
+			let sessionAlive: boolean;
+
+			beforeEach(async () => {
+				// The interceptor provides its signaler on the host, and context requests only resolve for an attached host.
+				document.body.appendChild(hostElement);
+				sessionAlive = true;
+				const timeoutUtc = new Date(Date.now() + 20 * 60 * 1000).toISOString();
+				stubFetch(() =>
+					sessionAlive
+						? new Response(JSON.stringify({ timeoutUtc }), { status: 200 })
+						: new Response(null, { status: 401 }),
+				);
+				await context.setInitialState();
+				fetchCalls = [];
+			});
+
+			afterEach(() => {
+				hostElement.remove();
+			});
+
+			async function receiveLoginRedirect(): Promise<Response> {
+				const interceptors: Array<(response: Response, request: Request, options: unknown) => Promise<Response>> = [];
+				context.configureClient({
+					getConfig: () => ({}),
+					interceptors: {
+						request: { use: () => {} },
+						response: { use: (fn: never) => interceptors.push(fn) },
+					},
+					setConfig: () => ({}),
+				} as never);
+				await aTimeout(0);
+
+				let response = new Response('<!doctype html><title>Log in</title>', { status: 200 });
+				Object.defineProperties(response, {
+					redirected: { value: true },
+					url: { value: 'http://localhost/umbraco/login?ReturnUrl=%2F' },
+				});
+				const request = new Request('http://localhost/umbraco/my-extension/settings', { method: 'POST' });
+				for (const interceptor of interceptors) {
+					response = await interceptor(response, request, {});
+				}
+				return response;
+			}
+
+			it('answers with a 403 and keeps the session while the server still accepts it', async () => {
+				const response = await receiveLoginRedirect();
+
+				expect(response.status).to.equal(403);
+				expect(context.getIsAuthorized()).to.be.true;
+				expect(String(fetchCalls[0].input)).to.contain('keep-alive');
+			});
+
+			it('ends the session once the server no longer accepts it', async () => {
+				sessionAlive = false;
+
+				const response = await receiveLoginRedirect();
+
+				expect(response.status).to.equal(401);
+				expect(context.getIsAuthorized()).to.be.false;
+			});
+		});
 	});
 
 	describe('Login URL construction', () => {

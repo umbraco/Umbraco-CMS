@@ -30,6 +30,8 @@ export class UmbAuthSignalerContext extends UmbContextBase {
 	 */
 	readonly activityDetectedAt = this.#activityDetectedAt.asObservable();
 
+	#sessionCheck: () => Promise<boolean> = () => Promise.resolve(false);
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_AUTH_SIGNALER_CONTEXT);
 	}
@@ -50,5 +52,21 @@ export class UmbAuthSignalerContext extends UmbContextBase {
 	/** Called by HTTP interceptors when a request completed successfully. */
 	signalActivity() {
 		this.#activityDetectedAt.setValue(Date.now());
+	}
+
+	/**
+	 * Called by the auth context to let HTTP interceptors ask whether the server still accepts the session.
+	 * @param {() => Promise<boolean>} check - Resolves true while the server accepts the session.
+	 */
+	setSessionCheck(check: () => Promise<boolean>) {
+		this.#sessionCheck = check;
+	}
+
+	/**
+	 * Called by HTTP interceptors to ask whether the server still accepts the session.
+	 * @returns {Promise<boolean>} True while it does; false once it doesn't, or when no auth context answers.
+	 */
+	isSessionAlive(): Promise<boolean> {
+		return this.#sessionCheck();
 	}
 }

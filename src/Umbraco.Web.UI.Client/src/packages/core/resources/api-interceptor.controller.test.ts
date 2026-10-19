@@ -281,6 +281,35 @@ describe('UmbApiInterceptorController', () => {
 				expect(activityDetectedAt).to.be.a('number');
 				expect(timeoutRequests).to.equal(0);
 			});
+
+			// The server's access-denied path is the login page too, so a signed-in user who isn't allowed
+			// ends up there just like one whose session ended.
+			it('answers a request that ended up on the login page with a 403 while the session is still alive', async () => {
+				signaler.setSessionCheck(async () => true);
+
+				for (const method of ['GET', 'POST']) {
+					const request = new Request('https://example.com/umbraco/my-extension/settings', { method });
+
+					const response = await runChain(redirectedResponse(LOGIN_URL), request);
+
+					expect(response.status, method).to.equal(403);
+					const body = await response.json();
+					expect(body.title, method).to.include('permissions');
+				}
+				expect(timeoutRequests).to.equal(0);
+				expect(retriedRequests).to.be.empty;
+				expect(activityDetectedAt).to.be.undefined;
+			});
+
+			it('asks for re-authentication when the session check finds the session ended', async () => {
+				signaler.setSessionCheck(async () => false);
+				const request = new Request('https://example.com/umbraco/my-extension/settings', { method: 'POST' });
+
+				const response = await runChain(redirectedResponse(LOGIN_URL), request);
+
+				expect(response.status).to.equal(401);
+				expect(timeoutRequests).to.equal(1);
+			});
 		});
 
 		// A retry re-issues the original request, and the original call reads whatever it gets with its own

@@ -114,6 +114,13 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			const redirectedToLogin = isRedirectToLogin(response);
 			if (response.status !== 401 && !redirectedToLogin) return response;
 
+			// The server's access-denied path is the login page too, so a redirect there only means the
+			// session ended once the server confirms it. The forbidden interceptor next in the chain gives
+			// the 403 its problem details.
+			if (redirectedToLogin && (await this.#signaler.isSessionAlive())) {
+				return new Response(null, { status: 403 });
+			}
+
 			// The login page's 200 is not the API's answer, so nothing of it is carried over.
 			const newResponse = this.#createUnauthorizedResponse(redirectedToLogin ? undefined : response);
 

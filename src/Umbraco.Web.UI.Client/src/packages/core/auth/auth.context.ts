@@ -183,6 +183,7 @@ export class UmbAuthContext extends UmbContextBase {
 					this.#slideSessionExpiry(activityDetectedAt);
 				}
 			});
+			signaler?.setSessionCheck(() => this.keepAlive());
 		});
 	}
 
