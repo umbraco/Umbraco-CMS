@@ -1,6 +1,6 @@
-import type { ManifestPlainJs } from '../types/index.js';
+import type { JsLoaderProperty } from '../types/index.js';
 import type { UmbEntryPointModule } from './entry-point.interface.js';
-import { hasInitExport, hasOnUnloadExport } from '../functions/index.js';
+import { hasInitExport, hasOnUnloadExport, loadManifestPlainJs } from '../functions/index.js';
 import { expect } from '@open-wc/testing';
 
 describe('UmbEntryPointModule', () => {
@@ -16,13 +16,10 @@ describe('UmbEntryPointModule', () => {
 		expect(hasOnUnloadExport(module)).to.be.true;
 	});
 
-	it('accepts a manifest loader for a module that only exports onInit', async () => {
-		const manifest: ManifestPlainJs<UmbEntryPointModule> = {
-			type: 'backofficeEntryPoint',
-			alias: 'Umb.Test.EntryPoint.OnInitOnly',
-			name: 'Test entry point exporting only onInit',
-			js: () => Promise.resolve({ onInit: () => {} }),
-		};
-		expect(manifest.js).to.be.a('function');
+	it('loads a manifest loader for a module that only exports onInit', async () => {
+		const js: JsLoaderProperty<UmbEntryPointModule> = () => Promise.resolve({ onInit: () => {} });
+		const module = await loadManifestPlainJs(js);
+		expect(hasInitExport(module)).to.be.true;
+		expect(hasOnUnloadExport(module)).to.be.false;
 	});
 });
