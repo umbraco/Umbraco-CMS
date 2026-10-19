@@ -392,8 +392,15 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
-		data = await super._processIncomingData(data);
+		// TODO: replace with contentType when it gets implemented for content detail model [NL]
 		const contentTypeUnique: string | undefined = (data as any)[this.#contentTypePropertyName].unique;
+
+		await this.incomingDataHook.execute({
+			entityType: this.getEntityType(),
+			unique: data.unique,
+			contentType: { unique: contentTypeUnique },
+		});
+
 		if (!contentTypeUnique) {
 			throw new Error(`Could not find content type unique on property '${this.#contentTypePropertyName}'`);
 		}

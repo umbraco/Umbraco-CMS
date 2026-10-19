@@ -4,14 +4,14 @@ import type { UmbContentTypeModel, UmbPropertyStructureWorkspaceContext } from '
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId, UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type {
-	UmbEntityDetailIncomingDataHookMeta,
-	UmbEntityDetailLoadingHookMeta,
+	UmbEntityDetailInitHookMeta,
 	UmbRoutableWorkspaceContext,
 	UmbVariantDatasetWorkspaceContext,
 	UmbVariantNameWriteGuardManager,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
-import type { UmbParallelHookController, UmbSequentialHookController } from '@umbraco-cms/backoffice/hook-api';
+import type { UmbParallelHookController } from '@umbraco-cms/backoffice/hook-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbContentWorkspaceContext<
 	ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
@@ -27,8 +27,8 @@ export interface UmbContentWorkspaceContext<
 		UmbPropertyStructureWorkspaceContext<ContentTypeModel> {
 	readonly IS_CONTENT_WORKSPACE_CONTEXT: true;
 
-	readonly loadingHook: UmbParallelHookController<UmbEntityDetailLoadingHookMeta>;
-	readonly incomingDataHook: UmbSequentialHookController<ContentModel, UmbEntityDetailIncomingDataHookMeta>;
+	readonly initHook: UmbParallelHookController<UmbEntityDetailInitHookMeta>;
+	readonly incomingDataHook: UmbParallelHookController<UmbContentDetailIncomingDataHookMeta>;
 
 	getData(): ContentModel | undefined;
 	isLoaded(): Promise<unknown> | undefined;
@@ -40,3 +40,9 @@ export interface UmbContentWorkspaceContext<
 	isWritableVariant(variantId: UmbVariantId): Observable<boolean>;
 	getIsWritableVariant(variantId: UmbVariantId): boolean;
 }
+
+export type UmbContentDetailIncomingDataHookMeta = {
+	entityType: string;
+	unique: string | null;
+	contentType: UmbReferenceByUnique | undefined;
+};

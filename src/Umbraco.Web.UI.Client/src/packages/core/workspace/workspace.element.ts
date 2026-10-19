@@ -54,8 +54,8 @@ export class UmbWorkspaceElement extends UmbLitElement {
 						api,
 					]);
 					// Let a workspace that loads entities wait for its additional workspace contexts to be ready, before processing the incoming data. [NL]
-					if ('loadingHook' in api && api.loadingHook instanceof UmbParallelHookController) {
-						api.loadingHook.add(async () => {
+					if ('initHook' in api && api.initHook instanceof UmbParallelHookController) {
+						api.initHook.add(async () => {
 							let timer: ReturnType<typeof setTimeout> | undefined;
 							const timeout = new Promise<void>((resolve) => {
 								timer = setTimeout(() => {

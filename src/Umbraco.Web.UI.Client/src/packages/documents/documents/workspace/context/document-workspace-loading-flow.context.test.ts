@@ -42,7 +42,7 @@ const TEST_CONDITION_ALIAS = 'Test.Condition.LoadingFlow';
 // The workspace context that the extensions below take part in.
 interface UmbTestExtensionOptions {
 	name: string;
-	registerLoadingHook?: boolean;
+	registerInitHook?: boolean;
 	loadingDelay?: number;
 	incomingWeight?: number;
 	throwOnIncomingData?: boolean;
@@ -53,8 +53,8 @@ function createTestExtensionClass(options: UmbTestExtensionOptions) {
 			super(host);
 			log.push(`${options.name}:created`);
 
-			if (options.registerLoadingHook) {
-				workspace.loadingHook.add(async () => {
+			if (options.registerInitHook) {
+				workspace.initHook.add(async () => {
 					await wait(options.loadingDelay ?? 0);
 					log.push(`${options.name}:loading`);
 				});
@@ -357,7 +357,7 @@ describe('Document workspace loading flow, with extensions taking part in the lo
 
 	describe('with an extension that adds a loading hook method of its own', () => {
 		it('runs it, after the wait for the extensions and before the incoming data hook', async () => {
-			registerExtension('Test.Ext.A', { name: 'A', registerLoadingHook: true });
+			registerExtension('Test.Ext.A', { name: 'A', registerInitHook: true });
 			const context = await openWorkspace();
 
 			await context.load(INVARIANT_DOCUMENT_ID);
@@ -367,8 +367,8 @@ describe('Document workspace loading flow, with extensions taking part in the lo
 	});
 	describe('with several extensions that add loading hook methods of their own', () => {
 		it('runs those at the same time, so the load takes as long as the slowest', async () => {
-			registerExtension('Test.Ext.A', { name: 'A', registerLoadingHook: true, loadingDelay: 400 });
-			registerExtension('Test.Ext.B', { name: 'B', registerLoadingHook: true, loadingDelay: 400 });
+			registerExtension('Test.Ext.A', { name: 'A', registerInitHook: true, loadingDelay: 400 });
+			registerExtension('Test.Ext.B', { name: 'B', registerInitHook: true, loadingDelay: 400 });
 			const context = await openWorkspace();
 			const start = performance.now();
 

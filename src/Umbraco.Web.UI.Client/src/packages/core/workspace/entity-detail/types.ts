@@ -17,7 +17,7 @@ export interface UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> {
 	preset?: UmbDeepPartialObject<DetailModelType>;
 }
 
-export type UmbEntityDetailLoadingHookMeta = {
+export type UmbEntityDetailInitHookMeta = {
 	entityType: string;
 	/**
 	 * The unique of the entity being loaded, or undefined when a new entity is being created and has no unique yet.

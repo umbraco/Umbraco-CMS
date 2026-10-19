@@ -79,7 +79,7 @@ describe('UmbDocumentWorkspaceContext (loading)', () => {
 	describe('hooks', () => {
 		it('awaits the loading hook before the incoming data hook runs', async () => {
 			const log: Array<string> = [];
-			context.loadingHook.add(async () => {
+			context.initHook.add(async () => {
 				await new Promise((resolve) => setTimeout(resolve, 20));
 				log.push('loading');
 			});

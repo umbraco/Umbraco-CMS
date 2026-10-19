@@ -5,7 +5,7 @@ import type { UmbSubmittableTreeEntityWorkspaceContext } from '../contexts/token
 import { UmbDeleteEntityWorkspaceRedirectController } from '../controllers/delete-entity-workspace-redirect.controller.js';
 import type {
 	UmbEntityDetailIncomingDataHookMeta,
-	UmbEntityDetailLoadingHookMeta,
+	UmbEntityDetailInitHookMeta,
 	UmbEntityDetailWorkspaceContextArgs,
 	UmbEntityDetailWorkspaceContextCreateArgs,
 } from './types.js';
@@ -25,7 +25,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbParallelHookController, UmbSequentialHookController } from '@umbraco-cms/backoffice/hook-api';
+import { UmbParallelHookController } from '@umbraco-cms/backoffice/hook-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	UmbDetailRepository,
@@ -79,16 +79,13 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * Anything the incoming data depends on being in place can be made ready here. All methods run at the same time,
 	 * so they must not depend on each other.
 	 */
-	public readonly loadingHook = new UmbParallelHookController<UmbEntityDetailLoadingHookMeta>();
+	public readonly initHook = new UmbParallelHookController<UmbEntityDetailInitHookMeta>();
 
 	/**
 	 * Runs on all incoming entity data before it is applied to the workspace, regardless of how it arrived.
 	 * Hook methods are awaited in order of weight and return the data, optionally changed.
 	 */
-	public readonly incomingDataHook = new UmbSequentialHookController<
-		DetailModelType,
-		UmbEntityDetailIncomingDataHookMeta
-	>();
+	public readonly incomingDataHook = new UmbParallelHookController<UmbEntityDetailIncomingDataHookMeta>();
 
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
@@ -269,7 +266,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
 		try {
 			await this.#init;
-			const loading = this.loadingHook.execute({
+			const loading = this.initHook.execute({
 				entityType: this.getEntityType(),
 				unique,
 				isNew: false,
@@ -365,7 +362,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			// Set before the loading hook runs, as extensions with an is-new condition cannot answer before this is known. [NL]
 			this.setIsNew(true);
 
-			const loading = this.loadingHook.execute({
+			const loading = this.initHook.execute({
 				entityType: this.getEntityType(),
 				unique: undefined,
 				isNew: true,
@@ -394,7 +391,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	protected async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
-		return this.incomingDataHook.execute(data, { entityType: this.getEntityType(), unique: data.unique });
+		await this.incomingDataHook.execute({ entityType: this.getEntityType(), unique: data.unique });
+		return data;
 	}
 
 	async submit() {
@@ -609,7 +607,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this._detailRepository?.destroy();
 		this.#entityContext.destroy();
 		this._getDataPromise = undefined;
-		this.loadingHook.destroy();
+		this.initHook.destroy();
 		this.incomingDataHook.destroy();
 		super.destroy();
 	}
