@@ -2,7 +2,6 @@ import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js
 import type { UmbBlockListWorkspaceOriginData } from '../index.js';
 import type { UmbBlockDataModel } from '../../block/types.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import { UMB_PROPERTY_SORT_MODE_CONTEXT } from '@umbraco-cms/backoffice/property-sort-mode';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -63,9 +62,8 @@ export class UmbBlockListManagerContext<
 		return await super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 	}
 
-	override insertExternalContent(elementKey: string, originData?: UmbBlockListWorkspaceOriginData) {
-		const layout = { key: UmbId.new(), contentKey: elementKey, isExternalContent: true } as BlockLayoutType;
-		this._layouts.appendOneAt(layout, originData?.index ?? -1);
+	override setOneLayout(layoutEntry: BlockLayoutType, originData?: UmbBlockListWorkspaceOriginData) {
+		this._layouts.appendOneAt(layoutEntry, originData?.index ?? -1);
 	}
 
 	insert(

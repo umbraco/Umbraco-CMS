@@ -258,7 +258,7 @@ export class UmbBlockGridEntriesContext
 						throw new Error('Failed to create block');
 					}
 				} else if (value && 'library' in value) {
-					await this._manager?.insertExternalContent(
+					this._manager?.insertExternalContent(
 						value.library.elementKey,
 						data?.originData as UmbBlockGridWorkspaceOriginData,
 					);
