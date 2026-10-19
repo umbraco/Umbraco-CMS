@@ -276,6 +276,8 @@ declare global {
 		blockEditor_createThisFor: (name: string, variantName: string) => string;
 		blockEditor_defaultLayoutStylesheet: string;
 		blockEditor_deleteArea: string;
+		blockEditor_deletedLibraryElementDescription: string;
+		blockEditor_deletedLibraryElementName: string;
 		blockEditor_disconnectFromElementLibrary: string;
 		blockEditor_disconnectFromElementLibraryConfirm: string;
 		blockEditor_elementTypeDoesNotExist: string;
@@ -317,11 +319,14 @@ declare global {
 		blockEditor_labelLabelTemplate: string;
 		blockEditor_labelSettingsElementType: string;
 		blockEditor_layoutOptions: string;
+		blockEditor_noAccessLibraryElementDescription: string;
+		blockEditor_noAccessLibraryElementName: string;
 		blockEditor_notExposedDescription: string;
 		blockEditor_notExposedLabel: string;
 		blockEditor_notPublishedLibraryElementDescription: string;
 		blockEditor_pickSpecificAllowance: string;
 		blockEditor_propertyEditorNotSupported: string;
+		blockEditor_publishedPendingChangesLibraryElementDescription: string;
 		blockEditor_rangeAllowed: string;
 		blockEditor_rootValidationEntriesNotAllowed: string;
 		blockEditor_scaleHandlerButtonTitle: string;
@@ -340,6 +345,7 @@ declare global {
 		blockEditor_tabLibrary: string;
 		blockEditor_thumbnail: string;
 		blockEditor_transferToElementLibrary: string;
+		blockEditor_trashedLibraryElementDescription: string;
 		blockEditor_unsupportedBlockDescription: string;
 		blockEditor_unsupportedBlockName: string;
 		blueprints_blankBlueprint: string;

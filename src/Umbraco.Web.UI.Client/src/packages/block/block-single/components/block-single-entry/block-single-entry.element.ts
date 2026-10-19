@@ -402,7 +402,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			<umb-ref-single-block
 				.icon=${this._icon}
 				.unpublished=${!this._exposed}
-				.isExternalContent=${this._isExternalContent}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
@@ -417,7 +416,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			<umb-inline-single-block
 				.icon=${this._icon}
 				.unpublished=${!this._exposed}
-				.isExternalContent=${this._isExternalContent}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}

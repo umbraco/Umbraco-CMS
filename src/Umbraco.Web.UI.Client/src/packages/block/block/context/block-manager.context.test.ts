@@ -4,6 +4,7 @@ import { expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementDetailRepository, type UmbElementDetailModel } from '@umbraco-cms/backoffice/element';
 import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbApiError } from '@umbraco-cms/backoffice/resources';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_VALIDATION_CONTEXT, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
@@ -233,6 +234,102 @@ describe('UmbBlockManagerContext', () => {
 			]);
 
 			manager.destroy();
+		});
+	});
+
+	describe('external content failures', () => {
+		const originalRequestByUnique = UmbElementDetailRepository.prototype.requestByUnique;
+		const originalRequestByUniques = UmbElementDetailRepository.prototype.requestByUniques;
+		let requestedKeys: Array<string>;
+		let respondWithStatus: number;
+		let manager: UmbTestBlockManagerContext;
+
+		const externalLayout = (key: string) => ({ key: `layout-${key}`, contentKey: key, isExternalContent: true });
+		const settle = () => new Promise((resolve) => setTimeout(resolve, 20));
+		const failureOf = (key: string) => {
+			let reason: string | undefined;
+			manager.observe(manager.externalContentFailureOf(key), (value) => (reason = value), null);
+			return reason;
+		};
+
+		beforeEach(async () => {
+			requestedKeys = [];
+			respondWithStatus = 404;
+			// The batched request does not return the missing elements, so each one is requested on its own to find out why.
+			UmbElementDetailRepository.prototype.requestByUniques = async () => ({ data: [] });
+			UmbElementDetailRepository.prototype.requestByUnique = async function (unique: string) {
+				requestedKeys.push(unique);
+				return {
+					error: new UmbApiError('error', respondWithStatus, undefined, {
+						title: 'error',
+						type: 'ApiError',
+						status: respondWithStatus,
+					}),
+				};
+			} as typeof originalRequestByUnique;
+
+			const host = await fixture<UmbControllerHostElement>(
+				html`<umb-test-block-manager-host></umb-test-block-manager-host>`,
+			);
+			manager = new UmbTestBlockManagerContext(host);
+		});
+
+		afterEach(() => {
+			UmbElementDetailRepository.prototype.requestByUnique = originalRequestByUnique;
+			UmbElementDetailRepository.prototype.requestByUniques = originalRequestByUniques;
+			manager.destroy();
+		});
+
+		it('records a missing element as deleted', async () => {
+			manager.setLayouts([externalLayout('a')]);
+
+			await waitUntil(() => failureOf('a') === 'deleted');
+		});
+
+		it('records a forbidden element as no access', async () => {
+			respondWithStatus = 403;
+			manager.setLayouts([externalLayout('a')]);
+
+			await waitUntil(() => failureOf('a') === 'noAccess');
+		});
+
+		it('does not request an element again once it is known to be unavailable', async () => {
+			manager.setLayouts([externalLayout('a')]);
+			await waitUntil(() => failureOf('a') === 'deleted');
+			manager.setLayouts([externalLayout('a'), externalLayout('b')]);
+			await waitUntil(() => failureOf('b') === 'deleted');
+
+			expect(requestedKeys).to.deep.equal(['a', 'b']);
+		});
+
+		it('does not record a failure that says nothing about availability', async () => {
+			respondWithStatus = 500;
+			manager.setLayouts([externalLayout('a')]);
+			await waitUntil(() => requestedKeys.includes('a'));
+			await settle();
+
+			expect(failureOf('a')).to.equal(undefined);
+		});
+
+		it('asks about one element only when a failure says nothing about availability', async () => {
+			respondWithStatus = 500;
+			manager.setLayouts([externalLayout('a'), externalLayout('b'), externalLayout('c')]);
+			await waitUntil(() => requestedKeys.includes('a'));
+			await settle();
+
+			expect(requestedKeys).to.deep.equal(['a']);
+		});
+
+		it('asks again once the statuses change after a failure that said nothing about availability', async () => {
+			respondWithStatus = 500;
+			manager.setLayouts([externalLayout('a')]);
+			await waitUntil(() => requestedKeys.includes('a'));
+			await settle();
+
+			respondWithStatus = 404;
+			manager.setLayouts([externalLayout('a'), externalLayout('b')]);
+
+			await waitUntil(() => failureOf('a') === 'deleted');
 		});
 	});
 });
