@@ -14,12 +14,12 @@ export interface UmbEntryPointModule {
 	 * Function that will be called when the host element is initialized and/or the extension is loaded for the first time.
 	 * @optional
 	 */
-	onInit: UmbEntryPointOnInit;
+	onInit?: UmbEntryPointOnInit;
 
 	/**
 	 * Function that will be called when the extension is unregistered.
 	 * @remarks This does not mean the host element is destroyed, only that the extension is no longer available. You should listen to the host element's `destroy` event if you need to clean up after the host element.
 	 * @optional
 	 */
-	onUnload: UmbEntryPointOnUnload;
+	onUnload?: UmbEntryPointOnUnload;
 }
