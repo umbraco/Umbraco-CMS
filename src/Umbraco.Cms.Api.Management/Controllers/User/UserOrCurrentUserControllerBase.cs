@@ -50,7 +50,7 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Duplicate Email")
                 .WithDetail("The email is already in use.")
                 .Build()),
-            UserOperationStatus.Unauthorized => Unauthorized(),
+            UserOperationStatus.Unauthorized => Forbidden(),
             UserOperationStatus.CancelledByNotification => BadRequest(problemDetailsBuilder
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the user operation.")
