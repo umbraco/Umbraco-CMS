@@ -888,7 +888,10 @@ const libraryElementMisconfigurationsDocument = createLibraryElementStatesDocume
 		externalListEntry('library-misconfig-list-element-type-deleted', 'library-element-state-orphan-type-id'),
 		externalListEntry('library-misconfig-list-block-type-removed', 'library-element-two-id'),
 	],
-	gridEntries: [externalGridEntry('library-misconfig-grid-element-type-deleted', 'library-element-state-orphan-type-id')],
+	gridEntries: [
+		externalGridEntry('library-misconfig-grid-element-type-deleted', 'library-element-state-orphan-type-id'),
+		externalGridEntry('library-misconfig-grid-root-element-two', 'library-element-two-id'),
+	],
 	gridContainer: {
 		key: 'library-misconfig-grid-container',
 		title: 'Area allows Element One only',
