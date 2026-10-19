@@ -22,6 +22,11 @@ public static class AuthorizationPolicies
 
     public const string ElementFolderPermissionByResource = nameof(ElementFolderPermissionByResource);
 
+    /// <summary>
+    ///     Requires that the user has access to the document blueprints in the request.
+    /// </summary>
+    public const string DocumentBlueprintPermissionByResource = nameof(DocumentBlueprintPermissionByResource);
+
     // Single section access
     public const string SectionAccessContent = nameof(SectionAccessContent);
     public const string SectionAccessPackages = nameof(SectionAccessPackages);
@@ -38,8 +43,14 @@ public static class AuthorizationPolicies
     public const string SectionAccessForContentTree = nameof(SectionAccessForContentTree);
     public const string SectionAccessForElementTree = nameof(SectionAccessForElementTree);
 
+    /// <summary>
+    ///     Requires access to a section that shows the document blueprint tree.
+    /// </summary>
+    public const string SectionAccessForDocumentBlueprintTree = nameof(SectionAccessForDocumentBlueprintTree);
+
     // Single tree access
     public const string TreeAccessDocuments = nameof(TreeAccessDocuments);
+    public const string TreeAccessDocumentBlueprints = nameof(TreeAccessDocumentBlueprints);
     public const string TreeAccessElements = nameof(TreeAccessElements);
     public const string TreeAccessPartialViews = nameof(TreeAccessPartialViews);
     public const string TreeAccessDataTypes = nameof(TreeAccessDataTypes);
@@ -57,12 +68,14 @@ public static class AuthorizationPolicies
 
     // Custom access based on multiple trees
     public const string TreeAccessDocumentsOrDocumentTypes = nameof(TreeAccessDocumentsOrDocumentTypes);
+    public const string TreeAccessDocumentsOrDocumentBlueprints = nameof(TreeAccessDocumentsOrDocumentBlueprints);
     public const string TreeAccessDocumentsOrElementsOrDocumentTypes = nameof(TreeAccessDocumentsOrElementsOrDocumentTypes);
     public const string TreeAccessMediaOrMediaTypes = nameof(TreeAccessMediaOrMediaTypes);
     public const string TreeAccessDictionaryOrTemplates = nameof(TreeAccessDictionaryOrTemplates);
     public const string TreeAccessDocumentOrMediaOrContentTypes = nameof(TreeAccessDocumentOrMediaOrContentTypes);
     public const string TreeAccessDocumentsOrMediaOrMembersOrContentTypes = nameof(TreeAccessDocumentsOrMediaOrMembersOrContentTypes);
     public const string TreeAccessDocumentsOrElementsOrMediaOrMembersOrContentTypes = nameof(TreeAccessDocumentsOrElementsOrMediaOrMembersOrContentTypes);
+    public const string TreeAccessDocumentsOrElementsOrMediaOrMembers = nameof(TreeAccessDocumentsOrElementsOrMediaOrMembers);
     public const string TreeAccessStylesheetsOrDocumentOrMediaOrMember = nameof(TreeAccessStylesheetsOrDocumentOrMediaOrMember);
     public const string TreeAccessMembersOrMemberTypes = nameof(TreeAccessMembersOrMemberTypes);
 

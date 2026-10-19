@@ -66,5 +66,6 @@ public class UmbracoPremigrationPlan : MigrationPlan
         // To 19.0.0
         To<V_19_0_0.AddInvariantEditedToDocumentAndElement>("{9578215E-3A50-486D-905C-1AF7ADB1C159}");
         To<V_19_0_0.AddHasAccessToInvariantForVariantColumnToUserGroup>("{550AD0E5-2AAA-4D51-BAE1-7ACCB4822F21}");
+        To<V_19_0_0.AddDocumentBlueprintStartNodeToUserGroup>("{FB1256C8-FA43-46B0-903D-E3FFE3C19824}");
     }
 }
