@@ -582,6 +582,143 @@ const variantLibraryStatesDocumentType: UmbMockDocumentTypeModel = {
 	flags: [],
 };
 
+const createLibraryElementStatesDocumentType = ({
+	id,
+	alias,
+	name,
+	containerId,
+	listPropertyId,
+	gridPropertyId,
+	listDescription,
+	gridDescription,
+}: {
+	id: string;
+	alias: string;
+	name: string;
+	containerId: string;
+	listPropertyId: string;
+	gridPropertyId: string;
+	listDescription: string;
+	gridDescription: string;
+}): UmbMockDocumentTypeModel => {
+	const createProperty = (
+		propertyId: string,
+		propertyAlias: string,
+		propertyName: string,
+		description: string,
+		dataTypeId: string,
+		sortOrder: number,
+	): UmbMockDocumentTypeModel['properties'][number] => ({
+		id: propertyId,
+		container: { id: containerId },
+		alias: propertyAlias,
+		name: propertyName,
+		description,
+		dataType: { id: dataTypeId },
+		variesByCulture: false,
+		variesBySegment: false,
+		sortOrder,
+		validation: {
+			mandatory: false,
+			mandatoryMessage: null,
+			regEx: null,
+			regExMessage: null,
+		},
+		appearance: {
+			labelOnTop: false,
+		},
+	});
+
+	return {
+		allowedTemplates: [],
+		defaultTemplate: null,
+		id,
+		alias,
+		name,
+		description: null,
+		icon: 'icon-bulleted-list color-green',
+		allowedAsRoot: true,
+		allowedInLibrary: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		noAccess: false,
+		parent: null,
+		isFolder: false,
+		properties: [
+			createProperty(
+				listPropertyId,
+				'blockListLibraryStates',
+				'Block List - Library States',
+				listDescription,
+				'b6e1d4c8-5a27-4f93-8c0b-1d7a9e3f2b56',
+				0,
+			),
+			createProperty(
+				gridPropertyId,
+				'blockGridLibraryStates',
+				'Block Grid - Library States',
+				gridDescription,
+				'2f8c5a1e-9d36-4b70-a4e2-7c1b0d6f8a93',
+				1,
+			),
+		],
+		containers: [
+			{
+				id: containerId,
+				parent: null,
+				name: 'Content',
+				type: 'Group',
+				sortOrder: 0,
+			},
+		],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	};
+};
+
+const lifecycleDescription = [
+	'1. Element is published.',
+	'2. Element is a draft, never published.',
+	'3. Element is published with pending changes.',
+	'4. Element has been unpublished.',
+	'5. Element is in the recycle bin.',
+	'6. Element has been deleted.',
+	'7. Element is not accessible to the current user.',
+].join('\n');
+
+const libraryElementLifecycleDocumentType = createLibraryElementStatesDocumentType({
+	id: '4a9e6c2d-8b15-4f73-9d0a-5e2c7b1f3a68',
+	alias: 'libraryElementLifecycleDocType',
+	name: 'Library Element Lifecycle',
+	containerId: '9c3f7a1b-4d86-4e25-a1b9-2e6d8f0c5a37',
+	listPropertyId: 'pt-159',
+	gridPropertyId: 'pt-160',
+	listDescription: lifecycleDescription,
+	gridDescription: lifecycleDescription,
+});
+
+const libraryElementMisconfigurationsDocumentType = createLibraryElementStatesDocumentType({
+	id: '7d2b5e9c-3a61-4f08-b4d7-0e8a1c6f3b95',
+	alias: 'libraryElementMisconfigurationsDocType',
+	name: 'Library Element Misconfigurations',
+	containerId: '1e6a8c3f-5b92-4d70-8a14-9f2d7b0c4e63',
+	listPropertyId: 'pt-161',
+	gridPropertyId: 'pt-162',
+	listDescription: ['1. Element Type has been deleted.', '2. Block Type configuration has been removed.'].join('\n'),
+	gridDescription: [
+		'1. Grid Area contains a Library Element whose Block Type configuration has been removed from areas.',
+		'2. Element Type has been deleted.',
+	].join('\n'),
+});
+
 export const data: Array<UmbMockDocumentTypeModel> = [
 	elementOneElementType,
 	elementTwoElementType,
@@ -592,4 +729,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 	variantBlockListDocumentType,
 	variantElementElementType,
 	variantLibraryStatesDocumentType,
+	libraryElementLifecycleDocumentType,
+	libraryElementMisconfigurationsDocumentType,
 ];
