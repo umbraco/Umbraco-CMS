@@ -46,6 +46,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
 	CreateArgsType extends UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> =
 		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
+	IncomingDataHookMetaType extends UmbEntityDetailIncomingDataHookMeta = UmbEntityDetailIncomingDataHookMeta,
 >
 	extends UmbSubmittableWorkspaceContextBase<DetailModelType>
 	implements UmbSubmittableTreeEntityWorkspaceContext
@@ -79,13 +80,13 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * Anything the incoming data depends on being in place can be made ready here. All methods run at the same time,
 	 * so they must not depend on each other.
 	 */
-	public readonly initHook = new UmbParallelHookController<UmbEntityDetailInitHookMeta>();
+	public readonly initHook = new UmbParallelHookController<UmbEntityDetailInitHookMeta>(this);
 
 	/**
 	 * Runs on all incoming entity data before it is applied to the workspace, regardless of how it arrived.
 	 * Hook methods are awaited in order of weight and return the data, optionally changed.
 	 */
-	public readonly incomingDataHook = new UmbParallelHookController<UmbEntityDetailIncomingDataHookMeta>();
+	public readonly incomingDataHook = new UmbParallelHookController<IncomingDataHookMetaType>(this);
 
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 

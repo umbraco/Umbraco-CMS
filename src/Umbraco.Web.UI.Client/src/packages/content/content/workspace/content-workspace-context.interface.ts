@@ -4,6 +4,7 @@ import type { UmbContentTypeModel, UmbPropertyStructureWorkspaceContext } from '
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId, UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type {
+	UmbEntityDetailIncomingDataHookMeta,
 	UmbEntityDetailInitHookMeta,
 	UmbRoutableWorkspaceContext,
 	UmbVariantDatasetWorkspaceContext,
@@ -41,8 +42,6 @@ export interface UmbContentWorkspaceContext<
 	getIsWritableVariant(variantId: UmbVariantId): boolean;
 }
 
-export type UmbContentDetailIncomingDataHookMeta = {
-	entityType: string;
-	unique: string | null;
+export interface UmbContentDetailIncomingDataHookMeta extends UmbEntityDetailIncomingDataHookMeta {
 	contentType: UmbReferenceByUnique | undefined;
-};
+}

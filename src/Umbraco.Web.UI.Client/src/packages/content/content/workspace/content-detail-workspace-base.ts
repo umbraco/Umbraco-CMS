@@ -8,7 +8,10 @@ import type { UmbContentValidationRepository } from '../repository/content-valid
 import type { UmbContentCollectionWorkspaceContext } from '../collection/content-collection-workspace-context.interface.js';
 import { UmbEntryDataValueVariantsController } from '../controller/entry-data-value-variants.controller.js';
 import { umbEntryAppendValue } from '../utils/index.js';
-import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
+import type {
+	UmbContentDetailIncomingDataHookMeta,
+	UmbContentWorkspaceContext,
+} from './content-workspace-context.interface.js';
 import { _resolveIsWritableVariant } from './content-writable-variant.function.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
@@ -122,7 +125,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	CreateArgsType extends UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> =
 		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
 >
-	extends UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType, CreateArgsType>
+	extends UmbEntityDetailWorkspaceContextBase<
+		DetailModelType,
+		DetailRepositoryType,
+		CreateArgsType,
+		UmbContentDetailIncomingDataHookMeta
+	>
 	implements
 		UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType, VariantOptionModelType>,
 		UmbSaveableWorkspaceContext,
