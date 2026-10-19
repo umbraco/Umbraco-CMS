@@ -151,7 +151,7 @@ export class UmbWorkspaceVariantOptionsController<
 		// Only segment variation
 		if (!varyByCulture && varyBySegment) {
 			const invariantCulture = {
-				variant: undefined, // We do not store variant-data for segments. [NL]
+				variant: variants.find((x) => x.culture === null),
 				culture: null,
 				segment: null,
 				unique: new UmbVariantId().toString(),
