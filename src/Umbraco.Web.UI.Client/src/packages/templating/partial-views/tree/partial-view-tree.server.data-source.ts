@@ -18,7 +18,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * A data source for the PartialView tree that fetches data from the server
  * @class UmbPartialViewTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @implements {UmbTreeServerDataSourceBase}
  */
 export class UmbPartialViewTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	FileSystemTreeItemPresentationModel,

@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_TREE_ALIAS } from '../../../tree/manifests.js';
 import { UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '../../../search/constants.js';
-import type { UmbDocumentTreeItemModel } from '../../../types.js';
+import { type UmbDocumentTreeItemModel } from '../../../types.js';
 import type {
 	UmbDuplicateDocumentModalData,
 	UmbDuplicateDocumentModalValue,
@@ -91,7 +91,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_copyTo')}>
 				<uui-box id="tree-box">
-					<umb-picker-search-field></umb-picker-search-field>
+					<umb-picker-search-field .alias=${UMB_DOCUMENT_TREE_ALIAS}></umb-picker-search-field>
 					<umb-picker-search-result .pickableFilter=${this.#selectableFilter}></umb-picker-search-result>
 					${this.#renderTree()}
 				</uui-box>

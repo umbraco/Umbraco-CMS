@@ -20,7 +20,7 @@ export interface UmbWorkspaceDataManager<ModelType> extends UmbController {
 
 	/**
 	 * Checks if there are unpersisted changes
-	 * @returns {*}
+	 * @returns {boolean}
 	 */
 	getHasUnpersistedChanges(): boolean;
 

@@ -8,7 +8,7 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 /**
  * A data source for user items that fetches data from the server
  * @class UmbUserItemServerDataSource
- * @implements {UmbItemDataSource}
+ * @augments {UmbItemServerDataSourceBase<UserItemResponseModel, UmbUserItemModel>}
  */
 export class UmbUserItemServerDataSource extends UmbItemServerDataSourceBase<UserItemResponseModel, UmbUserItemModel> {
 	#itemRequestManager = new UmbManagementApiUserItemDataRequestManager(this);

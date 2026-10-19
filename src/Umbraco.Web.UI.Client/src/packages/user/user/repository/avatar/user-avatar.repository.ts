@@ -2,6 +2,7 @@ import { UmbUserRepositoryBase } from '../user-repository-base.js';
 import { UmbUserAvatarServerDataSource } from './user-avatar.server.data-source.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 	#temporaryFileManager = new UmbTemporaryFileManager(this);
@@ -13,9 +14,9 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 	 * @param {string} userUnique - The unique id of the user.
 	 * @param {File} file - The avatar image file to upload.
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the upload operation.
-	 * @memberof UmbUserRepository
+	 * @memberof UmbUserAvatarRepository
 	 */
-	async uploadAvatar(userUnique: string, file: File) {
+	async uploadAvatar(userUnique: string, file: File): Promise<UmbDataSourceErrorResponse> {
 		if (!userUnique) throw new Error('Id is missing');
 		await this.init;
 
@@ -52,9 +53,9 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 	 * Removes the avatar for the user with the given id
 	 * @param {string} userUnique - The unique id of the user.
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
-	 * @memberof UmbUserRepository
+	 * @memberof UmbUserAvatarRepository
 	 */
-	async deleteAvatar(userUnique: string) {
+	async deleteAvatar(userUnique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!userUnique) throw new Error('Id is missing');
 		await this.init;
 

@@ -54,11 +54,12 @@ internal sealed class ServerRoleAwareLastSyncedRepository : ILastSyncedRepositor
 
     private ILastSyncedRepository GetRepository()
     {
-        if (_serverRoleAccessor.Value.CurrentServerRole != ServerRole.Subscriber)
+        if (_serverRoleAccessor.Value.CurrentServerRole is ServerRole.Single or ServerRole.SchedulingPublisher)
         {
             return _databaseRepository;
         }
 
+        // Covers both Subscriber and Unknown - the role can still be unresolved this early in boot.
         return _databaseReadOnlyAccessor.IsReadOnly()
             ? _fileSystemRepository
             : _databaseRepository;

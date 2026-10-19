@@ -115,8 +115,9 @@ export class UmbLocalizationController<
 	 * Looks up a localization entry for the given key.
 	 * Searches in order: primary (regional) → secondary (language) → fallback (en).
 	 * Also tracks the key usage for reactive updates.
+	 * @template K
 	 * @param {string} key - the localization key to look up.
-	 * @returns {any} - the localization entry (string or function), or null if not found.
+	 * @returns {LocalizationSetType[K] | null} - the localization entry (string or function), or null if not found.
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	#lookupTerm<K extends keyof LocalizationSetType>(key: K): any {
@@ -140,7 +141,7 @@ export class UmbLocalizationController<
 
 	/**
 	 * Processes a localization entry (string or function) with the provided arguments.
-	 * @param {any} term - the localization entry to process.
+	 * @param {string | ((...args: unknown[]) => string)} term - the localization entry to process.
 	 * @param {unknown[]} args - the arguments to apply to the term.
 	 * @returns {string} - the processed term as a string.
 	 */

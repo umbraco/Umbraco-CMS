@@ -50,6 +50,11 @@ export default [
 			'no-var': 'error',
 			'import-x/namespace': 'off',
 			'import-x/no-unresolved': 'off',
+			// Off: this codebase deliberately gives many classes/elements both a named export and a
+			// `export default` (the default is required for manifest-driven dynamic `js: () => import(...)`
+			// loading). The rule then flags every plain `import Foo from './foo.js'` of that class elsewhere,
+			// forcing `import { Foo } from './foo.js'` for no behavioural benefit.
+			'import-x/no-named-as-default': 'off',
 			// Off: false-positives on barrel files that reach the same underlying binding via two `export *`
 			// paths (e.g. an index.ts re-exporting both a submodule barrel and that submodule's constants
 			// directly) — harmless per the ES module spec, but the rule doesn't resolve to the original
@@ -61,8 +66,7 @@ export default [
 			'local-rules/enforce-manifest-alias': 'warn',
 			'local-rules/prefer-static-styles-last': 'warn',
 			'local-rules/no-unsafe-localize': 'error',
-			// TODO: change to 'error' when the ~130 current violations are cleaned up. [NL]
-			'local-rules/enforce-null-observe-alias-in-constructor': 'warn',
+			'local-rules/enforce-null-observe-alias-in-constructor': 'error',
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',
 				{
@@ -128,7 +132,7 @@ export default [
 			// import-x/named is off in the plugin's own typescript preset (spread above), but that preset's
 			// `rules` is a sibling key here and gets overwritten by this literal — restate it explicitly.
 			// TS type-checking already covers "does this import exist"; the rule's own resolution is prone
-			// to false negatives on deep/cyclic re-export barrels, which this codebase has plenty of.
+			// to false negatives on deep/cyclic re-export barrels.
 			'import-x/named': 'off',
 			'no-unused-vars': 'off', //Let '@typescript-eslint/no-unused-vars' catch the errors to allow unused function parameters (ex: in interfaces)
 			'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],

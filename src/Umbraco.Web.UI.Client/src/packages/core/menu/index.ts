@@ -1,4 +1,5 @@
 export * from './components/index.js';
+export * from './menu-list-structure-workspace-context-base.js';
 export * from './menu-tree-structure-workspace-context-base.js';
 export * from './menu-structure-workspace-context.context-token.js';
 export * from './menu-variant-structure-workspace-context.context-token.js';
@@ -8,3 +9,4 @@ export * from './constants.js';
 export type * from './types.js';
 
 export type { UmbMenuStructureWorkspaceContext } from './menu-structure-workspace-context.interface.js';
+export type { UmbMenuVariantStructureWorkspaceContext } from './menu-variant-structure-workspace-context.interface.js';

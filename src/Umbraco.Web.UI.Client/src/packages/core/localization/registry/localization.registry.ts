@@ -64,6 +64,26 @@ function baseLocaleOf(locale: string): string {
 	return new Intl.Locale(locale).baseName.toLowerCase();
 }
 
+/**
+ * Locale-sensitive formatting is delegated to `Intl`, which resolves a language-only tag to the
+ * conventions of that language's default region. Where the dictionary we ship under that tag is
+ * written for a different region, the default is wrong for our users and is corrected here.
+ * Keyed on the full base name, so an explicitly requested region is never overridden.
+ */
+const FORMATTING_LOCALE_OVERRIDES: Record<string, string> = {
+	// The `en` dictionary is UK English, but `Intl` resolves a bare `en` to US conventions.
+	en: 'en-gb',
+};
+
+/**
+ * Returns the locale to use for locale-sensitive formatting of the given base name.
+ * @param {string} baseName - the lowercase base name of the requested locale.
+ * @returns {string} the formatting locale, which is the base name itself unless overridden.
+ */
+function toFormattingLocale(baseName: string): string {
+	return FORMATTING_LOCALE_OVERRIDES[baseName] ?? baseName;
+}
+
 export class UmbLocalizationRegistry {
 	// The active language is driven by the consuming host element (<umb-app>, <umb-auth>) via
 	// `loadLanguage()` — Razor sets `lang="@DefaultUILanguage"` on those, the element passes
@@ -97,7 +117,7 @@ export class UmbLocalizationRegistry {
 				// language on its first render. Direction and the actual consumer notification
 				// happen below, once the dictionaries are in place.
 				tap((currentLanguage) => {
-					umbLocalizationManager.documentLanguage = baseLocaleOf(currentLanguage);
+					umbLocalizationManager.documentLanguage = toFormattingLocale(baseLocaleOf(currentLanguage));
 				}),
 				// Switch to the extensions registry to get the current language and the extensions for that language
 				// Note: This also cancels the previous subscription if the language changes
@@ -147,14 +167,15 @@ export class UmbLocalizationRegistry {
 							// Set the browser language and direction based on the translations
 							this.#setBrowserLanguage(locale!, translations);
 						})(),
+					).pipe(
+						// Caught on the inner observable so that an error only drops this load; caught on
+						// the outer pipe it would complete the subscription and stop all later language loads.
+						catchError((error) => {
+							console.error('Error loading translations:', error);
+							return of(undefined);
+						}),
 					),
 				),
-				// Catch any errors that occur while loading the translations
-				// This is important to ensure that the observable does not error out and stop the subscription
-				catchError((error) => {
-					console.error('Error loading translations:', error);
-					return of([]);
-				}),
 			)
 			// Subscribe to the observable to trigger the loading of translations
 			.subscribe();
@@ -171,13 +192,18 @@ export class UmbLocalizationRegistry {
 		}
 
 		// If extension contains a js file, load it and add the default dictionary to the inner dictionary.
+		// A failing file (e.g. a 404 on a stale chunk after a deploy) must not take down the other dictionaries.
 		if (extension.js) {
-			const loadedExtension = await loadManifestPlainJs(extension.js);
+			try {
+				const loadedExtension = await loadManifestPlainJs(extension.js);
 
-			if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
-				for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
-					addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
+				if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
+					for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
+						addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
+					}
 				}
+			} catch (error) {
+				console.error(`Localization extension "${extension.alias}" failed to load and was skipped:`, error);
 			}
 		}
 
@@ -207,7 +233,7 @@ export class UmbLocalizationRegistry {
 		// controller to re-render against the freshly loaded dictionaries. Inlined here because
 		// it's the only place this happens — no need for another public method on the manager
 		// that we'd just have to retire when the manager and registry get merged.
-		umbLocalizationManager.documentLanguage = newLang;
+		umbLocalizationManager.documentLanguage = toFormattingLocale(newLang);
 		umbLocalizationManager.documentDirection = direction;
 		umbLocalizationManager.connectedControllers.forEach((ctrl) => ctrl.documentUpdate());
 	}

@@ -113,7 +113,7 @@ public class AddEditorUiToDataType : MigrationBase
                 }
                 else
                 {
-                    _logger.LogWarning("No migration data was found for the data editor split for data type {name} ({editorAlias} - {id}). Please make sure you're upgrading from the latest V13. The affected data type may not work correctly.", dataTypeDto.NodeDto.Text, dataTypeDto.EditorAlias, dataTypeDto.NodeId);
+                    _logger.LogWarning("No migration data was found for the data editor split for data type {name} ({editorAlias} - id {id}, key {dataTypeKey}). Please make sure you're upgrading from the latest V13. The affected data type may not work correctly.", dataTypeDto.NodeDto.Text, dataTypeDto.EditorAlias, dataTypeDto.NodeId, dataTypeDto.NodeDto.UniqueId);
 
                     // we *need* an EditorUiAlias - default to the editor alias (let the client handle later)
                     dataTypeDto.EditorUiAlias = dataTypeDto.EditorAlias;

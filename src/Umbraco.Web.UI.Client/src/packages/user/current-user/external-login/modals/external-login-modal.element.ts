@@ -11,6 +11,7 @@ import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
+import { of } from '@umbraco-cms/backoffice/external/rxjs';
 
 type UmbExternalLoginProviderOption = UmbCurrentUserExternalLoginProviderModel & {
 	displayName: string;
@@ -39,7 +40,9 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 	}
 
 	async #loadProviders() {
-		const serverLoginProviders$ = (await this.#currentUserRepository.requestExternalLoginProviders()).asObservable();
+		// TODO: Fail early? if no asObservable method is available on the server response, we should probably throw an error or handle it differently. [NL]
+		const serverLoginProviders$ =
+			(await this.#currentUserRepository.requestExternalLoginProviders()).asObservable?.() ?? of([]);
 		const manifestLoginProviders$ = umbExtensionsRegistry.byTypeAndFilter(
 			'authProvider',
 			(ext) => !!ext.meta?.linking?.allowManualLinking,

@@ -24,7 +24,7 @@ export type UmbPropertyValueResolverValuesProcessor<
 	value: PropertyValueType,
 	valuesProcessor: (
 		values: Array<InnerPropertyValueType>,
-		groupIdentifier?: string,
+		identifier?: string,
 	) => Promise<Array<InnerPropertyValueType> | undefined>,
 ) => PromiseLike<PropertyValueType | undefined>;
 

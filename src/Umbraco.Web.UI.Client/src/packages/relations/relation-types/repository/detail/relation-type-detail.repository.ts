@@ -2,9 +2,13 @@ import type { UmbRelationTypeDetailModel } from '../../types.js';
 import { UmbRelationTypeDetailServerDataSource } from './relation-type-detail.server.data-source.js';
 import { UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT } from './relation-type-detail.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbReadDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbReadDetailRepository,
+	UmbRepositoryResponseWithAsObservable,
+} from '@umbraco-cms/backoffice/repository';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 // TODO: create read detail repository mixin
 export class UmbRelationTypeDetailRepository
@@ -28,10 +32,14 @@ export class UmbRelationTypeDetailRepository
 	/**
 	 * Requests the detail for the given unique
 	 * @param {string} unique - The unique identifier of the relation type.
-	 * @returns {*} The relation type detail.
-	 * @memberof UmbDetailRepositoryBase
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<UmbRelationTypeDetailModel, UmbRelationTypeDetailModel | undefined>>} The relation type detail.
+	 * @memberof UmbRelationTypeDetailRepository
 	 */
-	async requestByUnique(unique: string) {
+	async requestByUnique(
+		unique: string,
+	): Promise<
+		UmbRepositoryResponseWithAsObservable<UmbRelationTypeDetailModel, UmbRelationTypeDetailModel | undefined>
+	> {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
@@ -47,10 +55,10 @@ export class UmbRelationTypeDetailRepository
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {string} unique - The unique identifier of the relation type.
-	 * @returns {*} An observable of the relation type detail.
-	 * @memberof UmbDetailRepositoryBase
+	 * @returns {Promise<Observable<UmbRelationTypeDetailModel | undefined>>} An observable of the relation type detail.
+	 * @memberof UmbRelationTypeDetailRepository
 	 */
-	async byUnique(unique: string) {
+	async byUnique(unique: string): Promise<Observable<UmbRelationTypeDetailModel | undefined>> {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 		return this.#detailStore!.byUnique(unique);

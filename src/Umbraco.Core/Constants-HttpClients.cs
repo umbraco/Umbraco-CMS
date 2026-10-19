@@ -22,6 +22,11 @@ public static partial class Constants
         public const string WebhookFiring = "Umbraco:HttpClients:WebhookFiring";
 
         /// <summary>
+        ///     Name for http client which requests the back office news dashboard content.
+        /// </summary>
+        public const string News = "Umbraco:HttpClients:News";
+
+        /// <summary>
         ///     Contains HTTP header constants for Umbraco HTTP clients.
         /// </summary>
         public static class Headers

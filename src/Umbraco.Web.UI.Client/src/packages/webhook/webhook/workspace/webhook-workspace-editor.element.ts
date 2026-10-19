@@ -1,4 +1,3 @@
-import { UMB_WEBHOOK_ROOT_WORKSPACE_PATH } from '../../constants.js';
 import { UMB_WEBHOOK_WORKSPACE_CONTEXT } from './webhook-workspace.context-token.js';
 import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
@@ -41,7 +40,7 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-entity-detail-workspace-editor back-path=${UMB_WEBHOOK_ROOT_WORKSPACE_PATH}>
+			<umb-entity-detail-workspace-editor show-back-to-parent-button>
 				<div id="header" slot="header">
 					<div id="editors">
 						<uui-input

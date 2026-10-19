@@ -78,6 +78,8 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 	/**
 	 * Hook to clean data before comparison. Override to remove properties
 	 * that should not affect the pending-changes calculation.
+	 * @template {UmbEntityVariantModel} TVariantModel
+	 * @template {UmbContentDetailModel<TVariantModel>} TDetailModel
 	 * @param {TDetailModel} _mergedData - The merged data clone.
 	 * @param {TDetailModel} _publishedData - The published data clone.
 	 */

@@ -21,7 +21,6 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 /**
  * A server data source for Document publishing
  * @class UmbDocumentPublishingServerDataSource
- * @implements {DocumentTreeDataSource}
  */
 export class UmbDocumentPublishingServerDataSource {
 	#host: UmbControllerHost;
@@ -40,14 +39,14 @@ export class UmbDocumentPublishingServerDataSource {
 	 * @param {UmbDocumentDetailModel} model - Document Model
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after creating
 	 * @param {string | null} parentUnique - The unique of the parent to create under
-	 * @returns {*} The result of the create and publish request
+	 * @returns {Promise<UmbDataSourceResponse>} The result of the create and publish request
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async createAndPublish(
 		model: UmbDocumentDetailModel,
 		variantIds: Array<UmbVariantId>,
 		parentUnique: string | null = null,
-	) {
+	): Promise<UmbDataSourceResponse<string>> {
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 
@@ -59,14 +58,18 @@ export class UmbDocumentPublishingServerDataSource {
 		// 201 Created returns only the key (no document body). The workspace reloads after this to refresh
 		// its state, so we deliberately do NOT re-read the full document here — that would be a redundant
 		// round-trip on top of the reload.
-		return tryExecute(this.#host, DocumentService.postDocumentCreateAndPublish({ body }));
+		const { data, error } = await tryExecute(this.#host, DocumentService.postDocumentCreateAndPublish({ body }));
+
+		// The generated response type is `unknown` (Swagger has no schema for the empty 201 body), but the
+		// Umb-Generated-Resource interceptor rewrites it to the created document's key at runtime.
+		return { data: data as string | undefined, error };
 	}
 
 	/**
 	 * Updates and publishes a Document on the server in a single operation
 	 * @param {UmbDocumentDetailModel} model - Document Model
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after updating
-	 * @returns {*} The result of the update and publish request
+	 * @returns {Promise<UmbDataSourceResponse>} The result of the update and publish request
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async updateAndPublish(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>) {
@@ -100,7 +103,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * Publish one or more variants of a Document
 	 * @param {string} unique - The unique of the Document
 	 * @param {Array<UmbDocumentVariantPublishModel>} variants - The variants to publish
-	 * @returns {*} The result of the publish request
+	 * @returns {Promise<UmbDataSourceResponse>} The result of the publish request
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async publish(unique: string, variants: Array<UmbDocumentVariantPublishModel>) {
@@ -127,7 +130,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * Unpublish one or more variants of a Document
 	 * @param {string} unique - The unique of the Document
 	 * @param {Array<UmbVariantId>} variantIds - The variants to unpublish
-	 * @returns {*} The result of the unpublish request
+	 * @returns {Promise<UmbDataSourceResponse>} The result of the unpublish request
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async unpublish(unique: string, variantIds: Array<UmbVariantId>) {
@@ -198,7 +201,7 @@ export class UmbDocumentPublishingServerDataSource {
 			}
 
 			if (data.isComplete) {
-				return { error: null };
+				return { error: undefined };
 			}
 		}
 	}

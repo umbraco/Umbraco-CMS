@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <!-- Add design/build time support for EF Core migrations -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.13" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,7 +49,17 @@
     of the vulnerable 2.1.11 that Microsoft.Data.Sqlite / Microsoft.EntityFrameworkCore.Sqlite otherwise
     resolve (GHSA-2m69-gcr7-jv3q).
     -->
-    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+    Umbraco.Web.UI opts out of central package management, so the System.Security.Cryptography.Pkcs transitive pin in
+    Directory.Packages.props does not reach it. Reference it directly to force the patched version instead
+    of the vulnerable 10.0.0 that MailKit (via MimeKit) otherwise resolves (GHSA-846f-f764-76mx, GHSA-2fmv-rv2c-59x7).
+    Keep in sync with the central pin.
+    -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
   </ItemGroup>
 
   <PropertyGroup>

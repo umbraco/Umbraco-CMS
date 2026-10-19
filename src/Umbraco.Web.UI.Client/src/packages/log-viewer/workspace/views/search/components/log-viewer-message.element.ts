@@ -72,9 +72,15 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 				icon: 'icon-umbraco',
 			},
 			{
+				label: this.localize.term('logViewer_searchUmbracoDocs'),
+				title: this.localize.term('logViewer_searchThisMessageInUmbracoDocs'),
+				href: () => `https://docs.umbraco.com/?q=${this.renderedMessage}`,
+				icon: 'icon-book-alt',
+			},
+			{
 				label: this.localize.term('logViewer_searchOurUmbracoWithGoogle'),
 				title: this.localize.term('logViewer_searchOurUmbracoForumsUsingGoogle'),
-				href: () => `https://www.google.com/?q=site:forum.umbraco.com%20${this.renderedMessage}`,
+				href: () => `https://www.google.com/search?q=site:forum.umbraco.com%20${this.renderedMessage}`,
 				icon: 'icon-google',
 			},
 			{

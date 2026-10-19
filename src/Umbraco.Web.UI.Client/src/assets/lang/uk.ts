@@ -196,6 +196,7 @@ export default {
 		isSensitiveValue:
 			"Це значення приховано. Якщо Вам потрібний доступ до цього значення, зв'яжіться з адміністратором веб-сайту.",
 		isSensitiveValue_short: 'Це значення приховано.',
+		isSensitiveValueNotice: "Якщо Вам потрібний доступ до прихованих значень, зв'яжіться з адміністратором веб-сайту.",
 		itemChanged: 'Цей документ було змінено після публікації',
 		itemNotPublished: 'Цей документ не опубліковано',
 		lastPublished: 'Документ опубліковано',
@@ -571,6 +572,8 @@ export default {
 		next: 'Наст.',
 		no: 'Ні',
 		noItemsInList: 'Тут поки що немає елементів',
+		noResults: 'Немає результатів',
+		noResultsFor: (query: string) => `Немає результатів за запитом "${query}".`,
 		of: 'з',
 		off: 'Вимк',
 		ok: 'Ok',
@@ -838,6 +841,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Натисніть, щоб завантажити',
+		browseFilesAction: 'Огляд файлів',
+		dropFilesOr: 'Перетягніть медіафайли сюди<br />або',
 		disallowedFileType: 'Неможливе завантаження цього файлу, цей тип файлів не дозволяється для завантаження',
 		orClickHereToUpload: 'або натисніть тут, щоб вибрати файли',
 		maxFileSize: 'Максимально допустимий розмір файлу: ',
@@ -1104,6 +1109,17 @@ export default {
 		sortHelp:
 			'Перетягуйте елементи на потрібне місце вгору або вниз для визначення потрібного порядку сортування. Також можна використовувати заголовки стовпців, щоб відсортувати всі елементи одразу.',
 		sortPleaseWait: 'Зачекайте, будь ласка... Сторінки сортуються, це може зайняти деякий час.',
+		sortByFieldHeadline: 'Сортувати за полем',
+		sortByFieldSentence: 'Сортувати всі дочірні елементи за',
+		sortByFieldDirectionLabel: 'Напрямок',
+		sortByFieldAscending: 'За зростанням',
+		sortByFieldDescending: 'За спаданням',
+		sortByFieldNameOption: 'Ім’я',
+		sortByFieldCreateDateOption: 'Створено',
+		sortByFieldUpdateDateOption: 'Останнє редагування',
+		sortIndividuallyHeadline: 'Сортувати окремо',
+		sortByFieldCultureSentence: 'мовою',
+		sortByFieldCultureLabel: 'Мова',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'Процес публікації скасовано встановленим пакетом доповнень.',
@@ -1339,6 +1355,10 @@ export default {
 		stylesheets: 'Стилі CSS',
 		templates: 'Шаблони',
 		users: 'Користувачі',
+	},
+	picker: {
+		browseTab: 'Огляд',
+		searchTab: 'Пошук',
 	},
 	update: {
 		updateAvailable: 'Доступні оновлення',

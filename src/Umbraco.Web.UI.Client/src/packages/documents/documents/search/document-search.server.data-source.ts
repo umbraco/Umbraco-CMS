@@ -6,11 +6,12 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentService, type DocumentItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbDocumentSearchServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbSearchDataSource}
  */
 export class UmbDocumentSearchServerDataSource implements UmbSearchDataSource<
 	UmbDocumentSearchItemModel,
@@ -56,10 +57,12 @@ export class UmbDocumentSearchServerDataSource implements UmbSearchDataSource<
 	/**
 	 * Get a list of versions for a document
 	 * @param {UmbDocumentSearchRequestArgs} args - The arguments for the search
-	 * @returns {*} The search results
+	 * @returns {UmbDataSourceResponse<UmbPagedModel<UmbDocumentSearchItemModel>>} The search results
 	 * @memberof UmbDocumentSearchServerDataSource
 	 */
-	async search(args: UmbDocumentSearchRequestArgs) {
+	async search(
+		args: UmbDocumentSearchRequestArgs,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentSearchItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.getItemDocumentSearch({

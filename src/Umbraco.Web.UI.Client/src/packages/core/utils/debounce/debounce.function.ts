@@ -6,6 +6,7 @@ export interface UmbDebouncedFunction<T extends (...args: Array<any>) => any> {
 /**
  * Creates a debounced version of the provided function that delays execution
  * until after the specified wait time has elapsed since the last invocation.
+ * @template T
  * @param {T} fn - The function to debounce
  * @param {number} ms - Delay in milliseconds (default: 0)
  * @returns {UmbDebouncedFunction<T>} A debounced function with a cancel method

@@ -49,7 +49,7 @@ internal sealed class SvgFileUploadMediaSavingNotificationHandler : INotificatio
         if (model.Properties.TryGetValue(Core.Constants.Conventions.Media.Width, out _) is false
             || model.Properties.TryGetValue(Core.Constants.Conventions.Media.Height, out _) is false)
         {
-            _logger.LogDebug("Skipping SVG dimension extraction for media {MediaId}: width/height properties not found on content type.", model.Id);
+            _logger.LogDebug("Skipping SVG dimension extraction for media {MediaId} (key {MediaKey}): width/height properties not found on content type.", model.Id, model.Key);
             return;
         }
 
@@ -58,7 +58,7 @@ internal sealed class SvgFileUploadMediaSavingNotificationHandler : INotificatio
 
         if (property is null)
         {
-            _logger.LogDebug("Skipping SVG dimension extraction for media {MediaId}: no upload field property found.", model.Id);
+            _logger.LogDebug("Skipping SVG dimension extraction for media {MediaId} (key {MediaKey}): no upload field property found.", model.Id, model.Key);
             return;
         }
 
@@ -75,7 +75,7 @@ internal sealed class SvgFileUploadMediaSavingNotificationHandler : INotificatio
 
             if (_mediaFileManager.FileSystem.FileExists(filepath) is false)
             {
-                _logger.LogWarning("SVG file not found at path {FilePath} for media {MediaId}.", filepath, model.Id);
+                _logger.LogWarning("SVG file not found at path {FilePath} for media {MediaId} (key {MediaKey}).", filepath, model.Id, model.Key);
                 continue;
             }
 
@@ -90,13 +90,13 @@ internal sealed class SvgFileUploadMediaSavingNotificationHandler : INotificatio
         Size? size = _svgDimensionExtractor.GetDimensions(filestream);
         if (size.HasValue)
         {
-            _logger.LogDebug("Extracted SVG dimensions {Width}x{Height} for media {MediaId}.", size.Value.Width, size.Value.Height, model.Id);
+            _logger.LogDebug("Extracted SVG dimensions {Width}x{Height} for media {MediaId} (key {MediaKey}).", size.Value.Width, size.Value.Height, model.Id, model.Key);
             SetProperty(model, Core.Constants.Conventions.Media.Width, size.Value.Width, culture, segment);
             SetProperty(model, Core.Constants.Conventions.Media.Height, size.Value.Height, culture, segment);
         }
         else
         {
-            _logger.LogDebug("Could not extract dimensions from SVG for media {MediaId}.", model.Id);
+            _logger.LogDebug("Could not extract dimensions from SVG for media {MediaId} (key {MediaKey}).", model.Id, model.Key);
         }
     }
 

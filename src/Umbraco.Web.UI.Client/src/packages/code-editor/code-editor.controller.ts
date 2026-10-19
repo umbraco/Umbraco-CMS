@@ -204,7 +204,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Provides the current selections of the editor.
-	 * @returns {*}  {UmbCodeEditorSelection[]}
+	 * @returns {UmbCodeEditorSelection[]} The current selections.
 	 * @memberof UmbCodeEditor
 	 */
 	getSelections(): UmbCodeEditorSelection[] {
@@ -213,7 +213,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 	/**
 	 * Provides the current positions of the cursor or multiple cursors.
-	 * @returns {*}  {(UmbCodeEditorCursorPosition | null)}
+	 * @returns {(UmbCodeEditorCursorPosition | null)} The current cursor position.
 	 * @memberof UmbCodeEditor
 	 */
 	getPositions(): UmbCodeEditorCursorPosition | null {
@@ -239,7 +239,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	 * Looks for a string or matching strings in the editor and returns the ranges of the found strings. Can use regex, case sensitive and more. If you want regex set the isRegex to true in the options.
 	 * @param {string} searchString The string or pattern to search for.
 	 * @param {CodeEditorSearchOptions} [searchOptions] The options to use when searching.
-	 * @returns {*}  {UmbCodeEditorRange[]}
+	 * @returns {UmbCodeEditorRange[]} The ranges of the found strings.
 	 * @memberof UmbCodeEditor
 	 */
 	find(
@@ -277,7 +277,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	/**
 	 * Returns the value of the editor for a given range.
 	 * @param {UmbCodeEditorRange} range The range to get the value for.
-	 * @returns {*}  {string}
+	 * @returns {string} The value of the editor for the given range.
 	 * @memberof UmbCodeEditor
 	 */
 	getValueInRange(range: UmbCodeEditorRange): string {

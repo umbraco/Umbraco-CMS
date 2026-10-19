@@ -46,6 +46,7 @@ export class UmbStoreObjectBase<T> extends UmbContextBase implements UmbApi {
 
 	/**
 	 * Returns an observable of a part of the store
+	 * @template {keyof T} Part
 	 * @param {Part} key - The key of the part to return
 	 * @returns {Observable<T[Part]>} An observable of the part of the store
 	 * @memberof UmbStoreObjectBase

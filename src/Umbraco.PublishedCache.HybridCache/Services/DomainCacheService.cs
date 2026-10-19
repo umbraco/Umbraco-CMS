@@ -84,13 +84,10 @@ public class DomainCacheService : IDomainCacheService
     public IEnumerable<Domain> GetAssigned(int documentId, bool includeWildcards = false)
     {
         InitializeIfMissing();
-        IEnumerable<Domain> list = _domains.Values.Where(x => x.ContentId == documentId);
-        if (includeWildcards == false)
-        {
-            list = list.Where(x => x.IsWildcard == false);
-        }
-
-        return list.OrderBy(x => x.SortOrder);
+        return _domains
+            .Where(x => x.Value.ContentId == documentId && (includeWildcards || x.Value.IsWildcard == false))
+            .Select(x => x.Value)
+            .OrderBy(x => x.SortOrder);
     }
 
     /// <inheritdoc />

@@ -2,7 +2,11 @@ import type { UmbMemberDetailModel } from '../../types.js';
 import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import { UmbMemberKind } from '../../utils/index.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type { CreateMemberRequestModel, UpdateMemberRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -13,7 +17,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 /**
  * A data source for the Member that fetches data from the server
  * @class UmbMemberServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbMemberServerDataSource extends UmbControllerBase implements UmbDetailDataSource<UmbMemberDetailModel> {
 	/**
@@ -73,10 +77,10 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 	/**
 	 * Fetches a Member with the given id from the server
 	 * @param {string} unique - The unique identifier of the member to fetch.
-	 * @returns {*} The member.
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberDetailModel>>} The member.
 	 * @memberof UmbMemberServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbMemberDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this, MemberService.getMemberById({ path: { id: unique } }));
@@ -135,10 +139,10 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 	/**
 	 * Inserts a new Member on the server
 	 * @param {UmbMemberDetailModel} model - The member to create.
-	 * @returns {*} The created member.
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberDetailModel>>} The created member.
 	 * @memberof UmbMemberServerDataSource
 	 */
-	async create(model: UmbMemberDetailModel) {
+	async create(model: UmbMemberDetailModel): Promise<UmbDataSourceResponse<UmbMemberDetailModel>> {
 		if (!model) throw new Error('Member is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -171,10 +175,10 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 	/**
 	 * Updates a Member on the server
 	 * @param {UmbMemberDetailModel} model - The member to update.
-	 * @returns {*} The updated member.
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberDetailModel>>} The updated member.
 	 * @memberof UmbMemberServerDataSource
 	 */
-	async update(model: UmbMemberDetailModel) {
+	async update(model: UmbMemberDetailModel): Promise<UmbDataSourceResponse<UmbMemberDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -209,10 +213,10 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 	/**
 	 * Deletes a Member on the server
 	 * @param {string} unique - The unique identifier of the member to delete.
-	 * @returns {*} The result of the delete operation.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbMemberServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(

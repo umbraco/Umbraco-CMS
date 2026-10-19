@@ -280,7 +280,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	 * Pushes a new history item to the history array
 	 * @public
 	 * @param {UmbCurrentUserHistoryItem} historyItem The history item to push
-	 * @memberof UmbHistoryService
+	 * @memberof UmbCurrentUserHistoryStore
 	 */
 	public push(historyItem: UmbCurrentUserHistoryItem): void {
 		this.#pushIfNew(historyItem);
@@ -289,7 +289,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	/**
 	 * Clears the history array
 	 * @public
-	 * @memberof UmbHistoryService
+	 * @memberof UmbCurrentUserHistoryStore
 	 */
 	public clear() {
 		this._data.setValue([]);
