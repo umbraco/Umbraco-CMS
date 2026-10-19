@@ -18,6 +18,7 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 	#segments = new UmbArrayState<UmbSegmentModel, string, undefined>(undefined, (x) => x.alias);
 	#addedUniques: Array<string> = [];
 	#workspace?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
+	#currentUnique?: string;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -77,6 +78,11 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 	}
 
 	#onIncomingData: UmbHookMethod<UmbContentDetailModel, UmbEntityDetailIncomingDataHookMeta> = async (data) => {
+		if (this.#currentUnique === data.unique) {
+			// we already have loaded segments, user must refresh for update.
+			return data;
+		}
+		this.#currentUnique = data.unique;
 		// What happens when we leave out the skip/take? [NL]
 		const { data: response } = await this.#repository.requestCollection({
 			skip: 0,
