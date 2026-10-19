@@ -1,6 +1,6 @@
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbHookMethod } from '@umbraco-cms/backoffice/hook-api';
+import type { UmbSequentialHookMethod } from '@umbraco-cms/backoffice/hook-api';
 import type { UmbEntityDetailIncomingDataHookMeta } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -77,7 +77,9 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 		);
 	}
 
-	#onIncomingData: UmbHookMethod<UmbContentDetailModel, UmbEntityDetailIncomingDataHookMeta> = async (data) => {
+	#onIncomingData: UmbSequentialHookMethod<UmbContentDetailModel, UmbEntityDetailIncomingDataHookMeta> = async (
+		data,
+	) => {
 		if (this.#currentUnique === data.unique) {
 			// we already have loaded segments, user must refresh for update.
 			return data;

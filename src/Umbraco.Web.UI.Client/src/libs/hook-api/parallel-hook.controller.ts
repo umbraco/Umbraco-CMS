@@ -1,6 +1,9 @@
 import type { UmbParallelHookMethod } from './types.js';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbParallelHookController<MetaType extends Record<string, unknown> = Record<string, unknown>> {
+export class UmbParallelHookController<
+	MetaType extends Record<string, unknown> = Record<string, unknown>,
+> extends UmbControllerBase {
 	#methods: Array<UmbParallelHookMethod<MetaType>> = [];
 	// Starts a method in an execution that is running, one for each execution.
 	#executions = new Set<(method: UmbParallelHookMethod<MetaType>) => void>();
@@ -55,7 +58,8 @@ export class UmbParallelHookController<MetaType extends Record<string, unknown> 
 		if (failures.length > 0) throw failures[0];
 	}
 
-	destroy(): void {
+	override destroy(): void {
+		super.destroy();
 		this.#methods = [];
 		this.#executions.clear();
 	}
