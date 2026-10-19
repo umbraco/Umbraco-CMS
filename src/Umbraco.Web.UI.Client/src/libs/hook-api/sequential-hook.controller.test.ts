@@ -1,13 +1,21 @@
 import { UmbSequentialHookController } from './sequential-hook.controller.js';
-import { expect } from '@open-wc/testing';
+import { expect, fixture } from '@open-wc/testing';
+import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+
+@customElement('umb-test-sequential-hook-host')
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+class UmbTestSequentialHookHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 describe('UmbSequentialHookController', () => {
 	type TestData = { value: number; log?: Array<string> };
 
+	let host: UmbControllerHostElement;
 	let hook: UmbSequentialHookController<TestData>;
 
-	beforeEach(() => {
-		hook = new UmbSequentialHookController<TestData>();
+	beforeEach(async () => {
+		host = await fixture(html`<umb-test-sequential-hook-host></umb-test-sequential-hook-host>`);
+		hook = new UmbSequentialHookController<TestData>(host);
 	});
 
 	it('returns initial data when no hooks are registered', async () => {

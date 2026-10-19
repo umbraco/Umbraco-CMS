@@ -1,13 +1,11 @@
-export type UmbSequentialHookMethod<ValueType, MetaType extends Record<string, unknown> = Record<string, unknown>> = (
+export type UmbSequentialHookMethod<ValueType, MetaType> = (
 	data: ValueType,
 	meta: MetaType,
 ) => Promise<ValueType> | ValueType;
 
-export interface UmbSequentialHookEntry<ValueType, MetaType extends Record<string, unknown> = Record<string, unknown>> {
+export interface UmbSequentialHookEntry<ValueType, MetaType> {
 	method: UmbSequentialHookMethod<ValueType, MetaType>;
 	weight: number;
 }
 
-export type UmbParallelHookMethod<MetaType extends Record<string, unknown> = Record<string, unknown>> = (
-	meta: MetaType,
-) => Promise<void> | void;
+export type UmbParallelHookMethod<MetaType> = (meta: MetaType) => Promise<void> | void;

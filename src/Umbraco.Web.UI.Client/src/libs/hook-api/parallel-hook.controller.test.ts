@@ -1,13 +1,21 @@
 import { UmbParallelHookController } from './parallel-hook.controller.js';
-import { expect } from '@open-wc/testing';
+import { expect, fixture } from '@open-wc/testing';
+import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+
+@customElement('umb-test-parallel-hook-host')
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+class UmbTestParallelHookHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 describe('UmbParallelHookController', () => {
+	let host: UmbControllerHostElement;
 	let hook: UmbParallelHookController<{ name: string }>;
 
-	beforeEach(() => {
-		hook = new UmbParallelHookController<{ name: string }>();
+	beforeEach(async () => {
+		host = await fixture(html`<umb-test-parallel-hook-host></umb-test-parallel-hook-host>`);
+		hook = new UmbParallelHookController<{ name: string }>(host);
 	});
 
 	it('resolves when no methods are added', async () => {
