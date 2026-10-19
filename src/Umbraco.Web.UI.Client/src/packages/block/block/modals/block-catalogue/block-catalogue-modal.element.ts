@@ -124,8 +124,9 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		super.connectedCallback();
 		if (!this.data) return;
 
-		this._activeView = this.data.openLibrary ? 'library' : this.data.openClipboard ? 'clipboard' : 'create';
 		this.#hasLibraryElements = (this.data.libraryAllowedElementTypeKeys?.length ?? 0) > 0;
+		this._activeView =
+			this.data.openLibrary && this.#hasLibraryElements ? 'library' : this.data.openClipboard ? 'clipboard' : 'create';
 
 		this.#itemManager.setUniques(this.data.blocks.map((block) => block.contentElementTypeKey));
 	}

@@ -164,6 +164,9 @@ export class UmbPropertyEditorUIBlockListElement
 	private _blocks?: Array<UmbBlockTypeBaseModel>;
 
 	@state()
+	private _hasLibraryElements = false;
+
+	@state()
 	private _layouts: Array<UmbBlockLayoutBaseModel> = [];
 
 	@state()
@@ -290,6 +293,14 @@ export class UmbPropertyEditorUIBlockListElement
 			this.#managerContext.blockTypes,
 			(blockTypes) => {
 				this._blocks = blockTypes;
+			},
+			null,
+		);
+
+		this.observe(
+			observeMultiple([this.#managerContext.blockTypes, this.#entriesContext.libraryAllowedElementTypeKeys]),
+			([blockTypes, libraryKeys]) => {
+				this._hasLibraryElements = blockTypes.some((x) => libraryKeys.includes(x.contentElementTypeKey));
 			},
 			null,
 		);
@@ -444,10 +455,11 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	#renderLibraryButton() {
+		if (!this._hasLibraryElements) return nothing;
 		return html`
 			<uui-button
 				class="btnAction"
-				label="Reuse content from the Library"
+				label=${this.localize.term('blockEditor_tabLibrary')}
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'library', index: -1 }) ?? ''}
 				?disabled=${this.readonly}

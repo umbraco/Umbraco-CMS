@@ -624,11 +624,11 @@ export abstract class UmbBlockManagerContext<
 	 * Only creates a layout entry — no contentData entry is added.
 	 * The layout observer handles fetching the element data.
 	 * @param elementKey
-	 * @param _originData
+	 * @param originData
 	 */
-	insertExternalContent(elementKey: string, _originData?: BlockOriginDataType) {
+	insertExternalContent(elementKey: string, originData?: BlockOriginDataType) {
 		const layout = { key: UmbId.new(), contentKey: elementKey, isExternalContent: true } as BlockLayoutType;
-		this._layouts.appendOne(layout);
+		this.setOneLayout(layout, originData);
 	}
 
 	/**

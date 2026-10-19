@@ -150,6 +150,9 @@ export class UmbPropertyEditorUIBlockSingleElement
 	private _blocks?: Array<UmbBlockTypeBaseModel>;
 
 	@state()
+	private _hasLibraryElements = false;
+
+	@state()
 	private _layouts: Array<UmbBlockLayoutBaseModel> = [];
 
 	@state()
@@ -255,6 +258,14 @@ export class UmbPropertyEditorUIBlockSingleElement
 			this.#managerContext.blockTypes,
 			(blockTypes) => {
 				this._blocks = blockTypes;
+			},
+			null,
+		);
+
+		this.observe(
+			observeMultiple([this.#managerContext.blockTypes, this.#entriesContext.libraryAllowedElementTypeKeys]),
+			([blockTypes, libraryKeys]) => {
+				this._hasLibraryElements = blockTypes.some((x) => libraryKeys.includes(x.contentElementTypeKey));
 			},
 			null,
 		);
@@ -376,7 +387,11 @@ export class UmbPropertyEditorUIBlockSingleElement
 		if ((this.readonly && this._layouts.length > 0) || this._layouts.length >= 1) {
 			return nothing;
 		} else {
-			return html` <uui-button-group> ${this.#renderCreateButton()} ${this.#renderPasteButton()} </uui-button-group> `;
+			return html`
+				<uui-button-group>
+					${this.#renderCreateButton()}${this.#renderLibraryButton()}${this.#renderPasteButton()}
+				</uui-button-group>
+			`;
 		}
 	}
 
@@ -406,9 +421,25 @@ export class UmbPropertyEditorUIBlockSingleElement
 		`;
 	}
 
+	#renderLibraryButton() {
+		if (!this._hasLibraryElements) return nothing;
+		return html`
+			<uui-button
+				class="btnAction"
+				label=${this.localize.term('blockEditor_tabLibrary')}
+				look="placeholder"
+				href=${this._catalogueRouteBuilder?.({ view: 'library', index: -1 }) ?? ''}
+				?disabled=${this.readonly}
+				title=${this.localize.term('blockEditor_tabLibrary')}>
+				<uui-icon name="icon-link"></uui-icon>
+			</uui-button>
+		`;
+	}
+
 	#renderPasteButton() {
 		return html`
 			<uui-button
+				class="btnAction"
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
@@ -428,8 +459,11 @@ export class UmbPropertyEditorUIBlockSingleElement
 
 			uui-button-group {
 				margin-top: 1px;
-				display: grid;
-				grid-template-columns: 1fr auto;
+				display: flex;
+
+				.btnAction {
+					flex: 0;
+				}
 			}
 		`,
 	];
