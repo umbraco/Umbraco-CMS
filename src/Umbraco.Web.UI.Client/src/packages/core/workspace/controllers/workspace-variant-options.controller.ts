@@ -42,12 +42,12 @@ export class UmbWorkspaceVariantOptionsController<
 				}
 				const lang = languages?.find((x) => x.unique === opt.culture);
 				if (!lang) {
-					throw new Error(`Language for culture ${opt.culture} could not be found.`);
+					console.error(`Language for culture ${opt.culture} could not be found.`);
 				}
 				return { ...opt, language: lang };
 			});
 		},
-	).pipe(filter((options) => options !== undefined)) as Observable<Array<VariantOptionModelType>>;
+	).pipe(filter((options) => options !== undefined)) as Observable<undefined | Array<VariantOptionModelType>>;
 
 	#currentCoreUniques?: Array<string>;
 
