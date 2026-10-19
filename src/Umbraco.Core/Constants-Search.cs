@@ -33,6 +33,11 @@ public static partial class Constants
             /// </summary>
             public const string DraftMembers = $"{IndexPrefix}Members";
 
+            /// <summary>
+            ///     The alias of the draft elements index.
+            /// </summary>
+            public const string DraftElements = $"{IndexPrefix}Elements";
+
             private const string IndexPrefix = "Umb_";
         }
 
