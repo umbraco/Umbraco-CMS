@@ -12,7 +12,6 @@ import { UMB_ELEMENT_WORKSPACE_ALIAS } from '../../workspace/constants.js';
 import { UMB_ELEMENT_PUBLISHING_WORKSPACE_CONTEXT } from './element-publishing.workspace-context.token.js';
 import { UMB_ELEMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
 import { umbNeedsPublishConfirmation } from './needs-publish-confirmation.function.js';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
@@ -442,10 +441,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		await this.#init;
 		if (!this.#elementWorkspaceContext) throw new Error('Element workspace context is missing');
 
-		const allOptions = await firstValueFrom(this.#elementWorkspaceContext.variantOptions);
-		if (!allOptions) {
-			throw new Error('Failed to retrieve variant options');
-		}
+		const allOptions = await this.#elementWorkspaceContext.getVariantOptions();
 		const options = allOptions.filter((option) => option.segment === null);
 
 		let selected = this.#getPublishVariantsSelection();

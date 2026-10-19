@@ -93,6 +93,20 @@ describe('UmbWorkspaceVariantOptionsController', () => {
 
 			expect(latest).to.be.undefined;
 		});
+
+		it('emits undefined while loading and the options once loaded', async () => {
+			const seen: Array<unknown> = [];
+			controller.observe(controller.variantOptions, (options) => seen.push(options), 'seen');
+			await settle();
+			expect(seen[0]).to.be.undefined;
+
+			host.languageContext.setLanguages([EN, DA]);
+			varyByCulture.setValue(true);
+			varyBySegment.setValue(false);
+			await settle();
+
+			expect(seen[seen.length - 1]).to.be.an('array');
+		});
 	});
 
 	describe('core options', () => {

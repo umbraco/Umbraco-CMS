@@ -17,7 +17,13 @@ import { UmbContentDetailValidationPathTranslator } from './content-detail-valid
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
 import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
 import { mergeObservables, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { combineLatest, distinctUntilChanged, firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
+import {
+	combineLatest,
+	distinctUntilChanged,
+	filter,
+	firstValueFrom,
+	map,
+} from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
@@ -207,11 +213,15 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this.variantOptionsManager.getLanguages();
 	}
 
-	async getVariantOptions() {
-		return firstValueFrom(this.variantOptions);
+	/**
+	 * Resolves with the variant options once they have loaded.
+	 * @returns {Promise<Array<VariantOptionModelType>>} The loaded variant options.
+	 */
+	async getVariantOptions(): Promise<Array<VariantOptionModelType>> {
+		return firstValueFrom(this.variantOptions.pipe(filter((options) => options !== undefined)));
 	}
-	async getCultureVariantOptions() {
-		return (await firstValueFrom(this.variantOptions))?.filter((x) => !x.segment);
+	async getCultureVariantOptions(): Promise<Array<VariantOptionModelType>> {
+		return (await this.getVariantOptions()).filter((x) => !x.segment);
 	}
 
 	#variantValidationContexts: Array<UmbValidationController> = [];
@@ -451,12 +461,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		// TODO: Let´s make sure we have all the various variant options available at this point... [NL]
 
-		const variantOptions = (await firstValueFrom(this.variantOptions))?.map(
-			(o) => new UmbVariantId(o.culture, o.segment),
-		);
-		if (!variantOptions) {
-			throw new Error('Variant options could not be loaded.');
-		}
+		const variantOptions = (await this.getVariantOptions()).map((o) => new UmbVariantId(o.culture, o.segment));
 		if (contentTypeVariesByCulture) {
 			variantOptions.push(UmbVariantId.CreateInvariant()); // Ensure invariant is included, when the contentType varies by culture, because we do not have a invariant-variant in our variant-options. [NL]
 		}
@@ -746,9 +751,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		if (missingVariants.length === 0) return;
 
 		const cultureOptions = await this.getCultureVariantOptions();
-		if (!cultureOptions) {
-			throw new Error('Culture variant options could not be loaded.');
-		}
 
 		// Filter away missingVariants that are not part of the cultureOptions:
 		const variantsToUpdate = missingVariants.filter((variant) => {
@@ -786,9 +788,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		selected: string[];
 	}> {
 		const options = await this.getCultureVariantOptions();
-		if (!options) {
-			throw new Error('Culture variant options could not be loaded.');
-		}
 
 		const activeVariants = this.splitView.getActiveVariants();
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
@@ -1025,11 +1024,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		notifyWorkspaceActionStarting(executionOptions);
 
 		if (this.getVariesBySegment()) {
-			const variantOptions = await this.getVariantOptions();
-			if (!variantOptions) {
-				throw new Error('Variant options could not be loaded.');
-			}
-			variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, variantOptions);
+			variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, await this.getVariantOptions());
 		}
 
 		const saveData = await this.constructSaveData(variantIds);

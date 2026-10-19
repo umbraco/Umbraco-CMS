@@ -7,7 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/variant';
 import { mergeObservables, UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_APP_LANGUAGE_CONTEXT, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import { filter, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbWorkspaceVariantOptionsController<
 	VariantModelType extends UmbEntityVariantModel,
@@ -47,7 +47,7 @@ export class UmbWorkspaceVariantOptionsController<
 				return { ...opt, language: lang };
 			});
 		},
-	).pipe(filter((options) => options !== undefined)) as Observable<undefined | Array<VariantOptionModelType>>;
+	) as Observable<undefined | Array<VariantOptionModelType>>;
 
 	#currentCoreUniques?: Array<string>;
 
@@ -186,7 +186,7 @@ export class UmbWorkspaceVariantOptionsController<
 	public _internal_setOptionFilter(filter: (filter: Omit<VariantOptionModelType, 'language'>) => boolean) {
 		if (this.#hasFilter) return;
 		this.#hasFilter = true;
-		this.variantOptions = this.variantOptions.pipe(map((options) => options.filter((option) => filter(option))));
+		this.variantOptions = this.variantOptions.pipe(map((options) => options?.filter((option) => filter(option))));
 	}
 
 	public add(options: Array<Omit<VariantOptionModelType, 'language'>>) {
