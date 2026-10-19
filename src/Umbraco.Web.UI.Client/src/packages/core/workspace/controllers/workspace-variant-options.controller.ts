@@ -175,6 +175,14 @@ export class UmbWorkspaceVariantOptionsController<
 	}
 
 	#hasFilter?: boolean;
+
+	// TODO: Remove this feature in v.21
+	// eslint-disable-next-line @typescript-eslint/naming-convention, jsdoc/require-returns-check
+	/**
+	 * @deprecated - it is not possible to filter variant options from v.21.
+	 * @param filter - The filter function to apply to variant options.
+	 * @returns void
+	 */
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _internal_setOptionFilter(filter: (filter: Omit<VariantOptionModelType, 'language'>) => boolean) {
 		if (this.#hasFilter) return;

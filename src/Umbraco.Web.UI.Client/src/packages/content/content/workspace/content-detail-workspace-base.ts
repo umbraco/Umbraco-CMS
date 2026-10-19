@@ -172,8 +172,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	readonly #collectionConfiguration = new UmbContentCollectionConfigurationContext(this);
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
+	// TODO: Remove this property in v.21
+	// @deprecated - it is not possible to filter variant options from v.21.
+	protected _variantOptionsFilter = (variantOption: Omit<VariantOptionModelType, 'language'>) => true;
 
 	public variantOptionsManager: UmbWorkspaceVariantOptionsController<VariantModelType, VariantOptionModelType>;
 	public readonly variantOptions: Observable<Array<VariantOptionModelType> | undefined>;
@@ -254,6 +255,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.variesBySegment,
 			this.variants,
 		);
+		this.variantOptionsManager._internal_setOptionFilter((option) => this._variantOptionsFilter(option));
 		this.variantOptions = this.variantOptionsManager.variantOptions;
 		this.languages = this.variantOptionsManager.languages;
 
