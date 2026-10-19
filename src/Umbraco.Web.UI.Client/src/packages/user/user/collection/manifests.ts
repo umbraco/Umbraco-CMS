@@ -1,10 +1,10 @@
+import { manifests as valueSummaryManifests } from '../value-summary/manifests.js';
 import { UMB_USER_COLLECTION_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as collectionActionManifests } from './action/manifests.js';
 import { manifests as collectionMenuManifests } from './menu/manifests.js';
 import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
 import { manifests as collectionViewManifests } from './views/manifests.js';
 import { manifests as itemManifests } from './item/manifests.js';
-import { manifests as valueSummaryManifests } from '../value-summary/manifests.js';
 
 import { UMB_USER_COLLECTION_ALIAS } from './constants.js';
 

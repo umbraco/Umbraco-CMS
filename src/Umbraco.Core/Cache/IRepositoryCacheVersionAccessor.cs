@@ -23,30 +23,24 @@ public interface IRepositoryCacheVersionAccessor
     Task<RepositoryCacheVersion?> GetAsync(string cacheKey);
 
     /// <summary>
-    /// Notifies of a version change on a given cache key.
-    /// </summary>
-    /// <param name="cacheKey">Key of the changed version.</param>
-    [Obsolete("Use version that takes newVersion, scheduled for removal in V19")]
-    void VersionChanged(string cacheKey)
-    { }
-
-    /// <summary>
     /// Notifies of a version change on a given cache key, providing the new version so internal caches
     /// can be updated in-place without a database round-trip.
     /// </summary>
     /// <param name="cacheKey">Key of the changed version.</param>
     /// <param name="newVersion">The new version GUID that was just written to the database.</param>
-    void VersionChanged(string cacheKey, Guid newVersion)
-    {
-        VersionChanged(cacheKey);
-    }
+    void VersionChanged(string cacheKey, Guid newVersion);
 
     /// <summary>
-    /// Notifies the accessor that caches have been synchronized.
+    /// Notifies the accessor that caches have been synchronized and which versions were adopted.
     /// </summary>
+    /// <param name="adoptedVersions">The versions the local caches now hold.</param>
     /// <remarks>
-    /// This method is called after cache synchronization to temporarily bypass version checking,
-    /// preventing recursive sync attempts while repositories reload data from the database.
+    /// The scope-level cache is moved to the adopted versions instead of being cleared: a scope holds its
+    /// distributed locks for the rest of its transaction, so the data it reads cannot change under it and
+    /// checking the database version again would only trigger another sync for a version published after
+    /// its locks were taken. The request-level cache is cleared, so a later root scope in the same request
+    /// reads the current versions again. Clearing the scope-level cache instead would let a version published
+    /// mid-scope change that scope's view.
     /// </remarks>
-    void CachesSynced();
+    void CachesSynced(IEnumerable<RepositoryCacheVersion> adoptedVersions);
 }

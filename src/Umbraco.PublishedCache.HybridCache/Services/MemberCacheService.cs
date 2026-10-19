@@ -1,39 +1,23 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
-using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
+/// <summary>
+/// Implements a service for mapping member entities to published members.
+/// </summary>
 internal sealed class MemberCacheService : IMemberCacheService
 {
     private readonly IPublishedContentFactory _publishedContentFactory;
-    private readonly IDatabaseCacheRepository _databaseCacheRepository;
-    private readonly ICoreScopeProvider _scopeProvider;
 
-    public MemberCacheService(
-        IPublishedContentFactory publishedContentFactory,
-        IDatabaseCacheRepository databaseCacheRepository,
-        ICoreScopeProvider scopeProvider)
-    {
-        _publishedContentFactory = publishedContentFactory;
-        _databaseCacheRepository = databaseCacheRepository;
-        _scopeProvider = scopeProvider;
-    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MemberCacheService"/> class.
+    /// </summary>
+    /// <param name="publishedContentFactory">The published content factory.</param>
+    public MemberCacheService(IPublishedContentFactory publishedContentFactory)
+        => _publishedContentFactory = publishedContentFactory;
 
+    /// <inheritdoc/>
     public async Task<IPublishedMember?> Get(IMember member) => member is null ? null : _publishedContentFactory.ToPublishedMember(member);
-
-    public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
-        => _databaseCacheRepository.Rebuild(
-            null,
-            null,
-            contentTypeIds.ToList(),
-            null,
-            action =>
-            {
-                using ICoreScope scope = _scopeProvider.CreateCoreScope();
-                action();
-                scope.Complete();
-            });
 }

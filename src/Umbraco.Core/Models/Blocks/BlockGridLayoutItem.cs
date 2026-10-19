@@ -64,4 +64,8 @@ public class BlockGridLayoutItem : BlockLayoutItemBase
     /// <inheritdoc />
     public override bool ReferencesSetting(Guid key)
         => SettingsKey == key || Areas.Any(area => area.ContainsSetting(key));
+
+    /// <inheritdoc />
+    public override IEnumerable<IBlockLayoutItem> GetContainedLayouts()
+        => Areas.SelectMany(area => area.Items);
 }

@@ -1,11 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Logging;
@@ -33,35 +31,6 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
     private readonly UnattendedSettings _unattendedSettings;
     private readonly DistributedCache _distributedCache;
     private readonly ILogger<UnattendedUpgrader> _logger;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Install.UnattendedUpgrader"/> class, responsible for performing unattended upgrades of the Umbraco CMS database and executing package migrations.
-    /// </summary>
-    /// <param name="profilingLogger">The logger used for profiling and logging upgrade operations.</param>
-    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
-    /// <param name="databaseBuilder">Handles database schema creation and upgrades.</param>
-    /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
-    /// <param name="packageMigrationRunner">Executes package migrations during the upgrade process.</param>
-    /// <param name="unattendedSettings">The configuration options for unattended upgrades.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public UnattendedUpgrader(
-        IProfilingLogger profilingLogger,
-        IUmbracoVersion umbracoVersion,
-        DatabaseBuilder databaseBuilder,
-        IRuntimeState runtimeState,
-        PackageMigrationRunner packageMigrationRunner,
-        IOptions<UnattendedSettings> unattendedSettings)
-        : this(
-            profilingLogger,
-            umbracoVersion,
-            databaseBuilder,
-            runtimeState,
-            packageMigrationRunner,
-            unattendedSettings,
-            StaticServiceProvider.Instance.GetRequiredService<DistributedCache>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<UnattendedUpgrader>>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UnattendedUpgrader"/> class, responsible for performing unattended upgrades of the Umbraco database and executing package migrations.

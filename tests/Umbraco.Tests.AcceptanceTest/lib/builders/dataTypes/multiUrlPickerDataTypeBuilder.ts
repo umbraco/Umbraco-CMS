@@ -73,3 +73,13 @@ export class MultiUrlPickerDataTypeBuilder extends DataTypeBuilder {
     return values;
   }
 }
+
+// A single URL picker holds one link, so it has no link count to configure; the count builders on the base
+// simply have nothing to write to.
+export class SingleUrlPickerDataTypeBuilder extends MultiUrlPickerDataTypeBuilder {
+  constructor() {
+    super();
+    this.editorAlias = 'Umbraco.UrlPicker.Single';
+    this.editorUiAlias = 'Umb.PropertyEditorUi.UrlPicker.Single';
+  }
+}

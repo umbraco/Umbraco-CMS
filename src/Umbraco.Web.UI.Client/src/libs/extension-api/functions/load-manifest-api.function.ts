@@ -9,8 +9,10 @@ import type {
 } from '../types/utils.js';
 
 /**
- *
- * @param property
+ * Loads the API class constructor from a manifest's `api`/`js` property.
+ * @template {UmbApi} ApiType
+ * @param {ApiLoaderProperty<ApiType> | ElementAndApiLoaderProperty<any, ApiType>} property The manifest property to load the API from.
+ * @returns {Promise<ClassConstructor<ApiType> | undefined>} The resolved API class constructor, if found.
  */
 export async function loadManifestApi<ApiType extends UmbApi>(
 	property: ApiLoaderProperty<ApiType> | ElementAndApiLoaderProperty<any, ApiType>,

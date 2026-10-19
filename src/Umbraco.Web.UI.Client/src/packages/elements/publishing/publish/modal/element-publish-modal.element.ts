@@ -1,4 +1,5 @@
 import { UmbElementVariantState } from '../../../variant-state.js';
+import { UmbElementReferenceRepository } from '../../../reference/repository/element-reference.repository.js';
 import type { UmbElementVariantOptionModel } from '../../../types.js';
 import type { UmbElementPublishModalData, UmbElementPublishModalValue } from './element-publish-modal.token.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -51,6 +52,9 @@ export class UmbElementPublishModalElement extends UmbModalBaseElement<
 	@state()
 	private _isInvariant = false;
 
+	@state()
+	private _referenceCount?: number;
+
 	#pickableFilter = (option: UmbElementVariantOptionModel) => {
 		if (!option.variant || option.variant.state === UmbElementVariantState.NOT_CREATED) {
 			return false;
@@ -63,10 +67,19 @@ export class UmbElementPublishModalElement extends UmbModalBaseElement<
 		if (this.data?.options.length === 1 && this.data.options[0].culture === null) {
 			this._isInvariant = true;
 			this._hasInvalidSelection = false;
-			return;
+		} else {
+			this.#configureSelectionManager();
 		}
 
-		this.#configureSelectionManager();
+		this.#fetchReferenceCount();
+	}
+
+	async #fetchReferenceCount() {
+		const unique = this.data?.unique;
+		if (!unique) return;
+		const referenceRepository = new UmbElementReferenceRepository(this);
+		const { data } = await referenceRepository.requestReferencedBy(unique);
+		this._referenceCount = data?.total ?? 0;
 	}
 
 	async #configureSelectionManager() {
@@ -129,6 +142,16 @@ export class UmbElementPublishModalElement extends UmbModalBaseElement<
 							.requiredFilter=${isNotPublishedMandatory}
 							.pickableFilter=${this.#pickableFilter}></umb-element-variant-language-picker>`,
 				)}
+				${when(
+					this._referenceCount !== undefined && this._referenceCount > 0,
+					() => html`
+						<p class="reference-info">
+							<umb-localize key="blockEditor_elementUsedByCount" .args=${[this._referenceCount]}>
+								This element is used by ${this._referenceCount} item(s).
+							</umb-localize>
+						</p>
+					`,
+				)}
 
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
@@ -153,6 +176,11 @@ export class UmbElementPublishModalElement extends UmbModalBaseElement<
 				display: block;
 				min-width: 460px;
 				max-width: 90vw;
+			}
+
+			.reference-info {
+				color: var(--uui-color-text-alt);
+				font-size: var(--uui-type-small-size);
 			}
 		`,
 	];

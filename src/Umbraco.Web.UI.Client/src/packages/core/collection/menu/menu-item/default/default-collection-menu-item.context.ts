@@ -9,8 +9,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbDefaultCollectionMenuItemContext<
-		CollectionMenuItemType extends UmbCollectionItemModel = UmbCollectionItemModel,
-	>
+	CollectionMenuItemType extends UmbCollectionItemModel = UmbCollectionItemModel,
+>
 	extends UmbContextBase
 	implements UmbCollectionMenuItemContext<CollectionMenuItemType>
 {

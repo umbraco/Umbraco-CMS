@@ -1,5 +1,6 @@
 import { extractUmbNotificationColor } from './extractUmbNotificationColor.function.js';
 import { isUmbNotifications, UMB_NOTIFICATION_HEADER } from './isUmbNotifications.function.js';
+import type { UmbNotificationsEventModel } from './isUmbNotifications.function.js';
 import { isProblemDetailsLike } from './apiTypeValidators.function.js';
 import { UmbAuthSignalerContext } from './auth-signaler.context.js';
 import type { UmbProblemDetails } from './types.js';
@@ -62,11 +63,33 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		// TODO: Investigate whether some of these interceptors (e.g. addUmbGeneratedResourceInterceptor,
 		// addForbiddenResponseInterceptor, addUmbNotificationsInterceptor, addErrorInterceptor) belong
 		// somewhere else, since they are not auth-specific.
+		this.addSessionActivityInterceptor(client);
 		this.addAuthResponseInterceptor(client);
 		this.addForbiddenResponseInterceptor(client);
 		this.addUmbGeneratedResourceInterceptor(client);
 		this.addUmbNotificationsInterceptor(client);
 		this.addErrorInterceptor(client);
+	}
+
+	/**
+	 * Interceptor which signals the auth layer that a request succeeded. The server renews the session
+	 * on any request carrying a valid session, so this is what lets the auth layer keep its own expiry
+	 * bookkeeping in step with the server without a request of its own.
+	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 * @internal
+	 */
+	addSessionActivityInterceptor(client: typeof umbHttpClient) {
+		client.interceptors.response.use((response): Response => {
+			// A successful response stands in for the renewal, which the client cannot observe directly:
+			// the session lives in a cookie it cannot read. The proxy is optimistic in one direction —
+			// a request to an endpoint that does not require a session succeeds without renewing one —
+			// so it can report activity the server did not act on, never miss activity it did.
+			if (response.ok) {
+				this.#signaler.signalActivity();
+			}
+
+			return response;
+		});
 	}
 
 	/**
@@ -277,41 +300,49 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any. Removes the umb-notifications from the headers.
-	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any.
+	 * The error of a failed response that carried notifications is marked with `notifiedByServer`.
+	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response, Request and Error interceptors.
 	 * @internal
 	 */
 	addUmbNotificationsInterceptor(client: typeof umbHttpClient) {
 		client.interceptors.response.use((response) => {
-			// Check if the response has the umb-notifications header
-			// If not, we just return the response
-			const umbNotifications = response.headers.get(UMB_NOTIFICATION_HEADER);
-			if (!umbNotifications) return response;
-
-			// Parse the notifications from the header
-			// If the header is not a valid JSON, we just return the response
-			try {
-				const notifications = JSON.parse(umbNotifications);
-				if (!isUmbNotifications(notifications)) return response;
-
-				for (const notification of notifications) {
-					// Backend event messages may contain HTML (e.g. links) and are rendered sanitized by the
-					// notification layout via htmlMessage. The plain message must stay markup-free because it is
-					// read by screen readers (see umb-backoffice-notification-container).
-					this.#peekError(
-						notification.category,
-						this.#extractText(notification.message),
-						undefined,
-						extractUmbNotificationColor(notification.type),
-						notification.message,
-					);
-				}
-			} catch {
-				// Ignore JSON parse errors
+			for (const notification of this.#getUmbNotifications(response)) {
+				// Backend event messages may contain HTML (e.g. links) and are rendered sanitized by the
+				// notification layout via htmlMessage. The plain message must stay markup-free because it is
+				// read by screen readers (see umb-backoffice-notification-container).
+				this.#peekError(
+					notification.category,
+					this.#extractText(notification.message),
+					undefined,
+					extractUmbNotificationColor(notification.type),
+					notification.message,
+				);
 			}
 
 			return response;
 		});
+
+		client.interceptors.error?.use((error, response) => {
+			if (!response || !isProblemDetailsLike(error) || this.#getUmbNotifications(response).length === 0) {
+				return error;
+			}
+
+			return { ...error, notifiedByServer: true };
+		});
+	}
+
+	#getUmbNotifications(response: Response): Array<UmbNotificationsEventModel> {
+		const umbNotifications = response.headers.get(UMB_NOTIFICATION_HEADER);
+		if (!umbNotifications) return [];
+
+		try {
+			const notifications = JSON.parse(umbNotifications);
+			return isUmbNotifications(notifications) ? notifications : [];
+		} catch {
+			// Ignore JSON parse errors
+			return [];
+		}
 	}
 
 	/**
@@ -369,10 +400,13 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		const contentType = isString ? 'text/plain' : 'application/json';
 		const responseBody = isString ? body : JSON.stringify(body);
 
-		// Construct new headers but preserve "X-" headers from the original response
+		// Construct new headers but preserve "X-" headers and Umbraco's own "Umb-" headers from the original
+		// response, so interceptors running after the one that rebuilt it can still read them.
+		// @see https://github.com/umbraco/Umbraco-CMS/issues/23589
 		const headersOverride: Record<string, string> = {};
 		originalResponse?.headers.forEach((value, key) => {
-			if (key.toLowerCase().startsWith('x-')) {
+			const name = key.toLowerCase();
+			if (name.startsWith('x-') || name.startsWith('umb-')) {
 				headersOverride[key] = value;
 			}
 		});

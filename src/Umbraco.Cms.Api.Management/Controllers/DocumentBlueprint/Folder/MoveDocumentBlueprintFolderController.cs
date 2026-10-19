@@ -1,9 +1,13 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Folder;
 
@@ -13,17 +17,20 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Folder;
 [ApiVersion("1.0")]
 public class MoveDocumentBlueprintFolderController : DocumentBlueprintFolderControllerBase
 {
+    private readonly IAuthorizationService _authorizationService;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="MoveDocumentBlueprintFolderController"/> class, which handles requests for moving document blueprint folders in the Umbraco back office.
     /// </summary>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security features for authorization and authentication.</param>
     /// <param name="contentBlueprintContainerService">Service used to manage document blueprint containers (folders) within the system.</param>
+    /// <param name="authorizationService">The authorization service.</param>
     public MoveDocumentBlueprintFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IContentBlueprintContainerService contentBlueprintContainerService)
+        IContentBlueprintContainerService contentBlueprintContainerService,
+        IAuthorizationService authorizationService)
         : base(backOfficeSecurityAccessor, contentBlueprintContainerService)
-    {
-    }
+        => _authorizationService = authorizationService;
 
     /// <summary>
     /// Moves a document blueprint folder identified by the provided <paramref name="id"/> to a different location.
@@ -43,5 +50,17 @@ public class MoveDocumentBlueprintFolderController : DocumentBlueprintFolderCont
         CancellationToken cancellationToken,
         Guid id,
         MoveFolderRequestModel moveFolderRequestModel)
-        => await MoveFolderAsync(id, moveFolderRequestModel);
+    {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            DocumentBlueprintPermissionResource.WithKeys([id, moveFolderRequestModel.Target?.Id]),
+            AuthorizationPolicies.DocumentBlueprintPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
+        return await MoveFolderAsync(id, moveFolderRequestModel);
+    }
 }

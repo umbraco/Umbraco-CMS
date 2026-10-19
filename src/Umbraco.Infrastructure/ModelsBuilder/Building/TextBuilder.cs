@@ -48,9 +48,7 @@ public class TextBuilder : Builder
     /// <remarks>
     /// Internal for unit tests only.
     /// </remarks>
-    // TODO (V19): Remove obsoletion and make internal (so still available for unit tests). Also remove pragma warning disable CS0618 in BuilderTests.
-    [Obsolete("This constructor is not expected to be called from external libraries. Scheduled to be made internal in Umbraco 19.")]
-    public TextBuilder()
+    internal TextBuilder()
     {
     }
 
@@ -125,9 +123,7 @@ public class TextBuilder : Builder
     /// </summary>
     /// <param name="sb">The <see cref="StringBuilder"/> instance to which the type representation will be appended.</param>
     /// <param name="type">The <see cref="Type"/> to represent as a string, including its generic arguments if applicable.</param>
-    // TODO (V19): Remove obsoletion and make internal (so still available for unit tests). Also remove pragma warning disable CS0618 in BuilderTests.
-    [Obsolete("This method is not expected to be called from external libraries. Scheduled to be made internal in Umbraco 19.")]
-    public void WriteClrType(StringBuilder sb, Type type)
+    internal void WriteClrType(StringBuilder sb, Type type)
     {
         var s = type.ToString();
 

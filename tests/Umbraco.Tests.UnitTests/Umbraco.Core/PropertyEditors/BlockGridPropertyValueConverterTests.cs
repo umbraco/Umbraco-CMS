@@ -189,8 +189,8 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         var blockElementServiceMock = new Mock<IBlockElementService>();
         var publishedContentTypeCache = GetPublishedContentTypeCache();
         blockElementServiceMock
-            .Setup(service => service.BuildElementAsync(It.IsAny<BlockItemData>(), It.IsAny<bool?>()))
-            .Returns<BlockItemData, bool?>((blockItemData, preview) =>
+            .Setup(service => service.BuildElementAsync(It.IsAny<IPublishedElement>(), It.IsAny<BlockItemData>(), It.IsAny<bool?>()))
+            .Returns<IPublishedElement, BlockItemData, bool?>((owner, blockItemData, preview) =>
             {
                 var publishedElementType = publishedContentTypeCache.Get(PublishedItemType.Element, blockItemData.ContentTypeKey);
 
@@ -217,7 +217,8 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
             Mock.Of<IVariationContextAccessor>(),
             blockVarianceHandler,
             Mock.Of<ILanguageService>(),
-            Mock.Of<IPropertyRenderingContextAccessor>());
+            Mock.Of<IPropertyRenderingContextAccessor>(),
+            Mock.Of<IElementCacheService>());
         return editor;
     }
 

@@ -3,12 +3,9 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
@@ -20,13 +17,12 @@ internal partial class BlockListElementLevelVariationTests
     /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault(bool updateWithLimitedUserAccess)
     {
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -178,13 +174,12 @@ internal partial class BlockListElementLevelVariationTests
     /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault_WithoutInitialValues(bool updateWithLimitedUserAccess)
     {
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -316,7 +311,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -477,7 +472,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -600,7 +595,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -758,14 +753,13 @@ internal partial class BlockListElementLevelVariationTests
     /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_BlockStructureManipulation_For_Limited_Users_With_AllowEditInvariantFromNonDefault(
             bool updateWithLimitedUserAccess)
     {
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -890,7 +884,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -993,7 +987,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -1133,13 +1127,12 @@ internal partial class BlockListElementLevelVariationTests
 
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_Limited_User_Access_To_Languages_In_Nested_Blocks_Without_Access_With_AllowEditInvariantFromNonDefault(bool updateWithLimitedUserAccess)
     {
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
         var nestedElementType = await CreateElementType(ContentVariation.Culture);
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
@@ -1310,7 +1303,7 @@ internal partial class BlockListElementLevelVariationTests
             false);
 
         contentType.Variations = ContentVariation.Culture;
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
@@ -1369,7 +1362,7 @@ internal partial class BlockListElementLevelVariationTests
 
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Culture;
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
@@ -1430,7 +1423,7 @@ internal partial class BlockListElementLevelVariationTests
 
         elementType.Variations = ContentVariation.Nothing;
         elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
@@ -1466,25 +1459,293 @@ internal partial class BlockListElementLevelVariationTests
         });
     }
 
-    private async Task<IUser> CreateLimitedUser()
+    [TestCase("en-US", "Variant content in English", "Variant settings in English", false)]
+    [TestCase("en-US", "Variant content in English", "Variant settings in English", true)]
+    [TestCase("da-DK", "Variant content in Danish", "Variant settings in Danish", false)]
+    [TestCase("da-DK", "Variant content in Danish", "Variant settings in Danish", true)]
+    public async Task Can_Turn_Variant_Element_Invariant_For_Variant_Block_Property(string culture, string expectedContentValue, string expectedSettingsValue, bool addCarriedPropertyValues)
     {
-        var userGroupService = GetRequiredService<IUserGroupService>();
-        var userService = GetRequiredService<IUserService>();
+        var elementType = await CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
 
-        var danish = await LanguageService.GetAsync("da-DK");
-        Assert.IsNotNull(danish);
+        // Each culture of this block property is stored as its own document, and a document can carry entries
+        // for cultures other than its own. The value retained must be the one for the culture being mapped,
+        // not the default language's.
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new[]
+            {
+                new BlockProperty(
+                    new List<BlockPropertyValue>(
+                        new[]
+                        {
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The invariant content value" },
+                            new BlockPropertyValue { Alias = "variantText", Value = "Variant content in English", Culture = "en-US" },
+                            addCarriedPropertyValues
+                                ? new BlockPropertyValue { Alias = "variantText", Value = "Carried content in Danish", Culture = "da-DK" }
+                                : null,
+                        }.WhereNotNull()),
+                    new List<BlockPropertyValue>(
+                        new[]
+                        {
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The invariant settings value" },
+                            new BlockPropertyValue { Alias = "variantText", Value = "Variant settings in English", Culture = "en-US" },
+                            addCarriedPropertyValues
+                                ? new BlockPropertyValue { Alias = "variantText", Value = "Carried settings in Danish", Culture = "da-DK" }
+                                : null,
+                        }.WhereNotNull()),
+                    "en-US",
+                    null),
+                new BlockProperty(
+                    new List<BlockPropertyValue>(
+                        new[]
+                        {
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The invariant content value" },
+                            new BlockPropertyValue { Alias = "variantText", Value = "Variant content in Danish", Culture = "da-DK" },
+                            addCarriedPropertyValues
+                                ? new BlockPropertyValue { Alias = "variantText", Value = "Carried content in English", Culture = "en-US" }
+                                : null,
+                        }.WhereNotNull()),
+                    new List<BlockPropertyValue>(
+                        new[]
+                        {
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The invariant settings value" },
+                            new BlockPropertyValue { Alias = "variantText", Value = "Variant settings in Danish", Culture = "da-DK" },
+                            addCarriedPropertyValues
+                                ? new BlockPropertyValue { Alias = "variantText", Value = "Carried settings in English", Culture = "en-US" }
+                                : null,
+                        }.WhereNotNull()),
+                    "da-DK",
+                    null),
+            },
+            false);
 
-        var user = UserBuilder.CreateUser();
-        userService.Save(user);
+        elementType.Variations = ContentVariation.Nothing;
+        elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
-        var group = UserGroupBuilder.CreateUserGroup();
-        group.ClearAllowedLanguages();
-        group.AddAllowedLanguage(danish.Id);
+        // re-fetch content
+        content = ContentService.GetById(content.Key);
 
-        var userGroupResult = await userGroupService.CreateAsync(group, Constants.Security.SuperUserKey, [user.Key]);
-        Assert.IsTrue(userGroupResult.Success);
+        var valueEditor = (BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor)blockListDataType.Editor!.GetValueEditor();
 
-        return user;
+        var blockListValue = valueEditor.ToEditor(content!.Properties["blocks"]!, culture) as BlockListValue;
+        Assert.IsNotNull(blockListValue);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.ContentData.Count);
+            Assert.AreEqual(2, blockListValue.ContentData.First().Values.Count);
+            var variantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "variantText");
+            Assert.IsNull(variantValue.Culture);
+            Assert.AreEqual(expectedContentValue, variantValue.Value);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.SettingsData.Count);
+            Assert.AreEqual(2, blockListValue.SettingsData.First().Values.Count);
+            var variantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "variantText");
+            Assert.IsNull(variantValue.Culture);
+            Assert.AreEqual(expectedSettingsValue, variantValue.Value);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.Expose.Count);
+            Assert.IsNull(blockListValue.Expose.First().Culture);
+        });
+    }
+
+    /// <summary>
+    /// Tests whether the segment values of a culture the user cannot edit are each restored from their own
+    /// segment, rather than from another segment of the same culture.
+    /// </summary>
+    /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Handle_Limited_User_Access_To_Languages_With_Segment_Variant_Elements(bool updateWithLimitedUserAccess)
+    {
+        // Arrange: prepare an invariant block property whose element type varies by culture AND segment,
+        // holding a value per culture and segment, and an editor restricted to Danish.
+        var userKey = updateWithLimitedUserAccess
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
+            : Constants.Security.SuperUserKey;
+
+        var elementType = await CreateElementType(ContentVariation.CultureAndSegment);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType);
+        var content = CreateContent(contentType, elementType, [], false);
+
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "The first invariant content value" },
+                            new() { Alias = "variantText", Value = "The first content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "The first content value in English (Segment 1)", Culture = "en-US", Segment = "s1" },
+                            new() { Alias = "variantText", Value = "The first content value in Danish", Culture = "da-DK" },
+                            new() { Alias = "variantText", Value = "The first content value in Danish (Segment 1)", Culture = "da-DK", Segment = "s1" }
+                        },
+                        [],
+                        null,
+                        null))
+            ]);
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        foreach (BlockPropertyValue value in blockListValue.ContentData[0].Values)
+        {
+            value.Value = ((string)value.Value!).Replace("The first", "The second");
+        }
+
+        var updateModel = new ContentUpdateModel
+        {
+            Properties = new[]
+            {
+                new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
+            },
+            Variants = new[]
+            {
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" }
+            }
+        };
+
+        // Act: update the content, attempting to change every culture and segment of the block.
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
+        Assert.IsTrue(result.Success);
+
+        // Assert: the Danish values are updated, and for a limited user the English values are rolled back
+        // per segment - the segmented value must not be restored from the segment-less one.
+        content = ContentService.GetById(content.Key);
+        var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
+        Assert.NotNull(savedBlocksValue);
+        blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("The second invariant content value", BlockValue(null, null));
+            Assert.AreEqual("The second content value in Danish", BlockValue("da-DK", null));
+            Assert.AreEqual("The second content value in Danish (Segment 1)", BlockValue("da-DK", "s1"));
+
+            Assert.AreEqual(
+                updateWithLimitedUserAccess ? "The first content value in English" : "The second content value in English",
+                BlockValue("en-US", null));
+            Assert.AreEqual(
+                updateWithLimitedUserAccess ? "The first content value in English (Segment 1)" : "The second content value in English (Segment 1)",
+                BlockValue("en-US", "s1"));
+        });
+
+        string? BlockValue(string? culture, string? segment)
+            => blockListValue.ContentData[0].Values
+                .Single(value => value.Culture == culture && value.Segment == segment).Value as string;
+    }
+
+    /// <summary>
+    /// Tests whether a block property that varies by segment has every one of its segments merged for a user
+    /// with limited language access, rather than only its segment-less value.
+    /// </summary>
+    /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Handle_Limited_User_Access_To_Languages_With_Segment_Variant_Block_Property(bool updateWithLimitedUserAccess)
+    {
+        // Arrange: prepare a culture invariant, segment variant block property holding a separate block
+        // value per segment, each with a value per culture, and an editor restricted to Danish.
+        var userKey = updateWithLimitedUserAccess
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
+            : Constants.Security.SuperUserKey;
+
+        var elementType = await CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType, ContentVariation.Segment);
+        var content = CreateContent(contentType, elementType, [], false);
+
+        var contentElementKey = Guid.NewGuid();
+        var settingsElementKey = Guid.NewGuid();
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(BlockValueForSegment("default")), null, null);
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(BlockValueForSegment("s1")), null, "s1");
+        ContentService.Save(content);
+
+        var updateModel = new ContentUpdateModel
+        {
+            Properties = new[]
+            {
+                new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(UpdatedBlockValueForSegment("default")) },
+                new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(UpdatedBlockValueForSegment("s1")), Segment = "s1" }
+            },
+            Variants = new[]
+            {
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" }
+            }
+        };
+
+        // Act: update the content, attempting to change every culture in every segment.
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
+        Assert.IsTrue(result.Success);
+
+        // Assert: the Danish values are updated in both segments, and for a limited user the English values
+        // are rolled back in both segments - not only in the segment-less one.
+        content = ContentService.GetById(content.Key);
+
+        Assert.Multiple(() =>
+        {
+            foreach (var segment in new[] { null, "s1" })
+            {
+                var label = segment ?? "default";
+                Assert.AreEqual($"The second content value in Danish ({label})", BlockValue(segment, "da-DK"));
+                Assert.AreEqual(
+                    updateWithLimitedUserAccess
+                        ? $"The first content value in English ({label})"
+                        : $"The second content value in English ({label})",
+                    BlockValue(segment, "en-US"));
+            }
+        });
+
+        BlockListValue BlockValueForSegment(string label) => BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    contentElementKey,
+                    settingsElementKey,
+                    new BlockProperty(
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = $"The first invariant content value ({label})" },
+                            new() { Alias = "variantText", Value = $"The first content value in English ({label})", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = $"The first content value in Danish ({label})", Culture = "da-DK" }
+                        },
+                        [],
+                        null,
+                        null))
+            ]);
+
+        BlockListValue UpdatedBlockValueForSegment(string label)
+        {
+            BlockListValue blockListValue = BlockValueForSegment(label);
+            foreach (BlockPropertyValue value in blockListValue.ContentData[0].Values)
+            {
+                value.Value = ((string)value.Value!).Replace("The first", "The second");
+            }
+
+            return blockListValue;
+        }
+
+        string? BlockValue(string? segment, string culture)
+        {
+            var savedBlocksValue = content?.Properties["blocks"]?.GetValue(null, segment)?.ToString();
+            Assert.NotNull(savedBlocksValue);
+            return JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue)!.ContentData[0].Values
+                .Single(value => value.Alias == "variantText" && value.Culture == culture).Value as string;
+        }
     }
 
     private void AddBlock(BlockListValue listValue, BlockItemData contentData, BlockItemData? settingsData, IContentType elementType)
@@ -1506,14 +1767,8 @@ internal partial class BlockListElementLevelVariationTests
             cultures = [null];
         }
 
-        var segments = elementType.VariesBySegment()
-            ? contentData.Values.Select(value => value.Segment)
-                .Distinct()
-                .ToArray()
-            : [null];
-
-        foreach (var exposeItem in cultures.SelectMany(culture => segments.Select(segment =>
-                     new BlockItemVariation(contentData.Key, culture, segment))))
+        foreach (var exposeItem in cultures.Select(culture =>
+                     new BlockItemVariation(contentData.Key, culture)))
         {
             listValue.Expose.Add(exposeItem);
         }

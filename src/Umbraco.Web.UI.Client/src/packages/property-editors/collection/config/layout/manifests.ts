@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Collection Column Configuration Property Editor UI',
 	element: () => import('./layout-configuration.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Collection Layout Configuration',
 		icon: 'icon-autofill',
 		group: '#propertyEditorUIGroups_lists',

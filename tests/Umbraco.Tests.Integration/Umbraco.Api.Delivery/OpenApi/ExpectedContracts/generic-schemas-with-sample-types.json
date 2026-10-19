@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.1",
+  "openapi": "3.1.2",
   "info": {
     "title": "Umbraco Delivery API",
     "description": "You can find out more about the Umbraco Delivery API in [the documentation](https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api).",
@@ -11,7 +11,7 @@
         "tags": [
           "Content"
         ],
-        "operationId": "GetContent2.0",
+        "operationId": "GetContent2_0",
         "parameters": [
           {
             "name": "fetch",
@@ -283,7 +283,7 @@
         "tags": [
           "Content"
         ],
-        "operationId": "GetContentItemById2.0",
+        "operationId": "GetContentItemById2_0",
         "parameters": [
           {
             "name": "id",
@@ -423,7 +423,7 @@
         "tags": [
           "Content"
         ],
-        "operationId": "GetContentItemByPath2.0",
+        "operationId": "GetContentItemByPath2_0",
         "parameters": [
           {
             "name": "path",
@@ -563,7 +563,7 @@
         "tags": [
           "Content"
         ],
-        "operationId": "GetContentItems2.0",
+        "operationId": "GetContentItems2_0",
         "parameters": [
           {
             "name": "id",
@@ -705,7 +705,7 @@
         "tags": [
           "Media"
         ],
-        "operationId": "GetMedia2.0",
+        "operationId": "GetMedia2_0",
         "parameters": [
           {
             "name": "fetch",
@@ -898,7 +898,7 @@
         "tags": [
           "Media"
         ],
-        "operationId": "GetMediaItemById2.0",
+        "operationId": "GetMediaItemById2_0",
         "parameters": [
           {
             "name": "id",
@@ -984,7 +984,7 @@
         "tags": [
           "Media"
         ],
-        "operationId": "GetMediaItemByPath2.0",
+        "operationId": "GetMediaItemByPath2_0",
         "parameters": [
           {
             "name": "path",
@@ -1069,7 +1069,7 @@
         "tags": [
           "Media"
         ],
-        "operationId": "GetMediaItems2.0",
+        "operationId": "GetMediaItems2_0",
         "parameters": [
           {
             "name": "id",
@@ -1168,16 +1168,7 @@
         "type": "object",
         "properties": {
           "contentType": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "name": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "createDate": {
             "type": "string",
@@ -1194,17 +1185,17 @@
             "type": "string",
             "format": "uuid"
           },
-          "properties": {
+          "name": {
             "type": [
               "null",
-              "object"
+              "string"
             ]
           },
+          "properties": {
+            "type": "object"
+          },
           "cultures": {
-            "type": [
-              "null",
-              "object"
-            ],
+            "type": "object",
             "additionalProperties": {
               "$ref": "#/components/schemas/IApiContentRouteModel"
             }
@@ -1219,10 +1210,7 @@
         "type": "object",
         "properties": {
           "path": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "queryString": {
             "type": [
@@ -1247,10 +1235,7 @@
             "format": "uuid"
           },
           "path": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           }
         }
       },
@@ -1268,10 +1253,7 @@
         "type": "object",
         "properties": {
           "path": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "createDate": {
             "type": "string",
@@ -1282,7 +1264,14 @@
             "format": "date-time"
           },
           "focalPoint": {
-            "$ref": "#/components/schemas/ImageFocalPointModel"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ImageFocalPointModel"
+              }
+            ]
           },
           "crops": {
             "type": [
@@ -1298,22 +1287,13 @@
             "format": "uuid"
           },
           "name": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "mediaType": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "url": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "extension": {
             "type": [
@@ -1343,10 +1323,7 @@
             "format": "int32"
           },
           "properties": {
-            "type": [
-              "null",
-              "object"
-            ]
+            "type": "object"
           }
         }
       },
@@ -1401,7 +1378,14 @@
             "format": "int32"
           },
           "coordinates": {
-            "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+              }
+            ]
           }
         }
       },

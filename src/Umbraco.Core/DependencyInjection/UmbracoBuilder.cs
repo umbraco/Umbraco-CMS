@@ -34,14 +34,10 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.ContentTypeEditing;
-using Umbraco.Cms.Core.HostedServices;
-using Umbraco.Cms.Core.Preview;
-using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.ImportExport;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -210,10 +206,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<IMetricsConsentService, MetricsConsentService>();
 
-            // will be injected in controllers when needed to invoke rest endpoints on Our
-            Services.AddUnique<IInstallationService, InstallationService>();
-            Services.AddUnique<IUpgradeService, UpgradeService>();
-
             Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
             Services.AddUnique<ISiteDomainMapper, SiteDomainMapper>();
 
@@ -319,6 +311,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDictionaryPermissionService, DictionaryPermissionService>();
             Services.AddUnique<IElementPermissionService, ElementPermissionService>();
             Services.AddUnique<IElementContainerPermissionService, ElementContainerPermissionService>();
+            Services.AddUnique<IDocumentBlueprintPermissionService, DocumentBlueprintPermissionService>();
             Services.AddUnique<IContentService, ContentService>();
             Services.AddUnique<IElementService, ElementService>();
             Services.AddUnique<IElementVersionService, ElementVersionService>();
@@ -383,8 +376,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<ConflictingPackageData>();
             Services.AddSingleton<CompiledPackageXmlParser>();
-            Services.AddUnique<IPreviewTokenGenerator, NoopPreviewTokenGenerator>();
             Services.AddUnique<IPreviewService, PreviewService>();
+            Services.AddUnique<IPreviewSessionService, PreviewSessionService>();
             Services.AddUnique<DocumentNavigationService, DocumentNavigationService>();
             Services.AddUnique<IDocumentNavigationQueryService>(x => x.GetRequiredService<DocumentNavigationService>());
             Services.AddUnique<IDocumentNavigationManagementService>(x => x.GetRequiredService<DocumentNavigationService>());
@@ -404,10 +397,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ElementPublishStatusService, ElementPublishStatusService>();
             Services.AddUnique<IElementPublishStatusQueryService>(x => x.GetRequiredService<ElementPublishStatusService>());
             Services.AddUnique<IElementPublishStatusManagementService>(x => x.GetRequiredService<ElementPublishStatusService>());
-#pragma warning disable CS0618 // Type or member is obsolete
-            Services.AddUnique<IPublishStatusManagementService>(x => x.GetRequiredService<DocumentPublishStatusService>());
-            Services.AddUnique<IPublishStatusQueryService>(x => x.GetRequiredService<DocumentPublishStatusService>());
-#pragma warning restore CS0618 // Type or member is obsolete
 
             Services.AddUnique<IPublishedContentStatusFilteringService, PublishedContentStatusFilteringService>();
             Services.AddUnique<IPublishedMediaStatusFilteringService, PublishedMediaStatusFilteringService>();
@@ -419,7 +408,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IPropertyTypeUsageService, PropertyTypeUsageService>();
             Services.AddUnique<IDataTypeUsageService, DataTypeUsageService>();
 
-            Services.AddUnique<ICultureImpactFactory>(provider => new CultureImpactFactory(provider.GetRequiredService<IOptionsMonitor<ContentSettings>>()));
+            Services.AddUnique<ICultureImpactFactory, CultureImpactFactory>();
             Services.AddUnique<IDictionaryService, DictionaryService>();
             Services.AddUnique<IMediaImportService, MediaImportService>();
 
@@ -462,6 +451,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<IDictionaryPermissionAuthorizer, DictionaryPermissionAuthorizer>();
             Services.AddSingleton<IElementPermissionAuthorizer, ElementPermissionAuthorizer>();
             Services.AddSingleton<IElementContainerPermissionAuthorizer, ElementContainerPermissionAuthorizer>();
+            Services.AddSingleton<IDocumentBlueprintPermissionAuthorizer, DocumentBlueprintPermissionAuthorizer>();
             Services.AddSingleton<IFeatureAuthorizer, FeatureAuthorizer>();
             Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
             Services.AddSingleton<IUserGroupPermissionAuthorizer, UserGroupPermissionAuthorizer>();
@@ -488,6 +478,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlAliasServiceInitializerNotificationHandler>();
             Services.AddNotificationAsyncHandler<ContentTypeChangedNotification, DocumentUrlServiceContentTypeChangedNotificationHandler>();
             Services.AddNotificationAsyncHandler<ContentTreeChangeNotification, DocumentUrlServiceContentTreeChangeNotificationHandler>();
+#pragma warning disable CS0618 // Type or member is obsolete
+            Services.AddNotificationAsyncHandler<ContentRefreshNotification, DocumentUrlAliasContentRefreshNotificationHandler>();
+#pragma warning restore CS0618 // Type or member is obsolete
         }
     }
 }

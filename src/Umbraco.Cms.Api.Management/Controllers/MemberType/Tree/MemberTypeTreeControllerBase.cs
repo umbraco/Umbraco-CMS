@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -24,23 +22,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 public class MemberTypeTreeControllerBase : FolderTreeControllerBase<MemberTypeTreeItemResponseModel>
 {
     private readonly IMemberTypeService _memberTypeService;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MemberTypeTreeControllerBase"/> class with the specified services.
-    /// </summary>
-    /// <param name="entityService">Service used for entity operations.</param>
-    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
-    /// <param name="memberTypeService">Service used for member type operations.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MemberTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
-        : this(
-            entityService,
-            flagProviders,
-            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
-            memberTypeService)
-    {
-    }
 
     public MemberTypeTreeControllerBase(
         IEntityService entityService,

@@ -1,4 +1,5 @@
 import type { TagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -26,8 +27,7 @@ export class UmbTagStore extends UmbStoreBase {
 
 	/**
 	 * Append a tag to the store
-	 * @param {TagResponseModel} TAG
-	 * @param tag
+	 * @param {TagResponseModel} tag - The tag to append.
 	 * @memberof UmbTagStore
 	 */
 	override append(tag: TagResponseModel) {
@@ -36,11 +36,11 @@ export class UmbTagStore extends UmbStoreBase {
 
 	/**
 	 * Append a tag to the store
-	 * @param {id} TagResponseModel id.
-	 * @param id
+	 * @param {TagResponseModel['id']} id - The unique identifier of the tag to fetch.
+	 * @returns {Observable<TagResponseModel | undefined>} The tag observable part.
 	 * @memberof UmbTagStore
 	 */
-	byId(id: TagResponseModel['id']) {
+	byId(id: TagResponseModel['id']): Observable<TagResponseModel | undefined> {
 		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 
@@ -69,7 +69,7 @@ export class UmbTagStore extends UmbStoreBase {
 
 	/**
 	 * Removes tag in the store with the given uniques
-	 * @param {string[]} uniques
+	 * @param {string[]} uniques - The unique identifiers of the tags to remove.
 	 * @memberof UmbTagStore
 	 */
 	remove(uniques: Array<TagResponseModel['id']>) {

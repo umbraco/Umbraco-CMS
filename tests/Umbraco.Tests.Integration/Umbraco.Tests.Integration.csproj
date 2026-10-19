@@ -42,23 +42,16 @@
     <ProjectReference Include="..\..\src\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms.DevelopmentMode.Backoffice\Umbraco.Cms.DevelopmentMode.Backoffice.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Search.Extension.FileToText\Umbraco.Cms.Search.Extension.FileToText.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache.Bounded\Umbraco.PublishedCache.HybridCache.Bounded.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Search.Provider.Examine\Umbraco.Cms.Search.Provider.Examine.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <SubType>Designer</SubType>
-      <LastGenOutput>TestFiles.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <Compile Update="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>TestFiles.resx</DependentUpon>
-    </Compile>
     <Content Include="Umbraco.Infrastructure\Services\Importing\*.xml" />
     <EmbeddedResource Update="Umbraco.Infrastructure\Services\Importing\ImportResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -438,6 +431,48 @@
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.UpdateAndPublish.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <None Update="Umbraco.Cms.Search.Extension.FileToText\TestFiles\Lorem ipsum.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Umbraco.Cms.Search.Extension.FileToText\TestFiles\Lorem ipsum.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Umbraco.Cms.Search.Extension.FileToText\TestFiles\Lorem ipsum.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Umbraco.Cms.Search.Core\InvariantContentStructureTests.Published.cs">
+      <DependentUpon>InvariantContentStructureTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Cms.Search.Core\InvariantContentStructureTests.Draft.cs">
+      <DependentUpon>InvariantContentStructureTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Cms.Search.Core\InvariantContentTests.Published.cs">
+      <DependentUpon>InvariantContentTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Cms.Search.Core\InvariantContentTests.Draft.cs">
+      <DependentUpon>InvariantContentTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Cms.Search.Core\PublishedContentCacheRefresherTests.Variant.cs">
+      <DependentUpon>PublishedContentCacheRefresherTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Cms.Search.Core\PublishedContentCacheRefresherTests.Invariant.cs">
+      <DependentUpon>PublishedContentCacheRefresherTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\IndexedEntitySearchServiceTests.Content.cs">
+      <DependentUpon>IndexedEntitySearchServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\IndexedEntitySearchServiceTests.Media.cs">
+      <DependentUpon>IndexedEntitySearchServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentSearchServiceTests.Content.cs">
+      <DependentUpon>ContentSearchServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentSearchServiceTests.Media.cs">
+      <DependentUpon>ContentSearchServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

@@ -21,7 +21,7 @@ interface SearchableUI {
 }
 
 /**
- * @internal Not intended for public use. Subject to change without deprecation.
+ * @internal
  */
 export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 	#uis: Array<ManifestPropertyEditorUi> = [];

@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models.DeliveryApi;
 namespace Umbraco.Cms.Core.DeliveryApi;
 
 /// <summary>
-///     Concrete implementation of content querying (e.g. based on Examine)
+///     Concrete implementation of content querying (e.g. based on Umbraco Search)
 /// </summary>
 public interface IApiContentQueryProvider
 {

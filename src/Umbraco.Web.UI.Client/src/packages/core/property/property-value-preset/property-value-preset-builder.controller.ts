@@ -24,7 +24,7 @@ export class UmbPropertyValuePresetBuilderController<
 	/**
 	 * Clones the property data.
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} propertyTypes - Data about the properties to make a preset for.
-	 * @param createArgs
+	 * @param {Partial<UmbPropertyValuePresetApiCallArgsEntityBase>} [createArgs] - The base arguments used when calling the preset APIs.
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the cloned property data.
 	 */
 	async create<GivenPropertyTypesType extends UmbPropertyTypePresetModel>(

@@ -25,9 +25,9 @@ export interface UmbBulkVariantOptions {
 export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	/**
 	 * Builds variant options for bulk publish/unpublish actions based on selected documents.
-	 * @param documentItems - The document items to process
-	 * @param languages - Available languages in the system
-	 * @returns Object containing whether all documents are invariant and the filtered variant options with document counts and states
+	 * @param {Array<UmbDocumentItemModel>} documentItems - The document items to process
+	 * @param {Array<UmbLanguageDetailModel>} languages - Available languages in the system
+	 * @returns {UmbBulkVariantOptions} Object containing whether all documents are invariant and the filtered variant options with document counts and states
 	 */
 	static buildVariantOptions(
 		documentItems: Array<UmbDocumentItemModel>,
@@ -116,7 +116,8 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 	 * If all states are the same, returns that state.
 	 * If states differ, returns DRAFT (displays as "Unpublished") since mixed states can't be meaningfully represented
 	 * and DRAFT is more accurate than showing "Not created" (which shouldn't appear since those variants are filtered out).
-	 * @param states
+	 * @param {Array<UmbDocumentVariantState | null>} states - The variant states to compare
+	 * @returns {UmbDocumentVariantState | null} The representative state
 	 */
 	static #determineRepresentativeState(states: Array<UmbDocumentVariantState | null>): UmbDocumentVariantState | null {
 		if (states.length === 0) return null;

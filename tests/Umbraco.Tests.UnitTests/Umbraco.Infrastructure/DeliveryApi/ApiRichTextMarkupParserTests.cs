@@ -240,6 +240,23 @@ public class ApiRichTextMarkupParserTests
         StringAssert.Contains(@"src=""FRESH_URL""", parsedHtml);
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public void CleanUpBlocks_RemovesLayoutKeyAttribute(bool inlineBlock)
+    {
+        var parser = BuildDefaultSut(new Dictionary<Guid, MockData>());
+        var contentKey = Guid.Parse("36cc710a-d8a6-45d0-a07f-7bbd8742cf02");
+        var layoutKey = Guid.Parse("d2eeef66-4111-42f4-a164-7a523eaffbc2");
+
+        var tagName = $"umb-rte-block{(inlineBlock ? "-inline" : string.Empty)}";
+        var markup = $"<{tagName} data-key=\"{layoutKey:N}\" data-content-key=\"{contentKey:N}\"><!--Umbraco-Block--></{tagName}>";
+        var expectedOutput = $"<{tagName} data-content-id=\"{contentKey:D}\"></{tagName}>";
+
+        var parsedHtml = parser.Parse(markup);
+
+        Assert.AreEqual(expectedOutput, parsedHtml);
+    }
+
     private ApiRichTextMarkupParser BuildDefaultSut(Dictionary<Guid, MockData> mockData)
     {
         var contentCacheMock = new Mock<IPublishedContentCache>();

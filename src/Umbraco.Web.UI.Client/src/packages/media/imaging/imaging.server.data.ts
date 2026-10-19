@@ -7,7 +7,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Imaging Service that resizes a media item from the server
  * @class UmbImagingServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbImagingServerDataSource {
 	#host: UmbControllerHost;
@@ -23,9 +22,8 @@ export class UmbImagingServerDataSource {
 
 	/**
 	 * Fetches the URL for the given media items as resized images
-	 * @param {string} unique
-	 * @param uniques
-	 * @param imagingModel
+	 * @param {Array<string>} uniques The unique identifiers of the media items.
+	 * @param {UmbImagingResizeModel} [imagingModel] The resizing options to apply.
 	 * @memberof UmbImagingServerDataSource
 	 */
 	async getItems(uniques: Array<string>, imagingModel?: UmbImagingResizeModel) {

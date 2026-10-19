@@ -1,4 +1,5 @@
 import type { UmbEntityReferenceRepository } from '../reference/types.js';
+import type { UmbEntityReferencesBulkConfig } from './types.js';
 import {
 	html,
 	customElement,
@@ -14,20 +15,13 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export interface UmbConfirmBulkActionModalEntityReferencesConfig {
-	uniques: Array<string>;
-	itemRepositoryAlias: string;
-	referenceRepositoryAlias: string;
-}
+/** @deprecated Scheduled for removal in Umbraco 21. Use `UmbEntityReferencesBulkConfig` instead. [LK] */
+export type UmbConfirmBulkActionModalEntityReferencesConfig = UmbEntityReferencesBulkConfig;
 
 @customElement('umb-confirm-bulk-action-modal-entity-references')
 export class UmbConfirmBulkActionModalEntityReferencesElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	config?: {
-		uniques: Array<string>;
-		itemRepositoryAlias: string;
-		referenceRepositoryAlias: string;
-	};
+	config?: UmbEntityReferencesBulkConfig;
 
 	@state()
 	private _items: Array<any> = [];
@@ -106,14 +100,11 @@ export class UmbConfirmBulkActionModalEntityReferencesElement extends UmbLitElem
 		if (this._totalItems === 0) return nothing;
 
 		return html`
-			<h5 id="reference-headline">The following items are used by other content.</h5>
+			<h5 class="uui-h5" id="reference-headline">${this.localize.term('references_labelUsedByOtherContent')}</h5>
 			<uui-ref-list>
 				${this._items.map(
 					(item) =>
-						html`<umb-entity-item-ref
-							.item=${item}
-							readonly
-							?standalone=${this._totalItems === 1}></umb-entity-item-ref> `,
+						html`<umb-entity-item-ref .item=${item} ?standalone=${this._totalItems === 1}></umb-entity-item-ref> `,
 				)}
 			</uui-ref-list>
 			${this._totalItems > this.#limitItems

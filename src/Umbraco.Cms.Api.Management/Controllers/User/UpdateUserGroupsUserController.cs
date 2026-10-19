@@ -2,12 +2,10 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.UserGroup;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
@@ -40,7 +38,7 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
     /// </summary>
     /// <param name="authorizationService">Service used to authorize user group update operations.</param>
     /// <param name="userGroupService">Service used to manage user group data and operations.</param>
-    [ActivatorUtilitiesConstructor]
+    /// <param name="backOfficeSecurityAccessor">Accessor for the back office security context of the current user.</param>
     public UpdateUserGroupsUserController(
         IAuthorizationService authorizationService,
         IUserGroupService userGroupService,
@@ -49,15 +47,6 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
         _authorizationService = authorizationService;
         _userGroupService = userGroupService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-    }
-
-    [Obsolete("Please use the constructor accepting all parameters. Scheduled for removal in Umbraco 19.")]
-    public UpdateUserGroupsUserController(IAuthorizationService authorizationService, IUserGroupService userGroupService)
-        : this(
-            authorizationService,
-            userGroupService,
-            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>())
-    {
     }
 
     /// <summary>

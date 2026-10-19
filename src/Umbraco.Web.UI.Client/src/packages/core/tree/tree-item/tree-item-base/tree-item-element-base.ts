@@ -21,6 +21,8 @@ export abstract class UmbTreeItemElementBase<
 > extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	set item(newVal: TreeItemModelType) {
+		if (newVal === this._item) return;
+
 		this._item = newVal;
 		this._extractFlags(newVal);
 
@@ -38,7 +40,7 @@ export abstract class UmbTreeItemElementBase<
 	protected _noAccess: boolean = false;
 
 	/**
-	 * @param item - The item from which to extract flags.
+	 * @param {TreeItemModelType | undefined} item - The item from which to extract flags.
 	 * @description This method is called whenever the `item` property is set. It extracts the flags from the item and assigns them to the `_flags` state property.
 	 * This method is in some cases overridden in subclasses to customize how flags are extracted!
 	 */
@@ -82,12 +84,12 @@ export abstract class UmbTreeItemElementBase<
 			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value), '_observeTotalPages');
 			this.observe(
 				this.#api.isLoadingPrevChildren,
-				(value) => (this._isLoadingPrevChildren = value ?? false),
+				(value) => (this._isLoadingPrevChildren = value),
 				'_observeIsLoadingPrevChildren',
 			);
 			this.observe(
 				this.#api.isLoadingNextChildren,
-				(value) => (this._isLoadingNextChildren = value ?? false),
+				(value) => (this._isLoadingNextChildren = value),
 				'_observeIsLoadingNextChildren',
 			);
 
@@ -137,7 +139,7 @@ export abstract class UmbTreeItemElementBase<
 	@state()
 	protected _isSelected = false;
 
-	@state()
+	@property({ type: Boolean, attribute: 'has-children', reflect: true })
 	private _hasChildren = false;
 
 	@state()
@@ -185,7 +187,7 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.deselect();
 	}
 
-	#handleDblClick(event: MouseEvent) {
+	protected _handleDblClick(event: MouseEvent) {
 		if (!this._item?.hasChildren) return;
 		event.stopPropagation();
 		this.#api?.open();
@@ -238,10 +240,10 @@ export abstract class UmbTreeItemElementBase<
 				label=${ifDefined(this._label)}
 				href=${ifDefined(this._isSelectableContext || this._noAccess ? undefined : this._href)}
 				.renderExpandSymbol=${this._renderExpandSymbol}>
-				${this.#renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
+				${this._renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
 				${this.#renderChildItems()}
 				<slot></slot>
-				${this.#renderLoadNextButton()}
+				${this._renderLoadNextButton()}
 			</uui-menu-item>
 		`;
 	}
@@ -299,7 +301,7 @@ export abstract class UmbTreeItemElementBase<
 	}
 
 	renderLabel() {
-		return html`<span slot="label" @dblclick=${this.#handleDblClick}>${this._label}<slot name="label"></slot></span>`;
+		return html`<span slot="label" @dblclick=${this._handleDblClick}>${this._label}<slot name="label"></slot></span>`;
 	}
 
 	#renderActions() {
@@ -309,29 +311,25 @@ export abstract class UmbTreeItemElementBase<
 	}
 
 	#renderChildItems() {
-		return html`
-			${this._childItems
-				? repeat(
-						this._childItems,
-						(item, index) => item.name + '___' + index,
-						(item) => html`
-							<umb-tree-item
-								.entityType=${item.entityType}
-								.props=${{ hideActions: this.hideActions, item, isMenu: this.isMenu }}></umb-tree-item>
-						`,
-					)
-				: ''}
-		`;
+		if (!this._childItems) return nothing;
+		return repeat(this._childItems, (item) => `${item.entityType}:${item.unique}`, this.#renderChildItem);
 	}
 
-	#renderLoadPrevButton() {
+	#renderChildItem = this._renderChildItem.bind(this);
+	protected _renderChildItem(item: TreeItemModelType) {
+		return html`<umb-tree-item
+			.entityType=${item.entityType}
+			.props=${{ hideActions: this.hideActions, item, isMenu: this.isMenu }}></umb-tree-item>`;
+	}
+
+	protected _renderLoadPrevButton() {
 		if (!this._hasPreviousItems) return nothing;
 		return html` <umb-tree-load-prev-button
 			@click=${this.#onLoadPrev}
 			.loading=${this._isLoadingPrevChildren}></umb-tree-load-prev-button>`;
 	}
 
-	#renderLoadNextButton() {
+	protected _renderLoadNextButton() {
 		if (!this._hasNextItems) return nothing;
 		return html`
 			<umb-tree-load-more-button

@@ -5,6 +5,7 @@ import { publishingHandlers } from './publishing.handlers.js';
 import { detailHandlers } from './detail.handlers.js';
 import { folderHandlers } from './folder.handlers.js';
 import { moveCopyHandlers } from './move-copy.handlers.js';
+import { blockReferenceHandlers } from './block-reference.handlers.js';
 
 export const handlers = [
 	...recycleBinHandlers,
@@ -14,4 +15,5 @@ export const handlers = [
 	...detailHandlers,
 	...folderHandlers,
 	...moveCopyHandlers,
+	...blockReferenceHandlers,
 ];

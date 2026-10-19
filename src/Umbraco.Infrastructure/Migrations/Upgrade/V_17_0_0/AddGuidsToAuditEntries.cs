@@ -39,8 +39,8 @@ public class AddGuidsToAuditEntries : UnscopedMigrationBase
         ScopeDatabase(scope);
 
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
-        AddColumnIfNotExists<AuditEntryDto>(columns, NewPerformingUserKeyColumnName);
-        AddColumnIfNotExists<AuditEntryDto>(columns, NewAffectedUserKeyColumnName);
+        AddColumn<AuditEntryDto>(columns, NewPerformingUserKeyColumnName);
+        AddColumn<AuditEntryDto>(columns, NewAffectedUserKeyColumnName);
 
         Database.Execute(
             new Sql(

@@ -77,12 +77,15 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				const config = propertyContext.getConfig();
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
+				const libraryAllowedElementTypeKeys = await this._getLibraryAllowedElementTypeKeys(blockTypes);
+
 				return {
 					modal: { size: modalSize },
 					data: {
 						blocks: blockTypes,
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
+						libraryAllowedElementTypeKeys,
 						clipboardFilter: async (clipboardEntryDetail) => {
 							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
 								pasteTranslatorManifests,
@@ -114,7 +117,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				};
 			})
 			.onSubmit(async (value, data) => {
-				if (value?.create && data) {
+				if (value && 'create' in value && data) {
 					const created = await this.create(
 						value.create.contentElementTypeKey,
 						{},
@@ -130,7 +133,12 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 					} else {
 						throw new Error('Failed to create block');
 					}
-				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
+				} else if (value && 'library' in value && data) {
+					await this._manager?.insertExternalContent(
+						value.library.elementKey,
+						data.originData as UmbBlockRteWorkspaceOriginData,
+					);
+				} else if (value && 'clipboard' in value && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 					if (!clipboardContext) {
 						throw new Error('Clipboard context not found');
@@ -193,7 +201,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 
 	async create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentKey'>,
+		partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentKey' | 'key'>,
 		originData?: UmbBlockRteWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
@@ -214,11 +222,11 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	 * Delete a block by requesting its removal through the pending deletion mechanism.
 	 * This enables undo support by removing the HTML element first via Tiptap,
 	 * which triggers _filterUnusedBlocks to store block data before removal.
-	 * @param {string} contentKey - The content key of the block to delete.
+	 * @param {string} layoutKey - The layout key of the block to delete.
 	 */
-	override async delete(contentKey: string) {
+	override async delete(layoutKey: string) {
 		await this._retrieveManager;
-		this._manager?.requestPendingDeletion(contentKey);
+		this._manager?.requestPendingDeletion(layoutKey);
 	}
 
 	async #insertFromRtePropertyValues(

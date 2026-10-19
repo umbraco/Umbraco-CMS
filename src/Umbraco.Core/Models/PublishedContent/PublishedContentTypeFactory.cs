@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 
@@ -34,22 +32,6 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
         _propertyValueConverters = propertyValueConverters;
         _dataTypeService = dataTypeService;
         _idKeyMap = idKeyMap;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PublishedContentTypeFactory"/> class.
-    /// </summary>
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public PublishedContentTypeFactory(
-        IPublishedModelFactory publishedModelFactory,
-        PropertyValueConverterCollection propertyValueConverters,
-        IDataTypeService dataTypeService)
-        : this(
-            publishedModelFactory,
-            propertyValueConverters,
-            dataTypeService,
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
     }
 
     /// <inheritdoc />

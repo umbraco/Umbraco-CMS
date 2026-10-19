@@ -14,6 +14,7 @@ internal abstract partial class ApiRichTextParserBase
     private readonly IApiMediaUrlProvider _apiMediaUrlProvider;
 
     protected const string BlockContentKeyAttribute = "data-content-key";
+    protected const string BlockLayoutKeyAttribute = "data-key";
 
     protected ApiRichTextParserBase(IApiContentRouteBuilder apiContentRouteBuilder, IApiMediaUrlProvider apiMediaUrlProvider)
     {

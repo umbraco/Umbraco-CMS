@@ -3,7 +3,8 @@ import type { UmbCollectionTextFilterApi } from './collection-text-filter-api.in
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestCollectionTextFilter
-	extends ManifestElementAndApi<UmbCollectionTextFilterElement, UmbCollectionTextFilterApi>,
+	extends
+		ManifestElementAndApi<UmbCollectionTextFilterElement, UmbCollectionTextFilterApi>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'collectionTextFilter';
 }

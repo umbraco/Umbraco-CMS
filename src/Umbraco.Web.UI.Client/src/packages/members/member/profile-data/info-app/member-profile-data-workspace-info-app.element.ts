@@ -38,11 +38,7 @@ export class UmbMemberProfileDataWorkspaceInfoAppElement extends UmbLitElement {
 			// anything richer falls back to JSON so the structure stays visible.
 			const allPrimitive = value.every(
 				(v) =>
-					v === null ||
-					v === undefined ||
-					typeof v === 'string' ||
-					typeof v === 'number' ||
-					typeof v === 'boolean',
+					v === null || v === undefined || typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean',
 			);
 			if (allPrimitive) {
 				return value.map((v) => (v === null || v === undefined ? '—' : String(v))).join(', ');

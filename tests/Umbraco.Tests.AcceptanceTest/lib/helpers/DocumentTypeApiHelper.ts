@@ -139,6 +139,10 @@ export class DocumentTypeApiHelper {
   // FOLDER
   async getFolder(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document-type/folder/' + id);
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 
@@ -942,6 +946,20 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
+  async createDocumentTypeWithAllowedChildNodesAndCollectionId(documentTypeName: string, allowedChildNodeIds: string[], collectionId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const builder = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true);
+    for (const allowedChildNodeId of allowedChildNodeIds) {
+      builder.addAllowedDocumentType().withId(allowedChildNodeId).done();
+    }
+    const documentType = builder.withCollectionId(collectionId).build();
+    return await this.create(documentType);
+  }
+
   async createDocumentTypeWithCollectionId(documentTypeName: string, collectionId: string) {
     await this.ensureNameNotExists(documentTypeName);
 
@@ -1091,6 +1109,70 @@ export class DocumentTypeApiHelper {
       .build();
 
     return await this.create(documentType);
+  }
+
+  async createVariantDocumentTypeWithVaryingAndSharedProperties(documentTypeName: string, dataTypeId: string, varyingPropertyName: string, sharedPropertyName: string) {
+    const crypto = require('crypto');
+    const containerId = crypto.randomUUID();
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .addContainer()
+        .withName('TestGroup')
+        .withId(containerId)
+        .withType("Group")
+        .done()
+      .addProperty()
+        .withContainerId(containerId)
+        .withAlias(AliasHelper.toAlias(varyingPropertyName))
+        .withName(varyingPropertyName)
+        .withDataTypeId(dataTypeId)
+        .withVariesByCulture(true)
+        .done()
+      .addProperty()
+        .withContainerId(containerId)
+        .withAlias(AliasHelper.toAlias(sharedPropertyName))
+        .withName(sharedPropertyName)
+        .withDataTypeId(dataTypeId)
+        .withVariesByCulture(false)
+        .done()
+      .withVariesByCulture(true)
+      .build();
+
+    return await this.create(documentType);
+  }
+
+  async createCultureAndSegmentVariantDocumentTypeWithProperties(documentTypeName: string, dataTypeId: string, properties: {name: string, variesByCulture: boolean, variesBySegment: boolean}[]) {
+    const crypto = require('crypto');
+    const containerId = crypto.randomUUID();
+    await this.ensureNameNotExists(documentTypeName);
+
+    const builder = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .withVariesByCulture(true)
+      .withVariesBySegment(true)
+      .addContainer()
+        .withName('TestGroup')
+        .withId(containerId)
+        .withType("Group")
+        .done();
+    for (const property of properties) {
+      builder.addProperty()
+        .withContainerId(containerId)
+        .withAlias(AliasHelper.toAlias(property.name))
+        .withName(property.name)
+        .withDataTypeId(dataTypeId)
+        .withVariesByCulture(property.variesByCulture)
+        .withVariesBySegment(property.variesBySegment)
+        .done();
+    }
+
+    return await this.create(builder.build());
   }
 
   async createVariantDocumentTypeWithAllowedChildNodeAndInvariantPropertyEditor(documentTypeName: string, allowedChildNodeId: string, dataTypeName: string, dataTypeId: string, groupName: string = "TestGroup") {
@@ -1294,7 +1376,7 @@ export class DocumentTypeApiHelper {
 
   /**
    * Creates a document type with a nested Block List structure for testing the
-   * AllowEditInvariantFromNonDefault matrix.
+   * invariant-for-variant access matrix.
    *
    * Structure created:
    * - Document Type (Vary by culture)

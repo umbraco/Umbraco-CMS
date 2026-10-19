@@ -33,34 +33,24 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
-    private readonly IRichTextPropertyIndexValueFactory _richTextPropertyIndexValueFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RichTextPropertyEditor"/> class.
     /// </summary>
     /// <param name="dataValueEditorFactory">Factory used to create data value editors for property values.</param>
     /// <param name="ioHelper">Helper for IO operations, such as resolving file paths.</param>
-    /// <param name="richTextPropertyIndexValueFactory">Factory for creating index values specific to rich text properties.</param>
     /// <remarks>
     /// The constructor will set up the property editor based on the attribute if one is found.
     /// </remarks>
     public RichTextPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        IRichTextPropertyIndexValueFactory richTextPropertyIndexValueFactory)
+        IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _richTextPropertyIndexValueFactory = richTextPropertyIndexValueFactory;
 
         SupportsReadOnly = true;
     }
-
-    /// <summary>
-    /// Gets the <see cref="IPropertyIndexValueFactory"/> instance used to generate index values for properties edited with the rich text property editor.
-    /// This factory is used to extract and format property values for search indexing.
-    /// </summary>
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _richTextPropertyIndexValueFactory;
 
     /// <summary>
     /// Gets a value indicating whether this property editor supports configurable elements. Always returns <c>true</c> for the rich text property editor.
@@ -162,6 +152,20 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
     {
         var valueEditor = (RichTextPropertyValueEditor)GetValueEditor();
         return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData,allowedCultures);
+    }
+
+    /// <inheritdoc />
+    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
+    {
+        var valueEditor = (RichTextPropertyValueEditor)GetValueEditor();
+        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue, defaultCulture);
+    }
+
+    /// <inheritdoc />
+    public override bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue)
+    {
+        var valueEditor = (RichTextPropertyValueEditor)GetValueEditor();
+        return valueEditor.ArePropertyValuesEquivalent(editedValue, publishedValue);
     }
 
     /// <summary>
@@ -527,6 +531,50 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
             // structure is global, and markup follows structure
             var mergedEditorValue = new RichTextEditorValue { Markup = sourceRichTextEditorValue.Markup, Blocks = blocksMergeResult };
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(mergedEditorValue, _jsonSerializer);
+        }
+
+        internal override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
+        {
+            TryParseEditorValue(sourceValue, out RichTextEditorValue? sourceRichTextEditorValue);
+            TryParseEditorValue(targetValue, out RichTextEditorValue? targetRichTextEditorValue);
+
+            if (sourceRichTextEditorValue?.Blocks is null && targetRichTextEditorValue?.Blocks is null)
+            {
+                // no blocks on either side - any difference is in the markup, which is invariant/structural
+                // for this property. Deliberately return empty rather than diffing the markup: this
+                // explicitly hands the change to the caller's default-culture fallback, it is not an
+                // "unable to determine" signal.
+                return [];
+            }
+
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? sourceBlockEditorData =
+                sourceRichTextEditorValue?.Blocks is not null ? ConvertAndClean(sourceRichTextEditorValue.Blocks) : null;
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? targetBlockEditorData =
+                targetRichTextEditorValue?.Blocks is not null ? ConvertAndClean(targetRichTextEditorValue.Blocks) : null;
+
+            return GetChangedCulturesForBlockValue(sourceBlockEditorData?.BlockValue, targetBlockEditorData?.BlockValue, defaultCulture);
+        }
+
+        internal override bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue)
+        {
+            if (Equals(editedValue, publishedValue))
+            {
+                return true;
+            }
+
+            if (TryParseEditorValue(editedValue, out RichTextEditorValue? editedRichTextEditorValue) is false
+                || TryParseEditorValue(publishedValue, out RichTextEditorValue? publishedRichTextEditorValue) is false
+                || editedRichTextEditorValue.Markup != publishedRichTextEditorValue.Markup)
+            {
+                return false;
+            }
+
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? editedBlockEditorData =
+                editedRichTextEditorValue.Blocks is not null ? ConvertAndClean(editedRichTextEditorValue.Blocks) : null;
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? publishedBlockEditorData =
+                publishedRichTextEditorValue.Blocks is not null ? ConvertAndClean(publishedRichTextEditorValue.Blocks) : null;
+
+            return BlockValuesAreEquivalent(editedBlockEditorData?.BlockValue, publishedBlockEditorData?.BlockValue);
         }
 
         private bool TryParseEditorValue(object? value, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)

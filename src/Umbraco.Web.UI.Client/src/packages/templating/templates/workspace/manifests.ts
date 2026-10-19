@@ -7,12 +7,30 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspace',
 		kind: 'routable',
-		alias: 'Umb.Workspace.Template',
+		alias: UMB_TEMPLATE_WORKSPACE_ALIAS,
 		name: 'Template Workspace',
 		api: () => import('./template-workspace.context.js'),
 		meta: {
 			entityType: 'template',
 		},
+	},
+	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Template.CodeEditor',
+		name: 'Template Workspace Code Editor View',
+		element: () => import('./views/code-editor/template-code-editor-workspace-view.element.js'),
+		weight: 700,
+		meta: {
+			label: '#template_tabCode',
+			pathname: 'code',
+			icon: 'icon-brackets',
+		},
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_TEMPLATE_WORKSPACE_ALIAS,
+			},
+		],
 	},
 	{
 		type: 'workspaceAction',
@@ -41,8 +59,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Template.ProductionMode',
 		name: 'Template Production Mode',
-		api: () =>
-			import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
+		api: () => import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
 		element: () =>
 			import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
 		weight: 60,

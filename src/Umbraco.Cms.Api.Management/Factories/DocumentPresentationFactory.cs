@@ -8,10 +8,8 @@ using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -79,11 +77,6 @@ internal sealed class DocumentPresentationFactory
 
         return responseModel;
     }
-
-    /// <inheritdoc/>
-    [Obsolete("Use CreateItemResponseModelAsync instead. Scheduled for removal in Umbraco 19.")]
-    public DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity)
-        => CreateItemResponseModelAsync(entity).GetAwaiter().GetResult();
 
     /// <inheritdoc/>
     public async Task<DocumentItemResponseModel> CreateItemResponseModelAsync(IDocumentEntitySlim entity)

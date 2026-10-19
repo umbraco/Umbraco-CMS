@@ -5,9 +5,9 @@ import type {
 	UmbPropertyValueData,
 	UmbPropertyValueResolver,
 } from '@umbraco-cms/backoffice/property';
-import { UmbVariantId, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, type UmbEntityVariantModel, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 import { UmbMergeContentVariantDataController } from './merge-content-variant-data.controller.js';
-import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '../types.js';
+import type { UmbContentLikeDetailModel, UmbEntryValueModel, UmbPotentialContentValueModel } from '../types.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -15,20 +15,19 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 type TestPropertyValueNestedType = {
-	nestedValue: UmbPropertyValueData;
+	nestedValue: UmbPotentialContentValueModel;
 };
 
-export class TestPropertyValueResolver
-	implements
-		UmbPropertyValueResolver<
-			UmbPropertyValueData<TestPropertyValueNestedType>,
-			UmbPropertyValueData,
-			UmbVariantDataModel
-		>
-{
+export class TestPropertyValueResolver implements UmbPropertyValueResolver<
+	UmbPropertyValueData<TestPropertyValueNestedType>,
+	UmbPotentialContentValueModel,
+	UmbVariantDataModel
+> {
 	async processValues(
 		property: UmbPropertyValueData<TestPropertyValueNestedType>,
-		valuesCallback: (values: Array<UmbPropertyValueData>) => Promise<Array<UmbPropertyValueData> | undefined>,
+		valuesCallback: (
+			values: Array<UmbPotentialContentValueModel>,
+		) => Promise<Array<UmbPotentialContentValueModel> | undefined>,
 	) {
 		if (property.value) {
 			const processedValues = await valuesCallback([property.value.nestedValue]);
@@ -53,16 +52,17 @@ type TestBlockValueType = {
  * Mirrors UmbBlockValueResolver._processValueBlockData: the values callback is invoked
  * once per contentData entry, in array order.
  */
-export class TestBlockValueResolver
-	implements
-		UmbPropertyValueResolver<UmbPropertyValueData<TestBlockValueType>, UmbPropertyValueData, UmbVariantDataModel>
-{
+export class TestBlockValueResolver implements UmbPropertyValueResolver<
+	UmbPropertyValueData<TestBlockValueType>,
+	UmbPotentialContentValueModel,
+	UmbVariantDataModel
+> {
 	async processValues(
 		property: UmbPropertyValueData<TestBlockValueType>,
 		valuesCallback: (
-			values: Array<UmbPropertyValueData>,
+			values: Array<UmbPotentialContentValueModel>,
 			groupIdentifier?: string,
-		) => Promise<Array<UmbPropertyValueData> | undefined>,
+		) => Promise<Array<UmbPotentialContentValueModel> | undefined>,
 	) {
 		if (property.value) {
 			const contentData = await Promise.all(
@@ -168,6 +168,28 @@ describe('UmbMergeContentVariantDataController', () => {
 			// the block that took the deleted one's position.
 			expect(textOf('block-b', 'da'), 'block-b Danish').to.equal('b-da');
 			expect(textOf('block-c', 'da'), 'block-c Danish').to.equal('c-da');
+		});
+
+		it('sorts inner block values by culture, invariant first', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const data: UmbContentLikeDetailModel = {
+				values: [
+					blockValue([
+						{
+							key: 'block-a',
+							values: [innerValue('en-us', 'a-en'), innerValue(null, 'a-invariant'), innerValue('da-dk', 'a-da')],
+						},
+					]),
+				],
+			};
+
+			const variants = [new UmbVariantId('en-us'), new UmbVariantId('da-dk')];
+			const result = await ctrl.process(data, data, variants, [...variants, UmbVariantId.CreateInvariant()]);
+
+			const blocks = (result.values[0].value as TestBlockValueType).contentData;
+			expect(blocks[0].values.map((v) => v.culture)).to.deep.equal([null, 'da-dk', 'en-us']);
 		});
 	});
 
@@ -275,6 +297,99 @@ describe('UmbMergeContentVariantDataController', () => {
 			expect((result.values[0].value as TestPropertyValueNestedType).nestedValue.value).to.be.equal(
 				'saved-nested-value-invariant',
 			);
+		});
+	});
+
+	describe('Variant ordering', () => {
+		const variant = (culture: string | null, segment: string | null = null) =>
+			({ culture, segment, name: `${culture}-${segment}` }) as unknown as UmbEntityVariantModel;
+
+		it('places a draft-only culture by culture, not at the end', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const persistedData = { values: [], variants: [variant('da-dk'), variant('zz-zz')] };
+			const runtimeData = { values: [], variants: [variant('da-dk'), variant('zz-zz'), variant('en-us')] };
+
+			const variants = [new UmbVariantId('da-dk'), new UmbVariantId('en-us'), new UmbVariantId('zz-zz')];
+			const result = await ctrl.process(persistedData, runtimeData, variants, variants);
+
+			expect(result.variants!.map((v) => v.culture)).to.deep.equal(['da-dk', 'en-us', 'zz-zz']);
+		});
+	});
+
+	describe('Value ordering', () => {
+		const value = (alias: string, culture: string | null, segment: string | null = null): UmbEntryValueModel => ({
+			editorAlias: 'some-editor',
+			alias,
+			culture,
+			segment,
+			value: `${alias}-${culture}-${segment}`,
+		});
+
+		it('sorts values by culture, invariant first', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const data: UmbContentLikeDetailModel = {
+				values: [value('title', 'en-us'), value('title', null), value('title', 'da-dk')],
+			};
+
+			const variants = [new UmbVariantId('en-us'), new UmbVariantId('da-dk')];
+			const result = await ctrl.process(data, data, variants, [...variants, UmbVariantId.CreateInvariant()]);
+
+			expect(result.values.map((v) => v.culture)).to.deep.equal([null, 'da-dk', 'en-us']);
+		});
+
+		it('sorts values sharing a culture by segment, invariant segment first', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const data: UmbContentLikeDetailModel = {
+				values: [value('title', 'en-us', 's2'), value('title', 'en-us', null), value('title', 'en-us', 's1')],
+			};
+
+			const variants = [new UmbVariantId('en-us')];
+			const result = await ctrl.process(data, data, variants, [...variants, UmbVariantId.CreateInvariant()]);
+
+			expect(result.values.map((v) => v.segment)).to.deep.equal([null, 's1', 's2']);
+		});
+
+		it('places a draft-only new culture by culture, not at the end', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const persistedData: UmbContentLikeDetailModel = {
+				values: [value('title', null), value('title', 'en-us')],
+			};
+			const runtimeData: UmbContentLikeDetailModel = {
+				values: [value('title', null), value('title', 'en-us'), value('title', 'da-dk')],
+			};
+
+			const variants = [new UmbVariantId('en-us'), new UmbVariantId('da-dk')];
+			const result = await ctrl.process(persistedData, runtimeData, variants, [
+				...variants,
+				UmbVariantId.CreateInvariant(),
+			]);
+
+			expect(result.values.map((v) => v.culture)).to.deep.equal([null, 'da-dk', 'en-us']);
+		});
+
+		it('sorts values sharing a culture and segment by alias, ordinally', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			// Deliberately out of alias order, mirroring the Management API's
+			// OrderBy(Culture).ThenBy(Segment).ThenBy(Alias) so unchanged values keep the same array
+			// position the backend returns after a save and reload. [NL]
+			const data: UmbContentLikeDetailModel = {
+				values: [value('zzz-alias', 'da-dk'), value('aaa-alias', 'da-dk'), value('title', 'en-us')],
+			};
+
+			const variants = [new UmbVariantId('da-dk'), new UmbVariantId('en-us')];
+			const result = await ctrl.process(data, data, variants, variants);
+
+			expect(result.values.map((v) => v.alias)).to.deep.equal(['aaa-alias', 'zzz-alias', 'title']);
 		});
 	});
 });

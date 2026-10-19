@@ -3,11 +3,13 @@ import { UmbCurrentUserRepository } from '../../repository/index.js';
 import { UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL } from '../current-user-mfa-disable/current-user-mfa-disable-modal.token.js';
 import type { UmbCurrentUserMfaProviderModel } from '../../types.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbOpenModal, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import { of } from '@umbraco-cms/backoffice/external/rxjs';
 
 type UmbMfaLoginProviderOption = UmbCurrentUserMfaProviderModel & {
 	displayName: string;
@@ -47,7 +49,8 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 				return;
 			}
 
-			const serverLoginProviders$ = serverLoginProvidersResponse.asObservable();
+			// TODO: Fail early? if no asObservable method is available on the server response, we should probably throw an error or handle it differently. [NL]
+			const serverLoginProviders$ = serverLoginProvidersResponse.asObservable?.() ?? of([]);
 			const manifestLoginProviders$ = umbExtensionsRegistry.byType('mfaLoginProvider');
 
 			// Merge the server and manifest providers to get the final list of providers
@@ -122,9 +125,10 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 
 	/**
 	 * Render a provider with a toggle to enable/disable it
-	 * @param item
+	 * @param {UmbMfaLoginProviderOption} item The provider to render
+	 * @returns {TemplateResult} The rendered provider
 	 */
-	#renderProvider(item: UmbMfaLoginProviderOption) {
+	#renderProvider(item: UmbMfaLoginProviderOption): TemplateResult {
 		return html`
 			<uui-box headline=${item.displayName}>
 				${when(
@@ -171,7 +175,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * Open the provider modal.
 	 * This will show the QR code and/or other means of validation for the given provider and return the activation code.
 	 * The activation code is then used to either enable the provider.
-	 * @param item
+	 * @param {UmbMfaLoginProviderOption} item The provider to enable
 	 */
 	async #onProviderEnable(item: UmbMfaLoginProviderOption) {
 		await umbOpenModal(this, UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL, {
@@ -183,7 +187,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * Open the provider modal.
 	 * This will show the QR code and/or other means of validation for the given provider and return the activation code.
 	 * The activation code is then used to disable the provider.
-	 * @param item
+	 * @param {UmbMfaLoginProviderOption} item The provider to disable
 	 */
 	async #onProviderDisable(item: UmbMfaLoginProviderOption) {
 		await umbOpenModal(this, UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL, {

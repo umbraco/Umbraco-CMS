@@ -62,6 +62,7 @@ export class UmbBlockGridToBlockClipboardCopyPropertyValueTranslator
 			}
 
 			return {
+				key: gridLayout.key,
 				contentKey: gridLayout.contentKey,
 				settingsKey: gridLayout.settingsKey,
 			};

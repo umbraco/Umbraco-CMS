@@ -19,12 +19,21 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	readonly allowedSections = this.#currentUser.asObservablePart((user) => user?.allowedSections);
 	readonly avatarUrls = this.#currentUser.asObservablePart((user) => user?.avatarUrls);
 	readonly documentStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.documentStartNodeUniques);
+	readonly documentBlueprintStartNodeUniques = this.#currentUser.asObservablePart(
+		(user) => user?.documentBlueprintStartNodeUniques,
+	);
 	readonly elementStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.elementStartNodeUniques);
 	readonly email = this.#currentUser.asObservablePart((user) => user?.email);
 	readonly fallbackPermissions = this.#currentUser.asObservablePart((user) => user?.fallbackPermissions);
 	readonly hasAccessToAllLanguages = this.#currentUser.asObservablePart((user) => user?.hasAccessToAllLanguages);
+	readonly hasAccessToInvariantForVariant = this.#currentUser.asObservablePart(
+		(user) => user?.hasAccessToInvariantForVariant,
+	);
 	readonly hasAccessToSensitiveData = this.#currentUser.asObservablePart((user) => user?.hasAccessToSensitiveData);
 	readonly hasDocumentRootAccess = this.#currentUser.asObservablePart((user) => user?.hasDocumentRootAccess);
+	readonly hasDocumentBlueprintRootAccess = this.#currentUser.asObservablePart(
+		(user) => user?.hasDocumentBlueprintRootAccess,
+	);
 	readonly hasElementRootAccess = this.#currentUser.asObservablePart((user) => user?.hasElementRootAccess);
 	readonly hasMediaRootAccess = this.#currentUser.asObservablePart((user) => user?.hasMediaRootAccess);
 	readonly isAdmin = this.#currentUser.asObservablePart((user) => user?.isAdmin);
@@ -48,10 +57,14 @@ export class UmbCurrentUserContext extends UmbContextBase {
 			this.#addActionEventListeners();
 		});
 
-		this.observe(this.languageIsoCode, (currentLanguageIsoCode) => {
-			if (!currentLanguageIsoCode) return;
-			umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
-		});
+		this.observe(
+			this.languageIsoCode,
+			(currentLanguageIsoCode) => {
+				if (!currentLanguageIsoCode) return;
+				umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
+			},
+			null,
+		);
 	}
 
 	#loadPromise?: Promise<void>;
@@ -85,6 +98,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	async #doLoad(): Promise<void> {
 		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
+		// TODO: Fail early? if no asObservable method is available on the server response, we should probably throw an error or handle it differently. [NL]
 		if (asObservable) {
 			await this.observe(
 				asObservable(),
@@ -93,7 +107,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 				},
 				'observeUser',
 			)
-				.asPromise()
+				?.asPromise()
 				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
 				.catch(() => undefined);
 		}
@@ -106,8 +120,8 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 	/**
 	 * Checks if a user is the current user.
-	 * @param userUnique The user id to check
-	 * @returns True if the user is the current user, otherwise false
+	 * @param {string} userUnique The user id to check
+	 * @returns {Promise<boolean>} True if the user is the current user, otherwise false
 	 */
 	async isUserCurrentUser(userUnique: string): Promise<boolean> {
 		const currentUser = await firstValueFrom(this.currentUser);
@@ -116,7 +130,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 	/**
 	 * Checks if the current user is an admin.
-	 * @returns True if the current user is an admin, otherwise false
+	 * @returns {Promise<boolean>} True if the current user is an admin, otherwise false
 	 */
 	async isCurrentUserAdmin(): Promise<boolean> {
 		const currentUser = await firstValueFrom(this.currentUser);

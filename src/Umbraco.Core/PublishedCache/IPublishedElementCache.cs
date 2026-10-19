@@ -27,7 +27,5 @@ public interface IPublishedElementCache
     /// for backwards compatibility; consumers calling sync-over-async should prefer this
     /// overload.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    IPublishedElement? GetById(bool preview, Guid key)
-        => GetByIdAsync(key, preview).GetAwaiter().GetResult();
+    IPublishedElement? GetById(bool preview, Guid key);
 }

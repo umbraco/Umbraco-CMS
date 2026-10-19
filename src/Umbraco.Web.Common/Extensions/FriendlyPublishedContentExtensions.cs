@@ -1,5 +1,4 @@
 using System.Data;
-using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -25,7 +24,6 @@ public static class FriendlyPublishedContentExtensions
     private static IPublishedUrlProvider? _publishedUrlProvider;
     private static IUmbracoContextAccessor? _umbracoContextAccessor;
     private static ISiteDomainMapper? _siteDomainHelper;
-    private static IExamineManager? _examineManager;
     private static ITemplateService? _templateService;
     private static IOptions<WebRoutingSettings>? _webRoutingSettings;
     private static IContentTypeService? _contentTypeService;
@@ -115,15 +113,6 @@ public static class FriendlyPublishedContentExtensions
         }
     }
 
-    private static IExamineManager ExamineManager
-    {
-        get
-        {
-            _examineManager ??= StaticServiceProvider.Instance.GetRequiredService<IExamineManager>();
-            return _examineManager;
-        }
-    }
-
     private static ITemplateService TemplateService
     {
         get
@@ -198,7 +187,6 @@ public static class FriendlyPublishedContentExtensions
         _publishedUrlProvider = null;
         _umbracoContextAccessor = null;
         _siteDomainHelper = null;
-        _examineManager = null;
         _templateService = null;
         _webRoutingSettings = null;
         _contentTypeService = null;
@@ -877,18 +865,6 @@ public static class FriendlyPublishedContentExtensions
         this IPublishedContent content,
         Uri? current = null)
         => content.GetCultureFromDomains(UmbracoContextAccessor, SiteDomainHelper, DomainCache, DocumentNavigationQueryService, GetPublishedStatusFilteringService(content), current);
-
-    public static IEnumerable<PublishedSearchResult> SearchDescendants(
-        this IPublishedContent content,
-        string term,
-        string? indexName = null)
-        => content.SearchDescendants(ExamineManager, UmbracoContextAccessor, term, indexName);
-
-    public static IEnumerable<PublishedSearchResult> SearchChildren(
-        this IPublishedContent content,
-        string term,
-        string? indexName = null)
-        => content.SearchChildren(ExamineManager, UmbracoContextAccessor, term, indexName);
 
     // There is a lot of overlap between published content and published element extensions. To avoid duplicate code,
     // we delegate to the published element extensions with this.

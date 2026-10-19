@@ -21,15 +21,7 @@ export interface UmbAuthProviderDefaultProps {
 
 	/**
 	 * Callback that is called when the user selects a provider.
-	 * @param providerName The name of the provider that the user selected.
-	 * @param loginHint The login hint to use for login if available.
-	 * @deprecated Use the manifest parameter instead.
-	 */
-	onSubmit(providerName: string, loginHint?: string): void;
-
-	/**
-	 * Callback that is called when the user selects a provider.
 	 * @param manifest The manifest of the provider that the user selected.
 	 */
-	onSubmit(manifest: ManifestAuthProvider, loginHint?: string): void;
+	onSubmit(manifest: ManifestAuthProvider): void;
 }

@@ -96,8 +96,8 @@ export class UmbPropertyEditorUIBlockGridElement
 			super.value = undefined;
 			// Clear manager state so blocks are actually removed
 			this.#managerContext.setLayouts([]);
-			this.#managerContext.setContents([]);
-			this.#managerContext.setSettings([]);
+			this.#managerContext.setContents(undefined);
+			this.#managerContext.setSettings(undefined);
 			this.#managerContext.setExposes([]);
 			return;
 		}
@@ -245,7 +245,7 @@ export class UmbPropertyEditorUIBlockGridElement
 			);
 		});
 
-		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
+		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false), null);
 	}
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {

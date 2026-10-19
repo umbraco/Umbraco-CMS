@@ -1,6 +1,6 @@
 # Umbraco CMS - Multi-Project Repository
 
-Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
+Enterprise-grade CMS built on .NET 11.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
 
 **Repository**: https://github.com/umbraco/Umbraco-CMS
 **License**: MIT
@@ -28,7 +28,7 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 3. **Specialized Features** (Pluggable Modules)
    - Persistence: EF Core (modern), NPoco (legacy) for SQL Server & SQLite
    - Caching: `PublishedCache.HybridCache` (in-memory + distributed)
-   - Search: `Examine.Lucene` (full-text search)
+   - Search: `Umbraco.Cms.Search.*` (search abstractions + Examine/Lucene provider)
    - Imaging: `Imaging.ImageSharp` v1 & v2 (image processing)
    - Other: Static assets, targets, development tools
 
@@ -42,7 +42,7 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 
 ### Key Technologies
 
-- **.NET 10.0** - Target framework for all projects
+- **.NET 11.0** - Target framework for all projects
 - **ASP.NET Core** - Web framework
 - **Entity Framework Core** - Modern ORM
 - **OpenIddict** - OAuth 2.0/OpenID Connect authentication
@@ -53,7 +53,17 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 
 ---
 
-## 2. Repository Structure
+## 2. General-Purpose by Default
+
+This repository is a product platform, not an application. Every layer is consumed by code that does not live here — implementors, package developers, and other parts of the CMS. A change is finished when it serves the use case that prompted it *and* the use cases nobody has described yet.
+
+**Design to the contract.** When you change shared code, work out the rule the layer must uphold for *any* implementation of it, and make that rule hold there. Name a concrete implementation freely in the code that owns it — a specific service, package, or project; a shared or generic layer implements only the contract. A specific editor alias, content type alias, or class name appearing in generic code is the signal that a fix has been fitted to one caller — express it instead as a capability the contract exposes.
+
+**Describe the contract.** Comments and public docs use the vocabulary of the layer they sit in. In public XML doc / JSDoc a concrete illustration is welcome where it reads as one possible implementation ("for example, an editor that emits several groups may…"), never as the definition of the behaviour.
+
+---
+
+## 3. Repository Structure
 
 ```
 Umbraco-CMS/
@@ -68,7 +78,8 @@ Umbraco-CMS/
 │   ├── Umbraco.Cms.Api.Common/            # Shared API infrastructure
 │   │   └── CLAUDE.md                      # ⭐ API patterns guide
 │   ├── Umbraco.PublishedCache.HybridCache/ # Content caching
-│   ├── Umbraco.Examine.Lucene/            # Search indexing
+│   ├── Umbraco.Cms.Search.Core/           # Search abstractions
+│   ├── Umbraco.Cms.Search.Provider.Examine/ # Examine (Lucene) search provider
 │   ├── Umbraco.Cms.Persistence.EFCore/    # EF Core data access
 │   ├── Umbraco.Cms.Persistence.EFCore.Sqlite/
 │   ├── Umbraco.Cms.Persistence.EFCore.SqlServer/
@@ -124,7 +135,8 @@ Web.UI → Web.Common → Infrastructure → Core
 **Infrastructure Layer**:
 - `Umbraco.Infrastructure` → `Umbraco.Core`
 - `Umbraco.PublishedCache.*` → `Umbraco.Infrastructure`
-- `Umbraco.Examine.Lucene` → `Umbraco.Infrastructure`
+- `Umbraco.Cms.Search.Core` → `Umbraco.Infrastructure`
+- `Umbraco.Cms.Search.Provider.Examine` → `Umbraco.Cms.Search.Core` + `Umbraco.Web.Common` + `Umbraco.Cms.Api.Common` + `Umbraco.Cms.Api.Management`
 - `Umbraco.Cms.Persistence.*` → `Umbraco.Infrastructure`
 
 **Web Layer**:
@@ -138,7 +150,7 @@ Web.UI → Web.Common → Infrastructure → Core
 
 ---
 
-## 3. Teamwork & Collaboration
+## 4. Teamwork & Collaboration
 
 ### Branching Strategy
 
@@ -222,7 +234,7 @@ Project ownership is distributed across teams. Check individual project director
 
 ---
 
-## 4. Architecture Patterns
+## 5. Architecture Patterns
 
 ### Core Architectural Decisions
 
@@ -231,7 +243,7 @@ Project ownership is distributed across teams. Check individual project director
    - Infrastructure implements contracts that need Infrastructure-owned machinery
    - Web/APIs consume implementations via DI
 
-   **Where service implementations live**: Services whose dependencies are satisfiable from Core interfaces alone (repositories, scope, config, other Core services) live in `Umbraco.Core/Services/` — this covers the majority of domain services (`MemberService`, `ContentService`, `MediaService`, `ContentTypeService`, `EntityService`, `AuditService`, `ExternalMemberService`, etc.). Service implementations only live in `Umbraco.Infrastructure/Services/Implement/` when they genuinely need Infrastructure concerns — Examine indexes (`ContentSearchService`, `MediaSearchService`, `IndexedEntitySearchService`), log files (`LogViewerRepository`), packaging internals (`PackagingService`), webhook firing (`WebhookFiringService`), distributed-job coordination (`DistributedJobService`). When adding a new service, default to Core and only move to Infrastructure if a concrete dependency forces it.
+   **Where service implementations live**: Services whose dependencies are satisfiable from Core interfaces alone (repositories, scope, config, other Core services) live in `Umbraco.Core/Services/` — this covers the majority of domain services (`MemberService`, `ContentService`, `MediaService`, `ContentTypeService`, `EntityService`, `AuditService`, `ExternalMemberService`, etc.). Service implementations only live in `Umbraco.Infrastructure/Services/Implement/` when they genuinely need Infrastructure concerns — log files (`LogViewerRepository`), packaging internals (`PackagingService`), webhook firing (`WebhookFiringService`), distributed-job coordination (`DistributedJobService`). When adding a new service, default to Core and only move to Infrastructure if a concrete dependency forces it.
 
 2. **Interface-First Design**
    - All services defined as interfaces in Core
@@ -262,11 +274,11 @@ Project ownership is distributed across teams. Check individual project director
 
 ---
 
-## 5. Avoiding Breaking Changes
+## 6. Avoiding Breaking Changes
 
 No binary breaking changes are allowed within a major version. Three patterns are used:
 
-### 5.1 Obsolete Constructor + StaticServiceProvider
+### 6.1 Obsolete Constructor + StaticServiceProvider
 
 When a public class needs new dependencies, obsolete the existing constructor and add a new one. The old constructor delegates to the new one, resolving missing deps via `StaticServiceProvider`.
 
@@ -297,7 +309,7 @@ public MyService(IDependencyA depA, IDependencyB depB)
 - Uses `StaticServiceProvider.Instance.GetRequiredService<T>()` for new params only
 - DI registration must use the NEW constructor (old is for external consumers only)
 
-### 5.2 Obsolete Method + New Overload
+### 6.2 Obsolete Method + New Overload
 
 When a public method signature needs to change, add the new method/overload and obsolete the old. The obsolete method should call the new one with suitable defaults.
 
@@ -318,7 +330,7 @@ public void DoThing(string name, string? extraParam)
 - All internal callers must be updated to use the new method
 - No callers should remain on the obsolete method within the codebase
 
-### 5.3 Default Interface Implementation
+### 6.3 Default Interface Implementation
 
 When adding methods to a public interface, provide a default implementation so existing external implementations don't break.
 
@@ -348,7 +360,7 @@ public interface IMyService
 - Default impl should be functionally correct even if not optimal
 - If using `StaticServiceProvider` in a default impl, note this is temporary
 
-### 5.4 General Rules
+### 6.4 General Rules
 
 - **Removal policy**: Obsoleted members must remain for at least one full major version before removal. If obsoleted in version N, the earliest removal is version N+2. For example, something obsoleted in v17 is scheduled for removal in v19 (giving the whole of v18 as a deprecation period).
 - All `[Obsolete]` attributes must include **"Scheduled for removal in Umbraco {current+2}"**
@@ -363,7 +375,7 @@ public interface IMyService
 
 ---
 
-## 6. Project-Specific Notes
+## 7. Project-Specific Notes
 
 ### Centralized Package Management
 
@@ -394,6 +406,20 @@ When updating dependencies, decide which file the package belongs in:
 - `.editorconfig` - Code style rules
 - `.globalconfig` - Roslyn analyzer rules
 
+### SBOM Generation & License Policy (Azure Pipelines)
+
+`build/azure-pipelines.yml` generates a CycloneDX SBOM per project (Backend/NuGet, Login UI, Backoffice, E2E), each in its own job in the `Dependency_Track` stage, via **`umbraco-sbom`** (the `Umbraco.Internal.Sbom` .NET 10 global tool), not plain `dotnet CycloneDX` / `@cyclonedx/cyclonedx-npm`. It adds license-policy enforcement over CycloneDX. Repo (private): https://github.com/umbraco/Umbraco.Internal.Sbom — README has the full flag/exit-code/policy reference.
+
+When editing those steps:
+
+- **Output filenames and artifacts** (`bom-dotnet.xml`, `bom-login.xml`, `bom-backoffice.xml`, `bom-e2e.xml`) are mapped to Dependency-Track projects in the stage's `build/templates/dependency-track.yml` parameters — keep them in step.
+- **Usage**: `umbraco-sbom <path> --output-file <full-path> [policy flags]`. Only `--output-file` plus policy flags (`--allow-package`, `--allow-commercial`, `--allow-copyleft`, `--fail-on-unknown`, `--policy-allow-file`) exist.
+- **Commercial packages** need `--allow-package`, else **exit 50**. Backend uses `nuget:SixLabors.*` (covers both `SixLabors.ImageSharp` and `.ImageSharp.Web`).
+- **`isLatest`**: DT allows one latest version per project name, and projects are `Umbraco-CMS` (children `Umbraco-CMS-Backend` etc.) versioned by major. Only a stable public release of `main`'s major (read from `main`'s `version.json` at upload time) is marked latest; older-major releases upload with `false`.
+- **Exit 10** = success-with-warnings (unresolved licenses; SBOM still written). Each step tolerates it: `if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }; exit 0`.
+- **Every BOM job** needs a `UseDotNet@2` (`useGlobalJson: true`) step before the tool install (the .NET 10 tool needs the SDK, including in the otherwise Node-only frontend jobs).
+- **Backend** must restore before scanning: `umbraco-sbom` needs every project in the solution restored, including the two the solution restore skips (`Umbraco.Tests.AcceptanceTest.UmbracoProject`, `Umbraco.JsonSchema`).
+
 ### Persistence Layer - NPoco and EF Core
 
 The repository contains BOTH (actively supported):
@@ -402,20 +428,26 @@ The repository contains BOTH (actively supported):
 
 **Note**: The codebase is actively migrating to EF Core, but NPoco remains the primary persistence layer and is not deprecated. Both are fully supported.
 
-### Authentication: OpenIddict
+### Authentication
 
-All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
-- Reference tokens (not JWT) for better security
-- **Secure cookie-based token storage** (v17+) - tokens stored in HTTP-only cookies with `__Host-` prefix
-- Tokens are redacted from client-side responses and passed via secure cookies only (`[redacted]` placeholder)
-- ASP.NET Core Data Protection for token encryption
-- Configured in `Umbraco.Cms.Api.Common`
-- API requests must include credentials (`credentials: include` for fetch)
+**Back office (v19+)**: a single HTTP-only authentication cookie — no client-side tokens and no
+OpenIddict flow. The back-office authorization policies accept both the cookie scheme
+(`Constants.Security.BackOfficeAuthenticationType`) and the OpenIddict validation scheme; see
+`BackOfficeAuthPolicyBuilderExtensions`. Cookie behaviour (expiry, renewal, SameSite) is
+configured in `ConfigureBackOfficeCookieOptions`. Whether an unauthenticated request gets a
+401/403 or a 302 to the login page follows ASP.NET Core's endpoint metadata: `[ApiController]` on
+`ManagementApiControllerBase` disables the redirect, and `[AllowCookieRedirect]` opts an endpoint
+back in (the OAuth `authorize` action).
+
+**API users / external clients**: **OpenIddict** (OAuth 2.0/OpenID Connect) with reference tokens
+(not JWT), configured in `Umbraco.Cms.Api.Common`.
+
+- ASP.NET Core Data Protection protects both the auth cookie and OpenIddict tokens
+- Back-office requests must include credentials (`credentials: include` for fetch)
 
 **Load Balancing Requirement**: All servers must share the same Data Protection key ring.
 
 **Frontend auth pitfalls** — see `src/Umbraco.Web.UI.Client/docs/edge-cases.md` (Auth & Cross-tab section) and `docs/security.md`. Key points:
-- Never call `validateToken()` per API request — it revokes the previous reference token (ID2019 errors)
 - `window.opener` is set for ANY `window.open()` target, not only OAuth popups — scope guards to the pathname too
 - BroadcastChannel does not deliver messages to the sender's own tab
 
@@ -473,7 +505,7 @@ Full guidance, safe patterns and decision rule: see `/src/Umbraco.Infrastructure
 
 ---
 
-## 7. CI/CD — Claude AI Assistant
+## 8. CI/CD — Claude AI Assistant
 
 Two GitHub Actions workflows powered by `anthropics/claude-code-action@v1`. Advisory only — does not block merging.
 
@@ -498,9 +530,11 @@ Responds to `@claude` mentions on PRs and issues. The trigger phrase is stripped
 - `@claude label` → applies labels
 - `@claude` (empty) → defaults to `review` on PRs, `help` on issues
 
-Also triggers on issue assignment to `claude` or adding the `claude` label. Gated: only runs when `@claude` appears in the comment/issue body. Max 25 turns.
+Also triggers on issue assignment to `claude` or adding the `claude` label. Gated: only runs when `@claude` appears in the comment/issue body. Max 50 turns.
 
-**Allowed Bash tools**: `gh`, `git`, `npm`, `dotnet` (interactive only; auto-review allows `gh` and `git`).
+**Allowed tools**:
+- Auto-review: inline comments, `gh auth status`, `gh pr view/diff/comment/edit`, and `git diff/log/show/fetch`.
+- Interactive: inline comments, `git`, `npm` and `dotnet`, file edits inside the checkout (`--permission-mode acceptEdits`), and the `gh` commands for PRs, issues and runs that the requests need (`gh pr view/diff/checks/comment/edit/create`, `gh issue view/comment/edit`, `gh search issues/prs`, `gh run view/list`). Node and .NET are set up from `.nvmrc` and `global.json`.
 
 ### Labels
 
@@ -530,26 +564,30 @@ Labels are only added, never removed. Claude applies only labels it is confident
 
 - **Checkout required** — the action internally runs `git fetch origin main` for trusted file restoration. Without `actions/checkout`, it fails with `fatal: not a git repository`.
 - **`id-token: write` permission** — required for OIDC token exchange with the Claude GitHub App.
+- **Workflow files must match `main`** — the action skips, with a warning, when the workflow file it runs from differs from the version on the default branch. A PR that changes `claude-review.yml` can't review itself, and reviews on other branches skip until the change has been merged up to `main`.
+- **Mode decides the default tools** — `track_progress: true` runs the auto-review in tag mode, where the action adds read tools, file edits inside the checkout and its own commit tools. With a `prompt` and no progress tracking, the interactive and issue-deduplication workflows run in agent mode, where only `--allowedTools` applies: read-only tools always work, but file edits need `--permission-mode acceptEdits`.
 - **Trigger phrase stripping** — the action strips `@claude` from comments before passing to Claude. Prompts must reference commands without the prefix (e.g., `review` not `@claude review`).
 - **PR number injection** — the interactive workflow injects the PR/issue number into the prompt via `${{ github.event.issue.number }}` since Claude can't discover it from `gh pr view` when checked out on `main`.
 
 ---
 
-## 8. Code Comment Policy
+## 9. Code Comment Policy
 
-**Default to no comment.** Applies to all code in this repository — C#, TypeScript, Razor, build scripts. Well-named identifiers and small functions carry the meaning; a comment is a fallback for what the code genuinely cannot say — a non-obvious *why*, a subtle invariant the types don't enforce, or a surprising edge case the code handles deliberately. Add XML doc / JSDoc on public members, but keep it concise.
+**Default to no comment.** Applies to all code in this repository — C#, TypeScript, Razor, build scripts. Identifiers, small functions, and recognized idioms (a guard clause, a null check, an early return) carry their own meaning, even when some other layer has a reason to trigger them redundantly — that reason belongs to that layer, not to a comment here. Write one only for what *this* code genuinely can't say on its own: a non-obvious *why*, an invariant the types don't enforce, or an edge case it deliberately handles. Public members get XML doc / JSDoc, kept concise.
 
-Linking a tracked issue (`(#21996)`, `https://...`) to explain a non-obvious *why* is welcome — for example, on a section of code or to explain why a regression test exists. Such a link stays useful even after the issue is closed, since it documents why the code is the way it is.
+**When a comment is justified, pitch it at the altitude of the code it sits in** — the vocabulary of the layer it lives in, not the incident that prompted it. §2 shows what that looks like in practice.
 
-**Don't leave provenance noise.** No `// Fix for X`, `// Used by Y`, `// Added for the Z flow`, `// See PR #1234`. The transient task or PR that produced a change belongs in commit messages and PR descriptions; in source it rots as the codebase evolves.
+**Comments aren't a changelog.** An issue link (`#21996`) earns its place inline only while it's explaining a live *why* — a guard, a workaround, a regression test. It does not belong there as provenance (`// Fix for X`, `// Used by Y`, `// See PR #1234`); which task or PR produced a change lives in the commit message and PR description, where it stays accurate.
 
 ### TODOs
 
-Allowed, but cheap to write and cheaper to leave behind. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have an author or a version trigger.
+The one exception to "default to no comment" — deleted once the TODO is done, so it can't rot. Keep them short and trackable, anchored to an author or a version trigger: `// TODO (V19): remove once obsolete overload is gone`, `// TODO: pagination [NL]`.
 
 ---
 
-## 9. Testing Practices
+## 10. Testing Practices
+
+A test for shared code asserts the general rule from §2, not the scenario that reported it, and is named for the rule.
 
 ### Tests for a bug fix must fail before the fix
 
@@ -559,10 +597,11 @@ For integration tests that exercise caching or cache refreshers, see `tests/Umbr
 
 ---
 
-## 10. Verification Discipline
+## 11. Verification Discipline
 
 - **Fresh build before trusting a green.** Never treat `--no-build` or cached/incremental output as proof a change compiles or passes — a stale run can mask a compile error. Rebuild before reporting build or test state. (Integration tests have a related false-green trap — see `tests/Umbraco.Tests.Integration/CLAUDE.md`.)
 - **Grep the branch you think you're on.** A search only supports a claim against the branch actually checked out, so confirm HEAD is where you expect before drawing a conclusion from a grep. Easy to get wrong whenever the tree moves under you — reviewing a PR head, switching worktrees, or mid merge-up/rebase.
+- **Remove unused usings — touched files only.** Before handing back C# changes, remove unused `using` directives (IDE0005) from the `.cs` files the change adds or modifies, and never sweep other files (unrelated churn causes merge-up conflicts). Run it per affected project, not the solution, which is slow to load: `dotnet format style <project>.csproj --diagnostics IDE0005 --severity info --include <files>`, then rebuild (a using may only be needed under an `#if` symbol).
 
 ---
 
@@ -608,7 +647,8 @@ SQL Server-specific tests use `BaseTestDatabase.IsSqlite()` to skip when running
 | **Umbraco.Cms.Api.Delivery** | Library | Delivery API (headless CMS) |
 | **Umbraco.Cms.Api.Common** | Library | Shared API infrastructure |
 | **Umbraco.PublishedCache.HybridCache** | Library | Published content caching |
-| **Umbraco.Examine.Lucene** | Library | Full-text search indexing |
+| **Umbraco.Cms.Search.Core** | Library | Search abstractions and indexing pipeline |
+| **Umbraco.Cms.Search.Provider.Examine** | Library | Examine (Lucene) search provider |
 
 ### Important Files
 

@@ -146,8 +146,8 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 
 	/**
 	 * Show a peek notification with a message.
-	 * @param message The message to show.
-	 * @param color
+	 * @param {string} message The message to show.
+	 * @param {UmbNotificationColor} [color] The notification color.
 	 */
 	protected peek(message: string, color?: UmbNotificationColor) {
 		this.notificationContext?.peek(color ?? 'positive', {
@@ -160,7 +160,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 
 	/**
 	 * Submit the form with the code and secret back to the opener.
-	 * @param e The submit event
+	 * @param {SubmitEvent} e The submit event
 	 */
 	protected async submit(e: SubmitEvent) {
 		e.preventDefault();

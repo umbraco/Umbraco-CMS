@@ -8,6 +8,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   private readonly publishBtn: Locator;
   private readonly unpublishBtn: Locator;
   private readonly actionMenuForElementBtn: Locator;
+  private readonly elementSidebarHeader: Locator;
   private readonly textstringTxt: Locator;
   private readonly infoTab: Locator;
   private readonly linkElement: Locator;
@@ -168,6 +169,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   private readonly cascadingMenuContainer: Locator;
   private readonly modalFormValidationMessage: Locator;
   private readonly treePickerSearchTxt: Locator;
+  private readonly treePickerSearchTabBtn: Locator;
   private readonly mediaPickerSearchTxt: Locator;
   private readonly memberPickerSearchTxt: Locator;
   private readonly elementCreateOptionsModal: Locator;
@@ -202,7 +204,8 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.elementNameTxt = page.locator('#name-input input');
     this.publishBtn = page.getByLabel(/^Publish(…)?$/);
     this.unpublishBtn = page.getByLabel(/^Unpublish(…)?$/);
-    this.actionMenuForElementBtn = page.locator('#header').getByTestId('open-dropdown');
+    this.elementSidebarHeader = page.locator('[data-mark="section-sidebar-app:Umb.SidebarMenu.Element"]');
+    this.actionMenuForElementBtn = this.elementSidebarHeader.getByTestId('open-dropdown');
     this.textstringTxt = page.locator('umb-property-editor-ui-text-box #input');
     this.reloadChildrenThreeDotsBtn = page.getByRole('button', {name: 'Reload children…'});
     this.elementTree = page.locator('umb-tree[alias="Umb.Tree.Element"]');
@@ -215,7 +218,10 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.dropdown = page.locator('select#native');
     this.splitView = page.locator('#splitViews');
     this.setADateTxt = page.getByLabel('Set a date…');
-    this.chooseMediaPickerBtn = page.locator('umb-property-editor-ui-media-picker #btn-add');
+    // The single and multiple media pickers are separate elements, and a property can be either.
+    this.chooseMediaPickerBtn = page.locator(
+      'umb-property-editor-ui-media-picker #btn-add, umb-property-editor-ui-single-media-picker #btn-add',
+    );
     this.chooseMemberPickerBtn = page.locator('umb-property-editor-ui-member-picker #btn-add');
     this.numericTxt = page.locator('umb-property-editor-ui-number input');
     this.addMultiURLPickerBtn = page.locator('umb-property-editor-ui-multi-url-picker #btn-add');
@@ -287,7 +293,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.duplicateToBtn = page.getByRole('button', {name: 'Duplicate to'});
     this.moveToBtn = page.getByRole('button', {name: 'Move to'});
     this.duplicateBtn = page.getByLabel('Duplicate', {exact: true});
-    this.elementTreeRefreshBtn = page.locator('#header').getByLabel('#actions_refreshNode');
+    this.elementTreeRefreshBtn = page.locator('[data-mark="section-sidebar-app:Umb.SidebarMenu.Element"]').getByLabel('#actions_refreshNode');
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
     this.rollbackBtn = page.getByTestId('audit-log-action:Umb.AuditLogAction.Element.Rollback');
     this.rollbackContainerBtn = this.container.getByLabel('Rollback');
@@ -372,6 +378,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.cascadingMenuContainer = page.locator('umb-cascading-menu-popover uui-scroll-container');
     this.modalFormValidationMessage = this.sidebarModal.locator('umb-form-validation-message #messages');
     this.treePickerSearchTxt = this.page.locator('umb-tree-picker-modal #input');
+    this.treePickerSearchTabBtn = this.page.locator('umb-tree-picker-modal').locator('uui-tab[data-mark="picker:tab:search"]');
     this.mediaPickerSearchTxt = this.page.locator('umb-media-picker-modal #search #input');
     this.memberPickerSearchTxt = this.page.locator('umb-member-picker-modal #input');
     // Property Actions
@@ -408,6 +415,10 @@ export class LibraryUiHelper extends UiBaseLocators {
   async clickSaveAndPublishButton() {
     await this.click(this.saveAndPublishBtn);
     await this.page.waitForTimeout(ConstantHelper.wait.short);
+  }
+
+  async isElementSidebarHeaderVisible(isVisible: boolean = true) {
+    return this.isVisible(this.elementSidebarHeader, isVisible);
   }
 
   async isSuccessStateVisibleForSaveAndPublishButton (isVisible: boolean = true){
@@ -1066,6 +1077,10 @@ export class LibraryUiHelper extends UiBaseLocators {
 
   async isElementReadOnly(isVisible: boolean = true) {
     await this.isVisible(this.elementReadOnly, isVisible);
+  }
+
+  async doesElementNameInputHaveValue(name: string) {
+    await expect(this.elementNameTxt).toHaveValue(name, {timeout: ConstantHelper.timeout.long});
   }
 
   async isElementNameInputEditable(isEditable: boolean = true) {
@@ -1741,6 +1756,8 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async enterSearchKeywordInTreePickerModal(keyword: string) {
+    // The search input lives behind the modal's Search tab and is not visible while the Browse tab is active.
+    await this.click(this.treePickerSearchTabBtn);
     await this.enterText(this.treePickerSearchTxt, keyword);
     await this.pressKey(this.treePickerSearchTxt, 'Enter');
   }

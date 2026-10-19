@@ -1,31 +1,22 @@
 import { UmbReadOnlyGuardManager } from './readonly-guard.manager.js';
-import type { UmbGuardRule } from './guard.manager.base.js';
+import {
+	resolveVariantGuardPermission,
+	type UmbVariantGuardRule,
+} from './resolve-variant-guard-permission.function.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
-export interface UmbVariantGuardRule extends UmbGuardRule {
-	variantId?: UmbVariantId;
-}
-
-/**
- *
- * @param rule
- * @param variantId
- */
-function findRule(rule: UmbVariantGuardRule, variantId: UmbVariantId) {
-	return rule.variantId?.compare(variantId) || rule.variantId === undefined;
-}
+export type { UmbVariantGuardRule } from './resolve-variant-guard-permission.function.js';
 
 /**
  * Read only guard manager for variant rules.
- * @export
  * @class UmbReadOnlyVariantGuardManager
  * @augments {UmbReadOnlyGuardManager<UmbVariantGuardRule>}
  */
 export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbVariantGuardRule> {
 	/**
 	 * Observe if the given variantId is permitted to read
-	 * @param {UmbVariantId} variantId
+	 * @param {UmbVariantId} variantId - The variantId to check
 	 * @returns {Observable<boolean>} - Observable that emits true if the variantId is permitted to read, false otherwise
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
@@ -33,7 +24,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 		return mergeObservables(
 			[
 				this._rules.asObservablePart((rules) => {
-					return this.#resolvePermission(rules, variantId);
+					return resolveVariantGuardPermission(rules, variantId);
 				}),
 				this._fallback,
 			],
@@ -42,7 +33,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	}
 
 	/**
-	 * @param {Observable<UmbVariantId | undefined>} variantId
+	 * @param {Observable<UmbVariantId | undefined>} variantId - Observable emitting the variantId to evaluate
 	 * @returns {Observable<boolean | undefined>} - Observable that emits true if the variantId is permitted to read, false otherwise
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
@@ -51,7 +42,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 			if (!variantId) {
 				return undefined;
 			}
-			return this.#resolvePermission(rules, variantId) ?? fallback;
+			return resolveVariantGuardPermission(rules, variantId) ?? fallback;
 		});
 	}
 
@@ -68,27 +59,20 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 			if (!variantIds || variantIds.length === 0) {
 				return [];
 			}
-			return variantIds.map((id) => ({ variantId: id, permitted: this.#resolvePermission(rules, id) ?? fallback }));
+			return variantIds.map((id) => ({
+				variantId: id,
+				permitted: resolveVariantGuardPermission(rules, id) ?? fallback,
+			}));
 		});
 	}
 
 	/**
 	 * Check if the given variantId is permitted to read
-	 * @param {UmbVariantId} variantId
+	 * @param {UmbVariantId} variantId - The variantId to check
 	 * @returns {boolean} - true if the variantId is permitted to read, false otherwise
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	getIsPermittedForVariant(variantId: UmbVariantId): boolean {
-		return this.#resolvePermission(this.getRules(), variantId) ?? this._getFallback();
-	}
-
-	#resolvePermission(rules: UmbVariantGuardRule[], variantId: UmbVariantId): boolean | undefined {
-		if (rules.filter((x) => x.permitted === false).some((rule) => findRule(rule, variantId))) {
-			return false;
-		}
-		if (rules.filter((x) => x.permitted === true).some((rule) => findRule(rule, variantId))) {
-			return true;
-		}
-		return undefined;
+		return resolveVariantGuardPermission(this.getRules(), variantId) ?? this._getFallback();
 	}
 }

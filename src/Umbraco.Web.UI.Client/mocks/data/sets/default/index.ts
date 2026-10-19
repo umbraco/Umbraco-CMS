@@ -30,10 +30,5 @@ export {
 export { data as logs } from './logs.data.js';
 export { data as auditLogs } from './audit-log.data.js';
 export { healthGroups, healthGroupsWithoutResult } from './health-check.data.js';
-export {
-	Indexers as examineIndexers,
-	PagedIndexers as examinePagedIndexers,
-	searchResultMockData as examineSearchResults,
-} from './examine.data.js';
 export { items as trackedReferenceItems } from './tracked-reference.data.js';
 export { data as news } from './umbraco-news.data.js';

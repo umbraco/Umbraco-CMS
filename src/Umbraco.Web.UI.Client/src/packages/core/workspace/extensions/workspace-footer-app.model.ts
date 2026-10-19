@@ -2,7 +2,8 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestWorkspaceFooterApp
-	extends ManifestElementAndApi<UmbControllerHostElement, any>,
+	extends
+		ManifestElementAndApi<UmbControllerHostElement, any>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'workspaceFooterApp';
 }

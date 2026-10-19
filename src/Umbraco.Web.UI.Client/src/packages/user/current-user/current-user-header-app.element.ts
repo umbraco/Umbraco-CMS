@@ -45,11 +45,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbHeaderAppButtonElement {
 			: this.localize.term('visuallyHiddenTexts_profileOptionsDefault');
 
 		return html`
-			<uui-button
-				@click=${this.#handleUserClick}
-				look="primary"
-				label=${accessibleLabel}
-				compact>
+			<uui-button @click=${this.#handleUserClick} look="primary" label=${accessibleLabel} compact>
 				<umb-user-avatar
 					id="Avatar"
 					.name=${this._currentUser?.name}

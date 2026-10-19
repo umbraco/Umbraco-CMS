@@ -175,7 +175,6 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             .AddBackOfficeOpenIddictServices()
             .AddBackOfficeIdentity()
             .AddMembersIdentity()
-            .AddExamine()
             .AddUmbracoSqlServerSupport()
             .AddUmbracoSqliteSupport()
             .AddUmbracoHybridCache()
@@ -281,6 +280,17 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         foreach (var file in viewFileSystem.GetFiles(string.Empty).ToArray())
         {
             viewFileSystem.DeleteFile(file);
+        }
+    }
+
+    protected void DeleteAllMediaFiles()
+    {
+        var mediaFileManager = GetRequiredService<MediaFileManager>();
+        var directories = mediaFileManager.FileSystem.GetDirectories(string.Empty);
+
+        foreach (var directory in directories)
+        {
+            mediaFileManager.FileSystem.DeleteDirectory(directory, true);
         }
     }
 }

@@ -36,13 +36,25 @@ export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 			<uui-form>
 				<form id="form" name="form" @submit=${this.#handleSubmit}>
 					<uui-form-layout-item>
-						<uui-label for="includeDescendants" slot="label">${this.localize.term('defaultdialogs_includeDescendants')}</uui-label>
+						<uui-label for="includeDescendants" slot="label"
+							>${this.localize.term('defaultdialogs_includeDescendants')}</uui-label
+						>
 						<uui-toggle id="includeDescendants" name="includeDescendants"></uui-toggle>
 					</uui-form-layout-item>
 				</form>
 			</uui-form>
-			<uui-button slot="actions" type="button" label=${this.localize.term('general_cancel')} look="secondary" @click=${this.#handleClose}></uui-button>
-			<uui-button slot="actions" type="button" label=${this.localize.term('actions_export')} look="primary" @click=${this.#submitForm}></uui-button>
+			<uui-button
+				slot="actions"
+				type="button"
+				label=${this.localize.term('general_cancel')}
+				look="secondary"
+				@click=${this.#handleClose}></uui-button>
+			<uui-button
+				slot="actions"
+				type="button"
+				label=${this.localize.term('actions_export')}
+				look="primary"
+				@click=${this.#submitForm}></uui-button>
 		</umb-body-layout>`;
 	}
 

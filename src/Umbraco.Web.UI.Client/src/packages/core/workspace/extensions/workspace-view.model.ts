@@ -9,8 +9,7 @@ export interface UmbWorkspaceViewElement extends HTMLElement {
 }
 
 export interface ManifestWorkspaceView<MetaType extends MetaWorkspaceView = MetaWorkspaceView>
-	extends ManifestWithView<UmbWorkspaceViewElement>,
-		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
+	extends ManifestWithView<UmbWorkspaceViewElement>, ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'workspaceView';
 	meta: MetaType;
 }

@@ -13,6 +13,7 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -39,6 +40,42 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         builder.AddNotificationHandler<ContentMovedToRecycleBinNotification, ContentNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeDeletedNotification, ContentTypeNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeDeletingNotification, ContentTypeDeletingNotificationHandler>();
+    }
+
+    [Test]
+    public async Task GetComposedOf_Distinguishes_Composition_From_Inheritance()
+    {
+        var parent = ContentTypeBuilder.CreateBasicContentType("parent", "Parent");
+        await ContentTypeService.CreateAsync(parent, Constants.Security.SuperUserKey);
+
+        // child inherits from parent (tree inheritance stores the parent in the child's ContentTypeComposition)
+        var child = ContentTypeBuilder.CreateBasicContentType("child", "Child", parent);
+        await ContentTypeService.CreateAsync(child, Constants.Security.SuperUserKey);
+
+        // composer uses parent as a true composition
+        var composer = ContentTypeBuilder.CreateBasicContentType("composer", "Composer");
+        composer.AddContentType(parent);
+        await ContentTypeService.CreateAsync(composer, Constants.Security.SuperUserKey);
+
+        var composedOfIds = ContentTypeService.GetComposedOf(parent.Id).Select(x => x.Id).ToArray();
+        var compositionIds = ContentTypeService.GetComposedOf(parent.Id, ComposedOfType.Composition).Select(x => x.Id).ToArray();
+        var inheritanceIds = ContentTypeService.GetComposedOf(parent.Id, ComposedOfType.Inheritance).Select(x => x.Id).ToArray();
+        var allIds = ContentTypeService.GetComposedOf(parent.Id, ComposedOfType.All).Select(x => x.Id).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            // the parameterless overload returns both axes
+            Assert.That(composedOfIds, Is.EquivalentTo(new[] { child.Id, composer.Id }));
+
+            // the composition axis excludes the inheriting child
+            Assert.That(compositionIds, Is.EquivalentTo(new[] { composer.Id }));
+
+            // the inheritance axis returns only the inheriting child
+            Assert.That(inheritanceIds, Is.EquivalentTo(new[] { child.Id }));
+
+            // All is equivalent to the parameterless overload
+            Assert.That(allIds, Is.EquivalentTo(new[] { child.Id, composer.Id }));
+        });
     }
 
     [Test]
@@ -2834,5 +2871,101 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
             Assert.IsTrue(result.Items.Any(x => x.Key == allowedAtRoot.Key));
             Assert.IsFalse(result.Items.Any(x => x.Key == notAllowedAtRoot.Key));
         });
+    }
+
+    [Test]
+    public async Task Can_Get_First_Page_Of_Allowed_Children()
+    {
+        IContentType[] children = await CreateContentTypesAllowedAsChildren();
+
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> result =
+            await ContentTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 0, take: 2);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, result.Result!.Total);
+            Assert.AreEqual(new[] { children[0].Key, children[1].Key }, result.Result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Subsequent_Page_Of_Allowed_Children()
+    {
+        IContentType[] children = await CreateContentTypesAllowedAsChildren();
+
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> result =
+            await ContentTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 1, take: 2);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, result.Result!.Total);
+            Assert.AreEqual(new[] { children[1].Key, children[2].Key }, result.Result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Last_Page_Of_Allowed_Children()
+    {
+        IContentType[] children = await CreateContentTypesAllowedAsChildren();
+
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> result =
+            await ContentTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 2, take: 2);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, result.Result!.Total);
+            Assert.AreEqual(new[] { children[2].Key }, result.Result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Subsequent_Page_Of_ContentTypes_Allowed_At_Root()
+    {
+        foreach (var alias in new[] { "rootOne", "rootTwo", "rootThree" })
+        {
+            ContentType contentType = ContentTypeBuilder.CreateBasicContentType(alias, alias);
+            contentType.AllowedAsRoot = true;
+            await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        }
+
+        PagedModel<IContentType> all = await ContentTypeService.GetAllAllowedAsRootAsync(0, 1000);
+        Assert.GreaterOrEqual(all.Total, 3);
+        Guid[] expectedKeys = all.Items.Skip(1).Take(2).Select(x => x.Key).ToArray();
+
+        PagedModel<IContentType> result = await ContentTypeService.GetAllAllowedAsRootAsync(1, 2);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(all.Total, result.Total);
+            Assert.AreEqual(expectedKeys, result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    /// <summary>
+    /// Creates three content types, each allowed as a child of the first, in a known order.
+    /// </summary>
+    private async Task<IContentType[]> CreateContentTypesAllowedAsChildren()
+    {
+        IContentType[] children =
+        [
+            ContentTypeBuilder.CreateBasicContentType("childOne", "Child One"),
+            ContentTypeBuilder.CreateBasicContentType("childTwo", "Child Two"),
+            ContentTypeBuilder.CreateBasicContentType("childThree", "Child Three"),
+        ];
+
+        foreach (IContentType child in children)
+        {
+            await ContentTypeService.CreateAsync(child, Constants.Security.SuperUserKey);
+        }
+
+        children[0].AllowedContentTypes = children
+            .Select((child, index) => new ContentTypeSort(child.Key, index, child.Alias))
+            .ToArray();
+        await ContentTypeService.UpdateAsync(children[0], Constants.Security.SuperUserKey);
+
+        return children;
     }
 }

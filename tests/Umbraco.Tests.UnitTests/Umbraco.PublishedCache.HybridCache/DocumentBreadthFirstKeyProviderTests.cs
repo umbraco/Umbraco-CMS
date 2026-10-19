@@ -10,11 +10,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
 [TestFixture]
 public class DocumentBreadthFirstKeyProviderTests
 {
-    private IPublishStatusQueryService PublishStatusQueryService
+    private IDocumentPublishStatusQueryService PublishStatusQueryService
     {
         get
         {
-            var mock = new Mock<IPublishStatusQueryService>();
+            var mock = new Mock<IDocumentPublishStatusQueryService>();
             mock.Setup(x => x.IsPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
             return mock.Object;
         }

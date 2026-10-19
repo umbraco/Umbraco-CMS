@@ -29,7 +29,6 @@ import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import '../../components/block-single-entry/index.js';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import {
-	extractJsonQueryProps,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbFormControlMixin,
 	UmbValidationContext,
@@ -41,10 +40,10 @@ import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockSingleLayoutModel, UmbBlockSingleEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.contentKey!;
+		return element.key!;
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentKey;
+		return modelEntry.key;
 	},
 	//identifier: 'block-single-editor',
 	itemSelector: 'umb-block-single-entry',
@@ -214,38 +213,6 @@ export class UmbPropertyEditorUIBlockSingleElement
 			this.#gotPropertyContext(context);
 		});
 
-		// TODO: Why is this logic not part of the Block Grid and RTE Editors? [NL]
-		// Observe Blocks and clean up validation messages for content/settings that are not in the block single anymore:
-		this.observe(
-			this.#managerContext.layouts,
-			(layouts) => {
-				const validationMessagesToRemove: string[] = [];
-				const contentKeys = layouts.map((x) => x.contentKey);
-				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.contentData').forEach((message) => {
-					// get the KEY from this string: $.contentData[?(@.key == 'KEY')]
-					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
-					const key = extractJsonQueryProps(message.path).key;
-					if (key && contentKeys.indexOf(key) === -1) {
-						validationMessagesToRemove.push(message.key);
-					}
-				});
-
-				const settingsKeys = layouts.map((x) => x.settingsKey).filter((x) => x !== undefined) as string[];
-				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.settingsData').forEach((message) => {
-					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
-					// get the key from this string: $.settingsData[?(@.key == 'KEY')]
-					const key = extractJsonQueryProps(message.path).key;
-					if (key && settingsKeys.indexOf(key) === -1) {
-						validationMessagesToRemove.push(message.key);
-					}
-				});
-
-				// Remove the messages after the loop to prevent changing the array while iterating over it.
-				this.#validationContext.messages.removeMessageByKeys(validationMessagesToRemove);
-			},
-			null,
-		);
-
 		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
 			this.observe(
 				context?.displayVariantId,
@@ -395,13 +362,9 @@ export class UmbPropertyEditorUIBlockSingleElement
 		return html`
 			${repeat(
 				this._layouts,
-				(x) => x.contentKey,
+				(x) => x.key,
 				(layoutEntry) => html`
-					<umb-block-single-entry
-						.contentKey=${layoutEntry.contentKey}
-						.layout=${layoutEntry}
-						${umbDestroyOnDisconnect()}>
-					</umb-block-single-entry>
+					<umb-block-single-entry .layout=${layoutEntry} ${umbDestroyOnDisconnect()}></umb-block-single-entry>
 				`,
 			)}
 			${this.#renderCreateButtonGroup()}

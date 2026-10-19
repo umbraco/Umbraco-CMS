@@ -3,14 +3,20 @@ import type { UmbElementPropertyDataOwner } from '../property-dataset-context/in
 import type { UmbContentTypeModel, UmbPropertyStructureWorkspaceContext } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId, UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
-import type { UmbRoutableWorkspaceContext, UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbRoutableWorkspaceContext,
+	UmbVariantDatasetWorkspaceContext,
+	UmbVariantNameWriteGuardManager,
+} from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
 
 export interface UmbContentWorkspaceContext<
 	ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
 	ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,
 	VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
-> extends UmbElementPropertyDataOwner<ContentModel, ContentTypeModel>,
+>
+	extends
+		UmbElementPropertyDataOwner<ContentModel, ContentTypeModel>,
 		UmbRoutableWorkspaceContext,
 		UmbVariantDatasetWorkspaceContext<VariantModelType>,
 		UmbPropertyStructureWorkspaceContext<ContentTypeModel> {
@@ -21,4 +27,7 @@ export interface UmbContentWorkspaceContext<
 
 	readonly propertyViewGuard: UmbVariantPropertyGuardManager;
 	readonly propertyWriteGuard: UmbVariantPropertyGuardManager;
+	readonly nameWriteGuard: UmbVariantNameWriteGuardManager;
+	isWritableVariant(variantId: UmbVariantId): Observable<boolean>;
+	getIsWritableVariant(variantId: UmbVariantId): boolean;
 }

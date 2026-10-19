@@ -9,8 +9,7 @@ export type UmbBlockPropertyValueClonerArgs = {
 export abstract class UmbBlockPropertyValueCloner<
 	ValueType extends UmbBlockValueType,
 	LayoutEntryType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
-> implements UmbPropertyValueCloner<ValueType>
-{
+> implements UmbPropertyValueCloner<ValueType> {
 	#contentIdUpdatedCallback?: UmbBlockPropertyValueClonerArgs['contentIdUpdatedCallback'];
 
 	#propertyEditorAlias: string;
@@ -56,7 +55,8 @@ export abstract class UmbBlockPropertyValueCloner<
 		const contentKey = layoutEntry.contentKey;
 		const settingsKey = layoutEntry.settingsKey;
 
-		// Generate new contentKey and settingsKey:
+		// Generate new key and contentKey:
+		clonedLayoutEntry.key = UmbId.new();
 		const newContentKey = UmbId.new();
 		clonedLayoutEntry.contentKey = newContentKey;
 

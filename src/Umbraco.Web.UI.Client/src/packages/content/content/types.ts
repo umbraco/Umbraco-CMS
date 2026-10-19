@@ -6,16 +6,27 @@ export type * from './collection/types.js';
 export type * from './rollback/types.js';
 export type * from './tree/types.js';
 
-export interface UmbElementDetailModel {
-	values: Array<UmbElementValueModel>;
+export interface UmbEntryDetailModel {
+	values: Array<UmbEntryValueModel>;
+}
+// TODO: Remove in v.21
+/**
+ * @deprecated Use UmbEntryDetailModel instead
+ */
+export type UmbElementDetailModel = UmbEntryDetailModel;
+
+export interface UmbEntryValueModel<ValueType = unknown> extends UmbPropertyValueDataWithVariant<ValueType> {
+	editorAlias: string;
 }
 
-export interface UmbElementValueModel<ValueType = unknown> extends UmbPropertyValueDataWithVariant<ValueType> {
-	editorAlias: string;
-	segment: string | null;
-}
+// TODO: Remove in v.21
+/**
+ * @deprecated Use UmbEntryValueModel instead
+ */
+export type UmbElementValueModel<ValueType = unknown> = UmbEntryValueModel<ValueType>;
+
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbContentValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}
+export interface UmbContentValueModel<ValueType = unknown> extends UmbEntryValueModel<ValueType> {}
 
 export interface UmbPotentialContentValueModel<ValueType = unknown> extends UmbPropertyValueData<ValueType> {
 	editorAlias?: string;
@@ -23,9 +34,16 @@ export interface UmbPotentialContentValueModel<ValueType = unknown> extends UmbP
 	segment?: string | null;
 }
 
+export interface UmbEntryWithVariantsDetailModel<
+	VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
+> extends UmbEntryDetailModel {
+	entityType: string;
+	variants: Array<VariantModelType>;
+}
+
 export interface UmbContentDetailModel<
 	VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
-> extends UmbElementDetailModel {
+> extends UmbEntryDetailModel {
 	unique: string;
 	entityType: string;
 	variants: Array<VariantModelType>;
@@ -33,4 +51,4 @@ export interface UmbContentDetailModel<
 }
 
 export interface UmbContentLikeDetailModel
-	extends UmbElementDetailModel, Partial<Pick<UmbContentDetailModel, 'variants' | 'flags'>> {}
+	extends UmbEntryDetailModel, Partial<Pick<UmbContentDetailModel, 'variants' | 'flags'>> {}

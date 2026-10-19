@@ -1,11 +1,10 @@
-import { UmbCollectionActionBase } from '@umbraco-cms/backoffice/collection';
 import type { UmbRecycleBinRepository } from '../../recycle-bin-repository.interface.js';
 import type { ManifestCollectionActionEmptyRecycleBinKind } from './types.js';
+import { UmbCollectionActionBase, UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 
 /**
@@ -14,7 +13,6 @@ import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
  * @augments {UmbCollectionActionBase}
  */
 export class UmbEmptyRecycleBinCollectionAction extends UmbCollectionActionBase {
-
 	/**
 	 * The manifest for this action. Assigned by `umb-extension-with-api-slot` after construction.
 	 */

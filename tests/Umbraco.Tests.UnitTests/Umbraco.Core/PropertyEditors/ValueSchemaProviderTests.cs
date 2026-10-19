@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+
+// The multi node tree picker is obsolete, but must keep working for the whole deprecation period.
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -114,6 +117,30 @@ public class ValueSchemaProviderTests
         Assert.That(valueType, Is.EqualTo(typeof(string)));
     }
 
+    [Test]
+    public void MultiNodeTreePickerPropertyEditor_Returns_Udi_Entity_Types_For_Reference_Type()
+    {
+        // Arrange
+        var editor = CreateMultiNodeTreePickerPropertyEditor();
+
+        // Act
+        var schema = editor.GetValueSchema(null);
+
+        // Assert
+        Assert.That(schema, Is.Not.Null);
+
+        var entityTypes = schema!["items"]?["properties"]?["type"]?["enum"] as JsonArray;
+        Assert.That(entityTypes, Is.Not.Null);
+        Assert.That(
+            entityTypes!.Select(entityType => entityType?.GetValue<string>()),
+            Is.EquivalentTo(new[]
+            {
+                Constants.UdiEntityType.Document,
+                Constants.UdiEntityType.Media,
+                Constants.UdiEntityType.Member,
+            }));
+    }
+
     private static IntegerPropertyEditor CreateIntegerPropertyEditor()
     {
         var dataValueEditorFactory = Mock.Of<IDataValueEditorFactory>(f =>
@@ -141,4 +168,21 @@ public class ValueSchemaProviderTests
             dataValueEditorFactory,
             Mock.Of<IIOHelper>());
     }
+
+    private static MultiNodeTreePickerPropertyEditor CreateMultiNodeTreePickerPropertyEditor()
+    {
+        var dataValueEditorFactory = Mock.Of<IDataValueEditorFactory>(f =>
+            f.Create<DataValueEditor>(It.IsAny<DataEditorAttribute>()) ==
+                new DataValueEditor(
+                    Mock.Of<IShortStringHelper>(),
+                    Mock.Of<IJsonSerializer>(),
+                    Mock.Of<IIOHelper>(),
+                    new DataEditorAttribute(Constants.PropertyEditors.Aliases.MultiNodeTreePicker)));
+
+        return new MultiNodeTreePickerPropertyEditor(
+            dataValueEditorFactory,
+            Mock.Of<IIOHelper>());
+    }
 }
+
+#pragma warning restore CS0618 // Type or member is obsolete

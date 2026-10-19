@@ -2,8 +2,7 @@ import type { UmbMenuItemElement } from './menu-item-element.interface.js';
 import type { ManifestWithDynamicConditions, ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestMenuItem
-	extends ManifestElement<UmbMenuItemElement>,
-		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
+	extends ManifestElement<UmbMenuItemElement>, ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'menuItem';
 	meta: MetaMenuItem;
 }

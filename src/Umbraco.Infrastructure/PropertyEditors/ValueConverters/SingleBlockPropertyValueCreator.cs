@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
@@ -16,7 +17,9 @@ internal sealed class SingleBlockPropertyValueCreator : BlockPropertyValueCreato
     /// </summary>
     /// <param name="blockEditorConverter">The service used to convert block editor data.</param>
     /// <param name="variationContextAccessor">Provides access to the current variation context.</param>
+    /// <param name="propertyRenderingContextAccessor">Provides access to the current rendering context.</param>
     /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors.</param>
+    /// <param name="elementCacheService">The cache for elements.</param>
     /// <param name="jsonSerializer">The serializer used for JSON serialization and deserialization.</param>
     /// <param name="constructorCache">A cache for constructors used in block list property value creation.</param>
     /// <param name="languageService">Service used to retrieve language information for fallback resolution.</param>
@@ -25,10 +28,11 @@ internal sealed class SingleBlockPropertyValueCreator : BlockPropertyValueCreato
         IVariationContextAccessor variationContextAccessor,
         IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
+        IElementCacheService elementCacheService,
         IJsonSerializer jsonSerializer,
         BlockListPropertyValueConstructorCache constructorCache,
         ILanguageService languageService)
-        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService)
+        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService, elementCacheService)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;
@@ -42,15 +46,16 @@ internal sealed class SingleBlockPropertyValueCreator : BlockPropertyValueCreato
     /// <param name="referenceCacheLevel">The cache level to use for property references.</param>
     /// <param name="intermediateBlockModelValue">The intermediate block model value as a string, typically JSON.</param>
     /// <param name="preview">True if the model is being created for preview purposes; otherwise, false.</param>
+    /// <param name="owningPropertyCulture">The culture of the stored property value the block value was loaded from, or <c>null</c> when the property does not vary by culture.</param>
     /// <param name="blockConfigurations">An array of <see cref="BlockListConfiguration.BlockConfiguration"/> objects to use when creating the model.</param>
     /// <returns>A single <see cref="BlockListItem"/> representing the block model, or <c>null</c> if none could be created.</returns>
-    public async Task<BlockListItem?> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
+    public async Task<BlockListItem?> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, string? owningPropertyCulture, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
     {
         BlockListModel CreateEmptyModel() => BlockListModel.Empty;
 
         BlockListModel CreateModel(IList<BlockListItem> items) => new BlockListModel(items);
 
-        BlockListItem? blockModel = (await CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, blockConfigurations, CreateEmptyModel, CreateModel)).SingleOrDefault();
+        BlockListItem? blockModel = (await CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, owningPropertyCulture, blockConfigurations, CreateEmptyModel, CreateModel)).FirstOrDefault();
 
         return blockModel;
     }

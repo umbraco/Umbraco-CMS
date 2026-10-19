@@ -1,35 +1,38 @@
 import type { UmbBlockDataValueModel, UmbBlockExposeModel, UmbBlockValueDataPropertiesBaseType } from '../types.js';
-import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
+import { umbBlockExposeSortCompare } from '../utils/block-expose-sort-compare.function.js';
+import type { UmbEntryValueModel } from '@umbraco-cms/backoffice/content';
 import type { UmbPropertyValueResolver } from '@umbraco-cms/backoffice/property';
 
 export type UmbBlockValuesCallback = (
 	values: Array<UmbBlockDataValueModel>,
-	groupIdentifier?: string,
+	identifier?: string,
 ) => Promise<Array<UmbBlockDataValueModel> | undefined>;
 
-export abstract class UmbBlockValueResolver<ValueType>
-	implements UmbPropertyValueResolver<UmbElementValueModel<ValueType>, UmbBlockDataValueModel, UmbBlockExposeModel>
-{
+export abstract class UmbBlockValueResolver<ValueType> implements UmbPropertyValueResolver<
+	UmbEntryValueModel<ValueType>,
+	UmbBlockDataValueModel,
+	UmbBlockExposeModel
+> {
 	abstract processValues(
-		property: UmbElementValueModel<ValueType>,
+		property: UmbEntryValueModel<ValueType>,
 		valuesCallback: UmbBlockValuesCallback,
-	): Promise<UmbElementValueModel<ValueType>>;
+	): Promise<UmbEntryValueModel<ValueType>>;
 
 	protected async _processValueBlockData<ValueType extends UmbBlockValueDataPropertiesBaseType>(
 		value: ValueType,
 		valuesCallback: UmbBlockValuesCallback,
 	) {
-		// The group identifier ties each call back to its specific block, so consumers can pair
-		// two block values up by block instead of by the order the callback happens to fire in.
 		const contentData = await Promise.all(
 			(value.contentData ?? []).map(async (entry) => ({
 				...entry,
+				// We do not know for sure if the same key could be used for both content and settings data, so we prefix the key with the type to ensure uniqueness.
 				values: (await valuesCallback(entry.values, `contentData:${entry.key}`)) ?? [],
 			})),
 		);
 		const settingsData = await Promise.all(
 			(value.settingsData ?? []).map(async (entry) => ({
 				...entry,
+				// We do not know for sure if the same key could be used for both content and settings data, so we prefix the key with the type to ensure uniqueness.
 				values: (await valuesCallback(entry.values, `settingsData:${entry.key}`)) ?? [],
 			})),
 		);
@@ -37,20 +40,20 @@ export abstract class UmbBlockValueResolver<ValueType>
 	}
 
 	abstract processVariants(
-		property: UmbElementValueModel<ValueType>,
+		property: UmbEntryValueModel<ValueType>,
 		variantsCallback: (values: Array<UmbBlockExposeModel>) => Promise<Array<UmbBlockExposeModel> | undefined>,
-	): Promise<UmbElementValueModel<ValueType>>;
+	): Promise<UmbEntryValueModel<ValueType>>;
 
 	protected async _processVariantBlockData<ValueType extends UmbBlockValueDataPropertiesBaseType>(
 		value: ValueType,
 		variantsCallback: (values: Array<UmbBlockExposeModel>) => Promise<Array<UmbBlockExposeModel> | undefined>,
 	) {
-		const expose = (await variantsCallback(value.expose ?? [])) ?? [];
+		const expose = [...((await variantsCallback(value.expose ?? [])) ?? [])].sort(umbBlockExposeSortCompare);
 		return { ...value, expose };
 	}
 
 	compareVariants(a: UmbBlockExposeModel, b: UmbBlockExposeModel) {
-		return a.contentKey === b.contentKey && a.culture === b.culture && a.segment === b.segment;
+		return a.contentKey === b.contentKey && a.culture === b.culture;
 	}
 
 	destroy(): void {}

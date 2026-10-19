@@ -1,8 +1,11 @@
 using System.Collections.Immutable;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -38,7 +41,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly Lazy<IUserService> _userService;
 
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
     protected PublishableContentServiceBase(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -52,6 +57,53 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         IUserIdKeyResolver userIdKeyResolver,
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            auditService,
+            contentTypeRepository,
+            contentRepository,
+            languageRepository,
+            propertyValidationService,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            propertyEditorCollection,
+            idKeyMap,
+            StaticServiceProvider.Instance.GetRequiredService<Lazy<IUserService>>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishableContentServiceBase{TContent}"/> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="contentTypeRepository">The backing content type repository.</param>
+    /// <param name="contentRepository">The backing content repository.</param>
+    /// <param name="languageRepository">The language repository.</param>
+    /// <param name="propertyValidationService">The property validation service.</param>
+    /// <param name="cultureImpactFactory">The culture impact factory.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="propertyEditorCollection">The property editor collection.</param>
+    /// <param name="idKeyMap">The ID key map.</param>
+    /// <param name="userService">The user service, resolved lazily to avoid a circular dependency.</param>
+    protected PublishableContentServiceBase(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IAuditService auditService,
+        IContentTypeRepository contentTypeRepository,
+        IPublishableContentRepository<TContent> contentRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap,
+        Lazy<IUserService> userService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _auditService = auditService;
@@ -63,6 +115,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         _userIdKeyResolver = userIdKeyResolver;
         _propertyEditorCollection = propertyEditorCollection;
         _idKeyMap = idKeyMap;
+        _userService = userService;
     }
 
     protected abstract UmbracoObjectTypes ContentObjectType { get; }
@@ -75,14 +128,39 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected abstract ILogger<PublishableContentServiceBase<TContent>> Logger { get; }
 
+    /// <summary>
+    ///     Persists the pending changes of a content item, publishing or unpublishing it as its published state dictates.
+    /// </summary>
+    /// <param name="scope">The scope to persist within.</param>
+    /// <param name="content">The content item to persist.</param>
+    /// <param name="eventMessages">The event messages to report to.</param>
+    /// <param name="allLangs">All languages.</param>
+    /// <param name="notificationState">The notification state to pass on to notifications.</param>
+    /// <param name="userId">The identifier of the user performing the operation.</param>
+    /// <param name="includeInvariantForVariant">
+    ///     Whether publishing includes invariant properties of variant content. When <c>null</c>, it is determined by the
+    ///     invariant-for-variant permission of the user identified by <paramref name="userId"/>.
+    /// </param>
+    /// <returns>The result of the operation.</returns>
     protected virtual PublishResult CommitContentChanges(
         ICoreScope scope,
         TContent content,
         EventMessages eventMessages,
         IReadOnlyCollection<ILanguage> allLangs,
         IDictionary<string, object?>? notificationState,
-        int userId)
-        => CommitContentChangesInternal(scope, content, eventMessages, allLangs, notificationState, userId);
+        int userId,
+        bool? includeInvariantForVariant)
+        => CommitContentChangesInternal(
+            scope,
+            content,
+            eventMessages,
+            allLangs,
+            notificationState,
+            userId,
+            branchOne: false,
+            branchRoot: false,
+            raiseSavedNotification: false,
+            includeInvariantForVariant);
 
     protected abstract void DeleteLocked(ICoreScope scope, TContent content, EventMessages evtMsgs);
 
@@ -250,14 +328,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             {
                 // Log the error/warning
                 Logger.LogError(
-                    "User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    "User '{UserId}' was unable to rollback content '{ContentId}' (key '{ContentKey}') to version '{VersionId}'", userId, id, content.Key, versionId);
             }
             else
             {
                 scope.Notifications.Publish(RolledBackNotification(content, evtMsgs).WithStateFrom(rollingBackNotification));
 
                 // Logging & Audit message
-                Logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                Logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' (key '{ContentKey}') to version '{VersionId}'", userId, id, content.Key, versionId);
                 Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
             }
 
@@ -479,6 +557,32 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
+    /// <inheritdoc/>
+    public IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases, bool loadTemplates = true)
+    {
+        Guid[] idsA = ids.Distinct().ToArray();
+        if (idsA.Length == 0)
+        {
+            return Enumerable.Empty<TContent>();
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds);
+
+        var index = new Dictionary<Guid, TContent>(idsA.Length);
+        foreach (IEnumerable<Guid> group in idsA.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            List<Guid> groupKeys = group.ToList();
+            IQuery<TContent>? query = Query<TContent>()?.Where(x => groupKeys.Contains(x.Key));
+            foreach (TContent item in _contentRepository.GetPage(query, 0, groupKeys.Count, out _, propertyAliases, null, Ordering.By("sortOrder"), loadTemplates))
+            {
+                index[item.Key] = item;
+            }
+        }
+
+        return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+    }
+
     /// <inheritdoc />
     public IEnumerable<TContent> GetPagedOfType(
         int contentTypeId,
@@ -671,10 +775,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 $"Cannot save (un)publishing content with name: {content.Name} - and state: {content.PublishedState}, use the dedicated SavePublished method.");
         }
 
-        if (content.Name != null && content.Name.Length > 255)
+        if (content.Name != null && content.Name.Length > Constants.Validation.MaxNameLength)
         {
             throw new InvalidOperationException(
-                $"Content with the name {content.Name} cannot be more than 255 characters in length.");
+                $"Content with the name {content.Name} cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -833,9 +937,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, content);
         }
 
-        if (content.Name != null && content.Name.Length > 255)
+        if (content.Name != null && content.Name.Length > Constants.Validation.MaxNameLength)
         {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
 
         PublishedState publishedState = content.PublishedState;
@@ -869,13 +973,15 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            IUser user = GetRequiredUser(userId);
+
             scope.WriteLock(WriteLockIds);
 
             var allLangs = _languageRepository.GetMany().ToList();
 
             // this will create the correct culture impact even if culture is * or null
             IEnumerable<CultureImpact?> impacts =
-                cultures.Select(culture => _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content));
+                cultures.Select(culture => _cultureImpactFactory.Create(culture, content, includeInvariantForVariant: user.HasAccessToInvariantForVariant()));
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -888,7 +994,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             // Change state to publishing
             content.PublishedState = PublishedState.Publishing;
 
-            PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId);
+            PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId, includeInvariantForVariant: null);
             scope.Complete();
             return result;
         }
@@ -942,8 +1048,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
         }
 
-        IEnumerable<CultureImpact> impacts =
-            culturesToPublish.Select(x => _cultureImpactFactory.ImpactExplicit(x, IsDefaultCulture(allLangs, x)));
+        IUser user = GetRequiredUser(userId);
+        IEnumerable<CultureImpact> impacts = culturesToPublish
+            .Select(x => _cultureImpactFactory.ImpactExplicit(
+                x,
+                includeInvariantForVariant: user.HasAccessToInvariantForVariant()));
 
         // publish the culture(s)
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1006,7 +1115,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
 
         // this will create the correct culture impact even if culture is * or null
-        var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+        IUser user = GetRequiredUser(userId);
+        var impact = _cultureImpactFactory.Create(
+            culture,
+            content,
+            includeInvariantForVariant: user.HasAccessToInvariantForVariant());
 
         // publish the culture(s)
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1028,10 +1141,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     private static void EnsureNameLengthIsValid(TContent content)
     {
-        const int MaxContentNameLength = 255;
-        if (content.Name?.Length > MaxContentNameLength)
+        if (content.Name?.Length > Constants.Validation.MaxNameLength)
         {
-            throw new InvalidOperationException($"Name cannot be more than {MaxContentNameLength} characters in length.");
+            throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
     }
 
@@ -1113,7 +1225,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 // We are however unpublishing all cultures, so we will set this to unpublishing.
                 content.UnpublishCulture(culture);
                 content.PublishedState = PublishedState.Unpublishing;
-                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId, includeInvariantForVariant: null);
                 scope.Complete();
                 return result;
             }
@@ -1127,7 +1239,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 var removed = content.UnpublishCulture(culture);
 
                 // Save and publish any changes
-                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId, includeInvariantForVariant: null);
 
                 scope.Complete();
 
@@ -1200,10 +1312,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     }
 
                     _contentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                    PublishResult result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId, includeInvariantForVariant: true);
                     if (result.Success == false)
                     {
-                        Logger.LogError(null, "Failed to publish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
+                        Logger.LogError(null, "Failed to publish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -1216,7 +1328,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     PublishResult result = Unpublish(d, userId: d.WriterId);
                     if (result.Success == false)
                     {
-                        Logger.LogError(null, "Failed to unpublish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
+                        Logger.LogError(null, "Failed to unpublish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -1275,14 +1387,20 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
-                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
+
+                        // NOTE: hardcoding allowEditInvariantForVariant as true works for now, but it will need replacing if we ever introduce
+                        //       "invariance as opt-in" for save/publish/schedule operations.
+                        //       The writer's permission can't be used instead: the writer is the last user to save the content,
+                        //       not the user who scheduled it.
+                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, includeInvariantForVariant: true);
                         var tryPublish = d.PublishCulture(impact, date, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
                         {
                             Logger.LogWarning(
-                                "Scheduled publishing will fail for content {ContentId} and culture {Culture} because of invalid properties {InvalidProperties}",
+                                "Scheduled publishing will fail for content {ContentId} (key {ContentKey}) and culture {Culture} because of invalid properties {InvalidProperties}",
                                 d.Id,
+                                d.Key,
                                 culture,
                                 string.Join(",", invalidProperties.Select(x => x.Alias)));
                         }
@@ -1306,12 +1424,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     else
                     {
                         _contentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                        result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId, includeInvariantForVariant: true);
                     }
 
                     if (result.Success == false)
                     {
-                        Logger.LogError(null, "Failed to publish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
+                        Logger.LogError(null, "Failed to publish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -1335,7 +1453,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
                     if (result.Success == false)
                     {
-                        Logger.LogError(null, "Failed to publish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
+                        Logger.LogError(null, "Failed to publish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
 
                     results.Add(result);
@@ -1407,6 +1525,34 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         bool branchOne,
         bool branchRoot,
         bool raiseSavedNotification)
+        => CommitContentChangesInternal(
+            scope,
+            content,
+            eventMessages,
+            allLangs,
+            notificationState,
+            userId,
+            branchOne,
+            branchRoot,
+            raiseSavedNotification,
+            includeInvariantForVariant: null);
+
+    /// <inheritdoc cref="CommitContentChangesInternal(ICoreScope, TContent, EventMessages, IReadOnlyCollection{ILanguage}, IDictionary{string, object}, int, bool, bool, bool)" />
+    /// <param name="includeInvariantForVariant">
+    ///     Whether publishing includes invariant properties of variant content. When <c>null</c>, it is determined by the
+    ///     invariant-for-variant permission of the user identified by <paramref name="userId"/>.
+    /// </param>
+    private PublishResult CommitContentChangesInternal(
+        ICoreScope scope,
+        TContent content,
+        EventMessages eventMessages,
+        IReadOnlyCollection<ILanguage> allLangs,
+        IDictionary<string, object?>? notificationState,
+        int userId,
+        bool branchOne,
+        bool branchRoot,
+        bool raiseSavedNotification,
+        bool? includeInvariantForVariant)
     {
         if (scope == null)
         {
@@ -1497,7 +1643,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 culturesUnpublishing,
                 eventMessages,
                 allLangs,
-                notificationState);
+                notificationState,
+                userId,
+                includeInvariantForVariant);
 
             if (publishResult.Success)
             {
@@ -1505,7 +1653,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 if (scope.Notifications.PublishCancelable(
                         PublishingNotification(content, eventMessages).WithState(notificationState)))
                 {
-                    Logger.LogInformation("Content {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
+                    Logger.LogInformation("Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}", content.Name, content.Id, content.Key, "publishing was cancelled");
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
                 }
 
@@ -1906,9 +2054,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected static bool HasUnsavedChanges(TContent content) => content.HasIdentity is false || content.IsDirty();
 
-    protected static bool IsDefaultCulture(IReadOnlyCollection<ILanguage>? langs, string culture) =>
-        langs?.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture)) ?? false;
-
     /// <inheritdoc />
     public abstract ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
 
@@ -1929,6 +2074,16 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         return report;
     }
+
+    /// <summary>
+    ///     Gets the user performing an operation, so that their permissions can be applied to it.
+    /// </summary>
+    /// <param name="userId">The identifier of the user.</param>
+    /// <returns>The user.</returns>
+    /// <exception cref="ArgumentException">No user exists with the supplied identifier.</exception>
+    protected IUser GetRequiredUser(int userId)
+        => _userService.Value.GetUserById(userId)
+           ?? throw new ArgumentException("Could not find the supplied user", nameof(userId));
 
     #endregion
 
@@ -2062,18 +2217,25 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         IReadOnlyCollection<string>? culturesUnpublishing,
         EventMessages evtMsgs,
         IReadOnlyCollection<ILanguage> allLangs,
-        IDictionary<string, object?>? notificationState)
+        IDictionary<string, object?>? notificationState,
+        int userId,
+        bool? includeInvariantForVariant)
     {
         var variesByCulture = content.ContentType.VariesByCulture();
 
         // If it's null it's invariant
-        CultureImpact[] impactsToPublish = culturesPublishing == null
-                ? new[] { _cultureImpactFactory.ImpactInvariant() }
-            : culturesPublishing.Select(x =>
-                _cultureImpactFactory.ImpactExplicit(
-                        x,
-                        allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory)))
-                    .ToArray();
+        CultureImpact[] impactsToPublish;
+        if (culturesPublishing == null)
+        {
+            impactsToPublish = [_cultureImpactFactory.ImpactInvariant()];
+        }
+        else
+        {
+            var includeInvariant = includeInvariantForVariant ?? GetRequiredUser(userId).HasAccessToInvariantForVariant();
+            impactsToPublish = culturesPublishing
+                .Select(x => _cultureImpactFactory.ImpactExplicit(x, includeInvariantForVariant: includeInvariant))
+                .ToArray();
+        }
 
         // publish the culture(s)
         var publishTime = DateTime.UtcNow;
@@ -2131,9 +2293,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         if (content.PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
         {
             Logger.LogInformation(
-                "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                 content.Name,
                 content.Id,
+                content.Key,
                 "content does not have published values");
             return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
         }
@@ -2151,12 +2314,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     if (!variesByCulture)
                     {
                         Logger.LogInformation(
-                            "Content {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "content has expired");
+                            "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}", content.Name, content.Id, content.Key, "content has expired");
                     }
                     else
                     {
                         Logger.LogInformation(
-                            "Content {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "content culture has expired");
+                            "Content {ContentName} (id={ContentId}, key={ContentKey}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, content.Key, culture, "content culture has expired");
                     }
 
                     return new PublishResult(
@@ -2169,17 +2332,19 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     if (!variesByCulture)
                     {
                         Logger.LogInformation(
-                            "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                            "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                             content.Name,
                             content.Id,
+                            content.Key,
                             "content is awaiting release");
                     }
                     else
                     {
                         Logger.LogInformation(
-                            "Content {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}",
+                            "Content {ContentName} (id={ContentId}, key={ContentKey}) culture {Culture} cannot be published: {Reason}",
                             content.Name,
                             content.Id,
+                            content.Key,
                             culture,
                             "content has culture awaiting release");
                     }
@@ -2193,9 +2358,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
                 case ContentStatus.Trashed:
                     Logger.LogInformation(
-                        "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                        "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                         content.Name,
                         content.Id,
+                        content.Key,
                         "content is trashed");
                     return new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, content);
             }
@@ -2210,9 +2376,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             if (!pathIsOk)
             {
                 Logger.LogInformation(
-                    "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                    "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
                     content.Name,
                     content.Id,
+                    content.Key,
                     "parent is not published");
                 return new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, content);
             }
@@ -2259,18 +2426,20 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             if (culturesUnpublishing?.Count > 0)
             {
                 Logger.LogInformation(
-                    "Content {ContentName} (id={ContentId}) cultures: {Cultures} have been unpublished.",
+                    "Content {ContentName} (id={ContentId}, key={ContentKey}) cultures: {Cultures} have been unpublished.",
                     content.Name,
                     content.Id,
+                    content.Key,
                     string.Join(",", culturesUnpublishing));
             }
 
             if (culturesPublishing?.Count > 0)
             {
                 Logger.LogInformation(
-                    "Content {ContentName} (id={ContentId}) cultures: {Cultures} have been published.",
+                    "Content {ContentName} (id={ContentId}, key={ContentKey}) cultures: {Cultures} have been published.",
                     content.Name,
                     content.Id,
+                    content.Key,
                     string.Join(",", culturesPublishing));
             }
 
@@ -2287,7 +2456,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return new PublishResult(PublishResultType.SuccessPublishCulture, evtMsgs, content);
         }
 
-        Logger.LogInformation("Content {ContentName} (id={ContentId}) has been published.", content.Name, content.Id);
+        Logger.LogInformation("Content {ContentName} (id={ContentId}, key={ContentKey}) has been published.", content.Name, content.Id, content.Key);
         return new PublishResult(evtMsgs, content);
     }
 
@@ -2312,7 +2481,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         if (notificationResult)
         {
             Logger.LogInformation(
-                "Content {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
+                "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id, content.Key);
             return new PublishResult(PublishResultType.FailedUnpublishCancelledByEvent, evtMsgs, content);
         }
 
@@ -2353,7 +2522,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         if (pastReleases.Count > 0)
         {
             Logger.LogInformation(
-                "Content {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
+                "Content {ContentName} (id={ContentId}, key={ContentKey}) had its release date removed, because it was unpublished.", content.Name, content.Id, content.Key);
         }
 
         _contentRepository.PersistContentSchedule(content, contentSchedule);
@@ -2361,7 +2530,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         // change state to unpublishing
         content.PublishedState = PublishedState.Unpublishing;
 
-        Logger.LogInformation("Content {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
+        Logger.LogInformation("Content {ContentName} (id={ContentId}, key={ContentKey}) has been unpublished.", content.Name, content.Id, content.Key);
         return attempt;
     }
 

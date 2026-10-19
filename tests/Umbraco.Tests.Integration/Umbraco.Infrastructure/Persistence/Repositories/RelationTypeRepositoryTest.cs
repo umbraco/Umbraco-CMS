@@ -131,7 +131,7 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             Assert.That(relationTypes, Is.Not.Null);
-            Assert.That(relationTypes.Length, Is.EqualTo(12));
+            Assert.That(relationTypes.Length, Is.EqualTo(13));
             Assert.That(relationTypes.Any(x => x == null), Is.False);
         }
     }

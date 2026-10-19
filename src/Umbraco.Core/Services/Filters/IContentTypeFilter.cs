@@ -43,6 +43,17 @@ public interface IContentTypeFilter
 #pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
+    /// Filters the content types retrieved for being allowed as the basis for a document blueprint.
+    /// </summary>
+    /// <typeparam name="TItem">The type of content type, which must implement <see cref="IContentTypeComposition"/>.</typeparam>
+    /// <param name="contentTypes">Retrieved collection of content types.</param>
+    /// <param name="parentKey">The parent container key (provided to allow for custom filtering of the returned list based on the document blueprint context), or <c>null</c> at the document blueprint root.</param>
+    /// <returns>Filtered collection of content types.</returns>
+    Task<IEnumerable<TItem>> FilterAllowedForBlueprintsAsync<TItem>(IEnumerable<TItem> contentTypes, Guid? parentKey)
+        where TItem : IContentTypeComposition
+        => Task.FromResult(contentTypes);
+
+    /// <summary>
     /// Filters the content types retrieved for being allowed as children of a parent content type.
     /// </summary>
     /// <param name="contentTypes">Retrieved collection of content types.</param>

@@ -196,6 +196,8 @@ export default {
 		isSensitiveValue:
 			'Это значение скрыто. Если Вам нужен доступ к просмотру этого значения, свяжитесь с администратором веб-сайта.',
 		isSensitiveValue_short: 'Это значение скрыто.',
+		isSensitiveValueNotice:
+			'Если Вам нужен доступ к просмотру скрытых значений, свяжитесь с администратором веб-сайта.',
 		itemChanged: 'Этот документ был изменен после публикации',
 		itemNotPublished: 'Этот документ не опубликован',
 		lastPublished: 'Документ опубликован',
@@ -288,7 +290,8 @@ export default {
 		compositionUsageHeading: 'Где используется эта композиция?',
 		compositionUsageSpecification: 'Эта композиция сейчас используется при создании следующих типов документов:',
 		compositionUsageSpecificationMediaType: 'Эта композиция сейчас используется при создании следующих типов медиа:',
-		compositionUsageSpecificationMemberType: 'Эта композиция сейчас используется при создании следующих типов участников:',
+		compositionUsageSpecificationMemberType:
+			'Эта композиция сейчас используется при создании следующих типов участников:',
 		noAvailableCompositions: 'В настоящее время нет типов документов, допустимых для построения композиции.',
 		noAvailableCompositionsMediaType: 'В настоящее время нет типов медиа, допустимых для построения композиции.',
 		noAvailableCompositionsMemberType: 'В настоящее время нет типов участников, допустимых для построения композиции.',
@@ -572,6 +575,8 @@ export default {
 		next: 'След',
 		no: 'Нет',
 		noItemsInList: 'Здесь пока нет элементов',
+		noResults: 'Нет результатов',
+		noResultsFor: (query: string) => `Нет результатов по запросу "${query}".`,
 		of: 'из',
 		off: 'Выкл',
 		ok: 'Ok',
@@ -834,6 +839,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Нажмите, чтобы загрузить',
+		browseFilesAction: 'Обзор файлов',
+		dropFilesOr: 'Перетащите медиафайлы сюда<br />или',
 		disallowedFileType: 'Невозможна загрузка этого файла, этот тип файлов не разрешен для загрузки',
 		orClickHereToUpload: 'или нажмите сюда, чтобы выбрать файлы',
 		maxFileSize: 'Максимально допустимый размер файла: ',
@@ -1093,6 +1100,17 @@ export default {
 		sortHelp:
 			'Перетаскивайте элементы на нужное место вверх или вниз для определения необходимого Вам порядка сортировки. Также можно использовать заголовки столбцов, чтобы отсортировать все элементы сразу.',
 		sortPleaseWait: 'Пожалуйста, подождите... Страницы сортируются, это может занять некоторое время.',
+		sortByFieldHeadline: 'Сортировать по полю',
+		sortByFieldSentence: 'Сортировать все дочерние элементы по',
+		sortByFieldDirectionLabel: 'Направление',
+		sortByFieldAscending: 'По возрастанию',
+		sortByFieldDescending: 'По убыванию',
+		sortByFieldNameOption: 'Имя',
+		sortByFieldCreateDateOption: 'Создано',
+		sortByFieldUpdateDateOption: 'Последнее изменение',
+		sortIndividuallyHeadline: 'Сортировать по отдельности',
+		sortByFieldCultureSentence: 'на языке',
+		sortByFieldCultureLabel: 'Язык',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'Процесс публикации был отменен установленным пакетом дополнений.',
@@ -1328,6 +1346,10 @@ export default {
 		templates: 'Шаблоны',
 		users: 'Пользователи',
 	},
+	picker: {
+		browseTab: 'Обзор',
+		searchTab: 'Поиск',
+	},
 	update: {
 		updateAvailable: 'Доступны обновления',
 		updateDownloadText: 'Обновление %0% готово, кликните для загрузки',
@@ -1425,6 +1447,7 @@ export default {
 		updateDate: 'Время последнего изменения',
 		username: 'Имя пользователя',
 		usergroup: 'Группа пользователей',
+		type: 'Тип',
 		userInvited: ' был приглашен',
 		userInvitedSuccessHelp:
 			'Новому пользователю было отправлено приглашение, в котором содержатся инструкции для входа в панель Umbraco.',

@@ -108,7 +108,7 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .Build()),
                 ContentTypeOperationStatus.NameTooLong => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Name was too long")
-                    .WithDetail("Name cannot be more than 255 characters in length.")
+                    .WithDetail($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.")
                     .Build()),
                 ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")
@@ -129,6 +129,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 ContentTypeOperationStatus.InvalidSegmentVariationForElementType => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid segment variation")
                     .WithDetail("Element types cannot vary by segment.")
+                    .Build()),
+                ContentTypeOperationStatus.InvalidPropertyTypeVariation => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid property variation")
+                    .WithDetail($"A property cannot vary by culture or segment unless the {type} type does so too.")
                     .Build()),
                 _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
             });

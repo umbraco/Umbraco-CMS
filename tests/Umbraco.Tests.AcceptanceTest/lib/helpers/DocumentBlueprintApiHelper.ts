@@ -1,13 +1,6 @@
-import {ApiHelpers} from "./ApiHelpers";
+﻿import {ApiHelpers} from "./ApiHelpers";
 import {AliasHelper} from "./AliasHelper";
 import {DocumentBlueprintsBuilder} from "../builders";
-
-// The fields of a tree item this helper needs in order to delete it and recurse into its children.
-type DocumentBlueprintTreeItem = {
-  id: string;
-  hasChildren?: boolean;
-  isFolder?: boolean;
-};
 
 export class DocumentBlueprintApiHelper {
   api: ApiHelpers;
@@ -42,6 +35,18 @@ export class DocumentBlueprintApiHelper {
     return response.status();
   }
 
+  async deleteFolder(id: string) {
+    if (id == null) {
+      return;
+    }
+    const response = await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/folder/' + id);
+    return response.status();
+  }
+
+  private async deleteItem(item) {
+    return item.isFolder ? await this.deleteFolder(item.id) : await this.delete(item.id);
+  }
+
   async update(id: string, documentBlueprint) {
     if (documentBlueprint == null) {
       return;
@@ -59,44 +64,22 @@ export class DocumentBlueprintApiHelper {
     return this.api.itemsOf(items);
   }
 
-  async createFolder(name: string, parentId?: string) {
-    const folder = {
-      name: name,
-      parent: parentId ? {id: parentId} : null
-    }
-    const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/folder', folder);
-    return this.api.getIdFromLocation(response);
-  }
-
-  async getFolder(id: string) {
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/folder/' + id);
-    return await response.json();
-  }
-
-  async deleteFolder(id: string) {
-    return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/folder/' + id);
-  }
-
-  async doesFolderExist(id: string) {
-    const folder = await this.getFolder(id);
-    return folder !== null && folder.id === id;
-  }
-
   async doesNameExist(name: string) {
     return await this.getByName(name);
   }
 
-  private async recurseDeleteItem(item: DocumentBlueprintTreeItem) {
-    if (item.hasChildren) {
-      const items = await this.getChildren(item.id);
+  private async recurseDeleteChildren(id: string) {
+    const items = await this.getChildren(id);
 
-      for (const child of items) {
-        await this.recurseDeleteItem(child);
+    for (const child of items) {
+      if (child.hasChildren) {
+        await this.recurseDeleteChildren(child.id);
+      } else {
+        await this.deleteItem(child);
       }
     }
-
-    // A folder has to be empty before it can be deleted, so its children are removed first.
-    return item.isFolder ? await this.deleteFolder(item.id) : await this.delete(item.id);
+    // Only a folder is ever reported as having children, so the emptied node is always a folder.
+    return await this.deleteFolder(id);
   }
 
   private async recurseChildren(name: string, id: string, toDelete: boolean) {
@@ -105,9 +88,13 @@ export class DocumentBlueprintApiHelper {
     for (const child of items) {
       if (child.name === name) {
         if (!toDelete) {
-          return child.isFolder ? await this.getFolder(child.id) : await this.get(child.id);
+          return await this.get(child.id);
         }
-        return await this.recurseDeleteItem(child);
+        if (child.hasChildren) {
+          return await this.recurseDeleteChildren(child.id);
+        } else {
+          return await this.deleteItem(child);
+        }
       } else if (child.hasChildren) {
         const result = await this.recurseChildren(name, child.id, toDelete);
         if (result) {
@@ -124,7 +111,7 @@ export class DocumentBlueprintApiHelper {
 
     for (const blueprint of this.api.itemsOf(jsonDocumentBlueprints)) {
       if (blueprint.name === name) {
-        return blueprint.isFolder ? this.getFolder(blueprint.id) : this.get(blueprint.id);
+        return this.get(blueprint.id);
       } else if (blueprint.hasChildren) {
         const result = await this.recurseChildren(name, blueprint.id, false);
         if (result) {
@@ -141,7 +128,10 @@ export class DocumentBlueprintApiHelper {
 
     for (const blueprint of this.api.itemsOf(jsonDocumentBlueprints)) {
       if (blueprint.name === name) {
-        return await this.recurseDeleteItem(blueprint);
+        if (blueprint.hasChildren) {
+          return await this.recurseDeleteChildren(blueprint.id);
+        }
+        return await this.deleteItem(blueprint);
       } else if (blueprint.hasChildren) {
         await this.recurseChildren(name, blueprint.id, true);
       }
@@ -160,15 +150,36 @@ export class DocumentBlueprintApiHelper {
     return await this.create(documentBlueprint);
   }
 
+  async createDefaultDocumentBlueprintWithParent(documentBlueprintName: string, documentTypeId: string, parentId: string) {
+    await this.ensureNameNotExists(documentBlueprintName);
+    const documentBlueprint = new DocumentBlueprintsBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .withParentId(parentId)
+      .addVariant()
+        .withName(documentBlueprintName)
+        .done()
+      .build();
+    return await this.create(documentBlueprint);
+  }
+
   async createFromDocument(documentBlueprintName: string, documentId: string, parentId?: string) {
     const documentBlueprintData = {
       "name": documentBlueprintName,
-      "parent": parentId ? parentId : null,
+      "parent": parentId ? {"id": parentId} : null,
       "document": {
         "id": documentId
       }
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/from-document', documentBlueprintData);
+    return this.api.getIdFromLocation(response);
+  }
+
+  async createFolder(name: string, parentId?: string) {
+    const folder = {
+      name: name,
+      parent: parentId ? {id: parentId} : null
+    };
+    const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/folder', folder);
     return this.api.getIdFromLocation(response);
   }
 

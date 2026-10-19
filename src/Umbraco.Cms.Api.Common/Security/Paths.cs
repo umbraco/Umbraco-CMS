@@ -37,6 +37,12 @@ public static class Paths
         /// </summary>
         public static readonly string RevokeEndpoint = EndpointPath($"{EndpointTemplate}/revoke");
 
+        /// <summary>
+        ///     The session keep-alive endpoint path. A request here renews the back-office
+        ///     authentication ticket (see ConfigureBackOfficeCookieOptions).
+        /// </summary>
+        public static readonly string KeepAliveEndpoint = EndpointPath($"{EndpointTemplate}/keep-alive");
+
         private static string EndpointPath(string relativePath) => $"/umbraco{Constants.Web.ManagementApiPath}v1/{relativePath}";
     }
 

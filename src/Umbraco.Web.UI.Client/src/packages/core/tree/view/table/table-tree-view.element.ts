@@ -10,9 +10,12 @@ import {
 	property,
 	state,
 	type PropertyValues,
+	type TemplateResult,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
+import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -24,6 +27,22 @@ import type {
 import './tree-name-table-column-layout.element.js';
 import '@umbraco-cms/backoffice/entity-action';
 
+// The resolver context is keyed by item and lives for as long as the item is shown. It is created up
+// front (not in the row-render callback) so the resolved name/icon are present when the row is first
+// built, rather than applied as a post-render mutation.
+type UmbTableTreeViewResolverContext = {
+	resolver: UmbItemDataResolver;
+	nameObserver: UmbObserverController<string | undefined>;
+	iconObserver: UmbObserverController<string | undefined>;
+	currentName?: string;
+	currentIcon?: string | null;
+};
+
+/**
+ * Renders the items of the tree as rows of a table, with a column for the name, any columns declared by the
+ * `treeView` manifest, and the entity actions.
+ * @augments {UmbTreeViewElementBase<UmbTreeItemModel>}
+ */
 @customElement('umb-table-tree-view')
 export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemModel> {
 	private _items: Array<UmbTreeItemModel> = [];
@@ -53,6 +72,7 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 
 	#itemMap = new Map<string, UmbTreeItemModel>();
 	#rows = new Map<string, UmbTableTreeViewRowController>();
+	#resolverContexts = new Map<string, UmbTableTreeViewResolverContext>();
 
 	#onRowRendered = (element: HTMLElement | undefined, item: UmbTableItem) => {
 		if (!element) {
@@ -81,6 +101,65 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			onActiveChange: () => this.#updateRowActive(item.id),
 		});
 	};
+
+	// Creates/refreshes the per-item resolvers (when the repository provides them) before the rows are
+	// built, and disposes resolvers for items that are no longer shown.
+	#syncResolverContexts() {
+		const repository = this._treeContext?.getRepository();
+
+		for (const item of this._items) {
+			const existing = this.#resolverContexts.get(item.unique);
+			if (existing) {
+				existing.resolver.setData(item);
+				continue;
+			}
+
+			const resolver = repository?.createTreeItemDataResolver?.(this, { entityType: item.entityType });
+			if (!resolver) continue;
+
+			const ctx: UmbTableTreeViewResolverContext = {
+				resolver,
+				nameObserver: undefined!,
+				iconObserver: undefined!,
+			};
+
+			// Register before observers so synchronous emissions see the context.
+			this.#resolverContexts.set(item.unique, ctx);
+			resolver.setData(item);
+
+			ctx.nameObserver = this.observe(
+				resolver.name,
+				(name) => {
+					ctx.currentName = name;
+					this.#updateRowName(item.unique);
+				},
+				`_observeName_${item.unique}`,
+			);
+
+			ctx.iconObserver = this.observe(
+				resolver.icon,
+				(icon) => {
+					ctx.currentIcon = icon;
+					this.#updateRowIcon(item.unique);
+				},
+				`_observeIcon_${item.unique}`,
+			);
+		}
+
+		const currentIds = new Set(this._items.map((item) => item.unique));
+		for (const [id, ctx] of this.#resolverContexts) {
+			if (!currentIds.has(id)) {
+				this.#destroyResolverContext(ctx);
+				this.#resolverContexts.delete(id);
+			}
+		}
+	}
+
+	#destroyResolverContext(ctx: UmbTableTreeViewResolverContext) {
+		ctx.nameObserver.destroy();
+		ctx.iconObserver.destroy();
+		ctx.resolver.destroy();
+	}
 
 	#updateRowSelectable(id: string) {
 		const idx = this._tableRows.findIndex((r) => r.id === id);
@@ -111,13 +190,13 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		const nameData = rows[idx].data.find((d) => d.columnAlias === 'name');
 		if (nameData?.value?.href === href) return null;
 
-		const childrenIndicator = rows[idx].childrenIndicator;
+		const childrenIndicator = this.#getChildrenIndicator(treeItem, href);
 
 		return [
 			...rows.slice(0, idx),
 			{
 				...rows[idx],
-				childrenIndicator: childrenIndicator ? { ...childrenIndicator, href } : undefined,
+				childrenIndicator,
 				data: rows[idx].data.map((d) => (d.columnAlias === 'name' ? { ...d, value: { ...d.value, href } } : d)),
 			},
 			...rows.slice(idx + 1),
@@ -138,6 +217,50 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		];
 	}
 
+	#updateRowName(id: string) {
+		const idx = this._tableRows.findIndex((r) => r.id === id);
+		if (idx === -1) return;
+
+		const name = this.#resolveName(id);
+		const nameData = this._tableRows[idx].data.find((d) => d.columnAlias === 'name');
+		if (nameData?.value?.name === name) return;
+
+		this._tableRows = [
+			...this._tableRows.slice(0, idx),
+			{
+				...this._tableRows[idx],
+				data: this._tableRows[idx].data.map((d) =>
+					d.columnAlias === 'name' ? { ...d, value: { ...d.value, name } } : d,
+				),
+			},
+			...this._tableRows.slice(idx + 1),
+		];
+	}
+
+	#updateRowIcon(id: string) {
+		const idx = this._tableRows.findIndex((r) => r.id === id);
+		if (idx === -1) return;
+
+		const icon = this.#resolveIcon(id);
+		if (this._tableRows[idx].icon === icon) return;
+
+		this._tableRows = [
+			...this._tableRows.slice(0, idx),
+			{ ...this._tableRows[idx], icon },
+			...this._tableRows.slice(idx + 1),
+		];
+	}
+
+	#resolveName(id: string): string {
+		return this.#resolverContexts.get(id)?.currentName ?? this.#itemMap.get(id)?.name ?? '';
+	}
+
+	#resolveIcon(id: string): string {
+		const item = this.#itemMap.get(id);
+		const fallback = item?.isFolder ? 'icon-folder' : (item?.icon ?? getItemFallbackIcon());
+		return this.#resolverContexts.get(id)?.currentIcon ?? fallback;
+	}
+
 	protected override _gotTreeContext() {
 		super._gotTreeContext();
 
@@ -155,6 +278,44 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			(value) => (this._hideTreeItemActions = value ?? false),
 			'_observeHideTreeItemActions',
 		);
+	}
+
+	/**
+	 * Whether the item shows an expand symbol, which leads further into the tree.
+	 * @param {UmbTreeItemModel} item - The tree item the row represents.
+	 * @returns {boolean} True when the item shows the expand symbol.
+	 */
+	protected _showExpandSymbol(item: UmbTreeItemModel): boolean {
+		return item.hasChildren;
+	}
+
+	/**
+	 * Where activating the expand symbol of the item leads. Without a path, it asks the tree to drill into the item.
+	 * @param {UmbTreeItemModel} _item - The tree item the row represents.
+	 * @param {string | undefined} path - The path of the item, when the row is not selectable.
+	 * @returns {string | undefined} The path to navigate to.
+	 */
+	protected _getExpandPath(_item: UmbTreeItemModel, path: string | undefined): string | undefined {
+		return path;
+	}
+
+	/**
+	 * Renders the expand symbol of the item, or `undefined` for the default.
+	 * @param {UmbTreeItemModel} _item - The tree item the row represents.
+	 * @returns {TemplateResult | undefined} The symbol to render.
+	 */
+	protected _renderExpandSymbol(_item: UmbTreeItemModel): TemplateResult | undefined {
+		return undefined;
+	}
+
+	#getChildrenIndicator(item: UmbTreeItemModel, path: string | undefined): UmbTableItem['childrenIndicator'] {
+		if (!this._showExpandSymbol(item)) return undefined;
+
+		return {
+			href: this._getExpandPath(item, path),
+			onOpen: () => this._treeContext?.open?.(item),
+			renderExpandSymbol: () => this._renderExpandSymbol(item) ?? html`<uui-symbol-expand></uui-symbol-expand>`,
+		};
 	}
 
 	#buildTableColumns(): Array<UmbTableColumn> {
@@ -181,12 +342,12 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 
 	#toTableRow(item: UmbTreeItemModel): UmbTableItem {
 		const id = item.unique;
-		const icon = item.isFolder ? 'icon-folder' : (item.icon ?? getItemFallbackIcon());
 		const row = this.#rows.get(id);
 		const noAccess = row?.currentNoAccess ?? false;
 		const href = this._selectable ? undefined : row?.currentPath || undefined;
 		const isActive = row?.currentIsActive ?? false;
-		const name = item.name;
+		const name = this.#resolveName(id);
+		const icon = this.#resolveIcon(id);
 
 		const manifestColumnData = this.#manifestColumns.map((col) => {
 			const rawValue = (item as unknown as Record<string, unknown>)[col.field];
@@ -201,17 +362,18 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			return { columnAlias: col.field, value: rawValue };
 		});
 
-		const onOpen = item.hasChildren ? () => this._treeContext?.open?.(item as UmbTreeItemModel) : undefined;
+		const childrenIndicator = this.#getChildrenIndicator(item, href);
+		const onOpen = childrenIndicator?.onOpen;
 
 		return {
 			id,
 			icon,
 			entityType: item.entityType,
-			childrenIndicator: item.hasChildren ? { href, onOpen } : undefined,
+			childrenIndicator,
 			selectable: !noAccess && this._isSelectableItem(item as UmbTreeItemModel),
 			// select-only disables all row interaction, which would leave no way to drill into an item with
 			// children while a selection is in progress.
-			selectOnly: item.hasChildren ? false : undefined,
+			selectOnly: childrenIndicator ? false : undefined,
 			active: isActive,
 			data: [
 				{
@@ -235,6 +397,9 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		for (const item of items) {
 			this.#itemMap.set(item.unique, item);
 		}
+
+		// Resolve name/icon before building rows so they are present on first render.
+		this.#syncResolverContexts();
 
 		this._tableRows = items.map((item) => this.#toTableRow(item));
 
@@ -288,6 +453,10 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			row.destroy();
 		}
 		this.#rows.clear();
+		for (const ctx of this.#resolverContexts.values()) {
+			this.#destroyResolverContext(ctx);
+		}
+		this.#resolverContexts.clear();
 		this.#itemMap.clear();
 	}
 

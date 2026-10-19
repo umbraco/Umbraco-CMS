@@ -1,12 +1,8 @@
+import { _getCachedElementConfiguration } from './configuration.cache.js';
 import { UmbElementConfigurationServerDataSource } from './configuration.server.data-source.js';
 import type { UmbElementConfigurationModel } from './types.js';
 import type { UmbContentConfigurationRepository } from '@umbraco-cms/backoffice/content';
 import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
-
-/**
- * The cached element configuration, shared across all repository instances.
- */
-let configurationPromise: Promise<UmbRepositoryResponse<UmbElementConfigurationModel>> | undefined;
 
 /**
  * @description - Repository for Element configuration.
@@ -22,22 +18,9 @@ export class UmbElementConfigurationRepository extends UmbRepositoryBase impleme
 	 * @returns {Promise<UmbRepositoryResponse<UmbElementConfigurationModel>>} - The element configuration.
 	 * @memberof UmbElementConfigurationRepository
 	 */
-	async requestConfiguration(): Promise<UmbRepositoryResponse<UmbElementConfigurationModel>> {
-		configurationPromise ??= this.#serverDataSource.getConfiguration();
-		const response = await configurationPromise;
-		if (response.error) {
-			configurationPromise = undefined;
-		}
-		return response;
+	requestConfiguration(): Promise<UmbRepositoryResponse<UmbElementConfigurationModel>> {
+		return _getCachedElementConfiguration(() => this.#serverDataSource.getConfiguration());
 	}
 }
 
 export { UmbElementConfigurationRepository as api };
-
-/**
- * Test-only.
- * @internal
- */
-export function resetUmbElementConfigurationCache(): void {
-	configurationPromise = undefined;
-}

@@ -19,8 +19,9 @@ import { constructPathWithBasePath, path as getPath, queryString, stripSlash } f
 /**
  * Determines whether the path is active.
  * If the full path starts with the path and is followed by the end of the string or a "/" the path is considered active.
- * @param path
- * @param fullPath
+ * @param {string | PathFragment} path - The path to check.
+ * @param {string} [fullPath] - The full path to check against.
+ * @returns {boolean} True if the path is active.
  */
 export function isPathActive(path: string | PathFragment, fullPath: string = getPath()): boolean {
 	return new RegExp(`^${stripSlash(path)}(\/|$)`, 'gm').test(stripSlash(fullPath));
@@ -28,8 +29,10 @@ export function isPathActive(path: string | PathFragment, fullPath: string = get
 
 /**
  * Matches a route.
- * @param route
- * @param path
+ * @template D
+ * @param {IRoute<D>} route - The route to match.
+ * @param {string | PathFragment} path - The path to match against.
+ * @returns {IRouteMatch<D> | null} The route match, or null if it doesn't match.
  */
 export function matchRoute<D = any>(route: IRoute<D>, path: string | PathFragment): IRouteMatch<D> | null {
 	// We start by preparing the route path by replacing the param names with a regex that matches everything
@@ -107,8 +110,10 @@ export function matchRoute<D = any>(route: IRoute<D>, path: string | PathFragmen
 
 /**
  * Matches the first route that matches the given path.
- * @param routes
- * @param path
+ * @template D
+ * @param {IRoute<D>[]} routes - The routes to match against.
+ * @param {string | PathFragment} path - The path to match.
+ * @returns {IRouteMatch<D> | null} The first matching route, or null if none matches.
  */
 export function matchRoutes<D = any>(routes: IRoute<D>[], path: string | PathFragment): IRouteMatch<D> | null {
 	for (const route of routes) {
@@ -124,8 +129,9 @@ export function matchRoutes<D = any>(routes: IRoute<D>[], path: string | PathFra
 /**
  * Returns the page from the route.
  * If the component provided is a function (and not a class) call the function to get the promise.
- * @param route
- * @param info
+ * @param {IComponentRoute} route - The route to resolve the component from.
+ * @param {IRoutingInfo} info - The routing info to set up the component with.
+ * @returns {Promise<PageComponent>} The resolved page component.
  */
 export async function resolvePageComponent(route: IComponentRoute, info: IRoutingInfo): Promise<PageComponent> {
 	// Figure out if the component were given as an import or class.
@@ -170,7 +176,8 @@ export async function resolvePageComponent(route: IComponentRoute, info: IRoutin
 
 /**
  * Determines if a route is a redirect route.
- * @param route
+ * @param {IRoute} route - The route to check.
+ * @returns {boolean} True if the route is a redirect route.
  */
 export function isRedirectRoute(route: IRoute): route is IRedirectRoute {
 	return 'redirectTo' in route;
@@ -178,7 +185,8 @@ export function isRedirectRoute(route: IRoute): route is IRedirectRoute {
 
 /**
  * Determines if a route is a resolver route.
- * @param route
+ * @param {IRoute} route - The route to check.
+ * @returns {boolean} True if the route is a resolver route.
  */
 export function isResolverRoute(route: IRoute): route is IResolverRoute {
 	return 'resolve' in route;
@@ -186,7 +194,8 @@ export function isResolverRoute(route: IRoute): route is IResolverRoute {
 
 /**
  * Traverses the router tree up to the root route.
- * @param slot
+ * @param {IRouterSlot} slot - The router slot to start traversing from.
+ * @returns {{ tree: RouterTree; depth: number }} The router tree and its depth.
  */
 export function traverseRouterTree(slot: IRouterSlot): { tree: RouterTree; depth: number } {
 	// Find the nodes from the route up to the root route
@@ -208,8 +217,9 @@ export function traverseRouterTree(slot: IRouterSlot): { tree: RouterTree; depth
 
 /**
  * Generates a path based on the router tree.
- * @param tree
- * @param depth
+ * @param {RouterTree} tree - The router tree to generate the path from.
+ * @param {number} depth - The depth to traverse the tree.
+ * @returns {PathFragment[]} The path fragments.
  */
 export function getFragments(tree: RouterTree, depth: number): PathFragment[] {
 	let child = tree;
@@ -230,8 +240,11 @@ export function getFragments(tree: RouterTree, depth: number): PathFragment[] {
  * - Handles relative paths: "mypath"
  * - Handles absolute paths: "/mypath"
  * - Handles traversing paths: "../../mypath"
- * @param slot
- * @param path
+ * @template D
+ * @template P
+ * @param {IRouterSlot<D, P>} slot - The router slot to construct the path for.
+ * @param {string | PathFragment} [path] - The path to make absolute.
+ * @returns {string} The absolute path.
  */
 export function constructAbsolutePath<D = any, P = any>(
 	slot: IRouterSlot<D, P>,
@@ -277,8 +290,8 @@ export function constructAbsolutePath<D = any, P = any>(
 
 /**
  * Handles a redirect.
- * @param slot
- * @param route
+ * @param {IRouterSlot} slot - The router slot to redirect.
+ * @param {IRedirectRoute} route - The redirect route to handle.
  */
 export function handleRedirect(slot: IRouterSlot, route: IRedirectRoute) {
 	history.replaceState(
@@ -290,8 +303,10 @@ export function handleRedirect(slot: IRouterSlot, route: IRedirectRoute) {
 
 /**
  * Determines whether the navigation should start based on the current match and the new match.
- * @param currentMatch
- * @param newMatch
+ * @template D
+ * @param {IRouteMatch<D> | null} currentMatch - The current route match.
+ * @param {IRouteMatch<D>} newMatch - The new route match.
+ * @returns {boolean} True if the navigation should start.
  */
 export function shouldNavigate<D>(currentMatch: IRouteMatch<D> | null, newMatch: IRouteMatch<D>) {
 	// If the current match is not defined we should always route.

@@ -9,7 +9,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the UserGroup that fetches data from the server
  * @class UmbUserGroupCollectionServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbCollectionDataSource}
  */
 export class UmbUserGroupCollectionServerDataSource implements UmbCollectionDataSource<UmbUserGroupDetailModel> {
 	#host: UmbControllerHost;
@@ -38,11 +38,14 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 					aliasCanBeChanged: item.aliasCanBeChanged,
 					documentRootAccess: item.documentRootAccess,
 					documentStartNode: item.documentStartNode ? { unique: item.documentStartNode.id } : null,
+					documentBlueprintRootAccess: item.documentBlueprintRootAccess,
+					documentBlueprintStartNode: item.documentBlueprintStartNode ? { unique: item.documentBlueprintStartNode.id } : null,
 					elementRootAccess: item.elementRootAccess,
 					elementStartNode: item.elementStartNode ? { unique: item.elementStartNode.id } : null,
 					entityType: UMB_USER_GROUP_ENTITY_TYPE,
 					fallbackPermissions: item.fallbackPermissions,
 					hasAccessToAllLanguages: item.hasAccessToAllLanguages,
+					hasAccessToInvariantForVariant: item.hasAccessToInvariantForVariant,
 					icon: item.icon || null,
 					isDeletable: item.isDeletable,
 					languages: item.languages,

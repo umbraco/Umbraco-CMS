@@ -1,6 +1,6 @@
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbCollectionCreateActionButtonElement } from './collection-create-action.element.js';
 import { UmbCreateCollectionActionApi } from './collection-create-action.api.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{

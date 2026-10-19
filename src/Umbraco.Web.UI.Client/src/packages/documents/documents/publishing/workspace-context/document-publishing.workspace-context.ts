@@ -10,9 +10,9 @@ import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
 import { UmbDocumentUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../constants.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
 import { UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
-import { UmbDocumentVariantState } from '../../variant-state.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -23,8 +23,9 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbExpandVariantIdsWithSegmentOptions } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { apiErrorWasNotified } from '@umbraco-cms/backoffice/resources';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -148,6 +149,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			data: {
 				options,
 				activeVariants: selected,
+				currentVariant: this.#getCurrentScheduleVariant(options),
 				pickableFilter: this.#publishableVariantsFilter,
 				prevalues: options.map((option) => ({
 					unique: option.unique,
@@ -162,7 +164,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		if (!result?.selection.length) return;
 
 		// Map to the correct format for the API (UmbDocumentVariantPublishModel)
-		const variants =
+		const cultureVariants =
 			result?.selection.map<UmbDocumentVariantPublishModel>((x) => ({
 				variantId: UmbVariantId.FromString(x.unique),
 				schedule: {
@@ -171,9 +173,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				},
 			})) ?? [];
 
-		if (!variants.length) return;
+		if (!cultureVariants.length) return;
 
-		const variantIds = variants.map((x) => x.variantId);
+		let variantIds = cultureVariants.map((x) => x.variantId);
+		variantIds = umbExpandVariantIdsWithSegmentOptions(
+			variantIds,
+			await this.#documentWorkspaceContext.getVariantOptions(),
+		);
+
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
@@ -190,7 +197,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
 
 					// Schedule the document
-					const { error } = await this.#publishingRepository.publish(unique, variants);
+					const { error } = await this.#publishingRepository.publish(unique, cultureVariants);
 					if (error) {
 						throw error;
 					}
@@ -235,7 +242,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	 * Convert a date string to a server time string in ISO format, example: 2021-01-01T12:00:00.000+00:00.
 	 * The input must be a valid date string, otherwise it will return null.
 	 * The output matches the DateTimeOffset format in C#.
-	 * @param dateString
+	 * @param {string | null | undefined} dateString - The date string to convert.
+	 * @returns {string | null} The ISO date string, or null if invalid.
 	 */
 	#convertToDateTimeOffset(dateString: string | null | undefined) {
 		if (!dateString || dateString.length === 0) {
@@ -281,11 +289,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		if (!result?.selection.length) return;
 
 		// Map to variantIds
-		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+		let variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
 		if (!variantIds.length) return;
 
 		const workspaceContext = this.#documentWorkspaceContext;
+
+		variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, await workspaceContext.getVariantOptions());
 		const saveData = await workspaceContext.constructSaveData(variantIds);
 
 		try {
@@ -343,7 +353,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		this.#eventContext?.dispatchEvent(new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique }));
 	}
 
-	/** Peeks a single-message notification, when a notification context is available. */
+	/**
+	 * Peeks a single-message notification, when a notification context is available.
+	 * @param {UmbNotificationColor} color - The notification color/severity.
+	 * @param {string} messageKey - The localization key for the message.
+	 * @param {...string} args - Arguments to interpolate into the localized message.
+	 */
 	#notify(color: UmbNotificationColor, messageKey: string, ...args: Array<string>): void {
 		this.#notificationContext?.peek(color, { data: { message: this.#localize.term(messageKey, ...args) } });
 	}
@@ -353,6 +368,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	 * server calls, so the save goes through the default persistence path first: it merges the response
 	 * into those variants only and dispatches the save events, leaving the workspace correctly saved
 	 * even when the publish leg fails afterwards.
+	 * @param {UmbDocumentPublishWithDescendantsArgs} args - The publish arguments.
 	 * @returns {Promise<boolean>} whether reading the document back after publishing failed
 	 */
 	async #saveAndPublishDescendants(args: UmbDocumentPublishWithDescendantsArgs): Promise<boolean> {
@@ -391,6 +407,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	/**
 	 * Save the selected variants without publishing them, for when validation rejects the publish.
 	 * Rejects even though the save succeeded, to symbolize that we did not publish. [NL]
+	 * @param {Array<UmbVariantId>} variantIds - The variants to save.
+	 * @param {UmbDocumentDetailModel} saveData - The data to save.
+	 * @param {unknown} reason - The reason the publish was rejected, rethrown after saving.
 	 */
 	async #saveWithoutPublishing(
 		variantIds: Array<UmbVariantId>,
@@ -461,14 +480,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		const { options, selected } = await this.#determineVariantOptions();
 
-		// If there is only one variant, we don't need to open the modal.
+		// If there is only one variant and it may be published, we don't need to open the modal.
 		if (options.length === 0) {
 			throw new Error('No variants are available');
-		} else if (options.length === 1) {
+		} else if (options.length === 1 && this.#publishableVariantsFilter(options[0])) {
 			// If only one option we will skip ahead and save the document with the only variant available:
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
-			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
+			// Otherwise the modal lets the user pick which variants to publish, and shows the ones that may not be.
 			const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
@@ -488,6 +507,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		// User has committed to publishing (modal closed with a selection, or no modal needed).
 		notifyWorkspaceActionStarting(executionOptions);
 
+		if (this.#documentWorkspaceContext.getVariesBySegment()) {
+			variantIds = umbExpandVariantIdsWithSegmentOptions(
+				variantIds,
+				await this.#documentWorkspaceContext.getVariantOptions(),
+			);
+		}
+
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
@@ -498,9 +524,11 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				// Notify only on the publish path. The validation-failure path below already
 				// notifies, so a shared top-level .catch would fire a second, contradictory toast. [JOV]
 				return this.#performSaveAndPublish(variantIds, saveData).catch((error) => {
-					this.#notificationContext?.peek('danger', {
-						data: { message: this.#localize.term('speechBubbles_editContentPublishedFailed') },
-					});
+					// When the server reported why, the user has already seen it. Repeating a generic failure here
+					// would contradict it - and mislead, as a rejected publish still leaves the save in effect.
+					if (!apiErrorWasNotified(error?.cause)) {
+						this.#notify('danger', 'speechBubbles_editContentPublishedFailed');
+					}
 					return Promise.reject(error);
 				});
 			},
@@ -526,14 +554,26 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				return await this.#documentWorkspaceContext!.loadWithoutPersist();
 			} catch {
 				reloadAfterPublishFailed = true;
-				return saveData;
+				return { ...saveData, unique: this.#documentWorkspaceContext!.getUnique() ?? saveData.unique };
 			}
 		};
 
 		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData, {
 			create: async (data, ids, parent) => {
-				const { error } = await this.#publishingRepository.createAndPublish(data, ids, parent.unique);
+				const { data: createdUnique, error } = await this.#publishingRepository.createAndPublish(
+					data,
+					ids,
+					parent.unique,
+				);
 				if (error) throw new Error('Error creating and publishing document', { cause: error });
+
+				// The server may have assigned a different unique than the one this workspace scaffolded with
+				// (e.g. a Saving notification handler assigning its own key). The reload below reads by the
+				// workspace's current unique, so it must be updated to the actual persisted one first.
+				if (createdUnique) {
+					this.#documentWorkspaceContext!.setUnique(createdUnique);
+				}
+
 				return loadAfterPublish();
 			},
 			update: async (data, ids) => {
@@ -559,17 +599,15 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		await this.#loadAndProcessLastPublished();
 
-		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		// Re-read the unique: for a new document, the server may have assigned a different one than the
+		// workspace scaffolded with, and `performCreateOrUpdate` above will have re-synced it if so.
+		const persistedUnique = this.#documentWorkspaceContext.getUnique() ?? unique;
+		const event = new UmbRequestReloadStructureForEntityEvent({ unique: persistedUnique, entityType });
 		this.#eventContext?.dispatchEvent(event);
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
-		const variantId = UmbVariantId.Create(option);
-		// If the read only guard is permitted it means the variant is read only
-		const isReadOnly = this.#documentWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(variantId);
-		// If the variant is read only, we can't publish it
-		const isPublishable = !isReadOnly;
-		return isPublishable;
+		return this.#documentWorkspaceContext!.getIsWritableVariant(UmbVariantId.Create(option));
 	};
 
 	async #determineVariantOptions(): Promise<{
@@ -589,17 +627,28 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
 		selected = selected.filter((x) => options.some((o) => o.unique === x));
 
-		// Filter out read-only variants
+		// Filter out variants that cannot be written
 		// TODO: This would not work with segments, as the 'selected'-array is an array of strings, not UmbVariantId's. [NL]
 		// Please have a look at the implementation in the content-detail workspace context, as that one compares variantIds. [NL]
-		selected = selected.filter(
-			(x) => this.#documentWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(new UmbVariantId(x)) === false,
-		);
+		selected = selected.filter((x) => this.#documentWorkspaceContext!.getIsWritableVariant(new UmbVariantId(x)));
 
 		return {
 			options,
 			selected,
 		};
+	}
+
+	#getCurrentScheduleVariant(options: Array<UmbDocumentVariantOptionModel>): string | undefined {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+		// The schedule dialog lists cultures only, so an active segment variant resolves to its culture.
+		const activeCultures = this.#documentWorkspaceContext.splitView
+			.getActiveVariants()
+			.map((x) => UmbVariantId.Create(x).toSegmentInvariant().toString());
+
+		return activeCultures.find((unique) => {
+			const option = options.find((o) => o.unique === unique);
+			return !!option && this.#publishableVariantsFilter(option);
+		});
 	}
 
 	#getPublishVariantsSelection() {

@@ -1,15 +1,17 @@
-import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbEntryValueModel } from '@umbraco-cms/backoffice/content';
 
 export type * from './conditions/types.js';
 export type * from './clipboard/types.js';
 
 export interface UmbBlockLayoutBaseModel {
+	key: string;
 	contentKey: string;
 	settingsKey?: string | null;
+	isExternalContent?: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbBlockDataValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}
+export interface UmbBlockDataValueModel<ValueType = unknown> extends UmbEntryValueModel<ValueType> {}
 
 export interface UmbBlockDataModel {
 	key: string;
@@ -26,7 +28,6 @@ export interface UmbBlockDataType {
 export interface UmbBlockExposeModel {
 	contentKey: string;
 	culture: string | null;
-	segment: string | null;
 }
 
 export interface UmbBlockValueDataPropertiesBaseType {

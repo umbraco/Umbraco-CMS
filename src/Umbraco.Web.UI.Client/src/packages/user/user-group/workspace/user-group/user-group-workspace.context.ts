@@ -1,6 +1,7 @@
 import type { UmbUserGroupDetailModel } from '../../types.js';
 import { UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS, type UmbUserGroupDetailRepository } from '../../repository/index.js';
 import { UMB_USER_GROUP_ENTITY_TYPE, UMB_USER_GROUP_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_USER_GROUP_ROOT_WORKSPACE_PATH, UMB_EDIT_USER_GROUP_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UmbUserGroupWorkspaceEditorElement } from './user-group-workspace-editor.element.js';
 import { UMB_USER_GROUP_WORKSPACE_ALIAS } from './constants.js';
 import {
@@ -10,6 +11,8 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbStartNodeAccessValue } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbUserGroupDetailModel, UmbUserGroupDetailRepository>
@@ -23,8 +26,17 @@ export class UmbUserGroupWorkspaceContext
 	readonly hasAccessToAllLanguages = this._data.createObservablePartOfCurrent(
 		(data) => data?.hasAccessToAllLanguages || false,
 	);
+	readonly hasAccessToInvariantForVariant = this._data.createObservablePartOfCurrent(
+		(data) => data?.hasAccessToInvariantForVariant ?? false,
+	);
 	readonly documentStartNode = this._data.createObservablePartOfCurrent((data) => data?.documentStartNode || null);
 	readonly documentRootAccess = this._data.createObservablePartOfCurrent((data) => data?.documentRootAccess || false);
+	readonly documentBlueprintStartNode = this._data.createObservablePartOfCurrent(
+		(data) => data?.documentBlueprintStartNode || null,
+	);
+	readonly documentBlueprintRootAccess = this._data.createObservablePartOfCurrent(
+		(data) => data?.documentBlueprintRootAccess || false,
+	);
 	readonly elementStartNode = this._data.createObservablePartOfCurrent((data) => data?.elementStartNode || null);
 	readonly elementRootAccess = this._data.createObservablePartOfCurrent((data) => data?.elementRootAccess || false);
 	readonly mediaStartNode = this._data.createObservablePartOfCurrent((data) => data?.mediaStartNode || null);
@@ -65,12 +77,18 @@ export class UmbUserGroupWorkspaceContext
 		]);
 	}
 
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_USER_GROUP_ROOT_WORKSPACE_PATH;
+		return UMB_EDIT_USER_GROUP_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+	}
+
 	updateProperty<Alias extends keyof UmbUserGroupDetailModel>(alias: Alias, value: UmbUserGroupDetailModel[Alias]) {
 		this._data.updateCurrent({ [alias]: value });
 	}
 
 	/**
 	 * Gets the user group user permissions.
+	 * @returns {Array<UmbUserPermissionModel>} The user group user permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	getPermissions() {
@@ -79,7 +97,7 @@ export class UmbUserGroupWorkspaceContext
 
 	/**
 	 * Sets the user group user permissions.
-	 * @param {Array<UmbUserPermissionModel>} permissions
+	 * @param {Array<UmbUserPermissionModel>} permissions - The user group user permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	setPermissions(permissions: Array<UmbUserPermissionModel>) {
@@ -88,6 +106,7 @@ export class UmbUserGroupWorkspaceContext
 
 	/**
 	 * Gets the user group fallback permissions.
+	 * @returns {Array<string>} The user group fallback permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	getFallbackPermissions() {
@@ -96,7 +115,7 @@ export class UmbUserGroupWorkspaceContext
 
 	/**
 	 * Sets the user group fallback permissions.
-	 * @param {Array<string>} fallbackPermissions
+	 * @param {Array<string>} fallbackPermissions - The user group fallback permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	setFallbackPermissions(fallbackPermissions: Array<string>) {
@@ -110,6 +129,84 @@ export class UmbUserGroupWorkspaceContext
 	 */
 	setDescription(description: string) {
 		this._data.updateCurrent({ description });
+	}
+
+	/**
+	 * Sets the sections the user group grants access to.
+	 * @param {Array<string>} sections - The section aliases.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setSections(sections: Array<string>) {
+		this.updateProperty('sections', sections);
+	}
+
+	/**
+	 * Sets the user group language access.
+	 * @param {UmbStartNodeAccessValue} value - The language root access and start nodes.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setLanguageAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			hasAccessToAllLanguages: value.rootAccess,
+			languages: value.startNodes.map((startNode) => startNode.unique),
+		});
+	}
+
+	/**
+	 * Sets whether the user group can edit invariant (shared) property data on variant content.
+	 * @param {boolean} value - Whether the user group has invariant-for-variant access.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setHasAccessToInvariantForVariant(value: boolean) {
+		this.updateProperty('hasAccessToInvariantForVariant', value);
+	}
+
+	/**
+	 * Sets the user group document access.
+	 * @param {UmbStartNodeAccessValue} value - The document root access and start node.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setDocumentAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			documentRootAccess: value.rootAccess,
+			documentStartNode: value.startNodes[0] ? { unique: value.startNodes[0].unique } : null,
+		});
+	}
+
+	/**
+	 * Sets the user group media access.
+	 * @param {UmbStartNodeAccessValue} value - The media root access and start node.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setMediaAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			mediaRootAccess: value.rootAccess,
+			mediaStartNode: value.startNodes[0] ? { unique: value.startNodes[0].unique } : null,
+		});
+	}
+
+	/**
+	 * Sets the user group element access.
+	 * @param {UmbStartNodeAccessValue} value - The element root access and start node.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setElementAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			elementRootAccess: value.rootAccess,
+			elementStartNode: value.startNodes[0] ? { unique: value.startNodes[0].unique } : null,
+		});
+	}
+
+	/**
+	 * Sets the user group document blueprint access.
+	 * @param {UmbStartNodeAccessValue} value - The document blueprint root access and start node.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setDocumentBlueprintAccess(value: UmbStartNodeAccessValue) {
+		this._data.updateCurrent({
+			documentBlueprintRootAccess: value.rootAccess,
+			documentBlueprintStartNode: value.startNodes[0] ? { unique: value.startNodes[0].unique } : null,
+		});
 	}
 }
 

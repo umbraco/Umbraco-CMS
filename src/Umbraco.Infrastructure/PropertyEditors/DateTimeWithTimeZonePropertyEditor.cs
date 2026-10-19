@@ -24,12 +24,10 @@ public class DateTimeWithTimeZonePropertyEditor : DateTimePropertyEditorBase
     /// </summary>
     /// <param name="dataValueEditorFactory">Factory used to create data value editors for property values.</param>
     /// <param name="ioHelper">Helper for IO operations, such as path resolution.</param>
-    /// <param name="propertyIndexValueFactory">Factory for creating index values for date and time properties with time zone support.</param>
     public DateTimeWithTimeZonePropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        IDateTimeWithTimeZonePropertyIndexValueFactory propertyIndexValueFactory)
-        : base(dataValueEditorFactory, ioHelper, propertyIndexValueFactory)
+        IIOHelper ioHelper)
+        : base(dataValueEditorFactory, ioHelper)
     {
     }
 

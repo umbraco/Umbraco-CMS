@@ -63,9 +63,12 @@ public class UmbracoPremigrationPlan : MigrationPlan
         To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
         To<V_18_0_0.AddAllowedInLibraryToContentType>("{31C0D92A-49DD-47EC-B2A7-932A58FF224E}");
 
-        // To 18.2.0
+        // To 19.0.0
+        // The user group repository reads and writes this column, and migrations in the main plan load and save user groups.
+        To<V_19_0_0.AddHasAccessToInvariantForVariantColumnToUserGroup>("{550AD0E5-2AAA-4D51-BAE1-7ACCB4822F21}");
+        To<V_19_0_0.AddDocumentBlueprintStartNodeToUserGroup>("{FB1256C8-FA43-46B0-903D-E3FFE3C19824}");
         // The lock is required to write data types, and migrations in the main plan do so, so it has to exist
         // before that plan runs.
-        To<V_18_2_0.AddDataTypesLock>("{2B8F0C41-9D57-4E63-B1A9-7F4E52D6C08B}");
+        To<V_19_0_0.AddDataTypesLock>("{2B8F0C41-9D57-4E63-B1A9-7F4E52D6C08B}");
     }
 }

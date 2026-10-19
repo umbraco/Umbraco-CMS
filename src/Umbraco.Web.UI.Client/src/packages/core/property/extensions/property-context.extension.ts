@@ -1,8 +1,7 @@
 import type { ManifestApi, ManifestWithDynamicConditions, UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestPropertyContext<MetaType extends MetaPropertyContext = MetaPropertyContext>
-	extends ManifestWithDynamicConditions<UmbExtensionConditionConfig>,
-		ManifestApi<UmbApi> {
+	extends ManifestWithDynamicConditions<UmbExtensionConditionConfig>, ManifestApi<UmbApi> {
 	type: 'propertyContext';
 	forPropertyEditorUis: string[];
 	meta: MetaType;

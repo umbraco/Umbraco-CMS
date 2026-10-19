@@ -83,6 +83,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerContext.max;
@@ -115,7 +116,22 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	}
 
 	@property({ type: Boolean, attribute: 'readonly' })
-	readonly?: boolean;
+	public get readonly(): boolean | undefined {
+		return this.#readonly;
+	}
+	public set readonly(value: boolean | undefined) {
+		this.#readonly = value;
+		this.#updateSorterEnabled();
+	}
+	#readonly?: boolean;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
 
 	@state()
 	private _items?: Array<UmbDocumentTypeItemModel>;
@@ -152,9 +168,9 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
-		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), null);
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), null);
 	}
 
 	protected override getFormElement() {
@@ -236,7 +252,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 									?error=${true}
 									.errorMessage=${status.state.error}
 									.errorDetail=${unique}
-									?readonly=${this.readonly}
+									readonly
 									?standalone=${this.max === 1}>
 									${when(
 										!this.readonly,

@@ -1,41 +1,16 @@
-import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
+import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
-
-let hasWarnedLabelDeprecation = false;
 
 /**
  * @element umb-ref-list-block
  * @slot name - Content rendered in the block's primary label area (the `name` slot of the inner `uui-ref-node`). The expected projection is a `<umb-ufm-render>` element owned by the parent block-list entry.
  */
 @customElement('umb-ref-list-block')
-export class UmbRefListBlockElement extends UmbLitElement {
+export class UmbRefListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElement) {
 	//
-	/**
-	 * @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 19.
-	 */
-	@property({ type: String, reflect: false })
-	public set label(value: string | undefined) {
-		if (value !== undefined && value !== this._label) {
-			if (!hasWarnedLabelDeprecation) {
-				hasWarnedLabelDeprecation = true;
-				new UmbDeprecation({
-					deprecated: 'umb-ref-list-block.label property',
-					solution: 'Project a `<umb-ufm-render>` into the `name` slot instead.',
-					removeInVersion: '19.0.0',
-				}).warn();
-			}
-		}
-		this._label = value;
-	}
-	public get label(): string | undefined {
-		return this._label;
-	}
-	@state()
-	private _label?: string;
-
 	@property({ type: String, reflect: false })
 	icon?: string;
 
@@ -44,6 +19,13 @@ export class UmbRefListBlockElement extends UmbLitElement {
 
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
+
+	/**
+	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
+	 * reflects the library element's own publish state rather than the local expose entry.
+	 */
+	@property({ type: Boolean, attribute: false })
+	isExternalContent?: boolean;
 
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
@@ -54,14 +36,6 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;
 
-	@state()
-	private _hasNameSlotContent = false;
-
-	#onNameSlotChange = (event: Event) => {
-		const slot = event.target as HTMLSlotElement;
-		this._hasNameSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
-	};
-
 	override render() {
 		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
@@ -70,25 +44,24 @@ export class UmbRefListBlockElement extends UmbLitElement {
 				.readonly=${!(this.config?.showContentEdit ?? false)}
 				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-				<slot name="name" slot="name" @slotchange=${this.#onNameSlotChange}></slot>
-				${when(
-					!this._hasNameSlotContent && this._label !== undefined,
-					() =>
-						html`<umb-ufm-render slot="name" inline .markdown=${this._label} .value=${blockValue}></umb-ufm-render>`,
-				)}
-				${when(
-					this.unpublished,
-					() => html`
-						<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}>
-							<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-						</uui-tag>
-					`,
-				)}
+				${this.renderNameSlot(blockValue, 'name')}
+				${when(this.unpublished, () => this.#renderDraftTag())}
 			</uui-ref-node>
 		`;
 	}
 
-	static override styles = [
+	#renderDraftTag() {
+		const titleKey = this.isExternalContent
+			? 'blockEditor_notPublishedLibraryElementDescription'
+			: 'blockEditor_notExposedDescription';
+		return html`
+			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
+				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
+			</uui-tag>
+		`;
+	}
+
+	static override readonly styles = [
 		css`
 			:host {
 				display: block;

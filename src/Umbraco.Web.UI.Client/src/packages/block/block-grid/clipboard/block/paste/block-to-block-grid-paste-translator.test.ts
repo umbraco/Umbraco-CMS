@@ -36,6 +36,7 @@ describe('UmbBlockToBlockGridClipboardPastePropertyValueTranslator', () => {
 					columnSpan: 12,
 					rowSpan: 1,
 					areas: [],
+					key: 'contentKey',
 					contentKey: 'contentKey',
 					settingsKey: null,
 				},
@@ -49,6 +50,7 @@ describe('UmbBlockToBlockGridClipboardPastePropertyValueTranslator', () => {
 		contentData: blockGridPropertyValue.contentData,
 		layout: [
 			{
+				key: 'contentKey',
 				contentKey: 'contentKey',
 				settingsKey: null,
 			},

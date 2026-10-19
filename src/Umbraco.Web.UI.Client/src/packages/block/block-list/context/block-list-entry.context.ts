@@ -1,8 +1,5 @@
 import type { UmbBlockListValueModel } from '../types.js';
-import {
-	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
-	UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
-} from '../constants.js';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS } from '../constants.js';
 import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-token.js';
 import { UMB_BLOCK_LIST_ENTRIES_CONTEXT } from './block-list-entries.context-token.js';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
@@ -17,7 +14,10 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_LIST_ENTRIES_CONTEXT.TYPE
 > {
 	#inlineEditingMode = new UmbBooleanState(undefined);
-	readonly inlineEditingMode = this.#inlineEditingMode.asObservable();
+	readonly inlineEditingMode = mergeObservables(
+		[this.#inlineEditingMode.asObservable(), this.isExternalContent],
+		([inlineEditingMode, isExternalContent]) => inlineEditingMode === true && !isExternalContent,
+	);
 	readonly forceHideContentEditorInOverlay = this._blockType.asObservablePart((x) =>
 		x ? (x.forceHideContentEditorInOverlay ?? false) : undefined,
 	);

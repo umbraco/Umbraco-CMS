@@ -31,9 +31,7 @@ export class UmbMediaPickerTableColumnNameElement extends UmbLitElement implemen
 						>${this.value.name}</uui-button
 					>`
 				: html`<span class="name">${this.value.name}</span>`}
-			${this.value.ancestorPath
-				? html`<span class="ancestor-path">${this.value.ancestorPath}</span>`
-				: nothing}
+			${this.value.ancestorPath ? html`<span class="ancestor-path">${this.value.ancestorPath}</span>` : nothing}
 		`;
 	}
 

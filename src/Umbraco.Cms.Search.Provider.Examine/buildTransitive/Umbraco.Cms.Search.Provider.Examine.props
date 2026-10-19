@@ -1,0 +1,5 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <UmbracoJsonSchemaFiles Include="$(MSBuildThisFileDirectory)..\appsettings-schema.Umbraco.Cms.Search.Examine.json" Weight="-80" />
+  </ItemGroup>
+</Project>

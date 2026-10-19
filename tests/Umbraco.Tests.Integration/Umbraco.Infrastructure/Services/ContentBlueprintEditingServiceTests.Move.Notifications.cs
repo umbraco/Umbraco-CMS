@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -11,12 +10,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 public partial class ContentBlueprintEditingServiceTests
 {
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-    {
-        builder.AddNotificationHandler<ContentMovingBlueprintNotification, BlueprintMoveNotificationHandler>();
-        builder.AddNotificationHandler<ContentMovedBlueprintNotification, BlueprintMoveNotificationHandler>();
-    }
-
     [SetUp]
     public void ResetBlueprintMoveNotificationHandler()
     {

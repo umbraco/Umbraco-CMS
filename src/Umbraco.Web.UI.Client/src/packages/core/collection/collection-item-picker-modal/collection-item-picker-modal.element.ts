@@ -2,8 +2,9 @@ import type { UmbCollectionLayoutConfiguration, UmbCollectionSelectionConfigurat
 import { UmbCollectionItemPickerContext } from './collection-item-picker-modal.context.js';
 import type { UmbCollectionItemPickerModalData, UmbCollectionItemPickerModalValue } from './types.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, customElement, state, nothing, ifDefined, css, classMap } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing, ifDefined, css, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UmbPickerSearchFieldElement } from '@umbraco-cms/backoffice/picker';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-collection-item-picker-modal')
@@ -29,16 +30,23 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	private _isSearchable: boolean = false;
 
 	@state()
-	private _searchQuery?: string;
+	private _activeTab: 'browse' | 'search' = 'browse';
+
+	@query('umb-picker-search-field')
+	private _searchField?: UmbPickerSearchFieldElement;
 
 	#pickerContext = new UmbCollectionItemPickerContext(this);
 
 	constructor() {
 		super();
 		this.#pickerContext.selection.setSelectable(true);
-		this.observe(this.#pickerContext.selection.hasSelection, (hasSelection) => {
-			this._hasSelection = hasSelection;
-		});
+		this.observe(
+			this.#pickerContext.selection.hasSelection,
+			(hasSelection) => {
+				this._hasSelection = hasSelection;
+			},
+			null,
+		);
 		this.#observePickerSelection();
 		this.#observeSearch();
 	}
@@ -92,14 +100,6 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			(isSearchable) => (this._isSearchable = isSearchable ?? false),
 			null,
 		);
-
-		this.observe(
-			this.#pickerContext.search.query,
-			(query) => {
-				this._searchQuery = query?.query;
-			},
-			null,
-		);
 	}
 
 	#onItemSelected(event: UmbSelectedEvent) {
@@ -116,18 +116,53 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 
 	#searchSelectableFilter = () => true;
 
+	async #setActiveTab(tab: 'browse' | 'search') {
+		if (this._activeTab === tab) return;
+		this._activeTab = tab;
+
+		if (tab === 'search') {
+			await this.updateComplete;
+			this._searchField?.focus();
+		}
+	}
+
 	override render() {
 		const renderCollection = !!this.data?.collection.alias;
 
 		return html`
-			<umb-body-layout
-				headline="${this.localize.term('general_choose')}"
-				?main-no-padding=${renderCollection}
-				class=${classMap({ 'has-search': this._isSearchable, 'is-searching': !!this._searchQuery })}>
-				${this.#renderSearch()} ${this.#renderMain(renderCollection)} ${this.#renderSelectionCount()}
-				${this.#renderActions()}
+			<umb-body-layout headline="${this.localize.term('general_choose')}" ?main-no-padding=${renderCollection}>
+				${this.#renderTabs()}
+				<div id="browse" ?hidden=${this._activeTab !== 'browse'}>${this.#renderMain(renderCollection)}</div>
+				<div id="search" ?hidden=${this._activeTab !== 'search'}>${this.#renderSearch()}</div>
+				${this.#renderSelectionCount()} ${this.#renderActions()}
 			</umb-body-layout>
 		`;
+	}
+
+	#renderTabs() {
+		if (!this._isSearchable) return nothing;
+
+		return html`
+			<uui-tab-group slot="navigation">
+				${this.#renderTab('browse', 'picker_browseTab', 'icon-list')}
+				${this.#renderTab('search', 'picker_searchTab', 'icon-search')}
+			</uui-tab-group>
+		`;
+	}
+
+	// The label is passed as both property and child text: `uui-tab` renders its `label` in the default
+	// slot, which the whitespace of a multi-line template would otherwise occupy.
+	#renderTab(tab: 'browse' | 'search', labelKey: string, icon: string) {
+		const label = this.localize.term(labelKey);
+
+		return html`<uui-tab
+			label=${label}
+			?active=${this._activeTab === tab}
+			@click=${() => this.#setActiveTab(tab)}
+			data-mark="picker:tab:${tab}">
+			<umb-icon slot="icon" name=${icon}></umb-icon>
+			${label}
+		</uui-tab>`;
 	}
 
 	#renderSearch() {
@@ -137,10 +172,8 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
 
 		return html`
-			<div id="search-container">
-				<umb-picker-search-field></umb-picker-search-field>
-				<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
-			</div>
+			<umb-picker-search-field .alias=${this.data?.collection.alias}></umb-picker-search-field>
+			<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
 		`;
 	}
 
@@ -210,27 +243,19 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 
 	static override styles = [
 		css`
+			uui-tab-group {
+				--uui-tab-divider: var(--uui-color-border);
+				border-left: 1px solid var(--uui-color-border);
+				border-right: 1px solid var(--uui-color-border);
+			}
+
 			umb-collection {
 				display: block;
 				height: fit-content;
 			}
 
-			umb-body-layout[main-no-padding].has-search {
-				#search-container {
-					padding: var(--uui-size-layout-1);
-					padding-bottom: 0;
-				}
-
-				umb-collection {
-					margin-top: calc(-1 * var(--uui-size-4));
-				}
-			}
-
-			umb-body-layout.is-searching {
-				umb-collection,
-				#collection-menu-box {
-					display: none;
-				}
+			umb-body-layout[main-no-padding] #search {
+				padding: var(--uui-size-layout-1);
 			}
 
 			#selection-info {
