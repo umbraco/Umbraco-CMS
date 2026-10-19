@@ -182,8 +182,10 @@ internal sealed class DomainCacheServiceTests
     {
         var domainService = new Mock<IDomainService>();
         domainService
-            .Setup(x => x.GetAllAsync(true))
-            .ReturnsAsync(
+#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
+            .Setup(x => x.GetAll(true))
+#pragma warning restore CS0618 // Type or member is obsolete
+            .Returns(
             [
                 CreateDomain(1, "https://third.example/", 1001, "en-US", isWildcard: false, sortOrder: 2),
                 CreateDomain(2, "*1001", 1001, "da-DK", isWildcard: true, sortOrder: 0),
@@ -209,8 +211,10 @@ internal sealed class DomainCacheServiceTests
     {
         var domainService = new Mock<IDomainService>();
         domainService
-            .Setup(x => x.GetAllAsync(true))
-            .ReturnsAsync(
+#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
+            .Setup(x => x.GetAll(true))
+#pragma warning restore CS0618 // Type or member is obsolete
+            .Returns(
             [
                 CreateDomain(1, "https://site.example/", 1001, "en-US", isWildcard: false),
                 CreateDomain(2, "*1002", 1002, "en-US", isWildcard: true),
@@ -234,8 +238,10 @@ internal sealed class DomainCacheServiceTests
     {
         var domainService = new Mock<IDomainService>();
         domainService
-            .Setup(x => x.GetAllAsync(true))
-            .ReturnsAsync(
+#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
+            .Setup(x => x.GetAll(true))
+#pragma warning restore CS0618 // Type or member is obsolete
+            .Returns(
             [
                 CreateDomain(1, "https://moving.example/", 1001, "en-US", isWildcard: false),
                 CreateDomain(2, "https://removed.example/", 1001, "en-US", isWildcard: false, sortOrder: 1),
@@ -267,8 +273,10 @@ internal sealed class DomainCacheServiceTests
         var current = new List<IDomain> { CreateDomain(1, "https://site.example/", 1001, "en-US", isWildcard: false) };
         var domainService = new Mock<IDomainService>();
         domainService
-            .Setup(x => x.GetAllAsync(true))
-            .ReturnsAsync(() => current.ToArray());
+#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
+            .Setup(x => x.GetAll(true))
+#pragma warning restore CS0618 // Type or member is obsolete
+            .Returns(() => current.ToArray());
 
         var sut = new DomainCacheService(domainService.Object, CreateScopeProvider());
         Assert.IsTrue(sut.HasAssigned(1001));
