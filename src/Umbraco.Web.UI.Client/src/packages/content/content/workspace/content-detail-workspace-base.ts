@@ -426,7 +426,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		});
 
 		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
-		const loadType = await this.structure.loadType(contentTypeUnique);
+		const loadType = this.structure.loadType(contentTypeUnique);
 
 		await Promise.all([incoming, loadType]);
 
