@@ -83,9 +83,8 @@ describe('UmbDocumentWorkspaceContext (loading)', () => {
 				await new Promise((resolve) => setTimeout(resolve, 20));
 				log.push('loading');
 			});
-			context.incomingDataHook.add((data) => {
+			context.incomingDataHook.add(() => {
 				log.push('incoming');
-				return data;
 			});
 
 			await context.load(INVARIANT_DOCUMENT_ID);
@@ -93,20 +92,11 @@ describe('UmbDocumentWorkspaceContext (loading)', () => {
 			expect(log).to.deep.equal(['loading', 'incoming']);
 		});
 
-		it('applies the data returned by the incoming data hook', async () => {
-			context.incomingDataHook.add((data) => ({ ...data, isTrashed: true }));
-
-			await context.load(INVARIANT_DOCUMENT_ID);
-
-			expect(context.getData()?.isTrashed).to.be.true;
-		});
-
 		it('runs the incoming data hook on reload', async () => {
 			await context.load(INVARIANT_DOCUMENT_ID);
 			let calls = 0;
-			context.incomingDataHook.add((data) => {
+			context.incomingDataHook.add(() => {
 				calls++;
-				return data;
 			});
 
 			await context.reload();

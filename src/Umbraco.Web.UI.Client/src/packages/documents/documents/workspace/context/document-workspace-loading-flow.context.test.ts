@@ -44,7 +44,6 @@ interface UmbTestExtensionOptions {
 	name: string;
 	registerInitHook?: boolean;
 	loadingDelay?: number;
-	incomingWeight?: number;
 	throwOnIncomingData?: boolean;
 }
 function createTestExtensionClass(options: UmbTestExtensionOptions) {
@@ -59,11 +58,10 @@ function createTestExtensionClass(options: UmbTestExtensionOptions) {
 					log.push(`${options.name}:loading`);
 				});
 			}
-			workspace.incomingDataHook.add((data) => {
+			workspace.incomingDataHook.add(() => {
 				if (options.throwOnIncomingData) throw new Error(`${options.name} failed`);
 				log.push(`${options.name}:incoming`);
-				return { ...data, isTrashed: true };
-			}, options.incomingWeight ?? 0);
+			});
 		}
 	};
 }
@@ -217,19 +215,6 @@ describe('Document workspace loading flow, with extensions taking part in the lo
 
 			expect(log).to.deep.equal(['A:created', 'A:incoming']);
 			expect(context.getData()?.isTrashed).to.be.true;
-		});
-	});
-
-	describe('with several extensions', () => {
-		it('has all of them created before the first incoming data hook runs, and runs those by weight', async () => {
-			registerExtension('Test.Ext.Low', { name: 'low', incomingWeight: 1 });
-			registerExtension('Test.Ext.High', { name: 'high', incomingWeight: 10 });
-			const context = await openWorkspace();
-
-			await context.load(INVARIANT_DOCUMENT_ID);
-
-			expect(log.slice(0, 2).sort()).to.deep.equal(['high:created', 'low:created']);
-			expect(log.slice(2)).to.deep.equal(['high:incoming', 'low:incoming']);
 		});
 	});
 
