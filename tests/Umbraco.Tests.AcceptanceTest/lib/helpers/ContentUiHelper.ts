@@ -1343,6 +1343,10 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.isVisible(this.documentReadOnly, isVisible, ConstantHelper.timeout.long);
   }
 
+  async doesDocumentNameInputHaveValue(name: string) {
+    await expect(this.contentNameTxt).toHaveValue(name, {timeout: ConstantHelper.timeout.long});
+  }
+
   async isDocumentNameInputEditable(isEditable: boolean = true) {
     await this.waitForVisible(this.contentNameTxt);
     await expect(this.contentNameTxt).toBeEditable({editable: isEditable});
@@ -2114,6 +2118,11 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.containsText(this.documentVariantLanguagePicker, name);
   }
 
+  async isAppLanguageReadOnly(isReadOnly: boolean = true) {
+    const tag = this.documentLanguageSelect.getByText('Read-only');
+    await this.isVisible(tag, isReadOnly);
+  }
+
   async clickSchedulePublishLanguageButton(languageName: string) {
     await this.click(this.page.getByRole('menu').filter({hasText: languageName}));
   }
@@ -2156,7 +2165,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickBlockElementInRTEWithName(elementTypeName: string) {
-    const blockElementLocator = this.page.locator('uui-ref-node umb-ufm-render').filter({hasText: elementTypeName});
+    const blockElementLocator = this.page.locator('umb-ref-rte-block umb-ufm-render').filter({hasText: elementTypeName});
     await this.click(blockElementLocator, {force: true});
   }
 
@@ -2313,6 +2322,12 @@ export class ContentUiHelper extends UiBaseLocators {
     await expect(propertyLocator).toBeEditable({editable: isEditable});
   }
 
+  async clickCloseButtonInBlockWorkspace(elementTypeName: string) {
+    const blockWorkspace = this.blockModal.filter({has: this.page.getByTestId('layout-headline').filter({hasText: elementTypeName})});
+    await this.click(blockWorkspace.getByRole('button', {name: 'Close', exact: true}));
+    await this.isVisible(blockWorkspace, false);
+  }
+
   async clickEditNestedBlockListEntry(parentElementTypeName: string, blockListElementName: string) {
     const innerEntry = this.blockModal
       .filter({has: this.page.getByTestId('layout-headline').filter({hasText: parentElementTypeName})})
@@ -2361,6 +2376,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickSaveModalButtonAndWaitForDomainToBeCreated() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.domains, this.click(this.sidebarSaveBtn), ConstantHelper.statusCodes.ok);
+  }
+
+  async isDocumentBlueprintSaveButtonDisabled() {
+    await expect(this.documentBlueprintSaveBtn).toBeDisabled({timeout: ConstantHelper.timeout.medium});
   }
 
   async clickSaveModalButtonAndWaitForDocumentBlueprintToBeCreated() {

@@ -17,12 +17,15 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     /// <param name="icon">The icon for the user group.</param>
     /// <param name="startContentId">The starting content node identifier.</param>
     /// <param name="startMediaId">The starting media node identifier.</param>
+    /// <param name="startElementId">The starting element node identifier.</param>
+    /// <param name="startDocumentBlueprintId">The starting document blueprint container identifier.</param>
     /// <param name="alias">The alias of the user group.</param>
     /// <param name="allowedLanguages">The collection of allowed language identifiers.</param>
     /// <param name="allowedSections">The collection of allowed section aliases.</param>
     /// <param name="permissions">The set of permissions.</param>
     /// <param name="granularPermissions">The set of granular permissions.</param>
     /// <param name="hasAccessToAllLanguages">Indicates whether the group has access to all languages.</param>
+    /// <param name="hasAccessToInvariantForVariant">Indicates whether the group can edit invariant (shared) property data on variant content.</param>
     public ReadOnlyUserGroup(
         int id,
         Guid key,
@@ -32,12 +35,14 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         int? startContentId,
         int? startMediaId,
         int? startElementId,
+        int? startDocumentBlueprintId,
         string? alias,
         IEnumerable<int> allowedLanguages,
         IEnumerable<string> allowedSections,
         ISet<string> permissions,
         ISet<IGranularPermission> granularPermissions,
-        bool hasAccessToAllLanguages)
+        bool hasAccessToAllLanguages,
+        bool hasAccessToInvariantForVariant)
     {
         Id = id;
         Key = key;
@@ -52,7 +57,9 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         StartContentId = startContentId == 0 ? null : startContentId;
         StartMediaId = startMediaId == 0 ? null : startMediaId;
         StartElementId = startElementId == 0 ? null : startElementId;
+        StartDocumentBlueprintId = startDocumentBlueprintId == 0 ? null : startDocumentBlueprintId;
         HasAccessToAllLanguages = hasAccessToAllLanguages;
+        HasAccessToInvariantForVariant = hasAccessToInvariantForVariant;
         Permissions = permissions;
         GranularPermissions = granularPermissions;
     }
@@ -81,10 +88,16 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     public int? StartElementId { get; }
 
     /// <inheritdoc />
+    public int? StartDocumentBlueprintId { get; }
+
+    /// <inheritdoc />
     public string Alias { get; }
 
     /// <inheritdoc />
     public bool HasAccessToAllLanguages { get; set; }
+
+    /// <inheritdoc />
+    public bool HasAccessToInvariantForVariant { get; set; }
 
     /// <inheritdoc />
     public IEnumerable<int> AllowedLanguages { get; private set; }

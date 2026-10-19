@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Semver;
@@ -127,6 +127,8 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_19_0_0.MigrateSingleMediaPickerDataTypes>("{B84A1E90-9F3C-4C1F-9E51-3A2D7C4F8B16}");
         To<V_19_0_0.MigrateSingleUrlPickerDataTypes>("{4E0B7D51-6C89-4A3F-B1D2-7F5A9E30C48B}");
         To<V_19_0_0.MigrateSingleDropDownDataTypes>("{A21C6F84-3B5D-4E92-8C07-1D4F6B8A5E30}");
+        To<V_19_0_0.AddHasAccessToInvariantForVariantToUserGroup>("{B2C4E7A8-9F31-4D56-8E7B-C1A2F3D4E5F6}");
+        To<V_19_0_0.GrantDocumentBlueprintAccessToSettingsGroups>("{E973CB74-26BC-4092-AA46-01FE48301E29}");
         To<V_19_0_0.MigrateMultiUrlPickerMinMaxToRange>("{B1E4A7C2-3F5D-4A98-9C1E-0D2F6B7A81C4}");
         To<V_19_0_0.MigrateMultiNodeTreePickerMinMaxToRange>("{C2F5B8D3-4A6E-4BA9-8D2F-1E3A7C8B92D5}");
         To<V_19_0_0.MigrateMultipleTextStringMinMaxToRange>("{D3A6C9E4-5B7F-4CBA-9E30-2F4B8D9CA3E6}");

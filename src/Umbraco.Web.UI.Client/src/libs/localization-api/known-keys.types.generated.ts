@@ -344,12 +344,14 @@ declare global {
 		blockEditor_unsupportedBlockName: string;
 		blueprints_blankBlueprint: string;
 		blueprints_blueprintDescription: string;
+		blueprints_chooseDocumentType: string;
 		blueprints_createBlueprintFolderUnder: string;
 		blueprints_createBlueprintFrom: string;
 		blueprints_createBlueprintItemUnder: string;
 		blueprints_createdBlueprintHeading: string;
 		blueprints_createdBlueprintMessage: string;
 		blueprints_duplicateBlueprintMessage: string;
+		blueprints_noAccessToBlueprints: string;
 		blueprints_selectBlueprint: string;
 		bulk_copiedItem: string;
 		bulk_copiedItemOfItem: string;
@@ -1068,6 +1070,7 @@ declare global {
 		general_deleting: string;
 		general_description: string;
 		general_design: string;
+		general_destination: string;
 		general_details: string;
 		general_dictionary: string;
 		general_dimensions: string;
@@ -1766,6 +1769,7 @@ declare global {
 		profiling_profilerEnabledDescription: string;
 		profiling_reminder: string;
 		profiling_reminderDescription: string;
+		prompt_cannotUnpublishWhenReferenced: string;
 		prompt_confirmListViewPublish: string;
 		prompt_confirmListViewUnpublish: string;
 		prompt_confirmPublish: string;
@@ -1865,6 +1869,7 @@ declare global {
 		references_itemHasNoReferences: string;
 		references_labelDependentDescendants: string;
 		references_labelDependsOnThis: string;
+		references_labelDescendantsWithReferences: string;
 		references_labelMoreReferences: (count: number) => string;
 		references_labelUsedByDocuments: string;
 		references_labelUsedByDocumentTypes: string;
@@ -1880,6 +1885,8 @@ declare global {
 		references_tabName: string;
 		references_unpublishWarning: string;
 		references_usedByProperties: string;
+		references_viewDependentItemsAction: string;
+		references_viewDescendantsWithReferencesAction: string;
 		relatedlinks_caption: string;
 		relatedlinks_captionPlaceholder: string;
 		relatedlinks_chooseInternal: string;
@@ -2505,10 +2512,12 @@ declare global {
 		user_accessHelp: string;
 		user_addUsersToGroupError: string;
 		user_administrators: string;
+		user_allowAccessToAllDocumentBlueprints: string;
 		user_allowAccessToAllDocuments: string;
 		user_allowAccessToAllElements: string;
 		user_allowAccessToAllLanguages: string;
 		user_allowAccessToAllMedia: string;
+		user_allowAccessToInvariantForVariant: string;
 		user_andMore: string;
 		user_assignAccess: string;
 		user_avatarDeleteSuccess: string;
@@ -2553,6 +2562,7 @@ declare global {
 		user_granularRightsDescription: string;
 		user_granularRightsLabel: string;
 		user_groupsHelp: string;
+		user_invariantForVariantHelp: string;
 		user_invite: string;
 		user_inviteAnotherUser: string;
 		user_inviteUser: string;
@@ -2623,6 +2633,8 @@ declare global {
 		user_resetPassword: string;
 		user_searchAllChildren: string;
 		user_sectionsHelp: string;
+		user_selectDocumentBlueprintStartNode: string;
+		user_selectDocumentBlueprintStartNodeDescription: string;
 		user_selectElementStartNode: string;
 		user_selectElementStartNodeDescription: string;
 		user_selectUserGroup: (multiple: boolean) => string;

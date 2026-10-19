@@ -13,9 +13,11 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 	private _values: Array<UmbPropertyValueData> = [
 		{ alias: 'sections', value: [] },
 		{ alias: 'languageAccess', value: { rootAccess: false, startNodes: [] } },
+		{ alias: 'invariantForVariantAccess', value: false },
 		{ alias: 'documentAccess', value: { rootAccess: false, startNodes: [] } },
 		{ alias: 'mediaAccess', value: { rootAccess: false, startNodes: [] } },
 		{ alias: 'elementAccess', value: { rootAccess: false, startNodes: [] } },
+		{ alias: 'documentBlueprintAccess', value: { rootAccess: false, startNodes: [] } },
 	];
 
 	constructor() {
@@ -35,6 +37,12 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 						startNodes: (languages ?? []).map((unique) => ({ unique })),
 					}),
 				'_observeLanguageAccess',
+			);
+
+			this.observe(
+				instance.hasAccessToInvariantForVariant,
+				(value) => this.#setValue('invariantForVariantAccess', value ?? false),
+				'_observeInvariantForVariantAccess',
 			);
 
 			this.observe(
@@ -66,6 +74,16 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 					}),
 				'_observeElementAccess',
 			);
+
+			this.observe(
+				observeMultiple([instance.documentBlueprintRootAccess, instance.documentBlueprintStartNode]),
+				([rootAccess, startNode]) =>
+					this.#setValue('documentBlueprintAccess', {
+						rootAccess: rootAccess ?? false,
+						startNodes: startNode ? [{ unique: startNode.unique }] : [],
+					}),
+				'_observeDocumentBlueprintAccess',
+			);
 		});
 	}
 
@@ -84,6 +102,13 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 			| undefined;
 		if (languageAccess) this.#workspaceContext?.setLanguageAccess(languageAccess);
 
+		const invariantForVariantAccess = values.find((entry) => entry.alias === 'invariantForVariantAccess')?.value as
+			| boolean
+			| undefined;
+		if (invariantForVariantAccess !== undefined) {
+			this.#workspaceContext?.setHasAccessToInvariantForVariant(invariantForVariantAccess);
+		}
+
 		const documentAccess = values.find((entry) => entry.alias === 'documentAccess')?.value as
 			| UmbStartNodeAccessValue
 			| undefined;
@@ -98,6 +123,11 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 			| UmbStartNodeAccessValue
 			| undefined;
 		if (elementAccess) this.#workspaceContext?.setElementAccess(elementAccess);
+
+		const documentBlueprintAccess = values.find((entry) => entry.alias === 'documentBlueprintAccess')?.value as
+			| UmbStartNodeAccessValue
+			| undefined;
+		if (documentBlueprintAccess) this.#workspaceContext?.setDocumentBlueprintAccess(documentBlueprintAccess);
 	}
 
 	#getFields(): Array<PropertyEditorSettingsProperty> {
@@ -114,6 +144,13 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 				description: this.localize.term('user_languagesHelp'),
 				propertyEditorUiAlias: 'Umb.PropertyEditorUi.LanguageAccess',
 				config: [{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllLanguages') }],
+			},
+			{
+				alias: 'invariantForVariantAccess',
+				label: this.localize.term('user_allowAccessToInvariantForVariant'),
+				description: this.localize.term('user_invariantForVariantHelp'),
+				propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+				config: [{ alias: 'ariaLabel', value: this.localize.term('user_allowAccessToInvariantForVariant') }],
 			},
 			{
 				alias: 'documentAccess',
@@ -142,6 +179,16 @@ export class UmbUserGroupWorkspaceAssignAccessElement extends UmbLitElement {
 				propertyEditorUiAlias: 'Umb.PropertyEditorUi.ElementStartNodeAccess',
 				config: [
 					{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllElements') },
+					{ alias: 'validationLimit', value: { min: 0, max: 1 } },
+				],
+			},
+			{
+				alias: 'documentBlueprintAccess',
+				label: this.localize.term('user_selectDocumentBlueprintStartNode'),
+				description: this.localize.term('user_selectDocumentBlueprintStartNodeDescription'),
+				propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentBlueprintStartNodeAccess',
+				config: [
+					{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllDocumentBlueprints') },
 					{ alias: 'validationLimit', value: { min: 0, max: 1 } },
 				],
 			},
