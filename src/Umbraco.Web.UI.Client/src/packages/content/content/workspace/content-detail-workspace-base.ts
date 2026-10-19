@@ -181,7 +181,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	readonly #collectionConfiguration = new UmbContentCollectionConfigurationContext(this);
 
 	// TODO: Remove this property in v.21
-	// @deprecated - it is not possible to filter variant options from v.21.
+	/**
+	 * This property is deprecated and will be removed in v.21.
+	 * @deprecated - it is not possible to filter variant options from v.21.
+	 */
 	protected _variantOptionsFilter = (variantOption: Omit<VariantOptionModelType, 'language'>) => true;
 
 	public variantOptionsManager: UmbWorkspaceVariantOptionsController<VariantModelType, VariantOptionModelType>;
