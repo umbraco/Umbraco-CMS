@@ -1,13 +1,12 @@
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbSequentialHookMethod } from '@umbraco-cms/backoffice/hook-api';
+import type { UmbParallelHookMethod } from '@umbraco-cms/backoffice/hook-api';
 import type { UmbEntityDetailIncomingDataHookMeta } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId, type UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { UmbSegmentCollectionRepository, type UmbSegmentModel } from '@umbraco-cms/backoffice/segment';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import type { UmbContentDetailModel } from '@umbraco-cms/backoffice/content';
 
 const observeCtrlAlias = Symbol();
 
@@ -18,7 +17,7 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 	#segments = new UmbArrayState<UmbSegmentModel, string, undefined>(undefined, (x) => x.alias);
 	#addedUniques: Array<string> = [];
 	#workspace?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
-	#currentUnique?: string;
+	#currentUnique?: string | null;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -77,21 +76,18 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 		);
 	}
 
-	#onIncomingData: UmbSequentialHookMethod<UmbContentDetailModel, UmbEntityDetailIncomingDataHookMeta> = async (
-		data,
-	) => {
-		if (this.#currentUnique === data.unique) {
+	#onIncomingData: UmbParallelHookMethod<UmbEntityDetailIncomingDataHookMeta> = async (meta) => {
+		if (this.#currentUnique === meta.unique) {
 			// we already have loaded segments, user must refresh for update.
-			return data;
+			return;
 		}
-		this.#currentUnique = data.unique;
+		this.#currentUnique = meta.unique;
 		// What happens when we leave out the skip/take? [NL]
 		const { data: response } = await this.#repository.requestCollection({
 			skip: 0,
 			take: 9999,
 		});
 		this.#segments.setValue(response?.items ?? []);
-		return data;
 	};
 
 	#createOptions(segments: Array<UmbSegmentModel>, culture: string | null) {
