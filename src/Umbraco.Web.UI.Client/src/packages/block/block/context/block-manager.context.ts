@@ -456,14 +456,13 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	/**
-	 * Returns an observable that emits true when the layout for the given contentKey
-	 * has `isExternalContent` set (i.e., the block references external content).
+	 * Returns an observable that emits true when a layout entry for the given contentKey, at any nesting
+	 * level reached by {@link _collectExternalContentKeys}, has `isExternalContent` set (i.e., the block
+	 * references external content).
 	 * @param key
 	 */
 	isExternalContentOf(key: string) {
-		return this._layouts.asObservablePart(
-			(source) => source.find((x) => x.contentKey === key)?.isExternalContent === true,
-		);
+		return this._layouts.asObservablePart((layouts) => this._collectExternalContentKeys(layouts).includes(key));
 	}
 
 	/**
