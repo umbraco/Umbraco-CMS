@@ -13,27 +13,36 @@ interface ExampleSegmentModel {
 	name: string;
 	/**
 	 * Where the segment is available:
-	 * - `undefined`: everywhere, for each culture and for invariant content.
-	 * - `null`: only for content that does not vary by culture.
+	 * - `'all'`: for each culture, and for content that does not vary by culture.
+	 * - `'invariant'`: only for content that does not vary by culture.
 	 * - An array of culture codes: only for those cultures.
 	 */
-	cultures?: Array<string> | null;
+	availableFor: 'all' | 'invariant' | Array<string>;
 }
 
-// Stands in for a request to a server or a third-party personalization service.
-const fetchExampleSegments = async (): Promise<Array<ExampleSegmentModel>> => {
+// The "Culture And Segment Variant Document Type" of the "documents" mock data set.
+// Replace it with the unique of a Document Type in your own installation.
+const EXAMPLE_NEWSLETTER_DOCUMENT_TYPE_UNIQUE = 'variant-documents-culture-and-segment-variant-document-type-id';
+
+// Stands in for a request to a server or a third-party personalization service,
+// which can answer with segments that depend on the content being opened.
+const fetchExampleSegments = async (contentTypeUnique: string | undefined): Promise<Array<ExampleSegmentModel>> => {
 	await new Promise((resolve) => setTimeout(resolve, 300));
-	return [
-		{ alias: 'example-returning-visitor', name: 'Returning visitor' },
-		{ alias: 'example-campaign', name: 'Campaign', cultures: null },
-		{ alias: 'example-danish-visitor', name: 'Danish visitor', cultures: ['da'] },
+	const segments: Array<ExampleSegmentModel> = [
+		{ alias: 'example-returning-visitor', name: 'Returning visitor', availableFor: 'all' },
+		{ alias: 'example-campaign', name: 'Campaign', availableFor: 'invariant' },
+		{ alias: 'example-danish-visitor', name: 'Danish visitor', availableFor: ['da'] },
 	];
+	if (contentTypeUnique === EXAMPLE_NEWSLETTER_DOCUMENT_TYPE_UNIQUE) {
+		segments.push({ alias: 'example-newsletter-subscriber', name: 'Newsletter subscriber', availableFor: 'all' });
+	}
+	return segments;
 };
 
 const isSegmentAvailableFor = (segment: ExampleSegmentModel, culture: string | null) => {
-	if (segment.cultures === undefined) return true;
-	if (segment.cultures === null) return culture === null;
-	return culture !== null && segment.cultures.includes(culture);
+	if (segment.availableFor === 'all') return true;
+	if (segment.availableFor === 'invariant') return culture === null;
+	return culture !== null && segment.availableFor.includes(culture);
 };
 
 const observeCtrlAlias = Symbol();
@@ -96,10 +105,9 @@ export class ExampleSegmentProviderWorkspaceContext extends UmbControllerBase {
 		});
 	}
 
-	#onIncomingData: UmbParallelHookMethod<UmbContentDetailIncomingDataHookMeta> = async () => {
-		// The segments do not depend on the entity, so they are only requested once.
-		if (this.#segments.getValue()) return;
-		this.#segments.setValue(await fetchExampleSegments());
+	#onIncomingData: UmbParallelHookMethod<UmbContentDetailIncomingDataHookMeta> = async (meta) => {
+		// The meta describes the incoming content, so the segments are requested for its Document Type on every load.
+		this.#segments.setValue(await fetchExampleSegments(meta.contentType?.unique));
 	};
 
 	override destroy() {

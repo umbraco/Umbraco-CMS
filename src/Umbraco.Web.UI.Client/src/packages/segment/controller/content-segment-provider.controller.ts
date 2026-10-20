@@ -1,3 +1,5 @@
+import { UmbSegmentCollectionRepository } from '../collection/index.js';
+import type { UmbSegmentModel } from '../types.js';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbParallelHookMethod } from '@umbraco-cms/backoffice/hook-api';
@@ -5,7 +7,6 @@ import type { UmbEntityDetailIncomingDataHookMeta } from '@umbraco-cms/backoffic
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId, type UmbEntityVariantOptionSourceModel } from '@umbraco-cms/backoffice/variant';
-import { UmbSegmentCollectionRepository, type UmbSegmentModel } from '@umbraco-cms/backoffice/segment';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
 const observeCtrlAlias = Symbol();
@@ -65,12 +66,20 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 		});
 	}
 
+	// TODO (V20): Remove the filtering by cultures together with the deprecated `cultures` property.
 	#getVaryByCultureSegmentOptions(segments: UmbSegmentModel[], languages: UmbLanguageDetailModel[]) {
-		return languages.flatMap((language) => this.#createOptions(segments, language.unique));
+		return languages.flatMap((language) =>
+			this.#createOptions(
+				// eslint-disable-next-line @typescript-eslint/no-deprecated
+				segments.filter((s) => !s.cultures || s.cultures.includes(language.unique)),
+				language.unique,
+			),
+		);
 	}
 
 	#getNotCultureSegmentOptions(segments: UmbSegmentModel[]) {
 		return this.#createOptions(
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
 			segments.filter((s) => !s.cultures),
 			null,
 		);

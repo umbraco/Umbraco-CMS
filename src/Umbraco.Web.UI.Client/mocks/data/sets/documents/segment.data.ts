@@ -4,6 +4,7 @@ export const data: Array<UmbMockSegmentModel> = [
 	{
 		alias: 's1',
 		name: 'Segment 1',
+		cultures: null,
 	},
 	{
 		alias: 's2',
