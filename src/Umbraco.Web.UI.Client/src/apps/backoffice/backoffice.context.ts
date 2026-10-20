@@ -3,7 +3,6 @@ import { UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observabl
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbSysinfoRepository } from '@umbraco-cms/backoffice/sysinfo';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
@@ -71,15 +70,6 @@ export class UmbBackofficeContext extends UmbContextBase {
 
 	public setActiveSectionAlias(alias: string) {
 		this.#activeSectionAlias.setValue(alias);
-	}
-
-	public async serverUpgradeCheck() {
-		const version = await this.observe(this.version)
-			.asPromise()
-			.catch(() => null);
-		if (!version) return null;
-		const repository = new UmbSysinfoRepository(this);
-		return repository.serverUpgradeCheck(version);
 	}
 }
 

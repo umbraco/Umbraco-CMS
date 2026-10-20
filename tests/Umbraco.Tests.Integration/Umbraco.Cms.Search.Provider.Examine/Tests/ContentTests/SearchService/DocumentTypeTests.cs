@@ -40,7 +40,7 @@ public class DocumentTypeTests : SearcherTestBase
         await CreateDocumentsAndWaitForIndexing();
 
         SearchResult results = await Searcher.SearchAsync(
-            Constants.IndexAliases.DraftContent,
+            Constants.Search.IndexAliases.DraftContent,
             query: "Home Page");
 
         Assert.That(results.Total, Is.EqualTo(2));
@@ -51,7 +51,7 @@ public class DocumentTypeTests : SearcherTestBase
         await WaitForIndexesToRebuild();
 
         results = await Searcher.SearchAsync(
-            Constants.IndexAliases.DraftContent,
+            Constants.Search.IndexAliases.DraftContent,
             query: "Home Page");
 
         Assert.That(results.Total, Is.EqualTo(1));
@@ -63,7 +63,7 @@ public class DocumentTypeTests : SearcherTestBase
         await CreateDocumentsAndWaitForIndexing();
 
         SearchResult results = await Searcher.SearchAsync(
-            Constants.IndexAliases.DraftContent,
+            Constants.Search.IndexAliases.DraftContent,
             query: "Home Page");
 
         Assert.That(results.Total, Is.EqualTo(2));
@@ -73,7 +73,7 @@ public class DocumentTypeTests : SearcherTestBase
         await WaitForIndexesToRebuild();
 
         results = await Searcher.SearchAsync(
-            Constants.IndexAliases.DraftContent,
+            Constants.Search.IndexAliases.DraftContent,
             query: "Home Page");
 
         Assert.That(results.Total, Is.EqualTo(1));
@@ -84,7 +84,7 @@ public class DocumentTypeTests : SearcherTestBase
 
     private async Task CreateDocumentsAndWaitForIndexing()
         => await WaitForIndexing(
-            Constants.IndexAliases.DraftContent,
+            Constants.Search.IndexAliases.DraftContent,
             async () => await CreateDocuments());
 
     private async Task CreateDocuments()

@@ -5,7 +5,6 @@ import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
@@ -27,6 +26,9 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _isInvariant = false;
+
+	@state()
+	private _hasSelection = false;
 
 	@state()
 	private _referencesConfig?: UmbEntityReferencesConfig;
@@ -90,6 +92,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	readonly #handleSelectionChange = (selection: Array<string>) => {
 		const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
 		this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
+		this._hasSelection = selection.length > 0;
 	};
 
 	#submit() {
@@ -132,7 +135,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 						label=${this.localize.string(this.data?.confirmLabel || '#buttons_saveAndPublish')}
 						look="primary"
 						color="positive"
-						?disabled=${this._hasNotSelectedMandatory}
+						?disabled=${this._hasNotSelectedMandatory || (!this._isInvariant && !this._hasSelection)}
 						@click=${this.#submit}></uui-button>
 				</div>
 			</uui-dialog-layout>
@@ -140,7 +143,6 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: block;

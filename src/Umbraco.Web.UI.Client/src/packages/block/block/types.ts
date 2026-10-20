@@ -1,4 +1,4 @@
-import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbEntryValueModel } from '@umbraco-cms/backoffice/content';
 
 export type * from './conditions/types.js';
 export type * from './clipboard/types.js';
@@ -11,7 +11,7 @@ export interface UmbBlockLayoutBaseModel {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbBlockDataValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}
+export interface UmbBlockDataValueModel<ValueType = unknown> extends UmbEntryValueModel<ValueType> {}
 
 export interface UmbBlockDataModel {
 	key: string;
@@ -25,10 +25,14 @@ export interface UmbBlockDataType {
 	[key: string]: unknown;
 }
 
+/**
+ * Why the external (library element) content of a Block is unavailable: it no longer exists, or the current user may not access it.
+ */
+export type UmbBlockExternalContentFailureReason = 'deleted' | 'noAccess';
+
 export interface UmbBlockExposeModel {
 	contentKey: string;
 	culture: string | null;
-	segment: string | null;
 }
 
 export interface UmbBlockValueDataPropertiesBaseType {

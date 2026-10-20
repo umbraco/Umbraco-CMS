@@ -7,6 +7,8 @@ internal class NoOpServerEventRouter : IServerEventRouter
 {
     public Task RouteEventAsync(ServerEvent serverEvent) => Task.CompletedTask;
 
+    public Task RouteEventAsync(ServerEvent serverEvent, ServerEventRoutingContext context) => Task.CompletedTask;
+
     public Task NotifyUserAsync(ServerEvent serverEvent, Guid userKey) => Task.CompletedTask;
 
     public Task BroadcastEventAsync(ServerEvent serverEvent) => Task.CompletedTask;

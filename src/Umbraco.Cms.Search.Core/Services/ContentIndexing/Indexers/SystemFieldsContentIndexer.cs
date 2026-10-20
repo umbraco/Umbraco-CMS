@@ -58,15 +58,15 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
 
         var fields = new List<IndexField>
         {
-            new(Umbraco.Cms.Core.Constants.IndexFieldNames.Id, new() { Keywords = [content.Key.AsKeyword()] }, null, null),
-            new(Umbraco.Cms.Core.Constants.IndexFieldNames.ParentId, new() { Keywords = [parentKey.Value.AsKeyword()] }, null, null),
-            new(Umbraco.Cms.Core.Constants.IndexFieldNames.PathIds, new() { Keywords = pathKeys.Select(key => key.AsKeyword()).ToArray() }, null, null),
-            new(Umbraco.Cms.Core.Constants.IndexFieldNames.ContentTypeId, new() { Keywords = [content.ContentType.Key.AsKeyword()] }, null, null),
-            new(Umbraco.Cms.Core.Constants.IndexFieldNames.CreateDate, new() { DateTimeOffsets = [_dateTimeOffsetConverter.ToDateTimeOffset(content.CreateDate)] }, null, null),
-            new(Umbraco.Cms.Core.Constants.IndexFieldNames.UpdateDate, new() { DateTimeOffsets = [_dateTimeOffsetConverter.ToDateTimeOffset(content.UpdateDate)] }, null, null),
-            new(Umbraco.Cms.Core.Constants.IndexFieldNames.Level, new() { Integers = [content.Level] }, null, null),
-            new(Umbraco.Cms.Core.Constants.IndexFieldNames.ObjectType, new() { Keywords = [objectType.ToString()] }, null, null),
-            new(Umbraco.Cms.Core.Constants.IndexFieldNames.SortOrder, new() { Integers = [content.SortOrder] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.Id, new() { Keywords = [content.Key.AsKeyword()] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.ParentId, new() { Keywords = [parentKey.Value.AsKeyword()] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.PathIds, new() { Keywords = pathKeys.Select(key => key.AsKeyword()).ToArray() }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.ContentTypeId, new() { Keywords = [content.ContentType.Key.AsKeyword()] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.CreateDate, new() { DateTimeOffsets = [_dateTimeOffsetConverter.ToDateTimeOffset(content.CreateDate)] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.UpdateDate, new() { DateTimeOffsets = [_dateTimeOffsetConverter.ToDateTimeOffset(content.UpdateDate)] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.Level, new() { Integers = [content.Level] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.ObjectType, new() { Keywords = [objectType.ToString()] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.SortOrder, new() { Integers = [content.SortOrder] }, null, null),
         };
 
         fields.AddRange(GetCultureTagFields(content, cultures));
@@ -103,7 +103,7 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
             return true;
         }
 
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(content.ParentId, objectType);
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(content.ParentId, AncestorObjectType(objectType));
         if (parentKeyAttempt.Success is false)
         {
             _logger.LogWarning(
@@ -139,7 +139,7 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
         IEnumerable<int> ancestorIds = content.AncestorIds();
         foreach (var ancestorId in ancestorIds)
         {
-            Attempt<Guid> attempt = _idKeyMap.GetKeyForId(ancestorId, objectType);
+            Attempt<Guid> attempt = _idKeyMap.GetKeyForId(ancestorId, AncestorObjectType(objectType));
             if (attempt.Success is false)
             {
                 _logger.LogWarning(
@@ -169,7 +169,7 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
                 continue;
             }
 
-            yield return new IndexField(Umbraco.Cms.Core.Constants.IndexFieldNames.Tags, new() { Keywords = tags }, culture, null);
+            yield return new IndexField(Umbraco.Cms.Core.Constants.Search.FieldNames.Tags, new() { Keywords = tags }, culture, null);
         }
     }
 
@@ -188,14 +188,22 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
             }
 
             // the name is indexed both as analyzed text (for free text search) and as a keyword (for exact matching, e.g. Delivery API name filters)
-            yield return new IndexField(Umbraco.Cms.Core.Constants.IndexFieldNames.Name, new() { TextsR1 = [name], Keywords = [name] }, culture, null);
+            yield return new IndexField(Umbraco.Cms.Core.Constants.Search.FieldNames.Name, new() { TextsR1 = [name], Keywords = [name] }, culture, null);
         }
     }
 
     private Guid? GetRecycleBinId(UmbracoObjectTypes objectType)
-        => objectType is UmbracoObjectTypes.Document
-            ? Cms.Core.Constants.System.RecycleBinContentKey
-            : objectType is UmbracoObjectTypes.Media
-                ? Cms.Core.Constants.System.RecycleBinMediaKey
-                : null;
+        => objectType switch
+        {
+            UmbracoObjectTypes.Document => Cms.Core.Constants.System.RecycleBinContentKey,
+            UmbracoObjectTypes.Media => Cms.Core.Constants.System.RecycleBinMediaKey,
+            UmbracoObjectTypes.Element => Cms.Core.Constants.System.RecycleBinElementKey,
+            _ => null,
+        };
+
+    // elements are organised in element containers, so their ancestors are containers rather than elements
+    private static UmbracoObjectTypes AncestorObjectType(UmbracoObjectTypes objectType)
+        => objectType is UmbracoObjectTypes.Element
+            ? UmbracoObjectTypes.ElementContainer
+            : objectType;
 }

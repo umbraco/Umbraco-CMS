@@ -72,9 +72,10 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
 
         var indexAlias = objectType switch
         {
-            UmbracoObjectTypes.Document => Umbraco.Cms.Core.Constants.IndexAliases.DraftContent,
-            UmbracoObjectTypes.Media => Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia,
-            UmbracoObjectTypes.Member => Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers,
+            UmbracoObjectTypes.Document => Constants.Search.IndexAliases.DraftContent,
+            UmbracoObjectTypes.Media => Constants.Search.IndexAliases.DraftMedia,
+            UmbracoObjectTypes.Member => Constants.Search.IndexAliases.DraftMembers,
+            UmbracoObjectTypes.Element => Constants.Search.IndexAliases.DraftElements,
             _ => throw new ArgumentOutOfRangeException(nameof(objectType), objectType, null)
         };
 
@@ -85,7 +86,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
         {
             filters.Add(
                 new KeywordFilter(
-                    FieldName: Constants.IndexFieldNames.ContentTypeId,
+                    FieldName: Constants.Search.FieldNames.ContentTypeId,
                     Values: contentTypeIdsAsArray.Select(contentTypeId => contentTypeId.AsKeyword()).ToArray(),
                     Negate: false));
         }
@@ -94,7 +95,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
         {
             filters.Add(
                 new KeywordFilter(
-                    FieldName: Constants.IndexFieldNames.PathIds,
+                    FieldName: Constants.Search.FieldNames.PathIds,
                     Values: startNodeKeys.Select(key => key.AsKeyword()).ToArray(),
                     Negate: false));
         }
@@ -104,6 +105,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
             {
                 UmbracoObjectTypes.Document => Cms.Core.Constants.System.RecycleBinContentKey,
                 UmbracoObjectTypes.Media => Cms.Core.Constants.System.RecycleBinMediaKey,
+                UmbracoObjectTypes.Element => Cms.Core.Constants.System.RecycleBinElementKey,
                 _ => null
             };
 
@@ -111,7 +113,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
             {
                 filters.Add(
                     new KeywordFilter(
-                        FieldName: Constants.IndexFieldNames.PathIds,
+                        FieldName: Constants.Search.FieldNames.PathIds,
                         Values: [recycleBinId.Value.AsKeyword()],
                         Negate: trashed.Value is false));
             }
@@ -155,13 +157,19 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
         {
             UmbracoObjectTypes.Document => currentUser?.CalculateContentStartNodeIds(_entityService, _appCaches),
             UmbracoObjectTypes.Media => currentUser?.CalculateMediaStartNodeIds(_entityService, _appCaches),
+            UmbracoObjectTypes.Element => currentUser?.CalculateElementStartNodeIds(_entityService, _appCaches),
             _ => null
         };
+
+        // element start nodes are element containers
+        UmbracoObjectTypes startNodeObjectType = objectType is UmbracoObjectTypes.Element
+            ? UmbracoObjectTypes.ElementContainer
+            : objectType;
 
         return startNodeIds is not null
             ? startNodeIds.Select(id =>
                 {
-                    Attempt<Guid> attempt = _idKeyMap.GetKeyForId(id, objectType);
+                    Attempt<Guid> attempt = _idKeyMap.GetKeyForId(id, startNodeObjectType);
                     return attempt.Success ? attempt.Result : (Guid?)null;
                 })
                 .Where(key => key.HasValue)

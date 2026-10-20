@@ -2,11 +2,9 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -32,7 +30,6 @@ public class DeleteTemplateController : TemplateControllerBase
     /// <param name="templateService">The service used to manage templates.</param>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security features.</param>
     /// <param name="runtimeSettings">The runtime configuration settings.</param>
-    [ActivatorUtilitiesConstructor]
     public DeleteTemplateController(
         ITemplateService templateService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -41,17 +38,6 @@ public class DeleteTemplateController : TemplateControllerBase
         _templateService = templateService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _runtimeSettings = runtimeSettings;
-    }
-
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public DeleteTemplateController(
-        ITemplateService templateService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(
-            templateService,
-            backOfficeSecurityAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
-    {
     }
 
     /// <summary>

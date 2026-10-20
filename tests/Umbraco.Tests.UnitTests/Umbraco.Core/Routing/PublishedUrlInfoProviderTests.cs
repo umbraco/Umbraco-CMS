@@ -405,7 +405,7 @@ public class PublishedUrlInfoProviderTests
         return request.Object;
     }
 
-    private sealed class FakePublishStatusQueryService : IPublishStatusQueryService
+    private sealed class FakePublishStatusQueryService : IDocumentPublishStatusQueryService
     {
         public HashSet<Guid> Unpublished { get; } = [];
 
@@ -417,5 +417,7 @@ public class PublishedUrlInfoProviderTests
         public bool IsPublishedInAnyCulture(Guid documentKey) => Unpublished.Contains(documentKey) is false;
 
         public bool HasPublishedAncestorPath(Guid documentKey) => true;
+
+        public bool HasPublishedAncestorPath(Guid documentKey, string culture) => true;
     }
 }

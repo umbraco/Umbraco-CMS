@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
@@ -226,7 +227,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 // been switched over, so the alias still names the Block List editor - which yields null for a value
                 // that is already in single block shape, silently replacing the content. The override routes those
                 // values to the single block editor instead (https://github.com/umbraco/Umbraco-CMS/issues/23596).
-                // TODO (V22): Remove the override once the single block list migration it exists for is removed.
+                // TODO (V20): Remove the override along with the obsolete MigrateSingleBlockList it exists for.
                 IDataEditor? propertyEditor = _propertyEditors[
                     SingleBlockMigrationEditorAliasOverride.Resolve(
                         propertyType.DataTypeKey,
@@ -315,6 +316,10 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         MapBlockItemDataToEditor(property, blockValue.ContentData, culture, segment);
         MapBlockItemDataToEditor(property, blockValue.SettingsData, culture, segment);
         _blockEditorVarianceHandler.AlignExposeVariance(blockValue, culture);
+        blockValue.Expose = blockValue.Expose
+            .OrderBy(variation => variation.Culture, StringComparer.Ordinal)
+            .ThenBy(variation => variation.ContentKey)
+            .ToList();
     }
 
     // Ensures that all layout items have a key (for backwards data format compatibility).
@@ -354,7 +359,11 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             // to be friendly we'll map the values onto the culture being aligned - falling back to the default language -
             // instead of performing a hard reset of the property values (which would likely be the most correct thing to
             // do from a data point of view).
-            item.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult();
+            item.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult()
+                .OrderBy(value => value.Culture, StringComparer.Ordinal)
+                .ThenBy(value => value.Segment, StringComparer.Ordinal)
+                .ThenBy(value => value.Alias, StringComparer.Ordinal)
+                .ToList();
             foreach (BlockPropertyValue blockPropertyValue in item.Values)
             {
                 IPropertyType? propertyType = blockPropertyValue.PropertyType ?? throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them to editor.", nameof(items));
@@ -754,8 +763,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             }
         }
 
-        static (Guid ContentKey, string? Culture, string? Segment) ToKey(BlockItemVariation variation) =>
-            (variation.ContentKey, variation.Culture, variation.Segment);
+        static (Guid ContentKey, string? Culture) ToKey(BlockItemVariation variation) =>
+            (variation.ContentKey, variation.Culture);
     }
 
     private void CollectChangedCultures(
@@ -883,6 +892,133 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         static (string Alias, string? Culture, string? Segment) ToKey(BlockPropertyValue value) =>
             (value.Alias, value.Culture, value.Segment);
+    }
+
+    /// <summary>
+    /// Determines whether two stored block property values represent the same content. Block item values and
+    /// exposures are compared regardless of their order, while the layout is compared exactly, as it defines the
+    /// order of the blocks.
+    /// </summary>
+    /// <param name="editedValue">The edited property value.</param>
+    /// <param name="publishedValue">The published property value.</param>
+    /// <returns><c>true</c> if the values represent the same content; otherwise, <c>false</c>.</returns>
+    internal virtual bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue)
+    {
+        if (Equals(editedValue, publishedValue))
+        {
+            return true;
+        }
+
+        BlockEditorData<TValue, TLayout>? editedBlockEditorData;
+        BlockEditorData<TValue, TLayout>? publishedBlockEditorData;
+        try
+        {
+            editedBlockEditorData = BlockEditorValues.DeserializeAndClean(editedValue);
+            publishedBlockEditorData = BlockEditorValues.DeserializeAndClean(publishedValue);
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+
+        return BlockValuesAreEquivalent(editedBlockEditorData?.BlockValue, publishedBlockEditorData?.BlockValue);
+    }
+
+    /// <summary>
+    /// Determines whether two block values represent the same content. Block item values and exposures are compared
+    /// regardless of their order, while the layout is compared exactly, as it defines the order of the blocks.
+    /// </summary>
+    /// <param name="editedBlockValue">The edited block value, or <c>null</c> if it has no blocks.</param>
+    /// <param name="publishedBlockValue">The published block value, or <c>null</c> if it has no blocks.</param>
+    /// <returns><c>true</c> if the block values represent the same content; otherwise, <c>false</c>.</returns>
+    protected bool BlockValuesAreEquivalent(TValue? editedBlockValue, TValue? publishedBlockValue)
+    {
+        if (editedBlockValue is null || publishedBlockValue is null)
+        {
+            return editedBlockValue is null && publishedBlockValue is null;
+        }
+
+        return _jsonSerializer.Serialize(editedBlockValue.GetLayouts()?.ToArray()) == _jsonSerializer.Serialize(publishedBlockValue.GetLayouts()?.ToArray())
+               && BlockItemDataAreEquivalent(editedBlockValue.ContentData, publishedBlockValue.ContentData)
+               && BlockItemDataAreEquivalent(editedBlockValue.SettingsData, publishedBlockValue.SettingsData)
+               && editedBlockValue.Expose.Select(ToExposeKey).ToHashSet().SetEquals(publishedBlockValue.Expose.Select(ToExposeKey));
+
+        static (Guid ContentKey, string? Culture) ToExposeKey(BlockItemVariation variation) =>
+            (variation.ContentKey, variation.Culture);
+    }
+
+    private bool BlockItemDataAreEquivalent(List<BlockItemData> editedBlockItems, List<BlockItemData> publishedBlockItems)
+    {
+        Dictionary<Guid, BlockItemData>? editedBlockItemsByKey = ToUniqueDictionary(editedBlockItems, blockItem => blockItem.Key);
+        Dictionary<Guid, BlockItemData>? publishedBlockItemsByKey = ToUniqueDictionary(publishedBlockItems, blockItem => blockItem.Key);
+        if (editedBlockItemsByKey is null || publishedBlockItemsByKey is null || editedBlockItemsByKey.Count != publishedBlockItemsByKey.Count)
+        {
+            return false;
+        }
+
+        foreach (BlockItemData editedBlockItem in editedBlockItems)
+        {
+            if (publishedBlockItemsByKey.TryGetValue(editedBlockItem.Key, out BlockItemData? publishedBlockItem) is false
+                || editedBlockItem.ContentTypeKey != publishedBlockItem.ContentTypeKey
+                || BlockItemValuesAreEquivalent(editedBlockItem.Values, publishedBlockItem.Values) is false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private bool BlockItemValuesAreEquivalent(IList<BlockPropertyValue> editedValues, IList<BlockPropertyValue> publishedValues)
+    {
+        Dictionary<(string Alias, string? Culture, string? Segment), BlockPropertyValue>? editedValuesByKey = ToUniqueDictionary(editedValues, ToKey);
+        Dictionary<(string Alias, string? Culture, string? Segment), BlockPropertyValue>? publishedValuesByKey = ToUniqueDictionary(publishedValues, ToKey);
+        if (editedValuesByKey is null || publishedValuesByKey is null || editedValuesByKey.Count != publishedValuesByKey.Count)
+        {
+            return false;
+        }
+
+        foreach (BlockPropertyValue editedBlockPropertyValue in editedValues)
+        {
+            if (publishedValuesByKey.TryGetValue(ToKey(editedBlockPropertyValue), out BlockPropertyValue? publishedBlockPropertyValue) is false)
+            {
+                return false;
+            }
+
+            if (BlockPropertyValuesAreEqual(editedBlockPropertyValue.Value, publishedBlockPropertyValue.Value))
+            {
+                continue;
+            }
+
+            // values of nested editors (i.e. blocks within blocks) may represent the same content in a different order.
+            var isEquivalentNestedValue = editedBlockPropertyValue.PropertyType is not null
+                && _propertyEditors.TryGet(editedBlockPropertyValue.PropertyType.PropertyEditorAlias, out IDataEditor? nestedDataEditor)
+                && nestedDataEditor.ArePropertyValuesEquivalent(editedBlockPropertyValue.Value, publishedBlockPropertyValue.Value);
+            if (isEquivalentNestedValue is false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+
+        static (string Alias, string? Culture, string? Segment) ToKey(BlockPropertyValue value) =>
+            (value.Alias, value.Culture, value.Segment);
+    }
+
+    private static Dictionary<TKey, TItem>? ToUniqueDictionary<TKey, TItem>(IEnumerable<TItem> items, Func<TItem, TKey> keySelector)
+        where TKey : notnull
+    {
+        var result = new Dictionary<TKey, TItem>();
+        foreach (TItem item in items)
+        {
+            if (result.TryAdd(keySelector(item), item) is false)
+            {
+                return null;
+            }
+        }
+
+        return result;
     }
 
     private bool BlockPropertyValuesAreEqual(object? sourceValue, object? targetValue)

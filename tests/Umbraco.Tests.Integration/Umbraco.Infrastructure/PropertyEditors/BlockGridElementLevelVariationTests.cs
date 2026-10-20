@@ -505,12 +505,12 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             ],
             Expose =
             [
-                new (contentElementKey1, "en-US", null),
-                new (contentElementKey1, "da-DK", null),
-                new (contentElementKey2, "en-US", null),
-                new (contentElementKey2, "da-DK", null),
-                new (contentElementKey3, "en-US", null),
-                new (contentElementKey3, "da-DK", null),
+                new (contentElementKey1, "en-US"),
+                new (contentElementKey1, "da-DK"),
+                new (contentElementKey2, "en-US"),
+                new (contentElementKey2, "da-DK"),
+                new (contentElementKey3, "en-US"),
+                new (contentElementKey3, "da-DK"),
             ]
         };
     }
@@ -573,8 +573,8 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             ],
             Expose =
             [
-                new(contentElementKey, "en-US", null),
-                new(contentElementKey, "da-DK", null)
+                new(contentElementKey, "en-US"),
+                new(contentElementKey, "da-DK")
             ]
         };
 
@@ -602,7 +602,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         }
 
         blockGridValue.Expose = blockGridValue.Expose
-            .Select(e => new BlockItemVariation(e.ContentKey, null, null))
+            .Select(e => new BlockItemVariation(e.ContentKey, null))
             .DistinctBy(e => e.ContentKey)
             .ToList();
 
@@ -687,7 +687,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             ],
             Expose =
             [
-                new(contentElementKey, null, null)
+                new(contentElementKey, null)
             ]
         };
 
@@ -734,8 +734,8 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
 
         blockGridValue.Expose =
         [
-            new BlockItemVariation(contentElementKey, "en-US", null),
-            new BlockItemVariation(contentElementKey, "da-DK", null)
+            new BlockItemVariation(contentElementKey, "en-US"),
+            new BlockItemVariation(contentElementKey, "da-DK")
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockGridValue));
@@ -774,9 +774,9 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
 
         // Verify Expose entries are not duplicated
-        var exposeGroups = publishedBlockGridValue.Expose.GroupBy(e => (e.ContentKey, e.Culture, e.Segment));
+        var exposeGroups = publishedBlockGridValue.Expose.GroupBy(e => (e.ContentKey, e.Culture));
         Assert.IsTrue(
             exposeGroups.All(g => g.Count() == 1),
-            $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockGridValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}:{e.Segment}"))}");
+            $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockGridValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}"))}");
     }
 }

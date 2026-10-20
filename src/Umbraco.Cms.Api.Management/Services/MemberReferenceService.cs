@@ -43,9 +43,7 @@ internal sealed class MemberReferenceService : IMemberReferenceService
         if (result.Status == GetReferencesOperationStatus.ContentNotFound
             && await _memberEditingService.IsExternalMemberAsync(id))
         {
-#pragma warning disable CS0618 // Type or member is obsolete — using the key-based overload that doesn't require an entity.
             PagedModel<RelationItemModel> externalRelations = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
-#pragma warning restore CS0618
 
             return Attempt.SucceedWithStatus(GetReferencesOperationStatus.Success, externalRelations);
         }

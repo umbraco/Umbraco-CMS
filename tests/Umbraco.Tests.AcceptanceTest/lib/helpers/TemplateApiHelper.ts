@@ -306,7 +306,7 @@ export class TemplateApiHelper {
       '\n\t{' +
       '\n\t\t<li><a href="@item.Url()">@item.Name</a></li>' +
       '\n\t}' +
-      '\n<ul>';
+      '\n</ul>';
     return this.createTemplateWithDisplayingValue(name, templateContent);
   }
 

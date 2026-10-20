@@ -53,14 +53,18 @@ public class DecimalPropertyValueEditorTests
 
     [SetCulture("it-IT")]
     [SetUICulture("it-IT")]
-    [TestCase("123,45", 123.45)]
-    [TestCase("1.234,56", 1234.56)]
-    [TestCase("123.45", 12345)]
+    [TestCase("123,45", "123.45")]
+    [TestCase("1.234,56", "1234.56")]
+    [TestCase("123.45", "12345")]
     [TestCase("1,234.56", null)]
-    public void Can_Parse_Values_From_Editor_Using_Culture_With_Non_EnUs_Decimal_Separator(object value, decimal? expected)
+    public void Can_Parse_Values_From_Editor_Using_Culture_With_Non_EnUs_Decimal_Separator(object value, string? expected)
     {
+        // The expected value is parsed explicitly with the invariant culture so the test culture set above
+        // only applies to the value under test.
+        decimal? expectedDecimal = expected is null ? null : decimal.Parse(expected, CultureInfo.InvariantCulture);
+
         var fromEditor = FromEditor(value);
-        Assert.AreEqual(expected, fromEditor);
+        Assert.AreEqual(expectedDecimal, fromEditor);
     }
 
     [Test]

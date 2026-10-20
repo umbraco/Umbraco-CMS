@@ -252,6 +252,8 @@ export class UiBaseLocators extends BasePage {
   // User & User Group
   public readonly allowAccessToAllElementsBtn: Locator;
   public readonly elementStartNode: Locator;
+  public readonly allowAccessToAllDocumentBlueprintsBtn: Locator;
+  public readonly documentBlueprintStartNode: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -637,6 +639,8 @@ export class UiBaseLocators extends BasePage {
     // User & User Group
     this.allowAccessToAllElementsBtn = page.getByText('Allow access to all elements');
     this.elementStartNode = page.locator('[label="Select element start node"]').locator('umb-input-entity-data');
+    this.allowAccessToAllDocumentBlueprintsBtn = page.getByText('Allow access to all document blueprints');
+    this.documentBlueprintStartNode = page.locator('umb-input-document-blueprint');
   }
 
   // Helper Methods
@@ -664,9 +668,9 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isActionsMenuForNameVisible(name: string, isVisible = true) {
-    const menuItem = this.getMenuItemByLabel(name);
-    await this.click(menuItem);
-    await this.isVisible(menuItem.locator("#action-modal").first(), isVisible);
+    const menuItems = this.getMenuItemByLabel(name);
+    await this.click(menuItems.first());
+    await this.isAnyVisible(menuItems.locator("#action-modal"), isVisible);
   }
 
   // Caret Button Methods
@@ -688,18 +692,30 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.caretBtn);
   }
 
+  /** @param isInModal - @deprecated use {@link clickModalCaretButtonForName} instead; kept for backwards compatibility. */
   async openCaretButtonForName(name: string, isInModal: boolean = false) {
-    let menuItem: Locator;
     if (isInModal) {
-      menuItem = this.sidebarModal.locator(`uui-menu-item[label="${name}"]`);
-    } else {
-      menuItem = this.getMenuItemByLabel(name);
+      await this.clickModalCaretButtonForName(name);
+      return;
     }
+    const menuItem = this.getMenuItemByLabel(name).first();
     await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
-    const isCaretButtonOpen = await menuItem.getAttribute("show-children");
-    if (isCaretButtonOpen === null) {
-      // Click through menuItem (already scoped above), not clickCaretButtonForName - that resolves
-      // the item page-wide, which finds a same-named item's caret behind an open modal instead.
+    // The caret toggles, so acting on a single read can collapse a node that was still expanding.
+    await expect(async () => {
+      await this.clickCaretButtonIfCollapsed(menuItem);
+      expect(await menuItem.getAttribute("show-children")).not.toBeNull();
+    }).toPass({timeout: ConstantHelper.timeout.medium});
+  }
+
+  // A picker browses into the node rather than expanding it in place, so there is no expanded state to assert.
+  async clickModalCaretButtonForName(name: string) {
+    const menuItem = this.sidebarModal.locator(`uui-menu-item[label="${name}"]`).first();
+    await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
+    await this.clickCaretButtonIfCollapsed(menuItem);
+  }
+
+  private async clickCaretButtonIfCollapsed(menuItem: Locator) {
+    if (await menuItem.getAttribute("show-children") === null) {
       await this.click(menuItem.locator("#caret-button").first());
     }
   }
@@ -713,19 +729,37 @@ export class UiBaseLocators extends BasePage {
     await this.openCaretButtonForName(treeName);
   }
 
+  /**
+   * Expands a tree root and makes sure it stays expanded.
+   * After a save, the Backoffice expands the tree by itself to reveal the saved item. If that happens between
+   * reading `show-children` and clicking the caret, the click collapses the tree again, so retry until it is open.
+   * @param treeRoot - The `uui-menu-item` of the tree root
+   */
+  async expandTreeRoot(treeRoot: Locator) {
+    await expect(async () => {
+      if ((await treeRoot.getAttribute('show-children')) === null) {
+        await treeRoot.locator(this.caretBtn).first().click();
+      }
+      await expect(treeRoot).toHaveAttribute('show-children', {timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.long});
+  }
+
   async isTreeItemVisible(name: string, isVisible = true) {
-    await this.isVisible(
+    await this.isAnyVisible(
       this.treeItem.locator('[label="' + name + '"]'),
       isVisible,
     );
   }
 
   async doesTreeItemHaveTheCorrectIcon(name: string, icon: string) {
+    // Exact-label match, unlike a text-content filter which would also match ancestors.
+    // Scoped to #icon-container so the item's own icon is checked, not one rendered by its children.
     return await this.isVisible(
-      this.treeItem
-        .filter({ hasText: name })
-        .locator("umb-icon")
-        .locator('[name="' + icon + '"]'),
+      this.getMenuItemByLabel(name)
+        .first()
+        .locator("#icon-container umb-icon")
+        .first()
+        .and(this.page.locator(`[name="${icon}"]`)),
     );
   }
 
@@ -1111,6 +1145,10 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
+  async isSectionActive(sectionName: string) {
+    await expect(this.activeSectionLink.getByText(sectionName)).toBeVisible();
+  }
+
   async isBackOfficeMainVisible(isVisible: boolean = true) {
     await this.isVisible(this.backOfficeMain, isVisible, ConstantHelper.timeout.navigation);
   }
@@ -1145,7 +1183,7 @@ export class UiBaseLocators extends BasePage {
   // the click keeps working regardless of how the tree item renders its label HTML. Scope defaults to the
   // section sidebar; pass a modal/other root for trees rendered elsewhere (e.g. pickers).
   async clickTreeItemWithName(name: string, scope?: Locator | Page) {
-    await this.click((scope ?? this.sectionSidebar).getByText(name, { exact: true }));
+    await this.click((scope ?? this.sectionSidebar).getByText(name, { exact: true }).first());
   }
 
   async clickButtonWithName(name: string, isExact: boolean = false) {
@@ -1820,11 +1858,11 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
-  async doesCollectionTreeItemTableRowHaveIcon(name: string, icon: string) {
+  async doesCollectionTreeItemTableRowHaveIcon(name: string, icon: string, exact: boolean = false) {
     await this.waitForVisible(this.collectionTreeItemTableRow.first());
     await this.isVisible(
       this.collectionTreeItemTableRow
-        .filter({ hasText: name })
+        .filter(exact ? { has: this.page.getByText(name, { exact: true }) } : { hasText: name })
         .locator("umb-icon")
         .locator('[name="' + icon + '"]'),
     );
@@ -1877,6 +1915,12 @@ export class UiBaseLocators extends BasePage {
 
   async clickMoveToActionMenuOption() {
     await this.clickEntityActionWithName("MoveTo");
+  }
+
+  async moveToFolder(folderName: string) {
+    await this.clickMoveToActionMenuOption();
+    await this.click(this.sidebarModal.getByText(folderName, {exact: true}));
+    await this.click(this.chooseModalBtn);
   }
 
   async clickCreateBlueprintActionMenuOption() {
@@ -1978,7 +2022,7 @@ export class UiBaseLocators extends BasePage {
 
   // Loader Methods
   async waitUntilUiLoaderIsNoLongerVisible() {
-    await this.waitForHidden(this.uiLoader, ConstantHelper.timeout.navigation);
+    await this.isAnyVisible(this.uiLoader, false, ConstantHelper.timeout.navigation);
   }
 
   // Dashboard Methods
@@ -2033,6 +2077,18 @@ export class UiBaseLocators extends BasePage {
     return await this.isVisible(this.page.getByText(message), isVisible);
   }
 
+  async isDiscardChangesModalVisible(isVisible: boolean = true) {
+    return await this.isVisible(this.page.getByTestId('discard-changes-modal'), isVisible);
+  }
+
+  async clickDiscardChangesButton() {
+    await this.click(this.page.getByTestId('discard-changes-modal').getByTestId('action:discard-changes'));
+  }
+
+  async clickStayOnPageButton() {
+    await this.click(this.page.getByTestId('discard-changes-modal').getByTestId('action:stay'));
+  }
+
   /**
    * Runs an action and resolves on the first response whose URL contains `url`
    * and whose status matches.
@@ -2047,16 +2103,15 @@ export class UiBaseLocators extends BasePage {
    */
   async waitForResponseAfterExecutingPromise(
     url: string,
-    promise: Promise<void>,
+    action: Promise<void> | (() => Promise<void>),
     statusCode: number,
     method?: string,
   ) {
-    const [response] = await Promise.all([
-      this.page.waitForResponse(
-        (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
-      ),
-      promise,
-    ]);
+    // Prefer the callback form: an already-started promise can complete before the listener attaches.
+    const responsePromise = this.page.waitForResponse(
+      (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
+    );
+    const [response] = await Promise.all([responsePromise, typeof action === "function" ? action() : action]);
 
     if (statusCode === 201) {
       return response.headers()["location"]?.split("/").pop();
@@ -2190,6 +2245,22 @@ export class UiBaseLocators extends BasePage {
 
   async clickRemoveButtonForElementNodeWithName(elementStartNodeName: string) {
     await this.click(this.elementStartNode.filter({hasText: elementStartNodeName}).getByLabel('Remove'));
+  }
+
+  async clickAllowAccessToAllDocumentBlueprints() {
+    await this.click(this.allowAccessToAllDocumentBlueprintsBtn);
+  }
+
+  async clickChooseDocumentBlueprintStartNodeButton() {
+    await this.click(this.documentBlueprintStartNode.getByLabel('Choose'));
+  }
+
+  async clickRemoveButtonForDocumentBlueprintNodeWithName(documentBlueprintStartNodeName: string) {
+    await this.click(this.documentBlueprintStartNode.filter({hasText: documentBlueprintStartNodeName}).getByLabel('Remove'));
+  }
+
+  async isDocumentBlueprintStartNodeWithNameVisible(documentBlueprintStartNodeName: string, isVisible: boolean = true) {
+    return this.isVisible(this.documentBlueprintStartNode.filter({hasText: documentBlueprintStartNodeName}), isVisible);
   }
 
   async isRestoreFromRecycleBinMessageVisible(restoreItem: string, targetFolderName: string) {

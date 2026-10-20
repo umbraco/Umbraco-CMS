@@ -98,10 +98,7 @@ public class MediaCacheSyncFastPathTests
     }
 
     private static MediaCache CreateCache(Mock<IMediaCacheService> cacheService)
-        => new(
-            cacheService.Object,
-            Mock.Of<IPublishedContentTypeCache>(),
-            Mock.Of<IMediaNavigationQueryService>());
+        => new(cacheService.Object, Mock.Of<IMediaNavigationQueryService>());
 
     // Moq cannot bind directly to ref / out parameters in the lambda overload, so we
     // declare a delegate that matches the TryGetCached signature and pass it explicitly.

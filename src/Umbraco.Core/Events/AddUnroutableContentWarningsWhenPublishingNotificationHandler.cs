@@ -1,15 +1,10 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -31,73 +26,17 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
     /// <summary>
     ///     Initializes a new instance of the <see cref="AddUnroutableContentWarningsWhenPublishingNotificationHandler" /> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking an IPublishedUrlInfoProvider. Scheduled for removal in Umbraco 19.")]
-    public AddUnroutableContentWarningsWhenPublishingNotificationHandler(
-        IPublishedRouter publishedRouter,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        ILanguageService languageService,
-        ILocalizedTextService localizedTextService,
-        IContentService contentService,
-        IVariationContextAccessor variationContextAccessor,
-        ILoggerFactory loggerFactory,
-        UriUtility uriUtility,
-        IPublishedUrlProvider publishedUrlProvider,
-        IDocumentNavigationQueryService navigationQueryService,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
-        IEventMessagesFactory eventMessagesFactory,
-        IOptions<ContentSettings> contentSettings)
-        : this(
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlInfoProvider>(),
-            umbracoContextAccessor,
-            localizedTextService,
-            eventMessagesFactory,
-            contentSettings,
-            publishedRouter,
-            languageService,
-            contentService,
-            variationContextAccessor,
-            loggerFactory,
-            uriUtility,
-            publishedUrlProvider,
-            navigationQueryService,
-            publishedContentStatusFilteringService)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="AddUnroutableContentWarningsWhenPublishingNotificationHandler" /> class.
-    /// </summary>
     /// <param name="publishedUrlInfoProvider">The provider of URL information for published content.</param>
     /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
     /// <param name="localizedTextService">The localized text service.</param>
     /// <param name="eventMessagesFactory">The event messages factory.</param>
     /// <param name="contentSettings">The content settings.</param>
-    /// <param name="publishedRouter">The published router.</param>
-    /// <param name="languageService">The language service.</param>
-    /// <param name="contentService">The content service.</param>
-    /// <param name="variationContextAccessor">The variation context accessor.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="uriUtility">The URI utility.</param>
-    /// <param name="publishedUrlProvider">The published URL provider.</param>
-    /// <param name="navigationQueryService">The navigation query service.</param>
-    /// <param name="publishedContentStatusFilteringService">The published content status filtering service.</param>
     public AddUnroutableContentWarningsWhenPublishingNotificationHandler(
         IPublishedUrlInfoProvider publishedUrlInfoProvider,
         IUmbracoContextAccessor umbracoContextAccessor,
         ILocalizedTextService localizedTextService,
         IEventMessagesFactory eventMessagesFactory,
-        IOptions<ContentSettings> contentSettings,
-#pragma warning disable IDE0060 // Remove unused parameter
-        IPublishedRouter publishedRouter, // TODO (V19): Remove the unused parameters once the obsolete constructor is removed.
-        ILanguageService languageService,
-        IContentService contentService,
-        IVariationContextAccessor variationContextAccessor,
-        ILoggerFactory loggerFactory,
-        UriUtility uriUtility,
-        IPublishedUrlProvider publishedUrlProvider,
-        IDocumentNavigationQueryService navigationQueryService,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
-#pragma warning restore IDE0060 // Remove unused parameter
+        IOptions<ContentSettings> contentSettings)
     {
         _publishedUrlInfoProvider = publishedUrlInfoProvider;
         _umbracoContextAccessor = umbracoContextAccessor;

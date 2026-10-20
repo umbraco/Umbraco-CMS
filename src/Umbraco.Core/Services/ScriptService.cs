@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -38,68 +36,6 @@ public class ScriptService : FileServiceOperationBase<IScriptRepository, IScript
         IUserIdKeyResolver userIdKeyResolver,
         IAuditService auditService)
         : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditService)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ScriptService" /> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider for managing database transactions.</param>
-    /// <param name="loggerFactory">The factory for creating loggers.</param>
-    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
-    /// <param name="repository">The repository for script file operations.</param>
-    /// <param name="logger">The logger instance for logging operations.</param>
-    /// <param name="userIdKeyResolver">The resolver for converting user keys to IDs.</param>
-    /// <param name="auditRepository">The repository for audit logging (obsolete).</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public ScriptService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IScriptRepository repository,
-        ILogger<StylesheetService> logger,
-        IUserIdKeyResolver userIdKeyResolver,
-        IAuditRepository auditRepository)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            repository,
-            logger,
-            userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ScriptService" /> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider for managing database transactions.</param>
-    /// <param name="loggerFactory">The factory for creating loggers.</param>
-    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
-    /// <param name="repository">The repository for script file operations.</param>
-    /// <param name="logger">The logger instance for logging operations.</param>
-    /// <param name="userIdKeyResolver">The resolver for converting user keys to IDs.</param>
-    /// <param name="auditService">The service for audit logging.</param>
-    /// <param name="auditRepository">The repository for audit logging (obsolete).</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public ScriptService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IScriptRepository repository,
-        ILogger<StylesheetService> logger,
-        IUserIdKeyResolver userIdKeyResolver,
-        IAuditService auditService,
-        IAuditRepository auditRepository)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            repository,
-            logger,
-            userIdKeyResolver,
-            auditService)
     {
     }
 

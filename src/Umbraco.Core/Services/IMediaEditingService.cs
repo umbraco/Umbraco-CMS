@@ -1,6 +1,5 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -127,8 +126,7 @@ public interface IMediaEditingService
     /// <param name="userKey">The unique identifier of the user performing the operation.</param>
     /// <returns>The operation status indicating the operation outcome.</returns>
     /// <remarks>Media items never vary by culture, so children are always ordered by the invariant name.</remarks>
-    Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, Guid userKey)
-        => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
+    Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, Guid userKey);
 
     /// <summary>
     ///     Permanently deletes a media item from the recycle bin.
@@ -141,20 +139,6 @@ public interface IMediaEditingService
     ///     and <see cref="ContentEditingOperationStatus"/> indicating the operation outcome.
     /// </returns>
     Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey);
-
-    /// <summary>
-    ///     Restores a media item from the recycle bin to a specified parent location.
-    /// </summary>
-    /// <param name="key">The unique identifier of the media item to restore.</param>
-    /// <param name="parentKey">The unique identifier of the parent to restore to, or <c>null</c> to restore to the root.</param>
-    /// <param name="userKey">The unique identifier of the user performing the operation.</param>
-    /// <returns>
-    ///     A task that represents the asynchronous operation. The task result contains an
-    ///     <see cref="Attempt{TResult,TStatus}"/> with the restored <see cref="IMedia"/> item (if successful)
-    ///     and <see cref="ContentEditingOperationStatus"/> indicating the operation outcome.
-    /// </returns>
-    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
-    Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey);
 
     /// <summary>
     ///     Restores a media item from the recycle bin to a specified parent location, optionally leaving its
@@ -173,19 +157,5 @@ public interface IMediaEditingService
     ///     <see cref="Attempt{TResult,TStatus}"/> with the restored <see cref="IMedia"/> item (if successful)
     ///     and <see cref="ContentEditingOperationStatus"/> indicating the operation outcome.
     /// </returns>
-    // TODO (V19): Remove the default implementation when the obsolete overload without includeDescendants is removed.
-    Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
-    {
-        // Only the whole-tree restore can be satisfied by delegating to the existing method; there is no way to honour
-        // includeDescendants: false without the concrete implementation, so fail fast rather than silently restore
-        // the descendants after all.
-        if (includeDescendants is false)
-        {
-            throw new NotImplementedException("This IMediaEditingService implementation does not support restoring without descendants. Override the RestoreAsync overload that takes an includeDescendants parameter to support it.");
-        }
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        return RestoreAsync(key, parentKey, userKey);
-#pragma warning restore CS0618 // Type or member is obsolete
-    }
+    Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants);
 }

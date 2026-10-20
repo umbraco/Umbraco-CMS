@@ -58,16 +58,6 @@ public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampVali
         };
     }
 
-    /// <summary>
-    ///     Configures security stamp options and ensures any custom claims
-    ///     set on the identity are persisted to the new identity when it's refreshed.
-    /// </summary>
-    /// <param name="options">Options for <see cref="ISecurityStampValidator"/>.</param>
-    /// <param name="securitySettings">The <see cref="SecuritySettings" /> options.</param>
-    [Obsolete("Use the overload accepting a boolean allowConcurrentLogins parameter. Scheduled for removal in Umbraco 19.")]
-    public static void ConfigureOptions(SecurityStampValidatorOptions options, SecuritySettings securitySettings)
-        => ConfigureOptions(options, securitySettings.AllowConcurrentLogins);
-
     /// <inheritdoc />
     public void Configure(SecurityStampValidatorOptions options)
         => ConfigureOptions(options, _securitySettings.AllowConcurrentLogins);

@@ -1,11 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Tree;
 
@@ -15,33 +13,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Tree;
 [ApiVersion("1.0")]
 public class ChildrenStylesheetTreeController : StylesheetTreeControllerBase
 {
-    // TODO Remove the static service provider, and replace with base when the other constructors are obsoleted.
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Stylesheet.Tree.ChildrenStylesheetTreeController"/> class with the specified stylesheet tree service.
     /// </summary>
     /// <param name="styleSheetTreeService">The service used to manage and retrieve stylesheet tree data.</param>
-    [ActivatorUtilitiesConstructor]
     public ChildrenStylesheetTreeController(IStyleSheetTreeService styleSheetTreeService)
         : base(styleSheetTreeService)
-    {
-    }
-
-    /// <summary>Initializes a new instance of the <see cref="ChildrenStylesheetTreeController"/> class.</summary>
-    /// <param name="styleSheetTreeService">The stylesheet tree service.</param>
-    /// <param name="fileSystems">The file systems.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled to be removed in Umbraco 19.")]
-    public ChildrenStylesheetTreeController(IStyleSheetTreeService styleSheetTreeService, FileSystems fileSystems)
-        : base(styleSheetTreeService, fileSystems)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChildrenStylesheetTreeController"/> class.
-    /// </summary>
-    /// <param name="fileSystems">The <see cref="FileSystems"/> instance that provides access to the file systems required by the controller.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled to be removed in Umbraco 19.")]
-    public ChildrenStylesheetTreeController(FileSystems fileSystems)
-        : base(fileSystems)
     {
     }
 

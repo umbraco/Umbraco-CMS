@@ -260,7 +260,7 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 			return {
 				unique: 'item-unique',
 				entityType: 'test-entity-type',
-				variants: [{ name: 'Item', culture: null, segment: null }],
+				variants: [{ name: 'Item', culture: null }],
 				...overrides,
 			};
 		}

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Services.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 
@@ -16,10 +15,9 @@ public class AncestorsStaticFileTreeController : StaticFileTreeControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="AncestorsStaticFileTreeController"/> class.
     /// </summary>
-    /// <param name="physicalFileSystem">The <see cref="IPhysicalFileSystem"/> instance used for file operations.</param>
     /// <param name="fileSystemTreeService">The <see cref="IPhysicalFileSystemTreeService"/> used to manage the file system tree structure.</param>
-    public AncestorsStaticFileTreeController(IPhysicalFileSystem physicalFileSystem, IPhysicalFileSystemTreeService fileSystemTreeService)
-        : base(physicalFileSystem, fileSystemTreeService)
+    public AncestorsStaticFileTreeController(IPhysicalFileSystemTreeService fileSystemTreeService)
+        : base(fileSystemTreeService)
     {
     }
 

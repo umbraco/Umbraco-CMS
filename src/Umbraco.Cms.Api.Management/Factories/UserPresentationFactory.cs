@@ -195,52 +195,6 @@ public class UserPresentationFactory : IUserPresentationFactory
     {
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UserPresentationFactory"/> class.
-    /// </summary>
-    /// <param name="entityService">Service for accessing and managing entities.</param>
-    /// <param name="appCaches">Provides application-level caching functionality.</param>
-    /// <param name="mediaFileManager">Manages media file storage and retrieval.</param>
-    /// <param name="imageUrlGenerator">Generates URLs for images.</param>
-    /// <param name="userGroupPresentationFactory">Factory for creating user group presentation models.</param>
-    /// <param name="absoluteUrlBuilder">Builds absolute URLs for resources.</param>
-    /// <param name="emailSender">Handles sending emails.</param>
-    /// <param name="passwordConfigurationPresentationFactory">Factory for password configuration presentation models.</param>
-    /// <param name="securitySettings">Provides access to security-related configuration settings.</param>
-    /// <param name="externalLoginProviders">Manages back office external login providers.</param>
-    /// <param name="permissionPresentationMappers">Collection of mappers for permission presentation models.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public UserPresentationFactory(
-        IEntityService entityService,
-        AppCaches appCaches,
-        MediaFileManager mediaFileManager,
-        IImageUrlGenerator imageUrlGenerator,
-        IUserGroupPresentationFactory userGroupPresentationFactory,
-        IAbsoluteUrlBuilder absoluteUrlBuilder,
-        IEmailSender emailSender,
-        IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory,
-        IOptionsSnapshot<SecuritySettings> securitySettings,
-        IBackOfficeExternalLoginProviders externalLoginProviders,
-        IEnumerable<IPermissionPresentationMapper> permissionPresentationMappers)
-        : this(
-            entityService,
-            appCaches,
-            mediaFileManager,
-            imageUrlGenerator,
-            userGroupPresentationFactory,
-            absoluteUrlBuilder,
-            emailSender,
-            passwordConfigurationPresentationFactory,
-            securitySettings,
-            externalLoginProviders,
-            permissionPresentationMappers,
-            StaticServiceProvider.Instance.GetRequiredService<IContentPermissionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IElementContainerPermissionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ISessionExpiryAccessor>())
-    {
-    }
-
     /// <inheritdoc/>
     public UserResponseModel CreateResponseModel(IUser user)
     {
@@ -263,6 +217,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasMediaRootAccess = HasRootAccess(user.StartMediaIds),
             ElementStartNodeIds = GetKeysFromIds(user.StartElementIds, UmbracoObjectTypes.ElementContainer),
             HasElementRootAccess = HasRootAccess(user.StartElementIds),
+            DocumentBlueprintStartNodeIds = GetKeysFromIds(user.StartDocumentBlueprintIds, UmbracoObjectTypes.DocumentBlueprintContainer),
+            HasDocumentBlueprintRootAccess = HasRootAccess(user.StartDocumentBlueprintIds),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
             LastLockoutDate = user.LastLockoutDate,
@@ -353,7 +309,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         Task.FromResult(new UserConfigurationResponseModel
         {
             // You should not be able to invite users if any providers has deny local login set.
-            CanInviteUsers = _emailSender.CanSendRequiredEmail() && _externalLoginProviders.HasDenyLocalLogin() is false,
+            CanInviteUsers = _emailSender.IsEmailConfigured() && _externalLoginProviders.HasDenyLocalLogin() is false,
             UsernameIsEmail = _securitySettings.UsernameIsEmail,
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
 
@@ -378,6 +334,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasMediaRootAccess = updateModel.HasMediaRootAccess,
             ElementStartNodeKeys = updateModel.ElementStartNodeIds.Select(x => x.Id).ToHashSet(),
             HasElementRootAccess = updateModel.HasElementRootAccess,
+            DocumentBlueprintStartNodeKeys = updateModel.DocumentBlueprintStartNodeIds.Select(x => x.Id).ToHashSet(),
+            HasDocumentBlueprintRootAccess = updateModel.HasDocumentBlueprintRootAccess,
             UserGroupKeys = updateModel.UserGroupIds.Select(x => x.Id).ToHashSet()
         };
 
@@ -396,6 +354,8 @@ public class UserPresentationFactory : IUserPresentationFactory
         ISet<ReferenceByIdModel> documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
         var elementStartNodeIds = user.CalculateElementStartNodeIds(_entityService, _appCaches);
         ISet<ReferenceByIdModel> elementStartNodeKeys = GetKeysFromIds(elementStartNodeIds, UmbracoObjectTypes.ElementContainer);
+        var documentBlueprintStartNodeIds = user.CalculateDocumentBlueprintStartNodeIds(_entityService, _appCaches);
+        ISet<ReferenceByIdModel> documentBlueprintStartNodeKeys = GetKeysFromIds(documentBlueprintStartNodeIds, UmbracoObjectTypes.DocumentBlueprintContainer);
 
         HashSet<IPermissionPresentationModel> permissions = GetAggregatedGranularPermissions(user, presentationGroups);
 
@@ -406,6 +366,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             presentationGroups.SelectMany(x => x.FallbackPermissions).ToHashSet());
 
         var hasAccessToAllLanguages = presentationGroups.Any(x => x.HasAccessToAllLanguages);
+        var hasAccessToInvariantForVariant = presentationGroups.Any(x => x.HasAccessToInvariantForVariant);
 
         var allowedSections = presentationGroups.SelectMany(x => x.Sections).ToHashSet();
 
@@ -424,9 +385,12 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasDocumentRootAccess = HasRootAccess(contentStartNodeIds),
             ElementStartNodeIds = elementStartNodeKeys,
             HasElementRootAccess = HasRootAccess(elementStartNodeIds),
+            DocumentBlueprintStartNodeIds = documentBlueprintStartNodeKeys,
+            HasDocumentBlueprintRootAccess = HasRootAccess(documentBlueprintStartNodeIds),
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages,
+            HasAccessToInvariantForVariant = hasAccessToInvariantForVariant,
             HasAccessToSensitiveData = user.HasAccessToSensitiveData(),
             AllowedSections = allowedSections,
             IsAdmin = user.IsAdmin(),
@@ -510,6 +474,8 @@ public class UserPresentationFactory : IUserPresentationFactory
         ISet<ReferenceByIdModel> documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
         var elementStartNodeIds = user.CalculateElementStartNodeIds(_entityService, _appCaches);
         ISet<ReferenceByIdModel> elementStartNodeKeys = GetKeysFromIds(elementStartNodeIds, UmbracoObjectTypes.ElementContainer);
+        var documentBlueprintStartNodeIds = user.CalculateDocumentBlueprintStartNodeIds(_entityService, _appCaches);
+        ISet<ReferenceByIdModel> documentBlueprintStartNodeKeys = GetKeysFromIds(documentBlueprintStartNodeIds, UmbracoObjectTypes.DocumentBlueprintContainer);
 
         return Task.FromResult<CalculatedUserStartNodesResponseModel>(new CalculatedUserStartNodesResponseModel()
         {
@@ -520,6 +486,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasDocumentRootAccess = HasRootAccess(contentStartNodeIds),
             ElementStartNodeIds = elementStartNodeKeys,
             HasElementRootAccess = HasRootAccess(elementStartNodeIds),
+            DocumentBlueprintStartNodeIds = documentBlueprintStartNodeKeys,
+            HasDocumentBlueprintRootAccess = HasRootAccess(documentBlueprintStartNodeIds),
         });
     }
 

@@ -103,5 +103,5 @@ public abstract class TestBase : UmbracoIntegrationTest
         }
     }
 
-    protected static string GetIndexAlias(bool publish) => publish ? Constants.IndexAliases.PublishedContent : Constants.IndexAliases.DraftContent;
+    protected static string GetIndexAlias(bool publish) => publish ? Constants.Search.IndexAliases.PublishedContent : Constants.Search.IndexAliases.DraftContent;
 }

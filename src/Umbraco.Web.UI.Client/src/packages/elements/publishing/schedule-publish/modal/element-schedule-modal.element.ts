@@ -11,7 +11,6 @@ import { css, customElement, html, ref, repeat, state, when } from '@umbraco-cms
 import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import type { UUIBooleanInputElement, UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
@@ -157,6 +156,11 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 		return this._selection.some((s) => s.unique === unique);
 	}
 
+	#hasSelectableOption() {
+		const isAllowed = this.#selectionManager.getAllowLimitation();
+		return this._options.some((option) => isAllowed(option.unique));
+	}
+
 	#onSelectAllChange(event: Event) {
 		const allUniques = this._options.map((o) => o.unique);
 		const filter = this.#selectionManager.getAllowLimitation();
@@ -210,7 +214,8 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 					<uui-checkbox
 						@change=${this.#onSelectAllChange}
 						label=${this.localize.term('general_selectAll')}
-						.checked=${this._isAllSelected}></uui-checkbox>
+						.checked=${this._isAllSelected}
+						?disabled=${!this.#hasSelectableOption()}></uui-checkbox>
 				`,
 			)}
 			${repeat(
@@ -450,7 +455,6 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: block;

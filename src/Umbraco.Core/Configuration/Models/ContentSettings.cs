@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel;
@@ -86,6 +86,7 @@ public class ContentSettings
     /// <summary>
     ///     The default value for allowing edit of invariant properties from non-default language.
     /// </summary>
+    [Obsolete("No longer used. Superseded by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 22.")]
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
 
     /// <summary>
@@ -168,6 +169,11 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value indicating whether deprecated property editors should be shown.
     /// </summary>
+    /// <remarks>
+    ///     No longer used. The setting moved to <see cref="DataTypesSettings.OfferDeprecatedPropertyEditors" />, and
+    ///     only that one is read.
+    /// </remarks>
+    [Obsolete("No longer used. Use DataTypesSettings.OfferDeprecatedPropertyEditors instead. Scheduled for removal in Umbraco 21.")]
     [DefaultValue(StaticShowDeprecatedPropertyEditors)]
     public bool ShowDeprecatedPropertyEditors { get; set; } = StaticShowDeprecatedPropertyEditors;
 
@@ -228,8 +234,16 @@ public class ContentSettings
     /// <summary>
     /// Gets or sets a value indicating whether to allow editing invariant properties from a non-default language variation.
     /// </summary>
+    /// <remarks>
+    ///     No longer consulted by the content editing pipeline. Invariant-property editing is gated by the
+    ///     <c>HasAccessToInvariantForVariant</c> user-group permission. The setting is read once during the
+    ///     v19 upgrade migration to backfill existing user groups — remove no earlier than Umbraco 22.
+    /// </remarks>
+#pragma warning disable CS0618 // Type or member is obsolete
     [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
+    [Obsolete("No longer used. Superseded by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 22.")]
     public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are allowed for upload.

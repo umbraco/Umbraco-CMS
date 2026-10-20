@@ -23,12 +23,6 @@ public static partial class Constants
         public const string AcceptPreviewCookieName = "UMB-WEBSITE-PREVIEW-ACCEPT";
 
         /// <summary>
-        ///     The installer cookie name (obsolete).
-        /// </summary>
-        [Obsolete("InstallerCookieName is no longer used. Scheduled for removal in Umbraco 19.")]
-        public const string InstallerCookieName = "umb_installId";
-
-        /// <summary>
         ///     The cookie name that is used to store the validation value
         /// </summary>
         public const string CsrfValidationCookieName = "UMB-XSRF-V";

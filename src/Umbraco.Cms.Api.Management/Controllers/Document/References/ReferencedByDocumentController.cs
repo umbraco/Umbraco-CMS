@@ -34,39 +34,6 @@ public class ReferencedByDocumentController : DocumentControllerBase
     }
 
     /// <summary>
-    /// Retrieves a paged list of documents that reference the specified document.
-    /// </summary>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <param name="id">The unique identifier of the document to find references for.</param>
-    /// <param name="skip">The number of items to skip for paging.</param>
-    /// <param name="take">The number of items to take for paging.</param>
-    /// <returns>
-    /// A task representing the asynchronous operation. The result contains a <see cref="PagedViewModel{IReferenceResponseModel}"/>,
-    /// which provides a paged list of reference response models for documents referencing the specified document.
-    /// </returns>
-    /// <remarks>
-    /// This method is obsolete. Use <c>ReferencedBy2</c> instead.
-    /// </remarks>
-    [Obsolete("Use the ReferencedBy2 action method instead. Scheduled for removal in Umbraco 19, when ReferencedBy2 will be renamed back to ReferencedBy.")]
-    [NonAction]
-    public async Task<ActionResult<PagedViewModel<IReferenceResponseModel>>> ReferencedBy(
-        CancellationToken cancellationToken,
-        Guid id,
-        int skip = 0,
-        int take = 20)
-    {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
-
-        var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
-        {
-            Total = relationItems.Total,
-            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
-        };
-
-        return pagedViewModel;
-    }
-
-    /// <summary>
     ///     Gets a paged list of tracked references for the specified document, so you can see where a document is being used.
     /// </summary>
     /// <remarks>
@@ -84,7 +51,7 @@ public class ReferencedByDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Gets a collection of items that reference documents.")]
     [EndpointDescription("Gets a paginated collection of items that reference the documents identified by the provided Ids.")]
-    public async Task<IActionResult> ReferencedBy2(
+    public async Task<IActionResult> ReferencedBy(
 
         CancellationToken cancellationToken,
         Guid id,

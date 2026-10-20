@@ -17,10 +17,12 @@ public class AncestorsMemberTypeTreeController : MemberTypeTreeControllerBase
     /// Initializes a new instance of the <see cref="AncestorsMemberTypeTreeController"/> class, which provides API endpoints for retrieving ancestor member types in the tree structure.
     /// </summary>
     /// <param name="entityService">The service used to manage and retrieve entities.</param>
+    /// <param name="entitySearchService">The <see cref="IEntitySearchService"/> used to search entities.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used to map between identifiers and keys.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for tree nodes.</param>
     /// <param name="memberTypeService">The service used to manage member types.</param>
-    public AncestorsMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
-        : base(entityService, flagProviders, memberTypeService)
+    public AncestorsMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IMemberTypeService memberTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, memberTypeService)
     {
     }
 

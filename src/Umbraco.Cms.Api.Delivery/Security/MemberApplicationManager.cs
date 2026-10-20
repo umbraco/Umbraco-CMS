@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
@@ -11,15 +9,6 @@ namespace Umbraco.Cms.Api.Delivery.Security;
 public class MemberApplicationManager : OpenIdDictApplicationManagerBase, IMemberApplicationManager
 {
     private readonly IRuntimeState _runtimeState;
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MemberApplicationManager(IOpenIddictApplicationManager applicationManager, IRuntimeState runtimeState)
-        : this(
-            applicationManager,
-            runtimeState,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<MemberApplicationManager>>())
-    {
-    }
 
     public MemberApplicationManager(
         IOpenIddictApplicationManager applicationManager,

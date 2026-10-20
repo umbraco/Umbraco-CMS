@@ -1,8 +1,6 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
@@ -68,45 +66,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         _eventAggregator = eventAggregator;
         _userIdKeyResolver = userIdKeyResolver;
         _contentTypeFilters = contentTypeFilters;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentTypeServiceBase{TRepository, TItem}"/> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="repository">The content type repository.</param>
-    /// <param name="auditRepository">The audit repository.</param>
-    /// <param name="containerRepository">The entity container repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="eventAggregator">The event aggregator.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="contentTypeFilters">The content type filter collection.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    protected ContentTypeServiceBase(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        TRepository repository,
-        IAuditRepository auditRepository,
-        IEntityContainerRepository containerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            repository,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            containerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters)
-    {
     }
 
     /// <summary>
@@ -344,12 +303,13 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     {
         // find all content types impacted by the changes,
         // - content type alias changed
-        // - content type property removed, or alias changed
-        // - content type composition removed (not testing if composition had properties...)
+        // - content type property removed, added, or alias changed
+        // - content type composition removed or added (not testing if composition had properties...)
         // - content type variation changed
         // - property type variation changed
         //
-        // because these are the changes that would impact the raw content data
+        // because these are the changes that alter the set of property types a content type exposes,
+        // and so the set exposed by every content type that derives from it
 
         // note
         // this is meant to run *after* uow.Commit() so must use WasPropertyDirty() everywhere
@@ -357,10 +317,14 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
         var changes = new List<ContentTypeChange<TItem>>();
 
+        // Shared by every content type in the batch, so a deriving type reached from more than one of them is
+        // the same instance each time, and AddChange merges its changes into a single entry.
+        ILookup<int, TItem>? directReferencingTypes = null;
+
         // Track which types genuinely need a raw cmsContentNu rebuild vs. which only had a property removed.
         // A type can appear via more than one path (e.g. a batch save touching a composition, where the same
-        // type is both saved directly and returned by GetComposedOf as a different instance), so we key these
-        // by Id — not entity reference — and resolve the RawDataUnaffected flag once at the end: it is only
+        // type is both saved directly and returned by the composition traversal as a different instance), so we
+        // key these by Id — not entity reference — and resolve the RawDataUnaffected flag once at the end: it is only
         // safe when *nothing* required a rebuild for that Id.
         var rebuildRequiredIds = new HashSet<int>();
         var rawDataUnaffectedCandidateIds = new HashSet<int>();
@@ -497,16 +461,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(contentType.Id);
             }
 
-            if (hasPropertyMainImpact)
-            {
-                foreach (TItem c in GetComposedOf(contentType.Id))
-                {
-                    // Composing types inherit the same property change, so they share its rebuild requirement.
-                    AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
-                    (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(c.Id);
-                }
-            }
-
             // --- Non-structural changes (each includes RefreshOther automatically) ---
 
             // new properties added?
@@ -528,6 +482,33 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             if (!hasAnyChange)
             {
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
+            }
+
+            // A content type that derives from this one - through composition or inheritance, at any depth -
+            // resolves its published content type from this one's alias and property types, so any change to
+            // either has to refresh the whole closure beneath it. Left stale, a deriving type keeps projecting
+            // content through a property set the content type no longer has, and keeps reporting the old alias
+            // from its composition aliases (which IPublishedContent.IsComposedOf reads).
+            if (hasPropertyMainImpact || hasAnyPropertyBeenAdded || hasAliasChanged)
+            {
+                directReferencingTypes ??= GetDirectReferencingTypes();
+                foreach (TItem c in GetComposedOfTransitive(contentType.Id, directReferencingTypes))
+                {
+                    if (hasPropertyMainImpact)
+                    {
+                        // Deriving types inherit the same property change, so they share its rebuild requirement.
+                        AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
+                        (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(c.Id);
+                    }
+                    else
+                    {
+                        // Neither a property addition nor a content type alias change re-keys anything the
+                        // deriving types have stored - the added alias has no value yet, and the stored blob is
+                        // keyed by property alias, not content type alias. They only need their content type and
+                        // converted content caches cleared, not a rebuild.
+                        AddChange(changes, c, ContentTypeChangeTypes.RefreshOther);
+                    }
+                }
             }
         }
 
@@ -767,6 +748,63 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return GetComposedOf(id, allContentTypes);
     }
 
+    /// <summary>
+    /// Builds a lookup from each content type id to the content types that directly reference it as a composition
+    /// (or as the content type they inherit from).
+    /// </summary>
+    /// <returns>The lookup of directly referencing content types, keyed by referenced content type id.</returns>
+    /// <remarks>
+    /// Every call takes a fresh snapshot of all content types, and the full dataset cache policy deep clones each
+    /// of them, so build this once per unit of work and share it.
+    /// </remarks>
+    private ILookup<int, TItem> GetDirectReferencingTypes() =>
+        GetAll()
+            .SelectMany(
+                contentType => contentType.ContentTypeComposition,
+                (contentType, referenced) => (ReferencedId: referenced.Id, ContentType: contentType))
+            .ToLookup(x => x.ReferencedId, x => x.ContentType);
+
+    /// <summary>
+    /// Gets every content type whose effective property set derives from the specified content type, directly
+    /// or indirectly.
+    /// </summary>
+    /// <param name="id">The identifier of the content type.</param>
+    /// <param name="directReferencingTypes">
+    /// The content types that directly reference each content type, as built by
+    /// <see cref="GetDirectReferencingTypes" />.
+    /// </param>
+    /// <returns>The content types deriving from the specified content type.</returns>
+    /// <remarks>
+    /// Inheritance is stored as composition, so a single traversal of the composition graph covers both axes.
+    /// It has to be transitive because a content type resolves both its property types and its composition
+    /// aliases recursively through its compositions (see
+    /// <see cref="IContentTypeComposition.CompositionPropertyTypes" /> and
+    /// <see cref="IContentTypeComposition.CompositionAliases()" />), so a change to one content type is a change
+    /// to everything deriving from it, not just to its direct consumers.
+    /// </remarks>
+    private static TItem[] GetComposedOfTransitive(int id, ILookup<int, TItem> directReferencingTypes)
+    {
+        var composedOf = new Dictionary<int, TItem>();
+        var remaining = new Stack<int>();
+        remaining.Push(id);
+
+        while (remaining.Count > 0)
+        {
+            foreach (TItem contentType in directReferencingTypes[remaining.Pop()])
+            {
+                // TryAdd doubles as the guard against cycles in the composition graph
+                if (composedOf.TryAdd(contentType.Id, contentType) is false)
+                {
+                    continue;
+                }
+
+                remaining.Push(contentType.Id);
+            }
+        }
+
+        return [.. composedOf.Values];
+    }
+
     /// <inheritdoc />
     public int Count()
     {
@@ -861,7 +899,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return Attempt.Fail(ContentTypeOperationStatus.NameCannotBeEmpty);
         }
 
-        if (item.Name.Length > 255)
+        if (item.Name.Length > Constants.Validation.MaxNameLength)
         {
             return Attempt.Fail(ContentTypeOperationStatus.NameTooLong);
         }
@@ -1353,7 +1391,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             TItem[] allowedChildren = GetMany(sortedKeys).ToArray();
             result = new PagedModel<TItem>
             {
-                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Take(take).Skip(skip),
+                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Skip(skip).Take(take),
                 Total = allowedChildren.Length,
             };
         }

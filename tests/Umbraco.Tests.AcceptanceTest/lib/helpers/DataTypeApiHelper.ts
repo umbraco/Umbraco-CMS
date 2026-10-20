@@ -5,6 +5,12 @@ import {
   DatePickerDataTypeBuilder,
   BlockListDataTypeBuilder,
   DropdownDataTypeBuilder,
+  SingleDropdownDataTypeBuilder,
+  SingleMediaPickerDataTypeBuilder,
+  SingleUrlPickerDataTypeBuilder,
+  RangeSliderDataTypeBuilder,
+  MultipleDocumentPickerDataTypeBuilder,
+  MultipleMemberPickerDataTypeBuilder,
   ContentPickerDataTypeBuilder,
   BlockGridDataTypeBuilder,
   ImageCropperDataTypeBuilder,
@@ -309,9 +315,9 @@ export class DataTypeApiHelper {
   async createDropdownDataType(name: string, isMultiple: boolean, options: string[]) {
     await this.ensureNameNotExists(name);
 
-    const dataType = new DropdownDataTypeBuilder()
+    const builder = isMultiple ? new DropdownDataTypeBuilder() : new SingleDropdownDataTypeBuilder();
+    const dataType = builder
       .withName(name)
-      .withMultiple(isMultiple)
       .withItems(options)
       .build();
     return await this.save(dataType);
@@ -1159,7 +1165,6 @@ export class DataTypeApiHelper {
     const dataType = new MediaPickerDataTypeBuilder()
       .withName(name)
       .withFilter(mediaType.id)
-      .withMultiple(false)
       .withMinValue(minValue)
       .withMaxValue(maxValue)
       .withEnableLocalFocalPoint(enableLocalFocalPoint)
@@ -1875,11 +1880,78 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async createSingleMediaPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new SingleMediaPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createSingleUrlPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new SingleUrlPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createSingleDropdownDataType(name: string, options: string[] = []) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new SingleDropdownDataTypeBuilder()
+      .withName(name)
+      .withItems(options)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createRangeSliderDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new RangeSliderDataTypeBuilder()
+      .withName(name)
+      .withMaxValue(100)
+      .withStep(1)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createMultipleDocumentPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultipleDocumentPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createMultipleMemberPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultipleMemberPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
   async createDefaultDropdownDataType(name: string) {
     await this.ensureNameNotExists(name);
 
     const dataType = new DropdownDataTypeBuilder()
       .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createTypedLabelDataType(name: string, editorAlias: string, editorUiAlias: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new LabelDataTypeBuilder()
+      .withName(name)
+      .withEditor(editorAlias, editorUiAlias)
       .build();
     return await this.save(dataType);
   }

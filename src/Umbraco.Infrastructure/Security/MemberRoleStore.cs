@@ -1,7 +1,5 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -37,15 +35,6 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
         ErrorDescriber = errorDescriber ?? throw new ArgumentNullException(nameof(errorDescriber));
         _idKeyMap = idKeyMap ?? throw new ArgumentNullException(nameof(idKeyMap));
-    }
-
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber)
-        : this(
-            memberGroupService,
-            errorDescriber,
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
     }
 
     /// <summary>

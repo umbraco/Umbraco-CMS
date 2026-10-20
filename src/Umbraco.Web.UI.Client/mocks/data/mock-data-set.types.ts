@@ -3,10 +3,12 @@ import type {
 	DataTypeItemResponseModel,
 	DataTypeResponseModel,
 	DataTypeTreeItemResponseModel,
+	DatatypeConfigurationResponseModel,
 	// Dictionary
 	DictionaryItemItemResponseModel,
 	DictionaryItemResponseModel,
 	DictionaryOverviewResponseModel,
+	DomainsResponseModel,
 	NamedEntityTreeItemResponseModel,
 	// Document
 	DocumentItemResponseModel,
@@ -118,11 +120,15 @@ export type UmbMockDocumentModel = DocumentResponseModel &
 	DocumentItemResponseModel & {
 		/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
 		originalParent?: { id: string } | null;
+		/** Mock-only: the culture and hostnames of the document. Not a real response field. */
+		domains?: DomainsResponseModel;
 	};
 
-export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
-	DocumentBlueprintItemResponseModel &
-	DocumentBlueprintTreeItemResponseModel;
+export type UmbMockDocumentBlueprintModel = Omit<DocumentBlueprintResponseModel, 'documentType'> &
+	Omit<DocumentBlueprintItemResponseModel, 'documentType'> &
+	Omit<DocumentBlueprintTreeItemResponseModel, 'documentType'> & {
+		documentType: DocumentTypeReferenceResponseModel | null;
+	};
 
 export type UmbMockDocumentTypeModel = DocumentTypeResponseModel &
 	DocumentTypeTreeItemResponseModel &
@@ -223,6 +229,7 @@ export interface UmbMockLogLevelsModel {
 export interface UmbMockDataSet {
 	// Core entity data arrays (all optional, defaults to empty array)
 	dataType?: Array<UmbMockDataTypeModel>;
+	dataTypeConfiguration?: DatatypeConfigurationResponseModel;
 	dictionary?: Array<UmbMockDictionaryModel>;
 	document?: Array<UmbMockDocumentModel>;
 	documentBlueprint?: Array<UmbMockDocumentBlueprintModel>;

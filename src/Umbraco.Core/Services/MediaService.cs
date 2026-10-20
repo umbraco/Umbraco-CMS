@@ -20,6 +20,8 @@ namespace Umbraco.Cms.Core.Services
     /// </summary>
     public class MediaService : RepositoryService, IMediaService
     {
+        private const string SortOrderField = "sortOrder";
+
         private readonly IMediaRepository _mediaRepository;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly IAuditService _auditService;
@@ -201,9 +203,9 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media with that id.", nameof(parentId));
             }
 
-            if (name.Length > 255)
+            if (name.Length > Constants.Validation.MaxNameLength)
             {
-                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
             }
 
             var media = new Core.Models.Media(name, parentId, mediaType);
@@ -237,9 +239,9 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias));
             }
 
-            if (name.Length > 255)
+            if (name.Length > Constants.Validation.MaxNameLength)
             {
-                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
             }
 
             var media = new Core.Models.Media(name, -1, mediaType);
@@ -280,9 +282,9 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
             }
 
-            if (name.Length > 255)
+            if (name.Length > Constants.Validation.MaxNameLength)
             {
-                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
             }
 
             var media = new Core.Models.Media(name, parent, mediaType);
@@ -460,6 +462,32 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
+        public IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases)
+        {
+            Guid[] idsA = ids.Distinct().ToArray();
+            if (idsA.Length == 0)
+            {
+                return Enumerable.Empty<IMedia>();
+            }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+
+            var index = new Dictionary<Guid, IMedia>(idsA.Length);
+            foreach (IEnumerable<Guid> group in idsA.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                List<Guid> groupKeys = group.ToList();
+                IQuery<IMedia>? query = Query<IMedia>()?.Where(x => groupKeys.Contains(x.Key));
+                foreach (IMedia item in _mediaRepository.GetPage(query, 0, groupKeys.Count, out _, propertyAliases, null, Ordering.By(SortOrderField)))
+                {
+                    index[item.Key] = item;
+                }
+            }
+
+            return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+        }
+
+        /// <inheritdoc />
         public IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
             if (pageIndex < 0)
@@ -474,7 +502,7 @@ namespace Umbraco.Cms.Core.Services
 
             if (ordering == null)
             {
-                ordering = Ordering.By("sortOrder");
+                ordering = Ordering.By(SortOrderField);
             }
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -497,7 +525,7 @@ namespace Umbraco.Cms.Core.Services
 
             if (ordering == null)
             {
-                ordering = Ordering.By("sortOrder");
+                ordering = Ordering.By(SortOrderField);
             }
 
             // Need to use a List here because the expression tree cannot convert the array when used in Contains.
@@ -590,7 +618,11 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IMedia>? filter = null, Ordering? ordering = null)
+        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
+            => GetPagedChildren(id, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter, ordering);
+
+        /// <inheritdoc />
+        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IMedia>? filter, Ordering? ordering)
         {
             if (pageIndex < 0)
             {
@@ -604,14 +636,14 @@ namespace Umbraco.Cms.Core.Services
 
             if (ordering == null)
             {
-                ordering = Ordering.By("sortOrder");
+                ordering = Ordering.By(SortOrderField);
             }
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MediaTree);
 
             IQuery<IMedia>? query = Query<IMedia>()?.Where(x => x.ParentId == id);
-            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
+            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases, filter, ordering);
         }
 
         /// <inheritdoc />
@@ -799,9 +831,9 @@ namespace Umbraco.Cms.Core.Services
                     throw new ArgumentException("Media has no name.", nameof(media));
                 }
 
-                if (media.Name != null && media.Name.Length > 255)
+                if (media.Name != null && media.Name.Length > Constants.Validation.MaxNameLength)
                 {
-                    throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                    throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
                 }
 
                 if (media.Key.Version == 7 && _mediaPathScheme.SupportsGuid7 is false)

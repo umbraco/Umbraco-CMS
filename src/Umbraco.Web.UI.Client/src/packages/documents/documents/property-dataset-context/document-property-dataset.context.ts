@@ -9,7 +9,7 @@ export class UmbDocumentPropertyDatasetContext extends UmbContentPropertyDataset
 	UmbDocumentTypeDetailModel,
 	UmbDocumentVariantModel
 > {
-	constructor(host: UmbControllerHost, dataOwner: UmbDocumentWorkspaceContext, variantId?: UmbVariantId) {
+	constructor(host: UmbControllerHost, dataOwner: UmbDocumentWorkspaceContext, variantId: UmbVariantId) {
 		super(host, dataOwner, variantId);
 	}
 }

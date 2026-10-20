@@ -3,7 +3,9 @@
 
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
@@ -341,15 +343,6 @@ public static class DistributedCacheExtensions
     /// </summary>
     /// <param name="dc">The distributed cache.</param>
     /// <param name="externalMembers">The external members to refresh in cache.</param>
-    [Obsolete("Use the overload taking notification state instead. Scheduled for removal in Umbraco 19.")]
-    public static void RefreshExternalMemberCache(this DistributedCache dc, IEnumerable<ExternalMemberIdentity> externalMembers)
-        => dc.RefreshExternalMemberCache(externalMembers, new Dictionary<string, object?>());
-
-    /// <summary>
-    ///     Refreshes the specified external members in the distributed cache.
-    /// </summary>
-    /// <param name="dc">The distributed cache.</param>
-    /// <param name="externalMembers">The external members to refresh in cache.</param>
     /// <param name="state">The notification state dictionary.</param>
     public static void RefreshExternalMemberCache(this DistributedCache dc, IEnumerable<ExternalMemberIdentity> externalMembers, IDictionary<string, object?> state)
         => dc.RefreshByPayload(
@@ -478,6 +471,50 @@ public static class DistributedCacheExtensions
         => dc.RefreshByPayload(
             ElementContainerCacheRefresher.UniqueId,
             deletedContainers.Select(container => new ElementContainerCacheRefresher.JsonPayload(container.Id, container.Key)));
+
+    #endregion
+
+    #region EntityTypeMovedCacheRefresher
+
+    /// <summary>
+    ///     Invalidates the cache for the specified content types that were moved.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="moveInfoCollection">The move information for the content types that were moved.</param>
+    public static void RefreshMovedEntityTypeCache(this DistributedCache dc, IEnumerable<MoveEventInfo<IContentType>> moveInfoCollection)
+        => dc.RefreshMovedEntityTypeCache(nameof(IContentType), moveInfoCollection);
+
+    /// <summary>
+    ///     Invalidates the cache for the specified media types that were moved.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="moveInfoCollection">The move information for the media types that were moved.</param>
+    public static void RefreshMovedEntityTypeCache(this DistributedCache dc, IEnumerable<MoveEventInfo<IMediaType>> moveInfoCollection)
+        => dc.RefreshMovedEntityTypeCache(nameof(IMediaType), moveInfoCollection);
+
+    /// <summary>
+    ///     Invalidates the cache for the specified member types that were moved.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="moveInfoCollection">The move information for the member types that were moved.</param>
+    public static void RefreshMovedEntityTypeCache(this DistributedCache dc, IEnumerable<MoveEventInfo<IMemberType>> moveInfoCollection)
+        => dc.RefreshMovedEntityTypeCache(nameof(IMemberType), moveInfoCollection);
+
+    /// <summary>
+    ///     Invalidates the cache for the specified data types that were moved.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="moveInfoCollection">The move information for the data types that were moved.</param>
+    public static void RefreshMovedEntityTypeCache(this DistributedCache dc, IEnumerable<MoveEventInfo<IDataType>> moveInfoCollection)
+        => dc.RefreshMovedEntityTypeCache(nameof(IDataType), moveInfoCollection);
+
+    private static void RefreshMovedEntityTypeCache<TEntity>(this DistributedCache dc, string itemType, IEnumerable<MoveEventInfo<TEntity>> moveInfoCollection)
+        where TEntity : IUmbracoEntity
+        => dc.RefreshByPayload(
+            EntityTypeMovedCacheRefresher.UniqueId,
+            moveInfoCollection
+                .DistinctBy(moveInfo => moveInfo.Entity.Id)
+                .Select(moveInfo => new EntityTypeMovedCacheRefresher.JsonPayload(itemType, moveInfo.Entity.Id, moveInfo.Entity.Key)));
 
     #endregion
 

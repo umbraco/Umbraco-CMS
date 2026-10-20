@@ -20,21 +20,6 @@ namespace Umbraco.Cms.Api.Management.DependencyInjection;
 public static class BackOfficeAuthBuilderExtensions
 {
     /// <summary>
-    /// Configures and adds the necessary authentication services for the Umbraco back office to the specified builder.
-    /// </summary>
-    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to which back office authentication services will be added.</param>
-    /// <returns>The same <see cref="IUmbracoBuilder"/> instance with back office authentication configured.</returns>
-    [Obsolete("Use AddBackOffice() or AddBackOfficeSignIn() instead. Scheduled for removal in Umbraco 19.")]
-    public static IUmbracoBuilder AddBackOfficeAuthentication(this IUmbracoBuilder builder)
-    {
-        builder
-            .AddBackOfficeCookieAuthentication()
-            .AddBackOfficeOpenIddictServices();
-
-        return builder;
-    }
-
-    /// <summary>
     /// Registers handlers with the back-office authentication builder to automatically revoke user authentication tokens
     /// when certain user-related events occur, such as saving, deleting, or successful login of a user.
     /// </summary>

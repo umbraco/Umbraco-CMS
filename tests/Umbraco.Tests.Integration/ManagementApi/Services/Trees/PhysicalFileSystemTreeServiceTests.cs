@@ -51,13 +51,14 @@ public class PhysicalFileSystemTreeServiceTests : FileSystemTreeServiceTestsBase
     {
         var service = CreateService();
 
-        FileSystemTreeItemPresentationModel[] treeModels = service.GetAncestorModels(Path.Join("wwwroot", "css", "test.css"), true);
+        FileSystemTreeItemPresentationModel[] treeModels = service.GetAncestorModels(ToSystemPath("wwwroot", "css", "test.css"), true);
 
-        Assert.IsNotEmpty(treeModels);
-        Assert.AreEqual(treeModels.Length, 3);
-        Assert.AreEqual(treeModels[0].Name, "wwwroot");
-        Assert.AreEqual(treeModels[1].Name, "css");
-        Assert.AreEqual(treeModels[2].Name, "test.css");
+        Assert.AreEqual(4, treeModels.Length);
+        Assert.AreEqual("/", treeModels[0].Path);
+        Assert.AreEqual("/wwwroot", treeModels[1].Path);
+        Assert.AreEqual("/wwwroot/css", treeModels[2].Path);
+        Assert.AreEqual("/wwwroot/css/test.css", treeModels[3].Path);
+        Assert.AreEqual("test.css", treeModels[3].Name);
     }
 
     [Test]
@@ -92,4 +93,6 @@ public class PhysicalFileSystemTreeServiceTests : FileSystemTreeServiceTestsBase
         var physicalFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathWebRoot(FileSystemPath), HostingEnvironment.ToAbsolute(FileSystemPath));
         return new PhysicalFileSystemTreeService(physicalFileSystem);
     }
+
+    private static string ToSystemPath(params string[] segments) => $"{Path.DirectorySeparatorChar}{Path.Join(segments)}";
 }

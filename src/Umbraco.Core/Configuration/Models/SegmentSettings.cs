@@ -8,17 +8,10 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class SegmentSettings
 {
     private const bool StaticEnabled = false;
-    private const bool StaticAllowCreation = true;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the usage of segments is enabled.
     /// </summary>
     [DefaultValue(StaticEnabled)]
     public bool Enabled { get; set; } = StaticEnabled;
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether the creation of non-existing segments is allowed.
-    /// </summary>
-    [Obsolete("This functionality will be moved to a client-side extension. Scheduled for removal in Umbraco 19.")]
-    public bool AllowCreation { get; set; } = StaticAllowCreation;
 }

@@ -2,17 +2,17 @@ import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UmbElementItemDataResolver } from '../data-resolver/element-item-data-resolver.js';
 import type { UmbElementItemModel } from '../types.js';
-import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_WORKSPACE_MODAL, umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
 import type { UUISelectableEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
+import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-element-item-ref')
-export class UmbElementItemRefElement extends UmbLitElement {
-	#item = new UmbElementItemDataResolver<UmbElementItemModel>(this);
+export class UmbElementItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElement) {
+	readonly #item = new UmbElementItemDataResolver<UmbElementItemModel>(this);
 
 	@property({ type: Object })
 	public set item(value: UmbElementItemModel | undefined) {
@@ -56,9 +56,6 @@ export class UmbElementItemRefElement extends UmbLitElement {
 	private _isDraft = false;
 
 	@state()
-	private _flags: Array<UmbEntityFlag> = [];
-
-	@state()
 	private _editPath = '';
 
 	constructor() {
@@ -78,7 +75,10 @@ export class UmbElementItemRefElement extends UmbLitElement {
 		this.#item.observe(this.#item.icon, (icon) => (this._icon = icon ?? ''));
 		this.#item.observe(this.#item.isTrashed, (isTrashed) => (this._isTrashed = isTrashed ?? false));
 		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
-		this.#item.observe(this.#item.flags, (flags) => (this._flags = flags ?? []));
+	}
+
+	protected override get isEntityFrameNavigable() {
+		return !this.readonly && !this.selectOnly && !this.disabled && !!this._unique;
 	}
 
 	#getLink() {
@@ -121,17 +121,13 @@ export class UmbElementItemRefElement extends UmbLitElement {
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 			</uui-ref-node>
-			<umb-entity-frame><uui-icon name="link"></uui-icon> ${this._name}</umb-entity-frame>
+			${this.renderEntityFrame(this._name)}
 		`;
 	}
 
 	#renderIcon() {
 		if (!this._icon) return nothing;
-		return html`
-			<umb-entity-sign-bundle slot="icon" .entityType=${UMB_ELEMENT_ENTITY_TYPE} .entityFlags=${this._flags}>
-				<umb-icon name=${this._icon}></umb-icon>
-			</umb-entity-sign-bundle>
-		`;
+		return html`<umb-icon slot="icon" name=${this._icon}></umb-icon>`;
 	}
 
 	#renderIsTrashed() {
@@ -143,24 +139,6 @@ export class UmbElementItemRefElement extends UmbLitElement {
 		if (!this._isDraft) return nothing;
 		return html`<uui-tag size="s" slot="tag" look="secondary" color="default">Draft</uui-tag>`;
 	}
-
-	static override readonly styles = [
-		css`
-			:host {
-				--umb-entity-frame-opacity: 0;
-				--umb-entity-frame-color: var(--umb-color-reference);
-				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
-
-				display: block;
-				position: relative;
-			}
-
-			:host(:hover),
-			:host(:focus-within) {
-				--umb-entity-frame-opacity: 1;
-			}
-		`,
-	];
 }
 
 export { UmbElementItemRefElement as element };

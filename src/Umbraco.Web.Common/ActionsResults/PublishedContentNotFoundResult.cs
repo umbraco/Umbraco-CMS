@@ -1,9 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 
@@ -17,17 +14,23 @@ public class PublishedContentNotFoundResult : IActionResult
     private readonly string? _message;
     private readonly IUmbracoContext _umbracoContext;
 
-    // TODO (V19): Take the view path as a constructor parameter, as MaintenanceResult does, and drop the
-    // service location in ExecuteResultAsync.
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedContentNotFoundResult" /> class.
     /// </summary>
-    public PublishedContentNotFoundResult(IUmbracoContext umbracoContext, string? message = null)
+    /// <param name="umbracoContext">The Umbraco context for the current request.</param>
+    /// <param name="notFoundViewPath">The path of the view rendered for the not-found response.</param>
+    /// <param name="message">An optional message passed to the view.</param>
+    public PublishedContentNotFoundResult(IUmbracoContext umbracoContext, string notFoundViewPath, string? message = null)
     {
         _umbracoContext = umbracoContext;
+        ViewName = notFoundViewPath;
         _message = message;
     }
+
+    /// <summary>
+    ///     Gets the path of the view rendered for the not-found response.
+    /// </summary>
+    public string ViewName { get; }
 
     /// <inheritdoc />
     public async Task ExecuteResultAsync(ActionContext context)
@@ -49,13 +52,7 @@ public class PublishedContentNotFoundResult : IActionResult
             reason = "No template exists to render the document at URL '{0}'.";
         }
 
-        // Resolved from the request rather than injected: this type is public and constructed with `new` by
-        // callers outside this assembly, so taking the settings as a constructor parameter would be a binary
-        // breaking change.
-        GlobalSettings globalSettings = context.HttpContext.RequestServices
-            .GetRequiredService<IOptionsMonitor<GlobalSettings>>().CurrentValue;
-
-        var viewResult = new ViewResult { ViewName = globalSettings.NotFoundViewPath };
+        var viewResult = new ViewResult { ViewName = ViewName };
         context.HttpContext.Items.Add(
             "reason",
             string.Format(reason, WebUtility.HtmlEncode(_umbracoContext.OriginalRequestUrl.PathAndQuery)));

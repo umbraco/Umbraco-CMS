@@ -31,12 +31,16 @@ public abstract class UserStartNodeFolderTreeControllerBase<TItem> : FolderTreeC
     /// </summary>
     /// <param name="entityService">The entity service.</param>
     /// <param name="flagProviders">The flag provider collection.</param>
+    /// <param name="entitySearchService">The entity search service.</param>
+    /// <param name="idKeyMap">The id/key map.</param>
     /// <param name="treeFilterService">The user start node tree filter service.</param>
     protected UserStartNodeFolderTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
         IUserStartNodeTreeFilterService treeFilterService)
-        : base(entityService, flagProviders)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap)
     {
         _treeFilterService = treeFilterService;
     }

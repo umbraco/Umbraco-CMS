@@ -155,11 +155,12 @@ ContentIndexingService (orchestration)
     └─> IIndexer (writes to underlying provider)
 ```
 
-**Index Aliases** (see `Umbraco.Cms.Core.Constants.IndexAliases` — lives in Core so `IPublishedContentQuery` can reference it without a circular dependency):
+**Index Aliases** (see `Umbraco.Cms.Core.Constants.Search.IndexAliases` — lives in Core so `IPublishedContentQuery` can reference it without a circular dependency):
 - `PublishedContent` = `"Umb_PublishedContent"` - Published content index
 - `DraftContent` = `"Umb_Content"` - Draft content index
 - `DraftMedia` = `"Umb_Media"` - Media index
 - `DraftMembers` = `"Umb_Members"` - Members index
+- `DraftElements` = `"Umb_Elements"` - Library elements index (draft only; powers backoffice element search). Elements live in element containers, so their ancestor/parent keys resolve as `ElementContainer`, and a `RefreshBranch` element change becomes a `ContentChange.ElementContainer` change for the container key
 
 **System Field Names** (see `Constants.FieldNames`):
 - All system fields are prefixed with `Umb_`
@@ -201,7 +202,7 @@ Content changes are tracked via notification handlers that trigger indexing:
 
 - `IContentChangeStrategy` - Base interface for tracking content state changes
 - `IPublishedContentChangeStrategy` - Tracks published content changes (for `Umb_PublishedContent` index)
-- `IDraftContentChangeStrategy` - Tracks draft content changes (for `Umb_Content` index)
+- `IDraftContentChangeStrategy` - Tracks draft content changes (for `Umb_Content`, `Umb_Media`, `Umb_Members` and `Umb_Elements` indexes). Library elements are leaves organised in element containers: containers are not indexed themselves, an `ElementContainer` change with `RefreshWithDescendants` re-indexes the elements beneath it, and element descendants/rebuilds are paged via `IEntityService`
 
 Index documents are persisted via `IndexDocumentRepository` using **MessagePack serialization** (with Lz4 compression) for efficient change detection — only actual field changes trigger re-indexing, not every save.
 
@@ -396,11 +397,11 @@ Repositories abstract API calls and provide clean interfaces for UI components. 
 - Follow async/await patterns consistently
 - Use primary constructors for dependency injection
 - Prefix all system fields with `Umb_`
-- Use strong types for index aliases (`Umbraco.Cms.Core.Constants.IndexAliases`)
+- Use strong types for index aliases (`Umbraco.Cms.Core.Constants.Search.IndexAliases`)
 
 ## Version & Dependencies
 
-- **Target Framework**: .NET 10.0
+- **Target Framework**: .NET 11.0
 - **Umbraco CMS**: built as part of this repository (project references)
 - **Examine**: Search provider implementation
 - **Versioning**: Uses Nerdbank.GitVersioning (see `version.json` at the repository root)

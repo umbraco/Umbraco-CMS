@@ -26,10 +26,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
         /// </summary>
         private static ScopeProvider GetScopeProvider(
             out Mock<IDistributedLockingMechanism> lockingMechanism,
-            CoreDebugSettings coreDebugSettings = null,
+            DebugSettings coreDebugSettings = null,
             ILoggerFactory loggerFactory = null)
         {
-            coreDebugSettings ??= new CoreDebugSettings();
+            coreDebugSettings ??= new DebugSettings();
             loggerFactory ??= NullLoggerFactory.Instance;
             var fileSystems = new FileSystems(
                 loggerFactory,
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 lockingMechanismFactory.Object,
                 databaseFactory.Object,
                 fileSystems,
-                new TestOptionsMonitor<CoreDebugSettings>(coreDebugSettings),
+                new TestOptionsMonitor<DebugSettings>(coreDebugSettings),
                 mediaFileManager,
                 loggerFactory,
                 Mock.Of<IEventAggregator>());
@@ -123,7 +123,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 
             var scopeProvider = GetScopeProvider(
                 out _,
-                new CoreDebugSettings { LogIncompletedScopes = true },
+                new DebugSettings { LogIncompletedScopes = true },
                 loggerFactoryMock.Object);
 
             using (var outerScope = (Scope)scopeProvider.CreateScope())
@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 
             var scopeProvider = GetScopeProvider(
                 out _,
-                new CoreDebugSettings { LogIncompletedScopes = false },
+                new DebugSettings { LogIncompletedScopes = false },
                 loggerFactoryMock.Object);
 
             using (var outerScope = (Scope)scopeProvider.CreateScope())

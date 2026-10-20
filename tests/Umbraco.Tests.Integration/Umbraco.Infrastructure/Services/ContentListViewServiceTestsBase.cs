@@ -45,10 +45,10 @@ public abstract class ContentListViewServiceTestsBase : UmbracoIntegrationTest
 
         builder.Services.Configure<IndexOptions>(options =>
         {
-            options.RegisterContentIndex<IIndexer, ISearcher, IPublishedContentChangeStrategy>(Constants.IndexAliases.PublishedContent, UmbracoObjectTypes.Document);
-            options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(Constants.IndexAliases.DraftContent, UmbracoObjectTypes.Document);
-            options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(Constants.IndexAliases.DraftMedia, UmbracoObjectTypes.Media);
-            options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(Constants.IndexAliases.DraftMembers, UmbracoObjectTypes.Member);
+            options.RegisterContentIndex<IIndexer, ISearcher, IPublishedContentChangeStrategy>(Constants.Search.IndexAliases.PublishedContent, UmbracoObjectTypes.Document);
+            options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(Constants.Search.IndexAliases.DraftContent, UmbracoObjectTypes.Document);
+            options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(Constants.Search.IndexAliases.DraftMedia, UmbracoObjectTypes.Media);
+            options.RegisterContentIndex<IIndexer, ISearcher, IDraftContentChangeStrategy>(Constants.Search.IndexAliases.DraftMembers, UmbracoObjectTypes.Member);
         });
 
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();

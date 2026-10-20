@@ -28,18 +28,6 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         _scopeProvider = scopeProvider;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UserStartNodeEntitiesService"/> class.
-    /// </summary>
-    /// <param name="entityService">The entity service.</param>
-    /// <param name="scopeProvider">The core scope provider.</param>
-    /// <param name="idKeyMap">The ID to key mapping service.</param>
-    [Obsolete("Use the constructor without IIdKeyMap. Scheduled for removal in Umbraco 19.")]
-    public UserStartNodeEntitiesService(IEntityService entityService, ICoreScopeProvider scopeProvider, IIdKeyMap idKeyMap)
-        : this(entityService, scopeProvider)
-    {
-    }
-
     /// <inheritdoc />
     public IEnumerable<UserAccessEntity> RootUserAccessEntities(UmbracoObjectTypes umbracoObjectType, int[] userStartNodeIds)
         => RootUserAccessEntities([umbracoObjectType], userStartNodeIds);
@@ -187,7 +175,7 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
 
             // is ancestor of a start node?
             // Note: Add trailing comma to prevent false matches (e.g., path "-1,100" should not match "-1,1001")
-            if (userStartNodePaths.Any(path => path.StartsWith($"{child.Path},")))
+            if (userStartNodePaths.Any(path => path.IsDescendantOfPath(child.Path)))
             {
                 return new UserAccessEntity(child, false);
             }
@@ -268,7 +256,5 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         => entities.Select(entity => new UserAccessEntity(entity, IsDescendantOrSelf(entity, userStartNodePaths))).ToArray();
 
     private static bool IsDescendantOrSelf(IEntitySlim child, string[] userStartNodePaths)
-        // Note: Add trailing commas to both paths to prevent false matches (e.g., path "-1,100" should not match "-1,1001")
-        // This matches the pattern used in lines 92 and 192 of this file
-        => userStartNodePaths.Any(path => $"{child.Path},".StartsWith($"{path},"));
+        => userStartNodePaths.Any(path => child.Path.IsDescendantOrSelfOfPath(path));
 }

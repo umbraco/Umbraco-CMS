@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -38,14 +36,6 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .CreateAsync(new Language("de-DE", "German (Germany)"), Constants.Security.SuperUserKey);
 
         IndexerAndSearcher.Reset();
-    }
-
-    protected override void ConfigureTestServices(IServiceCollection services)
-    {
-        base.ConfigureTestServices(services);
-
-        // this is necessary to test publishing of invariant block level properties without publishing the default language
-        services.Configure<ContentSettings>(options => options.AllowEditInvariantFromNonDefault = true);
     }
 
     [Test]
@@ -155,7 +145,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ],
             Expose =
             [
-                new BlockItemVariation(contentElementKey, null, null)
+                new BlockItemVariation(contentElementKey, null)
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
@@ -172,7 +162,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
         AssertDocumentFields(IndexAliases.PublishedContent);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
-        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.IndexFieldNames.Tags)?.Value;
+        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.Search.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
         CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
 
@@ -261,7 +251,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
                                     ],
                                     Expose =
                                     [
-                                        new BlockItemVariation(nestedElement1Key, null, null)
+                                        new BlockItemVariation(nestedElement1Key, null)
                                     ]
                                 })
                         }
@@ -291,8 +281,8 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             ],
             Expose =
             [
-                new BlockItemVariation(rootElement1Key, null, null),
-                new BlockItemVariation(rootElement2Key, null, null),
+                new BlockItemVariation(rootElement1Key, null),
+                new BlockItemVariation(rootElement2Key, null),
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockGridValue);
@@ -320,7 +310,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             CollectionAssert.AreEqual(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, indexValue.Keywords);
         });
 
-        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.IndexFieldNames.Tags)?.Value;
+        IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Constants.Search.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
         CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
     }

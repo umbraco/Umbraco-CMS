@@ -73,8 +73,8 @@ internal sealed class DocumentHybridCacheStaleSetRaceTests : UmbracoIntegrationT
         _databaseCacheRepository = new Mock<IDatabaseCacheRepository>();
         _hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
 
-        var publishStatus = new Mock<IPublishStatusQueryService>();
-        publishStatus.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
+        var publishStatus = new Mock<IDocumentPublishStatusQueryService>();
+        publishStatus.Setup(x => x.IsPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
         publishStatus.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>())).Returns(true);
 
         _documentCacheService = new DocumentCacheService(

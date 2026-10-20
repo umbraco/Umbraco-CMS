@@ -22,7 +22,7 @@ internal sealed class UmbracoCmsSchema
 
         public required DeliveryApiSettings DeliveryApi { get; set; }
 
-        public required CoreDebugSettings Debug { get; set; }
+        public required DebugSettings Debug { get; set; }
 
         public required ExceptionFilterSettings ExceptionFilter { get; set; }
 
@@ -61,8 +61,6 @@ internal sealed class UmbracoCmsSchema
         public required PackageMigrationSettings PackageMigration { get; set; }
 
         public required LegacyPasswordMigrationSettings LegacyPasswordMigration { get; set; }
-
-        public required HelpPageSettings HelpPage { get; set; }
 
         public required InstallDefaultDataNamedOptions InstallDefaultData { get; set; }
 
