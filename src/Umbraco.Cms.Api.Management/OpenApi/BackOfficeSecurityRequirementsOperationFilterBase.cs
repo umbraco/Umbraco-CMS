@@ -12,6 +12,9 @@ namespace Umbraco.Cms.Api.Management.OpenApi;
 /// </summary>
 public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOperationFilter
 {
+    // The AuthorizeAttributes on ManagementApiControllerBase: backoffice access and feature flags.
+    private const int BaseAuthorizeAttributeCount = 2;
+
     protected abstract string ApiName { get; }
 
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
@@ -38,16 +41,15 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
             operation.Security.Add(new OpenApiSecurityRequirement { [schemaRef] = [] });
         }
 
-        // If an endpoint has more AuthorizeAttributes than the two on ManagementApiControllerBase (backoffice access and feature flags),
-        // the user may be authenticated without having access.
         var numberOfAuthorizeAttributes = endpointMetadata.Count(x => x is AuthorizeAttribute);
-
 
         var hasConstructorInjectingIAuthorizationService = context.MethodInfo.DeclaringType?.GetConstructors()
             .Any(ctor =>
                 ctor.GetParameters().Any(parameter => parameter.GetType() == typeof(IAuthorizationService))) ?? false;
 
-        if (numberOfAuthorizeAttributes > 2 || hasConstructorInjectingIAuthorizationService)
+        // An endpoint with more AuthorizeAttributes than ManagementApiControllerBase, or one that authorizes in code,
+        // may refuse a user who is authenticated.
+        if (numberOfAuthorizeAttributes > BaseAuthorizeAttributeCount || hasConstructorInjectingIAuthorizationService)
         {
             operation.Responses ??= new OpenApiResponses();
             operation.Responses.Add(

@@ -20,8 +20,10 @@ public static class ActionDescriptorApiCommonExtensions
     /// or if the attribute is not present and the API name matches the default API name; otherwise, <c>false</c>.
     /// </returns>
     /// <remarks>
-    /// When the endpoint metadata holds more than one <see cref="MapToApiAttribute"/>, the last (most specific) one wins.
-    /// This lets an attribute added at runtime override one declared on the controller.
+    /// Endpoint metadata lists the attributes declared on the controller, then those declared on the action,
+    /// then any added at runtime, for example by an application model convention.
+    /// When it holds more than one <see cref="MapToApiAttribute"/>, the last one in that order wins,
+    /// so an attribute added at runtime overrides one declared on the controller or action.
     /// </remarks>
     public static bool HasMapToApiAttribute(this ActionDescriptor actionDescriptor, string apiName)
     {
@@ -35,8 +37,6 @@ public static class ActionDescriptorApiCommonExtensions
     {
         IEnumerable<MapToApiAttribute> mapToApiAttributes = actionDescriptor?.EndpointMetadata?.OfType<MapToApiAttribute>() ?? [];
 
-        // Endpoint metadata is ordered from least to most specific, so an attribute added at runtime
-        // takes precedence over one declared on the controller.
         return mapToApiAttributes.LastOrDefault()?.ApiName;
     }
 }
