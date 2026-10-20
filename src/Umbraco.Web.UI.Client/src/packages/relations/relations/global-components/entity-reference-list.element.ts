@@ -35,7 +35,7 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 	public set unique(value: string | undefined) {
 		const oldValue = this.#unique;
 		this.#unique = value;
-		if (value === oldValue) return;
+		if (value === oldValue || this.#staticItems) return;
 		this._currentPage = 1;
 		// Clear before fetching, not just when there's no new value — otherwise the previous entity's
 		// items/total stay on screen (and visible to @change consumers) until the new fetch resolves.
@@ -154,7 +154,7 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 	async #getReferences() {
 		const unique = this.#unique;
 		const repository = this.#referenceRepository;
-		if (!unique || !repository) return;
+		if (!unique || !repository || this.#staticItems) return;
 
 		const token = ++this.#requestToken;
 		const skip = (this._currentPage - 1) * this.itemsPerPage;

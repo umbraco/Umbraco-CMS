@@ -39,6 +39,10 @@ export class UmbPropertyValueEntityReferencesController extends UmbControllerBas
 
 		api.manifest = manifest;
 
-		return api.resolveEntityReferences(value);
+		try {
+			return await api.resolveEntityReferences(value);
+		} finally {
+			api.destroy();
+		}
 	}
 }

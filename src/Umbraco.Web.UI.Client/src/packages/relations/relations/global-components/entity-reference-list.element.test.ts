@@ -261,6 +261,18 @@ describe('UmbEntityReferenceListElement', () => {
 			expect(element.shadowRoot?.querySelector('uui-pagination'), 'pagination shown').to.exist;
 		});
 
+		it('keeps the given items when a unique is set afterwards, instead of fetching over them', async () => {
+			UmbTestReferenceRepository.referencedByItems = makeItems(5);
+			element.referenceRepositoryAlias = REFERENCE_REPOSITORY_ALIAS;
+			element.items = makeItems(2);
+			element.unique = 'elm-1';
+			document.body.appendChild(element);
+			await aTimeout(0);
+
+			expect(element.getTotal()).to.equal(2);
+			expect(element.shadowRoot?.querySelectorAll('umb-entity-item-ref')).to.have.lengthOf(2);
+		});
+
 		it('shows the "no references" state when given an empty array', async () => {
 			element.items = [];
 			document.body.appendChild(element);

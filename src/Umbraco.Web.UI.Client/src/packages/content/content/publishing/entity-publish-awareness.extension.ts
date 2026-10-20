@@ -1,8 +1,12 @@
 import type { ManifestApi, UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestEntityPublishAwareness
-	extends ManifestApi<UmbEntityPublishAwarenessApi> {
+/**
+ * Opts entity types in to publish awareness, so entities of those types that are referenced by content being
+ * published can be reported when they need attention.
+ */
+export interface ManifestEntityPublishAwareness extends ManifestApi<UmbEntityPublishAwarenessApi> {
 	type: 'entityPublishAwareness';
+	/** The entity types this extension decides publish awareness for. */
 	forEntityTypes: Array<string>;
 	meta: MetaEntityPublishAwareness;
 }
@@ -18,6 +22,11 @@ export interface MetaEntityPublishAwareness {
  * thing referencing it is published — e.g. because it isn't fully published itself.
  */
 export interface UmbEntityPublishAwarenessApi<ItemType = any> extends UmbApi {
+	/**
+	 * Whether the given item needs attention before content referencing it is published.
+	 * @param {ItemType} item - The item to check, as loaded from the item repository.
+	 * @returns {boolean} `true` when the item needs attention.
+	 */
 	needsAttention(item: ItemType): boolean;
 }
 
