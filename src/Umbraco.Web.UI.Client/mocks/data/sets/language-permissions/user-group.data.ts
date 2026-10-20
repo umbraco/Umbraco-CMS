@@ -90,6 +90,7 @@ function createUserGroup(scenario: UmbLanguageAccessScenario, canEditSharedData:
 		hasAccessToAllLanguages: scenario.hasAccessToAllLanguages,
 		hasAccessToInvariantForVariant: canEditSharedData,
 		documentRootAccess: true,
+		documentBlueprintRootAccess: true,
 		elementRootAccess: true,
 		mediaRootAccess: false,
 		aliasCanBeChanged: false,
