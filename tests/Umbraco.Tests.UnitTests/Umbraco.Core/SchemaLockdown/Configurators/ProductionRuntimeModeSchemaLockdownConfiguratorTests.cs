@@ -3,8 +3,9 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.SchemaLockdown;
+using Umbraco.Cms.Core.SchemaLockdown.Configurators;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.SchemaLockdown;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.SchemaLockdown.Configurators;
 
 [TestFixture]
 public class ProductionRuntimeModeSchemaLockdownConfiguratorTests

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Cms.Core.SchemaLockdown;
+namespace Umbraco.Cms.Core.SchemaLockdown.Configurators;
 
 /// <summary>
 /// Locks templates and partial views when the site runs in <see cref="RuntimeMode.Production"/>.
