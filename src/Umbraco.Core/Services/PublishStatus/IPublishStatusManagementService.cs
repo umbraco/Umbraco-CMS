@@ -39,4 +39,27 @@ public interface IPublishStatusManagementService
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task AddOrUpdateStatusWithDescendantsAsync(Guid rootDocumentKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Adds a culture to the cached publish status of every document published in it.
+    /// </summary>
+    /// <remarks>
+    /// Used when a language is added or its ISO code changes, so the cached status of documents published in
+    /// that language is brought up to date without reloading the status of every other culture.
+    /// </remarks>
+    /// <param name="culture">The culture code.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    // TODO (V18): Remove the default implementation.
+    Task AddCultureAsync(string culture, CancellationToken cancellationToken)
+        => InitializeAsync(cancellationToken);
+
+    /// <summary>
+    /// Re-reads the default language used to resolve publish status queries made without a culture.
+    /// </summary>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    // TODO (V18): Remove the default implementation.
+    Task RefreshDefaultCultureAsync(CancellationToken cancellationToken)
+        => InitializeAsync(cancellationToken);
 }

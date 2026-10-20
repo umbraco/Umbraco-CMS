@@ -1,9 +1,12 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Navigation;
 using static Umbraco.Cms.Core.Cache.LanguageCacheRefresher.JsonPayload;
 
 namespace Umbraco.Cms.Core.Cache;
@@ -15,6 +18,7 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
     LanguageCacheRefresher.JsonPayload>
 {
     private readonly IDomainCacheService _domainCacheService;
+    private readonly IPublishStatusManagementService _publishStatusManagementService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="LanguageCacheRefresher" /> class.
@@ -24,15 +28,43 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="domainCache">The domain cache service.</param>
     /// <param name="factory">The cache refresher notification factory.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public LanguageCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IDomainCacheService domainCache,
         ICacheRefresherNotificationFactory factory)
+        : this(
+            appCaches,
+            serializer,
+            eventAggregator,
+            domainCache,
+            factory,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusManagementService>())
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LanguageCacheRefresher" /> class.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="domainCache">The domain cache service.</param>
+    /// <param name="factory">The cache refresher notification factory.</param>
+    /// <param name="publishStatusManagementService">The document publish status management service.</param>
+    public LanguageCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IDomainCacheService domainCache,
+        ICacheRefresherNotificationFactory factory,
+        IPublishStatusManagementService publishStatusManagementService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _domainCacheService = domainCache;
+        _publishStatusManagementService = publishStatusManagementService;
     }
 
     private static bool AffectsContent(JsonPayload[] payloads)
@@ -138,6 +170,7 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
         {
             switch (payload.ChangeType)
             {
+                case LanguageChangeType.Add:
                 case LanguageChangeType.Update:
                     clearDictionary = true;
                     break;
@@ -171,6 +204,26 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
         }
 
         base.Refresh(payloads);
+
+        RefreshPublishStatus(payloads);
+    }
+
+    // Invariant documents are cached as published in each language individually, so a language that appears
+    // after the cache was loaded must be added to them. Runs after base.Refresh so the default language is read
+    // from a cleared language cache.
+    private void RefreshPublishStatus(JsonPayload[] payloads)
+    {
+        if (payloads.Length == 0)
+        {
+            return;
+        }
+
+        foreach (JsonPayload payload in payloads.Where(x => x.ChangeType is LanguageChangeType.Add or LanguageChangeType.ChangeCulture))
+        {
+            _publishStatusManagementService.AddCultureAsync(payload.IsoCode, CancellationToken.None).GetAwaiter().GetResult();
+        }
+
+        _publishStatusManagementService.RefreshDefaultCultureAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
 
 

@@ -5,10 +5,12 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
@@ -17,9 +19,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 public class LanguageCacheRefresherTests
 {
     private Mock<IDomainCacheService> _domainCacheService = null!;
+    private Mock<IPublishStatusManagementService> _publishStatusManagementService = null!;
 
     [SetUp]
-    public void SetUp() => _domainCacheService = new Mock<IDomainCacheService>();
+    public void SetUp()
+    {
+        _domainCacheService = new Mock<IDomainCacheService>();
+        _publishStatusManagementService = new Mock<IPublishStatusManagementService>();
+    }
 
     [Test]
     public void RefreshInternal_Does_Not_Refresh_The_Domain_Cache()
@@ -55,10 +62,60 @@ public class LanguageCacheRefresherTests
         _domainCacheService.Verify(x => x.Refresh(It.IsAny<DomainCacheRefresher.JsonPayload[]>()), Times.Never);
     }
 
+    [Test]
+    public void RefreshInternal_Clears_Dictionary_Items_When_A_Language_Is_Added()
+    {
+        var appCaches = new AppCaches(
+            NoAppCache.Instance,
+            NoAppCache.Instance,
+            new IsolatedCaches(_ => new ObjectCacheAppCache()));
+        appCaches.IsolatedCaches.GetOrCreate<IDictionaryItem>().Insert("dictionary-item", () => new object());
+        LanguageCacheRefresher refresher = CreateRefresher(appCaches);
+
+        refresher.RefreshInternal([Payload(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Add)]);
+
+        Assert.IsNull(appCaches.IsolatedCaches.GetOrCreate<IDictionaryItem>().Get("dictionary-item"));
+    }
+
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Add)]
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture)]
+    public void Refresh_Adds_The_Culture_To_The_Publish_Status_When_The_IsoCode_Is_New(LanguageCacheRefresher.JsonPayload.LanguageChangeType changeType)
+    {
+        LanguageCacheRefresher refresher = CreateRefresher();
+
+        refresher.Refresh([Payload(changeType)]);
+
+        _publishStatusManagementService.Verify(x => x.AddCultureAsync("en-US", It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update)]
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Remove)]
+    public void Refresh_Does_Not_Add_A_Culture_To_The_Publish_Status_When_The_IsoCode_Is_Unchanged(LanguageCacheRefresher.JsonPayload.LanguageChangeType changeType)
+    {
+        LanguageCacheRefresher refresher = CreateRefresher();
+
+        refresher.Refresh([Payload(changeType)]);
+
+        _publishStatusManagementService.Verify(x => x.AddCultureAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Add)]
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update)]
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture)]
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Remove)]
+    public void Refresh_Refreshes_The_Default_Culture_Of_The_Publish_Status(LanguageCacheRefresher.JsonPayload.LanguageChangeType changeType)
+    {
+        LanguageCacheRefresher refresher = CreateRefresher();
+
+        refresher.Refresh([Payload(changeType), Payload(changeType)]);
+
+        _publishStatusManagementService.Verify(x => x.RefreshDefaultCultureAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
     private static LanguageCacheRefresher.JsonPayload Payload(LanguageCacheRefresher.JsonPayload.LanguageChangeType changeType)
         => new(1, "en-US", changeType);
 
-    private LanguageCacheRefresher CreateRefresher()
+    private LanguageCacheRefresher CreateRefresher(AppCaches? appCaches = null)
     {
         var notificationFactory = new Mock<ICacheRefresherNotificationFactory>();
         notificationFactory
@@ -66,10 +123,11 @@ public class LanguageCacheRefresherTests
             .Returns(new LanguageCacheRefresherNotification(new object(), MessageType.RefreshByPayload));
 
         return new LanguageCacheRefresher(
-            AppCaches.NoCache,
+            appCaches ?? AppCaches.NoCache,
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IEventAggregator>(),
             _domainCacheService.Object,
-            notificationFactory.Object);
+            notificationFactory.Object,
+            _publishStatusManagementService.Object);
     }
 }

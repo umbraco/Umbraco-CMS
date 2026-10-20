@@ -543,9 +543,11 @@ public static class DistributedCacheExtensions
         => dc.RefreshByPayload(LanguageCacheRefresher.UniqueId, languages.DistinctBy(x => (x.Id, x.IsoCode)).Select(x => new LanguageCacheRefresher.JsonPayload(
             x.Id,
             x.IsoCode,
-            x.WasPropertyDirty(nameof(ILanguage.IsoCode))
-            ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
-            : LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update)));
+            x.WasPropertyDirty(nameof(ILanguage.Id))
+            ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.Add
+            : x.WasPropertyDirty(nameof(ILanguage.IsoCode))
+                ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
+                : LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update)));
 
     /// <summary>
     ///     Removes the specified languages from the distributed cache.

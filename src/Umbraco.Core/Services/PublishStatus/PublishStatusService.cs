@@ -69,10 +69,37 @@ public PublishStatusService(
         }
 
         var newDictionary = new ConcurrentDictionary<Guid, ISet<string>>(publishStatus);
-        DefaultCulture = await _languageService.GetDefaultIsoCodeAsync();
+        await RefreshDefaultCultureAsync(cancellationToken);
 
         Interlocked.Exchange(ref _publishedCultures, newDictionary);
     }
+
+    /// <inheritdoc/>
+    public async Task AddCultureAsync(string culture, CancellationToken cancellationToken)
+    {
+        IEnumerable<Guid> publishedKeys;
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        {
+            publishedKeys = await _publishStatusRepository.GetPublishedKeysAsync(culture, cancellationToken);
+            scope.Complete();
+        }
+
+        // The cached sets are read concurrently, so they are replaced rather than modified in place.
+        ConcurrentDictionary<Guid, ISet<string>> publishedCultures = Volatile.Read(ref _publishedCultures);
+        foreach (Guid documentKey in publishedKeys)
+        {
+            publishedCultures.AddOrUpdate(
+                documentKey,
+                _ => new HashSet<string> { culture },
+                (_, existing) => existing.Contains(culture, StringComparer.InvariantCultureIgnoreCase)
+                    ? existing
+                    : new HashSet<string>(existing) { culture });
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task RefreshDefaultCultureAsync(CancellationToken cancellationToken)
+        => DefaultCulture = await _languageService.GetDefaultIsoCodeAsync();
 
     /// <inheritdoc/>
     public bool IsDocumentPublished(Guid documentKey, string culture)

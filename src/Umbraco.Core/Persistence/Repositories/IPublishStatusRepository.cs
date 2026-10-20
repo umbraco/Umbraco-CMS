@@ -27,4 +27,17 @@ public interface IPublishStatusRepository
     /// <param name="cancellationToken">A cancellation token to observe.</param>
     /// <returns>A dictionary mapping document keys to their published culture codes.</returns>
     Task<IDictionary<Guid, ISet<string>>> GetDescendantsOrSelfPublishStatusAsync(Guid rootDocumentKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets the keys of all documents that are published in a culture.
+    /// </summary>
+    /// <param name="culture">The culture code.</param>
+    /// <param name="cancellationToken">A cancellation token to observe.</param>
+    /// <returns>The keys of the documents published in the culture, including invariant published documents.</returns>
+    // TODO (V18): Remove the default implementation.
+    async Task<IEnumerable<Guid>> GetPublishedKeysAsync(string culture, CancellationToken cancellationToken)
+        => (await GetAllPublishStatusAsync(cancellationToken))
+            .Where(x => x.Value.Contains(culture, StringComparer.InvariantCultureIgnoreCase))
+            .Select(x => x.Key)
+            .ToArray();
 }
