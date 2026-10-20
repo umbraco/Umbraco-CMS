@@ -71,7 +71,8 @@ export class UmbContentReferencedEntitiesManager extends UmbControllerBase {
 	#groupByEntityType(entities: Array<UmbEntityModel>): Record<string, Array<UmbEntityModel>> {
 		const groups: Record<string, Array<UmbEntityModel>> = {};
 		for (const entity of entities) {
-			(groups[entity.entityType] ??= []).push(entity);
+			groups[entity.entityType] ??= [];
+			groups[entity.entityType].push(entity);
 		}
 		return groups;
 	}

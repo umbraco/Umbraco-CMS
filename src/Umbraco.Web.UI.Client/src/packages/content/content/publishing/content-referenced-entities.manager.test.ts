@@ -160,7 +160,7 @@ describe('UmbContentReferencedEntitiesManager', () => {
 			{ editorAlias: 'test-editor', alias: 'b', value: { uniques: ['elm-1'] } },
 		]);
 
-		expect(result.length).to.equal(1);
+		expect(result).to.have.lengthOf(1);
 		expect(result[0].unique).to.equal('elm-1');
 	});
 
