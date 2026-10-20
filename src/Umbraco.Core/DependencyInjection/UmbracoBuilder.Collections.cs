@@ -115,7 +115,8 @@ public static partial class UmbracoBuilderExtensions
         builder.WebhookEvents().AddCms(true, webhookPayloadType);
 
         builder.ContentTypeFilters();
-        builder.SchemaLockdownConfigurators();
+        builder.SchemaLockdownConfigurators()
+            .Add<ProductionRuntimeModeSchemaLockdownConfigurator>();
     }
 
     /// <summary>

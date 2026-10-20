@@ -1,0 +1,36 @@
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+
+namespace Umbraco.Cms.Core.SchemaLockdown;
+
+/// <summary>
+/// Locks templates and partial views when the site runs in <see cref="RuntimeMode.Production"/>.
+/// </summary>
+/// <remarks>
+/// In production runtime mode template and partial view files are not written to disk, as they arrive with the
+/// deployment. A change requested through the Management API could not be persisted, so it is denied rather than
+/// appearing to succeed.
+/// </remarks>
+public sealed class ProductionRuntimeModeSchemaLockdownConfigurator : ISchemaLockdownConfigurator
+{
+    private readonly IOptions<RuntimeSettings> _runtimeSettings;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProductionRuntimeModeSchemaLockdownConfigurator"/> class.
+    /// </summary>
+    /// <param name="runtimeSettings">The runtime settings.</param>
+    public ProductionRuntimeModeSchemaLockdownConfigurator(IOptions<RuntimeSettings> runtimeSettings)
+        => _runtimeSettings = runtimeSettings;
+
+    /// <inheritdoc />
+    public void Configure(ISchemaRestrictionsBuilder builder)
+    {
+        if (_runtimeSettings.Value.Mode != RuntimeMode.Production)
+        {
+            return;
+        }
+
+        builder.BlockMutations(Constants.UdiEntityType.Template);
+        builder.BlockMutations(Constants.UdiEntityType.PartialView);
+    }
+}
