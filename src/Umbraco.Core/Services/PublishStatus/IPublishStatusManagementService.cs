@@ -50,7 +50,7 @@ public interface IPublishStatusManagementService
     /// <param name="culture">The culture code.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    // TODO (V18): Remove the default implementation.
+    // TODO (V19): Remove the default implementation.
     Task AddCultureAsync(string culture, CancellationToken cancellationToken)
         => InitializeAsync(cancellationToken);
 
@@ -59,7 +59,9 @@ public interface IPublishStatusManagementService
     /// </summary>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    // TODO (V18): Remove the default implementation.
+    // TODO (V19): Remove the default implementation.
+    // This runs for every language change, so the default leaves existing implementations as they were rather than
+    // reloading the whole cache each time.
     Task RefreshDefaultCultureAsync(CancellationToken cancellationToken)
-        => InitializeAsync(cancellationToken);
+        => Task.CompletedTask;
 }
