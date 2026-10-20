@@ -73,9 +73,9 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	}
 
 	#renderDocumentBlueprintStartNodes() {
-		const uniques =
-			this._calculatedStartNodes?.documentBlueprintStartNodeUniques.map((reference) => reference.unique) || [];
-		const hasAccess = this._calculatedStartNodes?.hasDocumentBlueprintRootAccess === true || uniques.length > 0;
+		if (!this._calculatedStartNodes) return nothing;
+		const uniques = this._calculatedStartNodes.documentBlueprintStartNodeUniques.map((reference) => reference.unique);
+		const hasAccess = this._calculatedStartNodes.hasDocumentBlueprintRootAccess || uniques.length > 0;
 		return html`
 			<umb-property-layout label=${this.localize.term('treeHeaders_contentBlueprints')} orientation="vertical">
 				<div slot="editor">
@@ -83,7 +83,7 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 						? html`<umb-user-document-blueprint-start-node
 								readonly
 								.uniques=${uniques}></umb-user-document-blueprint-start-node>`
-						: html`<umb-localize key="user_noStartNodes">No start nodes selected</umb-localize>`}
+						: this.#renderNoStartNodes()}
 				</div>
 			</umb-property-layout>
 		`;

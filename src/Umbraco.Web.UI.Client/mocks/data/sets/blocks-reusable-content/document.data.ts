@@ -834,6 +834,7 @@ const createLibraryElementStatesDocument = ({
 					expose: container ? [container.expose] : [],
 					layout: {
 						'Umbraco.BlockGrid': [
+							...gridEntries,
 							...(container && gridContainer
 								? [
 										{
@@ -846,7 +847,6 @@ const createLibraryElementStatesDocument = ({
 										},
 									]
 								: []),
-							...gridEntries,
 						],
 					},
 				},
@@ -877,6 +877,14 @@ const libraryElementLifecycleDocument = createLibraryElementStatesDocument({
 	gridEntries: LIFECYCLE_ENTRIES.map(([state, contentKey]) =>
 		externalGridEntry(`library-lifecycle-grid-${state}`, contentKey),
 	),
+	gridContainer: {
+		key: 'library-lifecycle-grid-container',
+		title: 'Area with nested Library Elements',
+		areaKey: '8a4d2f6b-1e93-4c57-b0a8-3d5e7f9c1b24',
+		areaEntries: LIFECYCLE_ENTRIES.map(([state, contentKey]) =>
+			externalGridEntry(`library-lifecycle-grid-area-${state}`, contentKey),
+		),
+	},
 });
 
 const libraryElementMisconfigurationsDocument = createLibraryElementStatesDocument({
