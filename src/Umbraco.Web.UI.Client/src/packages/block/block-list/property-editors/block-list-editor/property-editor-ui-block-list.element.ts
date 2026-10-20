@@ -390,9 +390,10 @@ export class UmbPropertyEditorUIBlockListElement
 
 	#renderCreateButtonGroup() {
 		if (this._layouts.length > 0 && (this._limitMax === 1 || this.readonly)) return nothing;
+		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
 		return html`
 			<uui-button-group>
-				${this.#renderCreateButton()}${this.#renderLibraryButton()}${this.#renderPasteButton()}
+				${this.#renderCreateButton(createPath)}${this.#renderLibraryButton(createPath)}${this.#renderPasteButton()}
 			</uui-button-group>
 		`;
 	}
@@ -414,9 +415,8 @@ export class UmbPropertyEditorUIBlockListElement
 		`;
 	}
 
-	#renderCreateButton() {
+	#renderCreateButton(createPath: string | undefined) {
 		if (!this._catalogueRouteBuilder) return nothing;
-		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
 		return html`
 			<uui-button
 				look="placeholder"
@@ -448,8 +448,8 @@ export class UmbPropertyEditorUIBlockListElement
 		}
 	}
 
-	#renderLibraryButton() {
-		if (!this._hasLibraryElements) return nothing;
+	#renderLibraryButton(createPath: string | undefined) {
+		if (createPath || !this._hasLibraryElements) return nothing;
 		return html`
 			<uui-button
 				class="btnAction"

@@ -431,9 +431,10 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	#renderCreateButtonGroup() {
 		if (this._limitMax === 1 && this._layoutEntries.length > 0) return nothing;
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
+			const createPath = this.#getPathForCreateBlock(-1);
 			return html`
 				<uui-button-group id="createButton">
-					${this.#renderCreateButton()}${this.#renderLibraryButton()}${this.#renderPasteButton()}
+					${this.#renderCreateButton(createPath)}${this.#renderLibraryButton(createPath)}${this.#renderPasteButton()}
 				</uui-button-group>
 			`;
 		} else if (this._isReadOnly === false) {
@@ -447,10 +448,8 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		}
 	}
 
-	#renderCreateButton() {
+	#renderCreateButton(createPath: string | undefined) {
 		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
-		const createPath = this.#getPathForCreateBlock(-1);
-
 		return html`
 			<uui-button
 				look="placeholder"
@@ -490,8 +489,8 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		`;
 	}
 
-	#renderLibraryButton() {
-		if (!this._hasLibraryElements) return nothing;
+	#renderLibraryButton(createPath: string | undefined) {
+		if (createPath || !this._hasLibraryElements) return nothing;
 
 		return this.#renderActionButton({
 			label: this.localize.term('blockEditor_tabLibrary'),

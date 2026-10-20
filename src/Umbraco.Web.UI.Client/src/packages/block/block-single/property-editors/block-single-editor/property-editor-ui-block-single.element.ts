@@ -381,16 +381,16 @@ export class UmbPropertyEditorUIBlockSingleElement
 		if ((this.readonly && this._layouts.length > 0) || this._layouts.length >= 1) {
 			return nothing;
 		} else {
+			const createPath = this.#entriesContext.getPathForCreateBlock(-1);
 			return html`
 				<uui-button-group>
-					${this.#renderCreateButton()}${this.#renderLibraryButton()}${this.#renderPasteButton()}
+					${this.#renderCreateButton(createPath)}${this.#renderLibraryButton(createPath)}${this.#renderPasteButton()}
 				</uui-button-group>
 			`;
 		}
 	}
 
-	#renderCreateButton() {
-		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
+	#renderCreateButton(createPath: string | undefined) {
 		return html`
 			<uui-button
 				look="placeholder"
@@ -415,8 +415,8 @@ export class UmbPropertyEditorUIBlockSingleElement
 		`;
 	}
 
-	#renderLibraryButton() {
-		if (!this._hasLibraryElements) return nothing;
+	#renderLibraryButton(createPath: string | undefined) {
+		if (createPath || !this._hasLibraryElements) return nothing;
 		return html`
 			<uui-button
 				class="btnAction"
