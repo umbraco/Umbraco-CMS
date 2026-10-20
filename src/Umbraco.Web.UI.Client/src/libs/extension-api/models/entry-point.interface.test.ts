@@ -10,16 +10,16 @@ describe('UmbEntryPointModule', () => {
 		expect(hasOnUnloadExport(module)).to.be.false;
 	});
 
-	it('accepts a module that only exports onUnload', () => {
+	it('requires onInit, while the guards still tolerate a module without it', () => {
+		// @ts-expect-error onInit is the hook every entry point is expected to implement.
 		const module: UmbEntryPointModule = { onUnload: () => {} };
 		expect(hasInitExport(module)).to.be.false;
 		expect(hasOnUnloadExport(module)).to.be.true;
 	});
 
 	it('does not treat a hook that is not a function as an export', () => {
-		const module: UmbEntryPointModule = { onInit: undefined, onUnload: undefined };
-		expect(hasInitExport(module)).to.be.false;
-		expect(hasOnUnloadExport(module)).to.be.false;
+		expect(hasInitExport({ onInit: undefined })).to.be.false;
+		expect(hasOnUnloadExport({ onUnload: undefined })).to.be.false;
 		expect(hasInitExport({ onInit: 'onInit' })).to.be.false;
 		expect(hasOnUnloadExport({ onUnload: 'onUnload' })).to.be.false;
 	});

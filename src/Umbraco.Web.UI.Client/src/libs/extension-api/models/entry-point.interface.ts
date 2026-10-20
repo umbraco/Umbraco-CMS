@@ -12,9 +12,8 @@ export type UmbEntryPointOnUnload = (host: UmbElement, extensionRegistry: UmbExt
 export interface UmbEntryPointModule {
 	/**
 	 * Function that will be called when the host element is initialized and/or the extension is loaded for the first time.
-	 * @optional
 	 */
-	onInit?: UmbEntryPointOnInit;
+	onInit: UmbEntryPointOnInit;
 
 	/**
 	 * Function that will be called when the extension is unregistered.
