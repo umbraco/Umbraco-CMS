@@ -162,7 +162,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 			unique,
 		});
 		this.#uniques.appendOne(unique);
-		this.#observeAddedEntry(unique);
+		void this.#observeAddedEntry(unique);
 	}
 
 	// Follows the store so a change saved elsewhere in this client is reflected right away, rather than only after
