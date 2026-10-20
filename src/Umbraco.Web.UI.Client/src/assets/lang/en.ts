@@ -3009,11 +3009,18 @@ export default {
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
 		notPublishedLibraryElementDescription: 'The Library Element used by this Block is not published',
+		publishedPendingChangesLibraryElementDescription:
+			'The Library Element used by this Block has changes that are not yet published',
+		trashedLibraryElementDescription: 'The Library Element used by this Block is in the recycle bin',
 		areaValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in this area.',
 		rootValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in the root of this property.',
 		unsupportedBlockName: 'Unsupported',
 		unsupportedBlockDescription:
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
+		deletedLibraryElementName: 'Deleted Library Element',
+		deletedLibraryElementDescription: 'The Library Element used by this Block has been deleted. Remove this Block.',
+		noAccessLibraryElementName: 'Inaccessible Library Element',
+		noAccessLibraryElementDescription: 'You do not have access to the Library Element used by this Block.',
 		tabLibrary: 'Library',
 		transferToElementLibrary: 'Transfer to Library',
 		transferredToElementLibrary: 'Transferred to Library',

@@ -4121,6 +4121,43 @@ export type PutDataTypeFolderByIdResponses = {
     200: unknown;
 };
 
+export type PutDataTypeFolderByIdMoveData = {
+    body: MoveFolderRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/data-type/folder/{id}/move';
+};
+
+export type PutDataTypeFolderByIdMoveErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDataTypeFolderByIdMoveError = PutDataTypeFolderByIdMoveErrors[keyof PutDataTypeFolderByIdMoveErrors];
+
+export type PutDataTypeFolderByIdMoveResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetDataTypeSchemasBatchData = {
     body?: never;
     path?: never;
@@ -7015,6 +7052,43 @@ export type PutDocumentBlueprintFolderByIdResponses = {
     200: unknown;
 };
 
+export type PutDocumentBlueprintFolderByIdMoveData = {
+    body: MoveFolderRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document-blueprint/folder/{id}/move';
+};
+
+export type PutDocumentBlueprintFolderByIdMoveErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDocumentBlueprintFolderByIdMoveError = PutDocumentBlueprintFolderByIdMoveErrors[keyof PutDocumentBlueprintFolderByIdMoveErrors];
+
+export type PutDocumentBlueprintFolderByIdMoveResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PostDocumentBlueprintFromDocumentData = {
     body: CreateDocumentBlueprintFromDocumentRequestModel;
     path?: never;
@@ -8042,6 +8116,43 @@ export type PutDocumentTypeFolderByIdErrors = {
 export type PutDocumentTypeFolderByIdError = PutDocumentTypeFolderByIdErrors[keyof PutDocumentTypeFolderByIdErrors];
 
 export type PutDocumentTypeFolderByIdResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PutDocumentTypeFolderByIdMoveData = {
+    body: MoveFolderRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document-type/folder/{id}/move';
+};
+
+export type PutDocumentTypeFolderByIdMoveErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDocumentTypeFolderByIdMoveError = PutDocumentTypeFolderByIdMoveErrors[keyof PutDocumentTypeFolderByIdMoveErrors];
+
+export type PutDocumentTypeFolderByIdMoveResponses = {
     /**
      * OK
      */
@@ -13000,6 +13111,43 @@ export type PutMediaTypeFolderByIdResponses = {
     200: unknown;
 };
 
+export type PutMediaTypeFolderByIdMoveData = {
+    body: MoveFolderRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/media-type/folder/{id}/move';
+};
+
+export type PutMediaTypeFolderByIdMoveErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutMediaTypeFolderByIdMoveError = PutMediaTypeFolderByIdMoveErrors[keyof PutMediaTypeFolderByIdMoveErrors];
+
+export type PutMediaTypeFolderByIdMoveResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PostMediaTypeImportData = {
     body: ImportMediaTypeRequestModel;
     path?: never;
@@ -14514,6 +14662,43 @@ export type PutMemberTypeFolderByIdErrors = {
 export type PutMemberTypeFolderByIdError = PutMemberTypeFolderByIdErrors[keyof PutMemberTypeFolderByIdErrors];
 
 export type PutMemberTypeFolderByIdResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PutMemberTypeFolderByIdMoveData = {
+    body: MoveFolderRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/folder/{id}/move';
+};
+
+export type PutMemberTypeFolderByIdMoveErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutMemberTypeFolderByIdMoveError = PutMemberTypeFolderByIdMoveErrors[keyof PutMemberTypeFolderByIdMoveErrors];
+
+export type PutMemberTypeFolderByIdMoveResponses = {
     /**
      * OK
      */

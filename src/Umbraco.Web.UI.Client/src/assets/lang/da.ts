@@ -2690,9 +2690,17 @@ export default {
 		notExposedLabel: 'ikke oprettet',
 		notExposedDescription: 'Denne blok er endnu ikke oprettet for denne variant',
 		notPublishedLibraryElementDescription: 'Det bibliotekselement, som denne blok bruger, er ikke udgivet',
+		publishedPendingChangesLibraryElementDescription:
+			'Det bibliotekselement, som denne blok bruger, har ændringer, der endnu ikke er udgivet',
+		trashedLibraryElementDescription: 'Det bibliotekselement, som denne blok bruger, ligger i papirkurven',
 		unsupportedBlockName: 'Ugyldigt indhold',
 		unsupportedBlockDescription:
 			'Dette indhold er ikke længere understøttet. Hvis du mangler dette indhold bør du kontakte din administrator. Ellers bør du slette dette indhold.',
+		deletedLibraryElementName: 'Slettet bibliotekselement',
+		deletedLibraryElementDescription:
+			'Det bibliotekselement, som denne blok bruger, er slettet. Fjern denne blok.',
+		noAccessLibraryElementName: 'Utilgængeligt bibliotekselement',
+		noAccessLibraryElementDescription: 'Du har ikke adgang til det bibliotekselement, som denne blok bruger.',
 		blockVariantConfigurationNotSupported:
 			'En eller flere bloktyper i denne blokeditor bruger en elementtype, der er konfigureret til at variere efter kultur eller segment. Dette understøttes ikke på et indholdselement, som ikke varierer efter kultur eller segment.',
 		areaValidationEntriesNotAllowed: '<strong>%0%</strong> er ikke tilladt i dette område.',

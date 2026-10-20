@@ -19,6 +19,7 @@ internal sealed class ContentBlueprintEditingService
     : ContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>, IContentBlueprintEditingService
 {
     private readonly IContentBlueprintContainerService _containerService;
+    private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly ContentTypeFilterCollection _contentTypeFilters;
 
     /// <summary>
@@ -36,6 +37,9 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
     public ContentBlueprintEditingService(
         IContentService contentService,
         IContentTypeService contentTypeService,
@@ -50,10 +54,12 @@ internal sealed class ContentBlueprintEditingService
         IRelationService relationService,
         ContentTypeFilterCollection contentTypeFilters,
         ILanguageService languageService,
-        IUserService userService)
+        IUserService userService,
+        IEventMessagesFactory eventMessagesFactory)
         : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService, optionsMonitor, relationService, contentTypeFilters, languageService, userService)
     {
         _containerService = containerService;
+        _eventMessagesFactory = eventMessagesFactory;
         _contentTypeFilters = contentTypeFilters;
     }
 
@@ -265,12 +271,27 @@ internal sealed class ContentBlueprintEditingService
             return Attempt.Fail(ContentEditingOperationStatus.NotAllowed);
         }
 
+        EventMessages eventMessages = _eventMessagesFactory.Get();
+
+        // The move info has to be built before the parent is changed, so that it carries the original path.
+        var moveEventInfo = new MoveEventInfo<IContent>(toMove, toMove.Path, containerKey);
+
+        var movingNotification = new ContentMovingBlueprintNotification(moveEventInfo, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(movingNotification))
+        {
+            // Nothing has been written yet, and the scope is not completed, so there is nothing to roll back.
+            return Attempt.Fail(ContentEditingOperationStatus.CancelledByNotification);
+        }
+
         // NOTE: as long as the parent ID is correct the document repo takes care of updating the rest of the
         //       structural node data like path, level, sort orders etc.
         toMove.ParentId = parentId;
 
         var userId = await GetUserIdAsync(userKey);
         ContentService.MoveBlueprint(toMove, userId);
+
+        scope.Notifications.Publish(
+            new ContentMovedBlueprintNotification(moveEventInfo, eventMessages).WithStateFrom(movingNotification));
 
         scope.Complete();
 

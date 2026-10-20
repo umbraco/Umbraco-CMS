@@ -701,6 +701,30 @@ const variantLibraryStatesDocument: UmbMockDocumentModel = {
 							settingsKey: null,
 							isExternalContent: true,
 						},
+						{
+							key: 'variant-library-states-en-published-da-draft',
+							contentKey: 'library-variant-element-en-published-da-draft-id',
+							settingsKey: null,
+							isExternalContent: true,
+						},
+						{
+							key: 'variant-library-states-en-pending-da-published',
+							contentKey: 'library-variant-element-en-pending-da-published-id',
+							settingsKey: null,
+							isExternalContent: true,
+						},
+						{
+							key: 'variant-library-states-en-published-da-unpublished',
+							contentKey: 'library-variant-element-en-published-da-unpublished-id',
+							settingsKey: null,
+							isExternalContent: true,
+						},
+						{
+							key: 'variant-library-states-trashed',
+							contentKey: 'library-variant-element-trashed-id',
+							settingsKey: null,
+							isExternalContent: true,
+						},
 					],
 				},
 			},
@@ -709,6 +733,181 @@ const variantLibraryStatesDocument: UmbMockDocumentModel = {
 	flags: [],
 };
 
+const externalListEntry = (key: string, contentKey: string) => ({
+	key,
+	contentKey,
+	settingsKey: null,
+	isExternalContent: true,
+});
+
+const externalGridEntry = (key: string, contentKey: string) => ({
+	columnSpan: 6,
+	rowSpan: 1,
+	areas: [],
+	...externalListEntry(key, contentKey),
+});
+
+const localTextBlock = (key: string, title: string) => ({
+	contentData: {
+		contentTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
+		key,
+		values: [
+			{
+				editorAlias: 'Umbraco.TextBox',
+				culture: null,
+				segment: null,
+				alias: 'title',
+				value: title,
+			},
+		],
+	},
+	expose: { contentKey: key, culture: null, segment: null },
+});
+
+const createLibraryElementStatesDocument = ({
+	id,
+	documentTypeId,
+	name,
+	createDate,
+	listEntries,
+	gridEntries,
+	gridContainer,
+}: {
+	id: string;
+	documentTypeId: string;
+	name: string;
+	createDate: string;
+	listEntries: Array<ReturnType<typeof externalListEntry>>;
+	gridEntries: Array<ReturnType<typeof externalGridEntry>>;
+	gridContainer?: { key: string; title: string; areaKey: string; areaEntries: Array<ReturnType<typeof externalGridEntry>> };
+}): UmbMockDocumentModel => {
+	const container = gridContainer ? localTextBlock(gridContainer.key, gridContainer.title) : undefined;
+
+	return {
+		ancestors: [],
+		template: null,
+		id,
+		createDate,
+		parent: null,
+		documentType: {
+			id: documentTypeId,
+			icon: 'icon-bulleted-list color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published' as UmbDocumentVariantState,
+				publishDate: createDate,
+				culture: null,
+				segment: null,
+				name,
+				createDate,
+				updateDate: createDate,
+				id,
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.BlockList',
+				alias: 'blockListLibraryStates',
+				culture: null,
+				segment: null,
+				value: {
+					contentData: [],
+					settingsData: [],
+					expose: [],
+					layout: { 'Umbraco.BlockList': listEntries },
+				},
+			},
+			{
+				editorAlias: 'Umbraco.BlockGrid',
+				alias: 'blockGridLibraryStates',
+				culture: null,
+				segment: null,
+				value: {
+					contentData: container ? [container.contentData] : [],
+					settingsData: [],
+					expose: container ? [container.expose] : [],
+					layout: {
+						'Umbraco.BlockGrid': [
+							...gridEntries,
+							...(container && gridContainer
+								? [
+										{
+											columnSpan: 12,
+											rowSpan: 1,
+											areas: [{ key: gridContainer.areaKey, items: gridContainer.areaEntries }],
+											key: gridContainer.key,
+											contentKey: gridContainer.key,
+											settingsKey: null,
+										},
+									]
+								: []),
+						],
+					},
+				},
+			},
+		],
+		flags: [],
+	};
+};
+
+const LIFECYCLE_ENTRIES: Array<[string, string]> = [
+	['published', 'library-element-state-published-id'],
+	['draft', 'library-element-state-draft-id'],
+	['pending', 'library-element-state-pending-id'],
+	['unpublished', 'library-element-state-unpublished-id'],
+	['trashed', 'library-element-state-trashed-id'],
+	['deleted', 'library-element-state-deleted-id'],
+	['no-access', 'library-element-state-no-access-id'],
+];
+
+const libraryElementLifecycleDocument = createLibraryElementStatesDocument({
+	id: '6b1d9e3a-2f47-4c85-8a0e-7d3c5f1b9a42',
+	documentTypeId: '4a9e6c2d-8b15-4f73-9d0a-5e2c7b1f3a68',
+	name: 'Library Element Lifecycle',
+	createDate: '2026-04-17 09:00:00.000000',
+	listEntries: LIFECYCLE_ENTRIES.map(([state, contentKey]) =>
+		externalListEntry(`library-lifecycle-list-${state}`, contentKey),
+	),
+	gridEntries: LIFECYCLE_ENTRIES.map(([state, contentKey]) =>
+		externalGridEntry(`library-lifecycle-grid-${state}`, contentKey),
+	),
+	gridContainer: {
+		key: 'library-lifecycle-grid-container',
+		title: 'Area with nested Library Elements',
+		areaKey: '8a4d2f6b-1e93-4c57-b0a8-3d5e7f9c1b24',
+		areaEntries: LIFECYCLE_ENTRIES.map(([state, contentKey]) =>
+			externalGridEntry(`library-lifecycle-grid-area-${state}`, contentKey),
+		),
+	},
+});
+
+const libraryElementMisconfigurationsDocument = createLibraryElementStatesDocument({
+	id: 'c2e8a4f6-7d19-4b30-9e5a-1f6b3d8c0a75',
+	documentTypeId: '7d2b5e9c-3a61-4f08-b4d7-0e8a1c6f3b95',
+	name: 'Library Element Misconfigurations',
+	createDate: '2026-04-17 09:30:00.000000',
+	listEntries: [
+		externalListEntry('library-misconfig-list-element-type-deleted', 'library-element-state-orphan-type-id'),
+		externalListEntry('library-misconfig-list-block-type-removed', 'library-element-two-id'),
+	],
+	gridEntries: [
+		externalGridEntry('library-misconfig-grid-element-type-deleted', 'library-element-state-orphan-type-id'),
+		externalGridEntry('library-misconfig-grid-root-element-two', 'library-element-two-id'),
+	],
+	gridContainer: {
+		key: 'library-misconfig-grid-container',
+		title: 'Area allows Element One only',
+		areaKey: '8a4d2f6b-1e93-4c57-b0a8-3d5e7f9c1b24',
+		areaEntries: [externalGridEntry('library-misconfig-grid-area-not-allowed', 'library-element-two-id')],
+	},
+});
+
 export const data: Array<UmbMockDocumentModel> = [
 	blockGridDocument,
 	blockListDocument,
@@ -716,4 +915,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	richTextEditorDocument,
 	variantBlockListDocument,
 	variantLibraryStatesDocument,
+	libraryElementLifecycleDocument,
+	libraryElementMisconfigurationsDocument,
 ];

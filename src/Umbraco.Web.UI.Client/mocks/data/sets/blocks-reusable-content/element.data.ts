@@ -1,6 +1,8 @@
 import type { UmbMockElementModel } from '../../mock-data-set.types.js';
 import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 
+import { data as elementStates } from './element-states.data.js';
+
 const elementOneLibraryElement: UmbMockElementModel = {
 	ancestors: [],
 	id: 'library-element-one-id',
@@ -498,4 +500,5 @@ export const data: Array<UmbMockElementModel> = [
 	publishedBothLibraryElement,
 	missingDaLibraryElement,
 	emptyVariantsLibraryElement,
+	...elementStates,
 ];

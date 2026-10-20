@@ -3,6 +3,7 @@ import type {
 	UmbBlockDataModel,
 	UmbBlockDataValueModel,
 	UmbBlockExposeModel,
+	UmbBlockExternalContentFailureReason,
 	UmbBlockLayoutBaseModel,
 } from '../types.js';
 import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
@@ -14,7 +15,12 @@ import {
 	umbResolveBlockTransferCultures,
 	type UmbBlockTransferLanguageAccess,
 } from '../utils/block-transfer-variants.function.js';
+import { getExternalContentFailureReason } from '../utils/get-external-content-failure-reason.function.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
+import {
+	findExternalContentVariant,
+	type UmbBlockManagerExternalContentVariantModel,
+} from './block-manager-external-content.function.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -78,6 +84,42 @@ export interface UmbBlockTransferToExternalContentResult {
 	notified?: boolean;
 }
 
+/**
+ * Maps a resolved Element to the block data shape used for local and external block content alike.
+ * @param {UmbElementDetailModel} element - the resolved Element.
+ * @returns {UmbBlockDataModel} the block data.
+ */
+function elementToBlockData(element: UmbElementDetailModel): UmbBlockDataModel {
+	return {
+		key: element.unique,
+		contentTypeKey: element.documentType.unique,
+		values: element.values.map(
+			(v): UmbBlockDataValueModel => ({
+				alias: v.alias,
+				editorAlias: v.editorAlias,
+				culture: v.culture,
+				segment: v.segment,
+				value: v.value,
+			}),
+		),
+	};
+}
+
+/**
+ * Maps a resolved Element's variant to the external content variant shape.
+ * @param {UmbElementDetailModel['variants'][number]} variant - the Element's variant.
+ * @returns {UmbBlockManagerExternalContentVariantModel} the external content variant.
+ */
+function elementVariantToExternalContentVariant(
+	variant: UmbElementDetailModel['variants'][number],
+): UmbBlockManagerExternalContentVariantModel {
+	return {
+		culture: variant.culture ?? null,
+		state: variant.state ?? null,
+		name: variant.name ?? null,
+	};
+}
+
 export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
@@ -136,9 +178,15 @@ export abstract class UmbBlockManagerContext<
 		([local, external]) => [...(local ?? []), ...(external ?? [])],
 	);
 	readonly #externalContentVariants = new UmbArrayState(
-		<Array<{ key: string; variants: Array<{ culture: string | null; state: string | null }> }>>[],
+		<Array<{ key: string; variants: Array<UmbBlockManagerExternalContentVariantModel> }>>[],
 		(x) => x.key,
 	);
+	readonly #externalContentFailures = new UmbArrayState(
+		<Array<{ key: string; reason: UmbBlockExternalContentFailureReason }>>[],
+		(x) => x.key,
+	);
+	#unavailableExternalContentKeys = new Array<string>();
+	#isProbingExternalContentFailures = false;
 	#elementRepository = new UmbElementDetailRepository(this);
 	#elementPublishingRepository = new UmbElementPublishingRepository(this);
 	readonly #localize = new UmbLocalizationController(this);
@@ -255,49 +303,42 @@ export abstract class UmbBlockManagerContext<
 			null,
 		);
 
-		// Auto-resolve content for any layout marked as external, whenever layouts change.
+		// Keep the details manager's uniques in sync with any layout marked as external, so it resolves
+		// (and re-resolves on `UmbEntityUpdatedEvent`) the Elements those layouts reference, and drops any
+		// that are no longer referenced.
 		this.observe(
 			this._layouts.asObservable(),
 			(layouts) => {
-				const keys = layouts
-					.filter((layout) => layout.isExternalContent && layout.contentKey)
-					.map((layout) => layout.contentKey as string);
-				// Multiple block instances may reference the same external content — request each unique only once.
-				this.#externalContentManager.setUniques([...new Set(keys)]);
+				this.#externalContentManager.setUniques([...new Set(this._collectExternalContentKeys(layouts))]);
 			},
 			null,
 		);
 
-		// Rebuild the external content state whenever the manager's (batched) entries change.
+		// Reflect the resolved Elements into the external content states whenever they change.
 		this.observe(
 			this.#externalContentManager.entries,
 			(entries) => {
-				this.#externalContentValues.setValue(
-					entries.map(
-						(data): UmbBlockDataModel => ({
-							key: data.unique,
-							contentTypeKey: data.documentType.unique,
-							values: data.values.map(
-								(v): UmbBlockDataValueModel => ({
-									alias: v.alias,
-									editorAlias: v.editorAlias,
-									culture: v.culture,
-									segment: v.segment,
-									value: v.value,
-								}),
-							),
-						}),
-					),
-				);
+				this.#externalContentValues.setValue(entries.map(elementToBlockData));
 				this.#externalContentVariants.setValue(
-					entries.map((data) => ({
-						key: data.unique,
-						variants: data.variants.map((v) => ({
-							culture: v.culture ?? null,
-							state: v.state ?? null,
-						})),
+					entries.map((entry) => ({
+						key: entry.unique,
+						variants: entry.variants.map(elementVariantToExternalContentVariant),
 					})),
 				);
+			},
+			null,
+		);
+
+		// The batched request only says that an element is missing, not why. Ask for each missing element on its own
+		// to tell a deleted element from one the current user may not access.
+		this.observe(
+			this.#externalContentManager.statuses,
+			(statuses) => {
+				this.#externalContentFailures.remove(
+					statuses.filter((status) => status.state.type === 'success').map((status) => status.unique),
+				);
+				this.#unavailableExternalContentKeys = statuses.filter((status) => status.state.type === 'error').map((status) => status.unique);
+				this.#requestExternalContentFailures();
 			},
 			null,
 		);
@@ -454,14 +495,23 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	/**
-	 * Returns an observable that emits true when the layout for the given contentKey
-	 * has `isExternalContent` set (i.e., the block references external content).
+	 * Collects the content keys of every layout entry marked as external content. Override to also reach
+	 * layout entries that are nested inside other entries.
+	 * @param {Array<BlockLayoutType>} layouts - the top-level layout entries.
+	 * @returns {Array<string>} the content keys of the external content layouts, one per reference.
+	 */
+	protected _collectExternalContentKeys(layouts: Array<BlockLayoutType>): Array<string> {
+		return layouts.filter((layout) => layout.isExternalContent && layout.contentKey).map((layout) => layout.contentKey);
+	}
+
+	/**
+	 * Returns an observable that emits true when a layout entry for the given contentKey, at any nesting
+	 * level reached by {@link _collectExternalContentKeys}, has `isExternalContent` set (i.e., the block
+	 * references external content).
 	 * @param key
 	 */
 	isExternalContentOf(key: string) {
-		return this._layouts.asObservablePart(
-			(source) => source.find((x) => x.contentKey === key)?.isExternalContent === true,
-		);
+		return this._layouts.asObservablePart((layouts) => this._collectExternalContentKeys(layouts).includes(key));
 	}
 
 	/**
@@ -472,13 +522,56 @@ export abstract class UmbBlockManagerContext<
 	externalContentStateOf(key: string) {
 		return mergeObservables(
 			[this.#externalContentVariants.asObservablePart((source) => source.find((x) => x.key === key)), this.variantId],
-			([entry, variantId]) => {
-				if (!entry?.variants.length) return null;
-				if (!variantId) return entry.variants[0]?.state ?? null;
-				const match = entry.variants.find((v) => v.culture === variantId.culture);
-				return match?.state ?? entry.variants[0]?.state ?? null;
-			},
+			([entry, variantId]) => findExternalContentVariant(entry?.variants, variantId)?.state ?? null,
 		);
+	}
+
+	/**
+	 * Returns an observable of the external content's name (from the Element it references), matching the
+	 * current variant. Emits null if the external content has not resolved yet, or is not external content.
+	 * @param key
+	 */
+	externalContentNameOf(key: string) {
+		return mergeObservables(
+			[this.#externalContentVariants.asObservablePart((source) => source.find((x) => x.key === key)), this.variantId],
+			([entry, variantId]) => findExternalContentVariant(entry?.variants, variantId)?.name ?? null,
+		);
+	}
+
+	/**
+	 * Returns an observable of why the external content is unavailable.
+	 * Emits `undefined` while the content is available or not yet resolved.
+	 * @param key The content key of the external content.
+	 */
+	externalContentFailureOf(key: string) {
+		return this.#externalContentFailures.asObservablePart((source) => source.find((x) => x.key === key)?.reason);
+	}
+
+	async #requestExternalContentFailures() {
+		// One request at a time, so that a server that is down is asked once, not once per referenced element.
+		if (this.#isProbingExternalContentFailures) return;
+		this.#isProbingExternalContentFailures = true;
+
+		try {
+			let key = this.#nextUnexplainedExternalContentKey();
+			while (key) {
+				const { error } = await this.#elementRepository.requestByUnique(key);
+				const reason = getExternalContentFailureReason(error);
+				// A failure that says nothing about availability (the server being down, for example) is no reason to ask
+				// about the other elements as well. They are asked again the next time the statuses change.
+				if (!reason) return;
+
+				this.#externalContentFailures.appendOne({ key, reason });
+				key = this.#nextUnexplainedExternalContentKey();
+			}
+		} finally {
+			this.#isProbingExternalContentFailures = false;
+		}
+	}
+
+	#nextUnexplainedExternalContentKey() {
+		const explained = this.#externalContentFailures.getValue();
+		return this.#unavailableExternalContentKeys.find((key) => !explained.some((x) => x.key === key));
 	}
 
 	settingsOf(key: string) {
