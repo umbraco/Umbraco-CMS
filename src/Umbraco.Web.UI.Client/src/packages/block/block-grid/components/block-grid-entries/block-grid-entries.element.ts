@@ -187,9 +187,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	private _allowedBlockTypes?: UmbBlockGridTypeModel[];
 
 	@state()
-	private _hasLibraryElements = false;
-
-	@state()
 	private _configCreateLabel?: string;
 
 	@state()
@@ -252,8 +249,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			},
 			null,
 		);
-
-		this.observe(this.#context.hasLibraryElements, (x) => (this._hasLibraryElements = x), null);
 
 		this.observe(
 			this.#context.rangeLimits,
@@ -431,10 +426,9 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	#renderCreateButtonGroup() {
 		if (this._limitMax === 1 && this._layoutEntries.length > 0) return nothing;
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
-			const createPath = this.#getPathForCreateBlock(-1);
 			return html`
 				<uui-button-group id="createButton">
-					${this.#renderCreateButton(createPath)}${this.#renderLibraryButton(createPath)}${this.#renderPasteButton()}
+					${this.#renderCreateButton()} ${this.#renderPasteButton()}
 				</uui-button-group>
 			`;
 		} else if (this._isReadOnly === false) {
@@ -448,8 +442,10 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		}
 	}
 
-	#renderCreateButton(createPath: string | undefined) {
+	#renderCreateButton() {
 		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
+		const createPath = this.#getPathForCreateBlock(-1);
+
 		return html`
 			<uui-button
 				look="placeholder"
@@ -489,40 +485,18 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		`;
 	}
 
-	#renderLibraryButton(createPath: string | undefined) {
-		if (createPath || !this._hasLibraryElements) return nothing;
-
-		return this.#renderActionButton({
-			label: this.localize.term('blockEditor_tabLibrary'),
-			title: this.localize.term('blockEditor_tabLibrary'),
-			href: this._catalogueRouteBuilder?.({ view: 'library', index: -1 }),
-			icon: 'icon-link',
-		});
-	}
-
 	#renderPasteButton() {
 		if (this._areaKey) return nothing;
-
-		return this.#renderActionButton({
-			label: this.localize.term('content_createFromClipboard'),
-			title: this.localize.term('general_clipboard'),
-			href: this.#getPathForClipboard(-1),
-			icon: 'icon-clipboard-paste',
-		});
-	}
-
-	#renderActionButton({ label, title, href, icon }: { label: string; title: string; href?: string; icon: string }) {
 		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
 
 		return html`
 			<uui-button
-				class="btnAction"
-				label=${label}
+				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
-				href=${href ?? ''}
+				href=${this.#getPathForClipboard(-1) ?? ''}
 				?disabled=${this._isReadOnly}
-				title=${title}>
-				<uui-icon name=${icon}></uui-icon>
+				title=${this.localize.term('general_clipboard')}>
+				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;
 	}
@@ -562,17 +536,14 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 
 			#createButton {
 				margin-top: 1px;
-				display: flex;
-
-				.btnAction {
-					flex: 0;
-				}
+				grid-template-columns: 1fr auto;
+				display: grid;
 			}
 
 			/* Only when we are n an area, we like to hide the button on drag */
 			:host([area-key]) #createButton {
 				--umb-block-grid--create-button--is-dragging--variable: var(--umb-block-grid--is-dragging) none;
-				display: var(--umb-block-grid--create-button--is-dragging--variable, flex);
+				display: var(--umb-block-grid--create-button--is-dragging--variable, grid);
 			}
 
 			.umb-block-grid__layout-container[data-area-length='0'] {

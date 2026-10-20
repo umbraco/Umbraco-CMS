@@ -201,7 +201,6 @@ export class UmbBlockGridEntriesContext
 						blocks: blockTypes,
 						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
-						openLibrary: routingInfo.view === 'library',
 						libraryAllowedElementTypeKeys,
 						clipboardFilter: async (clipboardEntryDetail) => {
 							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
@@ -319,7 +318,6 @@ export class UmbBlockGridEntriesContext
 		if (!this._manager) return;
 
 		this.#setupAllowedBlockTypes();
-		this._observeLibraryBlockTypes(this.allowedBlockTypes);
 		this.#setupRangeLimits();
 	}
 

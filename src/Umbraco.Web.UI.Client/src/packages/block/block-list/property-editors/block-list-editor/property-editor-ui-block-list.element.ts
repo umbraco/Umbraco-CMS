@@ -449,7 +449,7 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	#renderLibraryButton(createPath: string | undefined) {
-		if (createPath || !this._hasLibraryElements) return nothing;
+		if (!this._catalogueRouteBuilder || createPath || !this._hasLibraryElements) return nothing;
 		return html`
 			<uui-button
 				class="btnAction"
