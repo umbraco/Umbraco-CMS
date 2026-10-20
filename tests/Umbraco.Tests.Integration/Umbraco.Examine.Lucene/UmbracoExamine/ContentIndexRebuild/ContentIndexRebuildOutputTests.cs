@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Attributes;
@@ -89,6 +90,26 @@ internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBa
 
     [TestCase(false)]
     [TestCase(true)]
+    public async Task Rebuild_Of_Index_Including_Specific_Fields_Loads_Only_Properties_For_Those_Fields(bool publishedValuesOnly)
+    {
+        await SeedAsync();
+        var validator = new ValueSetValidator(null, null, ["nodeName", "title", "title_en-us", "title_da-dk", "invariantBlocks", "invariantBlocks_de-de", "__Raw_body_en-us", "body_en-us"], null);
+
+        CapturedIndex unfiltered = Rebuild(publishedValuesOnly, batchSize: 2);
+        CapturedIndex filtered = Rebuild(publishedValuesOnly, batchSize: 2, validator: validator);
+
+        var expected = RenderSnapshot(unfiltered.ValueSets.Select(valueSet => validator.Validate(valueSet).ValueSet));
+        Assert.Multiple(() =>
+        {
+            Assert.That(expected, Does.Contain("invariantBlocks_de-de = ").And.Contain("body_en-us = ").And.Contain("title = "));
+            Assert.That(RenderSnapshot(filtered.ValueSets), Is.EqualTo(expected));
+            Assert.That(PropertiesWithValues(unfiltered.LoadedContent), Is.EquivalentTo(new[] { "title", "variantBlocks", "invariantBlocks", "body", "invariantBody", "grid" }));
+            Assert.That(PropertiesWithValues(filtered.LoadedContent), Is.EquivalentTo(new[] { "title", "invariantBlocks", "body" }));
+        });
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
     public async Task Rebuild_Indexes_Each_Document_Once_In_Batches_Of_The_Configured_Size(bool publishedValuesOnly)
     {
         var documentCount = await SeedAsync(publishedValuesOnly);
@@ -102,6 +123,14 @@ internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBa
             Assert.That(captured.Batches.Select(x => x.ValueSets.Count), Has.All.LessThanOrEqualTo(2));
         });
     }
+
+    private static string[] PropertiesWithValues(IEnumerable<IContent> content)
+        => content
+            .SelectMany(item => item.Properties)
+            .Where(property => property.Values.Any(value => value.EditedValue is not null || value.PublishedValue is not null))
+            .Select(property => property.Alias)
+            .Distinct()
+            .ToArray();
 
     /// <summary>
     ///     Seeds documents covering the block editor indexing paths, interleaving variant and invariant documents so that

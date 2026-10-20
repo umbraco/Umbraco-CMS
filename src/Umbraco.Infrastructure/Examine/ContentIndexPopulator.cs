@@ -2,6 +2,7 @@ using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -16,6 +17,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// </summary>
 public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 {
+    private const int MaxPropertyAliasesToLoad = 1000;
+
     private readonly IContentService _contentService;
     private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
     private readonly ILogger<ContentIndexPopulator> _logger;
@@ -152,23 +155,109 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
             contentParentId = _parentId.Value;
         }
 
+        string[]? propertyAliases = GetPropertyAliasesToLoad(indexes);
+        if (propertyAliases is not null && _logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Loading only the properties the indexes include fields for: {PropertyAliases}", propertyAliases);
+        }
+
         if (_publishedValuesOnly)
         {
-            IndexPublishedContent(contentParentId, pageIndex, _indexingSettings.BatchSize, indexes);
+            IndexPublishedContent(contentParentId, pageIndex, _indexingSettings.BatchSize, indexes, propertyAliases);
         }
         else
         {
-            IndexAllContent(contentParentId, pageIndex, _indexingSettings.BatchSize, indexes);
+            IndexAllContent(contentParentId, pageIndex, _indexingSettings.BatchSize, indexes, propertyAliases);
         }
     }
 
+    /// <summary>
+    ///     Gets the aliases of the properties to load when populating the given indexes.
+    /// </summary>
+    /// <param name="indexes">The indexes to populate.</param>
+    /// <returns>
+    ///     The aliases of the properties that may contribute to a field the indexes include, or <c>null</c> to load all
+    ///     properties. All properties are needed unless every index validates its value sets with a
+    ///     <see cref="ValueSetValidator" /> that only includes specific fields.
+    /// </returns>
+    /// <remarks>
+    ///     The validator removes any field it doesn't include before the index, or any handler transforming its values,
+    ///     sees the value set, so a property that cannot produce an included field doesn't need to be loaded. The
+    ///     aliases are derived from the included field names, so they may also contain names that are not property aliases.
+    /// </remarks>
+    internal static string[]? GetPropertyAliasesToLoad(IEnumerable<IIndex> indexes)
+    {
+        var propertyAliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            // URL segment providers may read this when building the URL name fields.
+            Constants.Conventions.Content.UrlName,
+        };
+
+        foreach (IIndex index in indexes)
+        {
+            if (index is not BaseIndexProvider { ValueSetValidator: ValueSetValidator { IncludeFields: { } includeFields } })
+            {
+                return null;
+            }
+
+            foreach (var fieldName in includeFields)
+            {
+                AddPropertyAliases(fieldName, propertyAliases);
+            }
+        }
+
+        // Each alias is a parameter of the property data query, which must stay well within the database parameter limit.
+        return propertyAliases.Count > MaxPropertyAliasesToLoad ? null : propertyAliases.ToArray();
+    }
+
+    /// <summary>
+    ///     Adds the property aliases that may produce a field with the given name. Property fields are named by the
+    ///     property alias, optionally prefixed for raw values, followed by the path of a nested value and the culture.
+    /// </summary>
+    private static void AddPropertyAliases(string fieldName, HashSet<string> propertyAliases)
+    {
+        var name = fieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix, StringComparison.Ordinal)
+            ? fieldName[UmbracoExamineFieldNames.RawFieldPrefix.Length..]
+            : fieldName;
+
+        var nestedPathIndex = name.IndexOf('.');
+        if (nestedPathIndex > 0)
+        {
+            name = name[..nestedPathIndex];
+        }
+
+        propertyAliases.Add(name);
+
+        // The name may end with a culture suffix, or the alias itself may contain an underscore.
+        var cultureSuffixIndex = name.LastIndexOf('_');
+        if (cultureSuffixIndex > 0)
+        {
+            propertyAliases.Add(name[..cultureSuffixIndex]);
+        }
+    }
+
+    [Obsolete("Please use the overload taking the property aliases to load. Scheduled for removal in Umbraco 19.")]
     protected void IndexAllContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes)
+        => IndexAllContent(contentParentId, pageIndex, pageSize, indexes, propertyAliases: null);
+
+    /// <summary>
+    ///     Indexes all content below the given parent.
+    /// </summary>
+    /// <param name="contentParentId">The identifier of the parent of the content to index.</param>
+    /// <param name="pageIndex">The index of the first page of content to index.</param>
+    /// <param name="pageSize">The number of content items to index at a time.</param>
+    /// <param name="indexes">The indexes to populate.</param>
+    /// <param name="propertyAliases">The aliases of the properties to load, or <c>null</c> to load all properties.</param>
+    protected void IndexAllContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes, string[]? propertyAliases)
     {
         IContent[] content;
 
         do
         {
-            content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
+            content = (propertyAliases is null
+                    ? _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _)
+                    : _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, propertyAliases, filter: null, ordering: null))
+                .ToArray();
 
             ValueSetIndexer.IndexItems(indexes, _contentValueSetBuilder.GetValueSets(content));
 
@@ -177,7 +266,19 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         while (content.Length == pageSize);
     }
 
+    [Obsolete("Please use the overload taking the property aliases to load. Scheduled for removal in Umbraco 19.")]
     protected void IndexPublishedContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes)
+        => IndexPublishedContent(contentParentId, pageIndex, pageSize, indexes, propertyAliases: null);
+
+    /// <summary>
+    ///     Indexes the published content below the given parent, excluding content below unpublished content.
+    /// </summary>
+    /// <param name="contentParentId">The identifier of the parent of the content to index.</param>
+    /// <param name="pageIndex">The index of the first page of content to index.</param>
+    /// <param name="pageSize">The number of content items to index at a time.</param>
+    /// <param name="indexes">The indexes to populate.</param>
+    /// <param name="propertyAliases">The aliases of the properties to load, or <c>null</c> to load all properties.</param>
+    protected void IndexPublishedContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes, string[]? propertyAliases)
     {
         IContent[] content;
 
@@ -187,7 +288,10 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         {
             // add the published filter
             // note: We will filter for published variants in the validator
-            content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, PublishedQuery, Ordering.By("Path")).ToArray();
+            content = (propertyAliases is null
+                    ? _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, PublishedQuery, Ordering.By("Path"))
+                    : _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, propertyAliases, PublishedQuery, Ordering.By("Path")))
+                .ToArray();
 
             var indexableContent = new List<IContent>();
 

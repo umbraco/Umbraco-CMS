@@ -945,7 +945,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 // Only specific properties are requested.
                 // Filter by property alias at SQL level using INNER JOIN to PropertyTypeDto.
-                propertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount, batch =>
+                // The property aliases are parameters of the same statement, so leave room for them in each batch.
+                propertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount - propertyAliases.Length, batch =>
                     SqlContext.Sql()
                         .Select<PropertyDataDto>()
                         .From<PropertyDataDto>()

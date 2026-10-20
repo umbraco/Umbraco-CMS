@@ -964,6 +964,10 @@ public class ContentService : RepositoryService, IContentService
 
     /// <inheritdoc />
     public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
+        => GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter: filter, ordering: ordering);
+
+    /// <inheritdoc />
+    public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering)
     {
         ordering ??= Ordering.By("Path");
 
@@ -982,10 +986,10 @@ public class ContentService : RepositoryService, IContentService
                     return Enumerable.Empty<IContent>();
                 }
 
-                return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
+                return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering, propertyAliases);
             }
 
-            return GetPagedLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
+            return GetPagedLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering, propertyAliases);
         }
     }
 
@@ -1000,7 +1004,7 @@ public class ContentService : RepositoryService, IContentService
         return query;
     }
 
-    private IEnumerable<IContent> GetPagedLocked(IQuery<IContent>? query, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter, Ordering? ordering)
+    private IEnumerable<IContent> GetPagedLocked(IQuery<IContent>? query, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter, Ordering? ordering, string[]? propertyAliases = null)
     {
         if (pageIndex < 0)
         {
@@ -1017,7 +1021,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(ordering));
         }
 
-        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
+        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases, filter, ordering);
     }
 
     /// <summary>
