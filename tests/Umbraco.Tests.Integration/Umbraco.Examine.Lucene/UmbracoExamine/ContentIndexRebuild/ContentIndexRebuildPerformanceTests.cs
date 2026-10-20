@@ -3,8 +3,11 @@ using System.Globalization;
 using Examine;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine.ContentIndexRebuild;
@@ -60,12 +63,12 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
         foreach (var batchSize in _batchSizes)
         {
             // Warm up caches and JIT before measuring.
-            RunPhases(valueSetBuilder, batchSize, measureMemory: false);
+            RunPhases(valueSetBuilder, batchSize, publishedValuesOnly, measureMemory: false);
 
             RebuildMetrics best = Enumerable.Range(0, MeasuredRuns)
-                .Select(_ => RunPhases(valueSetBuilder, batchSize, measureMemory: false))
+                .Select(_ => RunPhases(valueSetBuilder, batchSize, publishedValuesOnly, measureMemory: false))
                 .MinBy(x => x.LoadTime + x.BuildTime)!;
-            RebuildMetrics memory = RunPhases(valueSetBuilder, batchSize, measureMemory: true);
+            RebuildMetrics memory = RunPhases(valueSetBuilder, batchSize, publishedValuesOnly, measureMemory: true);
 
             CapturedIndex captured = null!;
             TimeSpan populate = Enumerable.Range(0, MeasuredRuns)
@@ -97,8 +100,9 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
     /// <summary>
     ///     Pages through all content as <see cref="ContentIndexPopulator" /> does, timing the load and the value set build separately.
     /// </summary>
-    private RebuildMetrics RunPhases(IValueSetBuilder<IContent> valueSetBuilder, int batchSize, bool measureMemory)
+    private RebuildMetrics RunPhases(IValueSetBuilder<IContent> valueSetBuilder, int batchSize, bool publishedValuesOnly, bool measureMemory)
     {
+        IQuery<IContent> publishedQuery = GetRequiredService<IUmbracoDatabaseFactory>().SqlContext.Query<IContent>().Where(x => x.Published);
         var metrics = new RebuildMetrics();
         var pageIndex = 0;
         IContent[] content;
@@ -107,7 +111,9 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
         {
             var allocatedBefore = GC.GetTotalAllocatedBytes(true);
             var load = Stopwatch.StartNew();
-            content = ContentService.GetPagedDescendants(-1, pageIndex, batchSize, out _).ToArray();
+            content = publishedValuesOnly
+                ? ContentService.GetPagedDescendants(-1, pageIndex, batchSize, out _, publishedQuery, Ordering.By("Path")).ToArray()
+                : ContentService.GetPagedDescendants(-1, pageIndex, batchSize, out _).ToArray();
             load.Stop();
             var allocatedAfterLoad = GC.GetTotalAllocatedBytes(true);
 
