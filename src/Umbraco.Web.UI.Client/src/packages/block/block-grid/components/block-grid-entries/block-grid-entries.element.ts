@@ -13,7 +13,6 @@ import {
 	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
@@ -254,7 +253,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			null,
 		);
 
-		this.#observeHasLibraryElements();
+		this.observe(this.#context.hasLibraryElements, (x) => (this._hasLibraryElements = x), null);
 
 		this.observe(
 			this.#context.rangeLimits,
@@ -316,16 +315,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		});
 
 		new UmbFormControlValidator(this, this /*, this.#dataPath*/);
-	}
-
-	#observeHasLibraryElements() {
-		this.observe(
-			observeMultiple([this.#context.allowedBlockTypes, this.#context.libraryAllowedElementTypeKeys]),
-			([allowedBlockTypes, libraryKeys]) => {
-				this._hasLibraryElements = allowedBlockTypes.some((x) => libraryKeys.includes(x.contentElementTypeKey));
-			},
-			null,
-		);
 	}
 
 	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {

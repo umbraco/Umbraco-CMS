@@ -159,6 +159,8 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	protected _gotBlockManager() {
 		if (!this._manager) return;
 
+		this._observeLibraryBlockTypes(this._manager.blockTypes);
+
 		this.observe(
 			this._manager.layouts,
 			(layouts) => {

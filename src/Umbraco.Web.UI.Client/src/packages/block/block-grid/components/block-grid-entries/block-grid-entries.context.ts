@@ -319,6 +319,7 @@ export class UmbBlockGridEntriesContext
 		if (!this._manager) return;
 
 		this.#setupAllowedBlockTypes();
+		this._observeLibraryBlockTypes(this.allowedBlockTypes);
 		this.#setupRangeLimits();
 	}
 
