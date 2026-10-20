@@ -1,12 +1,11 @@
 import { UmbDocumentSegmentProvider } from './content-segment-provider.controller.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElementMixin, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_CONTENT_WORKSPACE_CONTEXT, type UmbContentDetailIncomingDataHookMeta } from '@umbraco-cms/backoffice/content';
 import { UmbParallelHookController } from '@umbraco-cms/backoffice/hook-api';
-import { UMB_APP_LANGUAGE_CONTEXT, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbArrayState, UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { UmbWorkspaceVariantOptionsController } from '@umbraco-cms/backoffice/workspace';
@@ -25,16 +24,6 @@ const createLanguage = (unique: string, isDefault = false): UmbLanguageDetailMod
 	isMandatory: false,
 	fallbackIsoCode: null,
 });
-
-class UmbAppLanguageContextStub extends UmbContextBase {
-	readonly #languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
-	readonly languages = this.#languages.asObservable();
-
-	constructor(host: UmbControllerHost) {
-		super(host, UMB_APP_LANGUAGE_CONTEXT);
-		this.#languages.setValue([createLanguage('en-US', true), createLanguage('da')]);
-	}
-}
 
 @customElement('umb-test-content-segment-provider-host')
 class UmbTestContentSegmentProviderHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -57,6 +46,7 @@ class UmbTestContentWorkspaceContext {
 			this.variesByCulture,
 			this.variesBySegment,
 			new UmbBasicState<Array<UmbEntityVariantModel>>([]).asObservable(),
+			new UmbArrayState<UmbLanguageDetailModel>([createLanguage('en-US', true), createLanguage('da')], (x) => x.unique).asObservable(),
 		);
 		new UmbContextProviderController(host, UMB_CONTENT_WORKSPACE_CONTEXT, this as any);
 	}
@@ -91,7 +81,6 @@ describe('UmbDocumentSegmentProvider', () => {
 	beforeEach(async () => {
 		await useMockSet('documents');
 		host = await fixture(html`<umb-test-content-segment-provider-host></umb-test-content-segment-provider-host>`);
-		new UmbAppLanguageContextStub(host);
 		workspace = new UmbTestContentWorkspaceContext(host);
 		provider = new UmbDocumentSegmentProvider(host);
 		latest = undefined;

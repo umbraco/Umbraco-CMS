@@ -16,7 +16,7 @@ import { _resolveIsWritableVariant } from './content-writable-variant.function.j
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
 import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
-import { mergeObservables, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { mergeObservables, observeMultiple, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	combineLatest,
 	distinctUntilChanged,
@@ -47,7 +47,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import { UMB_APP_LANGUAGE_CONTEXT, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
 	UmbVariantPropertyGuardManager,
@@ -270,11 +270,19 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			x ? x.variesByCulture || x.variesBySegment : undefined,
 		);
 
+		// Languages are requested once per app session by UMB_APP_LANGUAGE_CONTEXT; every workspace observes
+		// that shared state instead of each issuing its own request for the full language collection.
+		const appLanguages = new UmbArrayState<UmbLanguageDetailModel, string, undefined>(undefined, (x) => x.unique);
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {
+			this.observe(appLanguageContext?.languages, (languages) => appLanguages.setValue(languages), null);
+		});
+
 		this.variantOptionsManager = new UmbWorkspaceVariantOptionsController<VariantModelType, VariantOptionModelType>(
 			this,
 			this.variesByCulture,
 			this.variesBySegment,
 			this.variants,
+			appLanguages.asObservable(),
 		);
 		this.variantOptionsManager._internal_setOptionFilter((option) => this._variantOptionsFilter(option));
 		this.variantOptions = this.variantOptionsManager.variantOptions;

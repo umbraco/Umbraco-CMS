@@ -7,7 +7,7 @@ import {
 	type UmbEntityVariantOptionSourceModel,
 } from '@umbraco-cms/backoffice/variant';
 import { mergeObservables, UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_APP_LANGUAGE_CONTEXT, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
@@ -71,20 +71,17 @@ export class UmbWorkspaceVariantOptionsController<
 		varyByCulture: Observable<boolean | undefined>,
 		varyBySegment: Observable<boolean | undefined>,
 		variants: Observable<Array<VariantModelType>>,
+		languages: Observable<Array<UmbLanguageDetailModel> | undefined>,
 	) {
 		super(host);
 
-		// Languages are requested once per app session by UMB_APP_LANGUAGE_CONTEXT; every workspace observes
-		// that shared state instead of each issuing its own request for the full language collection.
-		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {
-			this.observe(
-				appLanguageContext?.languages,
-				(languages) => {
-					this.#languages.setValue(languages);
-				},
-				null,
-			);
-		});
+		this.observe(
+			languages,
+			(languages) => {
+				this.#languages.setValue(languages);
+			},
+			null,
+		);
 
 		this.observe(
 			mergeObservables([varyByCulture, varyBySegment, variants, this.languages], (sources) => sources),

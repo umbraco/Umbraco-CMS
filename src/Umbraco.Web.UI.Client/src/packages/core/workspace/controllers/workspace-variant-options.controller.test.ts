@@ -70,6 +70,7 @@ describe('UmbWorkspaceVariantOptionsController', () => {
 			varyByCulture.asObservable(),
 			varyBySegment.asObservable(),
 			variants.asObservable(),
+			host.languageContext.languages,
 		);
 		controller.observe(
 			controller.variantOptions,
