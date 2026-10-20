@@ -544,10 +544,10 @@ public static class DistributedCacheExtensions
             x.Id,
             x.IsoCode,
             x.WasPropertyDirty(nameof(ILanguage.Id))
-            ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.Add
-            : x.WasPropertyDirty(nameof(ILanguage.IsoCode))
-                ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
-                : LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update)));
+                ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.Add
+                : x.WasPropertyDirty(nameof(ILanguage.IsoCode))
+                    ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
+                    : LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update)));
 
     /// <summary>
     ///     Removes the specified languages from the distributed cache.

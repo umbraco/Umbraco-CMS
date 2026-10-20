@@ -152,8 +152,6 @@ public PublishStatusService(
         return false;
     }
 
-    // Sync-over-async is intentional: IsDocumentPublished backs the synchronous published content surface, and the
-    // default language is only read here once after each language change.
     private string? GetDefaultCulture()
     {
         if (_defaultCultureIsStale)
