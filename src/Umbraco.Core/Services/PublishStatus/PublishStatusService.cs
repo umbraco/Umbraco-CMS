@@ -75,12 +75,12 @@ public PublishStatusService(
     }
 
     /// <inheritdoc/>
-    public async Task AddCultureAsync(string culture, CancellationToken cancellationToken)
+    public async Task RefreshCultureAsync(string culture, CancellationToken cancellationToken)
     {
-        IEnumerable<Guid> publishedKeys;
+        HashSet<Guid> publishedKeys;
         using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
-            publishedKeys = await _publishStatusRepository.GetPublishedKeysAsync(culture, cancellationToken);
+            publishedKeys = (await _publishStatusRepository.GetPublishedKeysAsync(culture, cancellationToken)).ToHashSet();
             scope.Complete();
         }
 
@@ -94,6 +94,29 @@ public PublishStatusService(
                 (_, existing) => existing.Contains(culture, StringComparer.InvariantCultureIgnoreCase)
                     ? existing
                     : new HashSet<string>(existing) { culture });
+        }
+
+        foreach ((Guid documentKey, ISet<string> existing) in publishedCultures)
+        {
+            if (publishedKeys.Contains(documentKey) || existing.Contains(culture, StringComparer.InvariantCultureIgnoreCase) is false)
+            {
+                continue;
+            }
+
+            var remaining = existing
+                .Where(x => string.Equals(x, culture, StringComparison.InvariantCultureIgnoreCase) is false)
+                .ToHashSet();
+
+            // A failed swap means the entry was reloaded from the database after the language change, so it is
+            // already correct and is left as it is.
+            if (remaining.Count > 0)
+            {
+                publishedCultures.TryUpdate(documentKey, remaining, existing);
+            }
+            else
+            {
+                publishedCultures.TryRemove(new KeyValuePair<Guid, ISet<string>>(documentKey, existing));
+            }
         }
     }
 

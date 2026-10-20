@@ -78,25 +78,25 @@ public class LanguageCacheRefresherTests
     }
 
     [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Add)]
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Remove)]
     [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture)]
-    public void Refresh_Adds_The_Culture_To_The_Publish_Status_When_The_IsoCode_Is_New(LanguageCacheRefresher.JsonPayload.LanguageChangeType changeType)
+    public void Refresh_Refreshes_The_Publish_Status_Of_The_Culture_When_The_Set_Of_IsoCodes_Changes(LanguageCacheRefresher.JsonPayload.LanguageChangeType changeType)
     {
         LanguageCacheRefresher refresher = CreateRefresher();
 
         refresher.Refresh([Payload(changeType)]);
 
-        _publishStatusManagementService.Verify(x => x.AddCultureAsync("en-US", It.IsAny<CancellationToken>()), Times.Once);
+        _publishStatusManagementService.Verify(x => x.RefreshCultureAsync("en-US", It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update)]
-    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Remove)]
-    public void Refresh_Does_Not_Add_A_Culture_To_The_Publish_Status_When_The_IsoCode_Is_Unchanged(LanguageCacheRefresher.JsonPayload.LanguageChangeType changeType)
+    [Test]
+    public void Refresh_Does_Not_Refresh_The_Publish_Status_Of_The_Culture_When_The_IsoCode_Is_Unchanged()
     {
         LanguageCacheRefresher refresher = CreateRefresher();
 
-        refresher.Refresh([Payload(changeType)]);
+        refresher.Refresh([Payload(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update)]);
 
-        _publishStatusManagementService.Verify(x => x.AddCultureAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _publishStatusManagementService.Verify(x => x.RefreshCultureAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Add)]

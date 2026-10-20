@@ -208,9 +208,9 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
         RefreshPublishStatus(payloads);
     }
 
-    // Invariant documents are cached as published in each language individually, so a language that appears
-    // after the cache was loaded must be added to them. Runs after base.Refresh so the default language is read
-    // from a cleared language cache.
+    // Invariant documents are cached as published in each language individually, so the cached status of any
+    // language that is added, removed or renamed must be brought up to date. Runs after base.Refresh so the default
+    // language is read from a cleared language cache.
     private void RefreshPublishStatus(JsonPayload[] payloads)
     {
         if (payloads.Length == 0)
@@ -218,9 +218,9 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
             return;
         }
 
-        foreach (JsonPayload payload in payloads.Where(x => x.ChangeType is LanguageChangeType.Add or LanguageChangeType.ChangeCulture))
+        foreach (JsonPayload payload in payloads.Where(x => x.ChangeType is LanguageChangeType.Add or LanguageChangeType.Remove or LanguageChangeType.ChangeCulture))
         {
-            _publishStatusManagementService.AddCultureAsync(payload.IsoCode, CancellationToken.None).GetAwaiter().GetResult();
+            _publishStatusManagementService.RefreshCultureAsync(payload.IsoCode, CancellationToken.None).GetAwaiter().GetResult();
         }
 
         _publishStatusManagementService.RefreshDefaultCultureAsync(CancellationToken.None).GetAwaiter().GetResult();

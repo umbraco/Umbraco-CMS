@@ -97,6 +97,93 @@ internal sealed partial class PublishStatusServiceTests
     }
 
     [Test]
+    public async Task Content_Is_Not_Published_In_A_Deleted_Language_After_It_Is_Added_Again()
+    {
+        await LanguageService.CreateAsync(new Language(UnusedCulture, "Danish"), Constants.Security.SuperUserKey);
+
+        IContentType variantContentType = new ContentTypeBuilder()
+            .WithAlias("variant")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .Build();
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        IContent publishedInBothCultures = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName(DefaultCulture, "Both EN")
+            .WithCultureName(UnusedCulture, "Both DA")
+            .Build();
+        ContentService.Save(publishedInBothCultures);
+        ContentService.Publish(publishedInBothCultures, [DefaultCulture, UnusedCulture]);
+
+        IContent publishedInDeletedCultureOnly = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName(DefaultCulture, "Only EN")
+            .WithCultureName(UnusedCulture, "Only DA")
+            .Build();
+        ContentService.Save(publishedInDeletedCultureOnly);
+        ContentService.Publish(publishedInDeletedCultureOnly, [UnusedCulture]);
+
+        ContentService.Publish(Textpage, ["*"]);
+
+        await LanguageService.DeleteAsync(UnusedCulture, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(publishedInBothCultures.Key, UnusedCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(publishedInBothCultures.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(publishedInDeletedCultureOnly.Key));
+            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, UnusedCulture));
+        });
+
+        await LanguageService.CreateAsync(new Language(UnusedCulture, "Danish"), Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(publishedInBothCultures.Key, UnusedCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(publishedInBothCultures.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(publishedInDeletedCultureOnly.Key, UnusedCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, UnusedCulture));
+        });
+    }
+
+    [Test]
+    public async Task Content_Is_Not_Published_In_An_Added_Language_Reusing_A_Changed_IsoCode()
+    {
+        const string changedIsoCode = "da";
+
+        await LanguageService.CreateAsync(new Language(UnusedCulture, "Danish"), Constants.Security.SuperUserKey);
+
+        IContentType variantContentType = new ContentTypeBuilder()
+            .WithAlias("variant")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .Build();
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        IContent document = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName(DefaultCulture, "Document EN")
+            .WithCultureName(UnusedCulture, "Document DA")
+            .Build();
+        ContentService.Save(document);
+        ContentService.Publish(document, [DefaultCulture, UnusedCulture]);
+
+        ILanguage language = (await LanguageService.GetAsync(UnusedCulture))!;
+        language.IsoCode = changedIsoCode;
+        language.CultureName = "Danish";
+        await LanguageService.UpdateAsync(language, Constants.Security.SuperUserKey);
+
+        await LanguageService.CreateAsync(new Language(UnusedCulture, "Danish (Denmark)"), Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(document.Key, changedIsoCode));
+            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(document.Key, UnusedCulture));
+        });
+    }
+
+    [Test]
     public async Task GetPublishedKeysAsync_Returns_Documents_Published_In_The_Culture()
     {
         await LanguageService.CreateAsync(new Language(UnusedCulture, "Danish"), Constants.Security.SuperUserKey);
