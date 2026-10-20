@@ -405,13 +405,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 	async #resolveEntitiesNeedingAttention(): Promise<Array<UmbEntityModel>> {
 		const values = this.#elementWorkspaceContext?.getData()?.values ?? [];
 		if (!values.length) return [];
-		try {
-			return await this.#referencedEntities.getEntitiesNeedingAttention(values);
-		} catch {
-			// This resolution is a client-side nicety layered on top of the referencedBy safety net above —
-			// a failure here must not block publishing.
-			return [];
-		}
+		return this.#referencedEntities.getEntitiesNeedingAttention(values);
 	}
 
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbElementDetailModel): Promise<void> {

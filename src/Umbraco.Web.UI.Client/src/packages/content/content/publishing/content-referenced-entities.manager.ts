@@ -21,9 +21,21 @@ export class UmbContentReferencedEntitiesManager extends UmbControllerBase {
 	/**
 	 * Resolves the referenced entities across the given property values that currently need attention.
 	 * @param {Array<UmbPropertyValueDataPotentiallyWithEditorAlias>} values - The property values to resolve references from.
+	 * Never rejects: this is an advisory check layered on top of the publish flow, so a failure resolves to no
+	 * entities rather than blocking the publish.
 	 * @returns {Promise<Array<UmbEntityModel>>} The referenced entities needing attention, sorted by name then unique.
 	 */
 	async getEntitiesNeedingAttention(
+		values: Array<UmbPropertyValueDataPotentiallyWithEditorAlias>,
+	): Promise<Array<UmbEntityModel>> {
+		try {
+			return await this.#getEntitiesNeedingAttention(values);
+		} catch {
+			return [];
+		}
+	}
+
+	async #getEntitiesNeedingAttention(
 		values: Array<UmbPropertyValueDataPotentiallyWithEditorAlias>,
 	): Promise<Array<UmbEntityModel>> {
 		const references = await this.#resolveReferences(values);

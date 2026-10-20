@@ -46,6 +46,13 @@ class TestUnawareEntityReferenceResolver implements UmbPropertyValueEntityRefere
 	destroy(): void {}
 }
 
+class TestFailingEntityReferenceResolver implements UmbPropertyValueEntityReferenceResolver {
+	async resolveEntityReferences(): Promise<Array<UmbEntityModel>> {
+		throw new Error('resolver failed');
+	}
+	destroy(): void {}
+}
+
 class TestItemRepository implements UmbItemRepository<TestItem> {
 	async requestItems(uniques: Array<string>) {
 		const items = uniques.map((unique) => TEST_ITEMS[unique]).filter((item): item is TestItem => !!item);
@@ -155,5 +162,26 @@ describe('UmbContentReferencedEntitiesManager', () => {
 
 		expect(result.length).to.equal(1);
 		expect(result[0].unique).to.equal('elm-1');
+	});
+
+	it('resolves to nothing, rather than rejecting, when a lookup fails', async () => {
+		const alias = 'Umb.Test.ReferencedEntitiesManager.FailingEntityReferenceResolver';
+		const failingManifest: ManifestPropertyValueEntityReference = {
+			type: 'propertyValueEntityReference',
+			name: 'Test Failing Entity Reference Resolver',
+			alias,
+			api: TestFailingEntityReferenceResolver,
+			forEditorAlias: 'test-editor-failing',
+		};
+		umbExtensionsRegistry.register(failingManifest);
+
+		try {
+			const result = await manager.getEntitiesNeedingAttention([
+				{ editorAlias: 'test-editor-failing', alias: 'test', value: {} },
+			]);
+			expect(result).to.deep.equal([]);
+		} finally {
+			umbExtensionsRegistry.unregister(alias);
+		}
 	});
 });

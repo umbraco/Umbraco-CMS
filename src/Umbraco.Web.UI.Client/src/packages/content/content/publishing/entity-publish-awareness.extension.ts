@@ -11,6 +11,9 @@ export interface ManifestEntityPublishAwareness extends ManifestApi<UmbEntityPub
 	meta: MetaEntityPublishAwareness;
 }
 
+/**
+ * Meta for {@link ManifestEntityPublishAwareness}.
+ */
 export interface MetaEntityPublishAwareness {
 	/** The item repository alias used to batch-load items of this entity type by unique. */
 	itemRepositoryAlias: string;
