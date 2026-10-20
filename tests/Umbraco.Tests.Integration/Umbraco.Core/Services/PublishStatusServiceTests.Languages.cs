@@ -2,6 +2,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -92,5 +94,46 @@ internal sealed partial class PublishStatusServiceTests
             Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(document.Key, string.Empty));
             Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(document.Key, DefaultCulture));
         });
+    }
+
+    [Test]
+    public async Task GetPublishedKeysAsync_Returns_Documents_Published_In_The_Culture()
+    {
+        await LanguageService.CreateAsync(new Language(UnusedCulture, "Danish"), Constants.Security.SuperUserKey);
+
+        IContentType variantContentType = new ContentTypeBuilder()
+            .WithAlias("variant")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .Build();
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        IContent publishedInCulture = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName(DefaultCulture, "Published EN")
+            .WithCultureName(UnusedCulture, "Published DA")
+            .Build();
+        ContentService.Save(publishedInCulture);
+        ContentService.Publish(publishedInCulture, [UnusedCulture]);
+
+        IContent publishedInOtherCulture = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName(DefaultCulture, "Other EN")
+            .WithCultureName(UnusedCulture, "Other DA")
+            .Build();
+        ContentService.Save(publishedInOtherCulture);
+        ContentService.Publish(publishedInOtherCulture, [DefaultCulture]);
+
+        // Publishes the invariant Textpage only; its children stay unpublished.
+        ContentService.Publish(Textpage, ["*"]);
+
+        IEnumerable<Guid> publishedKeys;
+        using (ICoreScope scope = GetRequiredService<ICoreScopeProvider>().CreateCoreScope())
+        {
+            publishedKeys = await GetRequiredService<IPublishStatusRepository>().GetPublishedKeysAsync(UnusedCulture, CancellationToken.None);
+            scope.Complete();
+        }
+
+        CollectionAssert.AreEquivalent(new[] { Textpage.Key, publishedInCulture.Key }, publishedKeys);
     }
 }
