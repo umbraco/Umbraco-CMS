@@ -65,6 +65,76 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
+    public async Task Index_Values_Do_Not_Depend_On_Values_Previously_Indexed_With_The_Same_Element_Type()
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant content value" },
+                new() { Alias = "variantText", Value = "The content value (en-US)", Culture = "en-US" },
+                new() { Alias = "variantText", Value = "The content value (da-DK)", Culture = "da-DK" },
+            },
+            [],
+            true);
+
+        // Indexing a culture variant block editor value with the same element type comes first, as it may within a
+        // document or a batch of documents.
+        var variantPropertyType = new PropertyTypeBuilder()
+            .WithAlias("variantBlocks")
+            .WithDataTypeId(blockListDataType.Id)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.BlockList)
+            .WithValueStorageType(ValueStorageType.Ntext)
+            .WithVariations(ContentVariation.Culture)
+            .WithSupportsPublishing(true)
+            .Build();
+        var variantProperty = new Property(variantPropertyType);
+        variantProperty.SetValue(
+            JsonSerializer.Serialize(BlockListPropertyValue(
+                elementType,
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                new BlockProperty([new() { Alias = "invariantText", Value = "The culture variant block value" }], [], "en-US", null))),
+            "en-US");
+        variantProperty.PublishValues("en-US");
+
+        var contentTypeDictionary = new Dictionary<Guid, IContentType>
+        {
+            { elementType.Key, elementType }, { contentType.Key, contentType }
+        };
+        var editor = blockListDataType.Editor!;
+        Assert.IsNotEmpty(editor.PropertyIndexValueFactory.GetIndexValues(
+            variantProperty,
+            culture: "en-US",
+            segment: null,
+            published: true,
+            availableCultures: ["en-US", "da-DK"],
+            contentTypeDictionary: contentTypeDictionary).ToArray());
+
+        var indexValues = editor.PropertyIndexValueFactory.GetIndexValues(
+            content.Properties["blocks"]!,
+            culture: null,
+            segment: null,
+            published: true,
+            availableCultures: ["en-US", "da-DK"],
+            contentTypeDictionary: contentTypeDictionary).ToArray();
+
+        Assert.AreEqual(ContentVariation.Nothing, elementType.PropertyTypes.Single(propertyType => propertyType.Alias == "invariantText").Variations);
+        foreach (var culture in new[] { "en-US", "da-DK" })
+        {
+            var indexedValue = indexValues.Single(v => v.Culture == culture).Values.Single() as string;
+            Assert.IsNotNull(indexedValue);
+            var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            Assert.That(values, Is.EquivalentTo(new[] { $"The content value ({culture})", "The invariant content value" }));
+        }
+    }
+
+    [Test]
     public async Task Can_Index_Cultures_Independently_Variant_Blocks()
     {
         var elementType = CreateElementType(ContentVariation.Culture);

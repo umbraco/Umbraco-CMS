@@ -47,23 +47,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
                 propertyTypeDictionary =
                     contentType
                         .CompositionPropertyTypes
-                        .Select(propertyType =>
-                        {
-                            // We want to ensure that the nested properties are set vary by culture if the parent is
-                            // This is because it's perfectly valid to have a nested property type that's set to invariant even if the parent varies.
-                            // For instance in a block list, the list it self can vary, but the elements can be invariant, at the same time.
-                            if (culture is not null)
-                            {
-                                propertyType.Variations |= ContentVariation.Culture;
-                            }
-
-                            if (segment is not null)
-                            {
-                                propertyType.Variations |= ContentVariation.Segment;
-                            }
-
-                            return propertyType;
-                        })
+                        .Select(propertyType => WithParentVariation(propertyType, culture, segment))
                         .ToDictionary(x => x.Alias);
                 propertyTypeDictionaries[contentType.Key] = propertyTypeDictionary;
             }
@@ -82,6 +66,37 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         }
 
         return RenameKeysToEnsureRawSegmentsIsAPrefix(result);
+    }
+
+    /// <summary>
+    /// Gets the property type to index a nested property with, varying by culture and segment if the parent value does.
+    /// </summary>
+    /// <remarks>
+    /// It's perfectly valid to have a nested property type that's set to invariant even if the parent varies. For
+    /// instance in a block list, the list itself can vary, but the elements can be invariant, at the same time.
+    /// The element type is shared by every value indexed with it, so a copy is returned rather than changing it.
+    /// </remarks>
+    private static IPropertyType WithParentVariation(IPropertyType propertyType, string? culture, string? segment)
+    {
+        ContentVariation variations = propertyType.Variations;
+        if (culture is not null)
+        {
+            variations |= ContentVariation.Culture;
+        }
+
+        if (segment is not null)
+        {
+            variations |= ContentVariation.Segment;
+        }
+
+        if (variations == propertyType.Variations)
+        {
+            return propertyType;
+        }
+
+        var nestedPropertyType = (IPropertyType)propertyType.DeepClone();
+        nestedPropertyType.Variations = variations;
+        return nestedPropertyType;
     }
 
     /// <summary>
