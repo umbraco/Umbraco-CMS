@@ -48,6 +48,13 @@ export interface UmbEntityVariantOptionModel<VariantType extends UmbEntityVarian
 	segment: string | null;
 }
 
+/**
+ * A variant option as it is supplied to a workspace, before its language has been resolved from the culture.
+ */
+export type UmbEntityVariantOptionSourceModel<
+	VariantOptionType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel,
+> = Omit<VariantOptionType, 'language'>;
+
 /** @deprecated use `UmbEntityVariantOptionModel` instead */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbVariantOptionModel<

@@ -194,6 +194,17 @@ describe('UmbWorkspaceVariantOptionsController', () => {
 			await settle();
 		});
 
+		it('leaves out an option whose language cannot be found', async () => {
+			controller.add([
+				{ culture: 'da', segment: 's1', unique: 'da_s:s1' },
+				{ culture: 'xx', segment: 's1', unique: 'xx_s:s1' },
+			]);
+			await settle();
+
+			expect(uniques()).to.include('da_s:s1');
+			expect(uniques()).to.not.include('xx_s:s1');
+		});
+
 		it('adds options next to the core options, and gives them a language', async () => {
 			controller.add([{ culture: 'da', segment: 's1', unique: 'da_s:s1' }]);
 			await settle();

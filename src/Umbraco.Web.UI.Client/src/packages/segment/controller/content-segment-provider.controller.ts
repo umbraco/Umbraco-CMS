@@ -4,7 +4,7 @@ import type { UmbParallelHookMethod } from '@umbraco-cms/backoffice/hook-api';
 import type { UmbEntityDetailIncomingDataHookMeta } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbVariantId, type UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, type UmbEntityVariantOptionSourceModel } from '@umbraco-cms/backoffice/variant';
 import { UmbSegmentCollectionRepository, type UmbSegmentModel } from '@umbraco-cms/backoffice/segment';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
@@ -102,7 +102,7 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 					segment: segment.alias,
 					segmentInfo: { alias: segment.alias, name: segment.name },
 					unique: new UmbVariantId(culture, segment.alias).toString(),
-				}) as Omit<UmbEntityVariantOptionModel, 'language'>,
+				}) as UmbEntityVariantOptionSourceModel,
 		);
 	}
 

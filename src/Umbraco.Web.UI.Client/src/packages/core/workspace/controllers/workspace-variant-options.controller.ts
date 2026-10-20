@@ -4,6 +4,7 @@ import {
 	UmbVariantId,
 	type UmbEntityVariantModel,
 	type UmbEntityVariantOptionModel,
+	type UmbEntityVariantOptionSourceModel,
 } from '@umbraco-cms/backoffice/variant';
 import { mergeObservables, UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_APP_LANGUAGE_CONTEXT, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
@@ -32,33 +33,38 @@ export class UmbWorkspaceVariantOptionsController<
 		return this.#languages.getValue();
 	}
 
-	#variantOptions = new UmbArrayState<Omit<VariantOptionModelType, 'language'>, string, undefined>(
+	#variantOptions = new UmbArrayState<UmbEntityVariantOptionSourceModel<VariantOptionModelType>, string, undefined>(
 		undefined,
 		(x) => x.unique,
 	);
 
 	/**
-	 * The variant options with their language resolved. Emits `undefined` until the variation of the entity and the languages are known.
+	 * The variant options with their language resolved. Options whose language cannot be found are left out. Emits `undefined` until the variation of the entity and the languages are known.
 	 */
 	public variantOptions = mergeObservables(
 		[this.#variantOptions.asObservable(), this.languages],
 		([option, languages]) => {
 			if (option === undefined || languages === undefined) return undefined;
-			const defaultLang = languages?.find((x) => x.isDefault);
-			return option.map((opt) => {
-				if (!opt.culture) {
-					return { ...opt, language: defaultLang };
+			const defaultLang = languages.find((x) => x.isDefault);
+			return option.flatMap((opt) => {
+				const language = opt.culture ? languages.find((x) => x.unique === opt.culture) : defaultLang;
+				if (!language) {
+					this.#warnUnresolvedLanguage(opt.unique);
+					return [];
 				}
-				const lang = languages?.find((x) => x.unique === opt.culture);
-				if (!lang) {
-					console.error(`Language for culture ${opt.culture} could not be found.`);
-				}
-				return { ...opt, language: lang };
+				return [{ ...opt, language }];
 			});
 		},
 	) as Observable<undefined | Array<VariantOptionModelType>>;
 
 	#currentCoreUniques?: Array<string>;
+	#warnedUniques = new Set<string>();
+
+	#warnUnresolvedLanguage(unique: string) {
+		if (this.#warnedUniques.has(unique)) return;
+		this.#warnedUniques.add(unique);
+		console.warn(`Variant option "${unique}" is left out, as its language could not be found.`);
+	}
 
 	constructor(
 		host: UmbControllerHost,
@@ -187,10 +193,12 @@ export class UmbWorkspaceVariantOptionsController<
 	// TODO: Remove this feature in v.21
 	/**
 	 * @deprecated - it is not possible to filter variant options from v.21.
-	 * @param {(option: Omit<VariantOptionModelType, 'language'>) => boolean} filter - The filter function to apply to variant options.
+	 * @param {(option: UmbEntityVariantOptionSourceModel<VariantOptionModelType>) => boolean} filter - The filter function to apply to variant options.
 	 */
 	// eslint-disable-next-line @typescript-eslint/naming-convention
-	public _internal_setOptionFilter(filter: (filter: Omit<VariantOptionModelType, 'language'>) => boolean) {
+	public _internal_setOptionFilter(
+		filter: (filter: UmbEntityVariantOptionSourceModel<VariantOptionModelType>) => boolean,
+	) {
 		if (this.#hasFilter) return;
 		this.#hasFilter = true;
 		this.variantOptions = this.variantOptions.pipe(map((options) => options?.filter((option) => filter(option))));
@@ -198,9 +206,9 @@ export class UmbWorkspaceVariantOptionsController<
 
 	/**
 	 * Adds options next to the ones derived from the entity. An option with a unique that already exists replaces it.
-	 * @param {Array<Omit<VariantOptionModelType, 'language'>>} options - The options to add. The language is resolved from the culture.
+	 * @param {Array<UmbEntityVariantOptionSourceModel<VariantOptionModelType>>} options - The options to add. The language is resolved from the culture, and an option whose language cannot be found is left out.
 	 */
-	public add(options: Array<Omit<VariantOptionModelType, 'language'>>) {
+	public add(options: Array<UmbEntityVariantOptionSourceModel<VariantOptionModelType>>) {
 		this.#variantOptions.append(options);
 	}
 
@@ -215,9 +223,9 @@ export class UmbWorkspaceVariantOptionsController<
 	/**
 	 * Removes and adds options in one step, so consumers only see the end result.
 	 * @param {Array<string>} uniques - The uniques of the options to remove.
-	 * @param {Array<Omit<VariantOptionModelType, 'language'>>} options - The options to add.
+	 * @param {Array<UmbEntityVariantOptionSourceModel<VariantOptionModelType>>} options - The options to add.
 	 */
-	public replace(uniques: Array<string>, options: Array<Omit<VariantOptionModelType, 'language'>>) {
+	public replace(uniques: Array<string>, options: Array<UmbEntityVariantOptionSourceModel<VariantOptionModelType>>) {
 		this.#variantOptions.mute();
 		this.remove(uniques);
 		this.add(options);
