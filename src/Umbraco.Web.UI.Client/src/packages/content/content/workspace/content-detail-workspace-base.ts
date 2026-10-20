@@ -161,6 +161,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Keeps the workspace on an existing variant when the content type's variance is changed from within the workspace.
+	 * @internal
 	 */
 	readonly contentTypeVarianceChangeRedirect: UmbContentTypeVarianceChangeRedirectController;
 

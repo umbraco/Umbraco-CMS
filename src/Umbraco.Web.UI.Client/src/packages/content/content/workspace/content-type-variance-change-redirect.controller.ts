@@ -21,6 +21,7 @@ interface UmbContentTypeVariance {
  * Moves the workspace URL to an existing variant when the content type's variance is changed from within the
  * workspace, for example by editing the content type in an infinite editing modal. Only the editor who made the
  * change is redirected; a URL referring to a variant that does not exist is otherwise left alone.
+ * @internal
  */
 export class UmbContentTypeVarianceChangeRedirectController extends UmbControllerBase {
 	readonly #workspace: UmbContentTypeVarianceChangeRedirectHost;

@@ -144,7 +144,9 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 	}
 
 	/**
-	 * Add an entry to the manager
+	 * Add an entry to the manager. Once added, the entry follows the repository store, if the repository
+	 * provides one, so the data passed in is replaced when the store emits the same entry. An empty store
+	 * value keeps the entry as it is.
 	 * @param {DetailType} data - The entry to add.
 	 * @memberof UmbRepositoryDetailsManager
 	 */
