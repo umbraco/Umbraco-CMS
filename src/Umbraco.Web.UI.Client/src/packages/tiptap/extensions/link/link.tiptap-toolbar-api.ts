@@ -23,9 +23,8 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 
 		const linkAttrs = this.#parseLinkData(result.link);
 
-		if (linkAttrs && editor?.state.selection.empty && !editor.isActive(UmbLink.name)) {
-			// With no text selected there is nothing to apply the link mark to, so insert the link,
-			// using its name as the text and falling back to its URL.
+		if (linkAttrs && this.#hasNoTextToLink(editor)) {
+			// Insert the link instead, using its name as the text and falling back to its URL.
 			const text = result.link.name || linkAttrs.href;
 			editor
 				.chain()
@@ -38,6 +37,15 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 		} else {
 			editor?.chain().focus().extendMarkRange(UmbLink.name).unsetLink().run();
 		}
+	}
+
+	/**
+	 * Whether there is no text for the link mark to apply to: nothing is selected and the cursor is not in a link.
+	 * @param {Editor} [editor] - The editor to check.
+	 * @returns {boolean} True when the link should be inserted rather than applied to existing text.
+	 */
+	#hasNoTextToLink(editor?: Editor): editor is Editor {
+		return !!editor?.state.selection.empty && !editor.isActive(UmbLink.name);
 	}
 
 	#parseLinkData(link: UmbLinkPickerLink) {
