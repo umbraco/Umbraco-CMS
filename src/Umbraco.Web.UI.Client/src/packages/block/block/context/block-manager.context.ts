@@ -47,7 +47,11 @@ import {
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
-import { UmbElementDetailRepository, UmbElementPublishingRepository } from '@umbraco-cms/backoffice/element';
+import {
+	UmbElementDetailRepository,
+	UmbElementPublishingRepository,
+	UmbElementValidationRepository,
+} from '@umbraco-cms/backoffice/element';
 import type { UmbElementDetailModel } from '@umbraco-cms/backoffice/element';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal, umbInfoModal } from '@umbraco-cms/backoffice/modal';
@@ -189,6 +193,7 @@ export abstract class UmbBlockManagerContext<
 	#isProbingExternalContentFailures = false;
 	#elementRepository = new UmbElementDetailRepository(this);
 	#elementPublishingRepository = new UmbElementPublishingRepository(this);
+	#elementValidationRepository = new UmbElementValidationRepository(this);
 	readonly #localize = new UmbLocalizationController(this);
 	#externalContentManager = new UmbRepositoryDetailsManager<UmbElementDetailModel>(this, this.#elementRepository);
 
@@ -760,6 +765,9 @@ export abstract class UmbBlockManagerContext<
 		const { data: created } = await this.#elementRepository.create(scaffold, result.parentUnique);
 		if (!created) return;
 
+		// Publish before swapping the layout, as the layout change makes the external content manager fetch the Element.
+		const publishResult = await this.#publishTransferredElement(created, culturesToPublish);
+
 		this.#contents.removeOne(contentKey);
 		this.removeExposesOf(contentKey);
 		this._layouts.updateOne(key, {
@@ -767,7 +775,7 @@ export abstract class UmbBlockManagerContext<
 			isExternalContent: true,
 		} as Partial<BlockLayoutType>);
 
-		return { unique: created.unique, ...(await this.#publishTransferredElement(created.unique, culturesToPublish)) };
+		return { unique: created.unique, ...publishResult };
 	}
 
 	async #getValueCultures(values: Array<UmbBlockDataValueModel>): Promise<Array<string | null>> {
@@ -818,14 +826,20 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	async #publishTransferredElement(
-		unique: string,
+		element: UmbElementDetailModel,
 		culturesToPublish: Array<string | null>,
 	): Promise<Omit<UmbBlockTransferToExternalContentResult, 'unique'>> {
 		if (culturesToPublish.length === 0) return { status: 'draft' };
 
+		const variantIds = culturesToPublish.map((culture) => new UmbVariantId(culture));
+
+		// Validated without notifications, so a failure is reported once, by the caller.
+		const { error: validationError } = await this.#elementValidationRepository.validateSave(element, variantIds);
+		if (validationError) return { status: 'validation-failed' };
+
 		const { error } = await this.#elementPublishingRepository.publish(
-			unique,
-			culturesToPublish.map((culture) => ({ variantId: new UmbVariantId(culture) })),
+			element.unique,
+			variantIds.map((variantId) => ({ variantId })),
 		);
 		if (!error) return { status: 'published' };
 

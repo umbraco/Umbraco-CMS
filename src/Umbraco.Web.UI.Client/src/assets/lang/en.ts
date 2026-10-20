@@ -3033,7 +3033,7 @@ export default {
 		transferToElementLibraryNotPermitted: 'Transfer not permitted',
 		transferToElementLibraryLanguagesNotPermitted:
 			'This Block has content in languages you do not have access to: <strong>%0%</strong>.',
-		transferToElementLibrarySharedNotPermitted: 'It also has shared content that you do not have access to edit.',
+		transferToElementLibrarySharedNotPermitted: 'It has shared content that you do not have access to edit.',
 		transferToElementLibraryLocationNotPermitted: 'You cannot create and publish Elements here.',
 		transferToElementLibraryLocationTypeNotAllowed: 'This Element Type is not allowed here.',
 		disconnectFromElementLibrary: 'Disconnect from Library',

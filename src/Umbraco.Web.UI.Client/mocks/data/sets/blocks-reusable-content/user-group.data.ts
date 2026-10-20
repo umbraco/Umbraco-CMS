@@ -141,7 +141,7 @@ const limitedEditorsUserGroup: UmbMockUserGroupModel = {
 		{
 			$type: 'ElementPermissionPresentationModel',
 			element: { id: RESTRICTED_FOLDER_ID },
-			verbs: ['Umb.Element.Read', 'Umb.Element.Create'],
+			verbs: ['Umb.Element.Read', 'Umb.Element.Create', 'Umb.ElementContainer.Read'],
 		},
 	],
 	sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Library', 'Umb.Section.Translation'],
