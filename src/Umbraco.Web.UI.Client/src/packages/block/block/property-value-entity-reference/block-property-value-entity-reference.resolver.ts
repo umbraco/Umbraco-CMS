@@ -21,9 +21,7 @@ interface UmbBlockLayoutEntryWithAreas extends UmbBlockLayoutBaseModel {
 export class UmbBlockPropertyValueEntityReferenceResolver implements UmbPropertyValueEntityReferenceResolver {
 	manifest?: ManifestPropertyValueEntityReference;
 
-	async resolveEntityReferences(
-		value: UmbPropertyValueData<UmbBlockValueType>,
-	): Promise<Array<UmbEntityModel>> {
+	async resolveEntityReferences(value: UmbPropertyValueData<UmbBlockValueType>): Promise<Array<UmbEntityModel>> {
 		const schemaAlias = this.manifest?.forEditorAlias;
 		if (!schemaAlias) return [];
 

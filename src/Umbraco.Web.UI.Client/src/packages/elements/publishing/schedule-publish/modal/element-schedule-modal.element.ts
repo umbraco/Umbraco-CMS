@@ -189,8 +189,7 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 					() =>
 						html`<umb-entity-references-summary
 							.config=${this._referencesConfig}
-							.entitiesNeedingAttention=${this.data
-								?.entitiesNeedingAttention}></umb-entity-references-summary>`,
+							.entitiesNeedingAttention=${this.data?.entitiesNeedingAttention}></umb-entity-references-summary>`,
 				)}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>

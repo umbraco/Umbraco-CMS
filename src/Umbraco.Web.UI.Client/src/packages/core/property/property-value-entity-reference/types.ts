@@ -12,7 +12,5 @@ export type * from './property-value-entity-reference.extension.js';
 export interface UmbPropertyValueEntityReferenceResolver extends UmbApi {
 	/** Assigned by the controller after construction — mirrors `UmbPropertyValueResolver.manifest`. */
 	manifest?: ManifestPropertyValueEntityReference;
-	resolveEntityReferences(
-		value: UmbPropertyValueDataPotentiallyWithEditorAlias,
-	): Promise<Array<UmbEntityModel>>;
+	resolveEntityReferences(value: UmbPropertyValueDataPotentiallyWithEditorAlias): Promise<Array<UmbEntityModel>>;
 }

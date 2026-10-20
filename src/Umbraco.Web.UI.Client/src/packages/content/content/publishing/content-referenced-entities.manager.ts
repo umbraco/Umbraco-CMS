@@ -66,9 +66,8 @@ export class UmbContentReferencedEntitiesManager extends UmbControllerBase {
 
 	async #resolveNeedingAttention(entityType: string, entities: Array<UmbEntityModel>): Promise<Array<UmbEntityModel>> {
 		// No manifest means this entity type hasn't opted in to publish awareness — nothing to check.
-		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
-			'entityPublishAwareness',
-			(x) => x.forEntityTypes.includes(entityType),
+		const manifest = umbExtensionsRegistry.getByTypeAndFilter('entityPublishAwareness', (x) =>
+			x.forEntityTypes.includes(entityType),
 		)[0];
 		if (!manifest) return [];
 

@@ -1,6 +1,6 @@
 import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '../types.js';
-import type { UmbPropertyValueEntityReferenceResolver } from './types.js';
 import { UmbPropertyValueFlatMapperController } from '../property-value-flat-mapper/property-value-flat-mapper.controller.js';
+import type { UmbPropertyValueEntityReferenceResolver } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -24,9 +24,7 @@ export class UmbPropertyValueEntityReferencesController extends UmbControllerBas
 		return dedupeEntityModels(referencesPerValue.flat());
 	}
 
-	async #resolveValue(
-		value: UmbPropertyValueDataPotentiallyWithEditorAlias,
-	): Promise<Array<UmbEntityModel>> {
+	async #resolveValue(value: UmbPropertyValueDataPotentiallyWithEditorAlias): Promise<Array<UmbEntityModel>> {
 		const editorAlias = value.editorAlias;
 		if (!editorAlias) return [];
 

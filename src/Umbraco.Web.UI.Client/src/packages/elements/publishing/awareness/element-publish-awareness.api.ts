@@ -2,8 +2,7 @@ import type { UmbElementItemModel } from '../../types.js';
 import { UmbElementVariantState } from '../../variant-state.js';
 import type { UmbEntityPublishAwarenessApi } from '@umbraco-cms/backoffice/content';
 
-// Lower rank = worse state; a variant-aware element needs attention if its *worst* variant is Draft or
-// PublishedPendingChanges.
+// Lower rank = worse state; a variant-aware element needs attention if its *worst* variant is Draft or PublishedPendingChanges.
 const STATE_RANK: Record<string, number> = {
 	[UmbElementVariantState.DRAFT]: 0,
 	[UmbElementVariantState.PUBLISHED_PENDING_CHANGES]: 1,
