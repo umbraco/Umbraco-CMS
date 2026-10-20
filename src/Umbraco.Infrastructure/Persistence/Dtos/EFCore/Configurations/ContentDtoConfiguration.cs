@@ -34,7 +34,5 @@ public class ContentDtoConfiguration : IEntityTypeConfiguration<ContentDto>
             .HasForeignKey(x => x.ContentTypeId)
             .HasPrincipalKey(x => x.NodeId)
             .OnDelete(DeleteBehavior.NoAction);
-
-        builder.Ignore(x => x.NodeDto);
     }
 }
