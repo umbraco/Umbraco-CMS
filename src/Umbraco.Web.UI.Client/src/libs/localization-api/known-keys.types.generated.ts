@@ -276,6 +276,8 @@ declare global {
 		blockEditor_createThisFor: (name: string, variantName: string) => string;
 		blockEditor_defaultLayoutStylesheet: string;
 		blockEditor_deleteArea: string;
+		blockEditor_deletedLibraryElementDescription: string;
+		blockEditor_deletedLibraryElementName: string;
 		blockEditor_disconnectFromElementLibrary: string;
 		blockEditor_disconnectFromElementLibraryConfirm: string;
 		blockEditor_elementTypeDoesNotExist: string;
@@ -317,11 +319,14 @@ declare global {
 		blockEditor_labelLabelTemplate: string;
 		blockEditor_labelSettingsElementType: string;
 		blockEditor_layoutOptions: string;
+		blockEditor_noAccessLibraryElementDescription: string;
+		blockEditor_noAccessLibraryElementName: string;
 		blockEditor_notExposedDescription: string;
 		blockEditor_notExposedLabel: string;
 		blockEditor_notPublishedLibraryElementDescription: string;
 		blockEditor_pickSpecificAllowance: string;
 		blockEditor_propertyEditorNotSupported: string;
+		blockEditor_publishedPendingChangesLibraryElementDescription: string;
 		blockEditor_rangeAllowed: string;
 		blockEditor_rootValidationEntriesNotAllowed: string;
 		blockEditor_scaleHandlerButtonTitle: string;
@@ -340,16 +345,19 @@ declare global {
 		blockEditor_tabLibrary: string;
 		blockEditor_thumbnail: string;
 		blockEditor_transferToElementLibrary: string;
+		blockEditor_trashedLibraryElementDescription: string;
 		blockEditor_unsupportedBlockDescription: string;
 		blockEditor_unsupportedBlockName: string;
 		blueprints_blankBlueprint: string;
 		blueprints_blueprintDescription: string;
+		blueprints_chooseDocumentType: string;
 		blueprints_createBlueprintFolderUnder: string;
 		blueprints_createBlueprintFrom: string;
 		blueprints_createBlueprintItemUnder: string;
 		blueprints_createdBlueprintHeading: string;
 		blueprints_createdBlueprintMessage: string;
 		blueprints_duplicateBlueprintMessage: string;
+		blueprints_noAccessToBlueprints: string;
 		blueprints_selectBlueprint: string;
 		bulk_copiedItem: string;
 		bulk_copiedItemOfItem: string;
@@ -1068,6 +1076,7 @@ declare global {
 		general_deleting: string;
 		general_description: string;
 		general_design: string;
+		general_destination: string;
 		general_details: string;
 		general_dictionary: string;
 		general_dimensions: string;
@@ -2509,6 +2518,7 @@ declare global {
 		user_accessHelp: string;
 		user_addUsersToGroupError: string;
 		user_administrators: string;
+		user_allowAccessToAllDocumentBlueprints: string;
 		user_allowAccessToAllDocuments: string;
 		user_allowAccessToAllElements: string;
 		user_allowAccessToAllLanguages: string;
@@ -2629,6 +2639,8 @@ declare global {
 		user_resetPassword: string;
 		user_searchAllChildren: string;
 		user_sectionsHelp: string;
+		user_selectDocumentBlueprintStartNode: string;
+		user_selectDocumentBlueprintStartNodeDescription: string;
 		user_selectElementStartNode: string;
 		user_selectElementStartNodeDescription: string;
 		user_selectUserGroup: (multiple: boolean) => string;

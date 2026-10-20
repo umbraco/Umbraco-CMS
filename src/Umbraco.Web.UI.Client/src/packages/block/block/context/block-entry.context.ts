@@ -5,10 +5,12 @@ import type {
 	UmbBlockDataType,
 	UmbBlockExposeModel,
 	UmbBlockDataValueModel,
+	UmbBlockExternalContentFailureReason,
 } from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
+	UmbBasicState,
 	UmbBooleanState,
 	UmbClassState,
 	UmbNumberState,
@@ -88,6 +90,12 @@ export abstract class UmbBlockEntryContext<
 	 * Undefined for local (non-external) blocks, or before the Element has resolved.
 	 */
 	readonly externalContentName = this.#externalContentName.asObservable();
+
+	#externalContentFailure = new UmbBasicState<UmbBlockExternalContentFailureReason | undefined>(undefined);
+	/**
+	 * Why the external content of this Block is unavailable. `undefined` while it is available or not yet resolved.
+	 */
+	readonly externalContentFailure = this.#externalContentFailure.asObservable();
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
@@ -701,18 +709,27 @@ export abstract class UmbBlockEntryContext<
 		const contentKey = this.#contentKey ?? this._layout.value?.contentKey;
 		if (!this._manager || !contentKey) return;
 
-		// Observe content and external-content state together to avoid race conditions.
-		// Both are evaluated in the same tick, preventing the unsupported flag
+		// Observe content, external-content state and external-content failure together to avoid race
+		// conditions. They are evaluated in the same tick, preventing the unsupported flag
 		// from flashing true while external content is being fetched.
 		this.observe(
 			mergeObservables(
-				[this._manager.contentOf(contentKey), this._manager.isExternalContentOf(contentKey)],
-				([content, isExternalContent]) => ({ content, isExternalContent: isExternalContent ?? false }),
+				[
+					this._manager.contentOf(contentKey),
+					this._manager.isExternalContentOf(contentKey),
+					this._manager.externalContentFailureOf(contentKey),
+				],
+				([content, isExternalContent, externalContentFailure]) => ({
+					content,
+					isExternalContent: isExternalContent ?? false,
+					externalContentFailure,
+				}),
 			),
-			({ content, isExternalContent }) => {
+			({ content, isExternalContent, externalContentFailure }) => {
 				this.#isExternalContent.setValue(isExternalContent);
+				this.#externalContentFailure.setValue(externalContentFailure);
 				if (!this.#structurallyUnsupported) {
-					this.#unsupported.setValue(!content && !isExternalContent);
+					this.#unsupported.setValue((!content && !isExternalContent) || !!externalContentFailure);
 				}
 				this.#content.setValue(content);
 			},

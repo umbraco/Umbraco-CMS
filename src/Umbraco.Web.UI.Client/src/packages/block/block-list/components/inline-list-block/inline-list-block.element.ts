@@ -21,6 +21,7 @@ import type {
 	UmbBlockLabelUfmValueType,
 } from '@umbraco-cms/backoffice/block';
 
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
@@ -45,13 +46,6 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
-
-	/**
-	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
-	 * reflects the library element's own publish state rather than the local expose entry.
-	 */
-	@property({ type: Boolean, attribute: false })
-	isExternalContent?: boolean;
 
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
@@ -210,7 +204,7 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 				</span>
 				<div id="info">${this.renderNameSlot(blockValue)}</div>
 			</span>
-			${when(this.unpublished, () => this.#renderDraftTag())}
+			<umb-block-state-tag slot="name"></umb-block-state-tag>
 		`;
 	}
 
@@ -233,17 +227,6 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 				</umb-block-workspace-view-edit-content-no-router>
 			`;
 		}
-	}
-
-	#renderDraftTag() {
-		const titleKey = this.isExternalContent
-			? 'blockEditor_notPublishedLibraryElementDescription'
-			: 'blockEditor_notExposedDescription';
-		return html`
-			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
-				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-			</uui-tag>
-		`;
 	}
 
 	static override readonly styles = [
@@ -347,13 +330,6 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 				justify-content: center;
 				height: 100%;
 				padding-left: var(--uui-size-2, 6px);
-			}
-
-			uui-tag {
-				margin-left: 0.5em;
-				margin-bottom: -0.3em;
-				margin-top: -0.3em;
-				vertical-align: text-top;
 			}
 
 			:host(:not([disabled])) #open-part:hover #icon {

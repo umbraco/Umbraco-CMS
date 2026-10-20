@@ -3,9 +3,10 @@ import type { UmbBlockDataObjectModel } from './block-manager.context.js';
 import type { UmbBlockWorkspaceOriginData } from '../workspace/index.js';
 import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '../types.js';
 import { UmbElementDetailStore } from '../../../elements/repository/detail/element-detail.store.js';
-import { aTimeout, expect, fixture, html } from '@open-wc/testing';
+import { aTimeout, expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbApiError } from '@umbraco-cms/backoffice/resources';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_VALIDATION_CONTEXT, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
@@ -161,6 +162,72 @@ describe('UmbBlockManagerContext', () => {
 			foreignValidation.destroy();
 		});
 	});
+	describe('external content', () => {
+		let host: UmbControllerHostElement;
+		let manager: UmbTestBlockManagerContext;
+		let requestedBatches: Array<Array<string>>;
+		const originalRequestByUniques = UmbElementDetailRepository.prototype.requestByUniques;
+
+		const layout = (key: string, contentKey: string) => ({ key, contentKey, isExternalContent: true });
+
+		beforeEach(async () => {
+			requestedBatches = [];
+			UmbElementDetailRepository.prototype.requestByUniques = async function (uniques: Array<string>) {
+				requestedBatches.push(uniques);
+				return {
+					data: uniques.map((unique) => ({
+						unique,
+						documentType: { unique: 'test-element-type' },
+						values: [],
+						variants: [],
+					})) as unknown as Array<UmbElementDetailModel>,
+				};
+			};
+
+			host = await fixture(html`<umb-test-block-manager-host></umb-test-block-manager-host>`);
+			manager = new UmbTestBlockManagerContext(host);
+		});
+
+		afterEach(() => {
+			UmbElementDetailRepository.prototype.requestByUniques = originalRequestByUniques;
+			manager.destroy();
+		});
+
+		const hasContent = (key: string) => {
+			let found = false;
+			const observer = manager.observe(manager.contentOf(key), (content) => (found = !!content), null);
+			observer.destroy();
+			return found;
+		};
+
+		it('requests each referenced element once in a single batch, even when several blocks reference it', async () => {
+			manager.setLayouts([layout('l1', 'e1'), layout('l2', 'e1'), layout('l3', 'e2')]);
+
+			await waitUntil(() => hasContent('e1') && hasContent('e2'));
+
+			expect(requestedBatches.flat().sort()).to.deep.equal(['e1', 'e2']);
+			expect(requestedBatches).to.have.length(1);
+		});
+
+		it('only requests the content referenced by external layouts', async () => {
+			manager.setLayouts([layout('l1', 'e1'), { key: 'l2', contentKey: 'local-content' }]);
+
+			await waitUntil(() => hasContent('e1'));
+
+			expect(requestedBatches).to.deep.equal([['e1']]);
+		});
+
+		it('drops the external content once no layout references it anymore', async () => {
+			manager.setLayouts([layout('l1', 'e1'), layout('l2', 'e2')]);
+			await waitUntil(() => hasContent('e1') && hasContent('e2'));
+
+			manager.setLayouts([layout('l2', 'e2')]);
+
+			await waitUntil(() => !hasContent('e1'));
+			expect(hasContent('e2')).to.be.true;
+		});
+	});
+
 	describe('expose ordering', () => {
 		it('keeps exposes sorted by culture, segment and content key regardless of insertion order', async () => {
 			const host = await fixture<UmbControllerHostElement>(
@@ -179,6 +246,102 @@ describe('UmbBlockManagerContext', () => {
 			]);
 
 			manager.destroy();
+		});
+	});
+
+	describe('external content failures', () => {
+		const originalRequestByUnique = UmbElementDetailRepository.prototype.requestByUnique;
+		const originalRequestByUniques = UmbElementDetailRepository.prototype.requestByUniques;
+		let requestedKeys: Array<string>;
+		let respondWithStatus: number;
+		let manager: UmbTestBlockManagerContext;
+
+		const externalLayout = (key: string) => ({ key: `layout-${key}`, contentKey: key, isExternalContent: true });
+		const settle = () => new Promise((resolve) => setTimeout(resolve, 20));
+		const failureOf = (key: string) => {
+			let reason: string | undefined;
+			manager.observe(manager.externalContentFailureOf(key), (value) => (reason = value), null);
+			return reason;
+		};
+
+		beforeEach(async () => {
+			requestedKeys = [];
+			respondWithStatus = 404;
+			// The batched request does not return the missing elements, so each one is requested on its own to find out why.
+			UmbElementDetailRepository.prototype.requestByUniques = async () => ({ data: [] });
+			UmbElementDetailRepository.prototype.requestByUnique = async function (unique: string) {
+				requestedKeys.push(unique);
+				return {
+					error: new UmbApiError('error', respondWithStatus, undefined, {
+						title: 'error',
+						type: 'ApiError',
+						status: respondWithStatus,
+					}),
+				};
+			} as typeof originalRequestByUnique;
+
+			const host = await fixture<UmbControllerHostElement>(
+				html`<umb-test-block-manager-host></umb-test-block-manager-host>`,
+			);
+			manager = new UmbTestBlockManagerContext(host);
+		});
+
+		afterEach(() => {
+			UmbElementDetailRepository.prototype.requestByUnique = originalRequestByUnique;
+			UmbElementDetailRepository.prototype.requestByUniques = originalRequestByUniques;
+			manager.destroy();
+		});
+
+		it('records a missing element as deleted', async () => {
+			manager.setLayouts([externalLayout('a')]);
+
+			await waitUntil(() => failureOf('a') === 'deleted');
+		});
+
+		it('records a forbidden element as no access', async () => {
+			respondWithStatus = 403;
+			manager.setLayouts([externalLayout('a')]);
+
+			await waitUntil(() => failureOf('a') === 'noAccess');
+		});
+
+		it('does not request an element again once it is known to be unavailable', async () => {
+			manager.setLayouts([externalLayout('a')]);
+			await waitUntil(() => failureOf('a') === 'deleted');
+			manager.setLayouts([externalLayout('a'), externalLayout('b')]);
+			await waitUntil(() => failureOf('b') === 'deleted');
+
+			expect(requestedKeys).to.deep.equal(['a', 'b']);
+		});
+
+		it('does not record a failure that says nothing about availability', async () => {
+			respondWithStatus = 500;
+			manager.setLayouts([externalLayout('a')]);
+			await waitUntil(() => requestedKeys.includes('a'));
+			await settle();
+
+			expect(failureOf('a')).to.equal(undefined);
+		});
+
+		it('asks about one element only when a failure says nothing about availability', async () => {
+			respondWithStatus = 500;
+			manager.setLayouts([externalLayout('a'), externalLayout('b'), externalLayout('c')]);
+			await waitUntil(() => requestedKeys.includes('a'));
+			await settle();
+
+			expect(requestedKeys).to.deep.equal(['a']);
+		});
+
+		it('asks again once the statuses change after a failure that said nothing about availability', async () => {
+			respondWithStatus = 500;
+			manager.setLayouts([externalLayout('a')]);
+			await waitUntil(() => requestedKeys.includes('a'));
+			await settle();
+
+			respondWithStatus = 404;
+			manager.setLayouts([externalLayout('a'), externalLayout('b')]);
+
+			await waitUntil(() => failureOf('a') === 'deleted');
 		});
 	});
 });
@@ -285,33 +448,24 @@ describe('UmbBlockManagerContext - external content (Library Elements)', () => {
 	});
 
 	describe('requests', () => {
-		const originalRequestByUnique = UmbElementDetailRepository.prototype.requestByUnique;
+		const originalRequestByUniques = UmbElementDetailRepository.prototype.requestByUniques;
 		let requestCount: number;
 		let failFirstRequest: boolean;
 
 		beforeEach(() => {
 			requestCount = 0;
 			failFirstRequest = false;
-			UmbElementDetailRepository.prototype.requestByUnique = function (this: UmbElementDetailRepository, unique) {
+			UmbElementDetailRepository.prototype.requestByUniques = function (this: UmbElementDetailRepository, uniques) {
 				requestCount++;
 				if (failFirstRequest && requestCount === 1) {
 					return Promise.resolve({ error: new Error('Request failed') }) as never;
 				}
-				return originalRequestByUnique.call(this, unique);
+				return originalRequestByUniques!.call(this, uniques);
 			};
 		});
 
 		afterEach(() => {
-			UmbElementDetailRepository.prototype.requestByUnique = originalRequestByUnique;
-		});
-
-		it('requests an Element once, however many blocks reference it', async () => {
-			manager.insertExternalContent(ELEMENT_UNIQUE);
-			manager.insertExternalContent(ELEMENT_UNIQUE);
-
-			await firstValueFrom(manager.contentOf(ELEMENT_UNIQUE).pipe(filter((value) => value !== undefined)));
-			await aTimeout(50);
-			expect(requestCount).to.equal(1);
+			UmbElementDetailRepository.prototype.requestByUniques = originalRequestByUniques;
 		});
 
 		it('requests an Element again when its reference is removed and re-added after a failed request', async () => {

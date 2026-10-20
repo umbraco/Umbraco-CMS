@@ -1,6 +1,8 @@
 import type { UmbMockElementModel } from '../../mock-data-set.types.js';
 import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 
+import { data as elementStates } from './element-states.data.js';
+
 const elementOneLibraryElement: UmbMockElementModel = {
 	ancestors: [],
 	id: 'library-element-one-id',
@@ -71,6 +73,82 @@ const elementTwoLibraryElement: UmbMockElementModel = {
 			culture: null,
 			segment: null,
 			value: '17cd53f2-93b3-4e34-ade2-916e7a6639ed',
+		},
+	],
+	flags: [],
+	noAccess: false,
+};
+
+const elementThreeLibraryElement: UmbMockElementModel = {
+	ancestors: [],
+	id: 'library-element-three-id',
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: null,
+	documentType: {
+		id: 'b818bb55-31e1-4537-9c42-17471a176089',
+		icon: 'icon-attachment color-deep-purple',
+	},
+	hasChildren: false,
+	isTrashed: false,
+	isFolder: false,
+	name: 'Element Three (Library)',
+	variants: [
+		{
+			state: UmbElementVariantState.PUBLISHED,
+			culture: null,
+			name: 'Element Three (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: '2024-01-15T10:00:00.000Z',
+			id: 'library-element-three',
+			flags: [],
+		},
+	],
+	values: [
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: null,
+			segment: null,
+			value: 'Reusable Element Three',
+		},
+	],
+	flags: [],
+	noAccess: false,
+};
+
+const elementFourLibraryElement: UmbMockElementModel = {
+	ancestors: [],
+	id: 'library-element-four-id',
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: null,
+	documentType: {
+		id: 'b818bb55-31e1-4537-9c42-17471a176089',
+		icon: 'icon-attachment color-deep-purple',
+	},
+	hasChildren: false,
+	isTrashed: false,
+	isFolder: false,
+	name: 'Element Four (Library)',
+	variants: [
+		{
+			state: UmbElementVariantState.PUBLISHED,
+			culture: null,
+			name: 'Element Four (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: '2024-01-15T10:00:00.000Z',
+			id: 'library-element-four',
+			flags: [],
+		},
+	],
+	values: [
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: null,
+			segment: null,
+			value: 'Reusable Element Four',
 		},
 	],
 	flags: [],
@@ -351,10 +429,13 @@ const emptyVariantsLibraryElement: UmbMockElementModel = {
 export const data: Array<UmbMockElementModel> = [
 	elementOneLibraryElement,
 	elementTwoLibraryElement,
+	elementThreeLibraryElement,
+	elementFourLibraryElement,
 	variantLibraryElement,
 	draftLibraryElement,
 	pendingChangesLibraryElement,
 	publishedBothLibraryElement,
 	missingDaLibraryElement,
 	emptyVariantsLibraryElement,
+	...elementStates,
 ];

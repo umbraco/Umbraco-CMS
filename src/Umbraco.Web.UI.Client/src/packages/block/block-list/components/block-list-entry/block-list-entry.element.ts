@@ -429,7 +429,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
-				.isExternalContent=${this._isExternalContent}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
@@ -445,7 +444,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
-				.isExternalContent=${this._isExternalContent}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
