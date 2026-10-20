@@ -26,6 +26,10 @@ internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBa
 {
     private static readonly string[] _cultures = ["en-US", "da-DK", "de-DE"];
 
+    private static readonly string[] _allSeededProperties = ["title", "variantBlocks", "invariantBlocks", "body", "invariantBody", "grid"];
+
+    private static readonly string[] _propertiesForIncludedFields = ["title", "invariantBlocks", "body"];
+
     public static void ConfigureExplicitlyIndexEachNestedProperty(IUmbracoBuilder builder, object explicitlyIndexEachNestedProperty)
         => builder.Services.Configure<IndexingSettings>(settings =>
             settings.ExplicitlyIndexEachNestedProperty = (bool)explicitlyIndexEachNestedProperty);
@@ -116,8 +120,8 @@ internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBa
         {
             Assert.That(expected, Does.Contain("invariantBlocks_de-de = ").And.Contain("body_en-us = ").And.Contain("title = "));
             Assert.That(RenderSnapshot(filtered.ValueSets), Is.EqualTo(expected));
-            Assert.That(PropertiesWithValues(unfiltered.LoadedContent), Is.EquivalentTo(new[] { "title", "variantBlocks", "invariantBlocks", "body", "invariantBody", "grid" }));
-            Assert.That(PropertiesWithValues(filtered.LoadedContent), Is.EquivalentTo(new[] { "title", "invariantBlocks", "body" }));
+            Assert.That(PropertiesWithValues(unfiltered.LoadedContent), Is.EquivalentTo(_allSeededProperties));
+            Assert.That(PropertiesWithValues(filtered.LoadedContent), Is.EquivalentTo(_propertiesForIncludedFields));
             Assert.That(RenderSnapshot(notEnabled.ValueSets), Is.EqualTo(expected));
             Assert.That(PropertiesWithValues(notEnabled.LoadedContent), Is.EquivalentTo(PropertiesWithValues(unfiltered.LoadedContent)));
         });

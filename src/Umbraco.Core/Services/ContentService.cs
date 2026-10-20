@@ -967,7 +967,7 @@ public class ContentService : RepositoryService, IContentService
         => GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter: filter, ordering: ordering);
 
     /// <inheritdoc />
-    public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering)
+    public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering)
     {
         ordering ??= Ordering.By("Path");
 
@@ -982,14 +982,14 @@ public class ContentService : RepositoryService, IContentService
                     _entityRepository.GetAllPaths(Constants.ObjectTypes.Document, id).ToArray();
                 if (contentPath.Length == 0)
                 {
-                    totalChildren = 0;
+                    totalRecords = 0;
                     return Enumerable.Empty<IContent>();
                 }
 
-                return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering, propertyAliases);
+                return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalRecords, filter, ordering, propertyAliases);
             }
 
-            return GetPagedLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering, propertyAliases);
+            return GetPagedLocked(null, pageIndex, pageSize, out totalRecords, filter, ordering, propertyAliases);
         }
     }
 
