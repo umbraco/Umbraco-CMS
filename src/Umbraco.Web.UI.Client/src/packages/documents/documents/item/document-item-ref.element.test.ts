@@ -109,4 +109,52 @@ describe('UmbDocumentItemRefElement', () => {
 
 		expect(element.shadowRoot?.querySelector('uui-ref-node')?.hasAttribute('readonly')).to.be.true;
 	});
+
+	describe('entity frame', () => {
+		const getFrame = (element: UmbDocumentItemRefElement) => element.shadowRoot!.querySelector('umb-entity-frame');
+
+		it('renders when the ref links to the workspace', async () => {
+			const element = await renderRef();
+
+			await waitUntil(() => !!getFrame(element), 'expected the entity frame to render');
+			expect(getFrame(element)!.textContent).to.contain('English Title');
+		});
+
+		it('is not rendered when the user has no access to the section', async () => {
+			userHasSectionAccess = false;
+			const element = await renderRef();
+
+			expect(getFrame(element)).to.be.null;
+		});
+
+		it('is not rendered when readonly', async () => {
+			const element = await renderRef();
+			await waitUntil(() => !!getFrame(element), 'expected the entity frame to render');
+
+			element.readonly = true;
+			await element.updateComplete;
+
+			expect(getFrame(element)).to.be.null;
+		});
+
+		it('is not rendered when select-only', async () => {
+			const element = await renderRef();
+			await waitUntil(() => !!getFrame(element), 'expected the entity frame to render');
+
+			element.selectOnly = true;
+			await element.updateComplete;
+
+			expect(getFrame(element)).to.be.null;
+		});
+
+		it('is not rendered when disabled', async () => {
+			const element = await renderRef();
+			await waitUntil(() => !!getFrame(element), 'expected the entity frame to render');
+
+			element.disabled = true;
+			await element.updateComplete;
+
+			expect(getFrame(element)).to.be.null;
+		});
+	});
 });
