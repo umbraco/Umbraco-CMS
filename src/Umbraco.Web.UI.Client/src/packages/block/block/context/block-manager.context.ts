@@ -835,7 +835,12 @@ export abstract class UmbBlockManagerContext<
 
 		// Validated without notifications, so a failure is reported once, by the caller.
 		const { error: validationError } = await this.#elementValidationRepository.validateSave(element, variantIds);
-		if (validationError) return { status: 'validation-failed' };
+		if (validationError) {
+			if (UmbApiError.isUmbApiError(validationError) && isPublishValidationError(validationError)) {
+				return { status: 'validation-failed' };
+			}
+			return { status: 'publish-failed' };
+		}
 
 		const { error } = await this.#elementPublishingRepository.publish(
 			element.unique,
