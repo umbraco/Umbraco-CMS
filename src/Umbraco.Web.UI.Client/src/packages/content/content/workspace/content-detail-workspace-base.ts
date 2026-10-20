@@ -191,8 +191,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * This property is deprecated and will be removed in v.21.
 	 * @deprecated - it is not possible to filter variant options from v.21.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected _variantOptionsFilter = (variantOption: UmbEntityVariantOptionSourceModel<VariantOptionModelType>) => true;
+	protected _variantOptionsFilter = (_variantOption: UmbEntityVariantOptionSourceModel<VariantOptionModelType>) => true;
 
 	public variantOptionsManager: UmbWorkspaceVariantOptionsController<VariantModelType, VariantOptionModelType>;
 	public readonly variantOptions: Observable<Array<VariantOptionModelType> | undefined>;
