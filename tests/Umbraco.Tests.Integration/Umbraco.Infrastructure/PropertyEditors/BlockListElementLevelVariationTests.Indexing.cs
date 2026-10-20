@@ -105,7 +105,7 @@ internal partial class BlockListElementLevelVariationTests
 
         var contentTypeDictionary = new Dictionary<Guid, IContentType>
         {
-            { elementType.Key, elementType }, { contentType.Key, contentType }
+            { elementType.Key, elementType }, { contentType.Key, contentType },
         };
         var editor = blockListDataType.Editor!;
         Assert.IsNotEmpty(editor.PropertyIndexValueFactory.GetIndexValues(
