@@ -94,7 +94,8 @@ public static partial class UmbracoBuilderExtensions
             .Append<Hulu>()
             .Append<Giphy>()
             .Append<LottieFiles>()
-            .Append<X>();
+            .Append<X>()
+            .Append<Wistia>();
         builder.SelectorHandlers().Add(() => builder.TypeLoader.GetTypes<ISelectorHandler>());
         builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
         builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());
