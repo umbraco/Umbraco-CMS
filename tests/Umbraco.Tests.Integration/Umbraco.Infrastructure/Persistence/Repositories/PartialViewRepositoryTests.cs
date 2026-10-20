@@ -202,6 +202,37 @@ internal sealed class PartialViewRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Delete_In_Production_Mode_Does_Not_Remove_File()
+    {
+        // Arrange - create file in development mode first.
+        var fileSystems = FileSystemsCreator.CreateTestFileSystems(
+            LoggerFactory,
+            IOHelper,
+            GetRequiredService<IOptions<GlobalSettings>>(),
+            HostingEnvironment,
+            _fileSystem,
+            null,
+            null,
+            null);
+
+        var developmentRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Development);
+        var developmentRepository = new PartialViewRepository(fileSystems, developmentRuntimeSettings);
+
+        IPartialView partialView = new PartialView("production-test-delete.cshtml") { Content = "// partialView" };
+        developmentRepository.Save(partialView);
+        Assert.IsTrue(_fileSystem.FileExists("production-test-delete.cshtml"));
+
+        // Act - try to delete in production mode.
+        var productionRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Production);
+        var productionRepository = new PartialViewRepository(fileSystems, productionRuntimeSettings);
+
+        productionRepository.Delete(productionRepository.Get("production-test-delete.cshtml")!);
+
+        // Assert - file should still exist.
+        Assert.IsTrue(_fileSystem.FileExists("production-test-delete.cshtml"));
+    }
+
+    [Test]
     public void Save_In_Development_Mode_Writes_File()
     {
         // Arrange
