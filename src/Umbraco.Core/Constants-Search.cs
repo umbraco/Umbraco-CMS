@@ -103,5 +103,41 @@ public static partial class Constants
 
             private const string FieldPrefix = "Umb_";
         }
+
+        /// <summary>
+        /// The names of the system fields written to every member search index document, all prefixed with <c>Umb_</c>.
+        /// </summary>
+        /// <remarks>
+        /// These are written for content-based members and external members alike.
+        /// </remarks>
+        public static class MemberFieldNames
+        {
+            /// <summary>
+            /// The field name for the member's email address.
+            /// </summary>
+            public const string Email = $"{FieldPrefix}Email";
+
+            /// <summary>
+            /// The field name for the member's username.
+            /// </summary>
+            public const string UserName = $"{FieldPrefix}UserName";
+
+            /// <summary>
+            /// The field name indicating whether the member is approved.
+            /// </summary>
+            public const string IsApproved = $"{FieldPrefix}IsApproved";
+
+            /// <summary>
+            /// The field name indicating whether the member is locked out.
+            /// </summary>
+            public const string IsLockedOut = $"{FieldPrefix}IsLockedOut";
+
+            /// <summary>
+            /// The field name indicating whether the member is an external member rather than a content-based member.
+            /// </summary>
+            public const string IsExternalMember = $"{FieldPrefix}IsExternalMember";
+
+            private const string FieldPrefix = "Umb_";
+        }
     }
 }

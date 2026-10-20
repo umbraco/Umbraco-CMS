@@ -204,6 +204,8 @@ Content changes are tracked via notification handlers that trigger indexing:
 - `IPublishedContentChangeStrategy` - Tracks published content changes (for `Umb_PublishedContent` index)
 - `IDraftContentChangeStrategy` - Tracks draft content changes (for `Umb_Content`, `Umb_Media`, `Umb_Members` and `Umb_Elements` indexes). Library elements are leaves organised in element containers: containers are not indexed themselves, an `ElementContainer` change with `RefreshWithDescendants` re-indexes the elements beneath it, and element descendants/rebuilds are paged via `IEntityService`
 
+**External members** (`ExternalMemberIdentity`) are not content, so they deliberately bypass `ContentChange` and the change strategies. `ExternalMemberIndexingService` writes them to every content index whose `ContainedObjectTypes` includes `Member` (whichever strategy that index uses), driven by its own `ExternalMemberIndexCacheRefresher` and by `IndexRebuildingNotification`, which `ContentIndexingService` publishes after the strategy has repopulated an index and before `IndexRebuildCompletedNotification`. Both member kinds carry the `Constants.Search.MemberFieldNames` fields — content-based members via `MemberFieldsContentIndexer`.
+
 Index documents are persisted via `IndexDocumentRepository` using **MessagePack serialization** (with Lz4 compression) for efficient change detection — only actual field changes trigger re-indexing, not every save.
 
 ### Backoffice Integration (Umbraco.Core/Services)
