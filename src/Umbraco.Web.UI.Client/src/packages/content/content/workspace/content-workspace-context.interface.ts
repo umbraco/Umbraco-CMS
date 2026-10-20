@@ -18,8 +18,7 @@ export interface UmbContentWorkspaceContext<
 	ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
 	ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,
 	VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
-	VariantOptionModelType extends UmbEntityVariantOptionModel<VariantModelType> =
-		UmbEntityVariantOptionModel<VariantModelType>,
+	VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantModelType>,
 >
 	extends
 		UmbElementPropertyDataOwner<ContentModel, ContentTypeModel>,

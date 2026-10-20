@@ -70,6 +70,7 @@ import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbra
 import type {
 	UmbEntityVariantModel,
 	UmbEntityVariantOptionModel,
+	UmbEntityVariantOptionSourceModel,
 	UmbObjectWithVariantProperties,
 } from '@umbraco-cms/backoffice/variant';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
@@ -126,8 +127,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	VariantModelType extends UmbEntityVariantModel = DetailModelType extends { variants: UmbEntityVariantModel[] }
 		? DetailModelType['variants'][0]
 		: never,
-	VariantOptionModelType extends UmbEntityVariantOptionModel<VariantModelType> =
-		UmbEntityVariantOptionModel<VariantModelType>,
+	VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantModelType>,
 	CreateArgsType extends UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> =
 		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
 >
@@ -191,7 +191,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * This property is deprecated and will be removed in v.21.
 	 * @deprecated - it is not possible to filter variant options from v.21.
 	 */
-	protected _variantOptionsFilter = (variantOption: Omit<VariantOptionModelType, 'language'>) => true;
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected _variantOptionsFilter = (variantOption: UmbEntityVariantOptionSourceModel<VariantOptionModelType>) => true;
 
 	public variantOptionsManager: UmbWorkspaceVariantOptionsController<VariantModelType, VariantOptionModelType>;
 	public readonly variantOptions: Observable<Array<VariantOptionModelType> | undefined>;
