@@ -53,7 +53,9 @@ public static class GuidUtils
             length = 26;
         }
 
-        var bytes = guid.ToByteArray(); // a Guid is 128 bits ie 16 bytes
+        // Write to a stack-allocated buffer to avoid the heap allocation of Guid.ToByteArray().
+        Span<byte> bytes = stackalloc byte[16]; // a Guid is 128 bits ie 16 bytes
+        guid.TryWriteBytes(bytes);
 
         // this could be optimized by making it unsafe,
         // and fixing the table + bytes + chars (see Convert.ToBase64CharArray)

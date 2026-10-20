@@ -55,10 +55,10 @@ public class UmbracoIndexUniqueKeyFieldNameTests
 
         public IEnumerable<string> GetFieldNames() => [];
 
-        public event EventHandler<IndexOperationEventArgs>? IndexOperationComplete;
+        public event EventHandler<IndexOperationEventArgs>? IndexOperationComplete { add { } remove { } }
 
-        public event EventHandler<IndexingItemEventArgs>? TransformingIndexValues;
+        public event EventHandler<IndexingItemEventArgs>? TransformingIndexValues { add { } remove { } }
 
-        public event EventHandler<IndexingErrorEventArgs>? IndexingError;
+        public event EventHandler<IndexingErrorEventArgs>? IndexingError { add { } remove { } }
     }
 }

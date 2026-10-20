@@ -1,7 +1,11 @@
 import type { UmbMemberGroupDetailModel } from '../../types.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { CreateMemberGroupRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -10,7 +14,7 @@ import { MemberGroupService } from '@umbraco-cms/backoffice/external/backend-api
 /**
  * A data source for the Member Group that fetches data from the server
  * @class UmbMemberGroupServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMemberGroupDetailModel> {
 	#host: UmbControllerHost;
@@ -26,8 +30,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Creates a new Member Group scaffold
-	 * @param {(string | null)} parentUnique
-	 * @returns { CreateMemberGroupRequestModel }
+	 * @returns { CreateMemberGroupRequestModel } The scaffolded Member Group.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async createScaffold() {
@@ -42,11 +45,11 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Fetches a Member Group with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the Member Group to fetch.
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>>} The Member Group, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(
@@ -69,11 +72,11 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Inserts a new Member Group on the server
-	 * @param {UmbMemberGroupDetailModel} model
-	 * @returns {*}
+	 * @param {UmbMemberGroupDetailModel} model - The Member Group to create.
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>>} The created Member Group, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
-	async create(model: UmbMemberGroupDetailModel) {
+	async create(model: UmbMemberGroupDetailModel): Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>> {
 		if (!model) throw new Error('Member Group is missing');
 
 		const body: CreateMemberGroupRequestModel = {
@@ -97,12 +100,11 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Updates a MemberGroup on the server
-	 * @param {UmbMemberGroupDetailModel} MemberGroup
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbMemberGroupDetailModel} model - The Member Group to update.
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>>} The updated Member Group, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
-	async update(model: UmbMemberGroupDetailModel) {
+	async update(model: UmbMemberGroupDetailModel): Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -128,11 +130,11 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Deletes a Member Group on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the Member Group to delete.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} Undefined if successful, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(

@@ -95,7 +95,21 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="newParentId">The new parent identifier.</param>
     /// <param name="userId">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
-    protected abstract OperationResult? Move(TContent content, int newParentId, int userId);
+    protected OperationResult? Move(TContent content, int newParentId, int userId)
+        => Move(content, newParentId, includeDescendants: true, userId);
+
+    /// <summary>
+    /// Moves content to a new parent, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="content">The content to move.</param>
+    /// <param name="newParentId">The new parent identifier.</param>
+    /// <param name="includeDescendants">
+    /// Whether to move the descendants along with the content. When restoring content out of the recycle bin this can
+    /// be set to <c>false</c> to restore only the content item itself, leaving its descendants in the recycle bin.
+    /// </param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <returns>The operation result.</returns>
+    protected abstract OperationResult? Move(TContent content, int newParentId, bool includeDescendants, int userId);
 
     /// <summary>
     /// Copies content to a new parent.
@@ -158,6 +172,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected async Task<Attempt<TContentCreateResult, ContentEditingOperationStatus>> MapCreate<TContentCreateResult>(ContentCreationModelBase contentCreationModelBase)
         where TContentCreateResult : ContentCreateResultBase<TContent>, new()
     {
+        if (HasValidNames(contentCreationModelBase) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidName, new TContentCreateResult());
+        }
+
         TContentType? contentType = TryGetAndValidateContentType(contentCreationModelBase.ContentTypeKey, contentCreationModelBase, out ContentEditingOperationStatus validationOperationStatus);
         if (contentType == null)
         {
@@ -196,6 +215,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected async Task<Attempt<TContentUpdateResult, ContentEditingOperationStatus>> MapUpdate<TContentUpdateResult>(TContent content, ContentEditingModelBase contentEditingModelBase)
         where TContentUpdateResult : ContentUpdateResultBase<TContent>, new()
     {
+        if (HasValidNames(contentEditingModelBase) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidName, new TContentUpdateResult { Content = content });
+        }
+
         TContentType? contentType = TryGetAndValidateContentType(content.ContentType.Key, contentEditingModelBase, out ContentEditingOperationStatus operationStatus);
         if (contentType == null)
         {
@@ -212,6 +236,17 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         return Attempt.SucceedWithStatus(validationResult.Status, new TContentUpdateResult { Content = content, ValidationResult = validationResult.Result });
     }
+
+    /// <summary>
+    /// Determines whether every supplied variant name is within the maximum length the persistence layer accepts.
+    /// </summary>
+    /// <remarks>
+    /// Checked here rather than left to the content service, which signals an over-long name by throwing. Every
+    /// variant is checked, not just the one that becomes the entity name, so the reason is reported for whichever
+    /// culture carries it.
+    /// </remarks>
+    private static bool HasValidNames(ContentEditingModelBase contentEditingModelBase)
+        => contentEditingModelBase.Variants.All(variant => variant.Name.Length <= Constants.Validation.MaxNameLength);
 
     /// <summary>
     /// Validates the cultures in the content editing model.
@@ -354,8 +389,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="parentKey">The new parent key, or null for root.</param>
     /// <param name="userKey">The user key performing the operation.</param>
     /// <param name="mustBeInRecycleBin">Whether the content must be in the recycle bin (for restore operations).</param>
+    /// <param name="includeDescendants">
+    /// Whether to move the descendants along with the content. When restoring out of the recycle bin this can be set to
+    /// <c>false</c> to restore only the content item itself, leaving its descendants in the recycle bin.
+    /// </param>
     /// <returns>An attempt containing the content and operation status.</returns>
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false, bool includeDescendants = true)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
@@ -396,7 +435,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         var userId = await GetUserIdAsync(userKey);
-        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, userId);
+        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, includeDescendants, userId);
 
         scope.Complete();
 

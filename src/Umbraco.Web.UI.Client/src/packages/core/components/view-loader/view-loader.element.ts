@@ -17,7 +17,7 @@ export class UmbViewLoaderElement extends LitElement {
 				height: 100%;
 				align-items: center;
 				opacity: 0;
-				animation: fadeIn 240ms 240ms forwards;
+				animation: fadeIn 840ms 120ms forwards;
 			}
 
 			@keyframes fadeIn {

@@ -16,7 +16,7 @@ export class ObjectTypesApiHelper {
     const response = await this.getAll();
     if (response.items === null) 
       return null;
-    for (const item of response.items) {
+    for (const item of this.api.itemsOf(response)) {
       if (item.name == name) {
         return item.id;
       }

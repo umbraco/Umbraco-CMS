@@ -87,6 +87,11 @@ public static partial class Constants
         public const string ManagementApiPath = "/management/api/";
 
         /// <summary>
+        ///     The "base" path to the Delivery API
+        /// </summary>
+        public const string DeliveryApiPath = "/delivery/api/";
+
+        /// <summary>
         ///     The SignalR hub path for backoffice real-time communication.
         /// </summary>
         public const string BackofficeSignalRHub = "/backofficeHub";

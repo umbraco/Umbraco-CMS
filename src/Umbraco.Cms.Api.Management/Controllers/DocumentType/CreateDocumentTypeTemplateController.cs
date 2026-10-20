@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Template;
@@ -9,6 +10,7 @@ using Umbraco.Cms.Core.SchemaLockdown;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
@@ -17,6 +19,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 /// </summary>
 [ApiVersion("1.0")]
 [SchemaEntityType(Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.Template)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class CreateDocumentTypeTemplateController : DocumentTypeControllerBase
 {
     private readonly IContentTypeService _contentTypeService;

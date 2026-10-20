@@ -1,8 +1,9 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbCollectionItemPickerModalData<CollectionItemType = UmbEntityModel>
-	extends UmbPickerModalData<CollectionItemType> {
+export interface UmbCollectionItemPickerModalData<
+	CollectionItemType = UmbEntityModel,
+> extends UmbPickerModalData<CollectionItemType> {
 	collection: UmbCollectionItemPickerModalCollectionConfig;
 }
 

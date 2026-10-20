@@ -135,7 +135,7 @@ test('can bulk move multiple child content items in list view', async ({umbracoA
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesListViewContainCount(0);
-  expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
+  await expect.poll(() => umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
   expect(await umbracoApi.document.getChildrenAmount(secondDocumentId)).toEqual(2);
 });
 
@@ -153,7 +153,7 @@ test('can bulk trash multiple child content items in list view', async ({umbraco
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesListViewContainCount(0);
-  expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
+  await expect.poll(() => umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
   await umbracoUi.content.isItemVisibleInRecycleBin(firstChildContentName);
   await umbracoUi.content.isItemVisibleInRecycleBin(secondChildContentName);
 });

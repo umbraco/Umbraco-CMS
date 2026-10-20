@@ -1,7 +1,7 @@
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
@@ -12,26 +12,30 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
 {
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IPublishedMediaCache _publishedMediaCache;
+    private readonly IImageUrlTokenGenerator _imageUrlTokenGenerator;
     private readonly ILogger<ApiRichTextMarkupParser> _logger;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.DeliveryApi.ApiRichTextMarkupParser"/> class.
+    /// Initializes a new instance of the <see cref="ApiRichTextMarkupParser"/> class.
     /// </summary>
     /// <param name="apiContentRouteBuilder">The <see cref="IApiContentRouteBuilder"/> used to build API content routes.</param>
     /// <param name="mediaUrlProvider">The <see cref="IApiMediaUrlProvider"/> used to provide media URLs for the API.</param>
     /// <param name="publishedContentCache">The <see cref="IPublishedContentCache"/> for accessing published content.</param>
     /// <param name="publishedMediaCache">The <see cref="IPublishedMediaCache"/> for accessing published media.</param>
+    /// <param name="imageUrlTokenGenerator">Used to re-sign rendered image URLs against the current HMAC secret key.</param>
     /// <param name="logger">The <see cref="ILogger{ApiRichTextMarkupParser}"/> instance for logging.</param>
     public ApiRichTextMarkupParser(
         IApiContentRouteBuilder apiContentRouteBuilder,
         IApiMediaUrlProvider mediaUrlProvider,
         IPublishedContentCache publishedContentCache,
         IPublishedMediaCache publishedMediaCache,
+        IImageUrlTokenGenerator imageUrlTokenGenerator,
         ILogger<ApiRichTextMarkupParser> logger)
         : base(apiContentRouteBuilder, mediaUrlProvider)
     {
         _publishedContentCache = publishedContentCache;
         _publishedMediaCache = publishedMediaCache;
+        _imageUrlTokenGenerator = imageUrlTokenGenerator;
         _logger = logger;
     }
 
@@ -120,7 +124,13 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
                     ? $"?{currentImageSource.Split('?').Last()}"
                     : null;
 
-                image.SetAttributeValue("src", $"{mediaUrl}{currentImageQueryString}");
+                // Re-sign the URL so a rotated HMAC secret key doesn't break previously-authored images.
+                // No-op when HMAC isn't configured.
+                var refreshedSrc = _imageUrlTokenGenerator.RefreshSignature(
+                    currentImageQueryString.IsNullOrWhiteSpace()
+                        ? mediaUrl
+                        : mediaUrl.AppendQueryStringToUrl(currentImageQueryString));
+                image.SetAttributeValue("src", refreshedSrc);
                 image.Attributes.Remove("data-udi");
 
                 // we don't want the "data-caption" attribute, it's already part of the output as <figcaption>

@@ -2,12 +2,15 @@ import {
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_ELEMENT,
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_TEMPLATE,
+	UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_PATH,
 	UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
 } from '../../paths.js';
 import type { UmbCreateDocumentTypeWorkspacePresetType } from '../../paths.js';
 import type { UmbDocumentTypeDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../constants.js';
 import { UmbDocumentTypeTemplateRepository } from '../../repository/template/document-type-template.repository.js';
+import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../tree/folder/entity.js';
+import { UMB_EDIT_DOCUMENT_TYPE_FOLDER_WORKSPACE_PATH_PATTERN } from '../../tree/folder/workspace/paths.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -86,6 +89,14 @@ export class UmbDocumentTypeWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_PATH;
+		if (entity.entityType === UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE) {
+			return UMB_EDIT_DOCUMENT_TYPE_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+		}
+		return UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	setAllowedAtRoot(allowedAtRoot: boolean) {

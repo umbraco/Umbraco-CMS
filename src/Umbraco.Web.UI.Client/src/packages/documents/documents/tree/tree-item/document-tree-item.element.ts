@@ -1,6 +1,6 @@
 import type { UmbDocumentTreeItemModel } from '../types.js';
 import type { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
-import { css, html, customElement, state, property, classMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, property, classMap, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-document-tree-item')
@@ -22,6 +22,8 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 				this._forceShowExpand = has;
 				this.requestUpdate('_forceShowExpand', oldValue);
 			});
+			this.observe(this.#api.drillableCollection, (drillable) => (this._drillableCollection = drillable));
+			this.observe(this.#api.collapsibleCollection, (collapsible) => (this._collapsibleCollection = collapsible));
 			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
 			this.observe(this.#api.flags, (flags) => (this._flags = flags || []));
 		}
@@ -36,11 +38,17 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	private _name = '';
 
 	/**
-	 * @internal
 	 * Indicates whether the document is a draft, this is controlled internally but present as an attribute as it affects styling.
+	 * @internal
 	 */
 	@property({ type: Boolean, reflect: true, attribute: 'draft' })
 	protected _isDraft = false;
+
+	@property({ type: Boolean, reflect: true, attribute: 'collection' })
+	private _collapsibleCollection = false;
+
+	@state()
+	private _drillableCollection = false;
 
 	#icon: string | null | undefined;
 
@@ -53,33 +61,106 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		return this.#icon;
 	}
 
+	protected override _renderChildItem(item: UmbDocumentTreeItemModel) {
+		if (this._collapsibleCollection) {
+			return html`<div class="child">
+				<div class="peek-child"></div>
+				${super._renderChildItem(item)}
+			</div>`;
+		} else {
+			return super._renderChildItem(item);
+		}
+	}
+
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	override _renderExpandSymbol = () => {
-		// If this in the menu and it is a collection, then we will enforce the user to the Collection view instead of expanding.
-		// `this._forceShowExpand` is equivalent to hasCollection for this element.
-		// Exception: a "no access" collection is an ancestor of the user's start node, so it must stay
-		// expandable in the tree (render the normal caret) to let the user browse down to it.
-		if (this._isMenu && this._forceShowExpand && !this._noAccess) {
-			return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
-		} else {
-			return undefined;
-		}
+		// The list icon replaces the expand arrow only where activating it drills into the Collection — see
+		// `drillableCollection`. Where it would do nothing, the normal caret is rendered and the children expand, so a
+		// subtree is never made unreachable by an affordance that cannot act.
+		if (!this._drillableCollection) return undefined;
+		return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
 	};
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}>
-			${this._name}
-		</span> `;
+		return html`<span
+			id="label"
+			slot="label"
+			class=${classMap({ draft: this._isDraft })}
+			@dblclick=${this._handleDblClick}
+			>${this._name}</span
+		>`;
+	}
+
+	protected override _renderLoadPrevButton() {
+		if (this._drillableCollection) return nothing;
+		return super._renderLoadPrevButton();
+	}
+	protected override _renderLoadNextButton() {
+		if (this._drillableCollection) return nothing;
+		return super._renderLoadNextButton();
 	}
 
 	static override styles = [
 		...UmbTreeItemElementBase.styles,
 		css`
+			:host {
+				--uui-menu-item-flat-structure: 0;
+				/** Keep the external value of --uui-menu-item-indent for the peek-child element [NL] */
+				--umb-tree-item-indent: var(--uui-menu-item-indent, 0);
+			}
+
+			:host([collection]) uui-menu-item {
+				--uui-menu-item-child-indent: 0;
+			}
+			:host([has-children]) uui-menu-item {
+				--umb-menu-item-child-flat-structure: 0;
+			}
+			:host([collection]) uui-menu-item {
+				--umb-menu-item-child-flat-structure: 0;
+			}
+			:host(:not([collection]):not([has-children])) uui-menu-item {
+				--uui-menu-item-flat-structure: var(--umb-menu-item-child-flat-structure, 0);
+			}
+
 			:host([draft]) #label {
 				opacity: 0.6;
 			}
 			:host([draft]) umb-icon {
 				opacity: 0.6;
+			}
+
+			.child {
+				display: flex;
+				flex-direction: row;
+				align-items: flex-start;
+			}
+			umb-tree-item {
+				flex-grow: 1;
+				flex-shrink: 1;
+			}
+			:host([collection]) umb-tree-item {
+				--umb-menu-item-child-flat-structure: 1;
+				--umb-tree-item-indent: 0;
+			}
+
+			.peek-child {
+				position: relative;
+				display: block;
+				flex-grow: 0;
+				flex-shrink: 0;
+				width: calc((2 + var(--umb-tree-item-indent, 0)) * var(--uui-size-4));
+				margin-right: 3px;
+			}
+			.peek-child::after {
+				content: '';
+				position: absolute;
+				top: -11px;
+				right: -9px;
+				border-left: 1px solid var(--uui-color-border-standalone);
+				border-bottom: 1px solid var(--uui-color-border-standalone);
+				border-bottom-left-radius: var(--uui-border-radius);
+				width: 16px;
+				height: 29px;
 			}
 		`,
 	];

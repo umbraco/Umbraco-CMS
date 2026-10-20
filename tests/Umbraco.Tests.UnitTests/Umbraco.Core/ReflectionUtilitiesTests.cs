@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using NUnit.Framework;
@@ -657,11 +655,15 @@ public class ReflectionUtilitiesTests
 
     public class Class1
     {
+#pragma warning disable SA1306 // Field names should begin with lower-case letter
+#pragma warning disable IDE1006 // Naming Styles
         public readonly int Field3 = 22;
 
         public int Field1 = 33;
-#pragma warning disable SA1306 // Field names should begin with lower-case letter
+#pragma warning disable CS0414 // Field is assigned but its value is never used
         private readonly int Field2 = 66;
+#pragma warning restore CS0414 // Field is assigned but its value is never used
+#pragma warning restore IDE1006 // Naming Styles
 #pragma warning restore SA1306 // Field names should begin with lower-case letter
 
         public Class1()

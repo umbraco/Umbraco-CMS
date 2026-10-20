@@ -188,11 +188,13 @@ internal sealed class MemberEditingService : IMemberEditingService
 
         if (user.HasAccessToSensitiveData() is false)
         {
-            // Handle sensitive data. Certain member properties (IsApproved, IsLockedOut) are subject to "sensitive data" rules.
-            // The client won't have received these, so will always be false.
-            // We should reset them back to their original values before proceeding with the update.
+            // The member account state gated by sensitive data access was withheld from this user, so the
+            // update model carries default values for it rather than the member's own. Restore it from the
+            // member before proceeding: otherwise saving silently resets state the user is not permitted to
+            // see, let alone change.
             updateModel.IsApproved = member.IsApproved;
             updateModel.IsLockedOut = member.IsLockedOut;
+            updateModel.IsTwoFactorEnabled = await _twoFactorLoginService.IsTwoFactorEnabledAsync(member.Key);
         }
 
         MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(member.Id.ToString());

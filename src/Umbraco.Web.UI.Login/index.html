@@ -10,7 +10,7 @@
   <meta name="pinterest" content="nopin"/>
   <title>Umbraco</title>
   <script type="module">
-    import '@umbraco-ui/uui-css/dist/uui-css.css';
+    import '../Umbraco.Web.UI.Client/node_modules/@umbraco-ui/uui/dist/themes/light.css';
     const { startMockServiceWorker } = await import('./src/mocks/index.ts');
     await startMockServiceWorker();
     await import('./src/index.ts');

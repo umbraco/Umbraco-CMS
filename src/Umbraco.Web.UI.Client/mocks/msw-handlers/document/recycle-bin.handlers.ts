@@ -28,4 +28,19 @@ export const recycleBinHandlers = [
 		umbDocumentMockDb.recycleBin.trash([id]);
 		return new HttpResponse(null, { status: 200 });
 	}),
+
+	http.get(umbracoPath(`/recycle-bin${UMB_SLUG}/:id/original-parent`), ({ params }) => {
+		const id = params.id as string;
+		const originalParent = umbDocumentMockDb.recycleBin.getOriginalParent(id);
+		if (originalParent === undefined) return new HttpResponse(null, { status: 404 });
+		return HttpResponse.json(originalParent);
+	}),
+
+	http.put(umbracoPath(`/recycle-bin${UMB_SLUG}/:id/restore`), async ({ params, request }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
+		const body = (await request.json()) as { target?: { id: string } | null };
+		umbDocumentMockDb.recycleBin.restore([id], body.target);
+		return new HttpResponse(null, { status: 200 });
+	}),
 ];

@@ -238,3 +238,97 @@ describe('ArrayState', () => {
 		});
 	});
 });
+
+describe('ArrayState with a nullable (undefined) value', () => {
+	type ObjectType = { key: string; another: string };
+
+	let nullableState: UmbArrayState<ObjectType, string, undefined>;
+
+	beforeEach(() => {
+		nullableState = new UmbArrayState<ObjectType, string, undefined>(undefined, (x) => x.key);
+	});
+
+	it('getValue returns undefined when constructed with undefined', () => {
+		expect(nullableState.getValue()).to.be.undefined;
+	});
+
+	it('asObservable emits undefined when constructed with undefined', (done) => {
+		nullableState.asObservable().subscribe((value) => {
+			expect(value).to.be.undefined;
+			done();
+		});
+	});
+
+	it('getHasOne returns false when the value is undefined', () => {
+		expect(nullableState.getHasOne('1')).to.be.false;
+	});
+
+	it('appendOne creates a new array from an undefined value', () => {
+		const newItem = { key: '1', another: 'myValue1' };
+		nullableState.appendOne(newItem);
+		expect(nullableState.getValue()).to.deep.equal([newItem]);
+	});
+
+	it('appendOneAt creates a new array from an undefined value', () => {
+		const newItem = { key: '1', another: 'myValue1' };
+		nullableState.appendOneAt(newItem, 0);
+		expect(nullableState.getValue()).to.deep.equal([newItem]);
+	});
+
+	it('append creates a new array from an undefined value', () => {
+		const newItems = [
+			{ key: '1', another: 'myValue1' },
+			{ key: '2', another: 'myValue2' },
+		];
+		nullableState.append(newItems);
+		expect(nullableState.getValue()).to.deep.equal(newItems);
+	});
+
+	it('prepend creates a new array from an undefined value', () => {
+		const newItems = [
+			{ key: '1', another: 'myValue1' },
+			{ key: '2', another: 'myValue2' },
+		];
+		nullableState.prepend(newItems);
+		// Each entry is unshifted individually, so the resulting order is the reverse of the input.
+		expect(nullableState.getValue()).to.deep.equal([...newItems].reverse());
+	});
+
+	it('remove leaves the value undefined when it is already undefined', () => {
+		nullableState.remove(['1']);
+		expect(nullableState.getValue()).to.be.undefined;
+	});
+
+	it('removeOne leaves the value undefined when it is already undefined', () => {
+		nullableState.removeOne('1');
+		expect(nullableState.getValue()).to.be.undefined;
+	});
+
+	it('filter leaves the value undefined when it is already undefined', () => {
+		nullableState.filter((x) => x.key !== '1');
+		expect(nullableState.getValue()).to.be.undefined;
+	});
+
+	it('replace leaves the value undefined when it is already undefined', () => {
+		nullableState.replace([{ key: '1', another: 'myValue1' }]);
+		expect(nullableState.getValue()).to.be.undefined;
+	});
+
+	it('updateOne leaves the value undefined when it is already undefined', () => {
+		nullableState.updateOne('1', { another: 'updated' });
+		expect(nullableState.getValue()).to.be.undefined;
+	});
+
+	it('setValue(undefined) resets an already-populated value back to undefined', () => {
+		nullableState.setValue([{ key: '1', another: 'myValue1' }]);
+		expect(nullableState.getValue()).to.not.be.undefined;
+
+		nullableState.setValue(undefined);
+		expect(nullableState.getValue()).to.be.undefined;
+	});
+
+	it('clear sets the value to an empty array, not undefined', () => {
+		nullableState.clear();
+		expect(nullableState.getValue()).to.deep.equal([]);
+	});
+});

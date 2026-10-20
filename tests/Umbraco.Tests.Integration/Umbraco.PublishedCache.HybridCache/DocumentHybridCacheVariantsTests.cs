@@ -49,7 +49,7 @@ internal sealed class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
     }
 
     [SetUp]
-    public async Task Setup() => await CreateTestData();
+    public new async Task Setup() => await CreateTestData();
 
     [Test]
     public async Task Can_Set_Invariant_Title()

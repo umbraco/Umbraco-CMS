@@ -14,7 +14,7 @@ export interface ManifestCollectionViewTableKind extends Omit<ManifestCollection
  * Configuration for a single column in a table collection view kind.
  */
 export interface MetaCollectionViewTableKindColumn {
-	/** The property name on the collection item model to display in this column. */
+	/** Property path on the collection item model to display in this column. Supports dot-notation for nested fields (e.g. `author.name`). */
 	field: string;
 	/** The column header label. Supports localization strings (e.g. `#general_status`). */
 	label: string;

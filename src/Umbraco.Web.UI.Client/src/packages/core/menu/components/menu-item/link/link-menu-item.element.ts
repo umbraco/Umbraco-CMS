@@ -3,8 +3,7 @@ import type { ManifestMenuItemLinkKind } from './types.js';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const elementName = 'umb-link-menu-item';
-@customElement(elementName)
+@customElement('umb-link-menu-item')
 export class UmbLinkMenuItemElement extends UmbLitElement implements UmbMenuItemElement {
 	@property({ type: Object, attribute: false })
 	manifest?: ManifestMenuItemLinkKind;
@@ -35,6 +34,6 @@ export { UmbLinkMenuItemElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbLinkMenuItemElement;
+		'umb-link-menu-item': UmbLinkMenuItemElement;
 	}
 }

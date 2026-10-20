@@ -49,7 +49,7 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
     }
 
     [SetUp]
-    public async Task Setup() => await CreateTestData();
+    public new async Task Setup() => await CreateTestData();
 
     [Test]
     [TestCase(true)]

@@ -114,6 +114,30 @@ public class ValueSchemaProviderTests
         Assert.That(valueType, Is.EqualTo(typeof(string)));
     }
 
+    [Test]
+    public void MultiNodeTreePickerPropertyEditor_Returns_Udi_Entity_Types_For_Reference_Type()
+    {
+        // Arrange
+        var editor = CreateMultiNodeTreePickerPropertyEditor();
+
+        // Act
+        var schema = editor.GetValueSchema(null);
+
+        // Assert
+        Assert.That(schema, Is.Not.Null);
+
+        var entityTypes = schema!["items"]?["properties"]?["type"]?["enum"] as JsonArray;
+        Assert.That(entityTypes, Is.Not.Null);
+        Assert.That(
+            entityTypes!.Select(entityType => entityType?.GetValue<string>()),
+            Is.EquivalentTo(new[]
+            {
+                Constants.UdiEntityType.Document,
+                Constants.UdiEntityType.Media,
+                Constants.UdiEntityType.Member,
+            }));
+    }
+
     private static IntegerPropertyEditor CreateIntegerPropertyEditor()
     {
         var dataValueEditorFactory = Mock.Of<IDataValueEditorFactory>(f =>
@@ -138,6 +162,21 @@ public class ValueSchemaProviderTests
                     new DataEditorAttribute(Constants.PropertyEditors.Aliases.ContentPicker)));
 
         return new ContentPickerPropertyEditor(
+            dataValueEditorFactory,
+            Mock.Of<IIOHelper>());
+    }
+
+    private static MultiNodeTreePickerPropertyEditor CreateMultiNodeTreePickerPropertyEditor()
+    {
+        var dataValueEditorFactory = Mock.Of<IDataValueEditorFactory>(f =>
+            f.Create<DataValueEditor>(It.IsAny<DataEditorAttribute>()) ==
+                new DataValueEditor(
+                    Mock.Of<IShortStringHelper>(),
+                    Mock.Of<IJsonSerializer>(),
+                    Mock.Of<IIOHelper>(),
+                    new DataEditorAttribute(Constants.PropertyEditors.Aliases.MultiNodeTreePicker)));
+
+        return new MultiNodeTreePickerPropertyEditor(
             dataValueEditorFactory,
             Mock.Of<IIOHelper>());
     }

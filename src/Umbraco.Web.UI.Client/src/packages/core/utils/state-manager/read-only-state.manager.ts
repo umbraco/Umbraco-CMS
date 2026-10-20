@@ -3,7 +3,6 @@ import { UmbStateManager } from './state.manager.js';
 
 /**
  * A State Manager to manage read-only states.
- * @export
  * @class UmbReadOnlyStateManager
  * @augments {UmbStateManager<StateType>}
  * @template StateType

@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Collections;
 ///     Represents a composite key of multiple strings for fast dictionaries.
 /// </summary>
 /// <remarks>
-///     <para>The string parts of the key are case-insensitive.</para>
+///     <para>The string parts of the key are compared using <see cref="StringComparer.OrdinalIgnoreCase" />.</para>
 ///     <para>Null is NOT a valid value for any part.</para>
 /// </remarks>
 public readonly struct CompositeStringArrayKey : IEquatable<CompositeStringArrayKey>
@@ -21,8 +21,8 @@ public readonly struct CompositeStringArrayKey : IEquatable<CompositeStringArray
         var hash = new HashCode();
         for (var i = 0; i < keys.Length; i++)
         {
-            _keys[i] = keys[i]?.ToLowerInvariant() ?? throw new ArgumentNullException(nameof(keys));
-            hash.Add(_keys[i]);
+            _keys[i] = keys[i] ?? throw new ArgumentNullException(nameof(keys));
+            hash.Add(_keys[i], StringComparer.OrdinalIgnoreCase);
         }
 
         _hashCode = hash.ToHashCode();
@@ -50,7 +50,7 @@ public readonly struct CompositeStringArrayKey : IEquatable<CompositeStringArray
 
         for (var i = 0; i < _keys.Length; i++)
         {
-            if (_keys[i] != other._keys[i])
+            if (!StringComparer.OrdinalIgnoreCase.Equals(_keys[i], other._keys[i]))
             {
                 return false;
             }

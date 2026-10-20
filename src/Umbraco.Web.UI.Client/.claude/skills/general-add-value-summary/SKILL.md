@@ -63,7 +63,7 @@ export { Umb{Feature}ValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-{feature}-value-summary']: Umb{Feature}ValueSummaryElement;
+		'umb-{feature}-value-summary': Umb{Feature}ValueSummaryElement;
 	}
 }
 ```

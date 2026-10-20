@@ -4,7 +4,7 @@ import { TextIndent } from './text-indent.tiptap-extension.js';
 export default class UmbTiptapTextIndentExtensionApi extends UmbTiptapExtensionApiBase {
 	getTiptapExtensions = () => [
 		TextIndent.configure({
-			types: ['div', 'heading', 'paragraph', 'blockquote', 'listItem', 'orderedList', 'bulletList'],
+			types: ['div', 'divContainer', 'heading', 'paragraph', 'blockquote', 'listItem', 'orderedList', 'bulletList'],
 		}),
 	];
 }

@@ -416,7 +416,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
         // expect RefreshMain when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [TestCase(false)]
@@ -464,7 +464,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
         // expect RefreshMain when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [Test]
@@ -507,7 +507,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
         // expect RefreshMain when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [TestCase(false)]
@@ -807,8 +807,11 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsTrue(propertyTypeAliases.Contains("testProperty1"));
         Assert.IsTrue(propertyTypeAliases.Contains("testProperty2"));
 
-        // expect RefreshOther when adding compositions (corresponds to adding properties)
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
+        // expect RefreshMain when adding compositions - the composition's properties become part of this
+        // content type (and any type composed of or inheriting from it), so it is a main-impact change.
+        // It is also flagged RawDataUnaffected: the composed-in aliases have no stored values yet, so the
+        // cmsContentNu blobs stay valid and only the converted content cache needs clearing (no rebuild).
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [Test]
@@ -857,6 +860,101 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         // expect RefreshOther when adding compositions (corresponds to adding properties)
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
+    }
+
+    [Test]
+    public async Task Adding_A_Property_Refreshes_The_Content_Types_Composed_Of_It()
+    {
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel("Composition", "composition"),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var createModel = ContentTypeCreateModel("Test", "test");
+        createModel.Compositions = new[]
+        {
+            new Composition { Key = compositionContentType.Key, CompositionType = CompositionType.Composition },
+        };
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel("Composition", "composition");
+        updateModel.Properties = new[] { ContentTypePropertyTypeModel("Test Property", "testProperty") };
+
+        var result = await ContentTypeEditingService.UpdateAsync(compositionContentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        // The composing content type now exposes the added property, so it has to be refreshed alongside the
+        // content type the property was added to. The new alias has no stored value, so neither needs a rebuild.
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, refreshedPayloads!.Length);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, compositionContentType.Id, ContentTypeChangeTypes.RefreshOther);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
+            Assert.IsFalse(refreshedPayloads.Any(x => x.ChangeTypes.RequiresRawDataRebuild()), "no payload should require a raw data rebuild");
+        });
+    }
+
+    [Test]
+    public async Task Changing_Property_Variation_Rebuilds_Every_Content_Type_Deriving_From_It()
+    {
+        var (root, middle, leaf) = await CreateInheritanceChainAsync(variesByCulture: true);
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var container = ContentTypePropertyContainerModel(key: root.PropertyGroups.Single().Key);
+        var propertyTypeModel = ContentTypePropertyTypeModel("rootProperty", "rootProperty", containerKey: container.Key);
+        propertyTypeModel.VariesByCulture = true;
+        var updateModel = ContentTypeUpdateModel("Root", alias: root.Alias, propertyTypes: [propertyTypeModel], containers: [container]);
+        updateModel.VariesByCulture = true;
+
+        var result = await ContentTypeEditingService.UpdateAsync(root, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, result.Status.ToString());
+
+        // The stored values change shape on every type that inherits the property, at any depth.
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, refreshedPayloads!.Length);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, root.Id, ContentTypeChangeTypes.RefreshMain);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, middle.Id, ContentTypeChangeTypes.RefreshMain);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, leaf.Id, ContentTypeChangeTypes.RefreshMain);
+        });
+    }
+
+    [Test]
+    public async Task Removing_A_Property_Refreshes_Every_Content_Type_Deriving_From_It_Without_A_Rebuild()
+    {
+        var (root, middle, leaf) = await CreateInheritanceChainAsync();
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel(
+            "Root",
+            alias: root.Alias,
+            propertyTypes: [],
+            containers: [ContentTypePropertyContainerModel(key: root.PropertyGroups.Single().Key)]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(root, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, result.Status.ToString());
+
+        // Every type that inherited the property loses it, at any depth, but the orphaned stored value is never
+        // read again, so none of them needs a rebuild.
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, refreshedPayloads!.Length);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, root.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, middle.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
+            AssertContentTypeRefreshPayloadFor(refreshedPayloads, leaf.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
+        });
     }
 
     [Test]
@@ -1380,8 +1478,10 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
 
+    // A content type that is only inherited from (not used as a true composition) can still gain
+    // compositions of its own - being inherited from must not lock its compositions. See issue #23103.
     [Test]
-    public async Task Cannot_Add_Compositions_For_Content_Type_With_Children()
+    public async Task Can_Add_Compositions_For_Content_Type_With_Children()
     {
         var compositionContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Composition"), Constants.Security.SuperUserKey)).Result!;
         var parentContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
@@ -1391,27 +1491,25 @@ internal sealed partial class ContentTypeEditingServiceTests
                     compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentContentType.Key }]),
                 Constants.Security.SuperUserKey)).Result!;
 
-        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
-        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
-            => refreshedPayloads = payloads;
-
         var updateModel = ContentTypeUpdateModel(
-            "Parent Updated",
+            "Parent",
+            alias: parentContentType.Alias,
             compositions: [new() { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]);
 
         var result = await ContentTypeEditingService.UpdateAsync(parentContentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
+        Assert.IsTrue(result.Success, result.Status.ToString());
 
-        // Ensure nothing was persisted
+        // The composition is persisted on the (inherited-from) parent
         parentContentType = await ContentTypeService.GetAsync(parentContentType.Key);
 
         Assert.IsNotNull(parentContentType);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Parent", parentContentType.Name);
-            Assert.AreEqual(0, parentContentType.ContentTypeComposition.Count());
+            Assert.AreEqual(1, parentContentType.ContentTypeComposition.Count());
+            Assert.AreEqual(compositionContentType.Key, parentContentType.ContentTypeComposition.Single().Key);
         });
 
+        // The child still inherits from the parent
         childContentType = await ContentTypeService.GetAsync(childContentType.Key);
 
         Assert.IsNotNull(childContentType);
@@ -1421,9 +1519,6 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
             Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
         });
-
-        // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
     }
 
     [Test]
@@ -1512,7 +1607,8 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual("Same Test Property Alias", compositionProperty.Name);
         });
 
-        // expect RefreshMain, because a property was removed to "make room" for the new compositions
+        // Expect a full rebuild (RefreshMain, not RawDataUnaffected): the removed alias is reintroduced by the
+        // added composition behind a different property type, so the alias-keyed cache blob must be rebuilt.
         AssertContentTypeRefreshPayload(refreshedPayloads, targetContentType.Id, ContentTypeChangeTypes.RefreshMain);
     }
 
@@ -1520,13 +1616,15 @@ internal sealed partial class ContentTypeEditingServiceTests
     {
         Assert.IsNotNull(refreshedPayloads);
         Assert.AreEqual(1, refreshedPayloads.Length);
-        Assert.Multiple(() =>
-        {
-            var payload = refreshedPayloads.First();
-            Assert.AreEqual(expectedContentTypeId, payload.Id);
-            Assert.AreEqual(expectedChangeTypes, payload.ChangeTypes);
-            Assert.AreEqual(nameof(IContentType), payload.ItemType);
-        });
+        Assert.Multiple(() => AssertContentTypeRefreshPayloadFor(refreshedPayloads, expectedContentTypeId, expectedChangeTypes));
+    }
+
+    private static void AssertContentTypeRefreshPayloadFor(ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads, int expectedContentTypeId, ContentTypeChangeTypes expectedChangeTypes)
+    {
+        ContentTypeCacheRefresher.JsonPayload? payload = refreshedPayloads.SingleOrDefault(x => x.Id == expectedContentTypeId);
+        Assert.IsNotNull(payload, $"expected a single payload for content type {expectedContentTypeId}");
+        Assert.AreEqual(expectedChangeTypes, payload!.ChangeTypes);
+        Assert.AreEqual(nameof(IContentType), payload.ItemType);
     }
 
     [Test]
@@ -1558,5 +1656,215 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidSegmentVariationForElementType, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Add_Composition_With_Non_Colliding_Property_To_Inherited_Parent()
+    {
+        var composition = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition", "compositionProperty"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+        await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key, "childProperty"), Constants.Security.SuperUserKey);
+
+        var updateModel = ContentTypeUpdateModel(
+            "Parent",
+            alias: parent.Alias,
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = composition.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+
+        // no alias collision with the descendant, so the composition is allowed
+        Assert.IsTrue(result.Success, result.Status.ToString());
+    }
+
+    [Test]
+    public async Task Cannot_Add_Composition_Whose_Property_Alias_Collides_With_Descendant_Own_Property()
+    {
+        var composition = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition", "sharedAlias"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+        await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key, "sharedAlias"), Constants.Security.SuperUserKey);
+
+        var updateModel = ContentTypeUpdateModel(
+            "Parent",
+            alias: parent.Alias,
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = composition.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+
+        // the collision is caught while validating the requested composition itself, not the content type's own properties
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Property_Whose_Alias_Collides_With_Descendant_Own_Property()
+    {
+        var parent = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+        await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key, "sharedAlias"), Constants.Security.SuperUserKey);
+
+        var container = ContentTypePropertyContainerModel();
+        var updateModel = ContentTypeUpdateModel(
+            "Parent",
+            alias: parent.Alias,
+            propertyTypes: [ContentTypePropertyTypeModel("sharedAlias", "sharedAlias", containerKey: container.Key)],
+            containers: [container]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Composition_Whose_Property_Alias_Collides_With_Grandchild_Own_Property()
+    {
+        var composition = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition", "sharedAlias"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+        var child = (await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key), Constants.Security.SuperUserKey)).Result!;
+        await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Grandchild", child.Key, "sharedAlias"), Constants.Security.SuperUserKey);
+
+        var updateModel = ContentTypeUpdateModel(
+            "Parent",
+            alias: parent.Alias,
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = composition.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Composition_Whose_Property_Alias_Collides_With_Descendant_Inherited_Composition_Property()
+    {
+        var sharedComposition = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Shared Composition", "sharedAlias"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+
+        // the child inherits from the parent AND composes sharedComposition, so it gets "sharedAlias" from one
+        // of its own compositions rather than as an own property
+        var childModel = ContentTypeCreateModel(
+            "Child",
+            compositions:
+            [
+                new Composition { CompositionType = CompositionType.Inheritance, Key = parent.Key },
+                new Composition { CompositionType = CompositionType.Composition, Key = sharedComposition.Key },
+            ]);
+        await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+
+        // adding another composition carrying "sharedAlias" to the parent would give the child that alias twice
+        var newComposition = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("New Composition", "sharedAlias"), Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = ContentTypeUpdateModel(
+            "Parent",
+            alias: parent.Alias,
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = newComposition.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
+    }
+
+    [Test]
+    public async Task Descendant_Inherits_Property_From_Composition_Added_To_Parent()
+    {
+        var composition = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition", "compProperty"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+        var child = (await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key), Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = ContentTypeUpdateModel(
+            "Parent",
+            alias: parent.Alias,
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = composition.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, result.Status.ToString());
+
+        // the child inherits the composition's property through its (now-composed) parent
+        child = await ContentTypeService.GetAsync(child.Key);
+        Assert.IsNotNull(child);
+        Assert.IsTrue(child.CompositionPropertyTypes.Any(p => p.Alias == "compProperty"));
+    }
+
+    [Test]
+    public async Task Can_Reapply_Composition_With_Property_When_It_Has_An_Inheriting_Child()
+    {
+        var composition = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition C", "shared"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await ContentTypeEditingService.CreateAsync(
+                ContentTypeCreateModel(
+                    "Parent",
+                    compositions: [new Composition { CompositionType = CompositionType.Composition, Key = composition.Key }]),
+                Constants.Security.SuperUserKey)).Result!;
+        await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key), Constants.Security.SuperUserKey);
+
+        var updateModel = ContentTypeUpdateModel(
+            "Parent",
+            alias: parent.Alias,
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = composition.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success, result.Status.ToString());
+    }
+
+    [Test]
+    public async Task Can_Resave_Own_Property_When_Content_Type_Has_An_Inheriting_Child()
+    {
+        var parent = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Parent", "own1"), Constants.Security.SuperUserKey)).Result!;
+        await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key), Constants.Security.SuperUserKey);
+
+        var container = ContentTypePropertyContainerModel();
+        var updateModel = ContentTypeUpdateModel(
+            "Parent Renamed",
+            alias: parent.Alias,
+            propertyTypes: [ContentTypePropertyTypeModel("own1", "own1", containerKey: container.Key)],
+            containers: [container]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success, result.Status.ToString());
+    }
+
+    private ContentTypeCreateModel ChildModelInheriting(string name, Guid parentKey, string? ownPropertyAlias = null)
+    {
+        IEnumerable<ContentTypePropertyTypeModel> properties = Enumerable.Empty<ContentTypePropertyTypeModel>();
+        IEnumerable<ContentTypePropertyContainerModel> containers = Enumerable.Empty<ContentTypePropertyContainerModel>();
+        if (ownPropertyAlias is not null)
+        {
+            var container = ContentTypePropertyContainerModel();
+            properties = [ContentTypePropertyTypeModel(ownPropertyAlias, ownPropertyAlias, containerKey: container.Key)];
+            containers = [container];
+        }
+
+        return ContentTypeCreateModel(
+            name,
+            propertyTypes: properties,
+            containers: containers,
+            compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentKey }]);
+    }
+
+    private async Task<(IContentType Root, IContentType Middle, IContentType Leaf)> CreateInheritanceChainAsync(bool variesByCulture = false)
+    {
+        var rootModel = CompositionModelWithProperty("Root", "rootProperty");
+        rootModel.VariesByCulture = variesByCulture;
+        var root = (await ContentTypeEditingService.CreateAsync(rootModel, Constants.Security.SuperUserKey)).Result!;
+
+        var middleModel = ChildModelInheriting("Middle", root.Key);
+        middleModel.VariesByCulture = variesByCulture;
+        var middle = (await ContentTypeEditingService.CreateAsync(middleModel, Constants.Security.SuperUserKey)).Result!;
+
+        var leafModel = ChildModelInheriting("Leaf", middle.Key);
+        leafModel.VariesByCulture = variesByCulture;
+        var leaf = (await ContentTypeEditingService.CreateAsync(leafModel, Constants.Security.SuperUserKey)).Result!;
+
+        return (root, middle, leaf);
+    }
+
+    private ContentTypeCreateModel CompositionModelWithProperty(string name, string propertyAlias)
+    {
+        var container = ContentTypePropertyContainerModel();
+        return ContentTypeCreateModel(
+            name,
+            propertyTypes: [ContentTypePropertyTypeModel(propertyAlias, propertyAlias, containerKey: container.Key)],
+            containers: [container]);
     }
 }

@@ -75,7 +75,7 @@ public class TextBuilder : Builder
             sb.AppendFormat("using {0};\n", t);
         }
 
-        sb.Append("\n");
+        sb.Append('\n');
         sb.AppendFormat("namespace {0}\n", GetModelsNamespace());
         sb.Append("{\n");
 
@@ -135,7 +135,7 @@ public class TextBuilder : Builder
         {
             var p = s.IndexOf('`');
             WriteNonGenericClrType(sb, s[..p]);
-            sb.Append("<");
+            sb.Append('<');
             Type[] args = type.GetGenericArguments();
             for (var i = 0; i < args.Length; i++)
             {
@@ -242,7 +242,7 @@ public class TextBuilder : Builder
             {
                 if (more)
                 {
-                    sb.Append("\n");
+                    sb.Append('\n');
                 }
 
                 more = true;
@@ -369,7 +369,7 @@ public class TextBuilder : Builder
 
     private void WriteMixinProperty(StringBuilder sb, PropertyModel property, string mixinClrName)
     {
-        sb.Append("\n");
+        sb.Append('\n');
 
         // Adds xml summary to each property containing
         // property name and property description
@@ -421,7 +421,7 @@ public class TextBuilder : Builder
     {
         var mixinStatic = mixinClrName != null;
 
-        sb.Append("\n");
+        sb.Append('\n');
 
         if (property.Errors != null)
         {
@@ -444,12 +444,12 @@ public class TextBuilder : Builder
                 {
                     sb.Append("\t\t * ");
                     sb.Append(s);
-                    sb.Append("\n");
+                    sb.Append('\n');
                 }
             }
 
             sb.Append("\t\t *\n");
-            sb.Append("\n");
+            sb.Append('\n');
         }
 
         // Adds xml summary to each property containing
@@ -507,9 +507,9 @@ public class TextBuilder : Builder
                 property.ClrName);
             if (property.ModelClrType != typeof(object))
             {
-                sb.Append("<");
+                sb.Append('<');
                 WriteClrType(sb, property.ClrTypeName);
-                sb.Append(">");
+                sb.Append('>');
             }
 
             sb.AppendFormat(
@@ -519,7 +519,7 @@ public class TextBuilder : Builder
 
         if (property.Errors != null)
         {
-            sb.Append("\n");
+            sb.Append('\n');
             sb.Append("\t\t *\n");
             sb.Append("\t\t */\n");
         }
@@ -532,7 +532,7 @@ public class TextBuilder : Builder
         var mixinStaticGetterName = MixinStaticGetterName(property.ClrName);
 
         // if (type.StaticMixinMethods.Contains(mixinStaticGetterName)) return;
-        sb.Append("\n");
+        sb.Append('\n');
 
         if (!string.IsNullOrWhiteSpace(property.Name))
         {
@@ -553,9 +553,9 @@ public class TextBuilder : Builder
             mixinClrName);
         if (property.ModelClrType != typeof(object))
         {
-            sb.Append("<");
+            sb.Append('<');
             WriteClrType(sb, property.ClrTypeName);
-            sb.Append(">");
+            sb.Append('>');
         }
 
         sb.AppendFormat(
@@ -586,12 +586,12 @@ public class TextBuilder : Builder
                 {
                     sb.Append("\t\t * ");
                     sb.Append(s);
-                    sb.Append("\n");
+                    sb.Append('\n');
                 }
             }
 
             sb.Append("\t\t *\n");
-            sb.Append("\n");
+            sb.Append('\n');
         }
 
         if (!string.IsNullOrWhiteSpace(property.Name))
@@ -613,7 +613,7 @@ public class TextBuilder : Builder
 
         if (property.Errors != null)
         {
-            sb.Append("\n");
+            sb.Append('\n');
             sb.Append("\t\t *\n");
             sb.Append("\t\t */\n");
         }
@@ -631,7 +631,7 @@ public class TextBuilder : Builder
         if (p >= 0)
         {
             WriteNonGenericClrType(sb, type[..p]);
-            sb.Append("<");
+            sb.Append('<');
 
             var argsString = type[(p + 1)..^1]; // Extract content between '<' and the final '>'
             IReadOnlyList<string> args = SplitGenericArguments(argsString);
@@ -646,7 +646,7 @@ public class TextBuilder : Builder
                 WriteClrType(sb, args[i]);
             }
 
-            sb.Append(">");
+            sb.Append('>');
         }
         else
         {
@@ -720,7 +720,7 @@ public class TextBuilder : Builder
     private void WriteNonGenericClrType(StringBuilder sb, string s)
     {
         // map model types
-        s = Regex.Replace(s, @"\{(.*)\}\[\*\]", m => ModelsMap[m.Groups[1].Value + "[]"]);
+        s = Regex.Replace(s, @"\{(.*)\}\[\*\]", m => ModelsMap[$"{m.Groups[1].ValueSpan}[]"]);
 
         // takes care eg of "System.Int32" vs. "int"
         if (_typesMap.TryGetValue(s, out var typeName))

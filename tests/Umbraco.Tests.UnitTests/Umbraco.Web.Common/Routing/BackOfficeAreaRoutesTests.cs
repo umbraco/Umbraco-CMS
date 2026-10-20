@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -11,6 +12,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
@@ -47,6 +49,28 @@ public class BackOfficeAreaRoutesTests
         Assert.AreEqual(2, route.Endpoints.Count);
 
         AssertMinimalBackOfficeRoutes(route);
+    }
+
+    [Test]
+    public void Hub_Endpoints_Require_BackOffice_Access()
+    {
+        var routes = GetBackOfficeAreaRoutes(RuntimeLevel.Run);
+        var endpoints = new TestRouteBuilder();
+        routes.CreateRoutes(endpoints);
+
+        var hubEndpoints = endpoints.DataSources
+            .SelectMany(x => x.Endpoints)
+            .OfType<RouteEndpoint>()
+            .Where(x => x.RoutePattern.RawText!.Contains("Hub"))
+            .ToList();
+        Assert.AreEqual(4, hubEndpoints.Count);
+
+        foreach (RouteEndpoint endpoint in hubEndpoints)
+        {
+            IAuthorizeData? authorize = endpoint.Metadata.GetMetadata<IAuthorizeData>();
+            Assert.IsNotNull(authorize, $"{endpoint.RoutePattern.RawText} has no authorization metadata");
+            Assert.AreEqual(AuthorizationPolicies.BackOfficeAccess, authorize!.Policy, endpoint.RoutePattern.RawText);
+        }
     }
 
     private void AssertMinimalBackOfficeRoutes(EndpointDataSource route)

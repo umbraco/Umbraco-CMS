@@ -156,7 +156,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 }
 
                 var creator = new BlockGridPropertyValueCreator(_blockConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache, _languageService);
-                return creator.CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks, configuration.GridColumns).GetAwaiter().GetResult();
+                return creator.CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, BlockPropertyVariance.OwningPropertyCulture(_variationContextAccessor, owner, propertyType), configuration.Blocks, configuration.GridColumns).GetAwaiter().GetResult();
             }
         }
     }

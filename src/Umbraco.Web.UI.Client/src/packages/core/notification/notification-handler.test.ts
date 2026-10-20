@@ -1,7 +1,30 @@
 import { UmbNotificationHandler } from './notification-handler.js';
 import type { UmbNotificationOptions } from './types.js';
-import { assert, expect } from '@open-wc/testing';
+import { aTimeout, assert, expect, fixture, html, oneEvent } from '@open-wc/testing';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+
+const PENDING = Symbol('pending');
+
+/**
+ * Resolves with the settled value, or with PENDING if the promise has not settled within the given time.
+ * @param {Promise<T>} promise The promise to wait for.
+ * @param {number} ms How long to wait.
+ * @returns {Promise<Awaited<T> | typeof PENDING>} The settled value, or PENDING.
+ */
+async function settleWithin<T>(promise: Promise<T>, ms = 1000): Promise<Awaited<T> | typeof PENDING> {
+	return Promise.race([promise, aTimeout(ms).then((): typeof PENDING => PENDING)]);
+}
+
+/**
+ * Shows the notification in a toast container, the way the backoffice does, and waits until it is open.
+ * @param {UmbNotificationHandler} handler The handler of the notification to show.
+ */
+async function show(handler: UmbNotificationHandler): Promise<void> {
+	handler.element.style.setProperty('--uui-toast-notification-animation-duration', '1ms');
+	const opened = oneEvent(handler.element, 'opened');
+	await fixture(html`<uui-toast-notification-container>${handler.element}</uui-toast-notification-container>`);
+	await opened;
+}
 
 describe('UmbNotificationHandler', () => {
 	let notificationHandler: UmbNotificationHandler;
@@ -60,6 +83,35 @@ describe('UmbNotificationHandler', () => {
 
 				return assert.fail('onClose should not have returned ´null´');
 			});
+		});
+	});
+
+	describe('onClose', () => {
+		it('resolves when the user dismisses the notification', async () => {
+			const handler = new UmbNotificationHandler({ duration: null, data: { message: 'Message' } });
+			await show(handler);
+
+			handler.element.shadowRoot!.querySelector<HTMLElement>('#close uui-button')!.click();
+
+			expect(await settleWithin(handler.onClose())).to.not.equal(PENDING);
+		});
+
+		it('resolves when the notification closes after its duration', async () => {
+			const handler = new UmbNotificationHandler({ duration: 50, data: { message: 'Message' } });
+			await show(handler);
+
+			expect(await settleWithin(handler.onClose())).to.not.equal(PENDING);
+		});
+
+		it('resolves with the value given to close() when the notification then finishes closing', async () => {
+			const handler = new UmbNotificationHandler({ duration: null, data: { message: 'Message' } });
+			await show(handler);
+			const closed = oneEvent(handler.element, 'closed');
+
+			handler.close('result value');
+			await closed;
+
+			expect(await handler.onClose()).to.equal('result value');
 		});
 	});
 

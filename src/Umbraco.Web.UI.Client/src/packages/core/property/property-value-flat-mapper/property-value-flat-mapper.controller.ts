@@ -6,8 +6,10 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 	/**
 	 * Maps the property values of the given property data.
+	 * @template ValueType
+	 * @template {UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>} PropertyType
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.
-	 * @param mapper
+	 * @param {(property: PropertyType) => ReturnType | Promise<ReturnType>} mapper - The function used to map each property.
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the mapped data.
 	 */
 	async flatMap<ReturnType, ValueType, PropertyType extends UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>>(

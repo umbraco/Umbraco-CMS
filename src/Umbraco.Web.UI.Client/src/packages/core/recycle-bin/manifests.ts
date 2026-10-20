@@ -5,6 +5,7 @@ import { manifests as restoreFromRecycleBinEntityActionManifests } from './entit
 import { manifests as trashEntityActionManifests } from './entity-action/trash/manifests.js';
 import { manifests as trashEntityBulkActionManifests } from './entity-bulk-action/bulk-trash/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
+import { manifests as workspaceContextManifests } from './workspace-context/manifests.js';
 
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -16,4 +17,5 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...trashEntityActionManifests,
 	...trashEntityBulkActionManifests,
 	...treeManifests,
+	...workspaceContextManifests,
 ];

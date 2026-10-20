@@ -96,6 +96,6 @@ export { UmbMediaRecycleBinTreeItemTableCollectionViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-media-recycle-bin-tree-item-table-collection-view']: UmbMediaRecycleBinTreeItemTableCollectionViewElement;
+		'umb-media-recycle-bin-tree-item-table-collection-view': UmbMediaRecycleBinTreeItemTableCollectionViewElement;
 	}
 }

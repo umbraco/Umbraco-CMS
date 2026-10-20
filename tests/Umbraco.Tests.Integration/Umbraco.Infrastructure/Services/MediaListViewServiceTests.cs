@@ -27,7 +27,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
     private IUser SuperUser { get; set; }
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
         => SuperUser = await GetSuperUser();
 
     [Test]

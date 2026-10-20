@@ -36,8 +36,8 @@ for (const dropdown of dropdownValues) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    dropdown.value.forEach(async value => {
+    for (const value of dropdown.value) {
       await umbracoUi.contentRender.doesContentRenderValueContainText(value);
-    });
+    }
   });
 }

@@ -43,12 +43,12 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -59,6 +59,7 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerInputContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerInputContext.max;
@@ -66,7 +67,7 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -103,13 +104,17 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 
 	@property({ type: Array, attribute: 'data-source-types' })
 	public set dataSourceTypes(value: Array<string>) {
@@ -142,18 +147,10 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 			() => !!this.max && this.#pickerInputContext.getSelection().length > this.max,
 		);
 
-		this.observe(
-			this.#pickerInputContext.selection,
-			(selection) => (this.value = selection.join(',')),
-			'_observeSelection',
-		);
-		this.observe(
-			this.#pickerInputContext.selectedItems,
-			(selectedItems) => (this._items = selectedItems),
-			'_observerItems',
-		);
+		this.observe(this.#pickerInputContext.selection, (selection) => (this.value = selection.join(',')), null);
+		this.observe(this.#pickerInputContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
 
-		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), '_observerStatuses');
+		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), null);
 	}
 
 	protected override getFormElement() {
@@ -193,12 +190,13 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 					(status) => {
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
+						const isError = status.state.type === 'error';
 						return html`<umb-entity-item-ref
 							id=${unique}
 							.item=${item}
-							?error=${status.state.type === 'error'}
+							?error=${isError}
 							.errorMessage=${status.state.error}
-							?readonly=${this.readonly}
+							?readonly=${this.readonly || isError}
 							?standalone=${this.max === 1}>
 							${when(
 								!this.readonly,

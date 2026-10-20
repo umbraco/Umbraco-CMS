@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Web.Caching;
@@ -32,6 +34,10 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
+        // Replaces the no-op IImageUrlTokenGenerator registered in Core; allows rich text render
+        // paths to re-sign image URLs against the current HMACSecretKey after a key rotation.
+        builder.Services.AddSingleton<IImageUrlTokenGenerator, ImageSharpImageUrlTokenGenerator>();
+
         builder.Services.AddImageSharp()
             // Replace default image provider
             .ClearProviders()
@@ -50,10 +56,18 @@ public static class UmbracoBuilderExtensions
         {
             options.AddFilter(new UmbracoPipelineFilter(nameof(ImageSharpComposer))
             {
-                PrePipeline = prePipeline => prePipeline.UseImageSharp()
+                PrePipeline = prePipeline =>
+                {
+                    ImageProcessingMemory.Configure(
+                        prePipeline.ApplicationServices,
+                        GC.GetGCMemoryInfo().TotalAvailableMemoryBytes);
+                    prePipeline.UseMiddleware<ImageProcessingThrottleMiddleware>();
+                    prePipeline.UseImageSharp();
+                }
             });
         });
 
         return builder.Services;
     }
+
 }

@@ -2,14 +2,17 @@ import { UmbClipboardEntryItemRepository } from '../../../clipboard-entry/index.
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '../../context/clipboard.property-context-token.js';
 import type { MetaPropertyActionPasteFromClipboardKind } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/backoffice/property-action';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionPasteFromClipboardKind> {
 	#init: Promise<unknown>;
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#clipboardContext?: typeof UMB_CLIPBOARD_PROPERTY_CONTEXT.TYPE;
+	readonly #localize = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost, args: UmbPropertyActionArgs<MetaPropertyActionPasteFromClipboardKind>) {
 		super(host, args);
@@ -70,12 +73,10 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 
 			const item = data[0];
 
-			// Todo: localize
 			await umbConfirmModal(this, {
-				headline: 'Paste from clipboard',
-				content: `The property already contains a value. Paste from the property action will overwrite the current value.
-				Do you want to replace the current value with ${item.name}?`,
-				confirmLabel: 'Paste',
+				headline: '#clipboard_confirmPasteHeadline',
+				content: this.#localize.term('clipboard_confirmPasteOverwriteMessage', escapeHTML(item.name ?? '')),
+				confirmLabel: '#defaultdialogs_paste',
 			});
 		}
 

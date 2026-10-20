@@ -97,20 +97,29 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 			nameColumn,
 			...(this.#hasDescriptions ? [descriptionColumn] : []),
 			...manifestColumns,
-			entityActionsColumn,
+			...(this._hideItemActions ? [] : [entityActionsColumn]),
 		];
 	}
 
 	override willUpdate(changedProperties: PropertyValues) {
 		super.willUpdate(changedProperties);
-		if (changedProperties.has('_selectable') || changedProperties.has('_multiple') || changedProperties.has('_selectOnly')) {
+		if (
+			changedProperties.has('_selectable') ||
+			changedProperties.has('_multiple') ||
+			changedProperties.has('_selectOnly')
+		) {
 			this.#tableConfig = {
 				allowSelection: this._selectable,
 				allowSelectAll: this._multiple,
 				selectOnly: this._selectOnly,
 			};
 		}
-		if (changedProperties.has('_items') || changedProperties.has('_itemHrefs') || changedProperties.has('manifest')) {
+		if (
+			changedProperties.has('_items') ||
+			changedProperties.has('_itemHrefs') ||
+			changedProperties.has('manifest') ||
+			changedProperties.has('_hideItemActions')
+		) {
 			this.#createTableRows();
 		}
 	}
@@ -125,7 +134,9 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 			const href = item.unique ? this._itemHrefs.get(item.unique) : undefined;
 
 			const manifestColumnData = this.#manifestColumns.map((col) => {
-				const rawValue = (item as unknown as Record<string, unknown>)[col.field];
+				const rawValue = col.field
+					.split('.')
+					.reduce((obj, key) => (obj as Record<string, unknown>)?.[key], item as unknown);
 				if (col.valueType) {
 					return {
 						columnAlias: col.field,

@@ -8,24 +8,28 @@ import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbrac
 import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_WORKSPACE_ALIAS, UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type {
-	UMB_BLOCK_WORKSPACE_CONTEXT,
 	UmbBlockDataType,
 	UmbBlockLabelUfmValueType,
+	UMB_BLOCK_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
 };
 
+/**
+ * @element umb-block-grid-block-inline
+ * @slot name - Content rendered as the block's primary label. The expected projection is a `<umb-ufm-render>` element owned by the parent block-grid entry.
+ */
 @customElement('umb-block-grid-block-inline')
-export class UmbBlockGridBlockInlineElement extends UmbLitElement {
+export class UmbBlockGridBlockInlineElement extends UmbBlockRefNameSlotMixin(UmbLitElement) {
 	//
 	#blockContext?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
@@ -36,9 +40,6 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 
 	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;
-
-	@property({ type: String, reflect: false })
-	label?: string;
 
 	@property({ type: String, reflect: false })
 	icon?: string;
@@ -190,7 +191,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		})}].value`;
 	}
 
-	#expose = () => {
+	readonly #expose = () => {
 		this.#workspaceContext?.expose();
 	};
 
@@ -214,9 +215,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				<span id="icon">
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
-				<div id="info">
-					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
-				</div>
+				<div id="info">${this.renderNameSlot(blockValue)}</div>
 			</span>
 			${when(
 				this.unpublished,
@@ -253,7 +252,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		}
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			umb-block-grid-areas-container::part(area) {
@@ -369,14 +368,16 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			:host(:not([disabled])) #open-part:hover #icon {
 				color: var(--uui-color-interactive-emphasis);
 			}
-			:host(:not([disabled])) #open-part:hover #name {
+			:host(:not([disabled])) #open-part:hover #name,
+			:host(:not([disabled])) #open-part:hover ::slotted([slot='name']) {
 				color: var(--uui-color-interactive-emphasis);
 			}
 
 			:host([disabled]) #icon {
 				color: var(--uui-color-disabled-contrast);
 			}
-			:host([disabled]) #name {
+			:host([disabled]) #name,
+			:host([disabled]) ::slotted([slot='name']) {
 				color: var(--uui-color-disabled-contrast);
 			}
 

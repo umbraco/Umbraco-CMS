@@ -301,6 +301,8 @@ export default {
 		isSensitiveValue:
 			'Ova vrijednost je skrivena. Ako vam je potreban pristup da vidite ovu vrijednost, obratite se\n       administratoru web stranice.\n    ',
 		isSensitiveValue_short: 'Ova vrijednost je skrivena.',
+		isSensitiveValueNotice:
+			'Ako vam je potreban pristup da vidite skrivene vrijednosti, obratite se administratoru web stranice.',
 		languagesToPublish: 'Koje jezike želite objaviti?',
 		languagesToSendForApproval: 'Koje jezike želite poslati na odobrenje?',
 		languagesToSchedule: 'Koje jezike želite zakazano objaviti?',
@@ -320,6 +322,8 @@ export default {
 		createFromClipboard: 'Zalijepi iz međuspremnika',
 		nodeIsInTrash: 'Ova stavka je u košu za smeće',
 		saveModalTitle: 'Spremi',
+		saveAndPublishDescendantsModalTitle: 'Spremi i objavi sa potomcima',
+		saveAndScheduleModalTitle: 'Spremi i zakaži objavu',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Kreirajte novi predložak sadržaja iz <em>%0%</em>',
@@ -333,6 +337,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Kliknite za prijenos',
+		browseFilesAction: 'Pregledaj datoteke',
+		dropFilesOr: 'Povucite i ispustite medije ovdje<br />ili',
 		orClickHereToUpload: 'ili kliknite ovdje kako bi odaberali datoteke',
 		disallowedFileType: 'Nije moguće učitati ovu datoteku, jer nema odobrenu vrstu datoteke',
 		disallowedMediaType: "Nije moguće učitati ovu datoteku, format medija sa nastavkom '%0%' nije dozvoljen",
@@ -770,6 +776,8 @@ export default {
 		next: 'Sljedeći',
 		no: 'Ne',
 		nodeName: 'Ime čvora',
+		noResults: 'Nema rezultata',
+		noResultsFor: (query: string) => `Nema rezultata za "${query}".`,
 		of: 'od',
 		off: 'Isključeno',
 		ok: 'OK',
@@ -1285,6 +1293,17 @@ export default {
 		sortHelp:
 			'Povucite različite stavke gore ili dolje ispod da postavite kako bi trebale biti raspoređene. Ili kliknite na\n       zaglavlja kolona za sortiranje cijele kolekcije stavki\n    ',
 		sortPleaseWait: 'Pričekajte. Stavke se sortiraju, ovo može potrajati.',
+		sortByFieldHeadline: 'Sortiraj po polju',
+		sortByFieldSentence: 'Sortiraj sve podređene stavke po',
+		sortByFieldDirectionLabel: 'Smjer',
+		sortByFieldAscending: 'Uzlazno',
+		sortByFieldDescending: 'Silazno',
+		sortByFieldNameOption: 'Naziv',
+		sortByFieldCreateDateOption: 'Kreirano',
+		sortByFieldUpdateDateOption: 'Zadnja izmjena',
+		sortIndividuallyHeadline: 'Sortiraj pojedinačno',
+		sortByFieldCultureSentence: 'na jeziku',
+		sortByFieldCultureLabel: 'Jezik',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validacija',
@@ -1576,8 +1595,10 @@ export default {
 		tabHasNoSortOrder: 'kartica nema redoslijed sortiranja',
 		compositionUsageHeading: 'Gdje se koristi ovaj sastav?',
 		compositionUsageSpecification: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      vrsta sadržaja:\n    ',
-		compositionUsageSpecificationMediaType: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      vrsta medija:\n    ',
-		compositionUsageSpecificationMemberType: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      vrsta člana:\n    ',
+		compositionUsageSpecificationMediaType:
+			'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      vrsta medija:\n    ',
+		compositionUsageSpecificationMemberType:
+			'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      vrsta člana:\n    ',
 		variantsHeading: 'Dozvoli varijacije',
 		cultureVariantHeading: 'Dozvolite varirati u zavisnosti od kulture',
 		segmentVariantHeading: 'Dozvoli segmentaciju',
@@ -1751,6 +1772,10 @@ export default {
 		templatingGroup: 'Predložak',
 		thirdPartyGroup: 'Treća strana',
 		webhooks: 'Webhooks',
+	},
+	picker: {
+		browseTab: 'Pregledaj',
+		searchTab: 'Pretraži',
 	},
 	update: {
 		updateAvailable: 'Postoji nova verzija',
@@ -2131,10 +2156,10 @@ export default {
 		searchThisMessageWithGoogle: 'Pretraži ovu poruku pomoću Google-a',
 		searchWithBing: 'Pretraži pomoću Bing-a',
 		searchThisMessageWithBing: 'Pretraži ovu poruku pomoću Bing-a',
-		searchOurUmbraco: 'Pretraži Our Umbraco',
-		searchThisMessageOnOurUmbracoForumsAndDocs: 'Pretraži ovu poruku na Our Umbraco forumu i dokumentaciji',
-		searchOurUmbracoWithGoogle: 'Pretraži Our Umbraco pomoću Google-a',
-		searchOurUmbracoForumsUsingGoogle: 'Pretraži Our Umbraco forume pomoću Google-a',
+		searchOurUmbraco: 'Pretraži Umbraco',
+		searchThisMessageOnOurUmbracoForumsAndDocs: 'Pretraži ovu poruku na Umbraco forumu i dokumentaciji',
+		searchOurUmbracoWithGoogle: 'Pretraži Umbraco pomoću Google-a',
+		searchOurUmbracoForumsUsingGoogle: 'Pretraži Umbraco forume pomoću Google-a',
 		searchUmbracoSource: 'Pretraži Umbraco Source',
 		searchWithinUmbracoSourceCodeOnGithub: 'Pretraži Umbraco source code on Github-u',
 		searchUmbracoIssues: 'Pretraži Umbraco Issues',

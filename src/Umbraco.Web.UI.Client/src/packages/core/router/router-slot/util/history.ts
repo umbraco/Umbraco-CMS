@@ -45,9 +45,9 @@ export function ensureHistoryEvents() {
 /**
  * Attaches a global router event after the native function on the object has been invoked.
  * Stores the original function at the _name.
- * @param obj
- * @param functionName
- * @param eventName
+ * @param {History} obj - The object to patch.
+ * @param {string} functionName - The name of the function to patch.
+ * @param {GlobalRouterEvent} eventName - The event to dispatch after the function is invoked.
  */
 export function attachCallback(obj: any, functionName: string, eventName: GlobalRouterEvent) {
 	const func = obj[functionName];
@@ -67,9 +67,9 @@ export function attachCallback(obj: any, functionName: string, eventName: Global
 
 /**
  * Saves the native function on the history object.
- * @param obj
- * @param name
- * @param func
+ * @param {History} obj - The object to save the native function on.
+ * @param {string} name - The name of the function.
+ * @param {() => void} func - The native function to save.
  */
 export function saveNativeFunction(obj: any, name: string, func: () => void) {
 	// Ensure that the native object exists.
@@ -84,9 +84,10 @@ export function saveNativeFunction(obj: any, name: string, func: () => void) {
 /**
  * Dispatches and event and returns whether the state change should be cancelled.
  * The state will be considered as cancelled if the "willChangeState" event was cancelled.
- * @param data
- * @param data.url
- * @param data.eventName
+ * @param {object} data - The event data.
+ * @param {string | null} [data.url] - The URL the state is changing to.
+ * @param {GlobalRouterEvent} data.eventName - The event name that triggered the state change.
+ * @returns {boolean} True if the state change should be cancelled.
  */
 function shouldCancelChangeState(data: { url?: string | null; eventName: GlobalRouterEvent }): boolean {
 	return !GLOBAL_ROUTER_EVENTS_TARGET.dispatchEvent(

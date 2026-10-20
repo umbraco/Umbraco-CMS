@@ -27,7 +27,7 @@ public class DomainsControllerTests : ManagementApiUserGroupTestBase<DomainsCont
     private Guid _documentKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());

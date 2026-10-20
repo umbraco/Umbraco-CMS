@@ -299,7 +299,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
         }
 
-        // true if Umbraco.CoreDebugSettings.LogUncompletedScope appSetting is set to "true"
         private bool LogUncompletedScopes => _coreDebugSettings.LogIncompletedScopes;
 
         /// <summary>
@@ -484,6 +483,17 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
 
             _disposed = true;
+        }
+
+        /// <inheritdoc />
+        protected override void ChildCompleted(bool? completed)
+        {
+            if (LogUncompletedScopes && completed is not true)
+            {
+                _logger.LogWarning("Uncompleted Child Scope at\r\n {StackTrace}", Environment.StackTrace);
+            }
+
+            base.ChildCompleted(completed);
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ public class ByKeyMediaTypeControllerTests : ManagementApiUserGroupTestBase<ByKe
     private Guid _mediaTypeKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         _mediaTypeKey = Guid.NewGuid();
         MediaTypeCreateModel mediaTypeCreateModel = new() { Name = Guid.NewGuid().ToString(), Alias = Guid.NewGuid().ToString(), Key = _mediaTypeKey };

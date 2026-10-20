@@ -252,7 +252,8 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         tokens[0].Value = "abcd123"; // update
 
         // save new list
-        ExternalLoginService.Save(user.Key,
+        ExternalLoginService.Save(
+            user.Key,
             tokens.Select(x => new ExternalLoginToken(x.LoginProvider, x.Name, x.Value)));
 
         var updatedTokens = ExternalLoginService.GetExternalLoginTokens(user.Key).OrderBy(x => x.LoginProvider)

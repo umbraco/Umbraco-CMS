@@ -82,6 +82,26 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(childOfChildFolderName, true, false);
 });
 
+test('can find a stylesheet in a sibling nested folder', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildFolderName = 'AAFirstChildFolder';
+  const nestedFolderName = 'NestedFolder';
+  const secondChildFolderName = 'ZZSecondChildFolder';
+  const targetStylesheetName = 'TargetStylesheet.css';
+  await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
+  const firstChildFolderPath = await umbracoApi.stylesheet.createFolder(firstChildFolderName, stylesheetFolderName);
+  await umbracoApi.stylesheet.createFolder(nestedFolderName, firstChildFolderPath);
+  const secondChildFolderPath = await umbracoApi.stylesheet.createFolder(secondChildFolderName, stylesheetFolderName);
+  const targetStylesheetPath = await umbracoApi.stylesheet.create(targetStylesheetName, 'body { color: #000; }', secondChildFolderPath);
+
+  // Act
+  const stylesheetData = await umbracoApi.stylesheet.getByName(targetStylesheetName);
+
+  // Assert
+  expect(stylesheetData).toBeTruthy();
+  expect(stylesheetData.path).toBe(targetStylesheetPath);
+});
+
 test('can create a stylesheet in a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.stylesheet.createFolder(stylesheetFolderName);

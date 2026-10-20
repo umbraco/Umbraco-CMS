@@ -1051,4 +1051,71 @@ public partial class ContentEditingServiceTests
                 out RichTextEditorValue? richTextEditorValue));
         Assert.AreEqual(expected, richTextEditorValue!.Markup);
     }
+
+    [Test]
+    public async Task Cannot_Create_With_An_Over_Long_Name()
+    {
+        var contentType = CreateInvariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Name = new string('x', 256) }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The title" }],
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Create_With_A_Name_At_The_Maximum_Length()
+    {
+        var contentType = CreateInvariantContentType();
+        var name = new string('x', 255);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Name = name }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The title" }],
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(name, result.Result.Content!.Name);
+    }
+
+    [Test]
+    public async Task Cannot_Create_With_An_Over_Long_Name_For_Any_Culture()
+    {
+        var contentType = await CreateVariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            // only the non-default culture is too long, so a check on the entity name alone would miss it
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "English" },
+                new VariantModel { Culture = "da-DK", Name = new string('x', 256) }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "variantTitle", Value = "English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "Danish title", Culture = "da-DK" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+    }
 }

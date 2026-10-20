@@ -59,6 +59,32 @@ public interface INavigationQueryService
     bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys);
 
     /// <summary>
+    ///     Attempts to determine whether a node has any children.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node.</param>
+    /// <param name="hasChildren">
+    ///     When this method returns, indicates whether the node has at least one child;
+    ///     otherwise, <c>false</c>.
+    /// </param>
+    /// <returns><c>true</c> if the node exists in the structure; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     Prefer this over <see cref="TryGetChildrenKeys" /> when only the existence of children is
+    ///     needed, as it avoids building and caching the ordered set of child keys.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    bool TryGetHasChildren(Guid parentKey, out bool hasChildren)
+    {
+        if (TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys))
+        {
+            hasChildren = childrenKeys.Any();
+            return true;
+        }
+
+        hasChildren = false;
+        return false;
+    }
+
+    /// <summary>
     ///     Attempts to get all child node keys of a specific content type under a parent node.
     /// </summary>
     /// <param name="parentKey">The unique identifier of the parent node.</param>

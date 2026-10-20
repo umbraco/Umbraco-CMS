@@ -32,7 +32,6 @@ test('can add a composition to a media type', {tag: '@smoke'}, async ({umbracoAp
 
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.mediaType.clickCompositionsButton();
   await umbracoUi.mediaType.clickModalMenuItemWithName(compositionMediaTypeName);
   await umbracoUi.mediaType.clickSubmitButton();
@@ -53,7 +52,6 @@ test('can remove a composition from a media type', {tag: '@smoke'}, async ({umbr
 
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.mediaType.clickCompositionsButton();
   await umbracoUi.mediaType.clickModalMenuItemWithName(compositionMediaTypeName);
   await umbracoUi.mediaType.clickSubmitButton();
@@ -76,7 +74,6 @@ test('can add multiple compositions to a media type', async ({umbracoApi, umbrac
 
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.mediaType.clickCompositionsButton();
   await umbracoUi.mediaType.clickModalMenuItemWithName(compositionMediaTypeName);
   await umbracoUi.mediaType.clickModalMenuItemWithName(secondCompositionMediaTypeName);

@@ -12,6 +12,6 @@ export { UmbDocumentTypeFolderWorkspaceEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-document-type-folder-workspace-editor']: UmbDocumentTypeFolderWorkspaceEditorElement;
+		'umb-document-type-folder-workspace-editor': UmbDocumentTypeFolderWorkspaceEditorElement;
 	}
 }

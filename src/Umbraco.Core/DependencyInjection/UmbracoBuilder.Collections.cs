@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DynamicRoot.Origin;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Mapping;
@@ -67,6 +68,11 @@ public static partial class UmbracoBuilderExtensions
             .Append<FurthestAncestorOrSelfDynamicRootQueryStep>()
             .Append<NearestDescendantOrSelfDynamicRootQueryStep>()
             .Append<FurthestDescendantOrSelfDynamicRootQueryStep>();
+
+        builder.MachineIdentityProviders()
+            .Append<ConfiguredMachineIdentityProvider>()
+            .Append<AzureWebsiteInstanceIdMachineIdentityProvider>()
+            .Append<DefaultMachineIdentityProvider>();
 
         builder.Components();
         builder.PartialViewSnippets();
@@ -141,6 +147,14 @@ public static partial class UmbracoBuilderExtensions
     /// <returns>The <see cref="SchemaLockdownConfiguratorCollectionBuilder" />.</returns>
     public static SchemaLockdownConfiguratorCollectionBuilder SchemaLockdownConfigurators(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<SchemaLockdownConfiguratorCollectionBuilder>();
+
+    /// <summary>
+    ///     Gets the server event access filters collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="ServerEventAccessFilterCollectionBuilder" />.</returns>
+    public static ServerEventAccessFilterCollectionBuilder ServerEventAccessFilters(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<ServerEventAccessFilterCollectionBuilder>();
 
     /// <summary>
     /// Gets the editor validators collection builder.
@@ -308,4 +322,12 @@ public static partial class UmbracoBuilderExtensions
     /// <returns>The <see cref="ContentTypeFilterCollectionBuilder" />.</returns>
     public static ContentTypeFilterCollectionBuilder ContentTypeFilters(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<ContentTypeFilterCollectionBuilder>();
+
+    /// <summary>
+    ///     Gets the machine identity providers collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="MachineIdentityProviderCollectionBuilder" />.</returns>
+    public static MachineIdentityProviderCollectionBuilder MachineIdentityProviders(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<MachineIdentityProviderCollectionBuilder>();
 }

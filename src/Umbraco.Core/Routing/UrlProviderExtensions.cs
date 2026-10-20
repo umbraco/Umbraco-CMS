@@ -226,7 +226,7 @@ public static class UrlProviderExtensions
         IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
     {
         // test for collisions on the 'main' URL
-        var uri = new Uri(url.TrimEnd(Constants.CharArrays.ForwardSlash), UriKind.RelativeOrAbsolute);
+        var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
         if (uri.IsAbsoluteUri == false)
         {
             uri = uri.MakeAbsolute(umbracoContext.CleanedUmbracoUrl);

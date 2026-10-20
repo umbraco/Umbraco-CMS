@@ -35,8 +35,8 @@ for (const tag of tags) {
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    tagValue.forEach(async value => {
+    for (const value of tagValue) {
       await umbracoUi.contentRender.doesContentRenderValueContainText(value);
-    });
+    }
   });
 }

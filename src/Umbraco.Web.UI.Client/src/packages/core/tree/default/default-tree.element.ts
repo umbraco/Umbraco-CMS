@@ -57,7 +57,17 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this.observe(
 				value.view.currentView,
 				async (manifest) => {
-					const element = manifest ? await createExtensionElement(manifest) : null;
+					if (!manifest) {
+						this._viewElement = null;
+						return;
+					}
+
+					const element = await createExtensionElement(manifest);
+
+					// Views are imported on demand, so a slow import must not replace the view that became the current
+					// one while it was in flight.
+					if (manifest.alias !== this._api?.view?.getCurrentView()?.alias) return;
+
 					if (element && 'manifest' in element) {
 						(element as HTMLElement & { manifest: unknown }).manifest = manifest;
 					}
@@ -103,6 +113,15 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	@property({ type: Boolean, attribute: false })
 	isMenu?: boolean = false;
+
+	/**
+	 * Whether opening an item takes the user into it, by acting on `UmbTreeItemOpenEvent`.
+	 *
+	 * Set it when the host does. A tree that can do no more than expand and collapse must leave it off, so an item never
+	 * replaces the affordance that expands with one that cannot act.
+	 */
+	@property({ type: Boolean, attribute: false })
+	drillable?: boolean = false;
 
 	@property({ attribute: false })
 	selectableFilter: (item: UmbTreeItemModelBase) => boolean = () => true;
@@ -188,6 +207,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this._api!.setHideTreeItemActions?.(this.hideTreeItemActions);
 		}
 
+		if (_changedProperties.has('drillable')) {
+			this._api!.setDrillable?.(this.drillable ?? false);
+		}
+
 		if (_changedProperties.has('isMenu')) {
 			this._api!.setIsMenu?.(this.isMenu ?? false);
 		}
@@ -220,7 +243,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		// the collection pattern. It is only relevant when the children are shown on their own (root hidden or drilled
 		// into a start node) and never in the sidebar menu.
 		if (this.isMenu || !(this.hideTreeRoot || this.startNode)) return nothing;
-		if (!this._initialLoadDone || this._isLoading || this._hasItems) return nothing;
+		if (!this._initialLoadDone) {
+			return html`<umb-view-loader></umb-view-loader>`;
+		}
+		if (this._isLoading || this._hasItems) return nothing;
 		return html`<div id="empty-state" class="uui-text"><h4>${this.localize.term('tree_noItems')}</h4></div>`;
 	}
 

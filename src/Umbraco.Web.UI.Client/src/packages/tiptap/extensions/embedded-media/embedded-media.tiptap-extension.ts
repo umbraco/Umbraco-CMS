@@ -34,8 +34,14 @@ export const umbEmbeddedMedia = Node.create<UmbEmbeddedMediaOptions>({
 
 	renderHTML({ HTMLAttributes }) {
 		const { markup, ...attrs } = HTMLAttributes;
-		const embed = document.createRange().createContextualFragment(markup);
-		return [this.options.inline ? 'span' : 'div', mergeAttributes({ class: 'umb-embed-holder' }, attrs), embed];
+		const dom = document.createElement(this.options.inline ? 'span' : 'div');
+		for (const [name, value] of Object.entries(mergeAttributes({ class: 'umb-embed-holder' }, attrs))) {
+			if (value != null) dom.setAttribute(name, value);
+		}
+		if (markup) {
+			dom.append(document.createRange().createContextualFragment(markup));
+		}
+		return dom;
 	},
 
 	addCommands() {

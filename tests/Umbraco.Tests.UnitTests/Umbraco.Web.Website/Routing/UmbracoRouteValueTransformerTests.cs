@@ -34,8 +34,9 @@ public class UmbracoRouteValueTransformerTests
         IRoutableDocumentFilter filter = null,
         IPublishedRouter router = null,
         IUmbracoRouteValuesFactory routeValuesFactory = null,
-        IDocumentUrlService documentUrlService = null)
-        => GetTransformer(ctx, Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run), filter, router, routeValuesFactory, documentUrlService);
+        IDocumentUrlService documentUrlService = null,
+        bool isReady = true)
+        => GetTransformer(ctx, Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run), filter, router, routeValuesFactory, documentUrlService, isReady);
 
     private UmbracoRouteValueTransformer GetTransformer(
         IUmbracoContextAccessor ctx,
@@ -43,7 +44,8 @@ public class UmbracoRouteValueTransformerTests
         IRoutableDocumentFilter filter = null,
         IPublishedRouter router = null,
         IUmbracoRouteValuesFactory routeValuesFactory = null,
-        IDocumentUrlService documentUrlService = null)
+        IDocumentUrlService documentUrlService = null,
+        bool isReady = true)
     {
         var publicAccessRequestHandler = new Mock<IPublicAccessRequestHandler>();
         publicAccessRequestHandler.Setup(x =>
@@ -65,7 +67,8 @@ public class UmbracoRouteValueTransformerTests
             publicAccessRequestHandler.Object,
             Mock.Of<IUmbracoVirtualPageRoute>(),
             Mock.Of<IOptionsMonitor<GlobalSettings>>(),
-            documentUrlService ?? Mock.Of<IDocumentUrlService>(x => x.HasAny() == true));
+            documentUrlService ?? Mock.Of<IDocumentUrlService>(x => x.HasAny() == true),
+            Mock.Of<IContentRoutingReadiness>(x => x.IsReady == isReady));
         return transformer;
     }
 
@@ -110,6 +113,28 @@ public class UmbracoRouteValueTransformerTests
 
         var result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
         Assert.IsNull(result);
+    }
+
+    [Test]
+    public async Task Null_When_Run_But_Not_Ready_And_Does_Not_Route()
+    {
+        // At Run but before per-server caches are seeded (background unattended upgrade), the transformer
+        // must drop the dynamic route without entering the content pipeline, so nothing can cache a negative
+        // result that would persist until restart (#22581).
+        var umbracoContext = GetUmbracoContext(true);
+        var router = new Mock<IPublishedRouter>();
+
+        var transformer = GetTransformerWithRunState(
+            Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)),
+            router: router.Object,
+            isReady: false);
+
+        var result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
+
+        Assert.IsNull(result);
+        router.Verify(
+            x => x.RouteRequestAsync(It.IsAny<IPublishedRequestBuilder>(), It.IsAny<RouteRequestOptions>()),
+            Times.Never);
     }
 
     [Test]

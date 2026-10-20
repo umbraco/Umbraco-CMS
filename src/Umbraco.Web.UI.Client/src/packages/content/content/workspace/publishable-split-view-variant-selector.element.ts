@@ -1,7 +1,6 @@
 import type { UmbPublishedVariantWithPendingChanges } from '../publishing/index.js';
 import { html, state } from '@umbraco-cms/backoffice/external/lit';
-import { sortVariants } from '@umbraco-cms/backoffice/variant';
-import { DocumentVariantStateModel as UmbPublishableVariantState } from '@umbraco-cms/backoffice/external/backend-api';
+import { sortVariants, UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbWorkspaceSplitViewVariantSelectorElement } from '@umbraco-cms/backoffice/workspace';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';

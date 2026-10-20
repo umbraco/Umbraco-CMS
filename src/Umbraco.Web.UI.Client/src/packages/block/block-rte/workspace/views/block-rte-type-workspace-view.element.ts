@@ -67,7 +67,7 @@ export class UmbBlockRteTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				<umb-property
 					label="Thumbnail"
 					alias="thumbnail"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"
+					property-editor-ui-alias="Umb.PropertyEditorUi.StaticImageFilePicker"
 					.config=${[
 						{
 							alias: 'singleItemMode',

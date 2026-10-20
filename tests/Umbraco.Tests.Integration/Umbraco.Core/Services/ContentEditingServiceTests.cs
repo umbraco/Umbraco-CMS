@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 internal sealed class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
 {
     [SetUp]
-    public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
+    public new void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
     [TearDown]
     public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;

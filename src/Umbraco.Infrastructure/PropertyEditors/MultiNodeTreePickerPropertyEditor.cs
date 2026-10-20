@@ -58,8 +58,11 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                     ["type"] = new JsonObject
                     {
                         ["type"] = "string",
-                        ["enum"] = new JsonArray("content", "media", "member"),
-                        ["description"] = "Entity type (content, media, or member)",
+                        ["enum"] = new JsonArray(
+                            Constants.UdiEntityType.Document,
+                            Constants.UdiEntityType.Media,
+                            Constants.UdiEntityType.Member),
+                        ["description"] = "UDI entity type of the selected entity",
                     },
                     ["unique"] = new JsonObject
                     {

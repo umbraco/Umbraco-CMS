@@ -23,6 +23,11 @@ export class ExamineManagementUiHelper extends UiBaseLocators {
     await this.containsText(this.indexersContent, text);
   }
 
+  async doesIndexersHaveCount(count: number) {
+    await this.hasCount(this.indexerItems, count);
+  }
+
+  /** @deprecated Prefer {@link doesIndexersHaveCount} (deterministic assertion); kept for backwards compatibility. */
   checkIndexersCount() {
     return this.indexerItems.count();
   }

@@ -73,7 +73,10 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 						${repeat(
 							this.items,
 							(ext) => ext.alias,
-							(ext) => ext.component,
+							(ext, i) =>
+								html`${i > 0 && ext.manifest?.separatorBefore
+									? html`<umb-separator></umb-separator>`
+									: nothing}${ext.component}`,
 						)}
 					</uui-scroll-container>
 				</umb-popover-layout>

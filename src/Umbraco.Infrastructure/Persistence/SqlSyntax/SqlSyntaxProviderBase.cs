@@ -644,12 +644,22 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string Format(IEnumerable<ColumnDefinition> columns)
     {
         var sb = new StringBuilder();
+        bool first = true;
         foreach (ColumnDefinition column in columns)
         {
-            sb.Append(Format(column) + ",\n");
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                sb.Append(",\n");
+            }
+
+            sb.Append(Format(column));
         }
 
-        return sb.ToString().TrimEnd(",\n");
+        return sb.ToString();
     }
 
     /// <summary>

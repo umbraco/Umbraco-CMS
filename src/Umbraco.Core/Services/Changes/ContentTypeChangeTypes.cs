@@ -51,4 +51,18 @@ public enum ContentTypeChangeTypes : byte
     ///     This impacts how URL segments and aliases are stored (NULL languageId for invariant, specific ID for variant).
     /// </summary>
     VariationChanged = 16,
+
+    /// <summary>
+    ///     Supplements <see cref="RefreshMain"/> to indicate that, although the change is structural, the raw
+    ///     content data stored in the database cache (<c>cmsContentNu</c>) does not need rebuilding.
+    /// </summary>
+    /// <remarks>
+    ///     Set for a change whose only structural impact is the removal of a property type: the stored blob keeps
+    ///     the removed property's data, but it is never read because published content is always resolved against
+    ///     the current content type (a removed alias simply no longer maps to a property type). The converted
+    ///     in-memory cache is still cleared, and all other <see cref="RefreshMain"/> handling (e.g. search
+    ///     re-indexing, published content type cache clearing) still runs — only the expensive
+    ///     <c>cmsContentNu</c> rebuild is skipped.
+    /// </remarks>
+    RawDataUnaffected = 32,
 }

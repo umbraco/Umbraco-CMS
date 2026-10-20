@@ -16,4 +16,9 @@ public class DocumentUrlInfo : ContentUrlInfoBase
     /// Gets or sets the name of the provider responsible for generating the document URL.
     /// </summary>
     public required string Provider { get; init; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the URL points to an external (remote host) destination.
+    /// </summary>
+    public bool IsExternal { get; init; }
 }

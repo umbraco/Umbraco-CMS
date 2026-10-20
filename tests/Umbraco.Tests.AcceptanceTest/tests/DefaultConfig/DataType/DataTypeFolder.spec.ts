@@ -37,7 +37,7 @@ test('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(wrongDataTypeFolderName);
   await umbracoUi.dataType.clickRenameActionMenuOption();
-  await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
+  await umbracoUi.dataType.enterRenameFolderName(dataTypeFolderName);
   await umbracoUi.dataType.clickConfirmRenameButtonAndWaitForDataTypeToBeRenamed();
 
   // Assert
@@ -118,6 +118,26 @@ test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoU
   const childrenFolderData = await umbracoApi.dataType.getChildren(childFolderId);
   expect(childrenFolderData[0].name).toBe(childOfChildFolderName);
   expect(childrenFolderData[0].isFolder).toBeTruthy();
+});
+
+test('can find a data type in a sibling nested folder', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildFolderName = 'AAFirstChildFolder';
+  const nestedFolderName = 'NestedFolder';
+  const secondChildFolderName = 'ZZSecondChildFolder';
+  const targetDataTypeName = 'TargetDataType';
+  const dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
+  const firstChildFolderId = await umbracoApi.dataType.createFolder(firstChildFolderName, dataTypeFolderId);
+  await umbracoApi.dataType.createFolder(nestedFolderName, firstChildFolderId);
+  const secondChildFolderId = await umbracoApi.dataType.createFolder(secondChildFolderName, dataTypeFolderId);
+  const targetDataTypeId = await umbracoApi.dataType.create(targetDataTypeName, editorAlias, editorUiAlias, [], secondChildFolderId);
+
+  // Act
+  const dataTypeData = await umbracoApi.dataType.getByName(targetDataTypeName);
+
+  // Assert
+  expect(dataTypeData).toBeTruthy();
+  expect(dataTypeData.id).toBe(targetDataTypeId);
 });
 
 test('cannot delete a non-empty data type folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {

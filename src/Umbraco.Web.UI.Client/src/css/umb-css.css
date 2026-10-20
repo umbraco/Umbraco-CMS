@@ -6,6 +6,31 @@
 	--umb-card-large-min-width: 250px;
 }
 
+/*
+ * UUI 2.0 introduced a graduated corner-rounding scale and increased every step:
+ *   --uui-border-radius   3px (--uui-size-1) -> 9px  (--uui-size-3)
+ *   --uui-border-radius-2 (new)              -> 9px  (--uui-size-3)
+ *   --uui-border-radius-3 (new)              -> 15px (--uui-size-5)  [buttons, button-groups, pagination]
+ * v1 had a single 3px radius, so reset all three to it to keep the v17 backoffice's
+ * established, subtler look. Buttons read --uui-border-radius-3; boxes/inputs read the
+ * lower steps — resetting the tokens covers them all (the only remaining hardcoded
+ * pills are uui-action-bar and uui-toast-notification, which don't read these tokens).
+ *
+ * The doubled :root selector raises specificity above the plain :root rule in the
+ * UUI theme files (light/dark/high-contrast.css), which are linked after this
+ * stylesheet and, for dark/high-contrast, injected dynamically by the theme system.
+ */
+:root:root {
+	--uui-border-radius: var(--uui-size-1);
+	--uui-border-radius-2: var(--uui-size-1);
+	--uui-border-radius-3: var(--uui-size-1);
+
+	--uui-palette-spanish-pink: #f5c1bc;
+	--uui-palette-spanish-pink-light: rgb(248, 214, 211);
+	--uui-palette-spanish-pink-dark: rgb(232, 192, 189);
+	--uui-palette-spanish-pink-dimmed: rgb(219, 212, 212);
+}
+
 @font-face {
 	font-display: block;
 	font-family: codicon;

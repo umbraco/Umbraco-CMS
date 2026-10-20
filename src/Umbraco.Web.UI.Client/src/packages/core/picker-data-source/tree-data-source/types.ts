@@ -10,9 +10,8 @@ import type {
 export interface UmbPickerTreeDataSource<
 	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
 	TreeRootType extends UmbTreeRootModel = UmbTreeRootModel,
-> extends UmbPickerDataSource,
-		UmbTreeRepository<TreeItemType, TreeRootType>,
-		UmbApi {
+>
+	extends UmbPickerDataSource, UmbTreeRepository<TreeItemType, TreeRootType>, UmbApi {
 	requestTreeStartNode?: () => Promise<UmbTreeStartNode | undefined>;
 	treePickableFilter?: (item: TreeItemType) => boolean;
 }

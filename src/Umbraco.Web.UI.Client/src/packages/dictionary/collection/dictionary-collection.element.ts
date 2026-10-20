@@ -2,16 +2,14 @@ import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import { UMB_SCHEMA_LOCKDOWN_CONTEXT } from '@umbraco-cms/backoffice/schema-lockdown';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 // The base collection state we need to reproduce its layout while injecting the notice.
 // These mirror private members of UmbCollectionDefaultElement, hence the underscore-prefixed names.
 /* eslint-disable @typescript-eslint/naming-convention */
 type UmbCollectionRenderState = {
-	_routes?: Array<UmbRoute>;
+	_viewElement?: HTMLElement;
 	_hasItems: boolean;
 	_initialLoadDone: boolean;
-	_emptyLabel?: string;
 };
 /* eslint-enable @typescript-eslint/naming-convention */
 
@@ -39,30 +37,27 @@ export class UmbDictionaryCollectionElement extends UmbCollectionDefaultElement 
 	}
 
 	// Mirrors UmbCollectionDefaultElement.render(), but places the schema lockdown notice inside the
-	// body-layout right before the router slot so it sits full-width at the top of the content area.
+	// body-layout right before the view so it sits full-width at the top of the content area.
 	override render() {
 		const base = this as unknown as UmbCollectionRenderState;
-		if (!base._routes) return nothing;
 		return html`
 			<umb-body-layout header-transparent class=${base._hasItems ? 'has-items' : ''}>
-				${this.#renderSchemaLockdownNotice()}
-				<umb-router-slot id="router" .routes=${base._routes}></umb-router-slot>
-				${this.renderToolbar()} ${base._hasItems ? this.#renderContent() : this.#renderEmptyState(base)}
+				${this.#renderSchemaLockdownNotice()} ${this.#renderBody(base)}
 			</umb-body-layout>
+		`;
+	}
+
+	#renderBody(base: UmbCollectionRenderState) {
+		if (!base._initialLoadDone || !base._viewElement) return html`<umb-view-loader></umb-view-loader>`;
+
+		return html`
+			<div id="view">${base._viewElement}</div>
+			${this.renderToolbar()} ${base._hasItems ? this.#renderContent() : this._renderEmptyState()}
 		`;
 	}
 
 	#renderContent() {
 		return html`${this.renderPagination()} ${this.renderSelectionActions()}`;
-	}
-
-	#renderEmptyState(base: UmbCollectionRenderState) {
-		if (!base._initialLoadDone) return nothing;
-		return html`
-			<div id="empty-state" class="uui-text">
-				<h4>${this.localize.string(base._emptyLabel)}</h4>
-			</div>
-		`;
 	}
 
 	#renderSchemaLockdownNotice() {

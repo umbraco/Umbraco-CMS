@@ -128,7 +128,8 @@ public class UmbracoContextTests
         var httpContextAccessor = Mock.Of<IHttpContextAccessor>(x => x.HttpContext == httpContext);
         var umbracoRequestPaths = new UmbracoRequestPaths(
             hostingEnvironment,
-            Options.Create(new UmbracoRequestPathsOptions()));
+            Options.Create(new UmbracoRequestPathsOptions()),
+            Options.Create(new DeliveryApiSettings()));
         var uriUtility = new UriUtility(hostingEnvironment);
         var cacheManager = Mock.Of<ICacheManager>(x =>
             x.Content == Mock.Of<IPublishedContentCache>() &&

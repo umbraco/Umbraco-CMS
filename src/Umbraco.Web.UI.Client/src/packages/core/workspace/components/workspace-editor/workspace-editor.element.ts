@@ -1,12 +1,22 @@
 import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
 import type { ManifestWorkspaceView } from '../../types.js';
+import type { UmbWorkspaceViewController } from '../index.js';
 import { UmbWorkspaceEditorContext } from './workspace-editor.context.js';
-import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	nothing,
+	property,
+	repeat,
+	state,
+	when,
+	type PropertyValues,
+} from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -26,7 +36,7 @@ import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 @customElement('umb-workspace-editor')
 export class UmbWorkspaceEditorElement extends UmbLitElement {
 	//
-	#navigationContext = new UmbWorkspaceEditorContext(this);
+	#context = new UmbWorkspaceEditorContext(this);
 	#workspaceViewHintObservers: Array<UmbObserverController> = [];
 
 	@property()
@@ -44,6 +54,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property({ type: Boolean })
 	public loading = false;
 
+	@property({ type: Boolean })
+	public notFound?: boolean;
+
 	@property({ attribute: false })
 	public get variantId(): UmbVariantId | undefined {
 		return this._variantId;
@@ -53,21 +66,24 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			return;
 		}
 		this._variantId = value;
-		this.#navigationContext.setVariantId(value);
+		this.#context.setVariantId(value);
 		this.#observeWorkspaceViewHints();
 	}
 	private _variantId?: UmbVariantId | undefined;
 
 	@property({ attribute: false })
 	public set overrides(value: Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined) {
-		this.#navigationContext.setOverrides(value);
+		this.#context.setOverrides(value);
 	}
 	public get overrides(): Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined {
 		return undefined;
 	}
 
 	@state()
-	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];
+	private _hasSlottedContent?: boolean;
+
+	@state()
+	private _workspaceViews: Array<UmbWorkspaceViewController> = [];
 
 	@state()
 	private _hintMap: Map<string, UmbVariantHint> = new Map();
@@ -84,7 +100,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.observe(
-			this.#navigationContext.views,
+			this.#context.views,
 			(views) => {
 				this._workspaceViews = views;
 				this.#observeWorkspaceViewHints();
@@ -92,6 +108,14 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			},
 			null,
 		);
+	}
+
+	override willUpdate(changedProperties: PropertyValues<this>) {
+		super.willUpdate(changedProperties);
+		// only need to check changed properties for an expensive computation.
+		if (changedProperties.has('notFound')) {
+			this.#createRoutes();
+		}
 	}
 
 	#observeWorkspaceViewHints() {
@@ -113,11 +137,11 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
-	#currentProvidedView?: UmbWorkspaceViewContext;
+	#currentProvidedView?: UmbWorkspaceViewController;
 	#createRoutes() {
 		const newRoutes: UmbRoute[] = [];
 
-		if (this._workspaceViews.length > 0) {
+		if (!this.notFound && this._workspaceViews.length > 0) {
 			this._workspaceViews.forEach((context) => {
 				const manifest = context.manifest;
 				const path = UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname });
@@ -154,14 +178,30 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		// Notice if no routes then fallback to use a slot.
-		// TODO: Deprecate the slot feature, to rely purely on routes, cause currently bringing an additional route would mean the slotted content would never be shown. [NL]
+		// TODO: Remove the default slot in v.21, to rely purely on workspaceViews extensions, cause currently bringing an additional route would mean the slotted content would never be shown. [NL]
 		return html`
 			<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
-				${this.#renderBackButton()}
-				<slot name="header" slot="header"></slot>
-				<slot name="action-menu" slot="action-menu"></slot>
-				${this.#renderViews()} ${this.#renderRoutes()}
-				<slot></slot>
+				${when(
+					!this.notFound,
+					() => html`
+						${this.#renderBackButton()}
+						<slot name="header" slot="header"></slot>
+						<slot name="action-menu" slot="action-menu"></slot>
+						${this.#renderViews()}
+					`,
+				)}
+				${this.#renderRoutes()}
+				<slot
+					@slotchange=${(event: Event) => {
+						this._hasSlottedContent = (event.target as HTMLSlotElement).assignedElements({ flatten: true }).length > 0;
+						if (this._hasSlottedContent) {
+							new UmbDeprecation({
+								deprecated: 'Using slotted content in umb-workspace-editor is deprecated, use routes instead.',
+								solution: 'Add a workspace view for your content.',
+								removeInVersion: '21.0.0',
+							}).warn();
+						}
+					}}></slot>
 				${when(
 					!this.enforceNoFooter,
 					() => html`
@@ -230,7 +270,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRoutes() {
-		if (!this._routes || this._routes.length === 0 || !this._workspaceViews || this._workspaceViews.length === 0) {
+		// Only render the router-slot if there is no slotted content, or if workspace views are registered.
+		if (this._hasSlottedContent && this._workspaceViews.length === 0) {
 			return nothing;
 		}
 		return html`
@@ -243,7 +284,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				}}
 				@change=${(event: UmbRouterSlotChangeEvent) => {
 					this._activePath = event.target.localActiveViewPath;
-				}}></umb-router-slot>
+				}}
+				>${!this._hasSlottedContent ? html`<umb-view-loader></umb-view-loader>` : nothing}</umb-router-slot
+			>
 		`;
 	}
 
@@ -283,11 +326,6 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			umb-badge {
 				font-size: var(--uui-type-small-size);
 				right: -1.5em;
-			}
-
-			umb-extension-slot[slot='actions'] {
-				display: flex;
-				gap: var(--uui-size-space-2);
 			}
 		`,
 	];

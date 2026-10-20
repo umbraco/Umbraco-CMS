@@ -71,7 +71,7 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         // e.g. "1234/second-root-url-segment". in V15+, IDocumentUrlService won't resolve this anymore; it will
         // however resolve "1234/" correctly, so to remain backwards compatible, we need to perform this extra step.
         var verifyUrlSegment = false;
-        if (documentKey is null && route.TrimEnd('/').CountOccurrences("/") is 1)
+        if (documentKey is null && route.AsSpan().TrimEnd('/').Count('/') is 1)
         {
             documentKey = _apiDocumentUrlService.GetDocumentKeyByRoute(
                 route[..(route.IndexOf('/') + 1)],

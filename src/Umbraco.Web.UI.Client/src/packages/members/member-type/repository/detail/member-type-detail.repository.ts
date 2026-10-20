@@ -38,7 +38,7 @@ export class UmbMemberTypeDetailRepository extends UmbDetailRepositoryBase<
 	/**
 	 * Requests multiple member type details by their unique IDs
 	 * @param {Array<string>} uniques - The unique IDs of the member types to fetch
-	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbMemberTypeDetailModel>>>}
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbMemberTypeDetailModel>>>} The requested member type details
 	 * @memberof UmbMemberTypeDetailRepository
 	 */
 	async requestByUniques(

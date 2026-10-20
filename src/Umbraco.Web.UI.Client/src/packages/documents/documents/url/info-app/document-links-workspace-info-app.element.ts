@@ -3,6 +3,7 @@ import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbDocumentUrlModel } from '../repository/types.js';
 import { UmbDocumentUrlsDataResolver } from '../document-urls-data-resolver.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import {
 	css,
 	customElement,
@@ -18,7 +19,6 @@ import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UmbDocumentVariantState } from '../../variant-state.js';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -84,7 +84,7 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 						if (unique !== this._unique) {
 							this._unique = unique;
-							this.#requestUrls();
+							this.#scheduleRequestUrls();
 						}
 					},
 					'observeWorkspaceState',
@@ -99,15 +99,22 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 			});
 		});
 
+		// Re-request when the displayed culture changes, so switching language fetches that culture.
+		this.observe(this.#documentUrlsDataResolver?.requestCulture, () => this.#scheduleRequestUrls(), null);
+
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#propertyDataSetVariantId = context?.getVariantId();
 			this.#setLinks();
 		});
 
-		this.observe(this.#documentUrlsDataResolver?.urls, (urls) => {
-			this.#urls = urls ?? [];
-			this.#setLinks();
-		});
+		this.observe(
+			this.#documentUrlsDataResolver?.urls,
+			(urls) => {
+				this.#urls = urls ?? [];
+				this.#setLinks();
+			},
+			null,
+		);
 	}
 
 	#setLinks() {
@@ -136,20 +143,33 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		return url;
 	}
 
+	// Show the loading indicator immediately (synchronously), before the debounced request runs, so no
+	// stale "no URL" message is shown while the URL is (re)resolved - e.g. on load or when switching culture.
+	#scheduleRequestUrls() {
+		if (this._isNew || !this._unique) return;
+
+		this._loading = true;
+		this.#debounceRequestUrls();
+	}
+
 	async #requestUrls() {
-		if (this._isNew) return;
-		if (!this._unique) return;
+		if (this._isNew || !this._unique) return;
 
 		this._loading = true;
 		this.#documentUrlsDataResolver?.setData([]);
 
-		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
+		try {
+			// Only request the culture currently being displayed for variant documents. Invariant documents
+			// return all of their domain urls, so no culture is passed (getRequestCulture resolves undefined).
+			const culture = await this.#documentUrlsDataResolver?.getRequestCulture();
+			const { data } = await this.#documentUrlRepository.requestUrls([this._unique], culture);
 
-		if (data?.length) {
-			this.#documentUrlsDataResolver?.setData(data[0].urls);
+			if (data?.length) {
+				this.#documentUrlsDataResolver?.setData(data[0].urls);
+			}
+		} finally {
+			this._loading = false;
 		}
-
-		this._loading = false;
 	}
 
 	#getStateLocalizationKey(state: UmbDocumentVariantState | null | undefined): string {
@@ -173,7 +193,7 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		// TODO: Introduce "Published Event". We only need to update the url when the document is published.
 		if (event.getUnique() !== this.#documentWorkspaceContext?.getUnique()) return;
 		if (event.getEntityType() !== this.#documentWorkspaceContext.getEntityType()) return;
-		this.#debounceRequestUrls();
+		this.#scheduleRequestUrls();
 	};
 
 	override render() {

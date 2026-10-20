@@ -16,7 +16,7 @@ public class ExecuteActionHealthCheckControllerTests : ManagementApiUserGroupTes
     private HealthCheckCollection HealthChecks => GetRequiredService<HealthCheckCollection>();
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var dataIntegrityCheck = HealthChecks.FirstOrDefault(x => x.Name.Contains("Data Integrity", StringComparison.OrdinalIgnoreCase));
         _dataIntegrityHealthCheckId = dataIntegrityCheck.Id;

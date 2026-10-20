@@ -28,7 +28,7 @@ export class UmbMediaTypeDetailRepository extends UmbDetailRepositoryBase<
 	/**
 	 * Requests multiple media type details by their unique IDs
 	 * @param {Array<string>} uniques - The unique IDs of the media types to fetch
-	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbMediaTypeDetailModel>>>}
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbMediaTypeDetailModel>>>} The media type details
 	 * @memberof UmbMediaTypeDetailRepository
 	 */
 	async requestByUniques(

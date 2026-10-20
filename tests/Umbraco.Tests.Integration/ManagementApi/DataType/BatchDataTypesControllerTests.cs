@@ -18,7 +18,7 @@ public class BatchDataTypesControllerTests : ManagementApiUserGroupTestBase<Batc
     private Guid _key2;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var dataType1 = new DataTypeBuilder()
             .WithId(0)

@@ -3,6 +3,7 @@ import type { UmbBlockTypeCardElement } from '../block-type-card/index.js';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -151,7 +152,7 @@ export class UmbInputBlockTypeElement<
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: '#blockEditor_confirmDeleteBlockTypeTitle',
-			content: this.localize.term('blockEditor_confirmDeleteBlockTypeMessage', [contentType[0]?.name]),
+			content: this.localize.term('blockEditor_confirmDeleteBlockTypeMessage', escapeHTML(contentType[0]?.name ?? '')),
 			confirmLabel: '#general_remove',
 		});
 		this.deleteItem(item.contentElementTypeKey);

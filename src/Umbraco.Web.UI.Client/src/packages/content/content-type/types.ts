@@ -29,7 +29,6 @@ export interface UmbPropertyTypeContainerMergedModel {
  *
  * @deprecated
  * This model is deprecated and will be removed in version 17. Please use the UmbContentTypeDetailModel instead.
- * @export
  * @interface UmbContentTypeModel
  */
 export interface UmbContentTypeModel {

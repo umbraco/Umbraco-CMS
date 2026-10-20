@@ -98,8 +98,12 @@ public sealed class RelateOnTrashNotificationHandler :
     /// <param name="notification">The notification containing information about the moved content items.</param>
     public void Handle(ContentMovedNotification notification)
     {
+        // Only remove the restore relation for items that have actually left the recycle bin. When restoring a single
+        // item without its descendants, those descendants stay trashed (re-homed under the recycle bin root) and must
+        // keep their relation so they can be restored on their own later.
         foreach (MoveEventInfo<IContent> item in notification.MoveInfoCollection.Where(x =>
-                     x.OriginalPath.Contains(Constants.System.RecycleBinContentString)))
+                     x.OriginalPath.Contains(Constants.System.RecycleBinContentString)
+                     && x.Entity.Path.Contains(Constants.System.RecycleBinContentString) is false))
         {
             const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
             IEnumerable<IRelation> relations = _relationService.GetByChildId(item.Entity.Id);
@@ -175,8 +179,12 @@ public sealed class RelateOnTrashNotificationHandler :
     /// <param name="notification">The notification containing information about the moved content items.</param>
     public void Handle(MediaMovedNotification notification)
     {
+        // Only remove the restore relation for items that have actually left the recycle bin. When restoring a single
+        // item without its descendants, those descendants stay trashed (re-homed under the recycle bin root) and must
+        // keep their relation so they can be restored on their own later.
         foreach (MoveEventInfo<IMedia> item in notification.MoveInfoCollection.Where(x =>
-                     x.OriginalPath.Contains(Constants.System.RecycleBinMediaString)))
+                     x.OriginalPath.Contains(Constants.System.RecycleBinMediaString)
+                     && x.Entity.Path.Contains(Constants.System.RecycleBinMediaString) is false))
         {
             const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
             IEnumerable<IRelation> relations = _relationService.GetByChildId(item.Entity.Id);
@@ -199,9 +207,9 @@ public sealed class RelateOnTrashNotificationHandler :
             // check that the relation-type exists, if not, then recreate it
             if (relationType == null)
             {
-                Guid documentObjectType = Constants.ObjectTypes.Document;
+                Guid mediaObjectType = Constants.ObjectTypes.Media;
                 const string relationTypeName = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName;
-                relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType, documentObjectType, false);
+                relationType = new RelationType(relationTypeName, relationTypeAlias, false, mediaObjectType, mediaObjectType, false);
                 _relationService.Save(relationType);
             }
 

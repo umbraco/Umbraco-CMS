@@ -38,7 +38,7 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
     protected ContentType ContentType { get; private set; }
 
     [SetUp]
-    public virtual void Setup() => CreateTestData();
+    public new virtual void Setup() => CreateTestData();
 
     public virtual void CreateTestData()
     {

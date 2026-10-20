@@ -31,37 +31,41 @@ export class UmbWorkspaceIsNewRedirectController extends UmbControllerBase {
 		super(host, UmbWorkspaceIsNewRedirectControllerAlias);
 
 		// Navigate to edit route when language is created:
-		this.observe(workspaceContext.isNew, (isNew) => {
-			if (this.timeout) {
-				clearTimeout(this.timeout);
-			}
-			if (isNew === false) {
-				this.timeout = setTimeout(() => {
-					const unique = workspaceContext.getUnique();
-					if (router && unique) {
-						const routerPath = router.absoluteRouterPath;
-						if (routerPath) {
-							const newPath: string = umbUrlPatternToString(ensurePathEndsWithSlash(routerPath) + 'edit/:id', {
-								id: unique,
-							});
-							this.destroy();
-							// get current url:
-							const currentUrl = window.location.href;
-							if (
-								router.localActiveViewPath === undefined ||
-								router.localActiveViewPath === '' ||
-								!currentUrl.includes(router.localActiveViewPath)
-							) {
-								return;
+		this.observe(
+			workspaceContext.isNew,
+			(isNew) => {
+				if (this.timeout) {
+					clearTimeout(this.timeout);
+				}
+				if (isNew === false) {
+					this.timeout = setTimeout(() => {
+						const unique = workspaceContext.getUnique();
+						if (router && unique) {
+							const routerPath = router.absoluteRouterPath;
+							if (routerPath) {
+								const newPath: string = umbUrlPatternToString(ensurePathEndsWithSlash(routerPath) + 'edit/:id', {
+									id: unique,
+								});
+								this.destroy();
+								// get current url:
+								const currentUrl = window.location.href;
+								if (
+									router.localActiveViewPath === undefined ||
+									router.localActiveViewPath === '' ||
+									!currentUrl.includes(router.localActiveViewPath)
+								) {
+									return;
+								}
+								// Check that we are still part of the DOM and thereby relevant:
+								window.history.replaceState(null, '', newPath);
 							}
-							// Check that we are still part of the DOM and thereby relevant:
-							window.history.replaceState(null, '', newPath);
 						}
-					}
-					this.timeout = undefined;
-				}, 500);
-			}
-		});
+						this.timeout = undefined;
+					}, 500);
+				}
+			},
+			null,
+		);
 
 		// TODO: If workspace route changes cause of other reasons then this controller should be destroyed.
 	}

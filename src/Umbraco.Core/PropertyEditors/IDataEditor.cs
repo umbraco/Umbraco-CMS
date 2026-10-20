@@ -85,4 +85,36 @@ public interface IDataEditor : IDiscoverable
         object? targetValue,
         bool canUpdateInvariantData,
         HashSet<string> allowedCultures) => sourceValue;
+
+    /// <summary>
+    ///     Determines the specific cultures that contain an actual content change within an otherwise
+    ///     culture-invariant property's value, for editors that support partial per-culture publishing
+    ///     (see <see cref="CanMergePartialPropertyValues"/>).
+    /// </summary>
+    /// <param name="sourceValue">The source (edited) property value.</param>
+    /// <param name="targetValue">The target (published) property value.</param>
+    /// <param name="defaultCulture">
+    ///     The default culture to attribute a change to when it cannot be tied to one specific culture
+    ///     (e.g. a genuinely invariant nested value, or a purely structural change).
+    /// </param>
+    /// <returns>
+    ///     The set of cultures containing an actual edit. Empty if the editor is unable to determine this,
+    ///     in which case the caller should fall back to flagging <paramref name="defaultCulture"/> as edited.
+    /// </returns>
+    IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture) => [];
+
+    /// <summary>
+    ///     Determines whether an edited and a published property value represent the same content, so that
+    ///     publishing the edited value would not change what is published.
+    /// </summary>
+    /// <param name="editedValue">The edited property value.</param>
+    /// <param name="publishedValue">The published property value.</param>
+    /// <returns><c>true</c> if the values represent the same content; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     The values are equivalent when they are equal. Editors whose stored format can represent the same content
+    ///     in more than one way may compare the values by their content instead, for example regardless of the order
+    ///     of nested values.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue) => object.Equals(editedValue, publishedValue);
 }

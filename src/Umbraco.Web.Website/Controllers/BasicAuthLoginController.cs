@@ -144,7 +144,7 @@ public class BasicAuthLoginController : Controller
             ReturnPath = returnPath,
             ProviderNames = providerNames,
         };
-        return View("/umbraco/BasicAuthLogin/TwoFactor.cshtml", model);
+        return View(_basicAuthSettings.Value.TwoFactorViewPath, model);
     }
 
     /// <summary>

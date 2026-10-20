@@ -366,8 +366,14 @@ export class UmbImageCropperElement extends UmbLitElement {
 			position: relative;
 			width: 100%;
 			height: 100%;
-			outline: 1px solid var(--uui-color-border);
+			border: 1px solid var(--uui-color-border);
 			border-radius: var(--uui-border-radius);
+		}
+		:host(:not([disabled]):hover) #viewport {
+			border-color: var(--uui-color-border-standalone);
+		}
+		:host(:not([disabled]):focus-within) #viewport {
+			border-color: var(--uui-color-border-emphasis);
 		}
 		#actions {
 			display: flex;

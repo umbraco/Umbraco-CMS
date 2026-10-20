@@ -85,9 +85,13 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 			this._manager = manager;
 		});
 
-		this.observe(this.#itemManager.items, async (items) => {
-			this.#observeBlockTypes(items);
-		});
+		this.observe(
+			this.#itemManager.items,
+			async (items) => {
+				this.#observeBlockTypes(items);
+			},
+			null,
+		);
 	}
 
 	override connectedCallback() {
@@ -270,14 +274,14 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 					label=${this.localize.term('blockEditor_tabCreateEmpty')}
 					?active=${!this._openClipboard}
 					@click=${() => (this._openClipboard = false)}>
-					<umb-localize key=${this.localize.term('blockEditor_tabCreateEmpty')}>Create Empty</umb-localize>
+					<umb-localize key="blockEditor_tabCreateEmpty">Create Empty</umb-localize>
 					<uui-icon slot="icon" name="icon-add"></uui-icon>
 				</uui-tab>
 				<uui-tab
 					label=${this.localize.term('blockEditor_tabClipboard')}
 					?active=${this._openClipboard}
 					@click=${() => (this._openClipboard = true)}>
-					<umb-localize key=${this.localize.term('blockEditor_tabClipboard')}>Clipboard</umb-localize>
+					<umb-localize key="blockEditor_tabClipboard">Clipboard</umb-localize>
 					<uui-icon slot="icon" name="icon-clipboard"></uui-icon>
 				</uui-tab>
 			</uui-tab-group>

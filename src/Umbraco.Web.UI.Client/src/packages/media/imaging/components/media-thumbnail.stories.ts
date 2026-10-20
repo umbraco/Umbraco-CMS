@@ -12,7 +12,7 @@ const SAMPLE_IMAGE =
 // imaging backend, so this story-only helper sets the resolved URL directly to demonstrate rendering.
 // The stable callback identity ensures the ref only runs on mount, not on every update.
 const withSampleImage = (el?: Element) => {
-	const thumbnail = el as (UmbMediaThumbnailElement & { _thumbnailUrl: string }) | undefined;
+	const thumbnail = el as unknown as { _thumbnailUrl: string; requestUpdate: () => void } | undefined;
 	if (thumbnail && thumbnail._thumbnailUrl !== SAMPLE_IMAGE) {
 		thumbnail._thumbnailUrl = SAMPLE_IMAGE;
 		thumbnail.requestUpdate();

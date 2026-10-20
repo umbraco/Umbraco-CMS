@@ -1,4 +1,5 @@
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute.Expressions;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
@@ -11,21 +12,33 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 public abstract partial class AsyncMigrationBase
 {
     /// <summary>
-    /// Ensures that the command timeout for the specified database is set to a minimum of 300 seconds.
+    /// Ensures that long-running database operations in this migration are allowed at least five minutes.
     /// </summary>
     /// <remarks>
-    /// Adjusts the command timeout to prevent potential timeouts during long-running
-    /// database operations.
-    /// If the command timeout is already longer, applied via the connection string with "Connect Timeout={timeout}" we leave it as is.
+    /// A command timeout that is already at least as long is left alone, whether it was set on the database
+    /// or derived by the provider from the connection string, and including a timeout of no limit at all.
     /// </remarks>
     /// <param name="database">The database instance for which the command timeout is being ensured.</param>
     protected static void EnsureLongCommandTimeout(NPoco.IDatabase database)
     {
-        const int CommandTimeoutInSeconds = 300;
-        if (database.CommandTimeout < CommandTimeoutInSeconds)
+        const int MinimumCommandTimeoutInSeconds = 300;
+
+        int? effectiveCommandTimeout;
+        if (database is UmbracoDatabase umbracoDatabase)
         {
-            database.CommandTimeout = CommandTimeoutInSeconds;
+            effectiveCommandTimeout = umbracoDatabase.EffectiveCommandTimeout;
         }
+        else
+        {
+            effectiveCommandTimeout = database.CommandTimeout > 0 ? database.CommandTimeout : null;
+        }
+
+        if (effectiveCommandTimeout is 0 || effectiveCommandTimeout >= MinimumCommandTimeoutInSeconds)
+        {
+            return;
+        }
+
+        database.CommandTimeout = MinimumCommandTimeoutInSeconds;
     }
 
     protected void AddColumn<T>(string columnName)

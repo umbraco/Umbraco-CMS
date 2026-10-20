@@ -300,6 +300,8 @@ export default {
 		new: '새로',
 		next: '다음',
 		no: '아니요',
+		noResults: '결과 없음',
+		noResultsFor: (query: string) => `"${query}"에 대한 결과가 없습니다.`,
 		of: '의',
 		ok: '완료',
 		open: '열기',
@@ -581,6 +583,17 @@ export default {
 		sortHelp:
 			'다른 아이템을 마우스로 위,아래로 드래그 하여 이동하거나 열의 헤더를 클릭하여 아이템을 정렬할 수 있습니다',
 		sortPleaseWait: '잠시 기다리십시오. 아이템을 정렬 하는데 잠시 시간이 소요될 수 있습니다',
+		sortByFieldHeadline: '필드로 정렬',
+		sortByFieldSentence: '모든 하위 항목 정렬 기준:',
+		sortByFieldDirectionLabel: '방향',
+		sortByFieldAscending: '오름차순',
+		sortByFieldDescending: '내림차순',
+		sortByFieldNameOption: '이름',
+		sortByFieldCreateDateOption: '생성일',
+		sortByFieldUpdateDateOption: '마지막 편집',
+		sortIndividuallyHeadline: '개별 정렬',
+		sortByFieldCultureSentence: '언어:',
+		sortByFieldCultureLabel: '언어',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: '3rd party add-in 때문에 발행이 취소되었습니다.',
@@ -795,5 +808,10 @@ export default {
 	logViewer: {
 		selectAllLogLevelFilters: '모두 선택',
 		deselectAllLogLevelFilters: '모두 선택 해제',
+	},
+	picker: {
+		browseTab: '찾아보기',
+		searchTab: '검색',
+		selectedCount: (count: number) => `${count}개 선택됨`,
 	},
 } as UmbLocalizationDictionary;

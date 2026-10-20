@@ -24,7 +24,7 @@
   "symbols": {
     "UmbracoVersion": {
       "displayName": "Umbraco version",
-      "description": "The version of Umbraco.Cms to add as PackageReference. By default it installs the latest non pre-release version",
+      "description": "The version of the Umbraco packages to reference. Defaults to the version of the installed templates.",
       "type": "parameter",
       "datatype": "string",
       "defaultValue": "*",
@@ -152,7 +152,8 @@
         {
           "condition": "(!IncludeExample)",
           "exclude": [
-            "[Cc]lient/src/dashboards/**"
+            "[Cc]lient/src/dashboards/**",
+            "ViewModels/**"
           ]
         },
         {

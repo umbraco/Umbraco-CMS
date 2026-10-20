@@ -3,4 +3,5 @@ import type { UmbDataSourceResponse, UmbDetailDataSource } from '@umbraco-cms/ba
 
 export interface UmbUserDetailDataSource extends UmbDetailDataSource<UmbUserDetailModel> {
 	calculateStartNodes(unique: string): Promise<UmbDataSourceResponse<UmbUserStartNodesModel>>;
+	readMany(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbUserDetailModel>>>;
 }
