@@ -367,6 +367,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#isLocationPickable() {
 		if (!this._currentLocation) return false;
+		if (this._currentLocation.unique === null && this.data?.hideTreeRoot) return false;
 		return this.data?.pickableFilter?.(this._currentLocation as unknown as TreeItemType) ?? true;
 	}
 

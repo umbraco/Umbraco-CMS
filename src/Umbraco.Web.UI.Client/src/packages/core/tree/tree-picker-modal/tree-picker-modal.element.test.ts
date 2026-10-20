@@ -256,6 +256,27 @@ describe('UmbTreePickerModalElement', () => {
 
 			expect(!!getChooseLocation()).to.be.false;
 		});
+
+		// A picker that hides the tree root does not offer it as a choice, so the breadcrumb must not either.
+		it('does not offer the root when the picker hides it', async () => {
+			await setup({ treeAlias: TREE_ALIAS, hideTreeRoot: true });
+			await waitUntil(() => getCrumbs().length === 1, 'the root breadcrumb was never loaded');
+			await element.updateComplete;
+
+			expect(!!getChooseLocation()).to.be.false;
+		});
+
+		it('offers a location browsed into when the picker hides the root', async () => {
+			await setup({ treeAlias: TREE_ALIAS, hideTreeRoot: true });
+			await waitUntil(() => getCrumbs().length === 1, 'the root breadcrumb was never loaded');
+			element.dispatchEvent(new UmbTreeItemOpenEvent({ unique: 'known', entityType: 'test-item' }));
+			await waitUntil(() => getCrumbs().length === 2, 'the browsed-into breadcrumb was never loaded');
+			await element.updateComplete;
+
+			await clickChooseLocation();
+
+			expect(getSelection()).to.deep.equal(['known']);
+		});
 	});
 
 	describe('selection', () => {
