@@ -941,11 +941,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             List<PropertyDataDto> propertyDataDtos;
 
-            if (propertyAliases is { Length: > 0 })
+            // The property aliases are parameters of the same statement as each batch of version ids. If there are too many
+            // to leave a useful batch size, load all properties instead, which includes the requested ones.
+            if (propertyAliases is { Length: > 0 } && propertyAliases.Length <= Constants.Sql.MaxParameterCount / 2)
             {
                 // Only specific properties are requested.
                 // Filter by property alias at SQL level using INNER JOIN to PropertyTypeDto.
-                // The property aliases are parameters of the same statement, so leave room for them in each batch.
                 propertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount - propertyAliases.Length, batch =>
                     SqlContext.Sql()
                         .Select<PropertyDataDto>()

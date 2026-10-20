@@ -175,17 +175,42 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     ///     Gets the aliases of the properties to load when populating the given indexes.
     /// </summary>
     /// <param name="indexes">The indexes to populate.</param>
+    /// <returns>The aliases of the properties to load, or <c>null</c> to load all properties.</returns>
+    /// <remarks>
+    ///     By default all properties are loaded. When <see cref="IndexingSettings.LoadOnlyPropertiesForIncludedFields" />
+    ///     is enabled and every index validates with a <see cref="ValueSetValidator" /> that only includes specific
+    ///     fields, only the properties that can produce those fields are loaded. They are worked out from the field
+    ///     names, assuming each is the property alias, optionally prefixed with
+    ///     <see cref="UmbracoExamineFieldNames.RawFieldPrefix" /> and followed by a nested value path or a culture suffix.
+    ///     Override this to load the properties needed for fields named differently.
+    /// </remarks>
+    protected virtual string[]? GetPropertyAliasesToLoad(IReadOnlyList<IIndex> indexes)
+        => _indexingSettings.LoadOnlyPropertiesForIncludedFields
+            ? GetPropertyAliasesForIncludedFields(indexes)
+            : null;
+
+    /// <summary>
+    ///     Gets the aliases of the properties that can produce the fields the given indexes include.
+    /// </summary>
+    /// <param name="indexes">The indexes to populate.</param>
     /// <returns>
-    ///     The aliases of the properties that may contribute to a field the indexes include, or <c>null</c> to load all
-    ///     properties. All properties are needed unless every index validates its value sets with a
+    ///     The aliases of the properties that may produce a field the indexes include, or <c>null</c> if all properties
+    ///     are needed. All properties are needed unless every index validates its value sets with a
     ///     <see cref="ValueSetValidator" /> that only includes specific fields.
     /// </returns>
     /// <remarks>
-    ///     The validator removes any field it doesn't include before the index, or any handler transforming its values,
-    ///     sees the value set, so a property that cannot produce an included field doesn't need to be loaded. The
-    ///     aliases are derived from the included field names, so they may also contain names that are not property aliases.
+    ///     <para>
+    ///         The validator removes any field it doesn't include before the index, or any handler transforming its
+    ///         values, sees the value set, so a property that cannot produce an included field doesn't need to be loaded.
+    ///     </para>
+    ///     <para>
+    ///         The aliases are worked out from the included field names, assuming each property field is named by the
+    ///         property alias, optionally prefixed with <see cref="UmbracoExamineFieldNames.RawFieldPrefix" /> and
+    ///         followed by a nested value path or a culture suffix, as the built-in property index value factories name
+    ///         them. They may also contain names that are not property aliases.
+    ///     </para>
     /// </remarks>
-    internal static string[]? GetPropertyAliasesToLoad(IEnumerable<IIndex> indexes)
+    internal static string[]? GetPropertyAliasesForIncludedFields(IEnumerable<IIndex> indexes)
     {
         var propertyAliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {

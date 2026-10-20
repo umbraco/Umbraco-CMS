@@ -70,7 +70,7 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
                 cultures.SelectMany(culture => new[] { $"nodeName_{culture.ToLowerInvariant()}", $"title_{culture.ToLowerInvariant()}" }).Concat(["nodeName", "title"]).ToArray(),
                 null)
             : null;
-        string[]? propertyAliases = validator is null ? null : ContentIndexPopulator.GetPropertyAliasesToLoad([new ValidatingCapturingIndex(publishedValuesOnly, validator, _ => { })]);
+        string[]? propertyAliases = validator is null ? null : ContentIndexPopulator.GetPropertyAliasesForIncludedFields([new ValidatingCapturingIndex(publishedValuesOnly, validator, _ => { })]);
 
         IValueSetBuilder<IContent> valueSetBuilder = publishedValuesOnly
             ? GetRequiredService<IPublishedContentValueSetBuilder>()
@@ -91,7 +91,7 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
                 .Select(_ =>
                 {
                     var stopwatch = Stopwatch.StartNew();
-                    captured = Rebuild(publishedValuesOnly, batchSize, validator: validator);
+                    captured = Rebuild(publishedValuesOnly, batchSize, validator: validator, loadOnlyPropertiesForIncludedFields: includeTitleFieldsOnly);
                     return stopwatch.Elapsed;
                 })
                 .Min();

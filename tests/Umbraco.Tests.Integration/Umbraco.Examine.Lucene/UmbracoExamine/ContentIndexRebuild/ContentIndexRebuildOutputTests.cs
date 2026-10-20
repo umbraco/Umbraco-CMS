@@ -88,15 +88,28 @@ internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBa
         AssertMatchesSnapshot("load-published", RenderSnapshot(content));
     }
 
+    [Test]
+    public async Task Paged_Descendants_With_More_Property_Aliases_Than_Query_Parameters_Load_The_Requested_Properties()
+    {
+        await SeedAsync();
+        string[] propertyAliases = ["title", .. Enumerable.Range(0, Constants.Sql.MaxParameterCount).Select(i => $"unknown{i}")];
+
+        IContent[] content = ContentService.GetPagedDescendants(Constants.System.Root, 0, 1000, out _, propertyAliases, filter: null, ordering: null).ToArray();
+
+        Assert.That(content, Is.Not.Empty);
+        Assert.That(PropertiesWithValues(content), Does.Contain("title"));
+    }
+
     [TestCase(false)]
     [TestCase(true)]
-    public async Task Rebuild_Of_Index_Including_Specific_Fields_Loads_Only_Properties_For_Those_Fields(bool publishedValuesOnly)
+    public async Task Rebuild_Of_Index_Including_Specific_Fields_Loads_Only_Properties_For_Those_Fields_When_Enabled(bool publishedValuesOnly)
     {
         await SeedAsync();
         var validator = new ValueSetValidator(null, null, ["nodeName", "title", "title_en-us", "title_da-dk", "invariantBlocks", "invariantBlocks_de-de", "__Raw_body_en-us", "body_en-us"], null);
 
         CapturedIndex unfiltered = Rebuild(publishedValuesOnly, batchSize: 2);
-        CapturedIndex filtered = Rebuild(publishedValuesOnly, batchSize: 2, validator: validator);
+        CapturedIndex filtered = Rebuild(publishedValuesOnly, batchSize: 2, validator: validator, loadOnlyPropertiesForIncludedFields: true);
+        CapturedIndex notEnabled = Rebuild(publishedValuesOnly, batchSize: 2, validator: validator);
 
         var expected = RenderSnapshot(unfiltered.ValueSets.Select(valueSet => validator.Validate(valueSet).ValueSet));
         Assert.Multiple(() =>
@@ -105,6 +118,8 @@ internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBa
             Assert.That(RenderSnapshot(filtered.ValueSets), Is.EqualTo(expected));
             Assert.That(PropertiesWithValues(unfiltered.LoadedContent), Is.EquivalentTo(new[] { "title", "variantBlocks", "invariantBlocks", "body", "invariantBody", "grid" }));
             Assert.That(PropertiesWithValues(filtered.LoadedContent), Is.EquivalentTo(new[] { "title", "invariantBlocks", "body" }));
+            Assert.That(RenderSnapshot(notEnabled.ValueSets), Is.EqualTo(expected));
+            Assert.That(PropertiesWithValues(notEnabled.LoadedContent), Is.EquivalentTo(PropertiesWithValues(unfiltered.LoadedContent)));
         });
     }
 

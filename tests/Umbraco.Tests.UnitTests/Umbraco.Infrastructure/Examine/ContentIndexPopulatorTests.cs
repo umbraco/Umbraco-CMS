@@ -12,25 +12,25 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Examine;
 public class ContentIndexPopulatorTests
 {
     [Test]
-    public void GetPropertyAliasesToLoad_Returns_Null_When_Index_Has_No_Validator()
-        => Assert.That(ContentIndexPopulator.GetPropertyAliasesToLoad([new TestIndex(null)]), Is.Null);
+    public void GetPropertyAliasesForIncludedFields_Returns_Null_When_Index_Has_No_Validator()
+        => Assert.That(ContentIndexPopulator.GetPropertyAliasesForIncludedFields([new TestIndex(null)]), Is.Null);
 
     [Test]
-    public void GetPropertyAliasesToLoad_Returns_Null_When_Validator_Does_Not_Restrict_Fields()
-        => Assert.That(ContentIndexPopulator.GetPropertyAliasesToLoad([new TestIndex(new ValueSetValidator(null, null, null, ["excluded"]))]), Is.Null);
+    public void GetPropertyAliasesForIncludedFields_Returns_Null_When_Validator_Does_Not_Restrict_Fields()
+        => Assert.That(ContentIndexPopulator.GetPropertyAliasesForIncludedFields([new TestIndex(new ValueSetValidator(null, null, null, ["excluded"]))]), Is.Null);
 
     [Test]
-    public void GetPropertyAliasesToLoad_Returns_Null_When_Validator_Is_Not_A_ValueSetValidator()
-        => Assert.That(ContentIndexPopulator.GetPropertyAliasesToLoad([new TestIndex(Mock.Of<IValueSetValidator>())]), Is.Null);
+    public void GetPropertyAliasesForIncludedFields_Returns_Null_When_Validator_Is_Not_A_ValueSetValidator()
+        => Assert.That(ContentIndexPopulator.GetPropertyAliasesForIncludedFields([new TestIndex(Mock.Of<IValueSetValidator>())]), Is.Null);
 
     [Test]
-    public void GetPropertyAliasesToLoad_Returns_Null_When_Index_Is_Not_An_Examine_Index()
-        => Assert.That(ContentIndexPopulator.GetPropertyAliasesToLoad([Mock.Of<IIndex>()]), Is.Null);
+    public void GetPropertyAliasesForIncludedFields_Returns_Null_When_Index_Is_Not_An_Examine_Index()
+        => Assert.That(ContentIndexPopulator.GetPropertyAliasesForIncludedFields([Mock.Of<IIndex>()]), Is.Null);
 
     [Test]
-    public void GetPropertyAliasesToLoad_Returns_Null_When_Any_Index_Needs_All_Fields()
+    public void GetPropertyAliasesForIncludedFields_Returns_Null_When_Any_Index_Needs_All_Fields()
     {
-        string[]? propertyAliases = ContentIndexPopulator.GetPropertyAliasesToLoad(
+        string[]? propertyAliases = ContentIndexPopulator.GetPropertyAliasesForIncludedFields(
         [
             new TestIndex(new ValueSetValidator(null, null, ["title"], null)),
             new TestIndex(null),
@@ -40,9 +40,9 @@ public class ContentIndexPopulatorTests
     }
 
     [Test]
-    public void GetPropertyAliasesToLoad_Returns_Aliases_That_May_Produce_Included_Fields()
+    public void GetPropertyAliasesForIncludedFields_Returns_Aliases_That_May_Produce_Included_Fields()
     {
-        string[]? propertyAliases = ContentIndexPopulator.GetPropertyAliasesToLoad(
+        string[]? propertyAliases = ContentIndexPopulator.GetPropertyAliasesForIncludedFields(
         [
             new TestIndex(new ValueSetValidator(null, null, ["title", "summary_en-us", "__Raw_body_da-dk", "blocks.items[0].text_en-us", "meta_title"], null)),
             new TestIndex(new ValueSetValidator(null, null, ["Keywords"], null)),
@@ -53,11 +53,11 @@ public class ContentIndexPopulatorTests
     }
 
     [Test]
-    public void GetPropertyAliasesToLoad_Returns_Null_When_Too_Many_Fields_Are_Included()
+    public void GetPropertyAliasesForIncludedFields_Returns_Null_When_Too_Many_Fields_Are_Included()
     {
         var includeFields = Enumerable.Range(0, 1001).Select(i => $"field{i}").ToArray();
 
-        Assert.That(ContentIndexPopulator.GetPropertyAliasesToLoad([new TestIndex(new ValueSetValidator(null, null, includeFields, null))]), Is.Null);
+        Assert.That(ContentIndexPopulator.GetPropertyAliasesForIncludedFields([new TestIndex(new ValueSetValidator(null, null, includeFields, null))]), Is.Null);
     }
 
     private sealed class TestIndex(IValueSetValidator? validator)

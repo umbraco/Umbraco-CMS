@@ -73,7 +73,8 @@ internal abstract partial class ContentIndexRebuildTestBase : UmbracoIntegration
     ///     The validator of the index, applied to each value set before it is captured. If <c>null</c>, the index has no
     ///     validator.
     /// </param>
-    protected CapturedIndex Rebuild(bool publishedValuesOnly, int batchSize, Action<CapturedBatch>? onBatch = null, IValueSetValidator? validator = null)
+    /// <param name="loadOnlyPropertiesForIncludedFields">The value of <see cref="IndexingSettings.LoadOnlyPropertiesForIncludedFields" />.</param>
+    protected CapturedIndex Rebuild(bool publishedValuesOnly, int batchSize, Action<CapturedBatch>? onBatch = null, IValueSetValidator? validator = null, bool loadOnlyPropertiesForIncludedFields = false)
     {
         IValueSetBuilder<IContent> valueSetBuilder = publishedValuesOnly
             ? GetRequiredService<IPublishedContentValueSetBuilder>()
@@ -87,7 +88,7 @@ internal abstract partial class ContentIndexRebuildTestBase : UmbracoIntegration
             ContentService,
             GetRequiredService<IUmbracoDatabaseFactory>(),
             new RecordingValueSetBuilder(valueSetBuilder, captured.LoadedContent),
-            new TestOptionsMonitor<IndexingSettings>(new IndexingSettings { BatchSize = batchSize }));
+            new TestOptionsMonitor<IndexingSettings>(new IndexingSettings { BatchSize = batchSize, LoadOnlyPropertiesForIncludedFields = loadOnlyPropertiesForIncludedFields }));
 
         void Capture(IEnumerable<ValueSet> valueSets)
         {
