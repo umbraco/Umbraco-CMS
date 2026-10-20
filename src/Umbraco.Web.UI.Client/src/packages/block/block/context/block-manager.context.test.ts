@@ -1,12 +1,24 @@
 import { UmbBlockManagerContext } from './block-manager.context.js';
-import type { UmbBlockDataModel } from '../types.js';
-import { expect, fixture, html, waitUntil } from '@open-wc/testing';
+import type { UmbBlockDataObjectModel } from './block-manager.context.js';
+import type { UmbBlockWorkspaceOriginData } from '../workspace/index.js';
+import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '../types.js';
+import { UmbElementDetailStore } from '../../../elements/repository/detail/element-detail.store.js';
+import { aTimeout, expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbElementDetailRepository, type UmbElementDetailModel } from '@umbraco-cms/backoffice/element';
 import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_VALIDATION_CONTEXT, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { useMockSet } from '@umbraco-cms/internal/mock-manager';
+import { UMB_ACTION_EVENT_CONTEXT, UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbElementDetailRepository,
+	UMB_ELEMENT_ENTITY_TYPE,
+	type UmbElementDetailModel,
+} from '@umbraco-cms/backoffice/element';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 @customElement('umb-test-block-manager-host')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -330,6 +342,144 @@ describe('UmbBlockManagerContext', () => {
 			manager.setLayouts([externalLayout('a'), externalLayout('b')]);
 
 			await waitUntil(() => failureOf('a') === 'deleted');
+		});
+	});
+});
+
+const ELEMENT_UNIQUE = 'library-element-one-id';
+const ELEMENT_NAME = 'Element One (Library)';
+
+class UmbTestExternalContentBlockManagerContext extends UmbBlockManagerContext<
+	UmbBlockTypeBaseModel,
+	UmbBlockLayoutBaseModel,
+	UmbBlockWorkspaceOriginData
+> {
+	async createWithPresets(): Promise<UmbBlockDataObjectModel<UmbBlockLayoutBaseModel> | undefined> {
+		return undefined;
+	}
+	insert(): boolean {
+		return true;
+	}
+}
+
+@customElement('umb-test-block-manager-context-host')
+class UmbTestBlockManagerContextHostElement extends UmbControllerHostElementMixin(HTMLElement) {
+	actionEventContext = new UmbActionEventContext(this);
+	constructor() {
+		super();
+		new UmbElementDetailStore(this);
+	}
+}
+
+describe('UmbBlockManagerContext - external content (Library Elements)', () => {
+	let host: UmbTestBlockManagerContextHostElement;
+	let manager: UmbTestExternalContentBlockManagerContext;
+
+	before(async () => {
+		await useMockSet('blocksReusableContent');
+	});
+
+	beforeEach(() => {
+		host = new UmbTestBlockManagerContextHostElement();
+		document.body.appendChild(host);
+		manager = new UmbTestExternalContentBlockManagerContext(host);
+	});
+
+	afterEach(() => {
+		manager.destroy();
+		document.body.innerHTML = '';
+	});
+
+	it('resolves the referenced Element into content and name', async () => {
+		manager.insertExternalContent(ELEMENT_UNIQUE);
+
+		const content = await firstValueFrom(manager.contentOf(ELEMENT_UNIQUE).pipe(filter((value) => value !== undefined)));
+		expect(content!.values.find((value) => value.alias === 'title')?.value).to.equal('Reusable Element One');
+
+		const name = await firstValueFrom(manager.externalContentNameOf(ELEMENT_UNIQUE).pipe(filter((value) => value !== null)));
+		expect(name).to.equal(ELEMENT_NAME);
+	});
+
+	it('updates the block content and name when the Element is saved elsewhere in the session', async () => {
+		manager.insertExternalContent(ELEMENT_UNIQUE);
+		await firstValueFrom(manager.contentOf(ELEMENT_UNIQUE).pipe(filter((value) => value !== undefined)));
+
+		// Simulate the Element workspace saving the Element (data source write) and, like the real
+		// workspace does on save/publish, notifying the rest of the session that it changed.
+		const repository = new UmbElementDetailRepository(host);
+		const { data: element } = await repository.requestByUnique(ELEMENT_UNIQUE);
+		const updated: UmbElementDetailModel = {
+			...element!,
+			variants: element!.variants.map((variant) => ({ ...variant, name: 'Renamed Element' })),
+			values: element!.values.map((value) =>
+				value.alias === 'title' ? { ...value, value: 'Updated title' } : value,
+			),
+		};
+		await repository.save(updated);
+
+		const eventContext = await manager.getContext(UMB_ACTION_EVENT_CONTEXT);
+		eventContext!.dispatchEvent(
+			new UmbEntityUpdatedEvent({ unique: ELEMENT_UNIQUE, entityType: UMB_ELEMENT_ENTITY_TYPE }),
+		);
+
+		const name = await firstValueFrom(
+			manager.externalContentNameOf(ELEMENT_UNIQUE).pipe(filter((value) => value === 'Renamed Element')),
+		);
+		expect(name).to.equal('Renamed Element');
+
+		const content = await firstValueFrom(
+			manager
+				.contentOf(ELEMENT_UNIQUE)
+				.pipe(filter((value) => value?.values.find((v) => v.alias === 'title')?.value === 'Updated title')),
+		);
+		expect(content!.values.find((value) => value.alias === 'title')?.value).to.equal('Updated title');
+	});
+
+	it('drops the resolved content when the layout no longer references external content', async () => {
+		manager.insertExternalContent(ELEMENT_UNIQUE);
+		await firstValueFrom(manager.contentOf(ELEMENT_UNIQUE).pipe(filter((value) => value !== undefined)));
+
+		manager.setLayouts([]);
+
+		await firstValueFrom(manager.contentOf(ELEMENT_UNIQUE).pipe(filter((value) => value === undefined)));
+		// Give any late-arriving fetch a chance to (wrongly) re-add the entry before asserting it stays gone.
+		await aTimeout(50);
+		expect(manager.getContentOf(ELEMENT_UNIQUE)).to.be.undefined;
+	});
+
+	describe('requests', () => {
+		const originalRequestByUniques = UmbElementDetailRepository.prototype.requestByUniques;
+		let requestCount: number;
+		let failFirstRequest: boolean;
+
+		beforeEach(() => {
+			requestCount = 0;
+			failFirstRequest = false;
+			UmbElementDetailRepository.prototype.requestByUniques = function (this: UmbElementDetailRepository, uniques) {
+				requestCount++;
+				if (failFirstRequest && requestCount === 1) {
+					return Promise.resolve({ error: new Error('Request failed') }) as never;
+				}
+				return originalRequestByUniques!.call(this, uniques);
+			};
+		});
+
+		afterEach(() => {
+			UmbElementDetailRepository.prototype.requestByUniques = originalRequestByUniques;
+		});
+
+		it('requests an Element again when its reference is removed and re-added after a failed request', async () => {
+			failFirstRequest = true;
+			manager.insertExternalContent(ELEMENT_UNIQUE);
+			await aTimeout(50);
+			expect(manager.getContentOf(ELEMENT_UNIQUE)).to.be.undefined;
+
+			manager.setLayouts([]);
+			manager.insertExternalContent(ELEMENT_UNIQUE);
+
+			const content = await firstValueFrom(manager.contentOf(ELEMENT_UNIQUE).pipe(filter((value) => value !== undefined)));
+			expect(content!.key).to.equal(ELEMENT_UNIQUE);
+			expect(requestCount).to.equal(2);
 		});
 	});
 });

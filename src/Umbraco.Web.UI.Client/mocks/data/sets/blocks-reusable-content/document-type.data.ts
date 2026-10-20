@@ -702,7 +702,7 @@ const libraryElementLifecycleDocumentType = createLibraryElementStatesDocumentTy
 	listPropertyId: 'pt-159',
 	gridPropertyId: 'pt-160',
 	listDescription: lifecycleDescription,
-	gridDescription: lifecycleDescription,
+	gridDescription: [lifecycleDescription, 'The same Elements are repeated inside a Grid Area.'].join('\n'),
 });
 
 const libraryElementMisconfigurationsDocumentType = createLibraryElementStatesDocumentType({
