@@ -56,7 +56,8 @@ public interface IPublishStatusManagementService
         => InitializeAsync(cancellationToken);
 
     /// <summary>
-    /// Re-reads the default language used to resolve publish status queries made without a culture.
+    /// Ensures the default language used to resolve publish status queries made without a culture is re-read before
+    /// it is next used.
     /// </summary>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>

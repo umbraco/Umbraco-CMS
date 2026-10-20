@@ -18,6 +18,7 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
 
     private ConcurrentDictionary<Guid, ISet<string>> _publishedCultures = new();
+    private volatile bool _defaultCultureIsStale;
 
     /// <summary>
     /// Gets or sets the default culture ISO code used when no culture is specified.
@@ -69,7 +70,8 @@ public PublishStatusService(
         }
 
         var newDictionary = new ConcurrentDictionary<Guid, ISet<string>>(publishStatus);
-        await RefreshDefaultCultureAsync(cancellationToken);
+        _defaultCultureIsStale = false;
+        DefaultCulture = await _languageService.GetDefaultIsoCodeAsync();
 
         Interlocked.Exchange(ref _publishedCultures, newDictionary);
     }
@@ -121,15 +123,22 @@ public PublishStatusService(
     }
 
     /// <inheritdoc/>
-    public async Task RefreshDefaultCultureAsync(CancellationToken cancellationToken)
-        => DefaultCulture = await _languageService.GetDefaultIsoCodeAsync();
+    /// <remarks>
+    /// The default language is re-read on the next query that needs it, rather than here, so a language change does
+    /// not reload the languages on every server unless a query without a culture is made.
+    /// </remarks>
+    public Task RefreshDefaultCultureAsync(CancellationToken cancellationToken)
+    {
+        _defaultCultureIsStale = true;
+        return Task.CompletedTask;
+    }
 
     /// <inheritdoc/>
     public bool IsDocumentPublished(Guid documentKey, string culture)
     {
-        if (string.IsNullOrEmpty(culture) && DefaultCulture is not null)
+        if (string.IsNullOrEmpty(culture) && GetDefaultCulture() is { } defaultCulture)
         {
-            culture = DefaultCulture;
+            culture = defaultCulture;
         }
 
         if (_publishedCultures.TryGetValue(documentKey, out ISet<string>? publishedCultures))
@@ -141,6 +150,19 @@ public PublishStatusService(
 
         _logger.LogDebug("Document {DocumentKey} not found in the publish status cache", documentKey);
         return false;
+    }
+
+    // Sync-over-async is intentional: IsDocumentPublished backs the synchronous published content surface, and the
+    // default language is only read here once after each language change.
+    private string? GetDefaultCulture()
+    {
+        if (_defaultCultureIsStale)
+        {
+            _defaultCultureIsStale = false;
+            DefaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        }
+
+        return DefaultCulture;
     }
 
     /// <inheritdoc />
