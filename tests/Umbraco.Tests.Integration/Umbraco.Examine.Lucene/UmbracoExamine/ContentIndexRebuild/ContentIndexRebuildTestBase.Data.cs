@@ -173,6 +173,7 @@ internal abstract partial class ContentIndexRebuildTestBase
     /// <param name="setValues">Sets the property values; called once before publishing.</param>
     /// <param name="culturesToPublish">The cultures to publish, or an empty array to leave the document unpublished.</param>
     /// <param name="setDraftValues">If set, changes property values after publishing so the draft differs from the published version.</param>
+    /// <returns>The created document.</returns>
     protected IContent CreateVariantDocument(
         IndexingSchema schema,
         string name,
@@ -198,6 +199,7 @@ internal abstract partial class ContentIndexRebuildTestBase
     /// <summary>
     ///     Creates an invariant document, saving and optionally publishing it.
     /// </summary>
+    /// <returns>The created document.</returns>
     protected IContent CreateInvariantDocument(
         IndexingSchema schema,
         string name,
@@ -216,7 +218,7 @@ internal abstract partial class ContentIndexRebuildTestBase
         return content;
     }
 
-    private void SaveAndPublish(IContent content, string[] culturesToPublish, Action<IContent>? setDraftValues)
+    private void SaveAndPublish(Content content, string[] culturesToPublish, Action<IContent>? setDraftValues)
     {
         ContentService.Save(content);
         if (culturesToPublish.Length > 0)
@@ -314,7 +316,7 @@ internal abstract partial class ContentIndexRebuildTestBase
         };
     }
 
-    private BlockItemData LeafData(IndexingSchema schema, Guid key, string seed, BlockSpec spec)
+    private static BlockItemData LeafData(IndexingSchema schema, Guid key, string seed, BlockSpec spec)
         => new(key, schema.Leaf.Key, schema.Leaf.Alias)
         {
             Values = InvariantValues("invariantText", seed, spec)
@@ -365,6 +367,7 @@ internal abstract partial class ContentIndexRebuildTestBase
     /// <summary>
     ///     Creates a readable text value, padded with words to at least the given length.
     /// </summary>
+    /// <returns>The seed, padded to at least the minimum length.</returns>
     protected static string Text(string seed, int minimumLength)
     {
         if (seed.Length >= minimumLength)

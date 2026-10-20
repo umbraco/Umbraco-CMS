@@ -66,6 +66,7 @@ internal abstract partial class ContentIndexRebuildTestBase : UmbracoIntegration
     /// <summary>
     ///     Rebuilds a capturing index through <see cref="ContentIndexPopulator" /> and returns what it received.
     /// </summary>
+    /// <returns>The value sets the index received, in batches.</returns>
     protected CapturedIndex Rebuild(bool publishedValuesOnly, int batchSize, Action<CapturedBatch>? onBatch = null)
     {
         IValueSetBuilder<IContent> valueSetBuilder = publishedValuesOnly
@@ -102,6 +103,7 @@ internal abstract partial class ContentIndexRebuildTestBase : UmbracoIntegration
     /// <summary>
     ///     Creates a deterministic key so that seeded data, and anything derived from it, is identical between runs.
     /// </summary>
+    /// <returns>A key derived from the seed.</returns>
     protected static Guid DeterministicKey(string seed)
         => new(MD5.HashData(Encoding.UTF8.GetBytes(seed)));
 
@@ -112,6 +114,7 @@ internal abstract partial class ContentIndexRebuildTestBase : UmbracoIntegration
     ///     Database identities, dates and paths depend on insertion order and timing rather than on indexing behaviour,
     ///     so they are left out. Value sets are ordered by node name, which the seeded data keeps unique.
     /// </remarks>
+    /// <returns>The rendered value sets.</returns>
     protected static string RenderSnapshot(IEnumerable<ValueSet> valueSets)
     {
         var builder = new StringBuilder();
@@ -139,6 +142,7 @@ internal abstract partial class ContentIndexRebuildTestBase : UmbracoIntegration
     /// <summary>
     ///     Renders the property values of loaded content as text that is stable between runs.
     /// </summary>
+    /// <returns>The rendered property values.</returns>
     protected static string RenderSnapshot(IEnumerable<IContent> content)
     {
         var builder = new StringBuilder();

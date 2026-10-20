@@ -44,14 +44,26 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
     [TestCase(24, 40, 100)]
     [TestCase(24, 40, 1000)]
     public async Task Rebuild_Internal_Index(int cultureCount, int documentCount, int textLength)
-        => await MeasureAsync(cultureCount, documentCount, textLength, publishedValuesOnly: false);
+    {
+        int[] indexedCounts = await MeasureAsync(cultureCount, documentCount, textLength, publishedValuesOnly: false);
+        Assert.That(indexedCounts, Has.All.EqualTo(documentCount));
+    }
 
     [TestCase(24, 40, 100)]
     public async Task Rebuild_Published_Index(int cultureCount, int documentCount, int textLength)
-        => await MeasureAsync(cultureCount, documentCount, textLength, publishedValuesOnly: true);
-
-    private async Task MeasureAsync(int cultureCount, int documentCount, int textLength, bool publishedValuesOnly)
     {
+        // Every seeded document is published.
+        int[] indexedCounts = await MeasureAsync(cultureCount, documentCount, textLength, publishedValuesOnly: true);
+        Assert.That(indexedCounts, Has.All.EqualTo(documentCount));
+    }
+
+    /// <summary>
+    ///     Seeds content and measures rebuilding an index from it at each batch size.
+    /// </summary>
+    /// <returns>The number of documents each rebuild indexed, by batch size.</returns>
+    private async Task<int[]> MeasureAsync(int cultureCount, int documentCount, int textLength, bool publishedValuesOnly)
+    {
+        var indexedCounts = new List<int>();
         var seeding = Stopwatch.StartNew();
         await SeedAsync(cultureCount, documentCount, textLength);
         TestContext.Out.WriteLine($"Seeded {documentCount} documents in {cultureCount} cultures in {seeding.Elapsed.TotalSeconds:F1}s.");
@@ -94,7 +106,10 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
                 best.LoadAllocatedBytes,
                 best.BuildAllocatedBytes,
                 memory.PeakRetainedBytes));
+            indexedCounts.Add(captured.ValueSets.Count());
         }
+
+        return indexedCounts.ToArray();
     }
 
     /// <summary>
