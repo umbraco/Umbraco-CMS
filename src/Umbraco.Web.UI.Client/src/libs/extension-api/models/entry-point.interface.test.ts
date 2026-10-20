@@ -16,6 +16,14 @@ describe('UmbEntryPointModule', () => {
 		expect(hasOnUnloadExport(module)).to.be.true;
 	});
 
+	it('does not treat a hook that is not a function as an export', () => {
+		const module: UmbEntryPointModule = { onInit: undefined, onUnload: undefined };
+		expect(hasInitExport(module)).to.be.false;
+		expect(hasOnUnloadExport(module)).to.be.false;
+		expect(hasInitExport({ onInit: 'onInit' })).to.be.false;
+		expect(hasOnUnloadExport({ onUnload: 'onUnload' })).to.be.false;
+	});
+
 	it('loads a manifest loader for a module that only exports onInit', async () => {
 		const js: JsLoaderProperty<UmbEntryPointModule> = () => Promise.resolve({ onInit: () => {} });
 		const module = await loadManifestPlainJs(js);
