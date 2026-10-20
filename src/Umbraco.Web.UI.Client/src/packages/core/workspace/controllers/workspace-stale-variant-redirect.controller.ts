@@ -19,8 +19,7 @@ export interface UmbWorkspaceStaleVariantRedirectControllerArgs {
  * existing variant option — e.g. after the content type's variance changed. Re-validates on every
  * navigation, as closing a modal restores the pre-modal URL, which may hold a stale variant.
  * @deprecated Deprecated since v17.9. A URL referring to a variant that does not exist should show Not Found
- * rather than be redirected silently. Use `resolveStaleVariantRoute` when a specific action, such as changing
- * the content type's variance, should move the URL to an existing variant. Scheduled for removal in Umbraco 20.
+ * rather than be redirected silently. Scheduled for removal in Umbraco 20.
  */
 export class UmbWorkspaceStaleVariantRedirectController extends UmbControllerBase {
 	readonly #args: UmbWorkspaceStaleVariantRedirectControllerArgs;
@@ -30,8 +29,7 @@ export class UmbWorkspaceStaleVariantRedirectController extends UmbControllerBas
 		new UmbDeprecation({
 			deprecated: 'UmbWorkspaceStaleVariantRedirectController is deprecated.',
 			removeInVersion: '20.0.0',
-			solution:
-				'Use resolveStaleVariantRoute when a specific action, such as changing the content type variance, should move the URL to an existing variant.',
+			solution: 'A URL referring to a variant that does not exist should show Not Found rather than be redirected.',
 		}).warn();
 		this.#args = args;
 	}

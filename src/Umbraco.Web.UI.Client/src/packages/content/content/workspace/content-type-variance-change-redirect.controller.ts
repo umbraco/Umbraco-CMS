@@ -1,9 +1,9 @@
+import { resolveStaleVariantRoute } from './resolve-stale-variant-route.function.js';
+import type { UmbStaleVariantRouteResolverVariant } from './resolve-stale-variant-route.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UMB_MODAL_ROUTE_PATH_SEGMENT } from '@umbraco-cms/backoffice/router';
-import { resolveStaleVariantRoute } from '@umbraco-cms/backoffice/workspace';
-import type { UmbStaleVariantRouteResolverVariant } from '@umbraco-cms/backoffice/workspace';
 
 interface UmbContentTypeVarianceChangeRedirectHost extends UmbControllerHost {
 	readonly splitView: { getWorkspaceRoute(): string | undefined };
@@ -38,7 +38,8 @@ export class UmbContentTypeVarianceChangeRedirectController extends UmbControlle
 
 	/**
 	 * Call before the content type is edited from within the workspace, for example when opening it in a modal.
-	 * Once the URL settles outside of any modal, redirects to the best matching variant if the variance changed.
+	 * Tracking ends once the URL settles outside of any modal, that is when the modal has closed: if the variance
+	 * changed by then, redirects to the best matching variant.
 	 *
 	 * The URL is checked on navigation rather than on the modal's result: a variance change removes the variant
 	 * the modal was opened from, which closes the modal without resolving it.
