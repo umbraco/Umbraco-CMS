@@ -2714,8 +2714,10 @@ export default {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
 		},
+		labelElementsWithPendingChanges: 'The following referenced elements are not fully published:',
 		viewDependentItemsAction: 'View items that depend on this…',
 		viewDescendantsWithReferencesAction: 'View referenced descendants…',
+		viewEntitiesNeedingAttentionAction: 'View referenced elements with pending changes…',
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',

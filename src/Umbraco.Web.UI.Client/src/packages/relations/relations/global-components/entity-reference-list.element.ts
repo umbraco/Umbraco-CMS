@@ -35,13 +35,15 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 	public set unique(value: string | undefined) {
 		const oldValue = this.#unique;
 		this.#unique = value;
-		if (value === oldValue) return;
+		if (value === oldValue || this.#staticItems) return;
 		this._currentPage = 1;
+		// Clear before fetching, not just when there's no new value — otherwise the previous entity's
+		// items/total stay on screen (and visible to @change consumers) until the new fetch resolves.
+		this._items = [];
+		this._total = 0;
 
 		if (!value) {
 			this.#requestToken++;
-			this._items = [];
-			this._total = 0;
 			return;
 		}
 
@@ -51,6 +53,25 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		return this.#unique;
 	}
 	#unique?: string;
+
+	/**
+	 * A pre-resolved, statically-paged set of items to render — e.g. entities resolved client-side from a
+	 * workspace draft. Setting this switches the element out of `unique`/`source`-driven fetch mode.
+	 * @param {Array<UmbReferenceItemModel | UmbEntityModel> | undefined} value - The items to render.
+	 */
+	@property({ type: Array, attribute: false })
+	public set items(value: Array<UmbReferenceItemModel | UmbEntityModel> | undefined) {
+		this.#staticItems = value;
+		this.#requestToken++;
+		this._currentPage = 1;
+		this._total = value?.length ?? 0;
+		this.#renderStaticItemsPage();
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+	public get items(): Array<UmbReferenceItemModel | UmbEntityModel> | undefined {
+		return this.#staticItems;
+	}
+	#staticItems?: Array<UmbReferenceItemModel | UmbEntityModel>;
 
 	/**
 	 * Alias of the {@link UmbEntityReferenceRepository} used to look up references.
@@ -133,7 +154,7 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 	async #getReferences() {
 		const unique = this.#unique;
 		const repository = this.#referenceRepository;
-		if (!unique || !repository) return;
+		if (!unique || !repository || this.#staticItems) return;
 
 		const token = ++this.#requestToken;
 		const skip = (this._currentPage - 1) * this.itemsPerPage;
@@ -185,9 +206,21 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		return data ?? [];
 	}
 
+	#renderStaticItemsPage() {
+		if (!this.#staticItems) return;
+		const skip = (this._currentPage - 1) * this.itemsPerPage;
+		this._items = this.#staticItems.slice(skip, skip + this.itemsPerPage);
+	}
+
 	#onPageChange(event: UUIPaginationEvent) {
 		if (this._currentPage === event.target.current) return;
 		this._currentPage = event.target.current;
+
+		if (this.#staticItems) {
+			this.#renderStaticItemsPage();
+			return;
+		}
+
 		this.#getReferences();
 	}
 

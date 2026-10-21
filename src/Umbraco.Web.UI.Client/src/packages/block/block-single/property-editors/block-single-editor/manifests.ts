@@ -1,6 +1,9 @@
 import { manifest as blockSingleSchemaManifest } from './Umbraco.SingleBlock.js';
 import { UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
-import { UmbStandardBlockValueResolver } from '@umbraco-cms/backoffice/block';
+import {
+	UmbBlockPropertyValueEntityReferenceResolver,
+	UmbStandardBlockValueResolver,
+} from '@umbraco-cms/backoffice/block';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -51,6 +54,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.PropertyValueResolver.BlockSingle',
 		name: 'Single Block Value Resolver',
 		api: UmbStandardBlockValueResolver,
+		forEditorAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
+	},
+	{
+		type: 'propertyValueEntityReference',
+		alias: 'Umb.PropertyValueEntityReference.BlockSingle',
+		name: 'Single Block Entity Reference Resolver',
+		api: UmbBlockPropertyValueEntityReferenceResolver,
 		forEditorAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	},
 	blockSingleSchemaManifest,

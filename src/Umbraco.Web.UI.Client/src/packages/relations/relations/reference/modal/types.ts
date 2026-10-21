@@ -1,4 +1,11 @@
 import type { UmbEntityReferenceListSource } from '../../global-components/entity-reference-list.element.js';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+
+/**
+ * The kind of reference the entity references modal can show: any `umb-entity-reference-list` source, or the
+ * entities the entity directly references that need attention (supplied by the caller as `entitiesNeedingAttention`).
+ */
+export type UmbEntityReferencesModalSource = UmbEntityReferenceListSource | 'needingAttention';
 
 /**
  * Data for the entity references modal, a paged overview of the entities referencing (or referenced by) a single entity.
@@ -22,9 +29,11 @@ export interface UmbEntityReferencesModalData {
 	 */
 	headline?: string;
 	/**
-	 * When set, only that kind of reference is shown; otherwise both are.
+	 * When set, only that kind of reference is shown; otherwise all are.
 	 */
-	source?: UmbEntityReferenceListSource;
+	source?: UmbEntityReferencesModalSource;
+	/** When set, also shows a read-only section listing the entities this entity directly references that need attention before publishing. */
+	entitiesNeedingAttention?: Array<UmbEntityModel>;
 }
 
 export type UmbEntityReferencesModalValue = undefined;
