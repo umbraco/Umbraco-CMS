@@ -107,8 +107,8 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 
 	/**
-	 * Resolves once this extension has had its first permission answer: either permitted, or its conditions
-	 * have all been created and evaluated as not permitting it. Later changes to the permission do not affect it.
+	 * Resolves once this extension has had its first permission answer: either permitted once all its conditions
+	 * have answered, or any of its conditions has answered that it is not permitted. Later changes to the permission do not affect it.
 	 * @returns {Promise<void>} A promise that resolves when the first answer is known.
 	 */
 	asSettledPromise(): Promise<void> {
@@ -281,6 +281,12 @@ export abstract class UmbBaseExtensionInitializer<
 		);
 	}
 
+	#hasConditionAnswerSettlingPermission() {
+		return this.#isPermitted === true
+			? this.#hasAllConditionsAnswered()
+			: this.#conditionControllers.some((controller) => controller.permitted === false);
+	}
+
 	#checkConditionsAreGood() {
 		if (this.#hasAllConditionControllers() === false) return false;
 		// Only good if all the conditions are permitted:
@@ -309,7 +315,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (this._isConditionsPositive === isPositive) {
 			// No change in the conditions, so we don't need to do anything, this is an optimization to prevent multiple calls to the callback when there is no change. [NL]
 			// A positive answer is settled by the pass that is making the extension permitted.
-			if (isPositive === false && this.#isPermitted !== undefined && this.#hasAllConditionsAnswered()) {
+			if (isPositive === false && this.#isPermitted !== undefined && this.#hasConditionAnswerSettlingPermission()) {
 				this.#settle();
 			}
 			return;
@@ -374,8 +380,8 @@ export abstract class UmbBaseExtensionInitializer<
 			}
 			this.#onPermissionChanged?.(this.#isPermitted, this as any);
 		}
-		// Before all conditions have answered, a not-permitted state is only the starting point and not an answer.
-		if (this.#isPermitted !== undefined && this.#hasAllConditionsAnswered()) {
+		// A not-permitted state is only the starting point until a condition has answered false, which rules the extension out without waiting for the others.
+		if (this.#isPermitted !== undefined && this.#hasConditionAnswerSettlingPermission()) {
 			this.#settle();
 		}
 	};

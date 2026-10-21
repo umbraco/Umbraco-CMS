@@ -56,13 +56,15 @@ const slowApiFactory = async () => {
 	return { api: UmbSettledTestApi };
 };
 
-function makeManifest(alias: string, uniqueKey?: string): TestManifest {
+function makeManifest(alias: string, ...uniqueKeys: Array<string>): TestManifest {
 	return {
 		type: 'test-settled',
 		name: alias,
 		alias,
 		api: slowApiFactory,
-		conditions: uniqueKey ? [{ alias: conditionManifest.alias, uniqueKey } as UmbConditionConfigBase] : undefined,
+		conditions: uniqueKeys.length
+			? uniqueKeys.map((uniqueKey) => ({ alias: conditionManifest.alias, uniqueKey }) as UmbConditionConfigBase)
+			: undefined,
 	};
 }
 
@@ -120,6 +122,16 @@ describe('UmbExtensionsApiInitializer — asSettledPromise', () => {
 
 	it('settles when the conditions of an extension have answered that it is not permitted', async () => {
 		extensionRegistry.register(makeManifest('Umb.Test.Settled.A', 'A'));
+		const promise = makePlural().asSettledPromise();
+
+		await wait(0);
+		conditionByUnique.get('A')!.flipTo(false);
+
+		expect(await state(promise)).to.equal('settled');
+	});
+
+	it('settles as soon as one condition says not permitted, without waiting for the other conditions to answer', async () => {
+		extensionRegistry.register(makeManifest('Umb.Test.Settled.A', 'A', 'B'));
 		const promise = makePlural().asSettledPromise();
 
 		await wait(0);
