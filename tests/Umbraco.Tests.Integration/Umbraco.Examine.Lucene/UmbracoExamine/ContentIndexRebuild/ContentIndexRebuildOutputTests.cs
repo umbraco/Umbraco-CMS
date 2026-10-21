@@ -66,7 +66,7 @@ internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBa
         IContent[] page;
         do
         {
-            page = ContentService.GetPagedDescendants(Constants.System.Root, pageIndex++, pageSize, out _).ToArray();
+            page = ContentService.GetPagedDescendants(Constants.System.Root, pageIndex++, pageSize, out _, propertyAliases: null, filter: null, ordering: null).ToArray();
             content.AddRange(page);
         }
         while (page.Length == pageSize);
@@ -86,7 +86,7 @@ internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBa
         IContent[] page;
         do
         {
-            page = ContentService.GetPagedDescendants(Constants.System.Root, pageIndex++, pageSize, out _, publishedQuery, Ordering.By("Path")).ToArray();
+            page = ContentService.GetPagedDescendants(Constants.System.Root, pageIndex++, pageSize, out _, propertyAliases: null, filter: publishedQuery, ordering: Ordering.By("Path")).ToArray();
             content.AddRange(page);
         }
         while (page.Length == pageSize);

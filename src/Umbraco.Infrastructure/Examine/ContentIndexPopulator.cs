@@ -279,10 +279,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 
         do
         {
-            content = (propertyAliases is null
-                    ? _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _)
-                    : _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, propertyAliases, filter: null, ordering: null))
-                .ToArray();
+            content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, propertyAliases, filter: null, ordering: null).ToArray();
 
             ValueSetIndexer.IndexItems(indexes, _contentValueSetBuilder.GetValueSets(content));
 
@@ -313,10 +310,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         {
             // add the published filter
             // note: We will filter for published variants in the validator
-            content = (propertyAliases is null
-                    ? _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, PublishedQuery, Ordering.By("Path"))
-                    : _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, propertyAliases, PublishedQuery, Ordering.By("Path")))
-                .ToArray();
+            content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, propertyAliases, PublishedQuery, Ordering.By("Path")).ToArray();
 
             var indexableContent = new List<IContent>();
 

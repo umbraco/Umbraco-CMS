@@ -450,7 +450,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 return;
             }
 
-            IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out _);
+            IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out _, propertyAliases: null, filter: null, ordering: null);
             foreach (IContent descendant in content.Yield().Concat(descendants))
             {
                 HandleNavigationForSingleContent(descendant);
