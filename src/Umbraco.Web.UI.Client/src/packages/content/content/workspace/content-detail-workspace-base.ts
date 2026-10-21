@@ -862,7 +862,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Observes if the given variant is writable: it is not read-only, and its own name or one of its own properties may
 	 * be written. Invariant (shared) data is the invariant variant: `UmbVariantId.CreateInvariant()`.
 	 * @param {UmbVariantId} variantId - The variant to check
-	 * @returns {Observable<boolean>} emits true if the variant is writable, and again when the answer changes
+	 * @returns {Observable<boolean>} emits true if the variant is writable, and again when the answer changes. Emits false until the variant options are loaded.
 	 */
 	public isWritableVariant(variantId: UmbVariantId): Observable<boolean> {
 		return combineLatest([
@@ -873,10 +873,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.propertyWriteGuard.rules,
 			this.propertyWriteGuard.fallbackPermitted,
 			this.structure.contentTypeProperties,
-			this.variantOptions as Observable<Array<VariantOptionModelType>>,
+			this.variantOptions,
 		]).pipe(
 			map(([, , , , , , properties, variantOptions]) =>
-				this.#resolveIsWritableVariant(variantId, properties, variantOptions),
+				variantOptions === undefined ? false : this.#resolveIsWritableVariant(variantId, properties, variantOptions),
 			),
 			distinctUntilChanged(),
 		);
