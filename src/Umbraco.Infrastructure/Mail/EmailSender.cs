@@ -27,10 +27,36 @@ public class EmailSender : IEmailSender
     private readonly bool _notificationHandlerRegistered;
     private GlobalSettings _globalSettings;
     private readonly IEmailSenderClient _emailSenderClient;
+    private readonly TimeProvider _timeProvider;
+    private readonly Lock _smtpProbeLock = new();
+    private Task<bool>? _smtpProbe;
+    private DateTimeOffset _smtpProbeExpiry;
+    private int _smtpProbeGeneration;
+
+    /// <summary>
+    /// The maximum time the SMTP probe may take before the server is treated as unavailable.
+    /// </summary>
+    internal static readonly TimeSpan SmtpProbeTimeout = TimeSpan.FromSeconds(10);
+
+    /// <summary>
+    /// How long a successful SMTP probe result is reused before the server is probed again.
+    /// </summary>
+    internal static readonly TimeSpan SmtpProbeAvailableCacheDuration = TimeSpan.FromSeconds(60);
+
+    /// <summary>
+    /// How long a failed SMTP probe result is reused before the server is probed again, kept short so recovery is noticed quickly.
+    /// </summary>
+    internal static readonly TimeSpan SmtpProbeUnavailableCacheDuration = TimeSpan.FromSeconds(15);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EmailSender"/> class.
     /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="globalSettings">The global settings, including the SMTP configuration.</param>
+    /// <param name="eventAggregator">The event aggregator used to publish <see cref="SendEmailNotification"/>.</param>
+    /// <param name="emailSenderClient">The client used to send emails and verify the SMTP connection.</param>
+    /// <param name="handler1">An optional synchronous handler for <see cref="SendEmailNotification"/>.</param>
+    /// <param name="handler2">An optional asynchronous handler for <see cref="SendEmailNotification"/>.</param>
     public EmailSender(
         ILogger<EmailSender> logger,
         IOptionsMonitor<GlobalSettings> globalSettings,
@@ -38,13 +64,49 @@ public class EmailSender : IEmailSender
         IEmailSenderClient emailSenderClient,
         INotificationHandler<SendEmailNotification>? handler1,
         INotificationAsyncHandler<SendEmailNotification>? handler2)
+        : this(logger, globalSettings, eventAggregator, emailSenderClient, handler1, handler2, TimeProvider.System)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EmailSender"/> class using the specified time provider.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="globalSettings">The global settings, including the SMTP configuration.</param>
+    /// <param name="eventAggregator">The event aggregator used to publish <see cref="SendEmailNotification"/>.</param>
+    /// <param name="emailSenderClient">The client used to send emails and verify the SMTP connection.</param>
+    /// <param name="handler1">An optional synchronous handler for <see cref="SendEmailNotification"/>.</param>
+    /// <param name="handler2">An optional asynchronous handler for <see cref="SendEmailNotification"/>.</param>
+    /// <param name="timeProvider">The time provider used for the SMTP probe cache expiry and timeout.</param>
+    /// <remarks>
+    /// This constructor is internal because the time provider only exists so tests can control the SMTP probe cache
+    /// expiry and timeout. Production code uses <see cref="TimeProvider.System"/> via the public constructor, so exposing
+    /// this would add public API surface without a use case.
+    /// </remarks>
+    internal EmailSender(
+        ILogger<EmailSender> logger,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IEventAggregator eventAggregator,
+        IEmailSenderClient emailSenderClient,
+        INotificationHandler<SendEmailNotification>? handler1,
+        INotificationAsyncHandler<SendEmailNotification>? handler2,
+        TimeProvider timeProvider)
     {
         _logger = logger;
         _eventAggregator = eventAggregator;
         _globalSettings = globalSettings.CurrentValue;
         _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
         _emailSenderClient = emailSenderClient;
-        globalSettings.OnChange(x => _globalSettings = x);
+        _timeProvider = timeProvider;
+        globalSettings.OnChange(x =>
+        {
+            lock (_smtpProbeLock)
+            {
+                _globalSettings = x;
+                _smtpProbe = null;
+                _smtpProbeGeneration++;
+            }
+        });
     }
 
     /// <inheritdoc/>
@@ -60,13 +122,88 @@ public class EmailSender : IEmailSender
         await SendAsyncInternal(message, emailType, enableNotification, expires);
 
     /// <inheritdoc/>
+    [Obsolete("Please use IsEmailConfigured to check configuration only, or IsEmailAvailableAsync to also check that the transport can currently be reached. Scheduled for removal in Umbraco 19.")]
+    public bool CanSendRequiredEmail() => IsEmailConfigured();
+
+    /// <inheritdoc/>
     /// <remarks>
     ///     We assume this is possible if either an event handler is registered or an smtp server is configured
     ///     or a pickup directory location is configured.
     /// </remarks>
-    public bool CanSendRequiredEmail() => _globalSettings.IsSmtpServerConfigured
-                                          || _globalSettings.IsPickupDirectoryLocationConfigured
-                                          || _notificationHandlerRegistered;
+    public bool IsEmailConfigured() => _globalSettings.IsSmtpServerConfigured
+                                       || _globalSettings.IsPickupDirectoryLocationConfigured
+                                       || _notificationHandlerRegistered;
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Only the SMTP transport is probed. A pickup directory only requires a local file write, so it is assumed to be
+    ///     available. A registered notification handler cannot be probed, so it is assumed to deliver email and SMTP is not
+    ///     probed, even when configured as a fallback; if the handler does not handle a given email, the send fails instead.
+    ///     Concurrent callers share a single probe, and its result is cached briefly, so the SMTP server is contacted at
+    ///     most once per cache period regardless of how often this is called. The cancellation token only stops the
+    ///     caller waiting; it does not cancel the shared probe.
+    /// </remarks>
+    public async Task<bool> IsEmailAvailableAsync(CancellationToken cancellationToken = default)
+    {
+        if (_notificationHandlerRegistered || UsesSmtpTransport() is false)
+        {
+            return IsEmailConfigured();
+        }
+
+        return await GetOrStartSmtpProbe().WaitAsync(cancellationToken);
+    }
+
+    private Task<bool> GetOrStartSmtpProbe()
+    {
+        lock (_smtpProbeLock)
+        {
+            if (_smtpProbe is null || (_smtpProbe.IsCompleted && _timeProvider.GetUtcNow() >= _smtpProbeExpiry))
+            {
+                _smtpProbe = ProbeSmtpAsync(_smtpProbeGeneration, _globalSettings.Smtp);
+            }
+
+            return _smtpProbe;
+        }
+    }
+
+    private async Task<bool> ProbeSmtpAsync(int generation, SmtpSettings? smtpSettings)
+    {
+        bool isAvailable;
+        using (var timeout = new CancellationTokenSource(SmtpProbeTimeout, _timeProvider))
+        {
+            try
+            {
+                await _emailSenderClient.VerifyConnectionAsync(timeout.Token);
+                isAvailable = true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Could not connect to the SMTP server at {SmtpHost}:{SmtpPort}.",
+                    smtpSettings?.Host,
+                    smtpSettings?.Port);
+                isAvailable = false;
+            }
+        }
+
+        lock (_smtpProbeLock)
+        {
+            // A settings change while this probe was running replaces it, so its result must not set the replacement's expiry.
+            if (generation == _smtpProbeGeneration)
+            {
+                _smtpProbeExpiry = _timeProvider.GetUtcNow()
+                                   + (isAvailable ? SmtpProbeAvailableCacheDuration : SmtpProbeUnavailableCacheDuration);
+            }
+        }
+
+        return isAvailable;
+    }
+
+    // Mirrors SendAsyncInternal: a pickup directory is only used when a From address is set, otherwise sending falls back to SMTP.
+    private bool UsesSmtpTransport()
+        => _globalSettings.IsSmtpServerConfigured
+           && (_globalSettings.IsPickupDirectoryLocationConfigured is false || string.IsNullOrWhiteSpace(_globalSettings.Smtp?.From));
 
     private async Task SendAsyncInternal(EmailMessage message, string emailType, bool enableNotification, TimeSpan? expires)
     {

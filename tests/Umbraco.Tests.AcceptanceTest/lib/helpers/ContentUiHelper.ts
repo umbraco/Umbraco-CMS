@@ -167,6 +167,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly inlineCreateBtn: Locator;
   private readonly removeAt: Locator;
   private readonly selectAllCheckbox: Locator;
+  private readonly scheduleForAllLanguagesCheckbox: Locator;
   private readonly confirmToPublishBtn: Locator;
   private readonly tiptapStatusbarWordCount: Locator;
   private readonly tiptapStatusbarElementPath: Locator;
@@ -410,6 +411,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.publishAt = this.generalItem.filter({hasText: 'Publish at'}).locator('umb-localize-date');
     this.removeAt = this.generalItem.filter({hasText: 'Remove at'}).locator('umb-localize-date');
     this.selectAllCheckbox = this.documentScheduleModal.locator('[label="Select all"]');
+    this.scheduleForAllLanguagesCheckbox = this.documentScheduleModal.locator('[label="Schedule for all selected languages"]');
     this.confirmToPublishBtn = page.locator('umb-content-publish-modal').getByLabel('Publish');
     // Publish with descendants
     this.documentPublishWithDescendantsModal = page.locator('umb-document-publish-with-descendants-modal');
@@ -873,6 +875,18 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.page.locator(`[name="${mediaPickerName}"] [label="Remove"] svg`));
     await this.clickConfirmRemoveButton();
     await this.isMediaNameVisible(mediaPickerName, false);
+  }
+
+  async dragMediaPickerItemBefore(draggedMediaId: string, targetMediaId: string) {
+    const draggedItem = this.page.getByTestId(`media:${draggedMediaId}`);
+    const targetItem = this.page.getByTestId(`media:${targetMediaId}`);
+    await this.dragAndDrop(draggedItem, targetItem, 0, -40, 20);
+  }
+
+  async doesMediaPickerHaveItemsInOrder(mediaIds: string[]) {
+    await expect.poll(async () => await this.page.locator('[data-mark^="media:"]').evaluateAll(
+      (items) => items.map((item) => item.getAttribute('data-mark')!.replace('media:', '')),
+    )).toEqual(mediaIds);
   }
 
   async isMediaNameVisible(mediaName: string, isVisible: boolean = true) {
@@ -1867,6 +1881,15 @@ export class ContentUiHelper extends UiBaseLocators {
     await expect(selectAllInput).toBeChecked({checked: !wasChecked});
   }
 
+  async clickScheduleForAllLanguagesCheckbox() {
+    await this.click(this.scheduleForAllLanguagesCheckbox);
+  }
+
+  async doesPublishTimeHaveValue(time: string, index: number = 0) {
+    const publishAtInput = this.documentScheduleModal.locator('.publish-date').nth(index).locator('uui-form-layout-item').first().locator('#input');
+    await expect(publishAtInput).toHaveValue(time);
+  }
+
   async doesSchedulePublishModalButtonContainDisabledTag(hasDisabledTag: boolean = false) {
     if (!hasDisabledTag) {
       await expect(this.schedulePublishModalBtn).not.toHaveAttribute('disabled', '');
@@ -1964,7 +1987,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickBlockElementInRTEWithName(elementTypeName: string) {
-    const blockElementLocator = this.page.locator('uui-ref-node umb-ufm-render').filter({hasText: elementTypeName});
+    const blockElementLocator = this.page.locator('umb-ref-rte-block umb-ufm-render').filter({hasText: elementTypeName});
     await this.click(blockElementLocator, {force: true});
   }
 
