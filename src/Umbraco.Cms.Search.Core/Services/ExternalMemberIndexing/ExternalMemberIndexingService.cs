@@ -89,18 +89,14 @@ internal sealed class ExternalMemberIndexingService
 
         _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken =>
         {
-            var pendingRemovals = new List<Guid>(removedMemberKeys);
-            foreach (Guid memberKey in memberKeys)
+            ExternalMemberIdentity[] members = (await _externalMemberService.GetByKeysAsync(memberKeys)).ToArray();
+            foreach (ExternalMemberIdentity member in members)
             {
-                ExternalMemberIdentity? member = await _externalMemberService.GetByKeyAsync(memberKey);
-                if (member is null)
-                {
-                    pendingRemovals.Add(memberKey);
-                    continue;
-                }
-
                 await UpdateIndexAsync(indexInfos, member);
             }
+
+            var pendingRemovals = new List<Guid>(removedMemberKeys);
+            pendingRemovals.AddRange(memberKeys.Except(members.Select(member => member.Key)));
 
             if (pendingRemovals.Count is 0)
             {
