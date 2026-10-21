@@ -105,11 +105,13 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 			};
 		}
 
-		// The rows carry their own selectability, so they are rebuilt when selection becomes available as well.
+		// The rows carry their own selectability and href, so they are rebuilt when selection or select-only
+		// mode changes too - not just when the underlying items change.
 		if (
 			changedProperties.has('_items') ||
 			changedProperties.has('_userDefinedProperties') ||
 			changedProperties.has('_selectable') ||
+			changedProperties.has('_selectOnly') ||
 			changedProperties.has('_hideItemActions')
 		) {
 			this.#createTableHeadings();
@@ -142,13 +144,16 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 		this._tableItems = this._items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
 
-			// While selectable (e.g. in a picker), the name must not navigate away from the picker. An item with
+			// While select-only (i.e. in a picker), the name must not navigate away from the picker. An item with
 			// children still needs a way to be opened, so it drills further into it via an open event instead.
 			const editPath = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique });
-			const href = this._selectable ? undefined : editPath;
-			const onOpen = item.hasChildren
-				? () => this.dispatchEvent(new UmbTreeItemOpenEvent({ unique: item.unique, entityType: item.entityType }))
-				: undefined;
+			const href = this._selectOnly ? undefined : editPath;
+			const hasCollection = !!item.contentType?.collection;
+			const indicatorHref = href && hasCollection ? `${href}?openCollection=true` : href;
+			const onOpen =
+				item.hasChildren || hasCollection
+					? () => this.dispatchEvent(new UmbTreeItemOpenEvent({ unique: item.unique, entityType: item.entityType }))
+					: undefined;
 
 			const data =
 				this._tableColumns?.map((column) => {
@@ -170,11 +175,20 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 				id: item.unique,
 				icon: item.documentType.icon,
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
-				childrenIndicator: item.hasChildren ? { href, onOpen } : undefined,
+				childrenIndicator:
+					item.hasChildren || hasCollection
+						? {
+								href: indicatorHref,
+								onOpen,
+								renderExpandSymbol: hasCollection
+									? () => html`<umb-icon name="icon-list" style="font-size: 8px;"></umb-icon>`
+									: undefined,
+							}
+						: undefined,
 				selectable: this._isSelectableItem(item),
 				// select-only disables all row interaction, which would leave no way to open an item with
 				// children while a selection is in progress.
-				selectOnly: item.hasChildren ? false : undefined,
+				selectOnly: item.hasChildren || hasCollection ? false : undefined,
 				data: data,
 			};
 		});

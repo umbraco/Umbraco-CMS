@@ -27,6 +27,10 @@ public class UserFilter
     /// </summary>
     public ISet<string>? NameFilters { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the set of user kinds to include in the filter.
+    /// </summary>
+    public ISet<UserKind>? IncludeUserKinds { get; set; }
 
     /// <summary>
     /// Merges two user filters
@@ -34,12 +38,13 @@ public class UserFilter
     /// <param name="target">User filter to merge with.</param>
     /// <returns>A new filter containing the union of the two filters. </returns>
     public UserFilter Merge(UserFilter target) =>
-        new UserFilter
+        new()
         {
             IncludedUserGroups = MergeSet(IncludedUserGroups, target.IncludedUserGroups),
             ExcludeUserGroups = MergeSet(ExcludeUserGroups, target.ExcludeUserGroups),
             IncludeUserStates = MergeSet(IncludeUserStates, target.IncludeUserStates),
-            NameFilters = MergeSet(NameFilters, target.NameFilters)
+            NameFilters = MergeSet(NameFilters, target.NameFilters),
+            IncludeUserKinds = MergeSet(IncludeUserKinds, target.IncludeUserKinds),
         };
 
     /// <summary>

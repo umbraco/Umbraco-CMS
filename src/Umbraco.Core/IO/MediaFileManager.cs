@@ -195,6 +195,37 @@ public sealed class MediaFileManager
         return _mediaPathScheme.GetFilePath(this, cuid, puid, filename);
     }
 
+    /// <summary>
+    ///     Determines whether a media file path is one that could have been generated for the given content and property type.
+    /// </summary>
+    /// <param name="pathOrUrl">The media file path or URL to check.</param>
+    /// <param name="contentKey">The unique identifier of the content/media expected to own the file.</param>
+    /// <param name="propertyTypeKey">The unique identifier of the property type expected to own the file.</param>
+    /// <returns>
+    ///     <c>true</c> if the path resolves to one the active media path scheme would produce for
+    ///     <paramref name="contentKey" /> and <paramref name="propertyTypeKey" />; otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    ///     A value editor stores the file path in the property value, so before acting destructively on that path
+    ///     (deleting or renaming the file) callers must confirm the path actually belongs to the item being processed,
+    ///     rather than one supplied by a client to reference another item's file. The determination is delegated to the
+    ///     active <see cref="IMediaPathScheme" />, which owns the mapping between item/property keys and file paths;
+    ///     see <see cref="IMediaPathScheme.IsFilePathOwnedBy" />.
+    /// </remarks>
+    public bool IsFileOwnedBy(string? pathOrUrl, Guid contentKey, Guid propertyTypeKey)
+    {
+        if (string.IsNullOrWhiteSpace(pathOrUrl))
+        {
+            return false;
+        }
+
+        var relativePath = FileSystem.GetRelativePath(pathOrUrl);
+        return _mediaPathScheme.IsFilePathOwnedBy(this, relativePath, contentKey, propertyTypeKey);
+    }
+
+    internal static string NormalizePathForComparison(string path)
+        => path.Replace('\\', '/').Trim('/');
+
     #endregion
 
     #region Associated Media Files

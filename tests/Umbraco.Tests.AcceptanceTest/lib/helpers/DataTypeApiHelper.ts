@@ -2122,6 +2122,17 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async createMultiNodeTreePickerDataTypeWithMinNumberOfItems(name: string, minNumber: number) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
+      .withName(name)
+      .withMinNumber(minNumber)
+      .build();
+
+    return await this.save(dataType);
+  }
+
   async createDefaultDateTimeWithTimeZonePickerDataType(name: string) {
     await this.ensureNameNotExists(name);
 

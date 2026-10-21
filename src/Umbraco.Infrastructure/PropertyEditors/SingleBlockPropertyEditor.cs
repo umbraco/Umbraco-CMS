@@ -99,6 +99,13 @@ public class SingleBlockPropertyEditor : DataEditor
         return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue, defaultCulture);
     }
 
+    /// <inheritdoc />
+    public override bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue)
+    {
+        var valueEditor = (SingleBlockEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.ArePropertyValuesEquivalent(editedValue, publishedValue);
+    }
+
     internal sealed class SingleBlockEditorPropertyValueEditor : BlockEditorPropertyValueEditor<SingleBlockValue, SingleBlockLayoutItem>
     {
         /// <summary>
@@ -140,8 +147,22 @@ public class SingleBlockPropertyEditor : DataEditor
             Validators.Add(new SingleBlockValidator(BlockEditorValues, textService));
         }
 
-        protected override SingleBlockValue CreateWithLayout(IEnumerable<SingleBlockLayoutItem> layout) =>
-            new(layout.Single());
+        /// <summary>
+        /// Creates a single block value holding the specified layout.
+        /// </summary>
+        /// <param name="layout">The layout items.</param>
+        /// <returns>The single block value.</returns>
+        /// <remarks>
+        /// A stored value is not guaranteed to hold exactly one block - for example, a value written by another block
+        /// editor whose layout this editor supports - so every layout item is carried over, and any surplus is left for
+        /// validation to report.
+        /// </remarks>
+        protected override SingleBlockValue CreateWithLayout(IEnumerable<SingleBlockLayoutItem> layout)
+        {
+            var value = new SingleBlockValue();
+            value.Layout[value.PropertyEditorAlias] = layout.ToArray();
+            return value;
+        }
 
         /// <inheritdoc/>
         public override IEnumerable<Guid> ConfiguredElementTypeKeys()

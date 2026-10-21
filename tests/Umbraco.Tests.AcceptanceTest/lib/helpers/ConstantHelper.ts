@@ -45,6 +45,7 @@
     invalidEmail: 'Invalid email',
     emptyManualLinkPicker: 'Please enter an URL or Anchor.',
     needMoreItems: 'This field needs more items',
+    minimumTwoEntriesRequiresOneMore: 'Minimum 2 entries, requires 1 more.',
   }
 
   public static readonly inputTypes = {

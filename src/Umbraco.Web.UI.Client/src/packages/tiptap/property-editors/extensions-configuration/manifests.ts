@@ -7,6 +7,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		name: 'Tiptap Extensions Property Editor UI',
 		element: () => import('./property-editor-ui-tiptap-extensions-configuration.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Tiptap Extensions Configuration',
 			icon: 'icon-autofill',
 			group: '#propertyEditorUIGroups_common',
