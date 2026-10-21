@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -310,7 +311,8 @@ public class DecimalPropertyValueEditorTests
             new DataEditorAttribute("alias"),
             localizedTextServiceMock.Object)
         {
-            ConfigurationObject = configuration
+            ConfigurationObject = new DecimalConfigurationEditor(Mock.Of<IIOHelper>())
+                .ToConfigurationObject(configuration, new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory())),
         };
     }
 }

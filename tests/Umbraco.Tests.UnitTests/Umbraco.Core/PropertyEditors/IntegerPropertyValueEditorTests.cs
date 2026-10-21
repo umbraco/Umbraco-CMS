@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -198,11 +199,14 @@ public class IntegerPropertyValueEditorTests
             new DataEditorAttribute("alias"),
             localizedTextServiceMock.Object)
         {
-            ConfigurationObject = new Dictionary<string, object>
-            {
-                { "validationRange", CreateRange(min, 20) },
-                { "step", step }
-            }
+            ConfigurationObject = new IntegerConfigurationEditor(Mock.Of<IIOHelper>())
+                .ToConfigurationObject(
+                    new Dictionary<string, object>
+                    {
+                        { "validationRange", CreateRange(min, 20) },
+                        { "step", step },
+                    },
+                    new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory())),
         };
     }
 

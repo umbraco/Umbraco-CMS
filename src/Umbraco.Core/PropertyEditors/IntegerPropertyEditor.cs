@@ -165,6 +165,35 @@ public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
             /// <inheritdoc/>
             protected override bool TryParsePropertyValue(object? value, out int parsedIntegerValue)
                 => int.TryParse(value?.ToString(), CultureInfo.InvariantCulture, out parsedIntegerValue);
+
+            /// <summary>
+            /// Retrieves the configured validation range from either the typed or the dictionary configuration.
+            /// </summary>
+            /// <param name="dataTypeConfiguration">The data type configuration.</param>
+            /// <param name="min">The minimum bound, or <c>null</c> when unbounded or not present.</param>
+            /// <param name="max">The maximum bound, or <c>null</c> when unbounded or not present.</param>
+            /// <returns>True if a validation range was found.</returns>
+            protected static bool TryGetRange(object? dataTypeConfiguration, out decimal? min, out decimal? max)
+                => dataTypeConfiguration is IntegerConfiguration integerConfiguration
+                    ? RangeConfigurationHelper.TryGetBounds(integerConfiguration.ValidationRange, out min, out max)
+                    : TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out min, out max);
+
+            /// <summary>
+            /// Retrieves the configured step from either the typed or the dictionary configuration.
+            /// </summary>
+            /// <param name="dataTypeConfiguration">The data type configuration.</param>
+            /// <param name="step">The configured step.</param>
+            /// <returns>True if a step was configured.</returns>
+            protected static bool TryGetStep(object? dataTypeConfiguration, out int step)
+            {
+                if (dataTypeConfiguration is IntegerConfiguration integerConfiguration)
+                {
+                    step = integerConfiguration.Step ?? default;
+                    return integerConfiguration.Step.HasValue;
+                }
+
+                return TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out step);
+            }
         }
 
         /// <summary>
@@ -188,7 +217,7 @@ public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
                     yield break;
                 }
 
-                if (TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out decimal? min, out decimal? max) is false)
+                if (TryGetRange(dataTypeConfiguration, out decimal? min, out decimal? max) is false)
                 {
                     yield break;
                 }
@@ -231,10 +260,10 @@ public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
                 }
 
                 // Default min to 0 if not configured (step validation is relative to min).
-                TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out decimal? configuredMin, out _);
+                TryGetRange(dataTypeConfiguration, out decimal? configuredMin, out _);
                 var min = configuredMin.HasValue ? (int)configuredMin.Value : 0;
 
-                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out int step) &&
+                if (TryGetStep(dataTypeConfiguration, out int step) &&
                     ValidationHelper.IsValueValidForStep(parsedIntegerValue, min, step) is false)
                 {
                     yield return new ValidationResult(

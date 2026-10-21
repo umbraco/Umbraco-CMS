@@ -209,6 +209,35 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
 
                 return double.TryParse(value.ToString(), NumberStyles.Any, CultureInfo.CurrentCulture, out parsedDecimalValue);
             }
+
+            /// <summary>
+            /// Retrieves the configured validation range from either the typed or the dictionary configuration.
+            /// </summary>
+            /// <param name="dataTypeConfiguration">The data type configuration.</param>
+            /// <param name="min">The minimum bound, or <c>null</c> when unbounded or not present.</param>
+            /// <param name="max">The maximum bound, or <c>null</c> when unbounded or not present.</param>
+            /// <returns>True if a validation range was found.</returns>
+            protected static bool TryGetRange(object? dataTypeConfiguration, out decimal? min, out decimal? max)
+                => dataTypeConfiguration is DecimalConfiguration decimalConfiguration
+                    ? RangeConfigurationHelper.TryGetBounds(decimalConfiguration.ValidationRange, out min, out max)
+                    : TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out min, out max);
+
+            /// <summary>
+            /// Retrieves the configured step from either the typed or the dictionary configuration.
+            /// </summary>
+            /// <param name="dataTypeConfiguration">The data type configuration.</param>
+            /// <param name="step">The configured step.</param>
+            /// <returns>True if a step was configured.</returns>
+            protected static bool TryGetStep(object? dataTypeConfiguration, out double step)
+            {
+                if (dataTypeConfiguration is DecimalConfiguration decimalConfiguration)
+                {
+                    step = (double)(decimalConfiguration.Step ?? default);
+                    return decimalConfiguration.Step.HasValue;
+                }
+
+                return TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out step);
+            }
         }
 
         /// <summary>
@@ -232,7 +261,7 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
                     yield break;
                 }
 
-                if (TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out decimal? min, out decimal? max) is false)
+                if (TryGetRange(dataTypeConfiguration, out decimal? min, out decimal? max) is false)
                 {
                     yield break;
                 }
@@ -275,12 +304,12 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
                 }
 
                 // Default min to 0 if not configured (step validation is relative to min).
-                TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out decimal? configuredMin, out _);
+                TryGetRange(dataTypeConfiguration, out decimal? configuredMin, out _);
                 var min = configuredMin.HasValue ? (double)configuredMin.Value : 0d;
 
                 // Default step to 0.000001 (6 decimal places) if not configured,
                 // matching the database DECIMAL(38,6) column precision.
-                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out double step) is false)
+                if (TryGetStep(dataTypeConfiguration, out double step) is false)
                 {
                     step = 0.000001;
                 }
