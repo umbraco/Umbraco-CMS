@@ -68,7 +68,6 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 			(variants) => {
 				this.#variants = variants;
 				this.#generateRoutes();
-				this.#staleVariantRedirect.redirect();
 			},
 			'_observeVariants',
 		);
