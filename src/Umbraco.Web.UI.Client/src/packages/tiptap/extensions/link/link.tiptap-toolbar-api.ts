@@ -24,14 +24,11 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 		const linkAttrs = this.#parseLinkData(result.link);
 
 		if (linkAttrs && this.#hasNoTextToLink(editor)) {
-			// Insert the link instead, using its name as the text and falling back to its URL.
-			const text = result.link.name || linkAttrs.href;
-			editor
-				.chain()
-				.focus()
-				.insertContent({ type: 'text', text, marks: [{ type: UmbLink.name, attrs: linkAttrs }] })
-				.unsetMark(UmbLink.name)
-				.run();
+			// Insert the link instead, using its name as the text and falling back to the picked URL, as a
+			// local link's href is a `{localLink:…}` token. Storing the link mark before inserting plain text
+			// keeps any formatting at the cursor.
+			const text = result.link.name || result.link.url || linkAttrs.href;
+			editor.chain().focus().setUmbLink(linkAttrs).insertContent({ type: 'text', text }).unsetMark(UmbLink.name).run();
 		} else if (linkAttrs) {
 			editor?.chain().focus().extendMarkRange(UmbLink.name).setUmbLink(linkAttrs).run();
 		} else {

@@ -1,4 +1,4 @@
-import { Document, Editor, Paragraph, Text } from '../../externals.js';
+import { Bold, Document, Editor, Paragraph, Text } from '../../externals.js';
 import UmbTiptapToolbarLinkExtensionApi from './link.tiptap-toolbar-api.js';
 import { UmbLink } from './link.tiptap-extension.js';
 import { expect } from '@open-wc/testing';
@@ -45,6 +45,14 @@ describe('UmbTiptapToolbarLinkExtensionApi', () => {
 		return api.execute(editor);
 	};
 
+	const marksOn = (text: string) => {
+		const names: Array<string> = [];
+		editor.state.doc.descendants((node) => {
+			if (node.isText && node.text === text) names.push(...node.marks.map((mark) => mark.type.name));
+		});
+		return names;
+	};
+
 	beforeEach(() => {
 		hostElement = new UmbTestLinkToolbarHostElement();
 		document.body.appendChild(hostElement);
@@ -52,7 +60,7 @@ describe('UmbTiptapToolbarLinkExtensionApi', () => {
 		editorHost = document.createElement('div');
 		document.body.appendChild(editorHost);
 
-		editor = new Editor({ element: editorHost, extensions: [Document, Paragraph, Text, UmbLink] });
+		editor = new Editor({ element: editorHost, extensions: [Document, Paragraph, Text, Bold, UmbLink] });
 
 		api = new UmbTiptapToolbarLinkExtensionApi(hostElement);
 	});
@@ -91,6 +99,26 @@ describe('UmbTiptapToolbarLinkExtensionApi', () => {
 
 			expect(editorHost.querySelector('a')?.textContent).to.equal('Read more');
 			expect(editorHost.textContent).to.equal('Read more today');
+		});
+
+		it('inserts a document link using its URL, not its local link, as the text when it has no name', async () => {
+			const unique = 'eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f';
+			await pickLink({ name: '', type: 'document', unique, url: '/about-us/' });
+
+			const anchor = editorHost.querySelector('a');
+			expect(anchor?.getAttribute('href')).to.equal(`/{localLink:${unique}}`);
+			expect(anchor?.textContent).to.equal('/about-us/');
+		});
+
+		it('keeps the formatting at the cursor on the link and the text typed after it', async () => {
+			editor.commands.setContent('<p><strong>Bold</strong></p>');
+			editor.commands.setTextSelection(5);
+
+			await pickLink({ name: 'Read more', url: 'https://example.com' });
+			editor.view.dispatch(editor.state.tr.insertText(' today'));
+
+			expect(marksOn('Read more')).to.have.members(['bold', UmbLink.name]);
+			expect(marksOn(' today')).to.deep.equal(['bold']);
 		});
 	});
 
