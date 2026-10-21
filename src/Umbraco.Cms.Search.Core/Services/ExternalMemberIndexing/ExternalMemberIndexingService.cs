@@ -187,6 +187,7 @@ internal sealed class ExternalMemberIndexingService
         IndexField[] systemFields =
         [
             new(Umbraco.Cms.Core.Constants.Search.FieldNames.Id, new() { Keywords = [member.Key.AsKeyword()] }, null, null),
+            new(Umbraco.Cms.Core.Constants.Search.FieldNames.PathIds, new() { Keywords = [member.Key.AsKeyword()] }, null, null),
             new(Umbraco.Cms.Core.Constants.Search.FieldNames.ObjectType, new() { Keywords = [nameof(UmbracoObjectTypes.Member)] }, null, null),
             new(Umbraco.Cms.Core.Constants.Search.FieldNames.CreateDate, new() { DateTimeOffsets = [_dateTimeOffsetConverter.ToDateTimeOffset(member.CreateDate)] }, null, null),
             new(Umbraco.Cms.Core.Constants.Search.FieldNames.UpdateDate, new() { DateTimeOffsets = [_dateTimeOffsetConverter.ToDateTimeOffset(member.UpdateDate)] }, null, null),

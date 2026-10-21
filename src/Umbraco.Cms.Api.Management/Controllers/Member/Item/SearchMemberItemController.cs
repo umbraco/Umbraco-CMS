@@ -56,6 +56,10 @@ public class SearchMemberItemController : MemberItemControllerBase
         // resolved by the member presentation service rather than as entities
         PagedModel<Guid> searchResult = await _indexedEntitySearchService.SearchKeysAsync(UmbracoObjectTypes.Member, query, null, allowedMemberTypes, false, "*", skip, take);
         Guid[] keys = searchResult.Items.ToArray();
+        if (keys.Length is 0)
+        {
+            return Ok(new PagedModel<MemberItemResponseModel> { Total = searchResult.Total });
+        }
 
         IEnumerable<MemberItemResponseModel> items = await _memberPresentationService.CreateItemResponseModelsAsync(keys.ToHashSet());
         var result = new PagedModel<MemberItemResponseModel>

@@ -70,4 +70,39 @@ public class SearchMemberItemControllerTests
             Assert.That(result.Total, Is.EqualTo(42));
         });
     }
+
+    [TestCase(0)]
+    [TestCase(42)]
+    public async Task Search_Member_Without_Search_Result_Keys_Returns_No_Members(long total)
+    {
+        _indexedEntitySearchService
+            .Setup(x => x.SearchKeysAsync(
+                UmbracoObjectTypes.Member,
+                "test",
+                It.IsAny<Guid?>(),
+                It.IsAny<IEnumerable<Guid>?>(),
+                It.IsAny<bool?>(),
+                It.IsAny<string?>(),
+                It.IsAny<int>(),
+                It.IsAny<int>(),
+                It.IsAny<bool>()))
+            .ReturnsAsync(new PagedModel<Guid> { Items = [], Total = total });
+
+        // resolving an empty set of keys yields every member, as the underlying entity lookup treats no keys as "all"
+        _memberPresentationService
+            .Setup(x => x.CreateItemResponseModelsAsync(It.Is<HashSet<Guid>>(keys => keys.Count == 0)))
+            .ReturnsAsync([new MemberItemResponseModel { Id = Guid.NewGuid(), Kind = MemberKind.Default }]);
+
+        IActionResult actionResult = await _controller.SearchWithAllowedTypes(CancellationToken.None, "test", skip: 100);
+
+        var okResult = actionResult as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        var result = okResult!.Value as PagedModel<MemberItemResponseModel>;
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.Items, Is.Empty);
+            Assert.That(result.Total, Is.EqualTo(total));
+        });
+    }
 }
