@@ -138,6 +138,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 	});
 
+	/**
+	 * Resolves once the workspace is initialized, meaning the detail repository is available.
+	 * Overrides of `load` and `createScaffold` await this before executing the `initHook`.
+	 */
+	protected get _initialized(): Promise<void> {
+		return this.#init;
+	}
+
 	constructor(host: UmbControllerHost, args: UmbEntityDetailWorkspaceContextArgs) {
 		super(host, args.workspaceAlias);
 		this.addValidationContext(this.validationContext);
