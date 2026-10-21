@@ -127,9 +127,9 @@ public enum ContentTypeOperationStatus
     NotImplemented,
 
     /// <summary>
-    ///     Element types cannot vary by segment.
+    ///     Element types can vary by segment, so this in an obsolete operation status.
     /// </summary>
-    [Obsolete("Element types can now vary by segment. Scheduled for removal in V21.")]
+    [Obsolete("Element types can now vary by segment. Scheduled for removal in Umbraco 21.")]
     InvalidSegmentVariationForElementType,
 
     /// <summary>

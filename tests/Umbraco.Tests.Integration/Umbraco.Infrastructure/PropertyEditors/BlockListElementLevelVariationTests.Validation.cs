@@ -845,7 +845,7 @@ internal partial class BlockListElementLevelVariationTests
     {
         var elementType = await CreateElementTypeWithValidationAsync(ContentVariation.CultureAndSegment);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = await CreateContentType(ContentVariation.Segment, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType);
         var blockListValue = BlockListPropertyValue(
             elementType,
             Guid.NewGuid(),
