@@ -279,7 +279,34 @@ test('can create content with a block grid area with specified allowance with mi
   await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 2);
 });
 
-test('can create content with a block grid area with specified allowance with max allowed', async ({umbracoApi, umbracoUi}) => {
+test('cannot publish content with a block grid area with specified allowance with min allowed when only other blocks are present', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
+  const thirdElementTypeId = await umbracoApi.documentType.createEmptyElementType(thirdElementTypeName);
+  const minAllowed = 1;
+  const warningMessage = thirdElementTypeName + ' must be present at least ' + minAllowed + ' time(s).';
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaWithTwoSpecifiedAllowancesWithMinMaxInABlock(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, thirdElementTypeId, minAllowed, 10, firstAreaName, areaCreateLabel);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickLinkWithName(areaCreateLabel);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  // A block type minimum within an area applies even when that type is absent, unlike the area's own minimum.
+  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Draft');
+});
+
+test('can create content with a block grid area with specified allowance with max allowed',async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const maxAllowed = 1;

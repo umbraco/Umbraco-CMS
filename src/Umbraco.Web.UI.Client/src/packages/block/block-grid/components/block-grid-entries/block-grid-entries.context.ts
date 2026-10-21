@@ -29,7 +29,6 @@ import {
 	UmbClipboardPastePropertyValueTranslatorValueResolver,
 } from '@umbraco-cms/backoffice/clipboard';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { isAboveZeroAndBelowMinimum } from '@umbraco-cms/backoffice/validation';
 import {
 	UMB_BLOCK_CATALOGUE_MODAL,
 	UmbBlockEntriesContext,
@@ -649,7 +648,7 @@ export class UmbBlockGridEntriesContext
 						return contentTypeKey ? groupElementTypeKeys.indexOf(contentTypeKey) !== -1 : false;
 					}).length;
 
-					if (isAboveZeroAndBelowMinimum(groupAmount, minAllowed) || (maxAllowed > 0 && groupAmount > maxAllowed)) {
+					if (groupAmount < minAllowed || (maxAllowed > 0 && groupAmount > maxAllowed)) {
 						return {
 							groupKey: rule.groupKey,
 							name: this._manager.getBlockGroupName(rule.groupKey) ?? '?',
@@ -666,7 +665,7 @@ export class UmbBlockGridEntriesContext
 						const contentTypeKey = this._manager!.getContentOf(entry.contentKey)?.contentTypeKey;
 						return contentTypeKey === rule.elementTypeKey;
 					}).length;
-					if (isAboveZeroAndBelowMinimum(amount, minAllowed) || (maxAllowed > 0 ? amount > maxAllowed : false)) {
+					if (amount < minAllowed || (maxAllowed > 0 ? amount > maxAllowed : false)) {
 						return {
 							key: rule.elementTypeKey,
 							name: this._manager.getContentTypeNameOf(rule.elementTypeKey) ?? '?',
