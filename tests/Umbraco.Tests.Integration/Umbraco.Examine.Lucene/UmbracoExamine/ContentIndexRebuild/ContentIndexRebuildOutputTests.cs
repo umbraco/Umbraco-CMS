@@ -30,27 +30,29 @@ internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBa
 
     private static readonly string[] _propertiesForIncludedFields = ["title", "invariantBlocks", "body"];
 
+    // Every document in its own batch, documents split across batches, and all documents in one batch.
+    private static readonly int[] _batchSizes = [1, 2, 1000];
+
     public static void ConfigureExplicitlyIndexEachNestedProperty(IUmbracoBuilder builder, object explicitlyIndexEachNestedProperty)
         => builder.Services.Configure<IndexingSettings>(settings =>
             settings.ExplicitlyIndexEachNestedProperty = (bool)explicitlyIndexEachNestedProperty);
 
-    [TestCase(false, false, 1)]
-    [TestCase(false, false, 1000)]
-    [TestCase(false, true, 1)]
-    [TestCase(false, true, 1000)]
-    [TestCase(true, false, 1)]
-    [TestCase(true, false, 1000)]
-    [TestCase(true, true, 1)]
-    [TestCase(true, true, 1000)]
+    [TestCase(false, false)]
+    [TestCase(false, true)]
+    [TestCase(true, false)]
+    [TestCase(true, true)]
     [ConfigureBuilderTestCase(ActionName = nameof(ConfigureExplicitlyIndexEachNestedProperty), IndexOfParameter = 1)]
-    public async Task Rebuild_Produces_Expected_Value_Sets(bool publishedValuesOnly, bool explicitlyIndexEachNestedProperty, int batchSize)
+    public async Task Rebuild_Produces_Expected_Value_Sets_For_Any_Batch_Size(bool publishedValuesOnly, bool explicitlyIndexEachNestedProperty)
     {
         await SeedAsync();
 
-        CapturedIndex captured = Rebuild(publishedValuesOnly, batchSize);
-
-        var snapshotName = $"{(publishedValuesOnly ? "published" : "internal")}-{(explicitlyIndexEachNestedProperty ? "explicit" : "summary")}-batch{batchSize}";
-        AssertMatchesSnapshot(snapshotName, RenderSnapshot(captured.ValueSets));
+        var snapshotName = $"{(publishedValuesOnly ? "published" : "internal")}-{(explicitlyIndexEachNestedProperty ? "explicit" : "summary")}";
+        foreach (var batchSize in _batchSizes)
+        {
+            TestContext.Out.WriteLine($"Rebuilding with batch size {batchSize}.");
+            CapturedIndex captured = Rebuild(publishedValuesOnly, batchSize);
+            AssertMatchesSnapshot(snapshotName, RenderSnapshot(captured.ValueSets));
+        }
     }
 
     [TestCase(1)]
