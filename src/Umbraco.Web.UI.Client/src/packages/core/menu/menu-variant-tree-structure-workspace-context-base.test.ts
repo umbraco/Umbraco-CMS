@@ -451,6 +451,8 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase (isNew resolves after 
 		await aTimeout(150);
 
 		expect(UmbTestSectionSidebarMenuContext.expandItemsCalls).to.have.lengthOf(1);
-		expect(UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(requestCountBeforeIsNewResolves);
+		expect(UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(
+			requestCountBeforeIsNewResolves,
+		);
 	});
 });

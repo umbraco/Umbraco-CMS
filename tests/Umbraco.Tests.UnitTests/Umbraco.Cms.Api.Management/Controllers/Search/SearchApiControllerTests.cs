@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Search;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Search;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -34,7 +35,7 @@ public class SearchApiControllerTests
         var searcherResolver = new Mock<ISearcherResolver>();
         searcherResolver.Setup(x => x.GetSearcher(IndexAlias)).Returns(_searcher.Object);
 
-        _controller = new SearchApiController(searcherResolver.Object, _entityService.Object, new TestVariationContextAccessor());
+        _controller = new SearchApiController(searcherResolver.Object, _entityService.Object, new TestVariationContextAccessor(), Mock.Of<IMemberPresentationService>());
     }
 
     [TestCase(UmbracoObjectTypes.Document)]

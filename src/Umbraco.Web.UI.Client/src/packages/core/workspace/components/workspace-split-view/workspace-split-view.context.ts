@@ -93,7 +93,7 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 			this.observe(
 				this.#workspaceContext && variantId
 					? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
-							variants.some((v) => v.unique === variantId.toString()),
+							variants?.some((v) => v.unique === variantId.toString()),
 						)
 					: undefined,
 				(variantExists) => {

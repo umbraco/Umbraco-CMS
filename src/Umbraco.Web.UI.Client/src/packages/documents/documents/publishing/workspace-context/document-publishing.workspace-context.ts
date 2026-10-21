@@ -15,7 +15,6 @@ import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../co
 import { UmbDocumentVariantState } from '../../variant-state.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
 import { UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import {
@@ -706,7 +705,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#init;
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
-		const allOptions = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+		const allOptions = await this.#documentWorkspaceContext.getVariantOptions();
 		const options = allOptions.filter((option) => option.segment === null);
 
 		// TODO: this is a temporary copy of the content-detail workspace context method.

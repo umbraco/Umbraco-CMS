@@ -84,7 +84,7 @@ describe('UmbBlockEntryIsUnsupportedCondition', () => {
 		});
 
 		await new Promise((resolve) => requestAnimationFrame(resolve));
-		expect(condition.permitted).to.be.false;
+		expect(condition.permitted).to.be.undefined;
 		expect(callbackCount).to.equal(0);
 	});
 

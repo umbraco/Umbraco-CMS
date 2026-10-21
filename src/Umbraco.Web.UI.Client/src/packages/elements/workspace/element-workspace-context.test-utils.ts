@@ -14,6 +14,10 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export const TEST_MANIFESTS = [
 	...elementDetailRepositoryManifests,
@@ -39,6 +43,28 @@ class UmbMockModalManagerContext extends UmbModalManagerContext {
 	}
 }
 
+// Workspaces derive their variant options from the app languages, so they never resolve without this context.
+class UmbMockAppLanguageContext extends UmbContextBase {
+	readonly #languages = new UmbArrayState<UmbLanguageDetailModel>(
+		[
+			{
+				entityType: 'language',
+				unique: 'en-US',
+				name: 'English (United States)',
+				isDefault: true,
+				isMandatory: false,
+				fallbackIsoCode: null,
+			},
+		],
+		(x) => x.unique,
+	);
+	readonly languages = this.#languages.asObservable();
+
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_APP_LANGUAGE_CONTEXT);
+	}
+}
+
 @customElement('umb-test-element-workspace-host')
 export class UmbTestElementWorkspaceHostElement extends UmbControllerHostElementMixin(HTMLElement) {
 	readonly #currentUserContext = new UmbCurrentUserContext(this);
@@ -53,6 +79,7 @@ export class UmbTestElementWorkspaceHostElement extends UmbControllerHostElement
 		new UmbMockModalManagerContext(this);
 		new UmbNotificationContext(this);
 		new UmbCurrentUserStore(this);
+		new UmbMockAppLanguageContext(this);
 	}
 
 	public async init() {

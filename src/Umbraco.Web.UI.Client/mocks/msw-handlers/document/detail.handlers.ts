@@ -1,14 +1,11 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import type { UmbMockDocumentModel } from '../../data/mock-data-set.types.js';
 import { umbMockManager } from '../../mock-manager.js';
 import { umbDocumentMockDb } from '../../db/document.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateAndPublishDocumentRequestModel,
 	CreateDocumentRequestModel,
-	GetDocumentByIdAvailableSegmentOptionsResponse,
 	GetDocumentByIdReferencedDescendantsResponse,
-	IReferenceResponseModel,
 	PagedIReferenceResponseModel,
 	UpdateAndPublishDocumentRequestModel,
 	UpdateDocumentRequestModel,
@@ -100,51 +97,6 @@ export const detailHandlers = [
 		};
 
 		return HttpResponse.json(ReferencedDescendantsResponse);
-	}),
-
-	http.get(umbracoPath(`${UMB_SLUG}/:id/available-segment-options`), ({ params }) => {
-		const id = params.id as string;
-		if (!id) return new HttpResponse(null, { status: 400 });
-
-		let document: UmbMockDocumentModel | null = null;
-
-		try {
-			document = umbDocumentMockDb.detail.read(id);
-		} catch {
-			return new HttpResponse(null, { status: 404 });
-		}
-
-		const availableSegments = [
-			...new Set(document.values.filter((v) => !!v.segment).map((v) => v.segment!)),
-		];
-
-		const response: GetDocumentByIdAvailableSegmentOptionsResponse = {
-			total: availableSegments.length,
-			items: availableSegments.map((alias) => {
-				// If the segment is generic (i.e. not tied to any culture) we show the segment on all cultures
-				const isGeneric = alias.includes('generic');
-				const whichCulturesHaveThisSegment: string[] | undefined = isGeneric
-					? undefined
-					: document.values.filter((v) => v.segment === alias).map((v) => v.culture!);
-
-				let availableSegmentOptions: string[] | null = whichCulturesHaveThisSegment ?? null;
-
-				if (whichCulturesHaveThisSegment) {
-					const hasNull = whichCulturesHaveThisSegment.some((c) => c === null);
-					if (hasNull) {
-						availableSegmentOptions = null;
-					}
-				}
-
-				return {
-					alias,
-					name: `Segment: ${alias}`,
-					cultures: availableSegmentOptions,
-				};
-			}),
-		};
-
-		return HttpResponse.json(response);
 	}),
 
 	http.put(umbracoPath(`${UMB_SLUG}/:id/validate`, 'v1.1'), ({ params }) => {
