@@ -80,10 +80,11 @@ export class UmbPropertyValueUserPermissionWorkspaceContextBase extends UmbContr
 		conditions.forEach((condition) => condition.then((api) => api.destroy()).catch(() => undefined));
 	}
 
-	override destroy(): void {
+override destroy(): void {
+		for (const stateManager of this.#conditions.keys()) {
+			this.#destroyConditions(stateManager);
+		}
 		super.destroy();
-		// Conditions should have been destroyed at this point as we share the same host.
-		this.#conditions.clear();
 	}
 }
 
