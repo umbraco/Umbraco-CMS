@@ -9,18 +9,11 @@ export const manifest: ManifestPropertyEditorSchema = {
 		settings: {
 			properties: [
 				{
-					alias: 'minNumber',
-					label: 'Minimum number of items',
-					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
-					config: [{ alias: 'min', value: 0 }],
-				},
-				{
-					alias: 'maxNumber',
-					label: 'Maximum number of items',
-					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
-					config: [{ alias: 'min', value: 0 }],
+					alias: 'validationLimit',
+					label: 'Amount',
+					description: 'Set the minimum and maximum number of items allowed.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
+					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
 				},
 				{
 					alias: 'ignoreUserStartNodes',
@@ -28,10 +21,6 @@ export const manifest: ManifestPropertyEditorSchema = {
 					description: 'Selecting this option allows a user to choose nodes that they normally dont have access to.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
-			],
-			defaultData: [
-				{ alias: 'minNumber', value: 0 },
-				{ alias: 'maxNumber', value: 0 },
 			],
 		},
 	},

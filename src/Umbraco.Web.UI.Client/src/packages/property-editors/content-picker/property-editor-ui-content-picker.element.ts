@@ -14,6 +14,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 // import of local component
@@ -116,8 +117,9 @@ export class UmbPropertyEditorUIContentPickerElement
 			}
 		}
 
-		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
-		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
+		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
+		this._min = this.#parseInt(minMax?.min, 0);
+		this._max = this.#parseInt(minMax?.max, Infinity);
 
 		this._allowedContentTypeUniques = config.getValueByAlias('filter');
 
@@ -137,7 +139,7 @@ export class UmbPropertyEditorUIContentPickerElement
 
 		if (this._min && this._max && this._min > this._max) {
 			console.warn(
-				`Property (Content Picker) has been misconfigured, 'minNumber' is greater than 'maxNumber'. Please correct your data type configuration.`,
+				`Property (Content Picker) has been misconfigured, the minimum is greater than the maximum. Please correct your data type configuration.`,
 				this,
 			);
 		}

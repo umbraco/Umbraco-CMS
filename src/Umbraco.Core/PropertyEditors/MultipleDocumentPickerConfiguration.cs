@@ -12,7 +12,7 @@ public class MultipleDocumentPickerConfiguration : IIgnoreUserStartNodesConfig
     /// <summary>
     /// Gets or sets the validation limits for the number of documents allowed.
     /// </summary>
-    [ConfigurationField("validationLimit")]
+    [ConfigurationField("validationLimit", Type = typeof(RangeConfigurationField))]
     public NumberRange? ValidationLimit { get; set; }
 
     /// <summary>
@@ -20,20 +20,4 @@ public class MultipleDocumentPickerConfiguration : IIgnoreUserStartNodesConfig
     /// </summary>
     [ConfigurationField("allowedContentTypes")]
     public string? AllowedContentTypeIds { get; set; }
-
-    /// <summary>
-    /// Represents a numeric range with optional minimum and maximum values.
-    /// </summary>
-    public class NumberRange
-    {
-        /// <summary>
-        /// Gets or sets the minimum value of the range.
-        /// </summary>
-        public int? Min { get; set; }
-
-        /// <summary>
-        /// Gets or sets the maximum value of the range.
-        /// </summary>
-        public int? Max { get; set; }
-    }
 }

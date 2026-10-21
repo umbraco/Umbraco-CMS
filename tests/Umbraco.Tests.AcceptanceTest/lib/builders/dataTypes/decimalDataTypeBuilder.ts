@@ -38,16 +38,13 @@ export class DecimalDataTypeBuilder extends DataTypeBuilder {
       alias: 'step',
       value: this.step || 0.01
     });
-    if (this.min !== undefined) {
+    if (this.min !== undefined || this.max !== undefined) {
       values.push({
-        alias: 'min',
-        value: this.min
-      });
-    }
-    if (this.max !== undefined) {
-      values.push({
-        alias: 'max',
-        value: this.max
+        alias: 'validationRange',
+        value: {
+          min: this.min,
+          max: this.max
+        }
       });
     }
     if (this.placeholder !== undefined) {

@@ -81,12 +81,12 @@ export class BlockGridAreaBuilder {
       values.rowSpan = this.rowSpan;
     }
 
-    if (this.minAllowed !== undefined) {
-      values.minAllowed = this.minAllowed;
-    }
-
-    if (this.maxAllowed !== undefined) {
-      values.maxAllowed = this.maxAllowed;
+    // The per-area minimum/maximum is stored as a single range object (Umbraco 19+).
+    if (this.minAllowed !== undefined || this.maxAllowed !== undefined) {
+      values.validationLimit = {
+        min: this.minAllowed,
+        max: this.maxAllowed,
+      };
     }
 
     if (this.createLabel !== undefined) {

@@ -392,25 +392,32 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
                     : [];
             }
 
-            if (urlPickerConfiguration is not MultiUrlPickerConfiguration configuration
-                || (linksDtos is null && configuration.MinNumber == 0))
+            if (urlPickerConfiguration is not MultiUrlPickerConfiguration configuration)
             {
                 return [];
             }
 
-            if (linksDtos is null || linksDtos.Length < configuration.MinNumber)
+            var minNumber = configuration.ValidationLimit.Min ?? 0;
+            var maxNumber = configuration.ValidationLimit.Max ?? 0;
+
+            if (linksDtos is null && minNumber == 0)
+            {
+                return [];
+            }
+
+            if (linksDtos is null || linksDtos.Length < minNumber)
             {
                 return [new ValidationResult(
                     _localizedTextService.Localize(
                         "validation",
                         "entriesShort",
-                        [configuration.MinNumber.ToString(), (configuration.MinNumber - (linksDtos?.Length ?? 0)).ToString()]),
+                        [minNumber.ToString(), (minNumber - (linksDtos?.Length ?? 0)).ToString()]),
                     ["value"])];
             }
 
-            if (linksDtos.Length > configuration.MaxNumber && configuration.MaxNumber > 0)
+            if (linksDtos.Length > maxNumber && maxNumber > 0)
             {
-                return [Exceeds(configuration.MaxNumber, linksDtos.Length)];
+                return [Exceeds(maxNumber, linksDtos.Length)];
             }
 
             return [];
