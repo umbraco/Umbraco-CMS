@@ -29,7 +29,7 @@ export class UmbDefaultWorkspaceContext extends UmbContextBase implements UmbWor
 	}
 
 	getUnique(): UmbEntityUnique {
-		return this.#entityContext.getUnique();
+		return this.#entityContext.getUnique() ?? null;
 	}
 
 	setEntityType(entityType: string): void {
