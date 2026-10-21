@@ -7,10 +7,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
-import {
-	UmbWorkspaceStaleVariantRedirectController,
-	UMB_WORKSPACE_PATH_VARIANT_DELIMITER,
-} from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
 
 // TODO: Refactor across all four content workspace editors (document, document blueprint, media, member) to use a base component. [NL]
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
@@ -55,12 +52,6 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			this.#observeLoading();
 		});
 	}
-
-	readonly #staleVariantRedirect = new UmbWorkspaceStaleVariantRedirectController(this, {
-		getWorkspaceRoute: () => this.#workspaceRoute,
-		getVariants: () => this.#variants,
-		getAppCulture: () => this.#appCulture,
-	});
 
 	#observeVariants() {
 		this.observe(
@@ -206,7 +197,6 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
 		this.#workspaceRoute = e.target.absoluteRouterPath;
 		this.#workspaceContext?.splitView.setWorkspaceRoute(this.#workspaceRoute);
-		this.#staleVariantRedirect.redirect();
 	};
 
 	override render() {

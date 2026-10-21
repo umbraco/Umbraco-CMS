@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -104,6 +105,34 @@ internal sealed class MemberPickerValueEditorValidationTests
         ValidateResult(succeed, valueEditor.Validate(Value(memberCount), false, null, PropertyValidationContext.Empty()));
     }
 
+    [Test]
+    public void Can_Validate_Null_Value_When_Minimum_Configured_And_Not_Mandatory()
+    {
+        var valueEditor = CreateMultipleValueEditor();
+        valueEditor.ConfigurationObject = new MultipleMemberPickerConfiguration
+        {
+            ValidationLimit = new NumberRange { Min = 2 },
+        };
+
+        ValidateResult(true, valueEditor.Validate(null, false, null, PropertyValidationContext.Empty()));
+    }
+
+    [TestCase(null, Constants.Validation.ErrorMessages.Properties.Missing)]
+    [TestCase("[]", Constants.Validation.ErrorMessages.Properties.Empty)]
+    public void Cannot_Validate_Empty_Value_When_Minimum_Configured_And_Mandatory(string? value, string expectedErrorMessage)
+    {
+        var valueEditor = CreateMultipleValueEditor();
+        valueEditor.ConfigurationObject = new MultipleMemberPickerConfiguration
+        {
+            ValidationLimit = new NumberRange { Min = 2 },
+        };
+
+        ValidationResult[] result = valueEditor.Validate(value, true, null, PropertyValidationContext.Empty()).ToArray();
+
+        Assert.AreEqual(1, result.Length);
+        Assert.AreEqual(expectedErrorMessage, result[0].ErrorMessage);
+    }
+
     [TestCase(1, 2, true)]
     [TestCase(2, 2, true)]
     [TestCase(3, 2, false)]
@@ -172,7 +201,7 @@ internal sealed class MemberPickerValueEditorValidationTests
             Mock.Of<IShortStringHelper>(),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias"),
+            new DataEditorAttribute("alias") { ValueType = ValueTypes.Json },
             Mock.Of<ILocalizedTextService>(),
             memberService.Object,
             coreScopeProvider.Object)

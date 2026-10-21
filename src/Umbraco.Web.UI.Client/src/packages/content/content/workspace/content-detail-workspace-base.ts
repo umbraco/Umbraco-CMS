@@ -16,6 +16,7 @@ import { _resolveIsWritableVariant } from './content-writable-variant.function.j
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
 import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
+import { UmbContentTypeVarianceChangeRedirectController } from './content-type-variance-change-redirect.controller.js';
 import { mergeObservables, observeMultiple, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	combineLatest,
@@ -182,6 +183,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	/* Split View */
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
+	/**
+	 * Keeps the workspace on an existing variant when the content type's variance is changed from within the workspace.
+	 * @internal
+	 */
+	readonly contentTypeVarianceChangeRedirect: UmbContentTypeVarianceChangeRedirectController;
+
 	readonly collection: UmbContentCollectionManager;
 
 	readonly #collectionConfiguration = new UmbContentCollectionConfigurationContext(this);
@@ -329,6 +336,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		new UmbContentDetailWorkspaceTypeTransformController(this as any, this._data);
+		this.contentTypeVarianceChangeRedirect = new UmbContentTypeVarianceChangeRedirectController(this);
 
 		this.observe(
 			this.variantOptions,

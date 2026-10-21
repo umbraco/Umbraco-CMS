@@ -377,7 +377,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
         /// <param name="valueType">The type of value being validated (not used in this implementation).</param>
         /// <param name="validationContext">The context for property validation.</param>
         /// <returns>
-        /// An <see cref="IEnumerable{ValidationResult}"/> containing validation errors if the number of links is less than the minimum or greater than the maximum allowed; otherwise, an empty enumerable.
+        /// An <see cref="IEnumerable{ValidationResult}"/> containing validation errors if the number of links does not meet the configured minimum or exceeds the configured maximum; otherwise, an empty enumerable.
         /// </returns>
         public IEnumerable<ValidationResult> Validate(
             LinkDisplay[]? linksDtos,
@@ -399,25 +399,21 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
 
             var minNumber = configuration.ValidationLimit.Min ?? 0;
             var maxNumber = configuration.ValidationLimit.Max ?? 0;
+            var numberOfLinks = linksDtos?.Length ?? 0;
 
-            if (linksDtos is null && minNumber == 0)
-            {
-                return [];
-            }
-
-            if (linksDtos is null || linksDtos.Length < minNumber)
+            if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(numberOfLinks, minNumber))
             {
                 return [new ValidationResult(
                     _localizedTextService.Localize(
                         "validation",
                         "entriesShort",
-                        [minNumber.ToString(), (minNumber - (linksDtos?.Length ?? 0)).ToString()]),
+                        [minNumber.ToString(), (minNumber - numberOfLinks).ToString()]),
                     ["value"])];
             }
 
-            if (linksDtos.Length > maxNumber && maxNumber > 0)
+            if (numberOfLinks > maxNumber && maxNumber > 0)
             {
-                return [Exceeds(maxNumber, linksDtos.Length)];
+                return [Exceeds(maxNumber, numberOfLinks)];
             }
 
             return [];

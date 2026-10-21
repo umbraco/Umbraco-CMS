@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -223,7 +224,7 @@ internal class MediaPickerValueEditorValidationTests
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"E243A7E2-8D2E-4DC9-88FB-822350A40142\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", 1, true)]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"E243A7E2-8D2E-4DC9-88FB-822350A40142\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", 2, true)]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"E243A7E2-8D2E-4DC9-88FB-822350A40142\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", 3, false)]
-    [TestCase("[]", 1, false)]
+    [TestCase("[]", 1, true)]
     [TestCase("[]", 0, true)]
     public void Validates_Min_Limit(string value, int min, bool succeed)
     {
@@ -234,6 +235,33 @@ internal class MediaPickerValueEditorValidationTests
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
         ValidateResult(succeed, result);
+    }
+
+    [TestCase(null)]
+    [TestCase("[]")]
+    public void Can_Validate_Empty_Value_When_Minimum_Configured_And_Not_Mandatory(string? value)
+    {
+        var (valueEditor, _, _, _) = CreateValueEditor();
+
+        valueEditor.ConfigurationObject = new MediaPicker3Configuration { Multiple = true, ValidationLimit = new NumberRange { Min = 3 } };
+
+        var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
+
+        Assert.IsEmpty(result);
+    }
+
+    [TestCase(null, Constants.Validation.ErrorMessages.Properties.Missing)]
+    [TestCase("[]", Constants.Validation.ErrorMessages.Properties.Empty)]
+    public void Cannot_Validate_Empty_Value_When_Mandatory(string? value, string expectedErrorMessage)
+    {
+        var (valueEditor, _, _, _) = CreateValueEditor();
+
+        valueEditor.ConfigurationObject = new MediaPicker3Configuration { Multiple = true, ValidationLimit = new NumberRange { Min = 3 } };
+
+        var result = valueEditor.Validate(value, true, null, PropertyValidationContext.Empty());
+
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(expectedErrorMessage, result.First().ErrorMessage);
     }
 
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", 1, true)]
@@ -274,7 +302,7 @@ internal class MediaPickerValueEditorValidationTests
             Mock.Of<IShortStringHelper>(),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias"),
+            new DataEditorAttribute("alias") { ValueType = ValueTypes.Json },
             Mock.Of<IMediaImportService>(),
             mediaServiceMock.Object,
             Mock.Of<ITemporaryFileService>(),

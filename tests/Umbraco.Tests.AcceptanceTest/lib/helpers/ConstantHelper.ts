@@ -93,7 +93,7 @@
 
   public static readonly mediaPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
-    1: ['Amount', 'Set a required range of medias'],
+    1: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
     2: ['Start node', ''],
     3: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
     4: ['Enable Focal Point', ''],
@@ -141,7 +141,7 @@
 
   public static readonly multipleDocumentPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
-    1: ['Amount', 'Set a required range of documents'],
+    1: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
     2: ['Start node', ''],
     3: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
     4: ['Ignore user start nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."]
@@ -153,7 +153,7 @@
 
   public static readonly multipleMemberPickerSettings = {
     0: ['Accepted types', 'Limit to specific member types'],
-    1: ['Amount', 'Set a required range of members']
+    1: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.']
   }
 
   public static readonly singleUrlPickerSettings = {
@@ -164,7 +164,7 @@
   }
 
   public static readonly multiURLPickerSettings = {
-    0: ['Amount', 'Set the minimum and maximum number of items allowed.'],
+    0: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
     1: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
     2: ['Overlay Size', 'Select the width of the overlay.'],
     3: ['Hide anchor/query string input', 'Selecting this hides the anchor/query string input field in the link picker overlay.'],
