@@ -22,11 +22,13 @@ async function wait(ms: number) {
 // rather than instance state.
 function createTestInitializer(host: UmbElement, registry: UmbExtensionRegistry<ManifestBase>) {
 	const instantiated: string[] = [];
+	const signals: Record<string, AbortSignal | undefined> = {};
 	class UmbTestInitializer extends UmbExtensionInitializerBase<'test'> {
 		constructor() {
 			super(host, registry as never, 'test');
 		}
-		async instantiateExtension(manifest: ManifestBase & { js?: unknown }): Promise<void> {
+		async instantiateExtension(manifest: ManifestBase & { js?: unknown }, signal?: AbortSignal): Promise<void> {
+			signals[manifest.alias] = signal;
 			if (manifest.js) {
 				await loadManifestPlainJs(manifest.js as never);
 			}
@@ -37,7 +39,7 @@ function createTestInitializer(host: UmbElement, registry: UmbExtensionRegistry<
 			if (index !== -1) instantiated.splice(index, 1);
 		}
 	}
-	return { initializer: new UmbTestInitializer(), instantiated };
+	return { initializer: new UmbTestInitializer(), instantiated, signals };
 }
 
 describe('UmbExtensionInitializerBase — loaded signal', () => {
@@ -130,5 +132,42 @@ describe('UmbExtensionInitializerBase — loaded signal', () => {
 			.then(() => instantiated.includes('Umb.Test.SlowBoot'));
 
 		expect(instantiatedWhenGateOpened, '`loaded` opened the gate before the extension instantiated').to.equal(true);
+	});
+});
+
+describe('UmbExtensionInitializerBase — unloading while instantiating', () => {
+	let hostElement: UmbElement;
+	let extensionRegistry: UmbExtensionRegistry<ManifestBase>;
+
+	const registerSlow = () =>
+		extensionRegistry.register({
+			type: 'test',
+			name: 'slow',
+			alias: 'Umb.Test.Slow',
+			js: () => new Promise((r) => setTimeout(() => r({}), 100)),
+		} as never);
+
+	beforeEach(async () => {
+		hostElement = await fixture(html`<umb-test-initializer-base-host></umb-test-initializer-base-host>`);
+		extensionRegistry = new UmbExtensionRegistry<ManifestBase>();
+	});
+
+	it('aborts the signal of an extension that is unloaded while it is still instantiating', async () => {
+		const { signals } = createTestInitializer(hostElement, extensionRegistry);
+		registerSlow();
+		await wait(20);
+
+		expect(signals['Umb.Test.Slow']?.aborted).to.equal(false);
+		extensionRegistry.unregister('Umb.Test.Slow');
+
+		expect(signals['Umb.Test.Slow']?.aborted).to.equal(true);
+	});
+
+	it('does not abort the signal of an extension that stays registered', async () => {
+		const { initializer, signals } = createTestInitializer(hostElement, extensionRegistry);
+		registerSlow();
+		await new UmbObserver(initializer.loaded).asPromise();
+
+		expect(signals['Umb.Test.Slow']?.aborted).to.equal(false);
 	});
 });

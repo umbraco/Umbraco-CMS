@@ -26,9 +26,6 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 > {
 	readonly #active: UmbBooleanState<boolean>;
 	readonly #instanceMap = new Map<string, UmbEntryPointModule>();
-	// The latest load per alias. unloadExtension drops it, so a load that settles after its extension was
-	// unloaded (unregistered, or the session ended) is discarded instead of initialized.
-	readonly #pendingLoads = new Map<string, symbol>();
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#isAuthorized = false;
 	#isUserLoaded = false;
@@ -93,15 +90,11 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 		this.#active.setValue(this.#isAuthorized && this.#isUserLoaded && this.#hasUser);
 	}
 
-	async instantiateExtension(manifest: ManifestUserEntryPoint) {
+	async instantiateExtension(manifest: ManifestUserEntryPoint, signal?: AbortSignal) {
 		if (!manifest.js) return;
-		const load = Symbol();
-		this.#pendingLoads.set(manifest.alias, load);
 		const moduleInstance = await loadManifestPlainJs(manifest.js);
-		// Only the latest load of an extension that is still loaded runs onInit.
-		if (this.#pendingLoads.get(manifest.alias) !== load) return;
-		this.#pendingLoads.delete(manifest.alias);
-		if (!moduleInstance) return;
+		// The extension may have been unloaded while its module loaded (unregistered, or the session ended).
+		if (!moduleInstance || signal?.aborted) return;
 		this.#instanceMap.set(manifest.alias, moduleInstance);
 		if (hasInitExport(moduleInstance)) {
 			// Promise.resolve so an async onInit is awaited even though the export type is `void`.
@@ -110,7 +103,6 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 	}
 
 	unloadExtension(manifest: ManifestUserEntryPoint) {
-		this.#pendingLoads.delete(manifest.alias);
 		const moduleInstance = this.#instanceMap.get(manifest.alias);
 		if (!moduleInstance) return;
 		this.#instanceMap.delete(manifest.alias);
