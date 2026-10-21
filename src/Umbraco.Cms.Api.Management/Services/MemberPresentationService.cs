@@ -17,6 +17,7 @@ internal sealed class MemberPresentationService : IMemberPresentationService
     private readonly IEntityService _entityService;
     private readonly IMemberEditingService _memberEditingService;
     private readonly IMemberPresentationFactory _memberPresentationFactory;
+    private readonly IExternalMemberService _externalMemberService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MemberPresentationService"/> class.
@@ -24,14 +25,17 @@ internal sealed class MemberPresentationService : IMemberPresentationService
     /// <param name="entityService">Service used for entity operations and retrieval.</param>
     /// <param name="memberEditingService">Service used for member editing operations.</param>
     /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models.</param>
+    /// <param name="externalMemberService">Service used to retrieve external members in bulk.</param>
     public MemberPresentationService(
         IEntityService entityService,
         IMemberEditingService memberEditingService,
-        IMemberPresentationFactory memberPresentationFactory)
+        IMemberPresentationFactory memberPresentationFactory,
+        IExternalMemberService externalMemberService)
     {
         _entityService = entityService;
         _memberEditingService = memberEditingService;
         _memberPresentationFactory = memberPresentationFactory;
+        _externalMemberService = externalMemberService;
     }
 
     /// <inheritdoc/>
@@ -64,15 +68,14 @@ internal sealed class MemberPresentationService : IMemberPresentationService
             contentMembers.Select(_memberPresentationFactory.CreateItemResponseModel));
 
         var resolvedIds = contentMembers.Select(m => m.Key).ToHashSet();
-
-        foreach (Guid unresolvedId in ids.Where(id => resolvedIds.Contains(id) is false))
+        Guid[] unresolvedIds = ids.Where(id => resolvedIds.Contains(id) is false).ToArray();
+        if (unresolvedIds.Length is 0)
         {
-            ExternalMemberIdentity? externalMember = await _memberEditingService.GetExternalMemberAsync(unresolvedId);
-            if (externalMember is not null)
-            {
-                responseModels.Add(_memberPresentationFactory.CreateExternalMemberItemResponseModel(externalMember));
-            }
+            return responseModels;
         }
+
+        IEnumerable<ExternalMemberIdentity> externalMembers = await _externalMemberService.GetByKeysAsync(unresolvedIds);
+        responseModels.AddRange(externalMembers.Select(_memberPresentationFactory.CreateExternalMemberItemResponseModel));
 
         return responseModels;
     }
