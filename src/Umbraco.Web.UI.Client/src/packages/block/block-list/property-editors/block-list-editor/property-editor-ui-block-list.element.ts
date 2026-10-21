@@ -164,6 +164,9 @@ export class UmbPropertyEditorUIBlockListElement
 	private _blocks?: Array<UmbBlockTypeBaseModel>;
 
 	@state()
+	private _hasLibraryElements = false;
+
+	@state()
 	private _layouts: Array<UmbBlockLayoutBaseModel> = [];
 
 	@state()
@@ -294,6 +297,8 @@ export class UmbPropertyEditorUIBlockListElement
 			null,
 		);
 
+		this.observe(this.#entriesContext.hasLibraryElements, (x) => (this._hasLibraryElements = x), null);
+
 		this.observe(
 			this.#entriesContext.catalogueRouteBuilder,
 			(routeBuilder) => {
@@ -385,7 +390,12 @@ export class UmbPropertyEditorUIBlockListElement
 
 	#renderCreateButtonGroup() {
 		if (this._layouts.length > 0 && (this._limitMax === 1 || this.readonly)) return nothing;
-		return html`<uui-button-group>${this.#renderCreateButton()}${this.#renderPasteButton()}</uui-button-group>`;
+		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
+		return html`
+			<uui-button-group>
+				${this.#renderCreateButton(createPath)}${this.#renderLibraryButton(createPath)}${this.#renderPasteButton()}
+			</uui-button-group>
+		`;
 	}
 
 	#renderInlineCreateButton(index: number) {
@@ -405,9 +415,8 @@ export class UmbPropertyEditorUIBlockListElement
 		`;
 	}
 
-	#renderCreateButton() {
+	#renderCreateButton(createPath: string | undefined) {
 		if (!this._catalogueRouteBuilder) return nothing;
-		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
 		return html`
 			<uui-button
 				look="placeholder"
@@ -439,9 +448,25 @@ export class UmbPropertyEditorUIBlockListElement
 		}
 	}
 
+	#renderLibraryButton(createPath: string | undefined) {
+		if (!this._catalogueRouteBuilder || createPath || !this._hasLibraryElements) return nothing;
+		return html`
+			<uui-button
+				class="btnAction"
+				label=${this.localize.term('blockEditor_tabLibrary')}
+				look="placeholder"
+				href=${this._catalogueRouteBuilder?.({ view: 'library', index: -1 }) ?? ''}
+				?disabled=${this.readonly}
+				title=${this.localize.term('blockEditor_tabLibrary')}>
+				<uui-icon name="icon-link"></uui-icon>
+			</uui-button>
+		`;
+	}
+
 	#renderPasteButton() {
 		return html`
 			<uui-button
+				class="btnAction"
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
@@ -465,8 +490,11 @@ export class UmbPropertyEditorUIBlockListElement
 
 			uui-button-group {
 				margin-top: 1px;
-				display: grid;
-				grid-template-columns: 1fr auto;
+				display: flex;
+
+				.btnAction {
+					flex: 0;
+				}
 			}
 		`,
 	];

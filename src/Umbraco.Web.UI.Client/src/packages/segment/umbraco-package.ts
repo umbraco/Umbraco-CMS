@@ -1,6 +1,4 @@
-import { manifests as collectionManifests } from './collection/manifests.js';
-
-export const manifests: Array<UmbExtensionManifest> = [...collectionManifests];
+import { manifests } from './manifests.js';
 
 export const name = 'Umbraco.Core.Segment';
 export const extensions = [

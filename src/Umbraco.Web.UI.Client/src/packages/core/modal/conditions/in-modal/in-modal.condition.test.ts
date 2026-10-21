@@ -69,14 +69,13 @@ describe('UmbInModalCondition', () => {
 				},
 			});
 
+			// The context lookup is rejected after a frame, which is when absence is known.
 			await new Promise((resolve) => {
-				requestAnimationFrame(() => {
-					expect(condition.permitted).to.be.false;
-					resolve(true);
-				});
+				requestAnimationFrame(() => requestAnimationFrame(resolve));
 			});
 
-			expect(callbackCount).to.equal(0);
+			expect(condition.permitted).to.be.false;
+			expect(callbackCount).to.equal(1);
 			condition.hostDisconnected();
 		});
 	});
@@ -124,9 +123,8 @@ describe('UmbInModalCondition', () => {
 				},
 				onChange: () => {
 					callbackCount++;
-					// First callback: permitted = true (from constructor, since match is false)
-					// Second callback: permitted = false (when context is found)
-					if (callbackCount === 2) {
+					// Only callback: permitted = false (when context is found)
+					if (callbackCount === 1) {
 						expect(condition.permitted).to.be.false;
 						condition.hostDisconnected();
 						done();

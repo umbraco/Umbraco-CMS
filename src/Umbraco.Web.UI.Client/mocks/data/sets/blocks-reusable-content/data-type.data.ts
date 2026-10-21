@@ -336,6 +336,127 @@ const blockListVariantElementDataType: UmbMockDataTypeModel = {
 	],
 };
 
+const blockListLibraryStatesDataType: UmbMockDataTypeModel = {
+	name: 'Block List - Library States',
+	id: 'b6e1d4c8-5a27-4f93-8c0b-1d7a9e3f2b56',
+	parent: null,
+	editorAlias: 'Umbraco.BlockList',
+	editorUiAlias: 'Umb.PropertyEditorUi.BlockList',
+	hasChildren: false,
+	noAccess: false,
+	isFolder: false,
+	isDeletable: true,
+	canIgnoreStartNodes: false,
+	flags: [],
+	values: [
+		{
+			alias: 'blocks',
+			value: [
+				{
+					contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
+					label: 'Element One: {umbValue:title}',
+					editorSize: 'medium',
+					forceHideContentEditorInOverlay: false,
+				},
+			],
+		},
+		{
+			alias: 'validationLimit',
+			value: {},
+		},
+		{
+			alias: 'useSingleBlockMode',
+			value: false,
+		},
+		{
+			alias: 'useLiveEditing',
+			value: false,
+		},
+		{
+			alias: 'useInlineEditingAsDefault',
+			value: false,
+		},
+	],
+};
+
+const blockGridLibraryStatesDataType: UmbMockDataTypeModel = {
+	name: 'Block Grid - Library States',
+	id: '2f8c5a1e-9d36-4b70-a4e2-7c1b0d6f8a93',
+	parent: null,
+	editorAlias: 'Umbraco.BlockGrid',
+	editorUiAlias: 'Umb.PropertyEditorUi.BlockGrid',
+	hasChildren: false,
+	noAccess: false,
+	isFolder: false,
+	isDeletable: true,
+	canIgnoreStartNodes: false,
+	flags: [],
+	values: [
+		{
+			alias: 'blocks',
+			value: [
+				{
+					columnSpanOptions: [
+						{
+							columnSpan: 6,
+						},
+						{
+							columnSpan: 12,
+						},
+					],
+					rowMinSpan: 1,
+					rowMaxSpan: 1,
+					allowAtRoot: true,
+					allowInAreas: true,
+					areas: [
+						{
+							key: '8a4d2f6b-1e93-4c57-b0a8-3d5e7f9c1b24',
+							alias: 'content',
+							columnSpan: 12,
+							rowSpan: 1,
+							minAllowed: 0,
+							specifiedAllowance: [],
+						},
+					],
+					contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
+					label: 'Element One: {umbValue:title}',
+					editorSize: 'medium',
+					inlineEditing: false,
+					forceHideContentEditorInOverlay: false,
+				},
+				{
+					columnSpanOptions: [
+						{
+							columnSpan: 6,
+						},
+						{
+							columnSpan: 12,
+						},
+					],
+					rowMinSpan: 1,
+					rowMaxSpan: 1,
+					allowAtRoot: true,
+					allowInAreas: false,
+					areas: [],
+					contentElementTypeKey: 'f7f156a0-a3f3-42ec-8b9c-e788157bd84e',
+					label: 'Element Two: {umbContentName:link}',
+					editorSize: 'medium',
+					inlineEditing: false,
+					forceHideContentEditorInOverlay: false,
+				},
+			],
+		},
+		{
+			alias: 'validationLimit',
+			value: {},
+		},
+		{
+			alias: 'useLiveEditing',
+			value: false,
+		},
+	],
+};
+
 export const data: Array<UmbMockDataTypeModel> = [
 	textstringDataType,
 	contentPickerDataType,
@@ -344,4 +465,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 	blockGridDefaultConfigDataType,
 	blockSingleDefaultConfigDataType,
 	blockListVariantElementDataType,
+	blockListLibraryStatesDataType,
+	blockGridLibraryStatesDataType,
 ];

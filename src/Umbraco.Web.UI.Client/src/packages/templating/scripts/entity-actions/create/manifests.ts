@@ -13,11 +13,4 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	},
 	...defaultManifests,
 	...folderManifests,
-	// Deprecated: kept for backwards compatibility. Scheduled for removal in Umbraco 19.
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.Script.CreateOptions',
-		name: 'Script Create Options Modal',
-		element: () => import('./options-modal/script-create-options-modal.element.js'),
-	},
 ];

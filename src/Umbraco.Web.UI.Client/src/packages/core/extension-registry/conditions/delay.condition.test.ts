@@ -19,13 +19,13 @@ describe('UmbDelayCondition', () => {
 		host = await fixture(html`<umb-test-delay-condition-host></umb-test-delay-condition-host>`);
 	});
 
-	it('starts not permitted', () => {
+	it('starts with permitted being undefined', () => {
 		const condition = new UmbDelayCondition(host, {
 			host,
 			config: baseConfig('30'),
 			onChange: () => {},
 		});
-		expect(condition.permitted).to.be.false;
+		expect(condition.permitted).to.be.undefined;
 		condition.destroy();
 	});
 
@@ -41,7 +41,7 @@ describe('UmbDelayCondition', () => {
 
 		// Not yet — well before the timer fires.
 		await aTimeout(5);
-		expect(condition.permitted).to.be.false;
+		expect(condition.permitted).to.be.undefined;
 		expect(transitions).to.eql([]);
 
 		// Wait long enough for the timer (with a generous margin to keep the test stable).
@@ -67,13 +67,13 @@ describe('UmbDelayCondition', () => {
 	});
 
 	it('throws when offset is not a positive number', () => {
-		expect(
-			() => new UmbDelayCondition(host, { host, config: baseConfig('0'), onChange: () => {} }),
-		).to.throw(/Offset must be a positive number/);
+		expect(() => new UmbDelayCondition(host, { host, config: baseConfig('0'), onChange: () => {} })).to.throw(
+			/Offset must be a positive number/,
+		);
 
-		expect(
-			() => new UmbDelayCondition(host, { host, config: baseConfig('-5'), onChange: () => {} }),
-		).to.throw(/Offset must be a positive number/);
+		expect(() => new UmbDelayCondition(host, { host, config: baseConfig('-5'), onChange: () => {} })).to.throw(
+			/Offset must be a positive number/,
+		);
 
 		expect(
 			() => new UmbDelayCondition(host, { host, config: baseConfig('not-a-number'), onChange: () => {} }),

@@ -55,7 +55,7 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 	}
 
 	get #validationErrors() {
-		return this.data?.errors ?? this.data?.details;
+		return this.data?.errors;
 	}
 
 	get #actions() {

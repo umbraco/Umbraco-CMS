@@ -1,7 +1,7 @@
 import { UmbDocumentTypeDetailRepository } from '../../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDatasetContext } from '../../property-dataset-context/document-property-dataset.context.js';
 import type { UmbDocumentDetailRepository } from '../../repository/index.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UmbDocumentSegmentRepository } from '../../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../../types.js';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
@@ -55,7 +55,6 @@ export class UmbDocumentWorkspaceContext
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
-	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#previewController = new UmbPreviewController(this);
 
 	constructor(host: UmbControllerHost) {
@@ -178,18 +177,6 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
-	}
-
-	protected override async _loadSegmentsFor(unique: string): Promise<void> {
-		if (!unique) {
-			this._segments.setValue([]);
-			return;
-		}
-		const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
-			skip: 0,
-			take: 9999,
-		});
-		this._segments.setValue(data?.items ?? []);
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {

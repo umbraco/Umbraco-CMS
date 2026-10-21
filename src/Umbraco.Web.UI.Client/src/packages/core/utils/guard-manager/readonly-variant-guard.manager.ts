@@ -53,7 +53,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	isPermittedForObservableVariants(
-		variantIds: Observable<UmbVariantId[]>,
+		variantIds: Observable<UmbVariantId[] | undefined>,
 	): Observable<{ variantId: UmbVariantId; permitted: boolean }[]> {
 		return mergeObservables([this.rules, variantIds, this._fallback], ([rules, variantIds, fallback]) => {
 			if (!variantIds || variantIds.length === 0) {

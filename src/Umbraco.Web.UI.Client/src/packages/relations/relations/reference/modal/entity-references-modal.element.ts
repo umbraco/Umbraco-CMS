@@ -6,6 +6,12 @@ import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 import '../../global-components/entity-reference-list.element.js';
 
+const HEADLINE_KEYS = {
+	referencedBy: 'references_labelUsedByItems',
+	descendantsWithReferences: 'references_labelDescendantsWithReferences',
+	needingAttention: 'references_labelElementsWithPendingChanges',
+} as const;
+
 @customElement('umb-entity-references-modal')
 export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 	UmbEntityReferencesModalData,
@@ -36,12 +42,9 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 		const source = data.source;
 		const showReferencedBy = !source || source === 'referencedBy';
 		const showDescendants = !source || source === 'descendantsWithReferences';
+		const showNeedingAttention = !source || source === 'needingAttention';
 
-		const headline =
-			data.headline ??
-			(source === 'descendantsWithReferences'
-				? this.localize.term('references_labelDescendantsWithReferences')
-				: this.localize.term('references_labelUsedByItems'));
+		const headline = data.headline ?? this.localize.term(HEADLINE_KEYS[source ?? 'referencedBy']);
 
 		return html`
 			<uui-dialog-layout headline=${headline}>
@@ -77,6 +80,19 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 								source="descendantsWithReferences"
 								@change=${this.#onDescendantsChange}>
 							</umb-entity-reference-list>
+						</div>
+					`,
+				)}
+				${when(
+					showNeedingAttention && data.entitiesNeedingAttention?.length,
+					() => html`
+						<div>
+							<p>
+								<umb-localize key="references_labelElementsWithPendingChanges"
+									>The following referenced elements are not fully published:</umb-localize
+								>
+							</p>
+							<umb-entity-reference-list .items=${data.entitiesNeedingAttention}></umb-entity-reference-list>
 						</div>
 					`,
 				)}

@@ -39,7 +39,15 @@ export class UmbElementOrElementFolderUserPermissionCondition
 	}
 
 	#evaluate() {
-		this.permitted = (this.#elementCondition?.permitted ?? false) || (this.#folderCondition?.permitted ?? false);
+		const results = [this.#elementCondition, this.#folderCondition]
+			.filter((condition) => condition !== undefined)
+			.map((condition) => condition.permitted);
+
+		if (results.includes(true)) {
+			this.permitted = true;
+		} else if (!results.includes(undefined)) {
+			this.permitted = false;
+		}
 	}
 }
 
