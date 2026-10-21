@@ -81,7 +81,5 @@ public interface IEntityTypeContainerService<TTreeEntity>
     /// <param name="parentKey">The key of the parent container to move to, or null to move to the tree root.</param>
     /// <param name="userKey">Key of the user issuing the move.</param>
     /// <returns>An <see cref="Attempt{TStatus}"/> describing the outcome of the operation.</returns>
-    // TODO (V19): Remove the default implementation and make this a required interface member.
-    Task<Attempt<EntityContainerOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
-        => throw new NotImplementedException();
+    Task<Attempt<EntityContainerOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey);
 }

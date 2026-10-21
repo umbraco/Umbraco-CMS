@@ -207,6 +207,7 @@ public partial class PropertyEditorSchemaServiceTests
         public IDataValueEditor GetValueEditor() => null!;
         public IDataValueEditor GetValueEditor(object? configuration) => null!;
         public IConfigurationEditor GetConfigurationEditor() => null!;
+        public bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue) => Equals(editedValue, publishedValue);
 
         public Type? GetValueType(object? configuration) => typeof(string);
 
@@ -229,5 +230,6 @@ public partial class PropertyEditorSchemaServiceTests
         public IDataValueEditor GetValueEditor() => null!;
         public IDataValueEditor GetValueEditor(object? configuration) => null!;
         public IConfigurationEditor GetConfigurationEditor() => null!;
+        public bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue) => Equals(editedValue, publishedValue);
     }
 }
