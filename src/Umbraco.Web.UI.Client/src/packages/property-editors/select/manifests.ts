@@ -6,7 +6,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Select Property Editor UI',
 	element: () => import('./property-editor-ui-select.element.js'),
 	meta: {
-		supportsVariantChange: true,
 		label: 'Select',
 		icon: 'icon-list',
 		group: '#propertyEditorUIGroups_pickers',

@@ -13,7 +13,7 @@ import type { UmbTreeRepository } from '../data/index.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
@@ -140,21 +140,6 @@ export class UmbDefaultTreeContext<
 		this.#observeRepository(this.#manifest?.meta.repositoryAlias);
 	}
 	public get manifest() {
-		return this.#manifest;
-	}
-
-	/**
-	 * Returns the manifest.
-	 * @returns {ManifestTree} The tree manifest
-	 * @memberof UmbDefaultTreeContext
-	 * @deprecated Use the `.manifest` property instead.
-	 */
-	public getManifest() {
-		new UmbDeprecation({
-			removeInVersion: '18.0.0',
-			deprecated: 'getManifest',
-			solution: 'Use .manifest property instead',
-		}).warn();
 		return this.#manifest;
 	}
 

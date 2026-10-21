@@ -9,7 +9,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Document Picker Property Editor UI',
 		element: () => import('./property-editor-ui-document-picker.element.js'),
 		meta: {
-			supportsVariantChange: true,
 			label: 'Single Document Picker',
 			propertyEditorSchemaAlias: 'Umbraco.ContentPicker',
 			icon: 'icon-document',
