@@ -1555,6 +1555,8 @@ declare global {
 		main_sections: string;
 		main_tree: string;
 		media_browseFilesAction: string;
+		media_chooseMediaTypeHeadline: string;
+		media_chooseMediaTypeMoreFiles: (count: number) => string;
 		media_clickToUpload: string;
 		media_createFolderFailed: string;
 		media_disallowedFileExtension: (extension: string) => string;
@@ -2683,6 +2685,7 @@ declare global {
 		validation_invalidToken: string;
 		validation_invalidUserGroupName: string;
 		validation_invalidUsername: string;
+		validation_invalidValue: string;
 		validation_items: string;
 		validation_itemsSelected: string;
 		validation_legacyOption: string;
@@ -2691,6 +2694,7 @@ declare global {
 		validation_mandatoryMessageLabel: string;
 		validation_maxCount: string;
 		validation_minCount: string;
+		validation_minimumOnlyWhenInUse: string;
 		validation_minimumRange: string;
 		validation_numberMaximum: string;
 		validation_numberMinimum: string;
