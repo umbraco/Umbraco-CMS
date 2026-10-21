@@ -41,7 +41,7 @@ test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
-  await umbracoUi.dataType.enterMinimumValue(minimumValue.toString());
+  await umbracoUi.dataType.enterMinAmount(minimumValue.toString());
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
@@ -55,7 +55,7 @@ test('can update maximum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
-  await umbracoUi.dataType.enterMaximumValue(maximumValue.toString());
+  await umbracoUi.dataType.enterMaxAmount(maximumValue.toString());
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert

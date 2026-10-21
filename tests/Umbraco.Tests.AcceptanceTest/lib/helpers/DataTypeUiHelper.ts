@@ -191,10 +191,9 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.createCropBtn = this.propertyCrops.getByRole('button', {name: 'Create'});
     this.editCropBtn = this.propertyCrops.locator('.crop-form uui-button[type="submit"]');
 
-    // Range control - the single min/max control shared by Numeric, Decimal, Slider,
-    // Multiple Text String and Multi URL Picker. Defined once so the label lookup lives in one place.
-    this.rangeLowValueTxt = page.getByLabel('Low value');
-    this.rangeHighValueTxt = page.getByLabel('High value');
+    // Range control - the validationRange min/max control shared by Numeric, Decimal and Slider
+    this.rangeLowValueTxt = page.getByTestId('property:validationRange').getByLabel('Low value');
+    this.rangeHighValueTxt = page.getByTestId('property:validationRange').getByLabel('High value');
 
     // Numeric
     this.stepSizeTxt = page.getByTestId('property:step').locator('#input');
@@ -646,11 +645,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   // Multi URL Picker
   async enterMinimumNumberOfItemsValue(value: string) {
-    await this.enterText(this.rangeLowValueTxt, value);
+    await this.enterText(this.minAmountTxt, value);
   }
 
   async enterMaximumNumberOfItemsValue(value: string) {
-    await this.enterText(this.rangeHighValueTxt, value);
+    await this.enterText(this.maxAmountTxt, value);
   }
 
   async clickIgnoreUserStartNodesToggle() {
