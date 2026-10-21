@@ -25,6 +25,11 @@ export interface UmbBlockDataType {
 	[key: string]: unknown;
 }
 
+/**
+ * Why the external (library element) content of a Block is unavailable: it no longer exists, or the current user may not access it.
+ */
+export type UmbBlockExternalContentFailureReason = 'deleted' | 'noAccess';
+
 export interface UmbBlockExposeModel {
 	contentKey: string;
 	culture: string | null;

@@ -1,6 +1,6 @@
 import { UMB_BLOCK_SINGLE_ENTRY_CONTEXT } from '../../context/index.js';
 import { UMB_BLOCK_WORKSPACE_ALIAS, UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
-import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
@@ -13,6 +13,7 @@ import type {
 	UMB_BLOCK_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
 
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
@@ -33,13 +34,6 @@ export class UmbInlineSingleBlockElement extends UmbBlockRefNameSlotMixin(UmbLit
 
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
-
-	/**
-	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
-	 * reflects the library element's own publish state rather than the local expose entry.
-	 */
-	@property({ type: Boolean, attribute: false })
-	isExternalContent?: boolean;
 
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
@@ -173,7 +167,7 @@ export class UmbInlineSingleBlockElement extends UmbBlockRefNameSlotMixin(UmbLit
 				</span>
 				<div id="info">${this.renderNameSlot(blockValue)}</div>
 			</span>
-			${when(this.unpublished, () => this.#renderDraftTag())}
+			<umb-block-state-tag slot="name"></umb-block-state-tag>
 		`;
 	}
 
@@ -196,17 +190,6 @@ export class UmbInlineSingleBlockElement extends UmbBlockRefNameSlotMixin(UmbLit
 				</umb-block-workspace-view-edit-content-no-router>
 			`;
 		}
-	}
-
-	#renderDraftTag() {
-		const titleKey = this.isExternalContent
-			? 'blockEditor_notPublishedLibraryElementDescription'
-			: 'blockEditor_notExposedDescription';
-		return html`
-			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
-				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-			</uui-tag>
-		`;
 	}
 
 	static override readonly styles = [
@@ -314,13 +297,6 @@ export class UmbInlineSingleBlockElement extends UmbBlockRefNameSlotMixin(UmbLit
 			#name,
 			::slotted([slot='name']) {
 				font-weight: 700;
-			}
-
-			uui-tag {
-				margin-left: 0.5em;
-				margin-bottom: -0.3em;
-				margin-top: -0.3em;
-				vertical-align: text-top;
 			}
 
 			:host(:not([disabled])) #open-part:hover #icon {

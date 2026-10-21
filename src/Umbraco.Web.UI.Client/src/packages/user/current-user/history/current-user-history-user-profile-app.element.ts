@@ -85,9 +85,8 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbCurrentUserHistoryItem) {
-		const label = Array.isArray(item.label) ? item.label[0] : item.label;
 		return html`
-			<uui-ref-node name=${label} detail=${this.#truncate(item.displayPath, 50)} href=${item.path}>
+			<uui-ref-node name=${item.label} detail=${this.#truncate(item.displayPath, 50)} href=${item.path}>
 				<uui-icon slot="icon" name="icon-link"></uui-icon>
 			</uui-ref-node>
 		`;

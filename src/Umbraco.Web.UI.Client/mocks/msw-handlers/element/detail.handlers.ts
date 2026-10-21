@@ -2,6 +2,7 @@ const { http, HttpResponse } = window.MockServiceWorker;
 import { umbMockManager } from '../../mock-manager.js';
 import { umbElementMockDb } from '../../db/element.db.js';
 import { UMB_SLUG } from './slug.js';
+import { createProblemDetails } from '../../utils.js';
 import type {
 	CreateAndPublishElementRequestModel,
 	CreateElementRequestModel,
@@ -90,7 +91,8 @@ export const detailHandlers = [
 
 	http.get(umbracoPath(`${UMB_SLUG}/batch`), ({ request }) => {
 		const ids = new URL(request.url).searchParams.getAll('id');
-		const response = umbElementMockDb.detail.readBatch(ids);
+		const accessibleIds = ids.filter((id) => !umbElementMockDb.read(id)?.noAccess);
+		const response = umbElementMockDb.detail.readBatch(accessibleIds);
 		return HttpResponse.json(response);
 	}),
 
@@ -100,6 +102,19 @@ export const detailHandlers = [
 		if (id === 'forbidden') {
 			return new HttpResponse(null, { status: 403 });
 		}
+		const element = umbElementMockDb.read(id);
+		if (!element) {
+			return HttpResponse.json(
+				createProblemDetails({
+					title: 'The content could not be found',
+					type: 'Error',
+					status: 404,
+					operationStatus: 'NotFound',
+				}),
+				{ status: 404 },
+			);
+		}
+		if (element.noAccess) return new HttpResponse(null, { status: 403 });
 		const response = umbElementMockDb.detail.read(id);
 		return HttpResponse.json(response);
 	}),

@@ -75,6 +75,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
             UmbracoObjectTypes.Document => Constants.Search.IndexAliases.DraftContent,
             UmbracoObjectTypes.Media => Constants.Search.IndexAliases.DraftMedia,
             UmbracoObjectTypes.Member => Constants.Search.IndexAliases.DraftMembers,
+            UmbracoObjectTypes.Element => Constants.Search.IndexAliases.DraftElements,
             _ => throw new ArgumentOutOfRangeException(nameof(objectType), objectType, null)
         };
 
@@ -104,6 +105,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
             {
                 UmbracoObjectTypes.Document => Cms.Core.Constants.System.RecycleBinContentKey,
                 UmbracoObjectTypes.Media => Cms.Core.Constants.System.RecycleBinMediaKey,
+                UmbracoObjectTypes.Element => Cms.Core.Constants.System.RecycleBinElementKey,
                 _ => null
             };
 
@@ -155,13 +157,19 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
         {
             UmbracoObjectTypes.Document => currentUser?.CalculateContentStartNodeIds(_entityService, _appCaches),
             UmbracoObjectTypes.Media => currentUser?.CalculateMediaStartNodeIds(_entityService, _appCaches),
+            UmbracoObjectTypes.Element => currentUser?.CalculateElementStartNodeIds(_entityService, _appCaches),
             _ => null
         };
+
+        // element start nodes are element containers
+        UmbracoObjectTypes startNodeObjectType = objectType is UmbracoObjectTypes.Element
+            ? UmbracoObjectTypes.ElementContainer
+            : objectType;
 
         return startNodeIds is not null
             ? startNodeIds.Select(id =>
                 {
-                    Attempt<Guid> attempt = _idKeyMap.GetKeyForId(id, objectType);
+                    Attempt<Guid> attempt = _idKeyMap.GetKeyForId(id, startNodeObjectType);
                     return attempt.Success ? attempt.Result : (Guid?)null;
                 })
                 .Where(key => key.HasValue)

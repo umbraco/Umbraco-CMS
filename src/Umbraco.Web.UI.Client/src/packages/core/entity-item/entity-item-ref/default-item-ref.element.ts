@@ -1,13 +1,14 @@
 import type { UmbItemModel } from '../types.js';
 import { getItemFallbackIcon, getItemFallbackName } from '../utils.js';
-import { css, customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbEntityItemRefFrameMixin } from './entity-item-ref-frame.mixin.js';
+import { customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWithOptionalDescriptionModel } from '@umbraco-cms/backoffice/models';
 
 type UmbDefaultItemRefItemModel = UmbItemModel & UmbWithOptionalDescriptionModel;
 
 @customElement('umb-default-item-ref')
-export class UmbDefaultItemRefElement extends UmbLitElement {
+export class UmbDefaultItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElement) {
 	@property({ type: Object })
 	item?: UmbDefaultItemRefItemModel;
 
@@ -32,7 +33,7 @@ export class UmbDefaultItemRefElement extends UmbLitElement {
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
 			</uui-ref-node>
-			<umb-entity-frame><uui-icon name="link"></uui-icon> ${name}</umb-entity-frame>
+			${this.renderEntityFrame(name)}
 		`;
 	}
 
@@ -40,24 +41,6 @@ export class UmbDefaultItemRefElement extends UmbLitElement {
 		const icon = item.icon || getItemFallbackIcon();
 		return html`<umb-icon slot="icon" name=${icon}></umb-icon>`;
 	}
-
-	static override readonly styles = [
-		css`
-			:host {
-				--umb-entity-frame-opacity: 0;
-				--umb-entity-frame-color: var(--umb-color-reference);
-				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
-
-				display: block;
-				position: relative;
-			}
-
-			:host(:hover),
-			:host(:focus-within) {
-				--umb-entity-frame-opacity: 1;
-			}
-		`,
-	];
 }
 
 declare global {

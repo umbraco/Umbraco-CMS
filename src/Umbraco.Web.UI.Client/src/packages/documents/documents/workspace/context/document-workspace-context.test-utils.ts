@@ -5,6 +5,7 @@ import { UmbDataTypeDetailStore } from '../../../../data-type/repository/detail/
 import { UmbDataTypeItemStore } from '../../../../data-type/repository/item/data-type-item.store.js';
 import { manifests as userPermissionConditionManifests } from '../../user-permissions/document/conditions/manifests.js';
 import { manifests as dataTypeItemManifests } from '../../../../data-type/repository/item/manifests.js';
+import { manifests as documentReferenceRepositoryManifests } from '../../reference/repository/manifests.js';
 import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
 import type { UmbModalContextClassArgs, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
@@ -22,6 +23,7 @@ export const TEST_MANIFESTS = [
 	...documentDetailRepositoryManifests,
 	...userPermissionConditionManifests,
 	...dataTypeItemManifests,
+	...documentReferenceRepositoryManifests,
 ];
 
 // Immediately submits every modal with its initial value so requestSave() works without UI infrastructure.

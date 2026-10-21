@@ -9,6 +9,11 @@ export interface UmbEntityReferenceCountManagerArgs {
 	 * Alias of the reference repository used to look up the count.
 	 */
 	referenceRepositoryAlias: string;
+	/**
+	 * When `false`, `setUnique` only resets the cached total rather than loading it — the first
+	 * `getTotalAsync()` call after that loads it on demand. Defaults to `true`.
+	 */
+	prefetch?: boolean;
 }
 
 /**
@@ -25,6 +30,7 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	public readonly total = this.#total.asObservable();
 
 	readonly #referenceRepositoryAlias: string;
+	readonly #prefetch: boolean;
 	#unique?: string;
 	#reloadToken = 0;
 	#repository?: UmbEntityReferenceRepository;
@@ -34,6 +40,7 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	constructor(host: UmbControllerHost, args: UmbEntityReferenceCountManagerArgs) {
 		super(host);
 		this.#referenceRepositoryAlias = args.referenceRepositoryAlias;
+		this.#prefetch = args.prefetch ?? true;
 	}
 
 	/**
@@ -60,14 +67,45 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	}
 
 	/**
-	 * Set the entity to count references for, and (re)load the count. A no-op if the unique is unchanged.
+	 * Set the entity to count references for. A no-op if the unique is unchanged. When `prefetch` is enabled
+	 * (the default), also (re)loads the count immediately; otherwise the count is loaded lazily, on the first
+	 * {@link getTotalAsync} call.
 	 * @param {string | undefined} unique - The unique identifier of the entity, or `undefined` to clear.
 	 * @returns {Promise<void>}
 	 */
 	async setUnique(unique: string | undefined): Promise<void> {
 		if (this.#unique === unique) return;
 		this.#unique = unique;
+
+		if (!this.#prefetch) {
+			this.#invalidate();
+			return;
+		}
+
 		await this.reload();
+	}
+
+	/**
+	 * Drops the cached count (if any) without changing the current unique, so the next {@link getTotalAsync} call
+	 * re-reads it from the server. Cheaper than {@link reload} for lazy (`prefetch: false`) consumers that don't
+	 * need the fresh value immediately — e.g. right after a publish/unpublish/schedule action.
+	 * @returns {void}
+	 */
+	clear(): void {
+		this.#invalidate();
+	}
+
+	/**
+	 * Invalidate any reload already in flight and drop the cached total, without touching {@link #unique}.
+	 * Shared by {@link clear} and the lazy branch of {@link setUnique} so the two can't drift apart — leaving
+	 * `#pendingReload` set here would let a subsequent {@link getTotalAsync} call ride along on a reload for a
+	 * unique this manager no longer cares about, and read its (irrelevant) result as the answer.
+	 * @returns {void}
+	 */
+	#invalidate(): void {
+		++this.#reloadToken;
+		this.#pendingReload = undefined;
+		this.#total.setValue(undefined);
 	}
 
 	/**
@@ -93,13 +131,20 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 			return;
 		}
 
-		const repository = await this.#getRepository();
-		const { data } = await repository.requestReferencedBy(unique, 0, 1);
+		const total = await this.#requestTotal(unique);
 
 		// A newer reload (e.g. the unique changed again) has since started — its result should win, not ours.
 		if (token !== this.#reloadToken) return;
 
-		this.#total.setValue(data?.total ?? 0);
+		this.#total.setValue(total);
+	}
+
+	async #requestTotal(unique: string): Promise<number> {
+		const repository = await this.#getRepository();
+
+		const { data, error } = await repository.requestReferencedBy(unique, 0, 1);
+		if (error) throw error;
+		return data?.total ?? 0;
 	}
 
 	async #getRepository(): Promise<UmbEntityReferenceRepository> {

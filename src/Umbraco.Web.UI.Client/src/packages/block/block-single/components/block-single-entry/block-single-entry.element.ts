@@ -152,6 +152,9 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	@state()
 	private _isReadOnly = false;
 
+	@state()
+	private _externalContentName?: string;
+
 	constructor() {
 		super();
 		this.#init();
@@ -184,8 +187,8 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.observe(
 			this.#context.label,
 			(label) => {
-				this.#updateBlockViewProps({ label });
 				this._label = label;
+				this.#updateBlockLabel();
 			},
 			null,
 		);
@@ -212,6 +215,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			},
 			null,
 		);
+		this.#observeExternalContentName();
 		this.observe(
 			this.#context.unsupported,
 			(unsupported) => {
@@ -306,6 +310,25 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.requestUpdate('_blockViewProps');
 	}
 
+	#updateBlockLabel() {
+		this.#updateBlockViewProps({ label: this._externalContentName ?? this._label });
+	}
+
+	#observeExternalContentName() {
+		this.observe(
+			this.#context.externalContentName,
+			(name) => {
+				this._externalContentName = name;
+				// The Element's name is its identity, so it takes over as the block's name/label instead of the block type's UFM label template.
+				if (name) {
+					this.#context.setName(name);
+				}
+				this.#updateBlockLabel();
+			},
+			null,
+		);
+	}
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
@@ -342,6 +365,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	};
 
 	readonly #onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		if (this._externalContentName) return;
 		this.#context.setName(event.detail.text);
 	};
 
@@ -353,10 +377,14 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	#renderUfm() {
+		if (this._externalContentName) {
+			return html`<span slot="name">${this._externalContentName}</span>`;
+		}
 		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved, 'name');
 	}
 
 	#renderHiddenUfm() {
+		if (this._externalContentName) return nothing;
 		return renderHiddenUfm(this._label, this.#blockValue, this.#onUfmResolved);
 	}
 
@@ -402,7 +430,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			<umb-ref-single-block
 				.icon=${this._icon}
 				.unpublished=${!this._exposed}
-				.isExternalContent=${this._isExternalContent}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
@@ -417,7 +444,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			<umb-inline-single-block
 				.icon=${this._icon}
 				.unpublished=${!this._exposed}
-				.isExternalContent=${this._isExternalContent}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}

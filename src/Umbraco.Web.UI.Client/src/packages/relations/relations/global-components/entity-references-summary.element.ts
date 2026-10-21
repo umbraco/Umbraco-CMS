@@ -8,13 +8,16 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 /**
  * Renders one action button per kind of reference to the entity in `config`: one for the items referencing it,
- * another for its descendants that are referenced elsewhere. Each button opens a paged overview of only that
- * kind of reference. Renders nothing when there are no references. Dispatches a `UmbChangeEvent` once both
- * totals have loaded (reporting no references if the lookup fails), reloads when `config` changes, and exposes `getTotalReferencedBy()` / `getTotalDescendantsWithReferences()`, so a host
- * can gate an action on the result — for example, a publish or unpublish confirmation dialog.
+ * another for its descendants that are referenced elsewhere, and, when `entitiesNeedingAttention` is set,
+ * a third for the entities it directly references that need attention. Each button opens a paged overview of only
+ * that kind of reference. Renders nothing when there is nothing to report. Dispatches a `UmbChangeEvent` once both
+ * totals have loaded (reporting no references if the lookup fails), reloads when `config` changes, and exposes
+ * `getTotalReferencedBy()` / `getTotalDescendantsWithReferences()`, so a host can gate an action on the result — for
+ * example, a publish or unpublish confirmation dialog.
  * @element umb-entity-references-summary
  */
 @customElement('umb-entity-references-summary')
@@ -27,6 +30,14 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 
 	@state()
 	private _totalDescendantsWithReferences = 0;
+
+	/**
+	 * Entities this entity's current draft directly references that need attention before publishing (e.g. an
+	 * element that isn't fully published). When set, shows a third, independent action button for them.
+	 * Undefined by default so consumers of this component (e.g. the unpublish modal) don't pick it up unasked.
+	 */
+	@property({ type: Array, attribute: false })
+	entitiesNeedingAttention?: Array<UmbEntityModel>;
 
 	#referenceRepository?: UmbEntityReferenceRepository;
 	#referenceRepositoryAlias?: string;
@@ -47,6 +58,15 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 	 */
 	getTotalDescendantsWithReferences() {
 		return this._totalDescendantsWithReferences;
+	}
+
+	/**
+	 * The number of entities this entity directly references that need attention before publishing, or `0` when
+	 * {@link entitiesNeedingAttention} is not set.
+	 * @returns {number} The entities-needing-attention count.
+	 */
+	getTotalEntitiesNeedingAttention() {
+		return this.entitiesNeedingAttention?.length ?? 0;
 	}
 
 	protected override updated(changedProperties: PropertyValues): void {
@@ -117,9 +137,25 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 		}).catch(() => undefined);
 	}
 
+	#onClickViewEntitiesNeedingAttention(event: Event) {
+		event.preventDefault();
+		if (!this.config) return;
+
+		umbOpenModal(this, UMB_ENTITY_REFERENCES_MODAL, {
+			data: {
+				unique: this.config.unique,
+				referenceRepositoryAlias: this.config.referenceRepositoryAlias,
+				itemRepositoryAlias: this.config.itemRepositoryAlias,
+				source: 'needingAttention',
+				entitiesNeedingAttention: this.entitiesNeedingAttention,
+			},
+		}).catch(() => undefined);
+	}
+
 	override render() {
 		const total = this._totalReferencedByItems + this._totalDescendantsWithReferences;
-		if (total === 0) return nothing;
+		const totalNeedingAttention = this.getTotalEntitiesNeedingAttention();
+		if (total === 0 && totalNeedingAttention === 0) return nothing;
 
 		return html`
 			<p class="reference-summary">
@@ -143,6 +179,19 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 							@click=${(event: Event) => this.#onClickView('descendantsWithReferences', event)}>
 							<umb-localize key="references_viewDescendantsWithReferencesAction"
 								>View referenced descendants…</umb-localize
+							>
+						</uui-button>
+					`,
+				)}
+				${when(
+					totalNeedingAttention > 0,
+					() => html`
+						<uui-button
+							label=${this.localize.term('references_viewEntitiesNeedingAttentionAction')}
+							look="outline"
+							@click=${this.#onClickViewEntitiesNeedingAttention}>
+							<umb-localize key="references_viewEntitiesNeedingAttentionAction"
+								>View referenced elements with pending changes…</umb-localize
 							>
 						</uui-button>
 					`,
