@@ -17,6 +17,11 @@ export class UmbIsRoutableContextCondition
 		this.consumeContext(UMB_ROUTE_CONTEXT, (context) => {
 			// Route context found, so we ARE in a routable context, if that matches the expected match value, then we are permitted.
 			this.permitted = !!context === matchValue;
-		});
+		})
+			.asPromise()
+			.catch(() => {
+				// The context could not be found, so it is absent: permitted if that matches the expected match value.
+				this.permitted = !matchValue;
+			});
 	}
 }
