@@ -86,7 +86,7 @@ test('cannot update the minimum greater than the maximum', async ({umbracoApi, u
 
   // Assert
   await umbracoUi.dataType.isFailedStateButtonVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible();
+  await umbracoUi.dataType.doesAmountContainErrorMessageWithText('The low value must not exceed the high value.');
 });
 
 test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
