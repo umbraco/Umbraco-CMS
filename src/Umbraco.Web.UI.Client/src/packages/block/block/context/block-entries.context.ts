@@ -2,9 +2,16 @@ import type { UmbBlockWorkspaceOriginData } from '../workspace/block-workspace.m
 import type { UmbBlockDataModel, UmbBlockLayoutBaseModel, UmbBlockValueType } from '../types.js';
 import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
-import { type Observable, UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbArrayState,
+	UmbBasicState,
+	UmbBooleanState,
+	UmbStringState,
+	observeMultiple,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbElementTypeStructureRepository } from '@umbraco-cms/backoffice/element';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
@@ -38,6 +45,9 @@ export abstract class UmbBlockEntriesContext<
 	#libraryAllowedElementTypeKeys = new UmbArrayState<string>([], (x) => x);
 	readonly libraryAllowedElementTypeKeys = this.#libraryAllowedElementTypeKeys.asObservable();
 	#libraryAllowedElementTypeKeysPromise: Promise<Array<string>>;
+
+	#hasLibraryElements = new UmbBooleanState(false);
+	readonly hasLibraryElements = this.#hasLibraryElements.asObservable();
 
 	getLength() {
 		return this._layoutEntries.getValue().length;
@@ -117,6 +127,31 @@ export abstract class UmbBlockEntriesContext<
 		const allowedKeys = await this.#libraryAllowedElementTypeKeysPromise;
 		const blockTypeKeys = new Set(blockTypes.map((bt) => bt.contentElementTypeKey));
 		return allowedKeys.filter((key) => blockTypeKeys.has(key));
+	}
+
+	/**
+	 * Keeps `hasLibraryElements` in sync with whether any of the given block types
+	 * is also allowed at the library root — the same rule the block catalogue modal
+	 * uses to offer the Library tab.
+	 * @param {Observable<Array<BlockType>>} blockTypes The block types the editor offers.
+	 */
+	protected _observeLibraryBlockTypes(blockTypes: Observable<Array<BlockType>>) {
+		this.observe(
+			observeMultiple([blockTypes, this.libraryAllowedElementTypeKeys]),
+			([types, libraryKeys]) => {
+				this.#hasLibraryElements.setValue(types.some((x) => libraryKeys.includes(x.contentElementTypeKey)));
+			},
+			'observeHasLibraryElements',
+		);
+	}
+
+	/**
+	 * Inserts an existing Library element as an external-content reference.
+	 * @param {string} elementKey The key of the element to reference.
+	 * @param {UmbBlockWorkspaceOriginData} [originData] Where the block was requested from, used to position it.
+	 */
+	protected _insertExternalContent(elementKey: string, originData?: UmbBlockWorkspaceOriginData) {
+		this._manager?.insertExternalContent(elementKey, originData as BlockOriginData | undefined);
 	}
 
 	public abstract create(
