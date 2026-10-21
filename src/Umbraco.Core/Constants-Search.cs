@@ -7,6 +7,8 @@ public static partial class Constants
     /// </summary>
     public static class Search
     {
+        private const string FieldPrefix = "Umb_";
+
         /// <summary>
         ///     Contains constants for Umbraco Search index aliases.
         /// </summary>
@@ -100,8 +102,6 @@ public static partial class Constants
             /// The field name for accumulated tags.
             /// </summary>
             public const string Tags = $"{FieldPrefix}Tags";
-
-            private const string FieldPrefix = "Umb_";
         }
 
         /// <summary>
@@ -136,8 +136,6 @@ public static partial class Constants
             /// The field name indicating whether the member is an external member rather than a content-based member.
             /// </summary>
             public const string IsExternalMember = $"{FieldPrefix}IsExternalMember";
-
-            private const string FieldPrefix = "Umb_";
         }
     }
 }
