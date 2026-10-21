@@ -1887,6 +1887,7 @@ declare global {
 		references_labelDependentDescendants: string;
 		references_labelDependsOnThis: string;
 		references_labelDescendantsWithReferences: string;
+		references_labelElementsWithPendingChanges: string;
 		references_labelMoreReferences: (count: number) => string;
 		references_labelUsedByDocuments: string;
 		references_labelUsedByDocumentTypes: string;
@@ -1904,6 +1905,7 @@ declare global {
 		references_usedByProperties: string;
 		references_viewDependentItemsAction: string;
 		references_viewDescendantsWithReferencesAction: string;
+		references_viewEntitiesNeedingAttentionAction: string;
 		relatedlinks_caption: string;
 		relatedlinks_captionPlaceholder: string;
 		relatedlinks_chooseInternal: string;

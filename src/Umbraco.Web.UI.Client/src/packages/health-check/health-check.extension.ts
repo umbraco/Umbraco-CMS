@@ -22,14 +22,6 @@ export interface UmbHealthCheck {
 	description: string;
 }
 
-/**
- * @deprecated Use `UmbHealthCheck` instead. This will be removed in Umbraco 18.
- */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/naming-convention
-export interface HealthCheck extends UmbHealthCheck {
-	// Left empty
-}
-
 declare global {
 	interface UmbExtensionManifestMap {
 		umbHealthCheck: ManifestHealthCheck;

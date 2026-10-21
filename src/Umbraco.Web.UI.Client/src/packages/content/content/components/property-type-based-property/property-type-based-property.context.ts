@@ -16,9 +16,3 @@ export class UmbPropertyTypeBasedPropertyContext extends UmbContextBase {
 		this.#dataType.setValue(dataType);
 	}
 }
-
-/**
- * @deprecated Use `UmbPropertyTypeBasedPropertyContext` instead.
- * This will be removed in v.18
- */
-export { UmbPropertyTypeBasedPropertyContext as UmbContentPropertyContext };

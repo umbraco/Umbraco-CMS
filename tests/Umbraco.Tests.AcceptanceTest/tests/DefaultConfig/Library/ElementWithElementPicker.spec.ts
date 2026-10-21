@@ -73,6 +73,7 @@ test('can publish element with an element picker selected', async ({umbracoApi, 
   // Create element picker type and element picker
   const elementPickerTypeId = await umbracoApi.documentType.createEmptyElementType(elementPickerTypeName, true);
   const elementPickerId = await umbracoApi.element.createDefaultElement(elementPickerName, elementPickerTypeId);
+  await umbracoApi.element.publish(elementPickerId);
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -97,6 +98,8 @@ test('can select multiple elements in the element picker', async ({umbracoApi, u
   const elementPickerTypeId = await umbracoApi.documentType.createEmptyElementType(elementPickerTypeName, true);
   const firstElementPickerId = await umbracoApi.element.createDefaultElement(elementPickerName, elementPickerTypeId);
   const secondElementPickerId = await umbracoApi.element.createDefaultElement(secondElementPickerName, elementPickerTypeId);
+  await umbracoApi.element.publish(firstElementPickerId);
+  await umbracoApi.element.publish(secondElementPickerId);
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -123,6 +126,7 @@ test('can not publish a mandatory element picker with an empty value', async ({u
   // Create element picker type and element picker
   const elementPickerTypeId = await umbracoApi.documentType.createEmptyElementType(elementPickerTypeName, true);
   const elementPickerId = await umbracoApi.element.createDefaultElement(elementPickerName, elementPickerTypeId);
+  await umbracoApi.element.publish(elementPickerId);
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -150,7 +154,8 @@ test('can validate minimum amount in element picker', async ({umbracoApi, umbrac
   await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   // Create element picker type and element picker
   const elementPickerTypeId = await umbracoApi.documentType.createEmptyElementType(elementPickerTypeName, true);
-  await umbracoApi.element.createDefaultElement(elementPickerName, elementPickerTypeId);
+  const elementPickerId = await umbracoApi.element.createDefaultElement(elementPickerName, elementPickerTypeId);
+  await umbracoApi.element.publish(elementPickerId);
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
