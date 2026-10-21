@@ -2,12 +2,14 @@ import type {
 	UmbDropzoneMediaTypePickerModalData,
 	UmbDropzoneMediaTypePickerModalValue,
 } from './dropzone-media-type-picker-modal.token.js';
-import { css, customElement, html, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+
+const VISIBLE_FILE_NAMES = 3;
 
 @customElement('umb-dropzone-media-type-picker-modal')
 export class UmbDropzoneMediaTypePickerModalElement extends UmbModalBaseElement<
@@ -40,34 +42,62 @@ export class UmbDropzoneMediaTypePickerModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html` <div id="options">
-			<uui-button id="auto" look="secondary" @click=${() => this.#onAutoPick()} label="Automatically" compact>
-				<umb-icon name="icon-wand"></umb-icon> Auto pick
-			</uui-button>
-			${repeat(
-				this._options,
-				(option) => option.unique,
-				(option) =>
-					html`<uui-button
-						look="secondary"
-						@click=${() => this.#onMediaTypePick(option.unique)}
-						label=${option.name}
-						compact>
-						<umb-icon .name=${option.icon ?? 'icon-circle-dotted'}></umb-icon>${option.name}
-					</uui-button>`,
-			)}
-		</div>`;
+		return html`<uui-dialog-layout headline=${this.localize.term('media_chooseMediaTypeHeadline')}>
+			${this.#renderFiles()}
+			<div id="options">
+				<uui-button
+					id="auto"
+					look="secondary"
+					@click=${() => this.#onAutoPick()}
+					label=${this.localize.term('mediaType_autoPickMediaType')}
+					compact>
+					<umb-icon name="icon-wand"></umb-icon>${this.localize.term('mediaType_autoPickMediaType')}
+				</uui-button>
+				${repeat(
+					this._options,
+					(option) => option.unique,
+					(option) =>
+						html`<uui-button
+							look="secondary"
+							@click=${() => this.#onMediaTypePick(option.unique)}
+							label=${option.name}
+							compact>
+							<umb-icon .name=${option.icon ?? 'icon-circle-dotted'}></umb-icon>${option.name}
+						</uui-button>`,
+				)}
+			</div>
+			<uui-button
+				id="cancel"
+				slot="actions"
+				label=${this.localize.term('general_cancel')}
+				@click=${() => this._rejectModal()}></uui-button>
+		</uui-dialog-layout>`;
+	}
+
+	#renderFiles() {
+		const files = this.data?.files ?? [];
+		if (!files.length) return nothing;
+
+		const names = files.slice(0, VISIBLE_FILE_NAMES).map((file) => file.name);
+		const remaining = files.length - names.length;
+		if (remaining > 0) names.push(this.localize.term('media_chooseMediaTypeMoreFiles', remaining));
+
+		return html`<p id="files">${this.localize.list(names)}</p>`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
+			#files {
+				margin-top: 0;
+				word-break: break-word;
+			}
 			#options {
 				display: flex;
-				margin: var(--uui-size-layout-1);
+				flex-wrap: wrap;
 				gap: var(--uui-size-3);
 			}
-			uui-button {
+			#options uui-button {
 				width: 150px;
 				height: 150px;
 			}

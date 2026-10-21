@@ -412,6 +412,8 @@ export default {
 		},
 	},
 	media: {
+		chooseMediaTypeHeadline: 'Choose media type',
+		chooseMediaTypeMoreFiles: (count: number) => (count === 1 ? '1 more file' : `${count} more files`),
 		clickToUpload: 'Click to upload',
 		browseFilesAction: 'Browse files',
 		dropFilesOr: 'Drag and drop media here<br />or',

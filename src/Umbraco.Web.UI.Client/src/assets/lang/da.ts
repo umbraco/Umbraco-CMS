@@ -400,6 +400,8 @@ export default {
 		},
 	},
 	media: {
+		chooseMediaTypeHeadline: 'Vælg medietype',
+		chooseMediaTypeMoreFiles: (count: number) => (count === 1 ? '1 fil mere' : `${count} filer mere`),
 		clickToUpload: 'Klik for at uploade',
 		browseFilesAction: 'Gennemse filer',
 		dropFilesOr: 'Træk og slip medier her<br />eller',
