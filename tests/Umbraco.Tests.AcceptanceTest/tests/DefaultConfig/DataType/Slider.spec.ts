@@ -45,7 +45,7 @@ test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await expect.poll(() => umbracoApi.dataType.doesDataTypeHaveRangeValue(customDataTypeName, 'validationRange', minimumValue)).toBeTruthy();
+  await expect.poll(() => umbracoApi.dataType.doesDataTypeHaveRangeValue(customDataTypeName, 'validationRange', minimumValue, 100)).toBeTruthy();
 });
 
 test('can update maximum value', async ({umbracoApi, umbracoUi}) => {

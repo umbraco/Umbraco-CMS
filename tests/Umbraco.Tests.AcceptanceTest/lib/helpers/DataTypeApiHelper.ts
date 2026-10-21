@@ -1982,16 +1982,14 @@ export class DataTypeApiHelper {
   }
 
   // Checks a single range configuration value (e.g. 'validationRange' or 'validationLimit') that stores its
-  // bounds as a {min, max} object. Only the bounds passed in are asserted, so a min-only or max-only check works.
+  // bounds as a {min, max} object. Both bounds are asserted, so a bound that is not passed in must be unset.
   async doesDataTypeHaveRangeValue(dataTypeName: string, alias: string, min?: number, max?: number, dataTypeData?) {
     const dataType = dataTypeData || await this.getByName(dataTypeName);
     const valueData = dataType.values.find(item => item.alias === alias);
     if (!valueData) {
       return false;
     }
-    const minMatches = min === undefined || valueData.value?.min === min;
-    const maxMatches = max === undefined || valueData.value?.max === max;
-    return minMatches && maxMatches;
+    return (valueData.value?.min ?? undefined) === min && (valueData.value?.max ?? undefined) === max;
   }
 
   async doesDataTypeHaveCrops(dataTypeName: string, cropLabel: string, cropAlias: string, cropWidth: number, cropHeight: number) {
