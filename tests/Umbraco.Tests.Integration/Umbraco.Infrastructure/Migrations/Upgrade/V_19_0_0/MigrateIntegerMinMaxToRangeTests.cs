@@ -32,4 +32,22 @@ internal sealed class MigrateIntegerMinMaxToRangeTests : MigrateMinMaxToRangeTes
             Assert.That(config["step"]?.GetValue<int>(), Is.EqualTo(2));
         });
     }
+
+    [Test]
+    public async Task Zero_Values_Become_Unbounded()
+    {
+        var id = await CreateDataTypeWithRawConfig(
+            Constants.PropertyEditors.Aliases.Integer,
+            """{ "min": 0, "max": 0 }""");
+
+        await RunMigration<MigrateIntegerMinMaxToRange>();
+
+        JsonObject config = await GetRawConfig(id);
+        Assert.Multiple(() =>
+        {
+            Assert.That(config.ContainsKey("min"), Is.False);
+            Assert.That(config.ContainsKey("max"), Is.False);
+            Assert.That(config.ContainsKey("validationRange"), Is.False);
+        });
+    }
 }

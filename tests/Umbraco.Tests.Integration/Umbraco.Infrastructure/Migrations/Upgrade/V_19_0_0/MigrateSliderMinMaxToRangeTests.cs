@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Upgrade.V19_0_0;
@@ -69,6 +70,37 @@ internal sealed class MigrateSliderMinMaxToRangeTests : MigrateMinMaxToRangeTest
             Assert.That(Min(config, "validationRange"), Is.EqualTo(10));
             Assert.That(Max(config, "validationRange"), Is.EqualTo(90));
             Assert.That(config["minimumRange"]?.GetValue<decimal>(), Is.EqualTo(5));
+        });
+    }
+
+    [Test]
+    public async Task Bounds_Survive_The_Earlier_Range_Slider_Data_Type_Migration()
+    {
+        var id = await CreateDataTypeWithRawConfig(
+            Constants.PropertyEditors.Aliases.Slider,
+            """{ "minVal": 10, "maxVal": 90, "step": 1, "enableRange": true, "minimumRange": 5 }""");
+
+        // Matches the order in the upgrade plan, where the range slider data types are moved first.
+        await RunMigration<MigrateRangeSliderDataTypes>();
+        await RunMigration<MigrateSliderMinMaxToRange>();
+
+        JsonObject config = await GetRawConfig(id);
+        string editorAlias;
+        using (IScope scope = ScopeProvider.CreateScope())
+        {
+            editorAlias = scope.Database.ExecuteScalar<string>(
+                "SELECT propertyEditorAlias FROM umbracoDataType WHERE nodeId = @0",
+                id);
+            scope.Complete();
+        }
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(editorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.RangeSlider));
+            Assert.That(config.ContainsKey("minVal"), Is.False);
+            Assert.That(config.ContainsKey("maxVal"), Is.False);
+            Assert.That(Min(config, "validationRange"), Is.EqualTo(10));
+            Assert.That(Max(config, "validationRange"), Is.EqualTo(90));
         });
     }
 }

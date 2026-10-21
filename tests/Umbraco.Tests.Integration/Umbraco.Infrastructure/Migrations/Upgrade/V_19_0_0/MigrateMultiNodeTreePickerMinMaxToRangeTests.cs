@@ -32,4 +32,22 @@ internal sealed class MigrateMultiNodeTreePickerMinMaxToRangeTests : MigrateMinM
             Assert.That(config["filter"]?.GetValue<string>(), Is.EqualTo("abc"));
         });
     }
+
+    [Test]
+    public async Task Zero_Values_Become_Unbounded()
+    {
+        var id = await CreateDataTypeWithRawConfig(
+            Constants.PropertyEditors.Aliases.MultiNodeTreePicker,
+            """{ "minNumber": 0, "maxNumber": 0 }""");
+
+        await RunMigration<MigrateMultiNodeTreePickerMinMaxToRange>();
+
+        JsonObject config = await GetRawConfig(id);
+        Assert.Multiple(() =>
+        {
+            Assert.That(config.ContainsKey("minNumber"), Is.False);
+            Assert.That(config.ContainsKey("maxNumber"), Is.False);
+            Assert.That(config.ContainsKey("validationLimit"), Is.False);
+        });
+    }
 }

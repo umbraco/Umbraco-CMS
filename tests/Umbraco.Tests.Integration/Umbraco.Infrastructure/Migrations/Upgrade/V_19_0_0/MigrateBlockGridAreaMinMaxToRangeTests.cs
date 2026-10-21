@@ -32,4 +32,22 @@ internal sealed class MigrateBlockGridAreaMinMaxToRangeTests : MigrateMinMaxToRa
             Assert.That(Max(area, "validationLimit"), Is.EqualTo(3));
         });
     }
+
+    [Test]
+    public async Task Zero_Area_Bounds_Are_Kept()
+    {
+        var id = await CreateDataTypeWithRawConfig(
+            Constants.PropertyEditors.Aliases.BlockGrid,
+            """{ "blocks": [ { "areas": [ { "alias": "main", "minAllowed": 0, "maxAllowed": 0 } ] } ] }""");
+
+        await RunMigration<MigrateBlockGridAreaMinMaxToRange>();
+
+        JsonObject config = await GetRawConfig(id);
+        var area = (JsonObject)((JsonArray)((JsonObject)((JsonArray)config["blocks"]!)[0]!)["areas"]!)[0]!;
+        Assert.Multiple(() =>
+        {
+            Assert.That(Min(area, "validationLimit"), Is.EqualTo(0));
+            Assert.That(Max(area, "validationLimit"), Is.EqualTo(0));
+        });
+    }
 }

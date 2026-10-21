@@ -30,4 +30,22 @@ internal sealed class MigrateDecimalMinMaxToRangeTests : MigrateMinMaxToRangeTes
             Assert.That(config["step"]?.GetValue<decimal>(), Is.EqualTo(0.1m));
         });
     }
+
+    [Test]
+    public async Task Zero_Values_Become_Unbounded()
+    {
+        var id = await CreateDataTypeWithRawConfig(
+            Constants.PropertyEditors.Aliases.Decimal,
+            """{ "min": 0, "max": 0 }""");
+
+        await RunMigration<MigrateDecimalMinMaxToRange>();
+
+        JsonObject config = await GetRawConfig(id);
+        Assert.Multiple(() =>
+        {
+            Assert.That(config.ContainsKey("min"), Is.False);
+            Assert.That(config.ContainsKey("max"), Is.False);
+            Assert.That(config.ContainsKey("validationRange"), Is.False);
+        });
+    }
 }
