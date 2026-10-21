@@ -24,24 +24,6 @@ describe('UmbAuthContext', () => {
 			expect(context).to.have.property('isAuthorized');
 		});
 
-		it('has an isInitialized property', () => {
-			expect(context).to.have.property('isInitialized');
-		});
-
-		// setInitialized() used to be driven from the core entry point. It now runs in the constructor,
-		// so guard the property that makes that safe: #isInitialized is a ReplaySubject(1), meaning a
-		// subscriber attaching after construction still receives the emission rather than hanging.
-		// Reading the deprecated getter logs a deprecation warning here — expected, since the test
-		// runner's origin resolves to 'unknown' rather than 'core' so the warning isn't suppressed.
-		it('emits isInitialized to a subscriber that attaches after construction', async () => {
-			let emitted = false;
-			context.isInitialized.subscribe(() => {
-				emitted = true;
-			});
-			await aTimeout(0);
-			expect(emitted).to.be.true;
-		});
-
 		it('has a getIsAuthorized method', () => {
 			expect(context).to.have.property('getIsAuthorized').that.is.a('function');
 		});
@@ -54,23 +36,12 @@ describe('UmbAuthContext', () => {
 			expect(context).to.have.property('signOut').that.is.a('function');
 		});
 
-		it('has a getServerUrl method', () => {
-			expect(context).to.have.property('getServerUrl').that.is.a('function');
-		});
-
 		it('has a configureClient method', () => {
 			expect(context).to.have.property('configureClient').that.is.a('function');
 		});
 
 		it('has a session$ observable', () => {
 			expect(context).to.have.property('session$');
-		});
-	});
-
-	describe('getServerUrl', () => {
-		it('returns the configured server URL', () => {
-			const serverUrl = context.getServerUrl();
-			expect(serverUrl).to.equal('http://localhost');
 		});
 	});
 

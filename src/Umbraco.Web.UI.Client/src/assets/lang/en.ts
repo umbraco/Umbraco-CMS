@@ -2714,8 +2714,10 @@ export default {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
 		},
+		labelElementsWithPendingChanges: 'The following referenced elements are not fully published:',
 		viewDependentItemsAction: 'View items that depend on this…',
 		viewDescendantsWithReferencesAction: 'View referenced descendants…',
+		viewEntitiesNeedingAttentionAction: 'View referenced elements with pending changes…',
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',
@@ -3023,6 +3025,19 @@ export default {
 		noAccessLibraryElementDescription: 'You do not have access to the Library Element used by this Block.',
 		tabLibrary: 'Library',
 		transferToElementLibrary: 'Transfer to Library',
+		transferredToElementLibrary: 'Transferred to Library',
+		transferredToElementLibraryAsDraft: 'Transferred to Library as draft',
+		transferToElementLibraryNotPublished: 'Transferred to Library, but not published',
+		transferToElementLibraryNotPublishedHeadline: 'Not published',
+		transferToElementLibraryNotPublishedValidation:
+			'The Element was added to the Library, but has validation errors that need fixing before it can be published.',
+		transferToElementLibraryOpenElement: 'Open Element',
+		transferToElementLibraryNotPermitted: 'Transfer not permitted',
+		transferToElementLibraryLanguagesNotPermitted:
+			'This Block has content in languages you do not have access to: <strong>%0%</strong>.',
+		transferToElementLibrarySharedNotPermitted: 'It has shared content that you do not have access to edit.',
+		transferToElementLibraryLocationNotPermitted: 'You cannot create and publish Elements here.',
+		transferToElementLibraryLocationTypeNotAllowed: 'This Element Type is not allowed here.',
 		disconnectFromElementLibrary: 'Disconnect from Library',
 		disconnectFromElementLibraryConfirm:
 			'This will create a local copy of the Element content. The Library Element will not be affected.',

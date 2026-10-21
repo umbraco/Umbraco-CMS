@@ -1,4 +1,4 @@
-import type { UmbEntityReferenceListElement } from './entity-reference-list.element.js';
+import type { UmbEntityReferenceListElement, UmbEntityReferenceListSource } from './entity-reference-list.element.js';
 import './entity-reference-list.element.js';
 import type { UmbEntityReferenceRepository } from '../reference/types.js';
 import { aTimeout, expect } from '@open-wc/testing';
@@ -94,6 +94,42 @@ describe('UmbEntityReferenceListElement', () => {
 		element.remove();
 	});
 
+	class UmbTestReferenceRepositoryWithoutOptionalMethods implements UmbEntityReferenceRepository {
+		async requestReferencedBy() {
+			return { data: { items: [], total: 0 } };
+		}
+		async requestAreReferenced() {
+			return { data: { items: [], total: 0 } };
+		}
+		destroy() {}
+	}
+
+	// Shared by the "reports zero when the repository does not support X" tests below: registers a
+	// repository missing the optional method for `source`, and asserts the element falls back to zero
+	// rather than erroring.
+	async function expectZeroWhenUnsupported(source: UmbEntityReferenceListSource, unique: string, aliasSuffix: string) {
+		const alias = `Umb.Test.EntityReferenceList.ReferenceRepository.${aliasSuffix}`;
+		const manifest: ManifestApi<UmbTestReferenceRepositoryWithoutOptionalMethods> = {
+			type: 'my-test-type',
+			alias,
+			name: `Test Entity Reference Repository Without ${aliasSuffix}`,
+			api: UmbTestReferenceRepositoryWithoutOptionalMethods,
+		};
+		umbExtensionsRegistry.register(manifest);
+
+		try {
+			element.referenceRepositoryAlias = alias;
+			element.source = source;
+			element.unique = unique;
+			document.body.appendChild(element);
+			await aTimeout(0);
+
+			expect(element.getTotal()).to.equal(0);
+		} finally {
+			umbExtensionsRegistry.unregister(alias);
+		}
+	}
+
 	describe('referencedBy (default source)', () => {
 		it('shows the "no references" state when there are none', async () => {
 			element.referenceRepositoryAlias = REFERENCE_REPOSITORY_ALIAS;
@@ -131,6 +167,25 @@ describe('UmbEntityReferenceListElement', () => {
 			element.unique = 'elm-2';
 			await aTimeout(0);
 
+			expect(element.getTotal()).to.equal(5);
+		});
+
+		it('clears the previous total immediately when the unique changes, before the new fetch resolves', async () => {
+			UmbTestReferenceRepository.referencedByItems = makeItems(2);
+			element.referenceRepositoryAlias = REFERENCE_REPOSITORY_ALIAS;
+			element.unique = 'elm-1';
+			document.body.appendChild(element);
+			await aTimeout(0);
+			expect(element.getTotal()).to.equal(2);
+
+			UmbTestReferenceRepository.referencedByItems = makeItems(5);
+			element.unique = 'elm-2';
+
+			// Before the new fetch has had a chance to resolve, elm-1's stale total must already be gone —
+			// not still showing until the new data arrives.
+			expect(element.getTotal(), "stale total from the previous entity mustn't still be showing").to.equal(0);
+
+			await aTimeout(0);
 			expect(element.getTotal()).to.equal(5);
 		});
 
@@ -181,36 +236,50 @@ describe('UmbEntityReferenceListElement', () => {
 		});
 
 		it('reports zero when the repository does not support descendants', async () => {
-			class UmbTestReferenceRepositoryWithoutDescendants implements UmbEntityReferenceRepository {
-				async requestReferencedBy() {
-					return { data: { items: [], total: 0 } };
-				}
-				async requestAreReferenced() {
-					return { data: { items: [], total: 0 } };
-				}
-				destroy() {}
-			}
+			await expectZeroWhenUnsupported('descendantsWithReferences', 'elm-1', 'NoDescendants');
+		});
+	});
 
-			const alias = 'Umb.Test.EntityReferenceList.ReferenceRepository.NoDescendants';
-			const manifest: ManifestApi<UmbTestReferenceRepositoryWithoutDescendants> = {
-				type: 'my-test-type',
-				alias,
-				name: 'Test Entity Reference Repository Without Descendants',
-				api: UmbTestReferenceRepositoryWithoutDescendants,
-			};
-			umbExtensionsRegistry.register(manifest);
+	describe('items (pre-resolved, statically-paged)', () => {
+		it('renders one row per item, without a repository', async () => {
+			element.items = makeItems(2);
+			document.body.appendChild(element);
+			await aTimeout(0);
 
-			try {
-				element.referenceRepositoryAlias = alias;
-				element.source = 'descendantsWithReferences';
-				element.unique = 'elm-1';
-				document.body.appendChild(element);
-				await aTimeout(0);
+			expect(element.getTotal()).to.equal(2);
+			expect(element.shadowRoot?.querySelectorAll('umb-entity-item-ref')).to.have.lengthOf(2);
+		});
 
-				expect(element.getTotal()).to.equal(0);
-			} finally {
-				umbExtensionsRegistry.unregister(alias);
-			}
+		it('paginates the given items locally', async () => {
+			element.itemsPerPage = 10;
+			element.items = makeItems(15);
+			document.body.appendChild(element);
+			await aTimeout(0);
+
+			expect(element.getTotal()).to.equal(15);
+			expect(element.shadowRoot?.querySelectorAll('umb-entity-item-ref'), 'first page').to.have.lengthOf(10);
+			expect(element.shadowRoot?.querySelector('uui-pagination'), 'pagination shown').to.exist;
+		});
+
+		it('keeps the given items when a unique is set afterwards, instead of fetching over them', async () => {
+			UmbTestReferenceRepository.referencedByItems = makeItems(5);
+			element.referenceRepositoryAlias = REFERENCE_REPOSITORY_ALIAS;
+			element.items = makeItems(2);
+			element.unique = 'elm-1';
+			document.body.appendChild(element);
+			await aTimeout(0);
+
+			expect(element.getTotal()).to.equal(2);
+			expect(element.shadowRoot?.querySelectorAll('umb-entity-item-ref')).to.have.lengthOf(2);
+		});
+
+		it('shows the "no references" state when given an empty array', async () => {
+			element.items = [];
+			document.body.appendChild(element);
+			await aTimeout(0);
+
+			expect(element.getTotal()).to.equal(0);
+			expect(element.shadowRoot?.querySelector('umb-localize'), 'empty state').to.exist;
 		});
 	});
 });

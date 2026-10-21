@@ -105,7 +105,7 @@ public class SearchApiController : SearchControllerBase
         // Default to an empty lookup; for unknown or unsupported object types
         // we will skip the entity lookup and return documents with null name/icon.
         Dictionary<Guid, IEntitySlim> entitiesByKey =
-            objectType is UmbracoObjectTypes.Document or UmbracoObjectTypes.Media
+            objectType is UmbracoObjectTypes.Document or UmbracoObjectTypes.Media or UmbracoObjectTypes.Element
                 ? _entityService.GetAll(objectType, keys).ToDictionary(e => e.Key)
                 : new Dictionary<Guid, IEntitySlim>();
 
@@ -149,7 +149,7 @@ public class SearchApiController : SearchControllerBase
     private string? GetCultureNameForEntity(IEntitySlim? entity) =>
         entity switch
         {
-            IDocumentEntitySlim documentEntitySlim when documentEntitySlim.CultureNames.TryGetValue(
+            IPublishableContentEntitySlim publishableContentEntitySlim when publishableContentEntitySlim.CultureNames.TryGetValue(
                 _variationContextAccessor.VariationContext!.Culture,
                 out var name) => name,
             _ => entity?.Name,

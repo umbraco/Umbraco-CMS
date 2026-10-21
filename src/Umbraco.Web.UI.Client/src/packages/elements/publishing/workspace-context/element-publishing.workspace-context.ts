@@ -15,7 +15,11 @@ import { umbNeedsPublishConfirmation } from './needs-publish-confirmation.functi
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import {
+	UMB_CONTENT_PUBLISH_MODAL,
+	UmbContentReferencedEntitiesManager,
+	UmbContentUnpublishEntityAction,
+} from '@umbraco-cms/backoffice/content';
 import { UmbEntityReferenceCountManager } from '@umbraco-cms/backoffice/relations';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
@@ -26,7 +30,7 @@ import { apiErrorWasNotified } from '@umbraco-cms/backoffice/resources';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { notifyWorkspaceActionStarting } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type {
 	UmbPublishableWorkspaceContext,
 	UmbWorkspaceActionExecutionOptions,
@@ -42,11 +46,21 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 	/**
 	 * Tracks how many items reference this element, so the publish flow can decide whether the confirmation
 	 * dialog has anything to say for a single-variant element (it always has something to say once there are
-	 * multiple variants to choose between).
+	 * multiple variants to choose between). Loaded lazily, at the point of publishing/scheduling, rather than
+	 * on workspace load.
+	 * @memberof UmbElementPublishingWorkspaceContext
 	 */
-	readonly #referenceCount = new UmbEntityReferenceCountManager(this, {
+	public readonly referenceCount = new UmbEntityReferenceCountManager(this, {
 		referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
+		prefetch: false,
 	});
+
+	/**
+	 * Resolves the elements this element directly references (via its draft property values) that are not
+	 * fully published, for the same publish-confirmation decision as {@link referenceCount}.
+	 * @memberof UmbElementPublishingWorkspaceContext
+	 */
+	readonly #referencedEntities = new UmbContentReferencedEntitiesManager(this);
 
 	#init: Promise<unknown>;
 	#elementWorkspaceContext?: typeof UMB_ELEMENT_WORKSPACE_CONTEXT.TYPE;
@@ -146,6 +160,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		// Reload workspace data to reflect the unpublished state
 		await this.#elementWorkspaceContext.reload();
 		await this.#loadAndProcessLastPublished();
+		this.referenceCount.clear();
 	}
 
 	/**
@@ -164,6 +179,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		if (!entityType) throw new Error('Entity type is missing');
 
 		const { options, selected } = await this.#determineVariantOptions();
+		const entitiesNeedingAttention = await this.#resolveEntitiesNeedingAttention();
 
 		const result = await umbOpenModal(this, UMB_ELEMENT_SCHEDULE_MODAL, {
 			data: {
@@ -180,6 +196,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 				unique,
 				itemRepositoryAlias: UMB_ELEMENT_ITEM_REPOSITORY_ALIAS,
 				referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
+				entitiesNeedingAttention,
 			},
 		}).catch(() => undefined);
 
@@ -234,6 +251,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 					// reload the element so all states are updated after the schedule operation
 					await this.#elementWorkspaceContext.reload();
+					this.referenceCount.clear();
 
 					// request reload of this entity
 					const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
@@ -295,12 +313,18 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 			throw new Error('No variants are available');
 		}
 
-		// Skip the confirmation dialog only when it would have nothing to say: a single variant that may be published
-		// and no items referencing this element. Otherwise open it — the modal lets the user pick which variants to
-		// publish, shows the ones that may not be, and (for a single option) just the reference-awareness section.
+		// Skip the confirmation dialog only when it would have nothing to say: a single variant that may be published,
+		// no items referencing this element, and no referenced element left unpublished. Otherwise open it — the modal
+		// lets the user pick which variants to publish, shows the ones that may not be, and (for a single option) just
+		// the reference sections.
+		const entitiesNeedingAttention = await this.#resolveEntitiesNeedingAttention();
 		const needsModal =
 			!this.#publishableVariantsFilter(options[0]) ||
-			(await umbNeedsPublishConfirmation(options.length, () => this.#referenceCount.getTotalAsync()));
+			(await umbNeedsPublishConfirmation(
+				options.length,
+				() => this.#getReferenceCount(),
+				entitiesNeedingAttention.length,
+			));
 
 		if (!needsModal) {
 			variantIds.push(UmbVariantId.Create(options[0]));
@@ -313,6 +337,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 					unique,
 					itemRepositoryAlias: UMB_ELEMENT_ITEM_REPOSITORY_ALIAS,
 					referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
+					entitiesNeedingAttention,
 				},
 				value: { selection: selected },
 			}).catch(() => undefined);
@@ -362,6 +387,25 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 				return await Promise.reject(reason);
 			},
 		);
+	}
+
+	/**
+	 * The number of items referencing this element. A never-saved element has no server-side references yet.
+	 * @returns {Promise<number>} The reference count.
+	 */
+	async #getReferenceCount(): Promise<number> {
+		if (this.#elementWorkspaceContext?.getIsNew()) return 0;
+		return this.referenceCount.getTotalAsync();
+	}
+
+	/**
+	 * Resolves the entities this element's current draft directly references that need attention before publishing.
+	 * @returns {Promise<Array<UmbEntityModel>>} The referenced entities needing attention.
+	 */
+	async #resolveEntitiesNeedingAttention(): Promise<Array<UmbEntityModel>> {
+		const values = this.#elementWorkspaceContext?.getData()?.values ?? [];
+		if (!values.length) return [];
+		return this.#referencedEntities.getEntitiesNeedingAttention(values);
 	}
 
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbElementDetailModel): Promise<void> {
@@ -426,6 +470,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		}
 
 		await this.#loadAndProcessLastPublished();
+		this.referenceCount.clear();
 
 		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		this.#eventContext?.dispatchEvent(event);
@@ -492,7 +537,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 				}
 
 				this.#currentUnique = unique;
-				this.#referenceCount.setUnique(unique ?? undefined).catch(() => undefined);
+				this.referenceCount.setUnique(unique ?? undefined).catch(() => undefined);
 
 				if (isNew === false && unique) {
 					this.#loadAndProcessLastPublished();

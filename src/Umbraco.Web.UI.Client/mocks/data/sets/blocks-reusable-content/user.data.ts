@@ -1,5 +1,5 @@
 import type { UmbMockUserModel } from '../../mock-data-set.types.js';
-import { ADMIN_USER_GROUP_ID, DANISH_EDITOR_USER_GROUP_ID } from './user-group.data.js';
+import { ADMIN_USER_GROUP_ID, DANISH_EDITOR_USER_GROUP_ID, LIMITED_EDITOR_USER_GROUP_ID } from './user-group.data.js';
 import { UserKindModel, UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const adminUser: UmbMockUserModel = {
@@ -58,5 +58,13 @@ const danishEditorUser: UmbMockUserModel = {
 	flags: [],
 };
 
+const limitedEditorUser: UmbMockUserModel = {
+	...danishEditorUser,
+	id: 'blocks-reusable-content-limited-editor-user-id',
+	name: 'Limited Editor',
+	email: 'limited.editor@example.com',
+	userGroupIds: [{ id: LIMITED_EDITOR_USER_GROUP_ID }],
+};
+
 // The mock API treats the first user as the signed-in user, so reorder this array to switch between them.
-export const data: Array<UmbMockUserModel> = [adminUser, danishEditorUser];
+export const data: Array<UmbMockUserModel> = [adminUser, danishEditorUser, limitedEditorUser];
