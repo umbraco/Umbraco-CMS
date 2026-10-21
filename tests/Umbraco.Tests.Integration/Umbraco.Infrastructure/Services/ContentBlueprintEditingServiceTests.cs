@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Filters;
@@ -109,6 +110,8 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
     {
         base.CustomTestSetup(builder);
         builder.ContentTypeFilters().Append<ExcludingContentTypeFilter>();
+        builder.AddNotificationHandler<ContentMovingBlueprintNotification, BlueprintMoveNotificationHandler>();
+        builder.AddNotificationHandler<ContentMovedBlueprintNotification, BlueprintMoveNotificationHandler>();
     }
 
     [SetUp]

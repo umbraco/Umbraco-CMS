@@ -1,7 +1,7 @@
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../block-grid-entry/constants.js';
 import type { UmbBlockGridWorkspaceOriginData } from '../../workspace/block-grid-workspace.modal-token.js';
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../block-grid-entries/constants.js';
-import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -19,6 +19,8 @@ import type {
 	UmbBlockLabelUfmValueType,
 	UMB_BLOCK_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
+
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -49,13 +51,6 @@ export class UmbBlockGridBlockInlineElement extends UmbBlockRefNameSlotMixin(Umb
 
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
-
-	/**
-	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
-	 * reflects the library element's own publish state rather than the local expose entry.
-	 */
-	@property({ type: Boolean, attribute: false })
-	isExternalContent?: boolean;
 
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
@@ -224,18 +219,7 @@ export class UmbBlockGridBlockInlineElement extends UmbBlockRefNameSlotMixin(Umb
 				</span>
 				<div id="info">${this.renderNameSlot(blockValue)}</div>
 			</span>
-			${when(this.unpublished, () => this.#renderDraftTag())}
-		`;
-	}
-
-	#renderDraftTag() {
-		const titleKey = this.isExternalContent
-			? 'blockEditor_notPublishedLibraryElementDescription'
-			: 'blockEditor_notExposedDescription';
-		return html`
-			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
-				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-			</uui-tag>
+			<umb-block-state-tag slot="name"></umb-block-state-tag>
 		`;
 	}
 
@@ -367,13 +351,6 @@ export class UmbBlockGridBlockInlineElement extends UmbBlockRefNameSlotMixin(Umb
 				justify-content: center;
 				height: 100%;
 				padding-left: var(--uui-size-2, 6px);
-			}
-
-			uui-tag {
-				margin-left: 0.5em;
-				margin-bottom: -0.3em;
-				margin-top: -0.3em;
-				vertical-align: text-top;
 			}
 
 			:host(:not([disabled])) #open-part:hover #icon {

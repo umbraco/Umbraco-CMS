@@ -81,7 +81,13 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 					.filter((entry) => !uniques.includes(entry.unique))
 					.map((x) => x.unique);
 
-				this.#statuses.remove(removedEntries);
+				// Also clears statuses of uniques that never resolved (e.g. a failed request), so re-adding them requests again:
+				const removedStatuses = this.#statuses
+					.getValue()
+					.filter((status) => !uniques.includes(status.unique))
+					.map((x) => x.unique);
+
+				this.#statuses.remove(removedStatuses);
 				this.#entries.remove(removedEntries);
 				removedEntries.forEach((entry) => {
 					this.removeUmbControllerByAlias('observeEntry_' + entry);
