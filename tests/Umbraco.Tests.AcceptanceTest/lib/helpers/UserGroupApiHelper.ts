@@ -302,6 +302,17 @@ export class UserGroupApiHelper {
     return await this.create(userGroup);
   }
 
+  async createUserGroupWithUsersSection(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.users)
+      .build();
+
+    return await this.create(userGroup);
+  }
+
   async createUserGroupWithPermissionsForSpecificDocumentWithRead(name: string, documentId: string) {
     await this.ensureNameNotExists(name);
 

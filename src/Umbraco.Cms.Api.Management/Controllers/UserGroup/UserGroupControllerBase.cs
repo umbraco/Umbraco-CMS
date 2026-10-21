@@ -96,8 +96,8 @@ public class UserGroupControllerBase : ManagementApiControllerBase
             UserGroupOperationStatus.UserNotInGroup => BadRequest(problemDetailsBuilder
                 .WithTitle("User not in group")
                 .WithDetail("The user is not in the group.")),
-            UserGroupOperationStatus.Unauthorized => Unauthorized(problemDetailsBuilder
-                .WithTitle("Unauthorized access")
+            UserGroupOperationStatus.Unauthorized => StatusCode(StatusCodes.Status403Forbidden, problemDetailsBuilder
+                .WithTitle("Forbidden")
                 .WithDetail("The performing user does not have the necessary access to perform this operation. Check the log for details.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
