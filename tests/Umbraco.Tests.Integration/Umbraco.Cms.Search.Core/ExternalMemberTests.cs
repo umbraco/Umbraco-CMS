@@ -180,6 +180,47 @@ public class ExternalMemberTests : ContentBaseTestBase
     }
 
     [Test]
+    public async Task ConvertExternalMemberToContentMember_ReplacesDocumentWithContentMemberDocument()
+    {
+        IMemberType memberType = new MemberTypeBuilder().WithAlias("convertedMemberType").Build();
+        await GetRequiredService<IMemberTypeService>().CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus> createResult = await ExternalMemberService.CreateAsync(
+            new ExternalMemberIdentity
+            {
+                Email = "external-convert@local",
+                UserName = "external-convert@local",
+                Name = "External Convert",
+                ProfileData = """{"petName":"Biscuit"}""",
+            });
+        Assert.That(createResult.Success, Is.True);
+        Guid memberKey = createResult.Result.Key;
+
+        TestIndexDocument externalDocument = IndexerAndSearcher.Dump(IndexAliases.Member).Single();
+        Assert.Multiple(() =>
+        {
+            Assert.That(Integer(externalDocument, MemberFieldNames.IsExternalMember), Is.EqualTo(1));
+            Assert.That(Field(externalDocument, "petName"), Is.Not.Null);
+        });
+
+        Attempt<IMember?, ExternalMemberOperationStatus> convertResult = await ExternalMemberService.ConvertToContentMemberAsync(memberKey, memberType.Alias);
+        Assert.That(convertResult.Success, Is.True);
+
+        IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Member);
+        Assert.That(documents, Has.Count.EqualTo(1));
+
+        TestIndexDocument contentDocument = documents[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentDocument.Id, Is.EqualTo(memberKey));
+            Assert.That(Integer(contentDocument, MemberFieldNames.IsExternalMember), Is.EqualTo(0));
+            Assert.That(Keyword(contentDocument, Constants.Search.FieldNames.ContentTypeId), Is.EqualTo(memberType.Key.AsKeyword()));
+            Assert.That(Keyword(contentDocument, MemberFieldNames.Email), Is.EqualTo("external-convert@local"));
+            Assert.That(Field(contentDocument, "petName"), Is.Null);
+        });
+    }
+
+    [Test]
     public async Task DeleteExternalMember_RemovesDocument()
     {
         ExternalMemberIdentity member = await CreateExternalMemberAsync("external-five@local", "External Five");
