@@ -50,6 +50,7 @@ export class UmbDocumentAuditLogRepository
 	 * @memberof UmbDocumentAuditLogRepository
 	 */
 	getTagStyleAndText(logType: string): UmbAuditLogTagData {
+		// TODO: Investigate why the repository is responsible for presentation (tag style) logic, and consider moving it out of the repository contract.
 		switch (logType as UmbDocumentAuditLogType) {
 			case UmbDocumentAuditLog.SAVE:
 				return {
