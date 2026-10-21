@@ -380,7 +380,7 @@ export abstract class UmbBaseExtensionInitializer<
 			}
 			this.#onPermissionChanged?.(this.#isPermitted, this as any);
 		}
-		// A not-permitted state is only the starting point until a condition has answered false, which rules the extension out without waiting for the others.
+		// Settles once every condition has answered, or as soon as one answers false, which rules the extension out without waiting for the others.
 		if (this.#isPermitted !== undefined && this.#hasConditionAnswerSettlingPermission()) {
 			this.#settle();
 		}
