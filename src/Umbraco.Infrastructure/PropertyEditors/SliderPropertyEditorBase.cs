@@ -172,16 +172,6 @@ public abstract class SliderPropertyEditorBase : DataEditor, IValueSchemaProvide
         internal abstract class SliderPropertyConfigurationValidatorBase
         {
             /// <summary>
-            /// The configuration key for the minimum value.
-            /// </summary>
-            protected const string ConfigurationKeyMinValue = "minVal";
-
-            /// <summary>
-            /// The configuration key for the maximum value.
-            /// </summary>
-            protected const string ConfigurationKeyMaxValue = "maxVal";
-
-            /// <summary>
             /// The configuration key for the step value.
             /// </summary>
             protected const string ConfigurationKeyStepValue = "step";
