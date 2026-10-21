@@ -190,6 +190,11 @@ internal sealed class ExternalMemberIndexingService
             new(Umbraco.Cms.Core.Constants.Search.FieldNames.Name, new() { TextsR1 = [name], Keywords = [name] }, null, null),
         ];
 
-        return systemFields.Concat(MemberIndexFields.Create(member.Email, member.UserName, member.IsApproved, member.IsLockedOut, isExternalMember: true));
+        IndexField[] memberFields = systemFields
+            .Concat(MemberIndexFields.Create(member.Email, member.UserName, member.IsApproved, member.IsLockedOut, isExternalMember: true))
+            .ToArray();
+
+        return memberFields.Concat(
+            ExternalMemberProfileDataIndexFields.Create(member.ProfileData, memberFields.Select(field => field.FieldName)));
     }
 }

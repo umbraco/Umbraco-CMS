@@ -131,6 +131,42 @@ public class ExternalMemberTests : ContentBaseTestBase
     }
 
     [Test]
+    public async Task ExternalMemberProfileData_YieldsProfileFields()
+    {
+        var member = new ExternalMemberIdentity
+        {
+            Email = "external-profile@local",
+            UserName = "external-profile@local",
+            Name = "External Profile",
+            ProfileData = """{"favouriteColour":"Turquoise","petCount":2,"Umb_Email":"spoofed@local"}""",
+        };
+        Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus> result = await ExternalMemberService.CreateAsync(member);
+        Assert.That(result.Success, Is.True);
+
+        TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.Member).Single();
+        Assert.Multiple(() =>
+        {
+            Assert.That(Field(document, "favouriteColour")?.Value.Texts?.SingleOrDefault(), Is.EqualTo("Turquoise"));
+            Assert.That(Integer(document, "petCount"), Is.EqualTo(2));
+            Assert.That(Keyword(document, MemberFieldNames.Email), Is.EqualTo("external-profile@local"));
+            Assert.That(document.Fields.Count(field => field.FieldName == MemberFieldNames.Email), Is.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public async Task UpdateExternalMemberProfileData_UpdatesDocument()
+    {
+        ExternalMemberIdentity member = await CreateExternalMemberAsync("external-profile-update@local", "External Profile Update");
+        IndexerAndSearcher.Reset();
+
+        member.ProfileData = """{"petName":"Biscuit"}""";
+        await ExternalMemberService.UpdateAsync(member);
+
+        TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.Member).Single();
+        Assert.That(Field(document, "petName")?.Value.Texts?.SingleOrDefault(), Is.EqualTo("Biscuit"));
+    }
+
+    [Test]
     public async Task UpdateExternalMemberLoginProperties_DoesNotReindex()
     {
         ExternalMemberIdentity member = await CreateExternalMemberAsync("external-four@local", "External Four");

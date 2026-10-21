@@ -2,12 +2,15 @@ using Examine;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using ISearcher = Umbraco.Cms.Core.Search.ISearcher;
+using SearchResult = Umbraco.Cms.Core.Search.Querying.SearchResult;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
@@ -43,6 +46,35 @@ public class MemberIndexServiceTests : IndexTestBase
         await WaitForIndexing(Constants.Search.IndexAliases.DraftMembers, () => externalMemberService.DeleteAsync(member!.Key));
 
         Assert.That(index.Searcher.CreateQuery().All().Execute().TotalItemCount, Is.EqualTo(0));
+    }
+
+    [Test]
+    public async Task CanFindExternalMemberByProfileData()
+    {
+        IExternalMemberService externalMemberService = GetRequiredService<IExternalMemberService>();
+
+        ExternalMemberIdentity? member = null;
+        await WaitForIndexing(Constants.Search.IndexAliases.DraftMembers, async () =>
+        {
+            Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus> result = await externalMemberService.CreateAsync(
+                new ExternalMemberIdentity
+                {
+                    Email = "profile@local",
+                    UserName = "profile@local",
+                    Name = "The Profiled Member",
+                    ProfileData = """{"favouriteColour":"Turquoise","petName":"Biscuit"}""",
+                });
+            Assert.That(result.Success, Is.True);
+            member = result.Result;
+        });
+
+        ISearcher searcher = GetRequiredService<ISearcherResolver>().GetSearcher(Constants.Search.IndexAliases.DraftMembers)!;
+
+        SearchResult result = await searcher.SearchAsync(Constants.Search.IndexAliases.DraftMembers, "Turquoise");
+        Assert.That(result.Documents.Select(document => document.Id), Is.EqualTo(new[] { member!.Key }));
+
+        result = await searcher.SearchAsync(Constants.Search.IndexAliases.DraftMembers, "Biscuit");
+        Assert.That(result.Documents.Select(document => document.Id), Is.EqualTo(new[] { member.Key }));
     }
 
     private async Task CreateMemberAsync()
