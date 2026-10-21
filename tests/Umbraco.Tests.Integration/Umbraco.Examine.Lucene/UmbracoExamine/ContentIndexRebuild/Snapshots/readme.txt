@@ -17,23 +17,21 @@ change shows up as a diff of these files that can be reviewed.
 
 The files
 ---------
-  {index}-{nested}-batch{size}.txt  The value sets a full rebuild of an index produces.
-                                    {index} is "internal" (all values) or "published" (published
-                                    values only).
-                                    {nested} is "summary" (block editor values indexed as a single
-                                    summary field) or "explicit" (each nested property also indexed in
-                                    its own field), set by Indexing:ExplicitlyIndexEachNestedProperty.
-                                    {size} is the number of documents indexed at a time.
-  load-all.txt                      The property values IContentService.GetPagedDescendants loads for
-                                    all documents.
-  load-published.txt                The same for published documents, as loaded for the published index.
+  {index}-{nested}.txt  The value sets a full rebuild of an index produces.
+                        {index} is "internal" (all values) or "published" (published values only).
+                        {nested} is "summary" (block editor values indexed as a single summary
+                        field) or "explicit" (each nested property also indexed in its own field), set
+                        by Indexing:ExplicitlyIndexEachNestedProperty.
+  load-all.txt          The property values IContentService.GetPagedDescendants loads for all
+                        documents.
+  load-published.txt    The same for published documents, as loaded for the published index.
 
 Database ids, keys, dates and paths depend on insertion order and timing rather than on indexing, so
 they are left out. Remaining GUIDs are replaced with <guid>. Documents are ordered by name.
 
-The output for batch sizes 1 and 1000 currently differs, because indexing a block editor value changes
-the shared element types used for every value indexed after it. That is a bug, and these files record
-the current behaviour.
+Indexing a document must not depend on the other documents indexed with it, so each index file is
+compared with the output of rebuilds that index 1, 2 and 1000 documents at a time, and the loads are
+compared at page sizes 1 and 1000.
 
 Updating them
 -------------
