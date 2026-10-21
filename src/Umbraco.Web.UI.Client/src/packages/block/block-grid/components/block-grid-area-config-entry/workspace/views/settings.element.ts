@@ -6,6 +6,7 @@ import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputNumberRangeElement } from '@umbraco-cms/backoffice/components';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-block-grid-area-type-workspace-view')
 export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -58,7 +59,8 @@ export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElem
 						slot="editor"
 						.minValue=${this._minValue}
 						.maxValue=${this._maxValue}
-						@change=${this.#onAllowedRangeChange}>
+						@change=${this.#onAllowedRangeChange}
+						${umbBindToValidation(this, '$.validationLimit')}>
 					</umb-input-number-range>
 				</umb-property-layout>
 

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Moq;
 using NUnit.Framework;
@@ -49,4 +50,50 @@ public class RangeConfigurationEditorValidationTests
 
         Assert.That(editor.Validate(configuration), Is.Empty);
     }
+
+    [Test]
+    public void Cannot_Configure_Block_Grid_Area_With_Max_Less_Than_Min()
+    {
+        var configuration = new Dictionary<string, object>
+        {
+            ["blocks"] = CreateBlocksWithAreaLimit(5, 2),
+        };
+
+        Assert.That(new BlockGridConfigurationEditor(IOHelper).Validate(configuration), Is.Not.Empty);
+    }
+
+    [Test]
+    public void Can_Configure_Block_Grid_Area_With_Max_Greater_Than_Min()
+    {
+        var configuration = new Dictionary<string, object>
+        {
+            ["blocks"] = CreateBlocksWithAreaLimit(2, 5),
+        };
+
+        Assert.That(new BlockGridConfigurationEditor(IOHelper).Validate(configuration), Is.Empty);
+    }
+
+    [Test]
+    public void Cannot_Configure_Block_Grid_Area_With_Max_Less_Than_Min_From_A_Json_Element()
+    {
+        // Configuration posted to the Management API arrives as JSON elements.
+        var configuration = new Dictionary<string, object>
+        {
+            ["blocks"] = JsonSerializer.SerializeToElement(CreateBlocksWithAreaLimit(5, 2)),
+        };
+
+        Assert.That(new BlockGridConfigurationEditor(IOHelper).Validate(configuration), Is.Not.Empty);
+    }
+
+    private static JsonArray CreateBlocksWithAreaLimit(int min, int max)
+        => new(
+            new JsonObject
+            {
+                ["areas"] = new JsonArray(
+                    new JsonObject
+                    {
+                        ["alias"] = "main",
+                        ["validationLimit"] = new JsonObject { ["min"] = min, ["max"] = max },
+                    }),
+            });
 }

@@ -193,7 +193,8 @@ test('can remove min allowed for an area in a block', async ({umbracoApi, umbrac
   // Arrange
   const areaAlias = 'TestArea';
   const minAllowed = 6;
-  await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias, undefined, undefined, undefined, minAllowed);
+  const maxAllowed = 7;
+  await umbracoApi.dataType.createBlockGridWithAnAreaInABlock(blockGridEditorName, contentElementTypeId, areaAlias, undefined, undefined, undefined, minAllowed, maxAllowed);
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMinAllowed(blockGridEditorName, contentElementTypeId, areaAlias, minAllowed)).toBeTruthy();
 
   // Act
@@ -266,11 +267,11 @@ test('min can not be more than max an area in a block', async ({umbracoApi, umbr
   await umbracoUi.dataType.goToAreaByAlias(areaAlias);
   await umbracoUi.dataType.enterMinAllowedInArea(newMinAllowed);
   await umbracoUi.dataType.clickAreaSubmitButton();
-  await umbracoUi.dataType.clickSubmitButton();
-  await umbracoUi.dataType.clickSaveButton();
 
   // Assert
   await umbracoUi.dataType.isFailedStateButtonVisible();
+  await umbracoUi.dataType.doesAmountContainErrorMessageWithText('The low value must not exceed the high value.');
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMinAllowed(blockGridEditorName, contentElementTypeId, areaAlias, minAllowed)).toBeTruthy();
 });
 
 test('can add specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
