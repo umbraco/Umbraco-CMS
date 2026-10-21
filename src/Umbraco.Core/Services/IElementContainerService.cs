@@ -9,21 +9,6 @@ namespace Umbraco.Cms.Core.Services;
 public interface IElementContainerService : IEntityTypeContainerService<IElement>
 {
     /// <summary>
-    /// Moves a container, and everything below it, to a new parent container.
-    /// </summary>
-    /// <param name="key">The key of the container to move.</param>
-    /// <param name="parentKey">The key of the parent container to move to, or null to move to the tree root.</param>
-    /// <param name="userKey">Key of the user issuing the move.</param>
-    /// <returns>An <see cref="Attempt{TStatus}"/> describing the outcome of the operation.</returns>
-    /// <remarks>
-    /// This member predates <see cref="IEntityTypeContainerService{TTreeEntity}.MoveAsync"/> and hides the inherited member,
-    /// so that removing it does not break packages compiled against 18.x.
-    /// </remarks>
-    // TODO (V19): Remove this member and the remarks above, and let IElementContainerService inherit MoveAsync
-    // from the base interface.
-    new Task<Attempt<EntityContainerOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey);
-
-    /// <summary>
     /// Moves a container, and everything below it, to the recycle bin.
     /// </summary>
     /// <param name="key">The key of the container to move to the recycle bin.</param>
