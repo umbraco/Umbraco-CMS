@@ -51475,16 +51475,6 @@
           },
           "alias": {
             "type": "string"
-          },
-          "cultures": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "items": {
-              "type": "string"
-            },
-            "deprecated": true
           }
         }
       },
