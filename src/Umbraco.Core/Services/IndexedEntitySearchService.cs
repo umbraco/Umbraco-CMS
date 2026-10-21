@@ -38,20 +38,35 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
         _idKeyMap = idKeyMap;
     }
 
-    /// <summary>
-    /// Synchronously searches for entities. See <see cref="SearchAsync"/>.
-    /// </summary>
-    /// <param name="objectType">The type of entities to search for.</param>
-    /// <param name="query">The search query string.</param>
-    /// <param name="skip">The number of results to skip for pagination.</param>
-    /// <param name="take">The maximum number of results to return.</param>
-    /// <param name="ignoreUserStartNodes">If true, ignores user start node restrictions when searching.</param>
-    /// <returns>A paged model containing the matching entities.</returns>
-    public PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, int skip = 0, int take = 100, bool ignoreUserStartNodes = false)
-        => SearchAsync(objectType, query, null, null, null, null, skip, take, ignoreUserStartNodes).GetAwaiter().GetResult();
-
     /// <inheritdoc />
     public async Task<PagedModel<IEntitySlim>> SearchAsync(
+        UmbracoObjectTypes objectType,
+        string query,
+        Guid? parentId,
+        IEnumerable<Guid>? contentTypeIds,
+        bool? trashed,
+        string? culture = null,
+        int skip = 0,
+        int take = 100,
+        bool ignoreUserStartNodes = false)
+    {
+        PagedModel<Guid> result = await SearchKeysAsync(objectType, query, parentId, contentTypeIds, trashed, culture, skip, take, ignoreUserStartNodes);
+
+        Guid[] resultKeys = result.Items.ToArray();
+        IEntitySlim[] resultEntities = resultKeys.Length > 0
+            ? _entityService
+                .GetAll(objectType, resultKeys)
+                // unfortunately we can't explicitly rely on the underlying services ordering the requested
+                // items correctly, so we need to enforce correct ordering here.
+                .OrderBy(entity => resultKeys.IndexOf(entity.Key))
+                .ToArray()
+            : [];
+
+        return new PagedModel<IEntitySlim> { Items = resultEntities, Total = result.Total };
+    }
+
+    /// <inheritdoc />
+    public async Task<PagedModel<Guid>> SearchKeysAsync(
         UmbracoObjectTypes objectType,
         string query,
         Guid? parentId,
@@ -67,7 +82,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
         // cannot combine trashed and start node filtering - this should always yield zero results
         if (startNodeKeys.Length > 0 && trashed is true)
         {
-            return new PagedModel<IEntitySlim>();
+            return new PagedModel<Guid>();
         }
 
         var indexAlias = objectType switch
@@ -132,17 +147,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
             skip,
             take);
 
-        Guid[] resultKeys = result.Documents.Select(d => d.Id).ToArray();
-        IEntitySlim[] resultEntities = resultKeys.Length > 0
-            ? _entityService
-                .GetAll(objectType, resultKeys)
-                // unfortunately we can't explicitly rely on the underlying services ordering the requested
-                // items correctly, so we need to enforce correct ordering here.
-                .OrderBy(entity => resultKeys.IndexOf(entity.Key))
-                .ToArray()
-            : [];
-
-        return new PagedModel<IEntitySlim> { Items = resultEntities, Total = result.Total };
+        return new PagedModel<Guid> { Items = result.Documents.Select(d => d.Id).ToArray(), Total = result.Total };
     }
 
     /// <summary>

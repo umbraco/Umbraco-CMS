@@ -227,6 +227,39 @@ public class ExternalMemberTests : ContentBaseTestBase
         Assert.That(IndexerAndSearcher.Dump(IndexAliases.Media), Is.Empty);
     }
 
+    [Test]
+    public async Task SearchMemberKeys_YieldsContentAndExternalMembers()
+    {
+        IMemberType memberType = new MemberTypeBuilder().WithAlias("contentMemberType").Build();
+        await GetRequiredService<IMemberTypeService>().CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        var contentMemberKey = Guid.NewGuid();
+        MemberService.Save(
+            new MemberBuilder()
+                .WithKey(contentMemberKey)
+                .WithMemberType(memberType)
+                .WithName("Findable Content Member")
+                .WithEmail("content-member@local")
+                .WithLogin("content-member@local", "Test123456")
+                .Build());
+
+        ExternalMemberIdentity externalMember = await CreateExternalMemberAsync("external-ten@local", "Findable External Member");
+        await CreateExternalMemberAsync("external-eleven@local", "Someone Else");
+
+        IIndexedEntitySearchService indexedEntitySearchService = GetRequiredService<IIndexedEntitySearchService>();
+
+        PagedModel<Guid> result = await indexedEntitySearchService.SearchKeysAsync(UmbracoObjectTypes.Member, "Findable", null, null, false);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Items, Is.EquivalentTo(new[] { contentMemberKey, externalMember.Key }));
+            Assert.That(result.Total, Is.EqualTo(2));
+        });
+
+        // external members have no member type, so restricting the search to member types excludes them
+        result = await indexedEntitySearchService.SearchKeysAsync(UmbracoObjectTypes.Member, "Findable", null, [memberType.Key], false);
+        Assert.That(result.Items, Is.EqualTo(new[] { contentMemberKey }));
+    }
+
     private async Task<ExternalMemberIdentity> CreateExternalMemberAsync(string email, string name)
     {
         var member = new ExternalMemberIdentity
