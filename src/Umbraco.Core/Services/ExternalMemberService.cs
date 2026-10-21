@@ -57,6 +57,19 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     }
 
     /// <inheritdoc />
+    public async Task<IEnumerable<ExternalMemberIdentity>> GetByKeysAsync(IEnumerable<Guid> keys)
+    {
+        Guid[] keysAsArray = keys as Guid[] ?? keys.ToArray();
+        if (keysAsArray.Length is 0)
+        {
+            return [];
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return await _repository.GetByKeysAsync(keysAsArray);
+    }
+
+    /// <inheritdoc />
     public async Task<ExternalMemberIdentity?> GetByEmailAsync(string email)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
