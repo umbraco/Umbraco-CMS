@@ -15,6 +15,7 @@ export class UmbDefaultWorkspaceContext extends UmbContextBase implements UmbWor
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_WORKSPACE_CONTEXT);
+		this.#entityContext.setUnique(null);
 	}
 
 	set manifest(manifest: ManifestWorkspaceDefaultKind) {
