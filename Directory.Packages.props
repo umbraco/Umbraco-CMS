@@ -80,10 +80,6 @@
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
-    <!-- Dazinator.Extensions.FileProviders references vulnerable versions of the following: -->
-    <!-- TODO (V18): Remove these pinned dependencies when the Dazinator.Extensions.FileProviders dependency is removed. -->
-    <PackageVersion Include="System.Net.Http" Version="4.3.4" />
-    <PackageVersion Include="System.Private.Uri" Version="4.3.2" />
     <!--
       Examine (via Microsoft.AspNetCore.DataProtection) and OpenIddict's *.DataProtection packages otherwise
       resolve System.Security.Cryptography.Xml down to a vulnerable 8.0.0 (GHSA-37gx-xxp4-5rgx, GHSA-w3x6-4m5h-cxqf).
