@@ -78,7 +78,8 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 	}
 
 	async #createMediaItems(uploadableItems: Array<UmbUploadableItem>) {
-		// Items offering the same media type choices share one pick, so the user is asked once per kind of item.
+		// Items in the same location offering the same media type choices share one pick, so the user is asked once per
+		// kind of item there.
 		const pickedMediaTypes = new Map<string, string | undefined>();
 
 		for (const item of uploadableItems) {
@@ -89,7 +90,7 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 				continue;
 			}
 
-			const mediaTypeUnique = await this.#resolveMediaTypeUnique(options, pickedMediaTypes);
+			const mediaTypeUnique = await this.#resolveMediaTypeUnique(item, options, uploadableItems, pickedMediaTypes);
 			if (!mediaTypeUnique) {
 				this._updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
 				continue;
@@ -264,7 +265,9 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 	}
 
 	async #resolveMediaTypeUnique(
+		item: UmbUploadableItem,
 		options: Array<UmbMediaTypeOption>,
+		items: Array<UmbUploadableItem> = [item],
 		pickedMediaTypes?: Map<string, string | undefined>,
 	): Promise<string | undefined> {
 		if (options.length === 1) return options[0].unique ?? undefined;
@@ -274,19 +277,43 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		if (specificMatches.length === 1) return specificMatches[0].unique ?? undefined;
 		if (specificMatches.length === 0) return options[0].unique ?? undefined;
 
-		const pickerKey = specificMatches
-			.map((x) => x.unique)
-			.sort()
-			.join('|');
-		if (pickedMediaTypes?.has(pickerKey)) return pickedMediaTypes.get(pickerKey);
+		const pickerKey = this.#getPickerKey(specificMatches);
+		const pickKey = `${item.parentUnique}|${pickerKey}`;
+		if (pickedMediaTypes?.has(pickKey)) return pickedMediaTypes.get(pickKey);
 
-		const mediaTypeUnique = await this.#showDialogMediaTypePicker(specificMatches);
-		pickedMediaTypes?.set(pickerKey, mediaTypeUnique);
+		const files = await this.#getFilesSharingPick(item, pickerKey, items);
+		const mediaTypeUnique = await this.#showDialogMediaTypePicker(specificMatches, files);
+		pickedMediaTypes?.set(pickKey, mediaTypeUnique);
 		return mediaTypeUnique;
 	}
 
-	async #showDialogMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>) {
-		const value = await umbOpenModal(this, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } }).catch(
+	#getPickerKey(specificMatches: Array<UmbMediaTypeOption>) {
+		return specificMatches
+			.map((x) => x.unique)
+			.sort()
+			.join('|');
+	}
+
+	// The files in the same location as the item whose choices match, so the picker can name every file the pick
+	// applies to. Within one location the choices only depend on the file extension.
+	async #getFilesSharingPick(item: UmbUploadableItem, pickerKey: string, items: Array<UmbUploadableItem>) {
+		const keyByExtension = new Map<string | undefined, string | undefined>();
+		const files: Array<File> = [];
+		for (const other of items) {
+			if (!other.temporaryFile || other.parentUnique !== item.parentUnique) continue;
+			const extension = getFileExtension(other.temporaryFile.file.name);
+			if (!keyByExtension.has(extension)) {
+				const { options } = await this.#getMediaTypeOptions(other);
+				const specificMatches = options.filter((x) => x.matchedFileExtension === true);
+				keyByExtension.set(extension, options.length > 1 ? this.#getPickerKey(specificMatches) : undefined);
+			}
+			if (keyByExtension.get(extension) === pickerKey) files.push(other.temporaryFile.file);
+		}
+		return files;
+	}
+
+	async #showDialogMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>, files: Array<File>) {
+		const value = await umbOpenModal(this, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options, files } }).catch(
 			() => undefined,
 		);
 		if (!value) return undefined; // cancelled
@@ -307,7 +334,7 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 			return this._updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED, message);
 		}
 
-		const mediaTypeUnique = await this.#resolveMediaTypeUnique(options);
+		const mediaTypeUnique = await this.#resolveMediaTypeUnique(item, options);
 
 		if (!mediaTypeUnique) {
 			return this._updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);

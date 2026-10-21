@@ -78,7 +78,7 @@ const mediaTypesForExtension = (fileExtension: string) => {
 };
 
 const mockRepositories = (state: TestState) => {
-	override(state, UmbMediaTypeStructureRepository.prototype, 'requestAllowedChildrenOf', async () => ({
+	override(state, UmbMediaTypeStructureRepository.prototype, 'requestAllAllowedChildrenOf', async () => ({
 		data: { items: [IMAGE_TYPE, PHOTO_TYPE, FILE_TYPE] },
 	}));
 	override(state, UmbMediaTypeStructureRepository.prototype, 'requestMediaTypesOf', async ({ fileExtension }: any) =>
@@ -184,6 +184,18 @@ describe('UmbMediaDropzoneManager', () => {
 		expect(progressItems.map((x) => x.status)).to.deep.equal([
 			UmbFileDropzoneItemStatus.CANCELLED,
 			UmbFileDropzoneItemStatus.CANCELLED,
+		]);
+	});
+
+	it('names every file a media type choice applies to', async () => {
+		const files = [new File(['a'], 'a.png'), new File(['b'], 'b.svg'), new File(['c'], 'c.png')];
+
+		const items = state.manager.createMediaItems({ files, folders: [] });
+		await waitForUpload(items);
+
+		expect(state.pickerData.map((data) => data.files.map((file: File) => file.name))).to.deep.equal([
+			['a.png', 'c.png'],
+			['b.svg'],
 		]);
 	});
 });
