@@ -279,7 +279,7 @@ test('can create content with a block grid area with specified allowance with mi
   await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 2);
 });
 
-test('cannot publish content with a block grid area with specified allowance with min allowed when only other blocks are present', async ({umbracoApi, umbracoUi}) => {
+test('cannot publish content with a block grid area with specified allowance with min allowed when that block type is absent',async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const thirdElementTypeId = await umbracoApi.documentType.createEmptyElementType(thirdElementTypeName);
@@ -299,7 +299,6 @@ test('cannot publish content with a block grid area with specified allowance wit
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  // A block type minimum within an area applies even when that type is absent, unlike the area's own minimum.
   await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   const contentData = await umbracoApi.document.getByName(contentName);
