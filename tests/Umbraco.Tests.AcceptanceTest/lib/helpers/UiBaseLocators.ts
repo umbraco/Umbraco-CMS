@@ -705,6 +705,21 @@ export class UiBaseLocators extends BasePage {
     await this.openCaretButtonForName(treeName);
   }
 
+  /**
+   * Expands a tree root and makes sure it stays expanded.
+   * After a save, the Backoffice expands the tree by itself to reveal the saved item. If that happens between
+   * reading `show-children` and clicking the caret, the click collapses the tree again, so retry until it is open.
+   * @param treeRoot - The `uui-menu-item` of the tree root
+   */
+  async expandTreeRoot(treeRoot: Locator) {
+    await expect(async () => {
+      if ((await treeRoot.getAttribute('show-children')) === null) {
+        await treeRoot.locator(this.caretBtn).first().click();
+      }
+      await expect(treeRoot).toHaveAttribute('show-children', {timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.long});
+  }
+
   async isTreeItemVisible(name: string, isVisible = true) {
     await this.isVisible(
       this.treeItem.locator('[label="' + name + '"]'),
@@ -1093,6 +1108,10 @@ export class UiBaseLocators extends BasePage {
       this.page.getByRole("tab", { name: sectionName }),
       isVisible,
     );
+  }
+
+  async isSectionActive(sectionName: string) {
+    await expect(this.activeSectionLink.getByText(sectionName)).toBeVisible();
   }
 
   async isBackOfficeMainVisible(isVisible: boolean = true) {
@@ -2013,6 +2032,18 @@ export class UiBaseLocators extends BasePage {
 
   async isTextWithMessageVisible(message: string, isVisible: boolean = true) {
     return await this.isVisible(this.page.getByText(message), isVisible);
+  }
+
+  async isDiscardChangesModalVisible(isVisible: boolean = true) {
+    return await this.isVisible(this.page.getByTestId('discard-changes-modal'), isVisible);
+  }
+
+  async clickDiscardChangesButton() {
+    await this.click(this.page.getByTestId('discard-changes-modal').getByTestId('action:discard-changes'));
+  }
+
+  async clickStayOnPageButton() {
+    await this.click(this.page.getByTestId('discard-changes-modal').getByTestId('action:stay'));
   }
 
   /**

@@ -69,6 +69,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerInputContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerInputContext.max;
@@ -122,13 +123,17 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 	@property({ type: Boolean })
 	required = false;
 	@property({ type: String })
