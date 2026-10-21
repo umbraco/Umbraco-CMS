@@ -21,18 +21,22 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 		);
 		if (!result?.link) return;
 
-		const linkAttrs = this.#parseLinkData(result.link);
+		this.#applyLink(result.link, editor);
+	}
 
-		if (linkAttrs && this.#hasNoTextToLink(editor)) {
+	#applyLink(link: UmbLinkPickerLink, editor?: Editor) {
+		const linkAttrs = this.#parseLinkData(link);
+
+		if (!linkAttrs) {
+			editor?.chain().focus().extendMarkRange(UmbLink.name).unsetLink().run();
+		} else if (this.#hasNoTextToLink(editor)) {
 			// Insert the link instead, using its name as the text and falling back to the picked URL, as a
 			// local link's href is a `{localLink:…}` token. Storing the link mark before inserting plain text
 			// keeps any formatting at the cursor.
-			const text = result.link.name || result.link.url || linkAttrs.href;
-			editor.chain().focus().setUmbLink(linkAttrs).insertContent({ type: 'text', text }).unsetMark(UmbLink.name).run();
-		} else if (linkAttrs) {
-			editor?.chain().focus().extendMarkRange(UmbLink.name).setUmbLink(linkAttrs).run();
+			const text = link.name || link.url || linkAttrs.href;
+			editor?.chain().focus().setUmbLink(linkAttrs).insertContent({ type: 'text', text }).unsetMark(UmbLink.name).run();
 		} else {
-			editor?.chain().focus().extendMarkRange(UmbLink.name).unsetLink().run();
+			editor?.chain().focus().extendMarkRange(UmbLink.name).setUmbLink(linkAttrs).run();
 		}
 	}
 
@@ -41,7 +45,7 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 	 * @param {Editor} [editor] - The editor to check.
 	 * @returns {boolean} True when the link should be inserted rather than applied to existing text.
 	 */
-	#hasNoTextToLink(editor?: Editor): editor is Editor {
+	#hasNoTextToLink(editor?: Editor): boolean {
 		return !!editor?.state.selection.empty && !editor.isActive(UmbLink.name);
 	}
 
