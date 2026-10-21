@@ -30,7 +30,8 @@ export class UmbContentReferencedEntitiesManager extends UmbControllerBase {
 	): Promise<Array<UmbEntityModel>> {
 		try {
 			return await this.#getEntitiesNeedingAttention(values);
-		} catch {
+		} catch (error) {
+			console.error('Failed to resolve referenced entities needing attention:', error);
 			return [];
 		}
 	}

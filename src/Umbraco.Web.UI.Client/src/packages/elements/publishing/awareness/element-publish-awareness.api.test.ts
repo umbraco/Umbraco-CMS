@@ -34,8 +34,16 @@ describe('UmbElementPublishAwarenessApi', () => {
 		expect(api.needsAttention(createItem(UmbElementVariantState.PUBLISHED))).to.be.false;
 	});
 
-	it('does not need attention when the element is trashed', () => {
-		expect(api.needsAttention(createItem(UmbElementVariantState.TRASHED))).to.be.false;
+	it('needs attention when the element is trashed', () => {
+		expect(api.needsAttention(createItem(UmbElementVariantState.TRASHED))).to.be.true;
+	});
+
+	it('needs attention when any variant is trashed, regardless of variant order', () => {
+		expect(api.needsAttention(createItem(UmbElementVariantState.PUBLISHED, UmbElementVariantState.TRASHED))).to.be
+			.true;
+		expect(
+			api.needsAttention(createItem(UmbElementVariantState.PUBLISHED_PENDING_CHANGES, UmbElementVariantState.TRASHED)),
+		).to.be.true;
 	});
 
 	it('does not need attention when no variant has been created', () => {
