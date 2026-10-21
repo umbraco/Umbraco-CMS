@@ -153,27 +153,15 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
         /// <summary>
         /// Base validator for the decimal property editor validation against data type configured values.
         /// </summary>
-        internal abstract class DecimalPropertyConfigurationValidatorBase : SimplePropertyConfigurationValidatorBase<double>
+        internal abstract class DecimalPropertyConfigurationValidatorBase : NumericPropertyConfigurationValidatorBase<double, DecimalConfiguration>
         {
-            /// <summary>
-            /// The configuration key for the validation range.
-            /// </summary>
-            protected const string ConfigurationKeyValidationRange = "validationRange";
-
-            /// <summary>
-            /// The configuration key for the step value.
-            /// </summary>
-            protected const string ConfigurationKeyStepValue = "step";
-
             /// <summary>
             /// Initializes a new instance of the <see cref="DecimalPropertyConfigurationValidatorBase"/> class.
             /// </summary>
-            protected DecimalPropertyConfigurationValidatorBase(ILocalizedTextService localizedTextService) => LocalizedTextService = localizedTextService;
-
-            /// <summary>
-            /// Gets the <see cref="ILocalizedTextService"/>.
-            /// </summary>
-            protected ILocalizedTextService LocalizedTextService { get; }
+            protected DecimalPropertyConfigurationValidatorBase(ILocalizedTextService localizedTextService)
+                : base(localizedTextService)
+            {
+            }
 
             /// <inheritdoc/>
             protected override bool TryParsePropertyValue(object? value, out double parsedDecimalValue)
@@ -210,34 +198,11 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
                 return double.TryParse(value.ToString(), NumberStyles.Any, CultureInfo.CurrentCulture, out parsedDecimalValue);
             }
 
-            /// <summary>
-            /// Retrieves the configured validation range from either the typed or the dictionary configuration.
-            /// </summary>
-            /// <param name="dataTypeConfiguration">The data type configuration.</param>
-            /// <param name="min">The minimum bound, or <c>null</c> when unbounded or not present.</param>
-            /// <param name="max">The maximum bound, or <c>null</c> when unbounded or not present.</param>
-            /// <returns>True if a validation range was found.</returns>
-            protected static bool TryGetRange(object? dataTypeConfiguration, out decimal? min, out decimal? max)
-                => dataTypeConfiguration is DecimalConfiguration decimalConfiguration
-                    ? RangeConfigurationHelper.TryGetBounds(decimalConfiguration.ValidationRange, out min, out max)
-                    : TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out min, out max);
+            /// <inheritdoc/>
+            protected override object? GetValidationRange(DecimalConfiguration configuration) => configuration.ValidationRange;
 
-            /// <summary>
-            /// Retrieves the configured step from either the typed or the dictionary configuration.
-            /// </summary>
-            /// <param name="dataTypeConfiguration">The data type configuration.</param>
-            /// <param name="step">The configured step.</param>
-            /// <returns>True if a step was configured.</returns>
-            protected static bool TryGetStep(object? dataTypeConfiguration, out double step)
-            {
-                if (dataTypeConfiguration is DecimalConfiguration decimalConfiguration)
-                {
-                    step = (double)(decimalConfiguration.Step ?? default);
-                    return decimalConfiguration.Step.HasValue;
-                }
-
-                return TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out step);
-            }
+            /// <inheritdoc/>
+            protected override double? GetStep(DecimalConfiguration configuration) => (double?)configuration.Step;
         }
 
         /// <summary>

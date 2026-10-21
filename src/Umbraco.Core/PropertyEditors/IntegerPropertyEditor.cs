@@ -140,60 +140,25 @@ public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
         /// <summary>
         /// /// Base validator for the integer property editor validation against data type configured values.
         /// </summary>
-        internal abstract class IntegerPropertyConfigurationValidatorBase : SimplePropertyConfigurationValidatorBase<int>
+        internal abstract class IntegerPropertyConfigurationValidatorBase : NumericPropertyConfigurationValidatorBase<int, IntegerConfiguration>
         {
-            /// <summary>
-            /// The configuration key for the validation range.
-            /// </summary>
-            protected const string ConfigurationKeyValidationRange = "validationRange";
-
-            /// <summary>
-            /// The configuration key for the step value.
-            /// </summary>
-            protected const string ConfigurationKeyStepValue = "step";
-
             /// <summary>
             /// Initializes a new instance of the <see cref="IntegerPropertyConfigurationValidatorBase"/> class.
             /// </summary>
-            protected IntegerPropertyConfigurationValidatorBase(ILocalizedTextService localizedTextService) => LocalizedTextService = localizedTextService;
-
-            /// <summary>
-            /// Gets the <see cref="ILocalizedTextService"/>.
-            /// </summary>
-            protected ILocalizedTextService LocalizedTextService { get; }
+            protected IntegerPropertyConfigurationValidatorBase(ILocalizedTextService localizedTextService)
+                : base(localizedTextService)
+            {
+            }
 
             /// <inheritdoc/>
             protected override bool TryParsePropertyValue(object? value, out int parsedIntegerValue)
                 => int.TryParse(value?.ToString(), CultureInfo.InvariantCulture, out parsedIntegerValue);
 
-            /// <summary>
-            /// Retrieves the configured validation range from either the typed or the dictionary configuration.
-            /// </summary>
-            /// <param name="dataTypeConfiguration">The data type configuration.</param>
-            /// <param name="min">The minimum bound, or <c>null</c> when unbounded or not present.</param>
-            /// <param name="max">The maximum bound, or <c>null</c> when unbounded or not present.</param>
-            /// <returns>True if a validation range was found.</returns>
-            protected static bool TryGetRange(object? dataTypeConfiguration, out decimal? min, out decimal? max)
-                => dataTypeConfiguration is IntegerConfiguration integerConfiguration
-                    ? RangeConfigurationHelper.TryGetBounds(integerConfiguration.ValidationRange, out min, out max)
-                    : TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out min, out max);
+            /// <inheritdoc/>
+            protected override object? GetValidationRange(IntegerConfiguration configuration) => configuration.ValidationRange;
 
-            /// <summary>
-            /// Retrieves the configured step from either the typed or the dictionary configuration.
-            /// </summary>
-            /// <param name="dataTypeConfiguration">The data type configuration.</param>
-            /// <param name="step">The configured step.</param>
-            /// <returns>True if a step was configured.</returns>
-            protected static bool TryGetStep(object? dataTypeConfiguration, out int step)
-            {
-                if (dataTypeConfiguration is IntegerConfiguration integerConfiguration)
-                {
-                    step = integerConfiguration.Step ?? default;
-                    return integerConfiguration.Step.HasValue;
-                }
-
-                return TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out step);
-            }
+            /// <inheritdoc/>
+            protected override int? GetStep(IntegerConfiguration configuration) => configuration.Step;
         }
 
         /// <summary>
