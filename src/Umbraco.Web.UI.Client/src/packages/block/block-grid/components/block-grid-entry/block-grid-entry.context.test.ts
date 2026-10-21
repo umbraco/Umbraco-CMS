@@ -28,6 +28,8 @@ class UmbTestBlockGridEntryContext extends UmbBlockGridEntryContext {
 			contentOf: () => of(undefined),
 			isExternalContentOf: () => of(false),
 			externalContentStateOf: () => of(undefined),
+			externalContentNameOf: () => of(null),
+			externalContentFailureOf: () => of(undefined),
 		};
 		this._entries = entries as never;
 		this._manager = manager as never;

@@ -2165,7 +2165,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickBlockElementInRTEWithName(elementTypeName: string) {
-    const blockElementLocator = this.page.locator('uui-ref-node umb-ufm-render').filter({hasText: elementTypeName});
+    const blockElementLocator = this.page.locator('umb-ref-rte-block umb-ufm-render').filter({hasText: elementTypeName});
     await this.click(blockElementLocator, {force: true});
   }
 
@@ -2376,6 +2376,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickSaveModalButtonAndWaitForDomainToBeCreated() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.domains, this.click(this.sidebarSaveBtn), ConstantHelper.statusCodes.ok);
+  }
+
+  async isDocumentBlueprintSaveButtonDisabled() {
+    await expect(this.documentBlueprintSaveBtn).toBeDisabled({timeout: ConstantHelper.timeout.medium});
   }
 
   async clickSaveModalButtonAndWaitForDocumentBlueprintToBeCreated() {

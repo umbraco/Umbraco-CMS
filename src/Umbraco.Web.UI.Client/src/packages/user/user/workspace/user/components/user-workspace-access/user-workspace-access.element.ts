@@ -36,6 +36,7 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 				</div>
 				<div>
 					${this.#renderDocumentStartNodes()} ${this.#renderMediaStartNodes()} ${this.#renderElementStartNodes()}
+					${this.#renderDocumentBlueprintStartNodes()}
 				</div>
 			</uui-box>
 		`;
@@ -65,6 +66,23 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 				<div slot="editor">
 					${hasAccess
 						? html`<umb-user-element-start-node readonly .uniques=${uniques}></umb-user-element-start-node>`
+						: this.#renderNoStartNodes()}
+				</div>
+			</umb-property-layout>
+		`;
+	}
+
+	#renderDocumentBlueprintStartNodes() {
+		if (!this._calculatedStartNodes) return nothing;
+		const uniques = this._calculatedStartNodes.documentBlueprintStartNodeUniques.map((reference) => reference.unique);
+		const hasAccess = this._calculatedStartNodes.hasDocumentBlueprintRootAccess || uniques.length > 0;
+		return html`
+			<umb-property-layout label=${this.localize.term('treeHeaders_contentBlueprints')} orientation="vertical">
+				<div slot="editor">
+					${hasAccess
+						? html`<umb-user-document-blueprint-start-node
+								readonly
+								.uniques=${uniques}></umb-user-document-blueprint-start-node>`
 						: this.#renderNoStartNodes()}
 				</div>
 			</umb-property-layout>

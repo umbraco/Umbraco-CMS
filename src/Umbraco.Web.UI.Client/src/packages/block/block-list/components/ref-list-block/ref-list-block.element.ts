@@ -1,14 +1,18 @@
-import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
+
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
 
 /**
  * @element umb-ref-list-block
  * @slot name - Content rendered in the block's primary label area (the `name` slot of the inner `uui-ref-node`). The expected projection is a `<umb-ufm-render>` element owned by the parent block-list entry.
  */
 @customElement('umb-ref-list-block')
-export class UmbRefListBlockElement extends UmbLitElement {
+export class UmbRefListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElement) {
+	//
 	@property({ type: String, reflect: false })
 	icon?: string;
 
@@ -17,13 +21,6 @@ export class UmbRefListBlockElement extends UmbLitElement {
 
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
-
-	/**
-	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
-	 * reflects the library element's own publish state rather than the local expose entry.
-	 */
-	@property({ type: Boolean, attribute: false })
-	isExternalContent?: boolean;
 
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
@@ -35,30 +32,20 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	config?: UmbBlockEditorCustomViewConfiguration;
 
 	override render() {
+		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<uui-ref-node
 				standalone
 				.readonly=${!(this.config?.showContentEdit ?? false)}
 				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-				<slot name="name" slot="name"></slot>
-				${when(this.unpublished, () => this.#renderDraftTag())}
+				${this.renderNameSlot(blockValue, 'name')}
+				<umb-block-state-tag slot="name"></umb-block-state-tag>
 			</uui-ref-node>
 		`;
 	}
 
-	#renderDraftTag() {
-		const titleKey = this.isExternalContent
-			? 'blockEditor_notPublishedLibraryElementDescription'
-			: 'blockEditor_notExposedDescription';
-		return html`
-			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
-				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-			</uui-tag>
-		`;
-	}
-
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: block;
@@ -67,13 +54,6 @@ export class UmbRefListBlockElement extends UmbLitElement {
 
 			uui-ref-node {
 				min-height: var(--uui-size-16);
-			}
-
-			uui-tag {
-				margin-left: 0.5em;
-				margin-bottom: -0.3em;
-				margin-top: -0.3em;
-				vertical-align: text-top;
 			}
 
 			umb-ufm-render,

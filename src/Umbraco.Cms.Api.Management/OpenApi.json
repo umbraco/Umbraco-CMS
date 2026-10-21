@@ -1342,6 +1342,129 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/data-type/folder/{id}/move": {
+      "put": {
+        "tags": [
+          "Data Type"
+        ],
+        "summary": "Moves a data type folder.",
+        "description": "Moves a data type folder identified by the provided Id to a different location.",
+        "operationId": "PutDataTypeFolderByIdMove",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveFolderRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/data-type/schemas/batch": {
       "get": {
         "tags": [
@@ -8076,6 +8199,30 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "headers": {
@@ -8595,6 +8742,129 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document-blueprint/folder/{id}/move": {
+      "put": {
+        "tags": [
+          "Document Blueprint"
+        ],
+        "summary": "Moves a document blueprint folder.",
+        "description": "Moves a document blueprint folder identified by the provided Id to a different location.",
+        "operationId": "PutDocumentBlueprintFolderByIdMove",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveFolderRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document-blueprint/from-document": {
       "post": {
         "tags": [
@@ -8642,6 +8912,30 @@
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -8728,6 +9022,52 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/DocumentBlueprintItemResponseModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/document-blueprint/folder": {
+      "get": {
+        "tags": [
+          "Document Blueprint"
+        ],
+        "summary": "Gets a collection of document blueprint folder items.",
+        "description": "Gets a collection of document blueprint folder items identified by the provided Ids.",
+        "operationId": "GetItemDocumentBlueprintFolder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FolderItemResponseModel"
                   }
                 }
               }
@@ -10307,6 +10647,67 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document-type/allowed-for-blueprint": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "summary": "Gets document types allowed for document blueprints.",
+        "description": "Gets a collection of document types that a document blueprint can be created for.",
+        "operationId": "GetDocumentTypeAllowedForBlueprint",
+        "parameters": [
+          {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedDocumentTypeModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document-type/allowed-in-library": {
       "get": {
         "tags": [
@@ -10835,6 +11236,129 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateFolderResponseModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document-type/folder/{id}/move": {
+      "put": {
+        "tags": [
+          "Document Type"
+        ],
+        "summary": "Moves a document type folder.",
+        "description": "Moves a document type folder identified by the provided Id to a different location.",
+        "operationId": "PutDocumentTypeFolderByIdMove",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveFolderRequestModel"
               }
             }
           },
@@ -13525,6 +14049,52 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/element/batch": {
+      "get": {
+        "tags": [
+          "Element"
+        ],
+        "summary": "Gets multiple elements.",
+        "description": "Gets multiple elements identified by the provided Ids. Ids the current user is not authorized to browse are omitted from the result.",
+        "operationId": "GetElementBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelElementResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/element/configuration": {
       "get": {
         "tags": [
@@ -14673,6 +15243,20 @@
             }
           },
           {
+            "name": "trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "skip",
             "in": "query",
             "schema": {
@@ -14688,6 +15272,25 @@
               "type": "integer",
               "format": "int32",
               "default": 100
+            }
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "allowedElementTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
             }
           }
         ],
@@ -22809,6 +23412,129 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/media-type/folder/{id}/move": {
+      "put": {
+        "tags": [
+          "Media Type"
+        ],
+        "summary": "Moves a media type folder.",
+        "description": "Moves a media type folder identified by the provided Id to a different location.",
+        "operationId": "PutMediaTypeFolderByIdMove",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveFolderRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/media-type/import": {
       "post": {
         "tags": [
@@ -26464,6 +27190,129 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateFolderResponseModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/member-type/folder/{id}/move": {
+      "put": {
+        "tags": [
+          "Member Type"
+        ],
+        "summary": "Moves a member type folder.",
+        "description": "Moves a member type folder identified by the provided Id to a different location.",
+        "operationId": "PutMemberTypeFolderByIdMove",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveFolderRequestModel"
               }
             }
           },
@@ -34705,7 +35554,7 @@
           "User"
         ],
         "summary": "Gets a filtered collection of users.",
-        "description": "Filters users based on the provided criteria with support for pagination.",
+        "description": "Returns a paged collection of users matching the provided criteria — user groups, user states, user kinds (default or API users) and a name/username search term.",
         "operationId": "GetFilterUser",
         "parameters": [
           {
@@ -40416,6 +41265,25 @@
           }
         }
       },
+      "BatchResponseModelElementResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ElementResponseModel"
+            }
+          }
+        }
+      },
       "BatchResponseModelMediaTypeResponseModel": {
         "required": [
           "total",
@@ -40481,7 +41349,9 @@
           "mediaStartNodeIds",
           "hasMediaRootAccess",
           "elementStartNodeIds",
-          "hasElementRootAccess"
+          "hasElementRootAccess",
+          "documentBlueprintStartNodeIds",
+          "hasDocumentBlueprintRootAccess"
         ],
         "type": "object",
         "properties": {
@@ -40514,6 +41384,15 @@
             }
           },
           "hasElementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNodeIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceByIdModel"
+            }
+          },
+          "hasDocumentBlueprintRootAccess": {
             "type": "boolean"
           }
         }
@@ -42191,7 +43070,8 @@
           "permissions",
           "documentRootAccess",
           "mediaRootAccess",
-          "elementRootAccess"
+          "elementRootAccess",
+          "documentBlueprintRootAccess"
         ],
         "type": "object",
         "properties": {
@@ -42275,6 +43155,19 @@
             ]
           },
           "elementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "documentBlueprintRootAccess": {
             "type": "boolean"
           },
           "fallbackPermissions": {
@@ -42460,6 +43353,8 @@
           "hasMediaRootAccess",
           "elementStartNodeIds",
           "hasElementRootAccess",
+          "documentBlueprintStartNodeIds",
+          "hasDocumentBlueprintRootAccess",
           "avatarUrls",
           "languages",
           "hasAccessToAllLanguages",
@@ -42511,6 +43406,15 @@
             }
           },
           "hasElementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNodeIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceByIdModel"
+            }
+          },
+          "hasDocumentBlueprintRootAccess": {
             "type": "boolean"
           },
           "avatarUrls": {
@@ -45039,47 +45943,6 @@
           "Warning"
         ]
       },
-      "FacetModel": {
-        "required": [
-          "fieldName"
-        ],
-        "type": "object",
-        "properties": {
-          "fieldName": {
-            "type": "string"
-          }
-        }
-      },
-      "FacetResultResponseModel": {
-        "required": [
-          "fieldName",
-          "values"
-        ],
-        "type": "object",
-        "properties": {
-          "fieldName": {
-            "type": "string"
-          },
-          "values": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FacetValueModel"
-            }
-          }
-        }
-      },
-      "FacetValueModel": {
-        "required": [
-          "count"
-        ],
-        "type": "object",
-        "properties": {
-          "count": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "FetchResponseModelDataTypeSchemaItemResponseModel": {
         "required": [
           "total",
@@ -45139,21 +46002,6 @@
             "type": "boolean"
           },
           "hasChildren": {
-            "type": "boolean"
-          }
-        }
-      },
-      "FilterModel": {
-        "required": [
-          "fieldName",
-          "negate"
-        ],
-        "type": "object",
-        "properties": {
-          "fieldName": {
-            "type": "string"
-          },
-          "negate": {
             "type": "boolean"
           }
         }
@@ -50644,33 +51492,6 @@
               "string"
             ]
           },
-          "filters": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "items": {
-              "$ref": "#/components/schemas/FilterModel"
-            }
-          },
-          "facets": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "items": {
-              "$ref": "#/components/schemas/FacetModel"
-            }
-          },
-          "sorters": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "items": {
-              "$ref": "#/components/schemas/SorterModel"
-            }
-          },
           "culture": {
             "type": [
               "null",
@@ -50688,7 +51509,6 @@
       "SearchResultResponseModel": {
         "required": [
           "documents",
-          "facets",
           "total"
         ],
         "type": "object",
@@ -50701,12 +51521,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SearchDocumentResponseModel"
-            }
-          },
-          "facets": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FacetResultResponseModel"
             }
           }
         }
@@ -50879,21 +51693,6 @@
           },
           "field": {
             "$ref": "#/components/schemas/ContentSortFieldModel"
-          },
-          "direction": {
-            "$ref": "#/components/schemas/DirectionModel"
-          }
-        }
-      },
-      "SorterModel": {
-        "required": [
-          "fieldName",
-          "direction"
-        ],
-        "type": "object",
-        "properties": {
-          "fieldName": {
-            "type": "string"
           },
           "direction": {
             "$ref": "#/components/schemas/DirectionModel"
@@ -53056,7 +53855,8 @@
           "permissions",
           "documentRootAccess",
           "mediaRootAccess",
-          "elementRootAccess"
+          "elementRootAccess",
+          "documentBlueprintRootAccess"
         ],
         "type": "object",
         "properties": {
@@ -53135,6 +53935,19 @@
           "elementRootAccess": {
             "type": "boolean"
           },
+          "documentBlueprintStartNode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "documentBlueprintRootAccess": {
+            "type": "boolean"
+          },
           "fallbackPermissions": {
             "type": "array",
             "items": {
@@ -53179,6 +53992,8 @@
           "hasMediaRootAccess",
           "elementStartNodeIds",
           "hasElementRootAccess",
+          "documentBlueprintStartNodeIds",
+          "hasDocumentBlueprintRootAccess",
           "email",
           "userName",
           "name",
@@ -53214,6 +54029,15 @@
             }
           },
           "hasElementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNodeIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceByIdModel"
+            }
+          },
+          "hasDocumentBlueprintRootAccess": {
             "type": "boolean"
           },
           "email": {
@@ -53463,7 +54287,8 @@
           "aliasCanBeChanged",
           "documentRootAccess",
           "mediaRootAccess",
-          "elementRootAccess"
+          "elementRootAccess",
+          "documentBlueprintRootAccess"
         ],
         "type": "object",
         "properties": {
@@ -53550,6 +54375,19 @@
             ]
           },
           "elementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "documentBlueprintRootAccess": {
             "type": "boolean"
           },
           "fallbackPermissions": {
@@ -53687,6 +54525,8 @@
           "hasMediaRootAccess",
           "elementStartNodeIds",
           "hasElementRootAccess",
+          "documentBlueprintStartNodeIds",
+          "hasDocumentBlueprintRootAccess",
           "avatarUrls",
           "state",
           "failedLoginAttempts",
@@ -53736,6 +54576,15 @@
             }
           },
           "hasElementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNodeIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceByIdModel"
+            }
+          },
+          "hasDocumentBlueprintRootAccess": {
             "type": "boolean"
           },
           "avatarUrls": {
