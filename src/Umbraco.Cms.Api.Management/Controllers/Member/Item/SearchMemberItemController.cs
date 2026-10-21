@@ -35,6 +35,25 @@ public class SearchMemberItemController : MemberItemControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Member.Item.SearchMemberItemController"/> class.
     /// </summary>
+    /// <remarks>
+    /// This constructor exists only to give the dependency injection container an unambiguous (greediest) constructor
+    /// to select while the obsolete constructor remains. Use the constructor taking an <see cref="IMemberPresentationService"/>.
+    /// </remarks>
+    /// <param name="indexedEntitySearchService">Service for performing indexed entity search operations.</param>
+    /// <param name="memberPresentationFactory">Unused.</param>
+    /// <param name="memberPresentationService">Service for creating member item presentation models, for content-based and external members alike.</param>
+    [Obsolete("This constructor exists only to satisfy dependency injection. Please use the constructor taking an IMemberPresentationService. Scheduled for removal in Umbraco 21.")]
+    public SearchMemberItemController(
+        IIndexedEntitySearchService indexedEntitySearchService,
+        IMemberPresentationFactory memberPresentationFactory,
+        IMemberPresentationService memberPresentationService)
+        : this(indexedEntitySearchService, memberPresentationService)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Member.Item.SearchMemberItemController"/> class.
+    /// </summary>
     /// <param name="indexedEntitySearchService">Service for performing indexed entity search operations.</param>
     /// <param name="memberPresentationFactory">Factory for creating member presentation models.</param>
     [Obsolete("Use the constructor taking an IMemberPresentationService. Scheduled for removal in Umbraco 21.")]
