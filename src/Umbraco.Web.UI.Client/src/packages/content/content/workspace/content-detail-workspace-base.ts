@@ -189,7 +189,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	// TODO: Remove this property in v.21
 	/**
 	 * This property is deprecated and will be removed in v.21.
-	 * @deprecated - it is not possible to filter variant options from v.21.
+	 * @deprecated Deprecated since v19. It is not possible to filter variant options from v21. Will be removed in v21.
 	 */
 	protected _variantOptionsFilter = (_variantOption: UmbEntityVariantOptionSourceModel<VariantOptionModelType>) => true;
 
@@ -284,7 +284,19 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.variants,
 			appLanguages.asObservable(),
 		);
-		this.variantOptionsManager._internal_setOptionFilter((option) => this._variantOptionsFilter(option));
+		const defaultVariantOptionsFilter = this._variantOptionsFilter;
+		let hasWarnedVariantOptionsFilter = false;
+		this.variantOptionsManager._internal_setOptionFilter((option) => {
+			if (!hasWarnedVariantOptionsFilter && this._variantOptionsFilter !== defaultVariantOptionsFilter) {
+				hasWarnedVariantOptionsFilter = true;
+				new UmbDeprecation({
+					deprecated: '_variantOptionsFilter',
+					removeInVersion: '21.0.0',
+					solution: 'Filtering variant options is no longer supported.',
+				}).warn();
+			}
+			return this._variantOptionsFilter(option);
+		});
 		this.variantOptions = this.variantOptionsManager.variantOptions;
 		this.languages = this.variantOptionsManager.languages;
 
