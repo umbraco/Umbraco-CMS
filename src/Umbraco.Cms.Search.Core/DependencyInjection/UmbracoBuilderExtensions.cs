@@ -9,6 +9,7 @@ using Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 using Umbraco.Cms.Search.Core.Cache;
 using Umbraco.Cms.Search.Core.Cache.Content;
 using Umbraco.Cms.Search.Core.Cache.Element;
+using Umbraco.Cms.Search.Core.Cache.ExternalMember;
 using Umbraco.Cms.Search.Core.Cache.Index;
 using Umbraco.Cms.Search.Core.Cache.Media;
 using Umbraco.Cms.Search.Core.Cache.MediaType;
@@ -20,6 +21,7 @@ using Umbraco.Cms.Search.Core.Persistence;
 using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing.Indexers;
+using Umbraco.Cms.Search.Core.Services.ExternalMemberIndexing;
 using Umbraco.Extensions;
 using ContentTypeCacheRefresherNotification = Umbraco.Cms.Search.Core.Cache.ContentType.ContentTypeCacheRefresherNotification;
 using LanguageCacheRefresherNotification = Umbraco.Cms.Search.Core.Cache.Language.LanguageCacheRefresherNotification;
@@ -61,6 +63,9 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<IContentIndexer, SystemFieldsContentIndexer>();
         builder.Services.AddTransient<IContentIndexer, PropertyValueFieldsContentIndexer>();
         builder.Services.AddTransient<ISystemFieldsContentIndexer, SystemFieldsContentIndexer>();
+        builder.Services.AddTransient<IContentIndexer, MemberFieldsContentIndexer>();
+
+        builder.Services.AddSingleton<ExternalMemberIndexingService>();
 
         builder.Services.AddTransient<IDateTimeOffsetConverter, DateTimeOffsetConverter>();
         builder.Services.AddTransient<IContentProtectionProvider, ContentProtectionProvider>();
@@ -109,6 +114,10 @@ public static class UmbracoBuilderExtensions
             .AddNotificationHandler<PublishedElementCacheRefresherNotification, ElementIndexingNotificationHandler>()
             .AddNotificationHandler<ElementDeletingNotification, ElementIndexingNotificationHandler>()
             .AddNotificationAsyncHandler<PublicAccessDetailedCacheRefresherNotification, PublicAccessIndexingNotificationHandler>();
+
+        builder
+            .AddNotificationHandler<ExternalMemberIndexCacheRefresherNotification, ExternalMemberIndexingNotificationHandler>()
+            .AddNotificationAsyncHandler<IndexRebuildingNotification, ExternalMemberIndexingNotificationHandler>();
 
         builder
             .WithCollectionBuilder<PropertyValueHandlerCollectionBuilder>()
