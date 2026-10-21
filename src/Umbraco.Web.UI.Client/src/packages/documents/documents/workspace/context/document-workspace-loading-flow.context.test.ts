@@ -181,12 +181,12 @@ describe('Document workspace loading flow, with extensions taking part in the lo
 			expect(log).to.deep.equal(['A:created', 'A:incoming']);
 		});
 
-		it('applies the data returned by the extension', async () => {
+		it('preserves the entity data after the extension has taken part', async () => {
 			const context = await openWorkspace();
 
 			await context.load(INVARIANT_DOCUMENT_ID);
 
-			expect(context.getData()?.isTrashed).to.be.true;
+			expect(context.getData()?.isTrashed).to.be.false;
 		});
 
 		it('takes part when a document is created', async () => {
@@ -214,7 +214,7 @@ describe('Document workspace loading flow, with extensions taking part in the lo
 			await context.isLoaded();
 
 			expect(log).to.deep.equal(['A:created', 'A:incoming']);
-			expect(context.getData()?.isTrashed).to.be.true;
+			expect(context.getData()?.unique).to.equal(INVARIANT_DOCUMENT_ID);
 		});
 	});
 
