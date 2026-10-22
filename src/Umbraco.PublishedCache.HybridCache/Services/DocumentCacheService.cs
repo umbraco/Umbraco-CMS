@@ -461,6 +461,41 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     }
 
     /// <inheritdoc />
+    public void RefreshMemoryCache(Guid key)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+
+        // The read lock stays held across the cache writes so a save cannot commit between this read and the cache
+        // update; the database read is synchronous so the lock is not held across a thread-pool hop. The cache writes
+        // complete synchronously unless a distributed (L2) cache is configured.
+        (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = _databaseCacheRepository.GetContentSourceForPublishStates(key);
+
+        if (draftNode is not null)
+        {
+            _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode)).AsTask().GetAwaiter().GetResult();
+        }
+        else
+        {
+            _hybridCache.RemoveAsync(GetCacheKey(key, true)).AsTask().GetAwaiter().GetResult();
+        }
+
+        if (publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key))
+        {
+            var cacheKey = GetCacheKey(publishedNode.Key, false);
+            _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode)).AsTask().GetAwaiter().GetResult();
+            _publishedContentCache.Remove(cacheKey);
+            InvalidateMemoryCacheGeneration();
+        }
+        else
+        {
+            ClearPublishedCacheAsync(key).GetAwaiter().GetResult();
+        }
+
+        scope.Complete();
+    }
+
+    /// <inheritdoc />
     public async Task RefreshMemoryCacheAsync(Guid key)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -612,6 +647,59 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         }
 
         return await _hybridCache.ExistsAsync<ContentCacheNode?>(GetCacheKey(keyAttempt.Result, preview), CancellationToken.None);
+    }
+
+    /// <inheritdoc />
+    public void RefreshContent(IContent content)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        if (content.Trashed)
+        {
+            _databaseCacheRepository.DeleteContentItem(content.Id);
+            AfterCommit(scope, $"{nameof(DocumentCacheService)}.{nameof(RemoveFromMemoryCacheAsync)}.{content.Key}", () => RemoveFromMemoryCacheAsync(content.Key));
+            scope.Complete();
+            return;
+        }
+
+        var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
+        _databaseCacheRepository.RefreshContent(draftCacheNode);
+
+        if (content.PublishedState is PublishedState.Publishing)
+        {
+            var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
+            _databaseCacheRepository.RefreshContent(publishedCacheNode);
+        }
+        else if (content.PublishedState is PublishedState.Unpublishing)
+        {
+            _databaseCacheRepository.RemovePublishedContent(content.Id);
+            AfterCommit(scope, $"{nameof(DocumentCacheService)}.{nameof(ClearPublishedCacheAsync)}.{content.Key}", () => ClearPublishedCacheAsync(content.Key));
+        }
+
+        scope.Complete();
+    }
+
+    /// <summary>
+    /// Runs a memory-cache update once the ambient transaction has committed, so the cache work (which may reach a
+    /// distributed cache) does not run while the content tree lock is held. Without an ambient scope context the
+    /// update runs at once.
+    /// </summary>
+    private void AfterCommit(ICoreScope scope, string key, Func<Task> update)
+    {
+        IScopeContext? context = _scopeProvider.Context;
+        if (context is null)
+        {
+            update().GetAwaiter().GetResult();
+            return;
+        }
+
+        context.Enlist(key, completed =>
+        {
+            if (completed)
+            {
+                update().GetAwaiter().GetResult();
+            }
+        });
     }
 
     /// <inheritdoc />

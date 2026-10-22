@@ -88,6 +88,18 @@ public interface IMediaCacheService
     Task RefreshMediaAsync(IMedia media);
 
     /// <summary>
+    /// Refreshes the cache for the specified media item without leaving the calling thread.
+    /// </summary>
+    /// <param name="media">The media item to refresh.</param>
+    /// <remarks>
+    /// Runs inside the transaction that persists the media, under the media tree lock; awaiting there would need a
+    /// second thread-pool thread while the first is blocked on the lock.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshMedia(IMedia media)
+        => RefreshMediaAsync(media).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Rebuilds the memory cache for media items of the specified media types.
     /// </summary>
     /// <param name="mediaTypeIds">The collection of media type identifiers to rebuild in memory cache.</param>

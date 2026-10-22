@@ -128,6 +128,42 @@ internal interface IDatabaseCacheRepository
     Task RemovePublishedContentAsync(int id);
 
     /// <summary>
+    /// Deletes a content item's rows without leaving the calling thread.
+    /// </summary>
+    /// <remarks>
+    /// The synchronous members run inside the content transaction, under the content tree lock. Until the lock wait
+    /// and the notification pipeline are asynchronous, awaiting there needs a second thread-pool thread while the
+    /// first is blocked, which under load stretches the time the lock is held.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void DeleteContentItem(int id) => DeleteContentItemAsync(id).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Refreshes a content item's rows without leaving the calling thread.
+    /// </summary>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshContent(ContentCacheNode contentCacheNode) => RefreshContentAsync(contentCacheNode).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Refreshes a media item's rows without leaving the calling thread.
+    /// </summary>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshMedia(ContentCacheNode contentCacheNode) => RefreshMediaAsync(contentCacheNode).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Removes a content item's published row without leaving the calling thread.
+    /// </summary>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RemovePublishedContent(int id) => RemovePublishedContentAsync(id).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Gets the draft and published cache nodes of a document without leaving the calling thread.
+    /// </summary>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    (ContentCacheNode? Draft, ContentCacheNode? Published) GetContentSourceForPublishStates(Guid key)
+        => GetContentSourceForPublishStatesAsync(key).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Rebuilds the caches for content and/or media based on the content type ids specified.
     /// </summary>
     /// <param name="contentTypeIds">

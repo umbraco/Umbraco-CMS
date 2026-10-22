@@ -48,12 +48,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task DeleteContentItemAsync(int id)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Delete<ContentNuDto>()
-            .Where<ContentNuDto>(x => x.NodeId == id);
-        await Database.ExecuteAsync(sql);
-    }
+        => await Database.ExecuteAsync(DeleteContentItemSql(id));
+
+    /// <inheritdoc/>
+    public void DeleteContentItem(int id)
+        => Database.Execute(DeleteContentItemSql(id));
 
     /// <inheritdoc/>
     public async Task RefreshContentAsync(ContentCacheNode contentCacheNode)
@@ -64,6 +63,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
+    public void RefreshContent(ContentCacheNode contentCacheNode)
+    {
+        IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+
+        OnRepositoryRefreshedSync(serializer, contentCacheNode, contentCacheNode.IsDraft);
+    }
+
+    /// <inheritdoc/>
     public async Task RefreshMediaAsync(ContentCacheNode contentCacheNode)
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
@@ -71,13 +78,29 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
-    public async Task RemovePublishedContentAsync(int id)
+    public void RefreshMedia(ContentCacheNode contentCacheNode)
     {
-        Sql<ISqlContext> sql = Sql()
+        IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+        OnRepositoryRefreshedSync(serializer, contentCacheNode, true);
+    }
+
+    /// <inheritdoc/>
+    public async Task RemovePublishedContentAsync(int id)
+        => await Database.ExecuteAsync(RemovePublishedContentSql(id));
+
+    /// <inheritdoc/>
+    public void RemovePublishedContent(int id)
+        => Database.Execute(RemovePublishedContentSql(id));
+
+    private Sql<ISqlContext> DeleteContentItemSql(int id)
+        => Sql()
+            .Delete<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == id);
+
+    private Sql<ISqlContext> RemovePublishedContentSql(int id)
+        => Sql()
             .Delete<ContentNuDto>()
             .Where<ContentNuDto>(x => x.NodeId == id && x.Published);
-        await Database.ExecuteAsync(sql);
-    }
 
     /// <inheritdoc/>
     public void Rebuild(
@@ -113,7 +136,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
     {
-        ContentSourceDto? dto = await GetContentSourceDto(key);
+        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(GetContentSourceSql(key));
 
         if (dto is null)
         {
@@ -138,9 +161,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetContentSourceForPublishStatesAsync(Guid key)
-    {
-        ContentSourceDto? dto = await GetContentSourceDto(key);
+        => ToPublishStateNodes(key, await Database.FirstOrDefaultAsync<ContentSourceDto>(GetContentSourceSql(key)));
 
+    /// <inheritdoc/>
+    public (ContentCacheNode? Draft, ContentCacheNode? Published) GetContentSourceForPublishStates(Guid key)
+        => ToPublishStateNodes(key, Database.FirstOrDefault<ContentSourceDto>(GetContentSourceSql(key)));
+
+    private (ContentCacheNode? Draft, ContentCacheNode? Published) ToPublishStateNodes(Guid key, ContentSourceDto? dto)
+    {
         if (dto is null)
         {
             return (null, null);
@@ -168,15 +196,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return (draftNode, publishedNode);
     }
 
-    private async Task<ContentSourceDto?> GetContentSourceDto(Guid key)
-    {
-        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
+    private Sql<ISqlContext> GetContentSourceSql(Guid key)
+        => SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
             .Append(SqlWhereNodeKey(SqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-        return await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
-    }
 
     private ContentCacheNode? CreateContentNodeKit(bool preview, ContentSourceDto dto)
     {
@@ -393,11 +417,23 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
+        (ContentNuDto dto, string updateCommand, object updateArgs) = GetRefreshStatement(serializer, content, preview);
+        await Database.InsertOrUpdateAsync(dto, updateCommand, updateArgs);
+    }
+
+    private void OnRepositoryRefreshedSync(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
+    {
+        (ContentNuDto dto, string updateCommand, object updateArgs) = GetRefreshStatement(serializer, content, preview);
+        Database.InsertOrUpdate(dto, updateCommand, updateArgs);
+    }
+
+    private (ContentNuDto Dto, string UpdateCommand, object UpdateArgs) GetRefreshStatement(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
+    {
         ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
 
         string C(string s) => SqlSyntax.GetQuotedColumnName(s);
 
-        await Database.InsertOrUpdateAsync(
+        return (
             dto,
             $"SET data = @data, {C("dataRaw")} = @dataRaw, rv = rv + 1 WHERE {C("nodeId")} = @id AND published = @published",
             new

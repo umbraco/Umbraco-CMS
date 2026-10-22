@@ -18,6 +18,8 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 /// </remarks>
 #pragma warning disable CS0618 // Type or member is obsolete
 internal sealed class CacheRefreshingNotificationHandler :
+    INotificationHandler<ContentRefreshNotification>,
+    INotificationHandler<MediaRefreshNotification>,
     INotificationAsyncHandler<ContentRefreshNotification>,
     INotificationAsyncHandler<ContentDeletedNotification>,
     INotificationAsyncHandler<MediaRefreshNotification>,
@@ -57,10 +59,30 @@ internal sealed class CacheRefreshingNotificationHandler :
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// Published from inside the content transaction, under the content tree lock. The registered handler is this
+    /// synchronous one: the asynchronous overload would be awaited through <c>Task.WaitAll</c> on the saving thread,
+    /// so each of its awaits would need a second thread-pool thread while the lock is held.
+    /// </remarks>
+    // TODO (V20): register HandleAsync instead once locks and notification publishing are asynchronous.
+#pragma warning disable CS0618 // Type or member is obsolete
+    public void Handle(ContentRefreshNotification notification)
+#pragma warning restore CS0618 // Type or member is obsolete
+        => _documentCacheService.RefreshContent(notification.Entity);
+
+    /// <inheritdoc />
 #pragma warning disable CS0618 // Type or member is obsolete
     public async Task HandleAsync(ContentRefreshNotification notification, CancellationToken cancellationToken)
 #pragma warning restore CS0618 // Type or member is obsolete
         => await _documentCacheService.RefreshContentAsync(notification.Entity);
+
+    /// <inheritdoc />
+    /// <remarks>Same reasoning as <see cref="Handle(ContentRefreshNotification)"/>, under the media tree lock.</remarks>
+    // TODO (V20): register HandleAsync instead once locks and notification publishing are asynchronous.
+#pragma warning disable CS0618 // Type or member is obsolete
+    public void Handle(MediaRefreshNotification notification)
+#pragma warning restore CS0618 // Type or member is obsolete
+        => _mediaCacheService.RefreshMedia(notification.Entity);
 
     /// <inheritdoc />
     public async Task HandleAsync(ContentDeletedNotification notification, CancellationToken cancellationToken)

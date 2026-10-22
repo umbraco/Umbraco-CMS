@@ -100,6 +100,20 @@ public interface IDocumentCacheService
     Task RefreshContentAsync(IContent content);
 
     /// <summary>
+    /// Refreshes the cache for the specified content item without leaving the calling thread.
+    /// </summary>
+    /// <param name="content">The content item to refresh.</param>
+    /// <remarks>
+    /// Runs inside the transaction that persists the content, under the content tree lock. Until the lock wait and
+    /// the notification pipeline are asynchronous, awaiting there needs a second thread-pool thread while the first
+    /// is blocked, which under load stretches the time the lock is held. Implementations should make this genuinely
+    /// synchronous and defer any work that reaches a distributed cache until after the commit.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshContent(IContent content)
+        => RefreshContentAsync(content).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Removes the specified content item from the cache.
     /// </summary>
     /// <param name="content">The content item to remove from the cache.</param>
@@ -132,6 +146,18 @@ public interface IDocumentCacheService
     /// <param name="key">The unique key of the content to refresh.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task RefreshMemoryCacheAsync(Guid key);
+
+    /// <summary>
+    /// Refreshes the in-memory cache for the specified key without leaving the calling thread.
+    /// </summary>
+    /// <param name="key">The key of the content item.</param>
+    /// <remarks>
+    /// Runs on the saving thread after the commit, under a content tree read lock; see <see cref="RefreshContent"/>
+    /// for why it is synchronous.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshMemoryCache(Guid key)
+        => RefreshMemoryCacheAsync(key).GetAwaiter().GetResult();
 
     /// <summary>
     /// Removes the content item with the specified key from the memory cache.

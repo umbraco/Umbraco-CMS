@@ -76,9 +76,11 @@ public static class UmbracoBuilderExtensions
         });
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, HybridCacheStartupNotificationHandler>(); // Need to happen before notification handlers use the cache. Eg. seeding
         builder.Services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
-        builder.AddNotificationAsyncHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
+        // Synchronous on purpose: these run inside the content transaction, under the content tree lock.
+        // TODO (V20): register the async handlers again once locks and notification publishing are asynchronous.
+        builder.AddNotificationHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<ContentDeletedNotification, CacheRefreshingNotificationHandler>();
-        builder.AddNotificationAsyncHandler<MediaRefreshNotification, CacheRefreshingNotificationHandler>();
+        builder.AddNotificationHandler<MediaRefreshNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<ContentTypeRefreshedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<ContentTypeDeletedNotification, CacheRefreshingNotificationHandler>();
