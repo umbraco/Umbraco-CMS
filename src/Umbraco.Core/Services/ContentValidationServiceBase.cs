@@ -38,13 +38,18 @@ internal abstract class ContentValidationServiceBase<TContentType>
     /// <param name="contentEditingModelBase">The content editing model to validate.</param>
     /// <param name="contentType">The content type to validate against.</param>
     /// <param name="culturesToValidate">Optional cultures to restrict validation to.</param>
+    /// <param name="validateCultureInvariantProperties">Whether to include culture invariant properties in the validation of culture variant content. Culture invariant content always has its properties validated.</param>
     /// <returns>The validation result containing any validation errors.</returns>
     protected async Task<ContentValidationResult> HandlePropertiesValidationAsync(
         ContentEditingModelBase contentEditingModelBase,
         TContentType contentType,
-        IEnumerable<string?>? culturesToValidate = null)
+        IEnumerable<string?>? culturesToValidate = null,
+        bool validateCultureInvariantProperties = true)
     {
         var validationErrors = new List<PropertyValidationError>();
+
+        // Invariant content types only have invariant properties, so these must always be validated.
+        var validateInvariantProperties = contentType.VariesByCulture() is false || validateCultureInvariantProperties;
 
         IPropertyType[] contentTypePropertyTypes = contentType.CompositionPropertyTypes.ToArray();
         IPropertyType[] invariantPropertyTypes = contentTypePropertyTypes
@@ -71,7 +76,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
         {
             var validationContext = new PropertyValidationContext
             {
-                Culture = null, Segment = null, CulturesBeingValidated = cultures
+                Culture = null, Segment = null, CulturesBeingValidated = cultures, ValidateInvariantProperties = validateInvariantProperties
             };
 
             PropertyValueModel? propertyValueModel = contentEditingModelBase
@@ -86,7 +91,10 @@ internal abstract class ContentValidationServiceBase<TContentType>
             {
                 var validationContext = new PropertyValidationContext
                 {
-                    Culture = culture, Segment = null, CulturesBeingValidated = cultures
+                    Culture = culture,
+                    Segment = null,
+                    CulturesBeingValidated = cultures,
+                    ValidateInvariantProperties = validateInvariantProperties,
                 };
 
                 PropertyValueModel? propertyValueModel = contentEditingModelBase
@@ -108,7 +116,10 @@ internal abstract class ContentValidationServiceBase<TContentType>
             {
                 var validationContext = new PropertyValidationContext
                 {
-                    Culture = null, Segment = segment, CulturesBeingValidated = cultures
+                    Culture = null,
+                    Segment = segment,
+                    CulturesBeingValidated = cultures,
+                    ValidateInvariantProperties = validateInvariantProperties,
                 };
 
                 PropertyValueModel? propertyValueModel = propertyValuesToValidate.FirstOrDefault(pv => pv.Segment.InvariantEquals(segment));
@@ -135,6 +146,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
                             Culture = culture,
                             Segment = segment,
                             CulturesBeingValidated = cultures,
+                            ValidateInvariantProperties = validateInvariantProperties,
                         };
 
                         PropertyValueModel? propertyValueModel = propertyValuesToValidate.FirstOrDefault(pv => pv.Segment.InvariantEquals(segment));

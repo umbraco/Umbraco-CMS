@@ -1,7 +1,7 @@
 import { UMB_ELEMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
-import type { UmbElementSearchAncestorModel, UmbElementSearchItemModel } from './types.js';
-import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbElementSearchAncestorModel, UmbElementSearchItemModel, UmbElementSearchRequestArgs } from './types.js';
+import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -9,9 +9,12 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source that fetches element search results from the server.
  * @class UmbElementSearchServerDataSource
- * @implements {UmbSearchDataSource<UmbElementSearchItemModel>}
+ * @implements {UmbSearchDataSource<UmbElementSearchItemModel, UmbElementSearchRequestArgs>}
  */
-export class UmbElementSearchServerDataSource implements UmbSearchDataSource<UmbElementSearchItemModel> {
+export class UmbElementSearchServerDataSource implements UmbSearchDataSource<
+	UmbElementSearchItemModel,
+	UmbElementSearchRequestArgs
+> {
 	#host: UmbControllerHost;
 
 	/**
@@ -46,16 +49,20 @@ export class UmbElementSearchServerDataSource implements UmbSearchDataSource<Umb
 
 	/**
 	 * Search for elements matching the given query, including ancestor chains for breadcrumb rendering.
-	 * @param {UmbSearchRequestArgs} args - The arguments for the search
+	 * @param {UmbElementSearchRequestArgs} args - The arguments for the search
 	 * @returns {*}
 	 * @memberof UmbElementSearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
+	async search(args: UmbElementSearchRequestArgs) {
 		const { data, error } = await tryExecute(
 			this.#host,
 			ElementService.getItemElementSearch({
 				query: {
+					allowedElementTypes: args.allowedContentTypes?.map((contentType) => contentType.unique),
+					culture: args.culture || undefined,
+					parentId: args.searchFrom?.unique ?? undefined,
 					query: args.query,
+					trashed: args.includeTrashed,
 					skip: args.paging?.skip,
 					take: args.paging?.take,
 				},

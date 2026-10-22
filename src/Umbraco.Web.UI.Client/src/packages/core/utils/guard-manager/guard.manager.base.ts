@@ -24,6 +24,10 @@ export abstract class UmbGuardManagerBase<
 
 	#fallback = new UmbBooleanState(false);
 	protected _fallback = this.#fallback.asObservable();
+	/**
+	 * Emits whether the guard permits when no rule applies.
+	 */
+	public readonly fallbackPermitted = this._fallback;
 	protected _getFallback() {
 		return this.#fallback.getValue();
 	}

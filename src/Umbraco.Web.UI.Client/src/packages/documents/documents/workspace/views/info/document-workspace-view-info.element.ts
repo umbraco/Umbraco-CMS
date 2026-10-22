@@ -66,6 +66,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('general/:entityType')
 			.onSetup((params) => {
+				this.#workspaceContext?.contentTypeVarianceChangeRedirect.trackVarianceChange();
 				return { data: { entityType: params.entityType, preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {

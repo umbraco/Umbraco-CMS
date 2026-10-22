@@ -25,7 +25,11 @@ import { UmbInteractionMemoryScopeContext } from '@umbraco-cms/backoffice/intera
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import {
+	isAboveZeroAndBelowMinimum,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+} from '@umbraco-cms/backoffice/validation';
 
 import '../link-picker-link-ref/link-picker-link-ref.element.js';
 import '../link-picker-link-ref/link-picker-document-ref.element.js';
@@ -86,7 +90,14 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	 * @default undefined
 	 */
 	@property({ type: Number })
-	max?: number;
+	public set max(value: number | undefined) {
+		this.#max = value;
+		this.#updateSorterEnabled();
+	}
+	public get max(): number | undefined {
+		return this.#max;
+	}
+	#max?: number;
 
 	/**
 	 * Max validation message.
@@ -144,13 +155,17 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 	@property({ type: Boolean })
 	required = false;
 	@property({ type: String })
@@ -193,7 +208,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.urls.length < this.min,
+			() => isAboveZeroAndBelowMinimum(this.urls.length, this.min),
 		);
 		this.addValidator(
 			'rangeOverflow',

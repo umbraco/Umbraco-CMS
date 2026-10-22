@@ -1,32 +1,18 @@
-import { UMB_BLOCK_RTE_ENTRY_CONTEXT } from '../../context/block-rte-entry.context-token.js';
-import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
-import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
+
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
 
 /**
  * @element umb-ref-rte-block
+ * @slot name - Content rendered in the block's primary label area (the `name` slot of the inner `uui-ref-node`). The expected projection is a `<umb-ufm-render>` element owned by the parent block-rte entry.
  */
 @customElement('umb-ref-rte-block')
-export class UmbRefRteBlockElement extends UmbLitElement {
+export class UmbRefRteBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElement) {
 	//
-	#blockContext?: typeof UMB_BLOCK_RTE_ENTRY_CONTEXT.TYPE;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_BLOCK_RTE_ENTRY_CONTEXT, (blockContext) => {
-			this.#blockContext = blockContext;
-		});
-	}
-
-	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
-		this.#blockContext?.setName(event.detail.text);
-	};
-
-	@property({ type: String })
-	label?: string;
-
 	@property({ type: String })
 	icon?: string;
 
@@ -35,13 +21,6 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
-
-	/**
-	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
-	 * reflects the library element's own publish state rather than the local expose entry.
-	 */
-	@property({ type: Boolean, attribute: false })
-	isExternalContent?: boolean;
 
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
@@ -61,26 +40,9 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<div class="selection-background" aria-hidden="true">&emsp;</div>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-				<umb-ufm-render
-					slot="name"
-					inline
-					.markdown=${this.label}
-					.value=${blockValue}
-					@umb-ufm-resolved=${this.#onUfmResolved}>
-				</umb-ufm-render>
-				${when(this.unpublished, () => this.#renderDraftTag())}
+				${this.renderNameSlot(blockValue, 'name')}
+				<umb-block-state-tag slot="name"></umb-block-state-tag>
 			</uui-ref-node>
-		`;
-	}
-
-	#renderDraftTag() {
-		const titleKey = this.isExternalContent
-			? 'blockEditor_notPublishedLibraryElementDescription'
-			: 'blockEditor_notExposedDescription';
-		return html`
-			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
-				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-			</uui-tag>
 		`;
 	}
 
@@ -95,7 +57,8 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 			}
 
 			:host([unpublished]) umb-icon,
-			:host([unpublished]) umb-ufm-render {
+			:host([unpublished]) umb-ufm-render,
+			:host([unpublished]) ::slotted([slot='name']) {
 				opacity: 0.6;
 			}
 
@@ -109,12 +72,14 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 				z-index: 0;
 			}
 
-			umb-ufm-render {
+			umb-ufm-render,
+			::slotted([slot='name']) {
 				user-select: none;
 			}
 
 			umb-icon,
-			umb-ufm-render {
+			umb-ufm-render,
+			::slotted([slot='name']) {
 				z-index: 1;
 			}
 		`,

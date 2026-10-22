@@ -1225,6 +1225,7 @@ internal sealed class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.CacheVersion, Name = "CacheVersion" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrlAliases, Name = "DocumentUrlAliases" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.ElementTree, Name = "ElementTree" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DataTypes, Name = "DataTypes" });
     }
 
     private void CreateContentTypeData()
@@ -1411,6 +1412,7 @@ internal sealed class DatabaseDataCreator
                 StartMediaId = -1,
                 StartContentId = -1,
                 StartElementId = -1,
+                StartDocumentBlueprintId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
                 Name = "Administrators",
                 Description = "Users with full access to all sections and functionality",
@@ -1418,6 +1420,7 @@ internal sealed class DatabaseDataCreator
                 UpdateDate = DateTime.UtcNow,
                 Icon = "icon-medal",
                 HasAccessToAllLanguages = true,
+                HasAccessToInvariantForVariant = true,
             });
         _database.Insert(
             Constants.DatabaseSchema.Tables.UserGroup,
@@ -1437,6 +1440,7 @@ internal sealed class DatabaseDataCreator
                 UpdateDate = DateTime.UtcNow,
                 Icon = "icon-edit",
                 HasAccessToAllLanguages = true,
+                HasAccessToInvariantForVariant = true,
             });
         _database.Insert(
             Constants.DatabaseSchema.Tables.UserGroup,
@@ -1449,6 +1453,7 @@ internal sealed class DatabaseDataCreator
                 StartMediaId = -1,
                 StartContentId = -1,
                 StartElementId = -1,
+                StartDocumentBlueprintId = -1,
                 Alias = EditorGroupAlias,
                 Name = "Editors",
                 Description = "Users with full permission to create, update and publish content",
@@ -1456,6 +1461,7 @@ internal sealed class DatabaseDataCreator
                 UpdateDate = DateTime.UtcNow,
                 Icon = "icon-tools",
                 HasAccessToAllLanguages = true,
+                HasAccessToInvariantForVariant = true,
             });
         _database.Insert(
             Constants.DatabaseSchema.Tables.UserGroup,
@@ -1475,6 +1481,7 @@ internal sealed class DatabaseDataCreator
                 UpdateDate = DateTime.UtcNow,
                 Icon = "icon-globe",
                 HasAccessToAllLanguages = true,
+                HasAccessToInvariantForVariant = true,
             });
         _database.Insert(
             Constants.DatabaseSchema.Tables.UserGroup,
@@ -1491,6 +1498,7 @@ internal sealed class DatabaseDataCreator
                 UpdateDate = DateTime.UtcNow,
                 Icon = "icon-lock",
                 HasAccessToAllLanguages = false,
+                HasAccessToInvariantForVariant = false,
             });
     }
 

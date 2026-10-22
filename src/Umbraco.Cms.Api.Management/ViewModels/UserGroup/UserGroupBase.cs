@@ -48,6 +48,14 @@ public class UserGroupBase
     public required bool HasAccessToAllLanguages { get; init; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the user group can edit invariant (shared) property data on variant content.
+    /// </summary>
+    /// <remarks>
+    /// The permission is not consulted when editing invariant content types — all users with access to the document can edit its properties in that case.
+    /// </remarks>
+    public required bool HasAccessToInvariantForVariant { get; init; }
+
+    /// <summary>
     /// Gets or sets the key of the document that should act as root node for the user group.
     /// <remarks>
     /// This can be overwritten by a different user group if a user is a member of multiple groups
@@ -94,6 +102,22 @@ public class UserGroupBase
     /// </remarks>
     /// </summary>
     public bool ElementRootAccess { get; init; }
+
+    /// <summary>
+    /// Gets the key of the container that should act as root node for the user group in the document blueprint tree.
+    /// <remarks>
+    /// This can be overwritten by a different user group if a user is a member of multiple groups
+    /// </remarks>
+    /// </summary>
+    public ReferenceByIdModel? DocumentBlueprintStartNode { get; init; }
+
+    /// <summary>
+    /// Gets a value indicating whether the group should have access to the document blueprint root.
+    /// <remarks>
+    /// This will be ignored if an explicit start node has been specified in <see cref="DocumentBlueprintStartNode"/>.
+    /// </remarks>
+    /// </summary>
+    public bool DocumentBlueprintRootAccess { get; init; }
 
     /// <summary>
     /// Gets or sets the list of permissions provided and maintained by the front-end. The server has no concept of all of them, but some can be used on the server.

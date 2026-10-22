@@ -43,15 +43,15 @@ export class MultiNodeTreePickerDataTypeBuilder extends DataTypeBuilder {
   getValues() {
     let values: any[] = [];
 
-    values.push({
-      alias: 'minNumber',
-      value: this.minNumber !== undefined ? this.minNumber : 0
-    });
-
-    values.push({
-      alias: 'maxNumber',
-      value: this.maxNumber !== undefined ? this.maxNumber : 0
-    });
+    if (this.minNumber !== undefined || this.maxNumber !== undefined) {
+      values.push({
+        alias: 'validationLimit',
+        value: {
+          min: this.minNumber,
+          max: this.maxNumber
+        }
+      });
+    }
     
     if (this.ignoreUserStartNodes !== undefined) {
       values.push({

@@ -16,8 +16,6 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 	UmbBlockRteTypeModel,
 	UmbBlockRteLayoutModel
 > {
-	/** @deprecated Use `displayInlineConfig` instead. This field will be removed in Umbraco 19. [LK] */
-	readonly displayInline = this._layout.asObservablePart((x) => (x ? (x.displayInline ?? false) : undefined));
 	readonly displayInlineConfig = this._blockType.asObservablePart((x) => (x ? (x.displayInline ?? false) : undefined));
 
 	readonly forceHideContentEditorInOverlay = this._blockType.asObservablePart((x) =>
@@ -33,12 +31,6 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_RTE_MANAGER_CONTEXT, UMB_BLOCK_RTE_ENTRIES_CONTEXT);
-	}
-
-	protected override _needsLegacyLabelRenderer(): boolean {
-		// RTE Block entry element owns the canonical `<umb-ufm-render>` (via <umb-ref-rte-block>)
-		// and pushes resolved text via `setName()`. No hidden virtual renderer needed.
-		return false;
 	}
 
 	protected override _gotManager() {}

@@ -226,6 +226,36 @@ public class MemberPresentationFactoryTests
     }
 
     [Test]
+    public void CreateExternalMemberItemResponseModel_Uses_Name_In_Variants()
+    {
+        // Arrange
+        var member = CreateExternalMember();
+
+        // Act
+        MemberItemResponseModel result = _sut.CreateExternalMemberItemResponseModel(member);
+
+        // Assert
+        Assert.AreEqual(MemberKind.ExternalOnly, result.Kind);
+        Assert.AreEqual("External Test", result.Variants.Single().Name);
+    }
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("  ")]
+    public void CreateExternalMemberItemResponseModel_Falls_Back_To_UserName_When_Name_Is_Missing(string? name)
+    {
+        // Arrange
+        var member = CreateExternalMember();
+        member.Name = name;
+
+        // Act
+        MemberItemResponseModel result = _sut.CreateExternalMemberItemResponseModel(member);
+
+        // Assert
+        Assert.AreEqual(member.UserName, result.Variants.Single().Name);
+    }
+
+    [Test]
     public async Task CreateExternalMemberResponseModel_Returns_Model_With_ExternalOnly_Kind()
     {
         // Arrange

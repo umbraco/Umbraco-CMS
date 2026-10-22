@@ -12,7 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { isAboveZeroAndBelowMinimum, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -77,6 +77,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerInputContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerInputContext.max;
@@ -133,13 +134,17 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 
 	@property({ type: Array, attribute: false })
 	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
@@ -185,7 +190,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !this.readonly && !!this.min && this.selection.length < this.min,
+			() => !this.readonly && isAboveZeroAndBelowMinimum(this.selection.length, this.min),
 		);
 		this.addValidator(
 			'rangeOverflow',

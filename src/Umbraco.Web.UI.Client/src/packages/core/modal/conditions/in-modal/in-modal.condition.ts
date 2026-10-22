@@ -11,16 +11,14 @@ export class UmbInModalCondition extends UmbConditionBase<UmbInModalConditionCon
 		// Default match value is true (checking if we are in a modal)
 		const matchValue = this.config.match ?? true;
 
-		// Default state: we assume we are NOT in a modal.
-		// So if match is false (looking for "not in modal"), we start as permitted.
-		// If match is true (looking for "in modal"), we start as not permitted.
-		this.permitted = !matchValue;
-
-		this.consumeContext(UMB_MODAL_CONTEXT, () => {
-			// Modal context found, so we ARE in a modal.
-			// Permitted if match is true, not permitted if match is false.
-			this.permitted = matchValue;
-		});
+		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
+			this.permitted = !!context === matchValue;
+		})
+			.asPromise()
+			.catch(() => {
+				// The context could not be found, so it is absent: permitted if that matches the expected match value.
+				this.permitted = !matchValue;
+			});
 	}
 }
 

@@ -37,6 +37,8 @@ export class UmbSegmentCollectionServerDataSource
 					entityType: UMB_SEGMENT_ENTITY_TYPE,
 					name: item.name,
 					unique: item.alias,
+					// eslint-disable-next-line @typescript-eslint/no-deprecated
+					cultures: item.cultures,
 				};
 
 				return model;

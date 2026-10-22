@@ -14,7 +14,11 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import {
+	isAboveZeroAndBelowMinimum,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+} from '@umbraco-cms/backoffice/validation';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 // TODO: Shall we rename to 'umb-input-user'? [LK]
@@ -47,7 +51,22 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	public get readonly(): boolean {
+		return this.#readonly;
+	}
+	public set readonly(value: boolean) {
+		this.#readonly = value;
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
 
 	/**
 	 * Sets the input to required, meaning validation will fail if the value is empty.
@@ -94,6 +113,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	}
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		this.#updateSorterEnabled();
 	}
 
 	/**
@@ -145,7 +165,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(

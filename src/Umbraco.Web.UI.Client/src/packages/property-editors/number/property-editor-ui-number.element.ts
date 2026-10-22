@@ -7,6 +7,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-property-editor-ui-number')
 export class UmbPropertyEditorUINumberElement
@@ -54,8 +55,9 @@ export class UmbPropertyEditorUINumberElement
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
-		this._min = this.#parseNumber(config.getValueByAlias('min'));
-		this._max = this.#parseNumber(config.getValueByAlias('max'));
+		const range = config.getValueByAlias<UmbNumberRangeValueType>('validationRange');
+		this._min = range?.min;
+		this._max = range?.max;
 		this._step = this.#parseNumber(config.getValueByAlias('step'));
 		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') ?? '');
 	}
@@ -70,24 +72,24 @@ export class UmbPropertyEditorUINumberElement
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.localize.term('validation_numberMinimum', this._min),
-			() => !!this._min && this.value! < this._min,
+			() => this._min != null && this.value! < this._min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.localize.term('validation_numberMaximum', this._max),
-			() => !!this._max && this.value! > this._max,
+			() => this._max != null && this.value! > this._max,
 		);
 
 		this.addValidator(
 			'customError',
 			() => this.localize.term('validation_numberMisconfigured', this._min, this._max),
-			() => !!this._min && !!this._max && this._min > this._max,
+			() => this._min != null && this._max != null && this._min > this._max,
 		);
 	}
 
 	protected override firstUpdated() {
-		if (this._min && this._max && this._min > this._max) {
+		if (this._min != null && this._max != null && this._min > this._max) {
 			console.warn(
 				`Property '${this._label}' (Numeric) has been misconfigured, 'min' is greater than 'max'. Please correct your data type configuration.`,
 				this,

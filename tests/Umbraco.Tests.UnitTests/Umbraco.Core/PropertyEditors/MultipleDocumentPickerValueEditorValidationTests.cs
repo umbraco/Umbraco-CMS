@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -32,7 +33,7 @@ internal sealed class MultipleDocumentPickerValueEditorValidationTests
         var valueEditor = CreateValueEditor();
         valueEditor.ConfigurationObject = new MultipleDocumentPickerConfiguration
         {
-            ValidationLimit = new MultipleDocumentPickerConfiguration.NumberRange { Min = min },
+            ValidationLimit = new NumberRange { Min = min },
         };
 
         IEnumerable<ValidationResult> result = valueEditor.Validate(
@@ -44,6 +45,34 @@ internal sealed class MultipleDocumentPickerValueEditorValidationTests
         ValidateResult(succeed, result);
     }
 
+    [Test]
+    public void Can_Validate_Null_Value_When_Minimum_Configured_And_Not_Mandatory()
+    {
+        var valueEditor = CreateValueEditor();
+        valueEditor.ConfigurationObject = new MultipleDocumentPickerConfiguration
+        {
+            ValidationLimit = new NumberRange { Min = 2 },
+        };
+
+        ValidateResult(true, valueEditor.Validate(null, false, null, PropertyValidationContext.Empty()));
+    }
+
+    [TestCase(null, Constants.Validation.ErrorMessages.Properties.Missing)]
+    [TestCase("[]", Constants.Validation.ErrorMessages.Properties.Empty)]
+    public void Cannot_Validate_Empty_Value_When_Minimum_Configured_And_Mandatory(string? value, string expectedErrorMessage)
+    {
+        var valueEditor = CreateValueEditor();
+        valueEditor.ConfigurationObject = new MultipleDocumentPickerConfiguration
+        {
+            ValidationLimit = new NumberRange { Min = 2 },
+        };
+
+        ValidationResult[] result = valueEditor.Validate(value, true, null, PropertyValidationContext.Empty()).ToArray();
+
+        Assert.AreEqual(1, result.Length);
+        Assert.AreEqual(expectedErrorMessage, result[0].ErrorMessage);
+    }
+
     [TestCase(1, 2, true)]
     [TestCase(2, 2, true)]
     [TestCase(3, 2, false)]
@@ -53,7 +82,7 @@ internal sealed class MultipleDocumentPickerValueEditorValidationTests
         var valueEditor = CreateValueEditor();
         valueEditor.ConfigurationObject = new MultipleDocumentPickerConfiguration
         {
-            ValidationLimit = new MultipleDocumentPickerConfiguration.NumberRange { Max = max },
+            ValidationLimit = new NumberRange { Max = max },
         };
 
         IEnumerable<ValidationResult> result = valueEditor.Validate(
@@ -175,7 +204,7 @@ internal sealed class MultipleDocumentPickerValueEditorValidationTests
             Mock.Of<IShortStringHelper>(),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias"),
+            new DataEditorAttribute("alias") { ValueType = ValueTypes.Json },
             Mock.Of<ILocalizedTextService>(),
             contentService.Object,
             coreScopeProvider.Object)

@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { isAboveZeroAndBelowMinimum, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { getItemFallbackName, type UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-entity')
@@ -74,6 +74,11 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 		if (this.#pickerContext) {
 			this.#pickerContext.max = value;
 		}
+		if (value === 1) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
 	}
 	public get max(): number {
 		return this.#max;
@@ -127,7 +132,7 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && (this.#pickerContext?.getSelection().length ?? 0) < this.min,
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext?.getSelection().length ?? 0, this.min),
 		);
 
 		this.addValidator(

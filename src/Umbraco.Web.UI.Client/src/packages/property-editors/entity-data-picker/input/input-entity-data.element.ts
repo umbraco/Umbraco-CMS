@@ -18,7 +18,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { isAboveZeroAndBelowMinimum, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbPickerDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 
 @customElement('umb-input-entity-data')
@@ -95,6 +95,7 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerInputContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerInputContext.max;
@@ -140,13 +141,17 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 
 	@property({ type: Array, attribute: false })
 	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
@@ -177,7 +182,7 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerInputContext.getSelection().length < this.min,
+			() => isAboveZeroAndBelowMinimum(this.#pickerInputContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(

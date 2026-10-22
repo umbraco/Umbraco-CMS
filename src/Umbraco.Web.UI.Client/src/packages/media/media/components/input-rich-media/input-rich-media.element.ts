@@ -1,6 +1,7 @@
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL } from '../../modals/index.js';
 import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry } from '../../types.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { UmbMediaPickerInputContext } from '../input-media/input-media.context.js';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
@@ -12,7 +13,11 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import {
+	isAboveZeroAndBelowMinimum,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+} from '@umbraco-cms/backoffice/validation';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
@@ -22,6 +27,7 @@ import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
 type UmbRichMediaCardModel = {
+	entityType: string;
 	unique: string;
 	media: string;
 	name: string;
@@ -92,7 +98,14 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	 * @default Infinity
 	 */
 	@property({ type: Number })
-	public max = Infinity;
+	public set max(value: number) {
+		this.#max = value;
+		this.#updateSorterEnabled();
+	}
+	public get max(): number {
+		return this.#max;
+	}
+	#max = Infinity;
 
 	/**
 	 * Max validation message.
@@ -150,13 +163,17 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 
 	@property({ type: Array, attribute: false })
 	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
@@ -268,14 +285,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() =>
-				!this.readonly &&
-				// Only if min is set:
-				!!this.min &&
-				// if the value is empty and not required, we should not validate the min:
-				!(this.value?.length === 0 && this.required == false) &&
-				// Validate the min:
-				(this.value?.length ?? 0) < this.min,
+			() => !this.readonly && isAboveZeroAndBelowMinimum(this.value?.length ?? 0, this.min),
 		);
 		this.addValidator(
 			'rangeOverflow',
@@ -296,6 +306,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				const media = mediaItems.find((x) => x.unique === item.mediaKey);
 				const isNotFound = this._statuses.find((x) => x.unique === item.mediaKey)?.state.type === 'error';
 				return {
+					entityType: media?.entityType ?? UMB_MEDIA_ENTITY_TYPE,
 					unique: item.key,
 					media: item.mediaKey,
 					name: media?.name ?? '',
@@ -430,7 +441,13 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
 
 		return html`
-			<uui-card-media id=${item.unique} title=${item.name} name=${item.name} .href=${href} ?readonly=${this.readonly}>
+			<uui-card-media
+				id=${item.unique}
+				data-mark="${item.entityType}:${item.media}"
+				title=${item.name}
+				name=${item.name}
+				.href=${href}
+				?readonly=${this.readonly}>
 				<umb-media-thumbnail
 					.unique=${item.media}
 					.alt=${item.name}

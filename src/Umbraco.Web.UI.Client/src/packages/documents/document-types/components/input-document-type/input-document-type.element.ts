@@ -5,7 +5,7 @@ import { UmbDocumentTypePickerInputContext } from './input-document-type.context
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { isAboveZeroAndBelowMinimum, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -83,6 +83,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerContext.max;
@@ -115,7 +116,22 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	}
 
 	@property({ type: Boolean, attribute: 'readonly' })
-	readonly?: boolean;
+	public get readonly(): boolean | undefined {
+		return this.#readonly;
+	}
+	public set readonly(value: boolean | undefined) {
+		this.#readonly = value;
+		this.#updateSorterEnabled();
+	}
+	#readonly?: boolean;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
 
 	@state()
 	private _items?: Array<UmbDocumentTypeItemModel>;
@@ -143,7 +159,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(

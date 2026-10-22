@@ -65,7 +65,6 @@ export type UmbCollectionBulkActionConfiguration = {
 export interface UmbCollectionContext {
 	setConfig(config: UmbCollectionConfiguration): void;
 	getConfig(): UmbCollectionConfiguration | undefined;
-	requestCollection(): Promise<void>;
 	requestItemHref?(item: UmbCollectionItemModel): Promise<string | undefined>;
 	pagination: UmbPaginationManager;
 	items: Observable<any[]>;

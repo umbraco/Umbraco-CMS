@@ -81,7 +81,13 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 					.filter((entry) => !uniques.includes(entry.unique))
 					.map((x) => x.unique);
 
-				this.#statuses.remove(removedEntries);
+				// Also clears statuses of uniques that never resolved (e.g. a failed request), so re-adding them requests again:
+				const removedStatuses = this.#statuses
+					.getValue()
+					.filter((status) => !uniques.includes(status.unique))
+					.map((x) => x.unique);
+
+				this.#statuses.remove(removedStatuses);
 				this.#entries.remove(removedEntries);
 				removedEntries.forEach((entry) => {
 					this.removeUmbControllerByAlias('observeEntry_' + entry);
@@ -144,7 +150,9 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 	}
 
 	/**
-	 * Add an entry to the manager
+	 * Add an entry to the manager. Once added, the entry follows the repository store, if the repository
+	 * provides one, so the data passed in is replaced when the store emits the same entry. An empty store
+	 * value keeps the entry as it is.
 	 * @param {DetailType} data - The entry to add.
 	 * @memberof UmbRepositoryDetailsManager
 	 */
@@ -160,7 +168,24 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 			unique,
 		});
 		this.#uniques.appendOne(unique);
-		// Notice in this case we do not have a observable from the repo, but it should maybe be fine that we just listen for ACTION EVENTS.
+		void this.#observeAddedEntry(unique);
+	}
+
+	// Follows the store so a change saved elsewhere in this client is reflected right away, rather than only after
+	// the entity-updated event has re-requested it. The entry was not loaded through the store, so it may not be there:
+	async #observeAddedEntry(unique: string): Promise<void> {
+		await this.#init;
+		const observable = await this.repository?.byUnique?.(unique);
+		if (!observable || !this.getUniques().includes(unique)) return;
+		this.observe(
+			observable,
+			(data) => {
+				if (data) {
+					this.#entries.updateOne(unique, data);
+				}
+			},
+			'observeEntry_' + unique,
+		);
 	}
 
 	/**

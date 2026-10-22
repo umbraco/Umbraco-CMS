@@ -321,7 +321,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     private static IPublishedPropertyType SetupUrlPickerPropertyType(bool multiple)
     {
         UrlPickerConfigurationBase configuration = multiple
-            ? new MultiUrlPickerConfiguration { MaxNumber = 10 }
+            ? new MultiUrlPickerConfiguration { ValidationLimit = new NumberRange { Max = 10 } }
             : new SingleUrlPickerConfiguration();
         var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => configuration));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();

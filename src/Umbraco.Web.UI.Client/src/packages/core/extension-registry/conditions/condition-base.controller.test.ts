@@ -23,9 +23,9 @@ describe('UmbConditionBase', () => {
 		expect(condition.config).to.equal(config);
 	});
 
-	it('initializes with permitted=false', () => {
+	it('initializes with permitted=undefined, until the first answer', () => {
 		const condition = new UmbTestCondition(host, { config, onChange: () => {} });
-		expect(condition.permitted).to.be.false;
+		expect(condition.permitted).to.be.undefined;
 	});
 
 	it('invokes onChange when permitted transitions to a new value', () => {
@@ -49,17 +49,21 @@ describe('UmbConditionBase', () => {
 			onChange: () => callCount++,
 		});
 
-		// Same as initial value (false) — should not fire.
+		// The first answer fires, even when it is false.
 		condition.permitted = false;
-		expect(callCount).to.equal(0);
-
-		// Real transition — should fire once.
-		condition.permitted = true;
 		expect(callCount).to.equal(1);
 
 		// Same value again — should not fire.
-		condition.permitted = true;
+		condition.permitted = false;
 		expect(callCount).to.equal(1);
+
+		// Real transition — should fire once.
+		condition.permitted = true;
+		expect(callCount).to.equal(2);
+
+		// Same value again — should not fire.
+		condition.permitted = true;
+		expect(callCount).to.equal(2);
 	});
 
 	it('does not invoke onChange after destroy()', () => {
