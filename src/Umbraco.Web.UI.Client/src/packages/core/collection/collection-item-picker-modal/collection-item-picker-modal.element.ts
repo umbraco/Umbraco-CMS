@@ -224,8 +224,6 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 					.props=${{
 						selectionConfiguration: this._selectionConfiguration,
 						filterArgs: this.data?.collection?.filterArgs,
-						// eslint-disable-next-line @typescript-eslint/no-deprecated
-						filter: this.data?.filter,
 						selectableFilter: this.data?.pickableFilter,
 					}}
 					@selected=${this.#onItemSelected}

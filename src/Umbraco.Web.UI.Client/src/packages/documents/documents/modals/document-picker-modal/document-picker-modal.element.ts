@@ -520,8 +520,6 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 					hideTreeRoot: this.data?.hideTreeRoot,
 					expandTreeRoot: this.data?.expandTreeRoot,
 					selectionConfiguration: this._selectionConfiguration,
-					// eslint-disable-next-line @typescript-eslint/no-deprecated
-					filter: this.data?.filter,
 					selectableFilter: this.data?.pickableFilter,
 					startNode: this._treeStartNode,
 					foldersOnly: this.data?.foldersOnly,

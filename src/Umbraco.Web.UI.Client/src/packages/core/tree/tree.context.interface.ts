@@ -34,6 +34,9 @@ export interface UmbTreeContext<
 	readonly drillable?: Observable<boolean>;
 
 	selectableFilter?(item: TreeItemType): boolean;
+	/**
+	 * @deprecated Deprecated since v17. Filtering items on the client breaks server-side pagination. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
+	 */
 	filter?(item: TreeItemType): boolean;
 
 	readonly selection: UmbSelectionManager;

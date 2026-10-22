@@ -12,6 +12,7 @@ import {
 	css,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 import '../menu-item/collection-menu-item.element.js';
 
@@ -43,8 +44,22 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 	@property({ attribute: false })
 	selectableFilter: (item: UmbCollectionItemModel) => boolean = () => true;
 
+	/**
+	 * @deprecated Deprecated since v17. Filtering items on the client breaks server-side pagination. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
+	 */
 	@property({ attribute: false })
-	filter: (item: UmbCollectionItemModel) => boolean = () => true;
+	public set filter(value: ((item: UmbCollectionItemModel) => boolean) | undefined) {
+		new UmbDeprecation({
+			deprecated: 'The `filter` property of umb-default-collection-menu',
+			removeInVersion: '21.0.0',
+			solution: 'Use `selectableFilter` to prevent items from being selected instead.',
+		}).warn();
+		this.#filter = value;
+	}
+	public get filter(): (item: UmbCollectionItemModel) => boolean {
+		return this.#filter ?? (() => true);
+	}
+	#filter?: (item: UmbCollectionItemModel) => boolean;
 
 	public get filterArgs(): Record<string, unknown> | undefined {
 		return this.#filterArgs;
@@ -90,10 +105,6 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 
 		if (_changedProperties.has('selectableFilter')) {
 			this._api!.selectableFilter = this.selectableFilter;
-		}
-
-		if (_changedProperties.has('filter')) {
-			this._api!.filter = this.filter;
 		}
 	}
 
