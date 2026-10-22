@@ -1,35 +1,59 @@
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '../../contexts/index.js';
 import { html, customElement, state, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 @customElement('umb-workspace-entity-action-menu')
 export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
-	private _workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
-
 	@state()
 	private _unique?: UmbEntityUnique;
 
 	@state()
 	private _entityType?: string;
 
+	@state()
+	private _hasActions = false;
+
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
-			this._workspaceContext = context;
-			this.observe(this._workspaceContext?.unique, (unique) => {
-				this._unique = unique;
-				// TODO: the context does not have an observable for the entity type, so we need to use the
-				// getEntityType method until we can add an observable for it.
-				this._entityType = this._workspaceContext?.getEntityType();
-			});
+		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
+			if (!context) return;
+			this.observe(
+				context.entityType,
+				(entityType) => {
+					this._entityType = entityType;
+					this.#observeEntityActions(entityType);
+				},
+				'_observeEntityType',
+			);
+			this.observe(context.unique, (unique) => (this._unique = unique), '_observeUnique');
 		});
+	}
+
+	#observeEntityActions(entityType: string | undefined) {
+		if (!entityType) {
+			this.removeUmbControllerByAlias('umbEntityActionsObserver');
+			this._hasActions = false;
+			return;
+		}
+
+		new UmbExtensionsManifestInitializer(
+			this,
+			umbExtensionsRegistry,
+			'entityAction',
+			(ext) => ext.forEntityTypes.includes(entityType),
+			(actions) => (this._hasActions = actions.length > 0),
+			'umbEntityActionsObserver',
+		);
 	}
 
 	override render() {
 		if (!this._entityType) return nothing;
 		if (this._unique === undefined) return nothing;
+		if (!this._hasActions) return nothing;
 
 		return html`<umb-entity-actions-dropdown
 			data-mark="workspace:action-menu-button"
