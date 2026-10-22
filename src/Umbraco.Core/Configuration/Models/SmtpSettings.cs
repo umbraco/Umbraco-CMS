@@ -61,6 +61,11 @@ public class SmtpSettings : ValidatableEntryBase
     internal const string StaticDeliveryMethod = "Network";
 
     /// <summary>
+    ///     The default value for whether the email notification is published for every email.
+    /// </summary>
+    internal const bool StaticPublishNotificationForAllEmails = false;
+
+    /// <summary>
     ///     Gets or sets a value for the SMTP from address to use for messages.
     /// </summary>
     [Required]
@@ -108,4 +113,16 @@ public class SmtpSettings : ValidatableEntryBase
     ///     Gets or sets a value for the time until an email expires.
     /// </summary>
     public TimeSpan? EmailExpiration { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the <see cref="Notifications.SendEmailNotification" /> is published for every email sent,
+    ///     rather than only for those whose sender requests it.
+    /// </summary>
+    /// <remarks>
+    ///     Enable this when a notification handler delivers email, for example through an email API, so that the handler
+    ///     receives every email instead of only those whose sender requests the notification.
+    /// </remarks>
+    [Obsolete("The notification will be published for every email from Umbraco 20, which makes this setting redundant. Scheduled for removal in Umbraco 20.")]
+    [DefaultValue(StaticPublishNotificationForAllEmails)]
+    public bool PublishNotificationForAllEmails { get; set; } = StaticPublishNotificationForAllEmails;
 }
