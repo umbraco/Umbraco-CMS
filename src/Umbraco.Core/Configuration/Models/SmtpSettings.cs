@@ -121,6 +121,8 @@ public class SmtpSettings : ValidatableEntryBase
     /// <remarks>
     ///     When enabled, sending an email completes once the email is queued for delivery, so a delivery failure is logged
     ///     rather than reported to the sender. Queued emails that have not been delivered when the application stops are lost.
+    ///     Delivery runs outside the request that sent the email, so a custom SMTP client cannot rely on the current request
+    ///     or on scoped services from it.
     /// </remarks>
     // TODO (V20): Consider enabling this by default.
     [DefaultValue(StaticSendInBackground)]

@@ -254,6 +254,39 @@ public class EmailSenderTests
     }
 
     [Test]
+    public async Task SendAsync_Queues_A_Copy_Of_Attachments_That_Outlives_The_Callers_Streams_When_SendInBackground_Is_Enabled()
+    {
+        EmailMessage? queuedMessage = null;
+        var queueMock = new Mock<IEmailDeliveryQueue>();
+        queueMock
+            .Setup(x => x.EnqueueAsync(It.IsAny<EmailMessage>(), It.IsAny<string>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()))
+            .Callback((EmailMessage message, string _, TimeSpan? _, CancellationToken _) => queuedMessage = message)
+            .Returns(ValueTask.CompletedTask);
+        var sender = CreateSender(_sendInBackgroundSettings, Mock.Of<IEmailSenderClient>(), emailDeliveryQueue: queueMock.Object);
+        byte[] content = "Attachment content"u8.ToArray();
+        var attachmentStream = new MemoryStream(content);
+        var message = new EmailMessage(
+            "from@test.com",
+            ["to@test.com"],
+            null,
+            null,
+            null,
+            "Subject",
+            "Body",
+            false,
+            [new EmailMessageAttachment(attachmentStream, "file.txt")]);
+
+        await sender.SendAsync(message, "Test");
+        await attachmentStream.DisposeAsync();
+
+        EmailMessageAttachment queuedAttachment = queuedMessage!.Attachments!.Single();
+        using var queuedContent = new MemoryStream();
+        await queuedAttachment.Stream.CopyToAsync(queuedContent);
+        Assert.AreEqual("file.txt", queuedAttachment.FileName);
+        CollectionAssert.AreEqual(content, queuedContent.ToArray());
+    }
+
+    [Test]
     public void SendAsync_Reports_Send_Failure_To_Caller_When_SendInBackground_Is_Disabled()
     {
         var queueMock = new Mock<IEmailDeliveryQueue>();
@@ -330,7 +363,6 @@ public class EmailSenderTests
             eventAggregator ?? Mock.Of<IEventAggregator>(),
             emailSenderClient,
             emailDeliveryQueue ?? Mock.Of<IEmailDeliveryQueue>(),
-            null,
-            handler,
+            handler is not null,
             timeProvider ?? TimeProvider.System);
 }

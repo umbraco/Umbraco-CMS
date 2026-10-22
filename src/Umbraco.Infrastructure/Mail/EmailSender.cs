@@ -96,7 +96,14 @@ public class EmailSender : IEmailSender
         IEmailDeliveryQueue emailDeliveryQueue,
         INotificationHandler<SendEmailNotification>? handler1,
         INotificationAsyncHandler<SendEmailNotification>? handler2)
-        : this(logger, globalSettings, eventAggregator, emailSenderClient, emailDeliveryQueue, handler1, handler2, TimeProvider.System)
+        : this(
+            logger,
+            globalSettings,
+            eventAggregator,
+            emailSenderClient,
+            emailDeliveryQueue,
+            handler1 is not null || handler2 is not null,
+            TimeProvider.System)
     {
     }
 
@@ -108,8 +115,7 @@ public class EmailSender : IEmailSender
     /// <param name="eventAggregator">The event aggregator used to publish <see cref="SendEmailNotification"/>.</param>
     /// <param name="emailSenderClient">The client used to send emails and verify the SMTP connection.</param>
     /// <param name="emailDeliveryQueue">The queue used to send emails in the background.</param>
-    /// <param name="handler1">An optional synchronous handler for <see cref="SendEmailNotification"/>.</param>
-    /// <param name="handler2">An optional asynchronous handler for <see cref="SendEmailNotification"/>.</param>
+    /// <param name="notificationHandlerRegistered">Whether a handler for <see cref="SendEmailNotification"/> is registered.</param>
     /// <param name="timeProvider">The time provider used for the SMTP probe cache expiry and timeout.</param>
     /// <remarks>
     /// This constructor is internal because the time provider only exists so tests can control the SMTP probe cache
@@ -122,14 +128,13 @@ public class EmailSender : IEmailSender
         IEventAggregator eventAggregator,
         IEmailSenderClient emailSenderClient,
         IEmailDeliveryQueue emailDeliveryQueue,
-        INotificationHandler<SendEmailNotification>? handler1,
-        INotificationAsyncHandler<SendEmailNotification>? handler2,
+        bool notificationHandlerRegistered,
         TimeProvider timeProvider)
     {
         _logger = logger;
         _eventAggregator = eventAggregator;
         _globalSettings = globalSettings.CurrentValue;
-        _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
+        _notificationHandlerRegistered = notificationHandlerRegistered;
         _emailSenderClient = emailSenderClient;
         _emailDeliveryQueue = emailDeliveryQueue;
         _timeProvider = timeProvider;
@@ -322,10 +327,40 @@ public class EmailSender : IEmailSender
 
         if (_globalSettings.Smtp?.SendInBackground is true)
         {
-            await _emailDeliveryQueue.EnqueueAsync(message, emailType, expires);
+            await _emailDeliveryQueue.EnqueueAsync(await CopyAttachmentsAsync(message), emailType, expires);
             return;
         }
 
         await _emailSenderClient.SendAsync(message, expires);
+    }
+
+    // The attachment streams belong to the caller, who may dispose of them once the send returns, so a queued email
+    // takes its own copy of them.
+    private static async Task<EmailMessage> CopyAttachmentsAsync(EmailMessage message)
+    {
+        if (message.HasAttachments is false)
+        {
+            return message;
+        }
+
+        var attachments = new List<EmailMessageAttachment>();
+        foreach (EmailMessageAttachment attachment in message.Attachments!)
+        {
+            var stream = new MemoryStream();
+            await attachment.Stream.CopyToAsync(stream);
+            stream.Position = 0;
+            attachments.Add(new EmailMessageAttachment(stream, attachment.FileName));
+        }
+
+        return new EmailMessage(
+            message.From,
+            message.To,
+            message.Cc,
+            message.Bcc,
+            message.ReplyTo,
+            message.Subject,
+            message.Body,
+            message.IsBodyHtml,
+            attachments);
     }
 }

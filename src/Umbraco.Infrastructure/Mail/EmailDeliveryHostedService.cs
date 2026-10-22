@@ -19,6 +19,9 @@ internal sealed class EmailDeliveryHostedService : BackgroundService
     /// <summary>
     ///     Initializes a new instance of the <see cref="EmailDeliveryHostedService"/> class.
     /// </summary>
+    /// <param name="queue">The queue holding the emails to deliver.</param>
+    /// <param name="emailSenderClient">The client used to deliver the emails.</param>
+    /// <param name="logger">The logger.</param>
     public EmailDeliveryHostedService(
         IEmailDeliveryQueue queue,
         IEmailSenderClient emailSenderClient,
@@ -68,6 +71,7 @@ internal sealed class EmailDeliveryHostedService : BackgroundService
         }
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
         {
+            // The application is stopping; StopAsync delivers what is still queued.
         }
     }
 
