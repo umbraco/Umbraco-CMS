@@ -8,7 +8,15 @@ namespace Umbraco.Cms.Infrastructure.Mail;
 ///     Delivers the emails held by the <see cref="InMemoryEmailDeliveryQueue"/> through the <see cref="IEmailSenderClient"/>.
 /// </summary>
 /// <remarks>
-///     Does nothing when <see cref="IEmailDeliveryQueue"/> has been replaced, as the replacement owns its delivery.
+///     <para>
+///         Does nothing when <see cref="IEmailDeliveryQueue"/> has been replaced, as the replacement owns its delivery.
+///     </para>
+///     <para>
+///         Unlike recurring background jobs, this deliberately runs on every instance, whatever its server role or runtime
+///         level. The queue is held in memory, so each instance only holds the emails its own requests queued and must
+///         deliver them itself; restricting delivery to a server role would leave emails queued on other instances
+///         undelivered. Delivery does not use the database, so it does not need to wait for the runtime to be running.
+///     </para>
 /// </remarks>
 internal sealed class EmailDeliveryHostedService : BackgroundService
 {
