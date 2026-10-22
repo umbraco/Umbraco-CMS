@@ -311,7 +311,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             return;
         }
 
-        HashSet<Guid> returnedKeys = returnedNodes.Select(node => node.Key).ToHashSet();
+        var returnedKeys = returnedNodes.Select(node => node.Key).ToHashSet();
         foreach (Guid key in keys.Where(key => returnedKeys.Contains(key) is false))
         {
             await _hybridCache.SetAsync(GetCacheKey(key, preview), (ContentCacheNode?)null, GetEntryOptions(key, preview), GenerateTags(null));

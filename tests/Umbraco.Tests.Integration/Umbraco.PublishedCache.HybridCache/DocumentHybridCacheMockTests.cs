@@ -307,7 +307,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     {
         Guid unpublishedKey = Guid.NewGuid();
 
-        // Nothing published for this key (e.g. an unpublished child passed by a Children() traversal).
+        // Nothing published for this key (e.g. an unpublished child passed by a Children("*") traversal).
         _mockDatabaseCacheRepository
             .Setup(x => x.GetDocumentSourcesAsync(It.Is<IEnumerable<Guid>>(keys => keys.Contains(unpublishedKey)), false))
             .ReturnsAsync(Array.Empty<ContentCacheNode>());
