@@ -61,6 +61,11 @@ public class SmtpSettings : ValidatableEntryBase
     internal const string StaticDeliveryMethod = "Network";
 
     /// <summary>
+    ///     The default value for whether emails are sent in the background.
+    /// </summary>
+    internal const bool StaticSendInBackground = false;
+
+    /// <summary>
     ///     Gets or sets a value for the SMTP from address to use for messages.
     /// </summary>
     [Required]
@@ -108,4 +113,16 @@ public class SmtpSettings : ValidatableEntryBase
     ///     Gets or sets a value for the time until an email expires.
     /// </summary>
     public TimeSpan? EmailExpiration { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether emails are sent through the SMTP client in the background, rather than
+    ///     while the sender waits.
+    /// </summary>
+    /// <remarks>
+    ///     When enabled, sending an email completes once the email is queued for delivery, so a delivery failure is logged
+    ///     rather than reported to the sender. Queued emails that have not been delivered when the application stops are lost.
+    /// </remarks>
+    // TODO (V20): Consider enabling this by default.
+    [DefaultValue(StaticSendInBackground)]
+    public bool SendInBackground { get; set; } = StaticSendInBackground;
 }
