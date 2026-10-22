@@ -97,6 +97,9 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 		return this.browsePickableFilter;
 	}
 
+	/**
+	 * Prevents items from being picked while browsing. Items for which this returns false are shown but cannot be picked.
+	 */
 	@property({ type: Object, attribute: false })
 	public browsePickableFilter?: (item: UmbStaticFileItemModel) => boolean;
 

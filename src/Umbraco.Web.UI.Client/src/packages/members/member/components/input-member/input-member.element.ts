@@ -126,9 +126,15 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	}
 	#filter?: (member: UmbMemberItemModel) => boolean;
 
+	/**
+	 * Prevents items from being picked while browsing. Items for which this returns false are shown but cannot be picked.
+	 */
 	@property({ type: Object, attribute: false })
 	public browsePickableFilter?: (member: UmbMemberItemModel) => boolean;
 
+	/**
+	 * Prevents search results from being picked. Results for which this returns false are shown but cannot be picked.
+	 */
 	@property({ type: Object, attribute: false })
 	public searchPickableFilter?: (member: UmbMemberSearchItemModel) => boolean;
 

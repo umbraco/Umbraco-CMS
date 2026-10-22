@@ -97,6 +97,9 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 	#filter?: (language: UmbLanguageItemModel) => boolean;
 
+	/**
+	 * Prevents items from being picked while browsing. Items for which this returns false are shown but cannot be picked.
+	 */
 	@property({ type: Object, attribute: false })
 	public browsePickableFilter?: (language: UmbLanguageItemModel) => boolean;
 

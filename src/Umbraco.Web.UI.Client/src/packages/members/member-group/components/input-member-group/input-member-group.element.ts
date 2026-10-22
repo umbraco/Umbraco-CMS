@@ -133,6 +133,9 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 	}
 	#filter?: (memberGroup: UmbMemberGroupItemModel) => boolean;
 
+	/**
+	 * Prevents items from being picked while browsing. Items for which this returns false are shown but cannot be picked.
+	 */
 	@property({ type: Object, attribute: false })
 	public browsePickableFilter?: (memberGroup: UmbMemberGroupItemModel) => boolean;
 
