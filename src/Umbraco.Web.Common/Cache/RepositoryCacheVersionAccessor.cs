@@ -52,20 +52,55 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
     /// </remarks>
     public async Task<RepositoryCacheVersion?> GetAsync(string cacheKey)
     {
+        if (TryGetCached(cacheKey, out RepositoryCacheVersion? cached, out ConcurrentDictionary<string, Guid>? scopeCache))
+        {
+            return cached;
+        }
+
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+
+        RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionRepository.GetAsync(cacheKey);
+        return Store(cacheKey, databaseVersion, scopeCache);
+    }
+
+    /// <inheritdoc />
+    public RepositoryCacheVersion? Get(string cacheKey)
+    {
+        if (TryGetCached(cacheKey, out RepositoryCacheVersion? cached, out ConcurrentDictionary<string, Guid>? scopeCache))
+        {
+            return cached;
+        }
+
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+
+        RepositoryCacheVersion? databaseVersion = _repositoryCacheVersionRepository.Get(cacheKey);
+        return Store(cacheKey, databaseVersion, scopeCache);
+    }
+
+    /// <summary>
+    /// Answers from the scope-level or request-level cache, or reports that the database has to be read. A
+    /// client-side request is always reported as cached with no version, so it is never checked against the database.
+    /// </summary>
+    private bool TryGetCached(string cacheKey, out RepositoryCacheVersion? version, out ConcurrentDictionary<string, Guid>? scopeCache)
+    {
+        version = null;
+        scopeCache = null;
+
         HttpContext? httpcontext = _httpContextAccessor.HttpContext;
         if (httpcontext?.RequestServices is not null && httpcontext.Request.IsBackOfficeRequest() is false)
         {
             _logger.LogDebug("Client side request detected, skipping cache version retrieval for key {CacheKey}", cacheKey);
             // We don't want to try and fetch version for client side requests, always assume we're in sync.
-            return null;
+            return true;
         }
 
         // 1. Scope-level cache — survives request-cache invalidation within a transaction.
-        ConcurrentDictionary<string, Guid>? scopeCache = GetOrRegisterScopeVersionCache();
+        scopeCache = GetOrRegisterScopeVersionCache();
         if (scopeCache is not null && scopeCache.TryGetValue(cacheKey, out Guid scopeVersion))
         {
             _logger.LogDebug("Cache version for key {CacheKey} found in scope cache", cacheKey);
-            return new RepositoryCacheVersion { Identifier = cacheKey, Version = scopeVersion.ToString() };
+            version = new RepositoryCacheVersion { Identifier = cacheKey, Version = scopeVersion.ToString() };
+            return true;
         }
 
         // 2. Request-level cache.
@@ -73,13 +108,18 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
         if (requestCachedVersion is not null)
         {
             _logger.LogDebug("Cache version for key {CacheKey} found in request cache", cacheKey);
-            return requestCachedVersion;
+            version = requestCachedVersion;
+            return true;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+        return false;
+    }
 
-        RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionRepository.GetAsync(cacheKey);
-
+    /// <summary>
+    /// Stores a version read from the database in the request-level and scope-level caches.
+    /// </summary>
+    private RepositoryCacheVersion? Store(string cacheKey, RepositoryCacheVersion? databaseVersion, ConcurrentDictionary<string, Guid>? scopeCache)
+    {
         if (databaseVersion is null)
         {
             return databaseVersion;

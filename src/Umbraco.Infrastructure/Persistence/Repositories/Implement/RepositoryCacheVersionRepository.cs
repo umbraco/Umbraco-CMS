@@ -24,18 +24,14 @@ internal class RepositoryCacheVersionRepository : RepositoryBase, IRepositoryCac
     /// <inheritdoc/>
     public async Task<RepositoryCacheVersion?> GetAsync(string identifier)
     {
-        if (string.IsNullOrWhiteSpace(identifier))
-        {
-            throw new ArgumentException("Identifier cannot be null or whitespace.", nameof(identifier));
-        }
+        var version = await Database.ExecuteScalarAsync<string?>(GetQuery(identifier));
+        return new RepositoryCacheVersion { Identifier = identifier, Version = version };
+    }
 
-        Sql<ISqlContext> query = Sql()
-            .Select<RepositoryCacheVersionDto>(x => x.Version)
-            .From<RepositoryCacheVersionDto>()
-            .Where<RepositoryCacheVersionDto>(x => x.Identifier == identifier);
-
-        var version = await Database.ExecuteScalarAsync<string?>(query);
-
+    /// <inheritdoc/>
+    public RepositoryCacheVersion? Get(string identifier)
+    {
+        var version = Database.ExecuteScalar<string?>(GetQuery(identifier));
         return new RepositoryCacheVersion { Identifier = identifier, Version = version };
     }
 
@@ -45,20 +41,42 @@ internal class RepositoryCacheVersionRepository : RepositoryBase, IRepositoryCac
     /// <returns>A task representing the asynchronous operation, containing an enumerable of <see cref="RepositoryCacheVersion"/>.</returns>
     public async Task<IEnumerable<RepositoryCacheVersion>> GetAllAsync()
     {
-        Sql<ISqlContext> query = Sql()
-            .Select<RepositoryCacheVersionDto>()
-            .From<RepositoryCacheVersionDto>();
+        IEnumerable<RepositoryCacheVersionDto> dtos = await Database.FetchAsync<RepositoryCacheVersionDto>(GetAllQuery());
+        return dtos.Select(Map).Where(x => x is not null)!;
+    }
 
-        IEnumerable<RepositoryCacheVersionDto> dtos = await Database.FetchAsync<RepositoryCacheVersionDto>(query);
+    /// <inheritdoc/>
+    public IEnumerable<RepositoryCacheVersion> GetAll()
+    {
+        IEnumerable<RepositoryCacheVersionDto> dtos = Database.Fetch<RepositoryCacheVersionDto>(GetAllQuery());
         return dtos.Select(Map).Where(x => x is not null)!;
     }
 
     /// <inheritdoc/>
     public async Task SaveAsync(RepositoryCacheVersion repositoryCacheVersion)
+        => await Database.InsertOrUpdateAsync(Map(repositoryCacheVersion), null, null);
+
+    /// <inheritdoc/>
+    public void Save(RepositoryCacheVersion repositoryCacheVersion)
+        => Database.InsertOrUpdate(Map(repositoryCacheVersion), null, null);
+
+    private Sql<ISqlContext> GetQuery(string identifier)
     {
-        RepositoryCacheVersionDto dto = Map(repositoryCacheVersion);
-        await Database.InsertOrUpdateAsync(dto, null, null);
+        if (string.IsNullOrWhiteSpace(identifier))
+        {
+            throw new ArgumentException("Identifier cannot be null or whitespace.", nameof(identifier));
+        }
+
+        return Sql()
+            .Select<RepositoryCacheVersionDto>(x => x.Version)
+            .From<RepositoryCacheVersionDto>()
+            .Where<RepositoryCacheVersionDto>(x => x.Identifier == identifier);
     }
+
+    private Sql<ISqlContext> GetAllQuery()
+        => Sql()
+            .Select<RepositoryCacheVersionDto>()
+            .From<RepositoryCacheVersionDto>();
 
     private static RepositoryCacheVersionDto Map(RepositoryCacheVersion entity)
         => new() { Identifier = entity.Identifier, Version = entity.Version };

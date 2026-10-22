@@ -303,4 +303,74 @@ public class RepositoryCacheVersionServiceTests
             _actions.Clear();
         }
     }
+
+    // The synchronous members exist for callers that hold a distributed lock; they must never route through the
+    // asynchronous accessor or repository, or the thread-pool hop they are meant to avoid comes back.
+
+    [Test]
+    public void IsCacheSynced_ReturnsFalse_WhenAccessorReturnsStaleVersion_WithoutAwaiting()
+    {
+        var cacheKey = _sut.GetCacheKey<IContent>();
+        var v0 = Guid.NewGuid();
+        var v1 = Guid.NewGuid();
+
+        _sut.SetCachesSyncedAsync(new[] { new RepositoryCacheVersion { Identifier = cacheKey, Version = v1.ToString() } }).GetAwaiter().GetResult();
+        _accessor
+            .Setup(x => x.Get(cacheKey))
+            .Returns(new RepositoryCacheVersion { Identifier = cacheKey, Version = v0.ToString() });
+
+        var isSynced = _sut.IsCacheSynced<IContent>();
+
+        Assert.IsFalse(isSynced);
+        _accessor.Verify(x => x.GetAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Test]
+    public void IsCacheSynced_ReturnsTrue_WhenAccessorAndLocalVersionMatch()
+    {
+        var cacheKey = _sut.GetCacheKey<IContent>();
+        var version = Guid.NewGuid();
+
+        _sut.SetCachesSyncedAsync(new[] { new RepositoryCacheVersion { Identifier = cacheKey, Version = version.ToString() } }).GetAwaiter().GetResult();
+        _accessor
+            .Setup(x => x.Get(cacheKey))
+            .Returns(new RepositoryCacheVersion { Identifier = cacheKey, Version = version.ToString() });
+
+        Assert.IsTrue(_sut.IsCacheSynced<IContent>());
+    }
+
+    [Test]
+    public void SetCacheUpdated_WritesTheVersionSynchronously_WhenNoRequestCache()
+    {
+        _sut.SetCacheUpdated<IContent>();
+
+        _repository.Verify(x => x.Save(It.IsAny<RepositoryCacheVersion>()), Times.Once);
+        _repository.Verify(x => x.SaveAsync(It.IsAny<RepositoryCacheVersion>()), Times.Never);
+        _accessor.Verify(x => x.VersionChanged(_sut.GetCacheKey<IContent>(), It.IsAny<Guid>()), Times.Once);
+    }
+
+    [Test]
+    public void FlushCacheUpdates_PublishesThePendingVersionsSynchronously()
+    {
+        _deferringSut.SetCacheUpdated<IContent>();
+        _defaultScopeContext.ScopeExit(completed: true);
+        _repository.Verify(x => x.Save(It.IsAny<RepositoryCacheVersion>()), Times.Never, "The version is deferred while a request cache is available.");
+
+        _deferringSut.FlushCacheUpdates();
+
+        _repository.Verify(x => x.Save(It.Is<RepositoryCacheVersion>(v => v.Identifier == _deferringSut.GetCacheKey<IContent>())), Times.Once);
+        _repository.Verify(x => x.SaveAsync(It.IsAny<RepositoryCacheVersion>()), Times.Never);
+    }
+
+    [Test]
+    public void GetCacheVersions_ReadsThePublishedVersionsSynchronously()
+    {
+        var expected = new[] { new RepositoryCacheVersion { Identifier = "a", Version = Guid.NewGuid().ToString() } };
+        _repository.Setup(x => x.GetAll()).Returns(expected);
+
+        IReadOnlyCollection<RepositoryCacheVersion> versions = _sut.GetCacheVersions();
+
+        Assert.That(versions, Is.EqualTo(expected));
+        _repository.Verify(x => x.GetAllAsync(), Times.Never);
+    }
 }
