@@ -308,6 +308,30 @@ public class EmailSenderTests
     }
 
     [Test]
+    public async Task SendAsync_Publishes_Notification_Requested_By_A_Send_From_A_SendEmailNotification_Handler()
+    {
+        EmailSender? sender = null;
+        var publishCount = 0;
+        var eventAggregatorMock = CreateEventAggregatorMock(async notification =>
+        {
+            // The first publish sends a further email requesting the notification; the second publish handles it.
+            if (++publishCount == 1)
+            {
+                await sender!.SendAsync(CreateMessage(), notification.EmailType, enableNotification: true);
+            }
+
+            notification.HandleEmail();
+        });
+        var clientMock = new Mock<IEmailSenderClient>();
+        sender = CreateSender(_smtpServerSettings, clientMock.Object, eventAggregator: eventAggregatorMock.Object);
+
+        await sender.SendAsync(CreateMessage(), "Test", enableNotification: true);
+
+        Assert.AreEqual(2, publishCount);
+        clientMock.Verify(x => x.SendAsync(It.IsAny<EmailMessage>(), It.IsAny<TimeSpan?>()), Times.Never);
+    }
+
+    [Test]
     public async Task SendAsync_Honours_PublishNotificationForAllEmails_Changed_At_Runtime()
     {
         Action<GlobalSettings, string?>? onChange = null;

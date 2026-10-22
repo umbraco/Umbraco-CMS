@@ -218,9 +218,10 @@ public class EmailSender : IEmailSender
     {
         var publishNotification = enableNotification || PublishNotificationForAllEmails;
 
-        // A handler may send the email on through this sender, for example after amending it. That send must go
-        // to the transport rather than publish the notification again, which would recurse.
-        if (publishNotification && _isPublishingNotification.Value is false)
+        // A handler may send the email on through this sender, for example after amending it. Unless its sender asks for
+        // the notification, that send goes to the transport rather than publishing again because of the setting, which
+        // would recurse.
+        if (publishNotification && (enableNotification || _isPublishingNotification.Value is false))
         {
             var notification =
                 new SendEmailNotification(message.ToNotificationEmail(_globalSettings.Smtp?.From), emailType);
@@ -253,8 +254,7 @@ public class EmailSender : IEmailSender
             if (publishNotification is false && _notificationHandlerRegistered)
             {
                 _logger.LogWarning(
-                    "Could not send a {EmailType} email. There is no SMTP configured, and the registered email notification handler did not receive it because the notification is not published for this email. Enable Umbraco:CMS:Global:Smtp:PublishNotificationForAllEmails to publish it for every email.",
-                    emailType);
+                    "Could not send an email. There is no SMTP configured, and the registered email notification handler did not receive it because the notification is not published for this email. Enable Umbraco:CMS:Global:Smtp:PublishNotificationForAllEmails to publish it for every email.");
             }
             else if (_logger.IsEnabled(LogLevel.Debug))
             {
