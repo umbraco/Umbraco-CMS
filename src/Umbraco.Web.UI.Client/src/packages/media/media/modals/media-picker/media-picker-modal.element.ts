@@ -170,7 +170,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		// eslint-disable-next-line @typescript-eslint/no-deprecated
 		if (_changedProperties.has('data') && this.data?.filter) {
 			new UmbDeprecation({
-				deprecated: 'The `filter` option of UmbMediaPickerModalData',
+				deprecated: 'The `filter` option of UmbMediaPickerModalData has no effect.',
 				removeInVersion: '21.0.0',
 				solution: 'Use `pickableFilter` to prevent media from being picked instead.',
 			}).warn();

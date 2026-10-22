@@ -35,7 +35,7 @@ export interface UmbTreeContext<
 
 	selectableFilter?(item: TreeItemType): boolean;
 	/**
-	 * @deprecated Deprecated since v17. Filtering items on the client breaks server-side pagination. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
+	 * @deprecated Deprecated since v17. This option has no effect. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
 	 */
 	filter?(item: TreeItemType): boolean;
 

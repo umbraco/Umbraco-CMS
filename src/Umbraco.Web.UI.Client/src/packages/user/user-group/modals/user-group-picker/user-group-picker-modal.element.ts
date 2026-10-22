@@ -57,7 +57,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		// eslint-disable-next-line @typescript-eslint/no-deprecated
 		if (_changedProperties.has('data') && this.data?.filter) {
 			new UmbDeprecation({
-				deprecated: 'The `filter` option of the user group picker modal data',
+				deprecated: 'The `filter` option of the user group picker modal data has no effect.',
 				removeInVersion: '21.0.0',
 				solution: 'Use `pickableFilter` to prevent user groups from being picked instead.',
 			}).warn();

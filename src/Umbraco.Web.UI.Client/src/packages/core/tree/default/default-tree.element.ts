@@ -130,14 +130,14 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	#hasWarnedFilterDeprecation = false;
 
 	/**
-	 * @deprecated Deprecated since v17. Filtering items on the client breaks server-side pagination. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
+	 * @deprecated Deprecated since v17. This option has no effect. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
 	 */
 	@property({ attribute: false })
 	public set filter(value: ((item: UmbTreeItemModelBase) => boolean) | undefined) {
 		if (value && !this.#hasWarnedFilterDeprecation) {
 			this.#hasWarnedFilterDeprecation = true;
 			new UmbDeprecation({
-				deprecated: 'The `filter` property of umb-tree',
+				deprecated: 'The `filter` property of umb-tree has no effect.',
 				removeInVersion: '21.0.0',
 				solution: 'Use `selectableFilter` to prevent items from being selected instead.',
 			}).warn();
