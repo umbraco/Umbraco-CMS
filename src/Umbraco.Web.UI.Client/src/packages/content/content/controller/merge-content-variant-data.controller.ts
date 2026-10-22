@@ -93,7 +93,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 					);
 
 					// Should this value be saved?
-					if (variantsToStore.some((x) => x.equal(UmbVariantId.CreateFromPartial(value)))) {
+					if (variantsToStore.some((x) => x.culture === value.culture)) {
 						const draftValue = draftValues?.find(
 							(x) => x.alias === value.alias && x.culture === value.culture && x.segment === value.segment,
 						);
