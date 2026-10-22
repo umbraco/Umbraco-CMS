@@ -265,7 +265,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
     // The single batched database read for whatever L0 and L1/L2 missed. A database-read node
     // additionally gets the published-ancestor guard applied (mirroring GetNodeAsync's read-through
-    // result) and, once resolved, is promoted into L1 — an L1/L2 hit is already there.
+    // result) and, once resolved, is promoted into L1 — an L1/L2 hit is already there. A key the
+    // database has nothing for gets a cached null, as GetNodeAsync writes, so it is not re-read on
+    // every request.
     private async Task ReadFromDatabaseAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved)
     {
         IReadOnlyCollection<ContentCacheNode> coldNodes;
@@ -292,6 +294,22 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
                 && preview is false && IsCacheGenerationCurrent(generation))
             {
                 await _hybridCache.SetAsync(GetCacheKey(node.Key, preview), node, GetEntryOptions(node.Key, preview), GenerateTags(node));
+            }
+        }
+
+        // Keys the database returned nothing for (e.g. unpublished documents) resolve to nothing until a
+        // refresh says otherwise. Without this a traversal that passes unpublished children re-reads them
+        // on every request. A node that came back but failed the ancestor guard is not cached as null,
+        // matching GetNodeAsync, since that check can be transiently wrong during a cache rebuild.
+        if (preview is false && IsCacheGenerationCurrent(generation))
+        {
+            HashSet<Guid> returnedKeys = coldNodes.Select(node => node.Key).ToHashSet();
+            foreach (Guid key in keys)
+            {
+                if (returnedKeys.Contains(key) is false)
+                {
+                    await _hybridCache.SetAsync(GetCacheKey(key, preview), (ContentCacheNode?)null, GetEntryOptions(key, preview), GenerateTags(null));
+                }
             }
         }
     }
