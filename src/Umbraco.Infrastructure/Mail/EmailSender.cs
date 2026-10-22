@@ -253,9 +253,8 @@ public class EmailSender : IEmailSender
             if (publishNotification is false && _notificationHandlerRegistered)
             {
                 _logger.LogWarning(
-                    "Could not send the {EmailType} email for {Subject}. There is no SMTP configured, and the registered email notification handler did not receive it because the notification is not published for this email. Enable Umbraco:CMS:Global:Smtp:PublishNotificationForAllEmails to publish it for every email.",
-                    emailType,
-                    message.Subject);
+                    "Could not send a {EmailType} email. There is no SMTP configured, and the registered email notification handler did not receive it because the notification is not published for this email. Enable Umbraco:CMS:Global:Smtp:PublishNotificationForAllEmails to publish it for every email.",
+                    emailType);
             }
             else if (_logger.IsEnabled(LogLevel.Debug))
             {
