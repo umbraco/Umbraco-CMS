@@ -71,7 +71,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`<umb-body-layout headline=${this.localize.term('defaultdialogs_selectLanguages')}>
 			<uui-box>
-				${this.#filteredLanguages.some((item) => this.#isPickable(item))
+				${this.#filteredLanguages.length > 0
 					? repeat(
 							this.#filteredLanguages,
 							(item) => item.unique,
