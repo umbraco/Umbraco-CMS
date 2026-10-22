@@ -91,6 +91,10 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.unique));
 	}
 
+	#isPickable(userGroup: UmbUserGroupDetailModel) {
+		return this.data?.pickableFilter ? this.data.pickableFilter(userGroup) : true;
+	}
+
 	#onFilterInput(event: UUIInputEvent) {
 		const query = (event.target.value as string) || '';
 		this.#debouncedFilter(query.toLowerCase());
@@ -121,7 +125,8 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 							<umb-user-group-ref
 								.name=${userGroup.name}
 								select-only
-								selectable
+								?selectable=${this.#isPickable(userGroup)}
+								?disabled=${!this.#isPickable(userGroup)}
 								?selected=${this.#selectionManager.isSelected(userGroup.unique)}
 								?documentRootAccess=${userGroup.documentRootAccess}
 								.documentStartNode=${!userGroup.documentRootAccess ? userGroup.documentStartNode?.unique : null}
