@@ -75,16 +75,21 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
+	#hasWarnedFilterDeprecation = false;
+
 	/**
 	 * @deprecated Deprecated since v17. Use `browsePickableFilter` to prevent languages from being picked instead. Scheduled for removal in Umbraco 21.
 	 */
 	@property({ type: Object, attribute: false })
 	public set filter(value: ((language: UmbLanguageItemModel) => boolean) | undefined) {
-		new UmbDeprecation({
-			deprecated: 'The `filter` property of umb-input-language',
-			removeInVersion: '21.0.0',
-			solution: 'Use `browsePickableFilter` to prevent languages from being picked instead.',
-		}).warn();
+		if (value && !this.#hasWarnedFilterDeprecation) {
+			this.#hasWarnedFilterDeprecation = true;
+			new UmbDeprecation({
+				deprecated: 'The `filter` property of umb-input-language',
+				removeInVersion: '21.0.0',
+				solution: 'Use `browsePickableFilter` to prevent languages from being picked instead.',
+			}).warn();
+		}
 		this.#filter = value;
 	}
 	public get filter(): (language: UmbLanguageItemModel) => boolean {

@@ -76,16 +76,21 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
+	#hasWarnedPickableFilterDeprecation = false;
+
 	/**
 	 * @deprecated Deprecated since v17. Use `browsePickableFilter` instead. Scheduled for removal in Umbraco 21.
 	 */
 	@property({ type: Object, attribute: false })
 	public set pickableFilter(value: ((item: UmbStaticFileItemModel) => boolean) | undefined) {
-		new UmbDeprecation({
-			deprecated: 'The `pickableFilter` property of umb-input-static-file',
-			removeInVersion: '21.0.0',
-			solution: 'Use `browsePickableFilter` instead.',
-		}).warn();
+		if (value && !this.#hasWarnedPickableFilterDeprecation) {
+			this.#hasWarnedPickableFilterDeprecation = true;
+			new UmbDeprecation({
+				deprecated: 'The `pickableFilter` property of umb-input-static-file',
+				removeInVersion: '21.0.0',
+				solution: 'Use `browsePickableFilter` instead.',
+			}).warn();
+		}
 		this.browsePickableFilter = value;
 	}
 	public get pickableFilter(): ((item: UmbStaticFileItemModel) => boolean) | undefined {

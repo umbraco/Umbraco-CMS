@@ -111,16 +111,21 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
+	#hasWarnedFilterDeprecation = false;
+
 	/**
 	 * @deprecated Deprecated since v17. Filtering member groups on the client breaks server-side pagination. Use `browsePickableFilter` to prevent member groups from being picked instead. Scheduled for removal in Umbraco 21.
 	 */
 	@property({ type: Object, attribute: false })
 	public set filter(value: ((memberGroup: UmbMemberGroupItemModel) => boolean) | undefined) {
-		new UmbDeprecation({
-			deprecated: 'The `filter` property of umb-input-member-group',
-			removeInVersion: '21.0.0',
-			solution: 'Use `browsePickableFilter` to prevent member groups from being picked instead.',
-		}).warn();
+		if (value && !this.#hasWarnedFilterDeprecation) {
+			this.#hasWarnedFilterDeprecation = true;
+			new UmbDeprecation({
+				deprecated: 'The `filter` property of umb-input-member-group',
+				removeInVersion: '21.0.0',
+				solution: 'Use `browsePickableFilter` to prevent member groups from being picked instead.',
+			}).warn();
+		}
 		this.#filter = value;
 	}
 	public get filter(): (memberGroup: UmbMemberGroupItemModel) => boolean {
