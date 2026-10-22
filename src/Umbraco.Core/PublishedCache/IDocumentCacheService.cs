@@ -29,6 +29,32 @@ public interface IDocumentCacheService
     Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null);
 
     /// <summary>
+    /// Gets a published content item by its key without leaving the calling thread.
+    /// </summary>
+    /// <param name="key">The unique key of the content.</param>
+    /// <param name="preview">Whether to consider unpublished content; when <c>null</c> the current preview state applies.</param>
+    /// <returns>The published content, or <c>null</c> if it does not exist or is not published.</returns>
+    /// <remarks>
+    /// For callers that run while a distributed lock is held, where awaiting would need a second thread-pool thread
+    /// while the first is blocked. An implementation should serve the in-memory tiers and otherwise read the
+    /// database synchronously rather than wrap <see cref="GetByKeyAsync"/>.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    IPublishedContent? GetByKey(Guid key, bool? preview = null)
+        => GetByKeyAsync(key, preview).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Gets a published content item by its integer id without leaving the calling thread.
+    /// </summary>
+    /// <param name="id">The integer id of the content.</param>
+    /// <param name="preview">Whether to consider unpublished content; when <c>null</c> the current preview state applies.</param>
+    /// <returns>The published content, or <c>null</c> if it does not exist or is not published.</returns>
+    /// <remarks>See <see cref="GetByKey"/>.</remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    IPublishedContent? GetById(int id, bool? preview = null)
+        => GetByIdAsync(id, preview).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Gets multiple published content items by their unique keys, fetching any not already cached
     /// from the database in a single batched query rather than one at a time.
     /// </summary>

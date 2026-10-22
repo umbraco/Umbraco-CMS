@@ -1,4 +1,3 @@
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
@@ -19,6 +18,15 @@ internal interface IDatabaseCacheRepository
     /// <param name="key">The document key.</param>
     /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
     Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
+
+    /// <summary>
+    /// Gets a single cache node for a document key without leaving the calling thread.
+    /// </summary>
+    /// <param name="key">The document key.</param>
+    /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    ContentCacheNode? GetContentSource(Guid key, bool preview = false)
+        => GetContentSourceAsync(key, preview).GetAwaiter().GetResult();
 
     /// <summary>
     /// Gets both draft and published cache nodes for a document key in a single query.

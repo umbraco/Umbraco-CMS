@@ -41,6 +41,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
     private readonly IConvertedPublishedContentCache<string> _publishedContentCache;
 
+    private static readonly HybridCacheEntryOptions _localTierOnlyEntryOptions = new()
+    {
+        Flags = HybridCacheEntryFlags.DisableUnderlyingData | HybridCacheEntryFlags.DisableLocalCacheWrite | HybridCacheEntryFlags.DisableDistributedCacheWrite,
+    };
+
     // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
     // GetNodeAsync captures it before reading the backing store and re-checks it before writing
     // back, so a snapshot read before a concurrent publish/refresh is never written over the
@@ -155,6 +160,22 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         Guid key = keyAttempt.Result;
 
         return await GetNodeAsync(key, calculatedPreview);
+    }
+
+    /// <inheritdoc />
+    public IPublishedContent? GetByKey(Guid key, bool? preview = null)
+        => GetNode(key, preview ?? GetPreview());
+
+    /// <inheritdoc />
+    public IPublishedContent? GetById(int id, bool? preview = null)
+    {
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        if (keyAttempt.Success is false)
+        {
+            return null;
+        }
+
+        return GetNode(keyAttempt.Result, preview ?? GetPreview());
     }
 
     /// <inheritdoc />
@@ -328,6 +349,76 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         content = null;
         return false;
+    }
+
+    // The synchronous counterpart of GetNodeAsync: the L0 and L1 tiers are served in memory and a miss reads the
+    // database on the calling thread. L2 is not consulted and L1 is not populated, because both go through
+    // asynchronous APIs; the asynchronous lookup and the refreshers keep those tiers warm.
+    private IPublishedContent? GetNode(Guid key, bool preview)
+    {
+        var cacheKey = GetCacheKey(key, preview);
+
+        if (preview is false && _publishedContentCache.TryGet(cacheKey, out IPublishedContent? cached))
+        {
+            return cached;
+        }
+
+        long generation = Interlocked.Read(ref _cacheGeneration);
+        bool snapshotIsCurrent = true;
+
+        ContentCacheNode? contentCacheNode = TryGetFromLocalHybridCache(cacheKey);
+        if (contentCacheNode is null)
+        {
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                contentCacheNode = _databaseCacheRepository.GetContentSource(key, preview);
+            }
+
+            snapshotIsCurrent = IsCacheGenerationCurrent(generation);
+
+            // Same ancestor rule as the read-through branch of GetNodeAsync; nothing is cached here, so a transient
+            // failure of the check costs no more than another read.
+            if (preview is false && contentCacheNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(contentCacheNode.Key) is false)
+            {
+                return null;
+            }
+        }
+
+        if (contentCacheNode is null)
+        {
+            return null;
+        }
+
+        _idKeyMap.PopulateCache(contentCacheNode.Id, contentCacheNode.Key, UmbracoObjectTypes.Document);
+
+        IPublishedContent? result = _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
+
+        if (result is not null && preview is false && snapshotIsCurrent)
+        {
+            _publishedContentCache.Set(cacheKey, result, ContentCacheNodeSizeEstimator.EstimateBytes(contentCacheNode));
+        }
+
+        return result;
+    }
+
+    // Serves an L1 (in-process HybridCache) hit synchronously. A lookup that has to go to L2 or join an in-flight
+    // read-through completes asynchronously and is not waited for; it writes nothing (no factory, no cache writes),
+    // so abandoning it is safe and the caller reads the database instead.
+    private ContentCacheNode? TryGetFromLocalHybridCache(string cacheKey)
+    {
+        ValueTask<ContentCacheNode?> lookup = _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
+            cacheKey,
+            static _ => default,
+            _localTierOnlyEntryOptions,
+            cancellationToken: CancellationToken.None);
+
+        if (lookup.IsCompletedSuccessfully)
+        {
+            return lookup.Result;
+        }
+
+        _ = lookup.AsTask();
+        return null;
     }
 
     private async Task<IPublishedContent?> GetNodeAsync(Guid key, bool preview)
