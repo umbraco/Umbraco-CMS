@@ -297,20 +297,24 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             }
         }
 
-        // Keys the database returned nothing for (e.g. unpublished documents) resolve to nothing until a
-        // refresh says otherwise. Without this a traversal that passes unpublished children re-reads them
-        // on every request. A node that came back but failed the ancestor guard is not cached as null,
-        // matching GetNodeAsync, since that check can be transiently wrong during a cache rebuild.
-        if (preview is false && IsCacheGenerationCurrent(generation))
+        await CacheNullsForKeysNotReturnedAsync(keys, coldNodes, preview, generation);
+    }
+
+    // Keys the database returned nothing for (e.g. unpublished documents) resolve to nothing until a
+    // refresh says otherwise. Without this a traversal that passes unpublished children re-reads them
+    // on every request. A node that came back but failed the ancestor guard is not cached as null,
+    // matching GetNodeAsync, since that check can be transiently wrong during a cache rebuild.
+    private async Task CacheNullsForKeysNotReturnedAsync(List<Guid> keys, IReadOnlyCollection<ContentCacheNode> returnedNodes, bool preview, long generation)
+    {
+        if (preview || IsCacheGenerationCurrent(generation) is false)
         {
-            HashSet<Guid> returnedKeys = coldNodes.Select(node => node.Key).ToHashSet();
-            foreach (Guid key in keys)
-            {
-                if (returnedKeys.Contains(key) is false)
-                {
-                    await _hybridCache.SetAsync(GetCacheKey(key, preview), (ContentCacheNode?)null, GetEntryOptions(key, preview), GenerateTags(null));
-                }
-            }
+            return;
+        }
+
+        HashSet<Guid> returnedKeys = returnedNodes.Select(node => node.Key).ToHashSet();
+        foreach (Guid key in keys.Where(key => returnedKeys.Contains(key) is false))
+        {
+            await _hybridCache.SetAsync(GetCacheKey(key, preview), (ContentCacheNode?)null, GetEntryOptions(key, preview), GenerateTags(null));
         }
     }
 
