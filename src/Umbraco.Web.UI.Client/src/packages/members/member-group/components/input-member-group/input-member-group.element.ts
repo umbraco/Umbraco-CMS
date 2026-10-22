@@ -12,7 +12,7 @@ import {
 	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { splitStringToArray, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -111,8 +111,25 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
+	/**
+	 * @deprecated Deprecated since v17. Filtering member groups on the client breaks server-side pagination. Use `browsePickableFilter` to prevent member groups from being picked instead. Scheduled for removal in Umbraco 21.
+	 */
 	@property({ type: Object, attribute: false })
-	public filter: (memberGroup: UmbMemberGroupItemModel) => boolean = () => true;
+	public set filter(value: ((memberGroup: UmbMemberGroupItemModel) => boolean) | undefined) {
+		new UmbDeprecation({
+			deprecated: 'The `filter` property of umb-input-member-group',
+			removeInVersion: '21.0.0',
+			solution: 'Use `browsePickableFilter` to prevent member groups from being picked instead.',
+		}).warn();
+		this.#filter = value;
+	}
+	public get filter(): (memberGroup: UmbMemberGroupItemModel) => boolean {
+		return this.#filter ?? (() => true);
+	}
+	#filter?: (memberGroup: UmbMemberGroupItemModel) => boolean;
+
+	@property({ type: Object, attribute: false })
+	public browsePickableFilter?: (memberGroup: UmbMemberGroupItemModel) => boolean;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -200,7 +217,8 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 
 	#openPicker() {
 		this.#pickerContext.openPicker({
-			filter: this.filter,
+			filter: this.#filter,
+			pickableFilter: this.browsePickableFilter,
 		});
 	}
 
