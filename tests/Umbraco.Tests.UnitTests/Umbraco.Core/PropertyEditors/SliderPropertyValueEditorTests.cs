@@ -340,15 +340,13 @@ public class SliderPropertyValueEditorTests
             ConfigurationObject = enableRange
                 ? new RangeSliderConfiguration
                 {
-                    MinimumValue = 1.1m,
-                    MaximumValue = 1.9m,
+                    ValidationRange = new DecimalRange { Min = 1.1m, Max = 1.9m },
                     Step = step,
                     MinimumRange = minimumRange,
                 }
                 : new SliderConfiguration
                 {
-                    MinimumValue = 1.1m,
-                    MaximumValue = 1.9m,
+                    ValidationRange = new DecimalRange { Min = 1.1m, Max = 1.9m },
                     Step = step,
                 },
         };

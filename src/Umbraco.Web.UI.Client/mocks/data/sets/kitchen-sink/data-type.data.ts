@@ -1254,16 +1254,12 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'min',
-				value: 10,
+				alias: 'validationRange',
+				value: { min: 10, max: 100 },
 			},
 			{
 				alias: 'step',
 				value: 0.5,
-			},
-			{
-				alias: 'max',
-				value: 100,
 			},
 		],
 	},
@@ -2401,14 +2397,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
-			{
 				alias: 'overlaySize',
 				value: 'small',
 			},
@@ -2499,12 +2487,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'minNumber',
-				value: 5,
-			},
-			{
-				alias: 'maxNumber',
-				value: 10,
+				alias: 'validationLimit',
+				value: { min: 5, max: 10 },
 			},
 			{
 				alias: 'overlaySize',
@@ -2578,14 +2562,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
-			{
 				alias: 'overlaySize',
 				value: 'large',
 			},
@@ -2657,14 +2633,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
-			{
 				alias: 'overlaySize',
 				value: 'small',
 			},
@@ -2712,14 +2680,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
 			{
 				alias: 'overlaySize',
 				value: 'small',
@@ -2773,12 +2733,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'minNumber',
-				value: 2,
-			},
-			{
-				alias: 'maxNumber',
-				value: 10,
+				alias: 'validationLimit',
+				value: { min: 2, max: 10 },
 			},
 			{
 				alias: 'overlaySize',
@@ -2957,14 +2913,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				},
 			},
 			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
-			{
 				alias: 'showOpenButton',
 				value: false,
 			},
@@ -3002,12 +2950,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				},
 			},
 			{
-				alias: 'minNumber',
-				value: 2,
-			},
-			{
-				alias: 'maxNumber',
-				value: 10,
+				alias: 'validationLimit',
+				value: { min: 2, max: 10 },
 			},
 			{
 				alias: 'showOpenButton',
@@ -3049,14 +2993,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'filter',
 				value: '7184285e-9709-4e13-8c72-1fe52f024b28',
-			},
-			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
 			},
 			{
 				alias: 'showOpenButton',
@@ -3101,12 +3037,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 					'015bc281-7410-40e2-81b5-b8f7c963bd61,41f34bb7-fd63-442f-8dcb-142df4246310,13c10f78-bf14-411d-9444-751e4bd1b178,9cff8f66-0e13-4617-ab9b-9f845ecc5e24',
 			},
 			{
-				alias: 'minNumber',
-				value: 2,
-			},
-			{
-				alias: 'maxNumber',
-				value: 5,
+				alias: 'validationLimit',
+				value: { min: 2, max: 5 },
 			},
 			{
 				alias: 'showOpenButton',
@@ -3146,14 +3078,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				},
 			},
 			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
-			{
 				alias: 'showOpenButton',
 				value: false,
 			},
@@ -3189,14 +3113,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 					id: null,
 					dynamicRoot: null,
 				},
-			},
-			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
 			},
 			{
 				alias: 'showOpenButton',
@@ -3240,12 +3156,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 'cc07b313-0843-4aa8-bbda-871c8da728c8,a43e3414-9599-4230-a7d3-943a21b20122',
 			},
 			{
-				alias: 'minNumber',
-				value: 1,
-			},
-			{
-				alias: 'maxNumber',
-				value: 10,
+				alias: 'validationLimit',
+				value: { min: 1, max: 10 },
 			},
 			{
 				alias: 'showOpenButton',
@@ -3285,14 +3197,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				},
 			},
 			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
-			{
 				alias: 'showOpenButton',
 				value: false,
 			},
@@ -3328,14 +3232,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 					id: null,
 					dynamicRoot: null,
 				},
-			},
-			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
 			},
 			{
 				alias: 'showOpenButton',
@@ -3379,12 +3275,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 'd59be02f-1df9-4228-aa1e-01917d806cda',
 			},
 			{
-				alias: 'minNumber',
-				value: 2,
-			},
-			{
-				alias: 'maxNumber',
-				value: 5,
+				alias: 'validationLimit',
+				value: { min: 2, max: 5 },
 			},
 			{
 				alias: 'showOpenButton',
@@ -3432,12 +3324,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'min',
-				value: 10,
-			},
-			{
-				alias: 'max',
-				value: 100,
+				alias: 'validationRange',
+				value: { min: 10, max: 100 },
 			},
 		],
 	},
@@ -3478,16 +3366,12 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'min',
-				value: 10,
+				alias: 'validationRange',
+				value: { min: 10, max: 70 },
 			},
 			{
 				alias: 'step',
 				value: 6,
-			},
-			{
-				alias: 'max',
-				value: 70,
 			},
 		],
 	},
@@ -3535,14 +3419,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				alias: 'umbMigrationV14',
 				value: '2026-04-16T09:54:45.5225801+00:00',
 			},
-			{
-				alias: 'min',
-				value: 0,
-			},
-			{
-				alias: 'max',
-				value: 0,
-			},
 		],
 	},
 	{
@@ -3565,12 +3441,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: '2026-04-16T09:54:45.5229632+00:00',
 			},
 			{
-				alias: 'min',
-				value: 5,
-			},
-			{
-				alias: 'max',
-				value: 0,
+				alias: 'validationLimit',
+				value: { min: 5 },
 			},
 		],
 	},
@@ -3594,12 +3466,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: '2026-04-16T09:54:45.5232232+00:00',
 			},
 			{
-				alias: 'min',
-				value: 0,
-			},
-			{
-				alias: 'max',
-				value: 10,
+				alias: 'validationLimit',
+				value: { max: 10 },
 			},
 		],
 	},
@@ -3623,12 +3491,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: '2026-04-16T09:54:45.5235305+00:00',
 			},
 			{
-				alias: 'min',
-				value: 5,
-			},
-			{
-				alias: 'max',
-				value: 50,
+				alias: 'validationLimit',
+				value: { min: 5, max: 50 },
 			},
 		],
 	},
@@ -3931,12 +3795,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 0,
 			},
 			{
-				alias: 'minVal',
-				value: 0,
-			},
-			{
-				alias: 'maxVal',
-				value: 0,
+				alias: 'validationRange',
+				value: { min: 0 },
 			},
 			{
 				alias: 'step',
@@ -3964,12 +3824,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 0,
 			},
 			{
-				alias: 'minVal',
-				value: 5,
-			},
-			{
-				alias: 'maxVal',
-				value: 100,
+				alias: 'validationRange',
+				value: { min: 5, max: 100 },
 			},
 			{
 				alias: 'step',
@@ -3997,12 +3853,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 0,
 			},
 			{
-				alias: 'minVal',
-				value: 0,
-			},
-			{
-				alias: 'maxVal',
-				value: 0,
+				alias: 'validationRange',
+				value: { min: 0 },
 			},
 			{
 				alias: 'step',
@@ -4030,12 +3882,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 6,
 			},
 			{
-				alias: 'minVal',
-				value: 0,
-			},
-			{
-				alias: 'maxVal',
-				value: 0,
+				alias: 'validationRange',
+				value: { min: 0 },
 			},
 			{
 				alias: 'step',
@@ -4063,12 +3911,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 15,
 			},
 			{
-				alias: 'minVal',
-				value: 10,
-			},
-			{
-				alias: 'maxVal',
-				value: 200,
+				alias: 'validationRange',
+				value: { min: 10, max: 200 },
 			},
 			{
 				alias: 'step',
@@ -4100,12 +3944,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 0,
 			},
 			{
-				alias: 'minVal',
-				value: 0,
-			},
-			{
-				alias: 'maxVal',
-				value: 0,
+				alias: 'validationRange',
+				value: { min: 0 },
 			},
 			{
 				alias: 'minimumRange',
@@ -4141,12 +3981,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 0,
 			},
 			{
-				alias: 'minVal',
-				value: 5,
-			},
-			{
-				alias: 'maxVal',
-				value: 100,
+				alias: 'validationRange',
+				value: { min: 5, max: 100 },
 			},
 			{
 				alias: 'minimumRange',
@@ -4182,12 +4018,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 0,
 			},
 			{
-				alias: 'minVal',
-				value: 0,
-			},
-			{
-				alias: 'maxVal',
-				value: 0,
+				alias: 'validationRange',
+				value: { min: 0 },
 			},
 			{
 				alias: 'minimumRange',
@@ -4223,12 +4055,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 24,
 			},
 			{
-				alias: 'minVal',
-				value: 0,
-			},
-			{
-				alias: 'maxVal',
-				value: 0,
+				alias: 'validationRange',
+				value: { min: 0 },
 			},
 			{
 				alias: 'minimumRange',
@@ -4264,12 +4092,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 30,
 			},
 			{
-				alias: 'minVal',
-				value: 5,
-			},
-			{
-				alias: 'maxVal',
-				value: 100,
+				alias: 'validationRange',
+				value: { min: 5, max: 100 },
 			},
 			{
 				alias: 'minimumRange',
@@ -5075,7 +4899,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 								alias: 'left',
 								columnSpan: 6,
 								rowSpan: 1,
-								minAllowed: 0,
+								validationLimit: { min: 0 },
 								specifiedAllowance: [],
 							},
 							{
@@ -5083,7 +4907,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 								alias: 'right',
 								columnSpan: 6,
 								rowSpan: 1,
-								minAllowed: 0,
+								validationLimit: { min: 0 },
 								specifiedAllowance: [],
 							},
 						],
@@ -5112,7 +4936,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 								alias: 'left',
 								columnSpan: 6,
 								rowSpan: 1,
-								minAllowed: 0,
+								validationLimit: { min: 0 },
 								specifiedAllowance: [],
 							},
 							{
@@ -5120,7 +4944,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 								alias: 'right',
 								columnSpan: 6,
 								rowSpan: 1,
-								minAllowed: 0,
+								validationLimit: { min: 0 },
 								specifiedAllowance: [],
 							},
 						],

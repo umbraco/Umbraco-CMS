@@ -174,10 +174,7 @@ public class MultipleMemberPickerPropertyEditor : DataEditor, IValueSchemaProvid
                 return validationResults;
             }
 
-            // A minimum applies only to a selection that is in use; whether an empty one is acceptable is decided by
-            // the property's mandatory setting. Matches ItemCountValidationHelper.IsBelowMinimum.
-            // TODO: call ItemCountValidationHelper once #23693 has merged up from v17.
-            if (validationLimit.Min is int min and > 0 && value is { Count: > 0 } && value.Count < min)
+            if (validationLimit.Min is int min && value is not null && ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(value.Count, min))
             {
                 validationResults.Add(new ValidationResult(
                     _localizedTextService.Localize(

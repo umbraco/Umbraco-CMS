@@ -35,15 +35,19 @@ public class ElementPickerPropertyEditorMinMaxValidationTests
         => Assert.IsEmpty(Validate(null, null, 0));
 
     [Test]
-    public void Cannot_Pass_Validation_When_Value_Is_Null_And_Minimum_Is_Required()
+    public void Can_Pass_Validation_When_Value_Is_Null_And_Minimum_Is_Configured()
     {
         var config = new ElementPickerConfiguration
         {
-            ValidationLimit = new ElementPickerConfiguration.NumberRange { Min = 1 },
+            ValidationLimit = new NumberRange { Min = 1 },
         };
 
-        Assert.That(_validator.Validate((List<string>?)null, config, null, PropertyValidationContext.Empty()).Count(), Is.EqualTo(1));
+        Assert.IsEmpty(_validator.Validate((List<string>?)null, config, null, PropertyValidationContext.Empty()));
     }
+
+    [Test]
+    public void Can_Pass_Validation_When_Value_Is_Empty_And_Minimum_Is_Configured()
+        => Assert.IsEmpty(Validate(2, null, 0));
 
     [TestCase(2, null, 1)]
     [TestCase(null, 2, 3)]
@@ -58,7 +62,7 @@ public class ElementPickerPropertyEditorMinMaxValidationTests
         {
             ValidationLimit = min is null && max is null
                 ? null
-                : new ElementPickerConfiguration.NumberRange { Min = min, Max = max },
+                : new NumberRange { Min = min, Max = max },
         };
 
         List<string> value = Enumerable.Range(0, count).Select(_ => Guid.NewGuid().ToString()).ToList();

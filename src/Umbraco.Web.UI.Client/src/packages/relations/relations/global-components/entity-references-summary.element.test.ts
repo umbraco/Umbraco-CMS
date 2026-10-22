@@ -4,8 +4,13 @@ import type { UmbEntityReferenceRepository } from '../reference/types.js';
 import { aTimeout, expect } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 const TEST_REPOSITORY_ALIAS = 'Umb.Test.EntityReferencesSummary.Repository';
+
+function makeElements(count: number): Array<UmbEntityModel> {
+	return Array.from({ length: count }, (_, i) => ({ unique: `elm-${i}`, entityType: 'element' }));
+}
 
 class UmbTestReferenceRepository implements UmbEntityReferenceRepository {
 	static referencedByTotal = 0;
@@ -93,6 +98,37 @@ describe('UmbEntityReferencesSummaryElement', () => {
 		await aTimeout(0);
 
 		expect(element.shadowRoot?.querySelectorAll('uui-button'), 'reference buttons').to.have.length(1);
+	});
+
+	it('does not show the pending-changes button when entitiesNeedingAttention is unset', async () => {
+		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
+		document.body.appendChild(element);
+		await aTimeout(0);
+
+		expect(element.getTotalEntitiesNeedingAttention()).to.equal(0);
+		expect(element.shadowRoot?.querySelectorAll('uui-button').length, 'reference buttons').to.equal(0);
+	});
+
+	it('renders a third, independent button for the given referenced elements with pending changes', async () => {
+		element.entitiesNeedingAttention = makeElements(3);
+		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
+		document.body.appendChild(element);
+		await aTimeout(0);
+
+		expect(element.getTotalEntitiesNeedingAttention()).to.equal(3);
+		// The existing referenced-by/descendants totals must stay unaffected by the new count — they feed unpublish gating elsewhere.
+		expect(element.getTotalReferencedBy() + element.getTotalDescendantsWithReferences()).to.equal(0);
+		expect(element.shadowRoot?.querySelectorAll('uui-button').length, 'reference buttons').to.equal(1);
+	});
+
+	it('shows nothing for an empty entitiesNeedingAttention array', async () => {
+		element.entitiesNeedingAttention = [];
+		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
+		document.body.appendChild(element);
+		await aTimeout(0);
+
+		expect(element.getTotalEntitiesNeedingAttention()).to.equal(0);
+		expect(element.shadowRoot?.querySelectorAll('uui-button').length, 'reference buttons').to.equal(0);
 	});
 
 	it('dispatches a change event once both totals have loaded', async () => {

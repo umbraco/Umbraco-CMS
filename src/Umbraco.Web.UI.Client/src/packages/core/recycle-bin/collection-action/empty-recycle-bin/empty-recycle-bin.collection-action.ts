@@ -67,7 +67,7 @@ export class UmbEmptyRecycleBinCollectionAction extends UmbCollectionActionBase 
 		const entityType = entityContext.getEntityType();
 		if (!entityType) return;
 
-		const unique = entityContext.getUnique();
+		const unique = entityContext.getUnique() ?? null;
 
 		const event = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
 		eventContext.dispatchEvent(event);

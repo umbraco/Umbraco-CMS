@@ -5,10 +5,13 @@ import type {
 	UmbBlockDataType,
 	UmbBlockExposeModel,
 	UmbBlockDataValueModel,
+	UmbBlockExternalContentFailureReason,
 } from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
+import type { UmbBlockTransferToExternalContentResult } from './block-manager.context.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
+	UmbBasicState,
 	UmbBooleanState,
 	UmbClassState,
 	UmbNumberState,
@@ -24,10 +27,10 @@ import {
 	UmbReadOnlyVariantGuardManager,
 } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
 import {
 	UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN,
 	UMB_ELEMENT_ENTITY_TYPE,
@@ -59,9 +62,6 @@ export abstract class UmbBlockEntryContext<
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 	BlockOriginData extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
 > extends UmbContextBase {
-	// TODO: [V19] Remove together with the legacy label renderer warning. [LK]
-	static #hasWarnedLegacyLabelRenderer = false;
-
 	protected _manager?: BlockManagerContextType;
 	protected _entries?: BlockEntriesContextType;
 
@@ -81,6 +81,19 @@ export abstract class UmbBlockEntryContext<
 
 	#externalContentVariantState = new UmbStringState(undefined);
 	readonly externalContentVariantState = this.#externalContentVariantState.asObservable();
+
+	#externalContentName = new UmbStringState<string | undefined>(undefined);
+	/**
+	 * Observable of the name of the Element this block references, matching the current variant.
+	 * Undefined for local (non-external) blocks, or before the Element has resolved.
+	 */
+	readonly externalContentName = this.#externalContentName.asObservable();
+
+	#externalContentFailure = new UmbBasicState<UmbBlockExternalContentFailureReason | undefined>(undefined);
+	/**
+	 * Why the external content of this Block is unavailable. `undefined` while it is available or not yet resolved.
+	 */
+	readonly externalContentFailure = this.#externalContentFailure.asObservable();
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
@@ -208,22 +221,6 @@ export abstract class UmbBlockEntryContext<
 	 */
 	public setName(text: string): void {
 		this.#name.setValue(text);
-	}
-
-	// TODO: [V19] Remove `#labelRender` and the related plumbing once the legacy renderer is gone. [LK]
-	#labelRender?: UmbUfmVirtualRenderController;
-
-	/**
-	 * Whether this context should run its own hidden `UmbUfmVirtualRenderController` as the
-	 * source of `getName()`. Subclasses whose entry element owns a canonical `<umb-ufm-render>`
-	 * (and pushes text via {@link setName}) should override this to return `false`.
-	 * @deprecated Scheduled for removal in Umbraco 19. Subclasses must own their own
-	 * `<umb-ufm-render>` and push resolved text via {@link setName} — the hidden virtual
-	 * renderer fallback will be removed entirely.
-	 * @returns {boolean} `true` to create the legacy hidden renderer; `false` to skip it.
-	 */
-	protected _needsLegacyLabelRenderer(): boolean {
-		return true;
 	}
 
 	#generateWorkspaceEditContentPath = (path?: string, contentKey?: string) =>
@@ -356,11 +353,6 @@ export abstract class UmbBlockEntryContext<
 	private readonly _settingsDataContentTypeKey = this.#settings.asObservablePart((x) =>
 		x ? (x.contentTypeKey ?? undefined) : null,
 	);
-	/**
-	 * @deprecated Use {@link UmbBlockEntryContext#_settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
-	 */
-	// eslint-disable-next-line
-	private readonly settingsDataContentTypeKey = this._settingsDataContentTypeKey;
 
 	#settingsValuesObservable?: Observable<UmbBlockDataType | undefined>;
 	public async settingsValues() {
@@ -406,30 +398,6 @@ export abstract class UmbBlockEntryContext<
 		blockEntriesContextToken: BlockEntriesContextTokenType,
 	) {
 		super(host, 'UmbBlockEntryContext');
-
-		// TODO: [V19] Drop this conditional and the legacy renderer plumbing entirely. [LK]
-		if (this._needsLegacyLabelRenderer()) {
-			if (!UmbBlockEntryContext.#hasWarnedLegacyLabelRenderer) {
-				UmbBlockEntryContext.#hasWarnedLegacyLabelRenderer = true;
-				new UmbDeprecation({
-					deprecated: 'UmbBlockEntryContext hidden virtual label renderer (legacy)',
-					solution:
-						'In your UmbBlockEntryContext subclass, override _needsLegacyLabelRenderer() to return false and push the resolved UFM text via setName() — e.g. by listening to @umb-ufm-resolved on a <umb-ufm-render> in your entry element.',
-					removeInVersion: '19.0.0',
-				}).warn();
-			}
-			this.#labelRender = new UmbUfmVirtualRenderController(this);
-			this.observe(
-				this.label,
-				(label) => {
-					if (this.#labelRender) {
-						this.#labelRender.markdown = label;
-					}
-				},
-				null,
-			);
-			this.#watchContentForLabelRender();
-		}
 
 		// Consume block manager:
 		this.consumeContext(blockManagerContextToken, (manager) => {
@@ -538,14 +506,6 @@ export abstract class UmbBlockEntryContext<
 		);
 	}
 
-	async #watchContentForLabelRender() {
-		this.observe(await this.contentValues(), (content) => {
-			if (this.#labelRender) {
-				this.#labelRender.value = content;
-			}
-		});
-	}
-
 	getContentKey() {
 		return this._layout.value?.contentKey;
 	}
@@ -590,8 +550,7 @@ export abstract class UmbBlockEntryContext<
 	 * @returns {string} - the value of the label.
 	 */
 	getName() {
-		// TODO: [V19] Drop the `#labelRender?.toString()` fallback once the legacy renderer is gone. [LK]
-		return this.#name.getValue() || this.#labelRender?.toString() || '';
+		return this.#name.getValue() || '';
 	}
 
 	#updateCreatePaths() {
@@ -694,18 +653,27 @@ export abstract class UmbBlockEntryContext<
 		const contentKey = this.#contentKey ?? this._layout.value?.contentKey;
 		if (!this._manager || !contentKey) return;
 
-		// Observe content and external-content state together to avoid race conditions.
-		// Both are evaluated in the same tick, preventing the unsupported flag
+		// Observe content, external-content state and external-content failure together to avoid race
+		// conditions. They are evaluated in the same tick, preventing the unsupported flag
 		// from flashing true while external content is being fetched.
 		this.observe(
 			mergeObservables(
-				[this._manager.contentOf(contentKey), this._manager.isExternalContentOf(contentKey)],
-				([content, isExternalContent]) => ({ content, isExternalContent: isExternalContent ?? false }),
+				[
+					this._manager.contentOf(contentKey),
+					this._manager.isExternalContentOf(contentKey),
+					this._manager.externalContentFailureOf(contentKey),
+				],
+				([content, isExternalContent, externalContentFailure]) => ({
+					content,
+					isExternalContent: isExternalContent ?? false,
+					externalContentFailure,
+				}),
 			),
-			({ content, isExternalContent }) => {
+			({ content, isExternalContent, externalContentFailure }) => {
 				this.#isExternalContent.setValue(isExternalContent);
+				this.#externalContentFailure.setValue(externalContentFailure);
 				if (!this.#structurallyUnsupported) {
-					this.#unsupported.setValue(!content && !isExternalContent);
+					this.#unsupported.setValue((!content && !isExternalContent) || !!externalContentFailure);
 				}
 				this.#content.setValue(content);
 			},
@@ -719,6 +687,15 @@ export abstract class UmbBlockEntryContext<
 				this.#externalContentVariantState.setValue(state ?? undefined);
 			},
 			'observeExternalContentVariantState',
+		);
+
+		// Observe the name of external content (from the Element it references), matching the current variant.
+		this.observe(
+			this._manager.externalContentNameOf(contentKey),
+			(name) => {
+				this.#externalContentName.setValue(name ?? undefined);
+			},
+			'observeExternalContentName',
 		);
 	}
 	#observeSettingsData() {
@@ -931,7 +908,56 @@ export abstract class UmbBlockEntryContext<
 	async requestTransferToExternalContent() {
 		if (!this.#key) return;
 		const name = this.getName();
-		await this._manager?.requestTransferToExternalContent(this.#key, name);
+		const result = await this._manager?.requestTransferToExternalContent(this.#key, name);
+		if (result) {
+			await this.#reportTransferResult(result);
+		}
+	}
+
+	async #reportTransferResult({ unique, status, notified }: UmbBlockTransferToExternalContentResult) {
+		switch (status) {
+			case 'published':
+				return this.#peekTransferNotification(
+					'positive',
+					this.localize.term('blockEditor_transferredToElementLibrary'),
+				);
+			case 'draft':
+				return this.#peekTransferNotification(
+					'positive',
+					this.localize.term('blockEditor_transferredToElementLibraryAsDraft'),
+				);
+			case 'publish-failed':
+				if (notified) return;
+				return this.#peekTransferNotification(
+					'warning',
+					this.localize.term('blockEditor_transferToElementLibraryNotPublished'),
+				);
+			case 'validation-failed':
+				return this.#offerToOpenTransferredElement(unique);
+		}
+	}
+
+	async #peekTransferNotification(color: 'positive' | 'warning', message: string) {
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT).catch(() => undefined);
+		notificationContext?.peek(color, { data: { message } });
+	}
+
+	async #offerToOpenTransferredElement(unique: string) {
+		try {
+			await umbConfirmModal(this, {
+				headline: '#blockEditor_transferToElementLibraryNotPublishedHeadline',
+				content: '#blockEditor_transferToElementLibraryNotPublishedValidation',
+				confirmLabel: '#blockEditor_transferToElementLibraryOpenElement',
+				cancelLabel: '#general_close',
+				color: 'warning',
+			});
+		} catch {
+			return; // user closed
+		}
+
+		const path = this.#externalContentWorkspacePath.getValue();
+		if (!path) return;
+		window.history.pushState({}, '', path + UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique }));
 	}
 
 	async requestDisconnectFromExternalContent() {

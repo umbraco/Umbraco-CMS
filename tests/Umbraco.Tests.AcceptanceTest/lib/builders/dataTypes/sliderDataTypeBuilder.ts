@@ -36,14 +36,15 @@ export class SliderDataTypeBuilder extends DataTypeBuilder {
 
   getValues() {
     let values: any = [];
-    values.push({
-      alias: 'minVal',
-      value: this.minVal || 0
-    });
-    values.push({
-      alias: 'maxVal',
-      value: this.maxVal || 0
-    });
+    if (this.minVal !== undefined || this.maxVal !== undefined) {
+      values.push({
+        alias: 'validationRange',
+        value: {
+          min: this.minVal,
+          max: this.maxVal
+        }
+      });
+    }
     values.push({
       alias: 'initVal1',
       value: this.initVal1 || 0

@@ -10,6 +10,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 import '../components/input-multi-url/index.js';
@@ -43,8 +44,9 @@ export abstract class UmbUrlPickerPropertyEditorUIElementBase
 		this._documentLinksConfig = {
 			allowCultureSpecificLinks: Boolean(config.getValueByAlias('allowCultureSpecificDocumentLinks')),
 		};
-		this._min = this.multiple ? this.#parseInt(config.getValueByAlias('minNumber'), 0) : 0;
-		this._max = this.multiple ? this.#parseInt(config.getValueByAlias('maxNumber'), Infinity) : 1;
+		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
+		this._min = this.multiple ? this.#parseInt(minMax?.min, 0) : 0;
+		this._max = this.multiple ? this.#parseInt(minMax?.max, Infinity) : 1;
 		this._overlaySize = config.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';
 	}
 

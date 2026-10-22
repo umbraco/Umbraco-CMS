@@ -75,6 +75,7 @@ test('can publish content with an element picker selected', {tag: '@smoke'}, asy
   // Create element type and element
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
+  await umbracoApi.element.publish(elementId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -99,6 +100,8 @@ test('can select multiple elements in the element picker', async ({umbracoApi, u
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const firstElementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   const secondElementId = await umbracoApi.element.createDefaultElement(secondElementName, elementTypeId);
+  await umbracoApi.element.publish(firstElementId);
+  await umbracoApi.element.publish(secondElementId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -125,6 +128,7 @@ test('can not publish a mandatory element picker with an empty value', async ({u
   // Create element type and element
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
+  await umbracoApi.element.publish(elementId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act

@@ -432,6 +432,8 @@ export default {
 		},
 	},
 	media: {
+		chooseMediaTypeHeadline: 'Choose media type',
+		chooseMediaTypeMoreFiles: (count: number) => (count === 1 ? '1 more file' : `${count} more files`),
 		clickToUpload: 'Click to upload',
 		browseFilesAction: 'Browse files',
 		dropFilesOr: 'Drag and drop media here<br />or',
@@ -2464,10 +2466,13 @@ export default {
 		invalidEmpty: 'Value cannot be empty',
 		invalidFalse: 'This field must be turned on',
 		invalidPattern: 'Value is invalid, it does not match the correct pattern',
+		invalidValue: 'Value is invalid',
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
 		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
+		minimumOnlyWhenInUse:
+			'The minimum applies once items have been added. To require a value, mark the property as mandatory.',
 		invalidMemberGroupName: 'Invalid member group name',
 		invalidUserGroupName: 'Invalid user group name',
 		invalidToken: 'Invalid token',
@@ -2714,8 +2719,10 @@ export default {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
 		},
+		labelElementsWithPendingChanges: 'The following referenced elements are not fully published:',
 		viewDependentItemsAction: 'View items that depend on this…',
 		viewDescendantsWithReferencesAction: 'View referenced descendants…',
+		viewEntitiesNeedingAttentionAction: 'View referenced elements with pending changes…',
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',
@@ -3009,13 +3016,33 @@ export default {
 		notExposedLabel: 'Draft',
 		notExposedDescription: 'This Block is not yet created for this variant',
 		notPublishedLibraryElementDescription: 'The Library Element used by this Block is not published',
+		publishedPendingChangesLibraryElementDescription:
+			'The Library Element used by this Block has changes that are not yet published',
+		trashedLibraryElementDescription: 'The Library Element used by this Block is in the recycle bin',
 		areaValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in this area.',
 		rootValidationEntriesNotAllowed: '<strong>%0%</strong> is not allowed in the root of this property.',
 		unsupportedBlockName: 'Unsupported',
 		unsupportedBlockDescription:
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
+		deletedLibraryElementName: 'Deleted Library Element',
+		deletedLibraryElementDescription: 'The Library Element used by this Block has been deleted. Remove this Block.',
+		noAccessLibraryElementName: 'Inaccessible Library Element',
+		noAccessLibraryElementDescription: 'You do not have access to the Library Element used by this Block.',
 		tabLibrary: 'Library',
 		transferToElementLibrary: 'Transfer to Library',
+		transferredToElementLibrary: 'Transferred to Library',
+		transferredToElementLibraryAsDraft: 'Transferred to Library as draft',
+		transferToElementLibraryNotPublished: 'Transferred to Library, but not published',
+		transferToElementLibraryNotPublishedHeadline: 'Not published',
+		transferToElementLibraryNotPublishedValidation:
+			'The Element was added to the Library, but has validation errors that need fixing before it can be published.',
+		transferToElementLibraryOpenElement: 'Open Element',
+		transferToElementLibraryNotPermitted: 'Transfer not permitted',
+		transferToElementLibraryLanguagesNotPermitted:
+			'This Block has content in languages you do not have access to: <strong>%0%</strong>.',
+		transferToElementLibrarySharedNotPermitted: 'It has shared content that you do not have access to edit.',
+		transferToElementLibraryLocationNotPermitted: 'You cannot create and publish Elements here.',
+		transferToElementLibraryLocationTypeNotAllowed: 'This Element Type is not allowed here.',
 		disconnectFromElementLibrary: 'Disconnect from Library',
 		disconnectFromElementLibraryConfirm:
 			'This will create a local copy of the Element content. The Library Element will not be affected.',

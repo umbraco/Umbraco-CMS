@@ -160,6 +160,7 @@ ContentIndexingService (orchestration)
 - `DraftContent` = `"Umb_Content"` - Draft content index
 - `DraftMedia` = `"Umb_Media"` - Media index
 - `DraftMembers` = `"Umb_Members"` - Members index
+- `DraftElements` = `"Umb_Elements"` - Library elements index (draft only; powers backoffice element search). Elements live in element containers, so their ancestor/parent keys resolve as `ElementContainer`, and a `RefreshBranch` element change becomes a `ContentChange.ElementContainer` change for the container key
 
 **System Field Names** (see `Constants.FieldNames`):
 - All system fields are prefixed with `Umb_`
@@ -201,7 +202,9 @@ Content changes are tracked via notification handlers that trigger indexing:
 
 - `IContentChangeStrategy` - Base interface for tracking content state changes
 - `IPublishedContentChangeStrategy` - Tracks published content changes (for `Umb_PublishedContent` index)
-- `IDraftContentChangeStrategy` - Tracks draft content changes (for `Umb_Content` index)
+- `IDraftContentChangeStrategy` - Tracks draft content changes (for `Umb_Content`, `Umb_Media`, `Umb_Members` and `Umb_Elements` indexes). Library elements are leaves organised in element containers: containers are not indexed themselves, an `ElementContainer` change with `RefreshWithDescendants` re-indexes the elements beneath it, and element descendants/rebuilds are paged via `IEntityService`
+
+**External members** (`ExternalMemberIdentity`) are not content, so they deliberately bypass `ContentChange` and the change strategies. `ExternalMemberIndexingService` writes them to every content index whose `ContainedObjectTypes` includes `Member` (whichever strategy that index uses), driven by its own `ExternalMemberIndexCacheRefresher` and by `IndexRebuildingNotification`, which `ContentIndexingService` publishes after the strategy has repopulated an index and before `IndexRebuildCompletedNotification`. Both member kinds carry the `Constants.Search.MemberFieldNames` fields — content-based members via `MemberFieldsContentIndexer`. External members also have their profile data JSON indexed via `ExternalMemberProfileDataIndexFields`: each top-level property becomes a field named after it (strings as `Texts`, numbers as `Integers`/`Decimals`, booleans as `Integers` 1/0); nulls, empty strings, arrays and nested objects are skipped, and a property can't overwrite a member field of the same name (compared case-insensitively).
 
 Index documents are persisted via `IndexDocumentRepository` using **MessagePack serialization** (with Lz4 compression) for efficient change detection — only actual field changes trigger re-indexing, not every save.
 

@@ -90,5 +90,70 @@ describe('FlatLayoutBlockPropertyValueCloner', () => {
 			expect(result.value?.settingsData[0].key).to.not.be.equal('settings-1');
 			expect(result.value?.settingsData[0].key).to.be.equal(newSettingsKey);
 		});
+
+		it('keeps the contentKey of external content while generating a new layout key', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbPropertyValueCloneController(ctrlHost);
+
+			const value = {
+				editorAlias: 'block-test-editor',
+				alias: 'test',
+				culture: null,
+				segment: null,
+				value: {
+					layout: {
+						TestEditor: [
+							{
+								key: 'layout-1',
+								contentKey: 'external-content-1',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+						],
+					},
+					contentData: [],
+					settingsData: [],
+					expose: [],
+				},
+			};
+
+			const result = (await ctrl.clone(value)) as { value: UmbBlockValueType | undefined };
+			const layoutEntry = result.value?.layout.TestEditor?.[0];
+
+			expect(layoutEntry?.contentKey).to.be.equal('external-content-1');
+			expect(layoutEntry?.key).to.not.be.equal('layout-1');
+			expect(layoutEntry?.isExternalContent).to.be.true;
+		});
+
+		it('only renews the contentKey of local blocks when mixed with external content', async () => {
+			const updatedKeys: Array<string> = [];
+			const cloner = new UmbFlatLayoutBlockPropertyValueCloner('TestEditor', {
+				contentIdUpdatedCallback: (oldContentKey) => updatedKeys.push(oldContentKey),
+			});
+
+			const value: UmbBlockValueType = {
+				layout: {
+					TestEditor: [
+						{ key: 'layout-1', contentKey: 'content-1', settingsKey: null },
+						{ key: 'layout-2', contentKey: 'external-content-1', settingsKey: null, isExternalContent: true },
+					],
+				},
+				contentData: [{ key: 'content-1', contentTypeKey: 'fictive-content-type', values: [] }],
+				settingsData: [],
+				expose: [{ contentKey: 'content-1', culture: null }],
+			};
+
+			const result = await cloner.cloneValue(value);
+			const [local, external] = result.layout.TestEditor!;
+
+			expect(local.contentKey).to.not.be.equal('content-1');
+			expect(result.contentData[0].key).to.be.equal(local.contentKey);
+			expect(result.expose[0].contentKey).to.be.equal(local.contentKey);
+
+			expect(external.contentKey).to.be.equal('external-content-1');
+			expect(external.key).to.not.be.equal('layout-2');
+
+			expect(updatedKeys).to.deep.equal(['content-1']);
+		});
 	});
 });

@@ -67,5 +67,8 @@ public class UmbracoPremigrationPlan : MigrationPlan
         To<V_19_0_0.AddInvariantEditedToDocumentAndElement>("{9578215E-3A50-486D-905C-1AF7ADB1C159}");
         To<V_19_0_0.AddHasAccessToInvariantForVariantColumnToUserGroup>("{550AD0E5-2AAA-4D51-BAE1-7ACCB4822F21}");
         To<V_19_0_0.AddDocumentBlueprintStartNodeToUserGroup>("{FB1256C8-FA43-46B0-903D-E3FFE3C19824}");
+        // The lock is required to write data types, and migrations in the main plan do so, so it has to exist
+        // before that plan runs.
+        To<V_19_0_0.AddDataTypesLock>("{2B8F0C41-9D57-4E63-B1A9-7F4E52D6C08B}");
     }
 }

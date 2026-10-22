@@ -25,12 +25,11 @@ const dataType = (
 	values,
 });
 
-const nodePicker = (id: string, name: string, documentTypeId: string, maxNumber: number) =>
+const nodePicker = (id: string, name: string, documentTypeId: string, maxNumber?: number) =>
 	dataType(id, name, 'Umbraco.MultiNodeTreePicker', 'Umb.PropertyEditorUi.ContentPicker', [
 		{ alias: 'startNode', value: { type: 'content', id: null, dynamicRoot: null } },
 		{ alias: 'filter', value: documentTypeId },
-		{ alias: 'minNumber', value: 0 },
-		{ alias: 'maxNumber', value: maxNumber },
+		{ alias: 'validationLimit', value: { max: maxNumber } },
 		{ alias: 'showOpenButton', value: true },
 		{ alias: 'ignoreUserStartNodes', value: false },
 	]);
@@ -97,7 +96,7 @@ const block = (options: UmbMbcsBlockOptions) => ({
 	areas: (options.areas ?? []).map((area) => ({
 		...area,
 		rowSpan: 1,
-		minAllowed: 0,
+		validationLimit: { min: 0 },
 		specifiedAllowance: [],
 	})),
 	editorSize: 'medium',
@@ -246,9 +245,9 @@ export const data: Array<UmbMockDataTypeModel> = [
 		'Multi URL Picker (max 1)',
 		'Umbraco.MultiUrlPicker',
 		'Umb.PropertyEditorUi.MultiUrlPicker',
-		[{ alias: 'maxNumber', value: 1 }],
+		[{ alias: 'validationLimit', value: { max: 1 } }],
 	),
-	nodePicker(DATA_TYPE_IDS.productPicker, 'Product Picker', DOCUMENT_TYPE_IDS.product, 0),
+	nodePicker(DATA_TYPE_IDS.productPicker, 'Product Picker', DOCUMENT_TYPE_IDS.product),
 	nodePicker(DATA_TYPE_IDS.productPickerSingle, 'Product Picker (max 1)', DOCUMENT_TYPE_IDS.product, 1),
 	nodePicker(DATA_TYPE_IDS.articlePickerSingle, 'Article Picker (max 1)', DOCUMENT_TYPE_IDS.article, 1),
 	collection(DATA_TYPE_IDS.productsCollection, 'Products Collection', {

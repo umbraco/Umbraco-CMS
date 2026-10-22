@@ -18,6 +18,7 @@ public class MemberPresentationServiceTests
     private Mock<IEntityService> _mockEntityService = null!;
     private Mock<IMemberEditingService> _mockMemberEditingService = null!;
     private Mock<IMemberPresentationFactory> _mockFactory = null!;
+    private Mock<IExternalMemberService> _mockExternalMemberService = null!;
     private MemberPresentationService _sut = null!;
 
     [SetUp]
@@ -26,11 +27,13 @@ public class MemberPresentationServiceTests
         _mockEntityService = new Mock<IEntityService>();
         _mockMemberEditingService = new Mock<IMemberEditingService>();
         _mockFactory = new Mock<IMemberPresentationFactory>();
+        _mockExternalMemberService = new Mock<IExternalMemberService>();
 
         _sut = new MemberPresentationService(
             _mockEntityService.Object,
             _mockMemberEditingService.Object,
-            _mockFactory.Object);
+            _mockFactory.Object,
+            _mockExternalMemberService.Object);
     }
 
     [Test]
@@ -128,7 +131,9 @@ public class MemberPresentationServiceTests
             .Setup(x => x.GetAll(UmbracoObjectTypes.Member, It.IsAny<Guid[]>()))
             .Returns(new[] { contentEntity.Object });
         _mockFactory.Setup(x => x.CreateItemResponseModel(contentEntity.Object)).Returns(contentItem);
-        _mockMemberEditingService.Setup(x => x.GetExternalMemberAsync(externalId)).ReturnsAsync(externalMember);
+        _mockExternalMemberService
+            .Setup(x => x.GetByKeysAsync(It.Is<IEnumerable<Guid>>(keys => keys.SequenceEqual(new[] { externalId }))))
+            .ReturnsAsync([externalMember]);
         _mockFactory.Setup(x => x.CreateExternalMemberItemResponseModel(externalMember)).Returns(externalItem);
 
         // Act
@@ -150,7 +155,9 @@ public class MemberPresentationServiceTests
         _mockEntityService
             .Setup(x => x.GetAll(UmbracoObjectTypes.Member, It.IsAny<Guid[]>()))
             .Returns(Enumerable.Empty<IEntitySlim>());
-        _mockMemberEditingService.Setup(x => x.GetExternalMemberAsync(unknownId)).ReturnsAsync((ExternalMemberIdentity?)null);
+        _mockExternalMemberService
+            .Setup(x => x.GetByKeysAsync(It.IsAny<IEnumerable<Guid>>()))
+            .ReturnsAsync([]);
 
         // Act
         IEnumerable<MemberItemResponseModel> results =
@@ -158,6 +165,57 @@ public class MemberPresentationServiceTests
 
         // Assert
         Assert.IsEmpty(results);
+    }
+
+    [Test]
+    public async Task CreateItemResponseModelsAsync_Resolves_External_Members_In_A_Single_Batch()
+    {
+        // Arrange
+        ExternalMemberIdentity[] externalMembers =
+        [
+            new() { Key = Guid.NewGuid() },
+            new() { Key = Guid.NewGuid() },
+            new() { Key = Guid.NewGuid() },
+        ];
+
+        _mockEntityService
+            .Setup(x => x.GetAll(UmbracoObjectTypes.Member, It.IsAny<Guid[]>()))
+            .Returns(Enumerable.Empty<IEntitySlim>());
+        _mockExternalMemberService
+            .Setup(x => x.GetByKeysAsync(It.IsAny<IEnumerable<Guid>>()))
+            .ReturnsAsync(externalMembers);
+        _mockFactory
+            .Setup(x => x.CreateExternalMemberItemResponseModel(It.IsAny<ExternalMemberIdentity>()))
+            .Returns((ExternalMemberIdentity member) => new MemberItemResponseModel { Id = member.Key, Kind = MemberKind.ExternalOnly });
+
+        // Act
+        IEnumerable<MemberItemResponseModel> results =
+            await _sut.CreateItemResponseModelsAsync(externalMembers.Select(member => member.Key).ToHashSet());
+
+        // Assert
+        Assert.AreEqual(3, results.Count());
+        _mockExternalMemberService.Verify(x => x.GetByKeysAsync(It.IsAny<IEnumerable<Guid>>()), Times.Once);
+        _mockExternalMemberService.Verify(x => x.GetByKeyAsync(It.IsAny<Guid>()), Times.Never);
+        _mockMemberEditingService.Verify(x => x.GetExternalMemberAsync(It.IsAny<Guid>()), Times.Never);
+    }
+
+    [Test]
+    public async Task CreateItemResponseModelsAsync_Does_Not_Query_External_Store_When_All_Ids_Are_Content_Members()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var entity = CreateMockMemberEntitySlim(id);
+
+        _mockEntityService
+            .Setup(x => x.GetAll(UmbracoObjectTypes.Member, It.IsAny<Guid[]>()))
+            .Returns([entity.Object]);
+        _mockFactory.Setup(x => x.CreateItemResponseModel(entity.Object)).Returns(new MemberItemResponseModel { Id = id });
+
+        // Act
+        await _sut.CreateItemResponseModelsAsync([id]);
+
+        // Assert
+        _mockExternalMemberService.Verify(x => x.GetByKeysAsync(It.IsAny<IEnumerable<Guid>>()), Times.Never);
     }
 
     [Test]
