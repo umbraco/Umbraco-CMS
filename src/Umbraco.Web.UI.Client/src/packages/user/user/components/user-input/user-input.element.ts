@@ -1,4 +1,5 @@
 import type { UmbUserItemModel } from '../../repository/index.js';
+import type { UmbUserDetailModel } from '../../types.js';
 import { UmbUserPickerInputContext } from './user-input.context.js';
 import {
 	css,
@@ -140,6 +141,14 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	}
 	public override get value(): string | undefined {
 		return this.selection.join(',');
+	}
+
+	@property({ type: Object, attribute: false })
+	public set browsePickableFilter(value: ((user: UmbUserDetailModel) => boolean) | undefined) {
+		this.#pickerContext.setModalData({ ...this.#pickerContext.getModalData(), pickableFilter: value });
+	}
+	public get browsePickableFilter(): ((user: UmbUserDetailModel) => boolean) | undefined {
+		return this.#pickerContext.getModalData()?.pickableFilter;
 	}
 
 	@state()
