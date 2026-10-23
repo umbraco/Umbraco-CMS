@@ -231,6 +231,13 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 				min-height: 180px;
 			}
 
+			/* The actions overlay the card name, which wraps across the full width of the card.
+			   An opaque backdrop keeps the two from reading through each other. */
+			slot[name='actions']::slotted(*) {
+				background-color: var(--uui-color-surface);
+				border-radius: var(--uui-border-radius);
+			}
+
 			#properties {
 				font-size: var(--uui-type-small-size);
 				line-height: calc(2 * var(--uui-size-3));
