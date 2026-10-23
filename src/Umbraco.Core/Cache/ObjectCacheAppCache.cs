@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Cache;
 /// </summary>
 public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
 {
-    private readonly Dictionary<string, object> _entries = new();
+    private readonly Dictionary<string, Lazy<object?>> _entries = new();
     private readonly ReaderWriterLockSlim _locker = new(LockRecursionPolicy.SupportsRecursion);
     private bool _disposedValue;
     private int _completedEvictionCallbacks;
@@ -409,7 +409,8 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
 
             // The callback runs on a background thread, so the key may have been re-cached with a new
             // entry since this one was evicted (e.g. an expired entry re-read through Get with a factory).
-            // Only prune the key while it still tracks the evicted entry.
+            // Only prune the key while it still tracks the evicted entry. Every write stores a new Lazy, so a
+            // reference check identifies the entry even when the factory returns the same instance each time.
             if (_entries.TryGetValue(key, out var tracked) && ReferenceEquals(tracked, value))
             {
                 _entries.Remove(key);
