@@ -65,6 +65,12 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
+	/**
+	 * Multiple nodes to start the picker tree from. Takes precedence over `startNode`.
+	 */
+	@property({ type: Array, attribute: false })
+	startNodes?: Array<UmbTreeStartNode>;
+
 	@property()
 	public set allowedContentTypeIds(value: string | undefined) {
 		this.#allowedContentTypeIds = value ? value.split(',') : undefined;
@@ -165,6 +171,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 			<umb-input-document
 				.selection=${this.#selection}
 				.startNode=${this.startNode}
+				.startNodes=${this.startNodes}
 				.allowedContentTypeIds=${this.#allowedContentTypeIds}
 				.min=${this.min}
 				.minMessage=${this.minMessage}
