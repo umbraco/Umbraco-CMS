@@ -176,6 +176,109 @@ describe('UmbTreePickerModalElement', () => {
 		});
 	});
 
+	// Only the children of the location being browsed are listed — in every view once drilled in, and always in views
+	// without a root row — so the location itself has to be choosable from the breadcrumb.
+	describe('choosing the location being browsed', () => {
+		function getSelection() {
+			return (
+				element as unknown as { _pickerContext: { selection: { getSelection(): Array<string | null> } } }
+			)._pickerContext.selection.getSelection();
+		}
+
+		function getChooseLocation() {
+			return getCrumbs().at(-1)?.querySelector<HTMLButtonElement>('button');
+		}
+
+		async function clickChooseLocation() {
+			getChooseLocation()?.click();
+			await element.updateComplete;
+		}
+
+		async function setupAtRoot(data?: Partial<UmbTreePickerModalData<UmbTreeItemModelBase>>) {
+			await setup({ treeAlias: TREE_ALIAS, ...data });
+			await waitUntil(() => !!getChooseLocation(), 'the location was never offered for choosing');
+		}
+
+		it('selects the location when it is chosen', async () => {
+			await setupAtRoot();
+
+			await clickChooseLocation();
+
+			expect(getSelection()).to.deep.equal([null]);
+		});
+
+		it('selects a location browsed into', async () => {
+			await setupAtRoot();
+			element.dispatchEvent(new UmbTreeItemOpenEvent({ unique: 'known', entityType: 'test-item' }));
+			await waitUntil(() => getCrumbs().length === 2, 'the browsed-into breadcrumb was never loaded');
+			await element.updateComplete;
+
+			await clickChooseLocation();
+
+			expect(getSelection()).to.deep.equal(['known']);
+		});
+
+		it('replaces an earlier selection with the location', async () => {
+			await setupAtRoot();
+			getPane('browse')?.querySelector('umb-tree')?.dispatchEvent(new UmbSelectedEvent('item-1'));
+			await element.updateComplete;
+
+			await clickChooseLocation();
+
+			expect(getSelection()).to.deep.equal([null]);
+		});
+
+		it('deselects the location when it is chosen again', async () => {
+			await setupAtRoot();
+
+			await clickChooseLocation();
+			await clickChooseLocation();
+
+			expect(getSelection()).to.deep.equal([]);
+		});
+
+		it('marks the location as chosen while it is selected', async () => {
+			await setupAtRoot();
+
+			await clickChooseLocation();
+			await waitUntil(() => getChooseLocation()?.getAttribute('aria-pressed') === 'true');
+
+			expect(getChooseLocation()?.getAttribute('aria-pressed')).to.equal('true');
+		});
+
+		it('does not offer a location the pickable filter rejects', async () => {
+			await setup({
+				treeAlias: TREE_ALIAS,
+				pickableFilter: (item) => (item as { unique?: string | null }).unique !== null,
+			});
+			await waitUntil(() => getCrumbs().length === 1, 'the root breadcrumb was never loaded');
+			await element.updateComplete;
+
+			expect(!!getChooseLocation()).to.be.false;
+		});
+
+		// A picker that hides the tree root does not offer it as a choice, so the breadcrumb must not either.
+		it('does not offer the root when the picker hides it', async () => {
+			await setup({ treeAlias: TREE_ALIAS, hideTreeRoot: true });
+			await waitUntil(() => getCrumbs().length === 1, 'the root breadcrumb was never loaded');
+			await element.updateComplete;
+
+			expect(!!getChooseLocation()).to.be.false;
+		});
+
+		it('offers a location browsed into when the picker hides the root', async () => {
+			await setup({ treeAlias: TREE_ALIAS, hideTreeRoot: true });
+			await waitUntil(() => getCrumbs().length === 1, 'the root breadcrumb was never loaded');
+			element.dispatchEvent(new UmbTreeItemOpenEvent({ unique: 'known', entityType: 'test-item' }));
+			await waitUntil(() => getCrumbs().length === 2, 'the browsed-into breadcrumb was never loaded');
+			await element.updateComplete;
+
+			await clickChooseLocation();
+
+			expect(getSelection()).to.deep.equal(['known']);
+		});
+	});
+
 	describe('selection', () => {
 		beforeEach(async () => {
 			await setupWithSearch({ multiple: true });
