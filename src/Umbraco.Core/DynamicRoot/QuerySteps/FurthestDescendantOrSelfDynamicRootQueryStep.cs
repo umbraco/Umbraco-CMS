@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 
