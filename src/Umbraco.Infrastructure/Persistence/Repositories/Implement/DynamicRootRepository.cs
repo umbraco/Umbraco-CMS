@@ -14,11 +14,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 public class DynamicRootRepository : IDynamicRootRepository
 {
-    // The queries can match nodes under several parents, so order per parent to follow the backoffice tree order
-    // within each sibling group; the identifier only breaks remaining ties. Without this the order of multiple
-    // resolved roots is undefined (https://github.com/umbraco/Umbraco-CMS/issues/23600).
-    private const string TreeOrderBy =
-        $"ORDER BY n.{NodeDto.ParentIdColumnName}, n.{NodeDto.SortOrderColumnName}, n.{NodeDto.IdColumnName}";
+    private const string OriginAlias = "norigin";
+    private const string RelativeAlias = "n";
 
     private readonly IScopeAccessor _scopeAccessor;
 
@@ -69,9 +66,9 @@ public class DynamicRootRepository : IDynamicRootRepository
         {
             IReadOnlyCollection<Guid> originKeys = originBatch.ToArray();
             Sql<ISqlContext> query = Database.SqlContext.SqlSyntax.SelectTop(
-                GetRelativesQuery($"n.{NodeDto.KeyColumnName}", docTypeKeys, IsAncestorOrSelf)
-                    .Where<NodeDto>(norigin => originKeys.Contains(norigin.UniqueId), "norigin")
-                    .Append($"ORDER BY n.{NodeDto.LevelColumnName} {direction}"),
+                GetRelativesQuery(QuotedColumn(RelativeAlias, NodeDto.KeyColumnName), docTypeKeys, IsAncestorOrSelf)
+                    .Where<NodeDto>(norigin => originKeys.Contains(norigin.UniqueId), OriginAlias)
+                    .Append($"ORDER BY {QuotedColumn(RelativeAlias, NodeDto.LevelColumnName)} {direction}"),
                 1);
 
             Guid? candidate = await Database.SingleOrDefaultAsync<Guid?>(query);
@@ -193,7 +190,10 @@ public class DynamicRootRepository : IDynamicRootRepository
         string levelAggregate,
         Func<string, string, string> isRelative)
     {
+        ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
         var docTypeKeys = queryStep.AnyOfDocTypeKeys.ToArray();
+        var originId = QuotedColumn(OriginAlias, NodeDto.IdColumnName);
+        var relativeLevel = QuotedColumn(RelativeAlias, NodeDto.LevelColumnName);
         var keys = new List<Guid>();
 
         foreach (IEnumerable<Guid> originBatch in origins.InGroupsOf(OriginsPerBatch(docTypeKeys)))
@@ -201,11 +201,11 @@ public class DynamicRootRepository : IDynamicRootRepository
             IReadOnlyCollection<Guid> originKeys = originBatch.ToArray();
 
             Sql<ISqlContext> levelQuery = GetRelativesQuery(
-                    $"norigin.{NodeDto.IdColumnName} AS {nameof(OriginLevel.OriginId)}, {levelAggregate}(n.{NodeDto.LevelColumnName}) AS {nameof(OriginLevel.Level)}",
+                    $"{originId} AS {syntax.GetQuotedName(nameof(OriginLevel.OriginId))}, {levelAggregate}({relativeLevel}) AS {syntax.GetQuotedName(nameof(OriginLevel.Level))}",
                     docTypeKeys,
                     isRelative)
-                .Where<NodeDto>(norigin => originKeys.Contains(norigin.UniqueId), "norigin")
-                .Append($"GROUP BY norigin.{NodeDto.IdColumnName}");
+                .Where<NodeDto>(norigin => originKeys.Contains(norigin.UniqueId), OriginAlias)
+                .Append($"GROUP BY {originId}");
             List<OriginLevel> originLevels = await Database.FetchAsync<OriginLevel>(levelQuery);
             if (originLevels.Count == 0)
             {
@@ -216,14 +216,14 @@ public class DynamicRootRepository : IDynamicRootRepository
             var args = new List<object>();
             foreach (IGrouping<int, OriginLevel> originsAtLevel in originLevels.GroupBy(x => x.Level))
             {
-                conditions.Add($"(norigin.{NodeDto.IdColumnName} IN (@{args.Count}) AND n.{NodeDto.LevelColumnName} = @{args.Count + 1})");
+                conditions.Add($"({originId} IN (@{args.Count}) AND {relativeLevel} = @{args.Count + 1})");
                 args.Add(originsAtLevel.Select(x => x.OriginId).ToArray());
                 args.Add(originsAtLevel.Key);
             }
 
-            Sql<ISqlContext> keyQuery = GetRelativesQuery($"n.{NodeDto.KeyColumnName}", docTypeKeys, isRelative)
+            Sql<ISqlContext> keyQuery = GetRelativesQuery(QuotedColumn(RelativeAlias, NodeDto.KeyColumnName), docTypeKeys, isRelative)
                 .Where($"({string.Join(" OR ", conditions)})", args.ToArray())
-                .Append(TreeOrderBy);
+                .Append(TreeOrderBy());
             keys.AddRange(await Database.FetchAsync<Guid>(keyQuery));
         }
 
@@ -231,20 +231,20 @@ public class DynamicRootRepository : IDynamicRootRepository
     }
 
     /// <summary>
-    /// Selects <paramref name="columns"/> over the origins (aliased norigin) joined to their relatives (aliased n) of
-    /// the given document types.
+    /// Selects <paramref name="columns"/> over the origins joined to their relatives of the given document types.
     /// </summary>
     private Sql<ISqlContext> GetRelativesQuery(
         string columns,
         IReadOnlyCollection<Guid> docTypeKeys,
         Func<string, string, string> isRelative)
     {
+        ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
         Sql<ISqlContext> query = Database.SqlContext.Sql()
             .Select(columns)
-            .From<NodeDto>("norigin")
-            .Append($"INNER JOIN {Database.SqlContext.SqlSyntax.GetQuotedTableName(NodeDto.TableName)} n ON {isRelative("norigin", "n")}") // hack because npoco do not support this
+            .From<NodeDto>(OriginAlias)
+            .Append($"INNER JOIN {syntax.GetQuotedTableName(NodeDto.TableName)} {syntax.GetQuotedName(RelativeAlias)} ON {isRelative(OriginAlias, RelativeAlias)}") // hack because npoco do not support this
             .InnerJoin<ContentDto>("c")
-            .On<ContentDto, NodeDto>((c, n) => c.NodeId == n.NodeId, "c", "n")
+            .On<ContentDto, NodeDto>((c, n) => c.NodeId == n.NodeId, "c", RelativeAlias)
             .InnerJoin<ContentTypeDto>("ct")
             .On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")
             .InnerJoin<NodeDto>("ctn")
@@ -258,17 +258,30 @@ public class DynamicRootRepository : IDynamicRootRepository
         return query;
     }
 
+    // The queries can match nodes under several parents, so order per parent to follow the backoffice tree order
+    // within each sibling group; the identifier only breaks remaining ties. Without this the order of multiple
+    // resolved roots is undefined (https://github.com/umbraco/Umbraco-CMS/issues/23600).
+    private string TreeOrderBy()
+        => $"ORDER BY {QuotedColumn(RelativeAlias, NodeDto.ParentIdColumnName)}, {QuotedColumn(RelativeAlias, NodeDto.SortOrderColumnName)}, {QuotedColumn(RelativeAlias, NodeDto.IdColumnName)}";
+
     private string IsAncestorOrSelf(string origin, string relative)
     {
         ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
-        return $"{syntax.Substring}({origin}.{NodeDto.PathColumnName}, 1, {syntax.Length}({relative}.{NodeDto.PathColumnName})) = {relative}.{NodeDto.PathColumnName}";
+        var originPath = QuotedColumn(origin, NodeDto.PathColumnName);
+        var relativePath = QuotedColumn(relative, NodeDto.PathColumnName);
+        return $"{syntax.Substring}({originPath}, 1, {syntax.Length}({relativePath})) = {relativePath}";
     }
 
     private string IsDescendantOrSelf(string origin, string relative)
     {
         ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
-        return $"{syntax.Substring}({relative}.{NodeDto.PathColumnName}, 1, {syntax.Length}({origin}.{NodeDto.PathColumnName})) = {origin}.{NodeDto.PathColumnName}";
+        var originPath = QuotedColumn(origin, NodeDto.PathColumnName);
+        var relativePath = QuotedColumn(relative, NodeDto.PathColumnName);
+        return $"{syntax.Substring}({relativePath}, 1, {syntax.Length}({originPath})) = {originPath}";
     }
+
+    private string QuotedColumn(string alias, string columnName)
+        => Database.SqlContext.SqlSyntax.GetQuotedColumn(alias, columnName);
 
     private sealed class OriginLevel
     {
