@@ -866,6 +866,66 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
     [Test]
+    public async Task Keeps_Existing_Group_Alias_When_Its_Tab_Belongs_To_A_Composition()
+    {
+        var compositionTab = ContentTypePropertyContainerModel("Content");
+        var compositionCreateModel = ContentTypeCreateModel("Composition", "composition");
+        compositionCreateModel.Containers = [compositionTab];
+        compositionCreateModel.Properties = [ContentTypePropertyTypeModel("Composition Property", "compositionProperty", containerKey: compositionTab.Key)];
+        var compositionContentType = (await ContentTypeEditingService.CreateAsync(compositionCreateModel, Constants.Security.SuperUserKey)).Result!;
+        Assert.AreEqual("content", compositionContentType.PropertyGroups.Single().Alias);
+
+        Composition[] compositions = [new Composition { Key = compositionContentType.Key, CompositionType = CompositionType.Composition }];
+        var group = ContentTypePropertyContainerModel("SEO", type: GroupContainerType);
+        var propertyType = ContentTypePropertyTypeModel("Test Property", "testProperty", containerKey: group.Key);
+        var createModel = ContentTypeCreateModel("Test", "test", compositions: compositions);
+        createModel.Containers = [group];
+        createModel.Properties = [propertyType];
+        IContentType contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        contentType.PropertyGroups.Single().Alias = "content/seo";
+        Assert.IsTrue((await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey)).Success);
+        contentType = (await ContentTypeService.GetAsync(contentType.Key))!;
+
+        var updateModel = ContentTypeUpdateModel("Test", "test", compositions: compositions);
+        updateModel.Description = "Changed";
+        updateModel.Containers = [group];
+        updateModel.Properties = [propertyType];
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        contentType = await ContentTypeService.GetAsync(contentType.Key);
+        Assert.AreEqual("content/seo", contentType!.PropertyGroups.Single().Alias);
+    }
+
+    [Test]
+    public async Task Removes_Tab_Prefix_When_Group_Is_Moved_Out_Of_Its_Tab()
+    {
+        var tab = ContentTypePropertyContainerModel("My Tab");
+        var group = ContentTypePropertyContainerModel("My Group", type: GroupContainerType);
+        group.ParentKey = tab.Key;
+        var propertyType1 = ContentTypePropertyTypeModel("Test Property 1", "testProperty1", containerKey: tab.Key);
+        var propertyType2 = ContentTypePropertyTypeModel("Test Property 2", "testProperty2", containerKey: group.Key);
+        var contentType = await CreateWithContainerAliasesAsync(
+            [tab, group],
+            [propertyType1, propertyType2],
+            (tab.Key, "Legacy Tab"),
+            (group.Key, "Legacy Tab/Legacy Group"));
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        group.ParentKey = null;
+        updateModel.Containers = [tab, group];
+        updateModel.Properties = [propertyType1, propertyType2];
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        contentType = await ContentTypeService.GetAsync(contentType.Key);
+        Assert.AreEqual("Legacy Group", contentType!.PropertyGroups.Single(g => g.Key == group.Key).Alias);
+    }
+
+    [Test]
     public async Task Makes_Alias_Of_Renamed_Container_Unique()
     {
         var tab1 = ContentTypePropertyContainerModel("Bar");

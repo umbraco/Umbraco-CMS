@@ -792,20 +792,31 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
     {
         var existingGroupsByKey = contentType.PropertyGroups.ToDictionary(group => group.Key);
+        var existingAliases = contentType.PropertyGroups.Select(group => group.Alias).ToHashSet();
 
         // NOTE: at this point we have validated the containers and their parent relationships in the model
         var containersByKey = model.Containers.ToDictionary(container => container.Key);
 
         string OwnAlias(TPropertyTypeContainer container)
         {
-            if (existingGroupsByKey.TryGetValue(container.Key, out PropertyGroup? existingGroup)
-                && existingGroup.Name == container.Name
-                && existingGroup.Type == Enum.Parse<PropertyGroupType>(container.Type))
+            if (existingGroupsByKey.TryGetValue(container.Key, out PropertyGroup? existingGroup) is false
+                || existingGroup.Name != container.Name
+                || existingGroup.Type != Enum.Parse<PropertyGroupType>(container.Type))
             {
-                return existingGroup.Alias[(existingGroup.Alias.LastIndexOf('/') + 1)..];
+                return PropertyGroupAlias(container.Name);
             }
 
-            return PropertyGroupAlias(container.Name);
+            // a root container whose stored parent is not one of the groups of this content type (for example a tab
+            // from a composition) was never presented with a parent, so it keeps its full alias
+            var parentSeparatorIndex = existingGroup.Alias.IndexOf('/');
+            if (container.ParentKey is null
+                && parentSeparatorIndex >= 0
+                && existingAliases.Contains(existingGroup.Alias[..parentSeparatorIndex]) is false)
+            {
+                return existingGroup.Alias;
+            }
+
+            return existingGroup.Alias[(existingGroup.Alias.LastIndexOf('/') + 1)..];
         }
 
         var aliasesByKey = new Dictionary<Guid, string>();
