@@ -476,14 +476,14 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         Sql<ISqlContext> sql;
         try
         {
-            groupKeys = Database.FetchByGroups<UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+            groupKeys = Database.ExecuteInSavepoint(() => Database.FetchByGroups<UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
             {
                 return SqlContext.Sql()
                     .Select<UserGroupDto>(x => x.Id, x => x.Key)
                     .From<UserGroupDto>()
                     .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
                     .WhereIn<User2UserGroupDto>(x => x.UserId, ints);
-            }).Select(x => x.Key).ToList();
+            }).Select(x => x.Key).ToList());
         }
         catch (DbException)
         {
@@ -521,7 +521,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
                 .From<UserGroupDto>()
                 .WhereIn<UserGroupDto>(x => x.Id, groupIds);
 
-            groups = Database.Fetch<UserGroupDto>(sql)
+            groups = Database.ExecuteInSavepoint(() => Database.Fetch<UserGroupDto>(sql))
                 .ToDictionary(x => x.Id, x => x);
         }
         catch (Exception e)

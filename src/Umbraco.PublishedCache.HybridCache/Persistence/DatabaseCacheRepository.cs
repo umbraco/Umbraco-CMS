@@ -1668,7 +1668,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         try
         {
-            Database.BulkInsertRecords(items);
+            Database.ExecuteInSavepoint(() => Database.BulkInsertRecords(items));
         }
         catch (Exception ex) when (IsPrimaryKeyViolation(ex))
         {
