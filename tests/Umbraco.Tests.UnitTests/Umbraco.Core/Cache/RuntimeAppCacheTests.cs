@@ -54,8 +54,6 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
         Assert.AreEqual(100, value);
     }
 
-    // Concurrent misses on the same key must only run the factory once, as the synchronous GetCacheItem does.
-    // https://github.com/umbraco/Umbraco-CMS/issues/23921
     [Test]
     public void Concurrent_Get_With_Factory_Only_Runs_Factory_Once()
     {
@@ -74,6 +72,8 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
         Assert.AreEqual(1, factoryCalls);
     }
 
+    // Concurrent misses on the same key must only run the factory once, as the synchronous GetCacheItem does.
+    // https://github.com/umbraco/Umbraco-CMS/issues/23921
     [Test]
     public async Task Concurrent_Get_With_Async_Factory_Only_Runs_Factory_Once()
     {
