@@ -166,6 +166,11 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 		this.#pickerInputContext.requestRemoveItem(unique);
 	}
 
+	#renderChangeAction() {
+		if (this.readonly || this.max !== 1) return nothing;
+		return html`<uui-button label=${this.localize.term('general_change')} @click=${this.#openPicker}></uui-button>`;
+	}
+
 	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
@@ -203,6 +208,7 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 								!this.readonly,
 								() => html`
 									<uui-action-bar slot="actions">
+										${this.#renderChangeAction()}
 										<uui-button
 											label=${this.localize.term('general_remove')}
 											@click=${() => this.#onRemove(unique)}></uui-button>
