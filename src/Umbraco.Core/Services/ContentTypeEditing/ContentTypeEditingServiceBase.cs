@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -17,7 +18,7 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 ///     This base class provides shared validation, mapping, and update logic for all content type
 ///     editing services including document types, media types, and member types.
 /// </remarks>
-internal abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeService, TPropertyTypeModel, TPropertyTypeContainer>
+internal abstract partial class ContentTypeEditingServiceBase<TContentType, TContentTypeService, TPropertyTypeModel, TPropertyTypeContainer>
     where TContentType : class, IContentTypeComposition
     where TContentTypeService : IContentTypeBaseService<TContentType>
     where TPropertyTypeModel : PropertyTypeModelBase
@@ -718,6 +719,8 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // This ensures we correctly handle property types that may have been filtered out from groups.
         var existingPropertyTypes = contentType.PropertyTypes.ToList();
 
+        Dictionary<Guid, string> propertyGroupAliasesByKey = PropertyGroupAliases(model.Containers);
+
         // To ensure correct change tracking, we must explicitly inform the content type of any
         // existing properties that have been removed.
         var removedPropertyTypeAliases = existingPropertyTypes
@@ -738,13 +741,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
                 // NOTE: eventually group.Type should be a string to make the client more flexible; for now we'll have to parse the string value back to its expected enum
                 propertyGroup.Type = Enum.Parse<PropertyGroupType>(container.Type);
                 propertyGroup.Name = container.Name;
-                // this is not pretty, but this is how the data structure is at the moment; we just have to live with it for the time being.
-                var alias = PropertyGroupAlias(container.Name);
-                if (container.ParentKey is not null)
-                {
-                    alias = $"{PropertyGroupAlias(parentContainerNamesById[container.ParentKey.Value])}/{alias}";
-                }
-                propertyGroup.Alias = alias;
+                propertyGroup.Alias = propertyGroupAliasesByKey[container.Key];
                 propertyGroup.SortOrder = container.SortOrder;
 
                 IPropertyType[] properties = model
@@ -784,20 +781,87 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     }
 
     /// <summary>
-    ///     Generates a property group alias from a container name.
+    ///     Generates the property group aliases for the containers in a model.
     /// </summary>
-    /// <param name="containerName">The container name to convert.</param>
-    /// <returns>The generated alias in camelCase format.</returns>
-    private static string PropertyGroupAlias(string? containerName)
+    /// <param name="containers">The containers to generate aliases for.</param>
+    /// <returns>The property group aliases keyed by container key.</returns>
+    /// <remarks>
+    ///     The alias of a container within another container is prefixed with the alias of that container, as the alias
+    ///     path is what defines the hierarchy. An alias already used by a previous container is made unique by appending a
+    ///     number.
+    /// </remarks>
+    private static Dictionary<Guid, string> PropertyGroupAliases(IEnumerable<TPropertyTypeContainer> containers)
     {
-        if (containerName.IsNullOrWhiteSpace())
+        // NOTE: at this point we have validated the containers and their parent relationships in the model
+        var containersByKey = containers.ToDictionary(container => container.Key);
+        var aliasesByKey = new Dictionary<Guid, string>();
+        var usedAliases = new HashSet<string>();
+
+        foreach (TPropertyTypeContainer container in containersByKey.Values.OrderBy(container => container.ParentKey is null ? 0 : 1))
         {
-            throw new ArgumentException("Container name cannot be empty", nameof(containerName));
+            var alias = PropertyGroupAlias(container);
+            if (container.ParentKey is not null)
+            {
+                TPropertyTypeContainer parent = containersByKey[container.ParentKey.Value];
+
+                // only one level of nesting is supported, so a parent within another container contributes its own alias only
+                var parentAlias = parent.ParentKey is null ? aliasesByKey[parent.Key] : PropertyGroupAlias(parent);
+                alias = $"{parentAlias}/{alias}";
+            }
+
+            var uniqueAlias = alias;
+            var suffix = 1;
+            while (usedAliases.Add(uniqueAlias) is false)
+            {
+                uniqueAlias = $"{alias}{suffix++}";
+            }
+
+            aliasesByKey[container.Key] = uniqueAlias;
         }
 
-        var parts = containerName.Split(Constants.CharArrays.Space);
-        return $"{parts.First().ToFirstLowerInvariant()}{string.Join(string.Empty, parts.Skip(1).Select(part => part.ToFirstUpperInvariant()))}";
+        return aliasesByKey;
     }
+
+    /// <summary>
+    ///     Generates the local property group alias for a container.
+    /// </summary>
+    /// <param name="container">The container to generate the alias for.</param>
+    /// <returns>
+    ///     The container name in camelCase, keeping only letters and digits, or the container key when the name
+    ///     contains neither.
+    /// </returns>
+    /// <remarks>
+    ///     The alias must not contain the "/" separator, as the full alias of a nested container is its parent alias
+    ///     and its local alias separated by "/".
+    /// </remarks>
+    private static string PropertyGroupAlias(TPropertyTypeContainer container)
+    {
+        // Same rules as the alias generation in the AngularJS backoffice (String.prototype.toUmbracoAlias),
+        // except letters and digits outside ASCII are kept rather than stripped.
+        var pascalCasedName = string.Concat(
+            PropertyGroupAliasWordSeparatorRegex()
+                .Split(PropertyGroupAliasInvalidCharactersRegex().Replace(container.Name ?? string.Empty, string.Empty))
+                .Where(word => word.Length > 0)
+                .Select(word => word.ToFirstUpperInvariant()));
+        if (pascalCasedName.Length == 0)
+        {
+            return container.Key.ToString();
+        }
+
+        Match leadingCapitals = PropertyGroupAliasLeadingCapitalsRegex().Match(pascalCasedName);
+        return leadingCapitals.Success
+            ? $"{leadingCapitals.Groups[1].Value.ToLowerInvariant()}{leadingCapitals.Groups[2].Value}".ToFirstLowerInvariant()
+            : pascalCasedName;
+    }
+
+    [GeneratedRegex(@"[^\p{L}\p{M}\p{Nd}\s.-]+")]
+    private static partial Regex PropertyGroupAliasInvalidCharactersRegex();
+
+    [GeneratedRegex(@"[\s.-]+")]
+    private static partial Regex PropertyGroupAliasWordSeparatorRegex();
+
+    [GeneratedRegex(@"^(\p{Lu}*)(\p{Lu}.*)$", RegexOptions.Singleline)]
+    private static partial Regex PropertyGroupAliasLeadingCapitalsRegex();
 
     /// <summary>
     ///     Maps a property model to an <see cref="IPropertyType"/>.
