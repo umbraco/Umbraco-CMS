@@ -21,6 +21,24 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
         : base(propertyValidationService)
         => _elementTypeCache = elementTypeCache;
 
+    /// <summary>
+    /// Gets the validation models for the content and settings of the blocks in a block editor value.
+    /// </summary>
+    /// <param name="blockEditorData">The block editor data to validate.</param>
+    /// <param name="validationContext">The context of the property value being validated.</param>
+    /// <returns>The validation models, one for each block item validated per culture and segment.</returns>
+    /// <remarks>
+    /// <para>Only exposed blocks are validated, with settings validated along with their content.</para>
+    /// <para>
+    /// Segments are not managed, so other than the segment in <paramref name="validationContext"/>, the segments
+    /// validated are the default segment and the ones present among the block values.
+    /// </para>
+    /// <para>
+    /// A mandatory property is only required to have an entry for the default segment. A missing entry for another
+    /// segment is not validated, as that segment falls back to the default segment. An entry for a segment being
+    /// validated is validated like any other, so an empty value fails a mandatory check.
+    /// </para>
+    /// </remarks>
     protected IEnumerable<ElementTypeValidationModel> GetBlockEditorDataValidation(BlockEditorData<TValue, TLayout> blockEditorData, PropertyValidationContext validationContext)
     {
         var elementTypeValidation = new List<ElementTypeValidationModel>();
@@ -45,7 +63,8 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
             IEnumerable<string> validationContextCulturesBeingValidated = isWildcardCulture
                 ? blockEditorData.BlockValue.Expose.Select(e => e.Culture).WhereNotNull().Distinct()
                 : validationContext.CulturesBeingValidated;
-            foreach (var culture in new string?[] { null }.Union(validationContextCulturesBeingValidated))
+            // Include null for the invariant culture, so culture-invariant values are validated for each segment too.
+            foreach (var culture in validationContextCulturesBeingValidated.Prepend<string?>(null))
             {
                 var segmentsToValidate = segmentsByCulture.FirstOrDefault(s => s.Culture.InvariantEquals(culture))?.Segments ?? [];
                 foreach (var segment in segmentsToValidate.DefaultIfEmpty(null))
