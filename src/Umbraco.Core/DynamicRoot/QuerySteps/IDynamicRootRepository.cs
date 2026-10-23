@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 public interface IDynamicRootRepository
 {
     /// <summary>
-    ///     Finds the nearest (closest to origin) ancestor or self that matches the query step criteria.
+    ///     Finds the nearest (deepest) ancestor or self, across all of the origins, that matches the query step criteria.
     /// </summary>
     /// <param name="origins">The collection of content keys to start the search from.</param>
     /// <param name="queryStep">The query step containing document type filter criteria.</param>
@@ -15,7 +15,7 @@ public interface IDynamicRootRepository
     Task<Guid?> NearestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep);
 
     /// <summary>
-    ///     Finds the furthest (topmost) ancestor or self that matches the query step criteria.
+    ///     Finds the furthest (topmost) ancestor or self, across all of the origins, that matches the query step criteria.
     /// </summary>
     /// <param name="origins">The collection of content keys to start the search from.</param>
     /// <param name="queryStep">The query step containing document type filter criteria.</param>

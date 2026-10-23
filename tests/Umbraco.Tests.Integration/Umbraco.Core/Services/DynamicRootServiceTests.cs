@@ -518,6 +518,69 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
     }
 
     /// <summary>
+    ///     Verifies that the single-result NearestAncestorOrSelfAsync returns the deepest matching ancestor or self
+    ///     across all origins, however many origins there are.
+    /// </summary>
+    [Test]
+    public async Task NearestAncestorOrSelfAsync_WithOriginsAtDifferentDepths_ReturnsTheDeepestMatchAcrossAllOrigins()
+    {
+        // Arrange - 2023 matches itself at level 2 and comes first, while Ran-D matches Acts at level 3
+        Guid[] origins = WithManyUnknownOriginsBetween(ContentYear2023.Key, ContentAct2022RanD.Key);
+        var queryStep = new DynamicRootQueryStep
+        {
+            Alias = DynamicRootStepAlias.NearestAncestorOrSelf.ToString(),
+            AnyOfDocTypeKeys = [ContentTypeActs.Key, ContentTypeYear.Key],
+        };
+
+        // Act
+        Guid? result;
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            result = await GetRequiredService<IDynamicRootRepository>().NearestAncestorOrSelfAsync(origins, queryStep);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        // Assert
+        Assert.AreEqual(ContentActs2022.Key, result);
+    }
+
+    /// <summary>
+    ///     Verifies that the single-result FurthestAncestorOrSelfAsync returns the shallowest matching ancestor or self
+    ///     across all origins, however many origins there are.
+    /// </summary>
+    [Test]
+    public async Task FurthestAncestorOrSelfAsync_WithOriginsAtDifferentDepths_ReturnsTheShallowestMatchAcrossAllOrigins()
+    {
+        // Arrange - Ran-D matches itself at level 4 and comes first, while the stages of 2024 match themselves at level 3
+        var stages2024 = ContentBuilder.CreateSimpleContent(ContentTypeStages, "Stages", ContentYear2024.Id);
+        ContentService.Save(stages2024, -1);
+
+        Guid[] origins = WithManyUnknownOriginsBetween(ContentAct2022RanD.Key, stages2024.Key);
+        var queryStep = new DynamicRootQueryStep
+        {
+            Alias = DynamicRootStepAlias.FurthestAncestorOrSelf.ToString(),
+            AnyOfDocTypeKeys = [ContentTypeAct.Key, ContentTypeStages.Key],
+        };
+
+        // Act
+        Guid? result;
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            result = await GetRequiredService<IDynamicRootRepository>().FurthestAncestorOrSelfAsync(origins, queryStep);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        // Assert
+        Assert.AreEqual(stages2024.Key, result);
+    }
+
+    // More origins than fit the parameters of a single statement, so the two given origins are queried separately.
+    private static Guid[] WithManyUnknownOriginsBetween(Guid first, Guid last)
+        => [first, .. Enumerable.Range(0, Constants.Sql.MaxParameterCount + 500).Select(_ => Guid.NewGuid()), last];
+
+    /// <summary>
     ///     Verifies that chaining multiple query steps (ancestor then descendant) correctly navigates the tree to find the expected node.
     /// </summary>
     [Test]

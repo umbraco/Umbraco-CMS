@@ -43,18 +43,55 @@ public class DynamicRootRepository : IDynamicRootRepository
 
     /// <inheritdoc/>
     [Obsolete("Use NearestAncestorsOrSelfAsync instead, which resolves an ancestor for each origin. Scheduled for removal in Umbraco 20.")]
-    public async Task<Guid?> NearestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep)
-    {
-        ICollection<Guid> keys = await NearestAncestorsOrSelfAsync(origins.ToArray(), queryStep);
-        return keys.Count > 0 ? keys.First() : null;
-    }
+    public Task<Guid?> NearestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep)
+        => SingleAncestorOrSelfAsync(origins, queryStep, deepest: true);
 
     /// <inheritdoc/>
     [Obsolete("Use FurthestAncestorsOrSelfAsync instead, which resolves an ancestor for each origin. Scheduled for removal in Umbraco 20.")]
-    public async Task<Guid?> FurthestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep)
+    public Task<Guid?> FurthestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep)
+        => SingleAncestorOrSelfAsync(origins, queryStep, deepest: false);
+
+    /// <summary>
+    /// Finds the single deepest or shallowest matching ancestor (or self) across all of the origins.
+    /// </summary>
+    /// <remarks>
+    /// Each batch of origins yields its own candidate, and the candidates are then compared by level, so the result
+    /// does not depend on how the origins are batched.
+    /// </remarks>
+    private async Task<Guid?> SingleAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep, bool deepest)
     {
-        ICollection<Guid> keys = await FurthestAncestorsOrSelfAsync(origins.ToArray(), queryStep);
-        return keys.Count > 0 ? keys.First() : null;
+        var direction = deepest ? "DESC" : "ASC";
+        var originsPerBatch = Math.Max(1, Constants.Sql.MaxParameterCount - queryStep.AnyOfDocTypeKeys.Count());
+        var candidates = new List<Guid>();
+
+        foreach (IEnumerable<Guid> originBatch in origins.InGroupsOf(originsPerBatch))
+        {
+            Sql<ISqlContext> query = Database.SqlContext.SqlSyntax.SelectTop(
+                GetAncestorOrSelfBaseQuery(originBatch, queryStep).Append($"ORDER BY n.{NodeDto.LevelColumnName} {direction}"),
+                1);
+
+            Guid? candidate = await Database.SingleOrDefaultAsync<Guid?>(query);
+            if (candidate.HasValue)
+            {
+                candidates.Add(candidate.Value);
+            }
+        }
+
+        if (candidates.Count <= 1)
+        {
+            return candidates.Count == 1 ? candidates[0] : null;
+        }
+
+        Sql<ISqlContext> levelsQuery = Database.SqlContext.Sql()
+            .Select<NodeDto>(n => n.UniqueId, n => n.Level)
+            .From<NodeDto>()
+            .WhereIn<NodeDto>(n => n.UniqueId, candidates);
+        Dictionary<Guid, int> levels = (await Database.FetchAsync<NodeDto>(levelsQuery))
+            .ToDictionary(n => n.UniqueId, n => (int)n.Level);
+
+        return deepest
+            ? candidates.OrderByDescending(key => levels[key]).First()
+            : candidates.OrderBy(key => levels[key]).First();
     }
 
     /// <inheritdoc/>
