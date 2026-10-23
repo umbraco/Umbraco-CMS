@@ -90,12 +90,11 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 		this.#active.setValue(this.#isAuthorized && this.#isUserLoaded && this.#hasUser);
 	}
 
-	async instantiateExtension(manifest: ManifestUserEntryPoint) {
+	async instantiateExtension(manifest: ManifestUserEntryPoint, signal?: AbortSignal) {
 		if (!manifest.js) return;
 		const moduleInstance = await loadManifestPlainJs(manifest.js);
-		// The gate may have closed (sign-out/timeout) while the module was loading; if so, the base has
-		// already unloaded this alias, so skip onInit rather than run it for an ended session.
-		if (!moduleInstance || !this.#active.getValue()) return;
+		// The extension may have been unloaded while its module loaded (unregistered, or the session ended).
+		if (!moduleInstance || signal?.aborted) return;
 		this.#instanceMap.set(manifest.alias, moduleInstance);
 		if (hasInitExport(moduleInstance)) {
 			// Promise.resolve so an async onInit is awaited even though the export type is `void`.

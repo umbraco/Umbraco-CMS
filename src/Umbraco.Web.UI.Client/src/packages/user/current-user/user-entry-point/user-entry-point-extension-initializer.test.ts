@@ -260,6 +260,44 @@ describe('UmbUserEntryPointExtensionInitializer', () => {
 		expect(calls.init).to.equal(0);
 	});
 
+	it('does not run onInit if the manifest is unregistered while the extension module is still loading', async () => {
+		registry.register(createManifest('Umb.Test.Slow', calls, 100));
+		authContext.setAuthorized(true);
+		await aTimeout(20);
+		registry.unregister('Umb.Test.Slow');
+		await aTimeout(200);
+		expect(calls.init).to.equal(0);
+	});
+
+	it('runs onInit once if the manifest is unregistered and registered again while its module is still loading', async () => {
+		const manifest = createManifest('Umb.Test.Slow', calls, 100);
+		registry.register(manifest);
+		authContext.setAuthorized(true);
+		await aTimeout(20);
+		registry.unregister('Umb.Test.Slow');
+		registry.register(manifest);
+		await aTimeout(300);
+		expect(calls.init).to.equal(1);
+
+		authContext.setAuthorized(false);
+		await aTimeout(50);
+		expect(calls.unload).to.equal(1);
+	});
+
+	it('runs onInit once if the session ends and starts again while the extension module is still loading', async () => {
+		registry.register(createManifest('Umb.Test.Slow', calls, 100));
+		authContext.setAuthorized(true);
+		await aTimeout(20);
+		authContext.setAuthorized(false);
+		authContext.setAuthorized(true);
+		await aTimeout(300);
+		expect(calls.init).to.equal(1);
+
+		authContext.setAuthorized(false);
+		await aTimeout(50);
+		expect(calls.unload).to.equal(1);
+	});
+
 	it('does not run onUnload on host destroy (the hook is session-scoped, not host-scoped)', async () => {
 		registry.register(createManifest('Umb.Test.A', calls));
 		authContext.setAuthorized(true);
