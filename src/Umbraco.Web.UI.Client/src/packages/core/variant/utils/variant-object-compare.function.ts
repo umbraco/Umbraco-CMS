@@ -1,4 +1,4 @@
-import type { UmbObjectWithVariantProperties } from './types.js';
+import type { UmbObjectWithVariantProperties } from '../types.js';
 
 /**
  * Compares the culture and segment of two variant objects.
