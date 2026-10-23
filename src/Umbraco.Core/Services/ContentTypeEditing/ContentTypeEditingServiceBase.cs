@@ -837,9 +837,10 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             foreach ((Guid key, string alias) in candidates)
             {
                 var uniqueAlias = alias;
-                for (var suffix = 1; usedAliases.Add(uniqueAlias) is false; suffix++)
+                var suffix = 1;
+                while (usedAliases.Add(uniqueAlias) is false)
                 {
-                    uniqueAlias = $"{alias}{suffix}";
+                    uniqueAlias = $"{alias}{suffix++}";
                 }
 
                 aliasesByKey[key] = uniqueAlias;
