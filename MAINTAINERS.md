@@ -31,7 +31,7 @@ The Umbraco Security Team handles vulnerability reports and security advisories 
 | --- | --- |
 | Anders Nis Herforth Larsen | [@legacy-git](https://github.com/legacy-git) |
 | Anders Reus | [@andersreus](https://github.com/andersreus) |
-| Eric | [@Frost117](https://github.com/Frost117) |
+| Eric Frost | [@Frost117](https://github.com/Frost117) |
 | Filip Bech-Larsen | [@filipbech](https://github.com/filipbech) |
 | Lan Nguyen Thuy | [@NguyenThuyLan](https://github.com/NguyenThuyLan) |
 | Mathias Tøndering | [@mta-umbraco](https://github.com/mta-umbraco) |
