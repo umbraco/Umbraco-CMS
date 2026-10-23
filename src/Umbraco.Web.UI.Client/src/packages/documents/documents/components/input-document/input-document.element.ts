@@ -12,7 +12,7 @@ import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
-import { umbResolveTreeStartNodes, type UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
@@ -197,7 +197,8 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 		this.#pickerInputContext.openPicker(
 			{
 				hideTreeRoot: true,
-				...umbResolveTreeStartNodes(this.startNode, this.startNodes),
+				startNode: this.startNode,
+				startNodes: this.startNodes,
 			},
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({

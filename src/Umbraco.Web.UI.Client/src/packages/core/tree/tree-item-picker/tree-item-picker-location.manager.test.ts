@@ -348,4 +348,40 @@ describe('UmbTreeItemPickerLocationManager', () => {
 			expect(manager.getCurrentLocation()).to.be.null;
 		});
 	});
+
+	describe('resolving the start node configuration', () => {
+		const first = { unique: 'a', entityType: 'test-item' };
+		const second = { unique: 'b', entityType: 'test-item' };
+
+		it('scopes to the start node when no start nodes are set', () => {
+			manager.setStartNode(first);
+
+			expect(manager.getStartNode()).to.deep.equal(first);
+			expect(manager.getStartNodes()).to.be.undefined;
+		});
+
+		it('scopes to a single start node when only one start node is set', () => {
+			manager.setStartNodes([first]);
+
+			expect(manager.getStartNode()).to.deep.equal(first);
+			expect(manager.getStartNodes()).to.be.undefined;
+		});
+
+		it('scopes to several start nodes in preference to the start node', () => {
+			manager.setStartNode(first);
+			manager.setStartNodes([first, second]);
+
+			expect(manager.getStartNode()).to.be.undefined;
+			expect(manager.getStartNodes()).to.deep.equal([first, second]);
+		});
+
+		it('falls back to the start node when the start nodes are cleared', () => {
+			manager.setStartNode(first);
+			manager.setStartNodes([first, second]);
+			manager.setStartNodes(undefined);
+
+			expect(manager.getStartNode()).to.deep.equal(first);
+			expect(manager.getStartNodes()).to.be.undefined;
+		});
+	});
 });

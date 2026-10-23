@@ -6,6 +6,7 @@ import type {
 	UmbTreeStartNode,
 } from '../types.js';
 import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
+import { resolveTreeStartNodes } from '../utils/index.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
 
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -178,12 +179,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this._api!.setSelectOnly(this._selectionConfiguration.selectOnly);
 		}
 
-		if (_changedProperties.has('startNode')) {
-			this._api!.setStartNode(this.startNode);
-		}
-
-		if (_changedProperties.has('startNodes')) {
-			this._api!.setStartNodes?.(this.startNodes);
+		if (_changedProperties.has('startNode') || _changedProperties.has('startNodes')) {
+			const { startNode, startNodes } = resolveTreeStartNodes(this.startNode, this.startNodes);
+			this._api!.setStartNodes?.(startNodes);
+			this._api!.setStartNode(startNode);
 		}
 
 		if (_changedProperties.has('hideTreeRoot')) {

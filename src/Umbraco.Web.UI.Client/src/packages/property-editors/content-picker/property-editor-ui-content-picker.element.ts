@@ -217,14 +217,14 @@ export class UmbPropertyEditorUIContentPickerElement
 
 	override render() {
 		const entityType = this._rootEntityType;
-		const startNode: UmbTreeStartNode | undefined =
-			this._rootUnique && entityType ? { unique: this._rootUnique, entityType } : undefined;
 
 		// A dynamic root query can resolve to more than one node, and all of them are made available to the picker.
 		const startNodes: Array<UmbTreeStartNode> | undefined =
 			this._rootUniques && this._rootUniques.length > 1 && entityType
 				? this._rootUniques.map((unique) => ({ unique, entityType }))
 				: undefined;
+		const startNode: UmbTreeStartNode | undefined =
+			!startNodes && this._rootUnique && entityType ? { unique: this._rootUnique, entityType } : undefined;
 
 		return html`
 			<umb-input-content

@@ -1,6 +1,7 @@
 import type { UmbTreeItemPickerBreadcrumbItem } from '../components/tree-item-picker-breadcrumb/index.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { ManifestTree } from '../extensions/types.js';
+import { resolveTreeStartNodes } from '../utils/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -56,6 +57,8 @@ export class UmbTreeItemPickerLocationManager extends UmbControllerBase {
 
 	#interactionMemoryManager?: UmbInteractionMemoryManager;
 	#treeAlias?: string;
+	#configuredStartNode?: UmbTreeStartNode;
+	#configuredStartNodes?: Array<UmbTreeStartNode>;
 	#startNode?: UmbTreeStartNode;
 	#startNodes?: Array<UmbTreeStartNode>;
 	#repository?: UmbTreeRepository;
@@ -77,16 +80,43 @@ export class UmbTreeItemPickerLocationManager extends UmbControllerBase {
 	 * @memberof UmbTreeItemPickerLocationManager
 	 */
 	setStartNode(startNode: UmbTreeStartNode | undefined) {
-		this.#startNode = startNode;
+		this.#configuredStartNode = startNode;
+		this.#resolveStartNodes();
 	}
 
 	/**
 	 * Sets several nodes the picker may not browse above, browsed from the tree root. Set it before the tree alias, as
-	 * the alias starts the load. Ignored when a single start node is set.
+	 * the alias starts the load. Takes precedence over the start node, and a single node is handled as the start node.
 	 * @param {Array<UmbTreeStartNode>} [startNodes] - The nodes to start from.
 	 * @memberof UmbTreeItemPickerLocationManager
 	 */
 	setStartNodes(startNodes: Array<UmbTreeStartNode> | undefined) {
+		this.#configuredStartNodes = startNodes;
+		this.#resolveStartNodes();
+	}
+
+	/**
+	 * Returns the single node the picker is scoped to.
+	 * @returns {UmbTreeStartNode | undefined} The start node, or undefined when the picker is scoped to several nodes or
+	 * to none.
+	 * @memberof UmbTreeItemPickerLocationManager
+	 */
+	getStartNode(): UmbTreeStartNode | undefined {
+		return this.#startNode;
+	}
+
+	/**
+	 * Returns the nodes the picker is scoped to when it is scoped to more than one.
+	 * @returns {Array<UmbTreeStartNode> | undefined} Two or more start nodes, or undefined otherwise.
+	 * @memberof UmbTreeItemPickerLocationManager
+	 */
+	getStartNodes(): Array<UmbTreeStartNode> | undefined {
+		return this.#startNodes;
+	}
+
+	#resolveStartNodes() {
+		const { startNode, startNodes } = resolveTreeStartNodes(this.#configuredStartNode, this.#configuredStartNodes);
+		this.#startNode = startNode;
 		this.#startNodes = startNodes;
 	}
 

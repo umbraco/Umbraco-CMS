@@ -11,7 +11,6 @@ import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import type { UmbTreeRepository } from '../data/index.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
-import { umbResolveTreeStartNodes } from '../utils/index.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
@@ -352,15 +351,25 @@ export class UmbDefaultTreeContext<
 	}
 
 	/**
-	 * Sets the startNodes config. A single node is handled as a start node, so only two or more nodes make the
-	 * tree present the nodes themselves as its top level.
+	 * Sets the startNodes config. Only two or more nodes make the tree present the nodes themselves as its top
+	 * level. The single start node is configured separately, through `setStartNode`.
 	 * @param {Array<UmbTreeStartNode> | undefined} startNodes - The start nodes
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setStartNodes(startNodes: Array<UmbTreeStartNode> | undefined) {
-		const resolved = umbResolveTreeStartNodes(undefined, startNodes);
-		this.#treeItemChildrenManager.setStartNodes(resolved.startNodes);
-		this.setStartNode(resolved.startNode);
+		const current = this.getStartNodes();
+		const next = startNodes ?? [];
+		const isUnchanged =
+			current.length === next.length &&
+			current.every(
+				(startNode, index) =>
+					startNode.unique === next[index].unique && startNode.entityType === next[index].entityType,
+			);
+		if (isUnchanged) return;
+
+		this.#treeItemChildrenManager.setStartNodes(next);
+		this.#clearTree();
+		this.loadTree();
 	}
 
 	/**

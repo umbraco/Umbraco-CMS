@@ -16,7 +16,7 @@ import {
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbPickerModalBaseElement, type UmbPickerSearchFieldElement } from '@umbraco-cms/backoffice/picker';
-import { umbResolveTreeStartNodes, UmbTreeItemOpenEvent, UmbTreeItemPickerContext } from '@umbraco-cms/backoffice/tree';
+import { UmbTreeItemOpenEvent, UmbTreeItemPickerContext } from '@umbraco-cms/backoffice/tree';
 import type {
 	UmbTreeElement,
 	UmbTreeItemPickerLocation,
@@ -102,8 +102,6 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 	@state()
 	private _treeStartNode?: UmbTreeStartNode;
 
-	#initialStartNodes?: Array<UmbTreeStartNode>;
-
 	@state()
 	private _hasCollection = false;
 
@@ -178,14 +176,21 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('data')) {
-			const resolvedStartNodes = umbResolveTreeStartNodes(this.data?.startNode, this.data?.startNodes);
-			this.#startNodeUniques = new Set(resolvedStartNodes.startNodes?.map((startNode) => startNode.unique) ?? []);
+			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
+				this._treeAlias = this.data.treeAlias;
+				this._pickerContext.location.setStartNode(this.data.startNode);
+				this._pickerContext.location.setStartNodes(this.data.startNodes);
+				this._pickerContext.location.setTreeAlias(this.data.treeAlias);
+			}
+
+			const startNodes = this._pickerContext.location.getStartNodes();
+			this.#startNodeUniques = new Set(startNodes?.map((startNode) => startNode.unique) ?? []);
 
 			if (this.data?.search) {
 				this._pickerContext.search.updateConfig({
 					...this.data.search,
 					// There is no server side search across multiple parents, so the scope is applied client side.
-					searchFrom: resolvedStartNodes.startNode,
+					searchFrom: this._pickerContext.location.getStartNode(),
 					dataTypeUnique: this._pickerContext.dataType?.unique,
 				});
 			}
@@ -203,14 +208,6 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 				multiple,
 				selectableFilter: this.data?.pickableFilter as ((item: UmbCollectionItemModel) => boolean) | undefined,
 			};
-
-			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
-				this._treeAlias = this.data.treeAlias;
-				this.#initialStartNodes = resolvedStartNodes.startNodes;
-				this._pickerContext.location.setStartNode(resolvedStartNodes.startNode);
-				this._pickerContext.location.setStartNodes(resolvedStartNodes.startNodes);
-				this._pickerContext.location.setTreeAlias(this.data.treeAlias);
-			}
 
 			if (this.data?.treeExpansion !== undefined) {
 				this._pickerContext.expansion.setExpansion(this.data.treeExpansion);
@@ -542,7 +539,7 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 					selectableFilter: this.#selectableFilter,
 					startNode: this._treeStartNode,
 					// Once drilled into a location the tree is scoped to that single node again.
-					startNodes: this._treeStartNode ? undefined : this.#initialStartNodes,
+					startNodes: this._treeStartNode ? undefined : this._pickerContext.location.getStartNodes(),
 					foldersOnly: this.data?.foldersOnly,
 					expansion: this._treeExpansion,
 					interactionMemories: this._treeInteractionMemories,

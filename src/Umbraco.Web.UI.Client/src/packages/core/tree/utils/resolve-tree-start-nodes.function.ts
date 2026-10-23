@@ -8,7 +8,7 @@ import type { UmbTreeStartNode } from '../types.js';
  * @param {Array<UmbTreeStartNode> | undefined} startNodes - A set of start nodes, taking precedence over `startNode`.
  * @returns {{ startNode?: UmbTreeStartNode; startNodes?: Array<UmbTreeStartNode> }} - The resolved configuration.
  */
-export function umbResolveTreeStartNodes(
+export function resolveTreeStartNodes(
 	startNode: UmbTreeStartNode | undefined,
 	startNodes: Array<UmbTreeStartNode> | undefined,
 ): { startNode?: UmbTreeStartNode; startNodes?: Array<UmbTreeStartNode> } {

@@ -2,7 +2,6 @@ import { UmbTreeItemPickerContext, type UmbTreeItemPickerLocation } from '../tre
 import type { UmbTreeElement } from '../tree.element.js';
 import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration, UmbTreeStartNode } from '../types.js';
 import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
-import { umbResolveTreeStartNodes } from '../utils/index.js';
 import '../components/tree-item-picker-breadcrumb/index.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './types.js';
 import { css, customElement, html, ifDefined, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
@@ -61,8 +60,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	private _treeStartNode?: UmbTreeStartNode;
 
-	#initialStartNodes?: Array<UmbTreeStartNode>;
-
 	@query('umb-picker-search-field')
 	private _searchField?: UmbPickerSearchFieldElement;
 
@@ -103,14 +100,21 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('data')) {
-			const resolvedStartNodes = umbResolveTreeStartNodes(this.data?.startNode, this.data?.startNodes);
-			this.#startNodeUniques = new Set(resolvedStartNodes.startNodes?.map((startNode) => startNode.unique) ?? []);
+			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
+				this._treeAlias = this.data.treeAlias;
+				this._pickerContext.location.setStartNode(this.data.startNode);
+				this._pickerContext.location.setStartNodes(this.data.startNodes);
+				this._pickerContext.location.setTreeAlias(this.data.treeAlias);
+			}
+
+			const startNodes = this._pickerContext.location.getStartNodes();
+			this.#startNodeUniques = new Set(startNodes?.map((startNode) => startNode.unique) ?? []);
 
 			if (this.data?.search) {
 				this._pickerContext.search.updateConfig({
 					...this.data.search,
 					// There is no server side search across multiple parents, so the scope is applied client side.
-					searchFrom: resolvedStartNodes.startNode,
+					searchFrom: this._pickerContext.location.getStartNode(),
 					dataTypeUnique: this._pickerContext.dataType?.unique,
 				});
 			}
@@ -122,14 +126,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				...this._selectionConfiguration,
 				multiple,
 			};
-
-			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
-				this._treeAlias = this.data.treeAlias;
-				this.#initialStartNodes = resolvedStartNodes.startNodes;
-				this._pickerContext.location.setStartNode(resolvedStartNodes.startNode);
-				this._pickerContext.location.setStartNodes(resolvedStartNodes.startNodes);
-				this._pickerContext.location.setTreeAlias(this.data.treeAlias);
-			}
 
 			if (this.data?.treeExpansion !== undefined) {
 				this._pickerContext.expansion.setExpansion(this.data.treeExpansion);
@@ -379,7 +375,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					selectableFilter: this.#selectableFilter,
 					startNode: this._treeStartNode,
 					// Once drilled into a location the tree is scoped to that single node again.
-					startNodes: this._treeStartNode ? undefined : this.#initialStartNodes,
+					startNodes: this._treeStartNode ? undefined : this._pickerContext.location.getStartNodes(),
 					foldersOnly: this.data?.foldersOnly,
 					expansion: this._treeExpansion,
 					interactionMemories: this._treeInteractionMemories,
