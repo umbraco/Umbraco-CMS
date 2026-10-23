@@ -233,7 +233,6 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             }
 
             // Read the member before opening the write scope, so a read lock is not upgraded to a write lock
-            // (which fails under concurrency on Sql Server and e.g. PostgreSql).
             IMember? found = _memberService.GetById(asInt);
 
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
