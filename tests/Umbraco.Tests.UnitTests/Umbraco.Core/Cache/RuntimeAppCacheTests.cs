@@ -106,6 +106,7 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
 
     // A null result is never stored, so callers waiting on the in-flight factory must share its result rather than
     // re-reading the cache and each running the factory again in turn.
+    // See: https://github.com/umbraco/Umbraco-CMS/issues/23921
     [Test]
     public async Task Concurrent_Get_With_Async_Factory_Returning_Null_Only_Runs_Factory_Once()
     {
