@@ -847,18 +847,29 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
 
             foreach ((Guid key, string alias) in candidates)
             {
-                var uniqueAlias = alias;
-                var suffix = 1;
-                while (usedAliases.Add(uniqueAlias) is false)
-                {
-                    uniqueAlias = $"{alias}{suffix++}";
-                }
-
-                aliasesByKey[key] = uniqueAlias;
+                aliasesByKey[key] = ReserveUniqueAlias(alias, usedAliases);
             }
         }
 
         return aliasesByKey;
+    }
+
+    /// <summary>
+    ///     Reserves an alias, appending a number when it is already in use.
+    /// </summary>
+    /// <param name="alias">The alias to reserve.</param>
+    /// <param name="usedAliases">The aliases in use, which the reserved alias is added to.</param>
+    /// <returns>The reserved alias.</returns>
+    private static string ReserveUniqueAlias(string alias, HashSet<string> usedAliases)
+    {
+        var uniqueAlias = alias;
+        var suffix = 1;
+        while (usedAliases.Add(uniqueAlias) is false)
+        {
+            uniqueAlias = $"{alias}{suffix++}";
+        }
+
+        return uniqueAlias;
     }
 
     /// <summary>
