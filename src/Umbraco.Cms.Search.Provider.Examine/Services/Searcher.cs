@@ -4,6 +4,7 @@ using System.Reflection;
 using Examine;
 using Examine.Lucene;
 using Examine.Search;
+using Lucene.Net.Analysis.Standard;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Exceptions;
@@ -140,9 +141,15 @@ public class Searcher : IExamineSearcher
                     .Select(term => term.TrimStart('*', '?'))
                     .Where(term => term.Length > 0)
                     .ToArray();
+
+                // the default analyzer leaves common words out of the index, so requiring them would exclude every
+                // document. they are optional whenever the query has other terms to match on, and still add to the
+                // relevance where an analyzer does index them.
+                var hasSignificantTerms = terms.Any(term => IsStopWord(term) is false);
                 foreach (var term in terms)
                 {
-                    searchQuery.And().Group(nestedQuery => CreateAggregatedTextQuery(nestedQuery, term, segment));
+                    IQuery termQuery = hasSignificantTerms && IsStopWord(term) ? searchQuery.Or() : searchQuery.And();
+                    termQuery.Group(nestedQuery => CreateAggregatedTextQuery(nestedQuery, term, segment));
                 }
             }
 
@@ -788,6 +795,9 @@ public class Searcher : IExamineSearcher
 
         return result;
     }
+
+    private static bool IsStopWord(string term)
+        => StandardAnalyzer.STOP_WORDS_SET.Contains(term.ToLowerInvariant());
 
     private static void EnsureFieldAnalyzersLoaded(IIndex index)
     {
