@@ -232,7 +232,28 @@ export class UmbAuthContext extends UmbContextBase {
 		usernameHint?: string,
 		manifest?: ManifestAuthProvider,
 	): Promise<void> {
-		const redirectUrl = await this.#client.buildAuthorizationUrl(identityProvider, usernameHint);
+		const popupTarget = manifest?.meta?.behavior?.popupTarget ?? 'umbracoAuthPopup';
+		const popupFeatures =
+			manifest?.meta?.behavior?.popupFeatures ??
+			'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no';
+
+		// The popup must open before the PKCE challenge is derived: WebKit does not carry the user gesture across
+		// the `crypto.subtle.digest` await, so a popup opened afterwards is blocked in Safari. Opening by target name
+		// with an empty URL returns a still-open popup untouched, which also covers re-authenticating into it.
+		let popup: WindowProxy | null = null;
+		if (!redirect) {
+			// Clean up any pending popup flow before starting a new one
+			this.#popupCleanup?.();
+			popup = window.open('', popupTarget, popupFeatures);
+		}
+
+		let redirectUrl: string;
+		try {
+			redirectUrl = await this.#client.buildAuthorizationUrl(identityProvider, usernameHint);
+		} catch (error) {
+			popup?.close();
+			throw error;
+		}
 
 		if (redirect) {
 			// For redirect flows, persist PKCE state in sessionStorage (survives same-tab navigation)
@@ -247,20 +268,14 @@ export class UmbAuthContext extends UmbContextBase {
 			return;
 		}
 
-		const popupTarget = manifest?.meta?.behavior?.popupTarget ?? 'umbracoAuthPopup';
-		const popupFeatures =
-			manifest?.meta?.behavior?.popupFeatures ??
-			'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no';
-
-		// Clean up any pending popup flow before starting a new one
-		this.#popupCleanup?.();
-
-		if (!this.#authWindowProxy || this.#authWindowProxy.closed) {
-			this.#authWindowProxy = window.open(redirectUrl, popupTarget, popupFeatures);
+		if (popup) {
+			// Navigating another window resolves relative URLs against its own (blank) document, so resolve here.
+			popup.location.replace(new URL(redirectUrl, window.location.href).toString());
+			popup.focus();
+			this.#authWindowProxy = popup;
 		} else {
-			// Popup still open — navigate to the new URL (always different due to PKCE state)
-			this.#authWindowProxy = window.open(redirectUrl, popupTarget);
-			this.#authWindowProxy?.focus();
+			// The gesture-time open was blocked; a late open is the only remaining attempt.
+			this.#authWindowProxy = window.open(redirectUrl, popupTarget, popupFeatures);
 		}
 
 		// Store PKCE state for the popup's postMessage request
