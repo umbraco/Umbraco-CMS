@@ -63,12 +63,12 @@ internal class HasDocumentScheduleFlagProviderTests
         {
             [key1] =
             [
-                new ContentSchedule("en-EN", DateTime.Now.AddDays(1), ContentScheduleAction.Release),
-                new ContentSchedule("da-DA", DateTime.Now.AddDays(-1), ContentScheduleAction.Release),
+                new ContentSchedule("en-EN", DateTime.Now.AddDays(1), ContentScheduleAction.Release, includeInvariantForVariant: null),
+                new ContentSchedule("da-DA", DateTime.Now.AddDays(-1), ContentScheduleAction.Release, includeInvariantForVariant: null),
             ],
             [key2] =
             [
-                new ContentSchedule("*", DateTime.Now.AddDays(1), ContentScheduleAction.Release),
+                new ContentSchedule("*", DateTime.Now.AddDays(1), ContentScheduleAction.Release, includeInvariantForVariant: null),
             ],
         });
 
@@ -118,12 +118,12 @@ internal class HasDocumentScheduleFlagProviderTests
         {
             [key1] =
             [
-                new ContentSchedule("en-EN", DateTime.Now.AddDays(1), ContentScheduleAction.Release),
-                new ContentSchedule("da-DA", DateTime.Now.AddDays(-1), ContentScheduleAction.Release),
+                new ContentSchedule("en-EN", DateTime.Now.AddDays(1), ContentScheduleAction.Release, includeInvariantForVariant: null),
+                new ContentSchedule("da-DA", DateTime.Now.AddDays(-1), ContentScheduleAction.Release, includeInvariantForVariant: null),
             ],
             [key2] =
             [
-                new ContentSchedule("*", DateTime.Now.AddDays(1), ContentScheduleAction.Release),
+                new ContentSchedule("*", DateTime.Now.AddDays(1), ContentScheduleAction.Release, includeInvariantForVariant: null),
             ],
         });
 
@@ -181,12 +181,12 @@ internal class HasDocumentScheduleFlagProviderTests
         {
             [key1] =
             [
-                new ContentSchedule("en-EN", DateTime.Now.AddDays(1), ContentScheduleAction.Release),
-                new ContentSchedule("da-DA", DateTime.Now.AddDays(-1), ContentScheduleAction.Release),
+                new ContentSchedule("en-EN", DateTime.Now.AddDays(1), ContentScheduleAction.Release, includeInvariantForVariant: null),
+                new ContentSchedule("da-DA", DateTime.Now.AddDays(-1), ContentScheduleAction.Release, includeInvariantForVariant: null),
             ],
             [key2] =
             [
-                new ContentSchedule("*", DateTime.Now.AddDays(1), ContentScheduleAction.Release),
+                new ContentSchedule("*", DateTime.Now.AddDays(1), ContentScheduleAction.Release, includeInvariantForVariant: null),
             ],
         });
 
