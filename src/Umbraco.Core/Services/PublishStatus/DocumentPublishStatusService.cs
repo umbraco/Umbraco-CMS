@@ -69,36 +69,96 @@ public class DocumentPublishStatusService :
 
     /// <inheritdoc/>
     public bool HasPublishedAncestorPath(Guid contentKey)
-        => HasPublishedAncestorPathInternal(contentKey, culture: null);
+        => AncestorsPublished(contentKey, culture: null);
 
     /// <inheritdoc/>
     public bool HasPublishedAncestorPath(Guid contentKey, string culture)
-        => HasPublishedAncestorPathInternal(contentKey, culture);
+        => AncestorsPublished(contentKey, culture);
 
-    private bool HasPublishedAncestorPathInternal(Guid contentKey, string? culture)
+    /// <inheritdoc/>
+    public IEnumerable<Guid> WhereAncestorPathPublished(IEnumerable<Guid> contentKeys, string? culture)
     {
-        var success = _documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out IEnumerable<Guid> keys);
-        if (success is false)
+        // Only the ancestors we walk through are memoised - they are shared across many candidates -
+        // while the candidate keys themselves are not, keeping the dictionary off the usually far more
+        // numerous leaves. Both buffers are reused across the whole set.
+        var memo = new Dictionary<Guid, bool>();
+        var walked = new List<Guid>();
+
+        foreach (Guid contentKey in contentKeys)
         {
-            // This might happen in certain cases, since notifications are not ordered, for instance, if you save and publish a content node in the same scope.
-            // In this case we'll try and update the node in the cache even though it hasn't been updated in the document navigation cache yet.
-            // It's okay to just return false here, since the node will be loaded later when it's actually requested.
-            return false;
+            if (AncestorsPublished(contentKey, culture, memo, walked))
+            {
+                yield return contentKey;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Determines whether all ancestors of <paramref name="contentKey"/> are published in the requested culture.
+    /// </summary>
+    /// <param name="contentKey">The document key whose ancestor path to verify.</param>
+    /// <param name="culture">The culture to check, or <c>null</c> to accept any published culture.</param>
+    /// <param name="memo">An optional cache of already resolved ancestors, shared across a batch of candidates.</param>
+    /// <param name="walked">An optional buffer holding the chain walked for the current candidate, used to populate <paramref name="memo"/>.</param>
+    /// <remarks>
+    /// The chain is walked iteratively rather than recursively, so that deep content structures cannot overflow the stack.
+    /// </remarks>
+    private bool AncestorsPublished(Guid contentKey, string? culture, Dictionary<Guid, bool>? memo = null, List<Guid>? walked = null)
+    {
+        walked?.Clear();
+
+        Guid current = contentKey;
+        bool result;
+
+        while (true)
+        {
+            if (memo is not null && memo.TryGetValue(current, out var cached))
+            {
+                result = cached;
+                break;
+            }
+
+            walked?.Add(current);
+
+            if (_documentNavigationQueryService.TryGetParentKey(current, out Guid? parentKey) is false)
+            {
+                // Node not (yet) in navigation - notifications are not ordered, so a node can reach the
+                // publish-status cache before the navigation cache. Treat it as having no published path;
+                // it will be re-evaluated once it is actually requested.
+                result = false;
+                break;
+            }
+
+            if (parentKey is null)
+            {
+                // Root: no ancestors, so the ancestor path is vacuously published.
+                result = true;
+                break;
+            }
+
+            var parentPublished = culture is null
+                ? IsPublishedInAnyCulture(parentKey.Value)
+                : IsPublished(parentKey.Value, culture);
+            if (parentPublished is false)
+            {
+                result = false;
+                break;
+            }
+
+            current = parentKey.Value;
         }
 
-        foreach (Guid key in keys)
+        // The walk stops at the first unpublished (or unresolvable) ancestor, so the entire walked chain
+        // shares the result. The candidate key itself - the first entry - is deliberately not memoised.
+        if (memo is not null && walked is not null)
         {
-            var isPublished = culture is null
-                ? IsPublishedInAnyCulture(key)
-                : IsPublished(key, culture);
-
-            if (isPublished is false)
+            for (var i = 1; i < walked.Count; i++)
             {
-                return false;
+                memo[walked[i]] = result;
             }
         }
 
-        return true;
+        return result;
     }
 
     /// <inheritdoc/>
