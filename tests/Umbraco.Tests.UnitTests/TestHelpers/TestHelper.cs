@@ -2,10 +2,7 @@
 // See LICENSE for more details.
 
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -81,7 +78,7 @@ public static class TestHelper
 
     public static UriUtility UriUtility => s_testHelperInternal.UriUtility;
 
-    public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(), new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()), Mock.Of<IEventAggregator>(), Mock.Of<IEmailSenderClient>(), null,null);
+    public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(), new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()), Mock.Of<IEventAggregator>(), Mock.Of<IEmailSenderClient>(), Mock.Of<IEmailDeliveryQueue>(), null, null);
 
     public static ITypeFinder GetTypeFinder() => s_testHelperInternal.GetTypeFinder();
 
