@@ -50,7 +50,8 @@ export interface UmbTreeDataSource<
 	getAncestorsOf(args: TreeAncestorsOfRequestArgsType): Promise<UmbDataSourceResponse<Array<TreeItemType>>>;
 
 	/**
-	 * Gets the items with the given uniques.
+	 * Gets the items with the given uniques. `UmbTreeRepositoryBase` uses this to answer `requestTreeItems`; when it is
+	 * not implemented, a tree scoped to several start nodes shows only the children of the first of them.
 	 * @returns {Promise<UmbDataSourceResponse<Array<TreeItemType>>>}
 	 * @memberof UmbTreeDataSource
 	 */

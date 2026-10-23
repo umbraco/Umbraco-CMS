@@ -75,7 +75,9 @@ export interface UmbTreeRepository<
 	requestTreeItemAncestors: (args: TreeAncestorsOfRequestArgsType) => Promise<UmbRepositoryResponse<TreeItemType[]>>;
 
 	/**
-	 * Requests the tree items with the given uniques.
+	 * Requests the tree items with the given uniques. A tree scoped to several start nodes uses this to show those nodes
+	 * in place of the tree root. When it is not implemented, or it returns an `UmbTreeItemsNotSupportedError`, the tree
+	 * instead shows the children of the first start node, as a tree scoped to a single start node would.
 	 * @param {UmbTreeItemsRequestArgs} args
 	 * @memberof UmbTreeRepository
 	 */
