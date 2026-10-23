@@ -5,6 +5,7 @@ import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbVariantId,
+	umbVariantIdsToCultures,
 	umbVariantObjectSortCompare,
 	type UmbEntityVariantModel,
 	type UmbVariantDataModel,
@@ -89,6 +90,8 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 				i === self.findIndex((v) => v.alias === n.alias && v.culture === n.culture && v.segment === n.segment),
 		);
 
+		const culturesToProcess = umbVariantIdsToCultures(variantsToProcess);
+
 		// Map unique values to their respective draft values.
 		const values = (
 			await Promise.all(
@@ -98,7 +101,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 					);
 
 					// Should this value be saved?
-					if (variantsToProcess.some((x) => x.culture === value.culture)) {
+					if (culturesToProcess.includes(value.culture ?? null)) {
 						const draftValue = draftValues?.find(
 							(x) => x.alias === value.alias && x.culture === value.culture && x.segment === value.segment,
 						);
