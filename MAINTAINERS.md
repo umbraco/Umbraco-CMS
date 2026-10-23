@@ -19,9 +19,9 @@ The Umbraco HQ CMS group (frontend, backend and product) reviews and merges chan
 | Lee Kelleher | [@leekelleher](https://github.com/leekelleher) |
 | Mads Rasmussen | [@madsrasmussen](https://github.com/madsrasmussen) |
 | Mathias Tøndering | [@mta-umbraco](https://github.com/mta-umbraco) |
-| Mole | [@nikolajlauridsen](https://github.com/nikolajlauridsen) |
 | Niels Lyngsø | [@nielslyngsoe](https://github.com/nielslyngsoe) |
 | Nikolaj Geisle | [@Zeegaan](https://github.com/Zeegaan) |
+| Nikolaj Lauridsen | [@nikolajlauridsen](https://github.com/nikolajlauridsen) |
 
 ## Security team
 
