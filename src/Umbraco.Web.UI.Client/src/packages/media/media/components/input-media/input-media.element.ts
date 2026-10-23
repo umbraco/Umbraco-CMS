@@ -295,7 +295,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 					icon=${item.mediaType.icon}
 					file-ext=${ifDefined(item.extension)}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
-				<uui-action-bar slot="actions">${this.#renderRemoveAction(unique)}</uui-action-bar>
+				<uui-action-bar slot="actions">${this.#renderChangeAction()}${this.#renderRemoveAction(unique)}</uui-action-bar>
 			</uui-card-media>
 		`;
 	}
@@ -316,8 +316,20 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				name=${this.localize.string(errorMessage ?? '#general_notFound')}
 				data-mark="${unique}">
 				<umb-icon name="icon-alert"></umb-icon>
-				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(unique)}</uui-action-bar>
+				<uui-action-bar slot="actions">
+					${this.#renderChangeAction()} ${this.#renderRemoveAction(unique)}
+				</uui-action-bar>
 			</uui-card-media>
+		`;
+	}
+
+	#renderChangeAction() {
+		if (this.readonly || this.max !== 1) return nothing;
+		return html`
+			<uui-button
+				label=${this.localize.term('general_change')}
+				look="secondary"
+				@click=${this.#openPicker}></uui-button>
 		`;
 	}
 
