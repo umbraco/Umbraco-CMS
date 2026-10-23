@@ -1,5 +1,10 @@
 import type { UmbContentTypePropertyStructureHelper } from '../../../structure/index.js';
-import type { UmbContentTypeModel, UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '../../../types.js';
+import type {
+	UmbContentTypeDetailModel,
+	UmbContentTypeModel,
+	UmbPropertyTypeModel,
+	UmbPropertyTypeScaffoldModel,
+} from '../../../types.js';
 import { UmbPropertyTypeContext } from './content-type-design-editor-property.context.js';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
@@ -10,6 +15,7 @@ import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/back
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 /**
  *  @element umb-content-type-design-editor-property
@@ -84,6 +90,57 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	@state()
 	private _dataTypeName?: string;
+
+	#persistedContentType?: UmbContentTypeDetailModel;
+	#aliasChangeConfirmed = false;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(
+				context?.persistedData,
+				(data) => {
+					this.#persistedContentType = data as UmbContentTypeDetailModel | undefined;
+				},
+				'observePersistedContentType',
+			);
+		});
+	}
+
+	#persistedAlias() {
+		return this.#persistedContentType?.properties?.find((x) => x.unique === this._property?.unique)?.alias;
+	}
+
+	/**
+	 * Only an Element Type keys its property values by alias, so only there does a rename orphan them.
+	 * Confirmed once the alias is left alone, rather than on every keystroke.
+	 */
+	async #confirmAliasChange() {
+		const persistedAlias = this.#persistedAlias();
+		if (this.#persistedContentType?.isElement !== true || persistedAlias === undefined) return;
+
+		if (persistedAlias === this._property?.alias) {
+			this.#aliasChangeConfirmed = false;
+			return;
+		}
+
+		if (this.#aliasChangeConfirmed) return;
+
+		try {
+			await umbConfirmModal(this, {
+				headline: this.localize.term('contentTypeEditor_confirmPropertyAliasChangeHeadline'),
+				content: html`<umb-localize
+					key="contentTypeEditor_confirmPropertyAliasChangeMessage"
+					.args=${[this._property?.name, persistedAlias]}></umb-localize>`,
+				confirmLabel: '#general_change',
+				color: 'danger',
+			});
+			this.#aliasChangeConfirmed = true;
+		} catch {
+			this.#singleValueUpdate('alias', persistedAlias);
+		}
+	}
 
 	async #checkInherited() {
 		if (this._propertyStructureHelper && this._property) {
@@ -204,6 +261,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						.value=${this.property.name}
 						.alias=${this.property.alias}
 						@change=${this.#onNameAliasChange}
+						@focusout=${this.#confirmAliasChange}
 						${umbBindToValidation(this)}></umb-input-with-alias>
 					<umb-form-validation-message for="name-alias-input"></umb-form-validation-message>
 
