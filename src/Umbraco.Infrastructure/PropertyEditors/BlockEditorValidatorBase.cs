@@ -28,7 +28,11 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
     /// <param name="validationContext">The context of the property value being validated.</param>
     /// <returns>The validation models, one for each block item validated per culture and segment.</returns>
     /// <remarks>
-    /// <para>Only exposed blocks are validated, with settings validated along with their content.</para>
+    /// <para>
+    /// Culture variant values are validated for the blocks exposed in their culture. Culture invariant values are
+    /// validated for the blocks exposed in any culture, as they apply to every culture the blocks are exposed in.
+    /// Settings are validated along with their content.
+    /// </para>
     /// <para>
     /// Segments are not managed, so other than the segment in <paramref name="validationContext"/>, the segments
     /// validated are the default segment and the ones present among the block values.
