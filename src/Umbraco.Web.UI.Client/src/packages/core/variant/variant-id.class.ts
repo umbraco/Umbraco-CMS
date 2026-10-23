@@ -50,6 +50,10 @@ export class UmbVariantId {
 		return this.culture === variantId.culture && this.segment === variantId.segment;
 	}
 
+	public oneOf(variantIds: Array<UmbVariantId>): boolean {
+		return variantIds.some((v) => v.equal(this));
+	}
+
 	public toString(): string {
 		// Currently a direct copy of the VariantPropertiesObjectToString method const.
 		return (this.culture || UMB_INVARIANT_CULTURE) + (this.segment ? `_${this.segment}` : '');

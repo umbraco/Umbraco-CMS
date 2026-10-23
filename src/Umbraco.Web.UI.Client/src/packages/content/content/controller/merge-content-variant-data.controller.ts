@@ -32,11 +32,11 @@ function defaultCompareVariantDataMethod(a: UmbVariantDataModel, b: UmbVariantDa
 
 export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	/**
-	 * Merges content variant data based on selected variants and variants to store.
+	 * Merges content variant data based on selected variants and variants to process.
 	 * @param {UmbContentLikeDetailModel | undefined} persistedData - The persisted content variant data.
 	 * @param {UmbContentLikeDetailModel} currentData - The current content variant data.
 	 * @param {Array<UmbVariantId>} selectedVariants - The selected variants.
-	 * @param {Array<UmbVariantId>} variantsToProcess - The variants to store. Values are matched on culture only, so a stored culture includes all of its segment values, whichever segment the given variant carries. We sometimes have additional variants that we like to process. This is typically the invariant variant, which we do not want to have as part of the variants data therefore a difference.
+	 * @param {Array<UmbVariantId>} variantsToProcess - The variants to process. Value-entries are matched on culture only, so a process culture includes all of its segment values, whichever segment the given variant carries. We sometimes have additional variants that we like to process. This is typically the invariant variant, which we do not want to have as part of the variants data therefore a difference.
 	 * @returns {Promise<UmbContentLikeDetailModel>} - A promise that resolves to the merged content variant data.
 	 */
 	async process<ModelType extends UmbContentLikeDetailModel>(
@@ -71,11 +71,11 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	}
 
 	/**
-	 * Builds and saves values based on selected variants and variants to store.
+	 * Builds and saves values based on selected variants and variants to process.
 	 * @param {Array<UmbPotentialContentValueModel> | undefined} persistedValues - The persisted values.
 	 * @param {Array<UmbPotentialContentValueModel> | undefined} draftValues - The draft values.
-	 * @param {Array<UmbVariantId>} variantsToProcess - The variants to store.
-	 * @returns {Promise<Array<UmbPotentialContentValueModel>>} - A promise that resolves to the saved values.
+	 * @param {Array<UmbVariantId>} variantsToProcess - The variants to process.
+	 * @returns {Promise<Array<UmbPotentialContentValueModel>>} - A promise that resolves to the processed values.
 	 */
 	async #processValues<T extends UmbPotentialContentValueModel = UmbPotentialContentValueModel>(
 		persistedValues: Array<T> | undefined,
@@ -116,10 +116,10 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	}
 
 	/**
-	 * Builds and saves a value based on selected variants and variants to store.
+	 * Builds and saves a value based on selected variants and variants to process.
 	 * @param {UmbPotentialContentValueModel | undefined} persistedValue - The persisted value.
 	 * @param {UmbPotentialContentValueModel | undefined} draftValue - The draft value.
-	 * @param {Array<UmbVariantId>} variantsToProcess - The variants to store.
+	 * @param {Array<UmbVariantId>} variantsToProcess - The variants to process.
 	 * @returns {Promise<UmbPotentialContentValueModel | undefined>} A promise that resolves to the saved value.
 	 */
 	async #processValue(
@@ -186,7 +186,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 		}
 
 		if (api.processVariants) {
-			// The a property values resolver resolves one value, we need to gather the persisted inner values first, and store them here:
+			// The a property values resolver resolves one value, we need to gather the persisted inner values first, and process them here:
 			const persistedVariantsHolder: Array<Array<UmbVariantDataModel>> = [];
 
 			if (persistedValue) {
@@ -220,7 +220,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	 * Construct variants property of model.
 	 * @param {Array<UmbVariantDataModel> | undefined} persistedVariants - The persisted value.
 	 * @param {Array<UmbVariantDataModel>} draftVariants - The draft value.
-	 * @param {Array<UmbVariantId>} variantsToProcess - The variants to be stored.
+	 * @param {Array<UmbVariantId>} variantsToProcess - The variants to be processed.
 	 * @param {(UmbVariantDataModel, UmbVariantDataModel) => boolean} compare - The compare method, which compares the unique properties of the variants.
 	 * @returns {UmbVariantDataModel[]} A new array of variants.
 	 */
@@ -234,12 +234,14 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			(n, i, self) => i === self.findIndex((v) => compare(v, n)),
 		);
 
+		// Take the draft variants that are meant to be processed, otherwise keep the persisted ones.
 		return uniqueVariants
 			.map((value) => {
 				const persistedVariant = persistedVariants?.find((x) => compare(x, value));
+				const variantId = UmbVariantId.CreateFromPartial(value);
 
-				// Should this value be saved?
-				if (variantsToProcess.some((x) => x.equal(UmbVariantId.CreateFromPartial(value)))) {
+				// Should this variant be processed?
+				if (variantId.oneOf(variantsToProcess)) {
 					const draftVariant = draftVariants?.find((x) => compare(x, value));
 
 					return draftVariant;
