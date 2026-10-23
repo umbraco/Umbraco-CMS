@@ -422,6 +422,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					?readonly=${!this.modalContext?.router}>
 					<uui-action-bar slot="actions">
 						<uui-button
+							label=${this.localize.term('general_change')}
+							@click=${this.#triggerDocumentLinkPicker}></uui-button>
+						<uui-button
 							label=${this.localize.term('general_remove')}
 							@click=${() => this.#onDocumentRemove()}></uui-button>
 					</uui-action-bar>

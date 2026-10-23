@@ -214,6 +214,13 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 		this.#pickerInputContext.requestRemoveItem(unique);
 	}
 
+	#renderChangeAction() {
+		if (this.readonly || this.max !== 1) return nothing;
+		return html`<uui-button
+			label=${this.localize.term('general_change')}
+			href=${ifDefined(this._modalRoute)}></uui-button>`;
+	}
+
 	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
@@ -255,6 +262,7 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 								!this.readonly,
 								() => html`
 									<uui-action-bar slot="actions">
+										${this.#renderChangeAction()}
 										<uui-button
 											label=${this.localize.term('general_remove')}
 											@click=${() => this.#onRemove(unique)}></uui-button>

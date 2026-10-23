@@ -1,16 +1,43 @@
 import type { UmbLinkPickerModalData, UmbLinkPickerModalValue } from './link-picker-modal.token.js';
 import { UmbLinkPickerModalElement } from './link-picker-modal.element.js';
-import { expect, fixture, html } from '@open-wc/testing';
+import { UMB_DOCUMENT_LINK_PICKER_MODAL } from '../document-link-picker-modal/document-link-picker-modal.token.js';
+import { expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_INTERACTION_MEMORY_SCOPE_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbPickerContext, UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
+import { useMockSet } from '@umbraco-cms/internal/mock-manager';
+import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
+import type { UmbEntityItemRefElement } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import type { UmbInputMultiUrlElement } from '../components/input-multi-url/index.js';
+import { UmbDocumentItemStore } from '../../documents/documents/item/repository/document-item.store.js';
+import { UmbDocumentUrlStore } from '../../documents/documents/url/repository/document-url.store.js';
 
 import '../components/input-multi-url/index.js';
+
+// Kitchen-sink documents.
+const HOME_ID = 'db79156b-3d5b-43d6-ab32-902dc423bec3';
+const CHECKBOX_LIST_ID = '9dfcda46-88bf-4d69-bb2d-e94667051727';
+
+// Provides what the app provides at runtime: the item stores the repositories wait for, and the
+// ambient cultures a document name resolves against.
+@customElement('umb-test-link-picker-modal-host')
+class UmbTestLinkPickerModalHostElement extends UmbElementMixin(HTMLElement) {
+	constructor() {
+		super();
+		new UmbDocumentItemStore(this);
+		new UmbDocumentUrlStore(this);
+		const variantContext = new UmbVariantContext(this);
+		variantContext.setCulture(null);
+		variantContext.setFallbackCulture('en-US');
+	}
+}
 
 // Stands in for the document link picker modal, which this modal opens. Real modals live in the
 // modal portal; nesting gives the same context resolution the modal context proxy arranges.
@@ -141,6 +168,67 @@ describe('UmbLinkPickerModalElement', () => {
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
 			expect(input.interactionMemories).to.deep.equal([]);
+		});
+	});
+
+	describe('picked document', () => {
+		let host: UmbTestLinkPickerModalHostElement;
+		let modal: UmbLinkPickerModalElement;
+		let openedModals: Array<unknown>;
+
+		before(async () => {
+			await useMockSet('kitchenSink');
+		});
+
+		beforeEach(async () => {
+			host = await fixture(html`<umb-test-link-picker-modal-host></umb-test-link-picker-modal-host>`);
+
+			openedModals = [];
+			const modalManager = {
+				getHostElement: () => host,
+				open: (_host: unknown, token: unknown) => {
+					openedModals.push(token);
+					return {
+						onSubmit: () => Promise.resolve({ unique: CHECKBOX_LIST_ID, entityType: UMB_DOCUMENT_ENTITY_TYPE }),
+					};
+				},
+			};
+			host.provideContext(UMB_MODAL_MANAGER_CONTEXT, modalManager as never);
+
+			const value = new UmbObjectState<UmbLinkPickerModalValue>({
+				link: { type: 'document', unique: HOME_ID, name: 'My title', queryString: '#anchor', target: '_blank' },
+			});
+			modal = document.createElement('umb-link-picker-modal');
+			modal.modalContext = {
+				value: value.asObservable(),
+				size: new UmbStringState('small').asObservable(),
+				updateValue: (partial: Partial<UmbLinkPickerModalValue>) => value.update(partial),
+			} as unknown as UmbModalContext<UmbLinkPickerModalData, UmbLinkPickerModalValue>;
+			host.appendChild(modal);
+
+			await waitUntil(
+				() => modal.shadowRoot?.querySelector<UmbEntityItemRefElement>('umb-entity-item-ref')?.item,
+				'picked document was not loaded',
+			);
+		});
+
+		it('changes the document in place, keeping title, anchor and target', async () => {
+			const changeButton = modal.shadowRoot!.querySelector<HTMLElement>(
+				`uui-action-bar uui-button[label="${modal.localize.term('general_change')}"]`,
+			);
+			expect(changeButton, 'change button').to.exist;
+
+			changeButton!.click();
+			await waitUntil(() => modal.value.link.unique === CHECKBOX_LIST_ID, 'document was not changed');
+
+			expect(openedModals).to.deep.equal([UMB_DOCUMENT_LINK_PICKER_MODAL]);
+			expect(modal.value.link).to.include({
+				type: 'document',
+				unique: CHECKBOX_LIST_ID,
+				name: 'My title',
+				queryString: '#anchor',
+				target: '_blank',
+			});
 		});
 	});
 });
