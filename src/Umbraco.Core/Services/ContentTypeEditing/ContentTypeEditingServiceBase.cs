@@ -791,15 +791,21 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
     {
         var existingGroupsByKey = contentType.PropertyGroups.ToDictionary(group => group.Key);
+
         // NOTE: at this point we have validated the containers and their parent relationships in the model
         var containersByKey = model.Containers.ToDictionary(container => container.Key);
 
         string OwnAlias(TPropertyTypeContainer container)
-            => existingGroupsByKey.TryGetValue(container.Key, out PropertyGroup? existingGroup)
-               && existingGroup.Name == container.Name
-               && existingGroup.Type == Enum.Parse<PropertyGroupType>(container.Type)
-                ? existingGroup.Alias[(existingGroup.Alias.LastIndexOf('/') + 1)..]
-                : PropertyGroupAlias(container.Name);
+        {
+            if (existingGroupsByKey.TryGetValue(container.Key, out PropertyGroup? existingGroup)
+                && existingGroup.Name == container.Name
+                && existingGroup.Type == Enum.Parse<PropertyGroupType>(container.Type))
+            {
+                return existingGroup.Alias[(existingGroup.Alias.LastIndexOf('/') + 1)..];
+            }
+
+            return PropertyGroupAlias(container.Name);
+        }
 
         return model.Containers.ToDictionary(
             container => container.Key,

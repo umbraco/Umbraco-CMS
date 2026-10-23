@@ -2046,7 +2046,7 @@ internal sealed partial class ContentTypeEditingServiceTests
             contentType.PropertyGroups.Single(g => g.Key == key).Alias = alias;
         }
 
-        ContentTypeService.Save(contentType);
+        Assert.IsTrue((await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey)).Success);
         return (await ContentTypeService.GetAsync(contentType.Key))!;
     }
 
