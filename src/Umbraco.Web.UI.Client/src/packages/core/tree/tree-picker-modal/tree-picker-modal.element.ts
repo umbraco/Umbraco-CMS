@@ -107,9 +107,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				this._pickerContext.location.setTreeAlias(this.data.treeAlias);
 			}
 
-			const startNodes = this._pickerContext.location.getStartNodes();
-			this.#startNodeUniques = new Set(startNodes?.map((startNode) => startNode.unique) ?? []);
-
 			if (this.data?.search) {
 				this._pickerContext.search.updateConfig({
 					...this.data.search,
@@ -268,13 +265,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		}
 	}
 
-	#startNodeUniques = new Set<string>();
-
-	// The start nodes are only there to be browsed, so they are not pickable — matching the single start node
-	// case, where the start node is not rendered at all.
 	#selectableFilter = (item: TreeItemType) => {
 		const unique = (item as { unique?: string | null }).unique;
-		if (unique && this.#startNodeUniques.has(unique)) return false;
+		if (this._pickerContext.location.isBrowseOnlyStartNode(unique)) return false;
 		return this.data?.pickableFilter?.(item) ?? true;
 	};
 
@@ -283,16 +276,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		const baseFilter: ((item: UmbSearchResultItemModel & TreeItemType) => boolean) | undefined =
 			this.data?.search?.pickableFilter ?? this.data?.pickableFilter;
 		if (baseFilter && !baseFilter(item)) return false;
-		if (this.#startNodeUniques.size === 0) return true;
-
-		const unique = item.unique;
-		if (unique && this.#startNodeUniques.has(unique)) return false;
-
-		// Without a resolved ancestor chain there is nothing to compare the scope against.
-		const ancestors = (item as { ancestors?: Array<{ unique: string }> }).ancestors;
-		if (!ancestors) return true;
-
-		return ancestors.some((ancestor) => this.#startNodeUniques.has(ancestor.unique));
+		return this._pickerContext.location.isWithinStartNodes(item);
 	};
 
 	async #setActiveTab(tab: 'browse' | 'search') {

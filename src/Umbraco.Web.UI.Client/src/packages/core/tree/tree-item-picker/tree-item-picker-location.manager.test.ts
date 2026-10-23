@@ -384,4 +384,56 @@ describe('UmbTreeItemPickerLocationManager', () => {
 			expect(manager.getStartNodes()).to.be.undefined;
 		});
 	});
+
+	describe('scoping items to the start nodes', () => {
+		const first = { unique: 'a', entityType: 'test-item' };
+		const second = { unique: 'b', entityType: 'test-item' };
+
+		describe('with several start nodes', () => {
+			beforeEach(() => manager.setStartNodes([first, second]));
+
+			it('treats each start node as browse only', () => {
+				expect(manager.isBrowseOnlyStartNode('a')).to.be.true;
+				expect(manager.isBrowseOnlyStartNode('b')).to.be.true;
+				expect(manager.isBrowseOnlyStartNode('c')).to.be.false;
+				expect(manager.isBrowseOnlyStartNode(null)).to.be.false;
+			});
+
+			it('accepts an item below one of the start nodes', () => {
+				expect(manager.isWithinStartNodes({ unique: 'c', ancestors: [{ unique: 'b' }] })).to.be.true;
+			});
+
+			it('rejects an item below none of the start nodes', () => {
+				expect(manager.isWithinStartNodes({ unique: 'c', ancestors: [{ unique: 'x' }] })).to.be.false;
+			});
+
+			it('rejects an item without ancestors', () => {
+				expect(manager.isWithinStartNodes({ unique: 'c', ancestors: [] })).to.be.false;
+				expect(manager.isWithinStartNodes({ unique: 'c' })).to.be.false;
+			});
+
+			it('rejects a start node itself', () => {
+				expect(manager.isWithinStartNodes({ unique: 'a', ancestors: [{ unique: 'b' }] })).to.be.false;
+			});
+		});
+
+		describe('with a single start node', () => {
+			beforeEach(() => manager.setStartNode(first));
+
+			it('does not treat the start node as browse only', () => {
+				expect(manager.isBrowseOnlyStartNode('a')).to.be.false;
+			});
+
+			it('accepts any item', () => {
+				expect(manager.isWithinStartNodes({ unique: 'c' })).to.be.true;
+			});
+		});
+
+		describe('without a start node', () => {
+			it('accepts any item', () => {
+				expect(manager.isBrowseOnlyStartNode('a')).to.be.false;
+				expect(manager.isWithinStartNodes({ unique: 'c' })).to.be.true;
+			});
+		});
+	});
 });

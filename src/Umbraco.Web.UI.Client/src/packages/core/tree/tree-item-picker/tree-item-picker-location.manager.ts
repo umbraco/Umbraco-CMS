@@ -114,6 +114,35 @@ export class UmbTreeItemPickerLocationManager extends UmbControllerBase {
 		return this.#startNodes;
 	}
 
+	/**
+	 * Determines whether a node is only there to be browsed into. When the picker is scoped to several start nodes they
+	 * take the place of the tree root, so they cannot be picked themselves.
+	 * @param {string | null} [unique] - The unique of the node.
+	 * @returns {boolean} True when the node is one of several start nodes.
+	 * @memberof UmbTreeItemPickerLocationManager
+	 */
+	isBrowseOnlyStartNode(unique: string | null | undefined): boolean {
+		if (!unique || !this.#startNodes) return false;
+		return this.#startNodes.some((startNode) => startNode.unique === unique);
+	}
+
+	/**
+	 * Determines whether an item that was not reached by browsing the tree, such as a search result, lies within the
+	 * start nodes. With several start nodes the item must have one of them among its ancestors, so an item that carries
+	 * no ancestors is out of scope. With a single start node or none, the scope is applied where the items are fetched,
+	 * so every item is within it.
+	 * @param {{ unique?: string | null; ancestors?: Array<{ unique: string | null }> }} item - The item to check.
+	 * @param {string | null} [item.unique] - The unique of the item.
+	 * @param {Array<{ unique: string | null }>} [item.ancestors] - The ancestors of the item.
+	 * @returns {boolean} True when the item lies within the start nodes.
+	 * @memberof UmbTreeItemPickerLocationManager
+	 */
+	isWithinStartNodes(item: { unique?: string | null; ancestors?: Array<{ unique: string | null }> }): boolean {
+		if (!this.#startNodes) return true;
+		if (this.isBrowseOnlyStartNode(item.unique)) return false;
+		return item.ancestors?.some((ancestor) => this.isBrowseOnlyStartNode(ancestor.unique)) ?? false;
+	}
+
 	#resolveStartNodes() {
 		const { startNode, startNodes } = resolveTreeStartNodes(this.#configuredStartNode, this.#configuredStartNodes);
 		this.#startNode = startNode;
