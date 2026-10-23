@@ -18,7 +18,6 @@ The Umbraco HQ CMS group (frontend, backend and product) reviews and merges chan
 | Laura Neto | [@lauraneto](https://github.com/lauraneto) |
 | Lee Kelleher | [@leekelleher](https://github.com/leekelleher) |
 | Mads Rasmussen | [@madsrasmussen](https://github.com/madsrasmussen) |
-| Mathias Tøndering | [@mta-umbraco](https://github.com/mta-umbraco) |
 | Niels Lyngsø | [@nielslyngsoe](https://github.com/nielslyngsoe) |
 | Nikolaj Geisle | [@Zeegaan](https://github.com/Zeegaan) |
 | Nikolaj Lauridsen | [@nikolajlauridsen](https://github.com/nikolajlauridsen) |
@@ -30,8 +29,6 @@ The Umbraco Security Team handles vulnerability reports and security advisories 
 | Name | GitHub |
 | --- | --- |
 | Anders Nis Herforth Larsen | [@legacy-git](https://github.com/legacy-git) |
-| Anders Reus | [@andersreus](https://github.com/andersreus) |
-| Eric Frost | [@Frost117](https://github.com/Frost117) |
 | Filip Bech-Larsen | [@filipbech](https://github.com/filipbech) |
 | Lan Nguyen Thuy | [@NguyenThuyLan](https://github.com/NguyenThuyLan) |
 | Mathias Tøndering | [@mta-umbraco](https://github.com/mta-umbraco) |
