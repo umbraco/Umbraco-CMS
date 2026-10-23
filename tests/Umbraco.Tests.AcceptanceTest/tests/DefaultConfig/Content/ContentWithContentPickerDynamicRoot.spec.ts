@@ -61,6 +61,8 @@ test('can see all resolved roots when the dynamic root query resolves to multipl
   // Assert
   await umbracoUi.content.isModalMenuItemWithNameVisible(firstRootContentName);
   await umbracoUi.content.isModalMenuItemWithNameVisible(secondRootContentName);
+  // The content being edited sits at the root too, but is not of the queried type, so it is outside the resolved roots.
+  await umbracoUi.content.isModalMenuItemWithNameVisible(contentName, false);
 });
 
 test('can save a descendant of a resolved root when the dynamic root query resolves to multiple roots', async ({umbracoApi, umbracoUi}) => {
