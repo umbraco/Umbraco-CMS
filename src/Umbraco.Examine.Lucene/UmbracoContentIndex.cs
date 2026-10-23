@@ -62,21 +62,16 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
         // We don't want to re-enumerate this list, but we need to split it into 2x enumerables: invalid and valid items.
         // The Invalid items will be deleted, these are items that have invalid paths (i.e. moved to the recycle bin, etc...)
         // Then we'll index the Value group all together.
-        IGrouping<ValueSetValidationStatus, ValueSet>[] invalidOrValid = values.GroupBy(v =>
+        // The validator may also filter the values, so index the value sets it returns rather than the ones passed in.
+        IGrouping<ValueSetValidationStatus, ValueSet>[] invalidOrValid = values.Select(v =>
         {
             if (!v.Values.TryGetValue("path", out IReadOnlyList<object>? paths) || paths.Count <= 0 || paths[0] == null)
             {
-                return ValueSetValidationStatus.Failed;
+                return new ValueSetValidationResult(ValueSetValidationStatus.Failed, v);
             }
 
-            if (ValueSetValidator is not null)
-            {
-                ValueSetValidationResult validationResult = ValueSetValidator.Validate(v);
-                return validationResult.Status;
-            }
-
-            return ValueSetValidationStatus.Valid;
-        }).ToArray();
+            return ValueSetValidator?.Validate(v) ?? new ValueSetValidationResult(ValueSetValidationStatus.Valid, v);
+        }).GroupBy(result => result.Status, result => result.ValueSet).ToArray();
 
         var hasDeletes = false;
         var hasUpdates = false;
