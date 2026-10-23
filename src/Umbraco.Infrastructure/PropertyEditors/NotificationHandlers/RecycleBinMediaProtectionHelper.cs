@@ -46,12 +46,16 @@ internal static class RecycleBinMediaProtectionHelper
         var trashedMedia = deletedMedia.Where(m => m.Trashed).ToList();
         var nonTrashedMedia = deletedMedia.Where(m => !m.Trashed).ToList();
 
-        // Delete trashed media files (with .deleted suffix on disk).
+        // Delete trashed media files. These usually have the .deleted suffix on disk, but media trashed before
+        // recycle bin protection was enabled was never renamed, and a rename that failed can leave the file at its
+        // original path. So delete both paths, so no file is left behind publicly accessible. Paths with no file
+        // are skipped.
         if (trashedMedia.Count > 0)
         {
-            IEnumerable<string> trashedPaths = containedFilePaths(trashedMedia)
+            var originalPaths = containedFilePaths(trashedMedia).ToList();
+            IEnumerable<string> trashedPaths = originalPaths
                 .Select(x => Path.ChangeExtension(x, Constants.Conventions.Media.TrashedMediaSuffix + Path.GetExtension(x)));
-            mediaFileManager.DeleteMediaFiles(trashedPaths);
+            mediaFileManager.DeleteMediaFiles(trashedPaths.Concat(originalPaths));
         }
 
         // Delete non-trashed media files (original paths).
