@@ -11,7 +11,7 @@ public interface IDynamicRootRepository
     /// <param name="origins">The collection of content keys to start the search from.</param>
     /// <param name="queryStep">The query step containing document type filter criteria.</param>
     /// <returns>A task representing the asynchronous operation, containing the key of the nearest matching ancestor or self, or <c>null</c> if none found.</returns>
-    [Obsolete("Use NearestAncestorsOrSelfAsync instead, which resolves an ancestor for each origin. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Use NearestAncestorsOrSelfAsync instead, which resolves an ancestor for each origin. Scheduled for removal in Umbraco 20.")]
     Task<Guid?> NearestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep);
 
     /// <summary>
@@ -20,7 +20,7 @@ public interface IDynamicRootRepository
     /// <param name="origins">The collection of content keys to start the search from.</param>
     /// <param name="queryStep">The query step containing document type filter criteria.</param>
     /// <returns>A task representing the asynchronous operation, containing the key of the furthest matching ancestor or self, or <c>null</c> if none found.</returns>
-    [Obsolete("Use FurthestAncestorsOrSelfAsync instead, which resolves an ancestor for each origin. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Use FurthestAncestorsOrSelfAsync instead, which resolves an ancestor for each origin. Scheduled for removal in Umbraco 20.")]
     Task<Guid?> FurthestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep);
 
     /// <summary>
@@ -29,7 +29,7 @@ public interface IDynamicRootRepository
     /// <param name="origins">The collection of content keys to start the search from.</param>
     /// <param name="queryStep">The query step containing document type filter criteria.</param>
     /// <returns>A task representing the asynchronous operation, containing a collection of keys for the nearest matching ancestor or self of each origin.</returns>
-    // TODO (V19): Remove the default implementation when NearestAncestorOrSelfAsync is removed.
+    // TODO (V20): Remove the default implementation when NearestAncestorOrSelfAsync is removed.
     async Task<ICollection<Guid>> NearestAncestorsOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep queryStep)
     {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -44,7 +44,7 @@ public interface IDynamicRootRepository
     /// <param name="origins">The collection of content keys to start the search from.</param>
     /// <param name="queryStep">The query step containing document type filter criteria.</param>
     /// <returns>A task representing the asynchronous operation, containing a collection of keys for the furthest matching ancestor or self of each origin.</returns>
-    // TODO (V19): Remove the default implementation when FurthestAncestorOrSelfAsync is removed.
+    // TODO (V20): Remove the default implementation when FurthestAncestorOrSelfAsync is removed.
     async Task<ICollection<Guid>> FurthestAncestorsOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep queryStep)
     {
 #pragma warning disable CS0618 // Type or member is obsolete

@@ -42,7 +42,7 @@ public class DynamicRootRepository : IDynamicRootRepository
     }
 
     /// <inheritdoc/>
-    [Obsolete("Use NearestAncestorsOrSelfAsync instead, which resolves an ancestor for each origin. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Use NearestAncestorsOrSelfAsync instead, which resolves an ancestor for each origin. Scheduled for removal in Umbraco 20.")]
     public async Task<Guid?> NearestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep)
     {
         ICollection<Guid> keys = await NearestAncestorsOrSelfAsync(origins.ToArray(), queryStep);
@@ -50,7 +50,7 @@ public class DynamicRootRepository : IDynamicRootRepository
     }
 
     /// <inheritdoc/>
-    [Obsolete("Use FurthestAncestorsOrSelfAsync instead, which resolves an ancestor for each origin. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Use FurthestAncestorsOrSelfAsync instead, which resolves an ancestor for each origin. Scheduled for removal in Umbraco 20.")]
     public async Task<Guid?> FurthestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep)
     {
         ICollection<Guid> keys = await FurthestAncestorsOrSelfAsync(origins.ToArray(), queryStep);
