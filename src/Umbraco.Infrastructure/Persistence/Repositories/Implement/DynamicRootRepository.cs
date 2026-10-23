@@ -61,13 +61,17 @@ public class DynamicRootRepository : IDynamicRootRepository
     private async Task<Guid?> SingleAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep, bool deepest)
     {
         var direction = deepest ? "DESC" : "ASC";
-        var originsPerBatch = Math.Max(1, Constants.Sql.MaxParameterCount - queryStep.AnyOfDocTypeKeys.Count());
+        var docTypeKeys = queryStep.AnyOfDocTypeKeys.ToArray();
+        var originsPerBatch = Math.Max(1, Constants.Sql.MaxParameterCount - docTypeKeys.Length);
         var candidates = new List<Guid>();
 
         foreach (IEnumerable<Guid> originBatch in origins.InGroupsOf(originsPerBatch))
         {
+            IReadOnlyCollection<Guid> originKeys = originBatch.ToArray();
             Sql<ISqlContext> query = Database.SqlContext.SqlSyntax.SelectTop(
-                GetAncestorOrSelfBaseQuery(originBatch, queryStep).Append($"ORDER BY n.{NodeDto.LevelColumnName} {direction}"),
+                GetRelativesQuery($"n.{NodeDto.KeyColumnName}", docTypeKeys, IsAncestorOrSelf)
+                    .Where<NodeDto>(norigin => originKeys.Contains(norigin.UniqueId), "norigin")
+                    .Append($"ORDER BY n.{NodeDto.LevelColumnName} {direction}"),
                 1);
 
             Guid? candidate = await Database.SingleOrDefaultAsync<Guid?>(query);
@@ -138,20 +142,7 @@ public class DynamicRootRepository : IDynamicRootRepository
         DynamicRootQueryStep queryStep,
         string levelAggregate)
     {
-        var docTypeKeys = queryStep.AnyOfDocTypeKeys.ToArray();
-        var keys = new List<Guid>();
-
-        foreach (IEnumerable<Guid> originBatch in origins.InGroupsOf(OriginsPerBatch(docTypeKeys)))
-        {
-            ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
-            var correlation =
-                $"{syntax.Substring}(norigin.{NodeDto.PathColumnName}, 1, {syntax.Length}(n2.{NodeDto.PathColumnName})) = n2.{NodeDto.PathColumnName}";
-
-            Sql<ISqlContext> query = GetAncestorOrSelfBaseQuery(originBatch, queryStep);
-            query = AppendMatchingLevelForOrigin(query, levelAggregate, docTypeKeys, correlation).Append(TreeOrderBy);
-
-            keys.AddRange(await Database.FetchAsync<Guid>(query));
-        }
+        ICollection<Guid> keys = await RelativesAtMatchingLevelAsync(origins, queryStep, levelAggregate, IsAncestorOrSelf);
 
         // Origins sharing an ancestor resolve to the same key.
         return keys.Distinct().ToArray();
@@ -172,113 +163,117 @@ public class DynamicRootRepository : IDynamicRootRepository
         DynamicRootQueryStep queryStep,
         string levelAggregate)
     {
-        var docTypeKeys = queryStep.AnyOfDocTypeKeys.ToArray();
-        var keys = new List<Guid>();
-
-        foreach (IEnumerable<Guid> originBatch in origins.InGroupsOf(OriginsPerBatch(docTypeKeys)))
-        {
-            Sql<ISqlContext> query = Database.SqlContext.Sql()
-                .Select<NodeDto>("n", n => n.UniqueId)
-                .DescendantOrSelfBaseQuery(originBatch, queryStep);
-
-            ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
-            var correlation =
-                $"{syntax.Substring}(n2.{NodeDto.PathColumnName}, 1, {syntax.Length}(norigin.{NodeDto.PathColumnName})) = norigin.{NodeDto.PathColumnName}";
-
-            query = AppendMatchingLevelForOrigin(query, levelAggregate, docTypeKeys, correlation).Append(TreeOrderBy);
-
-            keys.AddRange(await Database.FetchAsync<Guid>(query));
-        }
+        ICollection<Guid> keys = await RelativesAtMatchingLevelAsync(origins, queryStep, levelAggregate, IsDescendantOrSelf);
 
         // A node descending from more than one origin can match under each of them.
         return keys.Distinct().ToArray();
     }
 
     /// <summary>
-    /// How many origins can be bound to one query, given that the document type keys are bound twice: once for the
-    /// outer query and once for the correlated sub query. A batch holds at least one origin however many there are.
+    /// How many origins can be bound to one query alongside the document type keys. Resolving the relatives binds,
+    /// besides the origins, one level per distinct matching level, and there are never more of those than origins.
+    /// A batch holds at least one origin however many document types there are.
     /// </summary>
     private static int OriginsPerBatch(Guid[] docTypeKeys)
-        => Math.Max(1, Constants.Sql.MaxParameterCount - (docTypeKeys.Length * 2));
+        => Math.Max(1, (Constants.Sql.MaxParameterCount - docTypeKeys.Length) / 2);
 
-    private Sql<ISqlContext> GetAncestorOrSelfBaseQuery(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep)
+    /// <summary>
+    /// Resolves, per origin, the relatives at the level produced by <paramref name="levelAggregate"/> over that
+    /// origin's own matching relatives, where <paramref name="isRelative"/> builds the predicate relating a relative to
+    /// an origin from their aliases.
+    /// </summary>
+    /// <remarks>
+    /// The matching levels are fetched first and the relatives at them second. Expressing the per origin level within
+    /// a single query, whether as a correlated sub query or a joined derived table, lets the database re-evaluate the
+    /// aggregate for every candidate row, which does not scale to large trees.
+    /// </remarks>
+    private async Task<ICollection<Guid>> RelativesAtMatchingLevelAsync(
+        ICollection<Guid> origins,
+        DynamicRootQueryStep queryStep,
+        string levelAggregate,
+        Func<string, string, string> isRelative)
     {
-        Sql<ISqlContext> query = Database.SqlContext.Sql()
-            .Select<NodeDto>("n", n => n.UniqueId)
-            .From<NodeDto>("norigin")
-            .Append( // hack because npoco do not support this
-                $"INNER JOIN {Database.SqlContext.SqlSyntax.GetQuotedTableName(NodeDto.TableName)} n ON {Database.SqlContext.SqlSyntax.Substring}(norigin.path, 1, {Database.SqlContext.SqlSyntax.Length}(n.path)) = n.path")
-            .InnerJoin<ContentDto>("c")
-            .On<ContentDto, NodeDto>((c, n) => c.NodeId == n.NodeId, "c", "n")
-            .InnerJoin<ContentTypeDto>("ct")
-            .On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")
-            .InnerJoin<NodeDto>("ctn")
-            .On<ContentTypeDto, NodeDto>((ct, ctn) => ct.NodeId == ctn.NodeId, "ct", "ctn")
-            .Where<NodeDto>(norigin => origins.Contains(norigin.UniqueId), "norigin");
+        var docTypeKeys = queryStep.AnyOfDocTypeKeys.ToArray();
+        var keys = new List<Guid>();
 
-        if (queryStep.AnyOfDocTypeKeys.Any())
+        foreach (IEnumerable<Guid> originBatch in origins.InGroupsOf(OriginsPerBatch(docTypeKeys)))
         {
-            query = query.Where<NodeDto>(ctn => queryStep.AnyOfDocTypeKeys.Contains(ctn.UniqueId), "ctn");
+            IReadOnlyCollection<Guid> originKeys = originBatch.ToArray();
+
+            Sql<ISqlContext> levelQuery = GetRelativesQuery(
+                    $"norigin.{NodeDto.IdColumnName} AS {nameof(OriginLevel.OriginId)}, {levelAggregate}(n.{NodeDto.LevelColumnName}) AS {nameof(OriginLevel.Level)}",
+                    docTypeKeys,
+                    isRelative)
+                .Where<NodeDto>(norigin => originKeys.Contains(norigin.UniqueId), "norigin")
+                .Append($"GROUP BY norigin.{NodeDto.IdColumnName}");
+            List<OriginLevel> originLevels = await Database.FetchAsync<OriginLevel>(levelQuery);
+            if (originLevels.Count == 0)
+            {
+                continue;
+            }
+
+            var conditions = new List<string>();
+            var args = new List<object>();
+            foreach (IGrouping<int, OriginLevel> originsAtLevel in originLevels.GroupBy(x => x.Level))
+            {
+                conditions.Add($"(norigin.{NodeDto.IdColumnName} IN (@{args.Count}) AND n.{NodeDto.LevelColumnName} = @{args.Count + 1})");
+                args.Add(originsAtLevel.Select(x => x.OriginId).ToArray());
+                args.Add(originsAtLevel.Key);
+            }
+
+            Sql<ISqlContext> keyQuery = GetRelativesQuery($"n.{NodeDto.KeyColumnName}", docTypeKeys, isRelative)
+                .Where($"({string.Join(" OR ", conditions)})", args.ToArray())
+                .Append(TreeOrderBy);
+            keys.AddRange(await Database.FetchAsync<Guid>(keyQuery));
         }
 
-        return query;
+        return keys;
     }
 
     /// <summary>
-    /// Restricts the query to the nodes at the level produced by <paramref name="levelAggregate"/> over the matching
-    /// relatives of each origin, where <paramref name="correlation"/> relates the candidates (aliased n2) to the
-    /// outer origin (aliased norigin).
+    /// Selects <paramref name="columns"/> over the origins (aliased norigin) joined to their relatives (aliased n) of
+    /// the given document types.
     /// </summary>
-    private Sql<ISqlContext> AppendMatchingLevelForOrigin(
-        Sql<ISqlContext> sql,
-        string levelAggregate,
-        Guid[] docTypeKeys,
-        string correlation)
+    private Sql<ISqlContext> GetRelativesQuery(
+        string columns,
+        IReadOnlyCollection<Guid> docTypeKeys,
+        Func<string, string, string> isRelative)
     {
-        ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
-        var nodeTable = syntax.GetQuotedTableName(NodeDto.TableName);
-        var contentTable = syntax.GetQuotedTableName(ContentDto.TableName);
-        var contentTypeTable = syntax.GetQuotedTableName(ContentTypeDto.TableName);
-
-        var docTypeFilter = docTypeKeys.Length > 0 ? $"AND ctn2.{NodeDto.KeyColumnName} IN (@0)" : string.Empty;
-
-        // Correlated on the outer origin, so the aggregate is over that origin's own matching relatives.
-        var matchingLevel = $"""
-            AND n.{NodeDto.LevelColumnName} = (
-                SELECT {levelAggregate}(n2.{NodeDto.LevelColumnName})
-                FROM {nodeTable} n2
-                INNER JOIN {contentTable} c2 ON c2.{ContentDto.PrimaryKeyColumnName} = n2.{NodeDto.IdColumnName}
-                INNER JOIN {contentTypeTable} ct2 ON ct2.{ContentTypeDto.NodeIdColumnName} = c2.{ContentDto.ContentTypeIdColumnName}
-                INNER JOIN {nodeTable} ctn2 ON ctn2.{NodeDto.IdColumnName} = ct2.{ContentTypeDto.NodeIdColumnName}
-                WHERE {correlation}
-                {docTypeFilter})
-            """;
-
-        return docTypeKeys.Length > 0 ? sql.Append(matchingLevel, docTypeKeys) : sql.Append(matchingLevel);
-    }
-}
-
-internal static class HelperExtensions
-{
-    internal static Sql<ISqlContext> DescendantOrSelfBaseQuery(this Sql<ISqlContext> sql, IEnumerable<Guid> origins, DynamicRootQueryStep filter)
-    {
-        Sql<ISqlContext> query = sql
+        Sql<ISqlContext> query = Database.SqlContext.Sql()
+            .Select(columns)
             .From<NodeDto>("norigin")
-            .Append(// hack because npoco do not support this
-                $"INNER JOIN {sql.SqlContext.SqlSyntax.GetQuotedTableName(NodeDto.TableName)} n ON {sql.SqlContext.SqlSyntax.Substring}(N.path, 1, {sql.SqlContext.SqlSyntax.Length}(norigin.path)) = norigin.path")
+            .Append($"INNER JOIN {Database.SqlContext.SqlSyntax.GetQuotedTableName(NodeDto.TableName)} n ON {isRelative("norigin", "n")}") // hack because npoco do not support this
             .InnerJoin<ContentDto>("c")
             .On<ContentDto, NodeDto>((c, n) => c.NodeId == n.NodeId, "c", "n")
             .InnerJoin<ContentTypeDto>("ct")
             .On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")
             .InnerJoin<NodeDto>("ctn")
-            .On<ContentTypeDto, NodeDto>((ct, ctn) => ct.NodeId == ctn.NodeId, "ct", "ctn")
-            .Where<NodeDto>(norigin => origins.Contains(norigin.UniqueId), "norigin");
+            .On<ContentTypeDto, NodeDto>((ct, ctn) => ct.NodeId == ctn.NodeId, "ct", "ctn");
 
-        if (filter.AnyOfDocTypeKeys.Any())
+        if (docTypeKeys.Count > 0)
         {
-            query = query.Where<NodeDto>(ctn => filter.AnyOfDocTypeKeys.Contains(ctn.UniqueId), "ctn");
+            query = query.Where<NodeDto>(ctn => docTypeKeys.Contains(ctn.UniqueId), "ctn");
         }
 
         return query;
+    }
+
+    private string IsAncestorOrSelf(string origin, string relative)
+    {
+        ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
+        return $"{syntax.Substring}({origin}.{NodeDto.PathColumnName}, 1, {syntax.Length}({relative}.{NodeDto.PathColumnName})) = {relative}.{NodeDto.PathColumnName}";
+    }
+
+    private string IsDescendantOrSelf(string origin, string relative)
+    {
+        ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
+        return $"{syntax.Substring}({relative}.{NodeDto.PathColumnName}, 1, {syntax.Length}({origin}.{NodeDto.PathColumnName})) = {origin}.{NodeDto.PathColumnName}";
+    }
+
+    private sealed class OriginLevel
+    {
+        public int OriginId { get; set; }
+
+        public int Level { get; set; }
     }
 }
