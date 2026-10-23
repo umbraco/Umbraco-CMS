@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using Umbraco.Cms.Core.Cache;
 
@@ -8,6 +9,10 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class AppCacheExtensions
 {
+    private static bool RetrievedNullRepresentationInCache(object result) => result == (object)Cms.Core.Constants.Cache.NullRepresentationInCache;
+
+    private static bool RequestedNullRepresentationInCache<T>() => typeof(T) == typeof(string);
+
     /// <summary>
     ///     Gets a strongly typed cache item with the specified key, creating it if necessary using the provided factory.
     /// </summary>
@@ -141,7 +146,7 @@ public static class AppCacheExtensions
         bool isSliding = false)
     {
         var result = provider.Get(cacheKey)
-            ?? await GetOrInsertLockedAsync(provider, cacheKey, getCacheItemAsync, timeout, isSliding);
+            ?? await GetOrAddInFlightAsync(provider, cacheKey, getCacheItemAsync, timeout, isSliding);
 
         if (result == null)
         {
@@ -158,102 +163,77 @@ public static class AppCacheExtensions
         return result.TryConvertTo<T>().Result;
     }
 
-    // Serializes concurrent misses on the same key so the factory only runs once, matching the stampede protection
-    // the synchronous GetCacheItem gets from IAppPolicyCache.Get(key, factory). Locks are scoped per cache instance
-    // and removed once no caller is using them. (#23921)
-    private static async Task<object?> GetOrInsertLockedAsync<T>(
+    /// <summary>
+    ///     The asynchronous factory calls currently running, keyed by cache instance and cache key, so that concurrent
+    ///     misses on the same key await one shared result.
+    /// </summary>
+    /// <remarks>
+    ///     An entry is removed when its factory call completes, whether or not it succeeded.
+    /// </remarks>
+    private static readonly ConcurrentDictionary<(IAppPolicyCache, string), Lazy<Task<object?>>> _inFlight = new();
+
+    /// <summary>
+    ///     The cache instance and cache key pairs whose asynchronous factories are running in the current asynchronous
+    ///     context, used to detect a factory requesting its own key.
+    /// </summary>
+    private static readonly AsyncLocal<ImmutableHashSet<(IAppPolicyCache, string)>?> _factoryKeys = new();
+
+    // Concurrent misses on the same key share one in-flight factory call and its result, matching the stampede
+    // protection the synchronous GetCacheItem gets from IAppPolicyCache.Get(key, factory). Sharing the result rather
+    // than re-reading the cache means callers don't each re-run the factory when nothing was stored, such as for a null
+    // result or a cache that doesn't store. Entries are scoped per cache instance and removed once the factory completes.
+    private static Task<object?> GetOrAddInFlightAsync<T>(
         IAppPolicyCache provider,
         string cacheKey,
         Func<Task<T?>> getCacheItemAsync,
         TimeSpan? timeout,
         bool isSliding)
     {
-        var lockKey = (provider, cacheKey);
+        (IAppPolicyCache provider, string cacheKey) inFlightKey = (provider, cacheKey);
 
-        // The lock isn't re-entrant, so a factory requesting its own key would wait on itself forever. Fail fast
-        // instead, as the synchronous GetCacheItem does (Lazy throws on a recursive Value access).
-        var heldKeys = _heldKeyedLocks.Value ?? [];
-        if (heldKeys.Contains(lockKey))
+        // A factory requesting its own key would await its own result forever. Fail fast instead, as the synchronous
+        // GetCacheItem does (Lazy throws on a recursive Value access).
+        if (_factoryKeys.Value?.Contains(inFlightKey) is true)
         {
             throw new InvalidOperationException(
                 $"The factory for cache key '{cacheKey}' attempted to get the same key from the same cache.");
         }
 
-        using var releaser = await KeyedLock.AcquireAsync(lockKey);
+        Lazy<Task<object?>> inFlight = _inFlight.GetOrAdd(
+            inFlightKey,
+            key => new Lazy<Task<object?>>(() => RunFactoryAsync(key, getCacheItemAsync, timeout, isSliding)));
 
-        // Another caller may have populated the cache while we were waiting.
-        var result = provider.Get(cacheKey);
-        if (result != null)
+        return inFlight.Value;
+    }
+
+    private static async Task<object?> RunFactoryAsync<T>(
+        (IAppPolicyCache Provider, string CacheKey) inFlightKey,
+        Func<Task<T?>> getCacheItemAsync,
+        TimeSpan? timeout,
+        bool isSliding)
+    {
+        try
         {
+            // Another caller may have populated the cache between our miss and this factory call becoming in-flight.
+            var result = inFlightKey.Provider.Get(inFlightKey.CacheKey);
+            if (result != null)
+            {
+                return result;
+            }
+
+            // Flows into the factory's async context only, so it is gone once this method returns.
+            _factoryKeys.Value = (_factoryKeys.Value ?? []).Add(inFlightKey);
+            result = await getCacheItemAsync();
+            inFlightKey.Provider.Insert(inFlightKey.CacheKey, () => result, timeout, isSliding);
+
             return result;
         }
-
-        // Flows into the factory's async context only, so it is gone once this method returns.
-        _heldKeyedLocks.Value = heldKeys.Add(lockKey);
-        result = await getCacheItemAsync();
-        provider.Insert(cacheKey, () => result, timeout, isSliding);
-
-        return result;
-    }
-
-    private static readonly AsyncLocal<ImmutableHashSet<(IAppPolicyCache, string)>?> _heldKeyedLocks = new();
-
-    // A per-key semaphore, reference-counted so it is removed once no caller is holding or waiting on it.
-    private sealed class KeyedLock
-    {
-        private static readonly Dictionary<(IAppPolicyCache, string), KeyedLock> _locks = [];
-
-        private readonly (IAppPolicyCache, string) _key;
-        private readonly SemaphoreSlim _semaphore = new(1, 1);
-        private int _refCount;
-
-        private KeyedLock((IAppPolicyCache, string) key) => _key = key;
-
-        public static async Task<Releaser> AcquireAsync((IAppPolicyCache, string) key)
+        finally
         {
-            var keyedLock = AddReference(key);
-            await keyedLock._semaphore.WaitAsync();
-            return new Releaser(keyedLock);
-        }
-
-        private static KeyedLock AddReference((IAppPolicyCache, string) key)
-        {
-            lock (_locks)
-            {
-                if (_locks.TryGetValue(key, out var keyedLock) is false)
-                {
-                    keyedLock = new KeyedLock(key);
-                    _locks[key] = keyedLock;
-                }
-
-                keyedLock._refCount++;
-                return keyedLock;
-            }
-        }
-
-        private void Release()
-        {
-            _semaphore.Release();
-
-            lock (_locks)
-            {
-                if (--_refCount == 0)
-                {
-                    _locks.Remove(_key);
-                    _semaphore.Dispose();
-                }
-            }
-        }
-
-        public readonly struct Releaser(KeyedLock keyedLock) : IDisposable
-        {
-            public void Dispose() => keyedLock.Release();
+            // Only this call removes its entry and nothing replaces it while present, so the key is still ours.
+            _inFlight.TryRemove(inFlightKey, out _);
         }
     }
-
-    private static bool RetrievedNullRepresentationInCache(object result) => result == (object)Cms.Core.Constants.Cache.NullRepresentationInCache;
-
-    private static bool RequestedNullRepresentationInCache<T>() => typeof(T) == typeof(string);
 
     /// <summary>
     ///     Asynchronously inserts a strongly typed cache item with the specified key.

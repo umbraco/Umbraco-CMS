@@ -104,6 +104,36 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
         });
     }
 
+    // A null result is never stored, so callers waiting on the in-flight factory must share its result rather than
+    // re-reading the cache and each running the factory again in turn.
+    [Test]
+    public async Task Concurrent_Get_With_Async_Factory_Returning_Null_Only_Runs_Factory_Once()
+    {
+        var factoryCalls = 0;
+        var gate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var calls = Enumerable.Range(0, 10)
+            .Select(_ => AppPolicyCache.GetCacheItemAsync<string>(
+                "ConcurrentAsyncNullFactoryTest",
+                async () =>
+                {
+                    Interlocked.Increment(ref factoryCalls);
+                    await gate.Task;
+                    return null;
+                },
+                TimeSpan.FromMinutes(1)))
+            .ToArray();
+
+        gate.SetResult();
+        var values = await Task.WhenAll(calls);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, factoryCalls);
+            Assert.That(values, Is.All.Null);
+        });
+    }
+
     [Test]
     public async Task Get_With_Async_Factory_Does_Not_Block_Other_Keys()
     {
