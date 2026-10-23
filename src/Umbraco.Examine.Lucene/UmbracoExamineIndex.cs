@@ -5,12 +5,14 @@ using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Providers;
 using Lucene.Net.Documents;
+using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
+using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -58,6 +60,17 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
     /// <inheritdoc />
     public virtual string UniqueKeyFieldName => UmbracoExamineFieldNames.NodeKeyFieldName;
 
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Recreates the index folder on disk if it has been removed while the index is in use, so that clearing the
+    ///     index can commit and a subsequent rebuild restores it.
+    /// </remarks>
+    public override void CreateIndex()
+    {
+        EnsureIndexFolderExists();
+        base.CreateIndex();
+    }
+
     /// <summary>
     ///     override to check if we can actually initialize.
     /// </summary>
@@ -96,6 +109,25 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
 
         return canInit;
     }
+
+    private void EnsureIndexFolderExists()
+    {
+        // Lucene only recreates a missing folder based on an existence check it has cached, so a folder removed
+        // from disk after the directory was opened is never recreated and every commit fails.
+        if (GetFileSystemDirectory(GetLuceneDirectory()) is { } fileSystemDirectory)
+        {
+            System.IO.Directory.CreateDirectory(fileSystemDirectory.Directory.FullName);
+        }
+    }
+
+    private static FSDirectory? GetFileSystemDirectory(Directory directory)
+        => directory switch
+        {
+            FSDirectory fileSystemDirectory => fileSystemDirectory,
+            NRTCachingDirectory nrtCachingDirectory => GetFileSystemDirectory(nrtCachingDirectory.Delegate),
+            FilterDirectory filterDirectory => GetFileSystemDirectory(filterDirectory.Delegate),
+            _ => null,
+        };
 
     /// <summary>
     ///     This ensures that the special __Raw_ fields are indexed correctly
