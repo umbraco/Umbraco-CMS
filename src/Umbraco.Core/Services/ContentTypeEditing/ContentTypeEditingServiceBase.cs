@@ -782,9 +782,9 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     /// <param name="model">The model containing the container definitions.</param>
     /// <returns>The property group aliases keyed by container key.</returns>
     /// <remarks>
-    ///     An existing property group keeps its own alias unless it has been renamed or moved, because that alias can have
+    ///     An existing property group keeps its own alias unless its name or type has changed, because that alias can have
     ///     been set outside of this service and need not match the container name. A property group within another
-    ///     container is prefixed with the alias of that container, as the alias path is what defines the hierarchy.
+    ///     container is prefixed with the resolved alias of that container, as the alias path is what defines the hierarchy.
     /// </remarks>
     private static Dictionary<Guid, string> ResolvePropertyGroupAliases(
         TContentType contentType,
@@ -794,28 +794,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // NOTE: at this point we have validated the containers and their parent relationships in the model
         var containersByKey = model.Containers.ToDictionary(container => container.Key);
 
-        string? ExistingOwnAlias(TPropertyTypeContainer container)
-        {
-            if (existingGroupsByKey.TryGetValue(container.Key, out PropertyGroup? existingGroup) is false
-                || existingGroup.Name != container.Name)
-            {
-                return null;
-            }
-
-            var separatorIndex = existingGroup.Alias.IndexOf('/');
-            var existingParentAlias = separatorIndex < 0 ? null : existingGroup.Alias[..separatorIndex];
-            var parentAlias = container.ParentKey is null
-                ? null
-                : existingGroupsByKey.GetValueOrDefault(container.ParentKey.Value)?.Alias;
-
-            // a container that has moved gets a new alias, the same as a container that has been renamed
-            return existingParentAlias == parentAlias && (container.ParentKey is null || parentAlias is not null)
-                ? existingGroup.Alias[(separatorIndex + 1)..]
-                : null;
-        }
-
         string OwnAlias(TPropertyTypeContainer container)
-            => ExistingOwnAlias(container) ?? PropertyGroupAlias(container.Name);
+            => existingGroupsByKey.TryGetValue(container.Key, out PropertyGroup? existingGroup)
+               && existingGroup.Name == container.Name
+               && existingGroup.Type == Enum.Parse<PropertyGroupType>(container.Type)
+                ? existingGroup.Alias[(existingGroup.Alias.LastIndexOf('/') + 1)..]
+                : PropertyGroupAlias(container.Name);
 
         return model.Containers.ToDictionary(
             container => container.Key,

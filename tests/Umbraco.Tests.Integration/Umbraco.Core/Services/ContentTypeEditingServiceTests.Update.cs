@@ -840,7 +840,7 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Generates_Group_Alias_When_Group_Is_Moved_To_Another_Tab()
+    public async Task Keeps_Existing_Group_Alias_Under_The_New_Tab_When_Group_Is_Moved()
     {
         var tab1 = ContentTypePropertyContainerModel("One");
         var tab2 = ContentTypePropertyContainerModel("Two");
@@ -862,7 +862,35 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsTrue(result.Success);
 
         contentType = await ContentTypeService.GetAsync(contentType.Key);
-        Assert.AreEqual("two/myGroup", contentType!.PropertyGroups.Single(g => g.Key == group.Key).Alias);
+        Assert.AreEqual("two/Legacy Group", contentType!.PropertyGroups.Single(g => g.Key == group.Key).Alias);
+    }
+
+    [Test]
+    public async Task Generates_Container_Alias_When_Group_Is_Converted_To_Tab()
+    {
+        var tab = ContentTypePropertyContainerModel("My Tab");
+        var group = ContentTypePropertyContainerModel("My Group", type: GroupContainerType);
+        group.ParentKey = tab.Key;
+        var propertyType1 = ContentTypePropertyTypeModel("Test Property 1", "testProperty1", containerKey: tab.Key);
+        var propertyType2 = ContentTypePropertyTypeModel("Test Property 2", "testProperty2", containerKey: group.Key);
+        var contentType = await CreateWithContainerAliasesAsync(
+            [tab, group],
+            [propertyType1, propertyType2],
+            (tab.Key, "Legacy Tab"),
+            (group.Key, "Legacy Tab/Legacy Group"));
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        group.Type = TabContainerType;
+        group.ParentKey = null;
+        updateModel.Containers = [tab, group];
+        updateModel.Properties = [propertyType1, propertyType2];
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        contentType = await ContentTypeService.GetAsync(contentType.Key);
+        Assert.AreEqual("Legacy Tab", contentType!.PropertyGroups.Single(g => g.Key == tab.Key).Alias);
+        Assert.AreEqual("myGroup", contentType.PropertyGroups.Single(g => g.Key == group.Key).Alias);
     }
 
     [TestCase(false)]
