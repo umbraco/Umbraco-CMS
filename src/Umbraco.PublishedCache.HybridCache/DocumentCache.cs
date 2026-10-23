@@ -45,27 +45,16 @@ public sealed class DocumentCache : IPublishedContentCache
     public async Task<IPublishedContent?> GetByIdAsync(Guid key, bool? preview = null) => await _documentCacheService.GetByKeyAsync(key, preview);
 
     /// <inheritdoc/>
-    public IPublishedContent? GetById(bool preview, int contentId) => GetByIdAsync(contentId, preview).GetAwaiter().GetResult();
+    public IPublishedContent? GetById(bool preview, int contentId) => _documentCacheService.GetById(contentId, preview);
 
     /// <inheritdoc/>
-    public IPublishedContent? GetById(bool preview, Guid contentId)
-    {
-        // Sync fast path: when the converted-content L0 cache already holds the item we can return it
-        // without spinning up an async state machine — the dominant case on a warm site. On a miss we
-        // fall through to the async path which handles HybridCache (L1/L2) and database lookups.
-        if (_documentCacheService.TryGetCached(contentId, preview, out IPublishedContent? cached))
-        {
-            return cached;
-        }
-
-        return GetByIdAsync(contentId, preview).GetAwaiter().GetResult();
-    }
+    public IPublishedContent? GetById(bool preview, Guid contentId) => _documentCacheService.GetByKey(contentId, preview);
 
     /// <inheritdoc/>
-    public IPublishedContent? GetById(int contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
+    public IPublishedContent? GetById(int contentId) => _documentCacheService.GetById(contentId);
 
     /// <inheritdoc/>
-    public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
+    public IPublishedContent? GetById(Guid contentId) => _documentCacheService.GetByKey(contentId);
 
     /// <summary>
     /// Gets the published documents at the root of the content tree.

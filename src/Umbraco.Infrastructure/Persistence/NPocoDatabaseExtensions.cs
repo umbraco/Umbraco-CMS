@@ -231,8 +231,45 @@ public static partial class NPocoDatabaseExtensions
         T poco,
         string? updateCommand,
         object? updateArgs)
-        where T : class =>
-        db.InsertOrUpdateAsync(poco, updateCommand, updateArgs).GetAwaiter().GetResult();
+        where T : class
+    {
+        if (poco == null)
+        {
+            throw new ArgumentNullException(nameof(poco));
+        }
+
+        // Same update-then-insert sequence as InsertOrUpdateAsync, kept synchronous on purpose: callers inside a
+        // distributed lock must not need a second thread-pool thread to finish.
+        var rowCount = updateCommand.IsNullOrWhiteSpace() || updateArgs is null
+            ? db.Update(poco)
+            : db.Update<T>(updateCommand!, updateArgs);
+        if (rowCount > 0)
+        {
+            return RecordPersistenceType.Update;
+        }
+
+        var i = 0;
+        while (i++ < 4)
+        {
+            try
+            {
+                db.Insert(poco);
+                return RecordPersistenceType.Insert;
+            }
+            catch (DbException)
+            {
+                rowCount = updateCommand.IsNullOrWhiteSpace() || updateArgs is null
+                    ? db.Update(poco)
+                    : db.Update<T>(updateCommand!, updateArgs);
+                if (rowCount > 0)
+                {
+                    return RecordPersistenceType.Update;
+                }
+            }
+        }
+
+        throw new DataException("Record could not be inserted or updated.");
+    }
 
     /// <summary>
     ///     This will escape single @ symbols for npoco values so it doesn't think it's a parameter

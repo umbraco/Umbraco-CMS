@@ -16,16 +16,35 @@ public class SingleServerCacheVersionService : IRepositoryCacheVersionService
         => Task.FromResult(true);
 
     /// <inheritdoc />
+    public bool IsCacheSynced<TEntity>()
+        where TEntity : class
+        => true;
+
+    /// <inheritdoc />
     public Task SetCacheUpdatedAsync<TEntity>()
         where TEntity : class
         => Task.CompletedTask;
 
     /// <inheritdoc />
+    public void SetCacheUpdated<TEntity>()
+        where TEntity : class
+    {
+    }
+
+    /// <inheritdoc />
     public Task FlushCacheUpdatesAsync() => Task.CompletedTask;
+
+    /// <inheritdoc />
+    public void FlushCacheUpdates()
+    {
+    }
 
     /// <inheritdoc />
     public Task<IReadOnlyCollection<RepositoryCacheVersion>> GetCacheVersionsAsync()
         => Task.FromResult<IReadOnlyCollection<RepositoryCacheVersion>>(Array.Empty<RepositoryCacheVersion>());
+
+    /// <inheritdoc />
+    public IReadOnlyCollection<RepositoryCacheVersion> GetCacheVersions() => Array.Empty<RepositoryCacheVersion>();
 
     /// <inheritdoc />
     public Task SetCachesSyncedAsync() => Task.CompletedTask;

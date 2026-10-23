@@ -41,6 +41,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
     private readonly IConvertedPublishedContentCache<string> _publishedContentCache;
 
+    private static readonly HybridCacheEntryOptions _localTierOnlyEntryOptions = new()
+    {
+        Flags = HybridCacheEntryFlags.DisableUnderlyingData | HybridCacheEntryFlags.DisableLocalCacheWrite | HybridCacheEntryFlags.DisableDistributedCacheWrite,
+    };
+
     // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
     // GetNodeAsync captures it before reading the backing store and re-checks it before writing
     // back, so a snapshot read before a concurrent publish/refresh is never written over the
@@ -155,6 +160,22 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         Guid key = keyAttempt.Result;
 
         return await GetNodeAsync(key, calculatedPreview);
+    }
+
+    /// <inheritdoc />
+    public IPublishedContent? GetByKey(Guid key, bool? preview = null)
+        => GetNode(key, preview ?? GetPreview());
+
+    /// <inheritdoc />
+    public IPublishedContent? GetById(int id, bool? preview = null)
+    {
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        if (keyAttempt.Success is false)
+        {
+            return null;
+        }
+
+        return GetNode(keyAttempt.Result, preview ?? GetPreview());
     }
 
     /// <inheritdoc />
@@ -352,6 +373,76 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         return false;
     }
 
+    // The synchronous counterpart of GetNodeAsync: the L0 and L1 tiers are served in memory and a miss reads the
+    // database on the calling thread. L2 is not consulted and L1 is not populated, because both go through
+    // asynchronous APIs; the asynchronous lookup and the refreshers keep those tiers warm.
+    private IPublishedContent? GetNode(Guid key, bool preview)
+    {
+        var cacheKey = GetCacheKey(key, preview);
+
+        if (preview is false && _publishedContentCache.TryGet(cacheKey, out IPublishedContent? cached))
+        {
+            return cached;
+        }
+
+        long generation = Interlocked.Read(ref _cacheGeneration);
+        bool snapshotIsCurrent = true;
+
+        ContentCacheNode? contentCacheNode = TryGetFromLocalHybridCache(cacheKey);
+        if (contentCacheNode is null)
+        {
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                contentCacheNode = _databaseCacheRepository.GetContentSource(key, preview);
+            }
+
+            snapshotIsCurrent = IsCacheGenerationCurrent(generation);
+
+            // Same ancestor rule as the read-through branch of GetNodeAsync; nothing is cached here, so a transient
+            // failure of the check costs no more than another read.
+            if (preview is false && contentCacheNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(contentCacheNode.Key) is false)
+            {
+                return null;
+            }
+        }
+
+        if (contentCacheNode is null)
+        {
+            return null;
+        }
+
+        _idKeyMap.PopulateCache(contentCacheNode.Id, contentCacheNode.Key, UmbracoObjectTypes.Document);
+
+        IPublishedContent? result = _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
+
+        if (result is not null && preview is false && snapshotIsCurrent)
+        {
+            _publishedContentCache.Set(cacheKey, result, ContentCacheNodeSizeEstimator.EstimateBytes(contentCacheNode));
+        }
+
+        return result;
+    }
+
+    // Serves an L1 (in-process HybridCache) hit synchronously. A lookup that has to go to L2 or join an in-flight
+    // read-through completes asynchronously and is not waited for; it writes nothing (no factory, no cache writes),
+    // so abandoning it is safe and the caller reads the database instead.
+    private ContentCacheNode? TryGetFromLocalHybridCache(string cacheKey)
+    {
+        ValueTask<ContentCacheNode?> lookup = _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
+            cacheKey,
+            static _ => default,
+            _localTierOnlyEntryOptions,
+            cancellationToken: CancellationToken.None);
+
+        if (lookup.IsCompletedSuccessfully)
+        {
+            return lookup.Result;
+        }
+
+        _ = lookup.AsTask();
+        return null;
+    }
+
     private async Task<IPublishedContent?> GetNodeAsync(Guid key, bool preview)
     {
         var cacheKey = GetCacheKey(key, preview);
@@ -480,6 +571,39 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         // We have to run seeding again after the cache is cleared
         await SeedAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public void RefreshMemoryCache(Guid key)
+    {
+        // HybridCache writes its in-process tier and issues the distributed write before its first await, so the
+        // read lock still orders both against a later commit's refresh; only the wait for the distributed write's
+        // completion, which needs a thread-pool hop, happens after the lock is released.
+        var pending = new List<Task>(2);
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        {
+            scope.ReadLock(Constants.Locks.ContentTree);
+
+            (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = _databaseCacheRepository.GetContentSourceForPublishStates(key);
+
+            pending.Add(draftNode is not null
+                ? _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode)).AsTask()
+                : _hybridCache.RemoveAsync(GetCacheKey(key, true)).AsTask());
+
+            var cacheKey = GetCacheKey(key, false);
+            pending.Add(publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key)
+                ? _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode)).AsTask()
+                : _hybridCache.RemoveAsync(cacheKey).AsTask());
+            _publishedContentCache.Remove(cacheKey);
+            InvalidateMemoryCacheGeneration();
+
+            scope.Complete();
+        }
+
+        foreach (Task write in pending)
+        {
+            write.GetAwaiter().GetResult();
+        }
     }
 
     /// <inheritdoc />
@@ -634,6 +758,59 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         }
 
         return await _hybridCache.ExistsAsync<ContentCacheNode?>(GetCacheKey(keyAttempt.Result, preview), CancellationToken.None);
+    }
+
+    /// <inheritdoc />
+    public void RefreshContent(IContent content)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        if (content.Trashed)
+        {
+            _databaseCacheRepository.DeleteContentItem(content.Id);
+            AfterCommit(scope, $"{nameof(DocumentCacheService)}.{nameof(RemoveFromMemoryCacheAsync)}.{content.Key}", () => RemoveFromMemoryCacheAsync(content.Key));
+            scope.Complete();
+            return;
+        }
+
+        var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
+        _databaseCacheRepository.RefreshContent(draftCacheNode);
+
+        if (content.PublishedState is PublishedState.Publishing)
+        {
+            var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
+            _databaseCacheRepository.RefreshContent(publishedCacheNode);
+        }
+        else if (content.PublishedState is PublishedState.Unpublishing)
+        {
+            _databaseCacheRepository.RemovePublishedContent(content.Id);
+            AfterCommit(scope, $"{nameof(DocumentCacheService)}.{nameof(ClearPublishedCacheAsync)}.{content.Key}", () => ClearPublishedCacheAsync(content.Key));
+        }
+
+        scope.Complete();
+    }
+
+    /// <summary>
+    /// Runs a memory-cache update once the ambient transaction has committed, so the cache work (which may reach a
+    /// distributed cache) does not run while the content tree lock is held. Without an ambient scope context the
+    /// update runs at once.
+    /// </summary>
+    private void AfterCommit(ICoreScope scope, string key, Func<Task> update)
+    {
+        IScopeContext? context = _scopeProvider.Context;
+        if (context is null)
+        {
+            update().GetAwaiter().GetResult();
+            return;
+        }
+
+        context.Enlist(key, completed =>
+        {
+            if (completed)
+            {
+                update().GetAwaiter().GetResult();
+            }
+        });
     }
 
     /// <inheritdoc />

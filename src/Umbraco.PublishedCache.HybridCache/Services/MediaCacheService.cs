@@ -395,6 +395,42 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     }
 
     /// <inheritdoc />
+    public void RefreshMedia(IMedia media)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        if (media.Trashed)
+        {
+            _databaseCacheRepository.DeleteContentItem(media.Id);
+            IScopeContext? context = _scopeProvider.Context;
+            if (context is null)
+            {
+                RemoveFromMemoryCacheAsync(media.Key).GetAwaiter().GetResult();
+            }
+            else
+            {
+                // The cache removal may reach a distributed cache, so it runs after the commit, outside the media tree lock.
+                context.Enlist($"{nameof(MediaCacheService)}.{nameof(RemoveFromMemoryCacheAsync)}.{media.Key}", completed =>
+                {
+                    if (completed)
+                    {
+                        RemoveFromMemoryCacheAsync(media.Key).GetAwaiter().GetResult();
+                    }
+                });
+            }
+
+            scope.Complete();
+            return;
+        }
+
+        var cacheNode = _cacheNodeFactory.ToContentCacheNode(media);
+        _databaseCacheRepository.RefreshMedia(cacheNode);
+        _publishedContentCache.Remove(media.Key);
+        InvalidateMemoryCacheGeneration();
+        scope.Complete();
+    }
+
+    /// <inheritdoc />
     public async Task RefreshMediaAsync(IMedia media)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
