@@ -91,7 +91,6 @@ internal static class PropertyFactory
         var propertyDataDtos = new List<PropertyDataDto>();
         edited = false;
         editedCultures = null; // don't allocate unless necessary
-        string? defaultCulture = null; // don't allocate unless necessary
 
         var entityVariesByCulture = contentVariation.VariesByCulture();
 
@@ -156,12 +155,6 @@ internal static class PropertyFactory
                         }
                         else if (isInvariantValue)
                         {
-                            // flag culture as edited if it contains an edited invariant property
-                            if (defaultCulture == null)
-                            {
-                                defaultCulture = languageRepository.GetDefaultIsoCode();
-                            }
-
                             // the property itself is invariant, but its data editor may carry per-culture
                             // nested data (e.g. a Block List/Grid property whose element types vary by
                             // culture) - ask it which specific culture(s) actually changed, instead of
@@ -173,7 +166,7 @@ internal static class PropertyFactory
                                     .GetChangedCulturesForPartialPropertyValues(
                                         propertyValue?.EditedValue,
                                         propertyValue?.PublishedValue,
-                                        defaultCulture)
+                                        Constants.System.InvariantCulture)
                                     .ToArray();
                             }
 
@@ -183,7 +176,8 @@ internal static class PropertyFactory
                             }
                             else
                             {
-                                editedCultures?.Add(defaultCulture);
+                                // track invariant edits distinctly from any specific culture's own edited state
+                                editedCultures?.Add(Constants.System.InvariantCulture);
                             }
                         }
                     }
