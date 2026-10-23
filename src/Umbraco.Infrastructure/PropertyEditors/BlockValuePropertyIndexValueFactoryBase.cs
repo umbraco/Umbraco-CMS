@@ -32,6 +32,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         IDictionary<Guid, IContentType> contentTypeDictionary)
     {
         var result = new List<IndexValue>();
+        var propertyTypeDictionaries = new Dictionary<Guid, Dictionary<string, IPropertyType>>();
 
         var index = 0;
         foreach (RawDataItem rawData in GetDataItems(deserializedPropertyValue, published))
@@ -41,27 +42,15 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
                 continue;
             }
 
-            var propertyTypeDictionary =
-                contentType
-                    .CompositionPropertyTypes
-                    .Select(propertyType =>
-                    {
-                        // We want to ensure that the nested properties are set vary by culture if the parent is
-                        // This is because it's perfectly valid to have a nested property type that's set to invariant even if the parent varies.
-                        // For instance in a block list, the list it self can vary, but the elements can be invariant, at the same time.
-                        if (culture is not null)
-                        {
-                            propertyType.Variations |= ContentVariation.Culture;
-                        }
-
-                        if (segment is not null)
-                        {
-                            propertyType.Variations |= ContentVariation.Segment;
-                        }
-
-                        return propertyType;
-                    })
-                    .ToDictionary(x => x.Alias);
+            if (propertyTypeDictionaries.TryGetValue(contentType.Key, out Dictionary<string, IPropertyType>? propertyTypeDictionary) is false)
+            {
+                propertyTypeDictionary =
+                    contentType
+                        .CompositionPropertyTypes
+                        .Select(propertyType => WithParentVariation(propertyType, culture, segment))
+                        .ToDictionary(x => x.Alias);
+                propertyTypeDictionaries[contentType.Key] = propertyTypeDictionary;
+            }
 
             result.AddRange(GetNestedResults(
                 $"{property.Alias}.items[{index}]",
@@ -80,6 +69,37 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
     }
 
     /// <summary>
+    /// Gets the property type to index a nested property with, varying by culture and segment if the parent value does.
+    /// </summary>
+    /// <remarks>
+    /// It's perfectly valid to have a nested property type that's set to invariant even if the parent varies. For
+    /// instance in a block list, the list itself can vary, but the elements can be invariant, at the same time.
+    /// The element type is shared by every value indexed with it, so a copy is returned rather than changing it.
+    /// </remarks>
+    private static IPropertyType WithParentVariation(IPropertyType propertyType, string? culture, string? segment)
+    {
+        ContentVariation variations = propertyType.Variations;
+        if (culture is not null)
+        {
+            variations |= ContentVariation.Culture;
+        }
+
+        if (segment is not null)
+        {
+            variations |= ContentVariation.Segment;
+        }
+
+        if (variations == propertyType.Variations)
+        {
+            return propertyType;
+        }
+
+        var nestedPropertyType = (IPropertyType)propertyType.DeepClone();
+        nestedPropertyType.Variations = variations;
+        return nestedPropertyType;
+    }
+
+    /// <summary>
     /// Rename keys that count the RAW-constant, to ensure the RAW-constant is a prefix.
     /// </summary>
     private IEnumerable<IndexValue> RenameKeysToEnsureRawSegmentsIsAPrefix(
@@ -88,7 +108,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         foreach (IndexValue indexValue in indexContent)
         {
             // Tests if key includes the RawFieldPrefix and it is not in the start
-            if (indexValue.FieldName.Substring(1).Contains(UmbracoExamineFieldNames.RawFieldPrefix))
+            if (indexValue.FieldName.AsSpan(1).Contains(UmbracoExamineFieldNames.RawFieldPrefix, StringComparison.Ordinal))
             {
                 indexValue.FieldName = UmbracoExamineFieldNames.RawFieldPrefix +
                                        indexValue.FieldName.Replace(UmbracoExamineFieldNames.RawFieldPrefix, string.Empty);
@@ -209,6 +229,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         IEnumerable<string> availableCultures,
         IDictionary<Guid,IContentType> contentTypeDictionary)
     {
+        var rawDataCultures = rawData.Properties.Select(property => property.Culture).Distinct().WhereNotNull().ToArray();
         foreach (RawPropertyData rawPropertyData in rawData.Properties)
         {
             if (propertyTypeDictionary.TryGetValue(rawPropertyData.Alias, out IPropertyType? propertyType))
@@ -230,33 +251,26 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
                     continue;
                 }
 
-                IProperty subProperty = new Property(propertyType);
-                IEnumerable<IndexValue> indexValues = null!;
-
                 if (propertyType.VariesByCulture() && propertyCulture is null)
                 {
-                    foreach (var availableCulture in availableCultures)
+                    // The stored value has no culture, likely due to a change of the element property's variance. It's indexed as for the
+                    // last available culture, which retains behaviour observed before the optimisation in #24263.
+                    // Arguably this should be spread across all cultures.
+                    propertyCulture = availableCultures.LastOrDefault();
+                    if (propertyCulture is null)
                     {
-                        subProperty.SetValue(rawPropertyData.Value, availableCulture, segment);
-                        if (published)
-                        {
-                            subProperty.PublishValues(availableCulture, segment ?? "*");
-                        }
-                        indexValues =
-                            editor.PropertyIndexValueFactory.GetIndexValues(subProperty, availableCulture, segment, published, availableCultures, contentTypeDictionary);
+                        continue;
                     }
-                }
-                else
-                {
-                    subProperty.SetValue(rawPropertyData.Value, propertyCulture, segment);
-                    if (published)
-                    {
-                        subProperty.PublishValues(propertyCulture ?? "*", segment ?? "*");
-                    }
-                    indexValues = editor.PropertyIndexValueFactory.GetIndexValues(subProperty, propertyCulture, segment, published, availableCultures, contentTypeDictionary);
                 }
 
-                var rawDataCultures = rawData.Properties.Select(property => property.Culture).Distinct().WhereNotNull().ToArray();
+                IProperty subProperty = new Property(propertyType);
+                subProperty.SetValue(rawPropertyData.Value, propertyCulture, segment);
+                if (published)
+                {
+                    subProperty.PublishValues(propertyCulture ?? "*", segment ?? "*");
+                }
+
+                IEnumerable<IndexValue> indexValues = editor.PropertyIndexValueFactory.GetIndexValues(subProperty, propertyCulture, segment, published, availableCultures, contentTypeDictionary);
                 foreach (IndexValue indexValue in indexValues)
                 {
                     indexValue.FieldName = $"{keyPrefix}.{indexValue.FieldName}";
@@ -295,7 +309,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
                 Alias = value.Alias,
                 Culture = value.Culture,
                 Value = value.Value
-            })
+            }).ToArray()
         };
 
     protected class RawDataItem
