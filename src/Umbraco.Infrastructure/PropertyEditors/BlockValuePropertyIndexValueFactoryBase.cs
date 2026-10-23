@@ -253,7 +253,9 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
 
                 if (propertyType.VariesByCulture() && propertyCulture is null)
                 {
-                    // the stored value has no culture, so it is indexed under the last available culture.
+                    // The stored value has no culture, likely due to a change of the element property's variance. It's indexed as for the
+                    // last available culture, which retains behaviour observed before the optimisation in #24263.
+                    // Arguably this should be spread across all cultures.
                     propertyCulture = availableCultures.LastOrDefault();
                     if (propertyCulture is null)
                     {
