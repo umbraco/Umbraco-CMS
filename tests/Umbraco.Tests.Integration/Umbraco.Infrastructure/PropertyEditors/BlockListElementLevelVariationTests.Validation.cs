@@ -919,6 +919,7 @@ internal partial class BlockListElementLevelVariationTests
                 new List<BlockPropertyValue>
                 {
                     new() { Alias = "invariantText", Value = "Valid invariant content value" },
+
                     // no default segment value for "variantText"
                     new() { Alias = "variantText", Value = "Valid content value for seg1", Segment = "seg1" },
                     new() { Alias = "variantText", Value = "Valid content value for seg2", Segment = "seg2" },
@@ -926,6 +927,7 @@ internal partial class BlockListElementLevelVariationTests
                 new List<BlockPropertyValue>
                 {
                     new() { Alias = "invariantText", Value = "Valid invariant settings value" },
+
                     // no default segment value for "variantText"
                     new() { Alias = "variantText", Value = "Valid settings value for seg1", Segment = "seg1" },
                     new() { Alias = "variantText", Value = "Valid settings value for seg2", Segment = "seg2" },

@@ -63,6 +63,7 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
             IEnumerable<string> validationContextCulturesBeingValidated = isWildcardCulture
                 ? blockEditorData.BlockValue.Expose.Select(e => e.Culture).WhereNotNull().Distinct()
                 : validationContext.CulturesBeingValidated;
+
             // Include null for the invariant culture, so culture-invariant values are validated for each segment too.
             foreach (var culture in validationContextCulturesBeingValidated.Prepend<string?>(null))
             {

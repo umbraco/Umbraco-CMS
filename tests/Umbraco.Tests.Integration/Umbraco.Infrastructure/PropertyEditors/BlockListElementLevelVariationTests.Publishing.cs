@@ -2524,7 +2524,7 @@ internal partial class BlockListElementLevelVariationTests
             contentType,
             elementType,
             [
-                new BlockProperty(contentValues, settingsValues, null, null)
+                new BlockProperty(contentValues, settingsValues, null, null),
             ],
             true);
 
@@ -2541,7 +2541,6 @@ internal partial class BlockListElementLevelVariationTests
             "English variantText content value, s1",
             "English invariantText settings value",
             "English variantText settings value, s1");
-
 
         void AssertPropertyValues(
             string? segment,
