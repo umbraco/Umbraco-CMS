@@ -3645,4 +3645,123 @@ internal partial class BlockListElementLevelVariationTests
             Assert.IsFalse(content.IsCultureEdited("da-DK"), "Danish must not be flagged as edited after publishing all cultures.");
         });
     }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Publishing_After_Changing_Element_Property_From_Invariant_To_Variant_Publishes_Unsaved_Invariant_Value_For_Default_Culture(bool nestedInInvariantBlock)
+    {
+        // 1. Create an invariant content element type and a variant settings element type WITHOUT variant properties
+        var contentElementType = await CreateElementType(ContentVariation.Nothing, "myContentElementType");
+        var settingsElementType = await CreateElementType(ContentVariation.Culture, "mySettingsElementType");
+        settingsElementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(settingsElementType, Constants.Security.SuperUserKey);
+
+        var blockListDataType = await CreateBlockEditorDataType(
+            Constants.PropertyEditors.Aliases.BlockList,
+            new BlockListConfiguration.BlockConfiguration[]
+            {
+                new() { ContentElementTypeKey = contentElementType.Key, SettingsElementTypeKey = settingsElementType.Key }
+            });
+
+        IContentType? rootElementType = null;
+        if (nestedInInvariantBlock)
+        {
+            rootElementType = new ContentTypeBuilder()
+                .WithAlias("myRootElementType")
+                .WithName("My Root Element Type")
+                .WithIsElement(true)
+                .WithContentVariation(ContentVariation.Nothing)
+                .AddPropertyType()
+                .WithAlias("nestedBlocks")
+                .WithName("Nested blocks")
+                .WithDataTypeId(blockListDataType.Id)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.BlockList)
+                .WithValueStorageType(ValueStorageType.Ntext)
+                .WithVariations(ContentVariation.Nothing)
+                .Done()
+                .Build();
+            await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
+            blockListDataType = await CreateBlockListDataType(rootElementType);
+        }
+
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        // 2. Create content with an invariant settings value and publish it
+        var contentKey = Guid.NewGuid();
+        var settingsKey = Guid.NewGuid();
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                { Constants.PropertyEditors.Aliases.BlockList, [new BlockListLayoutItem { ContentKey = contentKey, SettingsKey = settingsKey }] }
+            },
+            ContentData =
+            [
+                new BlockItemData
+                {
+                    Key = contentKey,
+                    ContentTypeAlias = contentElementType.Alias,
+                    ContentTypeKey = contentElementType.Key,
+                    Values = [new() { Alias = "invariantText", Value = "The invariant content value" }],
+                }
+            ],
+            SettingsData =
+            [
+                new BlockItemData
+                {
+                    Key = settingsKey,
+                    ContentTypeAlias = settingsElementType.Alias,
+                    ContentTypeKey = settingsElementType.Key,
+                    Values = [new() { Alias = "variantText", Value = "The original invariant settings value" }],
+                }
+            ],
+            Expose = [new BlockItemVariation(contentKey, null, null)],
+        };
+
+        var content = nestedInInvariantBlock
+            ? CreateContent(
+                contentType,
+                rootElementType!,
+                new List<BlockPropertyValue> { new() { Alias = "nestedBlocks", Value = blockListValue } },
+                [],
+                false)
+            : CreateContent(contentType, contentElementType, [], false);
+        if (nestedInInvariantBlock is false)
+        {
+            content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+            ContentService.Save(content);
+        }
+
+        PublishContent(content, ["en-US", "da-DK"]);
+        AssertSettingsValue("en-US", "The original invariant settings value");
+
+        // 3. Change the settings property to vary by culture, without saving the content again
+        settingsElementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Culture;
+        await ContentTypeService.UpdateAsync(settingsElementType, Constants.Security.SuperUserKey);
+
+        // 4. Republish the default culture: the editor shows the unsaved invariant value for the default culture,
+        //    so the published value must keep it rather than discard it as misaligned.
+        content = ContentService.GetById(content.Key)!;
+        PublishContent(content, ["en-US"]);
+        AssertSettingsValue("en-US", "The original invariant settings value");
+
+        void AssertSettingsValue(string culture, string expectedValue)
+        {
+            SetVariationContext(culture, null);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var blocks = publishedContent.Value<BlockListModel>("blocks");
+            Assert.IsNotNull(blocks);
+            Assert.AreEqual(1, blocks.Count);
+            if (nestedInInvariantBlock)
+            {
+                blocks = blocks.First().Content.Value<BlockListModel>("nestedBlocks");
+                Assert.IsNotNull(blocks);
+                Assert.AreEqual(1, blocks.Count);
+            }
+
+            Assert.IsNotNull(blocks.First().Settings);
+            Assert.AreEqual(expectedValue, blocks.First().Settings!.Value<string>("variantText"));
+        }
+    }
 }
