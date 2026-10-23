@@ -24,6 +24,7 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
     private readonly UmbracoExamineIndexDiagnostics _diagnostics;
     private readonly ILogger<UmbracoExamineIndex> _logger;
     private readonly IRuntimeState _runtimeState;
+    private readonly System.Threading.Lock _recoveryLock = new();
     private bool _hasLoggedInitLog;
 
     protected UmbracoExamineIndex(
@@ -59,6 +60,31 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
 
     /// <inheritdoc />
     public virtual string UniqueKeyFieldName => UmbracoExamineFieldNames.NodeKeyFieldName;
+
+    /// <summary>
+    ///     Raised when the index has been cleared to recover from an unreadable state, and needs to be repopulated.
+    /// </summary>
+    public event EventHandler? RepopulationRequired;
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     If files of the index have been removed from disk while the index is in use, the index is cleared so that it
+    ///     can be searched again, and <see cref="RepopulationRequired" /> is raised.
+    /// </remarks>
+    public override ISearcher Searcher
+    {
+        get
+        {
+            try
+            {
+                return base.Searcher;
+            }
+            catch (Exception exception) when (IsMissingIndexFile(exception))
+            {
+                return RecoverSearcher(exception);
+            }
+        }
+    }
 
     /// <inheritdoc />
     /// <remarks>
@@ -108,6 +134,34 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
         }
 
         return canInit;
+    }
+
+    private static bool IsMissingIndexFile(Exception exception)
+        => exception is FileNotFoundException or DirectoryNotFoundException;
+
+    private ISearcher RecoverSearcher(Exception missingFileException)
+    {
+        lock (_recoveryLock)
+        {
+            try
+            {
+                // Another caller may have recovered the index while this one waited for the lock.
+                return base.Searcher;
+            }
+            catch (Exception exception) when (IsMissingIndexFile(exception))
+            {
+            }
+
+            _logger.LogWarning(
+                missingFileException,
+                "Files of the index {IndexName} are missing from disk. The index will be cleared and repopulated.",
+                Name);
+
+            CreateIndex();
+            ISearcher searcher = base.Searcher;
+            RepopulationRequired?.Invoke(this, EventArgs.Empty);
+            return searcher;
+        }
     }
 
     private void EnsureIndexFolderExists()
