@@ -57,16 +57,33 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
         Assert.That(indexedCounts, Has.All.EqualTo(documentCount));
     }
 
+    // Measures rebuilding an index that only includes the node name and title fields.
+    [TestCase(24, 40, 1000)]
+    public async Task Rebuild_Internal_Index_Including_Only_Title_Fields(int cultureCount, int documentCount, int textLength)
+    {
+        int[] indexedCounts = await MeasureAsync(cultureCount, documentCount, textLength, publishedValuesOnly: false, includeTitleFieldsOnly: true);
+        Assert.That(indexedCounts, Has.All.EqualTo(documentCount));
+    }
+
     /// <summary>
     ///     Seeds content and measures rebuilding an index from it at each batch size.
     /// </summary>
     /// <returns>The number of documents each rebuild indexed, by batch size.</returns>
-    private async Task<int[]> MeasureAsync(int cultureCount, int documentCount, int textLength, bool publishedValuesOnly)
+    private async Task<int[]> MeasureAsync(int cultureCount, int documentCount, int textLength, bool publishedValuesOnly, bool includeTitleFieldsOnly = false)
     {
         var indexedCounts = new List<int>();
         var seeding = Stopwatch.StartNew();
-        await SeedAsync(cultureCount, documentCount, textLength);
+        string[] cultures = await SeedAsync(cultureCount, documentCount, textLength);
         TestContext.Out.WriteLine($"Seeded {documentCount} documents in {cultureCount} cultures in {seeding.Elapsed.TotalSeconds:F1}s.");
+
+        ValueSetValidator? validator = includeTitleFieldsOnly
+            ? new ValueSetValidator(
+                null,
+                null,
+                cultures.SelectMany(culture => new[] { $"nodeName_{culture.ToLowerInvariant()}", $"title_{culture.ToLowerInvariant()}" }).Concat(["nodeName", "title"]).ToArray(),
+                null)
+            : null;
+        string[]? propertyAliases = validator is null ? null : ContentIndexPopulator.GetPropertyAliasesForIncludedFields([new ValidatingCapturingIndex(publishedValuesOnly, validator, _ => { })]);
 
         IValueSetBuilder<IContent> valueSetBuilder = publishedValuesOnly
             ? GetRequiredService<IPublishedContentValueSetBuilder>()
@@ -75,25 +92,25 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
         foreach (var batchSize in _batchSizes)
         {
             // Warm up caches and JIT before measuring.
-            RunPhases(valueSetBuilder, batchSize, publishedValuesOnly, measureMemory: false);
+            RunPhases(valueSetBuilder, batchSize, publishedValuesOnly, propertyAliases, measureMemory: false);
 
             RebuildMetrics best = Enumerable.Range(0, MeasuredRuns)
-                .Select(_ => RunPhases(valueSetBuilder, batchSize, publishedValuesOnly, measureMemory: false))
+                .Select(_ => RunPhases(valueSetBuilder, batchSize, publishedValuesOnly, propertyAliases, measureMemory: false))
                 .MinBy(x => x.LoadTime + x.BuildTime)!;
-            RebuildMetrics memory = RunPhases(valueSetBuilder, batchSize, publishedValuesOnly, measureMemory: true);
+            RebuildMetrics memory = RunPhases(valueSetBuilder, batchSize, publishedValuesOnly, propertyAliases, measureMemory: true);
 
             CapturedIndex captured = null!;
             TimeSpan populate = Enumerable.Range(0, MeasuredRuns)
                 .Select(_ =>
                 {
                     var stopwatch = Stopwatch.StartNew();
-                    captured = Rebuild(publishedValuesOnly, batchSize);
+                    captured = Rebuild(publishedValuesOnly, batchSize, validator: validator, loadOnlyPropertiesForIncludedFields: includeTitleFieldsOnly);
                     return stopwatch.Elapsed;
                 })
                 .Min();
 
             Report(new MetricsRow(
-                publishedValuesOnly ? "published" : "internal",
+                (publishedValuesOnly ? "published" : "internal") + (includeTitleFieldsOnly ? " (title fields)" : string.Empty),
                 cultureCount,
                 documentCount,
                 textLength,
@@ -115,7 +132,7 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
     /// <summary>
     ///     Pages through all content as <see cref="ContentIndexPopulator" /> does, timing the load and the value set build separately.
     /// </summary>
-    private RebuildMetrics RunPhases(IValueSetBuilder<IContent> valueSetBuilder, int batchSize, bool publishedValuesOnly, bool measureMemory)
+    private RebuildMetrics RunPhases(IValueSetBuilder<IContent> valueSetBuilder, int batchSize, bool publishedValuesOnly, string[]? propertyAliases, bool measureMemory)
     {
         IQuery<IContent> publishedQuery = GetRequiredService<IUmbracoDatabaseFactory>().SqlContext.Query<IContent>().Where(x => x.Published);
         var metrics = new RebuildMetrics();
@@ -127,8 +144,8 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
             var allocatedBefore = GC.GetTotalAllocatedBytes(true);
             var load = Stopwatch.StartNew();
             content = publishedValuesOnly
-                ? ContentService.GetPagedDescendants(-1, pageIndex, batchSize, out _, publishedQuery, Ordering.By("Path")).ToArray()
-                : ContentService.GetPagedDescendants(-1, pageIndex, batchSize, out _).ToArray();
+                ? ContentService.GetPagedDescendants(-1, pageIndex, batchSize, out _, propertyAliases, publishedQuery, Ordering.By("Path")).ToArray()
+                : ContentService.GetPagedDescendants(-1, pageIndex, batchSize, out _, propertyAliases, filter: null, ordering: null).ToArray();
             load.Stop();
             var allocatedAfterLoad = GC.GetTotalAllocatedBytes(true);
 
@@ -163,7 +180,7 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
     ///     variant blocks nested three levels deep, and a rich text with blocks, and have a draft that differs from the
     ///     published version. Invariant documents carry nested blocks and a block grid.
     /// </summary>
-    private async Task SeedAsync(int cultureCount, int documentCount, int textLength)
+    private async Task<string[]> SeedAsync(int cultureCount, int documentCount, int textLength)
     {
         string[] cultures = await CreateLanguagesAsync(cultureCount);
         IndexingSchema schema = await CreateSchemaAsync();
@@ -210,6 +227,7 @@ internal sealed class ContentIndexRebuildPerformanceTests : ContentIndexRebuildT
         }
 
         scope.Complete();
+        return cultures;
     }
 
     private static void Report(MetricsRow row)

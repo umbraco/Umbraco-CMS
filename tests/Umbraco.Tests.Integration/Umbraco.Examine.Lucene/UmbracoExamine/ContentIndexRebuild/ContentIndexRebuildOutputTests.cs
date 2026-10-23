@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Attributes;
@@ -24,6 +25,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine.Co
 internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBase
 {
     private static readonly string[] _cultures = ["en-US", "da-DK", "de-DE"];
+
+    private static readonly string[] _allSeededProperties = ["title", "variantBlocks", "invariantBlocks", "body", "invariantBody", "grid"];
+
+    private static readonly string[] _propertiesForIncludedFields = ["title", "invariantBlocks", "body"];
 
     // Every document in its own batch, documents split across batches, and all documents in one batch.
     private static readonly int[] _batchSizes = [1, 2, 1000];
@@ -61,7 +66,7 @@ internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBa
         IContent[] page;
         do
         {
-            page = ContentService.GetPagedDescendants(Constants.System.Root, pageIndex++, pageSize, out _).ToArray();
+            page = ContentService.GetPagedDescendants(Constants.System.Root, pageIndex++, pageSize, out _, propertyAliases: null, filter: null, ordering: null).ToArray();
             content.AddRange(page);
         }
         while (page.Length == pageSize);
@@ -81,12 +86,47 @@ internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBa
         IContent[] page;
         do
         {
-            page = ContentService.GetPagedDescendants(Constants.System.Root, pageIndex++, pageSize, out _, publishedQuery, Ordering.By("Path")).ToArray();
+            page = ContentService.GetPagedDescendants(Constants.System.Root, pageIndex++, pageSize, out _, propertyAliases: null, filter: publishedQuery, ordering: Ordering.By("Path")).ToArray();
             content.AddRange(page);
         }
         while (page.Length == pageSize);
 
         AssertMatchesSnapshot("load-published", RenderSnapshot(content));
+    }
+
+    [Test]
+    public async Task Paged_Descendants_With_More_Property_Aliases_Than_Query_Parameters_Load_The_Requested_Properties()
+    {
+        await SeedAsync();
+        string[] propertyAliases = ["title", .. Enumerable.Range(0, Constants.Sql.MaxParameterCount).Select(i => $"unknown{i}")];
+
+        IContent[] content = ContentService.GetPagedDescendants(Constants.System.Root, 0, 1000, out _, propertyAliases, filter: null, ordering: null).ToArray();
+
+        Assert.That(content, Is.Not.Empty);
+        Assert.That(PropertiesWithValues(content), Does.Contain("title"));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Rebuild_Of_Index_Including_Specific_Fields_Loads_Only_Properties_For_Those_Fields_When_Enabled(bool publishedValuesOnly)
+    {
+        await SeedAsync();
+        var validator = new ValueSetValidator(null, null, ["nodeName", "title", "title_en-us", "title_da-dk", "invariantBlocks", "invariantBlocks_de-de", "__Raw_body_en-us", "body_en-us"], null);
+
+        CapturedIndex unfiltered = Rebuild(publishedValuesOnly, batchSize: 2);
+        CapturedIndex filtered = Rebuild(publishedValuesOnly, batchSize: 2, validator: validator, loadOnlyPropertiesForIncludedFields: true);
+        CapturedIndex notEnabled = Rebuild(publishedValuesOnly, batchSize: 2, validator: validator);
+
+        var expected = RenderSnapshot(unfiltered.ValueSets.Select(valueSet => validator.Validate(valueSet).ValueSet));
+        Assert.Multiple(() =>
+        {
+            Assert.That(expected, Does.Contain("invariantBlocks_de-de = ").And.Contain("body_en-us = ").And.Contain("title = "));
+            Assert.That(RenderSnapshot(filtered.ValueSets), Is.EqualTo(expected));
+            Assert.That(PropertiesWithValues(unfiltered.LoadedContent), Is.EquivalentTo(_allSeededProperties));
+            Assert.That(PropertiesWithValues(filtered.LoadedContent), Is.EquivalentTo(_propertiesForIncludedFields));
+            Assert.That(RenderSnapshot(notEnabled.ValueSets), Is.EqualTo(expected));
+            Assert.That(PropertiesWithValues(notEnabled.LoadedContent), Is.EquivalentTo(PropertiesWithValues(unfiltered.LoadedContent)));
+        });
     }
 
     [TestCase(false)]
@@ -104,6 +144,14 @@ internal sealed class ContentIndexRebuildOutputTests : ContentIndexRebuildTestBa
             Assert.That(captured.Batches.Select(x => x.ValueSets.Count), Has.All.LessThanOrEqualTo(2));
         });
     }
+
+    private static string[] PropertiesWithValues(IEnumerable<IContent> content)
+        => content
+            .SelectMany(item => item.Properties)
+            .Where(property => property.Values.Any(value => value.EditedValue is not null || value.PublishedValue is not null))
+            .Select(property => property.Alias)
+            .Distinct()
+            .ToArray();
 
     /// <summary>
     ///     Seeds documents covering the block editor indexing paths, interleaving variant and invariant documents so that
