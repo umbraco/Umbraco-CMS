@@ -33,8 +33,8 @@ The Umbraco Security Team handles vulnerability reports and security advisories 
 | Anders Reus | [@andersreus](https://github.com/andersreus) |
 | Eric | [@Frost117](https://github.com/Frost117) |
 | Filip Bech-Larsen | [@filipbech](https://github.com/filipbech) |
+| Lan Nguyen Thuy | [@NguyenThuyLan](https://github.com/NguyenThuyLan) |
 | Mathias Tøndering | [@mta-umbraco](https://github.com/mta-umbraco) |
-| NguyenThuyLan | [@NguyenThuyLan](https://github.com/NguyenThuyLan) |
 | Tony Meyn | [@meyntony](https://github.com/meyntony) |
 
 Please don't report vulnerabilities in public issues. Email security@umbraco.com instead, or read [how to report a vulnerability in Umbraco](https://umbraco.com/trust-center/security-and-umbraco/how-to-report-a-vulnerability-in-umbraco/).
