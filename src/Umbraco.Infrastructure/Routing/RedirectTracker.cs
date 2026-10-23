@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Routing;
@@ -31,6 +32,7 @@ internal sealed class RedirectTracker : IRedirectTracker
     private readonly IDomainCache _domainCache;
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
     private readonly IDocumentUrlService _documentUrlService;
+    private readonly IUmbracoContextFactory _umbracoContextFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RedirectTracker"/> class.
@@ -45,7 +47,8 @@ internal sealed class RedirectTracker : IRedirectTracker
         IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
         IDomainCache domainCache,
         UrlSegmentProviderCollection urlSegmentProviders,
-        IDocumentUrlService documentUrlService)
+        IDocumentUrlService documentUrlService,
+        IUmbracoContextFactory umbracoContextFactory)
     {
         _languageService = languageService;
         _redirectUrlService = redirectUrlService;
@@ -57,6 +60,7 @@ internal sealed class RedirectTracker : IRedirectTracker
         _domainCache = domainCache;
         _urlSegmentProviders = urlSegmentProviders;
         _documentUrlService = documentUrlService;
+        _umbracoContextFactory = umbracoContextFactory;
     }
 
     /// <inheritdoc/>
@@ -103,6 +107,9 @@ internal sealed class RedirectTracker : IRedirectTracker
 
         // Get all language ISO codes (in case we're dealing with invariant content with variant ancestors)
         var languageIsoCodes = new Lazy<string[]>(() => [.. _languageService.GetAllIsoCodesAsync().GetAwaiter().GetResult()]);
+
+        // Resolving URLs requires an Umbraco context, which doesn't exist when called from a background job.
+        using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
         foreach (IPublishedContent publishedContent in entityContent.DescendantsOrSelf(_navigationQueryService, _publishedContentStatusFilteringService))
         {
@@ -280,6 +287,9 @@ internal sealed class RedirectTracker : IRedirectTracker
         {
             return;
         }
+
+        // Resolving URLs requires an Umbraco context, which doesn't exist when called from a background job.
+        using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
         foreach (((int contentId, string culture), (Guid contentKey, string oldRoute)) in oldRoutes)
         {
