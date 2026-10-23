@@ -6,6 +6,9 @@ export type * from './extensions/types.js';
 
 export interface UmbPickerModalData<ItemType> {
 	multiple?: boolean;
+	/**
+	 * @deprecated Deprecated since v17. Filtering items on the client breaks server-side pagination. Use `pickableFilter` to prevent items from being picked instead. Scheduled for removal in Umbraco 21.
+	 */
 	filter?: (item: ItemType) => boolean;
 	pickableFilter?: (item: ItemType) => boolean;
 	search?: UmbPickerModalSearchConfig;

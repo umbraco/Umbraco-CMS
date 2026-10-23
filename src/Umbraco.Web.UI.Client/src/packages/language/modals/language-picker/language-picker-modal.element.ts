@@ -1,8 +1,9 @@
 import { UmbLanguageCollectionRepository } from '../../collection/index.js';
 import type { UmbLanguageItemModel } from '../../types.js';
 import type { UmbLanguagePickerModalValue, UmbLanguagePickerModalData } from './language-picker-modal.token.js';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-language-picker-modal')
@@ -27,17 +28,36 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 		});
 	}
 
+	protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.willUpdate(_changedProperties);
+
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		if (_changedProperties.has('data') && this.data?.filter) {
+			new UmbDeprecation({
+				deprecated: 'The `filter` option of UmbLanguagePickerModalData',
+				removeInVersion: '21.0.0',
+				solution: 'Use `pickableFilter` to prevent languages from being picked instead.',
+			}).warn();
+		}
+	}
+
 	override async firstUpdated() {
 		const { data } = await this.#collectionRepository.requestAllItems();
 		this._languages = data?.items ?? [];
 	}
 
 	get #filteredLanguages() {
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
 		if (this.data?.filter) {
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
 			return this._languages.filter(this.data.filter);
 		} else {
 			return this._languages;
 		}
+	}
+
+	#isPickable(item: UmbLanguageItemModel) {
+		return this.data?.pickableFilter?.(item) ?? true;
 	}
 
 	#submit() {
@@ -58,7 +78,8 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 							(item) => html`
 								<uui-menu-item
 									label=${item.name ?? ''}
-									selectable
+									?selectable=${this.#isPickable(item)}
+									?disabled=${!this.#isPickable(item)}
 									@selected=${() => this.#selectionManager.select(item.unique)}
 									@deselected=${() => this.#selectionManager.deselect(item.unique)}
 									?selected=${this.value.selection.includes(item.unique)}>

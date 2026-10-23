@@ -35,7 +35,28 @@ export class UmbDefaultTreeContext<
 	#entityContext = new UmbEntityContext(this);
 
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
-	public filter?: (item: TreeItemType) => boolean = () => true;
+
+	#hasWarnedFilterDeprecation = false;
+
+	/**
+	 * @deprecated Deprecated since v17. This option has no effect. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
+	 */
+	public set filter(value: ((item: TreeItemType) => boolean) | undefined) {
+		if (value && !this.#hasWarnedFilterDeprecation) {
+			this.#hasWarnedFilterDeprecation = true;
+			new UmbDeprecation({
+				deprecated: 'The `filter` property of UmbDefaultTreeContext has no effect.',
+				removeInVersion: '21.0.0',
+				solution: 'Use `selectableFilter` to prevent items from being selected instead.',
+			}).warn();
+		}
+		this.#filter = value;
+	}
+	public get filter(): ((item: TreeItemType) => boolean) | undefined {
+		return this.#filter;
+	}
+	#filter?: (item: TreeItemType) => boolean = () => true;
+
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly expansion = new UmbTreeExpansionManager(this);
 	public readonly interactionMemory = new UmbInteractionMemoryManager(this);

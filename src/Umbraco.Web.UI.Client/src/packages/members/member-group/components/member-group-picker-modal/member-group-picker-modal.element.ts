@@ -4,9 +4,10 @@ import type {
 	UmbMemberGroupPickerModalValue,
 	UmbMemberGroupPickerModalData,
 } from './member-group-picker-modal.token.js';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbPaginationManager, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbPaginationManager, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 const PAGE_SIZE = 50;
@@ -37,6 +38,19 @@ export class UmbMemberGroupPickerModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
 	}
 
+	protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.willUpdate(_changedProperties);
+
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		if (_changedProperties.has('data') && this.data?.filter) {
+			new UmbDeprecation({
+				deprecated: 'The `filter` option of UmbMemberGroupPickerModalData',
+				removeInVersion: '21.0.0',
+				solution: 'Use `pickableFilter` to prevent member groups from being picked instead.',
+			}).warn();
+		}
+	}
+
 	override firstUpdated() {
 		this.#loadMemberGroups();
 	}
@@ -57,11 +71,17 @@ export class UmbMemberGroupPickerModalElement extends UmbModalBaseElement<
 	}
 
 	get #filteredMemberGroups() {
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
 		if (this.data?.filter) {
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
 			return this._memberGroups.filter(this.data.filter as any);
 		} else {
 			return this._memberGroups;
 		}
+	}
+
+	#isPickable(item: UmbMemberGroupCollectionItemModel) {
+		return this.data?.pickableFilter?.(item as any) ?? true;
 	}
 
 	#submit() {
@@ -83,7 +103,8 @@ export class UmbMemberGroupPickerModalElement extends UmbModalBaseElement<
 						(item) => html`
 							<uui-menu-item
 								label=${item.name ?? ''}
-								selectable
+								?selectable=${this.#isPickable(item)}
+								?disabled=${!this.#isPickable(item)}
 								@selected=${() => this.#selectionManager.select(item.unique)}
 								@deselected=${() => this.#selectionManager.deselect(item.unique)}
 								?selected=${this.#selectionManager.isSelected(item.unique)}>

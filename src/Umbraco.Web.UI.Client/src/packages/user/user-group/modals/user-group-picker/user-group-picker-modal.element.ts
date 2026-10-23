@@ -2,7 +2,8 @@ import { UmbUserGroupCollectionRepository } from '../../collection/repository/in
 import type { UmbUserGroupDetailModel } from '../../types.js';
 import type { UMB_USER_GROUP_PICKER_MODAL } from './user-group-picker-modal.token.js';
 import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { debounce, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
+import { debounce, UmbDeprecation, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -50,6 +51,19 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		this.observe(this.#selectionManager.selection, (selection) => this.updateValue({ selection }), 'selectionObserver');
 	}
 
+	protected override willUpdate(_changedProperties: PropertyValues): void {
+		super.willUpdate(_changedProperties);
+
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		if (_changedProperties.has('data') && this.data?.filter) {
+			new UmbDeprecation({
+				deprecated: 'The `filter` option of the user group picker modal data has no effect.',
+				removeInVersion: '21.0.0',
+				solution: 'Use `pickableFilter` to prevent user groups from being picked instead.',
+			}).warn();
+		}
+	}
+
 	async #observeUserGroups() {
 		const { error, asObservable } = await this.#userGroupCollectionRepository.requestAllItems();
 		if (error) return;
@@ -75,6 +89,10 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 
 		this.requestUpdate();
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.unique));
+	}
+
+	#isPickable(userGroup: UmbUserGroupDetailModel) {
+		return this.data?.pickableFilter ? this.data.pickableFilter(userGroup) : true;
 	}
 
 	#onFilterInput(event: UUIInputEvent) {
@@ -107,7 +125,8 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 							<umb-user-group-ref
 								.name=${userGroup.name}
 								select-only
-								selectable
+								?selectable=${this.#isPickable(userGroup)}
+								?disabled=${!this.#isPickable(userGroup)}
 								?selected=${this.#selectionManager.isSelected(userGroup.unique)}
 								?documentRootAccess=${userGroup.documentRootAccess}
 								.documentStartNode=${!userGroup.documentRootAccess ? userGroup.documentStartNode?.unique : null}

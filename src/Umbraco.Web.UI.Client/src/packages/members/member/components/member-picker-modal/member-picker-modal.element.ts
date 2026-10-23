@@ -8,6 +8,7 @@ import { customElement, html, nothing, repeat, state } from '@umbraco-cms/backof
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbCollectionItemPickerContext } from '@umbraco-cms/backoffice/collection';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-member-picker-modal')
 export class UmbMemberPickerModalElement extends UmbModalBaseElement<
@@ -46,6 +47,19 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		);
 	}
 
+	protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.willUpdate(_changedProperties);
+
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		if (_changedProperties.has('data') && this.data?.filter) {
+			new UmbDeprecation({
+				deprecated: 'The `filter` option of UmbMemberPickerModalData',
+				removeInVersion: '21.0.0',
+				solution: 'Use `pickableFilter` to prevent members from being picked instead.',
+			}).warn();
+		}
+	}
+
 	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
 		super.updated(_changedProperties);
 
@@ -81,7 +95,9 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	}
 
 	get #filteredMembers() {
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
 		if (this.data?.filter) {
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
 			return this._members.filter(this.data.filter as any);
 		} else {
 			return this._members;
@@ -93,7 +109,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMembers')}>
 				<uui-box>
 					<umb-picker-search-field .alias=${UMB_MEMBER_ENTITY_TYPE}></umb-picker-search-field>
-					<umb-picker-search-result></umb-picker-search-result>
+					<umb-picker-search-result .pickableFilter=${this.data?.search?.pickableFilter}></umb-picker-search-result>
 					${this.#renderItems()}</uui-box
 				>
 				${this.#renderActions()}

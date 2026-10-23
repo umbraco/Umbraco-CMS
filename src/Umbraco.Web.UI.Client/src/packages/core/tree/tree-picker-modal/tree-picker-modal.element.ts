@@ -10,7 +10,11 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbPickerModalBaseElement, type UmbPickerSearchFieldElement } from '@umbraco-cms/backoffice/picker';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
+import {
+	UmbDeprecation,
+	type UmbEntityExpansionModel,
+	type UmbExpansionChangeEvent,
+} from '@umbraco-cms/backoffice/utils';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
 const TREE_MEMORY_UNIQUE = 'UmbTreeItemPickerTree';
@@ -93,6 +97,19 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this.removeEventListener(UmbTreeItemOpenEvent.TYPE, this.#onTreeItemOpen);
+	}
+
+	protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.willUpdate(_changedProperties);
+
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		if (_changedProperties.has('data') && this.data?.filter) {
+			new UmbDeprecation({
+				deprecated: 'The `filter` option of UmbTreePickerModalData has no effect.',
+				removeInVersion: '21.0.0',
+				solution: 'Use `pickableFilter` to prevent items from being picked instead.',
+			}).warn();
+		}
 	}
 
 	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
@@ -343,7 +360,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					hideTreeRoot: this.data?.hideTreeRoot,
 					expandTreeRoot: this.data?.expandTreeRoot,
 					selectionConfiguration: this._selectionConfiguration,
-					filter: this.data?.filter,
 					selectableFilter: this.data?.pickableFilter,
 					startNode: this._treeStartNode,
 					foldersOnly: this.data?.foldersOnly,

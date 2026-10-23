@@ -1,7 +1,7 @@
 import type { UmbStaticFileItemModel } from '../../repository/item/types.js';
 import { UmbStaticFilePickerInputContext } from './input-static-file.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { splitStringToArray, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { isAboveZeroAndBelowMinimum, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
@@ -76,8 +76,32 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
-	@property()
-	public pickableFilter?: (item: UmbStaticFileItemModel) => boolean;
+	#hasWarnedPickableFilterDeprecation = false;
+
+	/**
+	 * @deprecated Deprecated since v17. Use `browsePickableFilter` instead. Scheduled for removal in Umbraco 21.
+	 */
+	@property({ type: Object, attribute: false })
+	public set pickableFilter(value: ((item: UmbStaticFileItemModel) => boolean) | undefined) {
+		if (value && !this.#hasWarnedPickableFilterDeprecation) {
+			this.#hasWarnedPickableFilterDeprecation = true;
+			new UmbDeprecation({
+				deprecated: 'The `pickableFilter` property of umb-input-static-file',
+				removeInVersion: '21.0.0',
+				solution: 'Use `browsePickableFilter` instead.',
+			}).warn();
+		}
+		this.browsePickableFilter = value;
+	}
+	public get pickableFilter(): ((item: UmbStaticFileItemModel) => boolean) | undefined {
+		return this.browsePickableFilter;
+	}
+
+	/**
+	 * Prevents items from being picked while browsing. Items for which this returns false are shown but cannot be picked.
+	 */
+	@property({ type: Object, attribute: false })
+	public browsePickableFilter?: (item: UmbStaticFileItemModel) => boolean;
 
 	@state()
 	private _items?: Array<UmbStaticFileItemModel>;
@@ -127,7 +151,7 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 
 	#openPicker() {
 		this.#pickerContext.openPicker({
-			pickableFilter: this.pickableFilter,
+			pickableFilter: this.browsePickableFilter,
 			multiple: this.max === 1 ? false : true,
 			hideTreeRoot: true,
 		});
