@@ -141,7 +141,7 @@ public class PackageManifestServiceTests
 
         var result = await service.GetPackageManifestImportmapAsync();
 
-        Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?umb__rnd=2.0.0-deploy-1"));
+        Assert.That(result.Imports["pkg"], Is.EqualTo("/App_Plugins/Pkg/index.js?umb__rnd=2.0.0-7bb8e1f"));
     }
 
     [Test]
@@ -153,6 +153,6 @@ public class PackageManifestServiceTests
 
         var result = await service.GetPackageManifestImportmapAsync();
 
-        Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?umb__rnd=deploy-1"));
+        Assert.That(result.Imports["pkg"], Is.EqualTo("/App_Plugins/Pkg/index.js?umb__rnd=7bb8e1f"));
     }
 }
