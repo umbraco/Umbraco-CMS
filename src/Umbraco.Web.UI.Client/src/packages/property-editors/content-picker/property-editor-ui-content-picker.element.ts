@@ -180,10 +180,8 @@ export class UmbPropertyEditorUIContentPickerElement
 		const parentUnique = parent?.unique ?? null;
 
 		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
-		if (result && result.length > 0) {
-			this._rootUnique = result[0];
-			this._rootUniques = result;
-		}
+		this._rootUnique = result?.[0];
+		this._rootUniques = result;
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputContentElement }) {
