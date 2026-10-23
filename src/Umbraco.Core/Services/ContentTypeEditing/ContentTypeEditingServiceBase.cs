@@ -785,6 +785,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     ///     An existing property group keeps its own alias unless its name or type has changed, because that alias can have
     ///     been set outside of this service and need not match the container name. A property group within another
     ///     container is prefixed with the resolved alias of that container, as the alias path is what defines the hierarchy.
+    ///     An alias that differs from the one stored is made unique by appending a number, so unchanged aliases take precedence.
     /// </remarks>
     private static Dictionary<Guid, string> ResolvePropertyGroupAliases(
         TContentType contentType,
@@ -807,11 +808,45 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return PropertyGroupAlias(container.Name);
         }
 
-        return model.Containers.ToDictionary(
-            container => container.Key,
-            container => container.ParentKey is null
-                ? OwnAlias(container)
-                : $"{OwnAlias(containersByKey[container.ParentKey.Value])}/{OwnAlias(container)}");
+        var aliasesByKey = new Dictionary<Guid, string>();
+
+        string AliasPath(TPropertyTypeContainer container)
+        {
+            if (container.ParentKey is null)
+            {
+                return OwnAlias(container);
+            }
+
+            TPropertyTypeContainer parent = containersByKey[container.ParentKey.Value];
+
+            // only one level of nesting is supported, so a parent within another container contributes its own alias only
+            var parentAlias = parent.ParentKey is null ? aliasesByKey[parent.Key] : OwnAlias(parent);
+            return $"{parentAlias}/{OwnAlias(container)}";
+        }
+
+        var usedAliases = new HashSet<string>();
+        foreach (IGrouping<bool, TPropertyTypeContainer> level in model.Containers
+                     .GroupBy(container => container.ParentKey is null)
+                     .OrderByDescending(level => level.Key))
+        {
+            IEnumerable<(Guid Key, string Alias)> candidates = level
+                .Select(container => (container.Key, Alias: AliasPath(container)))
+                .OrderBy(candidate => existingGroupsByKey.GetValueOrDefault(candidate.Key)?.Alias == candidate.Alias ? 0 : 1)
+                .ToArray();
+
+            foreach ((Guid key, string alias) in candidates)
+            {
+                var uniqueAlias = alias;
+                for (var suffix = 1; usedAliases.Add(uniqueAlias) is false; suffix++)
+                {
+                    uniqueAlias = $"{alias}{suffix}";
+                }
+
+                aliasesByKey[key] = uniqueAlias;
+            }
+        }
+
+        return aliasesByKey;
     }
 
     /// <summary>
