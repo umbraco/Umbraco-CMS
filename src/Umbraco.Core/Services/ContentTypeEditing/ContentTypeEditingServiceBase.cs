@@ -703,16 +703,14 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // build a dictionary of all data types within the model by their keys (we need it when mapping properties)
         var dataTypesByKey = (await GetDataTypesAsync(model)).ToDictionary(d => d.Key);
 
-        // build a dictionary of parent container IDs and their names (we need it when mapping property groups)
-        var parentContainerNamesById = model
+        // collect the keys of all parent containers (we need them when mapping property groups)
+        var parentContainerKeys = model
             .Containers
             .Where(container => container.ParentKey is not null)
-            .DistinctBy(container => container.ParentKey)
-            .ToDictionary(
-                container => container.ParentKey!.Value,
-                // NOTE: this look-up appears to be a little dangerous, but at this point we should have validated
-                //       the containers and their parent relationships in the model, so it's ok
-                container => model.Containers.First(c => c.Key == container.ParentKey).Name);
+            .Select(container => container.ParentKey!.Value)
+            .ToHashSet();
+
+        Dictionary<Guid, string> propertyGroupAliasesByKey = ResolvePropertyGroupAliases(contentType, model);
 
         // Store the existing property types in a list to reference when processing properties.
         // This ensures we correctly handle property types that may have been filtered out from groups.
@@ -738,13 +736,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
                 // NOTE: eventually group.Type should be a string to make the client more flexible; for now we'll have to parse the string value back to its expected enum
                 propertyGroup.Type = Enum.Parse<PropertyGroupType>(container.Type);
                 propertyGroup.Name = container.Name;
-                // this is not pretty, but this is how the data structure is at the moment; we just have to live with it for the time being.
-                var alias = PropertyGroupAlias(container.Name);
-                if (container.ParentKey is not null)
-                {
-                    alias = $"{PropertyGroupAlias(parentContainerNamesById[container.ParentKey.Value])}/{alias}";
-                }
-                propertyGroup.Alias = alias;
+                propertyGroup.Alias = propertyGroupAliasesByKey[container.Key];
                 propertyGroup.SortOrder = container.SortOrder;
 
                 IPropertyType[] properties = model
@@ -753,7 +745,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
                     .Select(property => MapProperty(contentType, property, propertyGroup, existingPropertyTypes, dataTypesByKey))
                     .ToArray();
 
-                if (properties.Any() is false && parentContainerNamesById.ContainsKey(container.Key) is false)
+                if (properties.Any() is false && parentContainerKeys.Contains(container.Key) is false)
                 {
                     // FIXME: if at all possible, retain empty containers (bad DX to remove stuff that's been attempted saved)
                     return null;
@@ -781,6 +773,55 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         {
             contentType.NoGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing, orphanedPropertyTypes);
         }
+    }
+
+    /// <summary>
+    ///     Resolves the property group aliases for the containers in a model.
+    /// </summary>
+    /// <param name="contentType">The content type being updated.</param>
+    /// <param name="model">The model containing the container definitions.</param>
+    /// <returns>The property group aliases keyed by container key.</returns>
+    /// <remarks>
+    ///     An existing property group keeps its own alias unless it has been renamed or moved, because that alias can have
+    ///     been set outside of this service and need not match the container name. A property group within another
+    ///     container is prefixed with the alias of that container, as the alias path is what defines the hierarchy.
+    /// </remarks>
+    private static Dictionary<Guid, string> ResolvePropertyGroupAliases(
+        TContentType contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+    {
+        var existingGroupsByKey = contentType.PropertyGroups.ToDictionary(group => group.Key);
+        // NOTE: at this point we have validated the containers and their parent relationships in the model
+        var containersByKey = model.Containers.ToDictionary(container => container.Key);
+
+        string? ExistingOwnAlias(TPropertyTypeContainer container)
+        {
+            if (existingGroupsByKey.TryGetValue(container.Key, out PropertyGroup? existingGroup) is false
+                || existingGroup.Name != container.Name)
+            {
+                return null;
+            }
+
+            var separatorIndex = existingGroup.Alias.IndexOf('/');
+            var existingParentAlias = separatorIndex < 0 ? null : existingGroup.Alias[..separatorIndex];
+            var parentAlias = container.ParentKey is null
+                ? null
+                : existingGroupsByKey.GetValueOrDefault(container.ParentKey.Value)?.Alias;
+
+            // a container that has moved gets a new alias, the same as a container that has been renamed
+            return existingParentAlias == parentAlias && (container.ParentKey is null || parentAlias is not null)
+                ? existingGroup.Alias[(separatorIndex + 1)..]
+                : null;
+        }
+
+        string OwnAlias(TPropertyTypeContainer container)
+            => ExistingOwnAlias(container) ?? PropertyGroupAlias(container.Name);
+
+        return model.Containers.ToDictionary(
+            container => container.Key,
+            container => container.ParentKey is null
+                ? OwnAlias(container)
+                : $"{OwnAlias(containersByKey[container.ParentKey.Value])}/{OwnAlias(container)}");
     }
 
     /// <summary>
