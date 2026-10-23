@@ -11,6 +11,35 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 internal sealed partial class ContentTypeEditingServiceTests
 {
+    [Test]
+    public async Task Can_Update_Property_Containers_Whose_Names_Generate_The_Same_Alias()
+    {
+        var tab1 = ContentTypePropertyContainerModel("Content");
+        var tab2 = ContentTypePropertyContainerModel("Content!");
+        var propertyType1 = ContentTypePropertyTypeModel("Test Property 1", "testProperty1", containerKey: tab1.Key);
+        var propertyType2 = ContentTypePropertyTypeModel("Test Property 2", "testProperty2", containerKey: tab2.Key);
+        var createModel = ContentTypeCreateModel("Test", "test", propertyTypes: [propertyType1, propertyType2]);
+        createModel.Containers = [tab1, tab2];
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        // existing property groups can have distinct aliases that the current names no longer generate
+        contentType.PropertyGroups.Single(g => g.Key == tab2.Key).Alias = "content!";
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        contentType = await ContentTypeService.GetAsync(contentType.Key);
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        updateModel.Containers = [tab1, tab2];
+        updateModel.Properties = [propertyType1, propertyType2];
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType!, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        contentType = await ContentTypeService.GetAsync(contentType!.Key);
+        Assert.AreEqual("content", contentType!.PropertyGroups.Single(g => g.Key == tab1.Key).Alias);
+        Assert.AreEqual("content1", contentType.PropertyGroups.Single(g => g.Key == tab2.Key).Alias);
+        Assert.AreEqual(2, contentType.PropertyTypes.Count());
+    }
+
     [TestCase(false)]
     [TestCase(true)]
     public async Task Can_Update_All_Basic_Settings(bool isElement)

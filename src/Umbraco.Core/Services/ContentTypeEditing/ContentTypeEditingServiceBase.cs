@@ -704,8 +704,8 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
         // build a dictionary of all data types within the model by their keys (we need it when mapping properties)
         var dataTypesByKey = (await GetDataTypesAsync(model)).ToDictionary(d => d.Key);
 
-        // build a dictionary of parent containers by their IDs (we need it when mapping property groups)
-        var parentContainersById = model
+        // build a dictionary of parent container IDs and their names (we need it when mapping property groups)
+        var parentContainerNamesById = model
             .Containers
             .Where(container => container.ParentKey is not null)
             .DistinctBy(container => container.ParentKey)
@@ -713,11 +713,13 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
                 container => container.ParentKey!.Value,
                 // NOTE: this look-up appears to be a little dangerous, but at this point we should have validated
                 //       the containers and their parent relationships in the model, so it's ok
-                container => model.Containers.First(c => c.Key == container.ParentKey));
+                container => model.Containers.First(c => c.Key == container.ParentKey).Name);
 
         // Store the existing property types in a list to reference when processing properties.
         // This ensures we correctly handle property types that may have been filtered out from groups.
         var existingPropertyTypes = contentType.PropertyTypes.ToList();
+
+        Dictionary<Guid, string> propertyGroupAliasesByKey = PropertyGroupAliases(model.Containers);
 
         // To ensure correct change tracking, we must explicitly inform the content type of any
         // existing properties that have been removed.
@@ -739,13 +741,7 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
                 // NOTE: eventually group.Type should be a string to make the client more flexible; for now we'll have to parse the string value back to its expected enum
                 propertyGroup.Type = Enum.Parse<PropertyGroupType>(container.Type);
                 propertyGroup.Name = container.Name;
-                // this is not pretty, but this is how the data structure is at the moment; we just have to live with it for the time being.
-                var alias = PropertyGroupAlias(container);
-                if (container.ParentKey is not null)
-                {
-                    alias = $"{PropertyGroupAlias(parentContainersById[container.ParentKey.Value])}/{alias}";
-                }
-                propertyGroup.Alias = alias;
+                propertyGroup.Alias = propertyGroupAliasesByKey[container.Key];
                 propertyGroup.SortOrder = container.SortOrder;
 
                 IPropertyType[] properties = model
@@ -754,7 +750,7 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
                     .Select(property => MapProperty(contentType, property, propertyGroup, existingPropertyTypes, dataTypesByKey))
                     .ToArray();
 
-                if (properties.Any() is false && parentContainersById.ContainsKey(container.Key) is false)
+                if (properties.Any() is false && parentContainerNamesById.ContainsKey(container.Key) is false)
                 {
                     // FIXME: if at all possible, retain empty containers (bad DX to remove stuff that's been attempted saved)
                     return null;
@@ -782,6 +778,48 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
         {
             contentType.NoGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing, orphanedPropertyTypes);
         }
+    }
+
+    /// <summary>
+    ///     Generates the property group aliases for the containers in a model.
+    /// </summary>
+    /// <param name="containers">The containers to generate aliases for.</param>
+    /// <returns>The property group aliases keyed by container key.</returns>
+    /// <remarks>
+    ///     The alias of a container within another container is prefixed with the alias of that container, as the alias
+    ///     path is what defines the hierarchy. An alias already used by a previous container is made unique by appending a
+    ///     number.
+    /// </remarks>
+    private static Dictionary<Guid, string> PropertyGroupAliases(IEnumerable<TPropertyTypeContainer> containers)
+    {
+        // NOTE: at this point we have validated the containers and their parent relationships in the model
+        var containersByKey = containers.ToDictionary(container => container.Key);
+        var aliasesByKey = new Dictionary<Guid, string>();
+        var usedAliases = new HashSet<string>();
+
+        foreach (TPropertyTypeContainer container in containersByKey.Values.OrderBy(container => container.ParentKey is null ? 0 : 1))
+        {
+            var alias = PropertyGroupAlias(container);
+            if (container.ParentKey is not null)
+            {
+                TPropertyTypeContainer parent = containersByKey[container.ParentKey.Value];
+
+                // only one level of nesting is supported, so a parent within another container contributes its own alias only
+                var parentAlias = parent.ParentKey is null ? aliasesByKey[parent.Key] : PropertyGroupAlias(parent);
+                alias = $"{parentAlias}/{alias}";
+            }
+
+            var uniqueAlias = alias;
+            var suffix = 1;
+            while (usedAliases.Add(uniqueAlias) is false)
+            {
+                uniqueAlias = $"{alias}{suffix++}";
+            }
+
+            aliasesByKey[container.Key] = uniqueAlias;
+        }
+
+        return aliasesByKey;
     }
 
     /// <summary>
