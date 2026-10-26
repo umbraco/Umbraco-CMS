@@ -1,7 +1,6 @@
 import { UmbMemberCollectionRepository } from '../../collection/index.js';
 import { UMB_MEMBER_ENTITY_TYPE } from '../../constants.js';
 import { type UmbMemberDetailModel } from '../../types.js';
-import type { UmbMemberItemModel } from '../../item/types.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
@@ -16,13 +15,13 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	UmbMemberPickerModalValue
 > {
 	@state()
-	private _members: Array<UmbMemberItemModel | UmbMemberDetailModel> = [];
+	private _members: Array<UmbMemberDetailModel> = [];
 
 	@state()
 	private _searchQuery?: string;
 
 	@state()
-	private _selectableFilter: (item: UmbMemberItemModel) => boolean = () => true;
+	private _selectableFilter: (item: UmbMemberDetailModel) => boolean = () => true;
 
 	#collectionRepository = new UmbMemberCollectionRepository(this);
 	#pickerContext = new UmbCollectionItemPickerContext(this);
@@ -98,7 +97,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		// eslint-disable-next-line @typescript-eslint/no-deprecated
 		if (this.data?.filter) {
 			// eslint-disable-next-line @typescript-eslint/no-deprecated
-			return this._members.filter(this.data.filter as any);
+			return this._members.filter(this.data.filter);
 		} else {
 			return this._members;
 		}
@@ -131,9 +130,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	#renderMemberItem(item: UmbMemberItemModel | UmbMemberDetailModel) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore - TODO: MemberDetailModel does not have a name. It should have so we ignore this for now.
+	#renderMemberItem(item: UmbMemberDetailModel) {
 		const selectable = this._selectableFilter(item);
 
 		return html`

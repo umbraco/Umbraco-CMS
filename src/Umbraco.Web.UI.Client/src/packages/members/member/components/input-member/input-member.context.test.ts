@@ -1,6 +1,6 @@
 import { UMB_MEMBER_SEARCH_PROVIDER_ALIAS } from '../../search/constants.js';
 import { manifests as itemRepositoryManifests } from '../../item/repository/manifests.js';
-import type { UmbMemberItemModel } from '../../item/types.js';
+import type { UmbMemberDetailModel } from '../../types.js';
 import type { UmbMemberPickerModalData } from '../member-picker-modal/member-picker-modal.token.js';
 import { UmbMemberPickerInputContext } from './input-member.context.js';
 import { expect, fixture, html } from '@open-wc/testing';
@@ -14,8 +14,12 @@ import { UMB_MEMBER_TYPE_ENTITY_TYPE, type UmbMemberTypeEntityType } from '@umbr
 @customElement('umb-test-input-member-context-host')
 class UmbTestInputMemberContextHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-const member = (memberTypeUnique: string, name = 'Member'): UmbMemberItemModel =>
-	({ unique: name, name, memberType: { unique: memberTypeUnique }, variants: [{ name }] }) as UmbMemberItemModel;
+const member = (memberTypeUnique: string, name = 'Member'): UmbMemberDetailModel =>
+	({
+		unique: name,
+		memberType: { unique: memberTypeUnique },
+		variants: [{ name, culture: null }],
+	}) as UmbMemberDetailModel;
 
 const allowedContentTypes: Array<{ unique: string; entityType: UmbMemberTypeEntityType }> = [
 	{ unique: 'allowed-type', entityType: UMB_MEMBER_TYPE_ENTITY_TYPE },
@@ -65,7 +69,10 @@ describe('UmbMemberPickerInputContext', () => {
 		});
 
 		it('requires both the allowed member types and the given pickable filter to accept a member', async () => {
-			await context.openPicker({ pickableFilter: (item) => item.name !== 'Rejected' }, { allowedContentTypes });
+			await context.openPicker(
+				{ pickableFilter: (item) => item.variants[0].name !== 'Rejected' },
+				{ allowedContentTypes },
+			);
 
 			const pickableFilter = openedWith[0].pickableFilter!;
 			expect(pickableFilter(member('allowed-type', 'Accepted'))).to.be.true;

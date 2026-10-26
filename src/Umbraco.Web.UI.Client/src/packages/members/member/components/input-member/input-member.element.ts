@@ -1,5 +1,6 @@
 import type { UmbMemberItemModel } from '../../item/types.js';
 import type { UmbMemberSearchItemModel } from '../../search/types.js';
+import type { UmbMemberDetailModel } from '../../types.js';
 import { UmbMemberPickerInputContext } from './input-member.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
@@ -13,7 +14,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/member-type';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
-import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 @customElement('umb-input-member')
 export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
@@ -110,7 +110,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	 * @deprecated Deprecated since v17. Filtering members on the client breaks server-side pagination. Use `browsePickableFilter` and `searchPickableFilter` to prevent members from being picked instead. Scheduled for removal in Umbraco 21.
 	 */
 	@property({ type: Object, attribute: false })
-	public set filter(value: ((member: UmbMemberItemModel) => boolean) | undefined) {
+	public set filter(value: ((member: UmbMemberDetailModel) => boolean) | undefined) {
 		if (value && !this.#hasWarnedFilterDeprecation) {
 			this.#hasWarnedFilterDeprecation = true;
 			new UmbDeprecation({
@@ -121,16 +121,16 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 		}
 		this.#filter = value;
 	}
-	public get filter(): (member: UmbMemberItemModel) => boolean {
+	public get filter(): (member: UmbMemberDetailModel) => boolean {
 		return this.#filter ?? (() => true);
 	}
-	#filter?: (member: UmbMemberItemModel) => boolean;
+	#filter?: (member: UmbMemberDetailModel) => boolean;
 
 	/**
 	 * Prevents items from being picked while browsing. Items for which this returns false are shown but cannot be picked.
 	 */
 	@property({ type: Object, attribute: false })
-	public browsePickableFilter?: (member: UmbMemberItemModel) => boolean;
+	public browsePickableFilter?: (member: UmbMemberDetailModel) => boolean;
 
 	/**
 	 * Prevents search results from being picked. Results for which this returns false are shown but cannot be picked.
@@ -212,7 +212,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 				filter: this.#filter,
 				pickableFilter: this.browsePickableFilter,
 				search: {
-					pickableFilter: this.searchPickableFilter as ((item: UmbSearchResultItemModel) => boolean) | undefined,
+					pickableFilter: this.searchPickableFilter,
 				},
 			},
 			{

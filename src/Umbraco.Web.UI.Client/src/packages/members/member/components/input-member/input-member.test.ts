@@ -1,6 +1,6 @@
 import { UMB_MEMBER_SEARCH_PROVIDER_ALIAS } from '../../search/constants.js';
 import { manifests as itemRepositoryManifests } from '../../item/repository/manifests.js';
-import type { UmbMemberItemModel } from '../../item/types.js';
+import type { UmbMemberDetailModel } from '../../types.js';
 import type { UmbMemberPickerModalData } from '../member-picker-modal/member-picker-modal.token.js';
 import { UmbInputMemberElement } from './input-member.element.js';
 import { expect, fixture, html, waitUntil } from '@open-wc/testing';
@@ -9,8 +9,12 @@ import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-const member = (name: string): UmbMemberItemModel =>
-	({ unique: name, name, memberType: { unique: 'member-type' }, variants: [{ name }] }) as UmbMemberItemModel;
+const browseRow = (name: string): UmbMemberDetailModel =>
+	({
+		unique: name,
+		memberType: { unique: 'member-type' },
+		variants: [{ name, culture: null }],
+	}) as UmbMemberDetailModel;
 
 describe('UmbInputMemberElement', () => {
 	let element: UmbInputMemberElement;
@@ -61,12 +65,12 @@ describe('UmbInputMemberElement', () => {
 
 	describe('pickable filters', () => {
 		it('prevents members rejected by the browse pickable filter from being picked', async () => {
-			element.browsePickableFilter = (item) => item.name !== 'Rejected';
+			element.browsePickableFilter = (item) => item.variants[0].name !== 'Rejected';
 
 			const { pickableFilter } = await openPicker();
 
-			expect(pickableFilter!(member('Accepted'))).to.be.true;
-			expect(pickableFilter!(member('Rejected'))).to.be.false;
+			expect(pickableFilter!(browseRow('Accepted'))).to.be.true;
+			expect(pickableFilter!(browseRow('Rejected'))).to.be.false;
 		});
 
 		it('passes the search pickable filter to the member search', async () => {

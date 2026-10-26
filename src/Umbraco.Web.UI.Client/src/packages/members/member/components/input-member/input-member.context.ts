@@ -1,4 +1,6 @@
 import type { UmbMemberItemModel } from '../../item/types.js';
+import type { UmbMemberSearchItemModel } from '../../search/types.js';
+import type { UmbMemberDetailModel } from '../../types.js';
 import {
 	UMB_MEMBER_PICKER_MODAL,
 	type UmbMemberPickerModalData,
@@ -16,7 +18,7 @@ interface UmbMemberPickerInputContextOpenArgs {
 
 export class UmbMemberPickerInputContext extends UmbPickerInputContext<
 	UmbMemberItemModel,
-	UmbMemberItemModel,
+	UmbMemberDetailModel,
 	UmbMemberPickerModalData,
 	UmbMemberPickerModalValue
 > {
@@ -26,7 +28,7 @@ export class UmbMemberPickerInputContext extends UmbPickerInputContext<
 
 	override async openPicker(
 		pickerData?: Partial<Omit<UmbMemberPickerModalData, 'search'>> & {
-			search?: Partial<UmbPickerModalSearchConfig>;
+			search?: Partial<UmbPickerModalSearchConfig<Record<string, unknown>, UmbMemberSearchItemModel>>;
 		},
 		args?: UmbMemberPickerInputContextOpenArgs,
 	) {
@@ -52,7 +54,7 @@ export class UmbMemberPickerInputContext extends UmbPickerInputContext<
 	}
 
 	#pickableFilter = (
-		item: UmbMemberItemModel,
+		item: UmbMemberDetailModel,
 		allowedContentTypes?: Array<{ unique: string; entityType: UmbMemberTypeEntityType }>,
 	): boolean => {
 		if (allowedContentTypes && allowedContentTypes.length > 0) {
