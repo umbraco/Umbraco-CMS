@@ -187,7 +187,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-button compact label=${this.localize.term('mediaPicker_changeMedia')} @click=${this.#openMediaPicker}>
 				<uui-icon name="icon-search"></uui-icon>
-				<umb-localize key="mediaPicker_changeMedia">Change Media Item</umb-localize>
+				<umb-localize key="mediaPicker_changeMedia">Replace Media Item</umb-localize>
 			</uui-button>
 			<uui-button
 				compact

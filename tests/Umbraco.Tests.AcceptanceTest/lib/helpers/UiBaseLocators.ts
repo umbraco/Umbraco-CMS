@@ -14,6 +14,7 @@ export class UiBaseLocators extends BasePage {
   public readonly addBtn: Locator;
   public readonly updateBtn: Locator;
   public readonly changeBtn: Locator;
+  public readonly replaceBtn: Locator;
   public readonly deleteBtn: Locator;
   public readonly deleteExactBtn: Locator;
   public readonly removeExactBtn: Locator;
@@ -269,6 +270,7 @@ export class UiBaseLocators extends BasePage {
     this.addBtn = page.getByRole("button", { name: "Add", exact: true });
     this.updateBtn = page.getByLabel("Update");
     this.changeBtn = page.getByLabel("Change", { exact: true });
+    this.replaceBtn = page.getByLabel("Replace", { exact: true });
     this.deleteBtn = page.getByRole("button", { name: /^Delete(…)?$/ });
     this.deleteExactBtn = page.getByRole("button", {
       name: "Delete",
@@ -780,6 +782,10 @@ export class UiBaseLocators extends BasePage {
 
   async clickChangeButton() {
     await this.click(this.changeBtn);
+  }
+
+  async clickReplaceButton() {
+    await this.click(this.replaceBtn);
   }
 
   async clickDeleteButton() {

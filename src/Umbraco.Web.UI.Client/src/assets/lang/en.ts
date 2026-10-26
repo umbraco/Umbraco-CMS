@@ -1437,7 +1437,7 @@ export default {
 		pickedTrashedItems: 'You have picked media items currently deleted or in the recycle bin',
 		trashed: 'Trashed',
 		openMedia: 'Open in Media Library',
-		changeMedia: 'Change Media Item',
+		changeMedia: 'Replace Media Item',
 		editMediaEntryLabel: 'Edit %0% on %1%',
 		confirmCancelMediaEntryCreationHeadline: 'Discard creation?',
 		confirmCancelMediaEntryCreationMessage: 'Are you sure you want to cancel the creation.',
