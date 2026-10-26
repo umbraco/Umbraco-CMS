@@ -704,22 +704,18 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
         // build a dictionary of all data types within the model by their keys (we need it when mapping properties)
         var dataTypesByKey = (await GetDataTypesAsync(model)).ToDictionary(d => d.Key);
 
-        // build a dictionary of parent container IDs and their names (we need it when mapping property groups)
-        var parentContainerNamesById = model
+        // collect the keys of all parent containers (we need them when mapping property groups)
+        var parentContainerKeys = model
             .Containers
             .Where(container => container.ParentKey is not null)
-            .DistinctBy(container => container.ParentKey)
-            .ToDictionary(
-                container => container.ParentKey!.Value,
-                // NOTE: this look-up appears to be a little dangerous, but at this point we should have validated
-                //       the containers and their parent relationships in the model, so it's ok
-                container => model.Containers.First(c => c.Key == container.ParentKey).Name);
+            .Select(container => container.ParentKey!.Value)
+            .ToHashSet();
+
+        Dictionary<Guid, string> propertyGroupAliasesByKey = ResolvePropertyGroupAliases(contentType, model);
 
         // Store the existing property types in a list to reference when processing properties.
         // This ensures we correctly handle property types that may have been filtered out from groups.
         var existingPropertyTypes = contentType.PropertyTypes.ToList();
-
-        Dictionary<Guid, string> propertyGroupAliasesByKey = PropertyGroupAliases(model.Containers);
 
         // To ensure correct change tracking, we must explicitly inform the content type of any
         // existing properties that have been removed.
@@ -750,7 +746,7 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
                     .Select(property => MapProperty(contentType, property, propertyGroup, existingPropertyTypes, dataTypesByKey))
                     .ToArray();
 
-                if (properties.Any() is false && parentContainerNamesById.ContainsKey(container.Key) is false)
+                if (properties.Any() is false && parentContainerKeys.Contains(container.Key) is false)
                 {
                     // FIXME: if at all possible, retain empty containers (bad DX to remove stuff that's been attempted saved)
                     return null;
@@ -781,45 +777,100 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
     }
 
     /// <summary>
-    ///     Generates the property group aliases for the containers in a model.
+    ///     Resolves the property group aliases for the containers in a model.
     /// </summary>
-    /// <param name="containers">The containers to generate aliases for.</param>
+    /// <param name="contentType">The content type being updated.</param>
+    /// <param name="model">The model containing the container definitions.</param>
     /// <returns>The property group aliases keyed by container key.</returns>
     /// <remarks>
-    ///     The alias of a container within another container is prefixed with the alias of that container, as the alias
-    ///     path is what defines the hierarchy. An alias already used by a previous container is made unique by appending a
-    ///     number.
+    ///     An existing property group keeps its own alias unless its name or type has changed, because that alias can have
+    ///     been set outside of this service and need not match the container name. A property group within another
+    ///     container is prefixed with the resolved alias of that container, as the alias path is what defines the hierarchy.
+    ///     An alias that differs from the one stored is made unique by appending a number, so unchanged aliases take precedence.
     /// </remarks>
-    private static Dictionary<Guid, string> PropertyGroupAliases(IEnumerable<TPropertyTypeContainer> containers)
+    private static Dictionary<Guid, string> ResolvePropertyGroupAliases(
+        TContentType contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
     {
+        var existingGroupsByKey = contentType.PropertyGroups.ToDictionary(group => group.Key);
+        var existingAliases = contentType.PropertyGroups.Select(group => group.Alias).ToHashSet();
+
         // NOTE: at this point we have validated the containers and their parent relationships in the model
-        var containersByKey = containers.ToDictionary(container => container.Key);
-        var aliasesByKey = new Dictionary<Guid, string>();
-        var usedAliases = new HashSet<string>();
+        var containersByKey = model.Containers.ToDictionary(container => container.Key);
 
-        foreach (TPropertyTypeContainer container in containersByKey.Values.OrderBy(container => container.ParentKey is null ? 0 : 1))
+        string OwnAlias(TPropertyTypeContainer container)
         {
-            var alias = PropertyGroupAlias(container);
-            if (container.ParentKey is not null)
+            if (existingGroupsByKey.TryGetValue(container.Key, out PropertyGroup? existingGroup) is false
+                || existingGroup.Name != container.Name
+                || existingGroup.Type != Enum.Parse<PropertyGroupType>(container.Type))
             {
-                TPropertyTypeContainer parent = containersByKey[container.ParentKey.Value];
-
-                // only one level of nesting is supported, so a parent within another container contributes its own alias only
-                var parentAlias = parent.ParentKey is null ? aliasesByKey[parent.Key] : PropertyGroupAlias(parent);
-                alias = $"{parentAlias}/{alias}";
+                return PropertyGroupAlias(container);
             }
 
-            var uniqueAlias = alias;
-            var suffix = 1;
-            while (usedAliases.Add(uniqueAlias) is false)
+            // a root container whose stored parent is not one of the groups of this content type (for example a tab
+            // from a composition) was never presented with a parent, so it keeps its full alias
+            var parentSeparatorIndex = existingGroup.Alias.IndexOf('/');
+            if (container.ParentKey is null
+                && parentSeparatorIndex >= 0
+                && existingAliases.Contains(existingGroup.Alias[..parentSeparatorIndex]) is false)
             {
-                uniqueAlias = $"{alias}{suffix++}";
+                return existingGroup.Alias;
             }
 
-            aliasesByKey[container.Key] = uniqueAlias;
+            return existingGroup.Alias[(existingGroup.Alias.LastIndexOf('/') + 1)..];
+        }
+
+        var aliasesByKey = new Dictionary<Guid, string>();
+
+        string AliasPath(TPropertyTypeContainer container)
+        {
+            if (container.ParentKey is null)
+            {
+                return OwnAlias(container);
+            }
+
+            TPropertyTypeContainer parent = containersByKey[container.ParentKey.Value];
+
+            // only one level of nesting is supported, so a parent within another container contributes its own alias only
+            var parentAlias = parent.ParentKey is null ? aliasesByKey[parent.Key] : OwnAlias(parent);
+            return $"{parentAlias}/{OwnAlias(container)}";
+        }
+
+        var usedAliases = new HashSet<string>();
+        foreach (IGrouping<bool, TPropertyTypeContainer> level in model.Containers
+                     .GroupBy(container => container.ParentKey is null)
+                     .OrderByDescending(level => level.Key))
+        {
+            IEnumerable<(Guid Key, string Alias)> candidates = level
+                .Select(container => (container.Key, Alias: AliasPath(container)))
+                .OrderBy(candidate => existingGroupsByKey.GetValueOrDefault(candidate.Key)?.Alias == candidate.Alias ? 0 : 1)
+                .ToArray();
+
+            foreach ((Guid key, string alias) in candidates)
+            {
+                aliasesByKey[key] = ReserveUniqueAlias(alias, usedAliases);
+            }
         }
 
         return aliasesByKey;
+    }
+
+    /// <summary>
+    ///     Reserves an alias, appending a number when it is already in use.
+    /// </summary>
+    /// <param name="alias">The alias to reserve.</param>
+    /// <param name="usedAliases">The aliases in use, which the reserved alias is added to.</param>
+    /// <returns>The reserved alias.</returns>
+    private static string ReserveUniqueAlias(string alias, HashSet<string> usedAliases)
+    {
+        var uniqueAlias = alias;
+        var suffix = 1;
+        while (usedAliases.Add(uniqueAlias) is false)
+        {
+            uniqueAlias = $"{alias}{suffix++}";
+        }
+
+        return uniqueAlias;
     }
 
     /// <summary>
