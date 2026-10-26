@@ -135,7 +135,7 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
             .WithCultureName("da-DK", "Danish Name")
             .Build();
         var contentSchedule = ContentScheduleCollection.CreateWithEntry("da-DK", DateTime.UtcNow.AddDays(1), null);
-        contentSchedule.Add(new ContentSchedule("en-US", DateTime.UtcNow.AddDays(1), ContentScheduleAction.Release, includeInvariantForVariant: null));
+        contentSchedule.Add(new ContentSchedule("en-US", DateTime.UtcNow.AddDays(1), ContentScheduleAction.Release, includeInvariantForVariant: true));
         ContentService.Save(content, contentSchedule: contentSchedule);
 
         var result = await LanguageService.DeleteAsync("da-DK", Constants.Security.SuperUserKey);

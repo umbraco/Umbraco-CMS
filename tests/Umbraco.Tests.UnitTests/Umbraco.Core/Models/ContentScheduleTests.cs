@@ -106,13 +106,11 @@ public class ContentScheduleTests
         Assert.AreEqual(2, schedule.FullSchedule.Count());
     }
 
-    [TestCase(null, null, true)]
     [TestCase(true, true, true)]
     [TestCase(false, false, true)]
     [TestCase(true, false, false)]
-    [TestCase(null, true, false)]
-    [TestCase(null, false, false)]
-    public void Equality_Includes_Invariant_For_Variant_Inclusion(bool? first, bool? second, bool expected)
+    [TestCase(false, true, false)]
+    public void Equality_Includes_Invariant_For_Variant_Inclusion(bool first, bool second, bool expected)
     {
         var now = DateTime.UtcNow;
         var schedule = new ContentSchedule("en-US", now, ContentScheduleAction.Release, first);

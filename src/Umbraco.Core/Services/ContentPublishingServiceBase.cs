@@ -86,7 +86,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
                     culture,
                     cultureToSchedule.Schedule!.PublishDate.Value.UtcDateTime,
                     ContentScheduleAction.Release,
-                    includeInvariantForVariant);
+                    includeInvariantForVariant.Value);
             }
 
             if (cultureToSchedule.Schedule!.UnpublishDate is null)
@@ -99,7 +99,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
                     culture,
                     cultureToSchedule.Schedule!.UnpublishDate.Value.UtcDateTime,
                     ContentScheduleAction.Expire,
-                    includeInvariantForVariant: null);
+                    includeInvariantForVariant: true);
             }
         }
 

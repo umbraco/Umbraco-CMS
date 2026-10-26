@@ -52,9 +52,9 @@ internal sealed class ContentScheduleDto
 
     /// <summary>
     /// Gets or sets a value indicating whether a scheduled release of variant content includes its invariant properties.
-    /// A null value indicates that the invariant properties are included.
     /// </summary>
     [Column("includeInvariantForVariant")]
-    [NullSetting(NullSetting = NullSettings.Null)]
-    public bool? IncludeInvariantForVariant { get; set; }
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    [Constraint(Default = "0")]
+    public bool IncludeInvariantForVariant { get; set; }
 }

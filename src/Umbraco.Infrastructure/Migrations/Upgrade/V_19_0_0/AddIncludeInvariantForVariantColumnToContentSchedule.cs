@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 ///     Adds the <c>includeInvariantForVariant</c> column to the <c>umbracoContentSchedule</c> table.
 /// </summary>
 /// <remarks>
-///     Existing schedules are left without a value, so their scheduled releases include invariant properties as before.
+///     Existing schedules are updated to include invariant properties, so their scheduled releases behave as before.
 /// </remarks>
 public class AddIncludeInvariantForVariantColumnToContentSchedule : AsyncMigrationBase
 {
@@ -31,6 +31,11 @@ public class AddIncludeInvariantForVariantColumnToContentSchedule : AsyncMigrati
         }
 
         AddColumn<ContentScheduleDto>(Constants.DatabaseSchema.Tables.ContentSchedule, ColumnName);
+
+        var table = SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentSchedule);
+        var column = SqlSyntax.GetQuotedColumnName(ColumnName);
+        Database.Execute($"UPDATE {table} SET {column} = 1");
+
         return Task.CompletedTask;
     }
 }

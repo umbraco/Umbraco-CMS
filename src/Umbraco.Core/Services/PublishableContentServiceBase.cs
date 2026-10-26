@@ -1371,7 +1371,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     // The release applies the invariant-for-variant access stored when it was scheduled, so the invariant properties
                     // are released with the cultures if any of them was scheduled with that access. The writer's access can't be used
                     // instead: the writer is the last user to save the content, not the user who scheduled it.
-                    var includeInvariantForVariant = pendingReleases.Any(x => x.IncludeInvariantForVariant ?? true);
+                    var includeInvariantForVariant = pendingReleases.Any(x => x.IncludeInvariantForVariant);
                     SavingNotification<TContent> savingNotification = SavingNotification(d, evtMsgs);
                     if (scope.Notifications.PublishCancelable(savingNotification))
                     {

@@ -17,9 +17,9 @@ public class ContentSchedule : IDeepCloneable
     /// <param name="date">The date of the scheduled action.</param>
     /// <param name="action">The action to take.</param>
     /// <param name="includeInvariantForVariant">
-    ///     Whether a scheduled release of variant content includes its invariant properties, or <c>null</c> to include them.
+    ///     Whether a scheduled release of variant content includes its invariant properties.
     /// </param>
-    public ContentSchedule(string culture, DateTime date, ContentScheduleAction action, bool? includeInvariantForVariant)
+    public ContentSchedule(string culture, DateTime date, ContentScheduleAction action, bool includeInvariantForVariant)
         : this(Guid.Empty, culture, date, action, includeInvariantForVariant)
     {
     }
@@ -32,9 +32,9 @@ public class ContentSchedule : IDeepCloneable
     /// <param name="date">The date of the scheduled action.</param>
     /// <param name="action">The action to take.</param>
     /// <param name="includeInvariantForVariant">
-    ///     Whether a scheduled release of variant content includes its invariant properties, or <c>null</c> to include them.
+    ///     Whether a scheduled release of variant content includes its invariant properties.
     /// </param>
-    public ContentSchedule(Guid id, string culture, DateTime date, ContentScheduleAction action, bool? includeInvariantForVariant)
+    public ContentSchedule(Guid id, string culture, DateTime date, ContentScheduleAction action, bool includeInvariantForVariant)
     {
         Id = id; // Guid.Empty will be assigned by document repository
         Culture = culture;
@@ -74,11 +74,10 @@ public class ContentSchedule : IDeepCloneable
     ///     Gets a value indicating whether a scheduled release of variant content includes its invariant properties.
     /// </summary>
     /// <remarks>
-    ///     Determined by the invariant-for-variant access of the user who scheduled the release. When <c>null</c>, the
-    ///     invariant properties are included.
+    ///     Determined by the invariant-for-variant access of the user who scheduled the release.
     /// </remarks>
     [DataMember]
-    public bool? IncludeInvariantForVariant { get; }
+    public bool IncludeInvariantForVariant { get; }
 
     /// <inheritdoc />
     public object DeepClone() => new ContentSchedule(Id, Culture, Date, Action, IncludeInvariantForVariant);

@@ -151,14 +151,14 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         // but the bool won't indicate which date was in error, maybe have 2 diff methods to schedule start/end?
         if (releaseDate.HasValue)
         {
-            var entry = new ContentSchedule(culture, releaseDate.Value, ContentScheduleAction.Release, includeInvariantForVariant: null);
+            var entry = new ContentSchedule(culture, releaseDate.Value, ContentScheduleAction.Release, includeInvariantForVariant: true);
             changes.Add(releaseDate.Value, entry);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
         }
 
         if (expireDate.HasValue)
         {
-            var entry = new ContentSchedule(culture, expireDate.Value, ContentScheduleAction.Expire, includeInvariantForVariant: null);
+            var entry = new ContentSchedule(culture, expireDate.Value, ContentScheduleAction.Expire, includeInvariantForVariant: true);
             changes.Add(expireDate.Value, entry);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
         }
@@ -209,9 +209,9 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// <param name="dateTime">The date and time for the scheduled action.</param>
     /// <param name="action">The action type (release or expire).</param>
     /// <param name="includeInvariantForVariant">
-    ///     Whether a scheduled release of variant content includes its invariant properties, or <c>null</c> to include them.
+    ///     Whether a scheduled release of variant content includes its invariant properties.
     /// </param>
-    public void AddOrUpdate(string culture, DateTime dateTime, ContentScheduleAction action, bool? includeInvariantForVariant)
+    public void AddOrUpdate(string culture, DateTime dateTime, ContentScheduleAction action, bool includeInvariantForVariant)
     {
         // we need to remove the old one as ContentSchedule.Date is immutable
         ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(change =>

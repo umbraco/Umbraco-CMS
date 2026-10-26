@@ -394,7 +394,7 @@ public class ContentVariantAccessPermissionTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Scheduled_Publish_Includes_Pending_Invariant_Change_When_Schedule_Holds_No_Invariant_Access()
+    public async Task Scheduled_Publish_Includes_Pending_Invariant_Change_When_Scheduled_Without_A_User()
     {
         var contentKey = await SetupBaselineContentAsync();
         await MakePendingInvariantEditAsync(contentKey);
