@@ -8,11 +8,14 @@ using Umbraco.Cms.Infrastructure.Models;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
+// TODO: Once https://github.com/Shazwazza/Examine/issues/629 is fixed, subscribe to the notification Examine raises
+// instead of RepopulationRequired, or delete this handler if Examine no longer clears the index when recovering.
+
 /// <summary>
 ///     Rebuilds an index when it reports that it has been cleared and needs to be repopulated.
 /// </summary>
 /// <seealso cref="UmbracoExamineIndex.RepopulationRequired" />
-public sealed class RebuildOnRepopulationRequiredHandler : INotificationHandler<UmbracoApplicationStartedNotification>
+internal sealed class RebuildOnRepopulationRequiredHandler : INotificationHandler<UmbracoApplicationStartedNotification>
 {
     // The notification is published again on restart, but each index only needs to be subscribed to once.
     private static readonly ConditionalWeakTable<UmbracoExamineIndex, object?> _subscribedIndexes = new();

@@ -61,15 +61,18 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
     /// <inheritdoc />
     public virtual string UniqueKeyFieldName => UmbracoExamineFieldNames.NodeKeyFieldName;
 
+    // TODO: Remove RepopulationRequired and the Searcher/CreateIndex recovery overrides once Examine recovers from
+    // index files removed from disk itself: https://github.com/Shazwazza/Examine/issues/629
+
     /// <summary>
     ///     Raised when the index has been cleared to recover from an unreadable state, and needs to be repopulated.
     /// </summary>
-    public event EventHandler? RepopulationRequired;
+    internal event EventHandler? RepopulationRequired;
 
     /// <inheritdoc />
     /// <remarks>
     ///     If files of the index have been removed from disk while the index is in use, the index is cleared so that it
-    ///     can be searched again, and <see cref="RepopulationRequired" /> is raised.
+    ///     can be searched again, and is then repopulated.
     /// </remarks>
     public override ISearcher Searcher
     {
