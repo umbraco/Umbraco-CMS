@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -17,7 +18,7 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 ///     This base class provides shared validation, mapping, and update logic for all content type
 ///     editing services including document types, media types, and member types.
 /// </remarks>
-internal abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeService, TPropertyTypeModel, TPropertyTypeContainer>
+internal abstract partial class ContentTypeEditingServiceBase<TContentType, TContentTypeService, TPropertyTypeModel, TPropertyTypeContainer>
     where TContentType : class, IContentTypeComposition
     where TContentTypeService : IContentTypeBaseService<TContentType>
     where TPropertyTypeModel : PropertyTypeModelBase
@@ -803,7 +804,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
                 || existingGroup.Name != container.Name
                 || existingGroup.Type != Enum.Parse<PropertyGroupType>(container.Type))
             {
-                return PropertyGroupAlias(container.Name);
+                return PropertyGroupAlias(container);
             }
 
             // a root container whose stored parent is not one of the groups of this content type (for example a tab
@@ -873,20 +874,45 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     }
 
     /// <summary>
-    ///     Generates a property group alias from a container name.
+    ///     Generates the local property group alias for a container.
     /// </summary>
-    /// <param name="containerName">The container name to convert.</param>
-    /// <returns>The generated alias in camelCase format.</returns>
-    private static string PropertyGroupAlias(string? containerName)
+    /// <param name="container">The container to generate the alias for.</param>
+    /// <returns>
+    ///     The container name in camelCase, keeping only letters and digits, or the container key when the name
+    ///     contains neither.
+    /// </returns>
+    /// <remarks>
+    ///     The alias must not contain the "/" separator, as the full alias of a nested container is its parent alias
+    ///     and its local alias separated by "/".
+    /// </remarks>
+    private static string PropertyGroupAlias(TPropertyTypeContainer container)
     {
-        if (containerName.IsNullOrWhiteSpace())
+        // Same rules as the alias generation in the AngularJS backoffice (String.prototype.toUmbracoAlias),
+        // except letters and digits outside ASCII are kept rather than stripped.
+        var pascalCasedName = string.Concat(
+            PropertyGroupAliasWordSeparatorRegex()
+                .Split(PropertyGroupAliasInvalidCharactersRegex().Replace(container.Name ?? string.Empty, string.Empty))
+                .Where(word => word.Length > 0)
+                .Select(word => word.ToFirstUpperInvariant()));
+        if (pascalCasedName.Length == 0)
         {
-            throw new ArgumentException("Container name cannot be empty", nameof(containerName));
+            return container.Key.ToString();
         }
 
-        var parts = containerName.Split(Constants.CharArrays.Space);
-        return $"{parts.First().ToFirstLowerInvariant()}{string.Join(string.Empty, parts.Skip(1).Select(part => part.ToFirstUpperInvariant()))}";
+        Match leadingCapitals = PropertyGroupAliasLeadingCapitalsRegex().Match(pascalCasedName);
+        return leadingCapitals.Success
+            ? $"{leadingCapitals.Groups[1].Value.ToLowerInvariant()}{leadingCapitals.Groups[2].Value}".ToFirstLowerInvariant()
+            : pascalCasedName;
     }
+
+    [GeneratedRegex(@"[^\p{L}\p{M}\p{Nd}\s.-]+")]
+    private static partial Regex PropertyGroupAliasInvalidCharactersRegex();
+
+    [GeneratedRegex(@"[\s.-]+")]
+    private static partial Regex PropertyGroupAliasWordSeparatorRegex();
+
+    [GeneratedRegex(@"^(\p{Lu}*)(\p{Lu}.*)$", RegexOptions.Singleline)]
+    private static partial Regex PropertyGroupAliasLeadingCapitalsRegex();
 
     /// <summary>
     ///     Maps a property model to an <see cref="IPropertyType"/>.
