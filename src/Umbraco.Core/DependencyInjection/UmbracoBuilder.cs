@@ -33,6 +33,7 @@ using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.SchemaLockdown;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
@@ -459,6 +460,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // add validation services
             Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
+
+            // Schema lockdown
+            Services.AddUnique<ISchemaRestrictions, SchemaRestrictions>();
 
             // Routing
             Services.AddUnique<DocumentUrlService, DocumentUrlService>();
