@@ -70,5 +70,7 @@ public class UmbracoPremigrationPlan : MigrationPlan
         // The lock is required to write data types, and migrations in the main plan do so, so it has to exist
         // before that plan runs.
         To<V_19_0_0.AddDataTypesLock>("{2B8F0C41-9D57-4E63-B1A9-7F4E52D6C08B}");
+        // The content repositories read and write this column when persisting content schedules.
+        To<V_19_0_0.AddIncludeInvariantForVariantColumnToContentSchedule>("{E432B49F-76A3-473B-B254-EB54FAA125FD}");
     }
 }
