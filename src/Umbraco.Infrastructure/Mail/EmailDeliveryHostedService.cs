@@ -93,5 +93,9 @@ internal sealed class EmailDeliveryHostedService : BackgroundService
         {
             _logger.LogError(ex, "Could not send a queued {EmailType} email.", email.EmailType);
         }
+        finally
+        {
+            _queue!.Release(email);
+        }
     }
 }

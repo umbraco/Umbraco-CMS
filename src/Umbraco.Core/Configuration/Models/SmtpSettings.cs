@@ -66,6 +66,16 @@ public class SmtpSettings : ValidatableEntryBase
     internal const bool StaticSendInBackground = false;
 
     /// <summary>
+    ///     The default maximum number of emails waiting to be sent in the background.
+    /// </summary>
+    internal const int StaticBackgroundQueueCapacity = 1000;
+
+    /// <summary>
+    ///     The default maximum total size, in megabytes, of the attachments of emails waiting to be sent in the background.
+    /// </summary>
+    internal const int StaticBackgroundQueueMaximumAttachmentMegabytes = 50;
+
+    /// <summary>
     ///     Gets or sets a value for the SMTP from address to use for messages.
     /// </summary>
     [Required]
@@ -127,4 +137,27 @@ public class SmtpSettings : ValidatableEntryBase
     // TODO (V20): Consider enabling this by default.
     [DefaultValue(StaticSendInBackground)]
     public bool SendInBackground { get; set; } = StaticSendInBackground;
+
+    /// <summary>
+    ///     Gets or sets the maximum number of emails that can wait to be sent in the background.
+    /// </summary>
+    /// <remarks>
+    ///     Applies when <see cref="SendInBackground"/> is enabled and the default queue is used. When the queue is full, an
+    ///     email is sent while the sender waits instead. Read when the application starts, so a change needs a restart.
+    ///     Values below 1 are treated as 1.
+    /// </remarks>
+    [DefaultValue(StaticBackgroundQueueCapacity)]
+    public int BackgroundQueueCapacity { get; set; } = StaticBackgroundQueueCapacity;
+
+    /// <summary>
+    ///     Gets or sets the maximum total size, in megabytes, of the attachments of emails waiting to be sent in the background.
+    /// </summary>
+    /// <remarks>
+    ///     Applies when <see cref="SendInBackground"/> is enabled and the default queue is used, which holds a copy of each
+    ///     queued email's attachments in memory. An email whose attachments would take the total over this limit is sent
+    ///     while the sender waits instead, as is one with an attachment whose size cannot be determined in advance. Set to
+    ///     0 to send every email with attachments while the sender waits.
+    /// </remarks>
+    [DefaultValue(StaticBackgroundQueueMaximumAttachmentMegabytes)]
+    public int BackgroundQueueMaximumAttachmentMegabytes { get; set; } = StaticBackgroundQueueMaximumAttachmentMegabytes;
 }

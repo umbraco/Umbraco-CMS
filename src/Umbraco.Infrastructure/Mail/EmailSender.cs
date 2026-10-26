@@ -327,40 +327,17 @@ public class EmailSender : IEmailSender
 
         if (_globalSettings.Smtp?.SendInBackground is true)
         {
-            await _emailDeliveryQueue.EnqueueAsync(await CopyAttachmentsAsync(message), emailType, expires);
-            return;
+            if (await _emailDeliveryQueue.TryEnqueueAsync(message, emailType, expires))
+            {
+                return;
+            }
+
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("The background email queue could not accept a {EmailType} email, so it is being sent immediately.", emailType);
+            }
         }
 
         await _emailSenderClient.SendAsync(message, expires);
-    }
-
-    // The attachment streams belong to the caller, who may dispose of them once the send returns, so a queued email
-    // takes its own copy of them.
-    private static async Task<EmailMessage> CopyAttachmentsAsync(EmailMessage message)
-    {
-        if (message.HasAttachments is false)
-        {
-            return message;
-        }
-
-        var attachments = new List<EmailMessageAttachment>();
-        foreach (EmailMessageAttachment attachment in message.Attachments!)
-        {
-            var stream = new MemoryStream();
-            await attachment.Stream.CopyToAsync(stream);
-            stream.Position = 0;
-            attachments.Add(new EmailMessageAttachment(stream, attachment.FileName));
-        }
-
-        return new EmailMessage(
-            message.From,
-            message.To,
-            message.Cc,
-            message.Bcc,
-            message.ReplyTo,
-            message.Subject,
-            message.Body,
-            message.IsBodyHtml,
-            attachments);
     }
 }

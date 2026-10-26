@@ -241,7 +241,7 @@ public class EmailSenderTests
     [Test]
     public async Task SendAsync_Queues_Email_Instead_Of_Sending_When_SendInBackground_Is_Enabled()
     {
-        var queueMock = new Mock<IEmailDeliveryQueue>();
+        var queueMock = CreateQueueMock(accepts: true);
         var clientMock = new Mock<IEmailSenderClient>();
         var sender = CreateSender(_sendInBackgroundSettings, clientMock.Object, emailDeliveryQueue: queueMock.Object);
         var message = CreateMessage();
@@ -249,41 +249,23 @@ public class EmailSenderTests
 
         await sender.SendAsync(message, "Test", expires: expires);
 
-        queueMock.Verify(x => x.EnqueueAsync(message, "Test", expires, It.IsAny<CancellationToken>()), Times.Once);
+        queueMock.Verify(x => x.TryEnqueueAsync(message, "Test", expires, It.IsAny<CancellationToken>()), Times.Once);
         clientMock.Verify(x => x.SendAsync(It.IsAny<EmailMessage>(), It.IsAny<TimeSpan?>()), Times.Never);
     }
 
     [Test]
-    public async Task SendAsync_Queues_A_Copy_Of_Attachments_That_Outlives_The_Callers_Streams_When_SendInBackground_Is_Enabled()
+    public async Task SendAsync_Sends_Immediately_When_The_Queue_Cannot_Accept_The_Email()
     {
-        EmailMessage? queuedMessage = null;
-        var queueMock = new Mock<IEmailDeliveryQueue>();
-        queueMock
-            .Setup(x => x.EnqueueAsync(It.IsAny<EmailMessage>(), It.IsAny<string>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()))
-            .Callback((EmailMessage message, string _, TimeSpan? _, CancellationToken _) => queuedMessage = message)
-            .Returns(ValueTask.CompletedTask);
-        var sender = CreateSender(_sendInBackgroundSettings, Mock.Of<IEmailSenderClient>(), emailDeliveryQueue: queueMock.Object);
-        byte[] content = "Attachment content"u8.ToArray();
-        var attachmentStream = new MemoryStream(content);
-        var message = new EmailMessage(
-            "from@test.com",
-            ["to@test.com"],
-            null,
-            null,
-            null,
-            "Subject",
-            "Body",
-            false,
-            [new EmailMessageAttachment(attachmentStream, "file.txt")]);
+        var queueMock = CreateQueueMock(accepts: false);
+        var clientMock = new Mock<IEmailSenderClient>();
+        var sender = CreateSender(_sendInBackgroundSettings, clientMock.Object, emailDeliveryQueue: queueMock.Object);
+        var message = CreateMessage();
+        var expires = TimeSpan.FromHours(1);
 
-        await sender.SendAsync(message, "Test");
-        await attachmentStream.DisposeAsync();
+        await sender.SendAsync(message, "Test", expires: expires);
 
-        EmailMessageAttachment queuedAttachment = queuedMessage!.Attachments!.Single();
-        using var queuedContent = new MemoryStream();
-        await queuedAttachment.Stream.CopyToAsync(queuedContent);
-        Assert.AreEqual("file.txt", queuedAttachment.FileName);
-        CollectionAssert.AreEqual(content, queuedContent.ToArray());
+        queueMock.Verify(x => x.TryEnqueueAsync(message, "Test", expires, It.IsAny<CancellationToken>()), Times.Once);
+        clientMock.Verify(x => x.SendAsync(message, expires), Times.Once);
     }
 
     [Test]
@@ -298,7 +280,7 @@ public class EmailSenderTests
 
         Assert.ThrowsAsync<SocketException>(async () => await sender.SendAsync(CreateMessage(), "Test"));
         queueMock.Verify(
-            x => x.EnqueueAsync(It.IsAny<EmailMessage>(), It.IsAny<string>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()),
+            x => x.TryEnqueueAsync(It.IsAny<EmailMessage>(), It.IsAny<string>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -320,11 +302,20 @@ public class EmailSenderTests
         await sender.SendAsync(CreateMessage(), "Test", enableNotification: true);
 
         queueMock.Verify(
-            x => x.EnqueueAsync(It.IsAny<EmailMessage>(), It.IsAny<string>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()),
+            x => x.TryEnqueueAsync(It.IsAny<EmailMessage>(), It.IsAny<string>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
     private static EmailMessage CreateMessage() => new("from@test.com", "to@test.com", "Subject", "Body", false);
+
+    private static Mock<IEmailDeliveryQueue> CreateQueueMock(bool accepts)
+    {
+        var queueMock = new Mock<IEmailDeliveryQueue>();
+        queueMock
+            .Setup(x => x.TryEnqueueAsync(It.IsAny<EmailMessage>(), It.IsAny<string>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(accepts);
+        return queueMock;
+    }
 
     private static Mock<IEmailSenderClient> CreateUnreachableClientMock()
     {
