@@ -1,15 +1,54 @@
-import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
+import { UmbSchemaOperationAllowedController } from '@umbraco-cms/backoffice/schema-lockdown';
 
 @customElement('umb-dictionary-collection')
 export class UmbDictionaryCollectionElement extends UmbCollectionDefaultElement {
+	@state()
+	private _isReadOnly = false;
+
+	constructor() {
+		super();
+		this.observe(
+			new UmbSchemaOperationAllowedController(this, { entityType: UMB_DICTIONARY_ENTITY_TYPE, operation: 'update' })
+				.allowed,
+			(allowed) => (this._isReadOnly = !allowed),
+			null,
+		);
+	}
+
 	protected override renderToolbar() {
 		return html`
 			<umb-collection-toolbar slot="header">
-				<umb-collection-filter-field></umb-collection-filter-field>
+				<div id="toolbar-content">
+					<umb-collection-filter-field></umb-collection-filter-field>
+					${this._isReadOnly
+						? html`<uui-tag look="secondary">${this.localize.term('general_readOnly')}</uui-tag>`
+						: nothing}
+				</div>
 			</umb-collection-toolbar>
 		`;
 	}
+
+	static override styles = [
+		...UmbCollectionDefaultElement.styles,
+		css`
+			#toolbar-content {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-3);
+			}
+
+			umb-collection-filter-field {
+				flex: 1 1 auto;
+			}
+
+			uui-tag {
+				white-space: nowrap;
+			}
+		`,
+	];
 }
 
 export { UmbDictionaryCollectionElement as element };

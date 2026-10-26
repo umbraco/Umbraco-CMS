@@ -16,6 +16,7 @@ import {
 import { UmbStylesheetTreeStore } from './stylesheet-tree.store.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_TREE_ALIAS_CONDITION } from '@umbraco-cms/backoffice/tree';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export { UMB_STYLESHEET_TREE_REPOSITORY_ALIAS, UMB_STYLESHEET_TREE_STORE_ALIAS, UMB_STYLESHEET_TREE_ALIAS };
@@ -71,6 +72,11 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			{
 				alias: UMB_TREE_ALIAS_CONDITION,
 				match: UMB_STYLESHEET_TREE_ALIAS,
+			},
+			{
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_STYLESHEET_ENTITY_TYPE,
+				operation: 'create',
 			},
 		],
 	},
