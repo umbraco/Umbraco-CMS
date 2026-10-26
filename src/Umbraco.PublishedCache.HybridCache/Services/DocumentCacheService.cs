@@ -655,7 +655,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         if (content.Trashed)
         {
             _databaseCacheRepository.DeleteContentItem(content.Id);
-            AfterCommit(scope, $"{nameof(DocumentCacheService)}.{nameof(RemoveFromMemoryCacheAsync)}.{content.Key}", () => RemoveFromMemoryCacheAsync(content.Key));
+            AfterCommit($"{nameof(DocumentCacheService)}.{nameof(RemoveFromMemoryCacheAsync)}.{content.Key}", () => RemoveFromMemoryCacheAsync(content.Key));
             scope.Complete();
             return;
         }
@@ -671,7 +671,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         else if (content.PublishedState is PublishedState.Unpublishing)
         {
             _databaseCacheRepository.RemovePublishedContent(content.Id);
-            AfterCommit(scope, $"{nameof(DocumentCacheService)}.{nameof(ClearPublishedCacheAsync)}.{content.Key}", () => ClearPublishedCacheAsync(content.Key));
+            AfterCommit($"{nameof(DocumentCacheService)}.{nameof(ClearPublishedCacheAsync)}.{content.Key}", () => ClearPublishedCacheAsync(content.Key));
         }
 
         scope.Complete();
@@ -682,7 +682,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     /// distributed cache) does not run while the content tree lock is held. Without an ambient scope context the
     /// update runs at once.
     /// </summary>
-    private void AfterCommit(ICoreScope scope, string key, Func<Task> update)
+    private void AfterCommit(string key, Func<Task> update)
     {
         IScopeContext? context = _scopeProvider.Context;
         if (context is null)

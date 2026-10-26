@@ -73,7 +73,7 @@ public class PublishStatusRepository : IPublishStatusRepository
 
     public async Task<ISet<string>> GetPublishStatusAsync(Guid documentKey, CancellationToken cancellationToken)
     {
-        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(GetPublishStatusSql(documentKey));
+        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(GetPublishStatusSql(documentKey), cancellationToken);
         return ToPublishStatus(documentKey, databaseRecords);
     }
 
@@ -117,13 +117,13 @@ public class PublishStatusRepository : IPublishStatusRepository
     /// </returns>
     public async Task<IDictionary<Guid, ISet<string>>> GetDescendantsOrSelfPublishStatusAsync(Guid rootDocumentKey, CancellationToken cancellationToken)
     {
-        var rootPath = await Database.ExecuteScalarAsync<string>(GetRootPathSql(rootDocumentKey));
+        var rootPath = await Database.ExecuteScalarAsync<string>(GetRootPathSql(rootDocumentKey), cancellationToken);
         if (string.IsNullOrWhiteSpace(rootPath))
         {
             return new Dictionary<Guid, ISet<string>>();
         }
 
-        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(GetDescendantsOrSelfSql(rootDocumentKey, rootPath));
+        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(GetDescendantsOrSelfSql(rootDocumentKey, rootPath), cancellationToken);
         return Map(databaseRecords);
     }
 

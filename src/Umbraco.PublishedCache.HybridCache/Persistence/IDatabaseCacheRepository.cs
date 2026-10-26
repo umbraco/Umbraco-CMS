@@ -1,4 +1,3 @@
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
@@ -135,30 +134,36 @@ internal interface IDatabaseCacheRepository
     /// and the notification pipeline are asynchronous, awaiting there needs a second thread-pool thread while the
     /// first is blocked, which under load stretches the time the lock is held.
     /// </remarks>
+    /// <param name="id">The identifier of the content item.</param>
     // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
     void DeleteContentItem(int id) => DeleteContentItemAsync(id).GetAwaiter().GetResult();
 
     /// <summary>
     /// Refreshes a content item's rows without leaving the calling thread.
     /// </summary>
+    /// <param name="contentCacheNode">The cache node to write.</param>
     // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
     void RefreshContent(ContentCacheNode contentCacheNode) => RefreshContentAsync(contentCacheNode).GetAwaiter().GetResult();
 
     /// <summary>
     /// Refreshes a media item's rows without leaving the calling thread.
     /// </summary>
+    /// <param name="contentCacheNode">The cache node to write.</param>
     // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
     void RefreshMedia(ContentCacheNode contentCacheNode) => RefreshMediaAsync(contentCacheNode).GetAwaiter().GetResult();
 
     /// <summary>
     /// Removes a content item's published row without leaving the calling thread.
     /// </summary>
+    /// <param name="id">The identifier of the content item.</param>
     // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
     void RemovePublishedContent(int id) => RemovePublishedContentAsync(id).GetAwaiter().GetResult();
 
     /// <summary>
     /// Gets the draft and published cache nodes of a document without leaving the calling thread.
     /// </summary>
+    /// <param name="key">The key of the document.</param>
+    /// <returns>The draft and published cache nodes; either is <c>null</c> when that state does not exist.</returns>
     // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
     (ContentCacheNode? Draft, ContentCacheNode? Published) GetContentSourceForPublishStates(Guid key)
         => GetContentSourceForPublishStatesAsync(key).GetAwaiter().GetResult();
