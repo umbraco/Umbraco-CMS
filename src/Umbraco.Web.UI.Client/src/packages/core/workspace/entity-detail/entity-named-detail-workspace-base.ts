@@ -6,6 +6,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
 
+const ENTITY_READ_ONLY_RULE_UNIQUE = 'UMB_ENTITY_READ_ONLY';
+
 export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 	NamedDetailModelType extends UmbNamedEntityModel = UmbNamedEntityModel,
 	NamedDetailRepositoryType extends UmbDetailRepository<NamedDetailModelType> =
@@ -26,6 +28,17 @@ export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 	constructor(host: UmbControllerHost, args: UmbEntityDetailWorkspaceContextArgs) {
 		super(host, args);
 		this.nameWriteGuard.fallbackToPermitted();
+		this.observe(
+			this.readOnly,
+			(isReadOnly) => {
+				if (isReadOnly) {
+					this.nameWriteGuard.addRule({ unique: ENTITY_READ_ONLY_RULE_UNIQUE, permitted: false });
+				} else {
+					this.nameWriteGuard.removeRule(ENTITY_READ_ONLY_RULE_UNIQUE);
+				}
+			},
+			null,
+		);
 		this.observe(
 			this.name,
 			(name) => {
