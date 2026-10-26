@@ -118,5 +118,10 @@ public static partial class Constants
         ///     Acquire before <see cref="ContentTypes" /> if both are needed, as content types reference data types.
         /// </remarks>
         public const int DataTypes = -350;
+
+        /// <summary>
+        ///     All relations and relation types.
+        /// </summary>
+        public const int Relations = -351;
     }
 }

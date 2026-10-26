@@ -111,7 +111,7 @@ internal sealed class ContentRelationsUpdate :
         // This runs after the triggering operation has committed, so it is a transaction of its own. The write lock
         // must be taken before anything is read, otherwise a database that serializes writers (such as SQLite) can
         // refuse the first write once another connection has committed since this transaction started reading.
-        scope.WriteLock(entitiesAsArray.Select(GetTreeLockId).Distinct().ToArray());
+        scope.WriteLock(Constants.Locks.Relations);
 
         foreach (IContentBase entity in entitiesAsArray)
         {
@@ -120,16 +120,6 @@ internal sealed class ContentRelationsUpdate :
 
         scope.Complete();
     }
-
-    private static int GetTreeLockId(IContentBase entity)
-        => entity switch
-        {
-            IContent => Constants.Locks.ContentTree,
-            IMedia => Constants.Locks.MediaTree,
-            IMember => Constants.Locks.MemberTree,
-            IElement => Constants.Locks.ElementTree,
-            _ => throw new NotSupportedException($"Cannot persist relations for an entity of type {entity.GetType().FullName}."),
-        };
 
     private void PersistRelations(IScope scope, IContentBase entity, bool checkNodeExists)
     {

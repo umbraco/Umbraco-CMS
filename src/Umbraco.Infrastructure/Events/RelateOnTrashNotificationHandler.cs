@@ -60,8 +60,7 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName,
             Constants.ObjectTypes.Document,
-            Constants.ObjectTypes.Document,
-            Constants.Locks.ContentTree);
+            Constants.ObjectTypes.Document);
         return Task.CompletedTask;
     }
 
@@ -80,8 +79,7 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
             Constants.ObjectTypes.Media,
-            Constants.ObjectTypes.Media,
-            Constants.Locks.MediaTree);
+            Constants.ObjectTypes.Media);
         return Task.CompletedTask;
     }
 
@@ -100,8 +98,7 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteName,
             Constants.ObjectTypes.ElementContainer,
-            Constants.ObjectTypes.Element,
-            Constants.Locks.ElementTree);
+            Constants.ObjectTypes.Element);
         return Task.CompletedTask;
     }
 
@@ -138,8 +135,7 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteName,
             Constants.ObjectTypes.ElementContainer,
-            Constants.ObjectTypes.ElementContainer,
-            Constants.Locks.ElementTree);
+            Constants.ObjectTypes.ElementContainer);
         return Task.CompletedTask;
     }
 
@@ -170,8 +166,7 @@ public sealed class RelateOnTrashNotificationHandler :
         string originalParentRelationTypeAlias,
         string originalParentRelationTypeName,
         Guid parentObjectType,
-        Guid childObjectType,
-        int treeLockId)
+        Guid childObjectType)
         where T : ITreeEntity
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -179,7 +174,7 @@ public sealed class RelateOnTrashNotificationHandler :
         // This runs after the move to the recycle bin has committed, so it is a transaction of its own. The write lock
         // must be taken before anything is read, otherwise a database that serializes writers (such as SQLite) can
         // refuse the first write once another connection has committed since this transaction started reading.
-        scope.WriteLock(treeLockId);
+        scope.WriteLock(Constants.Locks.Relations);
 
         IRelationType? relationType = _relationService.GetRelationTypeByAlias(originalParentRelationTypeAlias);
 
