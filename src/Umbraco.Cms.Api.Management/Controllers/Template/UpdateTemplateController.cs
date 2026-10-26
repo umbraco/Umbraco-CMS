@@ -7,7 +7,6 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.Template;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -27,7 +26,6 @@ public class UpdateTemplateController : TemplateControllerBase
     private readonly ITemplateService _templateService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateTemplateController"/> class, which manages update operations for templates in the Umbraco CMS.
@@ -35,30 +33,27 @@ public class UpdateTemplateController : TemplateControllerBase
     /// <param name="templateService">Service used to perform operations on templates.</param>
     /// <param name="umbracoMapper">Mapper used to convert between domain models and API models.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
-    /// <param name="runtimeSettings">The runtime configuration settings.</param>
     [ActivatorUtilitiesConstructor]
+    public UpdateTemplateController(
+        ITemplateService templateService,
+        IUmbracoMapper umbracoMapper,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    {
+        _templateService = templateService;
+        _umbracoMapper = umbracoMapper;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public UpdateTemplateController(
         ITemplateService templateService,
         IUmbracoMapper umbracoMapper,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IOptions<RuntimeSettings> runtimeSettings)
-    {
-        _templateService = templateService;
-        _umbracoMapper = umbracoMapper;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _runtimeSettings = runtimeSettings;
-    }
-
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public UpdateTemplateController(
-        ITemplateService templateService,
-        IUmbracoMapper umbracoMapper,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         : this(
             templateService,
             umbracoMapper,
-            backOfficeSecurityAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
+            backOfficeSecurityAccessor)
     {
     }
 
@@ -87,13 +82,7 @@ public class UpdateTemplateController : TemplateControllerBase
             return TemplateNotFound();
         }
 
-        // In production mode, block updates if the content is being changed.
-        var existingContent = template.Content;
         template = _umbracoMapper.Map(requestModel, template);
-        if (_runtimeSettings.Value.Mode == RuntimeMode.Production && existingContent != template.Content)
-        {
-            return TemplateOperationStatusResult(TemplateOperationStatus.ContentChangeNotAllowedInProductionMode);
-        }
 
         Attempt<ITemplate, TemplateOperationStatus> result = await _templateService.UpdateAsync(template, CurrentUserKey(_backOfficeSecurityAccessor));
 

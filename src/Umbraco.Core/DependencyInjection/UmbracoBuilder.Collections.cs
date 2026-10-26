@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.SchemaLockdown;
+using Umbraco.Cms.Core.SchemaLockdown.Configurators;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Snippets;
@@ -115,7 +116,8 @@ public static partial class UmbracoBuilderExtensions
         builder.WebhookEvents().AddCms(true, webhookPayloadType);
 
         builder.ContentTypeFilters();
-        builder.SchemaLockdownConfigurators();
+        builder.SchemaLockdownConfigurators()
+            .Add<ProductionRuntimeModeSchemaLockdownConfigurator>();
     }
 
     /// <summary>
