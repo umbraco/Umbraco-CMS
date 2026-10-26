@@ -217,7 +217,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 		if (_changedProperties.has('filter')) {
 			// eslint-disable-next-line @typescript-eslint/no-deprecated
-			this._api!.filter = this.filter;
+			this._api!.filter = this.#filter;
 		}
 
 		if (_changedProperties.has('expansion')) {

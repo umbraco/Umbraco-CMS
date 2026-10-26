@@ -31,9 +31,9 @@ export class UmbDefaultCollectionMenuContext extends UmbContextBase {
 		this.#filter = value;
 	}
 	public get filter(): ((item: UmbCollectionItemModel) => boolean) | undefined {
-		return this.#filter;
+		return this.#filter ?? (() => true);
 	}
-	#filter?: (item: UmbCollectionItemModel) => boolean = () => true;
+	#filter?: (item: UmbCollectionItemModel) => boolean;
 	public filterArgs?: Record<string, unknown>;
 
 	public readonly selection = new UmbSelectionManager(this);

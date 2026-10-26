@@ -53,9 +53,9 @@ export class UmbDefaultTreeContext<
 		this.#filter = value;
 	}
 	public get filter(): ((item: TreeItemType) => boolean) | undefined {
-		return this.#filter;
+		return this.#filter ?? (() => true);
 	}
-	#filter?: (item: TreeItemType) => boolean = () => true;
+	#filter?: (item: TreeItemType) => boolean;
 
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly expansion = new UmbTreeExpansionManager(this);
