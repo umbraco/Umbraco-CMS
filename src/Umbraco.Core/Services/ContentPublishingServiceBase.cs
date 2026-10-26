@@ -68,7 +68,10 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             culturesToPublishOrSchedule.Where(culture => culture.Schedule is null).Select(c => c.Culture ?? Constants.System.InvariantCulture).ToHashSet();
 
         ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(key);
-        bool? includeInvariantForVariant = null;
+
+        // The release runs without an editor, so it applies the access of the user scheduling it.
+        bool includeInvariantForVariant = culturesToPublishOrSchedule.Any(c => c.Schedule?.PublishDate is not null)
+            && (await _userService.GetRequiredUserAsync(userKey)).HasAccessToInvariantForVariant();
 
         foreach (CulturePublishScheduleModel cultureToSchedule in culturesToPublishOrSchedule.Where(c => c.Schedule is not null))
         {
@@ -80,13 +83,11 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             }
             else
             {
-                // The release runs without an editor, so it applies the access of the user scheduling it.
-                includeInvariantForVariant ??= (await _userService.GetRequiredUserAsync(userKey)).HasAccessToInvariantForVariant();
                 schedules.AddOrUpdate(
                     culture,
                     cultureToSchedule.Schedule!.PublishDate.Value.UtcDateTime,
                     ContentScheduleAction.Release,
-                    includeInvariantForVariant.Value);
+                    includeInvariantForVariant);
             }
 
             if (cultureToSchedule.Schedule!.UnpublishDate is null)
