@@ -56,6 +56,19 @@ public class ImageCropperPropertyValueEditorTests
         fileSystem.Verify(x => x.DeleteFile(It.IsAny<string>()), Times.Never);
     }
 
+    [TestCase(null)]
+    [TestCase("null")]
+    public void Empty_Value_Without_Current_File_Is_Stored_As_Null(string? currentValue)
+    {
+        ImageCropperPropertyValueEditor editor = CreateEditor(out _, out _);
+
+        var result = editor.FromEditor(
+            new ContentPropertyData(null, null) { ContentKey = EditingItem, PropertyTypeKey = PropertyType },
+            currentValue);
+
+        Assert.IsNull(result);
+    }
+
     private static ImageCropperPropertyValueEditor CreateEditor(out Mock<IFileSystem> fileSystem, out MediaFileManager manager)
     {
         fileSystem = new Mock<IFileSystem>();

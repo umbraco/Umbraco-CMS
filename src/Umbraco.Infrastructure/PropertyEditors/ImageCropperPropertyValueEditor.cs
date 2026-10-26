@@ -190,11 +190,18 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
                 return null; // clear
             }
 
-            if (editorImageCropperValue is not null && temporaryFileKey.HasValue)
+            if (editorImageCropperValue is null)
+            {
+                // nothing to begin with and nothing supplied => store null, not the serialized JSON text "null"
+                return null;
+            }
+
+            if (temporaryFileKey.HasValue)
             {
                 // a plausible tempFile value was supplied, but could not be converted to an actual file => clear the src
                 editorImageCropperValue.Src = null;
             }
+
             return _jsonSerializer.Serialize(editorImageCropperValue); // unchanged
         }
 
