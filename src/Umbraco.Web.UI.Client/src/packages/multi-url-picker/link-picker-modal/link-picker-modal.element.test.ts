@@ -1,7 +1,7 @@
 import type { UmbLinkPickerModalData, UmbLinkPickerModalValue } from './link-picker-modal.token.js';
 import { UmbLinkPickerModalElement } from './link-picker-modal.element.js';
 import { UMB_DOCUMENT_LINK_PICKER_MODAL } from '../document-link-picker-modal/document-link-picker-modal.token.js';
-import { expect, fixture, html, waitUntil } from '@open-wc/testing';
+import { aTimeout, expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
@@ -175,6 +175,7 @@ describe('UmbLinkPickerModalElement', () => {
 		let host: UmbTestLinkPickerModalHostElement;
 		let modal: UmbLinkPickerModalElement;
 		let openedModals: Array<unknown>;
+		let pickerResult: () => Promise<unknown>;
 
 		before(async () => {
 			await useMockSet('kitchenSink');
@@ -184,13 +185,12 @@ describe('UmbLinkPickerModalElement', () => {
 			host = await fixture(html`<umb-test-link-picker-modal-host></umb-test-link-picker-modal-host>`);
 
 			openedModals = [];
+			pickerResult = () => Promise.resolve({ unique: CHECKBOX_LIST_ID, entityType: UMB_DOCUMENT_ENTITY_TYPE });
 			const modalManager = {
 				getHostElement: () => host,
 				open: (_host: unknown, token: unknown) => {
 					openedModals.push(token);
-					return {
-						onSubmit: () => Promise.resolve({ unique: CHECKBOX_LIST_ID, entityType: UMB_DOCUMENT_ENTITY_TYPE }),
-					};
+					return { onSubmit: pickerResult };
 				},
 			};
 			host.provideContext(UMB_MODAL_MANAGER_CONTEXT, modalManager as never);
@@ -212,13 +212,15 @@ describe('UmbLinkPickerModalElement', () => {
 			);
 		});
 
-		it('changes the document in place, keeping title, anchor and target', async () => {
-			const changeButton = modal.shadowRoot!.querySelector<HTMLElement>(
-				`uui-action-bar uui-button[label="${modal.localize.term('general_change')}"]`,
+		const replaceButton = () =>
+			modal.shadowRoot!.querySelector<HTMLElement>(
+				`uui-action-bar uui-button[label="${modal.localize.term('actions_replace')}"]`,
 			);
-			expect(changeButton, 'change button').to.exist;
 
-			changeButton!.click();
+		it('replaces the document in place, keeping title, anchor and target', async () => {
+			expect(replaceButton(), 'replace button').to.exist;
+
+			replaceButton()!.click();
 			await waitUntil(() => modal.value.link.unique === CHECKBOX_LIST_ID, 'document was not changed');
 
 			expect(openedModals).to.deep.equal([UMB_DOCUMENT_LINK_PICKER_MODAL]);
@@ -229,6 +231,27 @@ describe('UmbLinkPickerModalElement', () => {
 				queryString: '#anchor',
 				target: '_blank',
 			});
+		});
+
+		it('keeps the link and settles quietly when the picker is closed without choosing', async () => {
+			pickerResult = () => Promise.reject(new Error('Closed'));
+			const unhandled: Array<unknown> = [];
+			const onUnhandledRejection = (event: PromiseRejectionEvent) => {
+				unhandled.push(event.reason);
+				event.preventDefault();
+			};
+			window.addEventListener('unhandledrejection', onUnhandledRejection);
+
+			try {
+				replaceButton()!.click();
+				await waitUntil(() => openedModals.length === 1, 'picker was not opened');
+				await aTimeout(50);
+			} finally {
+				window.removeEventListener('unhandledrejection', onUnhandledRejection);
+			}
+
+			expect(unhandled).to.be.empty;
+			expect(modal.value.link).to.include({ type: 'document', unique: HOME_ID, name: 'My title' });
 		});
 	});
 });

@@ -110,27 +110,27 @@ describe('UmbInputMemberGroupElement', () => {
 		expect(isDraggableAfterMouseDown(refNodes()[0])).to.be.false;
 	});
 
-	describe('change action', () => {
-		const changeButton = () =>
+	describe('replace action', () => {
+		const replaceButton = () =>
 			element.shadowRoot!.querySelector<HTMLElement>(
-				`uui-action-bar uui-button[label="${element.localize.term('general_change')}"]`,
+				`uui-action-bar uui-button[label="${element.localize.term('actions_replace')}"]`,
 			);
 
 		it('replaces the only item with the one picked, when a single item is allowed', async () => {
 			const opened = provideTestModalManager(element.parentElement!, { selection: ['group-b'] });
 			await renderWith(['group-a'], 1);
-			expect(changeButton(), 'change button').to.exist;
+			expect(replaceButton(), 'replace button').to.exist;
 
-			changeButton()!.click();
+			replaceButton()!.click();
 			await waitUntil(() => element.selection[0] === 'group-b', 'the item was not changed');
 
 			expect(opened).to.have.lengthOf(1);
 			expect(element.selection).to.deep.equal(['group-b']);
 		});
 
-		it('does not offer change when more than one item is allowed', async () => {
+		it('does not offer replace when more than one item is allowed', async () => {
 			await renderWith(['group-a'], 2);
-			expect(changeButton()).to.be.null;
+			expect(replaceButton()).to.be.null;
 		});
 	});
 });

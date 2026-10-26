@@ -166,9 +166,9 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 		this.#pickerContext?.requestRemoveItem(item.unique);
 	}
 
-	#renderChangeAction() {
+	#renderReplaceAction() {
 		if (this.max !== 1) return nothing;
-		return html`<uui-button label=${this.localize.term('general_change')} @click=${this.#openPicker}></uui-button>`;
+		return html`<uui-button label=${this.localize.term('actions_replace')} @click=${this.#openPicker}></uui-button>`;
 	}
 
 	override render() {
@@ -206,7 +206,7 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 			<uui-ref-node name=${item.name ?? getItemFallbackName(item)} id=${item.unique}>
 				${when(icon, () => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
 				<uui-action-bar slot="actions">
-					${this.#renderChangeAction()}
+					${this.#renderReplaceAction()}
 					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>

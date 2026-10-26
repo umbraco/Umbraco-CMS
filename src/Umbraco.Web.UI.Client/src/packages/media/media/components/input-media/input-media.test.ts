@@ -55,7 +55,7 @@ describe('UmbInputMediaElement', () => {
 		});
 	});
 
-	describe('change action', () => {
+	describe('replace action', () => {
 		let host: UmbTestInputMediaHostElement;
 		let openedModals: Array<{ multiple?: boolean }>;
 
@@ -89,25 +89,25 @@ describe('UmbInputMediaElement', () => {
 			);
 		};
 
-		const changeButton = () =>
+		const replaceButton = () =>
 			element.shadowRoot!.querySelector<HTMLElement>(
-				`uui-card-media uui-action-bar uui-button[label="${element.localize.term('general_change')}"]`,
+				`uui-card-media uui-action-bar uui-button[label="${element.localize.term('actions_replace')}"]`,
 			);
 
 		it('replaces the only item with the one picked, when a single item is allowed', async () => {
 			await setup(1);
-			expect(changeButton(), 'change button').to.exist;
+			expect(replaceButton(), 'replace button').to.exist;
 
-			changeButton()!.click();
+			replaceButton()!.click();
 			await waitUntil(() => element.value === NO_ACCESS_ID, 'media was not changed');
 
 			expect(openedModals).to.have.lengthOf(1);
 			expect(openedModals[0].multiple).to.be.false;
 		});
 
-		it('does not offer change when more than one item is allowed', async () => {
+		it('does not offer replace when more than one item is allowed', async () => {
 			await setup(2);
-			expect(changeButton()).to.be.null;
+			expect(replaceButton()).to.be.null;
 		});
 	});
 

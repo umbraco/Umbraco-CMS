@@ -9,7 +9,7 @@ describe('UmbUserInputElement', () => {
 		expect(element).to.be.instanceOf(UmbUserInputElement);
 	});
 
-	describe('change action', () => {
+	describe('replace action', () => {
 		let unregisterRepository: () => void;
 
 		before(() => {
@@ -34,19 +34,19 @@ describe('UmbUserInputElement', () => {
 			return { input, opened };
 		};
 
-		const changeButton = (input: UmbUserInputElement) =>
+		const replaceButton = (input: UmbUserInputElement) =>
 			input.shadowRoot!.querySelector<HTMLElement>(
-				`uui-action-bar uui-button[label="${input.localize.term('general_change')}"]`,
+				`uui-action-bar uui-button[label="${input.localize.term('actions_replace')}"]`,
 			);
 
-		it('offers change when a single item is allowed', async () => {
+		it('offers replace when a single item is allowed', async () => {
 			const { input } = await setup(1);
-			expect(changeButton(input)).to.exist;
+			expect(replaceButton(input)).to.exist;
 		});
 
-		it('does not offer change when more than one item is allowed', async () => {
+		it('does not offer replace when more than one item is allowed', async () => {
 			const { input } = await setup(2);
-			expect(changeButton(input)).to.be.null;
+			expect(replaceButton(input)).to.be.null;
 		});
 	});
 });

@@ -14,7 +14,7 @@ class UmbTestPickerInputContext extends UmbPickerInputContext {
 }
 
 describe('UmbInputEntityElement', () => {
-	describe('change action', () => {
+	describe('replace action', () => {
 		let unregisterRepository: () => void;
 
 		before(() => {
@@ -39,25 +39,25 @@ describe('UmbInputEntityElement', () => {
 			return { input, opened };
 		};
 
-		const changeButton = (input: UmbInputEntityElement) =>
+		const replaceButton = (input: UmbInputEntityElement) =>
 			input.shadowRoot!.querySelector<HTMLElement>(
-				`uui-action-bar uui-button[label="${input.localize.term('general_change')}"]`,
+				`uui-action-bar uui-button[label="${input.localize.term('actions_replace')}"]`,
 			);
 
 		it('replaces the only item with the one picked, when a single item is allowed', async () => {
 			const { input, opened } = await setup(1);
-			expect(changeButton(input), 'change button').to.exist;
+			expect(replaceButton(input), 'replace button').to.exist;
 
-			changeButton(input)!.click();
+			replaceButton(input)!.click();
 			await waitUntil(() => input.selection[0] === 'b', 'the item was not changed');
 
 			expect(opened).to.have.lengthOf(1);
 			expect(input.selection).to.deep.equal(['b']);
 		});
 
-		it('does not offer change when more than one item is allowed', async () => {
+		it('does not offer replace when more than one item is allowed', async () => {
 			const { input } = await setup(2);
-			expect(changeButton(input)).to.be.null;
+			expect(replaceButton(input)).to.be.null;
 		});
 	});
 });
