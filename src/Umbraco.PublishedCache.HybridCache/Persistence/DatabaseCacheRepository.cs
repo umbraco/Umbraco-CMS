@@ -135,14 +135,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
-        => ToContentSourceNode(key, preview, await Database.FirstOrDefaultAsync<ContentSourceDto>(GetContentSourceSql(key)));
-
-    /// <inheritdoc/>
-    public ContentCacheNode? GetContentSource(Guid key, bool preview = false)
-        => ToContentSourceNode(key, preview, Database.FirstOrDefault<ContentSourceDto>(GetContentSourceSql(key)));
-
-    private ContentCacheNode? ToContentSourceNode(Guid key, bool preview, ContentSourceDto? dto)
     {
+        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(GetContentSourceSql(key));
+
         if (dto is null)
         {
             return null;
