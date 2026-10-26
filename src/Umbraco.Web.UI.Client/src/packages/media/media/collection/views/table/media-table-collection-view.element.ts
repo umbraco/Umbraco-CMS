@@ -1,10 +1,15 @@
 import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from '../../types.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../../entity.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
+import { UmbElementControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -56,6 +61,45 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 
 	#collectionContext?: typeof UMB_MEDIA_COLLECTION_CONTEXT.TYPE;
 
+	#rowContexts = new Map<
+		string,
+		{
+			host: UmbElementControllerHost;
+			entityContext: UmbEntityContext;
+			entityContentTypeContext: UmbEntityContentTypeEntityContext;
+		}
+	>();
+
+	#onRowRendered = (element: HTMLElement | undefined, row: UmbTableItem) => {
+		if (!element) {
+			const existing = this.#rowContexts.get(row.id);
+			if (existing) {
+				existing.host.destroy();
+				this.#rowContexts.delete(row.id);
+			}
+			return;
+		}
+
+		let rowContexts = this.#rowContexts.get(row.id);
+		if (!rowContexts) {
+			const host = new UmbElementControllerHost(element);
+			host.hostConnected();
+			rowContexts = {
+				host,
+				entityContext: new UmbEntityContext(host),
+				entityContentTypeContext: new UmbEntityContentTypeEntityContext(host),
+			};
+			this.#rowContexts.set(row.id, rowContexts);
+		}
+
+		const mediaTypeUnique = this._items?.find((x) => x.unique === row.id)?.contentType?.unique;
+
+		rowContexts.entityContext.setEntityType(row.entityType);
+		rowContexts.entityContext.setUnique(row.id);
+		rowContexts.entityContentTypeContext.setEntityType(mediaTypeUnique ? UMB_MEDIA_TYPE_ENTITY_TYPE : undefined);
+		rowContexts.entityContentTypeContext.setUnique(mediaTypeUnique);
+	};
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
@@ -105,6 +149,13 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		);
 	}
 
+	#entityActionsColumn: UmbTableColumn = {
+		name: '',
+		alias: 'entityActions',
+		align: 'right',
+		elementName: 'umb-entity-actions-table-column-view',
+	};
+
 	#createTableHeadings() {
 		if (this._userDefinedProperties && this._userDefinedProperties.length > 0) {
 			const userColumns: Array<UmbTableColumn> = this._userDefinedProperties.map((item) => {
@@ -117,13 +168,9 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				};
 			});
 
-			this._tableColumns = [
-				...this.#systemColumns,
-				...userColumns,
-				{ name: '', alias: 'entityActions', align: 'right' },
-			];
+			this._tableColumns = [...this.#systemColumns, ...userColumns, this.#entityActionsColumn];
 		} else {
-			this._tableColumns = [...this.#systemColumns, { name: '', alias: 'entityActions', align: 'right' }];
+			this._tableColumns = [...this.#systemColumns, this.#entityActionsColumn];
 		}
 	}
 
@@ -144,12 +191,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 					if (column.alias === 'entityActions') {
 						return {
 							columnAlias: 'entityActions',
-							value: html`<umb-entity-actions-table-column-view
-								.value=${{
-									entityType: item.entityType,
-									unique: item.unique,
-									name: item.name,
-								}}></umb-entity-actions-table-column-view>`,
+							value: { name: item.name },
 						};
 					}
 
@@ -166,10 +208,18 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			return {
 				id: item.unique,
 				icon: item.icon,
-				entityType: 'media',
+				entityType: UMB_MEDIA_ENTITY_TYPE,
 				data: data,
 			};
 		});
+
+		const currentIds = new Set(this._tableItems.map((row) => row.id));
+		for (const [id, rowContexts] of this.#rowContexts) {
+			if (!currentIds.has(id)) {
+				rowContexts.host.destroy();
+				this.#rowContexts.delete(id);
+			}
+		}
 	}
 
 	#getPropertyValueByAlias(item: UmbMediaCollectionItemModel, alias: string) {
@@ -218,6 +268,14 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		for (const [, rowContexts] of this.#rowContexts) {
+			rowContexts.host.destroy();
+		}
+		this.#rowContexts.clear();
+	}
+
 	override render() {
 		return html`
 			<umb-table
@@ -227,6 +285,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				.selection=${this._selection}
 				.orderingColumn=${this._orderingColumn}
 				.orderingDesc=${this._orderingDesc}
+				.onRowRendered=${this.#onRowRendered}
 				@selected=${this.#handleSelect}
 				@deselected=${this.#handleDeselect}
 				@ordered=${this.#handleOrdering}></umb-table>
