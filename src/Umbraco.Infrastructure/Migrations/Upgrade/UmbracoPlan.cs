@@ -189,6 +189,9 @@ public partial class UmbracoPlan : MigrationPlan
         // To 17.6.0
         To<V_17_6_0.AddContentTypeIdIndexForContent>("{3A1A8047-74AE-491A-B2C4-0BAE4A1289EC}");
 
+        // To 17.10.0
+        To<V_17_10_0.AddMissingIndexesForNodeDeleteAndContentSchedule>("{CCAFB10D-1D1D-4B41-8B09-0777EEFD07B6}");
+
         // To 18.0.0
         // TODO (V18): Enable on 18 branch
         //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
