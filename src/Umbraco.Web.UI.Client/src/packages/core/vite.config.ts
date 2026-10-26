@@ -58,6 +58,7 @@ export default defineConfig({
 			'repository/index': './repository/index.ts',
 			'resources/index': './resources/index.ts',
 			'router/index': './router/index.ts',
+			'schema-lockdown/index': './schema-lockdown/index.ts',
 			'section/index': './section/index.ts',
 			'server-file-system/index': './server-file-system/index.ts',
 			'server/index': './server/index.ts',
