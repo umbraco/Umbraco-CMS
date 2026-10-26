@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Globalization;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
@@ -61,7 +60,8 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName,
             Constants.ObjectTypes.Document,
-            Constants.ObjectTypes.Document);
+            Constants.ObjectTypes.Document,
+            Constants.Locks.ContentTree);
         return Task.CompletedTask;
     }
 
@@ -80,7 +80,8 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
             Constants.ObjectTypes.Media,
-            Constants.ObjectTypes.Media);
+            Constants.ObjectTypes.Media,
+            Constants.Locks.MediaTree);
         return Task.CompletedTask;
     }
 
@@ -99,7 +100,8 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteName,
             Constants.ObjectTypes.ElementContainer,
-            Constants.ObjectTypes.Element);
+            Constants.ObjectTypes.Element,
+            Constants.Locks.ElementTree);
         return Task.CompletedTask;
     }
 
@@ -136,7 +138,8 @@ public sealed class RelateOnTrashNotificationHandler :
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteName,
             Constants.ObjectTypes.ElementContainer,
-            Constants.ObjectTypes.ElementContainer);
+            Constants.ObjectTypes.ElementContainer,
+            Constants.Locks.ElementTree);
         return Task.CompletedTask;
     }
 
@@ -167,10 +170,16 @@ public sealed class RelateOnTrashNotificationHandler :
         string originalParentRelationTypeAlias,
         string originalParentRelationTypeName,
         Guid parentObjectType,
-        Guid childObjectType)
+        Guid childObjectType,
+        int treeLockId)
         where T : ITreeEntity
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        // This runs after the move to the recycle bin has committed, so it is a transaction of its own. The write lock
+        // must be taken before anything is read, otherwise a database that serializes writers (such as SQLite) can
+        // refuse the first write once another connection has committed since this transaction started reading.
+        scope.WriteLock(treeLockId);
 
         IRelationType? relationType = _relationService.GetRelationTypeByAlias(originalParentRelationTypeAlias);
 
