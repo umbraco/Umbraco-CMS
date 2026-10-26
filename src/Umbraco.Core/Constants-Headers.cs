@@ -21,5 +21,11 @@ public static partial class Constants
         ///     Response notifications header name.
         /// </summary>
         public const string Notifications = "Umb-Notifications";
+
+        /// <summary>
+        ///     Schema lockdown denial header name. Present only on a response schema lockdown denied, naming the
+        ///     entity type and the operation it was denied for.
+        /// </summary>
+        public const string SchemaLockdown = "Umb-Schema-Lockdown";
     }
 }
