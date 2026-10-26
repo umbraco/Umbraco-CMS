@@ -58,7 +58,8 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 		// eslint-disable-next-line @typescript-eslint/no-deprecated
 		if (_changedProperties.has('data') && this.data?.filter) {
 			new UmbDeprecation({
-				deprecated: 'The `filter` option of UmbCollectionItemPickerModalData has no effect.',
+				deprecated:
+					'The `filter` option of UmbCollectionItemPickerModalData is not applied by the built-in collection menu.',
 				removeInVersion: '21.0.0',
 				solution: 'Use `pickableFilter` to prevent items from being picked instead.',
 			}).warn();
@@ -224,6 +225,8 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 					.props=${{
 						selectionConfiguration: this._selectionConfiguration,
 						filterArgs: this.data?.collection?.filterArgs,
+						// eslint-disable-next-line @typescript-eslint/no-deprecated
+						filter: this.data?.filter,
 						selectableFilter: this.data?.pickableFilter,
 					}}
 					@selected=${this.#onItemSelected}

@@ -47,14 +47,15 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 	#hasWarnedFilterDeprecation = false;
 
 	/**
-	 * @deprecated Deprecated since v17. This option has no effect. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
+	 * @deprecated Deprecated since v17. The built-in collection menu does not apply this option. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
 	 */
 	@property({ attribute: false })
 	public set filter(value: ((item: UmbCollectionItemModel) => boolean) | undefined) {
 		if (value && !this.#hasWarnedFilterDeprecation) {
 			this.#hasWarnedFilterDeprecation = true;
 			new UmbDeprecation({
-				deprecated: 'The `filter` property of umb-default-collection-menu has no effect.',
+				deprecated:
+					'The `filter` property of umb-default-collection-menu is not applied by the built-in collection menu.',
 				removeInVersion: '21.0.0',
 				solution: 'Use `selectableFilter` to prevent items from being selected instead.',
 			}).warn();
@@ -110,6 +111,11 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 
 		if (_changedProperties.has('selectableFilter')) {
 			this._api!.selectableFilter = this.selectableFilter;
+		}
+
+		if (_changedProperties.has('filter')) {
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			this._api!.filter = this.filter;
 		}
 	}
 

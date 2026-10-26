@@ -16,13 +16,14 @@ export class UmbDefaultCollectionMenuContext extends UmbContextBase {
 	#hasWarnedFilterDeprecation = false;
 
 	/**
-	 * @deprecated Deprecated since v17. This option has no effect. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
+	 * @deprecated Deprecated since v17. The built-in collection menu does not apply this option. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
 	 */
 	public set filter(value: ((item: UmbCollectionItemModel) => boolean) | undefined) {
 		if (value && !this.#hasWarnedFilterDeprecation) {
 			this.#hasWarnedFilterDeprecation = true;
 			new UmbDeprecation({
-				deprecated: 'The `filter` property of UmbDefaultCollectionMenuContext has no effect.',
+				deprecated:
+					'The `filter` property of UmbDefaultCollectionMenuContext is not applied by the built-in collection menu.',
 				removeInVersion: '21.0.0',
 				solution: 'Use `selectableFilter` to prevent items from being selected instead.',
 			}).warn();
