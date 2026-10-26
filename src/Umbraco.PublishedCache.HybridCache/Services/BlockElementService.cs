@@ -55,20 +55,25 @@ internal class BlockElementService : IBlockElementService
                 // Special case:
                 // The element property type varies by culture, but the owner element (e.g. the page) content type does not
                 // vary by culture. Since the created element is fully culture aware at render time, we need to replicate
-                // property values across all available languages, to make them available for rendering.
+                // the property value of each segment across all available languages, to make them available for rendering.
 
                 allLanguages ??= (await _languageService.GetAllAsync()).ToArray();
                 defaultLanguage ??= allLanguages.SingleOrDefault(l => l.IsDefault)
                                     ?? throw new InvalidOperationException("Could not find the default language.");
 
-                BlockPropertyValue property = properties.FirstOrDefault(p => p.Culture.InvariantEquals(defaultLanguage.IsoCode))
-                                              ?? properties.First();
-                propertyData[properties.Key] = allLanguages.Select(language => new PropertyData
-                {
-                    Culture = language.IsoCode,
-                    Segment = property.Segment ?? string.Empty, // throws an error if there is no value
-                    Value = property.Value,
-                }).ToArray();
+                ILanguage[] languages = allLanguages;
+                var defaultIsoCode = defaultLanguage.IsoCode;
+                propertyData[properties.Key] = properties
+                    .GroupBy(property => property.Segment)
+                    .Select(segmentProperties => segmentProperties.FirstOrDefault(p => p.Culture.InvariantEquals(defaultIsoCode))
+                                                 ?? segmentProperties.First())
+                    .SelectMany(property => languages.Select(language => new PropertyData
+                    {
+                        Culture = language.IsoCode,
+                        Segment = property.Segment ?? string.Empty, // throws an error if there is no value
+                        Value = property.Value,
+                    }))
+                    .ToArray();
             }
             else
             {

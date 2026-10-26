@@ -293,12 +293,6 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
             return operationStatus;
         }
 
-        // element types cannot vary by segment
-        if (model is { IsElement: true, VariesBySegment: true })
-        {
-            return ContentTypeOperationStatus.InvalidSegmentVariationForElementType;
-        }
-
         return ContentTypeOperationStatus.Success;
     }
 
