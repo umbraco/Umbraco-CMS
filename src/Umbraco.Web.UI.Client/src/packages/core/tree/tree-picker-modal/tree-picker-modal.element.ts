@@ -12,6 +12,7 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 const TREE_MEMORY_UNIQUE = 'UmbTreeItemPickerTree';
 
@@ -99,10 +100,18 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('data')) {
+			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
+				this._treeAlias = this.data.treeAlias;
+				this._pickerContext.location.setStartNode(this.data.startNode);
+				this._pickerContext.location.setStartNodes(this.data.startNodes);
+				this._pickerContext.location.setTreeAlias(this.data.treeAlias);
+			}
+
 			if (this.data?.search) {
 				this._pickerContext.search.updateConfig({
 					...this.data.search,
-					searchFrom: this.data.startNode,
+					// There is no server side search across multiple parents, so the scope is applied client side.
+					searchFrom: this._pickerContext.location.getStartNode(),
 					dataTypeUnique: this._pickerContext.dataType?.unique,
 				});
 			}
@@ -114,12 +123,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				...this._selectionConfiguration,
 				multiple,
 			};
-
-			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
-				this._treeAlias = this.data.treeAlias;
-				this._pickerContext.location.setStartNode(this.data.startNode);
-				this._pickerContext.location.setTreeAlias(this.data.treeAlias);
-			}
 
 			if (this.data?.treeExpansion !== undefined) {
 				this._pickerContext.expansion.setExpansion(this.data.treeExpansion);
@@ -262,7 +265,19 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		}
 	}
 
-	#searchSelectableFilter = () => true;
+	#selectableFilter = (item: TreeItemType) => {
+		const unique = (item as { unique?: string | null }).unique;
+		if (this._pickerContext.location.isBrowseOnlyStartNode(unique)) return false;
+		return this.data?.pickableFilter?.(item) ?? true;
+	};
+
+	// Search cannot be scoped server side to more than one parent, so out-of-scope results are filtered here.
+	#searchSelectableFilter = (item: UmbSearchResultItemModel & TreeItemType) => {
+		const baseFilter: ((item: UmbSearchResultItemModel & TreeItemType) => boolean) | undefined =
+			this.data?.search?.pickableFilter ?? this.data?.pickableFilter;
+		if (baseFilter && !baseFilter(item)) return false;
+		return this._pickerContext.location.isWithinStartNodes(item);
+	};
 
 	async #setActiveTab(tab: 'browse' | 'search') {
 		if (this._activeTab === tab) return;
@@ -314,12 +329,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	#renderSearch() {
 		if (!this._isSearchable) return nothing;
 
-		const selectableFilter =
-			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
-
 		return html`
 			<umb-picker-search-field .alias=${this._treeAlias}></umb-picker-search-field>
-			<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
+			<umb-picker-search-result .pickableFilter=${this.#searchSelectableFilter}></umb-picker-search-result>
 		`;
 	}
 
@@ -344,8 +356,10 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					expandTreeRoot: this.data?.expandTreeRoot,
 					selectionConfiguration: this._selectionConfiguration,
 					filter: this.data?.filter,
-					selectableFilter: this.data?.pickableFilter,
+					selectableFilter: this.#selectableFilter,
 					startNode: this._treeStartNode,
+					// Once drilled into a location the tree is scoped to that single node again.
+					startNodes: this._treeStartNode ? undefined : this._pickerContext.location.getStartNodes(),
 					foldersOnly: this.data?.foldersOnly,
 					expansion: this._treeExpansion,
 					interactionMemories: this._treeInteractionMemories,
