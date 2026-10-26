@@ -4,10 +4,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.HybridCache;
@@ -33,12 +33,15 @@ internal sealed class DocumentHybridCacheSynchronousPersistenceTests : UmbracoIn
 
     private RecordingDatabaseCacheRepository Repository => (RecordingDatabaseCacheRepository)GetRequiredService<IDatabaseCacheRepository>();
 
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         base.CustomTestSetup(builder);
 
         // Run the post-commit refresher in-process, as the real application does.
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<ContentPublishingNotification, RedirectTrackingHandler>();
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
         builder.Services.AddUnique<IDatabaseCacheRepository>(sp =>
             new RecordingDatabaseCacheRepository(ActivatorUtilities.CreateInstance<DatabaseCacheRepository>(sp)));
@@ -90,6 +93,23 @@ internal sealed class DocumentHybridCacheSynchronousPersistenceTests : UmbracoIn
             Assert.That(Repository.SynchronousWrites, Is.GreaterThan(0));
             Assert.That(PublishedContentCache.GetById(Textpage.Key), Is.Null);
         });
+    }
+
+    /// <summary>
+    /// The redirect tracker runs on the publishing notification, inside the content transaction. Content that has
+    /// never been published has no route to preserve, so the tracker must not look it up in the published content
+    /// cache: that lookup misses every tier and reads through to the database on the asynchronous pipeline while
+    /// the content tree lock is held.
+    /// </summary>
+    [Test]
+    public void FirstPublish_WithRedirectTracking_DoesNotReadThroughThePublishedCache()
+    {
+        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
+        Repository.Reset();
+
+        Assert.That(ContentService.Publish(Textpage, ["*"]).Success, Is.True);
+
+        Assert.That(Repository.AsynchronousReads, Is.Zero, "No published-cache read-through may run inside the content transaction for content without a published route.");
     }
 
     [Test]
@@ -190,7 +210,10 @@ internal sealed class DocumentHybridCacheSynchronousPersistenceTests : UmbracoIn
         }
 
         public Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
-            => _inner.GetContentSourceAsync(key, preview);
+        {
+            AsynchronousReads++;
+            return _inner.GetContentSourceAsync(key, preview);
+        }
 
         public Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
             => _inner.GetContentSourcesAsync(keys, preview);

@@ -71,6 +71,11 @@ internal sealed class RedirectTracker : IRedirectTracker
         Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes,
         bool isMove)
     {
+        if (HasPublishedUrlSegment(entity) is false)
+        {
+            return;
+        }
+
         IPublishedContent? entityContent = _contentCache.GetById(entity.Id);
         if (entityContent is null)
         {
@@ -330,6 +335,20 @@ internal sealed class RedirectTracker : IRedirectTracker
     // under an active preview cookie). See https://github.com/umbraco/Umbraco-CMS/issues/22256.
     // Falls back to "true" during upgrades when the document URL service is not yet initialized,
     // matching the fallback behaviour in HasUrlSegmentChanged.
+    // Content without a published URL segment in any culture has no published route to preserve. The document URL
+    // service answers from memory, so deciding this first keeps such content out of the published content cache,
+    // where the lookup could only miss every tier and read through to the database.
+    private bool HasPublishedUrlSegment(IContent entity)
+    {
+        if (_documentUrlService.IsInitialized is false)
+        {
+            return true;
+        }
+
+        IEnumerable<string> cultures = entity.AvailableCultures.Any() ? entity.AvailableCultures : [string.Empty];
+        return cultures.Any(culture => HasPublishedUrlSegment(entity.Key, culture));
+    }
+
     private bool HasPublishedUrlSegment(Guid contentKey, string culture) =>
         _documentUrlService.IsInitialized is false
         || _documentUrlService.GetUrlSegment(contentKey, culture, isDraft: false) is not null;

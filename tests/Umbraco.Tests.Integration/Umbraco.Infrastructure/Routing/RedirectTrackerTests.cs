@@ -199,6 +199,33 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     }
 
     /// <summary>
+    /// Content without a published URL segment has no published route, so the tracker decides that from the document
+    /// URL service alone and never consults the published content cache for it. That lookup runs inside the content
+    /// transaction and could only miss, so for a first publish it would reach the database for nothing.
+    /// </summary>
+    [TestCase(false)]
+    [TestCase(true)]
+    public void Does_Not_Consult_Published_Cache_For_Content_Without_Published_Url_Segment(bool isMove)
+    {
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
+        var lookups = 0;
+
+        var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions
+        {
+            DocumentUrlServiceInitialized = true,
+            OnContentCacheLookup = () => lookups++,
+        });
+
+        redirectTracker.StoreOldRoute(_testPage, dict, isMove);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(lookups, Is.Zero, "The published content cache must not be consulted for content without a published URL segment.");
+            Assert.That(dict, Is.Empty);
+        });
+    }
+
+    /// <summary>
     /// Verifies that when a domain includes a path prefix (e.g. "example.com/en/"), the stored
     /// route strips that prefix to avoid duplicating the culture segment.
     /// </summary>
@@ -472,6 +499,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         IPublishedContentCache contentCache = Mock.Of<IPublishedContentCache>();
         Mock.Get(contentCache)
             .Setup(x => x.GetById(_testPage.Id))
+            .Callback(() => options.OnContentCacheLookup?.Invoke())
             .Returns(content.Object);
         Mock.Get(contentCache)
             .Setup(x => x.GetById(_testPage.Key))
@@ -725,6 +753,11 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         /// descendant traversal regardless of segment changes.
         /// </summary>
         public bool DocumentUrlServiceInitialized { get; init; }
+
+        /// <summary>
+        /// Gets a callback invoked whenever the mock <see cref="IPublishedContentCache"/> is asked for the test page.
+        /// </summary>
+        public Action? OnContentCacheLookup { get; init; }
 
         /// <summary>
         /// Gets an explicit return value for <see cref="IUrlSegmentProvider.MayAffectDescendantSegments"/>.
