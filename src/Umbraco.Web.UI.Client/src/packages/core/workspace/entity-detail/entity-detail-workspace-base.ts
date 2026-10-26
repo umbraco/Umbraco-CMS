@@ -26,10 +26,11 @@ import type {
 	UmbRepositoryResponse,
 	UmbRepositoryResponseWithAsObservable,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbReadOnlyGuardManager, UmbStateManager, type UmbGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
+import { distinctUntilChanged, map, type Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 const LOADING_STATE_UNIQUE = 'umbLoadingEntityDetail';
 const FORBIDDEN_STATE_UNIQUE = 'umbForbiddenEntityDetail';
@@ -61,6 +62,34 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly persistedData = this._data.persisted;
 	public readonly loading = new UmbStateManager(this);
 	public readonly forbidden = new UmbStateManager(this);
+
+	/**
+	 * Decides what of the entity is read-only. A rule with `permitted: true` and no variant makes the whole entity
+	 * read-only, and its `message` explains why. A read-only entity can't be submitted. Rules are cleared whenever the
+	 * workspace loads or creates an entity, so they apply to that entity only.
+	 */
+	public readonly readOnlyGuard: UmbReadOnlyGuardManager<UmbGuardRule> = new UmbReadOnlyGuardManager<UmbGuardRule>(
+		this,
+	);
+
+	/**
+	 * Whether the whole entity is read-only.
+	 * @returns {Observable<boolean>} An observable of whether the whole entity is read-only.
+	 */
+	public get readOnly(): Observable<boolean> {
+		return this.readOnlyGuard.rules.pipe(
+			map((rules) => rules.some((rule) => this.#isWholeEntityReadOnlyRule(rule))),
+			distinctUntilChanged(),
+		);
+	}
+
+	/**
+	 * Whether the whole entity is currently read-only.
+	 * @returns {boolean} Whether the whole entity is read-only.
+	 */
+	public getReadOnly(): boolean {
+		return this.readOnlyGuard.getRules().some((rule) => this.#isWholeEntityReadOnlyRule(rule));
+	}
 
 	protected _getDataPromise?: Promise<
 		UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>
@@ -413,6 +442,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return data;
 	}
 
+	public override async requestSubmit(): Promise<void> {
+		if (this.getReadOnly()) return;
+		return super.requestSubmit();
+	}
+
 	async submit() {
 		await this.#init;
 		const currentData = this.getData();
@@ -568,6 +602,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	override resetState() {
 		super.resetState();
+		this.readOnlyGuard.clearRules();
 		this.loading.clear();
 		this.forbidden.clear();
 		this._data.clear();
@@ -614,6 +649,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		this.reload();
 	};
+
+	// A rule that targets a variant only makes that variant read-only, not the whole entity.
+	#isWholeEntityReadOnlyRule(rule: UmbGuardRule & { variantId?: unknown }) {
+		return rule.permitted && rule.variantId === undefined;
+	}
 
 	public override destroy(): void {
 		window.removeEventListener('willchangestate', this.#onWillNavigate);
