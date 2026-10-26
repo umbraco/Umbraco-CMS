@@ -377,6 +377,38 @@ public class EmailSenderTests
             Times.Once);
     }
 
+    [Test]
+    public async Task SendAsync_Logs_Warning_When_Email_Sent_On_From_A_SendEmailNotification_Handler_Is_Dropped()
+    {
+        EmailSender? sender = null;
+        var loggerMock = new Mock<ILogger<EmailSender>>();
+        var eventAggregatorMock = CreateEventAggregatorMock(async notification =>
+        {
+            await sender!.SendAsync(CreateMessage(), notification.EmailType, enableNotification: false);
+            notification.HandleEmail();
+        });
+#pragma warning disable CS0618 // Type or member is obsolete
+        var settings = new SmtpSettings { From = "from@test.com", PublishNotificationForAllEmails = true };
+#pragma warning restore CS0618 // Type or member is obsolete
+        sender = CreateSender(
+            settings,
+            Mock.Of<IEmailSenderClient>(),
+            handler: Mock.Of<INotificationAsyncHandler<SendEmailNotification>>(),
+            eventAggregator: eventAggregatorMock.Object,
+            logger: loggerMock.Object);
+
+        await sender.SendAsync(CreateMessage(), "Test", enableNotification: false);
+
+        loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
     private static EmailMessage CreateMessage() => new("from@test.com", "to@test.com", "Subject", "Body", false);
 
 #pragma warning disable CS0618 // Type or member is obsolete
