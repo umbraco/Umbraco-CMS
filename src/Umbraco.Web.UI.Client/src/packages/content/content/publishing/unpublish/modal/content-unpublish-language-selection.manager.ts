@@ -1,4 +1,3 @@
-import { UmbDeselectedEvent, UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
@@ -27,24 +26,6 @@ export class UmbContentUnpublishLanguageSelectionManager extends UmbSelectionMan
 
 	public override setSelection(value: Array<string>) {
 		super.setSelection(this.#applyMandatoryCascade(this.getSelection(), value));
-	}
-
-	public override select(unique: string) {
-		if (this.getSelectable() === false || this.isSelected(unique)) return;
-		this.setSelection([...this.getSelection(), unique]);
-		this.getHostElement().dispatchEvent(new UmbSelectedEvent(unique));
-		this.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
-	}
-
-	public override deselect(unique: string) {
-		if (this.getSelectable() === false) return;
-		this.setSelection(this.getSelection().filter((x) => x !== unique));
-		this.getHostElement().dispatchEvent(new UmbDeselectedEvent(unique));
-		this.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
-	}
-
-	public override clearSelection() {
-		this.setSelection([]);
 	}
 
 	#applyMandatoryCascade(previous: Array<string>, next: Array<string>): Array<string> {
