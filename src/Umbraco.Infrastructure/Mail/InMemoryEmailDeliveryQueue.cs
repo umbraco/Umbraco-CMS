@@ -47,7 +47,7 @@ internal sealed class InMemoryEmailDeliveryQueue : IEmailDeliveryQueue
     internal long QueuedAttachmentBytes => Interlocked.Read(ref _queuedAttachmentBytes);
 
     /// <inheritdoc />
-    public async ValueTask<bool> TryEnqueueAsync(EmailMessage message, string emailType, TimeSpan? expires, CancellationToken cancellationToken = default)
+    public async Task<bool> TryEnqueueAsync(EmailMessage message, string emailType, TimeSpan? expires, CancellationToken cancellationToken = default)
     {
         long attachmentBytes = 0;
         if (message.HasAttachments)

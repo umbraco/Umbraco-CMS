@@ -31,5 +31,5 @@ public interface IEmailDeliveryQueue
     ///     The sender may dispose the message's attachment streams as soon as this completes, so an implementation that
     ///     accepts the email must first take its own copy of anything it needs from them.
     /// </remarks>
-    ValueTask<bool> TryEnqueueAsync(EmailMessage message, string emailType, TimeSpan? expires, CancellationToken cancellationToken = default);
+    Task<bool> TryEnqueueAsync(EmailMessage message, string emailType, TimeSpan? expires, CancellationToken cancellationToken = default);
 }
