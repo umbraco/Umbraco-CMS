@@ -259,10 +259,8 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         else
         {
             // The source exists only in the inner file system, so stage a copy of it at the target.
-            using (Stream stream = Inner.OpenFile(source))
-            {
-                _sfs.AddFile(targetCanonical, stream, overrideIfExists);
-            }
+            using Stream stream = Inner.OpenFile(source);
+            _sfs.AddFile(targetCanonical, stream, overrideIfExists);
         }
 
         Nodes[normSource] = new ShadowNode(true, false, sf?.CanonicalPath ?? normSource);
