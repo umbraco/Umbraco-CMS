@@ -25,7 +25,7 @@ internal sealed class MemberDto
     /// </summary>
     [Column("Email")]
     [Length(1000)]
-    [Constraint(Default = "''")]
+    [Constraint(Default = "")]
     public string Email { get; set; } = null!;
 
     /// <summary>
@@ -33,7 +33,7 @@ internal sealed class MemberDto
     /// </summary>
     [Column("LoginName")]
     [Length(1000)]
-    [Constraint(Default = "''")]
+    [Constraint(Default = "")]
     [Index(IndexTypes.NonClustered, Name = "IX_cmsMember_LoginName")]
     public string LoginName { get; set; } = null!;
 
@@ -43,7 +43,7 @@ internal sealed class MemberDto
     /// </summary>
     [Column("Password")]
     [Length(1000)]
-    [Constraint(Default = "''")]
+    [Constraint(Default = "")]
     public string? Password { get; set; }
 
     /// <summary>
