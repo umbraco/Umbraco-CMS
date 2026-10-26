@@ -1,5 +1,6 @@
 import { UMB_SCRIPT_ITEM_REPOSITORY_ALIAS } from '../../repository/item/constants.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const UMB_RENAME_SCRIPT_REPOSITORY_ALIAS = 'Umb.Repository.Script.Rename';
 export const UMB_RENAME_SCRIPT_ENTITY_ACTION_ALIAS = 'Umb.EntityAction.Script.Rename';
@@ -21,5 +22,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			renameRepositoryAlias: UMB_RENAME_SCRIPT_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_SCRIPT_ITEM_REPOSITORY_ALIAS,
 		},
+		conditions: [
+			{
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_SCRIPT_ENTITY_TYPE,
+				operation: 'update',
+			},
+		],
 	},
 ];
