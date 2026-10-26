@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { umbExpandVariantIdsWithSegmentOptions } from './expand-variant-ids-with-segment-options.function.js';
-import { UmbVariantId } from './variant-id.class.js';
-import type { UmbEntityVariantOptionModel } from './types.js';
+import { UmbVariantId } from '../variant-id.class.js';
+import type { UmbEntityVariantOptionModel } from '../types.js';
 
 function makeOption(culture: string | null, segment: string | null): UmbEntityVariantOptionModel {
 	return {
@@ -29,7 +29,10 @@ describe('umbExpandVariantIdsWithSegmentOptions', () => {
 			makeOption('da', 's1'),
 		];
 
-		const result = umbExpandVariantIdsWithSegmentOptions([UmbVariantId.Create({ culture: 'en-US', segment: null })], variantOptions);
+		const result = umbExpandVariantIdsWithSegmentOptions(
+			[UmbVariantId.Create({ culture: 'en-US', segment: null })],
+			variantOptions,
+		);
 
 		expect(result.map((x) => x.toString()).sort()).to.deep.equal(['en-US', 'en-US_s1', 'en-US_s2'].sort());
 	});
@@ -75,10 +78,7 @@ describe('umbExpandVariantIdsWithSegmentOptions', () => {
 		];
 
 		const result = umbExpandVariantIdsWithSegmentOptions(
-			[
-				UmbVariantId.Create({ culture: 'en-US', segment: null }),
-				UmbVariantId.Create({ culture: 'da', segment: 's1' }),
-			],
+			[UmbVariantId.Create({ culture: 'en-US', segment: null }), UmbVariantId.Create({ culture: 'da', segment: 's1' })],
 			variantOptions,
 		);
 
