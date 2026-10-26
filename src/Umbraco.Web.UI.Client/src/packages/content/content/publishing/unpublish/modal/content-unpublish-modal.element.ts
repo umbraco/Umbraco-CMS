@@ -1,10 +1,10 @@
 import type { UmbContentConfigurationRepository } from '../../../configuration/types.js';
 import type { UmbContentUnpublishModalData, UmbContentUnpublishModalValue } from './types.js';
+import { UmbContentUnpublishLanguageSelectionManager } from './content-unpublish-language-selection.manager.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type {
@@ -32,7 +32,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 	UmbContentUnpublishModalData,
 	UmbContentUnpublishModalValue
 > {
-	protected readonly _selectionManager = new UmbSelectionManager<string>(this);
+	protected readonly _selectionManager = new UmbContentUnpublishLanguageSelectionManager(this);
 
 	@state()
 	private _options: Array<UmbEntityVariantOptionModel> = [];
@@ -55,9 +55,6 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
-
-	#previousSelection: Array<string> = [];
-	#autoSelected: Array<string> = [];
 
 	readonly #pickableFilter = (option: UmbEntityVariantOptionModel) => {
 		if (!option.variant) {
@@ -111,12 +108,12 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 		// Filter selection based on options:
 		selected = selected.filter((s) => validOptions.some((o) => o.unique === s));
 
+		this._selectionManager.setOptions(this._options, this.#pickableFilter);
 		this._selectionManager.setSelection(selected);
 
 		this.observe(
 			this._selectionManager.selection,
 			(selection) => {
-				if (this.#applyMandatorySelection(selection)) return;
 				this._selection = selection;
 				const selectionHasMandatory = this._options.some((o) => o.language.isMandatory && selection.includes(o.unique));
 				const selectionDoesNotHaveAllMandatory = this._options.some(
@@ -126,37 +123,6 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 			},
 			'observeSelection',
 		);
-	}
-
-	/**
-	 * Unpublishing a mandatory language takes every language offline, so selecting one selects all other pickable
-	 * languages too, and deselecting it releases the languages that were selected on its behalf.
-	 * @param {Array<string>} selection - The selection just emitted by the selection manager.
-	 * @returns {boolean} `true` if the selection was replaced, in which case the replacement is emitted next.
-	 */
-	#applyMandatorySelection(selection: Array<string>): boolean {
-		const previousSelection = this.#previousSelection;
-		this.#previousSelection = selection;
-		const isMandatory = (unique: string) => this._options.some((o) => o.unique === unique && o.language.isMandatory);
-
-		if (previousSelection.some((unique) => isMandatory(unique) && !selection.includes(unique))) {
-			const autoSelected = this.#autoSelected;
-			this.#autoSelected = [];
-			if (!autoSelected.some((unique) => selection.includes(unique))) return false;
-			this._selectionManager.setSelection(selection.filter((unique) => !autoSelected.includes(unique)));
-			return true;
-		}
-
-		if (!selection.some(isMandatory)) return false;
-
-		const missing = this._options
-			.filter((o) => this.#pickableFilter(o) && !selection.includes(o.unique))
-			.map((o) => o.unique);
-		if (missing.length === 0) return false;
-
-		this.#autoSelected = [...new Set([...this.#autoSelected, ...missing])];
-		this._selectionManager.setSelection([...selection, ...missing]);
-		return true;
 	}
 
 	#submit() {

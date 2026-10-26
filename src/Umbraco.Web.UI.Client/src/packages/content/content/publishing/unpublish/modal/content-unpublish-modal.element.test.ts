@@ -103,4 +103,16 @@ describe('UmbContentUnpublishModalElement', () => {
 
 		expect(await submit()).to.deep.equal(['da-DK', 'en-US']);
 	});
+
+	it('emits the selected languages consistently to every observer of the selection', async () => {
+		await render(['da-DK']);
+		let observed: Array<string> = [];
+		const subscription = (element as any)._selectionManager.selection.subscribe(
+			(selection: Array<string>) => (observed = selection),
+		);
+		await toggle('en-US', 'selected');
+		subscription.unsubscribe();
+
+		expect([...observed].sort()).to.deep.equal(['da-DK', 'de-DE', 'en-US']);
+	});
 });
