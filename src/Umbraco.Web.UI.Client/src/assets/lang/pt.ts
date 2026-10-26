@@ -492,8 +492,12 @@ export default {
 		confirmListViewPublish: 'A publicação tornará os itens selecionados publicamente disponíveis.',
 		confirmListViewUnpublish:
 			'A despublicação tornará os itens selecionados e todos os seus descendentes publicamente indisponíveis.',
+		confirmListViewUnpublishElements:
+			'A despublicação removerá os elementos selecionados do website onde quer que sejam utilizados.',
 		confirmPublish:
 			'A publicação tornará este conteúdo e todos os seus descendentes publicados publicamente disponíveis.',
+		confirmPublishElement:
+			'A publicação tornará este elemento visível no website onde quer que um documento publicado o utilize.',
 		confirmUnpublish: 'A despublicação tornará este conteúdo publicamente indisponível.',
 		doctypeChangeWarning:
 			'Tem alterações não guardadas. Fazer alterações ao Tipo de Documento descartará as alterações.',
@@ -1459,10 +1463,13 @@ export default {
 		editContentPublishedFailedByValidation: 'O documento não pôde ser publicado, mas guardámo-lo para si',
 		editContentPublishedFailedByParent: 'O documento não pôde ser publicado, porque uma página pai não está publicada',
 		editContentPublishedHeader: 'Documento publicado',
+		editElementPublishedHeader: 'Elemento publicado',
 		editContentPublishedText: 'e está visível no website',
+		editElementPublishedText: 'e está visível no website onde quer que um documento publicado o utilize',
 		editContentUnpublishedHeader: 'Documento despublicado',
 		editContentUnpublishedText: 'e já não está visível no website',
 		editVariantPublishedText: '%0% publicado e está visível no website',
+		editVariantElementPublishedText: '%0% publicado',
 		editVariantSavedText: '%0% guardado',
 		editBlueprintSavedHeader: 'Modelo de Documento guardado',
 		editBlueprintSavedText: 'As alterações foram guardadas com sucesso',

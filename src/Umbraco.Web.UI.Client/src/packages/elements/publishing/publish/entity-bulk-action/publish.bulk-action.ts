@@ -120,6 +120,7 @@ export class UmbElementPublishEntityBulkAction extends UmbEntityBulkActionBase<o
 
 		const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 			data: {
+				description: '#prompt_confirmListViewPublish',
 				options,
 			},
 			value: { selection },

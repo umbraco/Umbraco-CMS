@@ -1791,7 +1791,9 @@ declare global {
 		prompt_cannotUnpublishWhenReferenced: string;
 		prompt_confirmListViewPublish: string;
 		prompt_confirmListViewUnpublish: string;
+		prompt_confirmListViewUnpublishElements: string;
 		prompt_confirmPublish: string;
+		prompt_confirmPublishElement: string;
 		prompt_confirmUnpublish: string;
 		prompt_discardChanges: string;
 		prompt_doctypeChangeWarning: string;
@@ -2159,6 +2161,7 @@ declare global {
 		speechBubbles_editElementPublishedFailed: string;
 		speechBubbles_editElementPublishedHeader: string;
 		speechBubbles_editElementPublishedReloadFailed: string;
+		speechBubbles_editElementPublishedText: string;
 		speechBubbles_editElementUnpublishedHeader: string;
 		speechBubbles_editMediaSaved: string;
 		speechBubbles_editMediaSavedText: string;

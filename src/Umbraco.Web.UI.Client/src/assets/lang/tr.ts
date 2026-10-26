@@ -384,6 +384,7 @@ export default {
 		confirmListViewPublish: 'Yayınlama, seçili öğelerin sitede görünür olmasını sağlar.',
 		confirmListViewUnpublish:
 			'Yayından kaldırma, seçili öğeler ile birlikte bu öğelerin tüm alt öğelerini de siteden kaldırır.',
+		confirmListViewUnpublishElements: 'Yayından kaldırma, seçili öğeleri kullanıldıkları her yerde siteden kaldırır.',
 		confirmUnpublish: 'Yayından kaldırma, bu seçili öğe ile birlikte onun tüm alt öğelerini de siteden kaldırır.',
 		doctypeChangeWarning:
 			"Kaydedilmemiş değişiklikleriniz var. Belge Türü'nde değişiklik yapmak bu kaydedilmemiş değişikliklerinizi geçersiz kılacaktır.",
@@ -1145,7 +1146,9 @@ export default {
 		dictionaryItemSaved: 'Sözlük öğesi kaydedildi',
 		editContentPublishedFailedByParent: 'Üst sayfa yayınlanmadığı için yayınlama başarısız oldu',
 		editContentPublishedHeader: 'İçerik yayınlandı',
+		editElementPublishedHeader: 'Öğe yayınlandı',
 		editContentPublishedText: 've web sitesinde görünür',
+		editElementPublishedText: 've yayınlanmış bir belgenin kullandığı her yerde web sitesinde görünür',
 		editContentSavedHeader: 'İçerik kaydedildi',
 		editContentSavedText: 'Değişiklikleri görünür kılmak için yayınlamayı unutmayın',
 		editContentSendToPublish: 'Onay İçin Gönderildi',

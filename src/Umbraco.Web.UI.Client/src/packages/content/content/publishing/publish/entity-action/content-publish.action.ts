@@ -37,6 +37,7 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 		const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 			data: {
 				confirmLabel: '#actions_publish',
+				description: this.args.meta.publishConfirmationMessage,
 				options,
 				pickableFilter: (option) =>
 					this.#isLanguagePickable(option, currentUserAllowedLanguages, currentUserHasAccessToAllLanguages),
@@ -184,13 +185,17 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		const localize = new UmbLocalizationController(this);
 
+		const headline = localize.string(
+			this.args.meta.publishedNotificationHeadline || '#speechBubbles_editContentPublishedHeader',
+		);
+
 		// If the content is invariant, we need to show a different notification
 		const isInvariant = options.length === 1 && options[0].culture === null;
 
 		if (isInvariant) {
 			notificationContext?.peek('positive', {
 				data: {
-					headline: localize.term('speechBubbles_editContentPublishedHeader'),
+					headline,
 					message: localize.string(
 						this.args.meta.publishedNotificationMessage || '#speechBubbles_editContentPublishedText',
 					),
@@ -200,7 +205,7 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 			const publishedVariants = detailData.variants.filter((variant) => selection.includes(variant.culture!));
 			notificationContext?.peek('positive', {
 				data: {
-					headline: localize.term('speechBubbles_editContentPublishedHeader'),
+					headline,
 					message: localize.string(
 						this.args.meta.variantPublishedNotificationMessage || '#speechBubbles_editVariantPublishedText',
 						localize.list(publishedVariants.map((v) => new UmbVariantId(v.culture, null).toString() ?? v.name)),

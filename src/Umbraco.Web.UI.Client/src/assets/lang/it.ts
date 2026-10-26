@@ -447,6 +447,8 @@ export default {
 		confirmListViewPublish: 'Pubblicando renderai visibli gli oggetti selezionati sul sito.',
 		confirmListViewUnpublish:
 			'Non pubblicando rimuoverai gli oggetti selezionati e i loro discendenti dal\n      sito.\n    ',
+		confirmListViewUnpublishElements:
+			'Annullando la pubblicazione, gli elementi selezionati verranno rimossi dal sito ovunque vengano utilizzati.',
 		confirmUnpublish: 'Non pubblicando rimuoverai questa pagina e tutti i suoi discendenti dal sito.',
 		doctypeChangeWarning: 'Hai modifiche non salvate. Apportare modifiche al tipo di documento annullerà le modifiche.',
 	},
@@ -1286,9 +1288,12 @@ export default {
 		dataTypeSaved: 'Tipo di dato salvato',
 		dictionaryItemSaved: 'Elemento del dizionario salvato',
 		editContentPublishedHeader: 'Contenuto pubblicato',
+		editElementPublishedHeader: 'Elemento pubblicato',
 		editContentPublishedText: 'e visibile sul sito web',
+		editElementPublishedText: 'e visibile sul sito web ovunque un documento pubblicato lo utilizzi',
 		editMultiContentPublishedText: '%0% documenti pubblicati e visibili sul sito web',
 		editVariantPublishedText: '%0% pubblicati e visibili sul sito web',
+		editVariantElementPublishedText: '%0% pubblicati',
 		editMultiVariantPublishedText: '%0% documenti pubblicati per le lingue %1% e visibili sul sito web',
 		editContentSavedHeader: 'Contenuto salvato',
 		editContentSavedText: 'Ricorda di pubblicare per rendere i cambiamenti visibili',

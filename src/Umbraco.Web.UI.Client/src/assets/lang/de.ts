@@ -476,6 +476,8 @@ export default {
 		confirmListViewPublish: 'Veröffentlichen macht die ausgewählten Elemente auf der Website sichtbar.',
 		confirmListViewUnpublish:
 			'Aufheben der Veröffentlichung entfernt die ausgewählten Elemente\n      und ihre Unterknoten von der Website.\n    ',
+		confirmListViewUnpublishElements:
+			'Aufheben der Veröffentlichung entfernt die ausgewählten Elemente überall dort von der Website, wo sie verwendet werden.',
 		confirmUnpublish: 'Aufheben der Veröffentlichung entfernt diese Seite und ihre Unterseiten von der Website.',
 		doctypeChangeWarning:
 			'Es gibt ungesicherte Änderungen.\n      Ändern des Dokumenttyps macht diese rückgängig.\n    ',
@@ -1369,9 +1371,12 @@ export default {
 		dataTypeSaved: 'Datentyp gespeichert',
 		dictionaryItemSaved: 'Wörterbucheintrag gespeichert',
 		editContentPublishedHeader: 'Inhalt veröffentlicht',
+		editElementPublishedHeader: 'Element veröffentlicht',
 		editContentPublishedText: 'und ist auf der Website sichtbar',
+		editElementPublishedText: 'und ist auf der Website überall sichtbar, wo ein veröffentlichtes Dokument es verwendet',
 		editMultiContentPublishedText: '%0% Documente veröffentlicht und auf der Website sichtbar',
 		editVariantPublishedText: '%0% veröffentlicht und auf der Website sichtbar',
+		editVariantElementPublishedText: '%0% veröffentlicht',
 		editMultiVariantPublishedText: '%0% Documente veröffentlicht in Sprache %1% und auf der Website sichtbar',
 		editContentSavedHeader: 'Inhalte gespeichert',
 		editContentSavedText: 'Denken Sie daran, die Inhalte zu veröffentlichen, um die Änderungen sichtbar zu machen',

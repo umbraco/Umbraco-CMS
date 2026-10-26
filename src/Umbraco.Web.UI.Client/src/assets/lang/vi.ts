@@ -502,7 +502,11 @@ export default {
 		confirmListViewPublish: 'Xuất bản sẽ làm cho các mục đã chọn có sẵn công khai.',
 		confirmListViewUnpublish:
 			'Ngừng xuất bản sẽ làm cho các mục đã chọn và tất cả các mục con của chúng không còn khả dụng công khai.',
+		confirmListViewUnpublishElements:
+			'Ngừng xuất bản sẽ xóa các phần tử đã chọn khỏi trang web ở bất kỳ nơi nào chúng được sử dụng.',
 		confirmPublish: 'Xuất bản sẽ làm cho nội dung này và tất cả các mục con đã xuất bản của nó có sẵn công khai.',
+		confirmPublishElement:
+			'Xuất bản sẽ làm cho phần tử này hiển thị trên trang web ở bất kỳ nơi nào tài liệu đã xuất bản sử dụng nó.',
 		confirmUnpublish: 'Ngừng xuất bản sẽ làm cho nội dung này không còn khả dụng công khai.',
 		doctypeChangeWarning: 'Bạn có thay đổi chưa lưu. Thay đổi Loại tài liệu sẽ hủy bỏ các thay đổi.',
 	},
@@ -1469,10 +1473,13 @@ export default {
 		editContentPublishedFailedByValidation: 'Tài liệu không thể được xuất bản, nhưng chúng tôi đã lưu nó cho bạn',
 		editContentPublishedFailedByParent: 'Tài liệu không thể được xuất bản, vì một trang cha không được xuất bản',
 		editContentPublishedHeader: 'Tài liệu đã được xuất bản',
+		editElementPublishedHeader: 'Phần tử đã được xuất bản',
 		editContentPublishedText: 'và hiện đang hiển thị trên trang web',
+		editElementPublishedText: 'và hiển thị trên trang web ở bất kỳ nơi nào tài liệu đã xuất bản sử dụng nó',
 		editContentUnpublishedHeader: 'Tài liệu đã bị hủy xuất bản',
 		editContentUnpublishedText: 'và không còn hiển thị trên trang web',
 		editVariantPublishedText: '%0% đã được xuất bản và hiện đang hiển thị trên trang web',
+		editVariantElementPublishedText: '%0% đã được xuất bản',
 		editVariantSavedText: '%0% đã được lưu',
 		editBlueprintSavedHeader: 'Document Blueprint đã được lưu',
 		editBlueprintSavedText: 'Các thay đổi đã được lưu thành công',

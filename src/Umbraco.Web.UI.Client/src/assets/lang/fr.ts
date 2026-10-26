@@ -392,6 +392,8 @@ export default {
 		confirmListViewPublish: 'La publication rendra les éléments sélectionnés visibles sur le site.',
 		confirmListViewUnpublish:
 			'La suppression de la publication supprimera du site les éléments sélectionnés et tous leurs descendants.',
+		confirmListViewUnpublishElements:
+			'La suppression de la publication supprimera du site les éléments sélectionnés partout où ils sont utilisés.',
 		confirmUnpublish: 'La suppression de la publication supprimera du site cette page ainsi que tous ses descendants.',
 		doctypeChangeWarning:
 			'Vous avez des modifications en cours. Modifier le Type de Document fera disparaître ces modifications.',
@@ -1170,9 +1172,12 @@ export default {
 		dataTypeSaved: 'Type de données sauvegardé',
 		dictionaryItemSaved: 'Elément de dictionnaire sauvegardé',
 		editContentPublishedHeader: 'Contenu publié',
+		editElementPublishedHeader: 'Elément publié',
 		editContentPublishedText: 'et visible sur le site',
+		editElementPublishedText: "et visible sur le site partout où un document publié l'utilise",
 		editMultiContentPublishedText: '%0% documents publiés et visibles sur le site web',
 		editVariantPublishedText: '%0% publié et visible sur le site web',
+		editVariantElementPublishedText: '%0% publié',
 		editMultiVariantPublishedText: '%0% documents publiés pour la langue %1% et visibles sur le site web',
 		editContentSavedHeader: 'Contenu sauvegardé',
 		editContentSavedText: "N'oubliez pas de publier pour rendre les modifications visibles",

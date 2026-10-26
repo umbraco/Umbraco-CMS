@@ -406,6 +406,8 @@ export default {
 		confirmListViewPublish: 'Publiceren maakt de geselecteerde items zichtbaar op de site.',
 		confirmListViewUnpublish:
 			'Depubliceren zal de geselecteerde items en alle onderliggende items\n      verwijderen van de site.\n    ',
+		confirmListViewUnpublishElements:
+			'Depubliceren zal de geselecteerde elementen van de site verwijderen, overal waar ze worden gebruikt.',
 		confirmUnpublish: "Depubliceren zal deze pagina en alle onderliggende pagina's verwijderen van de site.\n    ",
 		doctypeChangeWarning:
 			'Wijzigingen niet opgeslagen. Aanpassingen aan het Documenttype zullen de\n      wijzigingen ongedaan maken.\n    ',
@@ -1243,9 +1245,12 @@ export default {
 		dataTypeSaved: 'Datatype opgeslagen',
 		dictionaryItemSaved: 'Woordenboek item opgeslagen',
 		editContentPublishedHeader: 'Inhoud gepubliceerd',
+		editElementPublishedHeader: 'Element gepubliceerd',
 		editContentPublishedText: 'en zichtbaar op de website',
+		editElementPublishedText: 'en zichtbaar op de website overal waar een gepubliceerd document het gebruikt',
 		editMultiContentPublishedText: '%0% documenten gepubliceerd en zichtbaar op de website',
 		editVariantPublishedText: '%0% gepubliceerd en zichtbaar op de website',
+		editVariantElementPublishedText: '%0% gepubliceerd',
 		editMultiVariantPublishedText:
 			'%0% documenten gepubliceerd voor de talen languages %1% en zichtbaar op\n      de website\n    ',
 		editContentSavedHeader: 'Inhoud opgeslagen',

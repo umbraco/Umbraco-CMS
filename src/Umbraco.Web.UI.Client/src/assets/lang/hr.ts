@@ -431,6 +431,8 @@ export default {
 		confirmListViewPublish: 'Objavljivanjem će odabrane stavke biti vidljive na stranici.',
 		confirmListViewUnpublish:
 			'Poništavanje objavljivanja će ukloniti odabrane stavke i sve njihove potomke sa\n       stranice.\n    ',
+		confirmListViewUnpublishElements:
+			'Poništavanje objavljivanja će ukloniti odabrane elemente sa stranice gdje god se koriste.',
 		confirmUnpublish: 'Poništavanje objavljivanja će ukloniti ovu stranicu i sve njene potomke sa stranice.',
 		doctypeChangeWarning: 'Imate ne spremljene promjene. Promjenom vrste dokumenta odbacit će se promjene.',
 	},
@@ -1283,7 +1285,9 @@ export default {
 		dictionaryItemSaved: 'Stavka riječnika je spremljena',
 		editContentPublishedFailedByParent: 'Objavljivanje nije uspjelo jer nadređena stranica nije objavljena',
 		editContentPublishedHeader: 'Sadržaj objavljen',
+		editElementPublishedHeader: 'Element objavljen',
 		editContentPublishedText: 'i vidljivo na web stranici',
+		editElementPublishedText: 'i vidljiv je na web stranici gdje god ga koristi objavljeni dokument',
 		editBlueprintSavedHeader: 'Predložak sadržaja je spremljen',
 		editBlueprintSavedText: 'Promjene su uspješno spremljene',
 		editContentSavedHeader: 'Sadržaj spremljen',

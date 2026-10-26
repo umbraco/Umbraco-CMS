@@ -298,6 +298,8 @@ export default {
 		unsavedChangesWarning: 'Er du sikker på at du vil navigere bort fra denne siden? Du har ulagrede endringer',
 		confirmListViewPublish: 'Publisering vil gjøre de valgte elementene synlige på nettstedet.',
 		confirmListViewUnpublish: 'Avpublisering vil fjerne de valgte sidene og alle deres undersider fra nettstedet.',
+		confirmListViewUnpublishElements:
+			'Avpublisering vil fjerne de valgte elementene fra nettstedet overalt der de brukes.',
 		confirmUnpublish: 'Avpublisering vil fjerne denne siden og alle undersider fra nettstedet.',
 		doctypeChangeWarning: 'Du har ulagrede endringer. Hvis du gjør endringer på dokumenttypen, forkastes endringene.',
 	},
@@ -954,7 +956,9 @@ export default {
 		dictionaryItemSaved: 'Ordbokelement lagret',
 		editContentPublishedFailedByParent: 'Publiseringen feilet fordi den overliggende siden ikke er publisert',
 		editContentPublishedHeader: 'Innhold publisert',
+		editElementPublishedHeader: 'Element publisert',
 		editContentPublishedText: 'og er nå synlig for besøkende',
+		editElementPublishedText: 'og er synlig på nettstedet der et publisert dokument bruker det',
 		editContentSavedHeader: 'Innhold lagret',
 		editContentSavedText: 'Husk å publisere for å gjøre endringene synlig for besøkende',
 		editContentSendToPublish: 'Sendt for godkjenning',

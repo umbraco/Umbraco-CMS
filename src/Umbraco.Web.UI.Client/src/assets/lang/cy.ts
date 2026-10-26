@@ -450,6 +450,8 @@ export default {
 			"Ydych chi'n sicr eich bod eisiau llywio i ffwrdd o'r dudalen yma? - mae gennych chi newidiadau sydd heb eu achub",
 		confirmListViewPublish: 'Bydd cyhoeddi yn gwneud yr eitemau a ddewiswyd yn weladwy ar y wefan.',
 		confirmListViewUnpublish: "Bydd anghyhoeddi yn tynnu'r eitemau a ddewiswyd a'u holl ddisgynyddion o'r safle.",
+		confirmListViewUnpublishElements:
+			"Bydd anghyhoeddi yn tynnu'r elfennau a ddewiswyd o'r safle lle bynnag y cânt eu defnyddio.",
 		confirmUnpublish: "Bydd dadgyhoeddi yn dileu'r dudalen yma a phob un o'i phlant o'r safle.",
 		doctypeChangeWarning:
 			"Mae gennych chi newidiadau heb eu cadw. Bydd gwneud newidiadau i'r Math o Ddogfen yn taflu'r newidiadau i ffwrdd.",
@@ -1335,9 +1337,12 @@ export default {
 		dataTypeSaved: "Math o ddata wedi'i achub",
 		dictionaryItemSaved: "Eitem geiriadur wedi'i achub",
 		editContentPublishedHeader: "Cynnwys wedi'i gyhoeddi",
+		editElementPublishedHeader: "Elfen wedi'i chyhoeddi",
 		editContentPublishedText: 'ac yn weladwy ar y wefan',
+		editElementPublishedText: 'ac yn weladwy ar y wefan lle bynnag y mae dogfen gyhoeddedig yn ei defnyddio',
 		editMultiContentPublishedText: "%0% dogfennau wedi'i gyhoeddi ac yn gweledig ar y wefan",
 		editVariantPublishedText: '%0% gyhoeddi ac yn gweledig ar y wefan',
+		editVariantElementPublishedText: "%0% wedi'i gyhoeddi",
 		editMultiVariantPublishedText: "%0% dogfennau wedi'i gyhoeddi am yr ieithoedd %1% ac yn gweledig ar y wefan",
 		editContentSavedHeader: "Cynnwys wedi'i achub",
 		editContentSavedText: "Cofiwch gyhoeddi er mwyn i'r newidiadau fod yn weladwy",

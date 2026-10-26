@@ -1068,7 +1068,9 @@ export default {
 		editContentPublishedFailedByParent:
 			'Det gick inte att publicera sidan eftersom dess överordnade sida inte är publicerad',
 		editContentPublishedHeader: 'Innehållet är publicerat',
+		editElementPublishedHeader: 'Elementet är publicerat',
 		editContentPublishedText: 'och syns på webbplatsen',
+		editElementPublishedText: 'och syns på webbplatsen överallt där ett publicerat dokument använder det',
 		editContentSavedHeader: 'Innehållet har sparats',
 		editContentSavedText: 'Kom ihåg att publicera för att ändringarna ska synas på webbplatsen',
 		editContentSendToPublish: 'Skickat för godkännande',

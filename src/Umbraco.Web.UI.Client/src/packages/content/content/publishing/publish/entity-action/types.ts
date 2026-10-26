@@ -16,6 +16,16 @@ export interface ManifestEntityActionContentPublishKind extends ManifestEntityAc
  */
 export interface MetaEntityActionContentPublishKind extends MetaEntityActionDefaultKind {
 	/**
+	 * Overrides the confirmation text shown in the publish modal.
+	 * Use a localization key, e.g. `#prompt_confirmPublish`.
+	 */
+	publishConfirmationMessage?: string;
+	/**
+	 * Overrides the success notification headline.
+	 * Use a localization key, e.g. `#speechBubbles_editContentPublishedHeader`.
+	 */
+	publishedNotificationHeadline?: string;
+	/**
 	 * Overrides the success notification message when invariant content is published.
 	 * Use a localization key, e.g. `#speechBubbles_editContentPublishedText`.
 	 */
