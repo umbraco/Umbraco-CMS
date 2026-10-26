@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Upgrad
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class ver : UmbracoIntegrationTest
+internal sealed class AddIncludeInvariantForVariantColumnToContentScheduleTests : UmbracoIntegrationTest
 {
     private const string ColumnName = "includeInvariantForVariant";
 
