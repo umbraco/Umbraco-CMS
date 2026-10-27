@@ -27,6 +27,8 @@ internal sealed class ContentRelationsUpdate :
     IDistributedCacheNotificationHandler<ElementSavedNotification>,
     IDistributedCacheNotificationHandler<ElementPublishedNotification>
 {
+    private const int PersistRelationsChunkSize = 200;
+
     private readonly IScopeProvider _scopeProvider;
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
     private readonly PropertyEditorCollection _propertyEditors;
@@ -106,19 +108,27 @@ internal sealed class ContentRelationsUpdate :
             return;
         }
 
-        using IScope scope = _scopeProvider.CreateScope();
-
-        // This runs after the triggering operation has committed, so it is a transaction of its own. The write lock
-        // must be taken before anything is read, otherwise a database that serializes writers (such as SQLite) can
-        // refuse the first write once another connection has committed since this transaction started reading.
-        scope.WriteLock(Constants.Locks.Relations);
-
-        foreach (IContentBase entity in entitiesAsArray)
+        // The write lock is held until each transaction commits, so a single transaction for a large batch (for
+        // example, publishing many items at once) would hold it long enough for a concurrent relation update to time
+        // out waiting for it. Committing in chunks bounds how long it is held. Losing atomicity across the whole batch
+        // is acceptable: this already runs after the triggering operation has committed, so it was never atomic with
+        // it, and relations are derived data that are rebuilt in full the next time an item is saved.
+        foreach (IEnumerable<IContentBase> chunk in entitiesAsArray.InGroupsOf(PersistRelationsChunkSize))
         {
-            PersistRelations(scope, entity, checkNodeExists);
-        }
+            using IScope scope = _scopeProvider.CreateScope();
 
-        scope.Complete();
+            // This is a transaction of its own, so the write lock must be taken before anything is read, otherwise a
+            // database that serializes writers (such as SQLite) can refuse the first write once another connection
+            // has committed since this transaction started reading.
+            scope.WriteLock(Constants.Locks.Relations);
+
+            foreach (IContentBase entity in chunk)
+            {
+                PersistRelations(scope, entity, checkNodeExists);
+            }
+
+            scope.Complete();
+        }
     }
 
     private void PersistRelations(IScope scope, IContentBase entity, bool checkNodeExists)
