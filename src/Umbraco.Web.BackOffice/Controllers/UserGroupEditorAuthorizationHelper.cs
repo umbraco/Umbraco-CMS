@@ -2,6 +2,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -116,7 +117,18 @@ internal class UserGroupEditorAuthorizationHelper
         int? currentMediaStartId,
         int? proposedMediaStartId)
     {
-        if (currentContentStartId != proposedContentStartId && proposedContentStartId.HasValue)
+        if (currentContentStartId != proposedContentStartId && proposedContentStartId == Constants.System.Root)
+        {
+            var hasRootAccess = ContentPermissions.HasPathAccess(
+                Constants.System.RootString,
+                currentUser?.CalculateContentStartNodeIds(_entityService, _appCaches),
+                Constants.System.RecycleBinContent);
+            if (hasRootAccess == false)
+            {
+                return Attempt.Fail("Current user doesn't have access to the content root");
+            }
+        }
+        else if (currentContentStartId != proposedContentStartId && proposedContentStartId.HasValue)
         {
             IContent? content = _contentService.GetById(proposedContentStartId.Value);
             if (content != null)
@@ -128,7 +140,18 @@ internal class UserGroupEditorAuthorizationHelper
             }
         }
 
-        if (currentMediaStartId != proposedMediaStartId && proposedMediaStartId.HasValue)
+        if (currentMediaStartId != proposedMediaStartId && proposedMediaStartId == Constants.System.Root)
+        {
+            var hasRootAccess = ContentPermissions.HasPathAccess(
+                Constants.System.RootString,
+                currentUser?.CalculateMediaStartNodeIds(_entityService, _appCaches),
+                Constants.System.RecycleBinMedia);
+            if (hasRootAccess == false)
+            {
+                return Attempt.Fail("Current user doesn't have access to the media root");
+            }
+        }
+        else if (currentMediaStartId != proposedMediaStartId && proposedMediaStartId.HasValue)
         {
             IMedia? media = _mediaService.GetById(proposedMediaStartId.Value);
             if (media != null)
