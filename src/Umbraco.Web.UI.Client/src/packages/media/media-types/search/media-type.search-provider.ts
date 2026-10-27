@@ -19,6 +19,7 @@ export class UmbMediaTypeSearchProvider
 
 	override destroy(): void {
 		this.#repository.destroy();
+		super.destroy();
 	}
 }
 
