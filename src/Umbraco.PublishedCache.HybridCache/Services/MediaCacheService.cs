@@ -402,22 +402,8 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         if (media.Trashed)
         {
             _databaseCacheRepository.DeleteContentItem(media.Id);
-            IScopeContext? context = _scopeProvider.Context;
-            if (context is null)
-            {
-                RemoveFromMemoryCacheAsync(media.Key).GetAwaiter().GetResult();
-            }
-            else
-            {
-                // The cache removal may reach a distributed cache, so it runs after the commit, outside the media tree lock.
-                context.Enlist($"{nameof(MediaCacheService)}.{nameof(RemoveFromMemoryCacheAsync)}.{media.Key}", completed =>
-                {
-                    if (completed)
-                    {
-                        RemoveFromMemoryCacheAsync(media.Key).GetAwaiter().GetResult();
-                    }
-                });
-            }
+            // TODO (V20): await the memory-cache removal once the notification pipeline is asynchronous.
+            RemoveFromMemoryCacheAsync(media.Key).GetAwaiter().GetResult();
 
             scope.Complete();
             return;

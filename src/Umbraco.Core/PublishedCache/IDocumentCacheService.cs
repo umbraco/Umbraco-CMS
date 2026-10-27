@@ -106,8 +106,8 @@ public interface IDocumentCacheService
     /// <remarks>
     /// Runs inside the transaction that persists the content, under the content tree lock. Until the lock wait and
     /// the notification pipeline are asynchronous, awaiting there needs a second thread-pool thread while the first
-    /// is blocked, which under load stretches the time the lock is held. Implementations should make this genuinely
-    /// synchronous and defer any work that reaches a distributed cache until after the commit.
+    /// is blocked, which under load stretches the time the lock is held. Implementations should avoid awaiting here
+    /// wherever their backing store allows it.
     /// </remarks>
     // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
     void RefreshContent(IContent content)

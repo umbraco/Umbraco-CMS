@@ -657,7 +657,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         if (content.Trashed)
         {
             _databaseCacheRepository.DeleteContentItem(content.Id);
-            AfterCommit($"{nameof(DocumentCacheService)}.{nameof(RemoveFromMemoryCacheAsync)}.{content.Key}", () => RemoveFromMemoryCacheAsync(content.Key));
+            // TODO (V20): await the memory-cache removals once the notification pipeline is asynchronous.
+            RemoveFromMemoryCacheAsync(content.Key).GetAwaiter().GetResult();
             scope.Complete();
             return;
         }
@@ -673,33 +674,10 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         else if (content.PublishedState is PublishedState.Unpublishing)
         {
             _databaseCacheRepository.RemovePublishedContent(content.Id);
-            AfterCommit($"{nameof(DocumentCacheService)}.{nameof(ClearPublishedCacheAsync)}.{content.Key}", () => ClearPublishedCacheAsync(content.Key));
+            ClearPublishedCacheAsync(content.Key).GetAwaiter().GetResult();
         }
 
         scope.Complete();
-    }
-
-    /// <summary>
-    /// Runs a memory-cache update once the ambient transaction has committed, so the cache work (which may reach a
-    /// distributed cache) does not run while the content tree lock is held. Without an ambient scope context the
-    /// update runs at once.
-    /// </summary>
-    private void AfterCommit(string key, Func<Task> update)
-    {
-        IScopeContext? context = _scopeProvider.Context;
-        if (context is null)
-        {
-            update().GetAwaiter().GetResult();
-            return;
-        }
-
-        context.Enlist(key, completed =>
-        {
-            if (completed)
-            {
-                update().GetAwaiter().GetResult();
-            }
-        });
     }
 
     /// <inheritdoc />
