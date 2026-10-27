@@ -184,7 +184,7 @@ stages:
               command: test
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
-              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
 
       # Integration Tests (SQL Server)
       - job:
@@ -307,7 +307,7 @@ stages:
               command: test
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
 
           # Stop SQL Server
           - pwsh: docker stop mssql
