@@ -189,6 +189,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 		return html`
 			<umb-figure-card
+				data-mark="clipboard-entry:${label}"
 				name=${label}
 				title=${label}
 				selectable
