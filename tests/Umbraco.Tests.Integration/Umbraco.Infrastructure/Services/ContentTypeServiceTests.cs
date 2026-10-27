@@ -2949,7 +2949,6 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         {
             Assert.AreEqual(2, all.Total);
             CollectionAssert.AreEquivalent(new[] { "rootOne", "rootTwo" }, all.Items.Select(item => item.Alias));
-            CollectionAssert.AreEquivalent(all.Items.Select(item => item.Alias), new [] { "rootOne", "rootTwo" });
         });
     }
 
