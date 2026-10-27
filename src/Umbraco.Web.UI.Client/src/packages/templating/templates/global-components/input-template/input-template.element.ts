@@ -2,7 +2,7 @@ import type { UmbTemplateCardElement } from '../template-card/template-card.elem
 import type { UmbTemplateItemModel } from '../../repository/item/index.js';
 import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { UMB_TEMPLATE_PICKER_MODAL } from '../../modals/index.js';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -71,6 +71,15 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 		return this.#defaultUnique;
 	}
 	#defaultUnique = '';
+
+	/**
+	 * Sets the input to readonly mode, meaning the templates and the default template cannot be changed but can still be opened.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	private _pickedTemplates: UmbTemplateItemModel[] = [];
@@ -176,23 +185,31 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 						.name=${template.name}
 						.href=${this._templatePath ? this._templatePath + 'edit/' + template.unique : undefined}
 						?default=${template.unique === this.defaultUnique}
+						?readonly=${this.readonly}
 						@change=${this.#onCardChange}>
-						<uui-button
-							slot="actions"
-							compact
-							label=${this.localize.term('general_remove') + ' ' + template.name}
-							@click=${() => this.#removeTemplate(template.unique ?? '')}>
-							<uui-icon name="icon-trash"></uui-icon>
-						</uui-button>
+						${this.readonly
+							? nothing
+							: html`<uui-button
+									slot="actions"
+									compact
+									label=${this.localize.term('general_remove') + ' ' + template.name}
+									@click=${() => this.#removeTemplate(template.unique ?? '')}>
+									<uui-icon name="icon-trash"></uui-icon>
+								</uui-button>`}
 					</umb-template-card>
 				`,
 			)}
-			<uui-button
-				id="btn-add"
-				look="placeholder"
-				label=${this.localize.term('general_choose')}
-				@click=${this.#openPicker}></uui-button>
+			${this.#renderAddButton()}
 		`;
+	}
+
+	#renderAddButton() {
+		if (this.readonly) return nothing;
+		return html`<uui-button
+			id="btn-add"
+			look="placeholder"
+			label=${this.localize.term('general_choose')}
+			@click=${this.#openPicker}></uui-button>`;
 	}
 
 	static override readonly styles = [

@@ -1,6 +1,6 @@
 import { UMB_WEBHOOK_EVENTS_MODAL } from './modal/webhook-events-modal.token.js';
 import type { UmbWebhookEventModel } from './types.js';
-import { css, html, customElement, property, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '@umbraco-cms/backoffice/culture';
@@ -12,6 +12,15 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 export class UmbInputWebhookEventsElement extends UmbLitElement {
 	@property({ attribute: false })
 	public events: Array<UmbWebhookEventModel> = [];
+
+	/**
+	 * Sets the input to readonly mode, meaning events cannot be chosen or removed but can still be read.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean, reflect: true })
+	public readonly = false;
 
 	private _modalContext?: UmbModalManagerContext;
 
@@ -52,13 +61,18 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 					this.events,
 					(item) => item.alias,
 					(item) => html`
-						<uui-ref-node name=${item.eventName} @open=${this.#openModal}>
+						<uui-ref-node name=${item.eventName} ?readonly=${this.readonly} @open=${this.#openModal}>
 							<umb-icon slot="icon" name="icon-globe"></umb-icon>
-							<uui-action-bar slot="actions">
-								<uui-button
-									label=${this.localize.term('general_remove')}
-									@click=${() => this.#removeEvent(item.alias)}></uui-button>
-							</uui-action-bar>
+							${when(
+								!this.readonly,
+								() => html`
+									<uui-action-bar slot="actions">
+										<uui-button
+											label=${this.localize.term('general_remove')}
+											@click=${() => this.#removeEvent(item.alias)}></uui-button>
+									</uui-action-bar>
+								`,
+							)}
 						</uui-ref-node>
 					`,
 				)}
@@ -67,12 +81,16 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`${this.#renderEvents()}
-			<uui-button
-				id="btn-add"
-				look="placeholder"
-				label=${this.localize.term('general_choose')}
-				@click=${this.#openModal}></uui-button>`;
+		return html`${this.#renderEvents()} ${this.#renderAddButton()}`;
+	}
+
+	#renderAddButton() {
+		if (this.readonly) return nothing;
+		return html`<uui-button
+			id="btn-add"
+			look="placeholder"
+			label=${this.localize.term('general_choose')}
+			@click=${this.#openModal}></uui-button>`;
 	}
 
 	static override styles = [

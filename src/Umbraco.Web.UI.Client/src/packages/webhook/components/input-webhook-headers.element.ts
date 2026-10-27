@@ -10,6 +10,15 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 	@property()
 	public headers: { [key: string]: string } = {};
 
+	/**
+	 * Sets the input to readonly mode, meaning headers cannot be added, changed or removed but can still be read.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean, reflect: true })
+	public readonly = false;
+
 	@state()
 	private _headers: Array<{ name: string; value: string }> = [];
 
@@ -71,14 +80,19 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 			<input
 				type="text"
 				.value=${header.name}
+				?readonly=${this.readonly}
 				@input=${(e: InputEvent) => this.#onInput(e, 'name', index)}
 				list="nameList" />
 			<input
 				type="text"
 				.value=${header.value}
+				?readonly=${this.readonly}
 				@input=${(e: InputEvent) => this.#onInput(e, 'value', index)}
 				list="valueList" />
-			<uui-button @click=${() => this.#removeHeader(index)} label=${this.localize.term('general_remove')}></uui-button>
+			<uui-button
+				?disabled=${this.readonly}
+				@click=${() => this.#removeHeader(index)}
+				label=${this.localize.term('general_remove')}></uui-button>
 		`;
 	}
 
@@ -117,8 +131,12 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 	}
 
 	override render() {
+		return html` ${this.#renderGrid()} ${this.#renderAddButton()} `;
+	}
+
+	#renderAddButton() {
+		if (this.readonly) return nothing;
 		return html`
-			${this.#renderGrid()}
 			<uui-button id="add" look="placeholder" label=${this.localize.term('general_add')} @click=${this.#addHeader}>
 				<umb-localize key="general_add">Add</umb-localize>
 			</uui-button>

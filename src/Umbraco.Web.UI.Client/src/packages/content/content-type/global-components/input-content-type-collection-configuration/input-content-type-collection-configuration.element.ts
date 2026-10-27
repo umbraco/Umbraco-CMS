@@ -29,6 +29,15 @@ export class UmbInputContentTypeCollectionConfigurationElement extends UmbFormCo
 	@property({ attribute: 'default-value' })
 	defaultValue?: string;
 
+	/**
+	 * Sets the input to readonly mode, meaning the collection cannot be chosen or removed but its data type can still be opened.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	#setValue(value: string | undefined) {
 		this.value = value;
 		this.dispatchEvent(new UmbChangeEvent());
@@ -88,7 +97,7 @@ export class UmbInputContentTypeCollectionConfigurationElement extends UmbFormCo
 	}
 
 	#renderCreate() {
-		if (!this._dataTypePickerModalPath) return nothing;
+		if (this.readonly || !this._dataTypePickerModalPath) return nothing;
 		return html`
 			<uui-button
 				id="create-button"
@@ -104,12 +113,14 @@ export class UmbInputContentTypeCollectionConfigurationElement extends UmbFormCo
 		return html`
 			<uui-ref-list>
 				<umb-ref-data-type standalone data-type-id=${this.value} @open=${this.#editDataType}>
-					<uui-action-bar slot="actions">
-						<uui-button
-							label=${this.localize.term('general_choose')}
-							href=${this._dataTypePickerModalPath}></uui-button>
-						<uui-button @click=${this.#clearDataType} label=${this.localize.term('general_remove')}></uui-button>
-					</uui-action-bar>
+					${this.readonly
+						? nothing
+						: html`<uui-action-bar slot="actions">
+								<uui-button
+									label=${this.localize.term('general_choose')}
+									href=${this._dataTypePickerModalPath}></uui-button>
+								<uui-button @click=${this.#clearDataType} label=${this.localize.term('general_remove')}></uui-button>
+							</uui-action-bar>`}
 				</umb-ref-data-type>
 			</uui-ref-list>
 		`;
