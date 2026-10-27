@@ -8,6 +8,9 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -67,8 +70,21 @@ public class UserGroupPermissionServiceTests
         Assert.AreEqual(UserGroupAuthorizationStatus.Success, result);
     }
 
-    private static UserGroupPermissionService CreateService()
+    [Test]
+    public async Task Can_Update_A_User_Group_With_An_Unchanged_Document_Blueprint_Start_Node_Outside_Own_Access()
     {
+        IUser user = CreateUserWithDocumentBlueprintStartNode(9876);
+        IUserGroup userGroup = CreateUserGroup(1234);
+
+        UserGroupAuthorizationStatus result = await CreateService(persistedUserGroup: CreateUserGroup(1234))
+            .AuthorizeUpdateAsync(user, userGroup);
+
+        Assert.AreEqual(UserGroupAuthorizationStatus.Success, result);
+    }
+
+    private static UserGroupPermissionService CreateService(IUserGroup? persistedUserGroup = null)
+    {
+        IUserGroup[] persistedUserGroups = persistedUserGroup is null ? [] : [persistedUserGroup];
         var entityService = new Mock<IEntityService>();
         entityService
             .Setup(x => x.GetAllPaths(UmbracoObjectTypes.DocumentBlueprintContainer, It.IsAny<int[]>()))
@@ -84,7 +100,9 @@ public class UserGroupPermissionServiceTests
             Mock.Of<IContentService>(),
             Mock.Of<IMediaService>(),
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            new Mock<ICoreScopeProvider> { DefaultValue = DefaultValue.Mock }.Object,
+            Mock.Of<IUserGroupRepository>(repository => repository.Get(It.IsAny<IQuery<IUserGroup>>()) == persistedUserGroups));
     }
 
     private static IUser CreateUserWithDocumentBlueprintStartNode(int startDocumentBlueprintId)
@@ -100,6 +118,7 @@ public class UserGroupPermissionServiceTests
 
     private static IUserGroup CreateUserGroup(int startDocumentBlueprintId)
         => new UserGroupBuilder()
+            .WithId(1)
             .WithKey(_userGroupKey)
             .WithAlias("editor")
             .WithAllowedSections([Constants.Applications.Users])
