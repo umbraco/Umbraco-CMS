@@ -29,10 +29,11 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     internal MemoryCache MemoryCache { get; private set; }
 
     /// <summary>
-    /// Gets the number of post-eviction callbacks that have completed, for tests only!
+    /// Gets the number of post-eviction callbacks that have completed.
     /// </summary>
     /// <remarks>
-    /// Eviction callbacks run on a background thread, so tests use this to wait for them deterministically.
+    /// Marked as internal to allow access for tests. Eviction callbacks run on a background thread, 
+    /// so tests use this to wait for them deterministically.
     /// </remarks>
     internal int CompletedEvictionCallbacks => Volatile.Read(ref _completedEvictionCallbacks);
 
