@@ -7,7 +7,7 @@ export class UmbDuplicateMediaTypeRepository extends UmbRepositoryBase implement
 	#duplicateSource = new UmbDuplicateMediaTypeServerDataSource(this);
 
 	async requestDuplicateTo(args: UmbDuplicateToRequestArgs) {
-		const { error } = await this.#duplicateSource.duplicateTo(args);
+		const { data, error } = await this.#duplicateSource.duplicateTo(args);
 
 		if (!error) {
 			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
@@ -18,7 +18,7 @@ export class UmbDuplicateMediaTypeRepository extends UmbRepositoryBase implement
 			notificationContext.peek('positive', notification);
 		}
 
-		return { error };
+		return { data, error };
 	}
 }
 
