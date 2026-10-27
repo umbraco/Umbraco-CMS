@@ -124,6 +124,23 @@ public class UmbracoRequestPathsTests
         Assert.AreEqual(expected, umbracoRequestPaths.IsBackOfficeRequest(source.AbsolutePath));
     }
 
+    [TestCase("http://www.domain.com/umbraco/delivery/api/v2/content/item/1234", "", true)]
+    [TestCase("http://www.domain.com/Umbraco/Delivery/Api/v2/content", "", true)]
+    [TestCase("http://www.domain.com/myvdir/umbraco/delivery/api/v2/content", "myvdir", true)]
+    [TestCase("http://www.domain.com/umbraco/management/api/v1/document", "", false)]
+    [TestCase("http://www.domain.com/umbraco/api/blah", "", false)]
+    [TestCase("http://www.domain.com/delivery/api/v2/content", "", false)]
+    [TestCase("http://www.domain.com/some/page", "", false)]
+    public void Is_Delivery_Api_Request(string input, string virtualPath, bool expected)
+    {
+        var source = new Uri(input);
+        var umbracoRequestPaths = new UmbracoRequestPaths(
+            CreateHostingEnvironment(virtualPath),
+            Options.Create(_umbracoRequestPathsOptions),
+            Options.Create(_deliveryApiSettings));
+        Assert.AreEqual(expected, umbracoRequestPaths.IsDeliveryApiRequest(source.AbsolutePath));
+    }
+
     [TestCase("/favicon.ico", true)]
     [TestCase("/umbraco_client/Tree/treeIcons.css", true)]
     [TestCase("/test/test.aspx", true)]
