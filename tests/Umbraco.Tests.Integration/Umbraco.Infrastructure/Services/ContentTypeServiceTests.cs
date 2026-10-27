@@ -2947,7 +2947,8 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         PagedModel<IContentType> all = await ContentTypeService.GetAllAllowedAsRootAsync(0, 10);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(all.Total, 2);
+            Assert.AreEqual(2, all.Total);
+            CollectionAssert.AreEquivalent(new[] { "rootOne", "rootTwo" }, all.Items.Select(item => item.Alias));
             CollectionAssert.AreEquivalent(all.Items.Select(item => item.Alias), new [] { "rootOne", "rootTwo" });
         });
     }
