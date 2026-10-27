@@ -24,6 +24,7 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
 
     private static readonly ServerRole[] _allServerRoles = Enum.GetValues<ServerRole>();
 
+    private readonly IActiveIndexManager _activeIndexManager;
     private readonly IContentIndexingService _contentIndexingService;
     private readonly ILogger<IndexRebuildJob> _logger;
     private readonly IOriginProvider _originProvider;
@@ -48,6 +49,7 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
         IOriginProvider originProvider)
         : base(_retryPeriod)
     {
+        _activeIndexManager = activeIndexManager;
         _contentIndexingService = contentIndexingService;
         _logger = logger;
         _originProvider = originProvider;
@@ -91,10 +93,15 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
             return Task.CompletedTask;
         }
 
-        _logger.LogInformation("Runtime is ready, rebuilding {IndexCount} index(es) missing at startup.", _indexAliasesToRebuild.Length);
+        // Skip indexes already being rebuilt, for example from the backoffice during the startup delay.
+        var indexAliasesToRebuild = _indexAliasesToRebuild
+            .Where(indexAlias => _activeIndexManager.IsRebuilding(indexAlias) is false)
+            .ToArray();
+
+        _logger.LogInformation("Runtime is ready, rebuilding {IndexCount} index(es) missing at startup.", indexAliasesToRebuild.Length);
 
         var origin = _originProvider.GetCurrent();
-        foreach (var indexAlias in _indexAliasesToRebuild)
+        foreach (var indexAlias in indexAliasesToRebuild)
         {
             _contentIndexingService.Rebuild(indexAlias, origin);
         }

@@ -156,6 +156,20 @@ public class IndexRebuildJobTests
     }
 
     [Test]
+    public async Task Does_Not_Rebuild_When_The_Index_Is_Already_Being_Rebuilt()
+    {
+        IIndex index = CreateIndex(exists: false);
+        _examineManager.Setup(x => x.TryGetIndex(PhysicalIndexName, out index)).Returns(true);
+
+        IndexRebuildJob sut = CreateSut();
+        _activeIndexManager.Setup(x => x.IsRebuilding(IndexAlias)).Returns(true);
+
+        await sut.RunJobAsync(CancellationToken.None);
+
+        _contentIndexingService.Verify(x => x.Rebuild(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Test]
     public async Task Does_Not_Rebuild_When_Not_A_Registered_Examine_Index()
     {
         IIndex? index = null;
