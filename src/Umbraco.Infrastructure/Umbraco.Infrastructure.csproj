@@ -38,6 +38,12 @@
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Serilog.Sinks.Map" />
 
+    <!-- MailKit (via MimeKit) and Microsoft.CodeAnalysis.Workspaces.MSBuild bring in a vulnerable version of System.Security.Cryptography.Pkcs -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" />
+
+    <!-- Microsoft.CodeAnalysis.Workspaces.MSBuild brings in a vulnerable version of System.Security.Cryptography.Xml -->
+    <PackageReference Include="System.Security.Cryptography.Xml" />
+
     <!-- Both Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer,NPoco.SqlServer, and more bring in a vulnerable version of System.Text.Json -->
     <PackageReference Include="System.Text.Json" />
 
