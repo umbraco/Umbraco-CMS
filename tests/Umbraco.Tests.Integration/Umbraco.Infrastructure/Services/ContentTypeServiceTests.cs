@@ -2933,6 +2933,45 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         });
     }
 
+    [Test]
+    public async Task Can_Omit_Element_Types_From_Allowed_At_Root()
+    {
+        foreach (var alias in new[] { "rootOne", "rootTwo", "rootThree" })
+        {
+            ContentType contentType = ContentTypeBuilder.CreateBasicContentType(alias, alias);
+            contentType.AllowedAsRoot = true;
+            contentType.IsElement = alias is "rootThree";
+            await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        }
+
+        PagedModel<IContentType> all = await ContentTypeService.GetAllAllowedAsRootAsync(0, 10);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(all.Total, 2);
+            CollectionAssert.AreEquivalent(all.Items.Select(item => item.Alias), new [] { "rootOne", "rootTwo" });
+        });
+    }
+
+    [Test]
+    public async Task Can_Omit_Element_Types_From_Allowed_Children()
+    {
+        IContentType[] children = await CreateContentTypesAllowedAsChildren();
+
+        var element = children.Last();
+        element.IsElement = true;
+        await ContentTypeService.UpdateAsync(element, Constants.Security.SuperUserKey);
+
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> result =
+            await ContentTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 0, take: 10);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, result.Result!.Total);
+            Assert.AreEqual(new[] { children[0].Key, children[1].Key }, result.Result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
     /// <summary>
     /// Creates three content types, each allowed as a child of the first, in a known order.
     /// </summary>
