@@ -324,7 +324,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 
 	async #getUrlForMedia(unique: string) {
 		const { data } = await this.#mediaUrlRepository.requestItems([unique]);
-		return data?.[0].url ?? '';
+		return data?.[0]?.url ?? '';
 	}
 
 	async #getNameForDocument(unique: string) {
