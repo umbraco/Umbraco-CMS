@@ -40,6 +40,22 @@ public class PreviewAccessEvaluatorTests
     }
 
     [Test]
+    public void Refuses_Any_Document_In_A_Preview_Session_For_A_Disabled_User()
+    {
+        PreviewAccessEvaluator evaluator = CreateEvaluator(CreateUser(isApproved: false), out _);
+
+        Assert.IsFalse(evaluator.CanPreviewDocument(Content(InsideStartNodePath)));
+    }
+
+    [Test]
+    public void Refuses_Any_Document_In_A_Preview_Session_For_A_Locked_Out_User()
+    {
+        PreviewAccessEvaluator evaluator = CreateEvaluator(CreateUser(isLockedOut: true), out _);
+
+        Assert.IsFalse(evaluator.CanPreviewDocument(Content(InsideStartNodePath)));
+    }
+
+    [Test]
     public void Allows_Document_Inside_Start_Node()
     {
         PreviewAccessEvaluator evaluator = CreateEvaluator(CreateUser(), out _);
@@ -99,6 +115,14 @@ public class PreviewAccessEvaluatorTests
     }
 
     [Test]
+    public void Refuses_Any_Element_In_A_Preview_Session_For_A_Disabled_User()
+    {
+        PreviewAccessEvaluator evaluator = CreateEvaluator(CreateUser(isApproved: false), out _);
+
+        Assert.IsFalse(evaluator.CanPreviewElement(Element(InsideStartNodePath)));
+    }
+
+    [Test]
     public void Allows_Element_Inside_Element_Start_Node()
     {
         PreviewAccessEvaluator evaluator = CreateEvaluator(CreateUser(), out _);
@@ -140,13 +164,15 @@ public class PreviewAccessEvaluatorTests
     private static IPublishedContent Content(string path)
         => Mock.Of<IPublishedContent>(x => x.Path == path && x.Key == Guid.NewGuid());
 
-    private IUser CreateUser(string[]? sections = null)
+    private IUser CreateUser(string[]? sections = null, bool isApproved = true, bool isLockedOut = false)
     {
         IReadOnlyUserGroup[] groups = [Mock.Of<IReadOnlyUserGroup>(x => x.StartContentId == StartNodeId && x.StartElementId == StartNodeId)];
 
         var user = new Mock<IUser>();
         user.SetupGet(x => x.Key).Returns(_userKey);
         user.SetupGet(x => x.Id).Returns(1234);
+        user.SetupGet(x => x.IsApproved).Returns(isApproved);
+        user.SetupGet(x => x.IsLockedOut).Returns(isLockedOut);
         user.SetupGet(x => x.AllowedSections).Returns(sections ?? [Constants.Applications.Content, Constants.Applications.Library]);
         user.SetupGet(x => x.Groups).Returns(groups);
         user.SetupGet(x => x.StartContentIds).Returns([]);

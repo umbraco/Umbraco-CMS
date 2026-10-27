@@ -18,7 +18,7 @@ public interface IPreviewAccessEvaluator
     /// <param name="content">The unpublished version of the document.</param>
     /// <returns>
     /// <c>true</c> when no preview session is active, or when the preview user may browse the document; otherwise
-    /// <c>false</c>, including in a preview session whose user can't be resolved.
+    /// <c>false</c>, including in a preview session whose user can't be resolved, or is disabled or locked out.
     /// </returns>
     bool CanPreviewDocument(IPublishedContent content);
 
@@ -28,7 +28,7 @@ public interface IPreviewAccessEvaluator
     /// <param name="element">The unpublished version of the element.</param>
     /// <returns>
     /// <c>true</c> when no preview session is active, or when the preview user may browse the element; otherwise
-    /// <c>false</c>, including in a preview session whose user can't be resolved.
+    /// <c>false</c>, including in a preview session whose user can't be resolved, or is disabled or locked out.
     /// </returns>
     bool CanPreviewElement(IPublishedElement element);
 }

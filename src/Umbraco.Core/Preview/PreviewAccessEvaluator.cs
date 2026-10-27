@@ -110,9 +110,17 @@ internal sealed class PreviewAccessEvaluator : IPreviewAccessEvaluator
         => (PreviewUser)_appCaches.RequestCache.Get(PreviewUserCacheKey, ResolvePreviewUser)!;
 
     private PreviewUser ResolvePreviewUser()
-        => _previewSessionService.IsActive()
-            ? new PreviewUser(true, _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser)
-            : PreviewUser.NoSession;
+    {
+        if (_previewSessionService.IsActive() is false)
+        {
+            return PreviewUser.NoSession;
+        }
+
+        // The session rides on the back-office authentication cookie, which disabling or locking out a user does not
+        // invalidate, so the user's state is checked here.
+        IUser? user = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        return new PreviewUser(true, user is { IsApproved: true, IsLockedOut: false } ? user : null);
+    }
 
     private sealed record PreviewTree(
         string Section,
@@ -134,7 +142,7 @@ internal sealed class PreviewAccessEvaluator : IPreviewAccessEvaluator
 
         public bool IsInSession { get; }
 
-        // Null in a session whose user can't be resolved, which is refused every draft.
+        // Null in a session whose user can't be resolved, or is disabled or locked out, which is refused every draft.
         public IUser? User { get; }
 
         public ConcurrentDictionary<(PreviewTree Tree, string Path), bool> PathAccess { get; } = new();
