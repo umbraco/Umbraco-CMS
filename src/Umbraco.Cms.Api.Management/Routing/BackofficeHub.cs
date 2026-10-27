@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Routing;
 
 /// <summary>
 /// Provides a SignalR hub for managing real-time communication and routing events within the Umbraco CMS backoffice API.
 /// </summary>
+[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
 public class BackofficeHub : Hub
 {
     /// <summary>

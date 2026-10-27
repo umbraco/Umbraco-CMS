@@ -26,10 +26,10 @@ export class UmbMemberMenuStructureWorkspaceContext
 
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
-	#structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
+	readonly #structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
 
-	#parentContext = new UmbParentEntityContext(this);
+	readonly #parentContext = new UmbParentEntityContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT);

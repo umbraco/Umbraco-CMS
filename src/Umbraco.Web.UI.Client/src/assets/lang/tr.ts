@@ -1156,6 +1156,17 @@ export default {
 		sortHelp:
 			'Nasıl düzenleneceklerini ayarlamak için farklı öğeleri aşağı veya yukarı sürükleyin. Veya tüm öğe koleksiyonunu sıralamak için sütun başlıklarını tıklayın',
 		sortPleaseWait: 'Lütfen bekleyin. Öğeler sıralanıyor, bu biraz zaman alabilir.',
+		sortByFieldHeadline: 'Alana göre sırala',
+		sortByFieldSentence: 'Tüm alt öğeleri şuna göre sırala:',
+		sortByFieldDirectionLabel: 'Yön',
+		sortByFieldAscending: 'Artan',
+		sortByFieldDescending: 'Azalan',
+		sortByFieldNameOption: 'Ad',
+		sortByFieldCreateDateOption: 'Oluşturuldu',
+		sortByFieldUpdateDateOption: 'Son düzenleme',
+		sortIndividuallyHeadline: 'Tek tek sırala',
+		sortByFieldCultureSentence: 'dil:',
+		sortByFieldCultureLabel: 'Dil',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Doğrulama',

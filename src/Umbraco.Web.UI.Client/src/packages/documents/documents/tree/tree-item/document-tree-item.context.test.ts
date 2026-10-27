@@ -25,6 +25,11 @@ function createTreeItem(
 	hasCollection: boolean,
 	overrides?: Partial<UmbDocumentTreeItemModel>,
 ): UmbDocumentTreeItemModel {
+	const contentType = {
+		unique: 'document-type-unique-id',
+		icon: 'icon-document',
+		collection: hasCollection ? { unique: 'collection-unique-id' } : null,
+	};
 	return {
 		unique: 'document-unique-id',
 		entityType: UMB_DOCUMENT_ENTITY_TYPE,
@@ -39,11 +44,8 @@ function createTreeItem(
 		noAccess: false,
 		isTrashed: false,
 		isProtected: false,
-		documentType: {
-			unique: 'document-type-unique-id',
-			icon: 'icon-document',
-			collection: hasCollection ? { unique: 'collection-unique-id' } : null,
-		},
+		contentType,
+		documentType: contentType,
 		createDate: '2024-01-01T00:00:00Z',
 		variants: [],
 		flags: [],

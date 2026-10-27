@@ -45,6 +45,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Umbraco.Cms.DevelopmentMode.Backoffice\Umbraco.Cms.DevelopmentMode.Backoffice.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache.Bounded\Umbraco.PublishedCache.HybridCache.Bounded.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
@@ -67,6 +68,9 @@
 
   <ItemGroup>
     <Compile Update="Umbraco.Cms.Api.Management\Services\BackOfficeExternalLoginServiceTests.ExternalLoginStatusForUserAsync.cs">
+      <DependentUpon>BackOfficeExternalLoginServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Cms.Api.Management\Services\BackOfficeExternalLoginServiceTests.HandleLoginCallbackAsync.cs">
       <DependentUpon>BackOfficeExternalLoginServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Cms.Api.Management\Services\BackOfficeExternalLoginServiceTests.UnLinkLoginAsync.cs">

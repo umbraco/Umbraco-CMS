@@ -706,6 +706,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     name: string;
     isFolder: boolean;
     documentType?: DocumentTypeReferenceResponseModel | null;
+    variants: Array<DocumentVariantItemResponseModel>;
 };
 
 export type DocumentCollectionResponseModel = {
@@ -1351,6 +1352,7 @@ export type MediaCollectionResponseModel = {
     sortOrder: number;
     hasChildren: boolean;
     mediaType: MediaTypeCollectionReferenceResponseModel;
+    extension?: string | null;
 };
 
 export type MediaConfigurationResponseModel = {
@@ -1368,6 +1370,7 @@ export type MediaItemResponseModel = {
     parent?: ReferenceByIdModel | null;
     hasChildren: boolean;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: string | null;
     variants: Array<VariantItemResponseModel>;
 };
 
@@ -1405,6 +1408,7 @@ export type MediaTreeItemResponseModel = {
     isTrashed: boolean;
     createDate: string;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: string | null;
     variants: Array<VariantItemResponseModel>;
 };
 
@@ -2489,6 +2493,7 @@ export type ServerInformationResponseModel = {
     assemblyVersion: string;
     baseUtcOffset: string;
     runtimeMode: RuntimeModeModel;
+    isDebugMode: boolean;
 };
 
 export type ServerStatusResponseModel = {
@@ -3319,6 +3324,17 @@ export type DocumentBlueprintResponseModelWritable = {
     documentType: DocumentTypeReferenceResponseModel;
 };
 
+export type DocumentBlueprintTreeItemResponseModelWritable = {
+    hasChildren: boolean;
+    id: string;
+    parent?: ReferenceByIdModel | null;
+    flags: Array<FlagModel>;
+    name: string;
+    isFolder: boolean;
+    documentType?: DocumentTypeReferenceResponseModel | null;
+    variants: Array<DocumentVariantItemResponseModelWritable>;
+};
+
 export type DocumentCollectionResponseModelWritable = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModelWritable>;
@@ -3448,6 +3464,11 @@ export type PackageDefinitionResponseModelWritable = {
     id: string;
 };
 
+export type PagedDocumentBlueprintTreeItemResponseModelWritable = {
+    total: number;
+    items: Array<DocumentBlueprintTreeItemResponseModelWritable>;
+};
+
 export type PagedDocumentCollectionResponseModelWritable = {
     total: number;
     items: Array<DocumentCollectionResponseModelWritable>;
@@ -3507,6 +3528,12 @@ export type SearchResultResponseModelWritable = {
     id: string;
     score: number;
     fields: Array<FieldPresentationModel>;
+};
+
+export type SubsetDocumentBlueprintTreeItemResponseModelWritable = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentBlueprintTreeItemResponseModelWritable>;
 };
 
 export type SubsetDocumentRecycleBinItemResponseModelWritable = {
@@ -8572,6 +8599,7 @@ export type GetImagingResizeUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
         height?: number;
         width?: number;
         mode?: ImageCropModeModel;
@@ -11034,6 +11062,7 @@ export type GetMediaUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/media/urls';
 };

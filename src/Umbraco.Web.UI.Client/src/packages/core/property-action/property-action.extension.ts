@@ -8,6 +8,11 @@ export interface ManifestPropertyAction<MetaType extends MetaPropertyAction = Me
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'propertyAction';
 	forPropertyEditorUis: string[];
+	/**
+	 * Renders a separator above this action, unless it is the first action in the list.
+	 * The separator belongs to this action, so it is not rendered when the action is not.
+	 */
+	separatorBefore?: boolean;
 	meta: MetaType;
 }
 

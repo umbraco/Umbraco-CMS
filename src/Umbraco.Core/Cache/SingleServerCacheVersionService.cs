@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+
+namespace Umbraco.Cms.Core.Cache;
 
 /// <summary>
 /// A simple cache version service that assumes the cache is always in sync.
@@ -19,5 +21,15 @@ public class SingleServerCacheVersionService : IRepositoryCacheVersionService
         => Task.CompletedTask;
 
     /// <inheritdoc />
+    public Task FlushCacheUpdatesAsync() => Task.CompletedTask;
+
+    /// <inheritdoc />
+    public Task<IReadOnlyCollection<RepositoryCacheVersion>> GetCacheVersionsAsync()
+        => Task.FromResult<IReadOnlyCollection<RepositoryCacheVersion>>(Array.Empty<RepositoryCacheVersion>());
+
+    /// <inheritdoc />
     public Task SetCachesSyncedAsync() => Task.CompletedTask;
+
+    /// <inheritdoc />
+    public Task SetCachesSyncedAsync(IEnumerable<RepositoryCacheVersion> cacheVersions) => Task.CompletedTask;
 }

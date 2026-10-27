@@ -217,7 +217,7 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
     /// <summary>
     /// Searches for redirect URLs whose URL contains the specified search term, with results paged according to the given page index and size.
     /// </summary>
-    /// <param name="searchTerm">The term to search for within redirect URLs. The search is case-insensitive and matches any part of the URL.</param>
+    /// <param name="searchTerm">The term to search for within redirect URLs. The search matches any part of the URL, with case sensitivity determined by the database collation.</param>
     /// <param name="pageIndex">The zero-based index of the page of results to retrieve.</param>
     /// <param name="pageSize">The number of redirect URLs to include in a single page of results.</param>
     /// <param name="total">When this method returns, contains the total number of redirect URLs matching the search term.</param>
@@ -226,7 +226,7 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
     {
         var wcPlaceholder = SqlSyntax.GetWildcardPlaceholder();
         Sql<ISqlContext> sql = GetBaseQuery(false)
-            .WhereLike<RedirectUrlDto>(x => x.Url, wcPlaceholder + searchTerm.Trim().ToLowerInvariant() + wcPlaceholder)
+            .WhereLike<RedirectUrlDto>(x => x.Url, wcPlaceholder + searchTerm.Trim() + wcPlaceholder)
             .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
         Page<RedirectUrlDto> result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
         total = Convert.ToInt32(result.TotalItems);

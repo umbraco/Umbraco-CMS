@@ -128,7 +128,7 @@ export class MediaTypeBuilder {
         return builder.build();
       }) || [],
       id: this.id,
-      folder: this.folderId ? {id: this.folderId} : null,
+      parent: this.folderId ? {id: this.folderId} : null,
     }
   }
 }
