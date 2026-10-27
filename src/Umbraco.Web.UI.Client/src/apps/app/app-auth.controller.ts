@@ -14,9 +14,13 @@ export class UmbAppAuthController extends UmbControllerBase {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#timedOutRequest?: Promise<boolean>;
 	#backofficePath?: string;
+	#restarting = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
+
+		// Registered as the app starts, so it runs before the unsaved-changes guards that are registered later
+		window.addEventListener('beforeunload', this.#onBeforeUnload, { capture: true });
 
 		this.#retrievedModal = this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
 			this.#authContext = context;
@@ -60,12 +64,18 @@ export class UmbAppAuthController extends UmbControllerBase {
 		});
 	}
 
+	#onBeforeUnload = (event: Event) => {
+		if (this.#restarting) event.stopImmediatePropagation();
+	};
+
 	/**
 	 * Starts the backoffice over with a full page load, for the user who is signed in now. Only a new page
 	 * guarantees that none of the previous user's client state, including state held by extensions, is
-	 * shown to them.
+	 * shown to them. Unsaved changes on the page belong to the previous user, so no unsaved-changes
+	 * prompt (`beforeunload`) can keep the page.
 	 */
 	restartForNewUser() {
+		this.#restarting = true;
 		// The path the previous user would have returned to after signing in
 		retrieveStoredPath();
 		location.href = this.#backofficePath ?? '/umbraco';
@@ -178,5 +188,10 @@ export class UmbAppAuthController extends UmbControllerBase {
 
 		// The authorization flow is finished, so let the caller know if the user is authorized
 		return this.#authContext.getIsAuthorized();
+	}
+
+	override destroy() {
+		window.removeEventListener('beforeunload', this.#onBeforeUnload, { capture: true });
+		super.destroy();
 	}
 }

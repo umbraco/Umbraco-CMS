@@ -53,6 +53,7 @@ describe('UmbAppAuthController', () => {
 	});
 
 	afterEach(() => {
+		controller.destroy();
 		hostElement.remove();
 		provider.destroy();
 		currentUserProvider.destroy();
@@ -90,5 +91,25 @@ describe('UmbAppAuthController', () => {
 		userChanged.next();
 
 		expect(restarts).to.equal(1);
+	});
+
+	it('lets no unsaved-changes guard hold the page when it starts over for another user', () => {
+		// A guard registered once the app has started, as an editor with unsaved changes does
+		const guard = (event: Event) => event.preventDefault();
+		window.addEventListener('beforeunload', guard);
+		// Cancels the navigation before it unloads the page, so the test page stays open
+		const { navigation } = window as unknown as { navigation: EventTarget };
+		const stay = (event: Event) => event.preventDefault();
+		navigation.addEventListener('navigate', stay);
+		try {
+			controller.restartForNewUser();
+
+			const unload = new Event('beforeunload', { cancelable: true });
+			window.dispatchEvent(unload);
+			expect(unload.defaultPrevented).to.be.false;
+		} finally {
+			window.removeEventListener('beforeunload', guard);
+			navigation.removeEventListener('navigate', stay);
+		}
 	});
 });

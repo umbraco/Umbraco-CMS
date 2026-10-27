@@ -637,6 +637,18 @@ describe('UmbAuthContext', () => {
 			expect(context.getIsAuthorized()).to.be.false;
 		});
 
+		it('reports the change again for each later sign-in, while the page has not started over', async () => {
+			respondToUserCall = signedInAs('editor');
+			context.timeOut();
+			signInElsewhere();
+			await waitUntil(() => userChanges === 1);
+
+			signInElsewhere();
+
+			await waitUntil(() => userChanges === 2);
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
 		it('reports the change when a different user signs in while this page still holds a session', async () => {
 			respondToUserCall = signedInAs('editor');
 

@@ -134,10 +134,12 @@ export class UmbAuthContext extends UmbContextBase {
 	readonly isAuthorized = this.#isAuthorized.asObservable().pipe(distinctUntilChanged());
 
 	/**
-	 * Emits once when the session has passed to a different user than the one the page is bound to
+	 * Emits when the session has passed to a different user than the one the page is bound to
 	 * (see `bindUser()`), or to a user who could not be determined. The new session is not applied:
 	 * the page holds client state that belongs to the previous user, so it has to start over rather than
-	 * show that state to the user who is signed in now. The app shell handles this by reloading the backoffice.
+	 * show that state to the user who is signed in now. From then on no session is applied to the page, so
+	 * the host has to start it over, or the page stays unauthorized. The app shell handles this by reloading
+	 * the backoffice. A sign-in while the page is still open emits again, so the host can try once more.
 	 * A user who cannot be determined (every lookup failed) is treated as a different user on purpose, so the
 	 * page also starts over, and discards unsaved work, when it is in fact the same user.
 	 * @internal
@@ -972,7 +974,11 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @param {() => void} apply Applies the session.
 	 */
 	#applyPeerSession(fromSignIn: boolean, apply: () => void) {
-		if (this.#hasUserChanged) return;
+		if (this.#hasUserChanged) {
+			// The page is still open, so it has not started over yet: a further sign-in reports the change again
+			if (fromSignIn) this.#userChanged.next();
+			return;
+		}
 		if (this.#isBypassed || !this.#boundUser || (!fromSignIn && !this.#confirmingUser)) {
 			apply();
 			return;
