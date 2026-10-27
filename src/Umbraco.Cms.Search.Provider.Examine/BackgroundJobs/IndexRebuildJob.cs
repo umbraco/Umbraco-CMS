@@ -1,7 +1,6 @@
 using Examine;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Search.Configuration;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
@@ -13,6 +12,10 @@ namespace Umbraco.Cms.Search.Provider.Examine.BackgroundJobs;
 /// <summary>
 /// On application startup, rebuilds any registered index whose active physical Lucene index does not yet exist.
 /// </summary>
+/// <remarks>
+/// Which indexes are missing is determined when the job is created at host start; only the rebuild itself waits for
+/// <see cref="Delay"/>.
+/// </remarks>
 internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
 {
     // Until the check has run once, the job stays schedulable so it can retry while the runtime is still
@@ -21,12 +24,11 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
 
     private static readonly ServerRole[] _allServerRoles = Enum.GetValues<ServerRole>();
 
-    private readonly IExamineManager _examineManager;
     private readonly IActiveIndexManager _activeIndexManager;
     private readonly IContentIndexingService _contentIndexingService;
     private readonly ILogger<IndexRebuildJob> _logger;
     private readonly IOriginProvider _originProvider;
-    private readonly IndexOptions _options;
+    private readonly string[] _indexAliasesToRebuild;
     private int _hasRun;
 
     /// <summary>
@@ -47,12 +49,17 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
         IOriginProvider originProvider)
         : base(_retryPeriod)
     {
-        _examineManager = examineManager;
         _activeIndexManager = activeIndexManager;
         _contentIndexingService = contentIndexingService;
         _logger = logger;
         _originProvider = originProvider;
-        _options = options.Value;
+
+        // Determined up front rather than when the job runs: anything indexed during the startup delay creates the
+        // physical index, which would then hide that it still needs a full rebuild.
+        _indexAliasesToRebuild = options.Value.GetContentIndexRegistrations()
+            .Select(registration => registration.IndexAlias)
+            .Where(indexAlias => IsMissing(indexAlias, examineManager, activeIndexManager))
+            .ToArray();
     }
 
     /// <inheritdoc />
@@ -86,28 +93,17 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
             return Task.CompletedTask;
         }
 
-        _logger.LogInformation("Runtime is ready, determining indexes to rebuild.");
+        // Skip indexes already being rebuilt, for example from the backoffice during the startup delay.
+        var indexAliasesToRebuild = _indexAliasesToRebuild
+            .Where(indexAlias => _activeIndexManager.IsRebuilding(indexAlias) is false)
+            .ToArray();
+
+        _logger.LogInformation("Runtime is ready, rebuilding {IndexCount} index(es) missing at startup.", indexAliasesToRebuild.Length);
 
         var origin = _originProvider.GetCurrent();
-        foreach (ContentIndexRegistration indexRegistration in _options.GetContentIndexRegistrations())
+        foreach (var indexAlias in indexAliasesToRebuild)
         {
-            var activePhysicalName = _activeIndexManager.ResolveActiveIndexName(indexRegistration.IndexAlias);
-
-            if (_examineManager.TryGetIndex(activePhysicalName, out IIndex? index))
-            {
-                // Check if active physical index exists, if it does, we can skip rebuilding.
-                if (index.IndexExists())
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                // Not a registered examine index, don't rebuild from here.
-                continue;
-            }
-
-            _contentIndexingService.Rebuild(indexRegistration.IndexAlias, origin);
+            _contentIndexingService.Rebuild(indexAlias, origin);
         }
 
         // Retire the job so it doesn't run again, since the check has been performed once.
@@ -116,4 +112,9 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
 
         return Task.CompletedTask;
     }
+
+    // An alias whose active physical index isn't a registered Examine index isn't rebuilt from here.
+    private static bool IsMissing(string indexAlias, IExamineManager examineManager, IActiveIndexManager activeIndexManager)
+        => examineManager.TryGetIndex(activeIndexManager.ResolveActiveIndexName(indexAlias), out IIndex? index)
+           && index.IndexExists() is false;
 }

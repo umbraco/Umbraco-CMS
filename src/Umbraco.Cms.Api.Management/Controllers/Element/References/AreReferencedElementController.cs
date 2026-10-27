@@ -1,12 +1,17 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.References;
 
@@ -18,16 +23,22 @@ public class AreReferencedElementController : ElementControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AreReferencedElementController"/> class.
     /// </summary>
     /// <param name="trackedReferencesService">Service for tracking content references.</param>
     /// <param name="umbracoMapper">Mapper for converting domain models to view models.</param>
-    public AreReferencedElementController(ITrackedReferencesService trackedReferencesService, IUmbracoMapper umbracoMapper)
+    /// <param name="authorizationService">The service used to authorize access to the requested items.</param>
+    public AreReferencedElementController(
+        ITrackedReferencesService trackedReferencesService,
+        IUmbracoMapper umbracoMapper,
+        IAuthorizationService authorizationService)
     {
         _trackedReferencesService = trackedReferencesService;
         _umbracoMapper = umbracoMapper;
+        _authorizationService = authorizationService;
     }
 
     /// <summary>
@@ -48,6 +59,16 @@ public class AreReferencedElementController : ElementControllerBase
         int skip = 0,
         int take = 20)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ElementPermissionResource.WithKeys(ActionElementBrowse.ActionLetter, ids),
+            AuthorizationPolicies.ElementPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
+
         PagedModel<Guid> distinctByKeyItemsWithReferencedRelations = await _trackedReferencesService
             .GetPagedKeysWithDependentReferencesAsync(ids, Constants.ObjectTypes.Element, skip, take);
 
