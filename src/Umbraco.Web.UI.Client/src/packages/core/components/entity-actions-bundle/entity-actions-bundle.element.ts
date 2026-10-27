@@ -6,6 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import type { UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 
 const umbEntityActionsBundleDeprecation = new UmbDeprecation({
 	deprecated: 'The `entityType` and `unique` properties on `<umb-entity-actions-bundle>`.',
@@ -49,6 +50,9 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	@property({ type: String })
 	public label?: string;
+
+	@property({ type: String })
+	public look?: UUIInterfaceLook;
 
 	@state()
 	private _numberOfActions = 0;
@@ -163,7 +167,10 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	#renderMore() {
 		if (this._numberOfActions === 1) return nothing;
 		return html`
-			<umb-entity-actions-dropdown compact .label=${this.localize.term('actions_viewActionsFor', this.label)}>
+			<umb-entity-actions-dropdown
+				look=${ifDefined(this.look)}
+				compact
+				.label=${this.localize.term('actions_viewActionsFor', this.label)}>
 				<uui-symbol-more slot="label"></uui-symbol-more>
 			</umb-entity-actions-dropdown>
 		`;
@@ -176,6 +183,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			<uui-button
 				label=${label}
 				title=${label}
+				look=${ifDefined(this.look)}
 				data-mark=${`entity-action:${this._firstActionManifest.alias}`}
 				href=${ifDefined(this._firstActionHref)}
 				@click=${this.#onFirstActionClick}>
