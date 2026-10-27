@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "11.0.0-rc.2.26504.105");
+            modelBuilder.HasAnnotation("ProductVersion", "11.0.0-rc.3.26522.148");
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication", b =>
                 {
