@@ -13847,6 +13847,14 @@
             }
           },
           {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "height",
             "in": "query",
             "schema": {
@@ -20381,6 +20389,14 @@
                 "type": "string",
                 "format": "uuid"
               }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -43420,7 +43436,8 @@
           "hasChildren",
           "id",
           "isFolder",
-          "name"
+          "name",
+          "variants"
         ],
         "type": "object",
         "properties": {
@@ -43462,6 +43479,16 @@
               }
             ],
             "nullable": true
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -46241,6 +46268,10 @@
                 "$ref": "#/components/schemas/MediaTypeCollectionReferenceResponseModel"
               }
             ]
+          },
+          "extension": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -46307,6 +46338,10 @@
                 "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
               }
             ]
+          },
+          "extension": {
+            "type": "string",
+            "nullable": true
           },
           "variants": {
             "type": "array",
@@ -46517,6 +46552,10 @@
                 "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
               }
             ]
+          },
+          "extension": {
+            "type": "string",
+            "nullable": true
           },
           "variants": {
             "type": "array",
@@ -51109,6 +51148,7 @@
         "required": [
           "assemblyVersion",
           "baseUtcOffset",
+          "isDebugMode",
           "runtimeMode",
           "version"
         ],
@@ -51125,6 +51165,9 @@
           },
           "runtimeMode": {
             "$ref": "#/components/schemas/RuntimeModeModel"
+          },
+          "isDebugMode": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

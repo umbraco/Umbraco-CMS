@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.Middleware;
@@ -82,6 +83,37 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
             }
 
             return Task.CompletedTask;
+        };
+
+        // Bound concurrent decoding from here rather than from the middleware: this runs on a cache
+        // miss only, immediately before the decode, so a request the cache can serve never waits.
+        // The middleware owns the slot; the place is given back below, or when the request ends.
+        Func<ImageCommandContext, Configuration, Task<DecoderOptions?>> onBeforeLoadAsync = options.OnBeforeLoadAsync;
+        options.OnBeforeLoadAsync = async (context, configuration) =>
+        {
+            if (context.Context.Items.TryGetValue(ImageProcessingSlot.HttpContextItemKey, out var value)
+                && value is ImageProcessingSlot slot)
+            {
+                await slot.AcquireAsync(context.Context.RequestAborted);
+            }
+
+            return await onBeforeLoadAsync(context, configuration);
+        };
+
+        // The decoded image has been disposed by the time this runs, and the cache write and the
+        // response that follow hold only the encoded result, so the place is given back here rather
+        // than when the request ends. The middleware releases again at the end of the request, which
+        // is a no-op after this, and covers a request that faulted before getting here.
+        Func<ImageProcessingContext, Task> onProcessedAsync = options.OnProcessedAsync;
+        options.OnProcessedAsync = async context =>
+        {
+            await onProcessedAsync(context);
+
+            if (context.Context.Items.TryGetValue(ImageProcessingSlot.HttpContextItemKey, out var value)
+                && value is ImageProcessingSlot slot)
+            {
+                slot.Release();
+            }
         };
 
         // Change Cache-Control header when cache buster value is present

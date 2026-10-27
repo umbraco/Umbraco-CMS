@@ -1,5 +1,6 @@
 import type { UmbTreeRootItemsRequestArgs } from '../data/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
+import { UmbTreeItemsNotSupportedError } from '../data/tree-items-not-supported.error.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../entity-actions/reload-tree-item-children/index.js';
 import { UMB_TREE_ITEM_EXPANDABLE_CONTEXT } from './tree-item.context.token.js';
@@ -54,6 +55,9 @@ export class UmbTreeItemChildrenManager<
 	#startNode = new UmbObjectState<UmbTreeStartNode | undefined>(undefined);
 	public readonly startNode = this.#startNode.asObservable();
 
+	#startNodes = new UmbArrayState<UmbTreeStartNode>([], (x) => x.unique);
+	public readonly startNodes = this.#startNodes.asObservable();
+
 	#isLoading = new UmbBooleanState(false);
 	public readonly isLoading = this.#isLoading.asObservable();
 
@@ -72,6 +76,7 @@ export class UmbTreeItemChildrenManager<
 	#treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
 	#parentTreeItemContext?: typeof UMB_TREE_ITEM_EXPANDABLE_CONTEXT.TYPE;
 	#requestMaxRetries = 2;
+	#startNodeItemsNotSupported = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -165,6 +170,25 @@ export class UmbTreeItemChildrenManager<
 	}
 
 	/**
+	 * Sets the startNodes config. When more than one start node is given, the start nodes themselves become
+	 * the children of this manager, so each of them can be expanded on its own.
+	 * @param {(Array<UmbTreeStartNode> | undefined)} startNodes - The start nodes
+	 * @memberof UmbTreeItemChildrenManager
+	 */
+	public setStartNodes(startNodes: Array<UmbTreeStartNode> | undefined) {
+		this.#startNodes.setValue(startNodes ?? []);
+	}
+
+	/**
+	 * Gets the startNodes config
+	 * @returns {Array<UmbTreeStartNode>} - The start nodes
+	 * @memberof UmbTreeItemChildrenManager
+	 */
+	public getStartNodes(): Array<UmbTreeStartNode> {
+		return this.#startNodes.getValue();
+	}
+
+	/**
 	 * Sets the hasChildren state
 	 * @param {boolean} hasChildren - Whether the current tree item has children
 	 * @memberof UmbTreeItemChildrenManager
@@ -215,8 +239,34 @@ export class UmbTreeItemChildrenManager<
 		return this.#loadNextItemsFromTarget();
 	}
 
+	/**
+	 * Resolves the parent to load children for. With multiple start nodes the start nodes are the children, so
+	 * this is only consulted when they cannot be resolved as items, in which case the first one is used — which
+	 * is the behaviour of a tree that only understands a single start node.
+	 * @returns {TreeItemType | TreeRootType | UmbTreeStartNode | undefined} The parent to load children for
+	 */
+	#getParent(): TreeItemType | TreeRootType | UmbTreeStartNode | undefined {
+		return this.getStartNode() ?? this.getStartNodes()[0] ?? this.getTreeItem();
+	}
+
+	/**
+	 * Whether the start nodes themselves should be loaded as the children of this manager. Only ever true for the
+	 * manager owned by the tree, never for the one owned by a tree item, and only while the tree repository can
+	 * resolve items by unique — a repository can only report that it cannot once it has been asked.
+	 * @returns {boolean} Whether the start nodes are the children of this manager
+	 */
+	#loadsStartNodesAsChildren(): boolean {
+		if (this.#startNodeItemsNotSupported) return false;
+		if (this.getStartNodes().length < 2) return false;
+		return this.#treeContext?.getRepository()?.requestTreeItems !== undefined;
+	}
+
 	#loadChildrenRetries = 0;
-	async #loadChildren(reload = false) {
+	async #loadChildren(reload = false): Promise<void> {
+		if (this.#loadsStartNodesAsChildren()) {
+			return this.#loadStartNodesAsChildren(reload);
+		}
+
 		if (this.#loadChildrenRetries > this.#requestMaxRetries) {
 			this.#loadChildrenRetries = 0;
 			this.#resetChildren('error');
@@ -228,7 +278,7 @@ export class UmbTreeItemChildrenManager<
 
 		this.#isLoading.setValue(true);
 
-		const parent = this.getStartNode() || this.getTreeItem();
+		const parent = this.#getParent();
 		const foldersOnly = this.getFoldersOnly();
 		const additionalArgs = this.getAdditionalRequestArgs();
 		const baseTarget = this.targetPagination.getBaseTarget();
@@ -334,8 +384,95 @@ export class UmbTreeItemChildrenManager<
 		this.#isLoading.setValue(false);
 	}
 
+	/**
+	 * Loads the start nodes as the children of this manager. The start nodes are already known, so they are
+	 * paginated client side and only the current window is resolved into items.
+	 * @param {boolean} reload - Whether to start over from the first page instead of continuing from the current offset
+	 * @returns {Promise<void>} Resolves once the current window of start nodes has been loaded
+	 */
+	async #loadStartNodesAsChildren(reload = false): Promise<void> {
+		const repository = this.#treeContext?.getRepository();
+		if (!repository?.requestTreeItems) throw new Error('Could not request start nodes, repository is missing');
+
+		this.#isLoading.setValue(true);
+
+		const uniques = this.getStartNodes().map((startNode) => startNode.unique);
+		const skip = reload ? 0 : this.offsetPagination.getSkip();
+		const take = reload
+			? this.offsetPagination.getCurrentPageNumber() * this.offsetPagination.getPageSize()
+			: this.offsetPagination.getPageSize();
+
+		const { data, error } = await repository.requestTreeItems({ uniques: uniques.slice(skip, skip + take) });
+
+		if (UmbTreeItemsNotSupportedError.isUmbTreeItemsNotSupportedError(error)) {
+			// The repository cannot resolve the start nodes as items, so fall back to the children of the first of
+			// them — the behaviour of a tree that only understands a single start node.
+			this.#startNodeItemsNotSupported = true;
+			return this.#loadChildren(reload);
+		}
+
+		if (error) {
+			this.#isLoading.setValue(false);
+			return this.#peekLoadingFailedNotification();
+		}
+
+		if (data) {
+			const items = data as Array<TreeItemType>;
+			this.#children.setValue(items);
+			this.#currentPageChildren.setValue(items);
+			this.setHasChildren(uniques.length > 0);
+
+			this.offsetPagination.setTotalItems(uniques.length);
+
+			this.targetPagination.setCurrentItems(items);
+			this.targetPagination.setTotalItems(uniques.length);
+			this.targetPagination.setTotalItemsBeforeStartTarget(0);
+			this.targetPagination.setTotalItemsAfterEndTarget(undefined);
+		}
+
+		this.#isLoading.setValue(false);
+	}
+
+	async #loadNextStartNodesAsChildren() {
+		const repository = this.#treeContext?.getRepository();
+		if (!repository?.requestTreeItems) throw new Error('Could not request start nodes, repository is missing');
+
+		this.#isLoading.setValue(true);
+		this.#isLoadingNextChildren.setValue(true);
+
+		const uniques = this.getStartNodes().map((startNode) => startNode.unique);
+		const skip = this.#children.getValue().length;
+
+		const { data, error } = await repository.requestTreeItems({
+			uniques: uniques.slice(skip, skip + this.offsetPagination.getPageSize()),
+		});
+
+		if (error) {
+			this.#isLoading.setValue(false);
+			this.#isLoadingNextChildren.setValue(false);
+			return this.#peekLoadingFailedNotification();
+		}
+
+		if (data) {
+			const items = data as Array<TreeItemType>;
+			this.#children.append(items);
+			this.#currentPageChildren.setValue(items);
+
+			this.offsetPagination.setCurrentPageNumber(this.offsetPagination.getCurrentPageNumber() + 1);
+
+			this.targetPagination.appendCurrentItems(items);
+			this.targetPagination.setTotalItemsAfterEndTarget(undefined);
+		}
+
+		this.#isLoading.setValue(false);
+		this.#isLoadingNextChildren.setValue(false);
+	}
+
 	#loadPrevItemsRetries = 0;
 	async #loadPrevItemsFromTarget() {
+		// There is nothing above the start nodes to load.
+		if (this.#loadsStartNodesAsChildren()) return;
+
 		if (this.#loadPrevItemsRetries > this.#requestMaxRetries) {
 			// If we have exceeded the maximum number of retries, we need to reset the base target and load from the top
 			this.#loadPrevItemsRetries = 0;
@@ -349,7 +486,7 @@ export class UmbTreeItemChildrenManager<
 		this.#isLoading.setValue(true);
 		this.#isLoadingPrevChildren.setValue(true);
 
-		const parent = this.getStartNode() || this.getTreeItem();
+		const parent = this.#getParent();
 		const foldersOnly = this.getFoldersOnly();
 		const additionalArgs = this.getAdditionalRequestArgs();
 		const startTarget = this.targetPagination.getStartTarget();
@@ -416,6 +553,10 @@ export class UmbTreeItemChildrenManager<
 
 	#loadNextItemsRetries = 0;
 	async #loadNextItemsFromTarget() {
+		if (this.#loadsStartNodesAsChildren()) {
+			return this.#loadNextStartNodesAsChildren();
+		}
+
 		if (this.#loadNextItemsRetries > this.#requestMaxRetries) {
 			// If we have exceeded the maximum number of retries, we need to reset the base target and load from the top
 			this.#loadNextItemsRetries = 0;
@@ -429,7 +570,7 @@ export class UmbTreeItemChildrenManager<
 		this.#isLoading.setValue(true);
 		this.#isLoadingNextChildren.setValue(true);
 
-		const parent = this.getStartNode() || this.getTreeItem();
+		const parent = this.#getParent();
 		const foldersOnly = this.getFoldersOnly();
 		const additionalArgs = this.getAdditionalRequestArgs();
 		const endTarget = this.targetPagination.getEndTarget();
@@ -544,6 +685,10 @@ export class UmbTreeItemChildrenManager<
 	 * - Throw errors (fails gracefully)
 	 */
 	async #loadChildrenWithOffsetPagination(): Promise<void> {
+		if (this.#loadsStartNodesAsChildren()) {
+			return this.#loadStartNodesAsChildren(true);
+		}
+
 		const repository = this.#treeContext?.getRepository();
 		if (!repository) {
 			// Terminal fallback - fail silently rather than throwing
@@ -552,7 +697,7 @@ export class UmbTreeItemChildrenManager<
 
 		this.#isLoading.setValue(true);
 
-		const parent = this.getStartNode() || this.getTreeItem();
+		const parent = this.#getParent();
 		const foldersOnly = this.getFoldersOnly();
 		const additionalArgs = this.getAdditionalRequestArgs();
 
@@ -588,6 +733,11 @@ export class UmbTreeItemChildrenManager<
 		// This is the terminal fallback, no further recovery
 
 		this.#isLoading.setValue(false);
+	}
+
+	async #peekLoadingFailedNotification(): Promise<void> {
+		const notificationManager = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notificationManager?.peek('danger', { data: { message: 'Menu loading failed.' } });
 	}
 
 	async #resetChildren(reason: ResetReason = 'error'): Promise<void> {
@@ -641,9 +791,13 @@ export class UmbTreeItemChildrenManager<
 	}
 
 	#onReloadChildrenRequest = (event: UmbEntityActionEvent) => {
+		// With the start nodes as our children, each of them owns its own children, so there is no
+		// single parent to match against.
+		if (this.#loadsStartNodesAsChildren()) return;
+
 		// Match against the parent we actually load children for. When drilled into a start node
 		// the children belong to the start node, not the tree root held by getTreeItem().
-		const parent = this.getStartNode() || this.getTreeItem();
+		const parent = this.#getParent();
 
 		if (event.getEntityType() !== parent?.entityType) return;
 		if (event.getUnique() !== parent?.unique) return;

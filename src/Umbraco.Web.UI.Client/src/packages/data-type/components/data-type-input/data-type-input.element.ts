@@ -6,6 +6,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { isAboveZeroAndBelowMinimum } from '@umbraco-cms/backoffice/validation';
 
 // TODO: Rename to 'umb-input-data-type'. [LK]
 @customElement('umb-data-type-input')
@@ -58,6 +59,11 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		if (value === 1) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
 	}
 	public get max(): number {
 		return this.#pickerContext.max;
@@ -100,7 +106,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(

@@ -1,12 +1,14 @@
 import { attachLinkInterceptor } from '../utils/index.js';
 import { UmbPreviewRepository } from '../repository/index.js';
+import { UmbPreviewSessionRenewalController } from '../controllers/preview-session-renewal.controller.js';
 import { UMB_PREVIEW_CONTEXT } from './preview.context-token.js';
 import { HubConnectionBuilder, HttpTransportType } from '@umbraco-cms/backoffice/external/signalr';
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SERVER_CONTEXT, UmbSignalRReconnectPolicy } from '@umbraco-cms/backoffice/server';
 import type { HubConnection, IHttpConnectionOptions } from '@umbraco-cms/backoffice/external/signalr';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -27,13 +29,16 @@ interface UmbPreviewUrlArgs {
 }
 
 export class UmbPreviewContext extends UmbContextBase {
+	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#connection?: HubConnection;
 	#currentArgs: UmbPreviewIframeArgs = {};
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#resizeController?: AbortController;
+	#serverContext?: typeof UMB_SERVER_CONTEXT.TYPE;
 	#serverUrl: string = '';
 
 	#previewRepository = new UmbPreviewRepository(this);
+	#previewSessionRenewal = new UmbPreviewSessionRenewalController(this, this.#previewRepository);
 
 	#localize = new UmbLocalizationController(this);
 
@@ -78,10 +83,20 @@ export class UmbPreviewContext extends UmbContextBase {
 			}
 
 			this.#serverUrl = serverUrl;
+			this.#serverContext = serverContext;
 
 			this.#setPreviewUrl({ serverUrl });
 
-			this.#initHubConnection(serverUrl, serverContext);
+			this.#initHubConnection();
+		});
+
+		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+			this.#authContext = authContext;
+			this.#initHubConnection();
+
+			if (authContext) {
+				this.#previewSessionRenewal.observeSession(authContext.session$, () => this.#getPreviewSessionArgs());
+			}
 		});
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
@@ -97,38 +112,76 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		// Clean up SignalR connection
 		if (this.#connection) {
-			this.#connection.stop();
+			const connection = this.#connection;
 			this.#connection = undefined;
+			connection.stop();
 		}
 	}
 
-	async #initHubConnection(serverUrl: string, serverContext?: typeof UMB_SERVER_CONTEXT.TYPE) {
-		const previewHubUrl = `${serverUrl}/umbraco/PreviewHub`;
+	async #initHubConnection() {
+		const authContext = this.#authContext;
+		if (!authContext || !this.#serverUrl) return;
 
-		// Make sure that no previous connection exists.
+		const previewHubUrl = `${this.#serverUrl}/umbraco/PreviewHub`;
+
+		// Clear the reference before stopping so the old connection's onclose handler stays silent.
 		if (this.#connection) {
-			await this.#connection.stop();
+			const previousConnection = this.#connection;
 			this.#connection = undefined;
+			await previousConnection.stop();
 		}
 
-		const skipNegotiation = serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
+		const skipNegotiation = this.#serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
 
-		const hubOptions: IHttpConnectionOptions = {};
+		const hubOptions: IHttpConnectionOptions = {
+			accessTokenFactory: () => authContext.getLatestToken(),
+		};
 
 		if (skipNegotiation) {
 			hubOptions.skipNegotiation = true;
 			hubOptions.transport = HttpTransportType.WebSockets;
 		}
 
-		this.#connection = new HubConnectionBuilder().withUrl(previewHubUrl, hubOptions).build();
+		this.#connection = new HubConnectionBuilder()
+			.withUrl(previewHubUrl, hubOptions)
+			.withAutomaticReconnect(new UmbSignalRReconnectPolicy())
+			.build();
 
-		this.#connection.on('refreshed', (payload) => {
+		const connection = this.#connection;
+
+		this.#connection.on('refreshed', async (payload) => {
 			if (payload === this.#unique.getValue()) {
+				await this.#previewSessionRenewal.renew(this.#getPreviewSessionArgs());
 				this.#setPreviewUrl({ rnd: Math.random() });
 			}
 		});
 
+		this.#connection.onreconnecting(() => {
+			this.#notificationContext?.peek('warning', {
+				data: {
+					headline: this.#localize.term('general_preview'),
+					message: this.#localize.term('preview_connectionReconnecting'),
+				},
+			});
+		});
+
+		this.#connection.onreconnected(() => {
+			// A 'refreshed' event may have been missed while disconnected, so reload the iframe to catch up.
+			this.#setPreviewUrl({ rnd: Math.random() });
+			this.#notificationContext?.peek('positive', {
+				data: {
+					headline: this.#localize.term('general_preview'),
+					message: this.#localize.term('preview_connectionRestored'),
+				},
+			});
+		});
+
 		this.#connection.onclose(() => {
+			// A connection that is no longer the active one was stopped deliberately.
+			if (this.#connection !== connection) {
+				return;
+			}
+
 			this.#notificationContext?.peek('warning', {
 				data: {
 					headline: this.#localize.term('general_preview'),
@@ -148,6 +201,14 @@ export class UmbPreviewContext extends UmbContextBase {
 				},
 			});
 		}
+	}
+
+	#getPreviewSessionArgs() {
+		return {
+			unique: this.#unique.getValue(),
+			culture: this.#culture.getValue(),
+			segment: this.#segment.getValue(),
+		};
 	}
 
 	async #getPublishedUrl(): Promise<string | null> {
@@ -212,8 +273,9 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		// Stop SignalR connection without waiting - window will close anyway
 		if (this.#connection) {
-			this.#connection.stop();
+			const connection = this.#connection;
 			this.#connection = undefined;
+			connection.stop();
 		}
 
 		// Close the preview window

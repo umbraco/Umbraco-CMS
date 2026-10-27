@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -131,13 +132,15 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
         // Get the current path
+        string? currentSource = null;
         var currentPath = string.Empty;
         try
         {
             if (currentValue is string currentStringValue)
             {
                 ImageCropperValue? currentImageCropperValue = _jsonSerializer.Deserialize<ImageCropperValue>(currentStringValue);
-                currentPath = currentImageCropperValue?.Src;
+                currentSource = currentImageCropperValue?.Src;
+                currentPath = currentSource;
             }
         }
         catch (Exception ex)
@@ -186,7 +189,7 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
             // value is unchanged.
             if (string.IsNullOrWhiteSpace(editorImageCropperValue?.Src) && string.IsNullOrWhiteSpace(currentPath) is false)
             {
-                _mediaFileManager.FileSystem.DeleteFile(currentPath);
+                DeleteFileIfOwned(currentPath, contentKey, propertyTypeKey);
                 return null; // clear
             }
 
@@ -195,6 +198,16 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
                 // a plausible tempFile value was supplied, but could not be converted to an actual file => clear the src
                 editorImageCropperValue.Src = null;
             }
+            else if (string.IsNullOrWhiteSpace(editorImageCropperValue?.Src) is false
+                     && FileUploadSource.IsAcceptable(editorImageCropperValue.Src, currentSource) is false)
+            {
+                _logger.LogWarning(
+                    "Refused to store the file source '{Source}' while editing content {ContentKey}: it is not a valid file location. The current file source is retained.",
+                    editorImageCropperValue.Src,
+                    contentKey);
+                editorImageCropperValue.Src = currentSource;
+            }
+
             return _jsonSerializer.Serialize(editorImageCropperValue); // unchanged
         }
 
@@ -204,7 +217,7 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
         // remove current file if replaced
         if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
         {
-            _mediaFileManager.FileSystem.DeleteFile(currentPath);
+            DeleteFileIfOwned(currentPath, contentKey, propertyTypeKey);
         }
 
         scope.Complete();
@@ -259,6 +272,24 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
         return _jsonSerializer.TryDeserialize(editorValue, out ImageCropperValue? imageCropperValue)
             ? imageCropperValue
             : throw new ArgumentException($"Could not parse editor value to a {nameof(ImageCropperValue)} object.");
+    }
+
+    private void DeleteFileIfOwned(string path, Guid contentKey, Guid propertyTypeKey)
+    {
+        if (_mediaFileManager.IsFileOwnedBy(path, contentKey, propertyTypeKey) is false)
+        {
+            // The stored path does not resolve to one this content and property type could own, so it references
+            // another item's file. Refuse to delete it - the value may have been tampered with to target a file
+            // the editing user is not authorized to remove.
+            _logger.LogWarning(
+                "Refused to delete media file at path '{Path}' while editing content {ContentKey}: the path does not belong to property type {PropertyTypeKey}.",
+                path,
+                contentKey,
+                propertyTypeKey);
+            return;
+        }
+
+        _mediaFileManager.FileSystem.DeleteFile(path);
     }
 
     private Guid? TryParseTemporaryFileKey(object? editorValue)

@@ -202,23 +202,77 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
                 return;
 
             case ApplicationUrlDetection.FirstRequest:
-                // Atomic: only the first thread to arrive sets the URL.
-                // Subsequent calls (even concurrent ones with different hosts) are no-ops.
-                Interlocked.CompareExchange(ref _applicationMainUrl, currentApplicationUrl, null);
+                TryReplaceApplicationMainUrl(currentApplicationUrl, IsUpgrade);
                 break;
 
             case ApplicationUrlDetection.EveryRequest:
-                var change = _applicationUrls.Contains(currentApplicationUrl) is false;
-                if (change)
+                if (_applicationUrls.Contains(currentApplicationUrl))
                 {
-                    if (_applicationUrls.TryAdd(currentApplicationUrl))
-                    {
-                        ApplicationMainUrl = currentApplicationUrl;
-                    }
+                    return;
+                }
+
+                if (TryReplaceApplicationMainUrl(currentApplicationUrl, static (current, candidate) => IsDowngrade(current, candidate) is false))
+                {
+                    _applicationUrls.TryAdd(currentApplicationUrl);
                 }
 
                 break;
         }
+    }
+
+    /// <summary>
+    ///     Applies <paramref name="candidate" /> as the application main URL when <paramref name="shouldReplace" />
+    ///     accepts it, retrying against the value another request may have applied in the meantime so that a
+    ///     replacement is only ever committed against the exact value it was evaluated for.
+    /// </summary>
+    private bool TryReplaceApplicationMainUrl(Uri candidate, Func<Uri, Uri, bool> shouldReplace)
+    {
+        Uri? current = _applicationMainUrl;
+        while (current is null || shouldReplace(current, candidate))
+        {
+            Uri? observed = Interlocked.CompareExchange(ref _applicationMainUrl, candidate, current);
+            if (ReferenceEquals(observed, current))
+            {
+                return true;
+            }
+
+            current = observed;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    ///     A locked URL is only replaced by one that is strictly more useful as the public application URL:
+    ///     a non-loopback host replacing a loopback host, or HTTPS replacing HTTP for the same host and path.
+    ///     The port comes from the request's host header, which host filtering does not check, so a URL on a
+    ///     default port only moves to the default HTTPS port.
+    /// </summary>
+    private static bool IsUpgrade(Uri current, Uri candidate)
+    {
+        if (current.IsLoopback != candidate.IsLoopback)
+        {
+            return candidate.IsLoopback is false;
+        }
+
+        return current.Scheme == Uri.UriSchemeHttp
+            && candidate.Scheme == Uri.UriSchemeHttps
+            && Uri.Compare(current, candidate, UriComponents.Host | UriComponents.Path, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0
+            && (current.IsDefaultPort is false || candidate.IsDefaultPort);
+    }
+
+    /// <summary>
+    ///     A URL is never replaced by one that is less useful as the public application URL:
+    ///     a loopback host replacing a non-loopback host, or HTTP replacing HTTPS.
+    /// </summary>
+    private static bool IsDowngrade(Uri current, Uri candidate)
+    {
+        if (current.IsLoopback != candidate.IsLoopback)
+        {
+            return candidate.IsLoopback;
+        }
+
+        return current.Scheme == Uri.UriSchemeHttps && candidate.Scheme == Uri.UriSchemeHttp;
     }
 
     private void SetSiteNameAndDebugMode(HostingSettings hostingSettings)
