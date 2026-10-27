@@ -46,6 +46,7 @@ public static class BackOfficeAuthBuilderExtensions
         builder.AddNotificationAsyncHandler<UserSavedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserDeletedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserLoginSuccessNotification, RevokeUserAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UserLogoutSuccessNotification, RevokeUserAuthenticationTokensNotificationHandler>();
 
         return builder;
     }
