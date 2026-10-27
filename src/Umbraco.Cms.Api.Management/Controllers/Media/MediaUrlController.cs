@@ -1,10 +1,8 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -28,26 +26,8 @@ public class MediaUrlController : MediaControllerBase
     /// </summary>
     /// <param name="mediaService">Service for managing media items.</param>
     /// <param name="mediaUrlFactory">Factory for generating URLs for media items.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MediaUrlController(
-        IMediaService mediaService,
-        IMediaUrlFactory mediaUrlFactory)
-        : this(
-            mediaService,
-            mediaUrlFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IMediaPermissionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MediaUrlController"/> class.
-    /// </summary>
-    /// <param name="mediaService">Service for managing media items.</param>
-    /// <param name="mediaUrlFactory">Factory for generating URLs for media items.</param>
     /// <param name="mediaPermissionService">Service for determining the media the current user can access.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for the current back office user.</param>
-    [ActivatorUtilitiesConstructor]
     public MediaUrlController(
         IMediaService mediaService,
         IMediaUrlFactory mediaUrlFactory,
@@ -59,18 +39,6 @@ public class MediaUrlController : MediaControllerBase
         _mediaPermissionService = mediaPermissionService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
-
-    /// <summary>
-    /// Retrieves the URLs for the specified media items.
-    /// </summary>
-    /// <param name="ids">A set of unique identifiers (GUIDs) representing the media items to retrieve URLs for. These are provided as query parameters.</param>
-    /// <returns>
-    /// A task representing the asynchronous operation. The result is an <see cref="IActionResult"/> containing a collection of <see cref="MediaUrlInfoResponseModel"/> objects with the URLs for each requested media item.
-    /// </returns>
-    [NonAction]
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public Task<IActionResult> GetUrls(HashSet<Guid> ids)
-        => GetUrls(CancellationToken.None, ids, null);
 
     /// <summary>
     /// Retrieves the URLs for the specified media items that the current user has access to.

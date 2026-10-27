@@ -2,12 +2,10 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
@@ -31,24 +29,7 @@ public class DocumentPreviewUrlController : DocumentControllerBase
     /// </summary>
     /// <param name="contentService">The service used to retrieve the document.</param>
     /// <param name="documentUrlFactory">The factory that produces the preview URL.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public DocumentPreviewUrlController(
-        IContentService contentService,
-        IDocumentUrlFactory documentUrlFactory)
-        : this(
-            contentService,
-            documentUrlFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentPreviewUrlController"/> class.
-    /// </summary>
-    /// <param name="contentService">The service used to retrieve the document.</param>
-    /// <param name="documentUrlFactory">The factory that produces the preview URL.</param>
     /// <param name="authorizationService">The service used to authorize access to the document.</param>
-    [ActivatorUtilitiesConstructor]
     public DocumentPreviewUrlController(
         IContentService contentService,
         IDocumentUrlFactory documentUrlFactory,
