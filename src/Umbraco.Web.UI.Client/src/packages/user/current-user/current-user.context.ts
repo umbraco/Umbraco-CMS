@@ -115,7 +115,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 	#loadDebounced = debounce(() => {
 		this.invalidate();
-		this.load().catch(() => undefined);
+		this.load().catch((error) => console.error('[UmbCurrentUserContext] Failed to reload the current user', error));
 	}, 100);
 
 	/**

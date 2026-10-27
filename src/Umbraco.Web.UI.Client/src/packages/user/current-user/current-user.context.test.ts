@@ -351,6 +351,24 @@ describe('UmbCurrentUserContext', () => {
 			expect(context.getName()).to.equal(SIGNED_IN_USER.name);
 		});
 
+		it('logs a failed reload after the current user is updated', async () => {
+			await hostElement.init();
+			failuresLeft = 1;
+			const logged: Array<unknown> = [];
+			const realError = console.error;
+			console.error = (message: unknown) => logged.push(message);
+			try {
+				hostElement.actionEventContext.dispatchEvent(
+					new UmbEntityUpdatedEvent({ entityType: UMB_USER_ENTITY_TYPE, unique: CURRENT_USER_UNIQUE }),
+				);
+				await aTimeout(300);
+			} finally {
+				console.error = realError;
+			}
+
+			expect(logged).to.include('[UmbCurrentUserContext] Failed to reload the current user');
+		});
+
 		it('keeps the previously loaded user in state when loading it again fails', async () => {
 			await hostElement.init();
 			context.invalidate();
