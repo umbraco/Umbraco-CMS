@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -6,7 +7,10 @@ using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.References;
 
@@ -18,16 +22,22 @@ public class AreReferencedMediaController : MediaControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesSkipTakeService;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Media.References.AreReferencedMediaController"/> class.
     /// </summary>
     /// <param name="trackedReferencesSkipTakeService">Service for retrieving tracked media references with support for pagination (skip and take).</param>
     /// <param name="umbracoMapper">The Umbraco mapper used for mapping between models.</param>
-    public AreReferencedMediaController(ITrackedReferencesService trackedReferencesSkipTakeService, IUmbracoMapper umbracoMapper)
+    /// <param name="authorizationService">The service used to authorize access to the requested items.</param>
+    public AreReferencedMediaController(
+        ITrackedReferencesService trackedReferencesSkipTakeService,
+        IUmbracoMapper umbracoMapper,
+        IAuthorizationService authorizationService)
     {
         _trackedReferencesSkipTakeService = trackedReferencesSkipTakeService;
         _umbracoMapper = umbracoMapper;
+        _authorizationService = authorizationService;
     }
 
 /// <summary>
@@ -54,6 +64,16 @@ public class AreReferencedMediaController : MediaControllerBase
         int skip = 0,
         int take = 20)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            MediaPermissionResource.WithKeys(ids),
+            AuthorizationPolicies.MediaPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
+
         PagedModel<Guid> distinctByKeyItemsWithReferencedRelations = await _trackedReferencesSkipTakeService.GetPagedKeysWithDependentReferencesAsync(ids, Constants.ObjectTypes.Media, skip, take);
         var pagedViewModel = new PagedViewModel<ReferenceByIdModel>
         {

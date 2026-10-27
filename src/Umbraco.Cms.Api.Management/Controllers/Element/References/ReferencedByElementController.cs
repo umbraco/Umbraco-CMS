@@ -1,13 +1,18 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.References;
 
@@ -19,18 +24,22 @@ public class ReferencedByElementController : ElementControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReferencedByElementController"/> class.
     /// </summary>
     /// <param name="trackedReferencesService">Service for tracking content references.</param>
     /// <param name="relationTypePresentationFactory">Factory for creating relation type presentation models.</param>
+    /// <param name="authorizationService">The service used to authorize access to the requested items.</param>
     public ReferencedByElementController(
         ITrackedReferencesService trackedReferencesService,
-        IRelationTypePresentationFactory relationTypePresentationFactory)
+        IRelationTypePresentationFactory relationTypePresentationFactory,
+        IAuthorizationService authorizationService)
     {
         _trackedReferencesService = trackedReferencesService;
         _relationTypePresentationFactory = relationTypePresentationFactory;
+        _authorizationService = authorizationService;
     }
 
     /// <summary>
@@ -52,6 +61,16 @@ public class ReferencedByElementController : ElementControllerBase
         int skip = 0,
         int take = 20)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ElementPermissionResource.WithKeys(ActionElementBrowse.ActionLetter, id),
+            AuthorizationPolicies.ElementPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
         Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> relationItemsAttempt =
             await _trackedReferencesService.GetPagedRelationsForItemAsync(
                 id,
