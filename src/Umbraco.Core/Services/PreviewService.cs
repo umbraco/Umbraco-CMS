@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Preview;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
@@ -20,6 +21,8 @@ namespace Umbraco.Cms.Core.Services;
 ///     as they would appear on the front-end website. This implementation uses
 ///     secure cookies with SameSite=None to support cross-site preview scenarios,
 ///     falling back to non-secure SameSite=Lax cookies for insecure (plain http) setups.
+///     The preview session applies to front-end website requests only: Delivery API requests are never in website
+///     preview, as the Delivery API has its own preview mechanism.
 /// </remarks>
 public class PreviewService : IPreviewService
 {
@@ -31,6 +34,37 @@ public class PreviewService : IPreviewService
     private readonly IRequestCache _requestCache;
     private readonly GlobalSettings _globalSettings;
     private readonly IRequestAccessor _requestAccessor;
+    private readonly UmbracoRequestPaths _umbracoRequestPaths;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PreviewService" /> class.
+    /// </summary>
+    /// <param name="cookieManager">The cookie manager for handling preview cookies.</param>
+    /// <param name="previewTokenGenerator">The generator for creating and validating preview tokens.</param>
+    /// <param name="serviceScopeFactory">The factory for creating service scopes.</param>
+    /// <param name="requestCache">The request cache for caching preview state per request.</param>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="requestAccessor">The request accessor for determining the current request scheme and path.</param>
+    /// <param name="umbracoRequestPaths">The request paths used to recognise requests the website preview session does not apply to.</param>
+    public PreviewService(
+        ICookieManager cookieManager,
+#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
+        IPreviewTokenGenerator previewTokenGenerator,
+#pragma warning restore CS0618 // Type or member is obsolete
+        IServiceScopeFactory serviceScopeFactory,
+        IRequestCache requestCache,
+        IOptions<GlobalSettings> globalSettings,
+        IRequestAccessor requestAccessor,
+        UmbracoRequestPaths umbracoRequestPaths)
+    {
+        _cookieManager = cookieManager;
+        _previewTokenGenerator = previewTokenGenerator;
+        _serviceScopeFactory = serviceScopeFactory;
+        _requestCache = requestCache;
+        _globalSettings = globalSettings.Value;
+        _requestAccessor = requestAccessor;
+        _umbracoRequestPaths = umbracoRequestPaths;
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PreviewService" /> class.
@@ -41,22 +75,23 @@ public class PreviewService : IPreviewService
     /// <param name="requestCache">The request cache for caching preview state per request.</param>
     /// <param name="globalSettings">The global settings.</param>
     /// <param name="requestAccessor">The request accessor for determining the current request scheme.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public PreviewService(
         ICookieManager cookieManager,
-#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
         IPreviewTokenGenerator previewTokenGenerator,
-#pragma warning restore CS0618 // Type or member is obsolete
         IServiceScopeFactory serviceScopeFactory,
         IRequestCache requestCache,
         IOptions<GlobalSettings> globalSettings,
         IRequestAccessor requestAccessor)
+        : this(
+            cookieManager,
+            previewTokenGenerator,
+            serviceScopeFactory,
+            requestCache,
+            globalSettings,
+            requestAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<UmbracoRequestPaths>())
     {
-        _cookieManager = cookieManager;
-        _previewTokenGenerator = previewTokenGenerator;
-        _serviceScopeFactory = serviceScopeFactory;
-        _requestCache = requestCache;
-        _globalSettings = globalSettings.Value;
-        _requestAccessor = requestAccessor;
     }
 
     /// <summary>
@@ -78,7 +113,8 @@ public class PreviewService : IPreviewService
             serviceScopeFactory,
             requestCache,
             StaticServiceProvider.Instance.GetRequiredService<IOptions<GlobalSettings>>(),
-            StaticServiceProvider.Instance.GetRequiredService<IRequestAccessor>())
+            StaticServiceProvider.Instance.GetRequiredService<IRequestAccessor>(),
+            StaticServiceProvider.Instance.GetRequiredService<UmbracoRequestPaths>())
     {
     }
 
@@ -123,7 +159,7 @@ public class PreviewService : IPreviewService
     public async Task<Attempt<ClaimsIdentity>> TryGetPreviewClaimsIdentityAsync()
     {
         var cookieValue = _cookieManager.GetCookieValue(Constants.Web.PreviewCookieName);
-        if (string.IsNullOrWhiteSpace(cookieValue))
+        if (string.IsNullOrWhiteSpace(cookieValue) || IsDeliveryApiRequest())
         {
             return Attempt<ClaimsIdentity>.Fail();
         }
@@ -141,6 +177,18 @@ public class PreviewService : IPreviewService
         ClaimsPrincipal? principal = await coreBackOfficeSignInManager.CreateUserPrincipalAsync(userKeyAttempt.Result!.Value);
         ClaimsIdentity? backOfficeIdentity = principal?.GetUmbracoIdentity();
 
-        return Attempt<ClaimsIdentity>.Succeed(backOfficeIdentity);
+        // A token whose user can no longer be resolved does not identify a preview session.
+        return backOfficeIdentity is null
+            ? Attempt<ClaimsIdentity>.Fail()
+            : Attempt<ClaimsIdentity>.Succeed(backOfficeIdentity);
+    }
+
+    // The cookie is sent with every request to the site, including the Delivery API, whose responses are built
+    // from the shared published cache. Honouring it there would hand drafts to requests outside a preview session,
+    // and cache them for anyone else asking.
+    private bool IsDeliveryApiRequest()
+    {
+        Uri? requestUrl = _requestAccessor.GetRequestUrl();
+        return requestUrl is not null && _umbracoRequestPaths.IsDeliveryApiRequest(requestUrl.AbsolutePath);
     }
 }
