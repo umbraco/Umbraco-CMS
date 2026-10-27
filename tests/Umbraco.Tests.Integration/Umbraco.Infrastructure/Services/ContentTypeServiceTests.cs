@@ -2934,7 +2934,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Omit_Element_Types_From_Allowed_At_Root()
+    public async Task GetAllAllowedAsRootAsync_Excludes_Element_Types()
     {
         foreach (var alias in new[] { "rootOne", "rootTwo", "rootThree" })
         {
@@ -2953,7 +2953,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Omit_Element_Types_From_Allowed_Children()
+    public async Task GetAllowedChildrenAsync_Excludes_Element_Types()
     {
         IContentType[] children = await CreateContentTypesAllowedAsChildren();
 
