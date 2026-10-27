@@ -29,9 +29,11 @@ export class UmbImagingServerDataSource {
 	async getItems(uniques: Array<string>, imagingModel?: UmbImagingResizeModel) {
 		if (!uniques.length) throw new Error('Uniques are missing');
 
+		const { dataTypeUnique, ...resizeModel } = imagingModel ?? {};
+
 		const { data, error } = await tryExecute(
 			this.#host,
-			ImagingService.getImagingResizeUrls({ query: { id: uniques, ...imagingModel } }),
+			ImagingService.getImagingResizeUrls({ query: { id: uniques, ...resizeModel, dataTypeId: dataTypeUnique } }),
 		);
 
 		if (data) {
