@@ -463,34 +463,36 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     /// <inheritdoc />
     public void RefreshMemoryCache(Guid key)
     {
-        // HybridCache writes its in-process tier and issues the distributed write before its first await, so the
-        // read lock still orders both against a later commit's refresh; only the wait for the distributed write's
-        // completion, which needs a thread-pool hop, happens after the lock is released.
-        var pending = new List<Task>(2);
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+
+        // The read lock stays held across the cache writes so a save cannot commit between this read and the cache
+        // update; the database read is synchronous so the lock is not held across a thread-pool hop. The cache writes
+        // complete synchronously unless a distributed (L2) cache is configured.
+        (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = _databaseCacheRepository.GetContentSourceForPublishStates(key);
+
+        if (draftNode is not null)
         {
-            scope.ReadLock(Constants.Locks.ContentTree);
+            _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode)).AsTask().GetAwaiter().GetResult();
+        }
+        else
+        {
+            _hybridCache.RemoveAsync(GetCacheKey(key, true)).AsTask().GetAwaiter().GetResult();
+        }
 
-            (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = _databaseCacheRepository.GetContentSourceForPublishStates(key);
-
-            pending.Add(draftNode is not null
-                ? _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode)).AsTask()
-                : _hybridCache.RemoveAsync(GetCacheKey(key, true)).AsTask());
-
-            var cacheKey = GetCacheKey(key, false);
-            pending.Add(publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key)
-                ? _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode)).AsTask()
-                : _hybridCache.RemoveAsync(cacheKey).AsTask());
+        if (publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key))
+        {
+            var cacheKey = GetCacheKey(publishedNode.Key, false);
+            _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode)).AsTask().GetAwaiter().GetResult();
             _publishedContentCache.Remove(cacheKey);
             InvalidateMemoryCacheGeneration();
-
-            scope.Complete();
         }
-
-        foreach (Task write in pending)
+        else
         {
-            write.GetAwaiter().GetResult();
+            ClearPublishedCacheAsync(key).GetAwaiter().GetResult();
         }
+
+        scope.Complete();
     }
 
     /// <inheritdoc />
