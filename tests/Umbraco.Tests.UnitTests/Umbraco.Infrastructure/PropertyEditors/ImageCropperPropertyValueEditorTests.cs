@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.IO.MediaPathSchemes;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
@@ -55,6 +56,58 @@ public class ImageCropperPropertyValueEditorTests
 
         fileSystem.Verify(x => x.DeleteFile(It.IsAny<string>()), Times.Never);
     }
+
+    [Test]
+    public void Posted_Source_That_Is_Not_A_Valid_File_Location_Is_Not_Stored()
+    {
+        ImageCropperPropertyValueEditor editor = CreateEditor(out _, out _);
+        const string currentSource = "/media/abc123/image.jpg";
+        const string tamperedSource = "@attacker.example.com/media/x.jpg\" ><script src=https://attacker.example.com/x.js></script>.svg";
+
+        var result = editor.FromEditor(
+            new ContentPropertyData(Serialize(new ImageCropperValue { Src = tamperedSource, FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = 0.1m, Top = 0.2m } }), null)
+            {
+                ContentKey = EditingItem,
+                PropertyTypeKey = PropertyType,
+            },
+            Serialize(new ImageCropperValue { Src = currentSource }));
+
+        ImageCropperValue? stored = Deserialize(result);
+        Assert.AreEqual(currentSource, stored?.Src);
+        Assert.AreEqual(0.1m, stored?.FocalPoint?.Left, "Other parts of the value are still stored.");
+    }
+
+    [Test]
+    public void Posted_Source_That_Is_A_Valid_File_Location_Is_Stored()
+    {
+        ImageCropperPropertyValueEditor editor = CreateEditor(out _, out _);
+        const string postedSource = "/media/def456/image.jpg";
+
+        var result = editor.FromEditor(
+            new ContentPropertyData(Serialize(new ImageCropperValue { Src = postedSource }), null) { ContentKey = EditingItem, PropertyTypeKey = PropertyType },
+            null);
+
+        Assert.AreEqual(postedSource, Deserialize(result)?.Src);
+    }
+
+    [Test]
+    public void Posted_Source_Matching_The_Stored_Value_Is_Stored_Even_When_Not_Well_Formed()
+    {
+        ImageCropperPropertyValueEditor editor = CreateEditor(out _, out _);
+        const string legacySource = "media/1234/legacy image.jpg";
+
+        var result = editor.FromEditor(
+            new ContentPropertyData(Serialize(new ImageCropperValue { Src = legacySource }), null) { ContentKey = EditingItem, PropertyTypeKey = PropertyType },
+            Serialize(new ImageCropperValue { Src = legacySource }));
+
+        Assert.AreEqual(legacySource, Deserialize(result)?.Src);
+    }
+
+    private static string Serialize(ImageCropperValue value)
+        => new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()).Serialize(value);
+
+    private static ImageCropperValue? Deserialize(object? value)
+        => new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()).Deserialize<ImageCropperValue>((string)value!);
 
     private static ImageCropperPropertyValueEditor CreateEditor(out Mock<IFileSystem> fileSystem, out MediaFileManager manager)
     {

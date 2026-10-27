@@ -8,6 +8,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -35,6 +36,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPreviewService _previewService;
+    private readonly IPreviewAccessEvaluator _previewAccessEvaluator;
     private readonly IPublishStatusQueryService _publishStatusQueryService;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<DocumentCacheService> _logger;
@@ -95,6 +97,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     /// <param name="publishStatusQueryService">The service used to check published state and ancestor paths.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="cacheFactory">The factory that creates the in-memory converted-content (L0) cache.</param>
+    /// <param name="previewAccessEvaluator">The evaluator that decides whether the preview user may see a document's unpublished version.</param>
     public DocumentCacheService(
         IDatabaseCacheRepository databaseCacheRepository,
         IIdKeyMap idKeyMap,
@@ -108,7 +111,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         IPreviewService previewService,
         IPublishStatusQueryService publishStatusQueryService,
         ILogger<DocumentCacheService> logger,
-        IConvertedPublishedContentCacheFactory cacheFactory)
+        IConvertedPublishedContentCacheFactory cacheFactory,
+        IPreviewAccessEvaluator previewAccessEvaluator)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -119,6 +123,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
         _previewService = previewService;
+        _previewAccessEvaluator = previewAccessEvaluator;
         _publishStatusQueryService = publishStatusQueryService;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
@@ -139,7 +144,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     {
         bool calculatedPreview = preview ?? GetPreview();
 
-        return await GetNodeAsync(key, calculatedPreview);
+        return await GetAccessibleNodeAsync(key, calculatedPreview);
     }
 
     /// <inheritdoc />
@@ -154,7 +159,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         bool calculatedPreview = preview ?? GetPreview();
         Guid key = keyAttempt.Result;
 
-        return await GetNodeAsync(key, calculatedPreview);
+        return await GetAccessibleNodeAsync(key, calculatedPreview);
     }
 
     /// <inheritdoc />
@@ -183,6 +188,13 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             await ReadFromDatabaseAsync(pending, calculatedPreview, generation, resolved);
         }
 
+        // Applied after all three tiers so the access check runs once over the whole resolved set, whichever
+        // tier each draft came from. Mirrors GetAccessibleNodeAsync for the single-key lookups.
+        if (calculatedPreview)
+        {
+            await ReplaceInaccessibleDraftsAsync(resolved);
+        }
+
         // Return in input order; keys that resolved to nothing (missing/unpublished) are omitted. A key
         // repeated in the input resolves to the same item at every occurrence, having only been looked
         // up once — so the input count, not the resolved count, is the upper bound on the result.
@@ -196,6 +208,76 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         }
 
         return ordered;
+    }
+
+    /// <summary>
+    /// Gets a document, handing out its draft only when the preview user may access it.
+    /// </summary>
+    /// <param name="key">The key of the document.</param>
+    /// <param name="preview">Whether the draft is requested.</param>
+    /// <returns>
+    /// The draft when <paramref name="preview"/> is <c>true</c> and the preview user may access the document;
+    /// otherwise the published version, or <c>null</c> when the document isn't published.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// Every draft lookup (routing, <c>GetById</c>, and the batched reads behind <c>Children()</c> and
+    /// <c>Descendants()</c>) passes through this service, so this is where a preview session is held to what its
+    /// user may access. A preview session belongs to a back-office user, but the cookie that enables it is not tied
+    /// to a document: without this check any draft the router or a template resolves would be rendered, including
+    /// drafts outside the user's start nodes or browse permission.
+    /// </para>
+    /// <para>
+    /// A refused draft resolves as it would outside preview. That discloses nothing a front-end visitor couldn't
+    /// already see, and the same rule holds for content a template pulls in (pickers, navigation) as for the routed
+    /// document. The evaluator allows everything when there is no preview user, so explicit preview requests made
+    /// outside a preview session (for example webhooks or Delivery API preview) are unaffected.
+    /// </para>
+    /// </remarks>
+    private async Task<IPublishedContent?> GetAccessibleNodeAsync(Guid key, bool preview)
+    {
+        IPublishedContent? content = await GetNodeAsync(key, preview);
+
+        // The check needs the draft's path (start nodes and permissions are path-based), so the draft is resolved
+        // first and only re-read as published when it is refused.
+        return preview && content is not null && _previewAccessEvaluator.CanPreviewDocument(content) is false
+            ? await GetNodeAsync(key, false)
+            : content;
+    }
+
+    /// <summary>
+    /// Replaces the drafts the preview user may not access with their published versions; the batch equivalent of
+    /// <see cref="GetAccessibleNodeAsync"/>.
+    /// </summary>
+    /// <param name="resolved">The drafts resolved so far, keyed by document key. Updated in place.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// Refused drafts are removed from <paramref name="resolved"/> and re-read as published in a single batched
+    /// call. Keys with no published version stay out of the set, so the caller omits them from its result as it
+    /// does for any key that resolves to nothing.
+    /// </remarks>
+    private async Task ReplaceInaccessibleDraftsAsync(Dictionary<Guid, IPublishedContent> resolved)
+    {
+        Guid[] inaccessibleKeys = resolved
+            .Where(entry => _previewAccessEvaluator.CanPreviewDocument(entry.Value) is false)
+            .Select(entry => entry.Key)
+            .ToArray();
+        if (inaccessibleKeys.Length == 0)
+        {
+            return;
+        }
+
+        foreach (Guid key in inaccessibleKeys)
+        {
+            resolved.Remove(key);
+        }
+
+        // Re-entering with preview: false takes the normal published path (L0, L1/L2, then the database with the
+        // published-ancestor guard), and never reaches this method again.
+        foreach (IPublishedContent content in await GetByKeysAsync(inaccessibleKeys, false))
+        {
+            resolved[content.Key] = content;
+        }
     }
 
     // L0 (converted) fast path — published only, mirroring GetNodeAsync (via the shared TryGetCached).

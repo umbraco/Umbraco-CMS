@@ -1,11 +1,18 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
@@ -17,13 +24,39 @@ public class DocumentPreviewUrlController : DocumentControllerBase
 {
     private readonly IContentService _contentService;
     private readonly IDocumentUrlFactory _documentUrlFactory;
+    private readonly IAuthorizationService _authorizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentPreviewUrlController"/> class.
+    /// </summary>
+    /// <param name="contentService">The service used to retrieve the document.</param>
+    /// <param name="documentUrlFactory">The factory that produces the preview URL.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public DocumentPreviewUrlController(
         IContentService contentService,
         IDocumentUrlFactory documentUrlFactory)
+        : this(
+            contentService,
+            documentUrlFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentPreviewUrlController"/> class.
+    /// </summary>
+    /// <param name="contentService">The service used to retrieve the document.</param>
+    /// <param name="documentUrlFactory">The factory that produces the preview URL.</param>
+    /// <param name="authorizationService">The service used to authorize access to the document.</param>
+    [ActivatorUtilitiesConstructor]
+    public DocumentPreviewUrlController(
+        IContentService contentService,
+        IDocumentUrlFactory documentUrlFactory,
+        IAuthorizationService authorizationService)
     {
         _contentService = contentService;
         _documentUrlFactory = documentUrlFactory;
+        _authorizationService = authorizationService;
     }
 
     /// <summary>Retrieves the preview URL for a document by its unique identifier.</summary>
@@ -41,6 +74,16 @@ public class DocumentPreviewUrlController : DocumentControllerBase
     [EndpointDescription("Gets the preview URL for the document identified by the provided Id.")]
     public async Task<IActionResult> GetPreviewUrl(Guid id, string providerAlias, string? culture, string? segment)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionBrowse.ActionLetter, id),
+            AuthorizationPolicies.ContentPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
         IContent? content = _contentService.GetById(id);
         if (content is null)
         {
