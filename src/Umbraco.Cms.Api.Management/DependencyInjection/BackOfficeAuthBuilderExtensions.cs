@@ -122,6 +122,23 @@ public static class BackOfficeAuthBuilderExtensions
                     .Build());
         });
 
+        builder.Services.AddSingleton<BackOfficeRedirectUriValidationHandler>();
+        builder.Services.Configure<OpenIddictServerOptions>(options =>
+        {
+            options.Handlers.Add(
+                OpenIddictServerHandlerDescriptor
+                    .CreateBuilder<OpenIddictServerEvents.ValidateAuthorizationRequestContext>()
+                    .UseSingletonHandler<BackOfficeRedirectUriValidationHandler>()
+                    .SetOrder(OpenIddictServerHandlers.Authentication.ValidateRedirectUriParameter.Descriptor.Order + 1)
+                    .Build());
+            options.Handlers.Add(
+                OpenIddictServerHandlerDescriptor
+                    .CreateBuilder<OpenIddictServerEvents.ValidateEndSessionRequestContext>()
+                    .UseSingletonHandler<BackOfficeRedirectUriValidationHandler>()
+                    .SetOrder(OpenIddictServerHandlers.Session.ValidatePostLogoutRedirectUriParameter.Descriptor.Order + 1)
+                    .Build());
+        });
+
         return builder;
     }
 }
