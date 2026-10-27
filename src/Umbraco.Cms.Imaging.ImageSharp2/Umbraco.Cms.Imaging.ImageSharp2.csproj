@@ -5,7 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SixLabors.ImageSharp" VersionOverride="[2.1.11, 3)" />
+    <!-- There is no patched 2.x release of ImageSharp, so these are pinned to the latest 2.x versions and are known to be flagged as vulnerable. Use Umbraco.Cms.Imaging.ImageSharp (ImageSharp 3) instead. -->
+    <PackageReference Include="SixLabors.ImageSharp" VersionOverride="[2.1.13, 3)" />
     <PackageReference Include="SixLabors.ImageSharp.Web" VersionOverride="[2.0.2, 3)" />
   </ItemGroup>
 
