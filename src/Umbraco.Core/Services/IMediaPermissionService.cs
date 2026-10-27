@@ -59,7 +59,5 @@ public interface IMediaPermissionService
     /// <param name="mediaKeys">The identifiers of the media items to filter.</param>
     /// <param name="dataTypeKey">The identifier of the data type the request originates from, if any.</param>
     /// <returns>A task resolving into the set of authorized media keys.</returns>
-    // TODO (V19): Remove default implementation.
-    Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> mediaKeys, Guid? dataTypeKey)
-        => FilterAuthorizedAccessAsync(user, mediaKeys);
+    Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> mediaKeys, Guid? dataTypeKey);
 }
