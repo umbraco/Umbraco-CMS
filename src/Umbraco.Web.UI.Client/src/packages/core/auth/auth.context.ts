@@ -154,6 +154,7 @@ export class UmbAuthContext extends UmbContextBase {
 					this.#slideSessionExpiry(activityDetectedAt);
 				}
 			});
+			signaler?.setSessionCheck(() => this.keepAlive());
 		});
 	}
 
@@ -405,8 +406,6 @@ export class UmbAuthContext extends UmbContextBase {
 			// Cookie auth: the httpOnly auth cookie (sent via credentials: 'include') is the sole
 			// credential, so no bearer-token auth callback is needed.
 			auth: undefined,
-			// Don't follow 302 redirects to /login — the auth interceptor handles 401s and replays requests after re-authentication.
-			redirect: 'manual',
 		});
 
 		// Lazy single instance — see #interceptorController field comment. Controller
