@@ -597,6 +597,13 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <returns>A tuple containing the parent ID (if valid) and the operation status.</returns>
     protected virtual async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
     {
+        // An element type can still be flagged as allowed at root or as a child, as these settings are retained when a
+        // content type is converted to an element type.
+        if (contentType.IsElement)
+        {
+            return (null, ContentEditingOperationStatus.NotAllowed);
+        }
+
         TContent? parent = parentKey.HasValue
             ? ContentService.GetById(parentKey.Value)
             : null;
