@@ -15,6 +15,9 @@ export const copyHandlers = [
 		// A missing/null target means "copy to the tree root" — target isn't required.
 		const newIds = umbMemberTypeMockDb.tree.copy([id], requestBody.target?.id ?? null);
 
-		return new HttpResponse(null, { status: 201, headers: { Location: newIds[0] } });
+		return new HttpResponse(null, {
+			status: 201,
+			headers: { Location: newIds[0], 'Umb-Generated-Resource': newIds[0] },
+		});
 	}),
 ];

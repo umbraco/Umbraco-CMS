@@ -16,6 +16,9 @@ export const copyHandlers = [
 		// `relateToOriginal`/`includeDescendants` aren't simulated by this mock.
 		const newIds = umbDocumentMockDb.tree.copy([id], requestBody.target?.id ?? null);
 
-		return new HttpResponse(null, { status: 201, headers: { Location: newIds[0] } });
+		return new HttpResponse(null, {
+			status: 201,
+			headers: { Location: newIds[0], 'Umb-Generated-Resource': newIds[0] },
+		});
 	}),
 ];
