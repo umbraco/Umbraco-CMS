@@ -6,6 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-data-type-details-workspace-view')
 export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -30,6 +31,9 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	@state()
 	private _supportedDataSourceTypes: Array<string> = [];
 
+	@state()
+	private _isReadOnly = false;
+
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -38,6 +42,10 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 			this.#observeDataType();
+		});
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
 		});
 	}
 
@@ -96,6 +104,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 						.propertyEditorUiAlias=${this._propertyEditorUiAlias}
 						.propertyEditorUiIcon=${this._propertyEditorUiIcon}
 						.propertyEditorSchemaAlias=${this._propertyEditorSchemaAlias}
+						?readonly=${this._isReadOnly}
 						${umbBindToValidation(this, '$.editorUiAlias', this._propertyEditorUiAlias)}>
 					</umb-data-type-details-workspace-property-editor-picker>
 				</umb-property-layout>
@@ -115,6 +124,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 					.dataSourceTypes=${this._supportedDataSourceTypes}
 					slot="editor"
 					max="1"
+					?readonly=${this._isReadOnly}
+					?disabled=${this._isReadOnly}
 					@change=${this.#onDataSourceChange}
 					required
 					${umbBindToValidation(

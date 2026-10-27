@@ -1,5 +1,9 @@
 import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE_ALIAS } from '../../entity.js';
-import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_WORKSPACE_CONDITION_ALIAS,
+	UmbSubmitWorkspaceAction,
+	UMB_WORKSPACE_ENTITY_IS_READ_ONLY_CONDITION_ALIAS,
+} from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -42,6 +46,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#buttons_save',
 		},
 		conditions: [
+			{
+				alias: UMB_WORKSPACE_ENTITY_IS_READ_ONLY_CONDITION_ALIAS,
+				match: false,
+			},
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_WEBHOOK_WORKSPACE_ALIAS,

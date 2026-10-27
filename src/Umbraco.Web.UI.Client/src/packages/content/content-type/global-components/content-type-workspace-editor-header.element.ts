@@ -1,11 +1,12 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../workspace/content-type-workspace.context-token.js';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-content-type-workspace-editor-header')
 export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
@@ -24,6 +25,9 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 	@state()
 	private _isNew?: boolean;
 
+	@state()
+	private _isReadOnly = false;
+
 	#workspaceContext?: typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -32,6 +36,10 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeContentType();
+		});
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
 		});
 	}
 
@@ -95,6 +103,7 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 					label=${this.#iconTitle ?? 'icon'}
 					look="outline"
 					title=${ifDefined(this.#iconTitle)}
+					?disabled=${this._isReadOnly}
 					@click=${this._handleIconClick}>
 					<umb-icon aria-hidden="true" name=${ifDefined(this._icon)}></umb-icon>
 				</uui-button>
@@ -106,11 +115,18 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 						.value=${this._name}
 						.alias=${this._alias}
 						?auto-generate-alias=${this._isNew}
+						?readonly=${this._isReadOnly}
+						?alias-readonly=${this._isReadOnly}
 						.autocomplete=${'off'}
 						@change=${this.#onNameAndAliasChange}
 						required
 						${umbBindToValidation(this, '$.name', this._name)}
 						${umbFocus()}>
+						${this._isReadOnly
+							? html`<uui-tag id="read-only-tag" slot="append" look="secondary">
+									${this.localize.term('general_readOnly')}
+								</uui-tag>`
+							: nothing}
 					</umb-input-with-alias>
 
 					<uui-input
@@ -118,6 +134,7 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 						.label=${this.localize.term('placeholders_enterDescription')}
 						.value=${this._description}
 						.placeholder=${this.localize.term('placeholders_enterDescription')}
+						?readonly=${this._isReadOnly}
 						@input=${this.#onDescriptionChange}></uui-input>
 				</div>
 			</div>
@@ -156,6 +173,12 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 
 			#description:hover {
 				--uui-input-border-color: var(--uui-color-border);
+			}
+
+			#read-only-tag {
+				align-self: center;
+				margin: 0 var(--uui-size-space-2);
+				white-space: nowrap;
 			}
 
 			#icon {

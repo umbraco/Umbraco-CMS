@@ -1,6 +1,10 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS } from './constants.js';
-import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_WORKSPACE_CONDITION_ALIAS,
+	UmbSubmitWorkspaceAction,
+	UMB_WORKSPACE_ENTITY_IS_READ_ONLY_CONDITION_ALIAS,
+} from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -25,6 +29,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			color: 'positive',
 		},
 		conditions: [
+			{
+				alias: UMB_WORKSPACE_ENTITY_IS_READ_ONLY_CONDITION_ALIAS,
+				match: false,
+			},
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS,

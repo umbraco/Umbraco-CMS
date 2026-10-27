@@ -13,6 +13,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-document-type-workspace-view-settings')
 export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -39,6 +40,9 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	@state()
 	private _useSegments?: boolean;
 
+	@state()
+	private _isReadOnly = false;
+
 	#configurationRepository = new UmbDocumentTypeConfigurationRepository(this);
 
 	constructor() {
@@ -47,6 +51,10 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (documentTypeContext) => {
 			this.#workspaceContext = documentTypeContext;
 			this.#observeDocumentType();
+		});
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
 		});
 	}
 
@@ -120,6 +128,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					<div slot="editor">
 						<uui-toggle
 							?checked=${this._variesByCulture}
+							?readonly=${this._isReadOnly}
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setVariesByCulture((e.target as UUIToggleElement).checked);
 							}}
@@ -138,6 +147,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					<div slot="editor">
 						<uui-toggle
 							?checked=${this._isElement}
+							?readonly=${this._isReadOnly}
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setIsElement((e.target as UUIToggleElement).checked);
 							}}
@@ -169,6 +179,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 											id="prevent-cleanup"
 											label=${this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}
 											.checked=${this._preventCleanup ?? false}
+											?readonly=${this._isReadOnly}
 											@change=${this.#onChangePreventCleanup}></uui-toggle>
 									</uui-form-layout-item>
 
@@ -189,6 +200,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 													placeholder="7"
 													label=${this.localize.term('contentTypeEditor_historyCleanupKeepAllVersionsNewerThanDays')}
 													.value=${this._keepAllVersionsNewerThanDays?.toString() ?? ''}
+													?readonly=${this._isReadOnly}
 													@change=${this.#onChangeKeepAllVersionsNewerThanDays}></uui-input>
 											</uui-form-layout-item>
 
@@ -205,6 +217,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 													placeholder="90"
 													label=${this.localize.term('contentTypeEditor_historyCleanupKeepLatestVersionPerDayForDays')}
 													.value=${this._keepLatestVersionPerDayForDays?.toString() ?? ''}
+													?readonly=${this._isReadOnly}
 													@change=${this.#onChangeKeepLatestVersionPerDayForDays}></uui-input>
 											</uui-form-layout-item>
 										`,
@@ -232,6 +245,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				<div slot="editor">
 					<uui-toggle
 						?checked=${this._variesBySegment}
+						?readonly=${this._isReadOnly}
 						@change=${(e: CustomEvent) => {
 							this.#workspaceContext?.setVariesBySegment((e.target as UUIToggleElement).checked);
 						}}

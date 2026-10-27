@@ -8,6 +8,7 @@ import type {
 	UmbInputContentTypeCollectionConfigurationElement,
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-media-type-workspace-view-structure')
@@ -23,12 +24,19 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 	@state()
 	private _collection?: string;
 
+	@state()
+	private _isReadOnly = false;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MEDIA_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
 			this._observeMediaType();
+		});
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_isReadOnlyObserver');
 		});
 	}
 
@@ -71,6 +79,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 						<uui-toggle
 							label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}
 							?checked=${this._allowedAtRoot}
+							?readonly=${this._isReadOnly}
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setAllowedAtRoot((e.target as UUIToggleElement).checked);
 							}}></uui-toggle>
@@ -82,6 +91,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
 						<umb-input-media-type
 							.selection=${this._allowedContentTypeIDs ?? []}
+							?readonly=${this._isReadOnly}
 							@change="${(e: CustomEvent & { target: UmbInputMediaTypeElement }) => {
 								const sortedContentTypesList: Array<UmbContentTypeSortModel> = e.target.selection.map((id, index) => ({
 									contentType: { unique: id },
@@ -100,6 +110,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 						<umb-input-content-type-collection-configuration
 							default-value="3a0156c4-3b8c-4803-bdc1-6871faa83fff"
 							.value=${this._collection}
+							?readonly=${this._isReadOnly}
 							@change=${(e: CustomEvent) => {
 								const unique = (e.target as UmbInputContentTypeCollectionConfigurationElement).value as string;
 								this.#workspaceContext?.setCollection({ unique });

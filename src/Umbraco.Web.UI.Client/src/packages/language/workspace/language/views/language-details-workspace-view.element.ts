@@ -8,6 +8,7 @@ import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cm
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '@umbraco-cms/backoffice/culture';
 
@@ -21,6 +22,9 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 
 	@state()
 	private _isNew?: boolean;
+
+	@state()
+	private _isReadOnly = false;
 
 	#languageWorkspaceContext?: typeof UMB_LANGUAGE_WORKSPACE_CONTEXT.TYPE;
 
@@ -49,6 +53,10 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 			this.observe(this.#languageWorkspaceContext?.isNew, (isNew) => {
 				this._isNew = isNew;
 			});
+		});
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
 		});
 	}
 
@@ -128,6 +136,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 						<uui-toggle
 							label="Default language"
 							?disabled=${this._isDefaultLanguage}
+							?readonly=${this._isReadOnly}
 							?checked=${this._language?.isDefault || false}
 							@change=${this.#handleDefaultChange}>
 							<div>
@@ -146,6 +155,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 						<uui-toggle
 							label="Mandatory language"
 							?checked=${this._language?.isMandatory || false}
+							?readonly=${this._isReadOnly}
 							@change=${this.#handleMandatoryChange}>
 							<div>
 								<b>Mandatory language</b>
@@ -162,6 +172,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 						value=${ifDefined(this._language?.fallbackIsoCode === null ? undefined : this._language?.fallbackIsoCode)}
 						slot="editor"
 						max="1"
+						?readonly=${this._isReadOnly}
 						@change=${this.#handleFallbackChange}
 						.filter=${(language: UmbLanguageItemModel) =>
 							language.unique !== this._language?.unique}></umb-input-language>
