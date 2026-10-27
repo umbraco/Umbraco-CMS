@@ -1,4 +1,4 @@
-import { isNotPublishedMandatory, isSelectableForPublishing } from '../../utils.js';
+import { umbIsNotPublishedMandatory, umbIsSelectableForPublishing } from '../../utils.js';
 import type { UmbContentPublishModalData, UmbContentPublishModalValue } from './types.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -47,7 +47,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
-		this._options = this.data?.options.filter(isSelectableForPublishing) ?? [];
+		this._options = this.data?.options.filter(umbIsSelectableForPublishing) ?? [];
 
 		const validOptions = this._options.filter((o) => this.#pickableFilter(o));
 
@@ -60,7 +60,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	}
 
 	readonly #handleSelectionChange = (selection: Array<string>) => {
-		const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
+		const missingMandatoryOptions = this._options.filter(umbIsNotPublishedMandatory);
 		this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
 	};
 
@@ -86,7 +86,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 						html`<umb-content-variant-language-picker
 							.selectionManager=${this.#selectionManager}
 							.variantLanguageOptions=${this._options}
-							.requiredFilter=${isNotPublishedMandatory}
+							.requiredFilter=${umbIsNotPublishedMandatory}
 							.pickableFilter=${this.#pickableFilter}></umb-content-variant-language-picker>`,
 				)}
 

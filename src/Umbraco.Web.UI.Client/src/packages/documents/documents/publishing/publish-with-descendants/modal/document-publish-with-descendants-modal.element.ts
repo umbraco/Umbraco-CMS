@@ -1,9 +1,9 @@
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { isNotPublishedMandatory, isSelectableForPublishing } from '../../utils.js';
 import type {
 	UmbDocumentPublishWithDescendantsModalData,
 	UmbDocumentPublishWithDescendantsModalValue,
 } from './document-publish-with-descendants-modal.token.js';
+import { umbIsNotPublishedMandatory, umbIsSelectableForPublishing } from '@umbraco-cms/backoffice/content';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -41,7 +41,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
-		this._options = this.data?.options.filter(isSelectableForPublishing) ?? [];
+		this._options = this.data?.options.filter(umbIsSelectableForPublishing) ?? [];
 
 		let selected = this.value?.selection ?? [];
 
@@ -68,7 +68,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 				if (!this._options && !selection) return;
 
 				//Getting not published mandatory options — the options that are mandatory and not currently published.
-				const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
+				const missingMandatoryOptions = this._options.filter(umbIsNotPublishedMandatory);
 				this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
 			},
 			'observeSelection',
@@ -112,7 +112,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
 				.variantLanguageOptions=${this._options}
-				.requiredFilter=${isNotPublishedMandatory}
+				.requiredFilter=${umbIsNotPublishedMandatory}
 				.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>
 
 			<uui-form-layout-item>

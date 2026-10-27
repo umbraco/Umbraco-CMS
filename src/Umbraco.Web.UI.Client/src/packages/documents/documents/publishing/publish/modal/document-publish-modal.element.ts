@@ -1,7 +1,7 @@
 import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { isNotPublishedMandatory, isSelectableForPublishing } from '../../utils.js';
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
+import { umbIsNotPublishedMandatory, umbIsSelectableForPublishing } from '@umbraco-cms/backoffice/content';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -62,7 +62,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
-		this._options = this.data?.options.filter(isSelectableForPublishing) ?? [];
+		this._options = this.data?.options.filter(umbIsSelectableForPublishing) ?? [];
 
 		let selected = this.value?.selection ?? [];
 
@@ -89,7 +89,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 				if (!this._options && !selection) return;
 
 				//Getting not published mandatory options — the options that are mandatory and not currently published.
-				const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
+				const missingMandatoryOptions = this._options.filter(umbIsNotPublishedMandatory);
 				this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
 			},
 			'observeSelection',
@@ -118,7 +118,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 						html`<umb-document-variant-language-picker
 							.selectionManager=${this.#selectionManager}
 							.variantLanguageOptions=${this._options}
-							.requiredFilter=${isNotPublishedMandatory}
+							.requiredFilter=${umbIsNotPublishedMandatory}
 							.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>`,
 				)}
 
