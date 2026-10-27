@@ -705,6 +705,13 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return UserGroupOperationStatus.ElementStartNodeKeyNotFound;
         }
 
+        if (userGroup.StartDocumentBlueprintId is not null
+            && userGroup.StartDocumentBlueprintId is not Constants.System.Root
+            && _entityService.Exists(userGroup.StartDocumentBlueprintId.Value, UmbracoObjectTypes.DocumentBlueprintContainer) is false)
+        {
+            return UserGroupOperationStatus.DocumentBlueprintStartNodeKeyNotFound;
+        }
+
         return UserGroupOperationStatus.Success;
     }
 

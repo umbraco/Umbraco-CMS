@@ -348,6 +348,34 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         Assert.IsNull((await UserGroupService.GetAsync(userGroup.Key))!.StartElementId);
     }
 
+    [TestCase(int.MaxValue)]
+    [TestCase(Constants.System.RecycleBinContent)]
+    public async Task Cannot_Create_User_Group_With_Document_Blueprint_Start_Node_That_Is_Not_A_Document_Blueprint_Folder(int startDocumentBlueprintId)
+    {
+        var result = await UserGroupService.CreateAsync(
+            BuildUserGroup(startDocumentBlueprintId: startDocumentBlueprintId),
+            Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.DocumentBlueprintStartNodeKeyNotFound, result.Status);
+    }
+
+    [TestCase(int.MaxValue)]
+    [TestCase(Constants.System.RecycleBinContent)]
+    public async Task Cannot_Update_User_Group_With_Document_Blueprint_Start_Node_That_Is_Not_A_Document_Blueprint_Folder(int startDocumentBlueprintId)
+    {
+        var createResult = await UserGroupService.CreateAsync(BuildUserGroup(), Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success, $"Could not create the user group: {createResult.Status}");
+        var userGroup = await UserGroupService.GetAsync(createResult.Result.Key);
+        userGroup!.StartDocumentBlueprintId = startDocumentBlueprintId;
+
+        var result = await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.DocumentBlueprintStartNodeKeyNotFound, result.Status);
+        Assert.IsNull((await UserGroupService.GetAsync(userGroup.Key))!.StartDocumentBlueprintId);
+    }
+
     [Test]
     public async Task Cannot_Create_User_Group_With_Element_As_Element_Start_Node()
     {
@@ -544,7 +572,11 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         return result.Result!;
     }
 
-    private IUserGroup BuildUserGroup(int? startContentId = null, int? startMediaId = null, int? startElementId = null)
+    private IUserGroup BuildUserGroup(
+        int? startContentId = null,
+        int? startMediaId = null,
+        int? startElementId = null,
+        int? startDocumentBlueprintId = null)
     {
         var alias = $"group{Guid.NewGuid():N}";
         IUserGroup userGroup = new UserGroupBuilder()
@@ -556,6 +588,7 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         userGroup.StartContentId = startContentId;
         userGroup.StartMediaId = startMediaId;
         userGroup.StartElementId = startElementId;
+        userGroup.StartDocumentBlueprintId = startDocumentBlueprintId;
 
         return userGroup;
     }
