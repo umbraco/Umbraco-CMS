@@ -5,6 +5,7 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes, type UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 import './content-type-design-editor-properties.element.js';
 
@@ -51,6 +52,17 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 
 	@state()
 	private _inheritedFrom?: Array<UmbContentTypeModel>;
+
+	@state()
+	private _isReadOnly = false;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
+		});
+	}
 
 	#checkInherited() {
 		if (this.groupStructureHelper && this.group) {
@@ -151,7 +163,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	// TODO: impl UMB_EDIT_DOCUMENT_TYPE_PATH_PATTERN, but we need either a generic type or a way to get the path pattern.... [NL]
 	#renderContainerHeader() {
 		return html`
-			<div slot="header" class="drag-handle">
+			<div slot="header" class="drag-handle ${this._isReadOnly ? 'read-only' : ''}">
 				<div>
 					${when(this.sortModeActive && this._hasOwnerContainer, () => html`<uui-icon name="icon-grip"></uui-icon>`)}
 					<uui-input
@@ -161,6 +173,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 						placeholder=${this.localize.term('placeholders_entername')}
 						.value=${this._group!.name}
 						?disabled=${!this._hasOwnerContainer}
+						?readonly=${this._isReadOnly}
 						@blur=${this.#blurGroup}
 						@change=${this.#renameGroup}
 						${this._group!.name === '' ? umbFocus() : nothing}
@@ -187,7 +200,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 					`,
 				)}
 				${when(
-					!this._inherited && !this.sortModeActive,
+					!this._inherited && !this.sortModeActive && !this._isReadOnly,
 					() => html`
 						<uui-button compact label=${this.localize.term('actions_delete')} @click=${this.#requestRemove}>
 							<uui-icon name="delete"></uui-icon>
@@ -278,7 +291,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 			}
 
-			:host([has-owner-container]) div[slot='header'] {
+			:host([has-owner-container]) div[slot='header']:not(.read-only) {
 				cursor: grab;
 			}
 

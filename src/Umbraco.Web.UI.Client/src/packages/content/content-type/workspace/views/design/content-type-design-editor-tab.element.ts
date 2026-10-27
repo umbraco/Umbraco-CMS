@@ -11,7 +11,7 @@ import { css, customElement, html, nothing, property, repeat, state } from '@umb
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 
 import './content-type-design-editor-properties.element.js';
@@ -197,11 +197,29 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	@state()
 	private _editContentTypePath?: string;
 
+	@state()
+	private _isReadOnly = false;
+
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 	#contentTypeWorkspaceContext?: typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(
+				context?.readOnly,
+				(isReadOnly) => {
+					this._isReadOnly = isReadOnly ?? false;
+					if (this._isReadOnly) {
+						this.#sorter.disable();
+					} else {
+						this.#sorter.enable();
+					}
+				},
+				'_observeIsReadOnly',
+			);
+		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#contentTypeWorkspaceContext = context;
@@ -259,7 +277,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	override render() {
 		return html`
 			${
-				this.#containerId !== undefined
+				this.#containerId !== undefined && (this._hasProperties || !this._isReadOnly)
 					? html`
 							<uui-box class="${this._hasProperties ? '' : 'opaque'}">
 								<umb-content-type-design-editor-properties
@@ -292,7 +310,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	}
 
 	#renderAddGroupButton() {
-		if (this._sortModeActive) return;
+		if (this._sortModeActive || this._isReadOnly) return;
 		return html`
 			<uui-button
 				id="btn-add"

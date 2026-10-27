@@ -26,6 +26,7 @@ import type {
 	ManifestWorkspaceViewContentTypeDesignEditorKind,
 	UmbWorkspaceViewElement,
 } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -133,6 +134,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	@state()
 	private _sortModeActive?: boolean;
 
+	@state()
+	private _isReadOnly = false;
+
 	constructor() {
 		super();
 
@@ -171,6 +175,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			},
 			null,
 		);
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
+		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
@@ -487,7 +495,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	#renderAddButton() {
-		if (this._sortModeActive) return;
+		if (this._sortModeActive || this._isReadOnly) return;
 		return html`
 			<uui-button
 				id="add-tab"
@@ -514,6 +522,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 								look="outline"
 								label=${this.localize.term('contentTypeEditor_compositions')}
 								compact
+								?disabled=${this._isReadOnly}
 								@click=${this.#openCompositionModal}>
 								<uui-icon name="icon-merge"></uui-icon>
 								<umb-localize key="contentTypeEditor_compositions"></umb-localize>
@@ -525,6 +534,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					look="outline"
 					label=${sortButtonText}
 					compact
+					?disabled=${this._isReadOnly}
 					@click=${this.#toggleSortMode}>
 					<uui-icon name="icon-height"></uui-icon>
 					${sortButtonText}
@@ -615,7 +625,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			</div>`;
 		}
 
-		if (tabActive && ownedTab) {
+		if (tabActive && ownedTab && !this._isReadOnly) {
 			return html`<div class="tab-inner">
 				<uui-input
 					data-mark="tab:name-input"
@@ -636,7 +646,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (ownedTab) {
 			return html`<div class="not-active">
 				<span class=${hasTabName ? '' : 'invalid'}>${this.localize.string(tabName)}</span>
-				${this.renderDeleteFor(tab)}
+				${this._isReadOnly ? nothing : this.renderDeleteFor(tab)}
 			</div>`;
 		} else {
 			return html`<div class="not-active">

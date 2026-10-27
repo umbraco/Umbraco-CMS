@@ -1,4 +1,8 @@
-import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_WORKSPACE_CONDITION_ALIAS,
+	UmbSubmitWorkspaceAction,
+	UMB_WORKSPACE_ENTITY_IS_READ_ONLY_CONDITION_ALIAS,
+} from '@umbraco-cms/backoffice/workspace';
 import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 export const UMB_PARTIAL_VIEW_WORKSPACE_ALIAS = 'Umb.Workspace.PartialView';
@@ -27,12 +31,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: UMB_PARTIAL_VIEW_WORKSPACE_ALIAS,
+				alias: UMB_WORKSPACE_ENTITY_IS_READ_ONLY_CONDITION_ALIAS,
+				match: false,
 			},
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_PARTIAL_VIEW_WORKSPACE_ALIAS,
 			},
 		],
 	},

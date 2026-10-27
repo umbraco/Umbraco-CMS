@@ -8,6 +8,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import '@umbraco-cms/backoffice/culture';
@@ -22,6 +23,9 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 	@state()
 	private _contentType?: string;
 
+	@state()
+	private _isReadOnly = false;
+
 	#webhookWorkspaceContext?: typeof UMB_WEBHOOK_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -33,6 +37,10 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 				this._webhook = webhook;
 				this._contentType = this._webhook?.events[0]?.eventType ?? undefined;
 			});
+		});
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
 		});
 	}
 
@@ -84,14 +92,16 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 						slot="editor"
 						@change=${this.#onTypesChange}
 						.selection=${this._webhook?.contentTypes ?? []}
-						.documentTypesOnly=${true}></umb-input-document-type>
+						.documentTypesOnly=${true}
+						?readonly=${this._isReadOnly}></umb-input-document-type>
 				`;
 			case 'Media':
 				return html`
 					<umb-input-media-type
 						slot="editor"
 						@change=${this.#onTypesChange}
-						.selection=${this._webhook?.contentTypes ?? []}></umb-input-media-type>
+						.selection=${this._webhook?.contentTypes ?? []}
+						?readonly=${this._isReadOnly}></umb-input-media-type>
 				`;
 			default:
 				return nothing;
@@ -112,7 +122,8 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 						label=${this.localize.term('webhooks_url')}
 						.value=${this._webhook.url}
 						slot="editor"
-						required="true"></uui-input>
+						required="true"
+						?readonly=${this._isReadOnly}></uui-input>
 				</umb-property-layout>
 				<umb-property-layout
 					mandatory
@@ -121,7 +132,8 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 					<umb-input-webhook-events
 						@change=${this.#onEventsChange}
 						.events=${this._webhook.events ?? []}
-						slot="editor"></umb-input-webhook-events>
+						slot="editor"
+						?readonly=${this._isReadOnly}></umb-input-webhook-events>
 				</umb-property-layout>
 				${this.#renderContentTypePicker()}
 				<umb-property-layout
@@ -131,6 +143,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 						slot="editor"
 						aria-label=${this.localize.term('webhooks_enabled')}
 						.checked=${this._webhook.enabled}
+						?readonly=${this._isReadOnly}
 						@change=${this.#onEnabledChange}></uui-toggle>
 				</umb-property-layout>
 				<umb-property-layout
@@ -139,7 +152,8 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 					<umb-input-webhook-headers
 						@change=${this.#onHeadersChange}
 						.headers=${this._webhook.headers}
-						slot="editor"></umb-input-webhook-headers>
+						slot="editor"
+						?readonly=${this._isReadOnly}></umb-input-webhook-headers>
 				</umb-property-layout>
 			</uui-box>
 		`;

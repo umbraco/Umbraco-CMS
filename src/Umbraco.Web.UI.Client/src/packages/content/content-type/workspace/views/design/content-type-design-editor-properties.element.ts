@@ -15,6 +15,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import {
@@ -196,10 +197,28 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	@state()
 	private _sortModeActive?: boolean;
 
+	@state()
+	private _isReadOnly = false;
+
 	constructor() {
 		super();
 
 		//this.#sorter.disable();
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(
+				context?.readOnly,
+				(isReadOnly) => {
+					this._isReadOnly = isReadOnly ?? false;
+					if (this._isReadOnly) {
+						this.#sorter.disable();
+					} else {
+						this.#sorter.enable();
+					}
+				},
+				'_observeIsReadOnly',
+			);
+		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
 			this.observe(
@@ -357,7 +376,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					</div>
 
 					${when(
-						!this._sortModeActive,
+						!this._sortModeActive && !this._isReadOnly,
 						() => html`
 							<uui-button
 								id="btn-add"

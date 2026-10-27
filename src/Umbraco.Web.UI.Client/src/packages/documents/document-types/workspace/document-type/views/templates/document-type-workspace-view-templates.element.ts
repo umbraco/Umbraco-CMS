@@ -5,6 +5,7 @@ import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/e
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 // TODO: This is needed to register the <umb-input-template> element, but it should be done in a better way without importing the whole module. [JOV]
 import '@umbraco-cms/backoffice/template';
@@ -22,11 +23,18 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 	@state()
 	private _allowedTemplateIds?: Array<string>;
 
+	@state()
+	private _isReadOnly = false;
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (documentTypeContext) => {
 			this.#workspaceContext = documentTypeContext as UmbDocumentTypeWorkspaceContext;
 			this._observeDocumentType();
+		});
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
 		});
 	}
 
@@ -103,6 +111,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 						<umb-input-template
 							.defaultUnique=${this._defaultTemplateId ?? ''}
 							.selection=${this._allowedTemplateIds}
+							?readonly=${this._isReadOnly}
 							@change=${this.#templateInputChange}>
 						</umb-input-template>
 					</div>

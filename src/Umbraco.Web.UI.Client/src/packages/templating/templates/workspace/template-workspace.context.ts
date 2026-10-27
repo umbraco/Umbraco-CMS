@@ -16,6 +16,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_SETTINGS_SECTION_PATH } from '@umbraco-cms/backoffice/settings';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+
+const PRODUCTION_MODE_READ_ONLY_RULE_UNIQUE = 'UMB_PRODUCTION_MODE';
 
 export class UmbTemplateWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbTemplateDetailModel, UmbTemplateDetailRepository>
@@ -32,11 +35,21 @@ export class UmbTemplateWorkspaceContext
 		(data) => data?.masterTemplate?.unique,
 	);
 
+	#isProductionMode?: boolean;
+
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			workspaceAlias: UMB_TEMPLATE_WORKSPACE_ALIAS,
 			entityType: UMB_TEMPLATE_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS,
+		});
+
+		this.#applyProductionModeReadOnly();
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(context?.isProductionMode, (isProductionMode) => {
+				this.#isProductionMode = isProductionMode;
+				this.#applyProductionModeReadOnly();
+			});
 		});
 
 		this.routes.setRoutes([
@@ -70,6 +83,20 @@ export class UmbTemplateWorkspaceContext
 	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
 		if (!entity?.unique) return UMB_SETTINGS_SECTION_PATH;
 		return UMB_EDIT_TEMPLATE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+	}
+
+	override resetState() {
+		super.resetState();
+		this.#applyProductionModeReadOnly();
+	}
+
+	#applyProductionModeReadOnly() {
+		// Read-only until we confirm it's NOT production mode (safe default).
+		if (this.#isProductionMode === false) {
+			this.readOnlyGuard.removeRule(PRODUCTION_MODE_READ_ONLY_RULE_UNIQUE);
+		} else {
+			this.readOnlyGuard.addRule({ unique: PRODUCTION_MODE_READ_ONLY_RULE_UNIQUE, permitted: true });
+		}
 	}
 
 	override async load(unique: string) {

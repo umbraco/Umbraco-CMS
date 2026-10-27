@@ -10,6 +10,7 @@ import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/back
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 /**
  *  @element umb-content-type-design-editor-property
@@ -85,6 +86,17 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@state()
 	private _dataTypeName?: string;
 
+	@state()
+	private _isReadOnly = false;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), 'observeIsReadOnly');
+		});
+	}
+
 	async #checkInherited() {
 		if (this._propertyStructureHelper && this._property) {
 			// We can first match with something if we have a name [NL]
@@ -154,17 +166,17 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	override render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings: [NL]
-		return this._inherited ? this.#renderInheritedProperty() : this.#renderEditableProperty();
+		return this._inherited || this._isReadOnly ? this.#renderReadOnlyProperty() : this.#renderEditableProperty();
 	}
 
-	#renderInheritedProperty() {
+	#renderReadOnlyProperty() {
 		if (!this.property) return;
 
 		if (this.sortModeActive) {
 			return this.#renderSortableProperty();
 		} else {
 			return html`
-				<div id="header">
+				<div id="header" class="read-only">
 					<p>${this.localize.string(this.property.name)}<i>${this.property.alias}</i></p>
 					<p>${this.property.description ?? ''}</p>
 				</div>
@@ -417,10 +429,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				border-radius: var(--uui-border-radius);
 			}
 
-			:host([_inherited]) {
-				#header {
-					padding: 0 var(--uui-size-3, 9px);
-				}
+			#header.read-only {
+				padding: 0 var(--uui-size-3, 9px);
 			}
 
 			p {

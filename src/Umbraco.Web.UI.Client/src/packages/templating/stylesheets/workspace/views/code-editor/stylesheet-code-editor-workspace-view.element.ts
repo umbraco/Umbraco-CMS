@@ -4,6 +4,7 @@ import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 import '@umbraco-cms/backoffice/code-editor';
 
@@ -12,10 +13,17 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 	@state()
 	private _content?: string | null = '';
 
+	@state()
+	private _isReadOnly = false;
+
 	#stylesheetWorkspaceContext?: UmbStylesheetWorkspaceContext;
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
+			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
+		});
 
 		this.consumeContext(UMB_STYLESHEET_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#stylesheetWorkspaceContext = workspaceContext;
@@ -33,7 +41,7 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html` <uui-box>
+		return html`<uui-box>
 			<div slot="header" id="code-editor-menu-container"></div>
 			${this.#renderCodeEditor()}
 		</uui-box>`;
@@ -49,6 +57,7 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 				id="content"
 				language="css"
 				.code=${this._content ?? ''}
+				?readonly=${this._isReadOnly}
 				@input=${this.#onCodeEditorInput}></umb-code-editor>
 		`;
 	}
