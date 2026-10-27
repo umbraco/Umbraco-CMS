@@ -137,19 +137,19 @@ public static class UmbracoBuilderAuthExtensions
                 {
                     configuration
                         .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessQueryResponse.Descriptor.Order - 1);
+                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessSelfRedirection.Descriptor.Order - 1);
                 });
                 options.AddEventHandler<OpenIddictServerEvents.ExtractTokenRequestContext>(configuration =>
                 {
                     configuration
                         .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractTokenRequestContext>.Descriptor.Order + 1);
+                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractBasicAuthenticationCredentials<OpenIddictServerEvents.ExtractTokenRequestContext>.Descriptor.Order + 1);
                 });
                 options.AddEventHandler<OpenIddictServerEvents.ExtractRevocationRequestContext>(configuration =>
                 {
                     configuration
                         .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractRevocationRequestContext>.Descriptor.Order + 1);
+                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractBasicAuthenticationCredentials<OpenIddictServerEvents.ExtractRevocationRequestContext>.Descriptor.Order + 1);
                 });
             })
 
