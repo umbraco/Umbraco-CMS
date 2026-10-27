@@ -43,12 +43,12 @@ export class UmbMemberProfileDataWorkspaceInfoAppElement extends UmbLitElement {
 			if (allPrimitive) {
 				return value.map((v) => (v === null || v === undefined ? '—' : String(v))).join(', ');
 			}
-			return html`<pre>${JSON.stringify(value, null, 2)}</pre>`;
+			return html`<pre dir="ltr">${JSON.stringify(value, null, 2)}</pre>`;
 		}
 		// Nested object — recurse one level, then fall back to JSON for anything deeper
 		// so the panel stays readable on pathological input.
 		if (depth >= 1) {
-			return html`<pre>${JSON.stringify(value, null, 2)}</pre>`;
+			return html`<pre dir="ltr">${JSON.stringify(value, null, 2)}</pre>`;
 		}
 		const entries = Object.entries(value as Record<string, unknown>);
 		if (entries.length === 0) {
@@ -76,7 +76,7 @@ export class UmbMemberProfileDataWorkspaceInfoAppElement extends UmbLitElement {
 			parsed = JSON.parse(this._profileData);
 		} catch {
 			// Not valid JSON — fall back to the raw string.
-			return html`<pre>${this._profileData}</pre>`;
+			return html`<pre dir="ltr">${this._profileData}</pre>`;
 		}
 
 		// Top-level object: render each property as a label/value row — label left, value right —
@@ -96,7 +96,7 @@ export class UmbMemberProfileDataWorkspaceInfoAppElement extends UmbLitElement {
 			`;
 		}
 
-		return html`<pre>${JSON.stringify(parsed, null, 2)}</pre>`;
+		return html`<pre dir="ltr">${JSON.stringify(parsed, null, 2)}</pre>`;
 	}
 
 	override render() {
