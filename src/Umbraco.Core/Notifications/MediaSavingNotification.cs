@@ -16,6 +16,11 @@ namespace Umbraco.Cms.Core.Notifications;
 public sealed class MediaSavingNotification : SavingNotification<IMedia>
 {
     /// <summary>
+    /// Gets a value indicating whether the notification was published while sorting media.
+    /// </summary>
+    public bool IsSorting { get; internal set; }
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="MediaSavingNotification"/> class with a single media item.
     /// </summary>
     /// <param name="target">The media item being saved.</param>
