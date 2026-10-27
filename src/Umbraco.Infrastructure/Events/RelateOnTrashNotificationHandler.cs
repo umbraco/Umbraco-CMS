@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Globalization;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
@@ -171,6 +170,11 @@ public sealed class RelateOnTrashNotificationHandler :
         where T : ITreeEntity
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        // This runs after the move to the recycle bin has committed, so it is a transaction of its own. The write lock
+        // must be taken before anything is read, otherwise a database that serializes writers (such as SQLite) can
+        // refuse the first write once another connection has committed since this transaction started reading.
+        scope.WriteLock(Constants.Locks.Relations);
 
         IRelationType? relationType = _relationService.GetRelationTypeByAlias(originalParentRelationTypeAlias);
 
