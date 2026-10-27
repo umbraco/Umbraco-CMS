@@ -18,6 +18,7 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
 
     private ConcurrentDictionary<Guid, ISet<string>> _publishedCultures = new();
+    private volatile bool _defaultCultureIsStale;
 
     /// <summary>
     /// Gets or sets the default culture ISO code used when no culture is specified.
@@ -69,17 +70,75 @@ public PublishStatusService(
         }
 
         var newDictionary = new ConcurrentDictionary<Guid, ISet<string>>(publishStatus);
+        _defaultCultureIsStale = false;
         DefaultCulture = await _languageService.GetDefaultIsoCodeAsync();
 
         Interlocked.Exchange(ref _publishedCultures, newDictionary);
     }
 
     /// <inheritdoc/>
+    public async Task RefreshCultureAsync(string culture, CancellationToken cancellationToken)
+    {
+        HashSet<Guid> publishedKeys;
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        {
+            publishedKeys = (await _publishStatusRepository.GetPublishedKeysAsync(culture, cancellationToken)).ToHashSet();
+            scope.Complete();
+        }
+
+        // The cached sets are read concurrently, so they are replaced rather than modified in place.
+        ConcurrentDictionary<Guid, ISet<string>> publishedCultures = Volatile.Read(ref _publishedCultures);
+        foreach (Guid documentKey in publishedKeys)
+        {
+            publishedCultures.AddOrUpdate(
+                documentKey,
+                _ => new HashSet<string> { culture },
+                (_, existing) => existing.Contains(culture, StringComparer.InvariantCultureIgnoreCase)
+                    ? existing
+                    : new HashSet<string>(existing) { culture });
+        }
+
+        foreach ((Guid documentKey, ISet<string> existing) in publishedCultures)
+        {
+            if (publishedKeys.Contains(documentKey) || existing.Contains(culture, StringComparer.InvariantCultureIgnoreCase) is false)
+            {
+                continue;
+            }
+
+            var remaining = existing
+                .Where(x => string.Equals(x, culture, StringComparison.InvariantCultureIgnoreCase) is false)
+                .ToHashSet();
+
+            // A failed swap means the entry was reloaded from the database after the language change, so it is
+            // already correct and is left as it is.
+            if (remaining.Count > 0)
+            {
+                publishedCultures.TryUpdate(documentKey, remaining, existing);
+            }
+            else
+            {
+                publishedCultures.TryRemove(new KeyValuePair<Guid, ISet<string>>(documentKey, existing));
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// The default language is re-read on the next query that needs it, rather than here, so a language change does
+    /// not reload the languages on every server unless a query without a culture is made.
+    /// </remarks>
+    public Task RefreshDefaultCultureAsync(CancellationToken cancellationToken)
+    {
+        _defaultCultureIsStale = true;
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc/>
     public bool IsDocumentPublished(Guid documentKey, string culture)
     {
-        if (string.IsNullOrEmpty(culture) && DefaultCulture is not null)
+        if (string.IsNullOrEmpty(culture) && GetDefaultCulture() is { } defaultCulture)
         {
-            culture = DefaultCulture;
+            culture = defaultCulture;
         }
 
         if (_publishedCultures.TryGetValue(documentKey, out ISet<string>? publishedCultures))
@@ -91,6 +150,17 @@ public PublishStatusService(
 
         _logger.LogDebug("Document {DocumentKey} not found in the publish status cache", documentKey);
         return false;
+    }
+
+    private string? GetDefaultCulture()
+    {
+        if (_defaultCultureIsStale)
+        {
+            _defaultCultureIsStale = false;
+            DefaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        }
+
+        return DefaultCulture;
     }
 
     /// <inheritdoc />
