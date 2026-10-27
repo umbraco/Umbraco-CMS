@@ -155,7 +155,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<div style="margin-bottom:20px; text-align: right;">
+			<div id="header">
 				<span>
 					${when(
 						this._items.length > 0,
@@ -169,7 +169,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 					)}
 				</span>
 			</div>
-			<div class="blockGroup">
+			<div id="items">
 				${when(
 					this._items.length > 0,
 					() =>
@@ -240,7 +240,12 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			.blockGroup {
+			#header {
+				margin-bottom: var(--uui-size-layout-1);
+				text-align: end;
+			}
+
+			#items {
 				display: grid;
 				gap: 1rem;
 				grid-template-columns: repeat(auto-fill, minmax(min(var(--umb-card-medium-min-width), 100%), 1fr));

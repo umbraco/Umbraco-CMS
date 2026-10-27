@@ -146,12 +146,11 @@ export abstract class UmbBlockEntryContext<
 	public readonly settingsElementTypeKey = this._blockType.asObservablePart((x) =>
 		x ? (x.settingsElementTypeKey ?? undefined) : null,
 	);
-	public readonly thumbnail = this._blockType.asObservablePart((x) => x?.thumbnail);
 
 	/**
 	 * Returns the thumbnail path as stored in the block type configuration.
 	 * Use {@link getThumbnailUrl} to get the resolved, client-usable URL.
-	 * @returns {string | undefined}
+	 * @returns {string | undefined} The configured thumbnail path, or undefined when the block type has none.
 	 */
 	public getThumbnail(): string | undefined {
 		return this._blockType.getValue()?.thumbnail;
@@ -160,7 +159,7 @@ export abstract class UmbBlockEntryContext<
 	/**
 	 * Returns the thumbnail as a resolved, client-usable URL.
 	 * Use {@link getThumbnail} to get the raw path instead.
-	 * @returns {{ src: string } | undefined}
+	 * @returns {{ src: string } | undefined} The thumbnail URL, or undefined when the block type has no thumbnail.
 	 */
 	public getThumbnailUrl(): { src: string } | undefined {
 		const rawPath = this.getThumbnail();
