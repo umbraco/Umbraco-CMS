@@ -86,7 +86,7 @@
     <PackageVersion Include="Azure.Identity" Version="1.13.2" />
     <!-- Dazinator.Extensions.FileProviders brings in a vulnerable version of System.Net.Http -->
     <PackageVersion Include="System.Net.Http" Version="4.3.4" />
-    <!-- Examine brings in a vulnerable version of System.Security.Cryptography.Xml -->
+    <!-- Examine and Microsoft.CodeAnalysis.Workspaces.MSBuild bring in a vulnerable version of System.Security.Cryptography.Xml -->
     <PackageVersion Include="System.Security.Cryptography.Xml" Version="8.0.5" />
     <!-- MailKit (via MimeKit) and Microsoft.CodeAnalysis.Workspaces.MSBuild bring in a vulnerable version of System.Security.Cryptography.Pkcs -->
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="8.0.2" />
