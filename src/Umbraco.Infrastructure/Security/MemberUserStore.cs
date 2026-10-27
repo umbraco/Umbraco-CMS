@@ -232,9 +232,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
-            // Load the member before opening the write scope. GetById takes a read lock on the member tree, and holding
-            // it inside the write scope means a full save must convert it to a write lock — concurrent updates each
-            // holding the read lock then deadlock on that conversion (SQL Server).
+            // Read outside the write scope to avoid a read-to-write lock deadlock (see #24309).
             IMember? found = _memberService.GetById(asInt);
 
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
