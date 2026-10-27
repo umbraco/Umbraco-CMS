@@ -138,6 +138,24 @@ public class IndexRebuildJobTests
     }
 
     [Test]
+    public async Task Rebuilds_When_Active_Physical_Index_Did_Not_Exist_At_Startup_But_Exists_When_The_Job_Runs()
+    {
+        var index = new Mock<IIndex>();
+        index.Setup(x => x.IndexExists()).Returns(false);
+        IIndex indexObject = index.Object;
+        _examineManager.Setup(x => x.TryGetIndex(PhysicalIndexName, out indexObject)).Returns(true);
+
+        IndexRebuildJob sut = CreateSut();
+
+        // Indexing a single item during the startup delay creates the physical index without populating it.
+        index.Setup(x => x.IndexExists()).Returns(true);
+
+        await sut.RunJobAsync(CancellationToken.None);
+
+        _contentIndexingService.Verify(x => x.Rebuild(IndexAlias, CurrentOrigin), Times.Once);
+    }
+
+    [Test]
     public async Task Does_Not_Rebuild_When_Not_A_Registered_Examine_Index()
     {
         IIndex? index = null;
