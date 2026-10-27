@@ -10283,6 +10283,7 @@ export type GetImagingResizeUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
         height?: number;
         width?: number;
         mode?: ImageCropModeModel;
@@ -11763,6 +11764,7 @@ export type GetMediaUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/media/urls';
 };
