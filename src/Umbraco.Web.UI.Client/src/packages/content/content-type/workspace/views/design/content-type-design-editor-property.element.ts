@@ -91,34 +91,19 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@state()
 	private _dataTypeName?: string;
 
-	#persistedContentType?: UmbContentTypeDetailModel;
 	#aliasChangeConfirmed = false;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				context?.persistedData,
-				(data) => {
-					this.#persistedContentType = data as UmbContentTypeDetailModel | undefined;
-				},
-				'observePersistedContentType',
-			);
-		});
-	}
-
-	#persistedAlias() {
-		return this.#persistedContentType?.properties?.find((x) => x.unique === this._property?.unique)?.alias;
-	}
 
 	/**
 	 * Only an Element Type keys its property values by alias, so only there does a rename orphan them.
 	 * Confirmed once the alias is left alone, rather than on every keystroke.
 	 */
 	async #confirmAliasChange() {
-		const persistedAlias = this.#persistedAlias();
-		if (this.#persistedContentType?.isElement !== true || persistedAlias === undefined) return;
+		const workspaceContext = await this.getContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT);
+		const persistedContentType = workspaceContext?.getPersistedData() as UmbContentTypeDetailModel | undefined;
+		if (persistedContentType?.isElement !== true) return;
+
+		const persistedAlias = persistedContentType.properties?.find((x) => x.unique === this._property?.unique)?.alias;
+		if (persistedAlias === undefined) return;
 
 		if (persistedAlias === this._property?.alias) {
 			this.#aliasChangeConfirmed = false;

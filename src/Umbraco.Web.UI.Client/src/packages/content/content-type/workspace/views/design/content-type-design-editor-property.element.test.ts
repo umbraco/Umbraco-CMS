@@ -21,8 +21,7 @@ class UmbTestWorkspaceContext {
 	readonly IS_ENTITY_DETAIL_WORKSPACE_CONTEXT = true;
 
 	#host: UmbLitElement;
-	#persisted = new UmbObjectState<UmbContentTypeDetailModel | undefined>(undefined);
-	readonly persistedData = this.#persisted.asObservable();
+	#persisted?: UmbContentTypeDetailModel;
 
 	constructor(host: UmbLitElement) {
 		this.#host = host;
@@ -32,8 +31,12 @@ class UmbTestWorkspaceContext {
 		return this.#host;
 	}
 
+	getPersistedData() {
+		return this.#persisted;
+	}
+
 	setPersisted(data: UmbContentTypeDetailModel | undefined) {
-		this.#persisted.setValue(data);
+		this.#persisted = data;
 	}
 }
 
