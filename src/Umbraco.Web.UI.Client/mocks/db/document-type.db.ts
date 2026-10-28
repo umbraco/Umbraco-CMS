@@ -30,7 +30,7 @@ const defaultConfiguration: DocumentTypeConfigurationResponseModel = {
 };
 
 class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel> {
-	tree = new UmbMockEntityTreeManager<UmbMockDocumentTypeModel>(this, documentTypeTreeItemMapper);
+	tree = new UmbMockEntityTreeManager<UmbMockDocumentTypeModel>(this, (item) => documentTypeTreeItemMapper(item, this));
 	folder = new UmbMockEntityFolderManager<UmbMockDocumentTypeModel>(this, createMockDocumentTypeFolderMapper);
 	item = new UmbMockEntityNamedItemManager<UmbMockDocumentTypeModel>(this, documentTypeItemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockDocumentTypeModel>(
@@ -149,12 +149,15 @@ const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeR
 	};
 };
 
-const documentTypeTreeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTypeTreeItemResponseModel => {
+const documentTypeTreeItemMapper = (
+	item: UmbMockDocumentTypeModel,
+	db: UmbDocumentTypeMockDB,
+): DocumentTypeTreeItemResponseModel => {
 	return {
 		name: item.name,
 		hasChildren: item.hasChildren,
 		id: item.id,
-		parent: item.parent,
+		parent: item.parent ? { id: item.parent.id, isFolder: db.read(item.parent.id)?.isFolder ?? false } : null,
 		isFolder: item.isFolder,
 		icon: item.icon,
 		isElement: item.isElement,

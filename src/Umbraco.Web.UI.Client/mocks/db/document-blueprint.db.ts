@@ -17,7 +17,7 @@ import type {
 type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 export class UmbDocumentBlueprintMockDB extends UmbEntityMockDbBase<UmbMockDocumentBlueprintModel> {
-	tree = new UmbMockEntityTreeManager<UmbMockDocumentBlueprintModel>(this, treeItemMapper);
+	tree = new UmbMockEntityTreeManager<UmbMockDocumentBlueprintModel>(this, (item) => treeItemMapper(item, this));
 	item = new UmbMockEntityItemManager<UmbMockDocumentBlueprintModel>(this, itemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockDocumentBlueprintModel>(
 		this,
@@ -30,7 +30,10 @@ export class UmbDocumentBlueprintMockDB extends UmbEntityMockDbBase<UmbMockDocum
 	}
 }
 
-const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintTreeItemResponseModel => {
+const treeItemMapper = (
+	model: UmbMockDocumentBlueprintModel,
+	db: UmbDocumentBlueprintMockDB,
+): DocumentBlueprintTreeItemResponseModel => {
 	const documentType = umbDocumentTypeMockDb.read(model.documentType.id);
 	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
 
@@ -43,7 +46,7 @@ const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprint
 		id: model.id,
 		isFolder: model.isFolder,
 		name: model.name,
-		parent: model.parent,
+		parent: model.parent ? { id: model.parent.id, isFolder: db.read(model.parent.id)?.isFolder ?? false } : null,
 		flags: model.flags,
 		variants: model.isFolder ? [] : model.variants,
 	};

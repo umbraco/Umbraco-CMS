@@ -105,7 +105,13 @@ import type {
 // Model Type Definitions
 // ============================================================================
 
-export type UmbMockDataTypeModel = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
+/** Mock-only: the stored parent of a folder tree item. Tree responses resolve `isFolder` from the parent record. */
+type UmbMockFolderTreeParent = { parent?: { id: string } | null };
+
+export type UmbMockDataTypeModel = DataTypeResponseModel &
+	Omit<DataTypeTreeItemResponseModel, 'parent'> &
+	DataTypeItemResponseModel &
+	UmbMockFolderTreeParent;
 
 export type UmbMockDictionaryModel = DictionaryItemResponseModel &
 	NamedEntityTreeItemResponseModel &
@@ -123,11 +129,13 @@ export type UmbMockDocumentModel = DocumentResponseModel &
 
 export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
 	DocumentBlueprintItemResponseModel &
-	DocumentBlueprintTreeItemResponseModel;
+	Omit<DocumentBlueprintTreeItemResponseModel, 'parent'> &
+	UmbMockFolderTreeParent;
 
 export type UmbMockDocumentTypeModel = DocumentTypeResponseModel &
-	DocumentTypeTreeItemResponseModel &
-	DocumentTypeItemResponseModel;
+	Omit<DocumentTypeTreeItemResponseModel, 'parent'> &
+	DocumentTypeItemResponseModel &
+	UmbMockFolderTreeParent;
 
 export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseModel;
 
@@ -139,16 +147,18 @@ export type UmbMockMediaModel = MediaResponseModel &
 	};
 
 export type UmbMockMediaTypeModel = MediaTypeResponseModel &
-	MediaTypeTreeItemResponseModel &
-	MediaTypeItemResponseModel;
+	Omit<MediaTypeTreeItemResponseModel, 'parent'> &
+	MediaTypeItemResponseModel &
+	UmbMockFolderTreeParent;
 
 export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
 
 export type UmbMockMemberGroupModel = MemberGroupItemResponseModel;
 
 export type UmbMockMemberTypeModel = MemberTypeResponseModel &
-	MemberTypeTreeItemResponseModel &
-	MemberTypeItemResponseModel & {
+	Omit<MemberTypeTreeItemResponseModel, 'parent'> &
+	MemberTypeItemResponseModel &
+	UmbMockFolderTreeParent & {
 		hasListView: boolean;
 	};
 

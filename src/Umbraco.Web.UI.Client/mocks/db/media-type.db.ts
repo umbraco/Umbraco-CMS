@@ -22,7 +22,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
-	tree = new UmbMockEntityTreeManager<UmbMockMediaTypeModel>(this, mediaTypeTreeItemMapper);
+	tree = new UmbMockEntityTreeManager<UmbMockMediaTypeModel>(this, (item) => mediaTypeTreeItemMapper(item, this));
 	folder = new UmbMockEntityFolderManager<UmbMockMediaTypeModel>(this, createMockMediaTypeFolderMapper);
 	item = new UmbMockEntityNamedItemManager<UmbMockMediaTypeModel>(this, mediaTypeItemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockMediaTypeModel>(
@@ -150,12 +150,15 @@ const mediaTypeDetailMapper = (item: UmbMockMediaTypeModel): MediaTypeResponseMo
 	};
 };
 
-const mediaTypeTreeItemMapper = (item: UmbMockMediaTypeModel): MediaTypeTreeItemResponseModel => {
+const mediaTypeTreeItemMapper = (
+	item: UmbMockMediaTypeModel,
+	db: UmbMediaTypeMockDB,
+): MediaTypeTreeItemResponseModel => {
 	return {
 		name: item.name,
 		hasChildren: item.hasChildren,
 		id: item.id,
-		parent: item.parent,
+		parent: item.parent ? { id: item.parent.id, isFolder: db.read(item.parent.id)?.isFolder ?? false } : null,
 		isFolder: item.isFolder,
 		icon: item.icon,
 		isDeletable: item.isDeletable,
