@@ -144,7 +144,11 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="template_id">Id</umb-localize></strong>
-				<span>${this._mediaUnique}</span>
+				<span
+					><uui-button-copy-text class="opaque" .text=${this._mediaUnique}
+						>${this._mediaUnique}</uui-button-copy-text
+					></span
+				>
 			</div>
 		`;
 	}
@@ -223,6 +227,15 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			uui-ref-node-document-type[readonly] {
 				padding-top: 7px;
 				padding-bottom: 7px;
+			}
+
+			uui-button-copy-text.opaque {
+				text-align: left;
+				--uui-button-content-align: left;
+				--uui-button-padding-top-factor: 0;
+				--uui-button-padding-bottom-factor: 0;
+				--uui-button-padding-left-factor: 0;
+				--uui-button-padding-right-factor: 0;
 			}
 		`,
 	];
