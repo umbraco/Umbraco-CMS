@@ -25,6 +25,11 @@ export interface UmbTreePickerModalData<
 	// TODO: create action should be replaces by entity actions in the pickers. Then we also open up for creating folders, choosing where to place items etc. [MR]
 	createAction?: UmbTreePickerModalCreateActionData<PathPatternParamsType>;
 	startNode?: UmbTreeStartNode;
+	/**
+	 * Multiple nodes to start the tree from. The nodes themselves become the top level of the tree, and are not
+	 * pickable. Takes precedence over `startNode`, and a single node is handled as `startNode`.
+	 */
+	startNodes?: Array<UmbTreeStartNode>;
 	foldersOnly?: boolean;
 }
 
