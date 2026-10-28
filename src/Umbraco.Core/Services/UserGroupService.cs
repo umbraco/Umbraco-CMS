@@ -698,6 +698,20 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return UserGroupOperationStatus.MediaStartNodeKeyNotFound;
         }
 
+        if (userGroup.StartElementId is not null
+            && userGroup.StartElementId is not Constants.System.Root
+            && _entityService.Exists(userGroup.StartElementId.Value, UmbracoObjectTypes.ElementContainer) is false)
+        {
+            return UserGroupOperationStatus.ElementStartNodeKeyNotFound;
+        }
+
+        if (userGroup.StartDocumentBlueprintId is not null
+            && userGroup.StartDocumentBlueprintId is not Constants.System.Root
+            && _entityService.Exists(userGroup.StartDocumentBlueprintId.Value, UmbracoObjectTypes.DocumentBlueprintContainer) is false)
+        {
+            return UserGroupOperationStatus.DocumentBlueprintStartNodeKeyNotFound;
+        }
+
         return UserGroupOperationStatus.Success;
     }
 

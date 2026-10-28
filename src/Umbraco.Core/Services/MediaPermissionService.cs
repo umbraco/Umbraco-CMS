@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -12,18 +13,22 @@ internal sealed class MediaPermissionService : IMediaPermissionService
 {
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
+    private readonly IDataTypeService _dataTypeService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaPermissionService" /> class.
     /// </summary>
     /// <param name="entityService">The entity service.</param>
     /// <param name="appCaches">The application caches.</param>
+    /// <param name="dataTypeService">The data type service.</param>
     public MediaPermissionService(
         IEntityService entityService,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        IDataTypeService dataTypeService)
     {
         _entityService = entityService;
         _appCaches = appCaches;
+        _dataTypeService = dataTypeService;
     }
 
     /// <inheritdoc/>
@@ -102,5 +107,16 @@ internal sealed class MediaPermissionService : IMediaPermissionService
         }
 
         return Task.FromResult<ISet<Guid>>(authorizedKeys);
+    }
+
+    /// <inheritdoc/>
+    public async Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> mediaKeys, Guid? dataTypeKey)
+    {
+        if (dataTypeKey is not null && await _dataTypeService.IsDataTypeIgnoringUserStartNodesAsync(dataTypeKey.Value))
+        {
+            return mediaKeys.ToHashSet();
+        }
+
+        return await FilterAuthorizedAccessAsync(user, mediaKeys);
     }
 }

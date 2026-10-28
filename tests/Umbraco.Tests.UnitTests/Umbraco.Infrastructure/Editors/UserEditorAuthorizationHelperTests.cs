@@ -36,7 +36,7 @@ public class UserEditorAuthorizationHelperTests
             entityService.Object,
             AppCaches.Disabled);
 
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [], [], []);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [], [], [], []);
 
         Assert.IsTrue(result.Success);
     }
@@ -57,7 +57,7 @@ public class UserEditorAuthorizationHelperTests
             entityService.Object,
             AppCaches.Disabled);
 
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [], [], []);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [], [], [], []);
 
         Assert.IsFalse(result.Success);
     }
@@ -78,7 +78,7 @@ public class UserEditorAuthorizationHelperTests
             entityService.Object,
             AppCaches.Disabled);
 
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [], [], ["FunGroup"]);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [], [], [], ["FunGroup"]);
 
         Assert.IsFalse(result.Success);
     }
@@ -99,7 +99,7 @@ public class UserEditorAuthorizationHelperTests
             entityService.Object,
             AppCaches.Disabled);
 
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [], [], ["test"]);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [], [], [], ["test"]);
 
         Assert.IsTrue(result.Success);
     }
@@ -130,7 +130,7 @@ public class UserEditorAuthorizationHelperTests
             entityService.Object,
             AppCaches.Disabled);
 
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [], [], [groupToAdd]);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [], [], [], [groupToAdd]);
 
         return result.Success;
     }
@@ -162,7 +162,7 @@ public class UserEditorAuthorizationHelperTests
             AppCaches.Disabled);
 
         // adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [1234, 5555], [], [], []);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [1234, 5555], [], [], [], []);
 
         Assert.IsTrue(result.Success);
     }
@@ -194,7 +194,7 @@ public class UserEditorAuthorizationHelperTests
             AppCaches.Disabled);
 
         // removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [1234], [], [], []);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [1234], [], [], [], []);
 
         Assert.IsTrue(result.Success);
     }
@@ -226,7 +226,7 @@ public class UserEditorAuthorizationHelperTests
             AppCaches.Disabled);
 
         // adding 1234 but currentUser doesn't have access to it ... nope
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [1234], [], [], []);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [1234], [], [], [], []);
 
         Assert.IsFalse(result.Success);
     }
@@ -258,7 +258,7 @@ public class UserEditorAuthorizationHelperTests
             AppCaches.Disabled);
 
         // adding 5555 which currentUser has access to since it's a child of 9876 ... ok
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [5555], [], [], []);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [5555], [], [], [], []);
 
         Assert.IsTrue(result.Success);
     }
@@ -290,7 +290,7 @@ public class UserEditorAuthorizationHelperTests
             AppCaches.Disabled);
 
         // adding 1234 but currentUser doesn't have access to it ... nope
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [1234], [], []);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [1234], [], [], []);
 
         Assert.IsFalse(result.Success);
     }
@@ -322,7 +322,7 @@ public class UserEditorAuthorizationHelperTests
             AppCaches.Disabled);
 
         // adding 5555 which currentUser has access to since it's a child of 9876 ... ok
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [5555], [], []);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [5555], [], [], []);
 
         Assert.IsTrue(result.Success);
     }
@@ -354,7 +354,7 @@ public class UserEditorAuthorizationHelperTests
             AppCaches.Disabled);
 
         // adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [1234, 5555], [], []);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [1234, 5555], [], [], []);
 
         Assert.IsTrue(result.Success);
     }
@@ -386,7 +386,7 @@ public class UserEditorAuthorizationHelperTests
             AppCaches.Disabled);
 
         // removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
-        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [1234], [], []);
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [1234], [], [], []);
 
         Assert.IsTrue(result.Success);
     }
@@ -402,6 +402,7 @@ public class UserEditorAuthorizationHelperTests
         var result = authHelper.IsAuthorized(
             currentUser,
             savingUser,
+            [],
             [],
             [],
             [1234],
@@ -423,6 +424,7 @@ public class UserEditorAuthorizationHelperTests
             savingUser,
             [],
             [],
+            [],
             [5555],
             []);
 
@@ -440,6 +442,7 @@ public class UserEditorAuthorizationHelperTests
         var result = authHelper.IsAuthorized(
             currentUser,
             savingUser,
+            [],
             [],
             [],
             [1234, 5555],
@@ -461,6 +464,7 @@ public class UserEditorAuthorizationHelperTests
             savingUser,
             [],
             [],
+            [],
             [5555, 1234],
             []);
 
@@ -478,6 +482,7 @@ public class UserEditorAuthorizationHelperTests
         var result = authHelper.IsAuthorized(
             currentUser,
             savingUser,
+            [],
             [],
             [],
             [Constants.System.Root],
@@ -499,6 +504,7 @@ public class UserEditorAuthorizationHelperTests
             savingUser,
             [],
             [],
+            [],
             [Constants.System.Root],
             []);
 
@@ -516,6 +522,7 @@ public class UserEditorAuthorizationHelperTests
         var result = authHelper.IsAuthorized(
             currentUser,
             savingUser,
+            [],
             [],
             [],
             [1234],
@@ -545,15 +552,130 @@ public class UserEditorAuthorizationHelperTests
             AppCaches.Disabled);
     }
 
+    [Test]
+    public void Cannot_Add_Root_Content_Start_Node_On_User_Without_Root_Access()
+    {
+        var currentUser = CreateUser(startContentIds: [9876]);
+        var savingUser = CreateUser();
+
+        var authHelper = CreateRootAccessAuthorizationHelper();
+
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [Constants.System.Root], [], [], [], []);
+
+        Assert.IsFalse(result.Success);
+    }
+
+    [Test]
+    public void Cannot_Add_Root_Media_Start_Node_On_User_Without_Root_Access()
+    {
+        var currentUser = CreateUser(startMediaIds: [9876]);
+        var savingUser = CreateUser();
+
+        var authHelper = CreateRootAccessAuthorizationHelper();
+
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [Constants.System.Root], [], [], []);
+
+        Assert.IsFalse(result.Success);
+    }
+
+    [Test]
+    public void Can_Add_Root_Start_Nodes_On_User_With_Root_Access()
+    {
+        var currentUser = CreateUser(startContentIds: [Constants.System.Root], startMediaIds: [Constants.System.Root]);
+        var savingUser = CreateUser();
+
+        var authHelper = CreateRootAccessAuthorizationHelper();
+
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [Constants.System.Root], [Constants.System.Root], [], [], []);
+
+        Assert.IsTrue(result.Success);
+    }
+
+    private static UserEditorAuthorizationHelper CreateRootAccessAuthorizationHelper()
+    {
+        var nodePaths = new Dictionary<int, string>
+        {
+            { Constants.System.Root, Constants.System.RootString }, { 9876, "-1,9876" },
+        };
+
+        var entityService = new Mock<IEntityService>();
+        entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+            .Returns((UmbracoObjectTypes objType, int[] ids) =>
+                ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x }));
+
+        return new UserEditorAuthorizationHelper(
+            Mock.Of<IContentService>(),
+            Mock.Of<IMediaService>(),
+            entityService.Object,
+            AppCaches.Disabled);
+    }
+
+    [TestCase(new[] { 9876 }, new int[0], new[] { 1234 }, ExpectedResult = false)]
+    [TestCase(new[] { 9876 }, new int[0], new[] { 5555 }, ExpectedResult = true)]
+    [TestCase(new[] { 9876 }, new[] { 1234 }, new[] { 1234, 5555 }, ExpectedResult = true)]
+    [TestCase(new[] { 9876 }, new[] { 5555 }, new[] { 5555, 1234 }, ExpectedResult = false)]
+    [TestCase(new[] { 9876 }, new[] { 1234, 4567 }, new[] { 1234 }, ExpectedResult = true)]
+    [TestCase(new[] { 9876 }, new[] { 5555 }, new[] { Constants.System.Root }, ExpectedResult = false)]
+    [TestCase(new[] { Constants.System.Root }, new[] { 5555 }, new[] { Constants.System.Root }, ExpectedResult = true)]
+    [TestCase(new[] { 9876 }, new int[0], new[] { 7777 }, ExpectedResult = false)]
+    public bool Can_Only_Add_Element_Start_Nodes_You_Have_Access_To_Yourself(
+        int[] currentUserStartElementIds,
+        int[] savingUserStartElementIds,
+        int[] startElementIds)
+    {
+        var currentUser = CreateUser(startElementIds: currentUserStartElementIds);
+        var savingUser = CreateUser(startElementIds: savingUserStartElementIds);
+
+        var result = CreateElementAuthHelper().IsAuthorized(
+            currentUser,
+            savingUser,
+            [],
+            [],
+            startElementIds,
+            [],
+            []);
+
+        return result.Success;
+    }
+
+    private static UserEditorAuthorizationHelper CreateElementAuthHelper()
+    {
+        var nodePaths = new Dictionary<int, string>
+        {
+            { 1234, "-1,1234" },
+            { 9876, "-1,9876" },
+            { 5555, "-1,9876,5555" },
+            { 4567, "-1,4567" },
+            { 7777, $"-1,{Constants.System.RecycleBinElement},9876,7777" },
+        };
+
+        var entityService = new Mock<IEntityService>();
+        entityService.Setup(service => service.GetAllPaths(UmbracoObjectTypes.ElementContainer, It.IsAny<int[]>()))
+            .Returns((UmbracoObjectTypes objType, int[] ids) =>
+                ids.Where(nodePaths.ContainsKey).Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x }));
+        entityService.Setup(service => service.Get(It.IsAny<int>(), UmbracoObjectTypes.ElementContainer))
+            .Returns((int id, UmbracoObjectTypes objType) => nodePaths.ContainsKey(id)
+                ? Mock.Of<IEntitySlim>(entity => entity.Id == id && entity.Path == nodePaths[id])
+                : null);
+
+        return new UserEditorAuthorizationHelper(
+            Mock.Of<IContentService>(),
+            Mock.Of<IMediaService>(),
+            entityService.Object,
+            AppCaches.Disabled);
+    }
+
     private static User CreateUser(
         bool withGroup = false,
         int[]? startContentIds = null,
         int[]? startMediaIds = null,
+        int[]? startElementIds = null,
         int[]? startDocumentBlueprintIds = null)
     {
         var builder = new UserBuilder()
             .WithStartContentIds(startContentIds ?? [])
             .WithStartMediaIds(startMediaIds ?? [])
+            .WithStartElementIds(startElementIds ?? [])
             .WithStartDocumentBlueprintIds(startDocumentBlueprintIds ?? []);
         if (withGroup)
         {
