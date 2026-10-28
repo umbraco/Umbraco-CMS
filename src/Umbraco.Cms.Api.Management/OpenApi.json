@@ -42971,10 +42971,11 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
+                "$ref": "#/components/schemas/FolderTreeItemParentReferenceModel"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           },
           "flags": {
             "type": "array",
@@ -43451,10 +43452,11 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
+                "$ref": "#/components/schemas/FolderTreeItemParentReferenceModel"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           },
           "flags": {
             "type": "array",
@@ -44596,10 +44598,11 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
+                "$ref": "#/components/schemas/FolderTreeItemParentReferenceModel"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           },
           "flags": {
             "type": "array",
@@ -45337,6 +45340,23 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FolderTreeItemParentReferenceModel": {
+        "required": [
+          "id",
+          "isFolder"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isFolder": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -47058,10 +47078,11 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
+                "$ref": "#/components/schemas/FolderTreeItemParentReferenceModel"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           },
           "flags": {
             "type": "array",
@@ -47910,10 +47931,11 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
+                "$ref": "#/components/schemas/FolderTreeItemParentReferenceModel"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           },
           "flags": {
             "type": "array",

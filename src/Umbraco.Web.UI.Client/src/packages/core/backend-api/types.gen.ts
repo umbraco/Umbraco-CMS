@@ -593,7 +593,7 @@ export type DataTypeSchemaResponseModel = {
 export type DataTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent?: ReferenceByIdModel | null;
+    parent?: FolderTreeItemParentReferenceModel | null;
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
@@ -701,7 +701,7 @@ export type DocumentBlueprintResponseModel = {
 export type DocumentBlueprintTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent?: ReferenceByIdModel | null;
+    parent?: FolderTreeItemParentReferenceModel | null;
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
@@ -927,7 +927,7 @@ export type DocumentTypeSortModel = {
 export type DocumentTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent?: ReferenceByIdModel | null;
+    parent?: FolderTreeItemParentReferenceModel | null;
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
@@ -1112,6 +1112,11 @@ export type FlagModel = {
 export type FolderResponseModel = {
     name: string;
     id: string;
+};
+
+export type FolderTreeItemParentReferenceModel = {
+    id: string;
+    isFolder: boolean;
 };
 
 export type HealthCheckActionRequestModel = {
@@ -1514,7 +1519,7 @@ export type MediaTypeSortModel = {
 export type MediaTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent?: ReferenceByIdModel | null;
+    parent?: FolderTreeItemParentReferenceModel | null;
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
@@ -1707,7 +1712,7 @@ export type MemberTypeResponseModel = {
 export type MemberTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent?: ReferenceByIdModel | null;
+    parent?: FolderTreeItemParentReferenceModel | null;
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
@@ -3316,6 +3321,16 @@ export type DataTypeSchemaResponseModelWritable = {
     } | null;
 };
 
+export type DataTypeTreeItemResponseModelWritable = {
+    hasChildren: boolean;
+    id: string;
+    flags: Array<FlagModel>;
+    name: string;
+    isFolder: boolean;
+    editorUiAlias?: string | null;
+    isDeletable: boolean;
+};
+
 export type DocumentBlueprintResponseModelWritable = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModelWritable>;
@@ -3327,7 +3342,6 @@ export type DocumentBlueprintResponseModelWritable = {
 export type DocumentBlueprintTreeItemResponseModelWritable = {
     hasChildren: boolean;
     id: string;
-    parent?: ReferenceByIdModel | null;
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
@@ -3403,6 +3417,16 @@ export type DocumentTreeItemResponseModelWritable = {
     variants: Array<DocumentVariantItemResponseModelWritable>;
 };
 
+export type DocumentTypeTreeItemResponseModelWritable = {
+    hasChildren: boolean;
+    id: string;
+    flags: Array<FlagModel>;
+    name: string;
+    isFolder: boolean;
+    isElement: boolean;
+    icon: string;
+};
+
 export type DocumentVariantItemResponseModelWritable = {
     name: string;
     culture?: string | null;
@@ -3446,6 +3470,25 @@ export type JsonNodeWritable = {
     [key: string]: never;
 };
 
+export type MediaTypeTreeItemResponseModelWritable = {
+    hasChildren: boolean;
+    id: string;
+    flags: Array<FlagModel>;
+    name: string;
+    isFolder: boolean;
+    icon: string;
+    isDeletable: boolean;
+};
+
+export type MemberTypeTreeItemResponseModelWritable = {
+    hasChildren: boolean;
+    id: string;
+    flags: Array<FlagModel>;
+    name: string;
+    isFolder: boolean;
+    icon: string;
+};
+
 export type PackageDefinitionResponseModelWritable = {
     name: string;
     contentNodeId?: string | null;
@@ -3462,6 +3505,11 @@ export type PackageDefinitionResponseModelWritable = {
     languages: Array<string>;
     dictionaryItems: Array<string>;
     id: string;
+};
+
+export type PagedDataTypeTreeItemResponseModelWritable = {
+    total: number;
+    items: Array<DataTypeTreeItemResponseModelWritable>;
 };
 
 export type PagedDocumentBlueprintTreeItemResponseModelWritable = {
@@ -3484,9 +3532,24 @@ export type PagedDocumentTreeItemResponseModelWritable = {
     items: Array<DocumentTreeItemResponseModelWritable>;
 };
 
+export type PagedDocumentTypeTreeItemResponseModelWritable = {
+    total: number;
+    items: Array<DocumentTypeTreeItemResponseModelWritable>;
+};
+
 export type PagedIReferenceResponseModelWritable = {
     total: number;
     items: Array<DefaultReferenceResponseModel | DocumentReferenceResponseModelWritable | DocumentTypePropertyTypeReferenceResponseModel | MediaReferenceResponseModel | MediaTypePropertyTypeReferenceResponseModel | MemberReferenceResponseModel | MemberTypePropertyTypeReferenceResponseModel>;
+};
+
+export type PagedMediaTypeTreeItemResponseModelWritable = {
+    total: number;
+    items: Array<MediaTypeTreeItemResponseModelWritable>;
+};
+
+export type PagedMemberTypeTreeItemResponseModelWritable = {
+    total: number;
+    items: Array<MemberTypeTreeItemResponseModelWritable>;
 };
 
 export type PagedModelDocumentItemResponseModelWritable = {
@@ -3530,6 +3593,12 @@ export type SearchResultResponseModelWritable = {
     fields: Array<FieldPresentationModel>;
 };
 
+export type SubsetDataTypeTreeItemResponseModelWritable = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DataTypeTreeItemResponseModelWritable>;
+};
+
 export type SubsetDocumentBlueprintTreeItemResponseModelWritable = {
     totalBefore: number;
     totalAfter: number;
@@ -3546,6 +3615,24 @@ export type SubsetDocumentTreeItemResponseModelWritable = {
     totalBefore: number;
     totalAfter: number;
     items: Array<DocumentTreeItemResponseModelWritable>;
+};
+
+export type SubsetDocumentTypeTreeItemResponseModelWritable = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentTypeTreeItemResponseModelWritable>;
+};
+
+export type SubsetMediaTypeTreeItemResponseModelWritable = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<MediaTypeTreeItemResponseModelWritable>;
+};
+
+export type SubsetMemberTypeTreeItemResponseModelWritable = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<MemberTypeTreeItemResponseModelWritable>;
 };
 
 export type UpdatePackageRequestModelWritable = {
