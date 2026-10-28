@@ -21,7 +21,7 @@ public class RecycleBinMediaProtectionHelperTests
         // Arrange
         var deletedFiles = new ConcurrentBag<string>();
         var fileSystemMock = new Mock<IFileSystem>();
-        fileSystemMock.Setup(fs => fs.FileExists(It.IsAny<string>())).Returns(true);
+        fileSystemMock.Setup(fs => fs.FileExists("media/test/image.deleted.jpg")).Returns(true);
         fileSystemMock
             .Setup(fs => fs.DeleteFile(It.IsAny<string>()))
             .Callback<string>(deletedFiles.Add);
@@ -40,6 +40,61 @@ public class RecycleBinMediaProtectionHelperTests
         // Assert
         Assert.That(deletedFiles, Has.Count.EqualTo(1));
         Assert.That(deletedFiles.Single(), Is.EqualTo("media/test/image.deleted.jpg"));
+    }
+
+    [Test]
+    public void DeleteContainedFilesWithProtection_WithTrashedMediaWithoutSuffixOnDisk_DeletesFileAtOriginalPath()
+    {
+        // Arrange: media trashed while protection was disabled keeps its original file name.
+        var deletedFiles = new ConcurrentBag<string>();
+        var fileSystemMock = new Mock<IFileSystem>();
+        fileSystemMock.Setup(fs => fs.FileExists("media/test/image.jpg")).Returns(true);
+        fileSystemMock
+            .Setup(fs => fs.DeleteFile(It.IsAny<string>()))
+            .Callback<string>(deletedFiles.Add);
+
+        var mediaFileManager = CreateMediaFileManager(fileSystemMock.Object);
+
+        var trashedMedia = new List<IMedia> { CreateMedia(trashed: true) };
+        static IEnumerable<string> ContainedFilePaths(IEnumerable<IMedia> _) => ["media/test/image.jpg"];
+
+        // Act
+        RecycleBinMediaProtectionHelper.DeleteContainedFilesWithProtection(
+            trashedMedia,
+            ContainedFilePaths,
+            mediaFileManager);
+
+        // Assert
+        Assert.That(deletedFiles, Has.Count.EqualTo(1));
+        Assert.That(deletedFiles.Single(), Is.EqualTo("media/test/image.jpg"));
+    }
+
+    [Test]
+    public void DeleteContainedFilesWithProtection_WithTrashedMediaOnBothPaths_DeletesBoth()
+    {
+        // Arrange: a rename that copied the file but could not delete the original leaves it at both paths.
+        var deletedFiles = new ConcurrentBag<string>();
+        var fileSystemMock = new Mock<IFileSystem>();
+        fileSystemMock.Setup(fs => fs.FileExists(It.IsAny<string>())).Returns(true);
+        fileSystemMock
+            .Setup(fs => fs.DeleteFile(It.IsAny<string>()))
+            .Callback<string>(deletedFiles.Add);
+
+        var mediaFileManager = CreateMediaFileManager(fileSystemMock.Object);
+
+        var trashedMedia = new List<IMedia> { CreateMedia(trashed: true) };
+        static IEnumerable<string> ContainedFilePaths(IEnumerable<IMedia> _) => ["media/test/image.jpg"];
+
+        // Act
+        RecycleBinMediaProtectionHelper.DeleteContainedFilesWithProtection(
+            trashedMedia,
+            ContainedFilePaths,
+            mediaFileManager);
+
+        // Assert
+        Assert.That(deletedFiles, Has.Count.EqualTo(2));
+        Assert.That(deletedFiles, Does.Contain("media/test/image.deleted.jpg"));
+        Assert.That(deletedFiles, Does.Contain("media/test/image.jpg"));
     }
 
     [Test]
@@ -75,7 +130,8 @@ public class RecycleBinMediaProtectionHelperTests
         // Arrange
         var deletedFiles = new ConcurrentBag<string>();
         var fileSystemMock = new Mock<IFileSystem>();
-        fileSystemMock.Setup(fs => fs.FileExists(It.IsAny<string>())).Returns(true);
+        fileSystemMock.Setup(fs => fs.FileExists("media/trashed/image.deleted.jpg")).Returns(true);
+        fileSystemMock.Setup(fs => fs.FileExists("media/normal/image.jpg")).Returns(true);
         fileSystemMock
             .Setup(fs => fs.DeleteFile(It.IsAny<string>()))
             .Callback<string>(deletedFiles.Add);
@@ -133,7 +189,7 @@ public class RecycleBinMediaProtectionHelperTests
         // Arrange
         var deletedFiles = new ConcurrentBag<string>();
         var fileSystemMock = new Mock<IFileSystem>();
-        fileSystemMock.Setup(fs => fs.FileExists(It.IsAny<string>())).Returns(true);
+        fileSystemMock.Setup(fs => fs.FileExists(It.Is<string>(path => path.Contains(".deleted.")))).Returns(true);
         fileSystemMock
             .Setup(fs => fs.DeleteFile(It.IsAny<string>()))
             .Callback<string>(deletedFiles.Add);

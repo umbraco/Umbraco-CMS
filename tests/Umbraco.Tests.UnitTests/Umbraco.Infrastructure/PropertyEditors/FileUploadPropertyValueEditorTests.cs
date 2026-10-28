@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.IO.MediaPathSchemes;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
@@ -88,6 +89,49 @@ public class FileUploadPropertyValueEditorTests
 
         fileSystem.Verify(x => x.DeleteFile(It.IsAny<string>()), Times.Never);
     }
+
+    [Test]
+    public void Posted_Source_That_Is_Not_A_Valid_File_Location_Is_Not_Stored()
+    {
+        FileUploadPropertyValueEditor editor = CreateEditor(out _, out _);
+        const string currentValue = "/media/abc123/image.jpg";
+        const string tamperedSource = "@attacker.example.com/media/x.jpg\" ><script src=https://attacker.example.com/x.js></script>.svg";
+
+        var result = editor.FromEditor(
+            new ContentPropertyData(SerializeSource(tamperedSource), null) { ContentKey = EditingItem, PropertyTypeKey = PropertyType },
+            currentValue);
+
+        Assert.AreEqual(currentValue, result);
+    }
+
+    [Test]
+    public void Posted_Source_That_Is_A_Valid_File_Location_Is_Stored()
+    {
+        FileUploadPropertyValueEditor editor = CreateEditor(out _, out _);
+        const string postedSource = "/media/def456/image.jpg";
+
+        var result = editor.FromEditor(
+            new ContentPropertyData(SerializeSource(postedSource), null) { ContentKey = EditingItem, PropertyTypeKey = PropertyType },
+            null);
+
+        Assert.AreEqual(postedSource, result);
+    }
+
+    [Test]
+    public void Posted_Source_Matching_The_Stored_Value_Is_Stored_Even_When_Not_Well_Formed()
+    {
+        FileUploadPropertyValueEditor editor = CreateEditor(out _, out _);
+        const string legacyValue = "media/1234/legacy image.jpg";
+
+        var result = editor.FromEditor(
+            new ContentPropertyData(SerializeSource(legacyValue), null) { ContentKey = EditingItem, PropertyTypeKey = PropertyType },
+            legacyValue);
+
+        Assert.AreEqual(legacyValue, result);
+    }
+
+    private static string SerializeSource(string source)
+        => new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()).Serialize(new FileUploadValue { Src = source });
 
     private static FileUploadPropertyValueEditor CreateEditor(out Mock<IFileSystem> fileSystem, out MediaFileManager manager)
     {

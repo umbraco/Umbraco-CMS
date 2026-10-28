@@ -42,7 +42,7 @@ public class DocumentPropertyCacheLevelTests : PropertyCacheLevelTestsBase
     [TestCase(PropertyCacheLevel.Element, false, 1, 1)]
     [TestCase(PropertyCacheLevel.Element, true, 2, 2)]
     [TestCase(PropertyCacheLevel.Elements, false, 1, 1)]
-    [TestCase(PropertyCacheLevel.Elements, true, 1, 1)]
+    [TestCase(PropertyCacheLevel.Elements, true, 2, 2)]
     public async Task Property_Value_Conversion_Respects_Property_Cache_Level(PropertyCacheLevel cacheLevel, bool preview, int expectedSourceConverts, int expectedInterConverts)
     {
         PropertyValueLevelDetectionTestsConverter.SetCacheLevel(cacheLevel);
