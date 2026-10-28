@@ -89,4 +89,16 @@ describe('UmbSortableListElement', () => {
 		);
 		expect(custom.identifier).to.equal('Umb.SorterIdentifier.Test');
 	});
+
+	it('applies the shared text styles to the rendered items', async () => {
+		const container = await fixture<HTMLDivElement>(html`<div dir="rtl"><umb-sortable-list></umb-sortable-list></div>`);
+		const list = container.querySelector<UmbSortableListElement<string>>('umb-sortable-list')!;
+		list.getUnique = getUnique;
+		list.renderMethod = (item) =>
+			html`<umb-sortable-list-item .unique=${item}><code>${item}</code></umb-sortable-list-item>`;
+		list.items = ['@RenderBody()'];
+		await list.updateComplete;
+
+		expect(getComputedStyle(list.shadowRoot!.querySelector('code')!).direction).to.equal('ltr');
+	});
 });

@@ -4,6 +4,7 @@ import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { css, customElement, html, nothing, property, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -141,6 +142,7 @@ export class UmbSortableListElement<T = unknown> extends UmbLitElement {
 	}
 
 	static override readonly styles = [
+		UmbTextStyles,
 		UUIBlinkKeyframes,
 		css`
 			:host {

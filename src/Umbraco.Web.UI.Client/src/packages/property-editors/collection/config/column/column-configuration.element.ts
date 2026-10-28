@@ -4,7 +4,6 @@ import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -160,7 +159,6 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			umb-sortable-list {
 				display: block;
