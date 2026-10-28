@@ -116,7 +116,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             Schedules = schedules,
         };
 
-        return await PublishAsync(key, cultureAndSchedule, userKey);
+        return await ContentWriteGate.Shared.RunAsync(() => PublishAsync(key, cultureAndSchedule, userKey));
     }
 
     /// <inheritdoc />
