@@ -28,6 +28,11 @@ public class Link
     public Udi? Udi { get; set; }
 
     /// <summary>
+    ///     Gets or sets the published content or media item the link points to, or <c>null</c> for external links.
+    /// </summary>
+    public IPublishedContent? Content { get; set; }
+
+    /// <summary>
     ///     Gets or sets the URL of the link.
     /// </summary>
     public string? Url { get; set; }
