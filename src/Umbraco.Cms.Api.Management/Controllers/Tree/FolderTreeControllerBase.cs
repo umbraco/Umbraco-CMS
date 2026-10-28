@@ -84,6 +84,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         Attempt<Guid> getKeyAttempt = EntityService.GetKey(entity.ParentId, ItemObjectType);
         if (getKeyAttempt.Success)
         {
+            _isFolderById[entity.ParentId] = false;
             return getKeyAttempt.Result;
         }
 
@@ -91,6 +92,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         getKeyAttempt = EntityService.GetKey(entity.ParentId, FolderObjectType);
         if (getKeyAttempt.Success)
         {
+            _isFolderById[entity.ParentId] = true;
             return getKeyAttempt.Result;
         }
 
@@ -183,7 +185,13 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             ancestors = ancestors.Append(entity);
         }
 
-        return Task.FromResult(ancestors.OrderBy(item => item.Level).ToArray());
+        IEntitySlim[] orderedAncestors = ancestors.OrderBy(item => item.Level).ToArray();
+        foreach (IEntitySlim ancestor in orderedAncestors)
+        {
+            _isFolderById[ancestor.Id] = ancestor.NodeObjectType == _folderObjectTypeId;
+        }
+
+        return Task.FromResult(orderedAncestors);
     }
 
     private IEntitySlim[] GetEntities(Guid? parentKey, int skip, int take, out long totalItems)
@@ -244,6 +252,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             Attempt<Guid> getKeyAttempt = IdKeyMap.GetKeyForId(entity.ParentId, FolderObjectType);
             if (getKeyAttempt.Success)
             {
+                _isFolderById[entity.ParentId] = true;
                 return getKeyAttempt.Result;
             }
         }
@@ -251,6 +260,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         Attempt<Guid> itemKeyAttempt = IdKeyMap.GetKeyForId(entity.ParentId, ItemObjectType);
         if (itemKeyAttempt.Success)
         {
+            _isFolderById[entity.ParentId] = false;
             return itemKeyAttempt.Result;
         }
 
