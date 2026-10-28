@@ -142,9 +142,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
 
         if (viewModel.Parent is not null)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
             viewModel.ParentIsFolder = IsFolder(entity.ParentId);
-#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         return viewModel;

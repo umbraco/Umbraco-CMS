@@ -73,7 +73,12 @@ public class DocumentTypeTreeParentTests : ManagementApiTest<ChildrenDocumentTyp
     {
         JsonNode root = await GetAsync<RootDocumentTypeTreeController>(x => x.Root(CancellationToken.None, 0, 100, false));
 
-        Assert.IsNull(FindItem(root["items"]!, _atRootKey)["parent"]);
+        JsonNode item = FindItem(root["items"]!, _atRootKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsNull(item["parent"]);
+            Assert.AreEqual(false, item["parentIsFolder"]?.GetValue<bool>());
+        });
     }
 
     [Test]
@@ -140,8 +145,7 @@ public class DocumentTypeTreeParentTests : ManagementApiTest<ChildrenDocumentTyp
         Assert.Multiple(() =>
         {
             Assert.AreEqual(expectedId, parent!["id"]!.GetValue<Guid>());
-            Assert.AreEqual(expectedIsFolder, parent["isFolder"]?.GetValue<bool>());
-            Assert.IsNull(item["parentIsFolder"]);
+            Assert.AreEqual(expectedIsFolder, item["parentIsFolder"]?.GetValue<bool>());
         });
     }
 }

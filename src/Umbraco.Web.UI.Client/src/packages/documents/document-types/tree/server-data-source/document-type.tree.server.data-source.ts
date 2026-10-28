@@ -61,7 +61,7 @@ export class UmbDocumentTypeTreeServerDataSource
 			parent: {
 				unique: item.parent ? item.parent.id : null,
 				entityType: item.parent
-					? item.parent.isFolder
+					? item.parentIsFolder
 						? UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE
 						: UMB_DOCUMENT_TYPE_ENTITY_TYPE
 					: UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,

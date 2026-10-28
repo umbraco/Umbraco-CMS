@@ -42957,7 +42957,8 @@
           "id",
           "isDeletable",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -42971,11 +42972,10 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/FolderTreeItemParentReferenceModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "flags": {
             "type": "array",
@@ -42991,6 +42991,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "editorUiAlias": {
@@ -43438,6 +43441,7 @@
           "id",
           "isFolder",
           "name",
+          "parentIsFolder",
           "variants"
         ],
         "type": "object",
@@ -43452,11 +43456,10 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/FolderTreeItemParentReferenceModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "flags": {
             "type": "array",
@@ -43472,6 +43475,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "documentType": {
@@ -44584,7 +44590,8 @@
           "id",
           "isElement",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -44598,11 +44605,10 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/FolderTreeItemParentReferenceModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "flags": {
             "type": "array",
@@ -44618,6 +44624,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "isElement": {
@@ -45340,23 +45349,6 @@
           "id": {
             "type": "string",
             "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
-      "FolderTreeItemParentReferenceModel": {
-        "required": [
-          "id",
-          "isFolder"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isFolder": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -47064,7 +47056,8 @@
           "id",
           "isDeletable",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -47078,11 +47071,10 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/FolderTreeItemParentReferenceModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "flags": {
             "type": "array",
@@ -47098,6 +47090,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "icon": {
@@ -47917,7 +47912,8 @@
           "icon",
           "id",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -47931,11 +47927,10 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/FolderTreeItemParentReferenceModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "flags": {
             "type": "array",
@@ -47951,6 +47946,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "icon": {

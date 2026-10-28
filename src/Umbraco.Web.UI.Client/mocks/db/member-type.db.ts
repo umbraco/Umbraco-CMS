@@ -73,7 +73,8 @@ const memberTypeTreeItemMapper = (item: UmbMockMemberTypeModel, db: UmbMemberTyp
 		name: item.name,
 		hasChildren: item.hasChildren,
 		id: item.id,
-		parent: item.parent ? { id: item.parent.id, isFolder: db.read(item.parent.id)?.isFolder ?? false } : null,
+		parent: item.parent,
+		parentIsFolder: item.parent ? (db.read(item.parent.id)?.isFolder ?? false) : false,
 		isFolder: false,
 		icon: item.icon,
 	};

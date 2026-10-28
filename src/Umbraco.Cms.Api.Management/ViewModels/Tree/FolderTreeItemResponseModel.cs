@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 /// <summary>
@@ -15,18 +13,9 @@ public class FolderTreeItemResponseModel : NamedEntityTreeItemResponseModel
     /// <summary>
     /// Gets or sets a value indicating whether the parent of this item is a folder.
     /// </summary>
-    [JsonIgnore]
-    [Obsolete("This property is temporary. Parent will become settable including whether it is a folder. Scheduled for removal in Umbraco 21.")]
+    /// <remarks>
+    /// Always <c>false</c> when the item has no parent.
+    /// </remarks>
+    // TODO (V20): Consider exposing this as Parent.IsFolder. This requires EntityTreeItemResponseModel.Parent to support a folder-aware reference type.
     public bool ParentIsFolder { get; set; }
-
-    /// <summary>
-    /// Gets a reference to the parent, including whether it is a folder, or <c>null</c> if there is no parent.
-    /// </summary>
-    // TODO (V21): Replace with a plain settable Parent of this type and remove ParentIsFolder.
-    public new FolderTreeItemParentReferenceModel? Parent
-        => base.Parent is null
-            ? null
-#pragma warning disable CS0618 // Type or member is obsolete
-            : new FolderTreeItemParentReferenceModel { Id = base.Parent.Id, IsFolder = ParentIsFolder };
-#pragma warning restore CS0618 // Type or member is obsolete
 }

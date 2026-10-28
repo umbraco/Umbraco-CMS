@@ -46,7 +46,8 @@ const treeItemMapper = (
 		id: model.id,
 		isFolder: model.isFolder,
 		name: model.name,
-		parent: model.parent ? { id: model.parent.id, isFolder: db.read(model.parent.id)?.isFolder ?? false } : null,
+		parent: model.parent,
+		parentIsFolder: model.parent ? (db.read(model.parent.id)?.isFolder ?? false) : false,
 		flags: model.flags,
 		variants: model.isFolder ? [] : model.variants,
 	};

@@ -64,7 +64,7 @@ export class UmbDocumentBlueprintTreeServerDataSource
 			parent: {
 				unique: item.parent ? item.parent.id : null,
 				entityType: item.parent
-					? item.parent.isFolder
+					? item.parentIsFolder
 						? UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE
 						: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE
 					: UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
