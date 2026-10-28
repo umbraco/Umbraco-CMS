@@ -152,4 +152,23 @@ describe('UmbMediaCollectionElement', () => {
 		expect(context.progressCalls).to.deep.include({ unique: item.unique, progress: 50 });
 		expect(context.statusCalls).to.deep.include({ unique: item.unique, status: UmbFileDropzoneItemStatus.ERROR });
 	});
+
+	// Inside a property the collection gets little height of its own, unlike in a workspace where it fills the view.
+	it('keeps the empty state below the toolbar and within the collection when given little height', async () => {
+		const host = element.parentElement!;
+		host.style.display = 'block';
+		host.style.height = '120px';
+		await aTimeout(0);
+
+		const emptyState = element.shadowRoot!.querySelector<HTMLElement>('umb-empty-media-state')!;
+		const toolbar = element.shadowRoot!.querySelector<HTMLElement>('umb-collection-toolbar')!;
+		await (emptyState as HTMLElement & { updateComplete?: Promise<unknown> }).updateComplete;
+
+		const collectionRect = element.getBoundingClientRect();
+		const emptyStateRect = emptyState.getBoundingClientRect();
+
+		expect(emptyStateRect.height, 'empty state height').to.be.at.least(emptyState.scrollHeight);
+		expect(emptyStateRect.top, 'empty state top').to.be.at.least(toolbar.getBoundingClientRect().bottom);
+		expect(emptyStateRect.bottom, 'empty state bottom').to.be.at.most(collectionRect.bottom);
+	});
 });
