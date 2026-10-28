@@ -78,7 +78,11 @@ export class UmbDataTypeTreeServerDataSource
 			unique: item.id,
 			parent: {
 				unique: item.parent?.id || null,
-				entityType: item.parent ? UMB_DATA_TYPE_ENTITY_TYPE : UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
+				entityType: item.parent
+					? item.parent.isFolder
+						? UMB_DATA_TYPE_FOLDER_ENTITY_TYPE
+						: UMB_DATA_TYPE_ENTITY_TYPE
+					: UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
 			},
 			icon: this.#manifestPropertyEditorUis.find((ui) => ui.alias === item.editorUiAlias)?.meta.icon,
 			name: item.name,
