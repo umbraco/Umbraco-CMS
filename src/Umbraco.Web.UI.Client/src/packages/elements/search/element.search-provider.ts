@@ -28,6 +28,7 @@ export class UmbElementSearchProvider
 
 	override destroy(): void {
 		this.#repository.destroy();
+		super.destroy();
 	}
 }
 

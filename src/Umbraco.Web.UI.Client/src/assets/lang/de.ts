@@ -1889,9 +1889,9 @@ export default {
 		type: 'Typ',
 		sortNameAscending: 'Name (A-Z)',
 		sortNameDescending: 'Name (Z-A)',
-		sortCreateDateAscending: 'Oldest',
-		sortCreateDateDescending: 'Newest',
-		sortLastLoginDateDescending: 'Last login',
+		sortCreateDateAscending: 'Älteste',
+		sortCreateDateDescending: 'Neueste',
+		sortLastLoginDateDescending: 'Letzte Anmeldung',
 	},
 	validation: {
 		validation: 'Validierung',

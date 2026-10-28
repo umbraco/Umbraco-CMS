@@ -209,7 +209,8 @@ export class UmbInputDocumentDynamicRootElement extends UmbFormControlMixin<stri
 				.sort()
 				.join(', ') ?? '';
 
-		const description = item.anyOfDocTypeKeys
+		// An empty set of document type keys means the step matches all of them, so there is nothing to list.
+		const description = item.anyOfDocTypeKeys?.length
 			? this.localize.term('dynamicRoot_queryStepTypes') + docTypeNames
 			: undefined;
 
