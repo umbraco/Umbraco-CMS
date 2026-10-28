@@ -43,6 +43,8 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
         V2016 = 7,
         V2017 = 8,
         V2019 = 9,
+        V2022 = 10,
+        V2025 = 11,
         Other = 99,
     }
 
@@ -103,6 +105,10 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
         {
             case "??":
                 return VersionName.Invalid;
+            case "17":
+                return VersionName.V2025;
+            case "16":
+                return VersionName.V2022;
             case "15":
                 return VersionName.V2019;
             case "14":
