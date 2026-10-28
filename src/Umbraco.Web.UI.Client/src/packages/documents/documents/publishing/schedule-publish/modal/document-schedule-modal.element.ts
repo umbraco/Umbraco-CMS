@@ -1,6 +1,5 @@
 import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { isNotPublishedMandatory } from '../../utils.js';
 import { UmbDocumentVariantLanguagePickerElement } from '../../../modals/index.js';
 import { mirrorSchedule } from './mirror-schedules.function.js';
 import type {
@@ -8,6 +7,7 @@ import type {
 	UmbDocumentScheduleModalValue,
 	UmbDocumentScheduleSelectionModel,
 } from './document-schedule-modal.token.js';
+import { umbIsNotPublishedMandatory, umbIsSelectableForPublishing } from '@umbraco-cms/backoffice/content';
 import { css, customElement, html, ref, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -47,7 +47,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	#validation = new UmbValidationContext(this);
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
-		if (isNotPublishedMandatory(option)) {
+		if (umbIsNotPublishedMandatory(option)) {
 			return true;
 		}
 		if (!option.variant || option.variant.state === UmbDocumentVariantState.NOT_CREATED) {
@@ -79,7 +79,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				}
 
 				//Getting not published mandatory options — the options that are mandatory and not currently published.
-				const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
+				const missingMandatoryOptions = this._options.filter(umbIsNotPublishedMandatory);
 				this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
 
 				this.requestUpdate();
@@ -102,20 +102,10 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			return option ? this.#pickableFilter(option) : true;
 		});
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
-		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
-		this._options =
-			this.data?.options.filter(
-				(option) =>
-					(option.variant && option.variant.state === null) ||
-					isNotPublishedMandatory(option) ||
-					option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
-			) ?? [];
+		this._options = this.data?.options.filter(umbIsSelectableForPublishing) ?? [];
 
 		let selected = this.data?.activeVariants ?? [];
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
-		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
 		const validOptions = this._options.filter((option) => this.#pickableFilter(option));
 
 		// Filter selection based on options:

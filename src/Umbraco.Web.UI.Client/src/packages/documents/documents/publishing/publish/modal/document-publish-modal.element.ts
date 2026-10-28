@@ -1,7 +1,7 @@
 import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { isNotPublishedMandatory } from '../../utils.js';
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
+import { umbIsNotPublishedMandatory, umbIsSelectableForPublishing } from '@umbraco-cms/backoffice/content';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -62,15 +62,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
-		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
-		this._options =
-			this.data?.options.filter(
-				(option) =>
-					(option.variant && option.variant.state === null) ||
-					isNotPublishedMandatory(option) ||
-					option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
-			) ?? [];
+		this._options = this.data?.options.filter(umbIsSelectableForPublishing) ?? [];
 
 		let selected = this.value?.selection ?? [];
 
@@ -97,7 +89,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 				if (!this._options && !selection) return;
 
 				//Getting not published mandatory options — the options that are mandatory and not currently published.
-				const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
+				const missingMandatoryOptions = this._options.filter(umbIsNotPublishedMandatory);
 				this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
 			},
 			'observeSelection',
@@ -126,7 +118,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 						html`<umb-document-variant-language-picker
 							.selectionManager=${this.#selectionManager}
 							.variantLanguageOptions=${this._options}
-							.requiredFilter=${isNotPublishedMandatory}
+							.requiredFilter=${umbIsNotPublishedMandatory}
 							.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>`,
 				)}
 

@@ -1,4 +1,4 @@
-import { isNotPublishedMandatory } from '../../utils.js';
+import { umbIsNotPublishedMandatory, umbIsSelectableForPublishing } from '../../utils.js';
 import type { UmbContentPublishModalData, UmbContentPublishModalValue } from './types.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -47,7 +47,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
-		this._options = this.#filterSelectableOptions(this.data?.options ?? []);
+		this._options = this.data?.options.filter(umbIsSelectableForPublishing) ?? [];
 
 		const validOptions = this._options.filter((o) => this.#pickableFilter(o));
 
@@ -59,19 +59,8 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 		this.observe(this.#selectionManager.selection, this.#handleSelectionChange, 'observeSelection');
 	}
 
-	#filterSelectableOptions(options: Array<UmbEntityVariantOptionModel>): Array<UmbEntityVariantOptionModel> {
-		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
-		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
-		return options.filter(
-			(option) =>
-				option.variant?.state === null ||
-				isNotPublishedMandatory(option) ||
-				(option.variant && option.variant.state !== UmbPublishableVariantState.NOT_CREATED),
-		);
-	}
-
 	readonly #handleSelectionChange = (selection: Array<string>) => {
-		const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
+		const missingMandatoryOptions = this._options.filter(umbIsNotPublishedMandatory);
 		this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
 	};
 
@@ -97,7 +86,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 						html`<umb-content-variant-language-picker
 							.selectionManager=${this.#selectionManager}
 							.variantLanguageOptions=${this._options}
-							.requiredFilter=${isNotPublishedMandatory}
+							.requiredFilter=${umbIsNotPublishedMandatory}
 							.pickableFilter=${this.#pickableFilter}></umb-content-variant-language-picker>`,
 				)}
 
