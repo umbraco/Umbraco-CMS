@@ -1,4 +1,5 @@
-import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../root/constants.js';
 import type { UmbMediaRecycleBinTreeItemModel } from './types.js';
 import type { MediaRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -66,7 +67,7 @@ const mapper = (item: MediaRecycleBinItemResponseModel): UmbMediaRecycleBinTreeI
 		unique: item.id,
 		parent: {
 			unique: item.parent ? item.parent.id : null,
-			entityType: item.parent ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
+			entityType: item.parent ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 		},
 		entityType: UMB_MEDIA_ENTITY_TYPE,
 		noAccess: false,
