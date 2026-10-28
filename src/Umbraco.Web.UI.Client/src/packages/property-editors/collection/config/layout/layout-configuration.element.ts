@@ -5,6 +5,7 @@ import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import type { UmbInputManifestElement } from '@umbraco-cms/backoffice/components';
 import type {
@@ -188,6 +189,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 	}
 
 	static override readonly styles = [
+		UmbTextStyles,
 		css`
 			umb-sortable-list {
 				display: block;
