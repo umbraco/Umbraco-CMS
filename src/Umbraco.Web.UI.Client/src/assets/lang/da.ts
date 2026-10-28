@@ -512,10 +512,7 @@ export default {
 		unsavedChangesWarning: 'Er du sikker på du vil navigere væk fra denne side? - du har ikke-gemte ændringer',
 		confirmListViewPublish: 'Udgivelse vil gøre de valgte sider synlige på sitet.',
 		confirmListViewUnpublish: 'Afpublicering vil fjerne de valgte sider og deres undersider fra sitet.',
-		confirmListViewUnpublishElements: 'Afpublicering vil fjerne de valgte elementer fra websitet, hvor end de bruges.',
 		confirmPublish: 'Udgivelse vil gøre denne side og alle dets publicerede undersider synlige på websitet.',
-		confirmPublishElement:
-			'Udgivelse vil gøre dette element synligt på websitet, hvor end et publiceret dokument bruger det.',
 		confirmUnpublish: 'Afpublicering vil fjerne denne side og alle dets undersider fra websitet.',
 		doctypeChangeWarning: 'Du har ikke-gemte ændringer. Hvis du ændrer dokumenttype, kasseres ændringerne.\n    ',
 	},
@@ -1355,6 +1352,9 @@ export default {
 		contentPublishedFailedByParent: '\n      %0% kan ikke udgives, fordi en overordnet side ikke er udgivet.\n    ',
 		contentPublishedFailedReqCultureValidationError:
 			"Validering mislykkedes for obligatorisk sprog '%0%'. Dette\n      sprog blev gemt, men ikke udgivet.\n    ",
+		publishedNotificationTitle: 'Publiceret',
+		publishedNotificationDescription: '%0% er nu offentligt tilgængeligt',
+		publishedVariantNotificationDescription: '%1% er nu offentligt tilgængeligt på %0%',
 	},
 	colorpicker: {
 		noColors: 'Du har ikke konfigureret nogen godkendte farver',
@@ -1547,13 +1547,11 @@ export default {
 		editContentPublishedHeader: 'Indhold publiceret',
 		editElementPublishedHeader: 'Element publiceret',
 		editContentPublishedText: 'og nu synligt for besøgende',
-		editElementPublishedText: 'og er synligt på websitet, hvor end et publiceret dokument bruger det',
 		editMultiContentPublishedText: '%0% dokumenter udgivet og synlige for besøgende',
 		editMultiContentUnpublishedText: '%0% dokumenter afpubliceret og ikke længere synlige for besøgende',
 		editContentUnpublishedHeader: 'Indhold afpubliceret',
 		editContentUnpublishedText: 'og er nu ikke længere synligt for besøgende',
 		editVariantPublishedText: '%0% udgivet og synligt for besøgende',
-		editVariantElementPublishedText: '%0% udgivet',
 		editVariantUnpublishedText: '%0% afpubliceret og ikke længere synligt for besøgende',
 		editMultiVariantPublishedText: '%0% dokumenter udgivet for sprogene %1% og synlige for besøgende',
 		editMultiVariantUnpublishedText:
@@ -3110,5 +3108,10 @@ export default {
 		cultureSelectLabel: 'Kultur',
 		searchDisabled: 'Søgning utilgængelig. Indeksstatus:',
 		searchError: 'Søgningen fejlede. Prøv igen.',
+	},
+	elements: {
+		confirmPublishDescription: 'Udgivelse vil gøre dette offentligt tilgængeligt.',
+		confirmBulkPublishDescription: 'Udgivelse vil gøre de valgte emner offentligt tilgængelige.',
+		confirmBulkUnpublishDescription: 'De valgte emner vil ikke længere være offentligt tilgængelige.',
 	},
 } as UmbLocalizationDictionary;

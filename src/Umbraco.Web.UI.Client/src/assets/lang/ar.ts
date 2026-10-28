@@ -430,7 +430,6 @@ export default {
 		unsavedChangesWarning: 'هل أنت متأكد أنك تريد الانتقال بعيدًا عن هذه الصفحة؟ - لديك تغييرات غير محفوظة',
 		confirmListViewPublish: 'النشر سيجعل العناصر المحددة مرئية على الموقع.',
 		confirmListViewUnpublish: 'إلغاء النشر سيزيل العناصر المحددة وجميع نسلها من الموقع.',
-		confirmListViewUnpublishElements: 'إلغاء النشر سيزيل العناصر المحددة من الموقع أينما تم استخدامها.',
 		confirmUnpublish: 'إلغاء النشر سيزيل هذه الصفحة وجميع نسلها من الموقع.',
 		doctypeChangeWarning: 'لديك تغييرات غير محفوظة. إجراء تغييرات على نوع الوثيقة سيتسبب في تجاهل التغييرات.',
 	},
@@ -1135,6 +1134,9 @@ export default {
 		publishAll: 'نشر %0% وجميع الصفحات الفرعية الخاصة به',
 		publishHelp:
 			'انقر على <em>نشر</em> لنشر <strong>%0%</strong> وجعل محتواه متاحًا علنًا.<br/><br />\n      يمكنك نشر هذه الصفحة وجميع صفحاتها الفرعية عن طريق تحديد <em>تضمين الصفحات الفرعية غير المنشورة</em> أدناه.\n      ',
+		publishedNotificationTitle: 'تم النشر',
+		publishedNotificationDescription: '%0% متاح الآن للعامة',
+		publishedVariantNotificationDescription: '%1% متاح الآن للعامة في %0%',
 	},
 	colorpicker: {
 		noColors: 'لم تقم بتكوين أي ألوان معتمدة',
@@ -1312,10 +1314,8 @@ export default {
 		editContentPublishedHeader: 'تم نشر المحتوى',
 		editElementPublishedHeader: 'تم نشر العنصر',
 		editContentPublishedText: 'وهو مرئي على الموقع',
-		editElementPublishedText: 'وهو مرئي على الموقع أينما يستخدمه مستند منشور',
 		editMultiContentPublishedText: 'تم نشر %0% مستندات وهي مرئية على الموقع',
 		editVariantPublishedText: '%0% تم نشره وهو مرئي على الموقع',
-		editVariantElementPublishedText: '%0% تم نشره',
 		editMultiVariantPublishedText: '%0% مستندات تم نشرها للغات %1% وهي مرئية على الموقع',
 		editBlueprintSavedHeader: 'تم حفظ مخطط الوثيقة',
 		editBlueprintSavedText: 'تم حفظ التغييرات بنجاح',
@@ -2459,5 +2459,9 @@ export default {
 		minimapConfigDescription: 'عرض خريطة مصغرة في محرر الأكواد.',
 		wordWrapConfigLabel: 'تغليف الكلمات',
 		wordWrapConfigDescription: 'تفعيل تغليف الكلمات في محرر الأكواد.',
+	},
+	elements: {
+		confirmBulkPublishDescription: 'النشر سيجعل العناصر المحددة متاحة للعامة.',
+		confirmBulkUnpublishDescription: 'لن تكون العناصر المحددة متاحة للعامة بعد الآن.',
 	},
 } as UmbLocalizationDictionary;

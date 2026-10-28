@@ -819,6 +819,8 @@ export default {
 		publishAll: 'Publikuj %0% ze wszytkimi podstronami',
 		publishHelp:
 			'Kliknij <em> OK </ em>, aby publikować <strong>% 0% </ strong> i spowodować upublicznienie całej zawartości.<br/><br/>\n      Możesz opublikować tą stronę wraz ze wszystkimi podstronami zaznaczając poniżej <em>publikuj wszystkie węzły pochodne</em>\n      ',
+		publishedNotificationTitle: 'Opublikowano',
+		publishedNotificationDescription: '%0% jest teraz dostępne publicznie',
 	},
 	colorpicker: {
 		noColors: 'Nie skonfigurowałeś żadnych zaakceptowanych kolorów',
@@ -920,7 +922,6 @@ export default {
 		editContentPublishedHeader: 'Treść została opublikowana',
 		editElementPublishedHeader: 'Element został opublikowany',
 		editContentPublishedText: 'i jest widoczna na stronie',
-		editElementPublishedText: 'i jest widoczny na stronie wszędzie tam, gdzie używa go opublikowany dokument',
 		editContentSavedHeader: 'Treść została zapisana',
 		editContentSavedText: 'Pamiętaj, aby opublikować, aby zmiany były widoczne',
 		editContentSendToPublish: 'Wysłano do zatwierdzenia',

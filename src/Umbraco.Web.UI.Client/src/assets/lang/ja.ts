@@ -222,11 +222,7 @@ export default {
 		unsavedChangesWarning: 'このページを離れてもよろしいですか？未保存の変更があります。',
 		confirmListViewPublish: '公開すると、選択した項目が公開されます。',
 		confirmListViewUnpublish: '非公開にすると、選択した項目とそのすべての子項目が公開されなくなります。',
-		confirmListViewUnpublishElements:
-			'非公開にすると、選択した要素は使用されているすべての箇所でウェブサイトから削除されます。',
 		confirmPublish: '公開すると、このコンテンツと公開済みの子項目が公開されます。',
-		confirmPublishElement:
-			'公開すると、この要素は公開済みのドキュメントで使用されているすべての箇所でウェブサイトに表示されます。',
 		confirmUnpublish: '非公開にすると、このコンテンツは公開されなくなります。',
 		doctypeChangeWarning: '未保存の変更があります。ドキュメントタイプを変更すると、変更は破棄されます。',
 	},
@@ -738,6 +734,8 @@ export default {
 		publishAll: '%0% とそのサブページの全てを公開します',
 		publishHelp:
 			'<em>OK</em> をクリックすると <strong>%0%</strong> を公開。<br/><br />\n      このページとその全ての子ページも公開したければ <em>全ての子ページを公開</em> をチェック。\n      ',
+		publishedNotificationTitle: '公開しました',
+		publishedNotificationDescription: '%0% が公開されました',
 	},
 	colorpicker: {
 		noColors: '設定済みの色はありません。',
@@ -844,7 +842,6 @@ export default {
 		editContentPublishedHeader: 'コンテントを公開しました',
 		editElementPublishedHeader: '要素を公開しました',
 		editContentPublishedText: 'と同時にウェブサイトを可視化しました',
-		editElementPublishedText: 'と同時に、公開済みのドキュメントで使用されている箇所でウェブサイトに表示されます',
 		editContentSavedHeader: 'コンテントを保存しました',
 		editContentSavedText: '変更を適用する為に公開する事を忘れないでください',
 		editContentSendToPublish: '承認へ送りました',
@@ -1183,5 +1180,10 @@ export default {
 		browseTab: '参照',
 		searchTab: '検索',
 		selectedCount: (count: number) => `${count}件選択済み`,
+	},
+	elements: {
+		confirmPublishDescription: '公開すると、これが一般公開されます。',
+		confirmBulkPublishDescription: '公開すると、選択した項目が公開されます。',
+		confirmBulkUnpublishDescription: '選択した項目は公開されなくなります。',
 	},
 } as UmbLocalizationDictionary;

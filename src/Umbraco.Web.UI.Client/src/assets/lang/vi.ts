@@ -502,11 +502,7 @@ export default {
 		confirmListViewPublish: 'Xuất bản sẽ làm cho các mục đã chọn có sẵn công khai.',
 		confirmListViewUnpublish:
 			'Ngừng xuất bản sẽ làm cho các mục đã chọn và tất cả các mục con của chúng không còn khả dụng công khai.',
-		confirmListViewUnpublishElements:
-			'Ngừng xuất bản sẽ xóa các phần tử đã chọn khỏi trang web ở bất kỳ nơi nào chúng được sử dụng.',
 		confirmPublish: 'Xuất bản sẽ làm cho nội dung này và tất cả các mục con đã xuất bản của nó có sẵn công khai.',
-		confirmPublishElement:
-			'Xuất bản sẽ làm cho phần tử này hiển thị trên trang web ở bất kỳ nơi nào tài liệu đã xuất bản sử dụng nó.',
 		confirmUnpublish: 'Ngừng xuất bản sẽ làm cho nội dung này không còn khả dụng công khai.',
 		doctypeChangeWarning: 'Bạn có thay đổi chưa lưu. Thay đổi Loại tài liệu sẽ hủy bỏ các thay đổi.',
 	},
@@ -1273,6 +1269,9 @@ export default {
 		invalidPublishBranchPermissions: 'Người dùng không có đủ quyền để xuất bản tất cả tài liệu con',
 		contentPublishedFailedReqCultureValidationError:
 			"Xác thực không thành công đối với ngôn ngữ bắt buộc '%0%'. Ngôn ngữ này đã được lưu nhưng chưa được xuất bản.",
+		publishedNotificationTitle: 'Đã xuất bản',
+		publishedNotificationDescription: '%0% hiện đã có sẵn công khai',
+		publishedVariantNotificationDescription: '%1% hiện đã có sẵn công khai bằng %0%',
 	},
 	colorpicker: {
 		noColors: 'Bạn chưa cấu hình bất kỳ màu nào được phê duyệt',
@@ -1475,11 +1474,9 @@ export default {
 		editContentPublishedHeader: 'Tài liệu đã được xuất bản',
 		editElementPublishedHeader: 'Phần tử đã được xuất bản',
 		editContentPublishedText: 'và hiện đang hiển thị trên trang web',
-		editElementPublishedText: 'và hiển thị trên trang web ở bất kỳ nơi nào tài liệu đã xuất bản sử dụng nó',
 		editContentUnpublishedHeader: 'Tài liệu đã bị hủy xuất bản',
 		editContentUnpublishedText: 'và không còn hiển thị trên trang web',
 		editVariantPublishedText: '%0% đã được xuất bản và hiện đang hiển thị trên trang web',
-		editVariantElementPublishedText: '%0% đã được xuất bản',
 		editVariantSavedText: '%0% đã được lưu',
 		editBlueprintSavedHeader: 'Document Blueprint đã được lưu',
 		editBlueprintSavedText: 'Các thay đổi đã được lưu thành công',
@@ -2824,5 +2821,10 @@ export default {
 		browseTab: 'Duyệt',
 		searchTab: 'Tìm kiếm',
 		selectedCount: (count: number) => `Đã chọn ${count} mục`,
+	},
+	elements: {
+		confirmPublishDescription: 'Xuất bản sẽ làm cho mục này có sẵn công khai.',
+		confirmBulkPublishDescription: 'Xuất bản sẽ làm cho các mục đã chọn có sẵn công khai.',
+		confirmBulkUnpublishDescription: 'Các mục đã chọn sẽ không còn khả dụng công khai.',
 	},
 } as UmbLocalizationDictionary;

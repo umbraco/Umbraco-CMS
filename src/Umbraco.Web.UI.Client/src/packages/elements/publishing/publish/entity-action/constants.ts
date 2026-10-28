@@ -11,8 +11,5 @@ export const UmbElementPublishManifestEntityActionMeta: MetaEntityActionContentP
 	publishingRepositoryAlias: UMB_ELEMENT_PUBLISHING_REPOSITORY_ALIAS,
 	itemRepositoryAlias: UMB_ELEMENT_ITEM_REPOSITORY_ALIAS,
 	referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
-	publishConfirmationMessage: '#prompt_confirmPublishElement',
-	publishedNotificationHeadline: '#speechBubbles_editElementPublishedHeader',
-	publishedNotificationMessage: '#speechBubbles_editElementPublishedText',
-	variantPublishedNotificationMessage: '#speechBubbles_editVariantElementPublishedText',
+	publishConfirmationMessage: '#elements_confirmPublishDescription',
 };

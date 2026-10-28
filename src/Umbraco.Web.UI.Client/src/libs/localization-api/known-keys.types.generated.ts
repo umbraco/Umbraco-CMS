@@ -1000,6 +1000,9 @@ declare global {
 		editdatatype_rteWidthAndHeight: string;
 		editdatatype_selectFolder: string;
 		editdatatype_wasMoved: string;
+		elements_confirmBulkPublishDescription: string;
+		elements_confirmBulkUnpublishDescription: string;
+		elements_confirmPublishDescription: string;
 		embeddedMedia_dimensionsDescription: string;
 		emptyStates_emptyDictionaryTree: string;
 		entityDetail_forbiddenDescription: (entityType: string) => string;
@@ -1791,9 +1794,7 @@ declare global {
 		prompt_cannotUnpublishWhenReferenced: string;
 		prompt_confirmListViewPublish: string;
 		prompt_confirmListViewUnpublish: string;
-		prompt_confirmListViewUnpublishElements: string;
 		prompt_confirmPublish: string;
-		prompt_confirmPublishElement: string;
 		prompt_confirmUnpublish: string;
 		prompt_discardChanges: string;
 		prompt_doctypeChangeWarning: string;
@@ -1852,6 +1853,9 @@ declare global {
 		publish_nodePublish: string;
 		publish_nodePublishAll: string;
 		publish_publishAll: string;
+		publish_publishedNotificationDescription: string;
+		publish_publishedNotificationTitle: string;
+		publish_publishedVariantNotificationDescription: string;
 		publish_publishHelp: string;
 		recycleBin_contentTrashed: string;
 		recycleBin_itemCannotBeRestored: string;
@@ -2161,7 +2165,6 @@ declare global {
 		speechBubbles_editElementPublishedFailed: string;
 		speechBubbles_editElementPublishedHeader: string;
 		speechBubbles_editElementPublishedReloadFailed: string;
-		speechBubbles_editElementPublishedText: string;
 		speechBubbles_editElementUnpublishedHeader: string;
 		speechBubbles_editMediaSaved: string;
 		speechBubbles_editMediaSavedText: string;

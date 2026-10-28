@@ -559,11 +559,7 @@ export default {
 		confirmListViewPublish: 'Publishing will make the selected items publicly available.',
 		confirmListViewUnpublish:
 			'Unpublishing will make the selected items and all their descendants publicly unavailable.',
-		confirmListViewUnpublishElements:
-			'Unpublishing will remove the selected elements from the website wherever they are used.',
 		confirmPublish: 'Publishing will make this content and all its published descendants publicly available.',
-		confirmPublishElement:
-			'Publishing will make this element visible on the website wherever a published document uses it.',
 		confirmUnpublish: 'Unpublishing will make this content publicly unavailable.',
 		cannotUnpublishWhenReferenced: 'This item cannot be unpublished because it is referenced by other items.',
 		doctypeChangeWarning: 'You have unsaved changes. Making changes to the Document Type will discard the changes.',
@@ -1416,6 +1412,9 @@ export default {
 		invalidPublishBranchPermissions: 'Insufficient user permissions to publish all descendant documents',
 		contentPublishedFailedReqCultureValidationError:
 			"Validation failed for required language '%0%'. This language was saved but not published.",
+		publishedNotificationTitle: 'Published',
+		publishedNotificationDescription: '%0% is now publicly available',
+		publishedVariantNotificationDescription: '%1% is now publicly available in %0%',
 	},
 	unpublish: {
 		inProgress: 'Unpublishing in progress - please wait...',
@@ -1641,7 +1640,6 @@ export default {
 		editContentPublishedReloadFailed: 'Document published, but the editor could not be refreshed',
 		editElementPublishedReloadFailed: 'Element published, but the editor could not be refreshed',
 		editContentPublishedText: 'and is visible on the website',
-		editElementPublishedText: 'and is visible on the website wherever a published document uses it',
 		editContentUnpublishedHeader: 'Document unpublished',
 		editContentUnpublishedText: 'and is no longer visible on the website',
 		editElementUnpublishedHeader: 'Element unpublished',
@@ -3384,5 +3382,10 @@ export default {
 		'zh-cn': '中文（简体，中国）',
 		'zh-tw': '中文（正體，台灣）',
 		vi: 'Tiếng Việt',
+	},
+	elements: {
+		confirmPublishDescription: 'Publishing will make this publicly available.',
+		confirmBulkPublishDescription: 'Publishing will make the selected items publicly available.',
+		confirmBulkUnpublishDescription: 'The selected items will no longer be publicly available.',
 	},
 } as UmbLocalizationDictionary;

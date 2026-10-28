@@ -476,8 +476,6 @@ export default {
 		confirmListViewPublish: 'Veröffentlichen macht die ausgewählten Elemente auf der Website sichtbar.',
 		confirmListViewUnpublish:
 			'Aufheben der Veröffentlichung entfernt die ausgewählten Elemente\n      und ihre Unterknoten von der Website.\n    ',
-		confirmListViewUnpublishElements:
-			'Aufheben der Veröffentlichung entfernt die ausgewählten Elemente überall dort von der Website, wo sie verwendet werden.',
 		confirmUnpublish: 'Aufheben der Veröffentlichung entfernt diese Seite und ihre Unterseiten von der Website.',
 		doctypeChangeWarning:
 			'Es gibt ungesicherte Änderungen.\n      Ändern des Dokumenttyps macht diese rückgängig.\n    ',
@@ -1230,6 +1228,9 @@ export default {
 		publishAll: '%0% und alle untergeordneten Elemente veröffentlichen',
 		publishHelp:
 			'\n    Klicken Sie <em>Sichern und Veröffentlichen</em>, um <strong>%0%</strong> zu veröffentlicht und auf der Website sichtbar zu machen.<br><br>\n    Sie können dieses Element mitsamt seinen untergeordneten Elementen veröffentlichen, indem Sie <em>Unveröffentlichte Unterelemente einschließen</em> markieren.\n    ',
+		publishedNotificationTitle: 'Veröffentlicht',
+		publishedNotificationDescription: '%0% ist jetzt öffentlich verfügbar',
+		publishedVariantNotificationDescription: '%1% ist jetzt öffentlich verfügbar in %0%',
 	},
 	colorpicker: {
 		noColors: 'Sie haben keine freigegeben Farben konfiguriert',
@@ -1373,10 +1374,8 @@ export default {
 		editContentPublishedHeader: 'Inhalt veröffentlicht',
 		editElementPublishedHeader: 'Element veröffentlicht',
 		editContentPublishedText: 'und ist auf der Website sichtbar',
-		editElementPublishedText: 'und ist auf der Website überall sichtbar, wo ein veröffentlichtes Dokument es verwendet',
 		editMultiContentPublishedText: '%0% Documente veröffentlicht und auf der Website sichtbar',
 		editVariantPublishedText: '%0% veröffentlicht und auf der Website sichtbar',
-		editVariantElementPublishedText: '%0% veröffentlicht',
 		editMultiVariantPublishedText: '%0% Documente veröffentlicht in Sprache %1% und auf der Website sichtbar',
 		editContentSavedHeader: 'Inhalte gespeichert',
 		editContentSavedText: 'Denken Sie daran, die Inhalte zu veröffentlichen, um die Änderungen sichtbar zu machen',
@@ -2109,5 +2108,9 @@ export default {
 		browseTab: 'Durchsuchen',
 		searchTab: 'Suchen',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'Element' : 'Elemente'} ausgewählt`,
+	},
+	elements: {
+		confirmBulkPublishDescription: 'Durch das Veröffentlichen werden die ausgewählten Einträge öffentlich verfügbar.',
+		confirmBulkUnpublishDescription: 'Die ausgewählten Einträge sind nicht mehr öffentlich verfügbar.',
 	},
 } as UmbLocalizationDictionary;

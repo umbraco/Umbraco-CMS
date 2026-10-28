@@ -392,8 +392,6 @@ export default {
 		confirmListViewPublish: 'La publication rendra les éléments sélectionnés visibles sur le site.',
 		confirmListViewUnpublish:
 			'La suppression de la publication supprimera du site les éléments sélectionnés et tous leurs descendants.',
-		confirmListViewUnpublishElements:
-			'La suppression de la publication supprimera du site les éléments sélectionnés partout où ils sont utilisés.',
 		confirmUnpublish: 'La suppression de la publication supprimera du site cette page ainsi que tous ses descendants.',
 		doctypeChangeWarning:
 			'Vous avez des modifications en cours. Modifier le Type de Document fera disparaître ces modifications.',
@@ -1051,6 +1049,9 @@ export default {
 		publishAll: 'Publier %0% et toutes ses pages enfant',
 		publishHelp:
 			'Cliquez sur <em>Publier</em> pour publier <strong>%0%</strong> et la rendre ainsi accessible publiquement.<br/><br />\n      Vous pouvez publier cette page et toutes ses sous-pages en cochant <em>Inclure les pages enfant non pubiées</em> ci-dessous.\n      ',
+		publishedNotificationTitle: 'Publié',
+		publishedNotificationDescription: '%0% est maintenant accessible publiquement',
+		publishedVariantNotificationDescription: '%1% est maintenant accessible publiquement en %0%',
 	},
 	colorpicker: {
 		noColors: "Vous n'avez configuré aucune couleur approuvée",
@@ -1174,10 +1175,8 @@ export default {
 		editContentPublishedHeader: 'Contenu publié',
 		editElementPublishedHeader: 'Elément publié',
 		editContentPublishedText: 'et visible sur le site',
-		editElementPublishedText: "et visible sur le site partout où un document publié l'utilise",
 		editMultiContentPublishedText: '%0% documents publiés et visibles sur le site web',
 		editVariantPublishedText: '%0% publié et visible sur le site web',
-		editVariantElementPublishedText: '%0% publié',
 		editMultiVariantPublishedText: '%0% documents publiés pour la langue %1% et visibles sur le site web',
 		editContentSavedHeader: 'Contenu sauvegardé',
 		editContentSavedText: "N'oubliez pas de publier pour rendre les modifications visibles",
@@ -1958,5 +1957,9 @@ export default {
 		browseTab: 'Parcourir',
 		searchTab: 'Rechercher',
 		selectedCount: (count: number) => `${count} ${count > 1 ? 'éléments sélectionnés' : 'élément sélectionné'}`,
+	},
+	elements: {
+		confirmBulkPublishDescription: 'La publication rendra les éléments sélectionnés accessibles publiquement.',
+		confirmBulkUnpublishDescription: 'Les éléments sélectionnés ne seront plus accessibles publiquement.',
 	},
 } as UmbLocalizationDictionary;

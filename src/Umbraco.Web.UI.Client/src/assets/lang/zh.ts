@@ -535,9 +535,7 @@ export default {
 		unsavedChangesWarning: '确定要离开此页吗？您有未保存的更改。',
 		confirmListViewPublish: '发布将使所选项对外公开。',
 		confirmListViewUnpublish: '取消发布将使所选项及其所有子级对外不可见。',
-		confirmListViewUnpublishElements: '取消发布将从网站上所有使用位置移除所选元素。',
 		confirmPublish: '发布将使此内容及其所有已发布的子级对外公开。',
-		confirmPublishElement: '发布将使此元素在已发布文档使用它的所有位置对外公开。',
 		confirmUnpublish: '取消发布将使此内容对外不可见。',
 		doctypeChangeWarning: '您有未保存的更改。修改文档类型将放弃这些更改。',
 	},
@@ -1389,6 +1387,9 @@ export default {
 		contentPublishedFailedByMissingName: '无法发布 %0%，因为它缺少名称。',
 		invalidPublishBranchPermissions: '用户权限不足，无法发布所有子级文档',
 		contentPublishedFailedReqCultureValidationError: "必选语言 '%0%' 验证失败。该语言已保存但未发布。",
+		publishedNotificationTitle: '已发布',
+		publishedNotificationDescription: '%0% 现已对外公开',
+		publishedVariantNotificationDescription: '%1% 现已在 %0% 中对外公开',
 	},
 	unpublish: {
 		inProgress: '正在取消发布，请稍候…',
@@ -1598,7 +1599,6 @@ export default {
 		editContentPublishedFailedByParent: '因为上级页面未发布导致发布失败！',
 		editContentPublishedHeader: '内容已发布',
 		editContentPublishedText: '公众可见',
-		editElementPublishedText: '在已发布文档使用它的所有位置公众可见',
 		editContentSavedHeader: '内容已保存',
 		editContentSavedText: '请发布以使更改生效',
 		editContentSendToPublish: '提交审核',
@@ -3088,5 +3088,10 @@ export default {
 		emptyDate: '请选择一个日期',
 		emptyTimeZone: '请选择一个时区',
 		invalidTimeZone: '所选时区无效',
+	},
+	elements: {
+		confirmPublishDescription: '发布将使其对外公开。',
+		confirmBulkPublishDescription: '发布将使所选项对外公开。',
+		confirmBulkUnpublishDescription: '所选项将不再对外公开。',
 	},
 } as UmbLocalizationDictionary;

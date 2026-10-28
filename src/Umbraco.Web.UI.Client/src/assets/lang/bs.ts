@@ -430,8 +430,6 @@ export default {
 		confirmListViewPublish: 'Objavljivanjem će odabrane stavke biti vidljive na stranici.',
 		confirmListViewUnpublish:
 			'Poništavanje objavljivanja će ukloniti odabrane stavke i sve njihove potomke sa\n       stranice.\n    ',
-		confirmListViewUnpublishElements:
-			'Poništavanje objavljivanja će ukloniti odabrane elemente sa stranice gdje god se koriste.',
 		confirmUnpublish: 'Poništavanje objavljivanja će ukloniti ovu stranicu i sve njene potomke sa stranice.',
 		doctypeChangeWarning: 'Imate nesačuvane promjene. Promjenom vrste dokumenta odbacit će se promjene.',
 	},
@@ -1107,6 +1105,8 @@ export default {
 		publishAll: 'Objavi %0% i sve njegove podstranice',
 		publishHelp:
 			'Pritisni <em>Objavi</em> za objavu <strong>%0%</strong> i na taj način svoj sadržaj učiniti javno dostupnim.<br/><br />\n      Ovu stranicu i sve njene podstranice možete objaviti odabirom <em>Uključi neobjavljene podstranice</em>.\n      ',
+		publishedNotificationTitle: 'Objavljeno',
+		publishedNotificationDescription: '%0% je sada javno dostupno',
 	},
 	colorpicker: {
 		noColors: 'Niste konfigurirali nijednu odobrenu boju',
@@ -1243,7 +1243,6 @@ export default {
 		editContentPublishedHeader: 'Sadržaj objavljen',
 		editElementPublishedHeader: 'Element objavljen',
 		editContentPublishedText: 'i vidljivo na web stranici',
-		editElementPublishedText: 'i vidljiv je na web stranici gdje god ga koristi objavljeni dokument',
 		editBlueprintSavedHeader: 'Šablon sadržaja je sačuvan',
 		editBlueprintSavedText: 'Promjene su uspješno sačuvane',
 		editContentSavedHeader: 'Sadržaj sačuvan',
@@ -2279,5 +2278,9 @@ export default {
 	treeSearch: {
 		searchResult: 'stavka vraćena',
 		searchResults: 'stavke vraćene',
+	},
+	elements: {
+		confirmBulkPublishDescription: 'Objavljivanjem će odabrane stavke postati javno dostupne.',
+		confirmBulkUnpublishDescription: 'Odabrane stavke više neće biti javno dostupne.',
 	},
 } as UmbLocalizationDictionary;

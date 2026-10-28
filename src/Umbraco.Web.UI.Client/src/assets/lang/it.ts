@@ -447,8 +447,6 @@ export default {
 		confirmListViewPublish: 'Pubblicando renderai visibli gli oggetti selezionati sul sito.',
 		confirmListViewUnpublish:
 			'Non pubblicando rimuoverai gli oggetti selezionati e i loro discendenti dal\n      sito.\n    ',
-		confirmListViewUnpublishElements:
-			'Annullando la pubblicazione, gli elementi selezionati verranno rimossi dal sito ovunque vengano utilizzati.',
 		confirmUnpublish: 'Non pubblicando rimuoverai questa pagina e tutti i suoi discendenti dal sito.',
 		doctypeChangeWarning: 'Hai modifiche non salvate. Apportare modifiche al tipo di documento annullerà le modifiche.',
 	},
@@ -1154,6 +1152,9 @@ export default {
 		publishAll: 'Pubblica %0% e tutte le sue sottopagine',
 		publishHelp:
 			'Click <em>Pubblica</em> per pubblicare <strong>%0%</strong> e quindi rendere visibile pubblicamente il suo contenuto.<br/><br />\n      Puoi pubblicare questa pagina e tutte le sue sottopagine spuntando <em>Includi le sottopagine non pubblicate</em> sotto.\n      ',
+		publishedNotificationTitle: 'Pubblicato',
+		publishedNotificationDescription: '%0% è ora disponibile pubblicamente',
+		publishedVariantNotificationDescription: '%1% è ora disponibile pubblicamente in %0%',
 	},
 	colorpicker: {
 		noColors: 'Non hai configurato nessun colore',
@@ -1290,10 +1291,8 @@ export default {
 		editContentPublishedHeader: 'Contenuto pubblicato',
 		editElementPublishedHeader: 'Elemento pubblicato',
 		editContentPublishedText: 'e visibile sul sito web',
-		editElementPublishedText: 'e visibile sul sito web ovunque un documento pubblicato lo utilizzi',
 		editMultiContentPublishedText: '%0% documenti pubblicati e visibili sul sito web',
 		editVariantPublishedText: '%0% pubblicati e visibili sul sito web',
-		editVariantElementPublishedText: '%0% pubblicati',
 		editMultiVariantPublishedText: '%0% documenti pubblicati per le lingue %1% e visibili sul sito web',
 		editContentSavedHeader: 'Contenuto salvato',
 		editContentSavedText: 'Ricorda di pubblicare per rendere i cambiamenti visibili',
@@ -2299,5 +2298,9 @@ export default {
 		browseTab: 'Sfoglia',
 		searchTab: 'Cerca',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento selezionato' : 'elementi selezionati'}`,
+	},
+	elements: {
+		confirmBulkPublishDescription: 'La pubblicazione renderà gli oggetti selezionati disponibili pubblicamente.',
+		confirmBulkUnpublishDescription: 'Gli oggetti selezionati non saranno più disponibili pubblicamente.',
 	},
 } as UmbLocalizationDictionary;

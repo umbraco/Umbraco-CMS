@@ -523,6 +523,8 @@ export default {
 		publishAll: '%0% 와 모든 서브페이지 발행',
 		publishHelp:
 			"<strong>%0%</strong>를 발행하기위해 <em>확인</em>를 클릭하세요 and thereby making it's content publicly available.<br/><br />\n    이 페이지와 모든 서브페이지를 아래 <em>모든 자식문서 발행</em>을 체크하여 발행할 수 있습니다.\n    ",
+		publishedNotificationTitle: '발행됨',
+		publishedNotificationDescription: '%0%이(가) 이제 공개되었습니다',
 	},
 	relatedlinks: {
 		addExternal: '외부링크 추가',
@@ -607,7 +609,6 @@ export default {
 		editContentPublishedHeader: '컨텐츠 발행됨',
 		editElementPublishedHeader: '항목 발행됨',
 		editContentPublishedText: 'and 웹사이트에서 보기',
-		editElementPublishedText: '발행된 문서에서 사용되는 모든 곳에서 웹사이트에 표시됨',
 		editContentSavedHeader: '컨텐츠 저장됨',
 		editContentSavedText: '변경된 내용이 적용되어 발행됨을 기억하세요',
 		editContentSendToPublish: '승인을 위해 전송',

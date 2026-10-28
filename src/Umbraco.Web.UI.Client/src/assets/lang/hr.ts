@@ -431,8 +431,6 @@ export default {
 		confirmListViewPublish: 'Objavljivanjem će odabrane stavke biti vidljive na stranici.',
 		confirmListViewUnpublish:
 			'Poništavanje objavljivanja će ukloniti odabrane stavke i sve njihove potomke sa\n       stranice.\n    ',
-		confirmListViewUnpublishElements:
-			'Poništavanje objavljivanja će ukloniti odabrane elemente sa stranice gdje god se koriste.',
 		confirmUnpublish: 'Poništavanje objavljivanja će ukloniti ovu stranicu i sve njene potomke sa stranice.',
 		doctypeChangeWarning: 'Imate ne spremljene promjene. Promjenom vrste dokumenta odbacit će se promjene.',
 	},
@@ -1109,6 +1107,8 @@ export default {
 		publishAll: 'Objavi %0% i sve njegove podstranice',
 		publishHelp:
 			'Pritisni <em>Objavi</em> za objavu <strong>%0%</strong> i na taj način svoj sadržaj učiniti javno dostupnim.<br/><br />\n      Ovu stranicu i sve njene podstranice možete objaviti odabirom <em>Uključi neobjavljene podstranice</em>.\n      ',
+		publishedNotificationTitle: 'Objavljeno',
+		publishedNotificationDescription: '%0% je sada javno dostupno',
 	},
 	colorpicker: {
 		noColors: 'Niste konfigurirali nijednu odobrenu boju',
@@ -1287,7 +1287,6 @@ export default {
 		editContentPublishedHeader: 'Sadržaj objavljen',
 		editElementPublishedHeader: 'Element objavljen',
 		editContentPublishedText: 'i vidljivo na web stranici',
-		editElementPublishedText: 'i vidljiv je na web stranici gdje god ga koristi objavljeni dokument',
 		editBlueprintSavedHeader: 'Predložak sadržaja je spremljen',
 		editBlueprintSavedText: 'Promjene su uspješno spremljene',
 		editContentSavedHeader: 'Sadržaj spremljen',
@@ -2341,5 +2340,9 @@ export default {
 		basicLevelDescription: 'Poslat ćemo anonimni ID web-mjesta, verziju Umbraco-a i instalirane pakete.',
 		detailedLevelDescription:
 			'\n          Poslat ćemo:\n          <ul>\n            <li>Anonimni ID web-mjesta, verziju Umbraco-a i instalirane pakete.</li>\n            <li>Broj: korijenskih čvorova, čvorova sadržaja, makroa, medija, vrsta dokumenata, predložaka, jezika, domena, korisničkih grupa, korisnika, članova, vanjskih pružatelja prijave u Backoffice-u i uređivača svojstava u upotrebi.</li>\n            <li>Informacije o sustavu: web poslužitelj, operativni sustav poslužitelja, okvir poslužitelja, jezik operativnog sustava poslužitelja i pružatelj baze podataka.</li>\n            <li>Postavke konfiguracije: način Modelsbuilder-a, postoji li prilagođena putanja Umbraco-a, ASP okolina, je li omogućen dostavni API, dopušta li javni pristup i je li u načinu rada za otklanjanje pogrešaka.</li>\n          </ul>\n          <em>Moguće je da ćemo u budućnosti promijeniti podatke koje šaljemo na Detaljnoj razini. Ako se to dogodi, bit će navedeno iznad.\n          <br>Odabirom "Detaljno" pristajete na prikupljanje trenutnih i budućih anonimiziranih informacija.</em>\n       ',
+	},
+	elements: {
+		confirmBulkPublishDescription: 'Objavljivanjem će odabrane stavke postati javno dostupne.',
+		confirmBulkUnpublishDescription: 'Odabrane stavke više neće biti javno dostupne.',
 	},
 } as UmbLocalizationDictionary;

@@ -667,6 +667,8 @@ export default {
 		publishAll: '發佈 %0% 及其子項',
 		publishHelp:
 			'點選<em>發佈</em>按鈕來將<strong>%0%</strong>的內容設定為公開。<br/><br />\n      您可以同時發佈本頁以及其子項目若您點選下面的<em>包含子頁</em>。\n      ',
+		publishedNotificationTitle: '已發佈',
+		publishedNotificationDescription: '%0% 現已對外公開',
 	},
 	colorpicker: {
 		noColors: '您尚未設定任何許可顏色',
@@ -764,7 +766,6 @@ export default {
 		editContentPublishedHeader: '內容已發佈',
 		editElementPublishedHeader: '元素已發佈',
 		editContentPublishedText: '公眾可見',
-		editElementPublishedText: '在已發佈文件使用它的所有位置公眾可見',
 		editContentSavedHeader: '內容已保存',
 		editContentSavedText: '請發佈以使更改生效',
 		editContentSendToPublish: '提交審核',

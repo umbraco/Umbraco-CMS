@@ -996,6 +996,8 @@ export default {
 		publishAll: 'Опублікувати документ %0% та всі його дочірні документи',
 		publishHelp:
 			'Натисніть кнопку <em>Опублікувати</em> для публікації документа <strong>%0%</strong>.\n\t\tТаким чином Ви зробите вміст документа доступним для перегляду.<br /><br />\n\t\tВи можете опублікувати цей документ та всі його дочірні документи, відмітивши опцію <em>Опублікувати усі дочірні документи</em>.\n\t\tЩоб опублікувати раніше неопубліковані документи серед дочірніх, відмітьте опцію <em>Включаючи неопубліковані дочірні документи</em>.\n\t\t',
+		publishedNotificationTitle: 'Опубліковано',
+		publishedNotificationDescription: '%0% тепер загальнодоступний',
 	},
 	redirectUrls: {
 		disableUrlTracker: 'Зупинити відстеження URL',
@@ -1129,7 +1131,6 @@ export default {
 		editContentPublishedHeader: 'Документ опубліковано',
 		editElementPublishedHeader: 'Елемент опубліковано',
 		editContentPublishedText: 'і є доступним',
-		editElementPublishedText: 'і є видимим на сайті скрізь, де його використовує опублікований документ',
 		editContentSavedHeader: 'Документ збережено',
 		editContentSavedText: 'Не забудьте опублікувати, щоб зробити доступним',
 		editContentSendToPublish: 'Надіслано на затвердження',

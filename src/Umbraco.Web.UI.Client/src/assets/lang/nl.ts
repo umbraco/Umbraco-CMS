@@ -406,8 +406,6 @@ export default {
 		confirmListViewPublish: 'Publiceren maakt de geselecteerde items zichtbaar op de site.',
 		confirmListViewUnpublish:
 			'Depubliceren zal de geselecteerde items en alle onderliggende items\n      verwijderen van de site.\n    ',
-		confirmListViewUnpublishElements:
-			'Depubliceren zal de geselecteerde elementen van de site verwijderen, overal waar ze worden gebruikt.',
 		confirmUnpublish: "Depubliceren zal deze pagina en alle onderliggende pagina's verwijderen van de site.\n    ",
 		doctypeChangeWarning:
 			'Wijzigingen niet opgeslagen. Aanpassingen aan het Documenttype zullen de\n      wijzigingen ongedaan maken.\n    ',
@@ -1111,6 +1109,9 @@ export default {
 		publishAll: 'Publiceer %0% en alle subitems',
 		publishHelp:
 			"Klik <em>ok</em> om <strong>%0%</strong> te publiceren en de wijzigingen zichtbaar te maken voor bezoekers.<br/><br />\n      Je kunt deze pagina publiceren en alle onderliggende sub-pagina's door <em>publiceer alle subitems</em> aan te vinken hieronder.\n    ",
+		publishedNotificationTitle: 'Gepubliceerd',
+		publishedNotificationDescription: '%0% is nu openbaar beschikbaar',
+		publishedVariantNotificationDescription: '%1% is nu openbaar beschikbaar in %0%',
 	},
 	colorpicker: {
 		noColors: 'Je hebt geen goedgekeurde kleuren geconfigureerd',
@@ -1247,10 +1248,8 @@ export default {
 		editContentPublishedHeader: 'Inhoud gepubliceerd',
 		editElementPublishedHeader: 'Element gepubliceerd',
 		editContentPublishedText: 'en zichtbaar op de website',
-		editElementPublishedText: 'en zichtbaar op de website overal waar een gepubliceerd document het gebruikt',
 		editMultiContentPublishedText: '%0% documenten gepubliceerd en zichtbaar op de website',
 		editVariantPublishedText: '%0% gepubliceerd en zichtbaar op de website',
-		editVariantElementPublishedText: '%0% gepubliceerd',
 		editMultiVariantPublishedText:
 			'%0% documenten gepubliceerd voor de talen languages %1% en zichtbaar op\n      de website\n    ',
 		editContentSavedHeader: 'Inhoud opgeslagen',
@@ -2207,5 +2206,9 @@ export default {
 		browseTab: 'Bladeren',
 		searchTab: 'Zoeken',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} geselecteerd`,
+	},
+	elements: {
+		confirmBulkPublishDescription: 'Publiceren maakt de geselecteerde items openbaar beschikbaar.',
+		confirmBulkUnpublishDescription: 'De geselecteerde items zijn niet langer openbaar beschikbaar.',
 	},
 } as UmbLocalizationDictionary;
