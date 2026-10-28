@@ -284,7 +284,7 @@ export default {
 		ancestorNotPublishedScheduleWarning:
 			"An ancestor isn't published. The scheduled publish will fail unless every ancestor is published by then.",
 		ancestorCultureNotPublishedScheduleWarning:
-			"An ancestor isn't published in this language. The scheduled publish won't be visible unless every ancestor is published in this language by then.",
+			"An ancestor isn't published in this language. The scheduled publish will fail unless every ancestor is published in this language by then.",
 		parentNotPublishedAnomaly: 'This document is published but is not in the cache',
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',
