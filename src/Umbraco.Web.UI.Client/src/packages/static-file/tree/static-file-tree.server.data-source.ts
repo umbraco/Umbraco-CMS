@@ -71,7 +71,7 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbStaticFileTreeIte
 		unique: serializer.toUnique(item.path),
 		parent: {
 			unique: item.parent ? serializer.toUnique(item.parent.path) : null,
-			entityType: item.parent ? UMB_STATIC_FILE_ENTITY_TYPE : UMB_STATIC_FILE_ROOT_ENTITY_TYPE,
+			entityType: item.parent ? UMB_STATIC_FILE_FOLDER_ENTITY_TYPE : UMB_STATIC_FILE_ROOT_ENTITY_TYPE,
 		},
 		entityType: item.isFolder ? UMB_STATIC_FILE_FOLDER_ENTITY_TYPE : UMB_STATIC_FILE_ENTITY_TYPE,
 		name: item.name,
