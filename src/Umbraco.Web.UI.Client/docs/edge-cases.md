@@ -649,3 +649,11 @@ if (state.held?.some((l) => l.name === 'umb:token-refresh')) {
 ```
 
 Note: there is a TOCTOU gap between `query()` and `request()`. If the lock releases between the two calls, `request()` acquires and releases immediately — this is harmless.
+
+**An ended session stays ended until a new one is established**
+
+After a timeout, a refresh the server rejected, or sign-out, `UmbAuthContext` marks the session ended. Requests made after that point do not call `/token`. They wait until a sign-in, in this tab or another one, establishes a new session. Do not clear that mark anywhere else, or a request made right after a timeout makes the ended session active again.
+
+**A session from another tab is held until its user is confirmed**
+
+Once the app shell has bound the page to the user it loaded (`bindUser()`), a session that may come from a sign-in is not applied straight away. That covers `authorized`, and a `sessionUpdate` that arrives while this tab holds no session. It waits until `/user/current` confirms the same user, so the same user keeps their unsaved work. A different user, or one that cannot be determined, emits `userChanged` instead, and from then on no session is applied to the page. The app shell then starts the page over with a full page load, which no `beforeunload` guard can stop. When adding a message type to `#handleChannelMessage` that establishes a session, apply it through `#applyPeerSession()`.
