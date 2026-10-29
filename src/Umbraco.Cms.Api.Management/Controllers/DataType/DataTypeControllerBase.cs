@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.SchemaLockdown;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
