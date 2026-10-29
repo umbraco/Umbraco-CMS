@@ -104,6 +104,15 @@ describe('UmbSchemaLockdownWorkspaceController', () => {
 		expect(entityReadOnlyGuard.getPermitted()).to.be.true;
 	});
 
+	it('keeps a new entity editable while it can be created, even if it cannot be updated', async () => {
+		allowedOperations = { create: true, update: false, delete: true };
+		setup('document-type', true);
+		await aTimeout(0);
+
+		expect(entityReadOnlyGuard.getPermitted()).to.be.false;
+		expect(forbidden.getIsOn()).to.be.false;
+	});
+
 	it('forbids a new entity again after its forbidden state is cleared', async () => {
 		allowedOperations = { create: false, update: true, delete: true };
 		setup('document-type', true);

@@ -11,7 +11,7 @@ const SCHEMA_LOCKDOWN_UNIQUE = 'UMB_SCHEMA_LOCKDOWN';
  * that access is denied. Workspaces whose entity type isn't governed by schema lockdown are left untouched.
  */
 export class UmbSchemaLockdownWorkspaceController extends UmbControllerBase {
-	#saveAllowed = new UmbSchemaOperationAllowedController(this, { operation: 'createOrUpdate' });
+	#updateAllowed = new UmbSchemaOperationAllowedController(this, { operation: 'update' });
 	#createAllowed = new UmbSchemaOperationAllowedController(this, { operation: 'create' });
 	#workspaceContext?: typeof UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.TYPE;
 	#isNew?: boolean;
@@ -24,7 +24,7 @@ export class UmbSchemaLockdownWorkspaceController extends UmbControllerBase {
 			this.#workspaceContext = context;
 			this.#isNew = undefined;
 			const entityType = context?.getEntityType();
-			this.#saveAllowed.setEntityType(entityType);
+			this.#updateAllowed.setEntityType(entityType);
 			this.#createAllowed.setEntityType(entityType);
 			this.observe(
 				context?.isNew,
@@ -40,7 +40,7 @@ export class UmbSchemaLockdownWorkspaceController extends UmbControllerBase {
 			this.observe(context?.forbidden.isOn, () => this.#update(), '_observeIsForbidden');
 		});
 
-		this.observe(this.#saveAllowed.allowed, () => this.#update(), null);
+		this.observe(this.#updateAllowed.allowed, () => this.#update(), null);
 		this.observe(this.#createAllowed.allowed, () => this.#update(), null);
 	}
 
@@ -48,7 +48,8 @@ export class UmbSchemaLockdownWorkspaceController extends UmbControllerBase {
 		const context = this.#workspaceContext;
 		if (!context) return;
 
-		if (this.#saveAllowed.getAllowed()) {
+		const saveAllowed = this.#isNew ? this.#createAllowed.getAllowed() : this.#updateAllowed.getAllowed();
+		if (saveAllowed) {
 			context.readOnlyGuard.removeRule(SCHEMA_LOCKDOWN_UNIQUE);
 		} else {
 			context.readOnlyGuard.addRule({ unique: SCHEMA_LOCKDOWN_UNIQUE, permitted: true });
