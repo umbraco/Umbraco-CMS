@@ -123,7 +123,7 @@ test('can delete a saved search', async ({umbracoApi, umbracoUi}) => {
 
 test('can expand a log entry', async ({umbracoUi}) => {
   // Arrange
-  const search = "StartsWith(@MessageTemplate, 'The token')";
+  const search = "StartsWith(@MessageTemplate, 'Acquiring MainDom')";
 
   // Act
   await umbracoUi.logViewer.clickSearchButton();
@@ -133,7 +133,7 @@ test('can expand a log entry', async ({umbracoUi}) => {
   await umbracoUi.logViewer.clickFirstLogSearchResult();
 
   // Assert
-  await umbracoUi.logViewer.doesDetailedLogHaveText('The token');
+  await umbracoUi.logViewer.doesDetailedLogHaveText('Acquiring MainDom');
 });
 
 // Currently only works if the user is using the locale 'en-US' otherwise it will fail
@@ -183,7 +183,7 @@ test.skip('can use pagination', async ({umbracoApi, umbracoUi}) => {
 test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const searchName = 'TestSearch';
-  const search = "StartsWith(@MessageTemplate, 'The token')";
+  const search = "StartsWith(@MessageTemplate, 'Acquiring MainDom')";
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
   await umbracoApi.logViewer.createSavedSearch(searchName, search);
   await umbracoUi.logViewer.goToSettingsTreeItem('Log Viewer');
@@ -199,7 +199,7 @@ test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
   // Checks if the search has the correct search value
   await umbracoUi.logViewer.doesSearchBoxHaveValue(search);
   // Checks if the saved search found the correct logs
-  await umbracoUi.logViewer.doesFirstLogHaveMessage('The token');
+  await umbracoUi.logViewer.doesFirstLogHaveMessage('Acquiring MainDom');
 
   // Clean
   await umbracoApi.logViewer.deleteSavedSearch(searchName);

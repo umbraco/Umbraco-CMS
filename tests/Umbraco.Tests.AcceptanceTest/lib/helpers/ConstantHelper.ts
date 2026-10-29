@@ -95,19 +95,17 @@
     0: ['Accepted types', 'Limit to specific types'],
     1: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
     2: ['Start node', ''],
-    3: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
-    4: ['Enable Focal Point', ''],
-    5: ['Image Crops', 'Local crops, stored on document'],
-    6: ['Ignore User Start Nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
+    3: ['Enable Focal Point', ''],
+    4: ['Image Crops', 'Local crops, stored on document'],
+    5: ['Ignore User Start Nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
   }
 
   public static readonly singleMediaPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
     1: ['Start node', ''],
-    2: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
-    3: ['Enable Focal Point', ''],
-    4: ['Image Crops', 'Local crops, stored on document'],
-    5: ['Ignore User Start Nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
+    2: ['Enable Focal Point', ''],
+    3: ['Image Crops', 'Local crops, stored on document'],
+    4: ['Ignore User Start Nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
   }
 
   public static readonly labelSettings = {

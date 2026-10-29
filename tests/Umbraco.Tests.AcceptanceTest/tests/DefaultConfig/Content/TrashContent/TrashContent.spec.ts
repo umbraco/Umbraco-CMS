@@ -117,9 +117,11 @@ test('can trash an invariant content node that references one item', async ({umb
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashActionMenuOption();
   // Verify the references list
+  await umbracoUi.content.clickViewItemsThatDependOnThisButton();
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
+  await umbracoUi.content.clickCloseEntityReferencesModalButton();
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
@@ -144,9 +146,11 @@ test('can trash a variant content node that references one item', async ({umbrac
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashActionMenuOption();
   // Verify the references list
+  await umbracoUi.content.clickViewItemsThatDependOnThisButton();
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
+  await umbracoUi.content.clickCloseEntityReferencesModalButton();
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
@@ -176,10 +180,11 @@ test('can trash an invariant content node that references more than 3 items', as
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  // Which 3 of the 4 references are shown is not deterministic, so assert the count and truncation text, not specific names.
+  // The references modal lists every item, so assert the count rather than specific names.
+  await umbracoUi.content.clickViewItemsThatDependOnThisButton();
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
-  await umbracoUi.content.doesReferenceItemsHaveCount(3);
-  await umbracoUi.content.doesReferencesContainText('...and one more item');
+  await umbracoUi.content.doesReferenceItemsHaveCount(4);
+  await umbracoUi.content.clickCloseEntityReferencesModalButton();
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
@@ -214,10 +219,11 @@ test('can trash a variant content node that references more than 3 items', async
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  // Which 3 of the 4 references are shown is not deterministic, so assert the count and truncation text, not specific names.
+  // The references modal lists every item, so assert the count rather than specific names.
+  await umbracoUi.content.clickViewItemsThatDependOnThisButton();
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
-  await umbracoUi.content.doesReferenceItemsHaveCount(3);
-  await umbracoUi.content.doesReferencesContainText('...and one more item');
+  await umbracoUi.content.doesReferenceItemsHaveCount(4);
+  await umbracoUi.content.clickCloseEntityReferencesModalButton();
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
@@ -252,9 +258,11 @@ test('can trash a content node with multiple cultures that references one item',
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashActionMenuOption();
   // Verify the references list
+  await umbracoUi.content.clickViewItemsThatDependOnThisButton();
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
+  await umbracoUi.content.clickCloseEntityReferencesModalButton();
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert

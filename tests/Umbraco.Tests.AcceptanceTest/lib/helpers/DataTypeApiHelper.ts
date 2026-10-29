@@ -2400,7 +2400,7 @@ export class DataTypeApiHelper {
     return await this.save(builder);
   }
 
-  async createDefaultElementPickerWithValidationLimit(name: string, minValidation: number = 0, maxValidation: number = 0) {
+  async createDefaultElementPickerWithValidationLimit(name: string, minValidation?: number, maxValidation?: number) {
     await this.ensureNameNotExists(name);
 
     const builder = new ElementPickerDataTypeBuilder()

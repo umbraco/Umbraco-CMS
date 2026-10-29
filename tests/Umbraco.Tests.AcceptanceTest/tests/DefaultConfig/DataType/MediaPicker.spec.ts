@@ -223,8 +223,9 @@ for (const mediaPicker of mediaPickerTypes) {
       const imageTypeData = await umbracoApi.mediaType.getByName('Image');
       expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'filter', imageTypeData.id)).toBeTruthy();
     }
-    if (!mediaPicker.type.includes('Multiple')) {
-      expect(await umbracoApi.dataType.doesMediaPickerHaveMinAndMaxAmount(mediaPicker.type, 0, 1)).toBeTruthy();
+    if (!mediaPicker.isMultiple) {
+      // A single picker holds one item by definition, so it carries no validation limit.
+      expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'validationLimit')).toBeFalsy();
     }
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'startNodeId')).toBeFalsy();
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'ignoreUserStartNodes')).toBeFalsy();

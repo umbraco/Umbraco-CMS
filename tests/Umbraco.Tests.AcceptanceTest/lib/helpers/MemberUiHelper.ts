@@ -147,7 +147,8 @@ export class MemberUiHelper extends UiBaseLocators {
   }
 
   async clickRemoveMemberGroupByName(memberGroupName: string) {
-    await this.click(this.page.locator(`[name="${memberGroupName}"]`).getByLabel('Remove'));
+    const memberGroupLocator = this.entityItem.filter({has: this.page.locator(`[name="${memberGroupName}"]`)});
+    await this.click(memberGroupLocator.getByLabel('Remove'));
   }
 
   async enterNewPassword(password: string) {

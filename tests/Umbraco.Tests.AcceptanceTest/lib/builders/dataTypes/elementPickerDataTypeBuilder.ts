@@ -10,12 +10,12 @@ export class ElementPickerDataTypeBuilder extends DataTypeBuilder {
     this.editorUiAlias = 'Umb.PropertyEditorUi.ElementPicker';
   }
 
-  withMinValidation(min: number) {
+  withMinValidation(min?: number) {
     this.minValidation = min;
     return this;
   }
 
-  withMaxValidation(max: number) {
+  withMaxValidation(max?: number) {
     this.maxValidation = max;
     return this;
   }

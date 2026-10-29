@@ -228,6 +228,9 @@ export class UiBaseLocators extends BasePage {
   public readonly confirmActionModalEntityReferences: Locator;
   public readonly referenceHeadline: Locator;
   public readonly entityItemRef: Locator;
+  public readonly viewDependentItemsBtn: Locator;
+  public readonly entityReferencesModal: Locator;
+  public readonly entityReferencesModalCloseBtn: Locator;
   public readonly entityItem: Locator;
 
   // Workspace & Action
@@ -596,12 +599,17 @@ export class UiBaseLocators extends BasePage {
     this.confirmActionModalEntityReferences = page.locator(
       "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
     );
-    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app').locator('uui-ref-list').first().getByTestId('entity-item-ref');
+    // Single-entity confirm dialogs summarise references behind a "View items that depend on this…" button that
+    // opens umb-entity-references-modal; bulk dialogs and the workspace info app still list them inline.
+    this.entityReferencesModal = page.locator('umb-entity-references-modal');
+    // Target the uui-button host: its inner native button sits behind the slotted label, which intercepts clicks.
+    this.viewDependentItemsBtn = page.locator('umb-entity-references-summary uui-button').filter({hasText: 'View items that depend on this'});
+    this.entityReferencesModalCloseBtn = this.entityReferencesModal.getByLabel('Close');
+    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app,umb-entity-references-modal').locator('uui-ref-list').first().getByTestId('entity-item-ref');
     this.referenceHeadline = page
       .locator(
-        "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
+        'umb-confirm-action-modal-entity-references #reference-headline, umb-confirm-bulk-action-modal-entity-references #reference-headline, umb-entity-references-modal umb-localize[key="references_labelDependsOnThis"]',
       )
-      .locator("#reference-headline")
       .first();
     this.entityItem = page.locator("umb-entity-item-ref");
 
@@ -1897,6 +1905,15 @@ export class UiBaseLocators extends BasePage {
 
   async doesReferencesContainText(text: string) {
     await this.containsText(this.confirmActionModalEntityReferences, text);
+  }
+
+  async clickViewItemsThatDependOnThisButton() {
+    await this.click(this.viewDependentItemsBtn);
+  }
+
+  async clickCloseEntityReferencesModalButton() {
+    await this.click(this.entityReferencesModalCloseBtn);
+    await this.isVisible(this.entityReferencesModal, false);
   }
 
   // Entity Action Methods
