@@ -20,10 +20,13 @@ public interface ISchemaRestrictionsBuilder : ISchemaRestrictions
     /// <see cref="SchemaOperation.Delete"/> can be denied; the others are answered by rule and denying one does
     /// nothing. See <see cref="ISchemaRestrictions.IsAllowed"/>.
     /// </remarks>
+    /// <param name="entityType">The entity type, for example one of <see cref="Constants.UdiEntityType"/>.</param>
+    /// <param name="operations">The operations to deny.</param>
     void Block(string entityType, params SchemaOperation[] operations);
 
     /// <summary>
     /// Denies every operation on the supplied entity type that is not a read.
     /// </summary>
+    /// <param name="entityType">The entity type, for example one of <see cref="Constants.UdiEntityType"/>.</param>
     void BlockMutations(string entityType);
 }
