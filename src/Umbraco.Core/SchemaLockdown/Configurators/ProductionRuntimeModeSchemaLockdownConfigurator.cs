@@ -7,17 +7,15 @@ namespace Umbraco.Cms.Core.SchemaLockdown.Configurators;
 /// Locks templates and partial views when the site runs in <see cref="RuntimeMode.Production"/>.
 /// </summary>
 /// <remarks>
-/// In production runtime mode template and partial view files are not written to disk, as they arrive with the
-/// deployment. A change requested through the Management API would either not be persisted, or, for the database
-/// record of a template, drift away from the deployed file, so it is denied.
+/// In production runtime mode template and partial view files come with the deployment and aren't written to disk,
+/// so a change would either be lost or, for a template's database record, drift from its file.
 /// <para>
-/// Deleting a template stays permitted. It removes only the database record, leaving the file to the deployment,
-/// which is how a template removed from the code is cleaned up on the environments it was deployed to. A partial
-/// view is only its file, so there is nothing to clean up and deleting one is denied.
+/// Deleting a template is still permitted: it removes only the database record, which is how a template removed from
+/// the code is cleaned up. A partial view is only its file, so deleting one is denied.
 /// </para>
 /// <para>
-/// For templates this is the only thing denying a change. A site that removes this configurator lets template
-/// changes through in production runtime mode, saving them to the database without writing their files.
+/// Removing this configurator lets template changes through in production runtime mode, saved to the database without
+/// their files.
 /// </para>
 /// </remarks>
 public sealed class ProductionRuntimeModeSchemaLockdownConfigurator : ISchemaLockdownConfigurator

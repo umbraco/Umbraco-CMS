@@ -11,8 +11,7 @@ using Umbraco.Cms.Core.SchemaLockdown;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// The restrictions match entity types case-insensitively and report back whatever casing a configurator wrote, so the
-/// endpoint settles the casing rather than leaving the backoffice to guess at it.
+/// The endpoint reports entity types in lower case, whatever casing the configurator used.
 /// </summary>
 public class ReportedEntityTypesAreLowerCasedTests : SchemaLockdownApiTest<SchemaLockdownServerController>
 {

@@ -11,8 +11,7 @@ using Umbraco.Cms.Core.SchemaLockdown;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// A restricted entity type is reported operation by operation rather than as locked or not, so a partial lock
-/// reaches the backoffice as one. This is what the backoffice disables its buttons from.
+/// The endpoint reports each operation of a restricted entity type, so a partial lock reaches the backoffice.
 /// </summary>
 public class ReportedOperationsFollowWhatWasBlockedTests : SchemaLockdownApiTest<SchemaLockdownServerController>
 {

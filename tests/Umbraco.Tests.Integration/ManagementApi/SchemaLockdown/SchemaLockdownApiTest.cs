@@ -4,8 +4,8 @@ using Umbraco.Cms.Api.Management.Controllers;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// Base class for the schema lockdown endpoint tests, which all need an authenticated client to reach the filter at
-/// all: an unauthenticated request is turned away by the authorization middleware before any filter runs.
+/// Base class for the schema lockdown endpoint tests. The client is authenticated, as the filter only runs after
+/// authorization.
 /// </summary>
 /// <typeparam name="T">The controller under test.</typeparam>
 public abstract class SchemaLockdownApiTest<T> : ManagementApiTest<T>

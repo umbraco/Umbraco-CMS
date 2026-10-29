@@ -5,10 +5,8 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.SchemaLockdown;
 
-// [SchemaEntityType] carries a free-form string, so a misspelled entity type still compiles and simply never
-// matches what a configurator wrote - the controller would look governed and be silently exempt. This is what
-// makes that fail, and it reads the Management API assembly rather than the current AppDomain so no test
-// fixture's own [SchemaEntityType] declaration can stand in for a real controller.
+// [SchemaEntityType] takes a free-form string, so a misspelled entity type would compile and never match. Only the
+// Management API assembly is scanned, so test fixtures can't stand in for real controllers.
 [TestFixture]
 public class EntityTypeDeclarationTests
 {

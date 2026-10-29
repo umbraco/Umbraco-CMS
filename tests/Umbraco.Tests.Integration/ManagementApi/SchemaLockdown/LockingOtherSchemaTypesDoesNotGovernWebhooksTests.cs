@@ -11,8 +11,7 @@ using Umbraco.Cms.Core.SchemaLockdown;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// Locking a broad set of other entity types leaves webhooks creatable, so a lockdown cannot sweep up an entity
-/// type no configurator named.
+/// Locking other entity types leaves webhooks creatable: only the entity types a configurator names are locked.
 /// </summary>
 public class LockingOtherSchemaTypesDoesNotGovernWebhooksTests : SchemaLockdownApiTest<CreateWebhookController>
 {

@@ -13,8 +13,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// Dictionary items have no per-operation carve-out: like every other locked entity type, they are blocked
-/// for every operation, including <see cref="UpdateDictionaryController"/>.
+/// Updating a locked dictionary item is denied.
 /// </summary>
 public class UpdatingADictionaryItemIsForbiddenTests : SchemaLockdownApiTest<UpdateDictionaryController>
 {

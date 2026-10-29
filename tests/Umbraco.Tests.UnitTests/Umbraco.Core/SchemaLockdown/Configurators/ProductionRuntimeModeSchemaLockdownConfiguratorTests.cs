@@ -36,8 +36,7 @@ public class ProductionRuntimeModeSchemaLockdownConfiguratorTests
         });
     }
 
-    // Deleting a template only removes its database record, which is how a template removed from the code is cleaned
-    // up where it was deployed. A partial view has no record, only the file the deployment owns.
+    // Deleting a template only removes its database record; a partial view is only its file.
     [Test]
     public void Production_Permits_Deleting_Templates_But_Not_Partial_Views()
     {
