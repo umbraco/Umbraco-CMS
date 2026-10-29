@@ -54,6 +54,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     // Global is correctness-robust; only revisit if read-through churn under heavy concurrent
     // publishing ever shows up in profiling.
     private long _cacheGeneration;
+    private readonly KeyedLock<Guid> _refreshLocks = new();
 
 #pragma warning disable IDE0032 // Use auto property - auto-property can't express the lazy initialization of the seed keys and reset, so we use a backing field instead.
     private HashSet<Guid>? _seedKeys;
@@ -463,36 +464,43 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     /// <inheritdoc />
     public void RefreshMemoryCache(Guid key)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        scope.ReadLock(Constants.Locks.ContentTree);
-
-        // The read lock stays held across the cache writes so a save cannot commit between this read and the cache
-        // update; the database read is synchronous so the lock is not held across a thread-pool hop. The cache writes
-        // complete synchronously unless a distributed (L2) cache is configured.
-        (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = _databaseCacheRepository.GetContentSourceForPublishStates(key);
-
-        if (draftNode is not null)
+        // Waiting for the distributed cache write needs a thread-pool thread. Under the content tree lock that wait
+        // can starve on a busy pool and hold the lock for seconds, so the writes are issued under the lock and only
+        // waited for once the scope is disposed.
+        //
+        // This keeps the ordering: HybridCache updates the in-process cache and sends the distributed write before
+        // its first await, so both still happen under the lock; only the wait for the acknowledgement moves out.
+        // The per-document lock makes the next refresh of the same document wait for this one's write, so a slow
+        // write cannot land on top of a newer one.
+        // TODO (V20): await the cache writes directly once the refresh pipeline is asynchronous.
+        using (_refreshLocks.Enter(key))
         {
-            _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode)).AsTask().GetAwaiter().GetResult();
-        }
-        else
-        {
-            _hybridCache.RemoveAsync(GetCacheKey(key, true)).AsTask().GetAwaiter().GetResult();
-        }
+            var pending = new List<Task>(2);
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
 
-        if (publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key))
-        {
-            var cacheKey = GetCacheKey(publishedNode.Key, false);
-            _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode)).AsTask().GetAwaiter().GetResult();
-            _publishedContentCache.Remove(cacheKey);
-            InvalidateMemoryCacheGeneration();
-        }
-        else
-        {
-            ClearPublishedCacheAsync(key).GetAwaiter().GetResult();
-        }
+                (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = _databaseCacheRepository.GetContentSourceForPublishStates(key);
 
-        scope.Complete();
+                pending.Add(draftNode is not null
+                    ? _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode)).AsTask()
+                    : _hybridCache.RemoveAsync(GetCacheKey(key, true)).AsTask());
+
+                var cacheKey = GetCacheKey(key, false);
+                pending.Add(publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key)
+                    ? _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode)).AsTask()
+                    : _hybridCache.RemoveAsync(cacheKey).AsTask());
+                _publishedContentCache.Remove(cacheKey);
+                InvalidateMemoryCacheGeneration();
+
+                scope.Complete();
+            }
+
+            foreach (Task write in pending)
+            {
+                write.GetAwaiter().GetResult();
+            }
+        }
     }
 
     /// <inheritdoc />
