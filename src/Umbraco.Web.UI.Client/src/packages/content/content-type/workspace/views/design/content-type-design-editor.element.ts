@@ -191,7 +191,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		this.observe(
 			entityDetailContext?.readOnlyGuard.permitted,
-			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			(isReadOnly) => {
+				this._isReadOnly = isReadOnly ?? false;
+				if (this.#currentTabComponent) {
+					this.#currentTabComponent.readonly = this._isReadOnly;
+				}
+			},
 			'_observeIsReadOnly',
 		);
 	}
@@ -234,6 +239,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			setup: (component) => {
 				this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
 				this.#currentTabComponent.containerId = null;
+				this.#currentTabComponent.readonly = this._isReadOnly;
 			},
 		});
 
@@ -250,6 +256,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					setup: (component) => {
 						this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
 						this.#currentTabComponent.containerId = tab.ownerId ?? tab.ids[0];
+						this.#currentTabComponent.readonly = this._isReadOnly;
 					},
 				});
 			});

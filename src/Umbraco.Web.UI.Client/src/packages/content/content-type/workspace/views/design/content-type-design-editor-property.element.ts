@@ -10,7 +10,6 @@ import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/back
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 /**
  *  @element umb-content-type-design-editor-property
@@ -83,23 +82,17 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	protected editPropertyTypePath?: string;
 
+	/**
+	 * Sets the property to readonly mode, meaning it can't be changed, sorted or removed.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean })
+	public readonly = false;
+
 	@state()
 	private _dataTypeName?: string;
-
-	@state()
-	private _isReadOnly = false;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				context?.readOnlyGuard.permitted,
-				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
-				'observeIsReadOnly',
-			);
-		});
-	}
 
 	async #checkInherited() {
 		if (this._propertyStructureHelper && this._property) {
@@ -170,7 +163,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	override render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings: [NL]
-		return this._inherited || this._isReadOnly ? this.#renderReadOnlyProperty() : this.#renderEditableProperty();
+		return this._inherited || this.readonly ? this.#renderReadOnlyProperty() : this.#renderEditableProperty();
 	}
 
 	#renderReadOnlyProperty() {

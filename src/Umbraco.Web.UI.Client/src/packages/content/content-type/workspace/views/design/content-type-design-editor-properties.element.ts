@@ -15,7 +15,6 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import {
@@ -197,28 +196,33 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	@state()
 	private _sortModeActive?: boolean;
 
-	@state()
-	private _isReadOnly = false;
+	/**
+	 * Sets the properties to readonly mode, meaning they can't be added, changed, sorted or removed.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean })
+	public get readonly(): boolean {
+		return this.#readonly;
+	}
+	public set readonly(value: boolean) {
+		const oldValue = this.#readonly;
+		if (value === oldValue) return;
+		this.#readonly = value;
+		if (value) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+		this.requestUpdate('readonly', oldValue);
+	}
+	#readonly = false;
 
 	constructor() {
 		super();
 
 		//this.#sorter.disable();
-
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				context?.readOnlyGuard.permitted,
-				(isReadOnly) => {
-					this._isReadOnly = isReadOnly ?? false;
-					if (this._isReadOnly) {
-						this.#sorter.disable();
-					} else {
-						this.#sorter.enable();
-					}
-				},
-				'_observeIsReadOnly',
-			);
-		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
 			this.observe(
@@ -365,6 +369,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 										.editContentTypePath=${this.editContentTypePath}
 										.editPropertyTypePath=${this._editPropertyTypePath}
 										?sort-mode-active=${this._sortModeActive}
+										.readonly=${this.readonly}
 										.propertyStructureHelper=${this.#propertyStructureHelper}
 										.property=${property}
 										.ownerVariesByCulture=${this._ownerContentTypeVariesByCulture}
@@ -376,7 +381,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					</div>
 
 					${when(
-						!this._sortModeActive && !this._isReadOnly,
+						!this._sortModeActive && !this.readonly,
 						() => html`
 							<uui-button
 								id="btn-add"
