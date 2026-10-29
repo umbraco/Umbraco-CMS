@@ -87,6 +87,20 @@ internal sealed class ContentEditingService
     /// <inheritdoc/>
     protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
 
+    /// <inheritdoc/>
+    protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
+    {
+        // Documents cannot be created from element types. They aren't provided as allowed types, but a direct API or service
+        // request could try to create one. An element type can still be flagged as allowed at root or as a child, as these
+        // settings are retained when a content type is converted to an element type.
+        if (contentType.IsElement)
+        {
+            return (null, ContentEditingOperationStatus.NotAllowed);
+        }
+
+        return await base.TryGetAndValidateParentIdAsync(parentKey, contentType);
+    }
+
     /// <inheritdoc />
     public Task<IContent?> GetAsync(Guid key)
     {

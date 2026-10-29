@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -259,6 +260,7 @@ public class DocumentCacheServiceRefreshMemoryCacheTests
             Mock.Of<IPreviewService>(),
             publishStatus.Object,
             NullLogger<DocumentCacheService>.Instance,
-            cacheFactory.Object);
+            cacheFactory.Object,
+            Mock.Of<IPreviewAccessEvaluator>());
     }
 }

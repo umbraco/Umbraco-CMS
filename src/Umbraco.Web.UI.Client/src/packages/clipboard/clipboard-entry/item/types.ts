@@ -1,6 +1,7 @@
 import type { UmbClipboardEntryEntityType } from '../entity.js';
+import type { UmbWithOptionalThumbnailModel } from '@umbraco-cms/backoffice/models';
 
-export interface UmbClipboardEntryItemModel<MetaType = object> {
+export interface UmbClipboardEntryItemModel<MetaType = object> extends UmbWithOptionalThumbnailModel {
 	entityType: UmbClipboardEntryEntityType;
 
 	/**
