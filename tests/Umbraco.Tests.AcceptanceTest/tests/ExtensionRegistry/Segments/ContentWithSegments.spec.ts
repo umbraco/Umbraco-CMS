@@ -49,10 +49,11 @@ test.describe('content with culture and segment variations', () => {
     await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
 
     // Assert
-    const contentData = await umbracoApi.document.getByName(contentName);
-    expect(contentData.values[0].culture).toBe('en-US');
-    expect(contentData.values[0].segment).toBeNull();
-    expect(contentData.values[0].value).toBe(defaultSegmentValue);
+    const [defaultValue] = await umbracoApi.document.getValuesByCultureAndSegmentForDocument(contentName, [
+      {culture: 'en-US', segment: null},
+    ]);
+    expect(defaultValue).toBeTruthy();
+    expect(defaultValue.value).toBe(defaultSegmentValue);
   });
 
   test('can save VIP segment-specific property value', async ({umbracoApi, umbracoUi}) => {

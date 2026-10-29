@@ -47,6 +47,8 @@ export class MediaDeliveryApiHelper {
 
   async verifyDefaultMediaItemJson(mediaName: string, mediaItemJson, mediaPath: string, mediaTypeName: string) {
     const mediaData = await this.api.media.getByName(mediaName);
+    // Property values are returned in a deterministic order, so look the file up by alias rather than by position.
+    const mediaFileValue = mediaData.values.find(x => x.alias === 'umbracoFile')?.value;
 
     // Verify path, createDate, updateDate, id, name, and mediaType are always included in the response
     expect(mediaItemJson.path).toBe(mediaPath);
@@ -58,7 +60,7 @@ export class MediaDeliveryApiHelper {
     expect(mediaItemJson.mediaType).toBe(mediaTypeData.alias);
     // Verify url, extension and the size in bytes are included for all files (not for folders).
     if (mediaTypeName !== 'Folder') {
-      const mediaSrc = mediaData.values[0].value.src ? mediaData.values[0].value.src : '';
+      const mediaSrc = mediaFileValue?.src ?? '';
       expect(mediaItemJson.url).toBe(mediaSrc);
       const mediaExtension = mediaData.values.find(x => x.alias === 'umbracoExtension')?.value || null;
       expect(mediaItemJson.extension).toBe(mediaExtension);
@@ -75,8 +77,8 @@ export class MediaDeliveryApiHelper {
       const mediaHeight = mediaData.values.find(x => x.alias === 'umbracoHeight')?.value;
       expect(mediaItemJson.width).toBe(mediaWidth ? Number(mediaWidth) : 0);
       expect(mediaItemJson.height).toBe(mediaHeight ? Number(mediaHeight) : 0);
-      expect(mediaItemJson.focalPoint).toBe(mediaData.values[0].value.focalPoint ? mediaData.values[0].value.focalPoint : null);
-      expect(mediaItemJson.crops).toEqual(mediaData.values[0].value.crops ? mediaData.values[0].value.crops : null);
+      expect(mediaItemJson.focalPoint).toBe(mediaFileValue?.focalPoint ?? null);
+      expect(mediaItemJson.crops).toEqual(mediaFileValue?.crops ?? null);
     } else {
       expect(mediaItemJson.width).toBeNull();
       expect(mediaItemJson.height).toBeNull();

@@ -229,6 +229,7 @@ export class UiBaseLocators extends BasePage {
   public readonly referenceHeadline: Locator;
   public readonly entityItemRef: Locator;
   public readonly viewDependentItemsBtn: Locator;
+  public readonly viewReferencedDescendantsBtn: Locator;
   public readonly entityReferencesModal: Locator;
   public readonly entityReferencesModalCloseBtn: Locator;
   public readonly entityItem: Locator;
@@ -604,11 +605,12 @@ export class UiBaseLocators extends BasePage {
     this.entityReferencesModal = page.locator('umb-entity-references-modal');
     // Target the uui-button host: its inner native button sits behind the slotted label, which intercepts clicks.
     this.viewDependentItemsBtn = page.locator('umb-entity-references-summary uui-button').filter({hasText: 'View items that depend on this'});
+    this.viewReferencedDescendantsBtn = page.locator('umb-entity-references-summary uui-button').filter({hasText: 'View referenced descendants'});
     this.entityReferencesModalCloseBtn = this.entityReferencesModal.getByLabel('Close');
     this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app,umb-entity-references-modal').locator('uui-ref-list').first().getByTestId('entity-item-ref');
     this.referenceHeadline = page
       .locator(
-        'umb-confirm-action-modal-entity-references #reference-headline, umb-confirm-bulk-action-modal-entity-references #reference-headline, umb-entity-references-modal umb-localize[key="references_labelDependsOnThis"]',
+        'umb-confirm-action-modal-entity-references #reference-headline, umb-confirm-bulk-action-modal-entity-references #reference-headline, umb-entity-references-modal umb-localize[key="references_labelDependsOnThis"], umb-entity-references-modal umb-localize[key="references_labelDependentDescendants"]',
       )
       .first();
     this.entityItem = page.locator("umb-entity-item-ref");
@@ -1909,6 +1911,10 @@ export class UiBaseLocators extends BasePage {
 
   async clickViewItemsThatDependOnThisButton() {
     await this.click(this.viewDependentItemsBtn);
+  }
+
+  async clickViewReferencedDescendantsButton() {
+    await this.click(this.viewReferencedDescendantsBtn);
   }
 
   async clickCloseEntityReferencesModalButton() {

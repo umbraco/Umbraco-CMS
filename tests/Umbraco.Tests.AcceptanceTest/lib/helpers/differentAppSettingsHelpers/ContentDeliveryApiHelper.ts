@@ -123,10 +123,12 @@ export class ContentDeliveryApiHelper {
 
   async verifyPropertiesForMediaItem(mediaName: string, mediaItemJson) {
     const mediaData = await this.api.media.getByName(mediaName);
+    // Property values are returned in a deterministic order, so look the file up by alias rather than by position.
+    const mediaFileValue = mediaData.values.find(x => x.alias === 'umbracoFile')?.value;
 
     expect(mediaItemJson.name).toBe(mediaName);
-    expect(mediaItemJson.focalPoint).toEqual(mediaData.values[0].value.focalPoint);
-    expect(mediaItemJson.crops).toEqual(mediaData.values[0].value.crops);
+    expect(mediaItemJson.focalPoint).toEqual(mediaFileValue?.focalPoint);
+    expect(mediaItemJson.crops).toEqual(mediaFileValue?.crops);
     expect(mediaItemJson.id).toEqual(mediaData.id);
     const expectedWidthValue = mediaData.values.find((p) => p.alias === 'umbracoWidth').value;
     expect(mediaItemJson.width).toEqual(Number(expectedWidthValue));

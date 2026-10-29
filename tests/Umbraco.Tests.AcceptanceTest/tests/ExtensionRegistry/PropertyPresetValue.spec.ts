@@ -123,7 +123,8 @@ test('can insert preset value in textstring property that vary by segment in con
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
   await umbracoUi.content.clickSelectVariantButton();
-  await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
+  // A segment that already holds a value (here: the preset) is listed as created rather than as an add option.
+  await umbracoUi.content.clickSegmentVariantButton(vipMemberSegment);
 
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(expectedString);
