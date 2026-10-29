@@ -7,9 +7,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.MediaType.Import',
-		weight: 999,
+		weight: 500,
 		separatorBefore: true,
-		name: 'Export Media Type Entity Action',
+		name: 'Import Media Type Entity Action',
 		forEntityTypes: [UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE],
 		api: () => import('./media-type-import.action.js'),
 		meta: {
