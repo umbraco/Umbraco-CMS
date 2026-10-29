@@ -36,15 +36,20 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeContentType();
+			this.#observeReadOnly();
 		});
+	}
 
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				context?.readOnlyGuard.permitted,
-				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
-				'_observeIsReadOnly',
-			);
-		});
+	#observeReadOnly() {
+		const context = this.#workspaceContext;
+		const entityDetailContext =
+			context && UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.getDiscriminator()?.(context) ? context : undefined;
+
+		this.observe(
+			entityDetailContext?.readOnlyGuard.permitted,
+			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			'_observeIsReadOnly',
+		);
 	}
 
 	#observeContentType() {

@@ -6,7 +6,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-data-type-details-workspace-view')
 export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -43,10 +42,6 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 			this.#workspaceContext = workspaceContext;
 			this.#observeDataType();
 		});
-
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context?.readOnlyGuard.permitted, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
-		});
 	}
 
 	#observeDataType() {
@@ -74,6 +69,12 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		this.observe(this.#workspaceContext.propertyEditorDataSourceAlias, (value) => {
 			this._propertyEditorDataSourceAlias = value;
 		});
+
+		this.observe(
+			this.#workspaceContext.readOnlyGuard.permitted,
+			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			'_observeIsReadOnly',
+		);
 	}
 
 	#observePropertyEditorUIManifest() {

@@ -47,15 +47,20 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 			this.#workspaceContext = workspaceContext;
 			this.#observeName();
 			this.#observeNameWriteGuardRules();
+			this.#observeReadOnly();
 		});
+	}
 
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				context?.readOnlyGuard.permitted,
-				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
-				'umbObserveWorkspaceReadOnly',
-			);
-		});
+	#observeReadOnly() {
+		const context = this.#workspaceContext;
+		const entityDetailContext =
+			context && UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.getDiscriminator()?.(context) ? context : undefined;
+
+		this.observe(
+			entityDetailContext?.readOnlyGuard.permitted,
+			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			'umbObserveWorkspaceReadOnly',
+		);
 	}
 
 	#observeNameWriteGuardRules() {

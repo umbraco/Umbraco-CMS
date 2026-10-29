@@ -13,7 +13,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-document-type-workspace-view-settings')
 export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -52,10 +51,6 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			this.#workspaceContext = documentTypeContext;
 			this.#observeDocumentType();
 		});
-
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context?.readOnlyGuard.permitted, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
-		});
 	}
 
 	protected override async firstUpdated(_changedProperties: PropertyValues): Promise<void> {
@@ -85,6 +80,12 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			this._keepAllVersionsNewerThanDays = cleanup?.keepAllVersionsNewerThanDays;
 			this._keepLatestVersionPerDayForDays = cleanup?.keepLatestVersionPerDayForDays;
 		});
+
+		this.observe(
+			this.#workspaceContext.readOnlyGuard.permitted,
+			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			'_observeIsReadOnly',
+		);
 	}
 
 	#setCleanup() {

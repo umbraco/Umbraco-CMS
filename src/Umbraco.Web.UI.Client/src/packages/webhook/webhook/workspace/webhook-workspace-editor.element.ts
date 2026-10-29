@@ -3,7 +3,6 @@ import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffic
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-webhook-workspace-editor')
 export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
@@ -29,10 +28,12 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#workspaceContext?.url, (url) => (this._url = url ?? ''));
 			this.observe(this.#workspaceContext?.name, (name) => (this._name = name ?? ''));
 			this.observe(this.#workspaceContext?.description, (description) => (this._description = description ?? ''));
-		});
 
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context?.readOnlyGuard.permitted, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
+			this.observe(
+				context?.readOnlyGuard.permitted,
+				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+				'_observeIsReadOnly',
+			);
 		});
 	}
 

@@ -9,7 +9,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
 import '@umbraco-cms/backoffice/code-editor';
@@ -42,10 +41,6 @@ export class UmbTemplateCodeEditorWorkspaceViewElement extends UmbLitElement imp
 			this.#modalContext = instance;
 		});
 
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context?.readOnlyGuard.permitted, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
-		});
-
 		this.consumeContext(UMB_TEMPLATE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#templateWorkspaceContext = workspaceContext;
 
@@ -57,6 +52,12 @@ export class UmbTemplateCodeEditorWorkspaceViewElement extends UmbLitElement imp
 				this.#masterTemplateUnique = masterTemplate?.unique ?? null;
 				this._masterTemplateName = masterTemplate?.name ?? null;
 			});
+
+			this.observe(
+				workspaceContext?.readOnlyGuard.permitted,
+				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+				'_observeIsReadOnly',
+			);
 		});
 	}
 
