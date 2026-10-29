@@ -14,6 +14,8 @@ import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
+const MAX_NOTIFICATION_NAME_LENGTH = 20;
+
 /**
  * @description - Shared entity action for publishing content-like entities (Document, Element, ...).
  * Resolves its detail/publishing repositories by alias from `meta`, so a single implementation can serve every
@@ -37,6 +39,7 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 		const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 			data: {
 				confirmLabel: '#actions_publish',
+				description: this.args.meta.publishConfirmationMessage,
 				options,
 				pickableFilter: (option) =>
 					this.#isLanguagePickable(option, currentUserAllowedLanguages, currentUserHasAccessToAllLanguages),
@@ -55,7 +58,7 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 		if (!publishableVariantIds.length) return;
 
 		await this.#publish(unique, publishableVariantIds);
-		await this.#notifyPublished(options, detailData, result.selection);
+		await this.#notifyPublished(options, detailData, result.selection, appCulture);
 		await this.#dispatchReloadEvent(unique);
 	}
 
@@ -180,9 +183,14 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 		options: Array<UmbEntityVariantOptionModel>,
 		detailData: UmbContentDetailModel,
 		selection: Array<string>,
+		appCulture: string | undefined,
 	): Promise<void> {
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		const localize = new UmbLocalizationController(this);
+
+		const headline = localize.string(
+			this.args.meta.publishedNotificationHeadline || '#publish_publishedNotificationTitle',
+		);
 
 		// If the content is invariant, we need to show a different notification
 		const isInvariant = options.length === 1 && options[0].culture === null;
@@ -190,24 +198,33 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 		if (isInvariant) {
 			notificationContext?.peek('positive', {
 				data: {
-					headline: localize.term('speechBubbles_editContentPublishedHeader'),
+					headline,
 					message: localize.string(
-						this.args.meta.publishedNotificationMessage || '#speechBubbles_editContentPublishedText',
+						this.args.meta.publishedNotificationMessage || '#publish_publishedNotificationDescription',
+						this.#truncateName(detailData.variants[0]?.name),
 					),
 				},
 			});
 		} else {
 			const publishedVariants = detailData.variants.filter((variant) => selection.includes(variant.culture!));
+			const namedVariant = publishedVariants.find((v) => v.culture === appCulture) ?? publishedVariants[0];
 			notificationContext?.peek('positive', {
 				data: {
-					headline: localize.term('speechBubbles_editContentPublishedHeader'),
+					headline,
 					message: localize.string(
-						this.args.meta.variantPublishedNotificationMessage || '#speechBubbles_editVariantPublishedText',
+						this.args.meta.variantPublishedNotificationMessage || '#publish_publishedVariantNotificationDescription',
 						localize.list(publishedVariants.map((v) => new UmbVariantId(v.culture, null).toString() ?? v.name)),
+						this.#truncateName(namedVariant?.name),
 					),
 				},
 			});
 		}
+	}
+
+	#truncateName(name: string | undefined): string {
+		if (!name) return '';
+		if (name.length <= MAX_NOTIFICATION_NAME_LENGTH) return name;
+		return `${name.slice(0, MAX_NOTIFICATION_NAME_LENGTH)}…`;
 	}
 
 	async #dispatchReloadEvent(unique: string): Promise<void> {

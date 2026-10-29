@@ -965,6 +965,8 @@ export default {
 		publishAll: 'Publicera %0% och alla dess underordnade sidor',
 		publishHelp:
 			'Klicka på <em>ok</em> för att publicera <strong>%0%</strong>. Därmed blir innehållet publikt.<br/><br /> Du kan publicera denna sida och alla dess undersidor genom att kryssa i <em>publicera alla undersidor</em>. ',
+		publishedNotificationTitle: 'Publicerat',
+		publishedNotificationDescription: '%0% är nu offentligt tillgängligt',
 	},
 	references: {
 		itemHasNoReferences: 'Det här objektet har inga referenser.',
@@ -1068,6 +1070,7 @@ export default {
 		editContentPublishedFailedByParent:
 			'Det gick inte att publicera sidan eftersom dess överordnade sida inte är publicerad',
 		editContentPublishedHeader: 'Innehållet är publicerat',
+		editElementPublishedHeader: 'Elementet är publicerat',
 		editContentPublishedText: 'och syns på webbplatsen',
 		editContentSavedHeader: 'Innehållet har sparats',
 		editContentSavedText: 'Kom ihåg att publicera för att ändringarna ska synas på webbplatsen',

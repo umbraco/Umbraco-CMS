@@ -1134,6 +1134,9 @@ export default {
 		publishAll: 'نشر %0% وجميع الصفحات الفرعية الخاصة به',
 		publishHelp:
 			'انقر على <em>نشر</em> لنشر <strong>%0%</strong> وجعل محتواه متاحًا علنًا.<br/><br />\n      يمكنك نشر هذه الصفحة وجميع صفحاتها الفرعية عن طريق تحديد <em>تضمين الصفحات الفرعية غير المنشورة</em> أدناه.\n      ',
+		publishedNotificationTitle: 'تم النشر',
+		publishedNotificationDescription: '%0% متاح الآن للعامة',
+		publishedVariantNotificationDescription: '%1% متاح الآن للعامة في %0%',
 	},
 	colorpicker: {
 		noColors: 'لم تقم بتكوين أي ألوان معتمدة',
@@ -1309,6 +1312,7 @@ export default {
 		dataTypeSaved: 'تم حفظ نوع البيانات',
 		dictionaryItemSaved: 'تم حفظ عنصر القاموس',
 		editContentPublishedHeader: 'تم نشر المحتوى',
+		editElementPublishedHeader: 'تم نشر العنصر',
 		editContentPublishedText: 'وهو مرئي على الموقع',
 		editMultiContentPublishedText: 'تم نشر %0% مستندات وهي مرئية على الموقع',
 		editVariantPublishedText: '%0% تم نشره وهو مرئي على الموقع',
@@ -2455,5 +2459,9 @@ export default {
 		minimapConfigDescription: 'عرض خريطة مصغرة في محرر الأكواد.',
 		wordWrapConfigLabel: 'تغليف الكلمات',
 		wordWrapConfigDescription: 'تفعيل تغليف الكلمات في محرر الأكواد.',
+	},
+	elements: {
+		confirmBulkPublishDescription: 'النشر سيجعل العناصر المحددة متاحة للعامة.',
+		confirmBulkUnpublishDescription: 'لن تكون العناصر المحددة متاحة للعامة بعد الآن.',
 	},
 } as UmbLocalizationDictionary;

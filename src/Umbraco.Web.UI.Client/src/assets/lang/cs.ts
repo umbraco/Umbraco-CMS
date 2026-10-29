@@ -1018,6 +1018,9 @@ export default {
 		publishHelp:
 			'Klikněte <em>ok</em> pro publikování <strong>%0%</strong> a tedy zveřejnění jejího obsahu.<br/><br />\n      Můžete publikovat tuto stránku a všechny její podstránky zatrhnutím <em>publikovat všchny podstránky</em> níže.\n      ',
 		includeUnpublished: 'Zahrnout nepublikované podřízené stránky',
+		publishedNotificationTitle: 'Publikováno',
+		publishedNotificationDescription: '%0% je nyní veřejně dostupné',
+		publishedVariantNotificationDescription: '%1% je nyní veřejně dostupné v %0%',
 	},
 	colorpicker: {
 		noColors: 'Nenakonfigurovali jste žádné schválené barvy',
@@ -1140,6 +1143,7 @@ export default {
 		dataTypeSaved: 'Datový typ byl uložen',
 		dictionaryItemSaved: 'Položka slovníku byla uložena',
 		editContentPublishedHeader: 'Obsah byl publikován',
+		editElementPublishedHeader: 'Prvek byl publikován',
 		editContentPublishedText: 'a je viditelný na webu',
 		editMultiContentPublishedText: '%0% dokumentů zveřejněných a viditelných na webu',
 		editVariantPublishedText: '%0% zveřejněných a viditelných na webu',
@@ -1899,5 +1903,9 @@ export default {
 		formsHeadline: 'Umbraco formuláře',
 		formsDescription:
 			'Vytvářejte formuláře pomocí intuitivního rozhraní drag and drop. Od jednoduchých kontaktních formulářů, které odesílají e-maily, až po pokročilé dotazníky, které se integrují do systémů CRM. Vaši klienti to budou milovat!',
+	},
+	elements: {
+		confirmBulkPublishDescription: 'Publikování zpřístupní vybrané položky veřejnosti.',
+		confirmBulkUnpublishDescription: 'Vybrané položky již nebudou veřejně dostupné.',
 	},
 } as UmbLocalizationDictionary;

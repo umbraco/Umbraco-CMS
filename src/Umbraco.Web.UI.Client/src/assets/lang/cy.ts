@@ -1151,6 +1151,9 @@ export default {
 		publishAll: 'Cyhoeddi %0% ac ei holl is-dudalennau',
 		publishHelp:
 			"Cliciwch <em>Cyhoeddi</em> er mwyn cyhoeddi <strong>%0%</strong> a felly yn gwneud i'r cynnwys berthnasol fod ar gael i'r cyhoedd.<br/><br />\n      Gallwch gyhoeddi'r dudalen yma ac ei holl is-dudalennau wrth dicio <em>Cynnwys tudalennau heb eu cyhoeddi</em> isod.\n      ",
+		publishedNotificationTitle: "Wedi'i gyhoeddi",
+		publishedNotificationDescription: "Mae %0% bellach ar gael i'r cyhoedd",
+		publishedVariantNotificationDescription: "Mae %1% bellach ar gael i'r cyhoedd yn %0%",
 	},
 	colorpicker: {
 		noColors: "Nid ydych chi wedi ffurfweddu unrhyw liwiau sydd wedi'u cymeradwyo",
@@ -1335,6 +1338,7 @@ export default {
 		dataTypeSaved: "Math o ddata wedi'i achub",
 		dictionaryItemSaved: "Eitem geiriadur wedi'i achub",
 		editContentPublishedHeader: "Cynnwys wedi'i gyhoeddi",
+		editElementPublishedHeader: "Elfen wedi'i chyhoeddi",
 		editContentPublishedText: 'ac yn weladwy ar y wefan',
 		editMultiContentPublishedText: "%0% dogfennau wedi'i gyhoeddi ac yn gweledig ar y wefan",
 		editVariantPublishedText: '%0% gyhoeddi ac yn gweledig ar y wefan',
@@ -2478,5 +2482,9 @@ export default {
 		minimalLevelDescription: 'Byddwn ond yn anfon ID safle dienw i roi gwybod i ni bod y wefan yn bodoli.',
 		basicLevelDescription: "Byddwn yn anfon ID safle dienw, fersiwn Umbraco, a phecynnau wedi'u gosod",
 		detailedLevelDescription: '\n          Byddwn yn anfon:\n          ',
+	},
+	elements: {
+		confirmBulkPublishDescription: "Bydd cyhoeddi yn gwneud yr eitemau a ddewiswyd ar gael i'r cyhoedd.",
+		confirmBulkUnpublishDescription: "Ni fydd yr eitemau a ddewiswyd ar gael i'r cyhoedd mwyach.",
 	},
 } as UmbLocalizationDictionary;

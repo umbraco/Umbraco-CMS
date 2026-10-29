@@ -1028,6 +1028,8 @@ export default {
 		publishAll: '%0% ve tüm alt sayfalarını yayınlayın',
 		publishHelp:
 			"<strong>%0%</strong> yayınlamak ve böylece içeriğini herkese açık hale getirmek için <em>Yayınla</em>'yı tıklayın. <br/><br />\n      Aşağıdaki <em>Yayınlanmamış alt sayfaları ekle</em> 'yi işaretleyerek bu sayfayı ve tüm alt sayfalarını yayınlayabilirsiniz.\n      ",
+		publishedNotificationTitle: 'Yayınlandı',
+		publishedNotificationDescription: '%0% artık herkese açık',
 	},
 	colorpicker: {
 		noColors: 'Onaylanmış herhangi bir renk yapılandırmadınız',
@@ -1145,6 +1147,7 @@ export default {
 		dictionaryItemSaved: 'Sözlük öğesi kaydedildi',
 		editContentPublishedFailedByParent: 'Üst sayfa yayınlanmadığı için yayınlama başarısız oldu',
 		editContentPublishedHeader: 'İçerik yayınlandı',
+		editElementPublishedHeader: 'Öğe yayınlandı',
 		editContentPublishedText: 've web sitesinde görünür',
 		editContentSavedHeader: 'İçerik kaydedildi',
 		editContentSavedText: 'Değişiklikleri görünür kılmak için yayınlamayı unutmayın',
@@ -1962,5 +1965,9 @@ export default {
 		browseTab: 'Gözat',
 		searchTab: 'Ara',
 		selectedCount: (count: number) => `${count} öğe seçildi`,
+	},
+	elements: {
+		confirmBulkPublishDescription: 'Yayınlama, seçili öğeleri herkese açık hale getirir.',
+		confirmBulkUnpublishDescription: 'Seçili öğeler artık herkese açık olmayacak.',
 	},
 } as UmbLocalizationDictionary;

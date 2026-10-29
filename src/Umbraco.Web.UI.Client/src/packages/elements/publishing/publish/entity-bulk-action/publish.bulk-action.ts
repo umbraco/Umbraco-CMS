@@ -75,7 +75,7 @@ export class UmbElementPublishEntityBulkAction extends UmbEntityBulkActionBase<o
 			const localizationController = new UmbLocalizationController(this._host);
 			const confirm = await umbConfirmModal(this, {
 				headline: localizationController.term('content_readyToPublish'),
-				content: localizationController.term('prompt_confirmListViewPublish'),
+				content: localizationController.term('elements_confirmBulkPublishDescription'),
 				color: 'positive',
 				confirmLabel: localizationController.term('actions_publish'),
 			}).catch(() => false);
@@ -120,6 +120,7 @@ export class UmbElementPublishEntityBulkAction extends UmbEntityBulkActionBase<o
 
 		const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 			data: {
+				description: '#elements_confirmBulkPublishDescription',
 				options,
 			},
 			value: { selection },

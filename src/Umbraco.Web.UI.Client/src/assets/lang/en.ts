@@ -1412,6 +1412,9 @@ export default {
 		invalidPublishBranchPermissions: 'Insufficient user permissions to publish all descendant documents',
 		contentPublishedFailedReqCultureValidationError:
 			"Validation failed for required language '%0%'. This language was saved but not published.",
+		publishedNotificationTitle: 'Published',
+		publishedNotificationDescription: '%0% is now publicly available',
+		publishedVariantNotificationDescription: '%1% is now publicly available in %0%',
 	},
 	unpublish: {
 		inProgress: 'Unpublishing in progress - please wait...',
@@ -3379,5 +3382,10 @@ export default {
 		'zh-cn': '中文（简体，中国）',
 		'zh-tw': '中文（正體，台灣）',
 		vi: 'Tiếng Việt',
+	},
+	elements: {
+		confirmPublishDescription: 'Publishing will make this publicly available.',
+		confirmBulkPublishDescription: 'Publishing will make the selected items publicly available.',
+		confirmBulkUnpublishDescription: 'The selected items will no longer be publicly available.',
 	},
 } as UmbLocalizationDictionary;

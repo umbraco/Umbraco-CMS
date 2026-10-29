@@ -75,7 +75,7 @@ export class UmbElementUnpublishEntityBulkAction extends UmbEntityBulkActionBase
 			const localizationController = new UmbLocalizationController(this._host);
 			const confirm = await umbConfirmModal(this, {
 				headline: localizationController.term('actions_unpublish'),
-				content: localizationController.term('prompt_confirmListViewUnpublish'),
+				content: localizationController.term('elements_confirmBulkUnpublishDescription'),
 				color: 'warning',
 				confirmLabel: localizationController.term('actions_unpublish'),
 			}).catch(() => false);

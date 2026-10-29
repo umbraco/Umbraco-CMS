@@ -1105,6 +1105,8 @@ export default {
 		publishAll: 'Objavi %0% i sve njegove podstranice',
 		publishHelp:
 			'Pritisni <em>Objavi</em> za objavu <strong>%0%</strong> i na taj način svoj sadržaj učiniti javno dostupnim.<br/><br />\n      Ovu stranicu i sve njene podstranice možete objaviti odabirom <em>Uključi neobjavljene podstranice</em>.\n      ',
+		publishedNotificationTitle: 'Objavljeno',
+		publishedNotificationDescription: '%0% je sada javno dostupno',
 	},
 	colorpicker: {
 		noColors: 'Niste konfigurirali nijednu odobrenu boju',
@@ -1239,6 +1241,7 @@ export default {
 		dictionaryItemSaved: 'Stavka rječnika je sačuvana',
 		editContentPublishedFailedByParent: 'Objavljivanje nije uspjelo jer nadređena stranica nije objavljena',
 		editContentPublishedHeader: 'Sadržaj objavljen',
+		editElementPublishedHeader: 'Element objavljen',
 		editContentPublishedText: 'i vidljivo na web stranici',
 		editBlueprintSavedHeader: 'Šablon sadržaja je sačuvan',
 		editBlueprintSavedText: 'Promjene su uspješno sačuvane',
@@ -2275,5 +2278,9 @@ export default {
 	treeSearch: {
 		searchResult: 'stavka vraćena',
 		searchResults: 'stavke vraćene',
+	},
+	elements: {
+		confirmBulkPublishDescription: 'Objavljivanjem će odabrane stavke postati javno dostupne.',
+		confirmBulkUnpublishDescription: 'Odabrane stavke više neće biti javno dostupne.',
 	},
 } as UmbLocalizationDictionary;

@@ -1152,6 +1152,9 @@ export default {
 		publishAll: 'Pubblica %0% e tutte le sue sottopagine',
 		publishHelp:
 			'Click <em>Pubblica</em> per pubblicare <strong>%0%</strong> e quindi rendere visibile pubblicamente il suo contenuto.<br/><br />\n      Puoi pubblicare questa pagina e tutte le sue sottopagine spuntando <em>Includi le sottopagine non pubblicate</em> sotto.\n      ',
+		publishedNotificationTitle: 'Pubblicato',
+		publishedNotificationDescription: '%0% è ora disponibile pubblicamente',
+		publishedVariantNotificationDescription: '%1% è ora disponibile pubblicamente in %0%',
 	},
 	colorpicker: {
 		noColors: 'Non hai configurato nessun colore',
@@ -1286,6 +1289,7 @@ export default {
 		dataTypeSaved: 'Tipo di dato salvato',
 		dictionaryItemSaved: 'Elemento del dizionario salvato',
 		editContentPublishedHeader: 'Contenuto pubblicato',
+		editElementPublishedHeader: 'Elemento pubblicato',
 		editContentPublishedText: 'e visibile sul sito web',
 		editMultiContentPublishedText: '%0% documenti pubblicati e visibili sul sito web',
 		editVariantPublishedText: '%0% pubblicati e visibili sul sito web',
@@ -2294,5 +2298,9 @@ export default {
 		browseTab: 'Sfoglia',
 		searchTab: 'Cerca',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento selezionato' : 'elementi selezionati'}`,
+	},
+	elements: {
+		confirmBulkPublishDescription: 'La pubblicazione renderà gli oggetti selezionati disponibili pubblicamente.',
+		confirmBulkUnpublishDescription: 'Gli oggetti selezionati non saranno più disponibili pubblicamente.',
 	},
 } as UmbLocalizationDictionary;

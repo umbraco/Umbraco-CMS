@@ -1352,6 +1352,9 @@ export default {
 		contentPublishedFailedByParent: '\n      %0% kan ikke udgives, fordi en overordnet side ikke er udgivet.\n    ',
 		contentPublishedFailedReqCultureValidationError:
 			"Validering mislykkedes for obligatorisk sprog '%0%'. Dette\n      sprog blev gemt, men ikke udgivet.\n    ",
+		publishedNotificationTitle: 'Publiceret',
+		publishedNotificationDescription: '%0% er nu offentligt tilgængeligt',
+		publishedVariantNotificationDescription: '%1% er nu offentligt tilgængeligt på %0%',
 	},
 	colorpicker: {
 		noColors: 'Du har ikke konfigureret nogen godkendte farver',
@@ -1542,6 +1545,7 @@ export default {
 		dictionaryItemSaved: 'Ordbogsnøgle gemt',
 		editContentPublishedFailedByParent: 'Udgivelse fejlede da overliggende side ikke er udgivet',
 		editContentPublishedHeader: 'Indhold publiceret',
+		editElementPublishedHeader: 'Element publiceret',
 		editContentPublishedText: 'og nu synligt for besøgende',
 		editMultiContentPublishedText: '%0% dokumenter udgivet og synlige for besøgende',
 		editMultiContentUnpublishedText: '%0% dokumenter afpubliceret og ikke længere synlige for besøgende',
@@ -3104,5 +3108,10 @@ export default {
 		cultureSelectLabel: 'Kultur',
 		searchDisabled: 'Søgning utilgængelig. Indeksstatus:',
 		searchError: 'Søgningen fejlede. Prøv igen.',
+	},
+	elements: {
+		confirmPublishDescription: 'Udgivelse vil gøre dette offentligt tilgængeligt.',
+		confirmBulkPublishDescription: 'Udgivelse vil gøre de valgte emner offentligt tilgængelige.',
+		confirmBulkUnpublishDescription: 'De valgte emner vil ikke længere være offentligt tilgængelige.',
 	},
 } as UmbLocalizationDictionary;
