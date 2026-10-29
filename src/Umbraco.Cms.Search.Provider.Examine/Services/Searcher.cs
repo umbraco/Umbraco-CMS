@@ -5,6 +5,7 @@ using Examine;
 using Examine.Lucene;
 using Examine.Search;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
@@ -13,8 +14,10 @@ using Umbraco.Cms.Core.Search.Querying.Faceting;
 using Umbraco.Cms.Core.Search.Querying.Filtering;
 using Umbraco.Cms.Core.Search.Querying.Sorting;
 using Umbraco.Cms.Search.Provider.Examine.Configuration;
+using Umbraco.Cms.Search.Provider.Examine.Extensions;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Search.Provider.Examine.Models.Searching.Filtering;
+using Umbraco.Extensions;
 using FacetResult = Umbraco.Cms.Core.Search.Querying.Faceting.FacetResult;
 using SearchResult = Umbraco.Cms.Core.Search.Querying.SearchResult;
 

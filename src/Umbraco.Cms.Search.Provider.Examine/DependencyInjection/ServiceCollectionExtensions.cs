@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Search.Configuration;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Umbraco.Cms.Search.Provider.Examine.Services;
+using Umbraco.Extensions;
 using ServicesCollectionExtensions = Examine.ServicesCollectionExtensions;
 
 namespace Umbraco.Cms.Search.Provider.Examine.DependencyInjection;
