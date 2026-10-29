@@ -515,8 +515,10 @@ public record GuidFilter(string FieldName, Guid[] Values, bool Negate)
 /// </summary>
 public class CustomSearcher : Searcher
 {
-    public CustomSearcher(IExamineManager examineManager, IOptions<SearcherOptions> searcherOptions, IActiveIndexManager activeIndexManager)
-        : base(examineManager, searcherOptions, activeIndexManager)
+#pragma warning disable CS0618 // Type or member is obsolete
+    public CustomSearcher(IExamineManager examineManager, IOptions<SearcherOptions> searcherOptions, IActiveIndexManager activeIndexManager, IStopWordDetector stopWordDetector)
+        : base(examineManager, searcherOptions, activeIndexManager, stopWordDetector)
+#pragma warning restore CS0618 // Type or member is obsolete
     {
     }
 
