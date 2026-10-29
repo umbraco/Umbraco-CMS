@@ -62,6 +62,15 @@ export class UmbSplitPanelElement extends UmbLitElement {
 
 	#hasInitialized = false;
 
+	override connectedCallback() {
+		console.log('connectedCallback called');
+		super.connectedCallback();
+		if (this.#hasBothPanels) {
+			console.log('connectedCallback: Both panels are present');
+			this.#connect();
+		}
+	}
+
 	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#disconnect();
@@ -94,20 +103,20 @@ export class UmbSplitPanelElement extends UmbLitElement {
 		// If lock is none
 		let maxStartWidth = this.position;
 		let maxEndWidth = '1fr';
-		
+
 		if (this.lock !== 'none') {
 			const { width } = this.mainElement.getBoundingClientRect();
-			
+
 			let pos = parseFloat(this.position);
-			
+
 			if (this.position.endsWith('%')) {
 				pos = (pos / 100) * width;
 			}
-			
+
 			const lockedPanelWidth = this.lock === 'start' ? pos : width - pos;
 			this.#lockedPanelWidth = lockedPanelWidth;
 		}
-		
+
 		if (this.lock === 'start') {
 			maxStartWidth = this.#lockedPanelWidth + 'px';
 			maxEndWidth = `1fr`;
@@ -188,8 +197,12 @@ export class UmbSplitPanelElement extends UmbLitElement {
 	async #connect() {
 		this.#hasInitialized = true;
 
-		this.mainElement.style.display = 'grid';		
-		this.#updateSplit();
+		if (this.position === 'var(--umb-split-panel-initial-position)') {
+			this.position = getComputedStyle(this).getPropertyValue('--umb-split-panel-initial-position').trim();
+		}
+
+		this.mainElement.style.display = 'grid';
+		this.#updateSplit();		
 		this.dividerElement.style.display = 'unset';
 
 		this.dividerTouchAreaElement.addEventListener('pointerdown', this.#onDragStart);
