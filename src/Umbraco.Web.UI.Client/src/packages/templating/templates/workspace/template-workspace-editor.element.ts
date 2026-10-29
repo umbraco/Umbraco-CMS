@@ -3,7 +3,6 @@ import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffic
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 /**
  * Template alias pattern - allows first character to be a letter, digit, or underscore.
@@ -28,10 +27,6 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context?.readOnlyGuard.permitted, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
-		});
-
 		this.consumeContext(UMB_TEMPLATE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#templateWorkspaceContext = workspaceContext;
 			this.observe(this.#templateWorkspaceContext?.name, (name) => {
@@ -45,6 +40,12 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#templateWorkspaceContext?.isNew, (isNew) => {
 				this.#isNew = !!isNew;
 			});
+
+			this.observe(
+				workspaceContext?.readOnlyGuard.permitted,
+				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+				'_observeIsReadOnly',
+			);
 		});
 	}
 

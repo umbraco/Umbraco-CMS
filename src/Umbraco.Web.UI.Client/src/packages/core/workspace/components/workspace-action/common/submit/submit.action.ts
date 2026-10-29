@@ -1,7 +1,7 @@
 import type { MetaWorkspaceAction } from '../../../../types.js';
 import { UMB_SUBMITTABLE_WORKSPACE_CONTEXT } from '../../../../contexts/tokens/index.js';
 import type { UmbSubmittableWorkspaceContext } from '../../../../contexts/tokens/index.js';
-import type { UmbEntityDetailWorkspaceContextBase } from '../../../../entity-detail/entity-detail-workspace-base.js';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '../../../../entity-detail/entity-detail-workspace.context-token.js';
 import { UmbWorkspaceActionBase } from '../../workspace-action-base.controller.js';
 import type { UmbSubmitWorkspaceActionArgs } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -45,9 +45,10 @@ export class UmbSubmitWorkspaceAction<
 			'saveWorkspaceActionUniqueObserver',
 		);
 
-		const entityDetailContext = this.#isEntityDetailWorkspaceContext(this._workspaceContext)
-			? this._workspaceContext
-			: undefined;
+		const context = this._workspaceContext;
+		const entityDetailContext =
+			context && UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.getDiscriminator()?.(context) ? context : undefined;
+
 		this.observe(
 			entityDetailContext?.readOnlyGuard.permitted,
 			(isReadOnly) => {
@@ -75,9 +76,5 @@ export class UmbSubmitWorkspaceAction<
 	override async execute() {
 		await this._retrieveWorkspaceContext;
 		return await this._workspaceContext?.requestSubmit();
-	}
-
-	#isEntityDetailWorkspaceContext(context: unknown): context is UmbEntityDetailWorkspaceContextBase {
-		return (context as UmbEntityDetailWorkspaceContextBase | undefined)?.IS_ENTITY_DETAIL_WORKSPACE_CONTEXT === true;
 	}
 }

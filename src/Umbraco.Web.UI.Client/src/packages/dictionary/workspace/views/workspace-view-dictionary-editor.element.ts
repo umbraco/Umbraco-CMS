@@ -5,7 +5,6 @@ import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-workspace-view-dictionary-editor')
 export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
@@ -40,10 +39,6 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 			this.#currentUserContext = context;
 			this.#observeCurrentUserLanguageAccess();
 		});
-
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context?.readOnlyGuard.permitted, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
-		});
 	}
 
 	#observeCurrentUserLanguageAccess() {
@@ -69,6 +64,12 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 		this.observe(this.#workspaceContext?.dictionary, (dictionary) => {
 			this._dictionary = dictionary;
 		});
+
+		this.observe(
+			this.#workspaceContext?.readOnlyGuard.permitted,
+			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			'_observeIsReadOnly',
+		);
 	}
 
 	#isReadOnly(culture: string | null) {

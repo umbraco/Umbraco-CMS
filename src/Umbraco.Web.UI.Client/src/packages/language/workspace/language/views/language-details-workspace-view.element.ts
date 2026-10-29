@@ -8,7 +8,6 @@ import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cm
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '@umbraco-cms/backoffice/culture';
 
@@ -53,10 +52,12 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 			this.observe(this.#languageWorkspaceContext?.isNew, (isNew) => {
 				this._isNew = isNew;
 			});
-		});
 
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context?.readOnlyGuard.permitted, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
+			this.observe(
+				instance?.readOnlyGuard.permitted,
+				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+				'_observeIsReadOnly',
+			);
 		});
 	}
 

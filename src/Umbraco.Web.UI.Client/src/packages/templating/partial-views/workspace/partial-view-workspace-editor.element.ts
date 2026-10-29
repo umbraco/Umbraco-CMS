@@ -1,7 +1,6 @@
 import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context-token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-partial-view-workspace-editor')
 export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
@@ -16,16 +15,18 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context?.readOnlyGuard.permitted, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
-		});
-
 		this.consumeContext(UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 
 			this.observe(this.#workspaceContext?.isNew, (isNew) => {
 				this._isNew = isNew;
 			});
+
+			this.observe(
+				workspaceContext?.readOnlyGuard.permitted,
+				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+				'_observeIsReadOnly',
+			);
 		});
 	}
 

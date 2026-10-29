@@ -176,19 +176,24 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			null,
 		);
 
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				context?.readOnlyGuard.permitted,
-				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
-				'_observeIsReadOnly',
-			);
-		});
-
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 			this.#tabsStructureHelper.setStructureManager(workspaceContext?.structure);
+			this.#observeReadOnly();
 			this.#observeRootGroups();
 		});
+	}
+
+	#observeReadOnly() {
+		const context = this.#workspaceContext;
+		const entityDetailContext =
+			context && UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.getDiscriminator()?.(context) ? context : undefined;
+
+		this.observe(
+			entityDetailContext?.readOnlyGuard.permitted,
+			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			'_observeIsReadOnly',
+		);
 	}
 
 	#toggleSortMode() {

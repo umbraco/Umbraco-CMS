@@ -3,7 +3,6 @@ import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 import '@umbraco-cms/backoffice/code-editor';
 
@@ -20,13 +19,15 @@ export class UmbScriptCodeEditorWorkspaceViewElement extends UmbLitElement imple
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context?.readOnlyGuard.permitted, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
-		});
-
 		this.consumeContext(UMB_SCRIPT_WORKSPACE_CONTEXT, (context) => {
 			this.#context = context;
 			this.observe(this.#context?.content, (content) => (this._content = content));
+
+			this.observe(
+				context?.readOnlyGuard.permitted,
+				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+				'_observeIsReadOnly',
+			);
 		});
 	}
 

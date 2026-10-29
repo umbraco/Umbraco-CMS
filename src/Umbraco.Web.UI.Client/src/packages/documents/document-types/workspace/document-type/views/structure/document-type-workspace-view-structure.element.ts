@@ -8,7 +8,6 @@ import type {
 	UmbInputContentTypeCollectionConfigurationElement,
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-type-workspace-view-structure')
@@ -36,10 +35,6 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (documentTypeContext) => {
 			this.#workspaceContext = documentTypeContext;
 			this._observeDocumentType();
-		});
-
-		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context?.readOnlyGuard.permitted, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_isReadOnlyObserver');
 		});
 	}
 
@@ -72,6 +67,12 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 				this._collection = collection?.unique;
 			},
 			'_collectionObserver',
+		);
+
+		this.observe(
+			this.#workspaceContext.readOnlyGuard.permitted,
+			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			'_isReadOnlyObserver',
 		);
 	}
 
