@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
@@ -115,7 +116,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             GetRequiredService<IPreviewService>(),
             mockedPublishedStatusService.Object,
             new NullLogger<DocumentCacheService>(),
-            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
+            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())));
 
         _mockedCache = new DocumentCache(
             _documentCacheService,
@@ -347,7 +349,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             GetRequiredService<IPreviewService>(),
             controllableMock.Object,
             new NullLogger<DocumentCacheService>(),
-            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
+            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())));
 
         var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
         await hybridCache.RemoveAsync($"{Textpage.Key}");
@@ -490,7 +493,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             GetRequiredService<IPreviewService>(),
             controllableMock.Object,
             new NullLogger<DocumentCacheService>(),
-            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
+            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())));
 
         var controlledCache = new DocumentCache(
             controlledCacheService,

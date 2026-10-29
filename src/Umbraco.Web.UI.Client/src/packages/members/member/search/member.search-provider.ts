@@ -15,6 +15,7 @@ export class UmbMemberSearchProvider
 
 	override destroy(): void {
 		this.#repository.destroy();
+		super.destroy();
 	}
 }
 

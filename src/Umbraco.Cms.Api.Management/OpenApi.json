@@ -13847,6 +13847,14 @@
             }
           },
           {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "height",
             "in": "query",
             "schema": {
@@ -20381,6 +20389,14 @@
                 "type": "string",
                 "format": "uuid"
               }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -42941,7 +42957,8 @@
           "id",
           "isDeletable",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -42974,6 +42991,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "editorUiAlias": {
@@ -43421,6 +43441,7 @@
           "id",
           "isFolder",
           "name",
+          "parentIsFolder",
           "variants"
         ],
         "type": "object",
@@ -43454,6 +43475,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "documentType": {
@@ -44566,7 +44590,8 @@
           "id",
           "isElement",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -44599,6 +44624,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "isElement": {
@@ -47028,7 +47056,8 @@
           "id",
           "isDeletable",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -47061,6 +47090,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "icon": {
@@ -47880,7 +47912,8 @@
           "icon",
           "id",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -47913,6 +47946,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "icon": {

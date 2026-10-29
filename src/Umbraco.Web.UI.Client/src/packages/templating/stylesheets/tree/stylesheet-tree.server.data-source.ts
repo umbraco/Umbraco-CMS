@@ -74,7 +74,7 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbStylesheetTreeIte
 		entityType: item.isFolder ? UMB_STYLESHEET_FOLDER_ENTITY_TYPE : UMB_STYLESHEET_ENTITY_TYPE,
 		parent: {
 			unique: item.parent ? serializer.toUnique(item.parent.path) : null,
-			entityType: item.parent ? UMB_STYLESHEET_ENTITY_TYPE : UMB_STYLESHEET_ROOT_ENTITY_TYPE,
+			entityType: item.parent ? UMB_STYLESHEET_FOLDER_ENTITY_TYPE : UMB_STYLESHEET_ROOT_ENTITY_TYPE,
 		},
 		name: item.name,
 		isFolder: item.isFolder,
