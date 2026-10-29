@@ -66,7 +66,7 @@ export class UmbSchemaOperationAllowedController extends UmbControllerBase {
 	}
 
 	override destroy() {
-		// Destroying the consumers below calls back into #update, so the state has to outlive them.
+		// Destroying the context consumer calls #update, so the state is destroyed after it.
 		super.destroy();
 		this.#allowed.destroy();
 	}

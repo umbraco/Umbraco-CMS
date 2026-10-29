@@ -6,9 +6,8 @@ import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/wor
 const SCHEMA_LOCKDOWN_UNIQUE = 'UMB_SCHEMA_LOCKDOWN';
 
 /**
- * Makes the workspace entity read-only while schema lockdown doesn't allow saving it: creating it while it is new,
- * and updating it otherwise. A new entity that can't be created is also marked forbidden, so the workspace shows
- * that access is denied. Workspaces whose entity type isn't governed by schema lockdown are left untouched.
+ * Makes the workspace entity read-only while schema lockdown doesn't allow saving it (creating a new entity, updating
+ * an existing one), and forbids creating a new entity when creating isn't allowed.
  */
 export class UmbSchemaLockdownWorkspaceController extends UmbControllerBase {
 	#updateAllowed = new UmbSchemaOperationAllowedController(this, { operation: 'update' });
@@ -34,8 +33,7 @@ export class UmbSchemaLockdownWorkspaceController extends UmbControllerBase {
 				},
 				'_observeIsNew',
 			);
-			// Loading or creating an entity clears the workspace's read-only rules and forbidden state, so they are applied
-			// again for each entity.
+			// Loading or creating an entity clears the workspace's rules and forbidden state, so they're applied again.
 			this.observe(context?.unique, () => this.#update(), '_observeUnique');
 			this.observe(context?.forbidden.isOn, () => this.#update(), '_observeIsForbidden');
 		});
