@@ -238,8 +238,9 @@
   public static readonly userGroupAssignAccessSettings = {
     0: ['Sections', 'Add sections to give users access'],
     1: ['Languages', 'Limit the languages users have access to edit'],
-    2: ['Select content start node', 'Limit the content tree to a specific start node'],
-    3: ['Select media start node', 'Limit the media library to a specific start node']
+    2: ['Allow editing shared content', 'Allows editing of content shared across languages. Does not apply to culture-invariant content.'],
+    3: ['Select content start node', 'Limit the content tree to a specific start node'],
+    4: ['Select media start node', 'Limit the media library to a specific start node']
   }
 
   public static readonly userGroupDefaultPermissionsSettings = {

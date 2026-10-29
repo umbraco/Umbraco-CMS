@@ -15,8 +15,8 @@ export class ElementApiHelper {
     return await response.json();
   }
 
-  async waitUntilIndexed(query: string, id: string) {
-    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.elementSearch, query, id);
+  async waitUntilIndexed(query: string, id: string, culture?: string) {
+    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.elementSearch, query, id, ConstantHelper.timeout.pageLoad, culture);
   }
 
   async doesExist(id: string) {

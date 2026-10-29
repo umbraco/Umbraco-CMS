@@ -179,11 +179,17 @@ export class ApiHelpers {
 
   // Examine indexes asynchronously after create; await this before a UI search so the item is findable.
   // Indexing can just take a long time sometimes, so this default leans on the longest timeout tier.
-  async waitUntilItemIsIndexed(searchEndpoint: string, query: string, id: string, timeout: number = ConstantHelper.timeout.pageLoad) {
+  async waitUntilItemIsIndexed(searchEndpoint: string, query: string, id: string, timeout: number = ConstantHelper.timeout.pageLoad, culture?: string) {
     await expect.poll(async () => {
       // take: 100 — the search is filtered by `query`, so the target is expected within the first page for
       // test-sized data. If a suite ever creates >100 items matching `query`, raise this or paginate.
-      const response = await this.get(this.baseUrl + searchEndpoint, {query: query, take: 100});
+      // Without a culture the search covers invariant items only, so a culture-variant item is found only when
+      // one of its cultures is passed.
+      const params: { [key: string]: string | number } = {query: query, take: 100};
+      if (culture) {
+        params.culture = culture;
+      }
+      const response = await this.get(this.baseUrl + searchEndpoint, params);
       if (!response.ok()) {
         return false;
       }
