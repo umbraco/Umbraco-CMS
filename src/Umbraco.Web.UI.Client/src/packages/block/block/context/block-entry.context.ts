@@ -639,7 +639,7 @@ export abstract class UmbBlockEntryContext<
 			.onSetup(() => {
 				return {
 					data: { entityType: UMB_ELEMENT_ENTITY_TYPE, preset: {} },
-					modal: { size: 'large' },
+					modal: { size: 'large', isReference: true },
 				};
 			})
 			.observeRouteBuilder((routeBuilder) => {
