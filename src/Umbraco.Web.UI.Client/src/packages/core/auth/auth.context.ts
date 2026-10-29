@@ -138,14 +138,14 @@ export class UmbAuthContext extends UmbContextBase {
 			switch (evt.data?.type) {
 				case 'authorized': {
 					// Apply locally — the sender already broadcast to all tabs.
-					this.#applySession(true, () => this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt));
+					void this.#applySession(true, () => this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt));
 					break;
 				}
 				case 'sessionUpdate': {
 					// Another tab learned a fresher expiry, typically by sliding it on activity. The auth
 					// cookie is shared between tabs, so the renewal applies here too. A session this tab no
 					// longer holds is re-established, possibly by a sign-in it missed.
-					this.#applySession(!this.#session.getValue(), () =>
+					void this.#applySession(!this.#session.getValue(), () =>
 						this.#applySessionExpiry(evt.data.expiresAt, evt.data.sessionWindowInMs),
 					);
 					break;
