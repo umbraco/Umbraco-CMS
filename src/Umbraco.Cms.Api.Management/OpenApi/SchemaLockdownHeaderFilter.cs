@@ -10,24 +10,18 @@ using Umbraco.Cms.Core.SchemaLockdown;
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
 /// <summary>
-/// Documents the schema lockdown header on the forbidden response of every governed operation.
+/// Documents the schema lockdown header on the 403 response of every governed operation.
 /// </summary>
 /// <remarks>
-/// The denial itself is a bodyless 403, because a 403 on these operations can equally come from the permissions the
-/// request has already passed, and one status code cannot describe two bodies. A header can say "may be present",
-/// which is what is actually true, so that is where the reason goes.
-/// <para>
 /// It applies to every OpenAPI document, so a package whose controllers declare <see cref="SchemaEntityTypeAttribute"/>
 /// gets the header documented in its own document too.
-/// </para>
 /// </remarks>
 internal sealed class SchemaLockdownHeaderFilter : IOperationFilter
 {
     /// <inheritdoc />
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        // A read is never denied, so an operation that only reads could not carry the header however locked down
-        // its entity types are.
+        // Reads are never denied.
         (string EntityType, SchemaOperation Operation)[] deniable = Array.FindAll(
             GovernedOperations(context),
             x => x.Operation != SchemaOperation.Read);
@@ -70,8 +64,6 @@ internal sealed class SchemaLockdownHeaderFilter : IOperationFilter
             .GetCustomAttributes<SchemaOperationAttribute>()
             .ToArray() ?? [];
 
-        // The same resolution the request goes through, so the document cannot say a request may be denied for
-        // something other than what would actually deny it.
         return SchemaOperationResolver.Resolve(governed.EntityTypes, declared, context.ApiDescription.HttpMethod);
     }
 }

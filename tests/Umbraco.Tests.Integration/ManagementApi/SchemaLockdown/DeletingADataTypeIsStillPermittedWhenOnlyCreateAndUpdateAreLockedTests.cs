@@ -13,8 +13,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// A configurator that blocks only some operations on an entity type leaves the untouched operations governed by
-/// the real request pipeline, not just by the restrictions in isolation.
+/// Operations a configurator didn't block on an entity type still go through.
 /// </summary>
 public class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTests : SchemaLockdownApiTest<DeleteDataTypeController>
 {

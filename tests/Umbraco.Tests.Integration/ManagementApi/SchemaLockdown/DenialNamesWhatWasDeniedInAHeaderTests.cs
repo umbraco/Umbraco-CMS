@@ -9,8 +9,7 @@ using Umbraco.Cms.Core.SchemaLockdown;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// A forbidden response on a governed endpoint can equally come from the permissions the request has already
-/// passed, so the denial names itself in a header rather than leaving the cause to be guessed at.
+/// A denial names the entity type and operation in a header, so it can be told apart from a permission 403.
 /// </summary>
 public class DenialNamesWhatWasDeniedInAHeaderTests : SchemaLockdownApiTest<DeleteDataTypeController>
 {

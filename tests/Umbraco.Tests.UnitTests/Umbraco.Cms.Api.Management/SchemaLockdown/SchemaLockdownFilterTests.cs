@@ -27,8 +27,7 @@ public class SchemaLockdownFilterTests
         }
     }
 
-    // A POST that updates one of its entity types, leaving the other to be resolved from the verb, so the two
-    // resolve to different operations.
+    // A POST that updates the document type, while the template's operation comes from the verb.
     private class TemplateForDocumentTypeController
     {
         [SchemaOperation(Constants.UdiEntityType.DocumentType, SchemaOperation.Update)]
@@ -83,8 +82,6 @@ public class SchemaLockdownFilterTests
         AssertForbidden(context);
     }
 
-    // The declared entity type is the only thing distinguishing these two, so a filter ignoring it would let one of
-    // them through.
     [Test]
     public async Task Decision_Follows_The_Declared_Entity_Type()
     {
@@ -114,7 +111,6 @@ public class SchemaLockdownFilterTests
         AssertPermitted(context);
     }
 
-    // The header is the only thing telling a developer which of the several reasons a 403 can have applied here.
     [Test]
     public async Task Denial_Names_The_Entity_Type_And_Operation()
     {
@@ -139,8 +135,6 @@ public class SchemaLockdownFilterTests
             Is.EqualTo("document-type:create"));
     }
 
-    // An endpoint touching more than one entity type is denied if any of them denies the operation, so the most
-    // restrictive answer wins. Creating a template for a document type is the case in the codebase.
     [Test]
     public async Task Every_Declared_Entity_Type_Has_To_Permit_The_Operation()
     {
@@ -176,8 +170,6 @@ public class SchemaLockdownFilterTests
         AssertPermitted(context);
     }
 
-    // A declaration naming an entity type decides that one's operation, so an endpoint doing different things to
-    // each of its types is judged on what it actually does to each.
     [Test]
     public async Task An_Entity_Type_Named_By_A_Declaration_Uses_That_Operation()
     {
@@ -189,8 +181,7 @@ public class SchemaLockdownFilterTests
         await CreateFilter(Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.Template)
             .OnAuthorizationAsync(context);
 
-        // The verb says create and document type creation is denied, but the declaration says this updates the
-        // document type, and updating it is not.
+        // The verb says create, but the declaration says this updates the document type, which isn't denied.
         AssertPermitted(context);
     }
 
@@ -220,8 +211,6 @@ public class SchemaLockdownFilterTests
             => builder.Block(Constants.UdiEntityType.Template, SchemaOperation.Create);
     }
 
-    // Mirrors what MVC hands an authorization filter: the routed action descriptor, and an HttpContext whose
-    // RequestServices is where the filter reaches its dependencies.
     private static AuthorizationFilterContext CreateContext(
         string httpMethod,
         bool lockDocumentTypes,

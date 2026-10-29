@@ -9,8 +9,7 @@ using Umbraco.Cms.Core.SchemaLockdown;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// Exercises a locked mutation through the real request pipeline. The id names nothing, so the only response that
-/// can precede the action running is the lockdown denial - reaching the action would answer with a not found.
+/// Deleting a locked data type is denied. The id doesn't exist, so reaching the action would return 404 instead.
 /// </summary>
 public class DeletingADataTypeIsForbiddenTests : SchemaLockdownApiTest<DeleteDataTypeController>
 {

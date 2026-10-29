@@ -3,17 +3,11 @@ using Umbraco.Cms.Core.SchemaLockdown;
 namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 
 /// <summary>
-/// Declares the operation an action performs when its HTTP verb misrepresents it.
+/// Declares the operation an action performs when its HTTP verb doesn't match it, for example a POST that only reads.
 /// </summary>
 /// <remarks>
-/// Applied to endpoints such as the composition pickers, which are POST because the query needs a request body but
-/// never write anything.
-/// <para>
-/// Naming an entity type declares the operation for that one alone, which an action doing different things to each
-/// of the entity types its controller declares needs: creating a template for a document type creates the template
-/// and updates the document type. A declaration naming no entity type covers every type that has none of its own,
-/// and a type with neither falls back to the HTTP verb.
-/// </para>
+/// Name an entity type when the action does different things to each one: creating a template for a document type
+/// creates the template and updates the document type. Entity types without a declaration fall back to the HTTP verb.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public sealed class SchemaOperationAttribute : Attribute

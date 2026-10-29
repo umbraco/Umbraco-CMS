@@ -12,12 +12,7 @@ internal static class SchemaOperationResolver
     /// Resolves the operation inferred from an HTTP verb.
     /// </summary>
     /// <param name="httpMethod">The HTTP method the action responds to.</param>
-    /// <returns>The resolved operation.</returns>
-    /// <remarks>
-    /// <see cref="SchemaOperation.Read"/> is only ever produced by an explicit allowlist of safe verbs. Anything
-    /// unrecognised, or absent, resolves to <see cref="SchemaOperation.Unknown"/>, which is denied on every entity
-    /// type the restrictions speak to, so a new or custom verb cannot bypass lockdown.
-    /// </remarks>
+    /// <returns>The resolved operation, or <see cref="SchemaOperation.Unknown"/> for an unrecognised verb.</returns>
     public static SchemaOperation Resolve(string? httpMethod)
         => httpMethod is null ? SchemaOperation.Unknown : FromVerb(httpMethod);
 
@@ -27,19 +22,10 @@ internal static class SchemaOperationResolver
     /// <param name="entityTypes">The entity types the action's controller manages.</param>
     /// <param name="declared">The operations the action declares.</param>
     /// <param name="httpMethod">The HTTP method the action responds to.</param>
-    /// <returns>
-    /// Every entity type the controller declared, in the casing it declared it, paired with the operation it is
-    /// subject to.
-    /// </returns>
+    /// <returns>Each entity type the controller declared, paired with its operation.</returns>
     /// <remarks>
-    /// A declaration naming an entity type decides that one, then a declaration naming none covers whatever is left,
-    /// then the verb. Enforcement and the OpenAPI document both resolve through here, so what the document says a
-    /// request may be denied for cannot drift from what would actually deny it.
-    /// <para>
-    /// A <see cref="SchemaOperationAttribute"/> matches the entity type it names case-insensitively, but only decides
-    /// that type's operation. The name itself comes from the controller's declaration, which is the one thing that
-    /// says what the controller manages.
-    /// </para>
+    /// A declaration naming the entity type wins, then a declaration naming none, then the HTTP verb. Both enforcement
+    /// and the OpenAPI document use this, so they can't disagree.
     /// </remarks>
     public static (string EntityType, SchemaOperation Operation)[] Resolve(
         IReadOnlyList<string> entityTypes,

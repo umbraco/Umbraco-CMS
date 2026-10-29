@@ -14,8 +14,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// Regression test: <see cref="MoveDictionaryController"/> was not covered by the old per-controller
-/// production-mode attribute mechanism, which motivated moving enforcement onto <see cref="DictionaryControllerBase"/> instead.
+/// Moving a locked dictionary item is denied, as the move endpoint inherits the declaration from its controller base.
 /// </summary>
 public class MovingADictionaryItemIsForbiddenTests : SchemaLockdownApiTest<MoveDictionaryController>
 {
