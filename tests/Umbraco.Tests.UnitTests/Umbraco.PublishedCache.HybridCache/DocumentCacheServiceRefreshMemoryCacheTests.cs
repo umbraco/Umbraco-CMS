@@ -22,9 +22,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
 /// The memory refresh runs under the content tree read lock, which blocks every save. The cache writes must be
 /// issued while the lock is held (so the lock orders them against a later commit) but the wait for a distributed
 /// write to complete must not keep the lock: that wait needs a thread-pool hop, and on a starved pool it
-/// stretches the hold from milliseconds to seconds. Because the lock no longer covers the wait, refreshes of one
-/// document are serialised instead, so a distributed write that is sent late cannot land on top of a newer one;
-/// refreshes of different documents stay independent.
+/// stretches the hold from milliseconds to seconds. Because the lock no longer covers the wait, refreshes and removals
+/// of one document are serialised instead, so a distributed write that is sent late cannot land on top of a newer
+/// one; refreshes of different documents stay independent.
 /// </summary>
 [TestFixture]
 public class DocumentCacheServiceRefreshMemoryCacheTests
@@ -192,6 +192,100 @@ public class DocumentCacheServiceRefreshMemoryCacheTests
         hybridCache.Verify(c => c.SetAsync(It.IsAny<string>(), It.IsAny<ContentCacheNode>(), It.IsAny<HybridCacheEntryOptions>(), It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()), Times.Never);
         hybridCache.Verify(c => c.RemoveAsync(key.ToString(), It.IsAny<CancellationToken>()), Times.Once);
         convertedCache.Verify(c => c.Remove(key.ToString()), Times.Once);
+    }
+
+    [Test]
+    public void RefreshMemoryCache_WhenOneWriteFails_WaitsForTheOtherWrite_BeforeThrowing()
+    {
+        Guid key = Guid.NewGuid();
+        var publishedWrite = new TaskCompletionSource();
+        var scopeDisposed = new ManualResetEventSlim();
+
+        Mock<Microsoft.Extensions.Caching.Hybrid.HybridCache> hybridCache = CreateHybridCache(() => new ValueTask(publishedWrite.Task));
+        hybridCache
+            .Setup(c => c.RemoveAsync($"{key}+draft", It.IsAny<CancellationToken>()))
+            .Returns(ValueTask.FromException(new InvalidOperationException("The draft removal failed.")));
+        DocumentCacheService service = CreateService(CreateRepository(key).Object, CreateScopeProvider(scopeDisposed), hybridCache.Object);
+
+        Task refresh = Task.Run(() => service.RefreshMemoryCache(key));
+        try
+        {
+            Assert.That(scopeDisposed.Wait(TimeSpan.FromSeconds(5)), Is.True);
+            Assert.That(Task.WhenAny(refresh, Task.Delay(300)).Result, Is.Not.SameAs(refresh), "The refresh must keep waiting for the published write after the draft write has failed, or the next refresh of the document could overtake it.");
+        }
+        finally
+        {
+            publishedWrite.TrySetResult();
+        }
+
+        Assert.That(() => refresh.GetAwaiter().GetResult(), Throws.InvalidOperationException);
+    }
+
+    [Test]
+    public void RemoveFromMemoryCacheAsync_WaitsForThePendingDistributedWriteOfTheSameDocument_BeforeRemoving()
+    {
+        Guid key = Guid.NewGuid();
+        var distributedWrite = new TaskCompletionSource();
+        var scopeDisposed = new ManualResetEventSlim();
+        var publishedEntryRemoved = new ManualResetEventSlim();
+
+        Mock<Microsoft.Extensions.Caching.Hybrid.HybridCache> hybridCache = CreateHybridCache(() => new ValueTask(distributedWrite.Task));
+        hybridCache
+            .Setup(c => c.RemoveAsync(key.ToString(), It.IsAny<CancellationToken>()))
+            .Callback(publishedEntryRemoved.Set)
+            .Returns(ValueTask.CompletedTask);
+        DocumentCacheService service = CreateService(CreateRepository(key).Object, CreateScopeProvider(scopeDisposed), hybridCache.Object);
+
+        Task refresh = Task.Run(() => service.RefreshMemoryCache(key));
+        Assert.That(scopeDisposed.Wait(TimeSpan.FromSeconds(5)), Is.True, "The refresh has issued its write and is waiting for it.");
+
+        Task removal = service.RemoveFromMemoryCacheAsync(key);
+        try
+        {
+            Assert.That(publishedEntryRemoved.Wait(TimeSpan.FromMilliseconds(300)), Is.False, "The removal must wait for the pending write of the same document, or that write could bring the entry back.");
+        }
+        finally
+        {
+            distributedWrite.TrySetResult();
+        }
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(publishedEntryRemoved.Wait(TimeSpan.FromSeconds(5)), Is.True);
+            Assert.That(removal.Wait(TimeSpan.FromSeconds(5)), Is.True);
+            Assert.That(refresh.Wait(TimeSpan.FromSeconds(5)), Is.True);
+        });
+    }
+
+    [Test]
+    public void RefreshContent_OfTrashedContent_DoesNotWaitForThePendingDistributedWriteOfTheSameDocument()
+    {
+        // RefreshContent runs inside the saving transaction, under the content tree write lock. A refresh of the same
+        // document that is waiting for that lock holds the per-document lock, so waiting for it here would deadlock.
+        Guid key = Guid.NewGuid();
+        var distributedWrite = new TaskCompletionSource();
+        var scopeDisposed = new ManualResetEventSlim();
+        var trashed = new Mock<IContent>();
+        trashed.SetupGet(c => c.Key).Returns(key);
+        trashed.SetupGet(c => c.Trashed).Returns(true);
+
+        Mock<Microsoft.Extensions.Caching.Hybrid.HybridCache> hybridCache = CreateHybridCache(() => new ValueTask(distributedWrite.Task));
+        DocumentCacheService service = CreateService(CreateRepository(key).Object, CreateScopeProvider(scopeDisposed), hybridCache.Object);
+
+        Task refresh = Task.Run(() => service.RefreshMemoryCache(key));
+        Assert.That(scopeDisposed.Wait(TimeSpan.FromSeconds(5)), Is.True, "The refresh has issued its write and is waiting for it.");
+
+        try
+        {
+            Task removal = Task.Run(() => service.RefreshContent(trashed.Object));
+            Assert.That(removal.Wait(TimeSpan.FromSeconds(5)), Is.True, "The removal inside the transaction must not wait for the pending write.");
+        }
+        finally
+        {
+            distributedWrite.TrySetResult();
+        }
+
+        Assert.That(refresh.Wait(TimeSpan.FromSeconds(5)), Is.True);
     }
 
     private static Mock<Microsoft.Extensions.Caching.Hybrid.HybridCache> CreateHybridCache(Func<ValueTask> setAsync)

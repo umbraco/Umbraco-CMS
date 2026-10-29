@@ -3,6 +3,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 /// <summary>
 ///     Mutual exclusion per key. A key's lock exists only while a thread holds it or waits for it.
 /// </summary>
+/// <typeparam name="TKey">The type of the keys.</typeparam>
 /// <remarks>
 ///     Not reentrant: a thread that enters a key it already holds deadlocks.
 /// </remarks>
@@ -28,26 +29,40 @@ internal sealed class KeyedLock<TKey>
     /// <summary>
     ///     Blocks until the key's lock is free and takes it. Dispose the result to release it.
     /// </summary>
+    /// <param name="key">The key to lock.</param>
+    /// <returns>The handle that releases the lock.</returns>
     public IDisposable Enter(TKey key)
     {
-        Entry entry;
+        Entry entry = Join(key);
+        entry.Semaphore.Wait();
+        return new Releaser(this, key, entry);
+    }
+
+    /// <summary>
+    ///     Waits until the key's lock is free and takes it. Dispose the result to release it.
+    /// </summary>
+    /// <param name="key">The key to lock.</param>
+    /// <returns>A task whose result is the handle that releases the lock.</returns>
+    public async Task<IDisposable> EnterAsync(TKey key)
+    {
+        Entry entry = Join(key);
+        await entry.Semaphore.WaitAsync().ConfigureAwait(false);
+        return new Releaser(this, key, entry);
+    }
+
+    private Entry Join(TKey key)
+    {
         lock (_entries)
         {
-            if (_entries.TryGetValue(key, out Entry? existing))
-            {
-                entry = existing;
-            }
-            else
+            if (_entries.TryGetValue(key, out Entry? entry) is false)
             {
                 entry = new Entry();
                 _entries[key] = entry;
             }
 
             entry.Users++;
+            return entry;
         }
-
-        entry.Semaphore.Wait();
-        return new Releaser(this, key, entry);
     }
 
     private void Exit(TKey key, Entry entry)

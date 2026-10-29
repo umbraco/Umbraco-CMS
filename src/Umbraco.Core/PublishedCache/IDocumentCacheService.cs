@@ -164,6 +164,10 @@ public interface IDocumentCacheService
     /// </summary>
     /// <param name="key">The unique key of the content to remove.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// Called after the change is committed, outside the content tree lock, so an implementation can order the
+    /// removal after a refresh of the same item that is still completing.
+    /// </remarks>
     Task RemoveFromMemoryCacheAsync(Guid key);
 
     /// <summary>

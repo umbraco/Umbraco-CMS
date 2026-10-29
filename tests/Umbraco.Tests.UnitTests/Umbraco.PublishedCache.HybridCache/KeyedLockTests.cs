@@ -44,6 +44,22 @@ public class KeyedLockTests
     }
 
     [Test]
+    public void EnterAsync_SameKey_WaitsUntilTheHolderLeaves()
+    {
+        var keyedLock = new KeyedLock<Guid>();
+        Guid key = Guid.NewGuid();
+
+        IDisposable first = keyedLock.Enter(key);
+        Task<IDisposable> second = keyedLock.EnterAsync(key);
+
+        Assert.That(second.Wait(TimeSpan.FromMilliseconds(300)), Is.False, "The second caller must wait while the first holds the key.");
+        first.Dispose();
+        Assert.That(second.Wait(TimeSpan.FromSeconds(5)), Is.True);
+        second.Result.Dispose();
+        Assert.That(keyedLock.Count, Is.Zero, "The key is removed once the last user leaves.");
+    }
+
+    [Test]
     public void Exit_OfTheLastUser_RemovesTheKey()
     {
         var keyedLock = new KeyedLock<Guid>();

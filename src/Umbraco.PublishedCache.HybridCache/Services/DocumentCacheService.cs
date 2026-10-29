@@ -42,6 +42,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     private readonly ILogger<DocumentCacheService> _logger;
 
     private readonly IConvertedPublishedContentCache<string> _publishedContentCache;
+    private readonly KeyedLock<Guid> _refreshLocks = new();
 
     // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
     // GetNodeAsync captures it before reading the backing store and re-checks it before writing
@@ -56,7 +57,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     // Global is correctness-robust; only revisit if read-through churn under heavy concurrent
     // publishing ever shows up in profiling.
     private long _cacheGeneration;
-    private readonly KeyedLock<Guid> _refreshLocks = new();
 
 #pragma warning disable IDE0032 // Use auto property - auto-property can't express the lazy initialization of the seed keys and reset, so we use a backing field instead.
     private HashSet<Guid>? _seedKeys;
@@ -574,36 +574,37 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         //
         // This keeps the ordering: HybridCache updates the in-process cache and sends the distributed write before
         // its first await, so both still happen under the lock; only the wait for the acknowledgement moves out.
-        // The per-document lock makes the next refresh of the same document wait for this one's write, so a slow
-        // write cannot land on top of a newer one.
+        // The per-document lock makes the next refresh or removal of the same document on this node wait for these
+        // writes, so a slow write cannot land on top of a newer one from this node. A newer write from another node
+        // can still be overtaken; that is corrected when this node processes the instruction for that change, as its
+        // own refresh is ordered after the slow write.
         // TODO (V20): await the cache writes directly once the refresh pipeline is asynchronous.
         using (_refreshLocks.Enter(key))
         {
-            var pending = new List<Task>(2);
+            ValueTask draftWrite;
+            ValueTask publishedWrite;
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
 
                 (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = _databaseCacheRepository.GetContentSourceForPublishStates(key);
 
-                pending.Add(draftNode is not null
-                    ? _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode)).AsTask()
-                    : _hybridCache.RemoveAsync(GetCacheKey(key, true)).AsTask());
+                draftWrite = draftNode is not null
+                    ? _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode))
+                    : _hybridCache.RemoveAsync(GetCacheKey(key, true));
 
                 var cacheKey = GetCacheKey(key, false);
-                pending.Add(publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key)
-                    ? _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode)).AsTask()
-                    : _hybridCache.RemoveAsync(cacheKey).AsTask());
+                publishedWrite = publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key)
+                    ? _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode))
+                    : _hybridCache.RemoveAsync(cacheKey);
                 _publishedContentCache.Remove(cacheKey);
                 InvalidateMemoryCacheGeneration();
 
                 scope.Complete();
             }
 
-            foreach (Task write in pending)
-            {
-                write.GetAwaiter().GetResult();
-            }
+            // Both writes settle before the lock is released, even when one of them fails.
+            Task.WhenAll(draftWrite.AsTask(), publishedWrite.AsTask()).GetAwaiter().GetResult();
         }
     }
 
@@ -645,6 +646,20 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
     /// <inheritdoc />
     public async Task RemoveFromMemoryCacheAsync(Guid key)
+    {
+        // Ordered after a pending refresh of the same document, so a slow write from that refresh cannot bring the
+        // entries back. Not for callers holding the content tree lock: a refresh waiting for that lock holds this one.
+        using (await _refreshLocks.EnterAsync(key))
+        {
+            await RemoveFromMemoryCacheUnorderedAsync(key);
+        }
+    }
+
+    /// <summary>
+    /// Removes both entries of a document without waiting for a pending refresh of it, for callers that hold the
+    /// content tree lock. The refresh that follows their commit removes the entries again, in order.
+    /// </summary>
+    private async Task RemoveFromMemoryCacheUnorderedAsync(Guid key)
     {
         await _hybridCache.RemoveAsync(GetCacheKey(key, true));
         await ClearPublishedCacheAsync(key);
@@ -769,8 +784,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         if (content.Trashed)
         {
             _databaseCacheRepository.DeleteContentItem(content.Id);
+
             // TODO (V20): await the memory-cache removals once the notification pipeline is asynchronous.
-            RemoveFromMemoryCacheAsync(content.Key).GetAwaiter().GetResult();
+            RemoveFromMemoryCacheUnorderedAsync(content.Key).GetAwaiter().GetResult();
             scope.Complete();
             return;
         }
@@ -800,7 +816,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         if (content.Trashed)
         {
             await _databaseCacheRepository.DeleteContentItemAsync(content.Id);
-            await RemoveFromMemoryCacheAsync(content.Key);
+            await RemoveFromMemoryCacheUnorderedAsync(content.Key);
             scope.Complete();
             return;
         }
