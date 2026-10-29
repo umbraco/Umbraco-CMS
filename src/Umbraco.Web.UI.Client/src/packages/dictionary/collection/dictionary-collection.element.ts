@@ -23,12 +23,15 @@ export class UmbDictionaryCollectionElement extends UmbCollectionDefaultElement 
 			<umb-collection-toolbar slot="header">
 				<div id="toolbar-content">
 					<umb-collection-filter-field></umb-collection-filter-field>
-					${this._isReadOnly
-						? html`<uui-tag look="secondary">${this.localize.term('general_readOnly')}</uui-tag>`
-						: nothing}
+					${this.#renderReadOnlyTag()}
 				</div>
 			</umb-collection-toolbar>
 		`;
+	}
+
+	#renderReadOnlyTag() {
+		if (!this._isReadOnly) return nothing;
+		return html`<uui-tag look="secondary">${this.localize.term('general_readOnly')}</uui-tag>`;
 	}
 
 	static override styles = [
