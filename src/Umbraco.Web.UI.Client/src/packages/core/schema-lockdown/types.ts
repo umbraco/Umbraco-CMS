@@ -3,12 +3,6 @@ import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-a
 
 export type UmbSchemaOperation = 'create' | 'update' | 'delete';
 
-/**
- * A schema operation, or 'createOrUpdate': 'create' while the surrounding workspace holds a new entity,
- * and 'update' otherwise.
- */
-export type UmbSchemaOperationOrCreateOrUpdate = UmbSchemaOperation | 'createOrUpdate';
-
 export interface UmbSchemaOperationAllowedConditionConfig extends UmbConditionConfigBase<
 	typeof UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS
 > {
@@ -20,7 +14,7 @@ export interface UmbSchemaOperationAllowedConditionConfig extends UmbConditionCo
 	/**
 	 * The operation the action performs.
 	 */
-	operation: UmbSchemaOperationOrCreateOrUpdate;
+	operation: UmbSchemaOperation;
 
 	/**
 	 * If true (default), the condition is permitted when the operation is allowed.
