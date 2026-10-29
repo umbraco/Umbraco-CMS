@@ -171,15 +171,15 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		);
 
 		if (workspaceContext) {
+			const moreThanOneOption = createObservablePart(
+				workspaceContext.variantOptions,
+				(options) => options && options.length > 1,
+			);
 			this.observe(
-				observeMultiple([
-					workspaceContext.variesByCulture,
-					workspaceContext.variesBySegment,
-					workspaceContext.variantOptions,
-				]),
-				([variesByCulture, variesBySegment, variantOptions]) => {
-					if (variesByCulture === false && variesBySegment === true && variantOptions.length > 1) {
-						this.#expandVariant(UmbVariantId.Create(variantOptions[0]));
+				observeMultiple([workspaceContext.variesByCulture, workspaceContext.variesBySegment, moreThanOneOption]),
+				([variesByCulture, variesBySegment, moreThanOneOption]) => {
+					if (variesByCulture === false && variesBySegment === true && moreThanOneOption) {
+						this.#expandVariant(UmbVariantId.INVARIANT);
 					}
 				},
 				'_observeExpandFirstVariantIfSegmentOnly',
@@ -223,7 +223,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		this.observe(
 			workspaceContext.variantOptions,
 			(options) => {
-				const option = options.find(
+				const option = options?.find(
 					(option) => option.culture === this._variantId?.culture && option.segment === this._variantId?.segment,
 				);
 				this._activeVariant = option as VariantOptionModelType;
@@ -310,7 +310,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		if (workspaceContext?.isWritableVariant) {
 			this.observe(
 				createObservablePart(workspaceContext.variantOptions, (options) =>
-					options.map((option) => UmbVariantId.Create(option)),
+					options?.map((option) => UmbVariantId.Create(option)),
 				),
 				(variantIds) => {
 					this.#observeWritableVariants(workspaceContext, variantIds);
@@ -321,7 +321,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			this.observe(
 				workspaceContext.readOnlyGuard.isPermittedForObservableVariants(
 					createObservablePart(workspaceContext.variantOptions, (options) =>
-						options.map((option) => UmbVariantId.Create(option)),
+						options?.map((option) => UmbVariantId.Create(option)),
 					),
 				),
 				(permitted: { variantId: UmbVariantId; permitted: boolean }[]) => {
@@ -335,8 +335,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		}
 	}
 
-	#observeWritableVariants(workspaceContext: UmbVariantDatasetWorkspaceContext, variantIds: Array<UmbVariantId>) {
-		if (variantIds.length === 0) {
+	#observeWritableVariants(
+		workspaceContext: UmbVariantDatasetWorkspaceContext,
+		variantIds: Array<UmbVariantId> | undefined,
+	) {
+		if (!variantIds || variantIds.length === 0) {
 			this._readOnlyCultures = [];
 			this.removeUmbControllerByAlias('_observeWritableVariants');
 			return;
@@ -356,12 +359,15 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		const nameWriteGuard = workspaceContext?.nameWriteGuard;
 		if (workspaceContext && nameWriteGuard) {
 			this.observe(
+				// TODO: Revisit this code, rules are parsed into the observables, but not used, instead a get method is used. That is slightly odd [NL]
 				observeMultiple([workspaceContext.variantOptions, nameWriteGuard.rules]),
 				([variantOptions]) => {
-					this._nameReadOnlyCultures = variantOptions
-						.map((option) => UmbVariantId.Create(option))
-						.filter((variantId) => !nameWriteGuard.getIsPermittedForName(variantId))
-						.map((variantId) => variantId.culture);
+					this._nameReadOnlyCultures = variantOptions?.length
+						? variantOptions
+								.map((option) => UmbVariantId.Create(option))
+								.filter((variantId) => !nameWriteGuard.getIsPermittedForName(variantId))
+								.map((variantId) => variantId.culture)
+						: [];
 				},
 				'_observeNameWriteGuard',
 			);

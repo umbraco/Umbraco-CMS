@@ -19,6 +19,7 @@ import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 import '@umbraco-cms/backoffice/entity-item';
+import { isAboveZeroAndBelowMinimum } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-user-group-input')
 export class UmbUserGroupInputElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
@@ -101,7 +102,7 @@ export class UmbUserGroupInputElement extends UUIFormControlWithBasicsMixin(UmbL
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(

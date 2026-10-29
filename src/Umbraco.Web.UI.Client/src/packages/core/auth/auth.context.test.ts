@@ -24,24 +24,6 @@ describe('UmbAuthContext', () => {
 			expect(context).to.have.property('isAuthorized');
 		});
 
-		it('has an isInitialized property', () => {
-			expect(context).to.have.property('isInitialized');
-		});
-
-		// setInitialized() used to be driven from the core entry point. It now runs in the constructor,
-		// so guard the property that makes that safe: #isInitialized is a ReplaySubject(1), meaning a
-		// subscriber attaching after construction still receives the emission rather than hanging.
-		// Reading the deprecated getter logs a deprecation warning here — expected, since the test
-		// runner's origin resolves to 'unknown' rather than 'core' so the warning isn't suppressed.
-		it('emits isInitialized to a subscriber that attaches after construction', async () => {
-			let emitted = false;
-			context.isInitialized.subscribe(() => {
-				emitted = true;
-			});
-			await aTimeout(0);
-			expect(emitted).to.be.true;
-		});
-
 		it('has a getIsAuthorized method', () => {
 			expect(context).to.have.property('getIsAuthorized').that.is.a('function');
 		});
@@ -54,23 +36,12 @@ describe('UmbAuthContext', () => {
 			expect(context).to.have.property('signOut').that.is.a('function');
 		});
 
-		it('has a getServerUrl method', () => {
-			expect(context).to.have.property('getServerUrl').that.is.a('function');
-		});
-
 		it('has a configureClient method', () => {
 			expect(context).to.have.property('configureClient').that.is.a('function');
 		});
 
 		it('has a session$ observable', () => {
 			expect(context).to.have.property('session$');
-		});
-	});
-
-	describe('getServerUrl', () => {
-		it('returns the configured server URL', () => {
-			const serverUrl = context.getServerUrl();
-			expect(serverUrl).to.equal('http://localhost');
 		});
 	});
 
@@ -122,8 +93,9 @@ describe('UmbAuthContext', () => {
 			expect(receivedConfig).to.have.property('credentials', 'include');
 			// Cookie auth carries no bearer token, so the auth callback is deliberately not set.
 			expect(receivedConfig.auth).to.be.undefined;
-			// The server's 302 to /login must not be followed; the interceptor handles the 401 instead.
-			expect(receivedConfig).to.have.property('redirect', 'manual');
+			// Redirects are followed, so endpoints can answer with a 3xx; the auth interceptor recognises a
+			// redirect to the login page instead.
+			expect(receivedConfig.redirect ?? 'follow').to.equal('follow');
 		});
 	});
 
@@ -451,6 +423,70 @@ describe('UmbAuthContext', () => {
 				expect(renewed).to.be.false;
 				// A failed keep-alive must not probe the configuration endpoint afterwards
 				expect(fetchCalls).to.have.lengthOf(1);
+				expect(context.getIsAuthorized()).to.be.false;
+			});
+		});
+
+		// The server sends both an ended session and a signed-in user it denies access to the login page.
+		describe('a request redirected to the login page', () => {
+			let sessionAlive: boolean;
+
+			beforeEach(async () => {
+				// The interceptor provides its signaler on the host, and context requests only resolve for an attached host.
+				document.body.appendChild(hostElement);
+				sessionAlive = true;
+				const timeoutUtc = new Date(Date.now() + 20 * 60 * 1000).toISOString();
+				stubFetch(() =>
+					sessionAlive
+						? new Response(JSON.stringify({ timeoutUtc }), { status: 200 })
+						: new Response(null, { status: 401 }),
+				);
+				await context.setInitialState();
+				fetchCalls = [];
+			});
+
+			afterEach(() => {
+				hostElement.remove();
+			});
+
+			async function receiveLoginRedirect(): Promise<Response> {
+				const interceptors: Array<(response: Response, request: Request, options: unknown) => Promise<Response>> = [];
+				context.configureClient({
+					getConfig: () => ({}),
+					interceptors: {
+						request: { use: () => {} },
+						response: { use: (fn: never) => interceptors.push(fn) },
+					},
+					setConfig: () => ({}),
+				} as never);
+				await aTimeout(0);
+
+				let response = new Response('<!doctype html><title>Log in</title>', { status: 200 });
+				Object.defineProperties(response, {
+					redirected: { value: true },
+					url: { value: 'http://localhost/umbraco/login?ReturnUrl=%2F' },
+				});
+				const request = new Request('http://localhost/umbraco/my-extension/settings', { method: 'POST' });
+				for (const interceptor of interceptors) {
+					response = await interceptor(response, request, {});
+				}
+				return response;
+			}
+
+			it('answers with a 403 and keeps the session while the server still accepts it', async () => {
+				const response = await receiveLoginRedirect();
+
+				expect(response.status).to.equal(403);
+				expect(context.getIsAuthorized()).to.be.true;
+				expect(String(fetchCalls[0].input)).to.contain('keep-alive');
+			});
+
+			it('ends the session once the server no longer accepts it', async () => {
+				sessionAlive = false;
+
+				const response = await receiveLoginRedirect();
+
+				expect(response.status).to.equal(401);
 				expect(context.getIsAuthorized()).to.be.false;
 			});
 		});

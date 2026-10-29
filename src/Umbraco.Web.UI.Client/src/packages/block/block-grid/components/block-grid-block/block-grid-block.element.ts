@@ -1,10 +1,11 @@
-import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
 import '@umbraco-cms/backoffice/ufm';
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
 
 /**
  * @element umb-block-grid-block
@@ -24,13 +25,6 @@ export class UmbBlockGridBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEle
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
 
-	/**
-	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
-	 * reflects the library element's own publish state rather than the local expose entry.
-	 */
-	@property({ type: Boolean, attribute: false })
-	isExternalContent?: boolean;
-
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
@@ -46,20 +40,9 @@ export class UmbBlockGridBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEle
 				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				${this.renderNameSlot(blockValue, 'name')}
-				${when(this.unpublished, () => this.#renderDraftTag())}
+				<umb-block-state-tag slot="name"></umb-block-state-tag>
 				<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
 			</umb-ref-grid-block>
-		`;
-	}
-
-	#renderDraftTag() {
-		const titleKey = this.isExternalContent
-			? 'blockEditor_notPublishedLibraryElementDescription'
-			: 'blockEditor_notExposedDescription';
-		return html`
-			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
-				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-			</uui-tag>
 		`;
 	}
 
@@ -77,13 +60,6 @@ export class UmbBlockGridBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEle
 			umb-ufm-render,
 			::slotted([slot='name']) {
 				user-select: none;
-			}
-
-			uui-tag {
-				margin-left: 0.5em;
-				margin-bottom: -0.3em;
-				margin-top: -0.3em;
-				vertical-align: text-top;
 			}
 
 			:host([unpublished]) umb-icon,

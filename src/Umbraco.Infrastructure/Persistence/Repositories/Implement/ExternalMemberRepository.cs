@@ -46,6 +46,24 @@ internal sealed class ExternalMemberRepository : IExternalMemberRepository
     }
 
     /// <inheritdoc />
+    public async Task<IEnumerable<ExternalMemberIdentity>> GetByKeysAsync(IEnumerable<Guid> keys)
+    {
+        var members = new List<ExternalMemberIdentity>();
+        foreach (IEnumerable<Guid> group in keys.Distinct().InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = SqlContext.Sql()
+                .Select<ExternalMemberDto>()
+                .From<ExternalMemberDto>()
+                .WhereIn<ExternalMemberDto>(x => x.Key, group);
+
+            List<ExternalMemberDto> dtos = await Database.FetchAsync<ExternalMemberDto>(sql);
+            members.AddRange(dtos.Select(MapToIdentity));
+        }
+
+        return members;
+    }
+
+    /// <inheritdoc />
     public async Task<ExternalMemberIdentity?> GetByEmailAsync(string email)
     {
         Sql<ISqlContext> sql = SqlContext.Sql()

@@ -13,8 +13,11 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import type { UmbEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import type { UUIBooleanInputElement, UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+
+import '@umbraco-cms/backoffice/relations';
 
 @customElement('umb-document-schedule-modal')
 export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
@@ -43,6 +46,9 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _submitButtonState?: UUIButtonState;
+
+	@state()
+	private _referencesConfig?: UmbEntityReferencesConfig;
 
 	#validation = new UmbValidationContext(this);
 
@@ -91,6 +97,17 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	override firstUpdated() {
 		this._internalValues = this.data?.prevalues ? [...this.data.prevalues] : [];
 		this.#configureSelectionManager();
+		this.#configureReferences();
+	}
+
+	#configureReferences() {
+		if (!this.data) return;
+		const { unique, itemRepositoryAlias, referenceRepositoryAlias } = this.data;
+		if (!unique) return;
+		if (!itemRepositoryAlias) return;
+		if (!referenceRepositoryAlias) return;
+
+		this._referencesConfig = { unique, itemRepositoryAlias, referenceRepositoryAlias };
 	}
 
 	async #configureSelectionManager() {
@@ -195,6 +212,14 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`<uui-dialog-layout headline=${this.localize.term('content_saveAndScheduleModalTitle')}>
 			${this.#renderOptions()}
+			${when(
+				this._referencesConfig,
+				() =>
+					html`<umb-entity-references-summary
+						.config=${this._referencesConfig}
+						.entitiesNeedingAttention=${this.data
+							?.entitiesNeedingAttention}></umb-entity-references-summary>`,
+			)}
 
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>

@@ -39,7 +39,6 @@ export interface UmbEntityVariantOptionModel<VariantType extends UmbEntityVarian
 	segmentInfo?: {
 		alias: string;
 		name: string;
-		cultures?: string[] | null;
 	};
 	/**
 	 * The unique identifier is a VariantId string.
@@ -48,6 +47,13 @@ export interface UmbEntityVariantOptionModel<VariantType extends UmbEntityVarian
 	culture: string | null;
 	segment: string | null;
 }
+
+/**
+ * A variant option as it is supplied to a workspace, before its language has been resolved from the culture.
+ */
+export type UmbEntityVariantOptionSourceModel<
+	VariantOptionType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel,
+> = Omit<VariantOptionType, 'language'>;
 
 /** @deprecated use `UmbEntityVariantOptionModel` instead */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

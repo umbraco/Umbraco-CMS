@@ -1,8 +1,10 @@
-import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
+
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
 
 /**
  * @element umb-ref-rte-block
@@ -19,13 +21,6 @@ export class UmbRefRteBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElemen
 
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
-
-	/**
-	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
-	 * reflects the library element's own publish state rather than the local expose entry.
-	 */
-	@property({ type: Boolean, attribute: false })
-	isExternalContent?: boolean;
 
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
@@ -46,18 +41,8 @@ export class UmbRefRteBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElemen
 				<div class="selection-background" aria-hidden="true">&emsp;</div>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				${this.renderNameSlot(blockValue, 'name')}
+				<umb-block-state-tag slot="name"></umb-block-state-tag>
 			</uui-ref-node>
-		`;
-	}
-
-	#renderDraftTag() {
-		const titleKey = this.isExternalContent
-			? 'blockEditor_notPublishedLibraryElementDescription'
-			: 'blockEditor_notExposedDescription';
-		return html`
-			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
-				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-			</uui-tag>
 		`;
 	}
 

@@ -25,8 +25,9 @@ import {
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbPaginationManager, UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -38,8 +39,6 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_ENTITY_CONTEXT, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
-
-const LOCAL_STORAGE_KEY = 'umb-collection-view';
 
 const FILTER_MEMORY_UNIQUE = 'UmbCollectionFilter';
 const ORDER_MEMORY_UNIQUE = 'UmbCollectionOrder';
@@ -107,6 +106,7 @@ export class UmbDefaultCollectionContext<
 	#defaultViewAlias: string;
 	#defaultFilter: Partial<FilterModelType>;
 	#pageNumberToRestore?: number;
+	#latestRequestId = 0;
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -315,39 +315,40 @@ export class UmbDefaultCollectionContext<
 	that will trigger multiple load calls with different filter arguments */
 	public loadCollection = debounce(() => this._requestCollection(), 100);
 
-	/**
-	 * Requests the collection from the repository.
-	 * @returns {Promise<void>}
-	 * @deprecated Deprecated since v.17.0.0. Use `loadCollection` instead.
-	 * @memberof UmbCollectionContext
-	 */
-	public async requestCollection() {
-		new UmbDeprecation({
-			removeInVersion: '19.0.0',
-			deprecated: 'requestCollection',
-			solution: 'Use .loadCollection method instead',
-		}).warn();
-
-		return this._requestCollection();
-	}
-
 	protected async _requestCollection() {
 		await this._init;
 
 		if (!this._configured) this._configure();
 		if (!this._repository) throw new Error(`Missing repository for ${this._manifest}`);
 
+		const requestId = ++this.#latestRequestId;
 		this._loading.setValue(true);
 
-		const filter = this._filter.getValue();
-		const { data } = await this._repository.requestCollection(filter);
+		try {
+			const filter = this._filter.getValue();
+			const { data } = await this._repository.requestCollection(filter);
 
-		if (data) {
-			this._items.setValue(data.items);
-			this._setTotalItems(data.total);
+			if (requestId !== this.#latestRequestId) return;
+
+			if (data) {
+				this._setCollectionData(data);
+			}
+		} finally {
+			if (requestId === this.#latestRequestId) {
+				this._loading.setValue(false);
+			}
 		}
+	}
 
-		this._loading.setValue(false);
+	/**
+	 * Applies the response of the latest collection request. Responses superseded by a newer request are never applied.
+	 * Override to transform or merge the items before they are set.
+	 * @param {UmbPagedModel<CollectionItemType>} data - The paged items returned by the repository.
+	 * @memberof UmbCollectionContext
+	 */
+	protected _setCollectionData(data: UmbPagedModel<CollectionItemType>) {
+		this._items.setValue(data.items);
+		this._setTotalItems(data.total);
 	}
 
 	/**
@@ -501,52 +502,6 @@ export class UmbDefaultCollectionContext<
 		const pageSize = this.pagination.getPageSize();
 		if (!skip || !pageSize) return 1;
 		return Math.floor(skip / pageSize) + 1;
-	}
-
-	/**
-	 * Returns the alias of the view the collection was last left in.
-	 * @param {(string | undefined)} unique - The unique of the entity holding the collection.
-	 * @returns {(string | undefined)} The alias of the last selected view.
-	 * @deprecated Deprecated since v17. The current view is remembered in the interaction memory of the collection,
-	 * see the `UmbCollectionCurrentView` memory on `.interactionMemory`. Scheduled for removal in Umbraco 19.
-	 */
-	public getLastSelectedView(unique: string | undefined): string | undefined {
-		new UmbDeprecation({
-			deprecated: 'UmbDefaultCollectionContext.getLastSelectedView()',
-			removeInVersion: '19.0.0',
-			solution: 'Read the UmbCollectionCurrentView memory from the interactionMemory of the collection instead.',
-		}).warn();
-
-		if (!unique) return undefined;
-
-		const layouts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) ?? '{}') ?? {};
-		if (!layouts) return undefined;
-
-		return layouts[unique];
-	}
-
-	/**
-	 * Stores the alias of the view the collection was last left in.
-	 * @param {(string | undefined)} unique - The unique of the entity holding the collection.
-	 * @param {string} viewAlias - The alias of the view.
-	 * @deprecated Deprecated since v17. The current view is remembered in the interaction memory of the collection,
-	 * see the `UmbCollectionCurrentView` memory on `.interactionMemory`. Scheduled for removal in Umbraco 19.
-	 */
-	public setLastSelectedView(unique: string | undefined, viewAlias: string) {
-		new UmbDeprecation({
-			deprecated: 'UmbDefaultCollectionContext.setLastSelectedView()',
-			removeInVersion: '19.0.0',
-			solution: 'The current view is remembered by the collection view manager, no call is needed.',
-		}).warn();
-
-		if (!unique) return;
-
-		const layouts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) ?? '{}') ?? {};
-		if (!layouts) return;
-
-		layouts[unique] = viewAlias;
-
-		localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(layouts));
 	}
 
 	#onReloadStructureRequest = (event: UmbRequestReloadStructureForEntityEvent) => {

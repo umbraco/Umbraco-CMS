@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { UUICopyTextEvent } from '@umbraco-cms/backoffice/external/uui';
 
 //TODO: check how to display EventId field in the message properties
 @customElement('umb-log-viewer-message')
@@ -126,6 +127,28 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		return queryString;
 	}
 
+	#onCopying(event: UUICopyTextEvent) {
+		event.text = this.#getCopyText();
+	}
+
+	#getCopyText() {
+		const lines = [
+			`Timestamp: ${this.date?.toISOString() ?? this.timestamp}`,
+			`Level: ${this.level}`,
+			`Message: ${this.renderedMessage}`,
+		];
+
+		if (this.exception) {
+			lines.push('', 'Exception:', this.exception);
+		}
+
+		if (this.properties.length) {
+			lines.push('', 'Properties:', ...this.properties.map((property) => `${property.name}: ${property.value ?? ''}`));
+		}
+
+		return lines.join('\n');
+	}
+
 	#setOpen(event: Event) {
 		this.open = (event.target as HTMLDetailsElement).open;
 	}
@@ -198,6 +221,13 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 						`,
 					)}
 				</umb-dropdown>
+				<uui-button-copy-text
+					id="copy-button"
+					look="secondary"
+					label=${this.localize.term('general_copy')}
+					@copying=${this.#onCopying}>
+					<umb-localize key="general_copy">Copy</umb-localize>
+				</uui-button-copy-text>
 			</details>
 		`;
 	}
@@ -291,6 +321,10 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			}
 			#search-button {
 				margin-left: var(--uui-size-layout-1);
+			}
+
+			#copy-button {
+				margin-left: var(--uui-size-space-2);
 			}
 
 			.property-name,

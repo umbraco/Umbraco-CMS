@@ -50,7 +50,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Duplicate Email")
                 .WithDetail("The email is already in use.")
                 .Build()),
-            UserOperationStatus.Unauthorized => Unauthorized(),
+            UserOperationStatus.Unauthorized => StatusCode(StatusCodes.Status403Forbidden, problemDetailsBuilder
+                .WithTitle("Forbidden")
+                .WithDetail("The performing user does not have the necessary access to perform this operation.")
+                .Build()),
             UserOperationStatus.CancelledByNotification => BadRequest(problemDetailsBuilder
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the user operation.")
@@ -102,6 +105,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
             UserOperationStatus.ElementStartNodeNotFound => BadRequest(problemDetailsBuilder
                 .WithTitle("Element Start Node not found")
                 .WithDetail("Some of the provided element start nodes was not found.")
+                .Build()),
+            UserOperationStatus.DocumentBlueprintStartNodeNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Document Blueprint Start Node not found")
+                .WithDetail("Some of the provided document blueprint start nodes was not found.")
                 .Build()),
             UserOperationStatus.UserNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The user was not found")

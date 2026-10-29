@@ -325,9 +325,6 @@ public sealed class BlockEditorVarianceHandler
     private static bool VariesByCulture(BlockPropertyValue blockPropertyValue)
         => blockPropertyValue.Culture.IsNullOrWhiteSpace() is false;
 
-    private static bool VariesBySegment(BlockPropertyValue blockPropertyValue)
-        => blockPropertyValue.Segment.IsNullOrWhiteSpace() is false;
-
     /// <summary>
     /// Determines which of a property's culture specific values survives the property type becoming culture invariant.
     /// </summary>
@@ -361,11 +358,9 @@ public sealed class BlockEditorVarianceHandler
         var alignedCulture = propertyType.Variations.VariesByCulture()
             ? culture.IfNullOrWhiteSpace(variationContext.Culture.IfNullOrWhiteSpace(defaultCulture))
             : null;
-        var alignedSegment = propertyType.Variations.VariesBySegment()
-            ? owner.ContentType.VariesBySegment() is false && VariesBySegment(blockPropertyValue)
-                ? variationContext.Segment
-                : blockPropertyValue.Segment.IfNullOrWhiteSpace(variationContext.Segment)
-            : null;
+        var alignedSegment = owner.ContentType.VariesBySegment() is false && propertyType.Variations.VariesBySegment()
+            ? variationContext.Segment
+            : blockPropertyValue.Segment;
 
         return new BlockPropertyValue
         {

@@ -120,6 +120,7 @@ public class BackOfficeSecurityRequirementsTransformerTests
             {
                 MethodInfo = methodInfo,
                 ControllerTypeInfo = typeof(TestControllerWithAllowAnonymousMethod).GetTypeInfo(),
+                EndpointMetadata = EndpointMetadataOf(methodInfo),
             },
         };
         var document = new OpenApiDocument();
@@ -152,6 +153,7 @@ public class BackOfficeSecurityRequirementsTransformerTests
             {
                 MethodInfo = methodInfo,
                 ControllerTypeInfo = typeof(AllowAnonymousController).GetTypeInfo(),
+                EndpointMetadata = EndpointMetadataOf(methodInfo),
             },
         };
         var document = new OpenApiDocument();
@@ -184,6 +186,7 @@ public class BackOfficeSecurityRequirementsTransformerTests
             {
                 MethodInfo = methodInfo,
                 ControllerTypeInfo = typeof(AuthorizedController).GetTypeInfo(),
+                EndpointMetadata = EndpointMetadataOf(methodInfo),
             },
         };
         var document = new OpenApiDocument();
@@ -215,6 +218,7 @@ public class BackOfficeSecurityRequirementsTransformerTests
             {
                 MethodInfo = methodInfo,
                 ControllerTypeInfo = typeof(AuthorizedController).GetTypeInfo(),
+                EndpointMetadata = EndpointMetadataOf(methodInfo),
             },
         };
         var document = new OpenApiDocument();
@@ -246,6 +250,7 @@ public class BackOfficeSecurityRequirementsTransformerTests
             {
                 MethodInfo = methodInfo,
                 ControllerTypeInfo = typeof(MultipleAuthorizeController).GetTypeInfo(),
+                EndpointMetadata = EndpointMetadataOf(methodInfo),
             },
         };
         var document = new OpenApiDocument();
@@ -278,6 +283,7 @@ public class BackOfficeSecurityRequirementsTransformerTests
             {
                 MethodInfo = methodInfo,
                 ControllerTypeInfo = typeof(ControllerWithAuthorizationServiceInjection).GetTypeInfo(),
+                EndpointMetadata = EndpointMetadataOf(methodInfo),
             },
         };
         var document = new OpenApiDocument();
@@ -298,7 +304,67 @@ public class BackOfficeSecurityRequirementsTransformerTests
         Assert.IsTrue(operation.Responses.ContainsKey(StatusCodes.Status403Forbidden.ToString()));
     }
 
+
+    [Test]
+    public async Task TransformAsync_Operation_Overrides_Security_When_AllowAnonymous_Is_Only_In_Endpoint_Metadata()
+    {
+        // Arrange
+        var operation = new OpenApiOperation();
+        var methodInfo = typeof(AuthorizedController).GetMethod(nameof(AuthorizedController.SecureAction))!;
+        OpenApiOperationTransformerContext context = CreateContext(methodInfo, new AllowAnonymousAttribute());
+
+        // Act
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
+
+        // Assert
+        Assert.IsFalse(operation.Responses?.ContainsKey(StatusCodes.Status401Unauthorized.ToString()) ?? false);
+        Assert.IsNotNull(operation.Security);
+        Assert.IsEmpty(operation.Security);
+    }
+
+    [TestCase(2, false)]
+    [TestCase(3, true)]
+    public async Task TransformAsync_Operation_Adds_403_Response_Only_When_Endpoint_Metadata_Has_More_AuthorizeAttributes_Than_The_Base_Controller(int numberOfAuthorizeAttributes, bool expectForbidden)
+    {
+        // Arrange
+        var operation = new OpenApiOperation();
+        var methodInfo = typeof(AuthorizedController).GetMethod(nameof(AuthorizedController.SecureAction))!;
+        object[] endpointMetadata = Enumerable.Range(0, numberOfAuthorizeAttributes)
+            .Select(_ => (object)new AuthorizeAttribute())
+            .ToArray();
+        OpenApiOperationTransformerContext context = CreateContext(methodInfo, endpointMetadata);
+
+        // Act
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
+
+        // Assert
+        Assert.AreEqual(expectForbidden, operation.Responses?.ContainsKey(StatusCodes.Status403Forbidden.ToString()) ?? false);
+    }
+
     #endregion
+
+    // Mirrors how ASP.NET Core builds endpoint metadata: controller attributes, then action attributes.
+    private static IList<object> EndpointMetadataOf(MethodInfo methodInfo)
+        => (methodInfo.DeclaringType?.GetCustomAttributes(true) ?? [])
+            .Concat(methodInfo.GetCustomAttributes(true))
+            .ToList();
+
+    private OpenApiOperationTransformerContext CreateContext(MethodInfo methodInfo, params object[] endpointMetadata)
+        => new()
+        {
+            Document = new OpenApiDocument(),
+            Description = new ApiDescription
+            {
+                ActionDescriptor = new ControllerActionDescriptor
+                {
+                    MethodInfo = methodInfo,
+                    ControllerTypeInfo = methodInfo.DeclaringType!.GetTypeInfo(),
+                    EndpointMetadata = endpointMetadata,
+                },
+            },
+            DocumentName = "test",
+            ApplicationServices = _services,
+        };
 
     #region Test Helper Classes
 

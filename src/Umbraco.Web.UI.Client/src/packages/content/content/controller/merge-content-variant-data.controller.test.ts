@@ -355,6 +355,55 @@ describe('UmbMergeContentVariantDataController', () => {
 			expect(result.values.map((v) => v.segment)).to.deep.equal([null, 's1', 's2']);
 		});
 
+		it('parses the segment values of a processed culture', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const persistedData: UmbContentLikeDetailModel = {
+				values: [{ ...value('title', 'en-us', 's1'), value: 'old' }],
+			};
+			const runtimeData: UmbContentLikeDetailModel = {
+				values: [{ ...value('title', 'en-us', 's1'), value: 'new' }],
+			};
+
+			const variants = [new UmbVariantId('en-us')];
+			const result = await ctrl.process(persistedData, runtimeData, variants, [
+				...variants,
+				UmbVariantId.CreateInvariant(),
+			]);
+
+			expect(result.values.find((v) => v.segment === 's1')?.value).to.equal('new');
+		});
+
+		it('keeps the persisted segment values of a culture that is not being processed', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const persistedData: UmbContentLikeDetailModel = {
+				values: [
+					{ ...value('title', 'en-us', 's1'), value: 'old-en' },
+					{ ...value('title', 'da-dk', 's1'), value: 'old-da' },
+				],
+			};
+			const runtimeData: UmbContentLikeDetailModel = {
+				values: [
+					{ ...value('title', 'en-us', 's1'), value: 'new-en' },
+					{ ...value('title', 'da-dk', 's1'), value: 'new-da' },
+				],
+			};
+
+			const variants = [new UmbVariantId('en-us')];
+			const result = await ctrl.process(persistedData, runtimeData, variants, [
+				...variants,
+				UmbVariantId.CreateInvariant(),
+			]);
+
+			const valueOf = (culture: string) =>
+				result.values.find((v) => v.culture === culture && v.segment === 's1')?.value;
+			expect(valueOf('en-us')).to.equal('new-en');
+			expect(valueOf('da-dk')).to.equal('old-da');
+		});
+
 		it('places a draft-only new culture by culture, not at the end', async () => {
 			const ctrlHost = new UmbTestControllerHostElement();
 			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);

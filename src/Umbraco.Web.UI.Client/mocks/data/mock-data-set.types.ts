@@ -62,6 +62,8 @@ import type {
 	// Script
 	ScriptItemResponseModel,
 	ScriptResponseModel,
+	// Segment
+	SegmentResponseModel,
 	// Static File
 	StaticFileItemResponseModel,
 	// Stylesheet
@@ -124,9 +126,11 @@ export type UmbMockDocumentModel = DocumentResponseModel &
 		domains?: DomainsResponseModel;
 	};
 
-export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
-	DocumentBlueprintItemResponseModel &
-	DocumentBlueprintTreeItemResponseModel;
+export type UmbMockDocumentBlueprintModel = Omit<DocumentBlueprintResponseModel, 'documentType'> &
+	Omit<DocumentBlueprintItemResponseModel, 'documentType'> &
+	Omit<DocumentBlueprintTreeItemResponseModel, 'documentType'> & {
+		documentType: DocumentTypeReferenceResponseModel | null;
+	};
 
 export type UmbMockDocumentTypeModel = DocumentTypeResponseModel &
 	DocumentTypeTreeItemResponseModel &
@@ -175,6 +179,8 @@ export type UmbMockRelationTypeModel = RelationTypeResponseModel & RelationTypeI
 export type UmbMockRelationTypeItemModel = RelationTypeItemResponseModel;
 
 export type UmbMockScriptModel = ScriptResponseModel & FileSystemTreeItemPresentationModel & ScriptItemResponseModel;
+
+export type UmbMockSegmentModel = SegmentResponseModel;
 
 export type UmbMockStaticFileModel = StaticFileItemResponseModel & FileSystemTreeItemPresentationModel;
 
@@ -244,6 +250,7 @@ export interface UmbMockDataSet {
 	relation?: Array<UmbMockRelationModel>;
 	relationType?: Array<UmbMockRelationTypeModel>;
 	script?: Array<UmbMockScriptModel>;
+	segment?: Array<UmbMockSegmentModel>;
 	staticFile?: Array<UmbMockStaticFileModel>;
 	stylesheet?: Array<UmbMockStylesheetModel>;
 	template?: Array<UmbMockTemplateModel>;

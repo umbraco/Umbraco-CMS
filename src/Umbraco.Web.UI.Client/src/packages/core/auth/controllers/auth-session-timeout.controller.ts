@@ -120,7 +120,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	 */
 	async #onSessionExpiring(originalExpiresAt: number) {
 		// Guard: if the session was refreshed since we scheduled this check, skip.
-		// We compare expiresAt rather than using isSessionValid() because this fires
+		// We compare expiresAt rather than checking whether the session is still valid because this fires
 		// during the buffer zone (before full expiry), when the session is still "valid".
 		if (this.#scheduledExpiresAt !== originalExpiresAt) return;
 

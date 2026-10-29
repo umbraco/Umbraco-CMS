@@ -33,4 +33,14 @@ public class UpdateUserRequestModel : UserPresentationBase
     public ISet<ReferenceByIdModel> ElementStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
 
     public bool HasElementRootAccess { get; init; }
+
+    /// <summary>
+    /// Gets or sets the document blueprint start nodes assigned to the user.
+    /// </summary>
+    public ISet<ReferenceByIdModel> DocumentBlueprintStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
+
+    /// <summary>
+    /// Gets a value indicating whether the user has access to the document blueprint root.
+    /// </summary>
+    public bool HasDocumentBlueprintRootAccess { get; init; }
 }

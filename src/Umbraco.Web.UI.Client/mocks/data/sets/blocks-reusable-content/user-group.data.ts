@@ -1,10 +1,14 @@
 import type { UmbMockUserGroupModel } from '../../mock-data-set.types.js';
+import { RESTRICTED_FOLDER_ID } from './element.data.js';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ADMIN_USER_GROUP_ID = 'blocks-reusable-content-user-group-administrators-id';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const DANISH_EDITOR_USER_GROUP_ID = 'blocks-reusable-content-user-group-danish-editors-id';
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const LIMITED_EDITOR_USER_GROUP_ID = 'blocks-reusable-content-user-group-limited-editors-id';
 
 const adminUserGroup: UmbMockUserGroupModel = {
 	id: ADMIN_USER_GROUP_ID,
@@ -60,6 +64,7 @@ const adminUserGroup: UmbMockUserGroupModel = {
 	hasAccessToAllLanguages: true,
 	hasAccessToInvariantForVariant: true,
 	documentRootAccess: true,
+	documentBlueprintRootAccess: true,
 	elementRootAccess: true,
 	mediaRootAccess: true,
 	aliasCanBeChanged: false,
@@ -103,6 +108,7 @@ const danishEditorsUserGroup: UmbMockUserGroupModel = {
 	hasAccessToAllLanguages: false,
 	hasAccessToInvariantForVariant: true,
 	documentRootAccess: true,
+	documentBlueprintRootAccess: true,
 	elementRootAccess: true,
 	mediaRootAccess: true,
 	aliasCanBeChanged: true,
@@ -110,4 +116,45 @@ const danishEditorsUserGroup: UmbMockUserGroupModel = {
 	flags: [],
 };
 
-export const data: Array<UmbMockUserGroupModel> = [adminUserGroup, danishEditorsUserGroup];
+const limitedEditorsUserGroup: UmbMockUserGroupModel = {
+	id: LIMITED_EDITOR_USER_GROUP_ID,
+	name: 'Limited Editors',
+	alias: 'limitedEditors',
+	description:
+		'Limited editors can create and publish elements, except in the Restricted Folder where they cannot publish.',
+	icon: 'icon-lock',
+	fallbackPermissions: [
+		'Umb.Document.Read',
+		'Umb.Document.Create',
+		'Umb.Document.Update',
+		'Umb.Document.Publish',
+		'Umb.Document.PropertyValue.Read',
+		'Umb.Document.PropertyValue.Write',
+		'Umb.Element.Read',
+		'Umb.Element.Create',
+		'Umb.Element.Update',
+		'Umb.Element.Publish',
+		'Umb.Element.Unpublish',
+		'Umb.ElementContainer.Read',
+	],
+	permissions: [
+		{
+			$type: 'ElementPermissionPresentationModel',
+			element: { id: RESTRICTED_FOLDER_ID },
+			verbs: ['Umb.Element.Read', 'Umb.Element.Create', 'Umb.ElementContainer.Read'],
+		},
+	],
+	sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Library', 'Umb.Section.Translation'],
+	languages: [],
+	hasAccessToAllLanguages: true,
+	hasAccessToInvariantForVariant: true,
+	documentRootAccess: true,
+	documentBlueprintRootAccess: true,
+	elementRootAccess: true,
+	mediaRootAccess: true,
+	aliasCanBeChanged: true,
+	isDeletable: true,
+	flags: [],
+};
+
+export const data: Array<UmbMockUserGroupModel> = [adminUserGroup, danishEditorsUserGroup, limitedEditorsUserGroup];

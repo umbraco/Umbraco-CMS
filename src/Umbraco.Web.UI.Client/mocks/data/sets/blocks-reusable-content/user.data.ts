@@ -1,5 +1,5 @@
 import type { UmbMockUserModel } from '../../mock-data-set.types.js';
-import { ADMIN_USER_GROUP_ID, DANISH_EDITOR_USER_GROUP_ID } from './user-group.data.js';
+import { ADMIN_USER_GROUP_ID, DANISH_EDITOR_USER_GROUP_ID, LIMITED_EDITOR_USER_GROUP_ID } from './user-group.data.js';
 import { UserKindModel, UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const adminUser: UmbMockUserModel = {
@@ -19,9 +19,11 @@ const adminUser: UmbMockUserModel = {
 	lastPasswordChangeDate: '2024-01-15T10:00:00.000Z',
 	failedLoginAttempts: 0,
 	documentStartNodeIds: [],
+	documentBlueprintStartNodeIds: [],
 	elementStartNodeIds: [],
 	mediaStartNodeIds: [],
 	hasDocumentRootAccess: true,
+	hasDocumentBlueprintRootAccess: true,
 	hasElementRootAccess: true,
 	hasMediaRootAccess: true,
 	userGroupIds: [{ id: ADMIN_USER_GROUP_ID }],
@@ -45,14 +47,24 @@ const danishEditorUser: UmbMockUserModel = {
 	lastPasswordChangeDate: '2024-01-15T10:00:00.000Z',
 	failedLoginAttempts: 0,
 	documentStartNodeIds: [],
+	documentBlueprintStartNodeIds: [],
 	elementStartNodeIds: [],
 	mediaStartNodeIds: [],
 	hasDocumentRootAccess: true,
+	hasDocumentBlueprintRootAccess: true,
 	hasElementRootAccess: true,
 	hasMediaRootAccess: true,
 	userGroupIds: [{ id: DANISH_EDITOR_USER_GROUP_ID }],
 	flags: [],
 };
 
+const limitedEditorUser: UmbMockUserModel = {
+	...danishEditorUser,
+	id: 'blocks-reusable-content-limited-editor-user-id',
+	name: 'Limited Editor',
+	email: 'limited.editor@example.com',
+	userGroupIds: [{ id: LIMITED_EDITOR_USER_GROUP_ID }],
+};
+
 // The mock API treats the first user as the signed-in user, so reorder this array to switch between them.
-export const data: Array<UmbMockUserModel> = [adminUser, danishEditorUser];
+export const data: Array<UmbMockUserModel> = [adminUser, danishEditorUser, limitedEditorUser];

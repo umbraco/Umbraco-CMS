@@ -102,6 +102,11 @@ export type BatchResponseModelDocumentTypeResponseModel = {
     items: Array<DocumentTypeResponseModel>;
 };
 
+export type BatchResponseModelElementResponseModel = {
+    total: number;
+    items: Array<ElementResponseModel>;
+};
+
 export type BatchResponseModelMediaTypeResponseModel = {
     total: number;
     items: Array<MediaTypeResponseModel>;
@@ -125,6 +130,8 @@ export type CalculatedUserStartNodesResponseModel = {
     hasMediaRootAccess: boolean;
     elementStartNodeIds: Array<ReferenceByIdModel>;
     hasElementRootAccess: boolean;
+    documentBlueprintStartNodeIds: Array<ReferenceByIdModel>;
+    hasDocumentBlueprintRootAccess: boolean;
 };
 
 export type ChangePasswordCurrentUserRequestModel = {
@@ -510,6 +517,8 @@ export type CreateUserGroupRequestModel = {
     mediaRootAccess: boolean;
     elementStartNode?: null | ReferenceByIdModel;
     elementRootAccess: boolean;
+    documentBlueprintStartNode?: null | ReferenceByIdModel;
+    documentBlueprintRootAccess: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<IPermissionPresentationModel>;
 };
@@ -563,6 +572,8 @@ export type CurrentUserResponseModel = {
     hasMediaRootAccess: boolean;
     elementStartNodeIds: Array<ReferenceByIdModel>;
     hasElementRootAccess: boolean;
+    documentBlueprintStartNodeIds: Array<ReferenceByIdModel>;
+    hasDocumentBlueprintRootAccess: boolean;
     avatarUrls: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
@@ -1175,19 +1186,6 @@ export enum EventMessageTypeModel {
     WARNING = 'Warning'
 }
 
-export type FacetModel = {
-    fieldName: string;
-};
-
-export type FacetResultResponseModel = {
-    fieldName: string;
-    values: Array<FacetValueModel>;
-};
-
-export type FacetValueModel = {
-    count: number;
-};
-
 export type FetchResponseModelDataTypeSchemaItemResponseModel = {
     total: number;
     items: Array<DataTypeSchemaItemResponseModel>;
@@ -1203,11 +1201,6 @@ export type FileSystemTreeItemPresentationModel = {
     parent?: null | FileSystemFolderModel;
     isFolder: boolean;
     hasChildren: boolean;
-};
-
-export type FilterModel = {
-    fieldName: string;
-    negate: boolean;
 };
 
 export type FlagModel = {
@@ -2673,9 +2666,6 @@ export type SearchDocumentResponseModel = {
 export type SearchRequestModel = {
     indexAlias: string;
     query?: null | string;
-    filters?: null | Array<FilterModel>;
-    facets?: null | Array<FacetModel>;
-    sorters?: null | Array<SorterModel>;
     culture?: null | string;
     segment?: null | string;
 };
@@ -2683,7 +2673,6 @@ export type SearchRequestModel = {
 export type SearchResultResponseModel = {
     total: number;
     documents: Array<SearchDocumentResponseModel>;
-    facets: Array<FacetResultResponseModel>;
 };
 
 export type SecurityConfigurationResponseModel = {
@@ -2693,10 +2682,6 @@ export type SecurityConfigurationResponseModel = {
 export type SegmentResponseModel = {
     name: string;
     alias: string;
-    /**
-     * @deprecated
-     */
-    cultures?: null | Array<string>;
 };
 
 export type ServerConfigurationItemResponseModel = {
@@ -2739,11 +2724,6 @@ export type SignalRClientSettingsResponseModel = {
 export type SortDocumentChildrenByFieldRequestModel = {
     culture?: null | string;
     field: ContentSortFieldModel;
-    direction: DirectionModel;
-};
-
-export type SorterModel = {
-    fieldName: string;
     direction: DirectionModel;
 };
 
@@ -3308,6 +3288,8 @@ export type UpdateUserGroupRequestModel = {
     mediaRootAccess: boolean;
     elementStartNode?: null | ReferenceByIdModel;
     elementRootAccess: boolean;
+    documentBlueprintStartNode?: null | ReferenceByIdModel;
+    documentBlueprintRootAccess: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<IPermissionPresentationModel>;
 };
@@ -3325,6 +3307,8 @@ export type UpdateUserRequestModel = {
     hasMediaRootAccess: boolean;
     elementStartNodeIds: Array<ReferenceByIdModel>;
     hasElementRootAccess: boolean;
+    documentBlueprintStartNodeIds: Array<ReferenceByIdModel>;
+    hasDocumentBlueprintRootAccess: boolean;
     email: string;
     userName: string;
     name: string;
@@ -3412,6 +3396,8 @@ export type UserGroupResponseModel = {
     mediaRootAccess: boolean;
     elementStartNode?: null | ReferenceByIdModel;
     elementRootAccess: boolean;
+    documentBlueprintStartNode?: null | ReferenceByIdModel;
+    documentBlueprintRootAccess: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<IPermissionPresentationModel>;
 };
@@ -3467,6 +3453,8 @@ export type UserResponseModel = {
     hasMediaRootAccess: boolean;
     elementStartNodeIds: Array<ReferenceByIdModel>;
     hasElementRootAccess: boolean;
+    documentBlueprintStartNodeIds: Array<ReferenceByIdModel>;
+    hasDocumentBlueprintRootAccess: boolean;
     avatarUrls: Array<string>;
     state: UserStateModel;
     failedLoginAttempts: number;
@@ -4123,6 +4111,43 @@ export type PutDataTypeFolderByIdErrors = {
 export type PutDataTypeFolderByIdError = PutDataTypeFolderByIdErrors[keyof PutDataTypeFolderByIdErrors];
 
 export type PutDataTypeFolderByIdResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PutDataTypeFolderByIdMoveData = {
+    body: MoveFolderRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/data-type/folder/{id}/move';
+};
+
+export type PutDataTypeFolderByIdMoveErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDataTypeFolderByIdMoveError = PutDataTypeFolderByIdMoveErrors[keyof PutDataTypeFolderByIdMoveErrors];
+
+export type PutDataTypeFolderByIdMoveResponses = {
     /**
      * OK
      */
@@ -5088,44 +5113,6 @@ export type GetDocumentByIdAuditLogResponses = {
 };
 
 export type GetDocumentByIdAuditLogResponse = GetDocumentByIdAuditLogResponses[keyof GetDocumentByIdAuditLogResponses];
-
-export type GetDocumentByIdAvailableSegmentOptionsData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: {
-        skip?: number;
-        take?: number;
-    };
-    url: '/umbraco/management/api/v1/document/{id}/available-segment-options';
-};
-
-export type GetDocumentByIdAvailableSegmentOptionsErrors = {
-    /**
-     * Bad Request
-     */
-    400: ProblemDetails;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-};
-
-export type GetDocumentByIdAvailableSegmentOptionsError = GetDocumentByIdAvailableSegmentOptionsErrors[keyof GetDocumentByIdAvailableSegmentOptionsErrors];
-
-export type GetDocumentByIdAvailableSegmentOptionsResponses = {
-    /**
-     * OK
-     */
-    200: PagedSegmentResponseModel;
-};
-
-export type GetDocumentByIdAvailableSegmentOptionsResponse = GetDocumentByIdAvailableSegmentOptionsResponses[keyof GetDocumentByIdAvailableSegmentOptionsResponses];
 
 export type PostDocumentByIdCopyData = {
     body: CopyDocumentRequestModel;
@@ -6818,6 +6805,10 @@ export type PutDocumentBlueprintByIdMoveData = {
 
 export type PutDocumentBlueprintByIdMoveErrors = {
     /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
@@ -7019,6 +7010,43 @@ export type PutDocumentBlueprintFolderByIdResponses = {
     200: unknown;
 };
 
+export type PutDocumentBlueprintFolderByIdMoveData = {
+    body: MoveFolderRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document-blueprint/folder/{id}/move';
+};
+
+export type PutDocumentBlueprintFolderByIdMoveErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDocumentBlueprintFolderByIdMoveError = PutDocumentBlueprintFolderByIdMoveErrors[keyof PutDocumentBlueprintFolderByIdMoveErrors];
+
+export type PutDocumentBlueprintFolderByIdMoveResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PostDocumentBlueprintFromDocumentData = {
     body: CreateDocumentBlueprintFromDocumentRequestModel;
     path?: never;
@@ -7027,6 +7055,10 @@ export type PostDocumentBlueprintFromDocumentData = {
 };
 
 export type PostDocumentBlueprintFromDocumentErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
     /**
      * The resource is protected and requires an authentication token
      */
@@ -7074,6 +7106,31 @@ export type GetItemDocumentBlueprintResponses = {
 };
 
 export type GetItemDocumentBlueprintResponse = GetItemDocumentBlueprintResponses[keyof GetItemDocumentBlueprintResponses];
+
+export type GetItemDocumentBlueprintFolderData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/document-blueprint/folder';
+};
+
+export type GetItemDocumentBlueprintFolderErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemDocumentBlueprintFolderResponses = {
+    /**
+     * OK
+     */
+    200: Array<FolderItemResponseModel>;
+};
+
+export type GetItemDocumentBlueprintFolderResponse = GetItemDocumentBlueprintFolderResponses[keyof GetItemDocumentBlueprintFolderResponses];
 
 export type GetTreeDocumentBlueprintAncestorsData = {
     body?: never;
@@ -7734,6 +7791,37 @@ export type GetDocumentTypeAllowedAtRootResponses = {
 
 export type GetDocumentTypeAllowedAtRootResponse = GetDocumentTypeAllowedAtRootResponses[keyof GetDocumentTypeAllowedAtRootResponses];
 
+export type GetDocumentTypeAllowedForBlueprintData = {
+    body?: never;
+    path?: never;
+    query?: {
+        parentKey?: string;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/document-type/allowed-for-blueprint';
+};
+
+export type GetDocumentTypeAllowedForBlueprintErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDocumentTypeAllowedForBlueprintResponses = {
+    /**
+     * OK
+     */
+    200: PagedAllowedDocumentTypeModel;
+};
+
+export type GetDocumentTypeAllowedForBlueprintResponse = GetDocumentTypeAllowedForBlueprintResponses[keyof GetDocumentTypeAllowedForBlueprintResponses];
+
 export type GetDocumentTypeAllowedInLibraryData = {
     body?: never;
     path?: never;
@@ -7986,6 +8074,43 @@ export type PutDocumentTypeFolderByIdErrors = {
 export type PutDocumentTypeFolderByIdError = PutDocumentTypeFolderByIdErrors[keyof PutDocumentTypeFolderByIdErrors];
 
 export type PutDocumentTypeFolderByIdResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PutDocumentTypeFolderByIdMoveData = {
+    body: MoveFolderRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document-type/folder/{id}/move';
+};
+
+export type PutDocumentTypeFolderByIdMoveErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDocumentTypeFolderByIdMoveError = PutDocumentTypeFolderByIdMoveErrors[keyof PutDocumentTypeFolderByIdMoveErrors];
+
+export type PutDocumentTypeFolderByIdMoveResponses = {
     /**
      * OK
      */
@@ -9007,6 +9132,35 @@ export type GetElementAreReferencedResponses = {
 
 export type GetElementAreReferencedResponse = GetElementAreReferencedResponses[keyof GetElementAreReferencedResponses];
 
+export type GetElementBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/element/batch';
+};
+
+export type GetElementBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetElementBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelElementResponseModel;
+};
+
+export type GetElementBatchResponse = GetElementBatchResponses[keyof GetElementBatchResponses];
+
 export type GetElementConfigurationData = {
     body?: never;
     path?: never;
@@ -9440,8 +9594,12 @@ export type GetItemElementSearchData = {
     path?: never;
     query?: {
         query?: string;
+        trashed?: boolean;
+        culture?: string;
         skip?: number;
         take?: number;
+        parentId?: string;
+        allowedElementTypes?: Array<string>;
     };
     url: '/umbraco/management/api/v1/item/element/search';
 };
@@ -10266,6 +10424,7 @@ export type GetImagingResizeUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
         height?: number;
         width?: number;
         mode?: ImageCropModeModel;
@@ -11640,6 +11799,7 @@ export type GetMediaUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/media/urls';
 };
@@ -12905,6 +13065,43 @@ export type PutMediaTypeFolderByIdErrors = {
 export type PutMediaTypeFolderByIdError = PutMediaTypeFolderByIdErrors[keyof PutMediaTypeFolderByIdErrors];
 
 export type PutMediaTypeFolderByIdResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PutMediaTypeFolderByIdMoveData = {
+    body: MoveFolderRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/media-type/folder/{id}/move';
+};
+
+export type PutMediaTypeFolderByIdMoveErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutMediaTypeFolderByIdMoveError = PutMediaTypeFolderByIdMoveErrors[keyof PutMediaTypeFolderByIdMoveErrors];
+
+export type PutMediaTypeFolderByIdMoveResponses = {
     /**
      * OK
      */
@@ -14425,6 +14622,43 @@ export type PutMemberTypeFolderByIdErrors = {
 export type PutMemberTypeFolderByIdError = PutMemberTypeFolderByIdErrors[keyof PutMemberTypeFolderByIdErrors];
 
 export type PutMemberTypeFolderByIdResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PutMemberTypeFolderByIdMoveData = {
+    body: MoveFolderRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/folder/{id}/move';
+};
+
+export type PutMemberTypeFolderByIdMoveErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutMemberTypeFolderByIdMoveError = PutMemberTypeFolderByIdMoveErrors[keyof PutMemberTypeFolderByIdMoveErrors];
+
+export type PutMemberTypeFolderByIdMoveResponses = {
     /**
      * OK
      */

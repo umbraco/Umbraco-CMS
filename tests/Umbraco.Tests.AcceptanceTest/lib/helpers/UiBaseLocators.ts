@@ -252,6 +252,8 @@ export class UiBaseLocators extends BasePage {
   // User & User Group
   public readonly allowAccessToAllElementsBtn: Locator;
   public readonly elementStartNode: Locator;
+  public readonly allowAccessToAllDocumentBlueprintsBtn: Locator;
+  public readonly documentBlueprintStartNode: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -637,6 +639,8 @@ export class UiBaseLocators extends BasePage {
     // User & User Group
     this.allowAccessToAllElementsBtn = page.getByText('Allow access to all elements');
     this.elementStartNode = page.locator('[label="Select element start node"]').locator('umb-input-entity-data');
+    this.allowAccessToAllDocumentBlueprintsBtn = page.getByText('Allow access to all document blueprints');
+    this.documentBlueprintStartNode = page.locator('umb-input-document-blueprint');
   }
 
   // Helper Methods
@@ -1913,6 +1917,12 @@ export class UiBaseLocators extends BasePage {
     await this.clickEntityActionWithName("MoveTo");
   }
 
+  async moveToFolder(folderName: string) {
+    await this.clickMoveToActionMenuOption();
+    await this.click(this.sidebarModal.getByText(folderName, {exact: true}));
+    await this.click(this.chooseModalBtn);
+  }
+
   async clickCreateBlueprintActionMenuOption() {
     await this.clickEntityActionWithName("CreateBlueprint");
   }
@@ -2235,6 +2245,22 @@ export class UiBaseLocators extends BasePage {
 
   async clickRemoveButtonForElementNodeWithName(elementStartNodeName: string) {
     await this.click(this.elementStartNode.filter({hasText: elementStartNodeName}).getByLabel('Remove'));
+  }
+
+  async clickAllowAccessToAllDocumentBlueprints() {
+    await this.click(this.allowAccessToAllDocumentBlueprintsBtn);
+  }
+
+  async clickChooseDocumentBlueprintStartNodeButton() {
+    await this.click(this.documentBlueprintStartNode.getByLabel('Choose'));
+  }
+
+  async clickRemoveButtonForDocumentBlueprintNodeWithName(documentBlueprintStartNodeName: string) {
+    await this.click(this.documentBlueprintStartNode.filter({hasText: documentBlueprintStartNodeName}).getByLabel('Remove'));
+  }
+
+  async isDocumentBlueprintStartNodeWithNameVisible(documentBlueprintStartNodeName: string, isVisible: boolean = true) {
+    return this.isVisible(this.documentBlueprintStartNode.filter({hasText: documentBlueprintStartNodeName}), isVisible);
   }
 
   async isRestoreFromRecycleBinMessageVisible(restoreItem: string, targetFolderName: string) {
