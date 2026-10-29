@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Core.SchemaLockdown.Configurators;
 /// </summary>
 /// <remarks>
 /// In production runtime mode template and partial view files are not written to disk, as they arrive with the
-/// deployment. A change requested through the Management API could not be persisted, so it is denied rather than
-/// appearing to succeed.
+/// deployment. A change requested through the Management API would either not be persisted, or, for the database
+/// record of a template, drift away from the deployed file, so it is denied.
 /// <para>
 /// Deleting a template stays permitted. It removes only the database record, leaving the file to the deployment,
 /// which is how a template removed from the code is cleaned up on the environments it was deployed to. A partial
