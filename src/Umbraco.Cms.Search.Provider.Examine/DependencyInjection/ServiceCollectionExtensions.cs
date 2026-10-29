@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Search.Configuration;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Umbraco.Cms.Search.Provider.Examine.Services;
-using Umbraco.Extensions;
 using ServicesCollectionExtensions = Examine.ServicesCollectionExtensions;
 
 namespace Umbraco.Cms.Search.Provider.Examine.DependencyInjection;
@@ -36,6 +35,10 @@ internal static class ServiceCollectionExtensions
 
         services.AddTransient<IIndexer, Indexer>();
         services.AddTransient<ISearcher, Searcher>();
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddUnique<IStopWordDetector, StopWordDetector>();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         services.Configure<IndexOptions>(options =>
         {
