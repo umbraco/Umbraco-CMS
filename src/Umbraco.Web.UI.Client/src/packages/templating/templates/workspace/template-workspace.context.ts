@@ -44,9 +44,9 @@ export class UmbTemplateWorkspaceContext
 			detailRepositoryAlias: UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS,
 		});
 
-		this.#applyProductionModeReadOnly();
 		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
-			this.observe(context?.isProductionMode, (isProductionMode) => {
+			if (!context) return;
+			this.observe(context.isProductionMode, (isProductionMode) => {
 				this.#isProductionMode = isProductionMode;
 				this.#applyProductionModeReadOnly();
 			});

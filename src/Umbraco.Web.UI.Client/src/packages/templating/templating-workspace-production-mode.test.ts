@@ -53,6 +53,8 @@ workspaces.forEach(([name, WorkspaceContext]) => {
 		it('is read-only until the runtime mode is known', () => {
 			context = new WorkspaceContext(host);
 
+			context.resetState();
+
 			expect(context.readOnlyGuard.getPermitted()).to.be.true;
 		});
 
