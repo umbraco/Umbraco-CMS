@@ -1,3 +1,5 @@
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.Models;
@@ -30,6 +32,11 @@ public class Link
     /// <summary>
     ///     Gets or sets the published content or media item the link points to, or <c>null</c> for external links.
     /// </summary>
+    /// <remarks>
+    ///     Excluded from serialization, as the published item graph is not serializable and could expose its property values.
+    /// </remarks>
+    [JsonIgnore]
+    [IgnoreDataMember]
     public IPublishedContent? Content { get; set; }
 
     /// <summary>
