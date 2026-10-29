@@ -11,7 +11,12 @@ namespace Umbraco.Cms.Core.SchemaLockdown.Configurators;
 /// deployment. A change requested through the Management API could not be persisted, so it is denied rather than
 /// appearing to succeed.
 /// <para>
-/// For templates this is the only thing denying such a change. A site that removes this configurator lets template
+/// Deleting a template stays permitted. It removes only the database record, leaving the file to the deployment,
+/// which is how a template removed from the code is cleaned up on the environments it was deployed to. A partial
+/// view is only its file, so there is nothing to clean up and deleting one is denied.
+/// </para>
+/// <para>
+/// For templates this is the only thing denying a change. A site that removes this configurator lets template
 /// changes through in production runtime mode, saving them to the database without writing their files.
 /// </para>
 /// </remarks>
@@ -34,7 +39,7 @@ public sealed class ProductionRuntimeModeSchemaLockdownConfigurator : ISchemaLoc
             return;
         }
 
-        builder.BlockMutations(Constants.UdiEntityType.Template);
+        builder.Block(Constants.UdiEntityType.Template, SchemaOperation.Create, SchemaOperation.Update);
         builder.BlockMutations(Constants.UdiEntityType.PartialView);
     }
 }

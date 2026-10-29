@@ -38,13 +38,11 @@ public class DeleteTemplateControllerProductionModeTests : ManagementApiTest<Del
     }
 
     [Test]
-    public async Task Delete_Returns_Forbidden()
+    public async Task Delete_Removes_The_Template()
     {
         var response = await Client.DeleteAsync(Url);
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
-        Assert.That(
-            response.Headers.GetValues(Constants.Headers.SchemaLockdown),
-            Is.EqualTo(new[] { $"{Constants.UdiEntityType.Template}:delete" }));
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.IsNull(await TemplateService.GetAsync(_template.Key));
     }
 }
