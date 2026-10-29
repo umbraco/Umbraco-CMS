@@ -8,10 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
-// The state the context holds whenever it has no answer from the server: while the initial request is in flight,
-// and again if that request fails. It permits everything, because the server enforces the matrix on every request
-// regardless - this layer only decides what the user is offered. Withholding permission instead would strip a
-// default site of every schema affordance the moment the request is slow or fails.
+// Used while loading and if the request fails. It permits everything, as the server enforces lockdown anyway.
 const UMB_SCHEMA_LOCKDOWN_UNKNOWN_STATE: ServerSchemaLockdownResponseModel = Object.freeze({
 	restrictedEntityTypes: [],
 });
@@ -33,9 +30,8 @@ export class UmbSchemaLockdownContext extends UmbContextBase {
 	}
 
 	/**
-	 * Whether the given operation is currently permitted for the given entity type.
-	 * Anything the matrix does not speak to is permitted: an entity type outside the matrix, an entity type the
-	 * server did not report, and any point at which no matrix has been retrieved.
+	 * Whether the given operation is currently permitted for the given entity type. Entity types the server doesn't
+	 * report as restricted are always permitted.
 	 * @param {string} entityType The backoffice entity type to check.
 	 * @param {UmbSchemaOperation} operation The operation to check.
 	 * @returns {boolean} Whether the operation is permitted.

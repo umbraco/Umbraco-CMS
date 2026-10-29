@@ -7,8 +7,7 @@ import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-
 @customElement('umb-test-schema-lockdown-host')
 export class UmbTestSchemaLockdownHostElement extends UmbElementMixin(HTMLElement) {}
 
-// No mock handler is registered for the schema lockdown endpoint, so the context's initial request always fails
-// here - which is the scenario these tests are about.
+// The schema lockdown endpoint has no mock handler, so the request always fails here.
 describe('UmbSchemaLockdownContext', () => {
 	let host: UmbTestSchemaLockdownHostElement;
 	let context: UmbSchemaLockdownContext;
@@ -23,17 +22,17 @@ describe('UmbSchemaLockdownContext', () => {
 		document.body.innerHTML = '';
 	});
 
-	it('permits an operation while the matrix has not been retrieved', () => {
+	it('permits an operation while the restrictions are loading', () => {
 		expect(context.isAllowed(UMB_DOCUMENT_TYPE_ENTITY_TYPE, 'update')).to.be.true;
 	});
 
-	it('permits an operation after retrieving the matrix has failed', async () => {
+	it('permits an operation after loading the restrictions has failed', async () => {
 		await aTimeout(100);
 
 		expect(context.isAllowed(UMB_DOCUMENT_TYPE_ENTITY_TYPE, 'update')).to.be.true;
 	});
 
-	it('permits an operation on an entity type outside the matrix', () => {
+	it('permits an operation on an entity type schema lockdown does not cover', () => {
 		expect(context.isAllowed('an-entity-type-schema-lockdown-does-not-govern', 'delete')).to.be.true;
 	});
 });
