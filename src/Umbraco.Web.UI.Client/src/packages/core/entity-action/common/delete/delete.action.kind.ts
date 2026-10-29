@@ -12,7 +12,8 @@ export const UMB_ENTITY_ACTION_DELETE_KIND_MANIFEST: UmbExtensionManifestKind = 
 		type: 'entityAction',
 		kind: 'delete',
 		api: UmbDeleteEntityAction,
-		weight: 1100,
+		weight: 780,
+		separatorBefore: true,
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-trash',
