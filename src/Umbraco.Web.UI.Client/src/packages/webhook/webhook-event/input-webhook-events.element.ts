@@ -1,6 +1,6 @@
 import { UMB_WEBHOOK_EVENTS_MODAL } from './modal/webhook-events-modal.token.js';
 import type { UmbWebhookEventModel } from './types.js';
-import { css, html, customElement, property, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '@umbraco-cms/backoffice/culture';
@@ -63,20 +63,22 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 					(item) => html`
 						<uui-ref-node name=${item.eventName} ?readonly=${this.readonly} @open=${this.#openModal}>
 							<umb-icon slot="icon" name="icon-globe"></umb-icon>
-							${when(
-								!this.readonly,
-								() => html`
-									<uui-action-bar slot="actions">
-										<uui-button
-											label=${this.localize.term('general_remove')}
-											@click=${() => this.#removeEvent(item.alias)}></uui-button>
-									</uui-action-bar>
-								`,
-							)}
+							${this.#renderEventActions(item)}
 						</uui-ref-node>
 					`,
 				)}
 			</uui-ref-list>
+		`;
+	}
+
+	#renderEventActions(item: UmbWebhookEventModel) {
+		if (this.readonly) return nothing;
+		return html`
+			<uui-action-bar slot="actions">
+				<uui-button
+					label=${this.localize.term('general_remove')}
+					@click=${() => this.#removeEvent(item.alias)}></uui-button>
+			</uui-action-bar>
 		`;
 	}
 

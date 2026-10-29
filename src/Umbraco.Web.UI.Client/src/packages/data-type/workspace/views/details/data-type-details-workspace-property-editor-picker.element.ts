@@ -113,14 +113,19 @@ export class UmbDataTypeDetailsWorkspacePropertyEditorPickerElement extends UmbF
 				${this.propertyEditorUiIcon
 					? html`<umb-icon name=${this.propertyEditorUiIcon} slot="icon"></umb-icon>`
 					: nothing}
-				${this.readonly
-					? nothing
-					: html`<uui-action-bar slot="actions">
-							<uui-button
-								label=${this.localize.term('general_change')}
-								@click=${this.#openPropertyEditorUIPicker}></uui-button>
-						</uui-action-bar>`}
+				${this.#renderPropertyEditorUiActions()}
 			</umb-ref-property-editor-ui>
+		`;
+	}
+
+	#renderPropertyEditorUiActions() {
+		if (this.readonly) return nothing;
+		return html`
+			<uui-action-bar slot="actions">
+				<uui-button
+					label=${this.localize.term('general_change')}
+					@click=${this.#openPropertyEditorUIPicker}></uui-button>
+			</uui-action-bar>
 		`;
 	}
 

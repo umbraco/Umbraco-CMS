@@ -1,6 +1,6 @@
 import type { UmbMediaTypeItemModel } from '../../types.js';
 import { UmbMediaTypePickerInputContext } from './input-media-type.context.js';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { isAboveZeroAndBelowMinimum, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -217,16 +217,7 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 									.errorMessage=${status.state.error}
 									.errorDetail=${unique}
 									?standalone=${this.max === 1}>
-									${when(
-										!this.readonly,
-										() => html`
-											<uui-action-bar slot="actions">
-												<uui-button
-													label=${this.localize.term('general_remove')}
-													@click=${() => this.#removeItem(unique)}></uui-button>
-											</uui-action-bar>
-										`,
-									)}
+									${this.#renderErrorItemActions(unique)}
 								</umb-entity-item-ref>
 							`;
 						}
@@ -239,14 +230,7 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 								${this.#renderIcon(item)}
 								<uui-action-bar slot="actions">
 									<uui-button href=${href} label=${this.localize.term('general_open')}></uui-button>
-									${when(
-										!this.readonly,
-										() => html`
-											<uui-button
-												label=${this.localize.term('general_remove')}
-												@click=${() => this.#removeItem(unique)}></uui-button>
-										`,
-									)}
+									${this.#renderRemoveButton(unique)}
 								</uui-action-bar>
 							</uui-ref-node-document-type>
 						`;
@@ -254,6 +238,18 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 				)}
 			</uui-ref-list>
 		`;
+	}
+
+	#renderErrorItemActions(unique: string) {
+		if (this.readonly) return nothing;
+		return html`<uui-action-bar slot="actions">${this.#renderRemoveButton(unique)}</uui-action-bar>`;
+	}
+
+	#renderRemoveButton(unique: string) {
+		if (this.readonly) return nothing;
+		return html`<uui-button
+			label=${this.localize.term('general_remove')}
+			@click=${() => this.#removeItem(unique)}></uui-button>`;
 	}
 
 	#renderIcon(item: UmbMediaTypeItemModel) {

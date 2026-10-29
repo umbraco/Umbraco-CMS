@@ -113,16 +113,19 @@ export class UmbInputContentTypeCollectionConfigurationElement extends UmbFormCo
 		return html`
 			<uui-ref-list>
 				<umb-ref-data-type standalone data-type-id=${this.value} @open=${this.#editDataType}>
-					${this.readonly
-						? nothing
-						: html`<uui-action-bar slot="actions">
-								<uui-button
-									label=${this.localize.term('general_choose')}
-									href=${this._dataTypePickerModalPath}></uui-button>
-								<uui-button @click=${this.#clearDataType} label=${this.localize.term('general_remove')}></uui-button>
-							</uui-action-bar>`}
+					${this.#renderDataTypeActions()}
 				</umb-ref-data-type>
 			</uui-ref-list>
+		`;
+	}
+
+	#renderDataTypeActions() {
+		if (this.readonly) return nothing;
+		return html`
+			<uui-action-bar slot="actions">
+				<uui-button label=${this.localize.term('general_choose')} href=${this._dataTypePickerModalPath}></uui-button>
+				<uui-button @click=${this.#clearDataType} label=${this.localize.term('general_remove')}></uui-button>
+			</uui-action-bar>
 		`;
 	}
 

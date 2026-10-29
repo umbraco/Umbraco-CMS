@@ -187,20 +187,23 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 						?default=${template.unique === this.defaultUnique}
 						?readonly=${this.readonly}
 						@change=${this.#onCardChange}>
-						${this.readonly
-							? nothing
-							: html`<uui-button
-									slot="actions"
-									compact
-									label=${this.localize.term('general_remove') + ' ' + template.name}
-									@click=${() => this.#removeTemplate(template.unique ?? '')}>
-									<uui-icon name="icon-trash"></uui-icon>
-								</uui-button>`}
+						${this.#renderTemplateActions(template)}
 					</umb-template-card>
 				`,
 			)}
 			${this.#renderAddButton()}
 		`;
+	}
+
+	#renderTemplateActions(template: UmbTemplateItemModel) {
+		if (this.readonly) return nothing;
+		return html`<uui-button
+			slot="actions"
+			compact
+			label=${this.localize.term('general_remove') + ' ' + template.name}
+			@click=${() => this.#removeTemplate(template.unique ?? '')}>
+			<uui-icon name="icon-trash"></uui-icon>
+		</uui-button>`;
 	}
 
 	#renderAddButton() {
