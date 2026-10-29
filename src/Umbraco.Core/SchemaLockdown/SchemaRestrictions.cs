@@ -13,6 +13,7 @@ internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
 {
     private readonly Dictionary<string, HashSet<SchemaOperation>> _blocked = new(StringComparer.OrdinalIgnoreCase);
     private readonly bool _frozen;
+    private IReadOnlyCollection<string> _restrictedEntityTypes = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SchemaRestrictions"/> class.
@@ -29,7 +30,7 @@ internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
     }
 
     /// <inheritdoc />
-    public IReadOnlyCollection<string> RestrictedEntityTypes => _blocked.Keys.ToArray();
+    public IReadOnlyCollection<string> RestrictedEntityTypes => _restrictedEntityTypes;
 
     /// <inheritdoc />
     public void Block(string entityType, params SchemaOperation[] operations)
@@ -40,28 +41,6 @@ internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
         {
             Block(entityType, operation);
         }
-    }
-
-    private void Block(string entityType, SchemaOperation operation)
-    {
-        // Refusing the write ahead of the frozen check keeps the rule holding whenever the write is attempted,
-        // rather than leaving behind a decision that looks meaningful and is not.
-        if (IsBlockable(operation) is false)
-        {
-            return;
-        }
-
-        if (_frozen)
-        {
-            throw new InvalidOperationException("The schema lockdown restrictions cannot be modified after they have been built.");
-        }
-
-        if (_blocked.TryGetValue(entityType, out HashSet<SchemaOperation>? blocked) is false)
-        {
-            _blocked[entityType] = blocked = [];
-        }
-
-        blocked.Add(operation);
     }
 
     /// <inheritdoc />
@@ -82,6 +61,32 @@ internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
         // An operation that could not be classified is denied wherever anything is denied: it may well be one of
         // those, and there is no way to tell which.
         return operation != SchemaOperation.Unknown && operations.Contains(operation) is false;
+    }
+
+    private void Block(string entityType, SchemaOperation operation)
+    {
+        // Refusing the write ahead of the frozen check keeps the rule holding whenever the write is attempted,
+        // rather than leaving behind a decision that looks meaningful and is not.
+        if (IsBlockable(operation) is false)
+        {
+            return;
+        }
+
+        if (_frozen)
+        {
+            throw new InvalidOperationException("The schema lockdown restrictions cannot be modified after they have been built.");
+        }
+
+        if (_blocked.TryGetValue(entityType, out HashSet<SchemaOperation>? blocked) is false)
+        {
+            _blocked[entityType] = blocked = [];
+
+            // Replaced rather than updated, so a configurator enumerating the entity types while it blocks more of
+            // them keeps enumerating the ones it started with.
+            _restrictedEntityTypes = Array.AsReadOnly(_blocked.Keys.ToArray());
+        }
+
+        blocked.Add(operation);
     }
 
     // Reads are never denied, and an unclassified operation is answered by whether the entity type is restricted at
