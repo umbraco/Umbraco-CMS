@@ -18,7 +18,7 @@ export class UmbWorkspaceEntityIsReadOnlyCondition
 
 		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
-				context?.readOnly,
+				context?.readOnlyGuard.permitted,
 				(isReadOnly) => {
 					if (isReadOnly !== undefined) {
 						this.permitted = isReadOnly === (this.config.match ?? true);

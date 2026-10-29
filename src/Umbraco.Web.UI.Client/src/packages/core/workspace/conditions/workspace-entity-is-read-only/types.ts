@@ -2,7 +2,9 @@ import type { UMB_WORKSPACE_ENTITY_IS_READ_ONLY_CONDITION_ALIAS } from './consta
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
 /**
- * Configuration for the condition that checks whether the entity of an entity detail workspace is read-only.
+ * Configuration for the condition that checks whether the entity of an entity detail workspace is read-only, as the
+ * workspace's `readOnlyGuard` reports it through `permitted`. In a workspace with variants, a rule for a single variant
+ * counts as well; use the guard's `isPermittedForVariant` to tell variants apart.
  * Outside an entity detail workspace the condition is never met, whatever `match` is.
  */
 export interface UmbWorkspaceEntityIsReadOnlyConditionConfig extends UmbConditionConfigBase<

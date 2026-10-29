@@ -13,7 +13,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 class UmbTestHostElement extends UmbElementMixin(HTMLElement) {}
 
 interface UmbTestWorkspaceContext {
-	getReadOnly(): boolean;
+	readOnlyGuard: { getPermitted(): boolean };
 	resetState(): void;
 }
 
@@ -53,7 +53,7 @@ workspaces.forEach(([name, WorkspaceContext]) => {
 		it('is read-only until the runtime mode is known', () => {
 			context = new WorkspaceContext(host);
 
-			expect(context.getReadOnly()).to.be.true;
+			expect(context.readOnlyGuard.getPermitted()).to.be.true;
 		});
 
 		it('is not read-only outside production mode', async () => {
@@ -62,7 +62,7 @@ workspaces.forEach(([name, WorkspaceContext]) => {
 
 			isProductionMode.setValue(false);
 
-			await waitUntil(() => context.getReadOnly() === false, 'the workspace stayed read-only');
+			await waitUntil(() => context.readOnlyGuard.getPermitted() === false, 'the workspace stayed read-only');
 		});
 
 		it('is read-only in production mode', async () => {
@@ -70,32 +70,32 @@ workspaces.forEach(([name, WorkspaceContext]) => {
 			context = new WorkspaceContext(host);
 
 			isProductionMode.setValue(false);
-			await waitUntil(() => context.getReadOnly() === false, 'the workspace stayed read-only');
+			await waitUntil(() => context.readOnlyGuard.getPermitted() === false, 'the workspace stayed read-only');
 
 			isProductionMode.setValue(true);
-			await waitUntil(() => context.getReadOnly() === true, 'the workspace did not become read-only');
+			await waitUntil(() => context.readOnlyGuard.getPermitted() === true, 'the workspace did not become read-only');
 		});
 
 		it('stays read-only in production mode when the workspace state is reset for another entity', async () => {
 			provideServerContext();
 			context = new WorkspaceContext(host);
 			isProductionMode.setValue(true);
-			await waitUntil(() => context.getReadOnly() === true, 'the workspace did not become read-only');
+			await waitUntil(() => context.readOnlyGuard.getPermitted() === true, 'the workspace did not become read-only');
 
 			context.resetState();
 
-			expect(context.getReadOnly()).to.be.true;
+			expect(context.readOnlyGuard.getPermitted()).to.be.true;
 		});
 
 		it('stays editable outside production mode when the workspace state is reset for another entity', async () => {
 			provideServerContext();
 			context = new WorkspaceContext(host);
 			isProductionMode.setValue(false);
-			await waitUntil(() => context.getReadOnly() === false, 'the workspace stayed read-only');
+			await waitUntil(() => context.readOnlyGuard.getPermitted() === false, 'the workspace stayed read-only');
 
 			context.resetState();
 
-			expect(context.getReadOnly()).to.be.false;
+			expect(context.readOnlyGuard.getPermitted()).to.be.false;
 		});
 	});
 });

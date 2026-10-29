@@ -51,7 +51,7 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 
 		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
-				context?.readOnly,
+				context?.readOnlyGuard.permitted,
 				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
 				'umbObserveWorkspaceReadOnly',
 			);
