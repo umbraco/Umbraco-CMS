@@ -450,12 +450,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
-	protected _resetScrollPosition() {
-		const bodyLayout = this.shadowRoot?.querySelector('umb-body-layout');
-		const scrollContainer = bodyLayout?.shadowRoot?.querySelector('#main') as HTMLElement | null;
-		scrollContainer?.scrollTo({ top: 0, behavior: 'auto' });
-	}
-
 	async #onPageChange(event: UUIPaginationEvent) {
 		event.stopPropagation();
 		const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
@@ -470,7 +464,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		this.#pagingMap.set(key, paginationManager);
 
 		await this.#loadChildrenOfCurrentMediaItem();
-		this._resetScrollPosition();
+		this.shadowRoot?.querySelector('umb-body-layout')?.getScrollContainer()?.scrollTo({ top: 0, behavior: 'instant' });
 	}
 
 	#allowNavigateToMedia(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel): boolean {
