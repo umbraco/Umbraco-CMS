@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.SchemaLockdown;
@@ -17,17 +16,16 @@ namespace Umbraco.Cms.Api.Management.OpenApi;
 /// The denial itself is a bodyless 403, because a 403 on these operations can equally come from the permissions the
 /// request has already passed, and one status code cannot describe two bodies. A header can say "may be present",
 /// which is what is actually true, so that is where the reason goes.
+/// <para>
+/// It applies to every OpenAPI document, so a package whose controllers declare <see cref="SchemaEntityTypeAttribute"/>
+/// gets the header documented in its own document too.
+/// </para>
 /// </remarks>
 internal sealed class SchemaLockdownHeaderFilter : IOperationFilter
 {
     /// <inheritdoc />
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (context.DocumentName != ManagementApiConfiguration.ApiName)
-        {
-            return;
-        }
-
         // A read is never denied, so an operation that only reads could not carry the header however locked down
         // its entity types are.
         (string EntityType, SchemaOperation Operation)[] deniable = Array.FindAll(
