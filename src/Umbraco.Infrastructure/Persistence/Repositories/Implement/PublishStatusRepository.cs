@@ -84,15 +84,6 @@ public class PublishStatusRepository : IPublishStatusRepository
         return ToPublishStatus(documentKey, databaseRecords);
     }
 
-    private Sql<ISqlContext> GetPublishStatusSql(Guid documentKey)
-        => GetBaseQuery().Where<NodeDto>(n => n.UniqueId == documentKey, "n");
-
-    private ISet<string> ToPublishStatus(Guid documentKey, List<PublishStatusDto> databaseRecords)
-    {
-        IDictionary<Guid, ISet<string>> result = Map(databaseRecords);
-        return result.TryGetValue(documentKey, out ISet<string>? value) ? value : new HashSet<string>();
-    }
-
     /// <inheritdoc />
     public async Task<IEnumerable<Guid>> GetPublishedKeysAsync(string culture, CancellationToken cancellationToken)
     {
@@ -138,6 +129,15 @@ public class PublishStatusRepository : IPublishStatusRepository
 
         List<PublishStatusDto>? databaseRecords = Database.Fetch<PublishStatusDto>(GetDescendantsOrSelfSql(rootDocumentKey, rootPath));
         return Map(databaseRecords);
+    }
+
+    private Sql<ISqlContext> GetPublishStatusSql(Guid documentKey)
+        => GetBaseQuery().Where<NodeDto>(n => n.UniqueId == documentKey, "n");
+
+    private ISet<string> ToPublishStatus(Guid documentKey, List<PublishStatusDto> databaseRecords)
+    {
+        IDictionary<Guid, ISet<string>> result = Map(databaseRecords);
+        return result.TryGetValue(documentKey, out ISet<string>? value) ? value : new HashSet<string>();
     }
 
     private Sql<ISqlContext> GetRootPathSql(Guid rootDocumentKey)

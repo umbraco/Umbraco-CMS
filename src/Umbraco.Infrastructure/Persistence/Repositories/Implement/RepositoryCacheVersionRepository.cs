@@ -60,6 +60,12 @@ internal class RepositoryCacheVersionRepository : RepositoryBase, IRepositoryCac
     public void Save(RepositoryCacheVersion repositoryCacheVersion)
         => Database.InsertOrUpdate(Map(repositoryCacheVersion), null, null);
 
+    private static RepositoryCacheVersionDto Map(RepositoryCacheVersion entity)
+        => new() { Identifier = entity.Identifier, Version = entity.Version };
+
+    private static RepositoryCacheVersion? Map(RepositoryCacheVersionDto? dto)
+        => dto is null ? null : new RepositoryCacheVersion { Identifier = dto.Identifier, Version = dto.Version };
+
     private Sql<ISqlContext> GetQuery(string identifier)
     {
         if (string.IsNullOrWhiteSpace(identifier))
@@ -77,10 +83,4 @@ internal class RepositoryCacheVersionRepository : RepositoryBase, IRepositoryCac
         => Sql()
             .Select<RepositoryCacheVersionDto>()
             .From<RepositoryCacheVersionDto>();
-
-    private static RepositoryCacheVersionDto Map(RepositoryCacheVersion entity)
-        => new() { Identifier = entity.Identifier, Version = entity.Version };
-
-    private static RepositoryCacheVersion? Map(RepositoryCacheVersionDto? dto)
-        => dto is null ? null : new RepositoryCacheVersion { Identifier = dto.Identifier, Version = dto.Version };
 }

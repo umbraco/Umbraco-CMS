@@ -77,6 +77,72 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
         return Store(cacheKey, databaseVersion, scopeCache);
     }
 
+    /// <inheritdoc />
+    public void VersionChanged(string cacheKey)
+    {
+        var removed = _requestCache.Remove(cacheKey);
+        if (removed is false)
+        {
+            _logger.LogDebug("Cache version for key {CacheKey} wasn't removed from request cache, possibly missing HTTP context", cacheKey);
+        }
+    }
+
+    /// <inheritdoc />
+    public void VersionChanged(string cacheKey, Guid newVersion)
+    {
+        // Update scope cache in-place — no DB re-read needed.
+        ConcurrentDictionary<string, Guid>? scopeCache = GetOrRegisterScopeVersionCache();
+        if (scopeCache is not null)
+        {
+            scopeCache[cacheKey] = newVersion;
+        }
+
+        // Clear request cache (keep in sync with scope cache).
+        _requestCache.Remove(cacheKey);
+    }
+
+    /// <inheritdoc />
+    [Obsolete("Use the overload that takes the adopted versions. Scheduled for removal in Umbraco 19.")]
+    public void CachesSynced()
+    {
+        // Clear scope cache so fresh versions are read from the DB after a full reload.
+        GetOrRegisterScopeVersionCache()?.Clear();
+        _requestCache.ClearOfType<RepositoryCacheVersion>();
+    }
+
+    /// <inheritdoc />
+    public void CachesSynced(IEnumerable<RepositoryCacheVersion> adoptedVersions)
+    {
+        // Move the scope cache to the adopted snapshot rather than clearing it. The scope keeps its distributed
+        // locks until its transaction ends, so what it reads cannot change under it; re-reading the database
+        // version here would only start another sync for a version published after those locks were taken.
+        ConcurrentDictionary<string, Guid>? scopeCache = GetOrRegisterScopeVersionCache();
+        if (scopeCache is not null)
+        {
+            var adopted = new Dictionary<string, Guid>();
+            foreach (RepositoryCacheVersion version in adoptedVersions)
+            {
+                if (version.Version is not null && Guid.TryParse(version.Version, out Guid parsedVersion))
+                {
+                    adopted[version.Identifier] = parsedVersion;
+                }
+            }
+
+            foreach (var key in scopeCache.Keys.Where(key => adopted.ContainsKey(key) is false).ToList())
+            {
+                scopeCache.TryRemove(key, out _);
+            }
+
+            foreach ((var key, Guid version) in adopted)
+            {
+                scopeCache[key] = version;
+            }
+        }
+
+        // A later root scope in the same request should see the current versions, not this scope's snapshot.
+        _requestCache.ClearOfType<RepositoryCacheVersion>();
+    }
+
     /// <summary>
     /// Answers from the scope-level or request-level cache, or reports that the database has to be read. A
     /// client-side request is always reported as cached with no version, so it is never checked against the database.
@@ -144,72 +210,6 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
         }
 
         return databaseVersion;
-    }
-
-    /// <inheritdoc />
-    public void VersionChanged(string cacheKey)
-    {
-        var removed = _requestCache.Remove(cacheKey);
-        if (removed is false)
-        {
-            _logger.LogDebug("Cache version for key {CacheKey} wasn't removed from request cache, possibly missing HTTP context", cacheKey);
-        }
-    }
-
-    /// <inheritdoc />
-    public void VersionChanged(string cacheKey, Guid newVersion)
-    {
-        // Update scope cache in-place — no DB re-read needed.
-        ConcurrentDictionary<string, Guid>? scopeCache = GetOrRegisterScopeVersionCache();
-        if (scopeCache is not null)
-        {
-            scopeCache[cacheKey] = newVersion;
-        }
-
-        // Clear request cache (keep in sync with scope cache).
-        _requestCache.Remove(cacheKey);
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Use the overload that takes the adopted versions. Scheduled for removal in Umbraco 19.")]
-    public void CachesSynced()
-    {
-        // Clear scope cache so fresh versions are read from the DB after a full reload.
-        GetOrRegisterScopeVersionCache()?.Clear();
-        _requestCache.ClearOfType<RepositoryCacheVersion>();
-    }
-
-    /// <inheritdoc />
-    public void CachesSynced(IEnumerable<RepositoryCacheVersion> adoptedVersions)
-    {
-        // Move the scope cache to the adopted snapshot rather than clearing it. The scope keeps its distributed
-        // locks until its transaction ends, so what it reads cannot change under it; re-reading the database
-        // version here would only start another sync for a version published after those locks were taken.
-        ConcurrentDictionary<string, Guid>? scopeCache = GetOrRegisterScopeVersionCache();
-        if (scopeCache is not null)
-        {
-            var adopted = new Dictionary<string, Guid>();
-            foreach (RepositoryCacheVersion version in adoptedVersions)
-            {
-                if (version.Version is not null && Guid.TryParse(version.Version, out Guid parsedVersion))
-                {
-                    adopted[version.Identifier] = parsedVersion;
-                }
-            }
-
-            foreach (var key in scopeCache.Keys.Where(key => adopted.ContainsKey(key) is false).ToList())
-            {
-                scopeCache.TryRemove(key, out _);
-            }
-
-            foreach ((var key, Guid version) in adopted)
-            {
-                scopeCache[key] = version;
-            }
-        }
-
-        // A later root scope in the same request should see the current versions, not this scope's snapshot.
-        _requestCache.ClearOfType<RepositoryCacheVersion>();
     }
 
     private ConcurrentDictionary<string, Guid>? GetOrRegisterScopeVersionCache()

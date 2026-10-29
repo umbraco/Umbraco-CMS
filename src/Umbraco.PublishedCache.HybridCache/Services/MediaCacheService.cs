@@ -402,6 +402,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         if (media.Trashed)
         {
             _databaseCacheRepository.DeleteContentItem(media.Id);
+
             // TODO (V20): await the memory-cache removal once the notification pipeline is asynchronous.
             RemoveFromMemoryCacheAsync(media.Key).GetAwaiter().GetResult();
 

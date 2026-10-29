@@ -35,6 +35,7 @@ internal sealed class ContentWriteGateTests : UmbracoIntegrationTestWithContent
     /// database and before the content tree lock is taken. Holding the first save there, a second request must not
     /// reach the content service until the first has left it.
     /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test.</returns>
     [Test]
     public async Task Admits_One_Save_Into_The_Content_Service_At_A_Time()
     {

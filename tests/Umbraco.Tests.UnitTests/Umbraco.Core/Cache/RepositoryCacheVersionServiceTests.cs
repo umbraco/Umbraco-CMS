@@ -306,7 +306,6 @@ public class RepositoryCacheVersionServiceTests
 
     // The synchronous members exist for callers that hold a distributed lock; they must never route through the
     // asynchronous accessor or repository, or the thread-pool hop they are meant to avoid comes back.
-
     [Test]
     public void IsCacheSynced_ReturnsFalse_WhenAccessorReturnsStaleVersion_WithoutAwaiting()
     {

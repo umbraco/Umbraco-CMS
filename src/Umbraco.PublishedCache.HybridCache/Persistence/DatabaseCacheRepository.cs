@@ -92,16 +92,6 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     public void RemovePublishedContent(int id)
         => Database.Execute(RemovePublishedContentSql(id));
 
-    private Sql<ISqlContext> DeleteContentItemSql(int id)
-        => Sql()
-            .Delete<ContentNuDto>()
-            .Where<ContentNuDto>(x => x.NodeId == id);
-
-    private Sql<ISqlContext> RemovePublishedContentSql(int id)
-        => Sql()
-            .Delete<ContentNuDto>()
-            .Where<ContentNuDto>(x => x.NodeId == id && x.Published);
-
     /// <inheritdoc/>
     public void Rebuild(
         IReadOnlyCollection<int>? contentTypeIds,
@@ -414,6 +404,16 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return filtered
             .Select(x => CreateMediaNodeKit(x, serializer));
     }
+
+    private Sql<ISqlContext> DeleteContentItemSql(int id)
+        => Sql()
+            .Delete<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == id);
+
+    private Sql<ISqlContext> RemovePublishedContentSql(int id)
+        => Sql()
+            .Delete<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == id && x.Published);
 
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {

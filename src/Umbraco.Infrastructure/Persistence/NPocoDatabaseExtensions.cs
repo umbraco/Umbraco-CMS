@@ -233,16 +233,13 @@ public static partial class NPocoDatabaseExtensions
         object? updateArgs)
         where T : class
     {
-        if (poco == null)
-        {
-            throw new ArgumentNullException(nameof(poco));
-        }
+        ArgumentNullException.ThrowIfNull(poco);
 
         // Same update-then-insert sequence as InsertOrUpdateAsync, kept synchronous on purpose: callers inside a
         // distributed lock must not need a second thread-pool thread to finish.
         var rowCount = updateCommand.IsNullOrWhiteSpace() || updateArgs is null
             ? db.Update(poco)
-            : db.Update<T>(updateCommand!, updateArgs);
+            : db.Update<T>(updateCommand, updateArgs);
         if (rowCount > 0)
         {
             return RecordPersistenceType.Update;
@@ -260,7 +257,7 @@ public static partial class NPocoDatabaseExtensions
             {
                 rowCount = updateCommand.IsNullOrWhiteSpace() || updateArgs is null
                     ? db.Update(poco)
-                    : db.Update<T>(updateCommand!, updateArgs);
+                    : db.Update<T>(updateCommand, updateArgs);
                 if (rowCount > 0)
                 {
                     return RecordPersistenceType.Update;

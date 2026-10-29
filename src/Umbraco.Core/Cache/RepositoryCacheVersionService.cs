@@ -59,49 +59,16 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     public bool IsCacheSynced<TEntity>()
         where TEntity : class
     {
-        _logger.LogDebug("Checking if cache for {EntityType} is synced", typeof(TEntity).Name);
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Checking if cache for {EntityType} is synced", typeof(TEntity).Name);
+        }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
         var cacheKey = GetCacheKey<TEntity>();
         RepositoryCacheVersion? databaseVersion = _repositoryCacheVersionAccessor.Get(cacheKey);
         return IsCacheSynced<TEntity>(cacheKey, databaseVersion);
-    }
-
-    private bool IsCacheSynced<TEntity>(string cacheKey, RepositoryCacheVersion? databaseVersion)
-        where TEntity : class
-    {
-        if (databaseVersion?.Version is null)
-        {
-            _logger.LogDebug("Cache for {EntityType} has no version in the database, considering it synced", typeof(TEntity).Name);
-
-            // If the database version is null, it means the cache has never been initialized, so we consider it synced.
-            return true;
-        }
-
-        if (_cacheVersions.TryGetValue(cacheKey, out Guid localVersion) is false)
-        {
-            _logger.LogDebug("Cache for {EntityType} is not initialized, considering it synced", typeof(TEntity).Name);
-
-            // We're not initialized yet, so cache is empty, which means cache is synced.
-            // Since the cache is most likely no longer empty, we should set the cache version to the database version.
-            _cacheVersions[cacheKey] = Guid.Parse(databaseVersion.Version);
-            return true;
-        }
-
-        // We could've parsed this in the repository layer; however, the fact that we are using a Guid is an implementation detail.
-        if (localVersion != Guid.Parse(databaseVersion.Version))
-        {
-            _logger.LogDebug(
-                "Cache for {EntityType} is not synced: local version {LocalVersion} does not match database version {DatabaseVersion}",
-                typeof(TEntity).Name,
-                localVersion,
-                databaseVersion.Version);
-            return false;
-        }
-
-        _logger.LogDebug("Cache for {EntityType} is synced", typeof(TEntity).Name);
-        return true;
     }
 
     /// <inheritdoc />
@@ -132,38 +99,6 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
         scope.WriteLock(Constants.Locks.CacheVersion);
         WriteVersion(cacheKey);
         scope.Complete();
-    }
-
-    /// <summary>
-    /// Registers the update for the scope and, inside a request, defers its publication to the end of the request.
-    /// </summary>
-    /// <returns><c>true</c> when nothing has to be written now; <c>false</c> when the caller must publish the version.</returns>
-    private bool TryDeferCacheUpdate<TEntity>(out string cacheKey)
-        where TEntity : class
-    {
-        cacheKey = GetCacheKey<TEntity>();
-
-        ConcurrentHashSet<string>? writtenKeys = GetOrRegisterScopeWrittenKeys();
-        if (writtenKeys?.TryAdd(cacheKey) is false)
-        {
-            _logger.LogDebug("Cache version for {EntityType} already written in this scope, skipping", typeof(TEntity).Name);
-            return true;
-        }
-
-        if (_requestCache.IsAvailable)
-        {
-            // Published at the end of the request, after the cache instructions. The local version and the accessor
-            // are left as they are: this server's isolated cache was updated in place, so its local version must keep
-            // matching the published one until the new version is published.
-            if (writtenKeys is null)
-            {
-                AddPendingCacheKey(cacheKey);
-            }
-
-            return true;
-        }
-
-        return false;
     }
 
     /// <inheritdoc />
@@ -204,18 +139,6 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
         }
 
         scope.Complete();
-    }
-
-    private ConcurrentHashSet<string>? TakePendingCacheKeys()
-    {
-        if (_requestCache.IsAvailable is false)
-        {
-            return null;
-        }
-
-        var pendingCacheKeys = _requestCache.Get(PendingCacheKeysKey) as ConcurrentHashSet<string>;
-        _requestCache.Remove(PendingCacheKeysKey);
-        return pendingCacheKeys is null || pendingCacheKeys.Count == 0 ? null : pendingCacheKeys;
     }
 
     /// <inheritdoc />
@@ -263,6 +186,86 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     internal string GetCacheKey<TEntity>()
         where TEntity : class =>
         typeof(TEntity).FullName ?? typeof(TEntity).Name;
+
+    private bool IsCacheSynced<TEntity>(string cacheKey, RepositoryCacheVersion? databaseVersion)
+        where TEntity : class
+    {
+        if (databaseVersion?.Version is null)
+        {
+            _logger.LogDebug("Cache for {EntityType} has no version in the database, considering it synced", typeof(TEntity).Name);
+
+            // If the database version is null, it means the cache has never been initialized, so we consider it synced.
+            return true;
+        }
+
+        if (_cacheVersions.TryGetValue(cacheKey, out Guid localVersion) is false)
+        {
+            _logger.LogDebug("Cache for {EntityType} is not initialized, considering it synced", typeof(TEntity).Name);
+
+            // We're not initialized yet, so cache is empty, which means cache is synced.
+            // Since the cache is most likely no longer empty, we should set the cache version to the database version.
+            _cacheVersions[cacheKey] = Guid.Parse(databaseVersion.Version);
+            return true;
+        }
+
+        // We could've parsed this in the repository layer; however, the fact that we are using a Guid is an implementation detail.
+        if (localVersion != Guid.Parse(databaseVersion.Version))
+        {
+            _logger.LogDebug(
+                "Cache for {EntityType} is not synced: local version {LocalVersion} does not match database version {DatabaseVersion}",
+                typeof(TEntity).Name,
+                localVersion,
+                databaseVersion.Version);
+            return false;
+        }
+
+        _logger.LogDebug("Cache for {EntityType} is synced", typeof(TEntity).Name);
+        return true;
+    }
+
+    /// <summary>
+    /// Registers the update for the scope and, inside a request, defers its publication to the end of the request.
+    /// </summary>
+    /// <returns><c>true</c> when nothing has to be written now; <c>false</c> when the caller must publish the version.</returns>
+    private bool TryDeferCacheUpdate<TEntity>(out string cacheKey)
+        where TEntity : class
+    {
+        cacheKey = GetCacheKey<TEntity>();
+
+        ConcurrentHashSet<string>? writtenKeys = GetOrRegisterScopeWrittenKeys();
+        if (writtenKeys?.TryAdd(cacheKey) is false)
+        {
+            _logger.LogDebug("Cache version for {EntityType} already written in this scope, skipping", typeof(TEntity).Name);
+            return true;
+        }
+
+        if (_requestCache.IsAvailable)
+        {
+            // Published at the end of the request, after the cache instructions. The local version and the accessor
+            // are left as they are: this server's isolated cache was updated in place, so its local version must keep
+            // matching the published one until the new version is published.
+            if (writtenKeys is null)
+            {
+                AddPendingCacheKey(cacheKey);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private ConcurrentHashSet<string>? TakePendingCacheKeys()
+    {
+        if (_requestCache.IsAvailable is false)
+        {
+            return null;
+        }
+
+        var pendingCacheKeys = _requestCache.Get(PendingCacheKeysKey) as ConcurrentHashSet<string>;
+        _requestCache.Remove(PendingCacheKeysKey);
+        return pendingCacheKeys is null || pendingCacheKeys.Count == 0 ? null : pendingCacheKeys;
+    }
 
     private async Task WriteVersionAsync(string cacheKey)
     {
