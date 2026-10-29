@@ -112,7 +112,7 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('general_choose')}>
+			<umb-body-layout headline=${this.localize.term('general_choose')} main-no-padding>
 				${this.#renderTabs()} ${this.#renderLanguageSelector()}
 				<div id="browse" ?hidden=${this._activeTab !== 'browse'}>
 					<umb-document-picker-browse hide-tree-root></umb-document-picker-browse>
@@ -173,23 +173,25 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 		const value = this._selectedCulture || EMPTY_VALUE;
 
 		return html`
-			<uui-combobox
-				placeholder=${this.localize.term('linkPicker_selectLanguageHint')}
-				.value=${value}
-				@change=${this.#onLanguageSelectionChange}>
-				<uui-combobox-list>
-					<uui-combobox-list-option value=${EMPTY_VALUE}
-						>${this.localize.term('linkPicker_selectLanguageDefault')}</uui-combobox-list-option
-					>
-					${repeat(
-						this._languages,
-						(language) => language.unique,
-						(language) => html`
-							<uui-combobox-list-option value=${language.unique}> ${language.name} </uui-combobox-list-option>
-						`,
-					)}
-				</uui-combobox-list>
-			</uui-combobox>
+			<div id="language">
+				<uui-combobox
+					placeholder=${this.localize.term('linkPicker_selectLanguageHint')}
+					.value=${value}
+					@change=${this.#onLanguageSelectionChange}>
+					<uui-combobox-list>
+						<uui-combobox-list-option value=${EMPTY_VALUE}
+							>${this.localize.term('linkPicker_selectLanguageDefault')}</uui-combobox-list-option
+						>
+						${repeat(
+							this._languages,
+							(language) => language.unique,
+							(language) => html`
+								<uui-combobox-list-option value=${language.unique}> ${language.name} </uui-combobox-list-option>
+							`,
+						)}
+					</uui-combobox-list>
+				</uui-combobox>
+			</div>
 		`;
 	}
 
@@ -207,9 +209,25 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 				border-right: 1px solid var(--uui-color-border);
 			}
 
+			#language {
+				padding: var(--uui-size-layout-1) var(--uui-size-layout-1) 0;
+			}
+
 			uui-combobox {
 				width: 100%;
-				margin-bottom: var(--uui-size-space-3);
+			}
+
+			#browse {
+				padding-top: var(--uui-size-layout-1);
+			}
+
+			#search {
+				padding: var(--uui-size-layout-1);
+			}
+
+			#language ~ #browse,
+			#language ~ #search {
+				padding-top: var(--uui-size-space-3);
 			}
 		`,
 	];

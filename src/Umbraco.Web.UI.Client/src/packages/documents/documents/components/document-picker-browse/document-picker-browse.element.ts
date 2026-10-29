@@ -46,6 +46,9 @@ type UmbContentTreeItemLike = {
  * Must be placed inside a tree item picker context (`UMB_TREE_ITEM_PICKER_CONTEXT`), which holds the location,
  * selection, expansion and interaction memory this element reads and writes. The host owns that context and configures
  * it — the document tree, start nodes, whether multiple items can be picked — before or after this element connects.
+ *
+ * Insets its own content at the sides and below, as the collection brings its own layout, so a host places it without
+ * padding around it — in `umb-body-layout`, with `main-no-padding` — and decides only the space above it.
  * @element umb-document-picker-browse
  * @fires {UmbSelectedEvent} selected - When an item is picked.
  * @fires {UmbDeselectedEvent} deselected - When an item is unpicked.
@@ -396,13 +399,20 @@ export class UmbDocumentPickerBrowseElement extends UmbLitElement {
 	#renderChildren() {
 		// Which renderer a level needs is only known once the location is, and mounting the tree in the meantime would
 		// tear it down again mid-initialisation.
-		if (this._currentLocation === undefined) return html`<umb-view-loader></umb-view-loader>`;
+		if (this._currentLocation === undefined) return this.#renderInset(html`<umb-view-loader></umb-view-loader>`);
 		// A level the tree cannot describe has no renderer, so neither the tree nor the collection stands in for it.
-		if (this._currentLocation === null) return this.#renderNotFound();
-		if (!this.#willRenderCollection()) return this.#renderTree();
+		if (this._currentLocation === null) return this.#renderInset(this.#renderNotFound());
+		if (!this.#willRenderCollection()) return this.#renderInset(this.#renderTree());
 		// The configuration is resolved from a data type, so the collection is held back rather than briefly showing
 		// the tree in its place.
-		return this._collectionConfig ? this.#renderCollection() : html`<umb-view-loader></umb-view-loader>`;
+		return this._collectionConfig
+			? this.#renderCollection()
+			: this.#renderInset(html`<umb-view-loader></umb-view-loader>`);
+	}
+
+	// A collection lays itself out inside its own body layout, so everything else is inset here rather than by the host.
+	#renderInset(content: unknown) {
+		return html`<div id="inset">${content}</div>`;
 	}
 
 	#renderNotFound() {
@@ -470,7 +480,11 @@ export class UmbDocumentPickerBrowseElement extends UmbLitElement {
 		}
 
 		#breadcrumb {
-			margin-bottom: var(--uui-size-space-4);
+			padding: 0 var(--uui-size-layout-1);
+		}
+
+		#inset {
+			padding: var(--uui-size-space-4) var(--uui-size-layout-1) var(--uui-size-layout-1);
 		}
 
 		#not-found {

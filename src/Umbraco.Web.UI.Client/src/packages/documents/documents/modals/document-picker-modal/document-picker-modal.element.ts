@@ -169,7 +169,7 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.string(this.data?.headline ?? '#general_choose')}>
+			<umb-body-layout headline=${this.localize.string(this.data?.headline ?? '#general_choose')} main-no-padding>
 				${this.#renderTabs()}
 				<div id="browse" ?hidden=${this._activeTab !== 'browse'}>${this.#renderBrowse()}</div>
 				<div id="search" ?hidden=${this._activeTab !== 'search'}>${this.#renderSearch()}</div>
@@ -251,6 +251,14 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 			--uui-tab-divider: var(--uui-color-border);
 			border-left: 1px solid var(--uui-color-border);
 			border-right: 1px solid var(--uui-color-border);
+		}
+
+		#browse {
+			padding-top: var(--uui-size-layout-1);
+		}
+
+		#search {
+			padding: var(--uui-size-layout-1);
 		}
 
 		#selection-info {
