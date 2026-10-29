@@ -90,7 +90,7 @@ describe('UmbSortableListElement', () => {
 		expect(custom.identifier).to.equal('Umb.SorterIdentifier.Test');
 	});
 
-	it('applies the shared text styles to the rendered items', async () => {
+	it('keeps inline code in the rendered items left-to-right', async () => {
 		const container = await fixture<HTMLDivElement>(html`<div dir="rtl"><umb-sortable-list></umb-sortable-list></div>`);
 		const list = container.querySelector<UmbSortableListElement<string>>('umb-sortable-list')!;
 		list.getUnique = getUnique;
@@ -99,6 +99,8 @@ describe('UmbSortableListElement', () => {
 		list.items = ['@RenderBody()'];
 		await list.updateComplete;
 
-		expect(getComputedStyle(list.shadowRoot!.querySelector('code')!).direction).to.equal('ltr');
+		const style = getComputedStyle(list.shadowRoot!.querySelector('code')!);
+		expect(style.direction).to.equal('ltr');
+		expect(style.unicodeBidi).to.equal('isolate');
 	});
 });
