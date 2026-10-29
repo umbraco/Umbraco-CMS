@@ -26,6 +26,8 @@ public interface ISchemaRestrictions
     /// <remarks>
     /// The same as asking whether <see cref="RestrictedEntityTypes"/> contains it, matched case-insensitively.
     /// </remarks>
+    /// <param name="entityType">The entity type, for example one of <see cref="Constants.UdiEntityType"/>.</param>
+    /// <returns><c>true</c> if at least one operation is denied on the entity type; otherwise <c>false</c>.</returns>
     bool IsRestricted(string entityType);
 
     /// <summary>
@@ -36,5 +38,8 @@ public interface ISchemaRestrictions
     /// only on an entity type absent from <see cref="RestrictedEntityTypes"/>: it may well be one of the operations
     /// denied there, and there is no way to tell which.
     /// </remarks>
+    /// <param name="entityType">The entity type, for example one of <see cref="Constants.UdiEntityType"/>.</param>
+    /// <param name="operation">The operation to check.</param>
+    /// <returns><c>true</c> if the operation is permitted on the entity type; otherwise <c>false</c>.</returns>
     bool IsAllowed(string entityType, SchemaOperation operation);
 }

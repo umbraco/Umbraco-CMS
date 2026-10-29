@@ -6,8 +6,8 @@ using Umbraco.Cms.Api.Management.Controllers.Dictionary;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.SchemaLockdown;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.SchemaLockdown;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
