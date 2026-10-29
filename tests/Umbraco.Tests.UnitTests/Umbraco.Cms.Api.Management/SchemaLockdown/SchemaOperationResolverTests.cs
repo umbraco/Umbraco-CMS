@@ -52,8 +52,6 @@ public class SchemaOperationResolverTests
                 (Template, SchemaOperation.Unknown),
             }));
 
-    // Creating a template for a document type is the case in the codebase: the verb describes what happens to the
-    // template, and only the document type needs saying.
     [Test]
     public void A_Declaration_Naming_An_Entity_Type_Applies_To_That_One_Alone()
         => Assert.That(
@@ -97,9 +95,6 @@ public class SchemaOperationResolverTests
                 (Template, SchemaOperation.Create),
             }));
 
-    // A SchemaOperation declaration only decides an operation. The name comes from the controller's declaration,
-    // which is the one thing that says what the controller manages, so the two disagreeing about casing cannot
-    // change what a denial is reported as.
     [Test]
     public void An_Entity_Type_Is_Named_As_The_Controller_Declared_It_Not_As_An_Operation_Did()
         => Assert.That(
@@ -109,8 +104,7 @@ public class SchemaOperationResolverTests
                 HttpMethods.Post),
             Is.EqualTo(new[] { ("Document-Type", SchemaOperation.Update) }));
 
-    // The composition pickers are POST because the query needs a request body. Nothing here is deniable, which is
-    // what lets the OpenAPI document leave the denial header off them.
+    // The composition pickers are POST because the query needs a request body.
     [Test]
     public void A_Post_Declared_As_A_Read_Leaves_Nothing_Deniable()
     {

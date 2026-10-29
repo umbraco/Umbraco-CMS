@@ -1,13 +1,9 @@
 namespace Umbraco.Cms.Core.SchemaLockdown;
 
 /// <summary>
-/// Adjusts the schema lockdown restrictions while they are being built at start-up.
+/// Denies schema operations while the schema lockdown restrictions are built at start-up. Nothing is locked unless a
+/// configurator denies it.
 /// </summary>
-/// <remarks>
-/// Registering a configurator is the only way an entity type comes under lockdown: nothing is locked until one
-/// says so. Every registered configurator runs against the same restrictions, and because a denial cannot be lifted
-/// once made, the order they run in does not affect the result.
-/// </remarks>
 /// <example>
 /// Locking content type and data type schema:
 /// <code>

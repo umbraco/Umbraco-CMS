@@ -11,14 +11,9 @@ using Umbraco.Cms.Core.SchemaLockdown;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// Creating a template for a document type creates a template, so the endpoint declares both entity types and a
-/// denial on either one refuses it. Its controller base declares document types alone, so this also covers the
-/// declaration on the endpoint replacing the one it inherits.
+/// Creating a template for a document type is denied when only templates are locked, as the endpoint declares both
+/// entity types. The id doesn't exist, so reaching the action would return 404 instead.
 /// </summary>
-/// <remarks>
-/// The id names nothing, so the only response that can precede the action running is the lockdown denial - reaching
-/// the action would answer with a not found.
-/// </remarks>
 public class CreatingATemplateForADocumentTypeIsForbiddenWhenTemplatesAreLockedTests
     : SchemaLockdownApiTest<CreateDocumentTypeTemplateController>
 {

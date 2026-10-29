@@ -56,7 +56,6 @@ public class SchemaRestrictionsTests
         });
     }
 
-    // Denials only accumulate, so every configurator's decisions survive whichever order they run in.
     [Test]
     public void Every_Configurators_Denials_Are_Kept_Whatever_The_Order()
     {
@@ -140,7 +139,6 @@ public class SchemaRestrictionsTests
         });
     }
 
-    // A single denial is enough: the unclassified operation could be the one that was denied.
     [Test]
     public void Unknown_Is_Blocked_Wherever_Any_Operation_Is_Blocked()
     {
@@ -166,8 +164,6 @@ public class SchemaRestrictionsTests
         });
     }
 
-    // Nothing consults a read cell, so a configurator writing one would be writing something that cannot take effect.
-    // This is what lets every consumer take reads as permitted without asking.
     [Test]
     public void Reads_Stay_Permitted_Whatever_A_Configurator_Writes()
     {

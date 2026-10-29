@@ -15,9 +15,9 @@ public class SchemaLockdownServerController : ServerControllerBase
     private readonly ISchemaRestrictions _restrictions;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SchemaLockdownServerController"/> class, which provides the schema lockdown endpoint for the Umbraco management API.
+    /// Initializes a new instance of the <see cref="SchemaLockdownServerController"/> class.
     /// </summary>
-    /// <param name="restrictions">The frozen decision table.</param>
+    /// <param name="restrictions">The schema lockdown restrictions.</param>
     public SchemaLockdownServerController(ISchemaRestrictions restrictions)
         => _restrictions = restrictions;
 
@@ -35,8 +35,7 @@ public class SchemaLockdownServerController : ServerControllerBase
     {
         var model = new ServerSchemaLockdownResponseModel
         {
-            // The restrictions match entity types case-insensitively and report back whatever casing a configurator wrote.
-            // The backoffice looks its own entity types up against this, so the casing is settled here instead.
+            // Configurators may use any casing, while the backoffice looks entity types up by their lower case name.
             RestrictedEntityTypes = _restrictions.RestrictedEntityTypes
                 .Select(entityType => new ServerSchemaLockdownEntityTypeResponseModel
                 {

@@ -1,13 +1,11 @@
 namespace Umbraco.Cms.Core.SchemaLockdown;
 
 /// <summary>
-/// The decision table for schema lockdown, holding which operations are denied on which entity types.
+/// Holds which operations are denied on which entity types.
 /// </summary>
 /// <remarks>
-/// Every registered <see cref="ISchemaLockdownConfigurator"/> writes to it while it is being constructed, after which
-/// it is frozen. Freezing is what allows the same instance to be both consulted by the authorization handler and
-/// served to the backoffice without the two being able to disagree. Denials only ever accumulate, so the order the
-/// configurators run in does not affect the result.
+/// Every registered <see cref="ISchemaLockdownConfigurator"/> configures it while it's constructed, after which it is
+/// frozen.
 /// </remarks>
 internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
 {
@@ -58,15 +56,11 @@ internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
             return true;
         }
 
-        // An operation that could not be classified is denied wherever anything is denied: it may well be one of
-        // those, and there is no way to tell which.
         return operation != SchemaOperation.Unknown && operations.Contains(operation) is false;
     }
 
     private void Block(string entityType, SchemaOperation operation)
     {
-        // Refusing the write ahead of the frozen check keeps the rule holding whenever the write is attempted,
-        // rather than leaving behind a decision that looks meaningful and is not.
         if (IsBlockable(operation) is false)
         {
             return;
@@ -81,16 +75,13 @@ internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
         {
             _blocked[entityType] = blocked = [];
 
-            // Replaced rather than updated, so a configurator enumerating the entity types while it blocks more of
-            // them keeps enumerating the ones it started with.
+            // Replaced, not updated, so a configurator can keep enumerating the entity types while it blocks more.
             _restrictedEntityTypes = Array.AsReadOnly(_blocked.Keys.ToArray());
         }
 
         blocked.Add(operation);
     }
 
-    // Reads are never denied, and an unclassified operation is answered by whether the entity type is restricted at
-    // all. Both are decided by rule, so neither can be recorded as a decision of its own.
     private static bool IsBlockable(SchemaOperation operation)
         => operation is SchemaOperation.Create or SchemaOperation.Update or SchemaOperation.Delete;
 }
