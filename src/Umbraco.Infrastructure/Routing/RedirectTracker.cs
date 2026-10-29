@@ -335,9 +335,14 @@ internal sealed class RedirectTracker : IRedirectTracker
     // under an active preview cookie). See https://github.com/umbraco/Umbraco-CMS/issues/22256.
     // Falls back to "true" during upgrades when the document URL service is not yet initialized,
     // matching the fallback behaviour in HasUrlSegmentChanged.
+    private bool HasPublishedUrlSegment(Guid contentKey, string culture) =>
+        _documentUrlService.IsInitialized is false
+        || _documentUrlService.GetUrlSegment(contentKey, culture, isDraft: false) is not null;
+
     // Content without a published URL segment in any culture has no published route to preserve. The document URL
     // service answers from memory, so deciding this first keeps such content out of the published content cache,
-    // where the lookup could only miss every tier and read through to the database.
+    // where the lookup could only miss every tier and read through to the database. Invariant content may store a
+    // segment per language, so it is checked per language; that lookup also finds a segment stored once for all.
     private bool HasPublishedUrlSegment(IContent entity)
     {
         if (_documentUrlService.IsInitialized is false)
@@ -345,13 +350,11 @@ internal sealed class RedirectTracker : IRedirectTracker
             return true;
         }
 
-        IEnumerable<string> cultures = entity.AvailableCultures.Any() ? entity.AvailableCultures : [string.Empty];
+        IEnumerable<string> cultures = entity.AvailableCultures.Any()
+            ? entity.AvailableCultures
+            : _languageService.GetAllIsoCodesAsync().GetAwaiter().GetResult();
         return cultures.Any(culture => HasPublishedUrlSegment(entity.Key, culture));
     }
-
-    private bool HasPublishedUrlSegment(Guid contentKey, string culture) =>
-        _documentUrlService.IsInitialized is false
-        || _documentUrlService.GetUrlSegment(contentKey, culture, isDraft: false) is not null;
 
     private void RemoveSelfReferencingRedirect(Guid contentKey, string route)
     {
