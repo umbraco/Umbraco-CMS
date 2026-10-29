@@ -177,7 +177,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		);
 
 		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
+			this.observe(
+				context?.readOnlyGuard.permitted,
+				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+				'_observeIsReadOnly',
+			);
 		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {

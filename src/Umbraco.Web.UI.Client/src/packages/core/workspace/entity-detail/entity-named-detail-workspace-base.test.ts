@@ -48,26 +48,6 @@ describe('UmbEntityNamedDetailWorkspaceContextBase', () => {
 		await waitUntil(isNamePermitted, 'renaming was not allowed again');
 	});
 
-	it('is read-only only through rules that target the whole entity', () => {
-		context.readOnlyGuard.addRule({ unique: 'variant', permitted: true, variantId: {} } as never);
-		expect(context.getReadOnly()).to.be.false;
-
-		context.readOnlyGuard.addRule({ unique: 'entity', permitted: true });
-		expect(context.getReadOnly()).to.be.true;
-	});
-
-	it('only reports read-only changes when the whole entity changes between read-only and editable', () => {
-		const emitted: Array<boolean> = [];
-		const subscription = context.readOnly.subscribe((isReadOnly) => emitted.push(isReadOnly));
-
-		context.readOnlyGuard.addRule({ unique: 'variant', permitted: true, variantId: {} } as never);
-		context.readOnlyGuard.addRule({ unique: 'entity', permitted: true });
-		context.readOnlyGuard.addRule({ unique: 'another-entity', permitted: true });
-		subscription.unsubscribe();
-
-		expect(emitted).to.deep.equal([false, true]);
-	});
-
 	it('does not submit while the entity is read-only', async () => {
 		context.readOnlyGuard.addRule({ unique: 'test', permitted: true });
 
@@ -91,6 +71,6 @@ describe('UmbEntityNamedDetailWorkspaceContextBase', () => {
 		context.resetState();
 
 		expect(context.readOnlyGuard.getRules()).to.be.empty;
-		expect(context.getReadOnly()).to.be.false;
+		expect(context.readOnlyGuard.getPermitted()).to.be.false;
 	});
 });

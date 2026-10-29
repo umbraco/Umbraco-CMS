@@ -49,7 +49,7 @@ export class UmbSubmitWorkspaceAction<
 			? this._workspaceContext
 			: undefined;
 		this.observe(
-			entityDetailContext?.readOnly,
+			entityDetailContext?.readOnlyGuard.permitted,
 			(isReadOnly) => {
 				this.#isReadOnly = isReadOnly ?? false;
 				this.#updateIsDisabled();

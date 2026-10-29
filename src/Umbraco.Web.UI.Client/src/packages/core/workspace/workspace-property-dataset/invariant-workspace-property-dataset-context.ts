@@ -55,7 +55,7 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 		this.#variantContext.setVariantId(this.getVariantId());
 
 		if (this.#isEntityDetailWorkspaceContext(workspace)) {
-			this.observe(workspace.readOnly, (isReadOnly) => this.#readOnly.setValue(isReadOnly ?? false), null);
+			this.observe(workspace.readOnlyGuard.permitted, (isReadOnly) => this.#readOnly.setValue(isReadOnly ?? false), null);
 		}
 	}
 

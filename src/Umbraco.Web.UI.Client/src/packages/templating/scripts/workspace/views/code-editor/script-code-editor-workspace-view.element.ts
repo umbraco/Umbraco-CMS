@@ -21,7 +21,7 @@ export class UmbScriptCodeEditorWorkspaceViewElement extends UmbLitElement imple
 		super();
 
 		this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context?.readOnly, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
+			this.observe(context?.readOnlyGuard.permitted, (isReadOnly) => (this._isReadOnly = isReadOnly ?? false), '_observeIsReadOnly');
 		});
 
 		this.consumeContext(UMB_SCRIPT_WORKSPACE_CONTEXT, (context) => {

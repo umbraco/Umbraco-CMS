@@ -29,7 +29,7 @@ export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 		super(host, args);
 		this.nameWriteGuard.fallbackToPermitted();
 		this.observe(
-			this.readOnly,
+			this.readOnlyGuard.permitted,
 			(isReadOnly) => {
 				if (isReadOnly) {
 					this.nameWriteGuard.addRule({ unique: ENTITY_READ_ONLY_RULE_UNIQUE, permitted: false });

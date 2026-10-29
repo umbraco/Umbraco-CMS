@@ -35,7 +35,7 @@ describe('UmbWorkspaceEntityIsReadOnlyCondition', () => {
 		readOnlyGuard = new UmbReadOnlyGuardManager<UmbGuardRule>(hostElement);
 		const workspaceContext = {
 			IS_ENTITY_DETAIL_WORKSPACE_CONTEXT: true,
-			readOnly: readOnlyGuard.permitted,
+			readOnlyGuard,
 			getHostElement: () => hostElement,
 		};
 		new UmbContextProvider(hostElement, UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, workspaceContext as never).hostConnected();
