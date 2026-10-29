@@ -21,7 +21,7 @@ public class ProductionRuntimeModeSchemaLockdownConfiguratorTests
             () => [new ProductionRuntimeModeSchemaLockdownConfigurator(Options.Create(new RuntimeSettings { Mode = mode }))]));
 
     [Test]
-    public void Production_Denies_Every_Mutation_Of_File_Backed_Schema()
+    public void Production_Denies_Creating_And_Updating_File_Backed_Schema()
     {
         SchemaRestrictions restrictions = CreateRestrictions(RuntimeMode.Production);
 
@@ -31,9 +31,22 @@ public class ProductionRuntimeModeSchemaLockdownConfiguratorTests
             {
                 Assert.That(restrictions.IsAllowed(entityType, SchemaOperation.Create), Is.False, entityType);
                 Assert.That(restrictions.IsAllowed(entityType, SchemaOperation.Update), Is.False, entityType);
-                Assert.That(restrictions.IsAllowed(entityType, SchemaOperation.Delete), Is.False, entityType);
                 Assert.That(restrictions.IsAllowed(entityType, SchemaOperation.Read), Is.True, entityType);
             }
+        });
+    }
+
+    // Deleting a template only removes its database record, which is how a template removed from the code is cleaned
+    // up where it was deployed. A partial view has no record, only the file the deployment owns.
+    [Test]
+    public void Production_Permits_Deleting_Templates_But_Not_Partial_Views()
+    {
+        SchemaRestrictions restrictions = CreateRestrictions(RuntimeMode.Production);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.Template, SchemaOperation.Delete), Is.True);
+            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.PartialView, SchemaOperation.Delete), Is.False);
         });
     }
 
