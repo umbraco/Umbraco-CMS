@@ -69,6 +69,10 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
 
         ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(key);
 
+        // The release runs without an editor, so it applies the access of the user scheduling it.
+        bool includeInvariantForVariant = culturesToPublishOrSchedule.Any(c => c.Schedule?.PublishDate is not null)
+            && (await _userService.GetRequiredUserAsync(userKey)).HasAccessToInvariantForVariant();
+
         foreach (CulturePublishScheduleModel cultureToSchedule in culturesToPublishOrSchedule.Where(c => c.Schedule is not null))
         {
             var culture = cultureToSchedule.Culture ?? Constants.System.InvariantCulture;
@@ -79,7 +83,11 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             }
             else
             {
-                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.PublishDate.Value.UtcDateTime, ContentScheduleAction.Release);
+                schedules.AddOrUpdate(
+                    culture,
+                    cultureToSchedule.Schedule!.PublishDate.Value.UtcDateTime,
+                    ContentScheduleAction.Release,
+                    includeInvariantForVariant);
             }
 
             if (cultureToSchedule.Schedule!.UnpublishDate is null)
@@ -88,7 +96,11 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             }
             else
             {
-                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.UnpublishDate.Value.UtcDateTime, ContentScheduleAction.Expire);
+                schedules.AddOrUpdate(
+                    culture,
+                    cultureToSchedule.Schedule!.UnpublishDate.Value.UtcDateTime,
+                    ContentScheduleAction.Expire,
+                    includeInvariantForVariant: true);
             }
         }
 

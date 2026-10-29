@@ -396,6 +396,129 @@ internal partial class BlockListElementLevelVariationTests
         });
     }
 
+    [TestCase(null, ContentVariation.Nothing, true)]
+    [TestCase(null, ContentVariation.Nothing, false)]
+    [TestCase(null, ContentVariation.Segment, true)]
+    [TestCase(null, ContentVariation.Segment, false)]
+    [TestCase("s1", ContentVariation.Nothing, true)]
+    [TestCase("s1", ContentVariation.Nothing, false)]
+    [TestCase("s1", ContentVariation.Segment, true)]
+    [TestCase("s1", ContentVariation.Segment, false)]
+    public async Task Can_Become_Segment_Invariant_After_Publish(string? requestSegment, ContentVariation elementVariationAfterPublish, bool defaultFirst)
+    {
+        var elementType = await CreateElementType(ContentVariation.Segment);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Segment, blockListDataType);
+
+        var defaultContentValue = new BlockPropertyValue { Alias = "variantText", Value = "The default segment content value", Segment = null };
+        var segmentContentValue = new BlockPropertyValue { Alias = "variantText", Value = "The s1 content value", Segment = "s1" };
+        var defaultSettingsValue = new BlockPropertyValue { Alias = "variantText", Value = "The default segment settings value", Segment = null };
+        var segmentSettingsValue = new BlockPropertyValue { Alias = "variantText", Value = "The s1 settings value", Segment = "s1" };
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant content value" },
+                defaultFirst ? defaultContentValue : segmentContentValue,
+                defaultFirst ? segmentContentValue : defaultContentValue,
+            },
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant settings value" },
+                defaultFirst ? defaultSettingsValue : segmentSettingsValue,
+                defaultFirst ? segmentSettingsValue : defaultSettingsValue,
+            },
+            true);
+
+        // the "variantText" property type no longer varies by segment, but the stored block data still holds a segment value
+        elementType.Variations = elementVariationAfterPublish;
+        elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+
+        RefreshContentTypeCache(elementType, contentType);
+
+        SetVariationContext(null, requestSegment);
+        var publishedContent = GetPublishedContent(content.Key);
+
+        // regardless of the requested segment, a segment invariant property must render the default segment value
+        var value = publishedContent.GetProperty("blocks")!.GetValue() as BlockListModel;
+        Assert.IsNotNull(value);
+        Assert.AreEqual(1, value.Count);
+
+        var blockListItem = value.First();
+        Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("The invariant content value", blockListItem.Content.Value<string>("invariantText"));
+            Assert.AreEqual("The default segment content value", blockListItem.Content.Value<string>("variantText"));
+        });
+
+        Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("The invariant settings value", blockListItem.Settings.Value<string>("invariantText"));
+            Assert.AreEqual("The default segment settings value", blockListItem.Settings.Value<string>("variantText"));
+        });
+    }
+
+    [TestCase("en-US", null, true)]
+    [TestCase("en-US", null, false)]
+    [TestCase("en-US", "s1", true)]
+    [TestCase("en-US", "s1", false)]
+    [TestCase("da-DK", null, true)]
+    [TestCase("da-DK", null, false)]
+    [TestCase("da-DK", "s1", true)]
+    [TestCase("da-DK", "s1", false)]
+    public async Task Culture_Variant_Values_Are_Replicated_Per_Segment_When_Owner_Does_Not_Vary_By_Culture(string requestCulture, string? requestSegment, bool defaultFirst)
+    {
+        var elementType = await CreateElementType(ContentVariation.CultureAndSegment);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Segment, blockListDataType);
+
+        var defaultContentValue = new BlockPropertyValue { Alias = "variantText", Value = "The default segment content value", Segment = null };
+        var segmentContentValue = new BlockPropertyValue { Alias = "variantText", Value = "The s1 content value", Segment = "s1" };
+        var defaultSettingsValue = new BlockPropertyValue { Alias = "variantText", Value = "The default segment settings value", Segment = null };
+        var segmentSettingsValue = new BlockPropertyValue { Alias = "variantText", Value = "The s1 settings value", Segment = "s1" };
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant content value" },
+                defaultFirst ? defaultContentValue : segmentContentValue,
+                defaultFirst ? segmentContentValue : defaultContentValue,
+            },
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant settings value" },
+                defaultFirst ? defaultSettingsValue : segmentSettingsValue,
+                defaultFirst ? segmentSettingsValue : defaultSettingsValue,
+            },
+            true);
+
+        SetVariationContext(requestCulture, requestSegment);
+        var publishedContent = GetPublishedContent(content.Key);
+
+        // the element varies by culture while the page does not, so the values are replicated across all languages -
+        // and every segment value must survive that, regardless of the order the values are stored in
+        var value = publishedContent.GetProperty("blocks")!.GetValue() as BlockListModel;
+        Assert.IsNotNull(value);
+        Assert.AreEqual(1, value.Count);
+
+        var expectedSegmentName = requestSegment is null ? "default segment" : requestSegment;
+        var blockListItem = value.First();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("The invariant content value", blockListItem.Content.Value<string>("invariantText"));
+            Assert.AreEqual($"The {expectedSegmentName} content value", blockListItem.Content.Value<string>("variantText"));
+            Assert.AreEqual("The invariant settings value", blockListItem.Settings.Value<string>("invariantText"));
+            Assert.AreEqual($"The {expectedSegmentName} settings value", blockListItem.Settings.Value<string>("variantText"));
+        });
+    }
+
     [TestCase(ContentVariation.Nothing, "en-US", "English")]
     [TestCase(ContentVariation.Nothing, "da-DK", "Danish")]
     [TestCase(ContentVariation.Culture, "en-US", "English")]

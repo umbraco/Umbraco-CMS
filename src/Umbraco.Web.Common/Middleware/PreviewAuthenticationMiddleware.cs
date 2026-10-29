@@ -38,8 +38,11 @@ public class PreviewAuthenticationMiddleware : IMiddleware
 
         try
         {
+            // The Delivery API has its own preview mechanism, and its responses are built from the shared published
+            // cache, so the website preview cookie must not put its requests into a preview session.
             var isPreview = request.HasPreviewCookie()
-                            && !request.IsBackOfficeRequest();
+                            && !request.IsBackOfficeRequest()
+                            && !request.IsDeliveryApiRequest();
 
             if (isPreview)
             {

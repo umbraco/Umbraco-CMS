@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Middleware;
 
@@ -91,6 +95,24 @@ public class PreviewAuthenticationMiddlewareTests
         _previewSessionServiceMock.Verify(x => x.Start(), Times.Never);
     }
 
+    /// <summary>
+    /// Verifies that a Delivery API request carrying the preview cookie is not put into a website preview session,
+    /// even with a valid back-office cookie, as the Delivery API has its own preview mechanism.
+    /// </summary>
+    [Test]
+    public async Task InvokeAsync_DeliveryApiRequest_DoesNotStartPreviewSession()
+    {
+        SetupAuthenticationResult(AuthenticateResult.Success(
+            new AuthenticationTicket(CreateBackOfficeIdentityPrincipal(), Constants.Security.BackOfficeAuthenticationType)));
+
+        HttpContext context = CreateHttpContext("/umbraco/delivery/api/v2/content/item/1234");
+
+        await _middleware.InvokeAsync(context, NextDelegate());
+
+        Assert.IsTrue(_nextCalled);
+        _previewSessionServiceMock.Verify(x => x.Start(), Times.Never);
+    }
+
     private void SetupAuthenticationResult(AuthenticateResult result) =>
         _authenticationServiceMock
             .Setup(x => x.AuthenticateAsync(It.IsAny<HttpContext>(), Constants.Security.BackOfficeAuthenticationType))
@@ -118,17 +140,27 @@ public class PreviewAuthenticationMiddlewareTests
         return new ClaimsPrincipal(identity);
     }
 
-    private HttpContext CreateHttpContext()
+    private HttpContext CreateHttpContext(string path = "/previewed-page")
     {
+        var hostingEnvironmentMock = new Mock<IHostingEnvironment>();
+        hostingEnvironmentMock.SetupGet(x => x.ApplicationVirtualPath).Returns(string.Empty);
+        hostingEnvironmentMock
+            .Setup(x => x.ToAbsolute(It.IsAny<string>()))
+            .Returns((string virtualPath) => virtualPath.TrimStart('~'));
+
         var services = new ServiceCollection();
         services.AddSingleton(_authenticationServiceMock.Object);
+        services.AddSingleton(new UmbracoRequestPaths(
+            hostingEnvironmentMock.Object,
+            Options.Create(new UmbracoRequestPathsOptions()),
+            Options.Create(new DeliveryApiSettings())));
 
         var httpContext = new DefaultHttpContext
         {
             RequestServices = services.BuildServiceProvider(),
         };
 
-        httpContext.Request.Path = "/previewed-page";
+        httpContext.Request.Path = path;
         httpContext.Request.Headers.Append("Cookie", $"{Constants.Web.PreviewCookieName}={Constants.Web.PreviewCookieValue}");
 
         return httpContext;

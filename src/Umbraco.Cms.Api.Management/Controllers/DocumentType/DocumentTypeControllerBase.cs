@@ -126,10 +126,6 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Invalid IsElement flag")
                     .WithDetail("Can not create a documentType with inheritance composition where the parent and the new type's IsElement flag are different.")
                     .Build()),
-                ContentTypeOperationStatus.InvalidSegmentVariationForElementType => new BadRequestObjectResult(problemDetailsBuilder
-                    .WithTitle("Invalid segment variation")
-                    .WithDetail("Element types cannot vary by segment.")
-                    .Build()),
                 ContentTypeOperationStatus.InvalidPropertyTypeVariation => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid property variation")
                     .WithDetail($"A property cannot vary by culture or segment unless the {type} type does so too.")

@@ -11,6 +11,9 @@ import { Subject, distinctUntilChanged, auditTime, map } from '@umbraco-cms/back
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
+/** Delays (in ms) before each attempt to look up the user behind a new sign-in. */
+const SIGNED_IN_USER_LOOKUP_DELAYS_MS = [0, 500, 1500];
+
 export interface UmbAuthSession {
 	/**
 	 * @deprecated Cookie auth has a single, server-owned expiry, so this is now identical to
@@ -42,6 +45,16 @@ export class UmbAuthContext extends UmbContextBase {
 
 	// Cross-tab coordination
 	#channel: BroadcastChannel;
+
+	// The user the client state of this page belongs to, see bindUser().
+	#boundUser?: string;
+	// Set once the session has passed to another user. The page holds the previous user's state, so no
+	// session is applied to it from then on.
+	#hasUserChanged = false;
+	// Applies the newest session that waits for the user behind it to be confirmed.
+	#heldSession?: () => void;
+	#confirmingUser?: Promise<boolean>;
+	#userChanged = new Subject<void>();
 
 	// Track clients that have been configured to prevent duplicate interceptor binding
 	#configuredClients = new WeakSet();
@@ -81,6 +94,19 @@ export class UmbAuthContext extends UmbContextBase {
 	);
 
 	/**
+	 * Emits when the session has passed to a different user than the one the page is bound to
+	 * (see `bindUser()`), or to a user who could not be determined. The new session is not applied:
+	 * the page holds client state that belongs to the previous user, so it has to start over rather than
+	 * show that state to the user who is signed in now. From then on no session is applied to the page, so
+	 * the host has to start it over, or the page stays unauthorized. The app shell handles this by reloading
+	 * the backoffice. A sign-in while the page is still open emits again, so the host can try once more.
+	 * A user who cannot be determined (every lookup failed) is treated as a different user on purpose, so the
+	 * page also starts over, and discards unsaved work, when it is in fact the same user.
+	 * @internal
+	 */
+	readonly userChanged = this.#userChanged.asObservable();
+
+	/**
 	 * Whether the server is configured to keep users logged in by auto-refreshing before session expiry.
 	 * Provided by the backend via the `keep-user-logged-in` attribute on `<umb-app>`.
 	 */
@@ -112,13 +138,16 @@ export class UmbAuthContext extends UmbContextBase {
 			switch (evt.data?.type) {
 				case 'authorized': {
 					// Apply locally — the sender already broadcast to all tabs.
-					this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
+					void this.#applySession(true, () => this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt));
 					break;
 				}
 				case 'sessionUpdate': {
 					// Another tab learned a fresher expiry, typically by sliding it on activity. The auth
-					// cookie is shared between tabs, so the renewal applies here too.
-					this.#applySessionExpiry(evt.data.expiresAt, evt.data.sessionWindowInMs);
+					// cookie is shared between tabs, so the renewal applies here too. A session this tab no
+					// longer holds is re-established, possibly by a sign-in it missed.
+					void this.#applySession(!this.#session.getValue(), () =>
+						this.#applySessionExpiry(evt.data.expiresAt, evt.data.sessionWindowInMs),
+					);
 					break;
 				}
 				case 'sessionCleared':
@@ -154,6 +183,7 @@ export class UmbAuthContext extends UmbContextBase {
 					this.#slideSessionExpiry(activityDetectedAt);
 				}
 			});
+			signaler?.setSessionCheck(() => this.keepAlive());
 		});
 	}
 
@@ -308,14 +338,33 @@ export class UmbAuthContext extends UmbContextBase {
 				? Math.max(0, Math.floor(new Date(data.timeoutUtc).getTime() / 1000) - issuedAt)
 				: undefined;
 
-			this.#setSessionLocally(expiresIn, issuedAt);
+			// A session this page does not hold may come from a sign-in, possibly by another user
+			const applied = this.#applySession(!this.#session.getValue(), () => this.#setSessionLocally(expiresIn, issuedAt));
 
 			// Tell other tabs a session is (re)established, so they can update their local state too.
 			this.#channel.postMessage({ type: 'authorized', expiresIn, issuedAt });
-			return true;
+			return await applied;
 		} catch {
 			this.#session.setValue(undefined);
 			return false;
+		}
+	}
+
+	/**
+	 * Binds the page to the user it has loaded client state for. A sign-in that happens after this, in this
+	 * tab or another one, is held until the user behind it is known: the same user resumes the page as it
+	 * is, so unsaved work survives; any other user is reported through {@link userChanged} instead.
+	 * Binding a different user later is reported the same way. The app shell calls this with the user it has loaded.
+	 * @internal
+	 * @param {string} unique The unique of the user the page has loaded.
+	 */
+	bindUser(unique: string): void {
+		if (!this.#boundUser) {
+			this.#boundUser = unique;
+			return;
+		}
+		if (unique !== this.#boundUser) {
+			this.#onUserChanged();
 		}
 	}
 
@@ -405,8 +454,6 @@ export class UmbAuthContext extends UmbContextBase {
 			// Cookie auth: the httpOnly auth cookie (sent via credentials: 'include') is the sole
 			// credential, so no bearer-token auth callback is needed.
 			auth: undefined,
-			// Don't follow 302 redirects to /login — the auth interceptor handles 401s and replays requests after re-authentication.
-			redirect: 'manual',
 		});
 
 		// Lazy single instance — see #interceptorController field comment. Controller
@@ -524,6 +571,69 @@ export class UmbAuthContext extends UmbContextBase {
 		// timestamps are the same — the historical access-vs-refresh token split (and its ×4
 		// multiplier) no longer applies. TODO (V21): drop the deprecated accessTokenExpiresAt.
 		this.#session.setValue({ accessTokenExpiresAt: expiresAt, expiresAt });
+	}
+
+	/**
+	 * Applies a session established after the page loaded. A session that may come from a sign-in can belong
+	 * to another user than the one the page is bound to, so it is held until that user is known. Sessions
+	 * arriving while a sign-in is held wait behind it, so the newest one is applied once the user is confirmed.
+	 * @param {boolean} fromSignIn Whether the session may come from a sign-in rather than a renewal of the session in hand.
+	 * @param {() => void} apply Applies the session.
+	 * @returns {Promise<boolean>} True once the session is applied, false when it belongs to another user.
+	 */
+	#applySession(fromSignIn: boolean, apply: () => void): Promise<boolean> {
+		if (this.#hasUserChanged) {
+			// The page is still open, so it has not started over yet: a further sign-in reports the change again
+			if (fromSignIn) this.#userChanged.next();
+			return Promise.resolve(false);
+		}
+		if (this.#isBypassed || !this.#boundUser || (!fromSignIn && !this.#confirmingUser)) {
+			apply();
+			return Promise.resolve(true);
+		}
+
+		this.#heldSession = apply;
+		this.#confirmingUser ??= this.#confirmSignedInUser();
+		return this.#confirmingUser;
+	}
+
+	async #confirmSignedInUser(): Promise<boolean> {
+		const signedInUser = await this.#lookUpSignedInUser();
+		const apply = this.#heldSession;
+		this.#heldSession = undefined;
+		this.#confirmingUser = undefined;
+
+		if (apply && signedInUser === this.#boundUser) {
+			apply();
+			return true;
+		}
+
+		this.#onUserChanged();
+		return false;
+	}
+
+	/**
+	 * Looks up the user behind the session cookie, retrying failed attempts.
+	 * Deliberately not through the configured API clients: their interceptors hold a request that is
+	 * rejected for authorization until the user is signed in, which is what is being decided here.
+	 * @returns {Promise<string | undefined>} The unique of the signed-in user, or undefined if it could not be determined.
+	 */
+	async #lookUpSignedInUser(): Promise<string | undefined> {
+		for (const delay of SIGNED_IN_USER_LOOKUP_DELAYS_MS) {
+			if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+			const response = await this.#fetchWithCookie(`${this.#serverUrl}/umbraco/management/api/v1/user/current`, 'GET');
+			if (!response?.ok) continue;
+			const user = await response.json().catch(() => undefined);
+			if (typeof user?.id === 'string') return user.id;
+		}
+		return undefined;
+	}
+
+	#onUserChanged() {
+		if (this.#hasUserChanged) return;
+		this.#hasUserChanged = true;
+		this.#heldSession = undefined;
+		this.#userChanged.next();
 	}
 
 	/**
