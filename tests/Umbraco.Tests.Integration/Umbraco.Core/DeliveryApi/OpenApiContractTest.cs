@@ -1275,9 +1275,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
               },
               "properties": {
                 "type": "object",
-                "additionalProperties": {
-                  "nullable": true
-                }
+                "additionalProperties": { }
               },
               "name": {
                 "type": "string"
@@ -1406,9 +1404,7 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
               },
               "properties": {
                 "type": "object",
-                "additionalProperties": {
-                  "nullable": true
-                },
+                "additionalProperties": { },
                 "readOnly": true
               },
               "focalPoint": {
