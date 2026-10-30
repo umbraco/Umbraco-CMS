@@ -1,4 +1,4 @@
-import { customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	UmbPropertyEditorUiElement,
@@ -28,6 +28,14 @@ export class UmbPropertyEditorUILabelElement extends UmbLitElement implements Um
 			() => html`${this.value ?? ''}`,
 		);
 	}
+
+	static override styles = [
+		css`
+			:host {
+				overflow-wrap: anywhere;
+			}
+		`,
+	];
 }
 
 export default UmbPropertyEditorUILabelElement;
