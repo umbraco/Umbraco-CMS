@@ -78,11 +78,11 @@ public class CreateAndPublishElementController : CreateElementControllerBase
             }
 
             ElementCreateModel model = _elementEditingPresentationFactory.MapCreateModel(requestModel);
-            Attempt<ElementCreateResult, ContentEditingOperationStatus> result =
-                await _elementEditingService.CreateAndPublishAsync(model, requestModel.CulturesToPublish, CurrentUserKey(_backOfficeSecurityAccessor));
+            Attempt<ElementCreateResult, ContentEditingAndPublishingStatus> result =
+                await _elementEditingService.CreateAndPublishAsync(model, requestModel.CulturesToPublish.ToHashSet(), CurrentUserKey(_backOfficeSecurityAccessor));
 
             return result.Success
                 ? CreatedAtId<ByKeyElementController>(controller => nameof(controller.ByKey), result.Result.Content!.Key)
-                : ContentEditingOperationStatusResult(result.Status);
+                : ElementEditingAndPublishingOperationStatusResult(result.Status, result.Result.InvalidPropertyAliases);
         });
 }

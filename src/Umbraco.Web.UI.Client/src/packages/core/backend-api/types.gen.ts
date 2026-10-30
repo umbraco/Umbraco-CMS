@@ -720,6 +720,7 @@ export type DocumentBlueprintResponseModel = {
 
 export type DocumentBlueprintTreeItemResponseModel = {
     documentType?: null | DocumentTypeReferenceResponseModel;
+    variants: Array<DocumentVariantItemResponseModel>;
     isFolder: boolean;
     noAccess: boolean;
     name: string;
@@ -1572,6 +1573,7 @@ export type ManifestResponseModel = {
 
 export type MediaCollectionResponseModel = {
     mediaType: MediaTypeCollectionReferenceResponseModel;
+    extension?: null | string;
     creator?: null | string;
     sortOrder: number;
     hasChildren: boolean;
@@ -1591,6 +1593,7 @@ export type MediaItemResponseModel = {
     parent?: null | ReferenceByIdModel;
     hasChildren: boolean;
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: null | string;
     variants: Array<VariantItemResponseModel>;
     id: string;
     flags: Array<FlagModel>;
@@ -1616,6 +1619,7 @@ export type MediaResponseModel = {
 
 export type MediaTreeItemResponseModel = {
     mediaType: MediaTypeReferenceResponseModel;
+    extension?: null | string;
     variants: Array<VariantItemResponseModel>;
     noAccess: boolean;
     isTrashed: boolean;
@@ -2726,6 +2730,7 @@ export type ServerInformationResponseModel = {
     assemblyVersion: string;
     baseUtcOffset: string;
     runtimeMode: RuntimeModeModel;
+    isDebugMode: boolean;
 };
 
 export type ServerStatusResponseModel = {
@@ -10278,6 +10283,7 @@ export type GetImagingResizeUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
         height?: number;
         width?: number;
         mode?: ImageCropModeModel;
@@ -11758,6 +11764,7 @@ export type GetMediaUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/media/urls';
 };
@@ -18183,6 +18190,7 @@ export type GetFilterUserData = {
         orderDirection?: DirectionModel;
         userGroupIds?: Array<string>;
         userStates?: Array<UserStateModel>;
+        userKinds?: Array<UserKindModel>;
         filter?: string;
     };
     url: '/umbraco/management/api/v1/filter/user';

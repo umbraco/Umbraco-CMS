@@ -174,7 +174,7 @@ export class DocumentTypeBuilder {
         return builder.build();
       }) || [],
       id: this.id,
-      folder: this.folderId ? {id: this.folderId} : null,
+      parent: this.folderId ? {id: this.folderId} : null,
       allowedTemplates: this.documentTypeAllowedTemplateBuilder.map((builder) => {
         return builder.build();
       }) || [],

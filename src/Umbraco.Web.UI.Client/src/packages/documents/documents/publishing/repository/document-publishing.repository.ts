@@ -1,4 +1,5 @@
 import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../../types.js';
+import type { UmbAncestorForCoverage } from '../utils.js';
 import { UmbDocumentPublishingServerDataSource } from './document-publishing.server.data-source.js';
 import {
 	UmbRepositoryBase,
@@ -15,7 +16,7 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * @param {UmbDocumentDetailModel} model - The Document to create
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after creating
 	 * @param {string | null} parentUnique - The unique of the parent to create under
-	 * @returns {Promise<UmbRepositoryResponse<unknown>>} The result of the create and publish request
+	 * @returns {Promise<UmbRepositoryResponse<string>>} The key of the created Document, which may differ from the one submitted
 	 * @memberof UmbDocumentPublishingRepository
 	 */
 	async createAndPublish(
@@ -97,6 +98,16 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 */
 	async published(unique: string): Promise<UmbRepositoryResponse<UmbDocumentDetailModel>> {
 		return this.#publishingDataSource.published(unique);
+	}
+
+	/**
+	 * Get the variant states of each ancestor of a document
+	 * @param {string} unique Document unique
+	 * @returns {Promise<UmbRepositoryResponse<Array<UmbAncestorForCoverage>>>} The ancestors, with the culture and state of each of their variants
+	 * @memberof UmbDocumentPublishingRepository
+	 */
+	async ancestorVariantStates(unique: string): Promise<UmbRepositoryResponse<Array<UmbAncestorForCoverage>>> {
+		return this.#publishingDataSource.ancestorVariantStates(unique);
 	}
 }
 

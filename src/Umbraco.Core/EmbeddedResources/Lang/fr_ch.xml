@@ -231,7 +231,7 @@
 		<key alias="parentCultureNotPublished">Cette culture est publiée mais n'est pas visible car elle n'est pas publiée pour le parent '%0%'</key>
 		<key alias="parentNotPublishedAnomaly">Ce document est publié mais n'est pas présent dans le cache</key>
 		<key alias="getUrlException">Oups: impossible d'obtenir cet URL (erreur interne - voir fichier log)</key>
-		<key alias="routeError">Ce document est publié mais son URL entrerait en collision avec le contenu %0%</key>
+		<key alias="routeError">Ce document est publié mais son URL entrerait en collision avec le contenu '%0%'</key>
 		<key alias="routeErrorCannotRoute">Ce document est publié mais son URL ne peut pas être routé</key>
 		<key alias="publish">Publier</key>
 		<key alias="published">Publié</key>

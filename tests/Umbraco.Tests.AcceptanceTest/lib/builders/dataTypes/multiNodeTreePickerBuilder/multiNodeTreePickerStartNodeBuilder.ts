@@ -40,13 +40,10 @@ export class MultiNodeTreePickerStartNodeBuilder {
     }
 
     if (this.originAlias) {
-      values.originAlias = this.originAlias;
-    }  
-
-    if (this.startNodeQueryStepsBuilder && this.startNodeQueryStepsBuilder.length > 0) {
-      values.startNodeQuerySteps = this.startNodeQueryStepsBuilder.map((builder) => {
-        return builder.getValues();
-      }); 
+      values.dynamicRoot = {
+        originAlias: this.originAlias,
+        querySteps: this.startNodeQueryStepsBuilder.map((builder) => builder.getValues()),
+      };
     }
 
     return values;

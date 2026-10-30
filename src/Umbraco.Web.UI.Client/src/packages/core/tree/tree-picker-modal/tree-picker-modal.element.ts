@@ -1,20 +1,10 @@
-import { UmbTreeItemPickerContext } from '../tree-item-picker/index.js';
+import { UmbTreeItemPickerContext, type UmbTreeItemPickerLocation } from '../tree-item-picker/index.js';
 import type { UmbTreeElement } from '../tree.element.js';
 import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration, UmbTreeStartNode } from '../types.js';
-import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
-import type { ManifestTree } from '../extensions/types.js';
 import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
+import '../components/tree-item-picker-breadcrumb/index.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './types.js';
-import {
-	css,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	query,
-	repeat,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbPickerModalBaseElement, type UmbPickerSearchFieldElement } from '@umbraco-cms/backoffice/picker';
@@ -22,17 +12,9 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
-import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 const TREE_MEMORY_UNIQUE = 'UmbTreeItemPickerTree';
-const LOCATION_MEMORY_UNIQUE = 'UmbTreeItemPickerLocation';
-
-interface UmbTreeBreadcrumbItem {
-	unique: string | null;
-	entityType: string;
-	name: string;
-}
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbPickerModalBaseElement<
@@ -71,21 +53,18 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	private _treeInteractionMemories?: Array<UmbInteractionMemoryModel>;
 
+	/** Tri-state, as the location manager reports it: undefined until established, null for a node the tree does not have. */
 	@state()
-	private _currentLocation?: UmbTreeStartNode;
+	private _currentLocation?: UmbTreeItemPickerLocation | null;
 
 	@state()
-	private _breadcrumb: Array<UmbTreeBreadcrumbItem> = [];
+	private _treeStartNode?: UmbTreeStartNode;
 
 	@query('umb-picker-search-field')
 	private _searchField?: UmbPickerSearchFieldElement;
 
 	@state()
 	private _treeAlias?: string;
-	private _initialStartNode?: UmbTreeStartNode;
-	private _repository?: UmbTreeRepository;
-	private _breadcrumbLoaded = false;
-	private _breadcrumbLoadPromise?: Promise<void>;
 
 	protected _pickerContext = new UmbTreeItemPickerContext(this);
 
@@ -103,6 +82,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this.#observeSearch();
 		this.#observeExpansion();
 		this.#observeTreeInteractionMemories();
+		this.#observeLocation();
 	}
 
 	override connectedCallback(): void {
@@ -120,10 +100,18 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('data')) {
+			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
+				this._treeAlias = this.data.treeAlias;
+				this._pickerContext.location.setStartNode(this.data.startNode);
+				this._pickerContext.location.setStartNodes(this.data.startNodes);
+				this._pickerContext.location.setTreeAlias(this.data.treeAlias);
+			}
+
 			if (this.data?.search) {
 				this._pickerContext.search.updateConfig({
 					...this.data.search,
-					searchFrom: this.data.startNode,
+					// There is no server side search across multiple parents, so the scope is applied client side.
+					searchFrom: this._pickerContext.location.getStartNode(),
 					dataTypeUnique: this._pickerContext.dataType?.unique,
 				});
 			}
@@ -135,16 +123,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				...this._selectionConfiguration,
 				multiple,
 			};
-
-			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
-				this._treeAlias = this.data.treeAlias;
-				this._initialStartNode = this.data.startNode;
-				this._currentLocation = this.data.startNode;
-				this._breadcrumb = [];
-				this._breadcrumbLoaded = false;
-				this._breadcrumbLoadPromise = undefined;
-				this.#initRepository(this.data.treeAlias);
-			}
 
 			if (this.data?.treeExpansion !== undefined) {
 				this._pickerContext.expansion.setExpansion(this.data.treeExpansion);
@@ -161,134 +139,23 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		}
 	}
 
-	#initRepository(treeAlias: string) {
-		const treeManifest = umbExtensionsRegistry.getByAlias<ManifestTree>(treeAlias);
-		const repositoryAlias = treeManifest?.meta?.repositoryAlias;
-		if (!repositoryAlias) return;
-
-		new UmbExtensionApiInitializer<ManifestRepository<UmbTreeRepository>>(
-			this,
-			umbExtensionsRegistry,
-			repositoryAlias,
-			[this],
-			async (permitted, ctrl) => {
-				this._repository = permitted ? ctrl.api : undefined;
-				if (this._repository && !this._breadcrumbLoaded) {
-					this._breadcrumbLoaded = true;
-					this._breadcrumbLoadPromise = this.#loadInitialBreadcrumb();
-					await this._breadcrumbLoadPromise;
-					await this.#restoreLocationFromMemory();
-				}
-			},
-		);
-	}
-
-	async #loadInitialBreadcrumb() {
-		if (!this._repository) return;
-
-		if (this._initialStartNode) {
-			const { data } = await this._repository.requestTreeItemAncestors({
-				treeItem: this._initialStartNode,
-			});
-			const items = data ?? [];
-			const ceilingIndex = items.findIndex((item) => item.unique === this._initialStartNode!.unique);
-			const sliced = ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
-			this._breadcrumb = sliced.map((item) => ({
-				unique: item.unique,
-				entityType: item.entityType,
-				name: item.name,
-			}));
-		} else {
-			const { data: root } = await this._repository.requestTreeRoot();
-			if (root) {
-				this._breadcrumb = [{ unique: null, entityType: root.entityType, name: root.name }];
-			}
-		}
-	}
-
 	#onTreeItemOpen = async (event: UmbTreeItemOpenEvent) => {
 		event.stopPropagation();
 		const { unique, entityType } = event;
-		await this.#navigateToLocation({ unique, entityType });
-		this.#setLocationInInteractionMemory();
+		await this._pickerContext.location.navigateTo({ unique, entityType });
 	};
 
-	async #navigateToLocation(entity: UmbTreeStartNode) {
-		this._currentLocation = entity;
-		if (!this._repository) return;
-
-		await this._breadcrumbLoadPromise;
-
-		const { data } = await this._repository.requestTreeItemAncestors({ treeItem: entity });
-		const items = data ?? [];
-
-		if (this._initialStartNode) {
-			const ceilingIndex = items.findIndex((item) => item.unique === this._initialStartNode!.unique);
-			const sliced = ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
-			this._breadcrumb = sliced.map((item) => ({
-				unique: item.unique,
-				entityType: item.entityType,
-				name: item.name,
-			}));
-		} else {
-			const root = this._breadcrumb[0];
-			this._breadcrumb = [
-				...(root ? [root] : []),
-				...items.map((item) => ({
-					unique: item.unique,
-					entityType: item.entityType,
-					name: item.name,
-				})),
-			];
-		}
-	}
-
-	#setLocationInInteractionMemory() {
-		if (!this._currentLocation) {
-			this._pickerContext.interactionMemory.deleteMemory(LOCATION_MEMORY_UNIQUE);
-			return;
-		}
-		const memory: UmbInteractionMemoryModel = {
-			unique: LOCATION_MEMORY_UNIQUE,
-			value: {
-				entity: {
-					unique: this._currentLocation.unique,
-					entityType: this._currentLocation.entityType,
-				},
+	#observeLocation() {
+		this.observe(
+			this._pickerContext.location.currentLocation,
+			(location) => {
+				this._currentLocation = location;
+				this._treeStartNode = location?.unique
+					? { unique: location.unique, entityType: location.entityType }
+					: undefined;
 			},
-		};
-		this._pickerContext.interactionMemory.setMemory(memory);
-	}
-
-	#getLocationFromInteractionMemory(): UmbTreeStartNode | undefined {
-		const memory = this._pickerContext.interactionMemory.getMemory(LOCATION_MEMORY_UNIQUE);
-		return memory?.value?.entity;
-	}
-
-	async #restoreLocationFromMemory() {
-		const entity = this.#getLocationFromInteractionMemory();
-		if (!entity || !this._repository) return;
-
-		if (this._initialStartNode) {
-			const { data } = await this._repository.requestTreeItemAncestors({ treeItem: entity });
-			const isWithinStartNode = (data ?? []).some((a) => a.unique === this._initialStartNode!.unique);
-			if (!isWithinStartNode) return;
-		}
-
-		await this.#navigateToLocation(entity);
-	}
-
-	#onBreadcrumbItemClick(index: number) {
-		if (index === this._breadcrumb.length - 1) return;
-
-		const item = this._breadcrumb[index];
-		if (index === 0 && !this._initialStartNode) {
-			this._currentLocation = undefined;
-		} else {
-			this._currentLocation = { unique: item.unique!, entityType: item.entityType };
-		}
-		this._breadcrumb = this._breadcrumb.slice(0, index + 1);
-		this.#setLocationInInteractionMemory();
+			'umbTreeItemPickerLocationObserver',
+		);
 	}
 
 	#observePickerSelection() {
@@ -398,7 +265,19 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		}
 	}
 
-	#searchSelectableFilter = () => true;
+	#selectableFilter = (item: TreeItemType) => {
+		const unique = (item as { unique?: string | null }).unique;
+		if (this._pickerContext.location.isBrowseOnlyStartNode(unique)) return false;
+		return this.data?.pickableFilter?.(item) ?? true;
+	};
+
+	// Search cannot be scoped server side to more than one parent, so out-of-scope results are filtered here.
+	#searchSelectableFilter = (item: UmbSearchResultItemModel & TreeItemType) => {
+		const baseFilter: ((item: UmbSearchResultItemModel & TreeItemType) => boolean) | undefined =
+			this.data?.search?.pickableFilter ?? this.data?.pickableFilter;
+		if (baseFilter && !baseFilter(item)) return false;
+		return this._pickerContext.location.isWithinStartNodes(item);
+	};
 
 	async #setActiveTab(tab: 'browse' | 'search') {
 		if (this._activeTab === tab) return;
@@ -450,16 +329,21 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	#renderSearch() {
 		if (!this._isSearchable) return nothing;
 
-		const selectableFilter =
-			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
-
 		return html`
 			<umb-picker-search-field .alias=${this._treeAlias}></umb-picker-search-field>
-			<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
+			<umb-picker-search-result .pickableFilter=${this.#searchSelectableFilter}></umb-picker-search-result>
 		`;
 	}
 
 	#renderTree() {
+		// A level the tree cannot describe has no renderer, so the tree does not stand in for it.
+		if (this._currentLocation === null) {
+			return html`${this.#renderBreadcrumb()}
+				<div id="not-found" class="uui-text">
+					<h4>${this.localize.term('general_notFound')}</h4>
+				</div>`;
+		}
+
 		return html`
 			${this.#renderBreadcrumb()}
 			<umb-tree
@@ -472,8 +356,10 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					expandTreeRoot: this.data?.expandTreeRoot,
 					selectionConfiguration: this._selectionConfiguration,
 					filter: this.data?.filter,
-					selectableFilter: this.data?.pickableFilter,
-					startNode: this._currentLocation,
+					selectableFilter: this.#selectableFilter,
+					startNode: this._treeStartNode,
+					// Once drilled into a location the tree is scoped to that single node again.
+					startNodes: this._treeStartNode ? undefined : this._pickerContext.location.getStartNodes(),
 					foldersOnly: this.data?.foldersOnly,
 					expansion: this._treeExpansion,
 					interactionMemories: this._treeInteractionMemories,
@@ -486,25 +372,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	#renderBreadcrumb() {
-		if (!this._breadcrumb.length) return nothing;
-
-		return html`
-			<div id="breadcrumb">
-				<uui-breadcrumbs>
-					${repeat(
-						this._breadcrumb,
-						(item) => item.unique ?? 'root',
-						(item, index) => html`
-							<uui-breadcrumb-item
-								?last-item=${index === this._breadcrumb.length - 1}
-								@click=${() => this.#onBreadcrumbItemClick(index)}>
-								${this.localize.string(item.name)}
-							</uui-breadcrumb-item>
-						`,
-					)}
-				</uui-breadcrumbs>
-			</div>
-		`;
+		return html`<umb-tree-item-picker-breadcrumb id="breadcrumb"></umb-tree-item-picker-breadcrumb>`;
 	}
 
 	#renderSelectionCount() {
@@ -546,13 +414,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			margin-bottom: var(--uui-size-space-4);
 		}
 
-		uui-breadcrumbs {
-			overflow: hidden;
-			min-width: 0;
-		}
-
-		uui-breadcrumb-item:not([last-item]) {
-			cursor: pointer;
+		#not-found {
+			text-align: center;
+			padding: var(--uui-size-layout-1);
 		}
 
 		#selection-info {

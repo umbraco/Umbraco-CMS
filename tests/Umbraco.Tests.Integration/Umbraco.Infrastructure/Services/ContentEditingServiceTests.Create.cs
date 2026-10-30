@@ -382,6 +382,78 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
+    public async Task Cannot_Create_With_Element_Type_At_Root()
+    {
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
+        contentType.AllowedAsRoot = true;
+        contentType.IsElement = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [Test]
+    public async Task Cannot_Create_With_Element_Type_As_Child()
+    {
+        var rootContentType = ContentTypeBuilder.CreateBasicContentType("root", "Root");
+        rootContentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(rootContentType, Constants.Security.SuperUserKey);
+
+        var elementType = ContentTypeBuilder.CreateBasicContentType("element", "Element");
+        elementType.IsElement = true;
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+
+        rootContentType.AllowedContentTypes = new[]
+        {
+            new ContentTypeSort(elementType.Key, 1, elementType.Alias)
+        };
+        await ContentTypeService.UpdateAsync(rootContentType, Constants.Security.SuperUserKey);
+
+        var rootKey = (await ContentEditingService.CreateAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = rootContentType.Key,
+                ParentKey = Constants.System.RootKey,
+                Variants =
+                [
+                    new () { Name = "Root" }
+                ]
+            },
+            Constants.Security.SuperUserKey)).Result.Content!.Key;
+
+        var result = await ContentEditingService.CreateAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = elementType.Key,
+                ParentKey = rootKey,
+                Variants =
+                [
+                    new () { Name = "Child" }
+                ]
+            },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [Test]
     public async Task Cannot_Create_Without_Content_Type()
     {
         var createModel = new ContentCreateModel
@@ -1050,5 +1122,72 @@ public partial class ContentEditingServiceTests
                 Mock.Of<ILogger>(),
                 out RichTextEditorValue? richTextEditorValue));
         Assert.AreEqual(expected, richTextEditorValue!.Markup);
+    }
+
+    [Test]
+    public async Task Cannot_Create_With_An_Over_Long_Name()
+    {
+        var contentType = await CreateInvariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Name = new string('x', 256) }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The title" }],
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Create_With_A_Name_At_The_Maximum_Length()
+    {
+        var contentType = await CreateInvariantContentType();
+        var name = new string('x', 255);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new VariantModel { Name = name }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The title" }],
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(name, result.Result.Content!.Name);
+    }
+
+    [Test]
+    public async Task Cannot_Create_With_An_Over_Long_Name_For_Any_Culture()
+    {
+        var contentType = await CreateVariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            // only the non-default culture is too long, so a check on the entity name alone would miss it
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "English" },
+                new VariantModel { Culture = "da-DK", Name = new string('x', 256) }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "variantTitle", Value = "English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "Danish title", Culture = "da-DK" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
     }
 }

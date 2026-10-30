@@ -256,6 +256,8 @@ export default {
 		noItemsTitle: 'No items',
 		addCollectionConfiguration: 'Add collection',
 		cardViewLabel: 'Cards',
+		gridViewLabel: 'Grid',
+		listViewLabel: 'List',
 		tableViewLabel: 'Table',
 	},
 	content: {
@@ -294,6 +296,10 @@ export default {
 		otherElements: 'Properties',
 		parentNotPublished: "This document is published but is not visible because the parent '%0%' is unpublished",
 		parentCultureNotPublished: "This culture is published but is not visible because it is unpublished on parent '%0%'",
+		ancestorNotPublishedScheduleWarning:
+			"An ancestor isn't published. The scheduled publish will fail unless every ancestor is published by then.",
+		ancestorCultureNotPublishedScheduleWarning:
+			"An ancestor isn't published in this language. The scheduled publish will fail unless every ancestor is published in this language by then.",
 		parentNotPublishedAnomaly: 'This document is published but is not in the cache',
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',
@@ -312,6 +318,7 @@ export default {
 		unpublishDate: 'Unpublish at',
 		removeDate: 'Clear date',
 		scheduledPublishing: 'Scheduled publishing',
+		scheduleForAllLanguages: 'Schedule for all selected languages',
 		setDate: 'Set date',
 		sortDone: 'Sort order is updated',
 		sortHelp:
@@ -424,6 +431,8 @@ export default {
 		},
 	},
 	media: {
+		chooseMediaTypeHeadline: 'Choose media type',
+		chooseMediaTypeMoreFiles: (count: number) => (count === 1 ? '1 more file' : `${count} more files`),
 		clickToUpload: 'Click to upload',
 		browseFilesAction: 'Browse files',
 		dropFilesOr: 'Drag and drop media here<br />or',
@@ -1019,6 +1028,7 @@ export default {
 		status: 'Status',
 		submit: 'Submit',
 		success: 'Success',
+		switchView: 'Switch view',
 		type: 'Type',
 		typeName: 'Type Name',
 		typeToSearch: 'Type to search...',
@@ -1267,6 +1277,7 @@ export default {
 		userFailedLogin: "Oops! We couldn't log you in. Please check your credentials and try again.",
 		userLockedOut: 'Your account has been locked out. Please try again later.',
 		receivedErrorFromServer: 'Received an error from the server',
+		passwordResetUnavailable: 'Sorry, password reset is not currently available. Please try again later or contact your administrator.',
 		resetCodeExpired: 'The link you have clicked on is invalid or has expired',
 		userInviteWelcomeMessage:
 			"Hello there and welcome to Umbraco! In just 1 minute you'll be good to go, we just need you to setup a password.",
@@ -1564,6 +1575,7 @@ export default {
 	},
 	scripts: {
 		editscript: 'Edit script file',
+		tabCode: 'Code',
 	},
 	sections: {
 		content: 'Content',
@@ -1775,6 +1787,7 @@ export default {
 		notAllowed: 'The selected template is no longer allowed on this document type.',
 		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
+		tabCode: 'Code',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
 		edittemplate: 'Edit template',
 		insertSections: 'Sections',
@@ -2224,6 +2237,8 @@ export default {
 		changePassword: 'Change your password',
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure 2FA',
+		disableUserHeadline: (name: string) => `Disable ${name}`,
+		disableUserConfirmation: 'Are you sure you want to disable this user?',
 		emailRequired: 'Required - enter an email address for this user',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2377,6 +2392,7 @@ export default {
 		stateApproved: 'Approved',
 		stateInvited: 'Invited',
 		stateInactive: 'Inactive',
+		type: 'Type',
 		sortNameAscending: 'Name (A-Z)',
 		sortNameDescending: 'Name (Z-A)',
 		sortCreateDateDescending: 'Newest',
@@ -2408,6 +2424,10 @@ export default {
 		usersNotManagedFromGroup: 'not manageable from this screen.',
 		selectElementStartNode: 'Select element start node',
 		selectElementStartNodeDescription: 'Limit the element library to a specific start node',
+		enableUserHeadline: (name: string) => `Enable ${name}`,
+		enableUserConfirmation: 'Are you sure you want to enable this user?',
+		unlockUserHeadline: (name: string) => `Unlock ${name}`,
+		unlockUserConfirmation: 'Are you sure you want to unlock this user?',
 	},
 	userPermissions: {
 		create: 'Create',
@@ -2464,10 +2484,13 @@ export default {
 		invalidEmpty: 'Value cannot be empty',
 		invalidFalse: 'This field must be turned on',
 		invalidPattern: 'Value is invalid, it does not match the correct pattern',
+		invalidValue: 'Value is invalid',
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
 		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
+		minimumOnlyWhenInUse:
+			'The minimum applies once items have been added. To require a value, mark the property as mandatory.',
 		invalidMemberGroupName: 'Invalid member group name',
 		invalidUserGroupName: 'Invalid user group name',
 		invalidToken: 'Invalid token',
@@ -3042,6 +3065,8 @@ export default {
 		viewPublishedContentDeclineButton: 'Stay in preview mode',
 		connectionFailed: 'Could not establish a connection to the server, preview live updates will not work.',
 		connectionLost: 'Connection to the server lost, preview live updates will not work.',
+		connectionReconnecting: 'Connection to the server lost, trying to reconnect…',
+		connectionRestored: 'Connection to the server restored, preview live updates are working again.',
 	},
 	permissions: {
 		FolderCreation: 'Folder creation',

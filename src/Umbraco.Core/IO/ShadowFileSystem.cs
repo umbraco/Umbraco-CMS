@@ -209,12 +209,9 @@ internal sealed partial class ShadowFileSystem : IFileSystem
     {
         var normSource = NormPath(source);
         var normTarget = NormPath(target);
-        if (Nodes.TryGetValue(normSource, out ShadowNode? sf) == false || sf.IsDir || sf.IsDelete)
+        if (FileExists(source) == false)
         {
-            if (Inner.FileExists(source) == false)
-            {
-                throw new FileNotFoundException("Source file does not exist.");
-            }
+            throw new FileNotFoundException("Source file does not exist.");
         }
 
         if (Nodes.TryGetValue(normTarget, out ShadowNode? tf) && tf.IsExist && (tf.IsDir || overrideIfExists == false))
@@ -254,10 +251,19 @@ internal sealed partial class ShadowFileSystem : IFileSystem
             }
         }
 
-        var sourceCanonical = sf?.CanonicalPath ?? normSource;
         var targetCanonical = tf?.CanonicalPath ?? normTarget;
-        _sfs.MoveFile(sourceCanonical, targetCanonical, overrideIfExists);
-        Nodes[normSource] = new ShadowNode(true, false, sourceCanonical);
+        if (Nodes.TryGetValue(normSource, out ShadowNode? sf))
+        {
+            _sfs.MoveFile(sf.CanonicalPath, targetCanonical, overrideIfExists);
+        }
+        else
+        {
+            // The source exists only in the inner file system, so stage a copy of it at the target.
+            using Stream stream = Inner.OpenFile(source);
+            _sfs.AddFile(targetCanonical, stream, overrideIfExists);
+        }
+
+        Nodes[normSource] = new ShadowNode(true, false, sf?.CanonicalPath ?? normSource);
         Nodes[normTarget] = new ShadowNode(false, false, targetCanonical);
     }
 

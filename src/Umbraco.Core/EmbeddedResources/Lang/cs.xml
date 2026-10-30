@@ -58,7 +58,7 @@
     <key alias="parentCultureNotPublished">Tato jazyková verze je publikována, ale není viditelná, protože její rodič '%0%' publikován není</key>
     <key alias="parentNotPublishedAnomaly">Jejda: tento dokument je publikován, ale není v mezipaměti (vnitřní chyba)</key>
     <key alias="getUrlException">Could not get the URL</key>
-    <key alias="routeError">This document is published but its URL would collide with content %0%</key>
+    <key alias="routeError">This document is published but its URL would collide with content '%0%'</key>
     <key alias="routeErrorCannotRoute">This document is published but its URL cannot be routed</key>
   </area>
   <area alias="member">

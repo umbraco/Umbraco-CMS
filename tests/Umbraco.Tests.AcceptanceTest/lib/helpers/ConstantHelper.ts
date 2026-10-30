@@ -45,6 +45,7 @@
     invalidEmail: 'Invalid email',
     emptyManualLinkPicker: 'Please enter an URL or Anchor.',
     needMoreItems: 'This field needs more items',
+    minimumTwoEntriesRequiresOneMore: 'Minimum 2 entries, requires 1 more.',
   }
 
   public static readonly inputTypes = {
@@ -89,7 +90,7 @@
   public static readonly mediaPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
     1: ['Pick multiple items', 'Outputs a IEnumerable'],
-    2: ['Amount', 'Set a required range of medias'],
+    2: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
     3: ['Start node', ''],
     4: ['Enable Focal Point', ''],
     5: ['Image Crops', 'Local crops, stored on document'],

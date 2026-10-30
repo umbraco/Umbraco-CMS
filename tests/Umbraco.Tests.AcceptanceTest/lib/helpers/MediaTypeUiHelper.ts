@@ -35,12 +35,7 @@ export class MediaTypeUiHelper extends UiBaseLocators {
   }
 
   async isMediaTypeTreeItemVisible(name: string, isVisible: boolean = true) {
-    const hasShowChildren = await this.mediaTypeTreeRoot.getAttribute('show-children') !== null;
-
-    if (!hasShowChildren) {
-      await this.click(this.mediaTypeTreeRoot.locator(this.caretBtn).first());
-    }
-
+    await this.expandTreeRoot(this.mediaTypeTreeRoot);
     await this.isTreeItemVisible(name, isVisible);
   }
 

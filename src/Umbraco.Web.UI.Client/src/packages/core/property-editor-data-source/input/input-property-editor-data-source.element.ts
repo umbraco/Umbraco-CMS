@@ -8,6 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import { isAboveZeroAndBelowMinimum } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-property-editor-data-source')
 export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
@@ -59,6 +60,7 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlWithB
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerInputContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerInputContext.max;
@@ -103,13 +105,17 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlWithB
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 
 	@property({ type: Array, attribute: 'data-source-types' })
 	public set dataSourceTypes(value: Array<string>) {
@@ -133,7 +139,7 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlWithB
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerInputContext.getSelection().length < this.min,
+			() => isAboveZeroAndBelowMinimum(this.#pickerInputContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(
@@ -185,12 +191,13 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlWithB
 					(status) => {
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
+						const isError = status.state.type === 'error';
 						return html`<umb-entity-item-ref
 							id=${unique}
 							.item=${item}
-							?error=${status.state.type === 'error'}
+							?error=${isError}
 							.errorMessage=${status.state.error}
-							?readonly=${this.readonly}
+							?readonly=${this.readonly || isError}
 							?standalone=${this.max === 1}>
 							${when(
 								!this.readonly,

@@ -10,6 +10,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
+/**
+ * @deprecated Deprecated since v17. Scheduled for removal in Umbraco 20.
+ */
 @customElement('umb-media-type-tree-item-table-collection-view')
 export class UmbMediaTypeTreeItemTableCollectionViewElement extends UmbLitElement {
 	@state()

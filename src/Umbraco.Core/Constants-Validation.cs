@@ -8,6 +8,11 @@ public static partial class Constants
     public static class Validation
     {
         /// <summary>
+        ///     The maximum length of the name of an Umbraco entity, matching the length of the database column that stores it.
+        /// </summary>
+        public const int MaxNameLength = 255;
+
+        /// <summary>
         ///     Contains validation error message constants.
         /// </summary>
         public static class ErrorMessages
@@ -31,6 +36,11 @@ public static partial class Constants
                 ///     The localization key for pattern mismatch validation error.
                 /// </summary>
                 public const string PatternMismatch = "#validation_invalidPattern";
+
+                /// <summary>
+                ///     The localization key for a value that could not be interpreted by the property editor.
+                /// </summary>
+                public const string Invalid = "#validation_invalidValue";
             }
         }
     }

@@ -47,4 +47,19 @@ public interface IMediaPermissionService
     /// <param name="mediaKeys">The identifiers of the media items to filter.</param>
     /// <returns>A task resolving into the set of authorized media keys.</returns>
     Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> mediaKeys);
+
+    /// <summary>
+    ///     Filters media keys to only those the user has access to, for a request originating from a data type.
+    /// </summary>
+    /// <remarks>
+    ///     A data type configured to ignore user start nodes, such as a media picker, may legitimately reference media
+    ///     outside the user's start nodes. When <paramref name="dataTypeKey" /> refers to such a data type, all keys are returned.
+    /// </remarks>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
+    /// <param name="mediaKeys">The identifiers of the media items to filter.</param>
+    /// <param name="dataTypeKey">The identifier of the data type the request originates from, if any.</param>
+    /// <returns>A task resolving into the set of authorized media keys.</returns>
+    // TODO (V19): Remove default implementation.
+    Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> mediaKeys, Guid? dataTypeKey)
+        => FilterAuthorizedAccessAsync(user, mediaKeys);
 }
