@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
@@ -6,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.Email;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Mail;
 using Umbraco.Cms.Infrastructure.Mail.Interfaces;
@@ -235,6 +237,194 @@ public class EmailSenderTests
         Assert.IsTrue(await otherCaller);
     }
 
+    [Test]
+    public async Task SendAsync_Does_Not_Publish_Notification_When_Caller_Does_Not_Request_It()
+    {
+        var eventAggregatorMock = new Mock<IEventAggregator>();
+        var clientMock = new Mock<IEmailSenderClient>();
+        var sender = CreateSender(_smtpServerSettings, clientMock.Object, eventAggregator: eventAggregatorMock.Object);
+
+        await sender.SendAsync(CreateMessage(), "Test", enableNotification: false);
+
+        eventAggregatorMock.Verify(
+            x => x.PublishAsync(It.IsAny<SendEmailNotification>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        clientMock.Verify(x => x.SendAsync(It.IsAny<EmailMessage>(), It.IsAny<TimeSpan?>()), Times.Once);
+    }
+
+    [Test]
+    public async Task SendAsync_Publishes_Notification_For_Every_Email_When_PublishNotificationForAllEmails_Is_Enabled()
+    {
+        var publishedNotifications = new List<SendEmailNotification>();
+        var eventAggregatorMock = CreateEventAggregatorMock(notification =>
+        {
+            publishedNotifications.Add(notification);
+            notification.HandleEmail();
+            return Task.CompletedTask;
+        });
+        var clientMock = new Mock<IEmailSenderClient>();
+        var sender = CreateSender(CreatePublishForAllEmailsSettings(), clientMock.Object, eventAggregator: eventAggregatorMock.Object);
+
+        await sender.SendAsync(CreateMessage(), "Test", enableNotification: false);
+
+        Assert.AreEqual(1, publishedNotifications.Count);
+        Assert.AreEqual("Test", publishedNotifications[0].EmailType);
+        clientMock.Verify(x => x.SendAsync(It.IsAny<EmailMessage>(), It.IsAny<TimeSpan?>()), Times.Never);
+    }
+
+    [Test]
+    public async Task SendAsync_Sends_Through_Transport_When_Published_Notification_Is_Not_Handled()
+    {
+        var eventAggregatorMock = CreateEventAggregatorMock(_ => Task.CompletedTask);
+        var clientMock = new Mock<IEmailSenderClient>();
+        var sender = CreateSender(CreatePublishForAllEmailsSettings(), clientMock.Object, eventAggregator: eventAggregatorMock.Object);
+
+        await sender.SendAsync(CreateMessage(), "Test", enableNotification: false);
+
+        clientMock.Verify(x => x.SendAsync(It.IsAny<EmailMessage>(), It.IsAny<TimeSpan?>()), Times.Once);
+    }
+
+    [Test]
+    public async Task SendAsync_Does_Not_Publish_Notification_Again_When_Called_From_A_SendEmailNotification_Handler()
+    {
+        EmailSender? sender = null;
+        var publishCount = 0;
+        var eventAggregatorMock = CreateEventAggregatorMock(async notification =>
+        {
+            // Only the first publish sends on, so that a missing guard fails the assertion rather than recursing forever.
+            if (++publishCount == 1)
+            {
+                await sender!.SendAsync(CreateMessage(), notification.EmailType, enableNotification: false);
+                notification.HandleEmail();
+            }
+        });
+        var clientMock = new Mock<IEmailSenderClient>();
+        sender = CreateSender(CreatePublishForAllEmailsSettings(), clientMock.Object, eventAggregator: eventAggregatorMock.Object);
+
+        await sender.SendAsync(CreateMessage(), "Test", enableNotification: false);
+
+        Assert.AreEqual(1, publishCount);
+        clientMock.Verify(x => x.SendAsync(It.IsAny<EmailMessage>(), It.IsAny<TimeSpan?>()), Times.Once);
+    }
+
+    [Test]
+    public async Task SendAsync_Publishes_Notification_Requested_By_A_Send_From_A_SendEmailNotification_Handler()
+    {
+        EmailSender? sender = null;
+        var publishCount = 0;
+        var eventAggregatorMock = CreateEventAggregatorMock(async notification =>
+        {
+            // The first publish sends a further email requesting the notification; the second publish handles it.
+            if (++publishCount == 1)
+            {
+                await sender!.SendAsync(CreateMessage(), notification.EmailType, enableNotification: true);
+            }
+
+            notification.HandleEmail();
+        });
+        var clientMock = new Mock<IEmailSenderClient>();
+        sender = CreateSender(_smtpServerSettings, clientMock.Object, eventAggregator: eventAggregatorMock.Object);
+
+        await sender.SendAsync(CreateMessage(), "Test", enableNotification: true);
+
+        Assert.AreEqual(2, publishCount);
+        clientMock.Verify(x => x.SendAsync(It.IsAny<EmailMessage>(), It.IsAny<TimeSpan?>()), Times.Never);
+    }
+
+    [Test]
+    public async Task SendAsync_Honours_PublishNotificationForAllEmails_Changed_At_Runtime()
+    {
+        Action<GlobalSettings, string?>? onChange = null;
+        var optionsMonitorMock = new Mock<IOptionsMonitor<GlobalSettings>>();
+        optionsMonitorMock.SetupGet(x => x.CurrentValue).Returns(new GlobalSettings { Smtp = _smtpServerSettings });
+        optionsMonitorMock
+            .Setup(x => x.OnChange(It.IsAny<Action<GlobalSettings, string?>>()))
+            .Callback<Action<GlobalSettings, string?>>(listener => onChange = listener);
+        var publishCount = 0;
+        var eventAggregatorMock = CreateEventAggregatorMock(_ =>
+        {
+            publishCount++;
+            return Task.CompletedTask;
+        });
+        var sender = CreateSender(optionsMonitorMock.Object, Mock.Of<IEmailSenderClient>(), eventAggregator: eventAggregatorMock.Object);
+
+        await sender.SendAsync(CreateMessage(), "Test", enableNotification: false);
+        onChange!(new GlobalSettings { Smtp = CreatePublishForAllEmailsSettings() }, null);
+        await sender.SendAsync(CreateMessage(), "Test", enableNotification: false);
+
+        Assert.AreEqual(1, publishCount);
+    }
+
+    [Test]
+    public async Task SendAsync_Logs_Warning_When_Email_Is_Dropped_Without_Being_Published_To_A_Registered_Handler()
+    {
+        var loggerMock = new Mock<ILogger<EmailSender>>();
+        var sender = CreateSender(
+            new SmtpSettings { From = "from@test.com" },
+            Mock.Of<IEmailSenderClient>(),
+            handler: Mock.Of<INotificationAsyncHandler<SendEmailNotification>>(),
+            logger: loggerMock.Object);
+
+        await sender.SendAsync(CreateMessage(), "Test", enableNotification: false);
+
+        loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task SendAsync_Logs_Warning_When_Email_Sent_On_From_A_SendEmailNotification_Handler_Is_Dropped()
+    {
+        EmailSender? sender = null;
+        var loggerMock = new Mock<ILogger<EmailSender>>();
+        var eventAggregatorMock = CreateEventAggregatorMock(async notification =>
+        {
+            await sender!.SendAsync(CreateMessage(), notification.EmailType, enableNotification: false);
+            notification.HandleEmail();
+        });
+#pragma warning disable CS0618 // Type or member is obsolete
+        var settings = new SmtpSettings { From = "from@test.com", PublishNotificationForAllEmails = true };
+#pragma warning restore CS0618 // Type or member is obsolete
+        sender = CreateSender(
+            settings,
+            Mock.Of<IEmailSenderClient>(),
+            handler: Mock.Of<INotificationAsyncHandler<SendEmailNotification>>(),
+            eventAggregator: eventAggregatorMock.Object,
+            logger: loggerMock.Object);
+
+        await sender.SendAsync(CreateMessage(), "Test", enableNotification: false);
+
+        loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    private static EmailMessage CreateMessage() => new("from@test.com", "to@test.com", "Subject", "Body", false);
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    private static SmtpSettings CreatePublishForAllEmailsSettings()
+        => new() { From = "from@test.com", Host = "smtp.test.com", PublishNotificationForAllEmails = true };
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    private static Mock<IEventAggregator> CreateEventAggregatorMock(Func<SendEmailNotification, Task> onPublish)
+    {
+        var eventAggregatorMock = new Mock<IEventAggregator>();
+        eventAggregatorMock
+            .Setup(x => x.PublishAsync(It.IsAny<SendEmailNotification>(), It.IsAny<CancellationToken>()))
+            .Returns((SendEmailNotification notification, CancellationToken _) => onPublish(notification));
+        return eventAggregatorMock;
+    }
+
     private static Mock<IEmailSenderClient> CreateUnreachableClientMock()
     {
         var clientMock = new Mock<IEmailSenderClient>();
@@ -248,22 +438,28 @@ public class EmailSenderTests
         SmtpSettings smtpSettings,
         IEmailSenderClient emailSenderClient,
         INotificationAsyncHandler<SendEmailNotification>? handler = null,
-        TimeProvider? timeProvider = null)
+        TimeProvider? timeProvider = null,
+        IEventAggregator? eventAggregator = null,
+        ILogger<EmailSender>? logger = null)
         => CreateSender(
             new TestOptionsMonitor<GlobalSettings>(new GlobalSettings { Smtp = smtpSettings }),
             emailSenderClient,
             handler,
-            timeProvider);
+            timeProvider,
+            eventAggregator,
+            logger);
 
     private static EmailSender CreateSender(
         IOptionsMonitor<GlobalSettings> globalSettings,
         IEmailSenderClient emailSenderClient,
         INotificationAsyncHandler<SendEmailNotification>? handler = null,
-        TimeProvider? timeProvider = null)
+        TimeProvider? timeProvider = null,
+        IEventAggregator? eventAggregator = null,
+        ILogger<EmailSender>? logger = null)
         => new(
-            NullLogger<EmailSender>.Instance,
+            logger ?? NullLogger<EmailSender>.Instance,
             globalSettings,
-            Mock.Of<IEventAggregator>(),
+            eventAggregator ?? Mock.Of<IEventAggregator>(),
             emailSenderClient,
             null,
             handler,
