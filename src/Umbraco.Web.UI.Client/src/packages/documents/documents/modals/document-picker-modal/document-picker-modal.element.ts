@@ -1,52 +1,15 @@
-import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../collection/constants.js';
+import { UMB_DOCUMENT_TREE_ALIAS } from '../../tree/constants.js';
 import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import type { UmbDocumentPickerModalData, UmbDocumentPickerModalValue } from './types.js';
-import { UMB_CONTENT_SECTION_ALIAS, UmbContentCollectionConfigurationContext } from '@umbraco-cms/backoffice/content';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import {
-	css,
-	customElement,
-	html,
-	ifDefined,
-	keyed,
-	nothing,
-	query,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
-import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbPickerModalBaseElement, type UmbPickerSearchFieldElement } from '@umbraco-cms/backoffice/picker';
-import { UmbTreeItemOpenEvent, UmbTreeItemPickerContext } from '@umbraco-cms/backoffice/tree';
-import type {
-	UmbTreeElement,
-	UmbTreeItemPickerLocation,
-	UmbTreeSelectionConfiguration,
-	UmbTreeStartNode,
-} from '@umbraco-cms/backoffice/tree';
-import type {
-	UmbCollectionConfiguration,
-	UmbCollectionElement,
-	UmbCollectionItemModel,
-	UmbCollectionSelectionConfiguration,
-} from '@umbraco-cms/backoffice/collection';
+import { UmbTreeItemPickerContext } from '@umbraco-cms/backoffice/tree';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
-import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
-const TREE_MEMORY_UNIQUE = 'UmbTreeItemPickerTree';
-const COLLECTION_MEMORY_UNIQUE = 'UmbItemPickerCollection';
-const ROOT_MEMORY_KEY = 'root';
-
-/**
- * The part of a content tree item this modal reads to decide how a node's children render. A tree that does not map
- * `contentType` is browsed as a tree throughout.
- */
-type UmbContentTreeItemLike = {
-	contentType?: {
-		collection?: { unique: string } | null;
-	};
-};
+import '../../components/document-picker-browse/document-picker-browse.element.js';
 
 /**
  * A picker that browses documents, rendering the document collection at any level whose node has one configured
@@ -60,19 +23,7 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 	UmbDocumentPickerModalValue
 > {
 	@state()
-	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
-		multiple: false,
-		selectable: true,
-		selection: [],
-	};
-
-	@state()
-	private _collectionSelectionConfiguration: UmbCollectionSelectionConfiguration = {
-		multiple: false,
-		selectable: true,
-		selectOnly: true,
-		selection: [],
-	};
+	private _multiple = false;
 
 	@state()
 	private _hasSelection: boolean = false;
@@ -86,53 +37,16 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 	@state()
 	private _activeTab: 'browse' | 'search' = 'browse';
 
-	@state()
-	private _treeExpansion: UmbEntityExpansionModel = [];
-
-	@state()
-	private _treeInteractionMemories?: Array<UmbInteractionMemoryModel>;
-
-	@state()
-	private _collectionInteractionMemories?: Array<UmbInteractionMemoryModel>;
-
-	/** Tri-state, as the location manager reports it: undefined until established, null for a node the tree does not have. */
-	@state()
-	private _currentLocation?: UmbTreeItemPickerLocation | null;
-
-	@state()
-	private _treeStartNode?: UmbTreeStartNode;
-
-	@state()
-	private _hasCollection = false;
-
-	@state()
-	private _collectionConfig?: UmbCollectionConfiguration;
-
-	@state()
-	private _hasContentSectionAccess = false;
-
 	@query('umb-picker-search-field')
 	private _searchField?: UmbPickerSearchFieldElement;
 
 	@state()
 	private _treeAlias?: string;
 
-	/**
-	 * Answers `UMB_ENTITY_CONTEXT` for the node being browsed. Without it the collection would bind to the entity of
-	 * whichever element opened the modal, because a modal re-dispatches unanswered context requests onto its opener.
-	 */
-	#entityContext = new UmbEntityContext(this);
-
-	#collectionConfiguration = new UmbContentCollectionConfigurationContext(this);
-
-	#collectionMemories: Array<UmbInteractionMemoryModel> = [];
-
 	protected _pickerContext = new UmbTreeItemPickerContext(this);
 
 	constructor() {
 		super();
-		// Which collection this picker renders follows from it being a document picker, so it is not a caller's choice.
-		this.#collectionConfiguration.setCollectionAlias(UMB_DOCUMENT_COLLECTION_ALIAS);
 		this._pickerContext.selection.setSelectable(true);
 		this.observe(
 			this._pickerContext.selection.hasSelection,
@@ -143,44 +57,21 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 		);
 		this.#observePickerSelection();
 		this.#observeSearch();
-		this.#observeExpansion();
-		this.#observeTreeInteractionMemories();
-		this.#observeCollectionInteractionMemories();
-		this.#observeCollectionConfiguration();
-		this.#observeContentSectionAccess();
-		this.#observeLocation();
-	}
-
-	override connectedCallback(): void {
-		super.connectedCallback();
-		this.addEventListener(UmbTreeItemOpenEvent.TYPE, this.#onItemOpen);
-	}
-
-	override disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this.removeEventListener(UmbTreeItemOpenEvent.TYPE, this.#onItemOpen);
-	}
-
-	protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
-		super.willUpdate(_changedProperties);
-
-		// The single point where a location is turned into a rendering decision. Everything that browses — a tree item
-		// opening, a collection item drilling in, a breadcrumb click, a restore from memory — moves `_currentLocation`
-		// and nothing else, so the renderer, the entity context and the configuration cannot drift apart.
-		if (_changedProperties.has('_currentLocation')) {
-			this.#resolveLocation();
-		}
 	}
 
 	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('data')) {
-			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
-				this._treeAlias = this.data.treeAlias;
-				this._pickerContext.location.setStartNode(this.data.startNode);
-				this._pickerContext.location.setStartNodes(this.data.startNodes);
-				this._pickerContext.location.setTreeAlias(this.data.treeAlias);
+			this.#warnUnappliedOptions();
+
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			const treeAlias = this.data?.treeAlias ?? UMB_DOCUMENT_TREE_ALIAS;
+			if (treeAlias !== this._treeAlias) {
+				this._treeAlias = treeAlias;
+				this._pickerContext.location.setStartNode(this.data?.startNode);
+				this._pickerContext.location.setStartNodes(this.data?.startNodes);
+				this._pickerContext.location.setTreeAlias(treeAlias);
 			}
 
 			if (this.data?.search) {
@@ -192,19 +83,8 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 				});
 			}
 
-			const multiple = this.data?.multiple ?? false;
-			this._pickerContext.selection.setMultiple(multiple);
-
-			this._selectionConfiguration = {
-				...this._selectionConfiguration,
-				multiple,
-			};
-
-			this._collectionSelectionConfiguration = {
-				...this._collectionSelectionConfiguration,
-				multiple,
-				selectableFilter: this.data?.pickableFilter as ((item: UmbCollectionItemModel) => boolean) | undefined,
-			};
+			this._multiple = this.data?.multiple ?? false;
+			this._pickerContext.selection.setMultiple(this._multiple);
 
 			if (this.data?.treeExpansion !== undefined) {
 				this._pickerContext.expansion.setExpansion(this.data.treeExpansion);
@@ -212,57 +92,29 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 		}
 
 		if (_changedProperties.has('value')) {
-			const selection = this.value?.selection ?? [];
-			this._pickerContext.selection.setSelection(selection);
-			this._selectionConfiguration = {
-				...this._selectionConfiguration,
-				selection: [...selection],
-			};
-			this._collectionSelectionConfiguration = {
-				...this._collectionSelectionConfiguration,
-				selection: [...selection].filter((unique) => unique !== null),
-			};
+			this._pickerContext.selection.setSelection(this.value?.selection ?? []);
 		}
 	}
 
-	#onItemOpen = async (event: UmbTreeItemOpenEvent) => {
-		event.stopPropagation();
-		const { unique, entityType } = event;
-		await this._pickerContext.location.navigateTo({ unique, entityType });
-	};
+	#warnUnappliedOptions() {
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		if (this.data?.foldersOnly) {
+			new UmbDeprecation({
+				deprecated:
+					'The `foldersOnly` option of UmbDocumentPickerModalData is not applied, as documents have no folders.',
+				removeInVersion: '21.0.0',
+				solution: 'Remove the option.',
+			}).warn();
+		}
 
-	#getCollectionUnique(location?: UmbTreeItemPickerLocation | null): string | undefined {
-		return (location as (UmbTreeItemPickerLocation & UmbContentTreeItemLike) | undefined)?.contentType?.collection
-			?.unique;
-	}
-
-	/**
-	 * Points the entity context and the collection configuration at the node being browsed, and picks up that node's
-	 * remembered collection state. The root renders the tree, as it has no content type and therefore no collection.
-	 */
-	#resolveLocation() {
-		const location = this._currentLocation;
-
-		this.#entityContext.setEntityType(location?.entityType);
-		this.#entityContext.setUnique(location?.unique ?? null);
-
-		this.#collectionConfiguration.setUnique(location?.unique ?? null);
-		this.#collectionConfiguration.setDataTypeUnique(this.#getCollectionUnique(location));
-
-		this.#updateCollectionInteractionMemories();
-	}
-
-	#observeLocation() {
-		this.observe(
-			this._pickerContext.location.currentLocation,
-			(location) => {
-				this._currentLocation = location;
-				this._treeStartNode = location?.unique
-					? { unique: location.unique, entityType: location.entityType }
-					: undefined;
-			},
-			'umbContentPickerLocationObserver',
-		);
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		if (this.data?.createAction) {
+			new UmbDeprecation({
+				deprecated: 'The `createAction` option of UmbDocumentPickerModalData is not applied by the document picker.',
+				removeInVersion: '21.0.0',
+				solution: 'Remove the option.',
+			}).warn();
+		}
 	}
 
 	#observePickerSelection() {
@@ -287,132 +139,15 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 		);
 	}
 
-	#observeExpansion() {
-		this.observe(
-			this._pickerContext.expansion.expansion,
-			(value) => {
-				this._treeExpansion = value;
-			},
-			'umbTreeItemPickerExpansionObserver',
-		);
-	}
-
-	#observeTreeInteractionMemories() {
-		this.observe(
-			this._pickerContext.interactionMemory.memory(TREE_MEMORY_UNIQUE),
-			(memory) => {
-				this._treeInteractionMemories = memory?.memories;
-			},
-			'umbTreePickerInteractionMemoriesObserver',
-		);
-	}
-
-	#observeCollectionInteractionMemories() {
-		this.observe(
-			this._pickerContext.interactionMemory.memory(COLLECTION_MEMORY_UNIQUE),
-			(memory) => {
-				this.#collectionMemories = memory?.memories ?? [];
-				this.#updateCollectionInteractionMemories();
-			},
-			'umbContentPickerCollectionInteractionMemoriesObserver',
-		);
-	}
-
-	#observeCollectionConfiguration() {
-		this.observe(
-			this.#collectionConfiguration.hasCollection,
-			(hasCollection) => {
-				this._hasCollection = hasCollection;
-			},
-			null,
-		);
-
-		this.observe(
-			this.#collectionConfiguration.collectionConfig,
-			(collectionConfig) => {
-				this._collectionConfig = collectionConfig;
-			},
-			null,
-		);
-	}
-
-	/** The Collection endpoint requires Content-section access; the Tree endpoint accepts any section. */
-	#observeContentSectionAccess() {
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(
-				context?.allowedSections,
-				(allowedSections) => {
-					this._hasContentSectionAccess = allowedSections?.includes(UMB_CONTENT_SECTION_ALIAS) ?? false;
-				},
-				'umbDocumentPickerContentSectionAccessObserver',
-			);
-		});
-	}
-
-	/**
-	 * Collection memories are nested per browsed node, so returning to a node restores the view, filter, ordering and
-	 * page it was left in while a sibling starts clean. An ordering column configured on one content type need not
-	 * exist on another.
-	 * @returns {string} The memory key of the node being browsed.
-	 */
-	#getCollectionMemoryKey(): string {
-		return this._currentLocation?.unique ?? ROOT_MEMORY_KEY;
-	}
-
-	#updateCollectionInteractionMemories() {
-		const key = this.#getCollectionMemoryKey();
-		this._collectionInteractionMemories = this.#collectionMemories.find((memory) => memory.unique === key)?.memories;
-	}
-
-	#onCollectionInteractionMemoriesChange(event: Event) {
-		event.stopPropagation();
-		const collection = event.currentTarget as UmbCollectionElement;
-		const memories = collection.getInteractionMemories();
-		const key = this.#getCollectionMemoryKey();
-
-		const others = this.#collectionMemories.filter((memory) => memory.unique !== key);
-		const next = memories.length ? [...others, { unique: key, memories }] : others;
-
-		if (next.length) {
-			this._pickerContext.interactionMemory.setMemory({ unique: COLLECTION_MEMORY_UNIQUE, memories: next });
-		} else {
-			this._pickerContext.interactionMemory.deleteMemory(COLLECTION_MEMORY_UNIQUE);
-		}
-	}
-
 	#onItemSelected(event: UmbSelectedEvent) {
 		event.stopPropagation();
-		this._pickerContext.selection.select(event.unique);
 		this.modalContext?.dispatchEvent(new UmbSelectedEvent(event.unique));
 	}
 
 	#onItemDeselected(event: UmbDeselectedEvent) {
 		event.stopPropagation();
-		this._pickerContext.selection.deselect(event.unique);
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(event.unique));
 	}
-
-	#onTreeItemExpansionChange(event: UmbExpansionChangeEvent) {
-		const target = event.target as UmbTreeElement;
-		const expansion = target.getExpansion();
-		this._pickerContext.expansion.setExpansion(expansion);
-	}
-
-	#onTreeInteractionMemoriesChange(event: Event) {
-		event.stopPropagation();
-		const tree = event.currentTarget as UmbTreeElement;
-		const memories = tree.interactionMemories;
-		if (memories.length > 0) {
-			this._pickerContext.interactionMemory.setMemory({ unique: TREE_MEMORY_UNIQUE, memories });
-		} else {
-			this._pickerContext.interactionMemory.deleteMemory(TREE_MEMORY_UNIQUE);
-		}
-	}
-
-	#selectableFilter = (item: UmbDocumentTreeItemModel) => {
-		if (this._pickerContext.location.isBrowseOnlyStartNode(item.unique)) return false;
-		return this.data?.pickableFilter?.(item) ?? true;
-	};
 
 	// Search cannot be scoped server side to more than one parent, so out-of-scope results are filtered here.
 	#searchSelectableFilter = (item: UmbSearchResultItemModel & UmbDocumentTreeItemModel) => {
@@ -432,16 +167,9 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 		}
 	}
 
-	/** Whether the collection is actually being rendered for the browsed node, rather than merely configured for it. */
-	#willRenderCollection(): boolean {
-		return this._hasCollection && this._hasContentSectionAccess;
-	}
-
 	override render() {
 		return html`
-			<umb-body-layout
-				headline=${this.localize.string(this.data?.headline ?? '#general_choose')}
-				?main-no-padding=${this.#willRenderCollection()}>
+			<umb-body-layout headline=${this.localize.string(this.data?.headline ?? '#general_choose')} main-no-padding>
 				${this.#renderTabs()}
 				<div id="browse" ?hidden=${this._activeTab !== 'browse'}>${this.#renderBrowse()}</div>
 				<div id="search" ?hidden=${this._activeTab !== 'search'}>${this.#renderSearch()}</div>
@@ -486,83 +214,18 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	#renderBrowse() {
-		return html`${this.#renderBreadcrumb()} ${this.#renderChildren()}`;
-	}
-
-	#renderChildren() {
-		// Which renderer a level needs is only known once the location is, and mounting the tree in the meantime would
-		// tear it down again mid-initialisation.
-		if (this._currentLocation === undefined) return html`<umb-view-loader></umb-view-loader>`;
-		// A level the tree cannot describe has no renderer, so neither the tree nor the collection stands in for it.
-		if (this._currentLocation === null) return this.#renderNotFound();
-		if (!this.#willRenderCollection()) return this.#renderTree();
-		// The configuration is resolved from a data type, so the collection is held back rather than briefly showing
-		// the tree in its place.
-		return this._collectionConfig ? this.#renderCollection() : html`<umb-view-loader></umb-view-loader>`;
-	}
-
-	#renderNotFound() {
-		return html`<div id="not-found" class="uui-text">
-			<h4>${this.localize.term('general_notFound')}</h4>
-		</div>`;
-	}
-
-	#renderTree() {
-		return html`
-			<umb-tree
-				alias=${ifDefined(this.data?.treeAlias)}
-				.props=${{
-					showToolbar: true,
-					drillable: true,
-					hideTreeItemActions: true,
-					hideTreeRoot: this.data?.hideTreeRoot,
-					expandTreeRoot: this.data?.expandTreeRoot,
-					selectionConfiguration: this._selectionConfiguration,
-					filter: this.data?.filter,
-					selectableFilter: this.#selectableFilter,
-					startNode: this._treeStartNode,
-					// Once drilled into a location the tree is scoped to that single node again.
-					startNodes: this._treeStartNode ? undefined : this._pickerContext.location.getStartNodes(),
-					foldersOnly: this.data?.foldersOnly,
-					expansion: this._treeExpansion,
-					interactionMemories: this._treeInteractionMemories,
-				}}
-				@selected=${this.#onItemSelected}
-				@deselected=${this.#onItemDeselected}
-				@expansion-change=${this.#onTreeItemExpansionChange}
-				@interaction-memories-change=${this.#onTreeInteractionMemoriesChange}></umb-tree>
-		`;
-	}
-
-	#renderCollection() {
-		const config: UmbCollectionConfiguration = {
-			...this._collectionConfig,
-			selectionConfiguration: this._collectionSelectionConfiguration,
-			bulkActionConfiguration: { enabled: false },
-			hideItemActions: true,
-			hideCollectionActions: true,
-		};
-
-		// Re-created per browsed node: a collection cannot be retargeted once configured, and a fresh instance also
-		// resets pagination and the per-view registrations.
-		return keyed(
-			this.#getCollectionMemoryKey(),
-			html`<umb-collection
-				alias=${UMB_DOCUMENT_COLLECTION_ALIAS}
-				.config=${config}
-				.interactionMemories=${this._collectionInteractionMemories}
-				@selected=${this.#onItemSelected}
-				@deselected=${this.#onItemDeselected}
-				@interaction-memories-change=${this.#onCollectionInteractionMemoriesChange}></umb-collection>`,
-		);
-	}
-
-	#renderBreadcrumb() {
-		return html`<umb-tree-item-picker-breadcrumb id="breadcrumb"></umb-tree-item-picker-breadcrumb>`;
+		return html`<umb-document-picker-browse
+			.pickableFilter=${this.data?.pickableFilter}
+			.filter=${this.data?.filter}
+			.treeAlias=${this._treeAlias}
+			?hide-tree-root=${this.data?.hideTreeRoot}
+			?expand-tree-root=${this.data?.expandTreeRoot}
+			@selected=${this.#onItemSelected}
+			@deselected=${this.#onItemDeselected}></umb-document-picker-browse>`;
 	}
 
 	#renderSelectionCount() {
-		if (!this._selectionConfiguration.multiple || !this._hasSelection) return nothing;
+		if (!this._multiple || !this._hasSelection) return nothing;
 
 		return html`
 			<div id="selection-info" slot="footer">${this.localize.term('picker_selectedCount', this._selectionCount)}</div>
@@ -590,38 +253,12 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 			border-right: 1px solid var(--uui-color-border);
 		}
 
-		umb-body-layout[main-no-padding] #search {
+		#browse {
+			padding-top: var(--uui-size-layout-1);
+		}
+
+		#search {
 			padding: var(--uui-size-layout-1);
-		}
-
-		#breadcrumb {
-			margin-bottom: var(--uui-size-space-4);
-		}
-
-		#not-found {
-			text-align: center;
-			padding: var(--uui-size-layout-1);
-		}
-
-		/* A collection lays itself out inside its own body layout, so the main padding is dropped for it and only the
-		   breadcrumb above it is inset — padding the whole panel would inset the collection twice. */
-		umb-body-layout[main-no-padding] #breadcrumb {
-			padding: var(--uui-size-layout-1) var(--uui-size-layout-1) 0;
-			margin-bottom: 0;
-		}
-
-		uui-breadcrumbs {
-			overflow: hidden;
-			min-width: 0;
-		}
-
-		uui-breadcrumb-item:not([last-item]) {
-			cursor: pointer;
-		}
-
-		umb-collection {
-			display: block;
-			height: fit-content;
 		}
 
 		#selection-info {
