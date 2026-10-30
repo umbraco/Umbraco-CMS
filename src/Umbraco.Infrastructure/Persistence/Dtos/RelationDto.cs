@@ -13,6 +13,11 @@ internal sealed class RelationDto
     public const string TableName = Constants.DatabaseSchema.Tables.Relation;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
+    /// <summary>
+    /// The name of the index on the child node identifier, used when relations are deleted for a node.
+    /// </summary>
+    internal const string ChildIdIndexName = "IX_" + TableName + "_" + ChildIdColumnName;
+
     private const string RelationTypeColumnName = "relType";
     private const string ParentIdColumnName = "parentId";
     private const string ChildIdColumnName = "childId";
@@ -37,6 +42,7 @@ internal sealed class RelationDto
     /// </summary>
     [Column(ChildIdColumnName)]
     [ForeignKey(typeof(NodeDto), Name = "FK_umbracoRelation_umbracoNode1")]
+    [Index(IndexTypes.NonClustered, Name = ChildIdIndexName, IncludeColumns = $"{ParentIdColumnName},{RelationTypeColumnName}")]
     public int ChildId { get; set; }
 
     /// <summary>

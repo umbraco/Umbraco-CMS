@@ -15,6 +15,11 @@ public class UserStartNodeDto : IEquatable<UserStartNodeDto>
     public const string TableName = Constants.DatabaseSchema.Tables.UserStartNode;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
+    /// <summary>
+    /// The name of the index on the start node identifier, used when start nodes are deleted for a node.
+    /// </summary>
+    internal const string StartNodeIndexName = "IX_" + TableName + "_" + StartNodeColumnName;
+
     private const string UserIdColumnName = "userId";
     private const string StartNodeColumnName = "startNode";
     private const string StartNodeTypeColumnName = "startNodeType";
@@ -50,6 +55,7 @@ public class UserStartNodeDto : IEquatable<UserStartNodeDto>
     [Column(StartNodeColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [ForeignKey(typeof(NodeDto))]
+    [Index(IndexTypes.NonClustered, Name = StartNodeIndexName)]
     public int StartNode { get; set; }
 
     /// <summary>
