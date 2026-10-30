@@ -183,14 +183,6 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			</uui-button>
 		`;
 	}
-
-	static override styles = [
-		css`
-			uui-scroll-container {
-				max-height: 700px;
-			}
-		`,
-	];
 }
 
 declare global {

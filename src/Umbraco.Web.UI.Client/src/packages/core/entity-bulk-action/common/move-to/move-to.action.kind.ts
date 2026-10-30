@@ -12,7 +12,7 @@ export const manifest: UmbExtensionManifestKind = {
 		type: 'entityBulkAction',
 		kind: 'moveTo',
 		api: UmbMoveToEntityBulkAction,
-		weight: 700,
+		weight: 720,
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-enter',

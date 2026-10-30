@@ -12,7 +12,8 @@ export const UMB_ENTITY_ACTION_TRASH_KIND_MANIFEST: UmbExtensionManifestKind = {
 		type: 'entityAction',
 		kind: 'trash',
 		api: UmbTrashEntityAction,
-		weight: 1150,
+		weight: 799,
+		separatorBefore: true,
 		meta: {
 			icon: 'icon-trash',
 			label: '#actions_trash',

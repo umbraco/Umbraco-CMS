@@ -12,7 +12,7 @@ export const manifest: UmbExtensionManifestKind = {
 		type: 'entityBulkAction',
 		kind: 'duplicateTo',
 		api: UmbDuplicateToEntityBulkAction,
-		weight: 700,
+		weight: 710,
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-split',
