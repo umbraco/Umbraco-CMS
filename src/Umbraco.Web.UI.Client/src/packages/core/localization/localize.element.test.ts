@@ -24,6 +24,7 @@ const english: ManifestLocalization = {
 				moreThanOneArgument: (arg1: string, arg2: string) => {
 					return `${arg1} ${arg2}`;
 				},
+				inlineCode: 'Inserts a <code>@RenderBody()</code> placeholder.',
 			},
 		},
 	},
@@ -253,6 +254,18 @@ describe('umb-localize', () => {
 			await elementUpdated(element);
 
 			expect(element.hasAttribute('data-localize-missing')).to.equal(false);
+		});
+
+		it('should lay out inline code left to right in right-to-left text', async () => {
+			const container = await fixture<HTMLDivElement>(
+				html`<div dir="rtl"><umb-localize key="general_inlineCode"></umb-localize></div>`,
+			);
+			const localize = container.querySelector<UmbLocalizeElement>('umb-localize')!;
+			await elementUpdated(localize);
+
+			const code = localize.shadowRoot!.querySelector('code')!;
+			expect(getComputedStyle(code).direction).to.equal('ltr');
+			expect(getComputedStyle(code).unicodeBidi).to.equal('isolate');
 		});
 
 		it('should use the key if debug is enabled and translation is not found', async () => {
