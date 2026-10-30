@@ -65,6 +65,11 @@ export const data: Array<UmbMockUserGroupModel> = [
 			UMB_USER_PERMISSION_ELEMENT_DUPLICATE,
 			UMB_USER_PERMISSION_ELEMENT_MOVE,
 			UMB_USER_PERMISSION_ELEMENT_ROLLBACK,
+			'Umb.ElementContainer.Create',
+			'Umb.ElementContainer.Read',
+			'Umb.ElementContainer.Update',
+			'Umb.ElementContainer.Delete',
+			'Umb.ElementContainer.Move',
 		],
 		permissions: [],
 		sections: [
