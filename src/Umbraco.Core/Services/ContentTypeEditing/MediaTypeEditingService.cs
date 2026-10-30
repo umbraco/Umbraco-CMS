@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
@@ -20,6 +22,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IDataTypeService _dataTypeService;
     private readonly IImageUrlGenerator _imageUrlGenerator;
+    private readonly ContentSettings _contentSettings;
     private readonly IReservedFieldNamesService _reservedFieldNamesService;
 
     /// <summary>
@@ -31,6 +34,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     /// <param name="entityService">The entity service for resolving entity relationships.</param>
     /// <param name="shortStringHelper">The helper for generating safe aliases.</param>
     /// <param name="imageUrlGenerator">The image URL generator for determining supported image formats.</param>
+    /// <param name="contentSettings">The content settings for determining configured image formats.</param>
     /// <param name="reservedFieldNamesService">The service providing reserved field names.</param>
     public MediaTypeEditingService(
         IContentTypeService contentTypeService,
@@ -39,12 +43,14 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         IEntityService entityService,
         IShortStringHelper shortStringHelper,
         IImageUrlGenerator imageUrlGenerator,
+        IOptions<ContentSettings> contentSettings,
         IReservedFieldNamesService reservedFieldNamesService)
         : base(contentTypeService, mediaTypeService, dataTypeService, entityService, shortStringHelper)
     {
         _mediaTypeService = mediaTypeService;
         _dataTypeService = dataTypeService;
         _imageUrlGenerator = imageUrlGenerator;
+        _contentSettings = contentSettings.Value;
         _reservedFieldNamesService = reservedFieldNamesService;
     }
 
@@ -117,7 +123,8 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         var results = new List<MediaTypeFileExtensionMatchResult>();
 
         // is this an image format supported by the image cropper?
-        if (_imageUrlGenerator.IsSupportedImageFormat(fileExtension))
+        if (_contentSettings.Imaging.ImageFileTypes.InvariantContains(fileExtension)
+            && _imageUrlGenerator.IsSupportedImageFormat(fileExtension))
         {
             // yes - add all media types with an image cropper "file" property
             results.AddRange(candidateMediaTypes

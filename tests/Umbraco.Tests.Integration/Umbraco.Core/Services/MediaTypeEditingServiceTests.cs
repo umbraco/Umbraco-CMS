@@ -18,7 +18,7 @@ internal sealed partial class MediaTypeEditingServiceTests : ContentTypeEditingS
 
     private class TestImageUrlGenerator : IImageUrlGenerator
     {
-        public IEnumerable<string> SupportedImageFileTypes => new[] { "jpg", "gif", "png" };
+        public IEnumerable<string> SupportedImageFileTypes => new[] { "jpg", "gif", "png", "pdf", "eps" };
 
         public string? GetImageUrl(ImageUrlGenerationOptions options) => options?.ImageUrl;
     }

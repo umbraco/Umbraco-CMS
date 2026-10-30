@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
 
@@ -7,6 +9,71 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 internal sealed partial class MediaTypeEditingServiceTests
 {
+    [TestCase("pdf")]
+    [TestCase("PDF")]
+    [TestCase(".Pdf")]
+    public async Task Provider_Support_Does_Not_Make_Pdf_An_Image(string fileExtension)
+    {
+        var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync(fileExtension, 0, 100);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Total, Is.EqualTo(2));
+            Assert.That(result.Items.Where(x => x.IsSpecificMatch).Select(x => x.MediaType.Alias),
+                Is.EqualTo(new[] { Constants.Conventions.MediaTypes.ArticleAlias }));
+            Assert.That(result.Items.Where(x => !x.IsSpecificMatch).Select(x => x.MediaType.Alias),
+                Is.EqualTo(new[] { Constants.Conventions.MediaTypes.File }));
+        });
+    }
+
+    [TestCase("eps")]
+    [TestCase("webp")]
+    public async Task Image_Matching_Requires_Configuration_And_Provider_Support(string fileExtension)
+    {
+        var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync(fileExtension, 0, 100);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Total, Is.EqualTo(1));
+            Assert.That(result.Items.Single().MediaType.Alias, Is.EqualTo(Constants.Conventions.MediaTypes.File));
+            Assert.That(result.Items.Single().IsSpecificMatch, Is.False);
+        });
+    }
+
+    [TestCase("pdf")]
+    [TestCase("PDF")]
+    public async Task Configured_Image_Formats_Are_Respected(string configuredExtension)
+    {
+        var imaging = GetRequiredService<IOptions<ContentSettings>>().Value.Imaging;
+        var original = imaging.ImageFileTypes;
+        imaging.ImageFileTypes = new HashSet<string> { configuredExtension };
+        try
+        {
+            var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync("pdf", 0, 100);
+            Assert.That(result.Items.Any(x => x.MediaType.Alias == Constants.Conventions.MediaTypes.Image && x.IsSpecificMatch), Is.True);
+
+            result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync("jpg", 0, 100);
+            Assert.That(result.Items.Any(x => x.MediaType.Alias == Constants.Conventions.MediaTypes.Image), Is.False);
+        }
+        finally
+        {
+            imaging.ImageFileTypes = original;
+        }
+    }
+
+    [Test]
+    public async Task Pdf_Pagination_Preserves_Article_And_File_Matches()
+    {
+        var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync("pdf", 1, 1);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Total, Is.EqualTo(2));
+            Assert.That(result.Items.Single().MediaType.Alias, Is.EqualTo(Constants.Conventions.MediaTypes.File));
+            Assert.That(result.Items.Single().IsSpecificMatch, Is.False);
+        });
+    }
+
     [TestCase("jpg", Constants.Conventions.MediaTypes.Image)]
     [TestCase("png", Constants.Conventions.MediaTypes.Image)]
     [TestCase("svg", Constants.Conventions.MediaTypes.VectorGraphicsAlias)]
