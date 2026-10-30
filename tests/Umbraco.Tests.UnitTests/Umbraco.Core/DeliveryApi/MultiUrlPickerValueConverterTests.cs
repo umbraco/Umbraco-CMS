@@ -406,4 +406,48 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var link = result as Link;
         Assert.AreEqual("/fr/the-page-url", link.Url);
     }
+
+    [Test]
+    public void MultiUrlPickerValueConverter_ConvertsLinksWithPublishedItemOfTheLinkedContentOrMedia()
+    {
+        // Arrange
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        RegisterMediaWithProviders(PublishedMedia);
+
+        var valueConverter = MultiUrlPickerValueConverter();
+        var inter = Serializer().Serialize(new[]
+        {
+            new MultiUrlPickerValueEditor.LinkDto
+            {
+                Udi = new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key)
+            },
+            new MultiUrlPickerValueEditor.LinkDto
+            {
+                Udi = new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key)
+            },
+            new MultiUrlPickerValueEditor.LinkDto
+            {
+                Name = "The link",
+                Url = "https://umbraco.com/"
+            }
+        });
+
+        // Act
+        var result = valueConverter.ConvertIntermediateToObject(
+            Mock.Of<IPublishedElement>(),
+            publishedPropertyType.Object,
+            PropertyCacheLevel.Element,
+            inter,
+            false) as IEnumerable<Link>;
+
+        // Assert
+        Assert.NotNull(result);
+        var links = result.ToArray();
+        Assert.AreEqual(3, links.Length);
+        Assert.AreSame(PublishedContent, links[0].Content);
+        Assert.AreSame(PublishedMedia, links[1].Content);
+        Assert.IsNull(links[2].Content);
+    }
 }
