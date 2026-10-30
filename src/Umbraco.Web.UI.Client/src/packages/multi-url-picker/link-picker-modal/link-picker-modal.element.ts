@@ -322,7 +322,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	async #triggerDocumentLinkPicker() {
 		const value = await umbOpenModal(this, UMB_DOCUMENT_LINK_PICKER_MODAL, {
 			data: { allowCultureSpecificLinks: this._config.documentLinksConfig?.allowCultureSpecificLinks },
-		});
+		}).catch(() => undefined);
+		if (!value) return;
 
 		// If a culture is selected for the document, we need to set the variant context to make sure we get the correct name and url for the document.
 		// This will make a local variant context for the link picker when a Document with a culture is selected,
@@ -421,6 +422,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					standalone
 					?readonly=${!this.modalContext?.router}>
 					<uui-action-bar slot="actions">
+						<uui-button
+							label=${this.localize.term('actions_replace')}
+							@click=${this.#triggerDocumentLinkPicker}></uui-button>
 						<uui-button
 							label=${this.localize.term('general_remove')}
 							@click=${() => this.#onDocumentRemove()}></uui-button>

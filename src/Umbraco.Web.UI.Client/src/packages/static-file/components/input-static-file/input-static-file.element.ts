@@ -111,6 +111,11 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 		return undefined;
 	}
 
+	#renderReplaceAction() {
+		if (this.max !== 1) return nothing;
+		return html`<uui-button label=${this.localize.term('actions_replace')} @click=${this.#openPicker}></uui-button>`;
+	}
+
 	override render() {
 		if (!this._statuses) return nothing;
 		return html`
@@ -158,6 +163,7 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 				.errorDetail=${isError ? this.#serializer.toServerPath(unique) : undefined}
 				?standalone=${this.max === 1}>
 				<uui-action-bar slot="actions">
+					${this.#renderReplaceAction()}
 					<uui-button
 						label=${this.localize.term('general_remove')}
 						@click=${() => this.#pickerContext.requestRemoveItem(unique)}></uui-button>

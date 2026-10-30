@@ -133,6 +133,11 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
+	#renderReplaceAction() {
+		if (this.max !== 1) return nothing;
+		return html`<uui-button label=${this.localize.term('actions_replace')} @click=${this.#openPicker}></uui-button>`;
+	}
+
 	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
@@ -166,6 +171,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 		return html`
 			<uui-ref-node-data-type name=${item.name} id=${item.unique}>
 				<uui-action-bar slot="actions">
+					${this.#renderReplaceAction()}
 					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node-data-type>

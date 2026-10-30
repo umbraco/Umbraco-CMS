@@ -117,6 +117,11 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 		});
 	}
 
+	#renderReplaceAction() {
+		if (this.max !== 1) return nothing;
+		return html`<uui-button label=${this.localize.term('actions_replace')} @click=${this.#openPicker}></uui-button>`;
+	}
+
 	override render() {
 		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
 	}
@@ -162,6 +167,7 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 					.errorDetail=${unique}
 					?standalone=${this.max === 1}>
 					<uui-action-bar slot="actions">
+						${this.#renderReplaceAction()}
 						<uui-button
 							label=${this.localize.term('general_remove')}
 							@click=${() => this.#pickerContext.requestRemoveItem(unique)}></uui-button>
@@ -176,6 +182,7 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 			<uui-ref-node-document-type name=${this.localize.string(item.name)}>
 				${when(item.icon, () => html`<umb-icon slot="icon" name=${item.icon!}></umb-icon>`)}
 				<uui-action-bar slot="actions">
+					${this.#renderReplaceAction()}
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(unique)}
 						label="Remove Member Type ${item.name}"
