@@ -276,6 +276,110 @@ describe('UmbCurrentUserContext', () => {
 		});
 	});
 
+	describe('when the user cannot be fetched', () => {
+		const SIGNED_IN_USER = { id: '2c0d7b9e-5a7c-4c4f-9b8e-000000000002', name: 'Signed-in user' };
+
+		let realFetch: typeof globalThis.fetch;
+		let failuresLeft: number;
+		let signedInUser: typeof SIGNED_IN_USER | undefined;
+
+		function settle<T>(promise: Promise<T>, ms = 1000): Promise<{ outcome: string; value?: T }> {
+			return Promise.race([
+				promise.then(
+					(value) => ({ outcome: 'resolved', value }),
+					() => ({ outcome: 'rejected' }),
+				),
+				aTimeout(ms).then(() => ({ outcome: 'pending' })),
+			]);
+		}
+
+		beforeEach(() => {
+			failuresLeft = 0;
+			signedInUser = undefined;
+
+			realFetch = globalThis.fetch;
+			globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+				const url = input instanceof Request ? input.url : String(input);
+				if (!/\/user\/current(\?|$)/.test(url)) return realFetch(input, init);
+				if (failuresLeft > 0) {
+					failuresLeft--;
+					return new Response(JSON.stringify({ title: 'Simulated failure', status: 500 }), {
+						status: 500,
+						headers: { 'Content-Type': 'application/problem+json' },
+					});
+				}
+				const response = await realFetch(input, init);
+				return signedInUser ? Response.json({ ...(await response.json()), ...signedInUser }) : response;
+			};
+		});
+
+		afterEach(() => {
+			globalThis.fetch = realFetch;
+		});
+
+		it('does not settle on the previously loaded user when fetching the current user fails', async () => {
+			await hostElement.init();
+			context.invalidate();
+			signedInUser = SIGNED_IN_USER;
+			failuresLeft = 1;
+
+			const { outcome, value } = await settle(context.load().then(() => context.getUnique()));
+
+			expect(value, 'load() resolved with the previously loaded user').to.not.equal(CURRENT_USER_UNIQUE);
+			expect(outcome).to.equal('rejected');
+		});
+
+		it('rejects when the first load fails instead of never settling', async () => {
+			failuresLeft = 1;
+
+			const { outcome } = await settle(context.load());
+
+			expect(outcome).to.equal('rejected');
+			expect(context.getUnique()).to.be.undefined;
+		});
+
+		it('fetches the user again on the next load() after a failed load', async () => {
+			await hostElement.init();
+			context.invalidate();
+			failuresLeft = 1;
+			await settle(context.load());
+
+			signedInUser = SIGNED_IN_USER;
+			await settle(context.load());
+
+			expect(context.getUnique()).to.equal(SIGNED_IN_USER.id);
+			expect(context.getName()).to.equal(SIGNED_IN_USER.name);
+		});
+
+		it('logs a failed reload after the current user is updated', async () => {
+			await hostElement.init();
+			failuresLeft = 1;
+			const logged: Array<unknown> = [];
+			const realError = console.error;
+			console.error = (message: unknown) => logged.push(message);
+			try {
+				hostElement.actionEventContext.dispatchEvent(
+					new UmbEntityUpdatedEvent({ entityType: UMB_USER_ENTITY_TYPE, unique: CURRENT_USER_UNIQUE }),
+				);
+				await aTimeout(300);
+			} finally {
+				console.error = realError;
+			}
+
+			expect(logged).to.include('[UmbCurrentUserContext] Failed to reload the current user');
+		});
+
+		it('keeps the previously loaded user in state when loading it again fails', async () => {
+			await hostElement.init();
+			context.invalidate();
+			failuresLeft = 1;
+
+			await settle(context.load());
+
+			expect(context.getUnique()).to.equal(CURRENT_USER_UNIQUE);
+		});
+	});
+
 	describe('invalidate', () => {
 		beforeEach(async () => {
 			// Re-seed the mock data before loading, as earlier tests mutate the user group.

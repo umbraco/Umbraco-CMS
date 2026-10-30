@@ -360,7 +360,19 @@ export class UmbAppElement extends UmbLitElement {
 
 	#loadCurrentUser() {
 		if (!this.#currentUser || !this.#packageModules) return;
-		this.#currentUser.load();
+		const currentUser = this.#currentUser;
+		currentUser.load().catch((error) => {
+			// Once a user has loaded, the backoffice may hold unsaved work, so only replace a shell without a user.
+			if (currentUser.getUnique()) {
+				console.error('[UmbAppElement] Failed to reload the current user', error);
+				return;
+			}
+			this.#errorPage(
+				'The current user could not be loaded. This might be due to a network issue or a server error.',
+				error,
+				{ headline: 'Failed to load the current user' },
+			);
+		});
 	}
 
 	#redirect() {
@@ -442,6 +454,8 @@ export class UmbAppElement extends UmbLitElement {
 		this._routes = [
 			{
 				path: '**',
+				// A unique of its own, so the router also replaces a backoffice that has already rendered.
+				unique: 'umbAppError',
 				component: () => import('./app-error.element.js'),
 				setup: (component) => {
 					(component as UmbAppErrorElement).errorMessage = errorMsg;

@@ -141,7 +141,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 					<div id="machine">${this.properties.find((property) => property.name === 'MachineName')?.value}</div>
 					<div id="message"><uui-scroll-container>${this.renderedMessage}</uui-scroll-container></div>
 				</summary>
-				${this.exception ? html`<pre id="exception">${this.exception}</pre>` : ''}
+				${this.exception ? html`<pre id="exception" dir="ltr">${this.exception}</pre>` : ''}
 				<ul id="properties-list">
 					<li class="property">
 						<div class="property-name"><umb-localize key="logViewer_timestamp">Timestamp</umb-localize></div>
