@@ -1,4 +1,5 @@
-﻿import {AliasHelper} from "./AliasHelper";
+﻿import {expect} from "@playwright/test";
+import {AliasHelper} from "./AliasHelper";
 import {ApiHelpers} from "./ApiHelpers";
 import {ConstantHelper} from "./ConstantHelper";
 import {ElementBuilder} from "../builders";
@@ -288,6 +289,29 @@ export class ElementApiHelper {
       .build();
 
     return await this.create(element);
+  }
+
+  async getFirstPropertyValue(id: string) {
+    const element = await this.get(id);
+    return element.values[0]?.value;
+  }
+
+  async waitUntilFirstPropertyValueEquals(id: string, expectedValue: string) {
+    // The save is reflected in the element API shortly after the UI action, so poll rather than read once.
+    await expect.poll(() => this.getFirstPropertyValue(id), {timeout: ConstantHelper.timeout.veryLong}).toBe(expectedValue);
+  }
+
+  async deleteAndVerifyElementIsDeleted(id: string) {
+    expect(await this.delete(id)).toBe(ConstantHelper.statusCodes.ok);
+    expect(await this.doesExist(id)).toBeFalsy();
+  }
+
+  async updateFirstPropertyValueAndPublish(id: string, value: string) {
+    const element = await this.get(id);
+    element.values[0].value = value;
+    const updateResponse = await this.update(id, element);
+    expect(updateResponse?.status()).toBe(ConstantHelper.statusCodes.ok);
+    expect(await this.publish(id)).toBe(ConstantHelper.statusCodes.ok);
   }
 
   async isElementPublished(id: string) {
