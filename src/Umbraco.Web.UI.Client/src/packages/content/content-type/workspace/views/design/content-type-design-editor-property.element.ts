@@ -98,14 +98,15 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	 * Confirmed once the alias is left alone, rather than on every keystroke.
 	 */
 	async #confirmAliasChange() {
+		if (!this._property) return;
 		const workspaceContext = await this.getContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT);
 		const persistedContentType = workspaceContext?.getPersistedData() as UmbContentTypeDetailModel | undefined;
 		if (persistedContentType?.isElement !== true) return;
 
-		const persistedAlias = persistedContentType.properties?.find((x) => x.unique === this._property?.unique)?.alias;
+		const persistedAlias = persistedContentType.properties?.find((x) => x.unique === this._property!.unique)?.alias;
 		if (persistedAlias === undefined) return;
 
-		if (persistedAlias === this._property?.alias) {
+		if (persistedAlias === this._property.alias) {
 			this.#aliasChangeConfirmed = false;
 			return;
 		}
@@ -117,7 +118,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				headline: this.localize.term('contentTypeEditor_confirmPropertyAliasChangeHeadline'),
 				content: html`<umb-localize
 					key="contentTypeEditor_confirmPropertyAliasChangeMessage"
-					.args=${[this._property?.name, persistedAlias]}></umb-localize>`,
+					.args=${[this._property.name]}></umb-localize>`,
 				confirmLabel: '#general_change',
 				color: 'danger',
 			});
