@@ -20,6 +20,9 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	@state()
 	private _currentUserHasAccessToAllLanguages?: boolean = false;
 
+	@state()
+	private _isReadOnly = false;
+
 	readonly #languageCollectionRepository = new UmbLanguageCollectionRepository(this);
 	#workspaceContext?: typeof UMB_DICTIONARY_WORKSPACE_CONTEXT.TYPE;
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
@@ -61,9 +64,16 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 		this.observe(this.#workspaceContext?.dictionary, (dictionary) => {
 			this._dictionary = dictionary;
 		});
+
+		this.observe(
+			this.#workspaceContext?.readOnlyGuard.permitted,
+			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			'_observeIsReadOnly',
+		);
 	}
 
 	#isReadOnly(culture: string | null) {
+		if (this._isReadOnly) return true;
 		if (!this.#currentUserContext) return true;
 		if (!culture) return false;
 		if (this._currentUserHasAccessToAllLanguages) return false;

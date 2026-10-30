@@ -65,14 +65,34 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerContext.max = value;
-		if (value === 1) {
+		this.#updateSorterEnabled();
+	}
+	public get max(): number {
+		return this.#pickerContext.max;
+	}
+
+	/**
+	 * Sets the input to readonly mode, meaning media types cannot be chosen, removed or sorted but can still be opened.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean, attribute: 'readonly' })
+	public get readonly(): boolean | undefined {
+		return this.#readonly;
+	}
+	public set readonly(value: boolean | undefined) {
+		this.#readonly = value;
+		this.#updateSorterEnabled();
+	}
+	#readonly?: boolean;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
-	}
-	public get max(): number {
-		return this.#pickerContext.max;
 	}
 
 	/**
@@ -165,7 +185,7 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 	}
 
 	#renderAddButton() {
-		if (this.max > 0 && this.selection.length >= this.max) return nothing;
+		if (this.readonly || (this.max > 0 && this.selection.length >= this.max)) return nothing;
 		return html`
 			<uui-button
 				id="btn-add"
@@ -197,11 +217,7 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 									.errorMessage=${status.state.error}
 									.errorDetail=${unique}
 									?standalone=${this.max === 1}>
-									<uui-action-bar slot="actions">
-										<uui-button
-											label=${this.localize.term('general_remove')}
-											@click=${() => this.#removeItem(unique)}></uui-button>
-									</uui-action-bar>
+									${this.#renderErrorItemActions(unique)}
 								</umb-entity-item-ref>
 							`;
 						}
@@ -214,9 +230,7 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 								${this.#renderIcon(item)}
 								<uui-action-bar slot="actions">
 									<uui-button href=${href} label=${this.localize.term('general_open')}></uui-button>
-									<uui-button
-										label=${this.localize.term('general_remove')}
-										@click=${() => this.#removeItem(unique)}></uui-button>
+									${this.#renderRemoveButton(unique)}
 								</uui-action-bar>
 							</uui-ref-node-document-type>
 						`;
@@ -224,6 +238,18 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 				)}
 			</uui-ref-list>
 		`;
+	}
+
+	#renderErrorItemActions(unique: string) {
+		if (this.readonly) return nothing;
+		return html`<uui-action-bar slot="actions">${this.#renderRemoveButton(unique)}</uui-action-bar>`;
+	}
+
+	#renderRemoveButton(unique: string) {
+		if (this.readonly) return nothing;
+		return html`<uui-button
+			label=${this.localize.term('general_remove')}
+			@click=${() => this.#removeItem(unique)}></uui-button>`;
 	}
 
 	#renderIcon(item: UmbMediaTypeItemModel) {

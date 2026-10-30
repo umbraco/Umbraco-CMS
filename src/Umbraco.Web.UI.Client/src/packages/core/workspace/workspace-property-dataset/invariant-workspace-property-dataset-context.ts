@@ -1,4 +1,5 @@
 import type { UmbInvariantDatasetWorkspaceContext } from '../contexts/index.js';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '../entity-detail/entity-detail-workspace.context-token.js';
 import type {
 	UmbPropertyDatasetContext,
 	UmbNameablePropertyDatasetContext,
@@ -11,7 +12,8 @@ import { UmbVariantContext, UmbVariantId } from '@umbraco-cms/backoffice/variant
 import { UmbBooleanState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
- * A property dataset context that hooks directly into the workspace context.
+ * A property dataset context that hooks directly into the workspace context. It is read-only while the workspace
+ * entity is read-only.
  */
 export class UmbInvariantWorkspacePropertyDatasetContext<
 	WorkspaceType extends UmbInvariantDatasetWorkspaceContext = UmbInvariantDatasetWorkspaceContext,
@@ -51,6 +53,14 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 
 		this.name = this.#workspace.name;
 		this.#variantContext.setVariantId(this.getVariantId());
+		this.#observeReadOnly();
+	}
+
+	#observeReadOnly() {
+		const workspace = this.#workspace;
+		if (!UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.getDiscriminator()?.(workspace)) return;
+
+		this.observe(workspace.readOnlyGuard.permitted, (isReadOnly) => this.#readOnly.setValue(isReadOnly ?? false), null);
 	}
 
 	get properties(): Observable<Array<UmbPropertyValueData> | undefined> {
