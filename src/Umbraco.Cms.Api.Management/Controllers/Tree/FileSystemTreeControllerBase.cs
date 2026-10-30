@@ -83,7 +83,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
             return _fileSystemTreeService.GetAncestorModels(path, includeSelf);
         }
 
-        var directories = path.Split(Path.DirectorySeparatorChar).Take(Range.EndAt(Index.FromEnd(1))).ToArray();
+        var directories = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries).Take(Range.EndAt(Index.FromEnd(1))).ToArray();
         var result = directories
             .Select((directory, index) => MapViewModel(string.Join(Path.DirectorySeparatorChar, directories.Take(index + 1)), directory, true))
             .ToList();
@@ -152,7 +152,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
     [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 19.")]
     private FileSystemTreeItemPresentationModel MapViewModel(string path, string name, bool isFolder)
     {
-        var parentPath = Path.GetDirectoryName(path);
+        var parentPath = Path.GetDirectoryName(path)?.TrimStart(Path.DirectorySeparatorChar);
         return new FileSystemTreeItemPresentationModel
         {
             Path = path.SystemPathToVirtualPath(),
