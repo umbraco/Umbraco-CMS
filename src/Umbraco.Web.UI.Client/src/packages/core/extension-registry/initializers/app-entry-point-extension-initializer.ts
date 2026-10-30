@@ -22,11 +22,11 @@ export class UmbAppEntryPointExtensionInitializer extends UmbExtensionInitialize
 		super(host, extensionRegistry, 'appEntryPoint' satisfies ManifestAppEntryPoint['type']);
 	}
 
-	async instantiateExtension(manifest: ManifestAppEntryPoint) {
+	async instantiateExtension(manifest: ManifestAppEntryPoint, signal?: AbortSignal) {
 		if (manifest.js) {
 			const moduleInstance = await loadManifestPlainJs(manifest.js);
 
-			if (!moduleInstance) return;
+			if (!moduleInstance || signal?.aborted) return;
 
 			this.#instanceMap.set(manifest.alias, moduleInstance);
 

@@ -22,11 +22,11 @@ export class UmbBackofficeEntryPointExtensionInitializer extends UmbExtensionIni
 		super(host, extensionRegistry, 'backofficeEntryPoint' satisfies ManifestBackofficeEntryPoint['type']);
 	}
 
-	async instantiateExtension(manifest: ManifestBackofficeEntryPoint) {
+	async instantiateExtension(manifest: ManifestBackofficeEntryPoint, signal?: AbortSignal) {
 		if (manifest.js) {
 			const moduleInstance = await loadManifestPlainJs(manifest.js);
 
-			if (!moduleInstance) return;
+			if (!moduleInstance || signal?.aborted) return;
 
 			this.#instanceMap.set(manifest.alias, moduleInstance);
 
