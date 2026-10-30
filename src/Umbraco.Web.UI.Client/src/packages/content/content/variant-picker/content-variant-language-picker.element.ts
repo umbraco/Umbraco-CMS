@@ -122,6 +122,18 @@ export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
 		`;
 	}
 
+	#onSelectableChange(event: Event, unique: string, select: boolean) {
+		if (select) {
+			this.selectionManager.select(unique);
+		} else {
+			this.selectionManager.deselect(unique);
+		}
+		// The selection manager has the final say, as a host may keep an item selected; cancel the item's own toggle then.
+		if (this.selectionManager.isSelected(unique) !== select) {
+			event.preventDefault();
+		}
+	}
+
 	#renderItem(option: UmbEntityVariantOptionModel) {
 		const pickable = this.pickableFilter ? this.pickableFilter(option) : true;
 		const selected = this._selection.includes(option.unique);
@@ -132,8 +144,8 @@ export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
 				?selectable=${pickable}
 				?disabled=${!pickable}
 				label=${option.variant?.name ?? option.language.name}
-				@selected=${() => this.selectionManager.select(option.unique)}
-				@deselected=${() => this.selectionManager.deselect(option.unique)}
+				@selected=${(event: Event) => this.#onSelectableChange(event, option.unique, true)}
+				@deselected=${(event: Event) => this.#onSelectableChange(event, option.unique, false)}
 				?selected=${selected}>
 				<uui-icon slot="icon" name="icon-globe"></uui-icon>
 				${UmbContentVariantLanguagePickerElement.renderLabel(option, mustSelect, this.renderAdditionalLabel)}

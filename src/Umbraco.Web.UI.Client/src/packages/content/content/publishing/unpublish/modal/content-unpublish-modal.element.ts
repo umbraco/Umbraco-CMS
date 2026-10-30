@@ -1,10 +1,10 @@
 import type { UmbContentConfigurationRepository } from '../../../configuration/types.js';
 import type { UmbContentUnpublishModalData, UmbContentUnpublishModalValue } from './types.js';
+import { UmbContentUnpublishLanguageSelectionManager } from './content-unpublish-language-selection.manager.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type {
@@ -32,7 +32,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 	UmbContentUnpublishModalData,
 	UmbContentUnpublishModalValue
 > {
-	protected readonly _selectionManager = new UmbSelectionManager<string>(this);
+	protected readonly _selectionManager = new UmbContentUnpublishLanguageSelectionManager(this);
 
 	@state()
 	private _options: Array<UmbEntityVariantOptionModel> = [];
@@ -108,6 +108,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 		// Filter selection based on options:
 		selected = selected.filter((s) => validOptions.some((o) => o.unique === s));
 
+		this._selectionManager.setOptions(this._options, this.#pickableFilter);
 		this._selectionManager.setSelection(selected);
 
 		this.observe(
