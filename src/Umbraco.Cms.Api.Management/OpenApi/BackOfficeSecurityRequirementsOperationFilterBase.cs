@@ -51,8 +51,9 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
         // may refuse a user who is authenticated.
         if (numberOfAuthorizeAttributes > BaseAuthorizeAttributeCount || hasConstructorInjectingIAuthorizationService)
         {
+            // Another filter may already have documented the forbidden response, for its own reason to refuse.
             operation.Responses ??= new OpenApiResponses();
-            operation.Responses.Add(
+            operation.Responses.TryAdd(
                 StatusCodes.Status403Forbidden.ToString(),
                 new OpenApiResponse
                 {

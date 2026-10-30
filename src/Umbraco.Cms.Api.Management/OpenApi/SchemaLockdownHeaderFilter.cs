@@ -10,11 +10,11 @@ using Umbraco.Cms.Core.SchemaLockdown;
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
 /// <summary>
-/// Documents the schema lockdown header on the 403 response of every governed operation.
+/// Documents the 403 response and the schema lockdown header of every operation schema lockdown can deny.
 /// </summary>
 /// <remarks>
-/// It applies to every OpenAPI document, so a package whose controllers declare <see cref="SchemaEntityTypeAttribute"/>
-/// gets the header documented in its own document too.
+/// It applies to every OpenAPI document, so any controller that declares <see cref="SchemaEntityTypeAttribute"/> gets
+/// them documented in its own document too.
 /// </remarks>
 internal sealed class SchemaLockdownHeaderFilter : IOperationFilter
 {
@@ -30,9 +30,17 @@ internal sealed class SchemaLockdownHeaderFilter : IOperationFilter
             return;
         }
 
-        if (operation.Responses?.TryGetValue(StatusCodes.Status403Forbidden.ToString(), out IOpenApiResponse? response)
-            is not true
-            || response is not OpenApiResponse forbidden)
+        // Schema lockdown is a reason to refuse an authenticated user in its own right, so the forbidden response is added
+        // when nothing else documented one.
+        operation.Responses ??= new OpenApiResponses();
+        if (operation.Responses.TryGetValue(StatusCodes.Status403Forbidden.ToString(), out IOpenApiResponse? response)
+            is false)
+        {
+            response = new OpenApiResponse { Description = "The authenticated user does not have access to this resource" };
+            operation.Responses[StatusCodes.Status403Forbidden.ToString()] = response;
+        }
+
+        if (response is not OpenApiResponse forbidden)
         {
             return;
         }
