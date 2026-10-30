@@ -15,6 +15,7 @@ export class UmbPropertyEditorDataSourceSearchProvider
 
 	override destroy(): void {
 		this.#repository.destroy();
+		super.destroy();
 	}
 }
 

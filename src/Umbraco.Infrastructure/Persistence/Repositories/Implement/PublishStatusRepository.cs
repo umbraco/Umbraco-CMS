@@ -82,6 +82,20 @@ public class PublishStatusRepository : IPublishStatusRepository
         return result.TryGetValue(documentKey, out ISet<string>? value) ? value : new HashSet<string>();
     }
 
+    /// <inheritdoc />
+    public async Task<IEnumerable<Guid>> GetPublishedKeysAsync(string culture, CancellationToken cancellationToken)
+    {
+        Sql<ISqlContext> sql = GetBaseQuery();
+        sql = sql.Where<LanguageDto>(l => l.IsoCode == culture, "l");
+
+        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(sql);
+
+        return Map(databaseRecords)
+            .Where(x => x.Value.Count > 0)
+            .Select(x => x.Key)
+            .ToArray();
+    }
+
     /// <summary>
     /// Asynchronously retrieves the publish status for the specified root document and all its descendants.
     /// </summary>
@@ -129,6 +143,20 @@ public class PublishStatusRepository : IPublishStatusRepository
 
         IDictionary<Guid, ISet<string>> result = Map(databaseRecords);
         return result.TryGetValue(elementKey, out ISet<string>? value) ? value : new HashSet<string>();
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<Guid>> GetPublishedElementKeysAsync(string culture, CancellationToken cancellationToken)
+    {
+        Sql<ISqlContext> sql = GetElementBaseQuery();
+        sql = sql.Where<LanguageDto>(l => l.IsoCode == culture, "l");
+
+        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(sql);
+
+        return Map(databaseRecords)
+            .Where(x => x.Value.Count > 0)
+            .Select(x => x.Key)
+            .ToArray();
     }
 
     private Sql<ISqlContext> GetElementBaseQuery()

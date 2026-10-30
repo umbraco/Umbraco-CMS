@@ -296,6 +296,10 @@ export default {
 		otherElements: 'Properties',
 		parentNotPublished: "This document is published but is not visible because the parent '%0%' is unpublished",
 		parentCultureNotPublished: "This culture is published but is not visible because it is unpublished on parent '%0%'",
+		ancestorNotPublishedScheduleWarning:
+			"An ancestor isn't published. The scheduled publish will fail unless every ancestor is published by then.",
+		ancestorCultureNotPublishedScheduleWarning:
+			"An ancestor isn't published in this language. The scheduled publish will fail unless every ancestor is published in this language by then.",
 		parentNotPublishedAnomaly: 'This document is published but is not in the cache',
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',
