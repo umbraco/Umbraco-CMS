@@ -6,6 +6,7 @@ import {
 	type GetServerTroubleshootingResponse,
 	type GetServerInformationResponse,
 	type GetServerConfigurationResponse,
+	type GetServerSchemaLockdownResponse,
 	type GetServerStatusResponse,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -47,6 +48,11 @@ export const serverInformationHandlers = [
 			baseUtcOffset: '01:00:00',
 			runtimeMode: RuntimeModeModel.BACKOFFICE_DEVELOPMENT,
 			isDebugMode: true,
+		});
+	}),
+	http.get(umbracoPath('/server/schema-lockdown'), () => {
+		return HttpResponse.json<GetServerSchemaLockdownResponse>({
+			restrictedEntityTypes: [],
 		});
 	}),
 	http.get(umbracoPath('/server/troubleshooting'), () => {

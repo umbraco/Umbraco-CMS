@@ -14,6 +14,7 @@ import { manifests as viewManifests } from './views/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_TREE_ALIAS_CONDITION } from '@umbraco-cms/backoffice/tree';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -86,6 +87,11 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			{
 				alias: UMB_TREE_ALIAS_CONDITION,
 				match: UMB_DOCUMENT_TYPE_TREE_ALIAS,
+			},
+			{
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+				operation: 'create',
 			},
 		],
 	},

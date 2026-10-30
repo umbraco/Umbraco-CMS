@@ -1,5 +1,10 @@
-import { UMB_STYLESHEET_FOLDER_ENTITY_TYPE, UMB_STYLESHEET_ROOT_ENTITY_TYPE } from '../../entity.js';
+import {
+	UMB_STYLESHEET_ENTITY_TYPE,
+	UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
+	UMB_STYLESHEET_ROOT_ENTITY_TYPE,
+} from '../../entity.js';
 import { UMB_STYLESHEET_FOLDER_REPOSITORY_ALIAS } from '../../tree/folder/repository/index.js';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 /** @deprecated No longer used internally. This will be removed in Umbraco 18. [LK] */
 const modal: UmbExtensionManifest = {
@@ -22,6 +27,13 @@ const entityAction: UmbExtensionManifest = {
 		additionalOptions: true,
 		headline: '#create_createUnder #treeHeaders_documentTypes',
 	},
+	conditions: [
+		{
+			alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+			entityType: UMB_STYLESHEET_ENTITY_TYPE,
+			operation: 'create',
+		},
+	],
 };
 
 const entityCreateOptionActions: Array<UmbExtensionManifest> = [

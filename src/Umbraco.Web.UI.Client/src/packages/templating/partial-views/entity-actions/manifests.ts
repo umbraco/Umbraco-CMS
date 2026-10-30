@@ -2,7 +2,7 @@ import { UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS, UMB_PARTIAL_VIEW_ITEM_REPOSIT
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as renameManifests } from './rename/manifests.js';
-import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -18,8 +18,9 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		},
 		conditions: [
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_PARTIAL_VIEW_ENTITY_TYPE,
+				operation: 'delete',
 			},
 		],
 	},
