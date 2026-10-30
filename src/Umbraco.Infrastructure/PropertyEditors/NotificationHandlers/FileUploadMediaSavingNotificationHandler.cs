@@ -42,6 +42,11 @@ internal sealed class FileUploadMediaSavingNotificationHandler : FileUploadNotif
     /// <inheritdoc/>
     public void Handle(MediaSavingNotification notification)
     {
+        if (notification.IsSorting)
+        {
+            return;
+        }
+
         foreach (IMedia entity in notification.SavedEntities)
         {
             AutoFillProperties(entity);

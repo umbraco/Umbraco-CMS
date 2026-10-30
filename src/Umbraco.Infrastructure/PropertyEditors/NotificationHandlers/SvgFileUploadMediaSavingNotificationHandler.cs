@@ -33,6 +33,11 @@ internal sealed class SvgFileUploadMediaSavingNotificationHandler : INotificatio
     /// <inheritdoc/>
     public void Handle(MediaSavingNotification notification)
     {
+        if (notification.IsSorting)
+        {
+            return;
+        }
+
         foreach (IMedia entity in notification.SavedEntities)
         {
             if (entity.ContentType.Alias.Equals(Core.Constants.Conventions.MediaTypes.VectorGraphicsAlias) is false)

@@ -43,6 +43,22 @@ public class SvgFileUploadMediaSavingNotificationHandlerTests
     }
 
     [Test]
+    public void Sorting_Does_Not_Read_File_Metadata()
+    {
+        IMedia media = CreateMedia(Constants.Conventions.MediaTypes.VectorGraphicsAlias, uploadValue: "/media/test.svg");
+        _fileSystem.Setup(x => x.GetRelativePath(It.IsAny<string>())).Returns("media/test.svg");
+        _fileSystem.Setup(x => x.FileExists("media/test.svg")).Returns(true);
+        _fileSystem.Setup(x => x.OpenFile("media/test.svg")).Returns(() => new MemoryStream(Encoding.UTF8.GetBytes("<svg/>")));
+        var notification = CreateNotification(media);
+        notification.IsSorting = true;
+
+        _handler.Handle(notification);
+
+        _fileSystem.Verify(x => x.OpenFile(It.IsAny<string>()), Times.Never);
+        _svgDimensionExtractor.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
+    }
+
+    [Test]
     public void Skips_Non_Vector_Graphics_Media_Type()
     {
         IMedia media = CreateMedia(Constants.Conventions.MediaTypes.Image);
