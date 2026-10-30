@@ -4,11 +4,17 @@ import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 export type * from './extensions/types.js';
 
-export interface UmbPickerModalData<ItemType> {
+export interface UmbPickerModalData<
+	ItemType,
+	SearchResultItemType extends UmbSearchResultItemModel = UmbSearchResultItemModel,
+> {
 	multiple?: boolean;
+	/**
+	 * @deprecated Deprecated since v17. Filtering items on the client breaks server-side pagination. Use `pickableFilter` to prevent items from being picked instead. Scheduled for removal in Umbraco 21.
+	 */
 	filter?: (item: ItemType) => boolean;
 	pickableFilter?: (item: ItemType) => boolean;
-	search?: UmbPickerModalSearchConfig;
+	search?: UmbPickerModalSearchConfig<Record<string, unknown>, SearchResultItemType>;
 }
 
 export interface UmbPickerModalSearchConfig<
@@ -17,7 +23,7 @@ export interface UmbPickerModalSearchConfig<
 > {
 	providerAlias: string;
 	queryParams?: QueryParamsType;
-	pickableFilter?: (item: SearchResultItemType) => boolean;
+	pickableFilter?(item: SearchResultItemType): boolean;
 }
 
 export interface UmbPickerModalValue {

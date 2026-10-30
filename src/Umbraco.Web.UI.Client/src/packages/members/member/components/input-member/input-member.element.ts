@@ -1,7 +1,9 @@
 import type { UmbMemberItemModel } from '../../item/types.js';
+import type { UmbMemberSearchItemModel } from '../../search/types.js';
+import type { UmbMemberDetailModel } from '../../types.js';
 import { UmbMemberPickerInputContext } from './input-member.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { splitStringToArray, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import {
 	isAboveZeroAndBelowMinimum,
@@ -102,8 +104,39 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
+	#hasWarnedFilterDeprecation = false;
+
+	/**
+	 * @deprecated Deprecated since v17. Filtering members on the client breaks server-side pagination. Use `browsePickableFilter` and `searchPickableFilter` to prevent members from being picked instead. Scheduled for removal in Umbraco 21.
+	 */
 	@property({ type: Object, attribute: false })
-	public filter: (member: UmbMemberItemModel) => boolean = () => true;
+	public set filter(value: ((member: UmbMemberDetailModel) => boolean) | undefined) {
+		if (value && !this.#hasWarnedFilterDeprecation) {
+			this.#hasWarnedFilterDeprecation = true;
+			new UmbDeprecation({
+				deprecated: 'The `filter` property of umb-input-member',
+				removeInVersion: '21.0.0',
+				solution: 'Use `browsePickableFilter` and `searchPickableFilter` to prevent members from being picked instead.',
+			}).warn();
+		}
+		this.#filter = value;
+	}
+	public get filter(): (member: UmbMemberDetailModel) => boolean {
+		return this.#filter ?? (() => true);
+	}
+	#filter?: (member: UmbMemberDetailModel) => boolean;
+
+	/**
+	 * Prevents items from being picked while browsing. Items for which this returns false are shown but cannot be picked.
+	 */
+	@property({ type: Object, attribute: false })
+	public browsePickableFilter?: (member: UmbMemberDetailModel) => boolean;
+
+	/**
+	 * Prevents search results from being picked. Results for which this returns false are shown but cannot be picked.
+	 */
+	@property({ type: Object, attribute: false })
+	public searchPickableFilter?: (member: UmbMemberSearchItemModel) => boolean;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -176,7 +209,11 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	#openPicker() {
 		this.#pickerContext.openPicker(
 			{
-				filter: this.filter,
+				filter: this.#filter,
+				pickableFilter: this.browsePickableFilter,
+				search: {
+					pickableFilter: this.searchPickableFilter,
+				},
 			},
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({

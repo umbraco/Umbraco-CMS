@@ -12,6 +12,7 @@ import type { UmbDefaultTreeContext } from './default-tree.context.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
@@ -130,8 +131,27 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ attribute: false })
 	selectableFilter: (item: UmbTreeItemModelBase) => boolean = () => true;
 
+	#hasWarnedFilterDeprecation = false;
+
+	/**
+	 * @deprecated Deprecated since v17. The built-in tree does not apply this option. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
+	 */
 	@property({ attribute: false })
-	filter: (item: UmbTreeItemModelBase) => boolean = () => true;
+	public set filter(value: ((item: UmbTreeItemModelBase) => boolean) | undefined) {
+		if (value && !this.#hasWarnedFilterDeprecation) {
+			this.#hasWarnedFilterDeprecation = true;
+			new UmbDeprecation({
+				deprecated: 'The `filter` property of umb-tree is not applied by the built-in tree.',
+				removeInVersion: '21.0.0',
+				solution: 'Use `selectableFilter` to prevent items from being selected instead.',
+			}).warn();
+		}
+		this.#filter = value;
+	}
+	public get filter(): (item: UmbTreeItemModelBase) => boolean {
+		return this.#filter ?? (() => true);
+	}
+	#filter?: (item: UmbTreeItemModelBase) => boolean;
 
 	@property({ attribute: false })
 	expansion: UmbTreeExpansionModel = [];
@@ -202,7 +222,8 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		}
 
 		if (_changedProperties.has('filter')) {
-			this._api!.filter = this.filter;
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			this._api!.filter = this.#filter;
 		}
 
 		if (_changedProperties.has('expansion')) {

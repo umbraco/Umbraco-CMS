@@ -4,7 +4,7 @@ import type { UmbCollectionItemModel } from '../../item/types.js';
 import { UMB_COLLECTION_MENU_CONTEXT } from './default-collection-menu.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbPaginationManager, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbPaginationManager, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
@@ -12,7 +12,28 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbDefaultCollectionMenuContext extends UmbContextBase {
 	public selectableFilter?: (item: UmbCollectionItemModel) => boolean = () => true;
-	public filter?: (item: UmbCollectionItemModel) => boolean = () => true;
+
+	#hasWarnedFilterDeprecation = false;
+
+	/**
+	 * @deprecated Deprecated since v17. The built-in collection menu does not apply this option. Use `selectableFilter` to prevent items from being selected instead. Scheduled for removal in Umbraco 21.
+	 */
+	public set filter(value: ((item: UmbCollectionItemModel) => boolean) | undefined) {
+		if (value && !this.#hasWarnedFilterDeprecation) {
+			this.#hasWarnedFilterDeprecation = true;
+			new UmbDeprecation({
+				deprecated:
+					'The `filter` property of UmbDefaultCollectionMenuContext is not applied by the built-in collection menu.',
+				removeInVersion: '21.0.0',
+				solution: 'Use `selectableFilter` to prevent items from being selected instead.',
+			}).warn();
+		}
+		this.#filter = value;
+	}
+	public get filter(): ((item: UmbCollectionItemModel) => boolean) | undefined {
+		return this.#filter ?? (() => true);
+	}
+	#filter?: (item: UmbCollectionItemModel) => boolean;
 	public filterArgs?: Record<string, unknown>;
 
 	public readonly selection = new UmbSelectionManager(this);
