@@ -1,6 +1,8 @@
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '../../contexts/index.js';
 import { html, customElement, state, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 @customElement('umb-workspace-entity-action-menu')
@@ -13,6 +15,9 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 	@state()
 	private _entityType?: string;
 
+	@state()
+	private _hasActions = false;
+
 	constructor() {
 		super();
 
@@ -22,14 +27,36 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 				this._unique = unique;
 				// TODO: the context does not have an observable for the entity type, so we need to use the
 				// getEntityType method until we can add an observable for it.
-				this._entityType = this._workspaceContext?.getEntityType();
+				const entityType = this._workspaceContext?.getEntityType();
+				if (entityType !== this._entityType) {
+					this._entityType = entityType;
+					this.#observeEntityActions();
+				}
 			});
 		});
+	}
+
+	#observeEntityActions() {
+		if (!this._entityType) return;
+		const entityType = this._entityType;
+
+		// Hide the menu when no entity actions are available for this entity type, so it doesn't open an empty dropdown.
+		new UmbExtensionsManifestInitializer(
+			this,
+			umbExtensionsRegistry,
+			'entityAction',
+			(ext) => ext.forEntityTypes.includes(entityType),
+			(actions) => {
+				this._hasActions = actions.length > 0;
+			},
+			'umbWorkspaceEntityActionsObserver',
+		);
 	}
 
 	override render() {
 		if (!this._entityType) return nothing;
 		if (this._unique === undefined) return nothing;
+		if (!this._hasActions) return nothing;
 
 		return html`<umb-entity-actions-dropdown
 			data-mark="workspace:action-menu-button"
