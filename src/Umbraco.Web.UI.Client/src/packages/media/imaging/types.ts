@@ -7,6 +7,11 @@ export interface UmbImagingResizeModel {
 	width?: number;
 	mode?: UmbImagingCropMode;
 	format?: string;
+	/**
+	 * The unique of the data type the request originates from, such as a media picker.
+	 * Media outside the user's start nodes is only resolved when this data type ignores user start nodes.
+	 */
+	dataTypeUnique?: string;
 }
 
 /**
@@ -16,7 +21,7 @@ export interface UmbImagingResizeModel {
  * @returns {string} The cache key
  */
 export function generateImagingCacheKey(model?: UmbImagingResizeModel): string {
-	return model ? `${model.width}x${model.height};${model.mode};${model.format}` : 'generic';
+	return model ? `${model.width}x${model.height};${model.mode};${model.format};${model.dataTypeUnique}` : 'generic';
 }
 
 /**
