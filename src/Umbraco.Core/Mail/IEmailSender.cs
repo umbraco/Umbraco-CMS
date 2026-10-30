@@ -22,6 +22,11 @@ public interface IEmailSender
     /// <summary>
     /// Sends a message asynchronously.
     /// </summary>
+    /// <remarks>
+    /// Implementations may send the message in the background, in which case the returned task completes once the
+    /// message is queued and a delivery failure is not reported to the caller. The default implementation does this
+    /// when <see cref="Configuration.Models.SmtpSettings.SendInBackground"/> is enabled.
+    /// </remarks>
     Task SendAsync(EmailMessage message, string emailType, bool enableNotification = false, TimeSpan? expires = null)
 #pragma warning disable CS0618 // Type or member is obsolete
         => SendAsync(message, emailType, enableNotification);
