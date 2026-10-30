@@ -7,6 +7,10 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbCollectionViewElementBase } from '@umbraco-cms/backoffice/collection';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import { UmbTreeItemOpenEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbElementControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbAncestorsEntityContext, UmbEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -17,7 +21,6 @@ import type {
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
 
-import './column-layouts/document-entity-actions-table-column-view.element.js';
 import './column-layouts/document-table-column-name.element.js';
 import './column-layouts/document-table-column-property-value.element.js';
 import './column-layouts/document-table-column-state.element.js';
@@ -57,6 +60,49 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 	private _orderingDesc = false;
 
 	#collectionContext?: typeof UMB_DOCUMENT_COLLECTION_CONTEXT.TYPE;
+
+	#rowContexts = new Map<
+		string,
+		{
+			host: UmbElementControllerHost;
+			entityContext: UmbEntityContext;
+			entityContentTypeContext: UmbEntityContentTypeEntityContext;
+			ancestorsContext: UmbAncestorsEntityContext;
+		}
+	>();
+
+	#onRowRendered = (element: HTMLElement | undefined, row: UmbTableItem) => {
+		if (!element) {
+			const existing = this.#rowContexts.get(row.id);
+			if (existing) {
+				existing.host.destroy();
+				this.#rowContexts.delete(row.id);
+			}
+			return;
+		}
+
+		let rowContexts = this.#rowContexts.get(row.id);
+		if (!rowContexts) {
+			const host = new UmbElementControllerHost(element);
+			host.hostConnected();
+			rowContexts = {
+				host,
+				entityContext: new UmbEntityContext(host),
+				entityContentTypeContext: new UmbEntityContentTypeEntityContext(host),
+				ancestorsContext: new UmbAncestorsEntityContext(host),
+			};
+			this.#rowContexts.set(row.id, rowContexts);
+		}
+
+		const item = this._items.find((x) => x.unique === row.id);
+		const documentTypeUnique = item?.contentType?.unique;
+
+		rowContexts.entityContext.setEntityType(row.entityType);
+		rowContexts.entityContext.setUnique(row.id);
+		rowContexts.entityContentTypeContext.setEntityType(documentTypeUnique ? UMB_DOCUMENT_TYPE_ENTITY_TYPE : undefined);
+		rowContexts.entityContentTypeContext.setUnique(documentTypeUnique);
+		rowContexts.ancestorsContext.setAncestors(item?.ancestors ?? []);
+	};
 
 	constructor() {
 		super();
@@ -135,7 +181,16 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 			this._tableColumns = [
 				...this.#systemColumns,
 				...userColumns,
-				...(this._hideItemActions ? [] : [{ name: '', alias: 'entityActions', align: 'right' } as UmbTableColumn]),
+				...(this._hideItemActions
+					? []
+					: [
+							{
+								name: '',
+								alias: 'entityActions',
+								align: 'right',
+								elementName: 'umb-entity-actions-table-column-view',
+							} as UmbTableColumn,
+						]),
 			];
 		}
 	}
@@ -160,8 +215,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 					if (column.alias === 'entityActions') {
 						return {
 							columnAlias: 'entityActions',
-							value: html`<umb-document-entity-actions-table-column-view
-								.value=${item}></umb-document-entity-actions-table-column-view>`,
+							value: {},
 						};
 					}
 
@@ -192,6 +246,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 				data: data,
 			};
 		});
+
+		const currentIds = new Set(this._tableItems.map((row) => row.id));
+		for (const [id, rowContexts] of this.#rowContexts) {
+			if (!currentIds.has(id)) {
+				rowContexts.host.destroy();
+				this.#rowContexts.delete(id);
+			}
+		}
 	}
 
 	#onSelected(event: UmbTableSelectedEvent) {
@@ -230,6 +292,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 		});
 	}
 
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		for (const [, rowContexts] of this.#rowContexts) {
+			rowContexts.host.destroy();
+		}
+		this.#rowContexts.clear();
+	}
+
 	override render() {
 		return html`
 			<umb-table
@@ -239,6 +309,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 				.selection=${this._selection}
 				.orderingColumn=${this._orderingColumn}
 				.orderingDesc=${this._orderingDesc}
+				.onRowRendered=${this.#onRowRendered}
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}
 				@ordered=${this.#onOrdering}></umb-table>
