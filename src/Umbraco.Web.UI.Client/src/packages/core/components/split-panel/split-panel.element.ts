@@ -63,10 +63,8 @@ export class UmbSplitPanelElement extends UmbLitElement {
 	#hasInitialized = false;
 
 	override connectedCallback() {
-		console.log('connectedCallback called');
 		super.connectedCallback();
 		if (this.#hasBothPanels) {
-			console.log('connectedCallback: Both panels are present');
 			this.#connect();
 		}
 	}
