@@ -1,4 +1,4 @@
-import { isLocalLinkHref, linkFromAttributes } from './link-attributes.function.js';
+import { attributesFromLink, isLocalLinkHref, linkFromAttributes } from './link-attributes.function.js';
 import { expect } from '@open-wc/testing';
 
 describe('isLocalLinkHref', () => {
@@ -115,5 +115,29 @@ describe('linkFromAttributes', () => {
 		expect(link.name).to.equal('Example');
 		expect(link.target).to.equal('_blank');
 		expect(link.culture).to.equal('da-DK');
+	});
+});
+
+describe('attributesFromLink', () => {
+	it('uses the name entered for the link as its title', () => {
+		const attrs = attributesFromLink({ name: 'Example', type: 'external', url: 'https://example.com' });
+
+		expect(attrs?.title).to.equal('Example');
+	});
+
+	it('turns a bare email address into a mailto link', () => {
+		expect(attributesFromLink({ type: 'external', url: 'info@example.com' })?.href).to.equal('mailto:info@example.com');
+	});
+
+	it('leaves an email address with a scheme or in a URL as it is', () => {
+		expect(attributesFromLink({ type: 'external', url: 'sip:info@example.com' })?.href).to.equal(
+			'sip:info@example.com',
+		);
+		expect(attributesFromLink({ type: 'external', url: '//info@example.com' })?.href).to.equal('//info@example.com');
+	});
+
+	it('has no title when no name was entered for the link', () => {
+		expect(attributesFromLink({ type: 'external', url: 'https://example.com' })?.title).to.be.null;
+		expect(attributesFromLink({ name: '', type: 'external', url: 'https://example.com' })?.title).to.be.null;
 	});
 });
