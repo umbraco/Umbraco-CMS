@@ -154,6 +154,21 @@ internal sealed class PartialViewRepository : FileRepository<string, IPartialVie
     }
 
     /// <summary>
+    ///     Deletes a partial view item, but only when not in production runtime mode.
+    /// </summary>
+    /// <param name="entity">The partial view entity to delete.</param>
+    protected override void PersistDeletedItem(IPartialView entity)
+    {
+        // Only delete file when not in production runtime mode.
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return;
+        }
+
+        base.PersistDeletedItem(entity);
+    }
+
+    /// <summary>
     ///     Gets a stream that is used to write to the file.
     /// </summary>
     /// <param name="content"></param>

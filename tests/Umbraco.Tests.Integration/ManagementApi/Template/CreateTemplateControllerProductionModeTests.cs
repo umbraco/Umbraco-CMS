@@ -26,7 +26,7 @@ public class CreateTemplateControllerProductionModeTests : ManagementApiTest<Cre
         => await AuthenticateClientAsync(Client, "admin@test.com", "1234567890", true);
 
     [Test]
-    public async Task Create_Returns_Bad_Request()
+    public async Task Create_Returns_Forbidden()
     {
         CreateTemplateRequestModel createModel = new()
         {
@@ -37,6 +37,9 @@ public class CreateTemplateControllerProductionModeTests : ManagementApiTest<Cre
 
         var response = await Client.PostAsync(Url, JsonContent.Create(createModel));
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.That(
+            response.Headers.GetValues(Constants.Headers.SchemaLockdown),
+            Is.EqualTo(new[] { $"{Constants.UdiEntityType.Template}:create" }));
     }
 }
