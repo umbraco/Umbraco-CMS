@@ -449,7 +449,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
-	#onPageChange(event: UUIPaginationEvent) {
+	async #onPageChange(event: UUIPaginationEvent) {
 		event.stopPropagation();
 		const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
 
@@ -462,7 +462,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		paginationManager.setCurrentPageNumber(event.target.current);
 		this.#pagingMap.set(key, paginationManager);
 
-		this.#loadChildrenOfCurrentMediaItem();
+		await this.#loadChildrenOfCurrentMediaItem();
+		this.shadowRoot?.querySelector('umb-body-layout')?.getScrollContainer()?.scrollTo({ top: 0, behavior: 'instant' });
 	}
 
 	#allowNavigateToMedia(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel): boolean {

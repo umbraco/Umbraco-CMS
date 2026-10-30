@@ -1,5 +1,5 @@
 import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -183,14 +183,6 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			</uui-button>
 		`;
 	}
-
-	static override styles = [
-		css`
-			uui-scroll-container {
-				max-height: 700px;
-			}
-		`,
-	];
 }
 
 declare global {
