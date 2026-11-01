@@ -10,8 +10,8 @@ const SCHEMA_LOCKDOWN_UNIQUE = 'UMB_SCHEMA_LOCKDOWN';
  * an existing one), and forbids creating a new entity when creating isn't allowed.
  */
 export class UmbSchemaLockdownWorkspaceController extends UmbControllerBase {
-	#updateAllowed = new UmbSchemaOperationAllowedController(this, { operation: 'update' });
 	#createAllowed = new UmbSchemaOperationAllowedController(this, { operation: 'create' });
+	#updateAllowed = new UmbSchemaOperationAllowedController(this, { operation: 'update' });
 	#workspaceContext?: typeof UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.TYPE;
 	#isNew?: boolean;
 
@@ -23,8 +23,8 @@ export class UmbSchemaLockdownWorkspaceController extends UmbControllerBase {
 			this.#workspaceContext = context;
 			this.#isNew = undefined;
 			const entityType = context?.getEntityType();
-			this.#updateAllowed.setEntityType(entityType);
 			this.#createAllowed.setEntityType(entityType);
+			this.#updateAllowed.setEntityType(entityType);
 			this.observe(
 				context?.isNew,
 				(isNew) => {
@@ -38,8 +38,8 @@ export class UmbSchemaLockdownWorkspaceController extends UmbControllerBase {
 			this.observe(context?.forbidden.isOn, () => this.#update(), '_observeIsForbidden');
 		});
 
-		this.observe(this.#updateAllowed.allowed, () => this.#update(), null);
 		this.observe(this.#createAllowed.allowed, () => this.#update(), null);
+		this.observe(this.#updateAllowed.allowed, () => this.#update(), null);
 	}
 
 	#update() {
