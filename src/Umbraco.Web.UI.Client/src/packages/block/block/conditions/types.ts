@@ -5,8 +5,8 @@ export type BlockWorkspaceHasSettingsConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceHasSettings'>;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export type BlockWorkspaceContentHasPropertiesConditionConfig =
-	UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceContentHasProperties'>;
+export type BlockWorkspaceShowContentEditConditionConfig =
+	UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceShowContentEdit'>;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface BlockEntryShowContentEditConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryShowContentEdit'> {
@@ -42,7 +42,7 @@ declare global {
 		umbBlock:
 			| BlockEntryShowContentEditConditionConfig
 			| BlockWorkspaceHasSettingsConditionConfig
-			| BlockWorkspaceContentHasPropertiesConditionConfig
+			| BlockWorkspaceShowContentEditConditionConfig
 			| BlockEntryIsExposedConditionConfig
 			| BlockWorkspaceIsReadOnlyConditionConfig
 			| BlockEntryIsReadOnlyConditionConfig

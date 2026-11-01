@@ -21,6 +21,7 @@ import {
 	UmbClassState,
 	UmbObjectState,
 	UmbStringState,
+	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -91,6 +92,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#exposed = new UmbBooleanState<undefined>(undefined);
 	readonly exposed = this.#exposed.asObservable();
+
+	#forceHideContentEditorInOverlay = new UmbBooleanState(false);
+	readonly showContentEdit = mergeObservables(
+		[this.content.structure.contentTypeHasProperties, this.#forceHideContentEditorInOverlay.asObservable()],
+		([hasProperties, forceHide]) => hasProperties === true && forceHide === false,
+	);
 
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
@@ -268,6 +275,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.observe(
 					contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
 					async (blockType) => {
+						this.#forceHideContentEditorInOverlay.setValue(blockType?.forceHideContentEditorInOverlay ?? false);
 						if (blockType?.editorSize) {
 							const editorConfig = manager.getEditorConfiguration();
 							const useInlineEditing = editorConfig?.find((x) => x.alias === 'useInlineEditingAsDefault')?.value;
