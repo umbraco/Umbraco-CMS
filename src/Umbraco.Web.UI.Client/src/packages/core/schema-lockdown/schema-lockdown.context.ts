@@ -15,7 +15,7 @@ const UMB_SCHEMA_LOCKDOWN_UNKNOWN_STATE: ServerSchemaLockdownResponseModel = Obj
 });
 
 export class UmbSchemaLockdownContext extends UmbContextBase {
-	#state = new UmbObjectState<ServerSchemaLockdownResponseModel>(UMB_SCHEMA_LOCKDOWN_UNKNOWN_STATE);
+	readonly #state = new UmbObjectState<ServerSchemaLockdownResponseModel>(UMB_SCHEMA_LOCKDOWN_UNKNOWN_STATE);
 	#requested = false;
 
 	/**

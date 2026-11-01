@@ -63,7 +63,7 @@ describe('UmbSchemaLockdownWorkspaceController', () => {
 		setup('document-type');
 
 		await waitUntil(() => entityReadOnlyGuard.getPermitted(), 'the entity was not made read-only');
-		expect(entityReadOnlyGuard.getRules().length).to.equal(1);
+		expect(entityReadOnlyGuard.getRules()).to.have.lengthOf(1);
 	});
 
 	it('makes the entity editable again once saving it is allowed', async () => {

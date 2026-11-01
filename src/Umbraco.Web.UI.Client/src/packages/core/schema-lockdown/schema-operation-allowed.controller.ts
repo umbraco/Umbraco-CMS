@@ -22,12 +22,12 @@ export interface UmbSchemaOperationAllowedControllerArgs {
  * The operation counts as allowed until the entity type is known.
  */
 export class UmbSchemaOperationAllowedController extends UmbControllerBase {
-	#allowed = new UmbBooleanState(true);
+	readonly #allowed = new UmbBooleanState(true);
 	readonly allowed = this.#allowed.asObservable();
 
 	#schemaLockdownContext?: UmbSchemaLockdownContext;
 	#entityType?: string;
-	#operation: UmbSchemaOperation;
+	readonly #operation: UmbSchemaOperation;
 
 	constructor(host: UmbControllerHost, args: UmbSchemaOperationAllowedControllerArgs) {
 		super(host);
