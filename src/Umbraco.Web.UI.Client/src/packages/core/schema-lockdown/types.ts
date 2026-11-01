@@ -7,9 +7,9 @@ export interface UmbSchemaOperationAllowedConditionConfig extends UmbConditionCo
 	typeof UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS
 > {
 	/**
-	 * The backoffice entity type the action applies to.
+	 * The backoffice entity type the action applies to. Defaults to the entity type of the surrounding workspace.
 	 */
-	entityType: string;
+	entityType?: string;
 
 	/**
 	 * The operation the action performs.

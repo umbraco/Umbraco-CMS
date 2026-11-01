@@ -3,6 +3,7 @@ import type { UmbSchemaOperationAllowedConditionConfig } from '../types.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 export class UmbSchemaOperationAllowedCondition
 	extends UmbConditionBase<UmbSchemaOperationAllowedConditionConfig>
@@ -18,6 +19,12 @@ export class UmbSchemaOperationAllowedCondition
 			entityType: this.config.entityType,
 			operation: this.config.operation,
 		});
+
+		if (!this.config.entityType) {
+			this.consumeContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT, (context) =>
+				operationAllowed.setEntityType(context?.getEntityType()),
+			);
+		}
 
 		this.observe(
 			operationAllowed.allowed,
