@@ -38,8 +38,6 @@ export class UmbSchemaLockdownContext extends UmbContextBase {
 	 */
 	public isAllowed(entityType: string, operation: UmbSchemaOperation): boolean {
 		const schemaEntityType = toSchemaEntityType(entityType);
-		if (!schemaEntityType) return true;
-
 		const entry = this.#state.getValue().restrictedEntityTypes.find((x) => x.entityType === schemaEntityType);
 		if (!entry) return true;
 
