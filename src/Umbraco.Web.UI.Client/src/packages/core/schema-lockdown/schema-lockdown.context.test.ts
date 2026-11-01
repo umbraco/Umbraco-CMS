@@ -27,6 +27,7 @@ describe('UmbSchemaLockdownContext', () => {
 
 	const createLoadedContext = async () => {
 		const context = new UmbSchemaLockdownContext(host);
+		context.observe(context.state, () => {}, null);
 		await waitUntil(() => requested, 'the restrictions were not requested');
 		await aTimeout(50);
 		return context;
@@ -87,6 +88,7 @@ describe('UmbSchemaLockdownContext', () => {
 			restrictedEntityTypes: [{ entityType: 'document-type', create: false, update: false, delete: false }],
 		});
 		const context = new UmbSchemaLockdownContext(host);
+		context.observe(context.state, () => {}, null);
 
 		expect(context.isAllowed('document-type', 'update')).to.be.true;
 	});
@@ -96,5 +98,20 @@ describe('UmbSchemaLockdownContext', () => {
 		const context = await createLoadedContext();
 
 		expect(context.isAllowed('document-type', 'update')).to.be.true;
+	});
+
+	it('requests the restrictions again for the next observer after a failed request', async () => {
+		respondWith(500);
+		const context = await createLoadedContext();
+
+		respondWith({
+			restrictedEntityTypes: [{ entityType: 'document-type', create: true, update: false, delete: true }],
+		});
+
+		// The failed response is handled some time after the request, so keep adding observers until one requests again.
+		await waitUntil(() => {
+			context.observe(context.state, () => {}, null);
+			return context.isAllowed('document-type', 'update') === false;
+		}, 'the restrictions were not requested again');
 	});
 });

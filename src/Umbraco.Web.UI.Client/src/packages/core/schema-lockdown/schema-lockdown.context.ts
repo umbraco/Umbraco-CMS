@@ -6,6 +6,7 @@ import type { ServerSchemaLockdownResponseModel } from '@umbraco-cms/backoffice/
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { defer } from '@umbraco-cms/backoffice/external/rxjs';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 // Used while loading and if the request fails. It permits everything, as the server enforces lockdown anyway.
@@ -15,18 +16,36 @@ const UMB_SCHEMA_LOCKDOWN_UNKNOWN_STATE: ServerSchemaLockdownResponseModel = Obj
 
 export class UmbSchemaLockdownContext extends UmbContextBase {
 	#state = new UmbObjectState<ServerSchemaLockdownResponseModel>(UMB_SCHEMA_LOCKDOWN_UNKNOWN_STATE);
-	public readonly state = this.#state.asObservable();
+	#requested = false;
+
+	/**
+	 * The schema lockdown restrictions. They're requested from the server once, when this is first observed.
+	 */
+	public readonly state = defer(() => {
+		this.#request();
+		return this.#state.asObservable();
+	});
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_SCHEMA_LOCKDOWN_CONTEXT);
-		this.#load();
+	}
+
+	#request() {
+		if (this.#requested) return;
+		this.#requested = true;
+		void this.#load();
 	}
 
 	async #load() {
 		const { data } = await tryExecute(this._host, ServerService.getServerSchemaLockdown(), {
 			disableNotifications: true,
 		});
-		this.#state.setValue(data ?? UMB_SCHEMA_LOCKDOWN_UNKNOWN_STATE);
+		if (data) {
+			this.#state.setValue(data);
+		} else {
+			// The next observer requests the restrictions again.
+			this.#requested = false;
+		}
 	}
 
 	/**
