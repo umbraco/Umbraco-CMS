@@ -79,6 +79,9 @@ Check that the member you need exists on the token's result type, and that you a
 ## Creating a Context
 
 ```typescript
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+
 export const UMB_MY_CONTEXT = new UmbContextToken<UmbMyContext>('UmbMyContext');
 
 export class UmbMyContext extends UmbContextBase<UmbMyContext> {
