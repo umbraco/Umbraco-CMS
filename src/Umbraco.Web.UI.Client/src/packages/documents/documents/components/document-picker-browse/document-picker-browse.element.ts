@@ -87,6 +87,13 @@ export class UmbDocumentPickerBrowseElement extends UmbLitElement {
 	@property({ type: String, attribute: 'tree-alias' })
 	treeAlias?: string;
 
+	/**
+	 * Passed on to the tree as is. The built-in tree does not apply it, as documents have no folders.
+	 * @deprecated Scheduled for removal in Umbraco 21.
+	 */
+	@property({ type: Boolean, attribute: 'folders-only' })
+	foldersOnly?: boolean;
+
 	@state()
 	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
 		multiple: false,
@@ -188,6 +195,16 @@ export class UmbDocumentPickerBrowseElement extends UmbLitElement {
 					'The `treeAlias` property of umb-document-picker-browse (and the `treeAlias` option of UmbDocumentPickerModalData) is deprecated.',
 				removeInVersion: '21.0.0',
 				solution: 'The document picker always browses the document tree. Use a tree picker to browse another tree.',
+			}).warn();
+		}
+
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		if (_changedProperties.has('foldersOnly') && this.foldersOnly) {
+			new UmbDeprecation({
+				deprecated:
+					'The `foldersOnly` property of umb-document-picker-browse (and the `foldersOnly` option of UmbDocumentPickerModalData) is deprecated.',
+				removeInVersion: '21.0.0',
+				solution: 'Remove the option, as documents have no folders.',
 			}).warn();
 		}
 
@@ -441,6 +458,8 @@ export class UmbDocumentPickerBrowseElement extends UmbLitElement {
 					startNode: this._treeStartNode,
 					// Once drilled into a location the tree is scoped to that single node again.
 					startNodes: this._treeStartNode ? undefined : this.#pickerContext?.location.getStartNodes(),
+					// eslint-disable-next-line @typescript-eslint/no-deprecated
+					foldersOnly: this.foldersOnly,
 					expansion: this._treeExpansion,
 					interactionMemories: this._treeInteractionMemories,
 				}}

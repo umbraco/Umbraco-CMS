@@ -98,16 +98,6 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 
 	#warnUnappliedOptions() {
 		// eslint-disable-next-line @typescript-eslint/no-deprecated
-		if (this.data?.foldersOnly) {
-			new UmbDeprecation({
-				deprecated:
-					'The `foldersOnly` option of UmbDocumentPickerModalData is not applied, as documents have no folders.',
-				removeInVersion: '21.0.0',
-				solution: 'Remove the option.',
-			}).warn();
-		}
-
-		// eslint-disable-next-line @typescript-eslint/no-deprecated
 		if (this.data?.createAction) {
 			new UmbDeprecation({
 				deprecated: 'The `createAction` option of UmbDocumentPickerModalData is not applied by the document picker.',
@@ -214,10 +204,14 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	#renderBrowse() {
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		const foldersOnly = this.data?.foldersOnly;
+
 		return html`<umb-document-picker-browse
 			.pickableFilter=${this.data?.pickableFilter}
 			.filter=${this.data?.filter}
 			.treeAlias=${this._treeAlias}
+			?folders-only=${foldersOnly}
 			?hide-tree-root=${this.data?.hideTreeRoot}
 			?expand-tree-root=${this.data?.expandTreeRoot}
 			@selected=${this.#onItemSelected}

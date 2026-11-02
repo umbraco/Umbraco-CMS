@@ -11,7 +11,7 @@ export interface UmbDocumentPickerModalData extends UmbTreePickerModalData<UmbDo
 	treeAlias?: string;
 
 	/**
-	 * Not applied by the document picker.
+	 * Passed on to the tree as is. The document tree does not apply it.
 	 * @deprecated Documents have no folders. Scheduled for removal in Umbraco 21.
 	 */
 	foldersOnly?: boolean;

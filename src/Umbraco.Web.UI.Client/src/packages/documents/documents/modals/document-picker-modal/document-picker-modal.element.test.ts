@@ -104,11 +104,12 @@ describe('UmbDocumentPickerModalElement', () => {
 		const warningsFor = (option: string) =>
 			warnings.filter((warning) => warning.includes(`\`${option}\` option of UmbDocumentPickerModalData`));
 
-		it('warns when foldersOnly is passed', async () => {
+		it('hands foldersOnly to umb-document-picker-browse', async () => {
 			element.data = { ...element.data, foldersOnly: true } as UmbDocumentPickerModalData;
 			await element.updateComplete;
 
-			expect(warningsFor('foldersOnly')).to.have.lengthOf(1);
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			expect(getPicker().foldersOnly).to.be.true;
 		});
 
 		it('warns when createAction is passed', async () => {
@@ -125,7 +126,6 @@ describe('UmbDocumentPickerModalElement', () => {
 			element.data = { ...element.data, multiple: false } as UmbDocumentPickerModalData;
 			await element.updateComplete;
 
-			expect(warningsFor('foldersOnly')).to.have.lengthOf(0);
 			expect(warningsFor('createAction')).to.have.lengthOf(0);
 		});
 	});

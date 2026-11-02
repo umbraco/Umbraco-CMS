@@ -418,6 +418,9 @@ describe('UmbDocumentPickerBrowseElement', () => {
 		const treeAliasWarnings = () =>
 			warnings.filter((warning) => warning.includes('`treeAlias` property of umb-document-picker-browse'));
 
+		const foldersOnlyWarnings = () =>
+			warnings.filter((warning) => warning.includes('`foldersOnly` property of umb-document-picker-browse'));
+
 		const filterWarnings = () =>
 			warnings.filter((warning) => warning.includes('`filter` property of umb-document-picker-browse'));
 
@@ -443,6 +446,15 @@ describe('UmbDocumentPickerBrowseElement', () => {
 
 			expect(getTree()!.alias).to.equal('Umb.Test.OtherTree');
 			expect(treeAliasWarnings()).to.have.lengthOf(1);
+		});
+
+		it('hands foldersOnly to the tree, and warns', async () => {
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			element.foldersOnly = true;
+			await element.updateComplete;
+
+			expect(getTree()!.props!.foldersOnly).to.be.true;
+			expect(foldersOnlyWarnings()).to.have.lengthOf(1);
 		});
 
 		it('does not warn when given the document tree', async () => {
