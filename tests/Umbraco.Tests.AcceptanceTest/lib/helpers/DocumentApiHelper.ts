@@ -488,6 +488,26 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createDocumentWithCultureNames(documentTypeId: string, cultureVariants: {isoCode: string, name: string}[], parentId?: string) {
+    for (const variant of cultureVariants) {
+      await this.ensureNameNotExists(variant.name);
+    }
+
+    const builder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId);
+    if (parentId) {
+      builder.withParentId(parentId);
+    }
+    for (const variant of cultureVariants) {
+      builder.addVariant()
+        .withName(variant.name)
+        .withCulture(variant.isoCode)
+        .done();
+    }
+
+    return await this.create(builder.build());
+  }
+
   async createDocumentWithMultipleVariants(documentName: string, documentTypeId: string, dataTypeAlias: string, cultureVariants: {isoCode: string, name: string, value: string}[]) {
     await this.ensureNameNotExists(documentName);
 

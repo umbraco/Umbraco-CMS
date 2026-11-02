@@ -207,6 +207,9 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly cardContentNode: Locator;
   private readonly documentPickerModal: Locator;
   private readonly collectionCardInDocumentPickerModal: Locator;
+  private readonly documentLinkPickerModal: Locator;
+  private readonly collectionCardInDocumentLinkPickerModal: Locator;
+  private readonly collectionFilterInDocumentLinkPickerModal: Locator;
   private readonly treeViewSwitchBtnInPickerModal: Locator;
   private readonly treeViewClassicOptionBtnInPickerModal: Locator;
   private readonly treeViewTableOptionBtnInPickerModal: Locator;
@@ -451,6 +454,9 @@ export class ContentUiHelper extends UiBaseLocators {
     this.cardContentNode = this.cardCollectionView.locator('uui-card-content-node');
     this.documentPickerModal = page.locator('umb-document-picker-modal');
     this.collectionCardInDocumentPickerModal = this.documentPickerModal.locator('uui-card-content-node');
+    this.documentLinkPickerModal = page.locator('umb-document-link-picker-modal');
+    this.collectionCardInDocumentLinkPickerModal = this.documentLinkPickerModal.locator('uui-card-content-node');
+    this.collectionFilterInDocumentLinkPickerModal = this.documentLinkPickerModal.locator('umb-collection-filter-field').locator('#input');
     // Tree View (Browse tab of a picker, not a collection)
     this.treeViewSwitchBtnInPickerModal = this.sidebarModal.locator('[data-mark="tree:switch-view"]');
     // The alias suffix (Classic/Table) is stable across entity types, but the entity segment isn't, so match on suffix only.
@@ -2218,6 +2224,19 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickCollectionCardInPickerModal(name: string) {
     await this.click(this.collectionCardInDocumentPickerModal.filter({hasText: name}));
+  }
+
+  async enterFilterKeywordInLinkPickerCollection(keyword: string) {
+    await this.enterText(this.collectionFilterInDocumentLinkPickerModal, keyword);
+    await this.pressKey(this.collectionFilterInDocumentLinkPickerModal, 'Enter');
+  }
+
+  async isCollectionCardInLinkPickerModalVisible(name: string, isVisible: boolean = true) {
+    await this.isVisible(this.collectionCardInDocumentLinkPickerModal.filter({has: this.page.getByText(name, {exact: true})}), isVisible);
+  }
+
+  async clickCollectionCardInLinkPickerModal(name: string) {
+    await this.click(this.collectionCardInDocumentLinkPickerModal.filter({has: this.page.getByText(name, {exact: true})}));
   }
 
   async changeTreeToTableView() {
