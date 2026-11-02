@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
 
@@ -32,12 +33,7 @@ internal sealed partial class MediaTypeEditingServiceTests
     {
         var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync(fileExtension, 0, 100);
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Total, Is.EqualTo(1));
-            Assert.That(result.Items.Single().MediaType.Alias, Is.EqualTo(Constants.Conventions.MediaTypes.File));
-            Assert.That(result.Items.Single().IsSpecificMatch, Is.False);
-        });
+        AssertFileFallback(result, 1);
     }
 
     [TestCase("pdf")]
@@ -71,12 +67,7 @@ internal sealed partial class MediaTypeEditingServiceTests
         try
         {
             var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync(extension, 0, 100);
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.Total, Is.EqualTo(1));
-                Assert.That(result.Items.Single().MediaType.Alias, Is.EqualTo(Constants.Conventions.MediaTypes.File));
-                Assert.That(result.Items.Single().IsSpecificMatch, Is.False);
-            });
+            AssertFileFallback(result, 1);
         }
         finally
         {
@@ -120,12 +111,7 @@ internal sealed partial class MediaTypeEditingServiceTests
     {
         var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync("pdf", 1, 1);
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Total, Is.EqualTo(2));
-            Assert.That(result.Items.Single().MediaType.Alias, Is.EqualTo(Constants.Conventions.MediaTypes.File));
-            Assert.That(result.Items.Single().IsSpecificMatch, Is.False);
-        });
+        AssertFileFallback(result, 2);
     }
 
     [TestCase("jpg", Constants.Conventions.MediaTypes.Image)]
@@ -256,4 +242,14 @@ internal sealed partial class MediaTypeEditingServiceTests
         Assert.AreEqual(Constants.Conventions.MediaTypes.ArticleAlias, result.Items.First().Alias);
     }
 #pragma warning restore CS0618 // Type or member is obsolete
+
+    private static void AssertFileFallback(PagedModel<MediaTypeFileExtensionMatchResult> result, int expectedTotal)
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Total, Is.EqualTo(expectedTotal));
+            Assert.That(result.Items.Single().MediaType.Alias, Is.EqualTo(Constants.Conventions.MediaTypes.File));
+            Assert.That(result.Items.Single().IsSpecificMatch, Is.False);
+        });
+    }
 }
