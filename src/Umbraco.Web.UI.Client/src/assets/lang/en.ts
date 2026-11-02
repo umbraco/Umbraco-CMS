@@ -281,6 +281,10 @@ export default {
 		otherElements: 'Properties',
 		parentNotPublished: "This document is published but is not visible because the parent '%0%' is unpublished",
 		parentCultureNotPublished: "This culture is published but is not visible because it is unpublished on parent '%0%'",
+		ancestorNotPublishedScheduleWarning:
+			"An ancestor isn't published. The scheduled publish will fail unless every ancestor is published by then.",
+		ancestorCultureNotPublishedScheduleWarning:
+			"An ancestor isn't published in this language. The scheduled publish will fail unless every ancestor is published in this language by then.",
 		parentNotPublishedAnomaly: 'This document is published but is not in the cache',
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',
@@ -412,6 +416,8 @@ export default {
 		},
 	},
 	media: {
+		chooseMediaTypeHeadline: 'Choose media type',
+		chooseMediaTypeMoreFiles: (count: number) => (count === 1 ? '1 more file' : `${count} more files`),
 		clickToUpload: 'Click to upload',
 		browseFilesAction: 'Browse files',
 		dropFilesOr: 'Drag and drop media here<br />or',
@@ -2358,10 +2364,13 @@ export default {
 		invalidEmpty: 'Value cannot be empty',
 		invalidFalse: 'This field must be turned on',
 		invalidPattern: 'Value is invalid, it does not match the correct pattern',
+		invalidValue: 'Value is invalid',
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
 		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
+		minimumOnlyWhenInUse:
+			'The minimum applies once items have been added. To require a value, mark the property as mandatory.',
 		invalidMemberGroupName: 'Invalid member group name',
 		invalidUserGroupName: 'Invalid user group name',
 		invalidToken: 'Invalid token',

@@ -152,6 +152,14 @@ public class UmbracoRequestPaths
     }
 
     /// <summary>
+    ///     Checks if the current uri is a Delivery API request.
+    /// </summary>
+    /// <param name="absPath">The absolute path of the request.</param>
+    /// <returns><c>true</c> if the path is within the Delivery API; otherwise <c>false</c>.</returns>
+    public bool IsDeliveryApiRequest(string absPath)
+        => TrimAppPath(absPath).InvariantStartsWith(_deliveryApiPath);
+
+    /// <summary>
     ///     Checks if the current uri is an install request
     /// </summary>
     public bool IsInstallerRequest(string absPath) => absPath.InvariantStartsWith(_managementApiPath);

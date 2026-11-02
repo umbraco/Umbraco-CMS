@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validation;
 
@@ -48,6 +50,14 @@ public class TypedJsonValidatorRunner<TValue, TConfiguration> : IValueValidator
         TValue? deserializedValue = null;
         if (value is not null && _jsonSerializer.TryDeserialize(value, out deserializedValue) is false)
         {
+            // A value that isn't JSON at all is not in editor form, and these validators only apply to editor values.
+            // A value that is JSON but of the wrong shape can't be validated by any of them, so report it as invalid
+            // rather than reporting it as valid.
+            if (IsJson(value))
+            {
+                validationResults.Add(new ValidationResult(Constants.Validation.ErrorMessages.Properties.Invalid, ["value"]));
+            }
+
             return validationResults;
         }
 
@@ -58,4 +68,7 @@ public class TypedJsonValidatorRunner<TValue, TConfiguration> : IValueValidator
 
         return validationResults;
     }
+
+    private static bool IsJson(object value)
+        => value is JsonNode || (value is string stringValue && stringValue.DetectIsJson());
 }

@@ -2,6 +2,7 @@ import type {
 	UmbClipboardEntryPickerModalValue,
 	UmbClipboardEntryPickerModalData,
 } from './clipboard-entry-picker-modal.token.js';
+import type { UmbEntityOpenedEvent } from '@umbraco-cms/backoffice/entity';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -17,6 +18,11 @@ export class UmbClipboardEntryPickerModalElement extends UmbModalBaseElement<
 		this.updateValue({ selection: target.selection });
 	}
 
+	#onEntityOpened(event: UmbEntityOpenedEvent) {
+		this.updateValue({ selection: [event.unique] });
+		this.modalContext?.submit();
+	}
+
 	#submit() {
 		this.modalContext?.submit();
 	}
@@ -30,7 +36,8 @@ export class UmbClipboardEntryPickerModalElement extends UmbModalBaseElement<
 			<umb-clipboard-entry-picker
 				.selection=${this.value?.selection}
 				.config=${this.data}
-				@selection-change=${this.#onSelectionChange}></umb-clipboard-entry-picker>
+				@selection-change=${this.#onSelectionChange}
+				@entity-opened=${this.#onEntityOpened}></umb-clipboard-entry-picker>
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button

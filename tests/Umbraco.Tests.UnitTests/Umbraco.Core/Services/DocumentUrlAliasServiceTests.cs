@@ -102,6 +102,7 @@ public class DocumentUrlAliasServiceTests
         contentMock.Setup(x => x.Key).Returns(documentKey);
         contentMock.Setup(x => x.Trashed).Returns(false);
         contentMock.Setup(x => x.Blueprint).Returns(false);
+        contentMock.Setup(x => x.Published).Returns(true);
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
         contentMock.Setup(x => x.Properties).Returns(propertyCollectionMock.Object);
         contentMock.Setup(x => x.GetValue<string>(
@@ -141,6 +142,7 @@ public class DocumentUrlAliasServiceTests
         contentMock.Setup(x => x.Key).Returns(documentKey);
         contentMock.Setup(x => x.Trashed).Returns(false);
         contentMock.Setup(x => x.Blueprint).Returns(false);
+        contentMock.Setup(x => x.Published).Returns(true);
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
         contentMock.Setup(x => x.Properties).Returns(propertyCollectionMock.Object);
 

@@ -3,7 +3,11 @@ import { UmbDocumentPickerInputContext } from './input-document.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import {
+	isAboveZeroAndBelowMinimum,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+} from '@umbraco-cms/backoffice/validation';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -91,6 +95,12 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
+	/**
+	 * Multiple nodes to start the picker tree from. Takes precedence over `startNode`.
+	 */
+	@property({ type: Array, attribute: false })
+	startNodes?: Array<UmbTreeStartNode>;
+
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
@@ -167,7 +177,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !this.readonly && !!this.min && this.selection.length < this.min,
+			() => !this.readonly && isAboveZeroAndBelowMinimum(this.selection.length, this.min),
 		);
 
 		this.addValidator(
@@ -188,6 +198,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 			{
 				hideTreeRoot: true,
 				startNode: this.startNode,
+				startNodes: this.startNodes,
 			},
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({

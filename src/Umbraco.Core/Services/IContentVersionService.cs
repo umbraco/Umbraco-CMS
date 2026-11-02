@@ -52,7 +52,10 @@ public interface IContentVersionService
     ///     Rolls back content to a specific version.
     /// </summary>
     /// <param name="versionId">The unique identifier of the version to roll back to.</param>
-    /// <param name="culture">The optional culture to roll back. If <c>null</c>, all cultures are rolled back.</param>
+    /// <param name="culture">
+    ///     The optional culture to roll back. If <c>null</c>, all cultures are rolled back. Can only be supplied for
+    ///     content that varies by culture.
+    /// </param>
     /// <param name="userKey">The unique identifier of the user performing the rollback.</param>
     /// <returns>An attempt containing the operation status.</returns>
     Task<Attempt<ContentVersionOperationStatus>> RollBackAsync(Guid versionId, string? culture, Guid userKey);

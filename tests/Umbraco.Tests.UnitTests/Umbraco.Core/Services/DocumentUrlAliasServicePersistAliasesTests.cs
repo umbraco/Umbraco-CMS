@@ -89,6 +89,7 @@ public class DocumentUrlAliasServicePersistAliasesTests
         contentMock.Setup(x => x.Trashed).Returns(trashed);
         contentMock.Setup(x => x.Blueprint).Returns(blueprint);
         contentMock.Setup(x => x.PublishedState).Returns(publishedState);
+        contentMock.Setup(x => x.Published).Returns(publishedState is PublishedState.Published or PublishedState.Publishing);
         contentMock.Setup(x => x.IsPropertyDirty(nameof(IContent.Trashed))).Returns(trashedChanged);
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
         contentMock.Setup(x => x.Properties).Returns(propertyCollectionMock.Object);
@@ -121,6 +122,7 @@ public class DocumentUrlAliasServicePersistAliasesTests
         var contentMock = new Mock<IContent>();
         contentMock.Setup(x => x.Key).Returns(Guid.NewGuid());
         contentMock.Setup(x => x.PublishedState).Returns(publishedState);
+        contentMock.Setup(x => x.Published).Returns(publishedState is PublishedState.Published or PublishedState.Publishing);
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
         contentMock.Setup(x => x.Properties).Returns(propertyCollectionMock.Object);
         contentMock.Setup(x => x.GetValue<string>(

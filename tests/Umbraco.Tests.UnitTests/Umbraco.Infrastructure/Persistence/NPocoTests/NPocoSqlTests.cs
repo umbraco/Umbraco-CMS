@@ -342,4 +342,24 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
             "SELECT * FROM [umbracoUserLogin] WITH (UPDLOCK) WHERE (([umbracoUserLogin].[sessionId] = @0))",
             sql.SQL.NoCrLf());
     }
+
+    [Test]
+    public void ForUpdate_With_Multi_Segment_Select()
+    {
+        var userOrMemberKey = Guid.NewGuid();
+
+        // Selecting a referenced DTO spreads the select over several segments before the FROM clause.
+        var sql = Sql()
+            .Select<ExternalLoginTokenDto>(r => r.Select(x => x.ExternalLoginDto))
+            .From<ExternalLoginTokenDto>()
+            .InnerJoin<ExternalLoginDto>()
+            .On<ExternalLoginTokenDto, ExternalLoginDto>(x => x.ExternalLoginId, x => x.Id)
+            .Where<ExternalLoginDto>(x => x.UserOrMemberKey == userOrMemberKey);
+
+        sql = sql.ForUpdate();
+
+        Assert.AreEqual(
+            "SELECT [umbracoExternalLoginToken].[id] AS [Id], [umbracoExternalLoginToken].[externalLoginId] AS [ExternalLoginId], [umbracoExternalLoginToken].[name] AS [Name], [umbracoExternalLoginToken].[value] AS [Value], [umbracoExternalLoginToken].[createDate] AS [CreateDate] , [umbracoExternalLogin].[id] AS [ExternalLoginDto__Id], [umbracoExternalLogin].[userOrMemberKey] AS [ExternalLoginDto__UserOrMemberKey], [umbracoExternalLogin].[loginProvider] AS [ExternalLoginDto__LoginProvider], [umbracoExternalLogin].[providerKey] AS [ExternalLoginDto__ProviderKey], [umbracoExternalLogin].[createDate] AS [ExternalLoginDto__CreateDate], [umbracoExternalLogin].[userData] AS [ExternalLoginDto__UserData] FROM [umbracoExternalLoginToken] WITH (UPDLOCK) INNER JOIN [umbracoExternalLogin] ON [umbracoExternalLoginToken].[externalLoginId] = [umbracoExternalLogin].[id] WHERE (([umbracoExternalLogin].[userOrMemberKey] = @0))",
+            sql.SQL.NoCrLf());
+    }
 }
