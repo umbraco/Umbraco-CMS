@@ -111,7 +111,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		...UmbCollectionDefaultElement.styles,
 		css`
 			umb-body-layout {
-				--umb-entity-frame-border-width: transparent;
+				--umb-body-layout-color-background: transparent;
 			}
 
 			umb-dropzone-media {
