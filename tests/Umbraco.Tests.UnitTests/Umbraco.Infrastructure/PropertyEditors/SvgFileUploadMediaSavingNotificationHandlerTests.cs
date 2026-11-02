@@ -1,22 +1,25 @@
 using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
-public class SvgFileUploadMediaSavingNotificationHandlerTests
+public class SvgFileUploadMediaSavingNotificationHandlerTests : MediaSavingMetadataHandlerTestsBase
 {
     private Mock<ISvgDimensionExtractor> _svgDimensionExtractor = null!;
     private Mock<IFileSystem> _fileSystem = null!;
@@ -42,21 +45,18 @@ public class SvgFileUploadMediaSavingNotificationHandlerTests
             mediaFileManager);
     }
 
-    [Test]
-    public void Sorting_Does_Not_Read_File_Metadata()
-    {
-        IMedia media = CreateMedia(Constants.Conventions.MediaTypes.VectorGraphicsAlias, uploadValue: "/media/test.svg");
-        _fileSystem.Setup(x => x.GetRelativePath(It.IsAny<string>())).Returns("media/test.svg");
-        _fileSystem.Setup(x => x.FileExists("media/test.svg")).Returns(true);
-        _fileSystem.Setup(x => x.OpenFile("media/test.svg")).Returns(() => new MemoryStream(Encoding.UTF8.GetBytes("<svg/>")));
-        var notification = CreateNotification(media);
-        notification.IsSorting = true;
+    protected override string EditorAlias => Constants.PropertyEditors.Aliases.UploadField;
 
-        _handler.Handle(notification);
+    protected override bool IsSvg => true;
 
-        _fileSystem.Verify(x => x.OpenFile(It.IsAny<string>()), Times.Never);
-        _svgDimensionExtractor.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
-    }
+    protected override INotificationHandler<MediaSavingNotification> CreateHandler(
+        MediaFileManager manager,
+        IOptionsMonitor<ContentSettings> settings,
+        IJsonSerializer serializer,
+        UploadAutoFillProperties autoFill,
+        ISvgDimensionExtractor svgDimensions) =>
+        new SvgFileUploadMediaSavingNotificationHandler(
+            NullLogger<SvgFileUploadMediaSavingNotificationHandler>.Instance, svgDimensions, manager);
 
     [Test]
     public void Skips_Non_Vector_Graphics_Media_Type()

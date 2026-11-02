@@ -29,7 +29,8 @@ internal class MediaSortingNotificationTests : UmbracoIntegrationTest
         var typeService = GetRequiredService<IMediaTypeService>();
         var mediaService = GetRequiredService<IMediaService>();
         IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("sortingTest", "Sorting Test");
-        Assert.That((await typeService.CreateAsync(mediaType, Constants.Security.SuperUserKey)).Success, Is.True);
+        await typeService.SaveAsync(mediaType, Constants.Security.SuperUserKey);
+        Assert.That(mediaType.HasIdentity, Is.True);
         IMedia first = MediaBuilder.CreateSimpleMedia(mediaType, "First", -1);
         IMedia second = MediaBuilder.CreateSimpleMedia(mediaType, "Second", -1);
         mediaService.Save(first);
