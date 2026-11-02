@@ -1704,25 +1704,25 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async doesClipboardHaveCopiedBlockWithName(contentName: string, propertyName: string, blockName: string, index: number = 0) {
-    await this.isVisible(this.clipboardEntryPicker.getByLabel(`${contentName} - ${propertyName} - ${blockName}`).nth(index));
+    await this.isVisible(this.clipboardEntryPicker.getByTestId(`clipboard-entry:${contentName} - ${propertyName} - ${blockName}`).nth(index));
   }
 
   async doesClipboardHaveCopiedBlocks(contentName: string, propertyName: string, index: number = 0) {
-    await this.isVisible(this.clipboardEntryPicker.getByLabel(`${contentName} - ${propertyName}`).nth(index));
+    await this.isVisible(this.clipboardEntryPicker.getByTestId(`clipboard-entry:${contentName} - ${propertyName}`).nth(index));
   }
 
   async doesClipboardContainCopiedBlocksCount(count: number) {
-    await this.hasCount(this.clipboardEntryPicker.locator(this.menuItem), count);
+    await this.hasCount(this.clipboardEntryPicker.getByTestId(/^clipboard-entry:/), count);
   }
 
   async selectClipboardEntryWithName(contentName: string, propertyName: string, blockName: string, index: number = 0) {
     await this.doesClipboardHaveCopiedBlockWithName(contentName, propertyName, blockName, index);
-    await this.click(this.clipboardEntryPicker.getByLabel(`${contentName} - ${propertyName} - ${blockName}`).nth(index));
+    await this.click(this.clipboardEntryPicker.getByTestId(`clipboard-entry:${contentName} - ${propertyName} - ${blockName}`).nth(index).locator('#select-checkbox'));
   }
 
   async selectClipboardEntriesWithName(contentName: string, propertyName: string, index: number = 0) {
     await this.doesClipboardHaveCopiedBlocks(contentName, propertyName, index);
-    await this.click(this.clipboardEntryPicker.getByLabel(`${contentName} - ${propertyName}`).nth(index));
+    await this.click(this.clipboardEntryPicker.getByTestId(`clipboard-entry:${contentName} - ${propertyName}`).nth(index).locator('#select-checkbox'));
   }
 
   async goToBlockGridBlockWithName(groupName: string, propertyName: string, blockName: string, index: number = 0) {

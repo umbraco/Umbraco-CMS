@@ -118,11 +118,11 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 			}
 
 			umb-empty-media-state {
-				position: absolute;
-				top: var(--uui-size-layout-4);
-				left: var(--uui-size-layout-1);
-				right: var(--uui-size-layout-1);
-				bottom: calc(var(--uui-size-60) * 2);
+				padding-top: var(--uui-size-layout-1);
+				padding-bottom: var(--uui-size-layout-1);
+				min-height: fit-content;
+				height: 100%;
+				box-sizing: border-box;
 			}
 		`,
 	];

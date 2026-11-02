@@ -3,7 +3,7 @@ import {
 	resolveStaleVariantRoute,
 	type UmbStaleVariantRouteResolverVariant,
 } from './resolve-stale-variant-route.function.js';
-import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from './constants.js';
+import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
 
 const WORKSPACE_ROUTE = '/section/content/workspace/document/edit/123';
 
