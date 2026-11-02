@@ -25,7 +25,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.WorkspaceView.BlockType.Grid.Areas',
 		name: 'Block Grid Type Workspace Areas View',
 		element: () => import('./block-grid-type-workspace-view-areas.element.js'),
-		weight: 1000,
+		weight: 900,
 		meta: {
 			label: '#blockEditor_tabAreas',
 			pathname: 'areas',
@@ -43,7 +43,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.WorkspaceView.BlockType.Grid.Advance',
 		name: 'Block Grid Type Workspace Advance View',
 		element: () => import('./block-grid-type-workspace-view-advanced.element.js'),
-		weight: 1000,
+		weight: 800,
 		meta: {
 			label: '#blockEditor_tabAdvanced',
 			pathname: 'advanced',

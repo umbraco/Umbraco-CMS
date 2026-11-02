@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Element Global Search',
 		alias: UMB_ELEMENT_GLOBAL_SEARCH_ALIAS,
 		type: 'globalSearch',
-		weight: 700,
+		weight: 690,
 		api: () => import('./element-global-search.js'),
 		meta: {
 			label: '#general_elements',
