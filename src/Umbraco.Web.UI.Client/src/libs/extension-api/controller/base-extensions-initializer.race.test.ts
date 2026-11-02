@@ -1,4 +1,8 @@
-import type { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types/index.js';
+import type {
+	ManifestCondition,
+	ManifestWithDynamicConditions,
+	UmbConditionConfigBase,
+} from '../types/index.js';
 import type { UmbConditionControllerArguments } from '../condition/condition-controller-arguments.type.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { PermittedControllerType, UmbBaseExtensionsInitializerArgs } from './index.js';
@@ -110,7 +114,16 @@ async function wait(ms: number) {
 // Wait until rAF has had a chance to flush the debounced notify — a couple of rAFs to be
 // safe against microtask ordering.
 async function waitForDebouncedNotify() {
-	await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+	await new Promise<void>((r) =>
+		requestAnimationFrame(() => requestAnimationFrame(() => r())),
+	);
+}
+
+// Permit the extension with the given condition key and wait until the change is exposed.
+async function permitAndSettle(uniqueKey: string) {
+	conditionByUnique.get(uniqueKey)!.flipTo(true);
+	await wait(UmbSlowGoodController.goodDelayMs + 50);
+	await waitForDebouncedNotify();
 }
 
 describe('UmbBaseExtensionsInitializer — condition-flip race', () => {
@@ -185,9 +198,10 @@ describe('UmbBaseExtensionsInitializer — condition-flip race', () => {
 		await waitForDebouncedNotify();
 
 		const finalState = changes[changes.length - 1] ?? [];
-		expect(finalState, `final exposed should include extension. history: ${JSON.stringify(changes)}`).to.deep.equal([
-			manifest.alias,
-		]);
+		expect(
+			finalState,
+			`final exposed should include extension. history: ${JSON.stringify(changes)}`,
+		).to.deep.equal([manifest.alias]);
 		expect(cond.permitted, 'condition final state').to.be.true;
 
 		plural.destroy();
@@ -215,9 +229,10 @@ describe('UmbBaseExtensionsInitializer — condition-flip race', () => {
 		await waitForDebouncedNotify();
 
 		const finalState = changes[changes.length - 1] ?? [];
-		expect(finalState, `final exposed should NOT include extension. history: ${JSON.stringify(changes)}`).to.deep.equal(
-			[],
-		);
+		expect(
+			finalState,
+			`final exposed should NOT include extension. history: ${JSON.stringify(changes)}`,
+		).to.deep.equal([]);
 
 		plural.destroy();
 	});
@@ -245,9 +260,10 @@ describe('UmbBaseExtensionsInitializer — condition-flip race', () => {
 		await waitForDebouncedNotify();
 
 		const finalState = changes[changes.length - 1] ?? [];
-		expect(finalState, `final exposed should include extension. history: ${JSON.stringify(changes)}`).to.deep.equal([
-			manifest.alias,
-		]);
+		expect(
+			finalState,
+			`final exposed should include extension. history: ${JSON.stringify(changes)}`,
+		).to.deep.equal([manifest.alias]);
 
 		plural.destroy();
 	});
@@ -280,9 +296,10 @@ describe('UmbBaseExtensionsInitializer — condition-flip race', () => {
 		// number of onChange emissions is not fixed (debouncer coalesces within frames),
 		// but the final emission must reflect truth.
 		const finalState = changes[changes.length - 1] ?? [];
-		expect(finalState, `final exposed should include extension. history: ${JSON.stringify(changes)}`).to.deep.equal([
-			manifest.alias,
-		]);
+		expect(
+			finalState,
+			`final exposed should include extension. history: ${JSON.stringify(changes)}`,
+		).to.deep.equal([manifest.alias]);
 
 		plural.destroy();
 	});
@@ -318,9 +335,10 @@ describe('UmbBaseExtensionsInitializer — condition-flip race', () => {
 		await waitForDebouncedNotify();
 
 		const finalState = changes[changes.length - 1] ?? [];
-		expect(finalState, `only A should be permitted. history: ${JSON.stringify(changes)}`).to.deep.equal([
-			manifestA.alias,
-		]);
+		expect(
+			finalState,
+			`only A should be permitted. history: ${JSON.stringify(changes)}`,
+		).to.deep.equal([manifestA.alias]);
 
 		plural.destroy();
 	});
@@ -353,9 +371,10 @@ describe('UmbBaseExtensionsInitializer — condition-flip race', () => {
 		await waitForDebouncedNotify();
 
 		const finalState = changes[changes.length - 1] ?? [];
-		expect(finalState, `both extensions should be in the list. history: ${JSON.stringify(changes)}`).to.deep.equal(
-			[manifestA.alias, manifestB.alias].sort(),
-		);
+		expect(
+			finalState,
+			`both extensions should be in the list. history: ${JSON.stringify(changes)}`,
+		).to.deep.equal([manifestA.alias, manifestB.alias].sort());
 
 		plural.destroy();
 	});
@@ -386,9 +405,10 @@ describe('UmbBaseExtensionsInitializer — condition-flip race', () => {
 		await waitForDebouncedNotify();
 
 		const finalState = changes[changes.length - 1] ?? [];
-		expect(finalState, `final exposed should include extension. history: ${JSON.stringify(changes)}`).to.deep.equal([
-			manifest.alias,
-		]);
+		expect(
+			finalState,
+			`final exposed should include extension. history: ${JSON.stringify(changes)}`,
+		).to.deep.equal([manifest.alias]);
 
 		plural.destroy();
 	});
@@ -492,35 +512,31 @@ describe('UmbBaseExtensionsInitializer — condition-flip race', () => {
 		await waitForDebouncedNotify();
 
 		const finalState = changes[changes.length - 1] ?? [];
-		expect(finalState, `final exposed should include extension. history: ${JSON.stringify(changes)}`).to.deep.equal([
-			manifest.alias,
-		]);
+		expect(
+			finalState,
+			`final exposed should include extension. history: ${JSON.stringify(changes)}`,
+		).to.deep.equal([manifest.alias]);
 
 		plural.destroy();
 	});
 
 	// Equal weights must not keep the order in which the conditions happened to resolve.
 	it('orders equal weights by alias, whichever condition resolves first', async () => {
-		const manifestA = makeManifest('Umb.Test.Plural.Race.A', 'A');
-		const manifestB = makeManifest('Umb.Test.Plural.Race.B', 'B');
-		extensionRegistry.register(manifestA);
-		extensionRegistry.register(manifestB);
+		extensionRegistry.registerMany([
+			makeManifest('Umb.Test.Plural.Race.A', 'A'),
+			makeManifest('Umb.Test.Plural.Race.B', 'B'),
+		]);
 
-		const changes: Array<string[]> = [];
-		const plural = new UmbTestPluralController(hostElement, extensionRegistry, (permitted) =>
-			changes.push(permitted.map((p) => p.alias)),
-		);
+		let exposed: Array<string> = [];
+		const plural = new UmbTestPluralController(hostElement, extensionRegistry, (permitted) => {
+			exposed = permitted.map((p) => p.alias);
+		});
 
 		await wait(0);
-		conditionByUnique.get('B')!.flipTo(true);
-		await wait(UmbSlowGoodController.goodDelayMs + 50);
-		await waitForDebouncedNotify();
-		conditionByUnique.get('A')!.flipTo(true);
-		await wait(UmbSlowGoodController.goodDelayMs + 50);
-		await waitForDebouncedNotify();
+		await permitAndSettle('B');
+		await permitAndSettle('A');
 
-		const finalState = changes[changes.length - 1] ?? [];
-		expect(finalState, `history: ${JSON.stringify(changes)}`).to.deep.equal([manifestA.alias, manifestB.alias]);
+		expect(exposed).to.deep.equal(['Umb.Test.Plural.Race.A', 'Umb.Test.Plural.Race.B']);
 
 		plural.destroy();
 	});

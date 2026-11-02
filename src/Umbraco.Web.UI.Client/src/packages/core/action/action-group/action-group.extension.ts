@@ -8,6 +8,9 @@ export interface ManifestActionGroupBase extends ManifestBase {
 	meta: MetaActionGroup;
 }
 
+/**
+ * The metadata of an action group.
+ */
 export interface MetaActionGroup {
 	/**
 	 * The accessible name of the group, read by assistive technology. Plain text or a localization key.

@@ -76,6 +76,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	#observingEntityActions = false;
 	#actions: Array<UmbExtensionManifestInitializer<ManifestEntityAction>> = [];
 	#groups: Array<ManifestActionGroupBase> = [];
+	#firstActionRequest = 0;
 
 	constructor() {
 		super();
@@ -84,7 +85,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			umbExtensionsRegistry.byType('entityActionGroup'),
 			(groups) => {
 				this.#groups = groups;
-				if (this.#actions.length > 0) this.#updateFirstAction();
+				if (this.#actions.length > 0) this.#updateFirstAction(true);
 			},
 			null,
 		);
@@ -146,25 +147,34 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		this.#observingEntityActions = true;
 	}
 
-	async #updateFirstAction() {
+	async #updateFirstAction(onlyWhenChanged = false) {
 		this._numberOfActions = this.#actions.length;
 		const oldFirstManifest = this._firstActionManifest;
 		// The inline action is the first action of the menu, so it follows the action groups.
 		const [firstItem] = umbOrderActionsByGroup(this.#actions, this.#groups, 'entityAction');
-		this._firstActionManifest = firstItem?.actions[0].action.manifest as ManifestEntityActionDefaultKind | undefined;
-		await this.#createFirstActionApi();
+		const firstManifest = firstItem?.actions[0].action.manifest as ManifestEntityActionDefaultKind | undefined;
+		if (onlyWhenChanged && firstManifest === oldFirstManifest) return;
+		const request = ++this.#firstActionRequest;
+		this._firstActionManifest = firstManifest;
+		await this.#createFirstActionApi(request);
 		this.requestUpdate('_firstActionManifest', oldFirstManifest);
 	}
 
-	async #createFirstActionApi() {
-		if (!this._firstActionManifest) return;
-		const oldFirstApi = this._firstActionApi;
-		this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
-			{ unique: this.#unique, entityType: this.#entityType, meta: this._firstActionManifest.meta },
+	async #createFirstActionApi(request: number) {
+		const manifest = this._firstActionManifest;
+		if (!manifest) return;
+		const api = await createExtensionApi(this, manifest, [
+			{ unique: this.#unique, entityType: this.#entityType, meta: manifest.meta },
 		]);
-		if (this._firstActionApi) {
-			(this._firstActionApi as any).manifest = this._firstActionManifest;
-			this._firstActionHref = await this._firstActionApi.getHref();
+		// A newer update started while this one was awaiting, so its result is stale.
+		if (request !== this.#firstActionRequest) return;
+		const oldFirstApi = this._firstActionApi;
+		this._firstActionApi = api;
+		if (api) {
+			(api as any).manifest = manifest;
+			const href = await api.getHref();
+			if (request !== this.#firstActionRequest) return;
+			this._firstActionHref = href;
 		}
 		this.requestUpdate('_firstActionApi', oldFirstApi);
 	}

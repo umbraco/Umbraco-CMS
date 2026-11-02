@@ -1,3 +1,6 @@
+/**
+ * An extension manifest, or a controller of one, that can be ordered by `compareExtensionsByWeight`.
+ */
 export type UmbWeightedExtension = { alias: string; weight?: number };
 
 /**

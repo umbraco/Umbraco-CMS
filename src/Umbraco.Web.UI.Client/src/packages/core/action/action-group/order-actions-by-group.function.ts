@@ -10,23 +10,39 @@ export interface UmbGroupableAction {
 	manifest?: { group?: string; separatorBefore?: boolean };
 }
 
+/**
+ * The action group of a menu item, as returned by `umbOrderActionsByGroup`.
+ */
 export interface UmbActionMenuGroup {
 	alias: string;
 	/** The registered group, or undefined for a fallback group: a `group` alias without a registered group. */
 	manifest?: ManifestActionGroupBase;
 }
 
+/**
+ * An action in a menu item, with whether a separator renders before it.
+ */
 export interface UmbActionMenuEntry<T extends UmbGroupableAction> {
 	action: T;
 	/** Whether a separator renders before this action. */
 	separatorBefore: boolean;
 }
 
+/**
+ * A top-level item of an ordered action menu: a group with its actions, or a single ungrouped action.
+ */
 export interface UmbActionMenuItem<T extends UmbGroupableAction> {
 	/** The group of the actions, or undefined for a single ungrouped action. */
 	group?: UmbActionMenuGroup;
 	actions: Array<UmbActionMenuEntry<T>>;
 }
+
+type UmbSortableMenuItem<T extends UmbGroupableAction> = {
+	alias: string;
+	weight: number;
+	isGroup: boolean;
+	item: UmbActionMenuItem<T>;
+};
 
 const warnedUnresolvedGroups = new Set<string>();
 
@@ -48,29 +64,12 @@ export function umbOrderActionsByGroup<T extends UmbGroupableAction>(
 	actionType: string,
 ): Array<UmbActionMenuItem<T>> {
 	const groupsByAlias = new Map(groups.map((group) => [group.alias, group]));
-	const membersByGroup = new Map<string, Array<T>>();
-	const ungrouped: Array<T> = [];
-
-	for (const action of actions) {
-		const groupAlias = action.manifest?.group;
-		if (!groupAlias) {
-			ungrouped.push(action);
-			continue;
-		}
-
-		let members = membersByGroup.get(groupAlias);
-		if (!members) membersByGroup.set(groupAlias, (members = []));
-		members.push(action);
-	}
-
-	const toEntries = (members: Array<T>) =>
-		[...members].sort(compareExtensionsByWeight).map((action) => ({ action, separatorBefore: false }));
-
-	type Sortable = { alias: string; weight: number; isGroup: boolean; item: UmbActionMenuItem<T> };
-	const sortables: Array<Sortable> = [];
+	const actionsByGroup = Map.groupBy(actions, (action) => action.manifest?.group || undefined);
+	const sortables = (actionsByGroup.get(undefined) ?? []).map(toUngroupedItem);
 	const fallbacks: Array<UmbActionMenuItem<T>> = [];
 
-	for (const [alias, members] of membersByGroup) {
+	for (const [alias, members] of actionsByGroup) {
+		if (alias === undefined) continue;
 		const manifest = groupsByAlias.get(alias);
 		const item: UmbActionMenuItem<T> = { group: { alias, manifest }, actions: toEntries(members) };
 		if (manifest) {
@@ -81,36 +80,96 @@ export function umbOrderActionsByGroup<T extends UmbGroupableAction>(
 		}
 	}
 
-	for (const action of ungrouped) {
-		sortables.push({
-			alias: action.alias,
-			weight: action.weight ?? 0,
-			isGroup: false,
-			item: { actions: [{ action, separatorBefore: false }] },
-		});
-	}
+	const items = [
+		...sortables.sort(compareSortableMenuItems).map((sortable) => sortable.item),
+		...fallbacks.sort(compareFallbackGroups),
+	];
+	setSeparators(items);
+	return items;
+}
 
-	sortables.sort(
-		(a, b) => b.weight - a.weight || Number(b.isGroup) - Number(a.isGroup) || compareExtensionsByWeight(a, b),
-	);
-	fallbacks.sort((a, b) => (a.group!.alias < b.group!.alias ? -1 : 1));
+/**
+ * Creates the menu item of an ungrouped action, sortable at the action's own weight.
+ * @param {T} action - The ungrouped action.
+ * @returns {UmbSortableMenuItem<T>} The sortable menu item.
+ */
+function toUngroupedItem<T extends UmbGroupableAction>(action: T): UmbSortableMenuItem<T> {
+	return {
+		alias: action.alias,
+		weight: action.weight ?? 0,
+		isGroup: false,
+		item: { actions: [{ action, separatorBefore: false }] },
+	};
+}
 
-	const items = [...sortables.map((x) => x.item), ...fallbacks];
+/**
+ * Sorts the actions of a group by weight, then by alias.
+ * @param {Array<T>} members - The actions of the group.
+ * @returns {Array<UmbActionMenuEntry<T>>} The entries of the group, without separators yet.
+ */
+function toEntries<T extends UmbGroupableAction>(members: Array<T>): Array<UmbActionMenuEntry<T>> {
+	return [...members].sort(compareExtensionsByWeight).map((action) => ({ action, separatorBefore: false }));
+}
 
+/**
+ * Compares two top-level menu items: highest weight first, then a group before an ungrouped action, then by alias.
+ * @param {UmbSortableMenuItem<UmbGroupableAction>} a - The first menu item.
+ * @param {UmbSortableMenuItem<UmbGroupableAction>} b - The second menu item.
+ * @returns {number} A negative number when `a` sorts first, a positive number when `b` sorts first, otherwise 0.
+ */
+function compareSortableMenuItems(
+	a: UmbSortableMenuItem<UmbGroupableAction>,
+	b: UmbSortableMenuItem<UmbGroupableAction>,
+): number {
+	return b.weight - a.weight || Number(b.isGroup) - Number(a.isGroup) || compareExtensionsByWeight(a, b);
+}
+
+/**
+ * Compares two fallback groups by alias.
+ * @param {UmbActionMenuItem<UmbGroupableAction>} a - The first fallback group.
+ * @param {UmbActionMenuItem<UmbGroupableAction>} b - The second fallback group.
+ * @returns {number} A negative number when `a` sorts first, otherwise a positive number.
+ */
+function compareFallbackGroups(
+	a: UmbActionMenuItem<UmbGroupableAction>,
+	b: UmbActionMenuItem<UmbGroupableAction>,
+): number {
+	return a.group!.alias < b.group!.alias ? -1 : 1;
+}
+
+/**
+ * Sets `separatorBefore` on every entry of the ordered menu items.
+ * @param {Array<UmbActionMenuItem<T>>} items - The menu items, in render order.
+ */
+function setSeparators<T extends UmbGroupableAction>(items: Array<UmbActionMenuItem<T>>) {
 	items.forEach((item, index) => {
+		const previous = items[index - 1];
 		item.actions.forEach((entry, entryIndex) => {
-			if (entryIndex > 0) {
-				entry.separatorBefore = entry.action.manifest?.separatorBefore === true;
-			} else if (index > 0) {
-				entry.separatorBefore =
-					item.group !== undefined ||
-					items[index - 1].group !== undefined ||
-					entry.action.manifest?.separatorBefore === true;
-			}
+			entry.separatorBefore = hasSeparatorBefore(entry, entryIndex === 0, item, previous);
 		});
 	});
+}
 
-	return items;
+/**
+ * Decides whether a separator renders before an entry. The first entry of a menu item gets one when a group starts or
+ * ends there, or when its action asks for one; any other entry only when its action asks for one. The first entry of
+ * the menu never gets one.
+ * @param {UmbActionMenuEntry<T>} entry - The entry.
+ * @param {boolean} isFirstOfItem - Whether the entry is the first of its menu item.
+ * @param {UmbActionMenuItem<T>} item - The menu item of the entry.
+ * @param {UmbActionMenuItem<T> | undefined} previous - The menu item before it, or undefined for the first item.
+ * @returns {boolean} Whether a separator renders before the entry.
+ */
+function hasSeparatorBefore<T extends UmbGroupableAction>(
+	entry: UmbActionMenuEntry<T>,
+	isFirstOfItem: boolean,
+	item: UmbActionMenuItem<T>,
+	previous: UmbActionMenuItem<T> | undefined,
+): boolean {
+	const requested = entry.action.manifest?.separatorBefore === true;
+	if (!isFirstOfItem) return requested;
+	if (!previous) return false;
+	return requested || item.group !== undefined || previous.group !== undefined;
 }
 
 /**
