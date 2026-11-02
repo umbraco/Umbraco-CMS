@@ -387,7 +387,7 @@ public interface ISqlSyntaxProvider
     /// <param name="tableName">The name of the table containing the column.</param>
     /// <param name="column">The new definition of the column.</param>
     /// <returns>A SQL statement that alters the column.</returns>
-    // TODO (V18): Remove the default implementation.
+    // TODO (V20): Remove the default implementation.
     string FormatAlterColumn(string? tableName, ColumnDefinition column)
         => string.Format(AlterColumn, GetQuotedTableName(tableName), Format(column));
 
