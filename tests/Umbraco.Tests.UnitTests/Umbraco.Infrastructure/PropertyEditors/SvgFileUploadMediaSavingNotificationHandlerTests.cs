@@ -1,18 +1,15 @@
 using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 
@@ -47,16 +44,21 @@ public class SvgFileUploadMediaSavingNotificationHandlerTests : MediaSavingMetad
 
     protected override string EditorAlias => Constants.PropertyEditors.Aliases.UploadField;
 
-    protected override bool IsSvg => true;
+    protected override string FileExtension => "svg";
 
-    protected override INotificationHandler<MediaSavingNotification> CreateHandler(
-        MediaFileManager manager,
-        IOptionsMonitor<ContentSettings> settings,
-        IJsonSerializer serializer,
-        UploadAutoFillProperties autoFill,
-        ISvgDimensionExtractor svgDimensions) =>
+    protected override string MediaTypeAlias => Constants.Conventions.MediaTypes.VectorGraphicsAlias;
+
+    protected override int PopulatedBytes => 30;
+
+    protected override INotificationHandler<MediaSavingNotification> CreateHandler() =>
         new SvgFileUploadMediaSavingNotificationHandler(
-            NullLogger<SvgFileUploadMediaSavingNotificationHandler>.Instance, svgDimensions, manager);
+            NullLogger<SvgFileUploadMediaSavingNotificationHandler>.Instance, SvgDimensions.Object, FileManager);
+
+    protected override void VerifyDimensions(Times times)
+    {
+        SvgDimensions.Verify(x => x.GetDimensions(It.IsAny<Stream>()), times);
+        Dimensions.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never());
+    }
 
     [Test]
     public void Skips_Non_Vector_Graphics_Media_Type()
