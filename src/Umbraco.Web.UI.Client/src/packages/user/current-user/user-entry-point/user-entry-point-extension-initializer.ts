@@ -34,7 +34,8 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 
 	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<ManifestUserEntryPoint>) {
 		// Create the gate before super() (no `this` access yet) and hand it to the base, which empties
-		// the observed set while it is false — so extensions unload on sign-out and instantiate on sign-in.
+		// the observed set while it is false, so extensions unload when the session ends and instantiate once
+		// the session's current user has loaded.
 		const active = new UmbBooleanState<boolean>(false);
 		super(host, extensionRegistry, 'userEntryPoint', active.asObservable());
 		this.#active = active;
@@ -47,8 +48,9 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 					if (this.#isAuthorized) {
 						void this.#loadCurrentUser();
 					} else {
-						// The context keeps the previous user once authorization is lost, and the next sign-in may be
-						// a different user, so drop its cached load and only count a load completed for the new session.
+						// The context keeps the user of the ended session. Only the same user resumes this page (a different
+						// user starts it over), but their data may have changed since, so drop the cached load and only count
+						// a load completed for the new session.
 						this.#currentUserContext?.invalidate();
 						this.#isUserLoaded = false;
 						this.#userLoad = undefined;
