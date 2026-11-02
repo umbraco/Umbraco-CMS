@@ -52,6 +52,11 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	public label?: string;
 
 	@property({ type: String })
+	/**
+	 * The look applied to the action buttons, both the first action and the "more" dropdown.
+	 * @type {UUIInterfaceLook}
+	 */
+	@property({ type: String })
 	public look?: UUIInterfaceLook;
 
 	@state()
