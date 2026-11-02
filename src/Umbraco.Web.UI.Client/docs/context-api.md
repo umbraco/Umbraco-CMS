@@ -54,8 +54,9 @@ this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (ctx) => {
 
 Source: `context-consumer.ts`, `context-provider.ts`
 
-- The request stops at the **first provider with a matching `contextAlias`** (`passContextAliasMatches()` turns this off).
-- If the discriminator rejects that instance, the consumer gets nothing. It does not keep searching ancestors.
+- Asks each ancestor for a match of `contentAlias` and `apiAlias`
+- It asks all the providers of that element until one passes the given discriminator.
+- The request stops bubbling at the **first element with a provider whose `contextAlias` matches** (`passContextAliasMatches()` turns this off). Other providers on the same element are still asked.
 - The callback re-fires when the context is replaced, and receives `undefined` when it goes away.
 - `skipHost()` starts the search at the host's parent.
 
