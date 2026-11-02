@@ -77,6 +77,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	#actions: Array<UmbExtensionManifestInitializer<ManifestEntityAction>> = [];
 	#groups: Array<ManifestActionGroupBase> = [];
 	#firstActionRequest = 0;
+	#requestedFirstActionManifest?: ManifestEntityActionDefaultKind;
 
 	constructor() {
 		super();
@@ -149,34 +150,32 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	async #updateFirstAction(onlyWhenChanged = false) {
 		this._numberOfActions = this.#actions.length;
-		const oldFirstManifest = this._firstActionManifest;
 		// The inline action is the first action of the menu, so it follows the action groups.
 		const [firstItem] = umbOrderActionsByGroup(this.#actions, this.#groups, 'entityAction');
-		const firstManifest = firstItem?.actions[0].action.manifest as ManifestEntityActionDefaultKind | undefined;
-		if (onlyWhenChanged && firstManifest === oldFirstManifest) return;
+		const manifest = firstItem?.actions[0].action.manifest as ManifestEntityActionDefaultKind | undefined;
+		if (onlyWhenChanged && manifest === this.#requestedFirstActionManifest) return;
+		this.#requestedFirstActionManifest = manifest;
 		const request = ++this.#firstActionRequest;
-		this._firstActionManifest = firstManifest;
-		await this.#createFirstActionApi(request);
-		this.requestUpdate('_firstActionManifest', oldFirstManifest);
+		const api = manifest ? await this.#createFirstActionApi(manifest) : undefined;
+		const href = await api?.getHref();
+		// Only the latest request publishes, and it publishes the manifest, API and href together.
+		if (request !== this.#firstActionRequest) {
+			api?.destroy();
+			return;
+		}
+		this._firstActionManifest = manifest;
+		this._firstActionApi = api;
+		this._firstActionHref = href;
 	}
 
-	async #createFirstActionApi(request: number) {
-		const manifest = this._firstActionManifest;
-		if (!manifest) return;
+	async #createFirstActionApi(manifest: ManifestEntityActionDefaultKind) {
 		const api = await createExtensionApi(this, manifest, [
 			{ unique: this.#unique, entityType: this.#entityType, meta: manifest.meta },
 		]);
-		// A newer update started while this one was awaiting, so its result is stale.
-		if (request !== this.#firstActionRequest) return;
-		const oldFirstApi = this._firstActionApi;
-		this._firstActionApi = api;
 		if (api) {
 			(api as any).manifest = manifest;
-			const href = await api.getHref();
-			if (request !== this.#firstActionRequest) return;
-			this._firstActionHref = href;
 		}
-		this.requestUpdate('_firstActionApi', oldFirstApi);
+		return api;
 	}
 
 	async #onFirstActionClick(event: PointerEvent) {

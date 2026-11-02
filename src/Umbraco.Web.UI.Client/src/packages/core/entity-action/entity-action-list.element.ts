@@ -142,7 +142,11 @@ export class UmbEntityActionListElement extends UmbLitElement {
 						.filter=${this._filter}
 						.elementProps=${this._props}
 						.apiArgs=${this._apiArgs}
-						.listRenderMethod=${this._renderActions}></umb-extension-with-api-slot>
+						.listRenderMethod=${
+							// A new callback on every render, so the slot also re-renders when the group labels are localized.
+							(extensions: Array<UmbExtensionElementAndApiInitializer<ManifestEntityAction>>) =>
+								this._renderActions?.(extensions)
+						}></umb-extension-with-api-slot>
 				`
 			: '';
 	}
