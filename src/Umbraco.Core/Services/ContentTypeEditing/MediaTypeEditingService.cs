@@ -22,7 +22,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IDataTypeService _dataTypeService;
     private readonly IImageUrlGenerator _imageUrlGenerator;
-    private readonly ContentSettings _contentSettings;
+    private readonly IOptionsMonitor<ContentSettings> _contentSettings;
     private readonly IReservedFieldNamesService _reservedFieldNamesService;
 
     /// <summary>
@@ -43,14 +43,14 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         IEntityService entityService,
         IShortStringHelper shortStringHelper,
         IImageUrlGenerator imageUrlGenerator,
-        IOptions<ContentSettings> contentSettings,
+        IOptionsMonitor<ContentSettings> contentSettings,
         IReservedFieldNamesService reservedFieldNamesService)
         : base(contentTypeService, mediaTypeService, dataTypeService, entityService, shortStringHelper)
     {
         _mediaTypeService = mediaTypeService;
         _dataTypeService = dataTypeService;
         _imageUrlGenerator = imageUrlGenerator;
-        _contentSettings = contentSettings.Value;
+        _contentSettings = contentSettings;
         _reservedFieldNamesService = reservedFieldNamesService;
     }
 
@@ -123,7 +123,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         var results = new List<MediaTypeFileExtensionMatchResult>();
 
         // is this an image format supported by the image cropper?
-        if (_contentSettings.Imaging.ImageFileTypes.InvariantContains(fileExtension)
+        if (_contentSettings.CurrentValue.IsAllowedImageFileType(fileExtension)
             && _imageUrlGenerator.IsSupportedImageFormat(fileExtension))
         {
             // yes - add all media types with an image cropper "file" property

@@ -58,8 +58,8 @@ public class ContentImagingSettings
     ///             <term>Media Type Matching During Upload</term>
     ///             <description>
     ///             Media types with an image cropper are offered as specific upload matches only when the file extension is in this
-    ///             list and supported by the image URL generator. Additional processable formats can still have thumbnails without
-    ///             being matched as images during upload.
+    ///             list, not disallowed for upload, and supported by the image URL generator. Additional processable formats can still
+    ///             have thumbnails without being matched as images during upload.
     ///             </description>
     ///         </item>
     ///     </list>

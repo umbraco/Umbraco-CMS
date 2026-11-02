@@ -44,7 +44,7 @@ internal sealed partial class MediaTypeEditingServiceTests
     [TestCase("PDF")]
     public async Task Configured_Image_Formats_Are_Respected(string configuredExtension)
     {
-        var imaging = GetRequiredService<IOptions<ContentSettings>>().Value.Imaging;
+        var imaging = GetRequiredService<IOptionsMonitor<ContentSettings>>().CurrentValue.Imaging;
         var original = imaging.ImageFileTypes;
         imaging.ImageFileTypes = new HashSet<string> { configuredExtension };
         try
@@ -58,6 +58,60 @@ internal sealed partial class MediaTypeEditingServiceTests
         finally
         {
             imaging.ImageFileTypes = original;
+        }
+    }
+
+    [TestCase("jpg", "JPG")]
+    [TestCase("png", "PnG")]
+    public async Task Configured_But_Disallowed_Image_Formats_Do_Not_Match_Image(string extension, string disallowedExtension)
+    {
+        var settings = GetRequiredService<IOptionsMonitor<ContentSettings>>().CurrentValue;
+        var original = settings.DisallowedUploadedFileExtensions;
+        settings.DisallowedUploadedFileExtensions = new HashSet<string>(original) { disallowedExtension };
+        try
+        {
+            var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync(extension, 0, 100);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Total, Is.EqualTo(1));
+                Assert.That(result.Items.Single().MediaType.Alias, Is.EqualTo(Constants.Conventions.MediaTypes.File));
+                Assert.That(result.Items.Single().IsSpecificMatch, Is.False);
+            });
+        }
+        finally
+        {
+            settings.DisallowedUploadedFileExtensions = original;
+        }
+    }
+
+    [Test]
+    public async Task Image_Matching_Uses_Reloaded_Content_Settings()
+    {
+        var service = MediaTypeEditingService;
+        var monitor = GetRequiredService<IOptionsMonitor<ContentSettings>>();
+        var cache = GetRequiredService<IOptionsMonitorCache<ContentSettings>>();
+        var original = monitor.CurrentValue;
+        var before = await service.GetMediaTypesForFileExtensionWithMatchInfoAsync("pdf", 0, 100);
+        Assert.That(before.Items.Any(x => x.MediaType.Alias == Constants.Conventions.MediaTypes.Image), Is.False);
+        var updated = new ContentSettings
+        {
+            Imaging = new ContentImagingSettings { ImageFileTypes = new HashSet<string> { "PDF" } },
+        };
+        try
+        {
+            cache.TryRemove(Options.DefaultName);
+            Assert.That(cache.TryAdd(Options.DefaultName, updated), Is.True);
+            Assert.That(monitor.CurrentValue, Is.SameAs(updated));
+
+            var result = await service.GetMediaTypesForFileExtensionWithMatchInfoAsync("pdf", 0, 100);
+            Assert.That(result.Items.Any(x => x.MediaType.Alias == Constants.Conventions.MediaTypes.Image && x.IsSpecificMatch), Is.True);
+            result = await service.GetMediaTypesForFileExtensionWithMatchInfoAsync("jpg", 0, 100);
+            Assert.That(result.Items.Any(x => x.MediaType.Alias == Constants.Conventions.MediaTypes.Image), Is.False);
+        }
+        finally
+        {
+            cache.TryRemove(Options.DefaultName);
+            cache.TryAdd(Options.DefaultName, original);
         }
     }
 
