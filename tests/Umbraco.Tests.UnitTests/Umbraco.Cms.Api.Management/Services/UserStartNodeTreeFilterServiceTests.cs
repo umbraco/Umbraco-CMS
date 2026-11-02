@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services;
@@ -193,27 +194,41 @@ internal class UserStartNodeTreeFilterServiceTests
     }
 
     [Test]
-    public void GetFilteredEntities_Delegates_To_UserStartNodeEntitiesService()
+    public void GetFilteredEntities_Returns_Entities_At_Or_Below_A_Start_Node_With_Access()
     {
-        var startNodePaths = new[] { "-1,100" };
-        var entities = new[] { CreateEntity(Guid.NewGuid()), CreateEntity(Guid.NewGuid()) };
-        var expected = new[]
-        {
-            new UserAccessEntity(entities[0], false),
-            new UserAccessEntity(entities[1], true),
-        };
+        var sut = CreateServiceWithStartNodeEntitiesService(["-1,100"]);
+        IEntitySlim startNode = CreateEntity(Guid.NewGuid(), "-1,100");
+        IEntitySlim descendant = CreateEntity(Guid.NewGuid(), "-1,100,200,300");
 
-        _userStartNodeEntitiesServiceMock
-            .Setup(x => x.ChildUserAccessEntities(entities, startNodePaths))
-            .Returns(expected);
-
-        var sut = CreateService([1234], startNodePaths);
-
-        var result = sut.GetFilteredEntities(entities);
+        var result = sut.GetFilteredEntities([startNode, descendant]);
 
         Assert.AreEqual(2, result.Length);
+        Assert.IsTrue(result.All(x => x.HasAccess));
+    }
+
+    [Test]
+    public void GetFilteredEntities_Returns_Ancestors_Of_A_Start_Node_Without_Access()
+    {
+        var sut = CreateServiceWithStartNodeEntitiesService(["-1,100,200"]);
+        IEntitySlim ancestor = CreateEntity(Guid.NewGuid(), "-1,100");
+
+        var result = sut.GetFilteredEntities([ancestor]);
+
+        Assert.AreEqual(1, result.Length);
+        Assert.AreEqual(ancestor.Key, result[0].Entity.Key);
         Assert.IsFalse(result[0].HasAccess);
-        Assert.IsTrue(result[1].HasAccess);
+    }
+
+    [Test]
+    public void GetFilteredEntities_Omits_Entities_Unrelated_To_A_Start_Node()
+    {
+        var sut = CreateServiceWithStartNodeEntitiesService(["-1,100"]);
+        IEntitySlim unrelated = CreateEntity(Guid.NewGuid(), "-1,500,600");
+        IEntitySlim sharingIdPrefix = CreateEntity(Guid.NewGuid(), "-1,1001");
+
+        var result = sut.GetFilteredEntities([unrelated, sharingIdPrefix]);
+
+        Assert.IsEmpty(result);
     }
 
     private void SetupDataTypeIgnoringStartNodes(Guid dataTypeKey, bool ignores)
@@ -231,10 +246,18 @@ internal class UserStartNodeTreeFilterServiceTests
     private TestUserStartNodeTreeFilterService CreateService(int[] startNodeIds, string[] startNodePaths) =>
         new(_userStartNodeEntitiesServiceMock.Object, _dataTypeServiceMock.Object, startNodeIds, startNodePaths);
 
-    private static IEntitySlim CreateEntity(Guid key)
+    private TestUserStartNodeTreeFilterService CreateServiceWithStartNodeEntitiesService(string[] startNodePaths) =>
+        new(
+            new UserStartNodeEntitiesService(Mock.Of<IEntityService>(), Mock.Of<ICoreScopeProvider>(), Mock.Of<IIdKeyMap>()),
+            _dataTypeServiceMock.Object,
+            [1234],
+            startNodePaths);
+
+    private static IEntitySlim CreateEntity(Guid key, string path = "")
     {
         var mock = new Mock<IEntitySlim>();
         mock.Setup(e => e.Key).Returns(key);
+        mock.Setup(e => e.Path).Returns(path);
         return mock.Object;
     }
 
