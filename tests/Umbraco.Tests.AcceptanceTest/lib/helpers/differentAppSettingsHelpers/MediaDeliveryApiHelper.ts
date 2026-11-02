@@ -47,7 +47,6 @@ export class MediaDeliveryApiHelper {
 
   async verifyDefaultMediaItemJson(mediaName: string, mediaItemJson, mediaPath: string, mediaTypeName: string) {
     const mediaData = await this.api.media.getByName(mediaName);
-    // Property values are returned in a deterministic order, so look the file up by alias rather than by position.
     const mediaFileValue = mediaData.values.find(x => x.alias === 'umbracoFile')?.value;
 
     // Verify path, createDate, updateDate, id, name, and mediaType are always included in the response

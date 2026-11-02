@@ -60,6 +60,8 @@ const elementNameCases = [
   {label: 'a name with numbers', name: 'BackofficeSearchElement1234567890', searchKeyword: 'BackofficeSearchElement12345'},
   {label: 'a name with special characters', name: 'BackofficeSearchElement , . ! ? # $ % & * @ é ü ă đ 漢字', searchKeyword: 'é ü ă đ'},
   {label: 'a name with Unicode characters', name: 'BackofficeSearchElement Æøå', searchKeyword: 'Æøå'},
+  // CJK text is indexed one character per term.
+  {label: 'a name with CJK characters', name: 'BackofficeSearchElement 漢字', searchKeyword: '漢'},
 ];
 for (const elementNameCase of elementNameCases) {
   test(`can find an element by ${elementNameCase.label}`, async ({umbracoApi, umbracoUi}) => {
