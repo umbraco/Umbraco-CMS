@@ -31,7 +31,7 @@ class UmbTestEntityActionListHostElement extends UmbLitElement {
 	}
 }
 
-type TestAction = { alias: string; weight: number; separatorBefore?: boolean };
+type TestAction = { alias: string; weight: number; group?: string; separatorBefore?: boolean };
 
 function registerActions(actions: Array<TestAction>) {
 	umbExtensionsRegistry.registerMany(
@@ -41,6 +41,7 @@ function registerActions(actions: Array<TestAction>) {
 				alias: action.alias,
 				name: action.alias,
 				weight: action.weight,
+				group: action.group,
 				separatorBefore: action.separatorBefore,
 				forEntityTypes: [ENTITY_TYPE],
 				elementName: 'umb-test-entity-action-list-action',
@@ -52,19 +53,31 @@ function registerActions(actions: Array<TestAction>) {
 }
 
 /**
- * Reads the rendered list as a sequence of action aliases, with '|' marking a separator.
+ * Reads the rendered elements as a sequence of action aliases, with '|' marking a separator and a group rendered as
+ * '[label', its actions and ']'.
+ * @param {Iterable<Element>} children - The rendered elements.
+ * @returns {Array<string>} The sequence.
+ */
+function readChildren(children: Iterable<Element>): Array<string> {
+	return Array.from(children).flatMap((child) =>
+		child.getAttribute('role') === 'separator'
+			? ['|']
+			: child.getAttribute('role') === 'group'
+				? [`[${child.getAttribute('aria-label')}`, ...readChildren(child.children), ']']
+				: child instanceof UmbTestEntityActionElement
+					? [(child as any).manifest.alias]
+					: [child.tagName],
+	);
+}
+
+/**
+ * Reads the rendered list as a sequence, see `readChildren`.
  * @param {UmbEntityActionListElement} element - The rendered entity action list.
  * @returns {Array<string>} The sequence.
  */
 function readSequence(element: UmbEntityActionListElement): Array<string> {
 	const slot = element.shadowRoot?.querySelector('umb-extension-with-api-slot');
-	return Array.from(slot?.shadowRoot?.children ?? []).map((child) =>
-		child.getAttribute('role') === 'separator'
-			? '|'
-			: child instanceof UmbTestEntityActionElement
-				? (child as any).manifest.alias
-				: child.tagName,
-	);
+	return readChildren(slot?.shadowRoot?.children ?? []);
 }
 
 /**
@@ -146,5 +159,57 @@ describe('UmbEntityActionListElement', () => {
 
 		umbExtensionsRegistry.unregister('b');
 		await expectSequence(element, ['a', 'c']);
+	});
+
+	describe('action groups', () => {
+		const GROUP = 'Umb.Test.EntityActionList.Group';
+
+		beforeEach(() => {
+			umbExtensionsRegistry.register({
+				type: 'entityActionGroup',
+				alias: GROUP,
+				name: GROUP,
+				weight: 50,
+				meta: { label: 'Test group' },
+			});
+		});
+
+		afterEach(() => {
+			umbExtensionsRegistry.unregister(GROUP);
+		});
+
+		it('renders the actions of a group together at the weight of the group, in a labelled group element', async () => {
+			const element = await renderList([
+				{ alias: 'a', weight: 100 },
+				{ alias: 'grouped-low', weight: 200, group: GROUP },
+				{ alias: 'grouped-high', weight: 1000, group: GROUP },
+				{ alias: 'b', weight: 10 },
+			]);
+			await expectSequence(element, ['a', '|', '[Test group', 'grouped-high', 'grouped-low', ']', '|', 'b']);
+		});
+
+		it('keeps the separators of a group when only some of its actions are rendered', async () => {
+			const element = await renderList([
+				{ alias: 'a', weight: 100 },
+				{ alias: 'grouped', weight: 1, group: GROUP },
+				{ alias: 'b', weight: 10 },
+			]);
+			await expectSequence(element, ['a', '|', '[Test group', 'grouped', ']', '|', 'b']);
+		});
+
+		it('renders the actions of an unregistered group in a fallback group at the end', async () => {
+			const element = await renderList([
+				{ alias: 'a', weight: 100 },
+				{ alias: 'missing-low', weight: 1, group: 'Umb.Test.EntityActionList.Missing' },
+				{ alias: 'missing-high', weight: 1000, group: 'Umb.Test.EntityActionList.Missing' },
+				{ alias: 'b', weight: 10 },
+			]);
+			await waitUntil(() => readSequence(element).includes('missing-low')).catch(() => {});
+			const sequence = readSequence(element);
+			expect(sequence.slice(0, 3)).to.deep.equal(['a', 'b', '|']);
+			expect(sequence.slice(4)).to.deep.equal(['missing-high', 'missing-low', ']']);
+			const slot = element.shadowRoot!.querySelector('umb-extension-with-api-slot')!;
+			expect(slot.shadowRoot!.querySelector('[data-mark="action-group:Umb.Test.EntityActionList.Missing"]')).to.exist;
+		});
 	});
 });

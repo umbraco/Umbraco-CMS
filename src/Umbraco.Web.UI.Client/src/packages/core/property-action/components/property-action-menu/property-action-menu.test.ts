@@ -18,7 +18,9 @@ const PROPERTY_EDITOR_UI_ALIAS = 'Umb.Test.PropertyActionMenu';
 describe('UmbPropertyActionMenuElement', () => {
 	let aliases: Array<string> = [];
 
-	async function renderSequence(actions: Array<{ alias: string; weight: number; separatorBefore?: boolean }>) {
+	async function renderSequence(
+		actions: Array<{ alias: string; weight: number; group?: string; separatorBefore?: boolean }>,
+	) {
 		aliases = actions.map((a) => a.alias);
 		umbExtensionsRegistry.registerMany(
 			actions.map(
@@ -27,6 +29,7 @@ describe('UmbPropertyActionMenuElement', () => {
 					alias: action.alias,
 					name: action.alias,
 					weight: action.weight,
+					group: action.group,
 					separatorBefore: action.separatorBefore,
 					forPropertyEditorUis: [PROPERTY_EDITOR_UI_ALIAS],
 					elementName: 'umb-test-property-action-menu-action',
@@ -38,15 +41,18 @@ describe('UmbPropertyActionMenuElement', () => {
 		const element = await fixture<UmbPropertyActionMenuElement>(
 			html`<umb-property-action-menu .propertyEditorUiAlias=${PROPERTY_EDITOR_UI_ALIAS}></umb-property-action-menu>`,
 		);
-		const read = () =>
-			Array.from(element.shadowRoot?.querySelector('umb-popover-layout')?.children ?? []).map((child) =>
+		const readChildren = (children: Iterable<Element>): Array<string> =>
+			Array.from(children).flatMap((child) =>
 				child.getAttribute('role') === 'separator'
-					? '|'
-					: child instanceof UmbTestPropertyActionElement
-						? (child as any).manifest.alias
-						: child.tagName,
+					? ['|']
+					: child.getAttribute('role') === 'group'
+						? [`[${child.getAttribute('aria-label')}`, ...readChildren(child.children), ']']
+						: child instanceof UmbTestPropertyActionElement
+							? [(child as any).manifest.alias]
+							: [child.tagName],
 			);
-		await waitUntil(() => read().filter((entry) => entry !== '|').length === actions.length);
+		const read = () => readChildren(element.shadowRoot?.querySelector('umb-popover-layout')?.children ?? []);
+		await waitUntil(() => read().filter((entry) => aliases.includes(entry)).length === actions.length);
 		return read();
 	}
 
@@ -71,5 +77,31 @@ describe('UmbPropertyActionMenuElement', () => {
 				{ alias: 'c', weight: 1, separatorBefore: true },
 			]),
 		).to.deep.equal(['a', 'b', '|', 'c']);
+	});
+
+	describe('action groups', () => {
+		const GROUPS = ['Umb.Test.PropertyActionMenu.Clipboard', 'Umb.Test.PropertyActionMenu.Edit'];
+
+		beforeEach(() => {
+			umbExtensionsRegistry.registerMany([
+				{ type: 'propertyActionGroup', alias: GROUPS[0], name: GROUPS[0], weight: 1200, meta: { label: 'Clipboard' } },
+				{ type: 'propertyActionGroup', alias: GROUPS[1], name: GROUPS[1], weight: 1100, meta: { label: 'Edit' } },
+			]);
+		});
+
+		afterEach(() => {
+			umbExtensionsRegistry.unregisterMany(GROUPS);
+		});
+
+		it('renders each group as its own block and an ungrouped action at weight 0 last', async () => {
+			expect(
+				await renderSequence([
+					{ alias: 'clear', weight: 0, separatorBefore: true },
+					{ alias: 'sort', weight: 1000, group: GROUPS[1] },
+					{ alias: 'paste', weight: 1190, group: GROUPS[0] },
+					{ alias: 'copy', weight: 1200, group: GROUPS[0] },
+				]),
+			).to.deep.equal(['[Clipboard', 'copy', 'paste', ']', '|', '[Edit', 'sort', ']', '|', 'clear']);
+		});
 	});
 });

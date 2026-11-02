@@ -1,9 +1,16 @@
+import { umbOrderActionsByGroup } from '@umbraco-cms/backoffice/action';
+import type { ManifestActionGroupBase } from '@umbraco-cms/backoffice/action';
 import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
+import type {
+	UmbEntityAction,
+	ManifestEntityAction,
+	ManifestEntityActionDefaultKind,
+} from '@umbraco-cms/backoffice/entity-action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
@@ -67,9 +74,20 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	#fallbackEntityContext?: UmbEntityContext;
 	#inViewport = false;
 	#observingEntityActions = false;
+	#actions: Array<UmbExtensionManifestInitializer<ManifestEntityAction>> = [];
+	#groups: Array<ManifestActionGroupBase> = [];
 
 	constructor() {
 		super();
+
+		this.observe(
+			umbExtensionsRegistry.byType('entityActionGroup'),
+			(groups) => {
+				this.#groups = groups;
+				if (this.#actions.length > 0) this.#updateFirstAction();
+			},
+			null,
+		);
 
 		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
 			if (!context) return;
@@ -119,17 +137,23 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			'entityAction',
 			(ext) => ext.forEntityTypes.includes(this.#entityType!),
 			async (actions) => {
-				this._numberOfActions = actions.length;
-				const oldFirstManifest = this._firstActionManifest;
-				this._firstActionManifest =
-					this._numberOfActions > 0 ? (actions[0].manifest as ManifestEntityActionDefaultKind) : undefined;
-				await this.#createFirstActionApi();
-				this.requestUpdate('_firstActionManifest', oldFirstManifest);
+				this.#actions = actions;
+				await this.#updateFirstAction();
 			},
 			'umbEntityActionsObserver',
 		);
 
 		this.#observingEntityActions = true;
+	}
+
+	async #updateFirstAction() {
+		this._numberOfActions = this.#actions.length;
+		const oldFirstManifest = this._firstActionManifest;
+		// The inline action is the first action of the menu, so it follows the action groups.
+		const [firstItem] = umbOrderActionsByGroup(this.#actions, this.#groups, 'entityAction');
+		this._firstActionManifest = firstItem?.actions[0].action.manifest as ManifestEntityActionDefaultKind | undefined;
+		await this.#createFirstActionApi();
+		this.requestUpdate('_firstActionManifest', oldFirstManifest);
 	}
 
 	async #createFirstActionApi() {

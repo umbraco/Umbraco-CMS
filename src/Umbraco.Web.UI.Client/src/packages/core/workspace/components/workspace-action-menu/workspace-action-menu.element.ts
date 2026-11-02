@@ -1,4 +1,6 @@
 import type { ManifestWorkspaceActionMenuItem } from '../../extensions/types.js';
+import { umbOrderActionsByGroup, umbRenderActionMenu } from '@umbraco-cms/backoffice/action';
+import type { ManifestActionGroupBase } from '@umbraco-cms/backoffice/action';
 import {
 	css,
 	html,
@@ -6,10 +8,10 @@ import {
 	property,
 	state,
 	nothing,
-	repeat,
 	query,
 	eventOptions,
 } from '@umbraco-cms/backoffice/external/lit';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
@@ -29,8 +31,20 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	@state()
 	private _popoverOpen = false;
 
+	@state()
+	private _groups: Array<ManifestActionGroupBase> = [];
+
 	@query('#workspace-action-popover')
 	private _popover?: HTMLElement;
+
+	constructor() {
+		super();
+		this.observe(
+			umbExtensionsRegistry.byType('workspaceActionMenuItemGroup'),
+			(groups) => (this._groups = groups),
+			null,
+		);
+	}
 
 	#onPopoverToggle(event: ToggleEvent) {
 		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -70,13 +84,10 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				@click=${this._onPopoverClickCapture}>
 				<umb-popover-layout id="workspace-action-popover-layout">
 					<uui-scroll-container>
-						${repeat(
-							this.items,
-							(ext) => ext.alias,
-							(ext, i) =>
-								html`${i > 0 && ext.manifest?.separatorBefore
-									? html`<umb-separator></umb-separator>`
-									: nothing}${ext.component}`,
+						${umbRenderActionMenu(
+							umbOrderActionsByGroup(this.items, this._groups, 'workspaceActionMenuItem'),
+							(ext) => ext.component,
+							this.localize,
 						)}
 					</uui-scroll-container>
 				</umb-popover-layout>

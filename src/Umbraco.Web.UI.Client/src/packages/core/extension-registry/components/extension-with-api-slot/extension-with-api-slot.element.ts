@@ -340,6 +340,21 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 		| undefined
 		| typeof nothing;
 
+	/**
+	 * Custom render function for the whole list of permitted extensions.
+	 * When provided, it is called with all permitted extensions instead of rendering each one with `renderMethod`,
+	 * so it can reorder them and wrap several of them in one element.
+	 * @example Render the extensions in reverse order
+	 * ```html
+	 * <umb-extension-with-api-slot
+	 *     type="entityAction"
+	 *     .listRenderMethod=${(extensions) => [...extensions].reverse().map((ext) => ext.component)}>
+	 * </umb-extension-with-api-slot>
+	 * ```
+	 */
+	@property({ attribute: false })
+	public listRenderMethod?: (extensions: Array<UmbExtensionElementAndApiInitializer>) => unknown;
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#attached = true;
@@ -400,7 +415,9 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	override render() {
 		return this._permitted
 			? this._permitted.length > 0
-				? repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
+				? this.listRenderMethod
+					? this.listRenderMethod(this._permitted)
+					: repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
 				: this.#renderNoting()
 			: nothing;
 	}

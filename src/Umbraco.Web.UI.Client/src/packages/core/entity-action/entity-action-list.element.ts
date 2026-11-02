@@ -1,7 +1,10 @@
 import type { UmbEntityActionArgs } from './types.js';
 import type { ManifestEntityAction, MetaEntityAction } from './entity-action.extension.js';
 import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { html, customElement, property, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { umbOrderActionsByGroup, umbRenderActionMenu } from '@umbraco-cms/backoffice/action';
+import type { ManifestActionGroupBase } from '@umbraco-cms/backoffice/action';
+import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	UmbApiConstructorArgumentsMethodType,
@@ -62,10 +65,21 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		[UmbEntityActionArgs<MetaEntityAction>]
 	>;
 
+	@state()
+	private _renderActions?: (extensions: Array<UmbExtensionElementAndApiInitializer<ManifestEntityAction>>) => unknown;
+
 	#fallbackEntityContext?: UmbEntityContext;
 
 	constructor() {
 		super();
+
+		this.observe(
+			umbExtensionsRegistry.byType('entityActionGroup'),
+			(groups) => {
+				this._renderActions = (extensions) => this.#renderEntityActions(extensions, groups);
+			},
+			null,
+		);
 
 		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
 			if (!context) return;
@@ -105,26 +119,30 @@ export class UmbEntityActionListElement extends UmbLitElement {
 
 	#hasRenderedOnce?: boolean;
 
-	#renderEntityAction = (ext: UmbExtensionElementAndApiInitializer<ManifestEntityAction>, i: number) => {
-		if (!this.#hasRenderedOnce && i === 0) {
-			this.#firstEntityAction = ext.component;
+	#renderEntityActions(
+		extensions: Array<UmbExtensionElementAndApiInitializer<ManifestEntityAction>>,
+		groups: Array<ManifestActionGroupBase>,
+	) {
+		const items = umbOrderActionsByGroup(extensions, groups, 'entityAction');
+
+		if (!this.#hasRenderedOnce) {
+			this.#firstEntityAction = items[0]?.actions[0]?.action.component;
 			this.#firstEntityAction?.focus();
 			this.#hasRenderedOnce = true;
 		}
 
-		const separator = i > 0 && ext.manifest?.separatorBefore;
-		return html`${separator ? html`<umb-separator></umb-separator>` : nothing}${ext.component}`;
-	};
+		return umbRenderActionMenu(items, (ext) => ext.component, this.localize);
+	}
 
 	override render() {
-		return this._filter
+		return this._filter && this._renderActions
 			? html`
 					<umb-extension-with-api-slot
 						type="entityAction"
 						.filter=${this._filter}
 						.elementProps=${this._props}
 						.apiArgs=${this._apiArgs}
-						.renderMethod=${this.#renderEntityAction}></umb-extension-with-api-slot>
+						.listRenderMethod=${this._renderActions}></umb-extension-with-api-slot>
 				`
 			: '';
 	}

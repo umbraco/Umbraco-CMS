@@ -1,6 +1,8 @@
 import type { UmbPropertyActionArgs } from '../../types.js';
 import type { ManifestPropertyAction, MetaPropertyAction } from '../../property-action.extension.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { umbOrderActionsByGroup, umbRenderActionMenu } from '@umbraco-cms/backoffice/action';
+import type { ManifestActionGroupBase } from '@umbraco-cms/backoffice/action';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -20,6 +22,14 @@ function ExtensionApiArgsMethod(manifest: ManifestPropertyAction): [UmbPropertyA
 export class UmbPropertyActionMenuElement extends UmbLitElement {
 	@state()
 	private _actions: Array<UmbExtensionElementAndApiInitializer<ManifestPropertyAction, never>> = [];
+
+	@state()
+	private _groups: Array<ManifestActionGroupBase> = [];
+
+	constructor() {
+		super();
+		this.observe(umbExtensionsRegistry.byType('propertyActionGroup'), (groups) => (this._groups = groups), null);
+	}
 
 	@property()
 	set propertyEditorUiAlias(alias: string) {
@@ -54,13 +64,10 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			</uui-button>
 			<uui-popover-container id="property-action-popover">
 				<umb-popover-layout>
-					${repeat(
-						this._actions,
-						(action) => action.alias,
-						(action, i) =>
-							html`${i > 0 && action.manifest?.separatorBefore
-								? html`<umb-separator></umb-separator>`
-								: nothing}${action.component}`,
+					${umbRenderActionMenu(
+						umbOrderActionsByGroup(this._actions, this._groups, 'propertyAction'),
+						(action) => action.component,
+						this.localize,
 					)}
 				</umb-popover-layout>
 			</uui-popover-container>
