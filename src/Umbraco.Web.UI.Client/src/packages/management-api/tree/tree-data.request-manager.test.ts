@@ -9,6 +9,7 @@ import { UmbManagementApiInFlightRequestCache } from '../inflight-request/cache.
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbError, type UmbApiResponse } from '@umbraco-cms/backoffice/resources';
 
 interface TestTreeItemModel {
 	parent?: { id: string } | null;
@@ -113,7 +114,7 @@ describe('UmbManagementApiTreeDataRequestManager', () => {
 		const createBatchManager = (
 			getBatch?: (
 				args: TestBatchRequestArgs,
-			) => Promise<{ data: { items: Array<TestTreeItemModel & { id: string }>; total: number } }>,
+			) => Promise<UmbApiResponse<{ data?: { items: Array<TestTreeItemModel & { id: string }>; total: number } }>>,
 		) =>
 			new UmbManagementApiTreeDataRequestManager(hostElement, {
 				getRootItems: async () => ({ data: { items: [], total: 0 } }),
@@ -160,6 +161,15 @@ describe('UmbManagementApiTreeDataRequestManager', () => {
 
 			expect(requests).to.have.length(2);
 			expect(requests.every((request) => request.dataType?.unique === 'data-type')).to.be.true;
+		});
+
+		it('returns an error when the batch request resolves with an error', async () => {
+			batchManager = createBatchManager(async () => ({ error: new UmbError('Request failed') }));
+
+			const { data, error } = await batchManager.getBatch({ uniques: ['item-0'] });
+
+			expect(data).to.be.undefined;
+			expect(error).to.not.be.undefined;
 		});
 
 		it('returns an error when no batch request is configured', async () => {

@@ -290,6 +290,7 @@ export class UmbManagementApiTreeDataRequestManager<
 		const controller = new UmbItemDataApiGetRequestController(this, {
 			api: async ({ uniques }) => {
 				const response = await getBatch({ ...args, uniques });
+				if (response.error) throw response.error;
 				return { data: response.data?.items ?? [] };
 			},
 			uniques: args.uniques,
