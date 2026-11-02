@@ -32,7 +32,7 @@ class UmbFocusDirective extends AsyncDirective {
 	 * If it moved somewhere else in the meantime, the user (or another
 	 * command) took it, and we must not steal it back.
 	 */
-	#focusBeforeAttempt: Element | null = null;
+	#focusBeforeAttempt?: Element | null;
 
 	override render() {
 		return nothing;
@@ -73,7 +73,7 @@ class UmbFocusDirective extends AsyncDirective {
 			// updateComplete), so the first attempt may have to be retried. If focus
 			// moved since our last attempt, someone else claimed it — stop retrying
 			// instead of pulling focus back from the user (see #24186).
-			if (this.#focusBeforeAttempt !== null && !hasFocus(document.activeElement, this.#focusBeforeAttempt)) {
+			if (this.#focusBeforeAttempt && !hasFocus(document.activeElement, this.#focusBeforeAttempt)) {
 				UmbFocusDirective.#next = undefined;
 				return;
 			}
