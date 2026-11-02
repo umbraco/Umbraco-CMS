@@ -23,6 +23,10 @@ export interface UmbSchemaOperationAllowedControllerArgs {
  */
 export class UmbSchemaOperationAllowedController extends UmbControllerBase {
 	readonly #allowed = new UmbBooleanState(true);
+
+	/**
+	 * Whether the operation is currently allowed for the entity type.
+	 */
 	readonly allowed = this.#allowed.asObservable();
 
 	#schemaLockdownContext?: UmbSchemaLockdownContext;

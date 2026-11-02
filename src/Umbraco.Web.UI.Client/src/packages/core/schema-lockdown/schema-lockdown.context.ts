@@ -15,6 +15,12 @@ const UMB_SCHEMA_LOCKDOWN_UNKNOWN_STATE: ServerSchemaLockdownResponseModel = Obj
 	restrictedEntityTypes: [],
 });
 
+/**
+ * Global context that holds which schema operations the server denies for each entity type.
+ * The backoffice uses it to hide what the server would deny; the Management API enforces it either way.
+ * Until the restrictions have loaded, or when they can't be loaded, every operation is allowed.
+ * Entity types are the backoffice ones, translated to the server's; folders follow the entity type they hold.
+ */
 export class UmbSchemaLockdownContext extends UmbContextBase {
 	readonly #state = new UmbObjectState<ServerSchemaLockdownResponseModel>(UMB_SCHEMA_LOCKDOWN_UNKNOWN_STATE);
 	#requested = false;

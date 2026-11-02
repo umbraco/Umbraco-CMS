@@ -5,6 +5,10 @@ import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@um
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
+/**
+ * Permits an extension while schema lockdown allows the configured operation on the entity type, or, with
+ * `match: false`, while it denies it. The entity type defaults to the one of the surrounding workspace.
+ */
 export class UmbSchemaOperationAllowedCondition
 	extends UmbConditionBase<UmbSchemaOperationAllowedConditionConfig>
 	implements UmbExtensionCondition

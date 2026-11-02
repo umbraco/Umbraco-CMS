@@ -1,8 +1,14 @@
 import type { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from './constants.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
+/**
+ * A schema operation that schema lockdown can deny. Reading is never denied.
+ */
 export type UmbSchemaOperation = 'create' | 'update' | 'delete';
 
+/**
+ * Configuration of the {@link UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS} condition.
+ */
 export interface UmbSchemaOperationAllowedConditionConfig extends UmbConditionConfigBase<
 	typeof UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS
 > {
