@@ -30,7 +30,7 @@ public sealed class SchemaLockdownComposer : IComposer
     public void Compose(IUmbracoBuilder builder)
     {
         builder.SchemaLockdownConfigurators().Add<SchemaLockdownTestConfigurator>();
-        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, SchemaLockdownTestDataSeeder>();
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, SchemaLockdownTestDataSeeder>();
     }
 }
 
@@ -52,6 +52,8 @@ public sealed class SchemaLockdownTestConfigurator : ISchemaLockdownConfigurator
         Constants.UdiEntityType.Webhook,
     ];
 
+    private static readonly SchemaOperation[] BlockableOperations = [SchemaOperation.Create, SchemaOperation.Update, SchemaOperation.Delete];
+
     private readonly IConfiguration _configuration;
 
     public SchemaLockdownTestConfigurator(IConfiguration configuration) => _configuration = configuration;
@@ -60,7 +62,7 @@ public sealed class SchemaLockdownTestConfigurator : ISchemaLockdownConfigurator
     {
         SchemaOperation[] operations = (_configuration["SchemaLockdownTest:BlockedOperations"] ?? string.Empty)
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(operation => Enum.Parse<SchemaOperation>(operation, ignoreCase: true))
+            .Select(ParseOperation)
             .ToArray();
         if (operations.Length == 0)
         {
@@ -72,28 +74,31 @@ public sealed class SchemaLockdownTestConfigurator : ISchemaLockdownConfigurator
             builder.Block(entityType, operations);
         }
     }
+
+    private static SchemaOperation ParseOperation(string value)
+    {
+        SchemaOperation operation = BlockableOperations.FirstOrDefault(x => x.ToString().Equals(value, StringComparison.OrdinalIgnoreCase));
+        return operation is SchemaOperation.Unknown
+            ? throw new InvalidOperationException($"'{value}' in SchemaLockdownTest:BlockedOperations isn't Create, Update or Delete.")
+            : operation;
+    }
 }
 
 /// <summary>
 /// Seeds one item of each entity type schema lockdown covers, plus a folder for the entity types that have folders.
 /// Keep the names in step with the ones the tests use.
 /// </summary>
-public sealed class SchemaLockdownTestDataSeeder : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
+public sealed class SchemaLockdownTestDataSeeder : INotificationAsyncHandler<UmbracoApplicationStartingNotification>
 {
     private static readonly Guid UserKey = Constants.Security.SuperUserKey;
 
-    private readonly IRuntimeState _runtimeState;
     private readonly IServiceProvider _services;
 
-    public SchemaLockdownTestDataSeeder(IRuntimeState runtimeState, IServiceProvider services)
-    {
-        _runtimeState = runtimeState;
-        _services = services;
-    }
+    public SchemaLockdownTestDataSeeder(IServiceProvider services) => _services = services;
 
-    public async Task HandleAsync(UmbracoApplicationStartedNotification notification, CancellationToken cancellationToken)
+    public async Task HandleAsync(UmbracoApplicationStartingNotification notification, CancellationToken cancellationToken)
     {
-        if (_runtimeState.Level != RuntimeLevel.Run)
+        if (notification.RuntimeLevel != RuntimeLevel.Run)
         {
             return;
         }
