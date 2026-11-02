@@ -1,6 +1,6 @@
 import type { ManifestSection } from '../extensions/index.js';
 import type { UmbSectionPickerModalData, UmbSectionPickerModalValue } from './section-picker-modal.token.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -45,20 +45,16 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline="Select sections">
 				<uui-box>
-					<div id="sections">
-						${repeat(
-							this._sections,
-							(item) => item.alias,
-							(item) => html`
-								<uui-menu-item
-									label=${this.localize.string(item.meta.label)}
-									?selectable=${this._selectable}
-									?selected=${this.#selectionManager.isSelected(item.alias)}
-									@selected=${() => this.#selectionManager.select(item.alias)}
-									@deselected=${() => this.#selectionManager.deselect(item.alias)}></uui-menu-item>
-							`,
-						)}
-					</div>
+					${this._sections.map(
+						(item) => html`
+							<uui-menu-item
+								label=${this.localize.string(item.meta.label)}
+								?selectable=${this._selectable}
+								?selected=${this.#selectionManager.isSelected(item.alias)}
+								@selected=${() => this.#selectionManager.select(item.alias)}
+								@deselected=${() => this.#selectionManager.deselect(item.alias)}></uui-menu-item>
+						`,
+					)}
 				</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
@@ -70,9 +66,8 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 
 	static override styles = [
 		css`
-			#sections {
-				display: grid;
-				gap: var(--uui-size-2);
+			uui-menu-item {
+				margin-bottom: 1px;
 			}
 		`,
 	];
