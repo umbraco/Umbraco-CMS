@@ -110,15 +110,6 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	static override styles = [
 		...UmbCollectionDefaultElement.styles,
 		css`
-			/* Leaves room for the empty state when the collection gets little height, for instance inside a property. */
-			:host {
-				min-height: calc(var(--uui-size-layout-4) + var(--uui-size-60) + var(--uui-size-layout-1));
-			}
-
-			umb-body-layout {
-				flex-grow: 1;
-			}
-
 			umb-dropzone-media {
 				top: var(--uui-size-layout-4);
 				left: 0;
@@ -127,12 +118,11 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 			}
 
 			umb-empty-media-state {
-				position: absolute;
-				top: var(--uui-size-layout-4);
-				left: var(--uui-size-layout-1);
-				right: var(--uui-size-layout-1);
-				bottom: calc(var(--uui-size-60) * 2);
+				padding-top: var(--uui-size-layout-1);
+				padding-bottom: var(--uui-size-layout-1);
 				min-height: fit-content;
+				height: 100%;
+				box-sizing: border-box;
 			}
 		`,
 	];
