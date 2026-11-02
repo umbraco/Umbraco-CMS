@@ -152,7 +152,7 @@ describe('UmbContentTypeDesignEditorPropertyElement', () => {
 		await finishEditingAlias();
 
 		expect(modalManager.opened.length).to.equal(1);
-		expect(modalManager.opened[0].args).to.deep.equal(['Headline', 'headline']);
+		expect(modalManager.opened[0].args).to.deep.equal(['Headline']);
 	});
 
 	it('does not ask when the alias matches the stored one', async () => {
