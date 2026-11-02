@@ -225,7 +225,7 @@ for (const mediaPicker of mediaPickerTypes) {
     }
     if (!mediaPicker.isMultiple) {
       // A single picker holds one item by definition, so it carries no validation limit.
-      expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'validationLimit')).toBeFalsy();
+      expect(dataTypeDefaultData.values.some(item => item.alias === 'validationLimit')).toBeFalsy();
     }
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'startNodeId')).toBeFalsy();
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'ignoreUserStartNodes')).toBeFalsy();
