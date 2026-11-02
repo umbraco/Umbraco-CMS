@@ -794,6 +794,21 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
+    public async Task Search_Matches_Query_Shorter_Than_Three_Characters_Only_At_The_Start_Of_A_Word()
+    {
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+
+        // "01" occurs within "po001026", but only "0123" starts with it.
+        const string startsWithMatch = "Annual 0123 Summary";
+        await PublishContents("COA REPORT PO001026 26", startsWithMatch);
+
+        ISearchResult[] searchResults = BackOfficeExamineSearch("01").ToArray();
+
+        Assert.AreEqual(1, searchResults.Length);
+        Assert.AreEqual(startsWithMatch, searchResults[0].Values["nodeName"]);
+    }
+
+    [Test]
     public async Task Search_Ranks_Content_Name_Starting_With_Query_Above_Name_Containing_It()
     {
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);

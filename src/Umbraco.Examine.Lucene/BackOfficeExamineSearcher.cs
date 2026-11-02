@@ -24,6 +24,8 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 
 public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 {
+    private const int MinimumMatchWithinWordLength = 3;
+
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
@@ -377,14 +379,19 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
         sb.Append(") ");
 
-        if (matchWithinWords is false)
+        // Shorter words would match within nearly every node name, so they only match as a prefix.
+        string[] wordsToMatchWithin = matchWithinWords
+            ? querywords.Where(w => w.Length >= MinimumMatchWithinWordLength).ToArray()
+            : [];
+
+        if (wordsToMatchWithin.Length == 0)
         {
             return;
         }
 
         // A word that starts with the term matches both clauses, so it ranks above one that only contains it.
         sb.Append(field).Append(':').Append('(');
-        foreach (var w in querywords)
+        foreach (var w in wordsToMatchWithin)
         {
             sb.Append('*');
             sb.Append(w.ToLower());
