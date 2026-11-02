@@ -47,7 +47,7 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
     /// <returns></returns>
     public IEnumerable<IIdentityUserToken> Get(IQuery<IIdentityUserToken>? query)
     {
-        Sql<ISqlContext> sqlClause = GetBaseTokenQuery(false);
+        Sql<ISqlContext> sqlClause = GetBaseTokenQuery();
 
         var translator = new SqlTranslator<IIdentityUserToken>(sqlClause, query);
         Sql<ISqlContext> sql = translator.Translate();
@@ -221,9 +221,10 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
 
         var providers = tokens.Select(x => x.LoginProvider).Distinct().ToList();
 
-        Sql<ISqlContext> sql = GetBaseTokenQuery(true)
+        Sql<ISqlContext> sql = GetBaseTokenQuery()
             .WhereIn<ExternalLoginDto>(x => x.LoginProvider, providers)
-            .Where<ExternalLoginDto>(x => x.UserOrMemberKey == userOrMemberKey);
+            .Where<ExternalLoginDto>(x => x.UserOrMemberKey == userOrMemberKey)
+            .ForUpdate();
 
         var toUpdate = new Dictionary<int, (IExternalLoginToken externalLoginToken, int externalLoginId)>();
         var toDelete = new List<int>();
@@ -400,18 +401,10 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
         entity.ResetDirtyProperties();
     }
 
-    private Sql<ISqlContext> GetBaseTokenQuery(bool forUpdate)
-        => forUpdate
-            ? Sql()
-                .Select<ExternalLoginTokenDto>(r => r.Select(x => x.ExternalLoginDto))
-                .From<ExternalLoginTokenDto>()
-                .AppendForUpdateHint() // ensure these table values are locked for updates, the ForUpdate ext method does not work here
-                .InnerJoin<ExternalLoginDto>()
-                .On<ExternalLoginTokenDto, ExternalLoginDto>(x => x.ExternalLoginId, x => x.Id)
-            : Sql()
-                .Select<ExternalLoginTokenDto>()
-                .AndSelect<ExternalLoginDto>(x => x.LoginProvider, x => x.UserOrMemberKey)
-                .From<ExternalLoginTokenDto>()
-                .InnerJoin<ExternalLoginDto>()
-                .On<ExternalLoginTokenDto, ExternalLoginDto>(x => x.ExternalLoginId, x => x.Id);
+    private Sql<ISqlContext> GetBaseTokenQuery()
+        => Sql()
+            .Select<ExternalLoginTokenDto>(r => r.Select(x => x.ExternalLoginDto))
+            .From<ExternalLoginTokenDto>()
+            .InnerJoin<ExternalLoginDto>()
+            .On<ExternalLoginTokenDto, ExternalLoginDto>(x => x.ExternalLoginId, x => x.Id);
 }
