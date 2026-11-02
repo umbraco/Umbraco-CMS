@@ -66,6 +66,17 @@ public interface IUserStartNodeTreeFilterService
         out long totalAfter);
 
     /// <summary>
+    /// Filters the provided entities by user start node access, keeping only those the tree would show.
+    /// </summary>
+    /// <param name="entities">The entities to filter.</param>
+    /// <returns>
+    /// The entities at or below a user start node, which the user has access to, and those above one, which the user
+    /// can only navigate through. Entities in neither position are omitted.
+    /// </returns>
+    // TODO (V20): Remove the default implementation.
+    UserAccessEntity[] GetFilteredEntities(IEnumerable<IEntitySlim> entities) => [];
+
+    /// <summary>
     /// Maps entities to tree item view models, applying access filtering using the provided access map.
     /// </summary>
     /// <typeparam name="TItem">The type of tree item view model.</typeparam>

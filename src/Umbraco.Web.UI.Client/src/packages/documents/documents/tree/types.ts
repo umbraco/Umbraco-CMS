@@ -3,6 +3,7 @@ import type { UmbDocumentVariantState } from '../variant-state.js';
 import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeItemModel,
+	UmbTreeItemsRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 	UmbTreeRootModel,
 } from '@umbraco-cms/backoffice/tree';
@@ -53,6 +54,12 @@ export interface UmbDocumentTreeRootItemsRequestArgs extends UmbTreeRootItemsReq
 }
 
 export interface UmbDocumentTreeChildrenOfRequestArgs extends UmbTreeChildrenOfRequestArgs {
+	dataType?: {
+		unique: string;
+	};
+}
+
+export interface UmbDocumentTreeItemsRequestArgs extends UmbTreeItemsRequestArgs {
 	dataType?: {
 		unique: string;
 	};

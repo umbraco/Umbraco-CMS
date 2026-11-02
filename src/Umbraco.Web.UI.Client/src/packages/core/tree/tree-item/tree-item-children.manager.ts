@@ -402,7 +402,10 @@ export class UmbTreeItemChildrenManager<
 			? this.offsetPagination.getCurrentPageNumber() * this.offsetPagination.getPageSize()
 			: this.offsetPagination.getPageSize();
 
-		const { data, error } = await repository.requestTreeItems({ uniques: uniques.slice(skip, skip + take) });
+		const { data, error } = await repository.requestTreeItems({
+			...this.getAdditionalRequestArgs(),
+			uniques: uniques.slice(skip, skip + take),
+		});
 
 		if (UmbTreeItemsNotSupportedError.isUmbTreeItemsNotSupportedError(error)) {
 			// The repository cannot resolve the start nodes as items, so fall back to the children of the first of
@@ -444,6 +447,7 @@ export class UmbTreeItemChildrenManager<
 		const skip = this.#children.getValue().length;
 
 		const { data, error } = await repository.requestTreeItems({
+			...this.getAdditionalRequestArgs(),
 			uniques: uniques.slice(skip, skip + this.offsetPagination.getPageSize()),
 		});
 

@@ -192,6 +192,30 @@ internal class UserStartNodeTreeFilterServiceTests
         Assert.IsFalse(result[2].HasAccess);
     }
 
+    [Test]
+    public void GetFilteredEntities_Delegates_To_UserStartNodeEntitiesService()
+    {
+        var startNodePaths = new[] { "-1,100" };
+        var entities = new[] { CreateEntity(Guid.NewGuid()), CreateEntity(Guid.NewGuid()) };
+        var expected = new[]
+        {
+            new UserAccessEntity(entities[0], false),
+            new UserAccessEntity(entities[1], true),
+        };
+
+        _userStartNodeEntitiesServiceMock
+            .Setup(x => x.ChildUserAccessEntities(entities, startNodePaths))
+            .Returns(expected);
+
+        var sut = CreateService([1234], startNodePaths);
+
+        var result = sut.GetFilteredEntities(entities);
+
+        Assert.AreEqual(2, result.Length);
+        Assert.IsFalse(result[0].HasAccess);
+        Assert.IsTrue(result[1].HasAccess);
+    }
+
     private void SetupDataTypeIgnoringStartNodes(Guid dataTypeKey, bool ignores)
     {
         var dataTypeMock = new Mock<IDataType>();

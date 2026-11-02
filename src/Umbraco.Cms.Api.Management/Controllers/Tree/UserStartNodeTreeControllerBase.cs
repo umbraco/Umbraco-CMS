@@ -3,7 +3,6 @@ using Umbraco.Cms.Api.Management.Models.Entities;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -96,6 +95,15 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
         => ShouldBypassStartNodeFiltering()
             ? base.GetPagedChildEntities(parentKey, skip, take, out totalItems)
             : MapAccessEntities(_treeFilterService.GetFilteredChildEntities(parentKey, skip, take, ItemOrdering, out totalItems));
+
+    /// <inheritdoc />
+    protected override IEntitySlim[] GetBatchEntities(Guid[] keys)
+    {
+        IEntitySlim[] entities = base.GetBatchEntities(keys);
+        return ShouldBypassStartNodeFiltering()
+            ? entities
+            : MapAccessEntities(_treeFilterService.GetFilteredEntities(entities));
+    }
 
     /// <inheritdoc />
     protected override IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter)

@@ -102,6 +102,9 @@ internal abstract class UserStartNodeTreeFilterService : IUserStartNodeTreeFilte
     }
 
     /// <inheritdoc />
+    public UserAccessEntity[] GetFilteredEntities(IEnumerable<IEntitySlim> entities)
+        => _userStartNodeEntitiesService.ChildUserAccessEntities(entities, UserStartNodePaths).ToArray();
+
     public TItem[] MapWithAccessFiltering<TItem>(
         IEntitySlim[] entities,
         Dictionary<Guid, bool> accessMap,
