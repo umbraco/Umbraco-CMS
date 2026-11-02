@@ -62,8 +62,14 @@
     <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
     <PackageVersion Include="MiniProfiler.Shared" Version="4.5.4" />
     <PackageVersion Include="ncrontab" Version="3.4.0" />
-    <PackageVersion Include="NPoco" Version="6.4.0" />
-    <PackageVersion Include="NPoco.SqlServer" Version="6.4.0" />
+    <!--
+      HOLD at 6.2.0 - do not bump within this major. NPoco.SqlServer 6.3.0+ depends on Microsoft.Data.SqlClient 7,
+      which moved the Microsoft Entra ID authentication providers (e.g. "Active Directory Managed Identity") into the
+      separate Microsoft.Data.SqlClient.Extensions.Azure package, so sites using those connection strings fail to boot.
+      See https://github.com/umbraco/Umbraco-CMS/issues/24385. The Microsoft.Data.SqlClient pin below enforces this.
+    -->
+    <PackageVersion Include="NPoco" Version="6.2.0" />
+    <PackageVersion Include="NPoco.SqlServer" Version="6.2.0" />
     <PackageVersion Include="OpenIddict.Abstractions" Version="7.7.2" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="7.7.2" />
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.7.2" />
@@ -104,6 +110,12 @@
       Pin it forward until both of those dependencies reference a fixed version.
     -->
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
+    <!--
+      Keep Microsoft.Data.SqlClient on the 6.x major (the version Microsoft.EntityFrameworkCore.SqlServer references).
+      SqlClient 7 drops the built-in Microsoft Entra ID authentication providers, a breaking change for existing sites,
+      so a dependency pulling in 7.x should fail restore rather than ship. Patch and minor 6.x updates are fine.
+    -->
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.7" />
     <!--
       Microsoft.AspNetCore.OpenApi and Swashbuckle only require Microsoft.OpenApi >= 2.0.0, which otherwise
       resolves to a vulnerable 2.0.0 (CVE-2026-49451, GHSA-v5pm-xwqc-g5wc). Pin forward to a patched 2.x
