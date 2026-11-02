@@ -2,10 +2,16 @@ import { UmbDocumentSearchServerDataSource } from './document-search.server.data
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('test-document-search-data-source-host')
-class UmbTestDocumentSearchDataSourceHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+class UmbTestDocumentSearchDataSourceHostElement extends UmbControllerHostElementMixin(HTMLElement) {
+	constructor() {
+		super();
+		new UmbNotificationContext(this);
+	}
+}
 
 const makeSearchItem = (id: string) => ({
 	id,
