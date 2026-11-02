@@ -178,15 +178,34 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         }
     }
 
+    /// <summary>
+    ///     Verifies that a cache row saved between the rebuild deleting a content type's rows and re-inserting them
+    ///     is kept, rather than overwritten by the rebuild's older data.
+    /// </summary>
+    /// <remarks>
+    ///     The rebuild re-inserts each page of rows with a single bulk insert. That bulk insert only fails when a row
+    ///     with the same node id and published flag already exists, which happens when a foreground save writes the
+    ///     row after the rebuild has deleted it. On that primary key violation, the rebuild falls back to
+    ///     <c>DatabaseCacheRepository.InsertNewRows</c>, which inserts each row with <c>INSERT ... WHERE NOT EXISTS</c>,
+    ///     so it skips the saved row and inserts the rest of the page.
+    /// </remarks>
     [Test]
-    public void Rebuild_Keeps_A_Row_Written_While_It_Runs()
-        => AssertRebuildKeepsARowWrittenWhileItRuns();
+    public void Rebuild_Does_Not_Overwrite_Row_Saved_During_Rebuild()
+        => AssertRebuildDoesNotOverwriteRowSavedDuringRebuild();
 
-    // The JSON serializer stores no binary data, so the rebuilt rows leave the binary column empty.
+    /// <summary>
+    ///     Verifies that a cache row saved during the rebuild is kept when the rows the rebuild inserts have no
+    ///     binary data, so the fallback in <c>DatabaseCacheRepository.InsertNewRows</c> has a null value to insert.
+    /// </summary>
+    /// <remarks>
+    ///     The JSON serializer stores no binary data, so the rebuilt rows leave the binary column empty. The fallback
+    ///     leaves null columns out of its insert, because some providers cannot convert an untyped null parameter to
+    ///     the binary column type.
+    /// </remarks>
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureJsonSerializer))]
-    public void Rebuild_Keeps_A_Row_Written_While_It_Runs_With_The_Json_Serializer()
-        => AssertRebuildKeepsARowWrittenWhileItRuns();
+    public void Rebuild_Does_Not_Overwrite_Row_Saved_During_Rebuild_When_Binary_Data_Is_Null()
+        => AssertRebuildDoesNotOverwriteRowSavedDuringRebuild();
 
     [Test]
     public void GetContentByContentTypeKey_With_Keys_Returns_Matching_Nodes()
@@ -206,7 +225,7 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         Assert.That(returnedKeys, Does.Contain(Subpage3.Key));
     }
 
-    private void AssertRebuildKeepsARowWrittenWhileItRuns()
+    private void AssertRebuildDoesNotOverwriteRowSavedDuringRebuild()
     {
         DocumentCacheService.Rebuild([ContentType.Id]);
 
