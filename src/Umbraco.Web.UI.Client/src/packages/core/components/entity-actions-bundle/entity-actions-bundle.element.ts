@@ -86,7 +86,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			umbExtensionsRegistry.byType('entityActionGroup'),
 			(groups) => {
 				this.#groups = groups;
-				if (this.#actions.length > 0) this.#updateFirstAction(true);
+				if (this.#actions.length > 0) void this.#updateFirstAction(true);
 			},
 			null,
 		);

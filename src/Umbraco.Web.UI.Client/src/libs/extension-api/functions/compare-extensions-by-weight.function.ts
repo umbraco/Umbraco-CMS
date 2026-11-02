@@ -11,5 +11,8 @@ export type UmbWeightedExtension = { alias: string; weight?: number };
  * @returns {number} A negative number when `a` sorts first, a positive number when `b` sorts first, otherwise 0.
  */
 export function compareExtensionsByWeight(a: UmbWeightedExtension, b: UmbWeightedExtension): number {
-	return (b.weight ?? 0) - (a.weight ?? 0) || (a.alias < b.alias ? -1 : a.alias > b.alias ? 1 : 0);
+	const byWeight = (b.weight ?? 0) - (a.weight ?? 0);
+	if (byWeight !== 0) return byWeight;
+	if (a.alias === b.alias) return 0;
+	return a.alias < b.alias ? -1 : 1;
 }

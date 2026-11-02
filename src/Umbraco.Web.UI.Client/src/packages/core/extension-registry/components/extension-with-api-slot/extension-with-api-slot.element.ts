@@ -413,13 +413,10 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._permitted
-			? this._permitted.length > 0
-				? this.listRenderMethod
-					? this.listRenderMethod(this._permitted)
-					: repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
-				: this.#renderNoting()
-			: nothing;
+		if (!this._permitted) return nothing;
+		if (this._permitted.length === 0) return this.#renderNoting();
+		if (this.listRenderMethod) return this.listRenderMethod(this._permitted);
+		return repeat(this._permitted, (ext) => ext.alias, this.#renderExtension);
 	}
 
 	#renderNoting() {

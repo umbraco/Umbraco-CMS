@@ -80,10 +80,9 @@ export function umbOrderActionsByGroup<T extends UmbGroupableAction>(
 		}
 	}
 
-	const items = [
-		...sortables.sort(compareSortableMenuItems).map((sortable) => sortable.item),
-		...fallbacks.sort(compareFallbackGroups),
-	];
+	sortables.sort(compareSortableMenuItems);
+	fallbacks.sort(compareFallbackGroups);
+	const items = [...sortables.map((sortable) => sortable.item), ...fallbacks];
 	setSeparators(items);
 	return items;
 }
