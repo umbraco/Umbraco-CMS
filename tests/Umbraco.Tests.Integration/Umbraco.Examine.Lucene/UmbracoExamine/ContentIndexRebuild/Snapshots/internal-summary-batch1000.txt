@@ -1,0 +1,154 @@
+### A variant page [content/variantPage]
+__Published = y
+__Published_da-dk = y
+__Published_de-de = y
+__Published_en-us = y
+__Raw_body_da-dk = <p>A body da-DK markup</p><umb-rte-block data-content-key="<guid>"><!--Umbraco-Block--></umb-rte-block><umb-rte-block data-content-key="<guid>"><!--Umbraco-Block--></umb-rte-block>
+__Raw_body_de-de = <p>A body de-DE markup</p><umb-rte-block data-content-key="<guid>"><!--Umbraco-Block--></umb-rte-block><umb-rte-block data-content-key="<guid>"><!--Umbraco-Block--></umb-rte-block>
+__Raw_body_en-us = <p>A body en-US markup</p><umb-rte-block data-content-key="<guid>"><!--Umbraco-Block--></umb-rte-block><umb-rte-block data-content-key="<guid>"><!--Umbraco-Block--></umb-rte-block>
+__Raw_invariantBody = <p>A invariantBody markup</p><umb-rte-block data-content-key="<guid>"><!--Umbraco-Block--></umb-rte-block><umb-rte-block data-content-key="<guid>"><!--Umbraco-Block--></umb-rte-block>
+__VariesByCulture = y
+body_da-dk = A body da-DK markup\nA body da-DK/rte/0 invariantText\nA body da-DK/rte/0 variantText\nA body da-DK/rte/1 invariantText\nA body da-DK/rte/1 variantText\n
+body_de-de = A body de-DE markup\nA body de-DE/rte/0 invariantText\nA body de-DE/rte/0 variantText\nA body de-DE/rte/1 invariantText\nA body de-DE/rte/1 variantText\n
+body_en-us = A body en-US markup\nA body en-US/rte/0 invariantText\nA body en-US/rte/0 variantText\nA body en-US/rte/1 invariantText\nA body en-US/rte/1 variantText\n
+creatorName = Administrator
+icon = icon-document
+invariantBlocks_da-dk = A invariantBlocks/0 heading da-DK\nA invariantBlocks/0/0 title da-DK\nA invariantBlocks/0/0/0 variantText da-DK\nA invariantBlocks/0/0/1 variantText da-DK\n\nA invariantBlocks/0/1 title da-DK\nA invariantBlocks/0/1/0 variantText da-DK\nA invariantBlocks/0/1/1 variantText da-DK\n\n\nA invariantBlocks/1 heading da-DK\nA invariantBlocks/1/0 title da-DK\nA invariantBlocks/1/0/0 variantText da-DK\nA invariantBlocks/1/0/1 variantText da-DK\n\nA invariantBlocks/1/1 title da-DK\nA invariantBlocks/1/1/0 variantText da-DK\nA invariantBlocks/1/1/1 variantText da-DK\n\n\n
+invariantBlocks_de-de = A invariantBlocks/0 invariantText\nA invariantBlocks/0 heading de-DE\nA invariantBlocks/0/0 invariantText\nA invariantBlocks/0/0 title de-DE\nA invariantBlocks/0/0/0 invariantText\nA invariantBlocks/0/0/0 variantText de-DE\nA invariantBlocks/0/0/1 invariantText\nA invariantBlocks/0/0/1 variantText de-DE\n\nA invariantBlocks/0/1 invariantText\nA invariantBlocks/0/1 title de-DE\nA invariantBlocks/0/1/0 invariantText\nA invariantBlocks/0/1/0 variantText de-DE\nA invariantBlocks/0/1/1 invariantText\nA invariantBlocks/0/1/1 variantText de-DE\n\n\nA invariantBlocks/1 invariantText\nA invariantBlocks/1 heading de-DE\nA invariantBlocks/1/0 invariantText\nA invariantBlocks/1/0 title de-DE\nA invariantBlocks/1/0/0 invariantText\nA invariantBlocks/1/0/0 variantText de-DE\nA invariantBlocks/1/0/1 invariantText\nA invariantBlocks/1/0/1 variantText de-DE\n\nA invariantBlocks/1/1 invariantText\nA invariantBlocks/1/1 title de-DE\nA invariantBlocks/1/1/0 invariantText\nA invariantBlocks/1/1/0 variantText de-DE\nA invariantBlocks/1/1/1 invariantText\nA invariantBlocks/1/1/1 variantText de-DE\n\n\n
+invariantBlocks_en-us = A invariantBlocks/0 heading en-US\nA invariantBlocks/0/0 title en-US\nA invariantBlocks/0/0/0 variantText en-US\nA invariantBlocks/0/0/1 variantText en-US\n\nA invariantBlocks/0/1 title en-US\nA invariantBlocks/0/1/0 variantText en-US\nA invariantBlocks/0/1/1 variantText en-US\n\n\nA invariantBlocks/1 heading en-US\nA invariantBlocks/1/0 title en-US\nA invariantBlocks/1/0/0 variantText en-US\nA invariantBlocks/1/0/1 variantText en-US\n\nA invariantBlocks/1/1 title en-US\nA invariantBlocks/1/1/0 variantText en-US\nA invariantBlocks/1/1/1 variantText en-US\n\n\n
+invariantBody_da-dk = A invariantBody markup\nA invariantBody/rte/0 variantText da-DK\nA invariantBody/rte/1 variantText da-DK\n
+invariantBody_de-de = A invariantBody markup\nA invariantBody/rte/0 invariantText\nA invariantBody/rte/0 variantText de-DE\nA invariantBody/rte/1 invariantText\nA invariantBody/rte/1 variantText de-DE\n
+invariantBody_en-us = A invariantBody markup\nA invariantBody/rte/0 variantText en-US\nA invariantBody/rte/1 variantText en-US\n
+level = 1
+nodeName = A variant page
+nodeName_da-dk = A variant page (da-DK)
+nodeName_de-de = A variant page (de-DE)
+nodeName_en-us = A variant page
+sortOrder = 0
+title_da-dk = A title da-DK
+title_de-de = A title de-DE
+title_en-us = A title en-US draft
+urlName = a-variant-page
+urlName_da-dk = a-variant-page-da-dk
+urlName_de-de = a-variant-page-de-de
+urlName_en-us = a-variant-page
+variantBlocks_da-dk = A variantBlocks da-DK draft/0 invariantText\nA variantBlocks da-DK draft/0 title\nA variantBlocks da-DK draft/0/0 invariantText\nA variantBlocks da-DK draft/0/0 variantText\n\n
+variantBlocks_de-de = A variantBlocks de-DE/0 invariantText\nA variantBlocks de-DE/0 heading\nA variantBlocks de-DE/0/0 invariantText\nA variantBlocks de-DE/0/0 title\nA variantBlocks de-DE/0/0/0 invariantText\nA variantBlocks de-DE/0/0/0 variantText\nA variantBlocks de-DE/0/0/1 invariantText\nA variantBlocks de-DE/0/0/1 variantText\n\nA variantBlocks de-DE/0/1 invariantText\nA variantBlocks de-DE/0/1 title\nA variantBlocks de-DE/0/1/0 invariantText\nA variantBlocks de-DE/0/1/0 variantText\nA variantBlocks de-DE/0/1/1 invariantText\nA variantBlocks de-DE/0/1/1 variantText\n\n\nA variantBlocks de-DE/1 invariantText\nA variantBlocks de-DE/1 heading\nA variantBlocks de-DE/1/0 invariantText\nA variantBlocks de-DE/1/0 title\nA variantBlocks de-DE/1/0/0 invariantText\nA variantBlocks de-DE/1/0/0 variantText\nA variantBlocks de-DE/1/0/1 invariantText\nA variantBlocks de-DE/1/0/1 variantText\n\nA variantBlocks de-DE/1/1 invariantText\nA variantBlocks de-DE/1/1 title\nA variantBlocks de-DE/1/1/0 invariantText\nA variantBlocks de-DE/1/1/0 variantText\nA variantBlocks de-DE/1/1/1 invariantText\nA variantBlocks de-DE/1/1/1 variantText\n\n\n
+variantBlocks_en-us = A variantBlocks en-US/0 invariantText\nA variantBlocks en-US/0 heading\nA variantBlocks en-US/0/0 invariantText\nA variantBlocks en-US/0/0 title\nA variantBlocks en-US/0/0/0 invariantText\nA variantBlocks en-US/0/0/0 variantText\nA variantBlocks en-US/0/0/1 invariantText\nA variantBlocks en-US/0/0/1 variantText\n\nA variantBlocks en-US/0/1 invariantText\nA variantBlocks en-US/0/1 title\nA variantBlocks en-US/0/1/0 invariantText\nA variantBlocks en-US/0/1/0 variantText\nA variantBlocks en-US/0/1/1 invariantText\nA variantBlocks en-US/0/1/1 variantText\n\n\nA variantBlocks en-US/1 invariantText\nA variantBlocks en-US/1 heading\nA variantBlocks en-US/1/0 invariantText\nA variantBlocks en-US/1/0 title\nA variantBlocks en-US/1/0/0 invariantText\nA variantBlocks en-US/1/0/0 variantText\nA variantBlocks en-US/1/0/1 invariantText\nA variantBlocks en-US/1/0/1 variantText\n\nA variantBlocks en-US/1/1 invariantText\nA variantBlocks en-US/1/1 title\nA variantBlocks en-US/1/1/0 invariantText\nA variantBlocks en-US/1/1/0 variantText\nA variantBlocks en-US/1/1/1 invariantText\nA variantBlocks en-US/1/1/1 variantText\n\n\n
+writerName = Administrator
+
+### B invariant page [content/invariantPage]
+__Published = y
+__VariesByCulture = n
+creatorName = Administrator
+grid = B grid/grid/0 invariantText\nB grid/grid/0 variantText\nB grid/grid/1 invariantText\nB grid/grid/1 variantText\nB grid/grid/2 invariantText\nB grid/grid/2 variantText\n
+icon = icon-document
+invariantBlocks = B invariantBlocks/0 invariantText\nB invariantBlocks/0 heading\nB invariantBlocks/0/0 invariantText\nB invariantBlocks/0/0 title\nB invariantBlocks/0/0/0 invariantText\nB invariantBlocks/0/0/0 variantText\nB invariantBlocks/0/0/1 invariantText\nB invariantBlocks/0/0/1 variantText\n\nB invariantBlocks/0/1 invariantText\nB invariantBlocks/0/1 title\nB invariantBlocks/0/1/0 invariantText\nB invariantBlocks/0/1/0 variantText\nB invariantBlocks/0/1/1 invariantText\nB invariantBlocks/0/1/1 variantText\n\n\nB invariantBlocks/1 invariantText\nB invariantBlocks/1 heading\nB invariantBlocks/1/0 invariantText\nB invariantBlocks/1/0 title\nB invariantBlocks/1/0/0 invariantText\nB invariantBlocks/1/0/0 variantText\nB invariantBlocks/1/0/1 invariantText\nB invariantBlocks/1/0/1 variantText\n\nB invariantBlocks/1/1 invariantText\nB invariantBlocks/1/1 title\nB invariantBlocks/1/1/0 invariantText\nB invariantBlocks/1/1/0 variantText\nB invariantBlocks/1/1/1 invariantText\nB invariantBlocks/1/1/1 variantText\n\n\n
+level = 1
+nodeName = B invariant page
+sortOrder = 1
+title = B title
+urlName = 
+writerName = Administrator
+
+### C variant page [content/variantPage]
+__Published = y
+__Published_da-dk = n
+__Published_en-us = y
+__VariesByCulture = y
+creatorName = Administrator
+icon = icon-document
+invariantBlocks_da-dk = C invariantBlocks/0 invariantText\nC invariantBlocks/0 invariantText stale da-DK\nC invariantBlocks/0 heading\nC invariantBlocks/0/0 invariantText\nC invariantBlocks/0/0 invariantText stale da-DK\nC invariantBlocks/0/0 title\nC invariantBlocks/0/0/0 invariantText\nC invariantBlocks/0/0/0 invariantText stale da-DK\nC invariantBlocks/0/0/0 variantText\nC invariantBlocks/0/0/1 invariantText\nC invariantBlocks/0/0/1 invariantText stale da-DK\nC invariantBlocks/0/0/1 variantText\n\nC invariantBlocks/0/1 invariantText\nC invariantBlocks/0/1 invariantText stale da-DK\nC invariantBlocks/0/1 title\nC invariantBlocks/0/1/0 invariantText\nC invariantBlocks/0/1/0 invariantText stale da-DK\nC invariantBlocks/0/1/0 variantText\nC invariantBlocks/0/1/1 invariantText\nC invariantBlocks/0/1/1 invariantText stale da-DK\nC invariantBlocks/0/1/1 variantText\n\n\nC invariantBlocks/1 invariantText\nC invariantBlocks/1 invariantText stale da-DK\nC invariantBlocks/1 heading\nC invariantBlocks/1/0 invariantText\nC invariantBlocks/1/0 invariantText stale da-DK\nC invariantBlocks/1/0 title\nC invariantBlocks/1/0/0 invariantText\nC invariantBlocks/1/0/0 invariantText stale da-DK\nC invariantBlocks/1/0/0 variantText\nC invariantBlocks/1/0/1 invariantText\nC invariantBlocks/1/0/1 invariantText stale da-DK\nC invariantBlocks/1/0/1 variantText\n\nC invariantBlocks/1/1 invariantText\nC invariantBlocks/1/1 invariantText stale da-DK\nC invariantBlocks/1/1 title\nC invariantBlocks/1/1/0 invariantText\nC invariantBlocks/1/1/0 invariantText stale da-DK\nC invariantBlocks/1/1/0 variantText\nC invariantBlocks/1/1/1 invariantText\nC invariantBlocks/1/1/1 invariantText stale da-DK\nC invariantBlocks/1/1/1 variantText\n\n\n
+level = 1
+nodeName = C variant page
+nodeName_da-dk = C variant page (da-DK)
+nodeName_en-us = C variant page
+sortOrder = 2
+title_da-dk = C title da-DK
+title_en-us = C title en-US
+urlName = c-variant-page
+urlName_da-dk = c-variant-page-da-dk
+urlName_en-us = c-variant-page
+writerName = Administrator
+
+### D invariant page [content/invariantPage]
+__Published = n
+__VariesByCulture = n
+creatorName = Administrator
+icon = icon-document
+invariantBlocks = D invariantBlocks/0 invariantText\nD invariantBlocks/0 title\nD invariantBlocks/0/0 invariantText\nD invariantBlocks/0/0 variantText\nD invariantBlocks/0/1 invariantText\nD invariantBlocks/0/1 variantText\n\nD invariantBlocks/1 invariantText\nD invariantBlocks/1 title\nD invariantBlocks/1/0 invariantText\nD invariantBlocks/1/0 variantText\nD invariantBlocks/1/1 invariantText\nD invariantBlocks/1/1 variantText\n\n
+level = 1
+nodeName = D invariant page
+sortOrder = 3
+title = D title
+urlName = 
+writerName = Administrator
+
+### E variant page [content/variantPage]
+__Published = y
+__Published_da-dk = y
+__Published_de-de = y
+__Published_en-us = y
+__Raw_invariantBody = <p>E invariantBody markup</p><umb-rte-block data-content-key="<guid>"><!--Umbraco-Block--></umb-rte-block>
+__VariesByCulture = y
+creatorName = Administrator
+icon = icon-document
+invariantBlocks = E invariantBlocks/0 invariantText\nE invariantBlocks/0 variantText\nE invariantBlocks/1 invariantText\nE invariantBlocks/1 variantText\nE invariantBlocks/2 invariantText\nE invariantBlocks/2 variantText\n
+invariantBody = E invariantBody markup\nE invariantBody/rte/0 invariantText\nE invariantBody/rte/0 variantText\n
+level = 1
+nodeName = E variant page
+nodeName_da-dk = E variant page (da-DK)
+nodeName_de-de = E variant page (de-DE)
+nodeName_en-us = E variant page
+sortOrder = 4
+title_da-dk = E title da-DK
+title_de-de = E title de-DE
+title_en-us = E title en-US
+urlName = e-variant-page
+urlName_da-dk = e-variant-page-da-dk
+urlName_de-de = e-variant-page-de-de
+urlName_en-us = e-variant-page
+writerName = Administrator
+
+### F invariant page [content/invariantPage]
+__Published = y
+__VariesByCulture = n
+creatorName = Administrator
+icon = icon-document
+invariantBlocks = F invariantBlocks/0 invariantText\nF invariantBlocks/0 heading\nF invariantBlocks/0/0 invariantText\nF invariantBlocks/0/0 title\nF invariantBlocks/0/0/0 invariantText\nF invariantBlocks/0/0/0 variantText\nF invariantBlocks/0/0/1 invariantText\nF invariantBlocks/0/0/1 variantText\n\nF invariantBlocks/0/1 invariantText\nF invariantBlocks/0/1 title\nF invariantBlocks/0/1/0 invariantText\nF invariantBlocks/0/1/0 variantText\nF invariantBlocks/0/1/1 invariantText\nF invariantBlocks/0/1/1 variantText\n\n\nF invariantBlocks/1 invariantText\nF invariantBlocks/1 heading\nF invariantBlocks/1/0 invariantText\nF invariantBlocks/1/0 title\nF invariantBlocks/1/0/0 invariantText\nF invariantBlocks/1/0/0 variantText\nF invariantBlocks/1/0/1 invariantText\nF invariantBlocks/1/0/1 variantText\n\nF invariantBlocks/1/1 invariantText\nF invariantBlocks/1/1 title\nF invariantBlocks/1/1/0 invariantText\nF invariantBlocks/1/1/0 variantText\nF invariantBlocks/1/1/1 invariantText\nF invariantBlocks/1/1/1 variantText\n\n\n
+level = 1
+nodeName = F invariant page
+sortOrder = 5
+title = F title
+urlName = 
+writerName = Administrator
+
+### G variant page [content/variantPage]
+__Published = y
+__Published_da-dk = y
+__Published_de-de = y
+__Published_en-us = y
+__VariesByCulture = y
+creatorName = Administrator
+icon = icon-document
+invariantBlocks_da-dk = G invariantBlocks/0 heading da-DK\nG invariantBlocks/0/0 title da-DK\nG invariantBlocks/0/0/0 variantText da-DK\n\n\n
+invariantBlocks_de-de = G invariantBlocks/0 invariantText\nG invariantBlocks/0 heading de-DE\nG invariantBlocks/0/0 invariantText\nG invariantBlocks/0/0 title de-DE\nG invariantBlocks/0/0/0 invariantText\nG invariantBlocks/0/0/0 variantText de-DE\n\n\n
+invariantBlocks_en-us = G invariantBlocks/0 heading en-US\nG invariantBlocks/0/0 title en-US\nG invariantBlocks/0/0/0 variantText en-US\n\n\n
+level = 1
+nodeName = G variant page
+nodeName_da-dk = G variant page (da-DK)
+nodeName_de-de = G variant page (de-DE)
+nodeName_en-us = G variant page
+sortOrder = 6
+title_da-dk = G title da-DK
+title_de-de = G title de-DE
+title_en-us = G title en-US
+urlName = g-variant-page
+urlName_da-dk = g-variant-page-da-dk
+urlName_de-de = g-variant-page-de-de
+urlName_en-us = g-variant-page
+variantBlocks_da-dk = G variantBlocks da-DK/0 invariantText\nG variantBlocks da-DK/0 heading\nG variantBlocks da-DK/0/0 invariantText\nG variantBlocks da-DK/0/0 title\nG variantBlocks da-DK/0/0/0 invariantText\nG variantBlocks da-DK/0/0/0 variantText\n\n\n
+variantBlocks_de-de = G variantBlocks de-DE/0 invariantText\nG variantBlocks de-DE/0 heading\nG variantBlocks de-DE/0/0 invariantText\nG variantBlocks de-DE/0/0 title\nG variantBlocks de-DE/0/0/0 invariantText\nG variantBlocks de-DE/0/0/0 variantText\n\n\n
+variantBlocks_en-us = G variantBlocks en-US/0 invariantText\nG variantBlocks en-US/0 heading\nG variantBlocks en-US/0/0 invariantText\nG variantBlocks en-US/0/0 title\nG variantBlocks en-US/0/0/0 invariantText\nG variantBlocks en-US/0/0/0 variantText\n\n\n
+writerName = Administrator
+
