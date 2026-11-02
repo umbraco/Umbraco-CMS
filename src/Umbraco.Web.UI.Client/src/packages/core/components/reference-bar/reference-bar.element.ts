@@ -1,12 +1,10 @@
 import { css, customElement, html, LitElement } from '@umbraco-cms/backoffice/external/lit';
 
 /**
- * An overlay that frames its parent with a rounded border and shows a label tab
- * just above the parent's top-right corner. Visibility is controlled by the consumer via
- * `--umb-reference-bar-opacity` (defaults to `1`); the typical pattern is for the parent
- * container to set it to `0` by default and toggle to `1` on `:hover` and/or `:focus-within`.
- * The parent must establish a positioning context (e.g. `position: relative`), and must not
- * clip overflow above its top edge (the tab renders outside the parent's content box).
+ * An overlay that marks its parent as a reference. It draws a bar along the parent's left edge
+ * with a link icon tab attached to it. The overlay ignores pointer events, so it does not
+ * interfere with the content beneath it.
+ * The parent must establish a positioning context (e.g. `position: relative`).
  * @element umb-reference-bar
  * @augments {LitElement}
  */
