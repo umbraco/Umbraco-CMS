@@ -1,4 +1,4 @@
-import {Page, Locator} from "@playwright/test";
+import {Page, Locator, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
@@ -16,6 +16,7 @@ export class DictionaryUiHelper extends UiBaseLocators {
   private readonly dictionaryCollection: Locator;
   private readonly exportModalBtn: Locator;
   private readonly importModalBtn: Locator;
+  private readonly dictionaryRootActions: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -32,6 +33,7 @@ export class DictionaryUiHelper extends UiBaseLocators {
     this.emptySearchResultMessage = page.locator('#empty-state');
     this.dictionaryTree = page.locator('umb-tree[alias="Umb.Tree.Dictionary"]');
     this.dictionaryCollection = page.locator('umb-dictionary-collection');
+    this.dictionaryRootActions = page.locator('umb-section-sidebar-menu-with-entity-actions #header umb-entity-actions-bundle');
   }
 
   async clickCreateDictionaryItemButton() {
@@ -122,5 +124,21 @@ export class DictionaryUiHelper extends UiBaseLocators {
     await this.waitForVisible(this.importModalBtn);
     await this.waitForEnabled(this.importModalBtn);
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.dictionaryImport, this.click(this.importModalBtn), ConstantHelper.statusCodes.created);
+  }
+
+  async goToDictionaryItem(name: string) {
+    await this.clickTreeItemWithName(name, this.dictionaryTree);
+  }
+
+  async isTranslationEditableForLanguage(isoCode: string, isEditable: boolean = true) {
+    await expect(this.page.locator(`uui-textarea[name="${isoCode}"] textarea`)).toBeEditable({editable: isEditable, timeout: ConstantHelper.timeout.medium});
+  }
+
+  async isDictionaryRootEntityActionVisible(actionName: string, isVisible: boolean = true) {
+    await this.isVisible(this.dictionaryRootActions.getByTestId(new RegExp(`^entity-action:.*${actionName}$`)), isVisible);
+  }
+
+  async isDictionaryRootActionsMenuVisible(isVisible: boolean = true) {
+    await this.isVisible(this.dictionaryRootActions.locator('#action-modal'), isVisible);
   }
 }

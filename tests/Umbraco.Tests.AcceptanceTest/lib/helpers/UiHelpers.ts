@@ -37,6 +37,7 @@ import {WebhookUiHelper} from "./WebhookUiHelper";
 import {InstallUiHelper} from "./differentAppSettingsHelpers/InstallUiHelper";
 import {ExternalLoginUiHelpers} from "./differentAppSettingsHelpers/ExternalLoginUiHelpers";
 import {PreviewUiHelper} from "./PreviewUiHelper";
+import {SchemaLockdownUiHelper} from "./SchemaLockdownUiHelper";
 
 export class UiHelpers {
   page: Page;
@@ -77,6 +78,7 @@ export class UiHelpers {
   install: InstallUiHelper;
   externalLogin: ExternalLoginUiHelpers;
   preview: PreviewUiHelper;
+  schemaLockdown: SchemaLockdownUiHelper;
 
   constructor(page: Page) {
     this.page = page;
@@ -117,6 +119,7 @@ export class UiHelpers {
     this.install = new InstallUiHelper(this.page);
     this.externalLogin = new ExternalLoginUiHelpers(this.page);
     this.preview = new PreviewUiHelper(this.page);
+    this.schemaLockdown = new SchemaLockdownUiHelper(this.page);
   }
 
   async goToBackOffice() {
