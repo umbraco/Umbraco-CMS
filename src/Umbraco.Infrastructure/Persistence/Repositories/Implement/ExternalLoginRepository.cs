@@ -170,7 +170,7 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
 
         try
         {
-            Database.InsertBulk(toInsert.Select(i => ExternalLoginFactory.BuildDto(userOrMemberKey, i)));
+            Database.ExecuteInSavepoint(() => Database.InsertBulk(toInsert.Select(i => ExternalLoginFactory.BuildDto(userOrMemberKey, i))));
         }
         catch (DbException ex) when (IsDuplicateKeyException(ex))
         {
@@ -181,7 +181,7 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
                 ExternalLoginDto dto = ExternalLoginFactory.BuildDto(userOrMemberKey, login);
                 try
                 {
-                    Database.Insert(dto);
+                    Database.ExecuteInSavepoint(() => Database.Insert(dto));
                 }
                 catch (DbException inner) when (IsDuplicateKeyException(inner))
                 {
