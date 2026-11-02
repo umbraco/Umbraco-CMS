@@ -3,6 +3,8 @@ import {expect} from "@playwright/test";
 
 let startTelemetryLevel = '';
 
+const oneYearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.logViewer.goToSettingsTreeItem('Log Viewer');
@@ -128,6 +130,7 @@ test('can expand a log entry', async ({umbracoUi}) => {
   // Act
   await umbracoUi.logViewer.clickSearchButton();
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
+  await umbracoUi.logViewer.setStartDate(oneYearAgo);
   await umbracoUi.logViewer.enterSearchKeyword(search);
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
   await umbracoUi.logViewer.clickFirstLogSearchResult();
@@ -192,6 +195,7 @@ test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
   // Saved searches live in the "Saved searches" dropdown on the Search view, so open Search first.
   await umbracoUi.logViewer.clickSearchButton();
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
+  await umbracoUi.logViewer.setStartDate(oneYearAgo);
   await umbracoUi.logViewer.clickSavedSearchByName(searchName);
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
 
