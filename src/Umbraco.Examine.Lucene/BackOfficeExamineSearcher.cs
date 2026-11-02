@@ -5,19 +5,17 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Examine;
+using Examine.Lucene.Providers;
+using Examine.Lucene.Search;
 using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -164,14 +162,24 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
             throw new InvalidOperationException("No index found by name " + indexName);
         }
 
-        if (!BuildQuery(sb, query, searchFrom, fields, type))
+        // Matching a term anywhere within a node name needs a leading wildcard, which only a Lucene searcher can be told to allow.
+        var luceneSearcher = index.Searcher as BaseLuceneSearcher;
+
+        if (!BuildQuery(sb, query, searchFrom, fields, type, matchWithinWords: luceneSearcher is not null))
         {
             totalFound = 0;
             return [];
         }
 
-        ISearchResults? result = index.Searcher
-            .CreateQuery()
+        IQuery searchQuery = luceneSearcher is not null
+            ? luceneSearcher.CreateQuery(
+                null,
+                BooleanOperation.And,
+                luceneSearcher.LuceneAnalyzer,
+                new LuceneSearchOptions { AllowLeadingWildcard = true })
+            : index.Searcher.CreateQuery();
+
+        ISearchResults? result = searchQuery
             .NativeQuery(sb.ToString())
             .SelectFields(fieldsToLoad)
             //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
@@ -190,7 +198,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         sb.Append($"{requiredOrNotString}__Path:{trashPath}\\,* ");
     }
 
-    private bool BuildQuery(StringBuilder sb, string query, string? searchFrom, List<string> fields, string type)
+    private bool BuildQuery(StringBuilder sb, string query, string? searchFrom, List<string> fields, string type, bool matchWithinWords)
     {
         //build a lucene query:
         // the nodeName will be boosted 10x without wildcards
@@ -265,7 +273,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
                 AppendNodeNameExactWithBoost(sb, query, allLangs);
 
-                AppendNodeNameWithWildcards(sb, querywords, allLangs);
+                AppendNodeNameWithWildcards(sb, querywords, allLangs, matchWithinWords);
 
                 foreach (var f in fields)
                 {
@@ -347,11 +355,20 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
     }
 
-    private static void AppendNodeNameWithWildcards(StringBuilder sb, string[] querywords, IEnumerable<string> allLangs)
+    private static void AppendNodeNameWithWildcards(StringBuilder sb, string[] querywords, IEnumerable<string> allLangs, bool matchWithinWords)
     {
-        //node name normally with wildcards
-        sb.Append("nodeName:");
-        sb.Append('(');
+        AppendNodeNameFieldWithWildcards(sb, "nodeName", querywords, matchWithinWords);
+
+        //also search on all variant node names
+        foreach (var lang in allLangs)
+        {
+            AppendNodeNameFieldWithWildcards(sb, $"nodeName_{lang}", querywords, matchWithinWords);
+        }
+    }
+
+    private static void AppendNodeNameFieldWithWildcards(StringBuilder sb, string field, string[] querywords, bool matchWithinWords)
+    {
+        sb.Append(field).Append(':').Append('(');
         foreach (var w in querywords)
         {
             sb.Append(w.ToLower());
@@ -359,20 +376,22 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
 
         sb.Append(") ");
-        //also search on all variant node names
-        foreach (var lang in allLangs)
-        {
-            //node name normally with wildcards
-            sb.Append($"nodeName_{lang}:");
-            sb.Append('(');
-            foreach (var w in querywords)
-            {
-                sb.Append(w.ToLower());
-                sb.Append("* ");
-            }
 
-            sb.Append(") ");
+        if (matchWithinWords is false)
+        {
+            return;
         }
+
+        // A word that starts with the term matches both clauses, so it ranks above one that only contains it.
+        sb.Append(field).Append(':').Append('(');
+        foreach (var w in querywords)
+        {
+            sb.Append('*');
+            sb.Append(w.ToLower());
+            sb.Append("* ");
+        }
+
+        sb.Append(") ");
     }
 
     private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, string? searchFrom, bool ignoreUserStartNodes, out bool abortQuery)

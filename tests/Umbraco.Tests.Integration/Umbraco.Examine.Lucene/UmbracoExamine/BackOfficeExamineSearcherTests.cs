@@ -775,6 +775,41 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         Assert.AreEqual(exactMatch, items.First().Name);
     }
 
+    [TestCase("PO001026")]
+    [TestCase("REPO")]
+    [TestCase("001026")]
+    [TestCase("1026")]
+    [TestCase("eport")]
+    public async Task Search_Matches_Content_Name_Containing_Query_Anywhere_Within_A_Word(string query)
+    {
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+
+        const string contentName = "COA REPORT PO001026 26";
+        await CreateDefaultPublishedContent(contentName);
+
+        ISearchResult[] searchResults = BackOfficeExamineSearch(query).ToArray();
+
+        Assert.AreEqual(1, searchResults.Length);
+        Assert.AreEqual(contentName, searchResults[0].Values["nodeName"]);
+    }
+
+    [Test]
+    public async Task Search_Ranks_Content_Name_Starting_With_Query_Above_Name_Containing_It()
+    {
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+
+        // The name that only contains the query is published first, so database order alone would rank it first.
+        const string containsMatch = "Notebook Covers";
+        const string prefixMatch = "Booking Terms";
+        await PublishContents(containsMatch, prefixMatch);
+
+        ISearchResult[] searchResults = BackOfficeExamineSearch("book").ToArray();
+
+        Assert.AreEqual(2, searchResults.Length);
+        Assert.AreEqual(prefixMatch, searchResults[0].Values["nodeName"]);
+        Assert.AreEqual(containsMatch, searchResults[1].Values["nodeName"]);
+    }
+
     private async Task PublishContents(params string[] contentNames)
     {
         var contentType = new ContentTypeBuilder()
