@@ -6,6 +6,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { isAboveZeroAndBelowMinimum } from '@umbraco-cms/backoffice/validation';
 
 // TODO: Rename to 'umb-input-data-type'. [LK]
 @customElement('umb-data-type-input')
@@ -42,12 +43,12 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -58,6 +59,11 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		if (value === 1) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
 	}
 	public get max(): number {
 		return this.#pickerContext.max;
@@ -65,11 +71,11 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
@@ -100,7 +106,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(
@@ -109,8 +115,8 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), null);
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
 	}
 
 	protected override getFormElement() {

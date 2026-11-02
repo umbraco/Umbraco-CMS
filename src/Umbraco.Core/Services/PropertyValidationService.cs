@@ -89,7 +89,8 @@ public class PropertyValidationService : IPropertyValidationService
             return [];
         }
 
-        return ValidatePropertyValue(dataEditor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage, validationContext);
+        var isRequired = ShouldValidateAsRequired(propertyType, validationContext);
+        return ValidatePropertyValue(dataEditor, dataType, postedValue, isRequired, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage, validationContext);
     }
 
     /// <inheritdoc />
@@ -144,23 +145,30 @@ public class PropertyValidationService : IPropertyValidationService
             // impacts invariant = validate invariant property, invariant culture
             if (impact.ImpactsOnlyInvariantCulture)
             {
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
                 return !(propertyTypeVaries || IsPropertyValid(x, PropertyValidationContext.Empty()));
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             // impacts all = validate property, all cultures (incl. invariant)
             if (impact.ImpactsAllCultures)
             {
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
                 return !IsPropertyValid(x, PropertyValidationContext.CultureAndSegment("*", null));
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             // impacts explicit culture = validate variant property, explicit culture
             if (propertyTypeVaries)
             {
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
                 return !IsPropertyValid(x, PropertyValidationContext.CultureAndSegment(impact.Culture, null));
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             if (impact.ImpactsExplicitCulture && GetDataEditor(x.PropertyType)?.CanMergePartialPropertyValues(x.PropertyType) is true)
             {
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
                 return !IsPropertyValid(x, new PropertyValidationContext
                 {
                     Culture = null,
@@ -168,6 +176,7 @@ public class PropertyValidationService : IPropertyValidationService
                     CulturesBeingValidated = [impact.Culture!],
                     SegmentsBeingValidated = []
                 });
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             // and, for explicit culture, we may also have to validate invariant property, invariant culture
@@ -175,13 +184,20 @@ public class PropertyValidationService : IPropertyValidationService
             // - it is impacted (default culture), or
             // - there is no published version of the content - maybe non-default culture, but no published version
             var alsoInvariant = impact.ImpactsAlsoInvariantProperties || !content.Published;
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
             return alsoInvariant && !IsPropertyValid(x, PropertyValidationContext.Empty());
+#pragma warning restore CS0618 // Type or member is obsolete
         }).ToArray();
 
         return invalidProperties.Length == 0;
     }
 
     /// <inheritdoc />
+    // TODO (V20): Make this internal rather than removing it entirely in V20, so the
+    // referencing unit tests can continue to exercise this code.
+    // Also remove the obsolete code warning suppressions added around the various
+    // callers to this method (including the unit tests).
+    [Obsolete("Property level validation is not going to be supported moving forward. Please use content level validation with IsPropertyDataValid instead. Scheduled for removal in Umbraco 20.")]
     public bool IsPropertyValid(IProperty property, PropertyValidationContext validationContext)
     {
         // NOTE - the pvalue and vvalues logic in here is borrowed directly from the Property.Values setter so if you are wondering what that's all about, look there.
@@ -216,6 +232,28 @@ public class PropertyValidationService : IPropertyValidationService
         if (culture == null && segment == null)
         {
             return true;
+        }
+
+        // if the property varies by segment, make explicitly sure we validate mandatory against
+        // the non-segmented value (or null, if not present)
+        if (property.PropertyType.VariesBySegment())
+        {
+            IPropertyValue? defaultSegmentValue = property
+                .Values
+                .FirstOrDefault(x => (culture == "*" || x.Culture.InvariantEquals(culture)) && x.Segment == null);
+            if (!IsValidPropertyValue(
+                    property,
+                    defaultSegmentValue?.EditedValue,
+                    new PropertyValidationContext
+                    {
+                        Culture = culture,
+                        Segment = null,
+                        CulturesBeingValidated = validationContext.CulturesBeingValidated,
+                        SegmentsBeingValidated = validationContext.SegmentsBeingValidated,
+                    }))
+            {
+                return false;
+            }
         }
 
         // if nothing else to validate, we are good
@@ -279,8 +317,19 @@ public class PropertyValidationService : IPropertyValidationService
         var configuration = GetDataType(propertyType)?.ConfigurationObject;
         IDataValueEditor valueEditor = editor.GetValueEditor(configuration);
 
-        return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp, validationContext).Any();
+        var isRequired = ShouldValidateAsRequired(propertyType, validationContext);
+        return !valueEditor.Validate(value, isRequired, propertyType.ValidationRegExp, validationContext).Any();
     }
+
+    /// <summary>
+    ///     Determines whether mandatory validation applies within the given validation context.
+    /// </summary>
+    /// <remarks>
+    ///     Values for non-default segments are optional overrides of the default segment value, so a mandatory
+    ///     property type is only enforced as required when validating the default (null) segment.
+    /// </remarks>
+    private static bool ShouldValidateAsRequired(IPropertyType propertyType, PropertyValidationContext validationContext)
+        => propertyType.Mandatory && validationContext.Segment.IsNullOrWhiteSpace();
 
     private IDataType? GetDataType(IPropertyType propertyType)
         => _dataTypeService.GetDataType(propertyType.DataTypeId);

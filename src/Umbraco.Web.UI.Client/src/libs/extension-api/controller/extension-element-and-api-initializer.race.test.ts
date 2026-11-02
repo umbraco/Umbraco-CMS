@@ -457,4 +457,56 @@ describe('UmbExtensionElementAndApiInitializer — condition-flip race with a sl
 
 		controller.destroy();
 	});
+
+	// Regression test for #23384. The extension is unregistered while a good-call is being
+	// set up, clearing the manifest mid-flight:
+	//
+	//   1. `flipTo(true)` synchronously enters #onConditionsChangedCallback and suspends at
+	//      `await _conditionsAreBad()`, queuing the _conditionsAreGood() call as a microtask.
+	//   2. `unregister()` runs synchronously before that microtask resumes. The manifest
+	//      observer fires synchronously and sets the internal manifest to undefined.
+	//   3. The microtask resumes and (before the fix) called _conditionsAreGood() with an
+	//      undefined manifest. The subclass asserts `this.manifest!` and handed undefined to
+	//      createExtensionElementWithApi, which threw
+	//      "Cannot read properties of undefined (reading 'api')" — an uncaught rejection.
+	//
+	// The fix re-checks the manifest after the await and bails. After it, the controller
+	// simply settles unpermitted with no element/api and no throw.
+	it('does not crash when the extension is unregistered during the good-call setup', async () => {
+		// The crash surfaces as an unhandled rejection (the callback is fired from the
+		// condition's onChange with no awaiting caller), so capture those to assert on.
+		const rejections: unknown[] = [];
+		const onRejection = (event: PromiseRejectionEvent) => rejections.push(event.reason);
+		window.addEventListener('unhandledrejection', onRejection);
+
+		try {
+			const controller = new UmbExtensionElementAndApiInitializer<TestManifest>(
+				hostElement,
+				extensionRegistry,
+				baseManifest.alias,
+				[hostElement],
+				() => {},
+			);
+
+			await wait(0);
+			expect(lastManualCondition, 'condition must exist').to.exist;
+
+			lastManualCondition!.flipTo(true);
+			extensionRegistry.unregister(baseManifest.alias);
+
+			await wait(120);
+
+			expect(
+				rejections.map((r) => (r instanceof Error ? r.message : String(r))),
+				'unregistering during the good-call setup must not throw',
+			).to.be.empty;
+			expect(controller.permitted, 'not permitted after unregister').to.be.false;
+			expect(controller.component, 'no component after unregister').to.be.undefined;
+			expect(controller.api, 'no api after unregister').to.be.undefined;
+
+			controller.destroy();
+		} finally {
+			window.removeEventListener('unhandledrejection', onRejection);
+		}
+	});
 });

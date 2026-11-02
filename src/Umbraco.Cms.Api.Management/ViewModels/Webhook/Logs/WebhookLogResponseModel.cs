@@ -21,6 +21,11 @@ public class WebhookLogResponseModel
     public string StatusCode { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the numeric HTTP status code of the webhook response, or <c>null</c> when the delivery has no HTTP status code (e.g. a connection error).
+    /// </summary>
+    public int? HttpStatusCode { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the HTTP response status code indicates success.
     /// </summary>
     public bool IsSuccessStatusCode { get; set; }

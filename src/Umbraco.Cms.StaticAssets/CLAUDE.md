@@ -28,9 +28,9 @@ This project packages all static assets required for Umbraco CMS at runtime:
 Umbraco.Cms.StaticAssets/
 ├── umbraco/                                # Razor Views (server-rendered)
 │   ├── UmbracoBackOffice/
-│   │   └── Index.cshtml                    # Backoffice SPA shell (69 lines)
+│   │   └── Index.cshtml                    # Backoffice SPA shell
 │   ├── UmbracoLogin/
-│   │   └── Index.cshtml                    # Login page (99 lines)
+│   │   └── Index.cshtml                    # Login page
 │   └── UmbracoWebsite/
 │       ├── NoNodes.cshtml                  # "No published content" page
 │       ├── NotFound.cshtml                 # 404 error page
@@ -49,7 +49,7 @@ Umbraco.Cms.StaticAssets/
 │       ├── login/                          # Built login SPA (from Umbraco.Web.UI.Login)
 │       └── website/                        # Frontend website assets (fonts, CSS)
 │
-└── Umbraco.Cms.StaticAssets.csproj         # Build configuration (149 lines)
+└── Umbraco.Cms.StaticAssets.csproj         # Build configuration
 ```
 
 ### Project Dependencies
@@ -71,13 +71,13 @@ Umbraco.Cms.StaticAssets/
 
 ### Razor Views
 
-| View | Purpose | Line Count |
-|------|---------|------------|
-| `UmbracoBackOffice/Index.cshtml` | Backoffice SPA entry point with `<umb-app>` web component | 69 |
-| `UmbracoLogin/Index.cshtml` | Login page with `<umb-auth>` web component | 99 |
-| `UmbracoWebsite/NoNodes.cshtml` | Welcome page when no content published | 59 |
-| `UmbracoWebsite/NotFound.cshtml` | 404 error page (debug info in debug mode) | 79 |
-| `UmbracoWebsite/Maintenance.cshtml` | Maintenance mode during upgrades | 65 |
+| View | Purpose |
+|------|---------|
+| `UmbracoBackOffice/Index.cshtml` | Backoffice SPA entry point with `<umb-app>` web component |
+| `UmbracoLogin/Index.cshtml` | Login page with `<umb-auth>` web component |
+| `UmbracoWebsite/NoNodes.cshtml` | Welcome page when no content published |
+| `UmbracoWebsite/NotFound.cshtml` | 404 error page (debug info in debug mode) |
+| `UmbracoWebsite/Maintenance.cshtml` | Maintenance mode during upgrades |
 
 ### Backoffice Index View (umbraco/UmbracoBackOffice/Index.cshtml)
 
@@ -130,6 +130,10 @@ LoginAssetsPath = wwwroot/umbraco/login
 | `BuildBackoffice` | Runs `npm run build:for:cms` |
 | `DefineBackofficeAssets` | Registers assets with StaticWebAssets system |
 | `CleanBackoffice` | Removes built assets on `dotnet clean` |
+| `RestoreLogin` | Runs `npm i` if Login's package-lock changed |
+| `BuildLogin` | Runs `npm run build` in Login. Depends on `RestoreBackoffice` because Login's `tsc` walks Client's `src/` via tsconfig path aliases and needs Client's `node_modules` populated for transitive `lit`/`rxjs`/UUI resolution |
+| `DefineLoginAssets` | Registers Login assets with StaticWebAssets system |
+| `CleanLogin` | Removes built Login assets on `dotnet clean` |
 
 ### Build Conditions
 
@@ -209,11 +213,13 @@ Full Monaco code editor included at `wwwroot/umbraco/backoffice/monaco-editor/` 
 
 CSS themes in `wwwroot/umbraco/backoffice/css/`:
 - `umb-css.css` - Main styles
-- `uui-css.css` - UI library styles
-- `dark.theme.css` - Dark theme
-- `high-contrast.theme.css` - Accessibility theme
+- `light.css` - Default UUI theme (replaces the former `uui-css.css`)
+- `dark.css` - Dark theme (shipped by `@umbraco-ui/uui`)
+- `high-contrast.css` - Accessibility theme (shipped by `@umbraco-ui/uui`)
 - `umbraco-blockgridlayout.css` - Block grid styles
 - `rte-content.css` - Rich text editor content styles
+
+The UUI theme files (`light.css`, `dark.css`, `high-contrast.css`) are copied from `@umbraco-ui/uui` during the backoffice build; see `Umbraco.Web.UI.Client/src/packages/core/themes/manifests.ts`.
 
 ---
 

@@ -6,6 +6,7 @@ import type {
 	UmbTreeStartNode,
 } from '../types.js';
 import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
+import { resolveTreeStartNodes } from '../utils/index.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
 
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -57,7 +58,17 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this.observe(
 				value.view.currentView,
 				async (manifest) => {
-					const element = manifest ? await createExtensionElement(manifest) : null;
+					if (!manifest) {
+						this._viewElement = null;
+						return;
+					}
+
+					const element = await createExtensionElement(manifest);
+
+					// Views are imported on demand, so a slow import must not replace the view that became the current
+					// one while it was in flight.
+					if (manifest.alias !== this._api?.view?.getCurrentView()?.alias) return;
+
 					if (element && 'manifest' in element) {
 						(element as HTMLElement & { manifest: unknown }).manifest = manifest;
 					}
@@ -98,11 +109,23 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
+	@property({ type: Array, attribute: false })
+	startNodes?: Array<UmbTreeStartNode>;
+
 	@property({ type: Boolean, attribute: false })
 	foldersOnly?: boolean = false;
 
 	@property({ type: Boolean, attribute: false })
 	isMenu?: boolean = false;
+
+	/**
+	 * Whether opening an item takes the user into it, by acting on `UmbTreeItemOpenEvent`.
+	 *
+	 * Set it when the host does. A tree that can do no more than expand and collapse must leave it off, so an item never
+	 * replaces the affordance that expands with one that cannot act.
+	 */
+	@property({ type: Boolean, attribute: false })
+	drillable?: boolean = false;
 
 	@property({ attribute: false })
 	selectableFilter: (item: UmbTreeItemModelBase) => boolean = () => true;
@@ -156,8 +179,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this._api!.setSelectOnly(this._selectionConfiguration.selectOnly);
 		}
 
-		if (_changedProperties.has('startNode')) {
-			this._api!.setStartNode(this.startNode);
+		if (_changedProperties.has('startNode') || _changedProperties.has('startNodes')) {
+			const { startNode, startNodes } = resolveTreeStartNodes(this.startNode, this.startNodes);
+			this._api!.setStartNodes?.(startNodes);
+			this._api!.setStartNode(startNode);
 		}
 
 		if (_changedProperties.has('hideTreeRoot')) {
@@ -186,6 +211,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 		if (_changedProperties.has('hideTreeItemActions')) {
 			this._api!.setHideTreeItemActions?.(this.hideTreeItemActions);
+		}
+
+		if (_changedProperties.has('drillable')) {
+			this._api!.setDrillable?.(this.drillable ?? false);
 		}
 
 		if (_changedProperties.has('isMenu')) {
@@ -219,8 +248,11 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		// The empty state belongs to the children list, not a single view, so it is presented once here — mirroring
 		// the collection pattern. It is only relevant when the children are shown on their own (root hidden or drilled
 		// into a start node) and never in the sidebar menu.
-		if (this.isMenu || !(this.hideTreeRoot || this.startNode)) return nothing;
-		if (!this._initialLoadDone || this._isLoading || this._hasItems) return nothing;
+		if (this.isMenu || !(this.hideTreeRoot || this.startNode || this.startNodes?.length)) return nothing;
+		if (!this._initialLoadDone) {
+			return html`<umb-view-loader></umb-view-loader>`;
+		}
+		if (this._isLoading || this._hasItems) return nothing;
 		return html`<div id="empty-state" class="uui-text"><h4>${this.localize.term('tree_noItems')}</h4></div>`;
 	}
 

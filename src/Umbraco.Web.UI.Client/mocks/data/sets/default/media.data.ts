@@ -307,4 +307,57 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		flags: [],
 	},
+	// Media the imaging endpoint cannot preview, so the cards fall back to their media type icon — the case the
+	// file extension label exists for. Their names carry no extension, as `toFriendlyName` leaves them on upload,
+	// so they also cover the label coming from the file rather than from the name.
+	{
+		hasChildren: false,
+		id: '9b4b5e4a-1f2c-4d3e-8a71-6c0d5e2f1a01',
+		extension: 'pdf',
+		createDate: '2026-09-01T10:15:00.000000',
+		parent: null,
+		noAccess: false,
+		isTrashed: false,
+		mediaType: {
+			id: 'media-type-5-id',
+			icon: 'icon-document',
+		},
+		values: [],
+		variants: [
+			{
+				publishDate: null,
+				culture: null,
+				segment: null,
+				name: 'Annual Report',
+				createDate: '2026-09-01T10:15:00.000000',
+				updateDate: '2026-09-01T10:15:00.000000',
+			},
+		],
+		flags: [],
+	},
+	{
+		hasChildren: false,
+		id: '9b4b5e4a-1f2c-4d3e-8a71-6c0d5e2f1a02',
+		extension: 'mov',
+		createDate: '2026-09-02T11:30:00.000000',
+		parent: null,
+		noAccess: false,
+		isTrashed: false,
+		mediaType: {
+			id: 'media-type-4-id',
+			icon: 'icon-video',
+		},
+		values: [],
+		variants: [
+			{
+				publishDate: null,
+				culture: null,
+				segment: null,
+				name: 'Promo Clip',
+				createDate: '2026-09-02T11:30:00.000000',
+				updateDate: '2026-09-02T11:30:00.000000',
+			},
+		],
+		flags: [],
+	},
 ];

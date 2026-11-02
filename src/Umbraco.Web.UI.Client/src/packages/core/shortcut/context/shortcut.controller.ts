@@ -132,10 +132,10 @@ export class UmbShortcutController extends UmbControllerBase {
 
 	/**
 	 * Get all hints
-	 * @param key
-	 * @param modifier
-	 * @param shift
-	 * @param alt
+	 * @param {string} key Key of the shortcut to find
+	 * @param {boolean} modifier Whether the modifier key is required
+	 * @param {boolean} shift Whether the shift key is required
+	 * @param {boolean} alt Whether the alt key is required
 	 * @returns {UmbShortcut[]} Array of hints
 	 */
 	findShortcut(key: string, modifier: boolean, shift: boolean = false, alt: boolean = false): UmbShortcut | undefined {

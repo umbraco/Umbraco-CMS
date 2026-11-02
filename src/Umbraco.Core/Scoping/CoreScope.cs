@@ -250,10 +250,10 @@ public class CoreScope : ICoreScope
     public void WriteLock(params int[] lockIds) => Locks.WriteLock(InstanceId, null, lockIds);
 
     /// <inheritdoc />
-    public void WriteLock(TimeSpan timeout, int lockId) => Locks.ReadLock(InstanceId, timeout, lockId);
+    public void WriteLock(TimeSpan timeout, int lockId) => Locks.WriteLock(InstanceId, timeout, lockId);
 
     /// <inheritdoc />
-    public void ReadLock(TimeSpan timeout, int lockId) => Locks.WriteLock(InstanceId, timeout, lockId);
+    public void ReadLock(TimeSpan timeout, int lockId) => Locks.ReadLock(InstanceId, timeout, lockId);
 
     /// <inheritdoc />
     public void EagerWriteLock(params int[] lockIds) => Locks.EagerWriteLock(InstanceId, null, lockIds);
@@ -265,7 +265,7 @@ public class CoreScope : ICoreScope
     public void EagerReadLock(TimeSpan timeout, int lockId) => Locks.EagerReadLock(InstanceId, timeout, lockId);
 
     /// <inheritdoc />
-    public void EagerReadLock(params int[] lockIds) => Locks.EagerReadLock(InstanceId, TimeSpan.Zero, lockIds);
+    public void EagerReadLock(params int[] lockIds) => Locks.EagerReadLock(InstanceId, null, lockIds);
 
     /// <summary>
     ///     Disposes the scope, handling file systems, notifications, and parent scope completion.
@@ -289,7 +289,7 @@ public class CoreScope : ICoreScope
     ///     Called when a child scope has completed, to update the parent's completion status.
     /// </summary>
     /// <param name="completed">A value indicating whether the child completed successfully.</param>
-    protected void ChildCompleted(bool? completed)
+    protected virtual void ChildCompleted(bool? completed)
     {
         // if child did not complete we cannot complete
         if (completed.HasValue == false || completed.Value == false)

@@ -24,6 +24,10 @@ export const detailHandlers = [
 		return HttpResponse.json(umbUserMockDb.getConfiguration());
 	}),
 
+	http.get(umbracoPath(`${UMB_SLUG}/current/configuration`), () => {
+		return HttpResponse.json(umbUserMockDb.getCurrentConfiguration());
+	}),
+
 	http.get(umbracoPath(`${UMB_SLUG}/:id/calculate-start-nodes`), ({ params }) => {
 		const id = params.id as string;
 		if (!id) return new HttpResponse(null, { status: 400 });
@@ -42,6 +46,12 @@ export const detailHandlers = [
 			return new HttpResponse(null, { status: 403 });
 		}
 		return HttpResponse.json(umbUserMockDb.clientCredentials(id));
+	}),
+
+	http.get(umbracoPath(`${UMB_SLUG}/batch`), ({ request }) => {
+		const ids = new URL(request.url).searchParams.getAll('id');
+		const response = umbUserMockDb.detail.readBatch(ids);
+		return HttpResponse.json(response);
 	}),
 
 	http.get(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {

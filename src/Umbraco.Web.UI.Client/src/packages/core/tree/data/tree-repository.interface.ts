@@ -1,7 +1,10 @@
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import type {
+	UmbCreateTreeItemDataResolverArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeItemsRequestArgs,
+	UmbTreeItemDataResolver,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
@@ -11,6 +14,7 @@ import type {
 	UmbRepositoryResponseWithAsObservable,
 	UmbTargetPagedModel,
 } from '@umbraco-cms/backoffice/repository';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Interface for a tree repository.
@@ -31,6 +35,19 @@ export interface UmbTreeRepository<
 	 * @memberof UmbTreeRepository
 	 */
 	requestTreeRoot: () => Promise<UmbRepositoryResponse<TreeRootType>>;
+
+	/**
+	 * Creates an item data resolver for a tree item. Implement this to resolve names and icons that cannot be
+	 * read directly off the tree item, such as variant aware document names.
+	 * @param {UmbControllerHost} host - The controller host of the consumer.
+	 * @param {UmbCreateTreeItemDataResolverArgs} [args] - Optional arguments for selecting the resolver.
+	 * @returns {UmbTreeItemDataResolver | undefined} A resolver for the item, if one is available.
+	 * @memberof UmbTreeRepository
+	 */
+	createTreeItemDataResolver?: (
+		host: UmbControllerHost,
+		args?: UmbCreateTreeItemDataResolverArgs,
+	) => UmbTreeItemDataResolver<TreeItemType> | undefined;
 
 	/**
 	 * Requests the root items of the tree.
@@ -56,6 +73,15 @@ export interface UmbTreeRepository<
 	 * @memberof UmbTreeRepository
 	 */
 	requestTreeItemAncestors: (args: TreeAncestorsOfRequestArgsType) => Promise<UmbRepositoryResponse<TreeItemType[]>>;
+
+	/**
+	 * Requests the tree items with the given uniques. A tree scoped to several start nodes uses this to show those nodes
+	 * in place of the tree root. When it is not implemented, or it returns an `UmbTreeItemsNotSupportedError`, the tree
+	 * instead shows the children of the first start node, as a tree scoped to a single start node would.
+	 * @param {UmbTreeItemsRequestArgs} args
+	 * @memberof UmbTreeRepository
+	 */
+	requestTreeItems?: (args: UmbTreeItemsRequestArgs) => Promise<UmbRepositoryResponse<TreeItemType[]>>;
 
 	/**
 	 * Returns an observable of the root items of the tree.

@@ -124,11 +124,11 @@ Uses the `semver` package (npm's own semver library) for robust parsing:
 **Pre-release packages (0.x.y)**
 
 ```
-Input:  ^0.85.0    or    0.85.0
-Output: >=0.85.0 <1.0.0
+Input:  ^0.99.0    or    0.99.0
+Output: >=0.99.0 <1.0.0
 
-Why: Pre-release caret (^0.85.0) only allows patch updates (0.85.x).
-     Explicit range allows plugins to use 0.91.1 without conflicts.
+Why: Pre-release caret (^0.99.0) only allows patch updates (0.99.x).
+     Explicit range allows plugins to use 0.99.5 without conflicts.
 ```
 
 **Stable packages with caret (major ≥ 1)**
@@ -156,10 +156,10 @@ Why: Normalizes to conventional semver format
 	"peerDependencies": {
 		"lit": "^3.3.1",
 		"rxjs": "^7.8.2",
-		"@umbraco-ui/uui": "^1.18.1",
+		"@umbraco-ui/uui": "^2.0.0",
 		"monaco-editor": "^0.55.1",
 		"@tiptap/core": "^3.16.0",
-		"@hey-api/openapi-ts": ">=0.85.0 <1.0.0"
+		"@hey-api/openapi-ts": ">=0.99.0 <1.0.0"
 	}
 }
 ```
@@ -169,16 +169,17 @@ Why: Normalizes to conventional semver format
 When using `@umbraco-cms/backoffice`:
 
 - **Declare dependencies explicitly** in your `package.json` (don't rely on transitive deps from backoffice)
-- **Version ranges are flexible**: `>=0.85.0 <1.0.0` means you can use `0.85.0`, `0.91.1`, or `0.99.99`
+- **Version ranges are flexible**: `>=0.99.0 <1.0.0` means you can use `0.99.0`, `0.99.5`, or `0.99.99`
 - **Types come from npm**: TypeScript gets types from your declared versions
 - **Runtime comes from importmap**: The actual code at runtime is managed by the backoffice (importmap)
 - **Future compatibility**: When `@hey-api` hits `1.0.0`, the published range will automatically become `^1.0.0`
 
 ### Key Files
 
-| File                            | Purpose                                                          |
-| ------------------------------- | ---------------------------------------------------------------- |
-| `package.json`                  | Root package with exports and workspace references               |
-| `devops/publish/cleanse-pkg.js` | Script that runs during `npm pack` to hoist and convert versions |
-| `src/external/*`                | Dependency wrapper packages                                      |
-| `src/packages/core`             | Contains `@hey-api/openapi-ts` and other utilities               |
+| File                                         | Purpose                                                                                                    |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `package.json`                               | Root package with exports and workspace references                                                         |
+| `devops/publish/cleanse-pkg.js`              | Script that runs during `npm pack` to hoist and convert versions                                           |
+| `devops/package/validate-hey-api-version.js` | Fails `package:validate` when the extension template's `@hey-api/openapi-ts` leaves the backoffice's range |
+| `src/external/*`                             | Dependency wrapper packages                                                                                |
+| `src/packages/core`                          | Contains `@hey-api/openapi-ts` and other utilities                                                         |

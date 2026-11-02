@@ -11,7 +11,7 @@ export class PackageApiHelper {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/package/created?skip=0&take=10000');
     const json = await response.json();
 
-    for (const sb of json.items) {
+    for (const sb of this.api.itemsOf(json)) {
       if (sb.name === name) {
         if (sb.id !== null) {
           return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/package/created/' + sb.id);
@@ -31,7 +31,7 @@ export class PackageApiHelper {
     const json = await response.json();
 
     if (name !== null) {
-      for (const sb of json.items) {
+      for (const sb of this.api.itemsOf(json)) {
         if (sb.name === name) {
           return true;
         }
@@ -78,7 +78,7 @@ export class PackageApiHelper {
 
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/package/created', packageData);
     // Returns the id of the created package
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async getByName(name: string) {
@@ -86,7 +86,7 @@ export class PackageApiHelper {
     const json = await response.json();
 
     if (name !== null) {
-      for (const sb of json.items) {
+      for (const sb of this.api.itemsOf(json)) {
         if (sb.name === name) {
           if (sb.id !== null) {
             const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/package/created/' + sb.id);

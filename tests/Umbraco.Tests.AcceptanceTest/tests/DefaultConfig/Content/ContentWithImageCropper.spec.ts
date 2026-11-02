@@ -109,3 +109,45 @@ test('can create content with the custom image cropper data type', {tag: '@smoke
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
+
+test('can navigate away from content with a saved image cropper value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const expectedState = 'Published';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.uploadFile(imageFilePath);
+  // Wait for the upload to complete
+  await umbracoUi.content.isInputDropzoneVisible(false);
+  await umbracoUi.content.isImageCropperFieldVisible();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed image cropper value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const expectedState = 'Published';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.uploadFile(imageFilePath);
+  // Wait for the upload to complete
+  await umbracoUi.content.isInputDropzoneVisible(false);
+  await umbracoUi.content.isImageCropperFieldVisible();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});

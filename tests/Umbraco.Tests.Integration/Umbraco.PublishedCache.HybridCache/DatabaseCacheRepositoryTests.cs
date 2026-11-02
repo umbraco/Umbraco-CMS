@@ -1,6 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
@@ -8,9 +11,12 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -27,7 +33,16 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
     }
 
+    // Applied via [ConfigureBuilder] to only the batched-delete test, so the tiny batch size doesn't change the
+    // number of SQL statements other tests in this fixture issue.
+    public static void ConfigureSmallDeleteBatchSize(IUmbracoBuilder builder) =>
+        builder.Services.PostConfigure<NuCacheSettings>(options => options.ContentTypeRebuildDeleteBatchSize = 2);
+
     private IDatabaseCacheRepository DatabaseCacheRepository => GetRequiredService<IDatabaseCacheRepository>();
+
+    private IDocumentCacheService DocumentCacheService => GetRequiredService<IDocumentCacheService>();
+
+    private ISqlContext SqlContext => GetRequiredService<ISqlContext>();
 
     private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
 
@@ -105,6 +120,59 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         var sources = await DatabaseCacheRepository.GetMediaSourcesAsync(Array.Empty<Guid>());
 
         Assert.That(sources, Is.Empty);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureSmallDeleteBatchSize))]
+    public void Rebuild_Deletes_Stale_Rows_In_Batches_And_Repopulates()
+    {
+        // Guard: the [ConfigureBuilder] override must be in effect, otherwise the default (large) batch size
+        // would delete every row in one statement and this test would no longer exercise the batching loop.
+        Assert.That(GetRequiredService<IOptions<NuCacheSettings>>().Value.ContentTypeRebuildDeleteBatchSize, Is.EqualTo(2));
+
+        // Arrange — populate the cache for the document type, then mark every row for the type as stale.
+        // If the batched delete failed to remove a row, the repopulation's insert-where-not-exists would
+        // skip it and the stale marker would survive — so this proves the delete actually runs (with a
+        // batch size of 2 forcing multiple batches over the fixture's documents).
+        DocumentCacheService.Rebuild([ContentType.Id]);
+
+        const string staleMarker = "STALE";
+        var contentTypeNodeIds = new[] { Textpage.Id, Subpage.Id, Subpage2.Id, Subpage3.Id };
+
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            ScopeAccessor.AmbientScope!.Database.Execute(
+                SqlContext.Sql()
+                    .Update<ContentNuDto>(u => u.Set(x => x.Data, staleMarker))
+                    .WhereIn<ContentNuDto>(x => x.NodeId, contentTypeNodeIds));
+            scope.Complete();
+        }
+
+        // Act
+        DocumentCacheService.Rebuild([ContentType.Id]);
+
+        // Assert — every document of the type has a refreshed (non-stale) row, and none was left behind.
+        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        {
+            var dtos = ScopeAccessor.AmbientScope!.Database.Fetch<ContentNuDto>(
+                SqlContext.Sql()
+                    .Select<ContentNuDto>()
+                    .From<ContentNuDto>()
+                    .WhereIn<ContentNuDto>(x => x.NodeId, contentTypeNodeIds));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(dtos, Is.Not.Empty, "Expected the cache to be repopulated for the content type.");
+                Assert.That(
+                    dtos.Select(x => x.NodeId).Distinct(),
+                    Is.EquivalentTo(contentTypeNodeIds),
+                    "Every document of the type should have a cache row after the rebuild.");
+                Assert.That(
+                    dtos.Any(x => x.Data == staleMarker),
+                    Is.False,
+                    "The batched delete should have removed the stale rows before repopulation.");
+            });
+        }
     }
 
     [Test]

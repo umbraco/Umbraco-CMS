@@ -66,10 +66,19 @@ internal sealed class InitializeMemberApplicationNotificationHandler : INotifica
             using IServiceScope scope = _serviceScopeFactory.CreateScope();
             IMemberApplicationManager memberApplicationManager = scope.ServiceProvider.GetRequiredService<IMemberApplicationManager>();
 
-            await HandleMemberApplication(memberApplicationManager, cancellationToken);
-            await HandleMemberClientCredentialsApplication(memberApplicationManager, cancellationToken);
-
-            _isInitialized = true;
+            try
+            {
+                await HandleMemberApplication(memberApplicationManager, cancellationToken);
+                await HandleMemberClientCredentialsApplication(memberApplicationManager, cancellationToken);
+                _isInitialized = true;
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                // A server that cannot write to the OpenIddict store (e.g. a Subscriber on a read-only database
+                // connection) should never be able to fail the whole boot sequence over this. Leave _isInitialized
+                // false so a later restart gets another chance once the underlying issue is resolved.
+                _logger.LogError(ex, "Failed to initialize the Delivery API member application. Member authentication may not function correctly on this server.");
+            }
         }
         finally
         {

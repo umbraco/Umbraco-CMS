@@ -1,5 +1,15 @@
 steps:
-  - task: NodeTool@0
+  # The Microsoft-hosted Linux agents can run low on disk space, which causes the cache
+  # save step below to fail while writing its archive. The pre-installed Android SDK is
+  # unused by any Umbraco job, so removing it reclaims the space.
+  - bash: |
+      df -h /
+      sudo rm -rf /usr/local/lib/android
+      df -h /
+    displayName: Free up disk space
+    condition: eq(variables['Agent.OS'], 'Linux')
+
+  - task: UseNode@1
     displayName: Use Node.js
     retryCountOnTaskFailure: 3
     inputs:

@@ -13,7 +13,7 @@ export interface UmbElementDetailModel {
 export interface UmbElementValueModel<ValueType = unknown> extends UmbPropertyValueDataWithVariant<ValueType> {
 	editorAlias: string;
 	/**
-	 * @deprecated, we do not use entityType on values anymore. To be removed in Umbraco v.18.
+	 * @deprecated We do not use entityType on values anymore. To be removed in Umbraco v.18.
 	 * Just remove the property.
 	 */
 	entityType?: string;

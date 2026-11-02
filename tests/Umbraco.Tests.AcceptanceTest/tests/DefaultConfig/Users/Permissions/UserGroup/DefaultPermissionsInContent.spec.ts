@@ -160,7 +160,6 @@ test('can empty recycle bin with delete permission enabled', {tag: '@release'}, 
 
   // Act
   await umbracoUi.content.clickRecycleBinButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.content.clickEmptyRecycleBinButton();
   await umbracoUi.content.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
@@ -616,8 +615,8 @@ test('can rollback content with rollback permission enabled', {tag: '@release'},
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, updatedTextStringText);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);// Wait for the rollback items to load
-  await umbracoUi.content.clickLatestRollBackItem();
+  await umbracoUi.content.waitForRollbackItems();
+  await umbracoUi.content.clickPreviousRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 
   // Assert
@@ -625,8 +624,8 @@ test('can rollback content with rollback permission enabled', {tag: '@release'},
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, documentText);
   // Verify audit trail
   await umbracoUi.content.clickInfoTab();
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.rollback);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentRolledBack);
+  await umbracoUi.content.doesAnyHistoryItemHaveTag(ConstantHelper.auditTrailTypes.rollback);
+  await umbracoUi.content.doesAnyHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentRolledBack);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
@@ -664,6 +663,8 @@ test('can not see delete button in content for userGroup with delete permission 
 test('can create and update content with permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedDocumentName = testDocumentName + ' Updated';
+  await umbracoApi.document.ensureNameNotExists(testDocumentName);
+  await umbracoApi.document.ensureNameNotExists(updatedDocumentName);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateAndUpdateDocumentPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);

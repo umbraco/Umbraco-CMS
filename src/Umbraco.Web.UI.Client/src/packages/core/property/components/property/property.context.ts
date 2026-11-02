@@ -23,6 +23,8 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbReadOnlyStateManager } from '@umbraco-cms/backoffice/utils';
 
+const UMB_READONLY_STATE_UNIQUE = 'UMB_DATASET';
+
 export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 	#alias = new UmbStringState(undefined);
 	public readonly alias = this.#alias.asObservable();
@@ -160,10 +162,22 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	private async _observeProperty(): Promise<void> {
 		const alias = this.#alias.getValue();
-		if (!this.#datasetContext || !alias) return;
+		if (!this.#datasetContext || !alias) {
+			this.removeUmbControllerByAlias('observeVariantId');
+			this.removeUmbControllerByAlias('observeValue');
+			this.removeUmbControllerByAlias('observeDatasetReadOnly');
+			this.readOnlyState.removeState(UMB_READONLY_STATE_UNIQUE);
+			return;
+		}
+
+		const variantIdSource = await this.#datasetContext.propertyVariantId?.(alias);
+		const valueSource = await this.#datasetContext.propertyValueByAlias<ValueType>(alias);
+
+		// Guard: this context may have been destroyed while the awaits were in flight.
+		if (!this._host) return;
 
 		this.observe(
-			await this.#datasetContext.propertyVariantId?.(alias),
+			variantIdSource,
 			(variantId) => {
 				this.#variantId.setValue(variantId);
 			},
@@ -171,24 +185,26 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 		);
 
 		this.observe(
-			await this.#datasetContext.propertyValueByAlias<ValueType>(alias),
+			valueSource,
 			(value) => {
 				this.#value.setValue(value);
 			},
 			'observeValue',
 		);
 
-		this.observe(this.#datasetContext.readOnly, (value) => {
-			const unique = 'UMB_DATASET';
-
-			if (value) {
-				this.readOnlyState.addState({
-					unique,
-				});
-			} else {
-				this.readOnlyState.removeState(unique);
-			}
-		});
+		this.observe(
+			this.#datasetContext?.readOnly,
+			(value) => {
+				if (value) {
+					this.readOnlyState.addState({
+						unique: UMB_READONLY_STATE_UNIQUE,
+					});
+				} else {
+					this.readOnlyState.removeState(UMB_READONLY_STATE_UNIQUE);
+				}
+			},
+			'observeDatasetReadOnly',
+		);
 	}
 
 	private _generateVariantDifferenceString() {
@@ -235,7 +251,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	/**
 	 * Get the alias of this property.
-	 * @returns {*}  {(string | undefined)}
+	 * @returns {string | undefined} The alias of the property
 	 * @memberof UmbPropertyContext
 	 */
 	public getAlias(): string | undefined {
@@ -262,7 +278,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	/**
 	 * Set the description of this property.
-	 * @param {(string | undefined)} description
+	 * @param {(string | undefined)} description - The description of the property
 	 * @memberof UmbPropertyContext
 	 */
 	public setDescription(description: string | undefined): void {
@@ -271,7 +287,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	/**
 	 * Get the description of this property.
-	 * @returns {*}  {(string | undefined)}
+	 * @returns {string | undefined} The description of the property
 	 * @memberof UmbPropertyContext
 	 */
 	public getDescription(): string | undefined {

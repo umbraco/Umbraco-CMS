@@ -2,6 +2,7 @@ import type { IRouterSlot, Params } from '../router-slot/index.js';
 import { UMB_ROUTE_PATH_ADDENDUM_CONTEXT } from '../contexts/route-path-addendum.context-token.js';
 import { UMB_ROUTE_CONTEXT } from '../route/route.context.js';
 import { encodeFolderName } from '../encode-folder-name.function.js';
+import { UMB_MODAL_ROUTE_PATH_SEGMENT } from './constants.js';
 import type { UmbModalRouteRegistration } from './modal-route-registration.interface.js';
 import type {
 	UmbModalConfig,
@@ -41,9 +42,9 @@ export type UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> = Um
 				value: UmbModalTokenValue;
 			};
 export class UmbModalRouteRegistrationController<
-		UmbModalTokenData extends { [key: string]: any } = { [key: string]: any },
-		UmbModalTokenValue = unknown,
-	>
+	UmbModalTokenData extends { [key: string]: any } = { [key: string]: any },
+	UmbModalTokenValue = unknown,
+>
 	extends UmbControllerBase
 	implements UmbModalRouteRegistration<UmbModalTokenData, UmbModalTokenValue>
 {
@@ -258,7 +259,7 @@ export class UmbModalRouteRegistrationController<
 	}
 
 	public generateModalPath() {
-		return `modal/${encodeFolderName(this.alias.toString())}${this.path && this.path !== '' ? `/${this.path}` : ''}`;
+		return `${UMB_MODAL_ROUTE_PATH_SEGMENT}/${encodeFolderName(this.alias.toString())}${this.path && this.path !== '' ? `/${this.path}` : ''}`;
 	}
 
 	public get path() {

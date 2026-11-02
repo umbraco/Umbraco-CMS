@@ -38,7 +38,7 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
     }
 
     [SetUp]
-    public void Setup() => CreateTestData();
+    public new void Setup() => CreateTestData();
 
     protected virtual void CreateTestData()
     {

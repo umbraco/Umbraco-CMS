@@ -35,6 +35,12 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 		super(host, UMB_BLOCK_RTE_MANAGER_CONTEXT, UMB_BLOCK_RTE_ENTRIES_CONTEXT);
 	}
 
+	protected override _needsLegacyLabelRenderer(): boolean {
+		// The RTE block entry element renders the canonical `<umb-ufm-render>` (projected into <umb-ref-rte-block>'s name slot)
+		// and pushes resolved text via `setName()`. No hidden virtual renderer needed.
+		return false;
+	}
+
 	protected override _gotManager() {}
 
 	protected override _gotEntries() {}
@@ -73,6 +79,7 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 
 		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
+			thumbnail: this.getThumbnailUrl(),
 			name: entryName,
 			propertyValue: this.#buildPropertyValue(),
 			propertyEditorUiAlias: editorUiAlias,

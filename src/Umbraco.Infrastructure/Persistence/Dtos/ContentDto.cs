@@ -29,6 +29,7 @@ public class ContentDto
     /// </summary>
     [Column(ContentTypeIdColumnName)]
     [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdColumnName)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_" + ContentTypeIdColumnName)]
     public int ContentTypeId { get; set; }
 
     /// <summary>

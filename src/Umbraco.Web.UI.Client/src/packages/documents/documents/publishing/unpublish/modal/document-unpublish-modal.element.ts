@@ -9,7 +9,7 @@ import type {
 import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type {
 	UmbConfirmActionModalEntityReferencesConfig,
 	UmbConfirmActionModalEntityReferencesElement,
@@ -30,12 +30,23 @@ export function isPublished(option: UmbDocumentVariantOptionModel): boolean {
 	);
 }
 
+/** @deprecated Use `umb-content-unpublish-modal` from `@umbraco-cms/backoffice/content` instead. Scheduled for removal in Umbraco 19. */
 @customElement('umb-document-unpublish-modal')
 export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue
 > {
 	protected readonly _selectionManager = new UmbSelectionManager<string>(this);
+
+	constructor() {
+		super();
+
+		new UmbDeprecation({
+			deprecated: 'UmbDocumentUnpublishModalElement is deprecated.',
+			removeInVersion: '19.0.0',
+			solution: 'Use umb-content-unpublish-modal from @umbraco-cms/backoffice/content instead.',
+		}).warn();
+	}
 
 	@state()
 	private _options: Array<UmbDocumentVariantOptionModel> = [];
@@ -191,16 +202,6 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				display: block;
 				min-width: 600px;
 				max-width: 90vw;
-			}
-
-			#references {
-				--uui-table-cell-padding: 0;
-			}
-
-			#references-warning {
-				margin-top: 1rem;
-				background-color: var(--uui-color-danger);
-				color: var(--uui-color-danger-contrast);
 			}
 		`,
 	];

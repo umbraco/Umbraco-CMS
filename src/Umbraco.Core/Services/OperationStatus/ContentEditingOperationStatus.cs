@@ -125,4 +125,14 @@ public enum ContentEditingOperationStatus
     ///     One or more property values have a segment variance that does not match the property type's segment variance.
     /// </summary>
     PropertyTypeSegmentVarianceMismatch,
+
+    /// <summary>
+    ///     One or more of the supplied names is not valid, for example because it exceeds the maximum length.
+    /// </summary>
+    InvalidName,
+
+    /// <summary>
+    ///     The content was modified by another operation, so the attempted operation was abandoned.
+    /// </summary>
+    ConcurrencyViolation,
 }

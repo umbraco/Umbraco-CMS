@@ -30,7 +30,7 @@ public class ImportDictionaryControllerTests : ManagementApiUserGroupTestBase<Im
     }
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var createTempFileModel = new CreateTemporaryFileModel
         {

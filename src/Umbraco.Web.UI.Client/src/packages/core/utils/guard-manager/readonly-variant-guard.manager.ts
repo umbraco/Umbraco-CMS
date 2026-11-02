@@ -8,9 +8,10 @@ export interface UmbVariantGuardRule extends UmbGuardRule {
 }
 
 /**
- *
- * @param rule
- * @param variantId
+ * Checks if the given rule applies to the given variantId
+ * @param {UmbVariantGuardRule} rule - The rule to check
+ * @param {UmbVariantId} variantId - The variantId to check against
+ * @returns {boolean} True if the rule applies to the variantId
  */
 function findRule(rule: UmbVariantGuardRule, variantId: UmbVariantId) {
 	return rule.variantId?.compare(variantId) || rule.variantId === undefined;
@@ -18,14 +19,13 @@ function findRule(rule: UmbVariantGuardRule, variantId: UmbVariantId) {
 
 /**
  * Read only guard manager for variant rules.
- * @export
  * @class UmbReadOnlyVariantGuardManager
  * @augments {UmbReadOnlyGuardManager<UmbVariantGuardRule>}
  */
 export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbVariantGuardRule> {
 	/**
 	 * Observe if the given variantId is permitted to read
-	 * @param {UmbVariantId} variantId
+	 * @param {UmbVariantId} variantId - The variantId to check
 	 * @returns {Observable<boolean>} - Observable that emits true if the variantId is permitted to read, false otherwise
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
@@ -42,7 +42,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	}
 
 	/**
-	 * @param {Observable<UmbVariantId | undefined>} variantId
+	 * @param {Observable<UmbVariantId | undefined>} variantId - Observable emitting the variantId to evaluate
 	 * @returns {Observable<boolean | undefined>} - Observable that emits true if the variantId is permitted to read, false otherwise
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
@@ -74,7 +74,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 
 	/**
 	 * Check if the given variantId is permitted to read
-	 * @param {UmbVariantId} variantId
+	 * @param {UmbVariantId} variantId - The variantId to check
 	 * @returns {boolean} - true if the variantId is permitted to read, false otherwise
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */

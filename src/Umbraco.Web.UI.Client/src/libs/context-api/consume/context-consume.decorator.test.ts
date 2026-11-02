@@ -2,6 +2,7 @@ import { UmbContextToken } from '../token/context-token.js';
 import type { UmbContextMinimal } from '../types.js';
 import { UmbContextProvider } from '../provide/context-provider.js';
 import { consumeContext } from './context-consume.decorator.js';
+import { UmbContextConsumerController } from './context-consumer.controller.js';
 import { aTimeout, elementUpdated, expect, fixture } from '@open-wc/testing';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -134,5 +135,125 @@ describe('@consume decorator', () => {
 		// Should still be the old value
 		expect(controller.contextValue).to.not.equal(newProvider.providerInstance());
 		expect(controller.contextValue?.prop).to.equal('value from provider');
+	});
+
+	it('should resolve context before first render when provider is already in ancestor tree', async () => {
+		class RenderTimingElement extends UmbLitElement {
+			@consumeContext({ context: testToken })
+			@state()
+			contextValue?: UmbTestContextConsumerClass;
+
+			public renderedValues: (string | undefined)[] = [];
+
+			override render() {
+				this.renderedValues.push(this.contextValue?.prop);
+				return html`<div>${this.contextValue?.prop ?? 'no context'}</div>`;
+			}
+		}
+
+		customElements.define('render-timing-element', RenderTimingElement);
+
+		const timingElement = await fixture<RenderTimingElement>(`<render-timing-element></render-timing-element>`);
+
+		// First render should already have the resolved context value, not undefined
+		expect(timingElement.renderedValues[0]).to.equal('value from provider');
+		// Element should not have rendered with 'no context' at any point
+		expect(timingElement.renderedValues).to.not.include(undefined);
+	});
+
+	it('should receive context when provider mounts AFTER consumer (late arrival)', async () => {
+		// Remove the default provider to simulate no-provider state
+		provider.destroy();
+
+		class LateArrivalElement extends UmbLitElement {
+			@consumeContext({ context: testToken })
+			@state()
+			contextValue?: UmbTestContextConsumerClass;
+		}
+
+		customElements.define('late-arrival-element', LateArrivalElement);
+
+		const lateElement = await fixture<LateArrivalElement>(`<late-arrival-element></late-arrival-element>`);
+		await elementUpdated(lateElement);
+
+		// No provider yet — consumer has nothing
+		expect(lateElement.contextValue).to.be.undefined;
+
+		// Now mount the provider
+		const lateProvider = new UmbContextProvider(
+			document.body,
+			testToken,
+			new UmbTestContextConsumerClass(document.body),
+		);
+		lateProvider.hostConnected();
+
+		await elementUpdated(lateElement);
+
+		// Consumer should now have resolved
+		expect(lateElement.contextValue).to.equal(lateProvider.providerInstance());
+
+		lateProvider.destroy();
+		// Restore the provider for the other tests (afterEach expects it to exist)
+		provider = new UmbContextProvider(document.body, testToken, new UmbTestContextConsumerClass(document.body));
+		provider.hostConnected();
+	});
+
+	it('swallows asPromise rejection when subscribe:false and no provider is available', async () => {
+		// Use a different token with no provider registered.
+		const unprovidedToken = new UmbContextToken<UmbTestContextConsumerClass>('unprovided-context');
+
+		class NoProviderController extends UmbControllerBase {
+			@consumeContext({ context: unprovidedToken, subscribe: false })
+			contextValue?: UmbTestContextConsumerClass;
+		}
+
+		let unhandledRejection: PromiseRejectionEvent | undefined;
+		const rejectionHandler = (e: PromiseRejectionEvent) => {
+			unhandledRejection = e;
+		};
+		window.addEventListener('unhandledrejection', rejectionHandler);
+
+		try {
+			const controller = new NoProviderController(element);
+			// Wait long enough for the RAF-based request timeout to reject the promise.
+			await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+			await aTimeout(0);
+
+			expect(unhandledRejection, 'no unhandled promise rejection should surface').to.be.undefined;
+			expect(controller.contextValue).to.be.undefined;
+		} finally {
+			window.removeEventListener('unhandledrejection', rejectionHandler);
+		}
+	});
+
+	it('should not set up the consumer multiple times across disconnect/reconnect cycles', async () => {
+		class ReconnectElement extends UmbLitElement {
+			@consumeContext({
+				context: testToken,
+			})
+			contextValue?: UmbTestContextConsumerClass;
+		}
+
+		customElements.define('reconnect-element', ReconnectElement);
+
+		const reconnectElement = await fixture<ReconnectElement>(`<reconnect-element></reconnect-element>`);
+		await elementUpdated(reconnectElement);
+
+		const countConsumers = () =>
+			reconnectElement.getUmbControllers((c) => c instanceof UmbContextConsumerController).length;
+
+		const initialConsumerCount = countConsumers();
+		expect(initialConsumerCount, 'a consumer controller is registered after initial connect').to.equal(1);
+
+		// Disconnect and reconnect
+		const parent = reconnectElement.parentElement!;
+		parent.removeChild(reconnectElement);
+		await aTimeout(0);
+		parent.appendChild(reconnectElement);
+		await elementUpdated(reconnectElement);
+
+		// The decorator must not register a duplicate consumer on reconnect.
+		expect(countConsumers(), 'consumer controller count is unchanged after reconnect').to.equal(initialConsumerCount);
+		expect(reconnectElement.contextValue).to.equal(provider.providerInstance());
 	});
 });

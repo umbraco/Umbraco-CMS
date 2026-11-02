@@ -7,6 +7,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 
+const UMB_TIPTAP_STATUSBAR_ITEM_DRAG_TYPE = 'text/umb-tiptap-statusbar-item';
+
 @customElement('umb-property-editor-ui-tiptap-statusbar-configuration')
 export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 	extends UmbLitElement
@@ -74,29 +76,40 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 		this.#context.insertStatusbarItem(item.alias, [lastArea, lastItem]);
 	}
 
+	#isOwnDragItem(event: DragEvent) {
+		return event.dataTransfer?.types.includes(UMB_TIPTAP_STATUSBAR_ITEM_DRAG_TYPE) === true;
+	}
+
 	#onDragStart(event: DragEvent, alias: string, fromPos?: [number, number]) {
 		event.dataTransfer!.effectAllowed = 'move';
+		event.dataTransfer!.setData(UMB_TIPTAP_STATUSBAR_ITEM_DRAG_TYPE, alias);
 		this.#currentDragItem = { alias, fromPos };
 	}
 
 	#onDragOver(event: DragEvent) {
+		if (!this.#isOwnDragItem(event)) return;
 		event.preventDefault();
 		event.dataTransfer!.dropEffect = 'move';
 	}
 
 	#onDragEnd(event: DragEvent) {
 		event.preventDefault();
-		if (event.dataTransfer?.dropEffect === 'none') {
-			const { fromPos } = this.#currentDragItem ?? {};
-			if (!fromPos) return;
+		const { fromPos } = this.#currentDragItem ?? {};
+		this.#currentDragItem = undefined;
 
+		if (event.dataTransfer?.dropEffect === 'none' && fromPos) {
 			this.#context.removeStatusbarItem(fromPos);
 		}
 	}
 
 	#onDrop(event: DragEvent, toPos?: [number, number]) {
+		// An area can also receive a drag of the toolbar designer, which sits alongside this one. Acting on one of
+		// those would re-insert the item of the preceding drag. (#23524)
+		if (!this.#isOwnDragItem(event)) return;
+
 		event.preventDefault();
 		const { alias, fromPos } = this.#currentDragItem ?? {};
+		this.#currentDragItem = undefined;
 
 		// Remove item if no destination position is provided
 		if (fromPos && !toPos) {
@@ -198,7 +211,7 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 				class="area"
 				dropzone="move"
 				@dragover=${this.#onDragOver}
-				@drop=${(e: DragEvent) => this.#onDrop(e, [areaIndex, area.data.length - 1])}>
+				@drop=${(e: DragEvent) => this.#onDrop(e, [areaIndex, area.data.length])}>
 				<div class="items">
 					${when(
 						area?.data.length === 0,

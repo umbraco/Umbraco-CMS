@@ -19,5 +19,5 @@ public class ScriptTreeService : FileSystemTreeServiceBase, IScriptTreeService
         _scriptFileSystem = fileSystems.ScriptsFileSystem ??
                             throw new ArgumentException("Missing partial views file system", nameof(fileSystems));
 
-    protected override bool FilterFile(string file) => file.ToLowerInvariant().EndsWith(".js");
+    protected override bool FilterFile(string file) => file.EndsWith(".js", StringComparison.OrdinalIgnoreCase);
 }

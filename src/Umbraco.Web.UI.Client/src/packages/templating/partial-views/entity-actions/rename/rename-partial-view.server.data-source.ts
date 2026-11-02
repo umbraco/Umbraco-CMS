@@ -1,4 +1,5 @@
 import { UmbPartialViewDetailServerDataSource } from '../../repository/partial-view-detail.server.data-source.js';
+import type { UmbPartialViewDetailModel } from '../../types.js';
 import {
 	UmbServerFilePathUniqueSerializer,
 	appendFileExtensionIfNeeded,
@@ -7,6 +8,7 @@ import type { RenameStylesheetRequestModel } from '@umbraco-cms/backoffice/exter
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbRenamePartialViewServerDataSource {
 	#host: UmbControllerHost;
@@ -20,12 +22,12 @@ export class UmbRenamePartialViewServerDataSource {
 
 	/**
 	 * Rename Partial View
-	 * @param {string} unique
-	 * @param {string} name
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the partial view to rename
+	 * @param {string} name - The new name for the partial view
+	 * @returns {UmbDataSourceResponse<UmbPartialViewDetailModel>} The renamed partial view, or an error
 	 * @memberof UmbRenamePartialViewServerDataSource
 	 */
-	async rename(unique: string, name: string) {
+	async rename(unique: string, name: string): Promise<UmbDataSourceResponse<UmbPartialViewDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 		if (!name) throw new Error('Name is missing');
 

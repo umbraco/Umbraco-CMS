@@ -136,6 +136,11 @@ export class DocumentTypeBuilder {
     return this;
   }
 
+  withFolderId(folderId: string) {
+    this.folderId = folderId;
+    return this;
+  }
+
   build() {
     this.id = ensureIdExists(this.id);
 
@@ -162,7 +167,7 @@ export class DocumentTypeBuilder {
         return builder.build();
       }) || [],
       id: this.id,
-      folder: this.folderId ? {id: this.folderId} : null,
+      parent: this.folderId ? {id: this.folderId} : null,
       allowedTemplates: this.documentTypeAllowedTemplateBuilder.map((builder) => {
         return builder.build();
       }) || [],

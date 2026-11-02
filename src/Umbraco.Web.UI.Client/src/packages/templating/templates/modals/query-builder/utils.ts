@@ -14,9 +14,10 @@ type TemplatePropertyModel = TemplateQueryPropertyPresentationModel & { localize
 type TemplateSortModel = TemplateQueryExecuteSortModel & { localizeKey?: string };
 
 /**
- *
- * @param operators
- * @param currentPropertyType
+ * Localizes the operators based on the current property type
+ * @param {Array<TemplateQueryOperatorModel>} operators - The operators to localize
+ * @param {TemplateQueryPropertyTypeModel | null} currentPropertyType - The property type to localize the operators for
+ * @returns {Array<TemplateOperatorModel>} The localized operators
  */
 export function localizeOperators(
 	operators: Array<TemplateQueryOperatorModel>,
@@ -35,8 +36,9 @@ export function localizeOperators(
 }
 
 /**
- *
- * @param propertyTypes
+ * Localizes the given property types
+ * @param {Array<TemplateQueryPropertyPresentationModel>} [propertyTypes] - The property types to localize
+ * @returns {Array<TemplatePropertyModel> | undefined} The localized property types
  */
 export function localizePropertyType(propertyTypes?: Array<TemplateQueryPropertyPresentationModel>) {
 	if (!propertyTypes) return;
@@ -57,8 +59,9 @@ export function localizePropertyType(propertyTypes?: Array<TemplateQueryProperty
 }
 
 /**
- *
- * @param sort
+ * Localizes the given sort direction
+ * @param {TemplateQueryExecuteSortModel | null} [sort] - The sort to localize
+ * @returns {TemplateSortModel | undefined} The localized sort
  */
 export function localizeSort(sort?: TemplateQueryExecuteSortModel | null): TemplateSortModel | undefined {
 	if (!sort?.direction) return undefined;
@@ -75,8 +78,9 @@ export function localizeSort(sort?: TemplateQueryExecuteSortModel | null): Templ
 // Following code is for localization of operators (checks on property type);
 
 /**
- *
- * @param operators
+ * Localizes operators for a string property type
+ * @param {Array<TemplateQueryOperatorModel>} operators - The operators to localize
+ * @returns {Array<TemplateOperatorModel>} The localized operators
  */
 function isString(operators: Array<TemplateQueryOperatorModel>): Array<TemplateOperatorModel> {
 	return operators.map((operator): TemplateOperatorModel => {
@@ -96,8 +100,9 @@ function isString(operators: Array<TemplateQueryOperatorModel>): Array<TemplateO
 }
 
 /**
- *
- * @param operators
+ * Localizes operators for an integer property type
+ * @param {Array<TemplateQueryOperatorModel>} operators - The operators to localize
+ * @returns {Array<TemplateOperatorModel>} The localized operators
  */
 function isInteger(operators: Array<TemplateQueryOperatorModel>): Array<TemplateOperatorModel> {
 	return operators.map((operator): TemplateOperatorModel => {
@@ -121,8 +126,9 @@ function isInteger(operators: Array<TemplateQueryOperatorModel>): Array<Template
 }
 
 /**
- *
- * @param operators
+ * Localizes operators for a date/time property type
+ * @param {Array<TemplateQueryOperatorModel>} operators - The operators to localize
+ * @returns {Array<TemplateOperatorModel>} The localized operators
  */
 function isDateTime(operators: Array<TemplateQueryOperatorModel>): Array<TemplateOperatorModel> {
 	return operators.map((operator): TemplateOperatorModel => {

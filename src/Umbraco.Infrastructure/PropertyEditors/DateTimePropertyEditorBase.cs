@@ -71,7 +71,7 @@ public abstract class DateTimePropertyEditorBase : DataEditor, IValueSchemaProvi
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<DateTimeDataValueEditor>(Attribute!, MapDateToEditorFormat);
+        DataValueEditorFactory.Create<DateTimeDataValueEditor>(Attribute!, (Func<DateTimeValueConverterBase.DateTimeDto, string>)MapDateToEditorFormat);
 
     /// <summary>
     /// Converts the specified date and time value to a string formatted for use in the property editor.

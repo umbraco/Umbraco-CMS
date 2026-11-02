@@ -6,8 +6,7 @@ import type { UmbPropertyDatasetContext, UmbPropertyValueData } from '@umbraco-c
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export interface UmbInvariantDatasetWorkspaceContext
-	extends UmbSubmittableWorkspaceContext,
-		UmbNamableWorkspaceContext {
+	extends UmbSubmittableWorkspaceContext, UmbNamableWorkspaceContext {
 	readonly values: Observable<Array<UmbPropertyValueData> | undefined>;
 	getValues(): Promise<Array<UmbPropertyValueData> | undefined>;
 

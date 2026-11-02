@@ -4,6 +4,7 @@ using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -235,9 +236,10 @@ public class FixConvertLocalLinks : MigrationBase
             }
 
             _logger.LogDebug(
-                "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
+                "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
                 propertyType.Name,
                 propertyType.Id,
+                propertyType.Key,
                 propertyType.Alias,
                 propertyType.PropertyEditorAlias,
                 result);
@@ -261,6 +263,7 @@ public class FixConvertLocalLinks : MigrationBase
                 cultureResult.OrphanedLanguageId,
                 propertyType.Name,
                 propertyType.Id,
+                propertyType.Key,
                 propertyType.Alias);
             return false;
         }
@@ -274,23 +277,36 @@ public class FixConvertLocalLinks : MigrationBase
         if (_localLinkProcessor.ProcessToEditorValue(toEditorValue) == false)
         {
             _logger.LogDebug(
-                "    - skipping as no processor modified the data for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                "    - skipping as no processor modified the data for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias})",
                 propertyDataDto.Id,
                 propertyType.Name,
                 propertyType.Id,
+                propertyType.Key,
                 propertyType.Alias);
             return false;
         }
 
         var editorValue = _jsonSerializer.Serialize(toEditorValue);
-        var dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+
+        // Re-running FromEditor here is only to re-serialize the converted value; the referenced-entity
+        // caching it would otherwise trigger is wasted work that issues per-property content/media reads
+        // in separate scopes, contending with this migration's own scope. Suppress it.
+        object? dbValue;
+#pragma warning disable CS0618 // Type or member is obsolete
+        using (CacheReferencedEntitiesSuppression.Suppress())
+        {
+            dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
         if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
         {
             _logger.LogWarning(
-                "    - value editor did not yield a valid JSON string as FromEditor value property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                "    - value editor did not yield a valid JSON string as FromEditor value property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias})",
                 propertyDataDto.Id,
                 propertyType.Name,
                 propertyType.Id,
+                propertyType.Key,
                 propertyType.Alias);
             return false;
         }

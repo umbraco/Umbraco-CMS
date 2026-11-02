@@ -1,7 +1,6 @@
 import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
 
-export interface ManifestEntityActionEmptyRecycleBinKind
-	extends ManifestEntityAction<MetaEntityActionEmptyRecycleBinKind> {
+export interface ManifestEntityActionEmptyRecycleBinKind extends ManifestEntityAction<MetaEntityActionEmptyRecycleBinKind> {
 	type: 'entityAction';
 	kind: 'emptyRecycleBin';
 }

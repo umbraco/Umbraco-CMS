@@ -79,7 +79,8 @@ public class RestoreMediaRecycleBinController : MediaRecycleBinControllerBase
         Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.RestoreAsync(
             id,
             moveDocumentRequestModel.Target?.Id,
-            CurrentUserKey(_backOfficeSecurityAccessor));
+            CurrentUserKey(_backOfficeSecurityAccessor),
+            includeDescendants: true);
 
         return result.Success
             ? Ok()

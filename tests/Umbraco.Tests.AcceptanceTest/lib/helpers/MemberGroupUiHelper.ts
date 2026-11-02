@@ -1,4 +1,4 @@
-import {Page, Locator} from "@playwright/test";
+import {Page, Locator, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
@@ -26,7 +26,6 @@ export class MemberGroupUiHelper extends UiBaseLocators {
 
   async clickMemberGroupsTab() {
     await this.waitForVisible(this.memberGroupsTab);
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
     await this.click(this.memberGroupsTab);
     await this.waitForVisible(this.activeMemberGroupsTab);
   }
@@ -44,7 +43,14 @@ export class MemberGroupUiHelper extends UiBaseLocators {
   }
 
   async clickMemberGroupLinkByName(memberGroupName: string) {
-    await this.click(this.page.getByRole('link', {name: memberGroupName}));
+    const memberGroupLink = this.page.getByRole('link', {name: memberGroupName});
+    await expect(async () => {
+      if (!(await memberGroupLink.isVisible())) {
+        await this.clickMemberGroupsSidebarButton();
+      }
+      await expect(memberGroupLink).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.veryLong});
+    await this.click(memberGroupLink);
   }
 
   async isMemberGroupNameVisible(memberGroupName: string, isVisible: boolean = true) {

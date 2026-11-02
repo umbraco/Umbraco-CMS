@@ -1,4 +1,5 @@
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -33,6 +34,37 @@ public class ContentNavigationRepository : INavigationRepository
     public IEnumerable<INavigationModel> GetTrashedContentNodesByObjectType(Guid objectTypeKey)
         => FetchNavigationDtos(objectTypeKey, true);
 
+    /// <inheritdoc />
+    public IEnumerable<INavigationModel> GetContentNodeWithAncestors(Guid key, Guid objectTypeKey)
+    {
+        if (AmbientScope is null)
+        {
+            return [];
+        }
+
+        Sql<ISqlContext> pathSql = AmbientScope.SqlContext.Sql()
+            .Select<NodeDto>(x => x.Path)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == objectTypeKey);
+        var path = AmbientScope.Database.ExecuteScalar<string?>(pathSql);
+        if (string.IsNullOrEmpty(path))
+        {
+            return [];
+        }
+
+        var pathIds = path.Split(',').Select(int.Parse).Where(id => id > 0).ToList();
+        var positionById = pathIds.Select((id, index) => (id, index)).ToDictionary(x => x.id, x => x.index);
+
+        var nodes = new List<NavigationDto>();
+        foreach (IEnumerable<int> ids in pathIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = SelectNavigation().WhereIn<NodeDto>(n => n.NodeId, ids, "n");
+            nodes.AddRange(AmbientScope.Database.Fetch<NavigationDto>(sql));
+        }
+
+        return nodes.OrderBy(x => positionById[x.Id]);
+    }
+
     private IEnumerable<INavigationModel> FetchNavigationDtos(Guid objectTypeKey, bool trashed)
     {
         if (AmbientScope is null)
@@ -40,9 +72,18 @@ public class ContentNavigationRepository : INavigationRepository
             return Enumerable.Empty<NavigationDto>();
         }
 
-        ISqlSyntaxProvider syntax = AmbientScope.SqlContext.SqlSyntax;
+        Sql<ISqlContext> sql = SelectNavigation()
+            .Where<NodeDto>(n => n.NodeObjectType == objectTypeKey && n.Trashed == trashed, "n")
+            .OrderBy<NodeDto>(n => n.Path, "n"); // make sure that we get the parent items first
 
-        Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql()
+        return AmbientScope.Database.Fetch<NavigationDto>(sql);
+    }
+
+    private Sql<ISqlContext> SelectNavigation()
+    {
+        ISqlSyntaxProvider syntax = AmbientScope!.SqlContext.SqlSyntax;
+
+        return AmbientScope.SqlContext.Sql()
             .Select(
                 $"n.{syntax.GetQuotedColumnName(NodeDto.IdColumnName)} as {syntax.GetQuotedColumnName(NodeDto.IdColumnName)}",
                 $"n.{syntax.GetQuotedColumnName(NodeDto.KeyColumnName)} as {syntax.GetQuotedColumnName(NodeDto.KeyColumnName)}",
@@ -52,10 +93,6 @@ public class ContentNavigationRepository : INavigationRepository
                 $"n.{syntax.GetQuotedColumnName(NodeDto.TrashedColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.TrashedColumnName)}")
             .From<NodeDto>("n")
             .InnerJoin<ContentDto>("c").On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId, "n", "c")
-            .InnerJoin<NodeDto>("ctn").On<ContentDto, NodeDto>((c, ctn) => c.ContentTypeId == ctn.NodeId, "c", "ctn")
-            .Where<NodeDto>(n => n.NodeObjectType == objectTypeKey && n.Trashed == trashed, "n")
-            .OrderBy<NodeDto>(n => n.Path, "n"); // make sure that we get the parent items first
-
-        return AmbientScope.Database.Fetch<NavigationDto>(sql);
+            .InnerJoin<NodeDto>("ctn").On<ContentDto, NodeDto>((c, ctn) => c.ContentTypeId == ctn.NodeId, "c", "ctn");
     }
 }

@@ -1,6 +1,7 @@
 export * from './entity-bulk-action-base.js';
 export * from './entity-bulk-action.element.js';
 export * from './common/bulk-delete/index.js';
+export * from './progress/index.js';
 export type * from './types.js';
 
 export { UMB_ENTITY_BULK_ACTION_DEFAULT_KIND_MANIFEST } from './default/default.action.kind.js';

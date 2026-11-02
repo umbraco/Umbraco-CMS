@@ -9,7 +9,7 @@ export class UmbDocumentSegmentRepository extends UmbRepositoryBase {
 	 * Get available segment options for a document by its ID.
 	 * @param {string} unique The unique identifier of the document.
 	 * @param {UmbDocumentSegmentFilterModel} filter The filter options to apply.
-	 * @returns A promise that resolves with the available segment options.
+	 * @returns {Promise<UmbRepositoryResponse<UmbSegmentResponseModel>>} A promise that resolves with the available segment options.
 	 */
 	async getDocumentByIdSegmentOptions(
 		unique: string,

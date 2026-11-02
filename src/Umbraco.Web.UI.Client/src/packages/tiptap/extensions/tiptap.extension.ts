@@ -1,8 +1,9 @@
 import type { UmbTiptapExtensionApi } from './types.js';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestTiptapExtension<MetaType extends MetaTiptapExtension = MetaTiptapExtension>
-	extends ManifestApi<UmbTiptapExtensionApi> {
+export interface ManifestTiptapExtension<
+	MetaType extends MetaTiptapExtension = MetaTiptapExtension,
+> extends ManifestApi<UmbTiptapExtensionApi> {
 	type: 'tiptapExtension';
 	meta: MetaType;
 }

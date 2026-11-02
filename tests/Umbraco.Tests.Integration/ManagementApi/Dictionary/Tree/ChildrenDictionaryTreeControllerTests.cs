@@ -15,7 +15,7 @@ public class ChildrenDictionaryTreeControllerTests : ManagementApiUserGroupTestB
     private Guid _parentDictionaryKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         // Parent dictionary
         var dictionaryParentItem = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());

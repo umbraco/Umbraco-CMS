@@ -15,7 +15,7 @@ public class ByKeyDictionaryControllerTests : ManagementApiUserGroupTestBase<ByK
     private Guid _dictionaryKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var dictionaryItem = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
         _dictionaryKey = dictionaryItem.Key;

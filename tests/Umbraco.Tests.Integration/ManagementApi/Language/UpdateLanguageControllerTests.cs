@@ -16,7 +16,7 @@ public class UpdateLanguageControllerTests : ManagementApiUserGroupTestBase<Upda
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var daLanguage = new LanguageBuilder()
             .WithCultureInfo("da-DK")

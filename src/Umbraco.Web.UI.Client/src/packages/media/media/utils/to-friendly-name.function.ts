@@ -4,6 +4,8 @@
  * preserved (the dot is not treated as a separator), filenames with line breaks
  * are left untouched, and a dot at the start of the name (e.g. `.gitignore`) is
  * not treated as an extension delimiter.
+ * @param {string} fileName - The file name to strip the extension from.
+ * @returns {string} The file name without its extension.
  */
 function stripFileExtension(fileName: string): string {
 	if (fileName.includes('\n') || fileName.includes('\r')) {

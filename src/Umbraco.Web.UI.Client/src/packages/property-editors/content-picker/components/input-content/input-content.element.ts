@@ -26,20 +26,50 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	}
 	#type: UmbContentPickerSource['type'] = 'content';
 
+	/**
+	 * This is a minimum amount of selected items in this input.
+	 * @type {number}
+	 * @attr
+	 * @default 0
+	 */
 	@property({ type: Number })
 	min = 0;
 
+	/**
+	 * Min validation message.
+	 * @type {string}
+	 * @attr
+	 * @default
+	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
+	/**
+	 * This is a maximum amount of selected items in this input.
+	 * @type {number}
+	 * @attr
+	 * @default 0
+	 */
 	@property({ type: Number })
 	max = 0;
 
+	/**
+	 * Max validation message.
+	 * @type {string}
+	 * @attr
+	 * @default
+	 */
 	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
+
+	/**
+	 * Multiple nodes to start the picker tree from. Takes precedence over `startNode`.
+	 */
+	@property({ type: Array, attribute: false })
+	startNodes?: Array<UmbTreeStartNode>;
 
 	@property()
 	public set allowedContentTypeIds(value: string | undefined) {
@@ -86,7 +116,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 		this.addValidator(
 			'valueMissing',
 			() => this.requiredMessage,
-			() => !this.readonly && (this.required || this.min > 0) && this.selection.length === 0,
+			() => !this.readonly && this.required && this.selection.length === 0,
 		);
 	}
 
@@ -141,6 +171,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 			<umb-input-document
 				.selection=${this.#selection}
 				.startNode=${this.startNode}
+				.startNodes=${this.startNodes}
 				.allowedContentTypeIds=${this.#allowedContentTypeIds}
 				.min=${this.min}
 				.minMessage=${this.minMessage}

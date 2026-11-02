@@ -26,7 +26,7 @@ test('can not create a empty media file', {tag: '@release'}, async ({umbracoApi,
 
   // Assert
   await umbracoUi.media.isFailedStateButtonVisible();
-  await umbracoUi.media.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.media.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   await umbracoUi.media.isMediaTreeItemVisible(mediaFileName, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
 });
@@ -324,7 +324,7 @@ test('can bulk trash media nodes with a relation', async ({umbracoApi, umbracoUi
 
 test('can move a media item to a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
+  const mediaFileId = await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(folderName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
@@ -333,7 +333,7 @@ test('can move a media item to a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickMoveToActionMenuOption();
   await umbracoUi.media.openCaretButtonForName('Media', true);
   await umbracoUi.media.clickModalTextByName(folderName);
-  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaItemsToBeMoved(1);
+  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaWithIdsToBeMoved([mediaFileId]);
 
   // Assert
   await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);

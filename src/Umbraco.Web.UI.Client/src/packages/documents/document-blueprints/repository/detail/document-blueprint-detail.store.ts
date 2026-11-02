@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @class UmbDocumentBlueprintDetailStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for Document Blueprint Details
  */
 export class UmbDocumentBlueprintDetailStore extends UmbDetailStoreBase<UmbDocumentBlueprintDetailModel> {

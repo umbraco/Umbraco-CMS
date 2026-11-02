@@ -157,6 +157,8 @@ export default {
 	},
 	media: {
 		clickToUpload: '點選以便上傳',
+		browseFilesAction: '瀏覽檔案',
+		dropFilesOr: '將媒體拖放至此處<br />或',
 		orClickHereToUpload: '或按這裡選擇檔案',
 		maxFileSize: '檔案大小上限為',
 	},
@@ -403,6 +405,8 @@ export default {
 		new: '新的',
 		next: '下一步',
 		no: '否',
+		noResults: '沒有結果',
+		noResultsFor: (query: string) => `找不到 "${query}" 的結果。`,
 		of: '屬於',
 		ok: '確定',
 		open: '打開',
@@ -735,6 +739,17 @@ export default {
 		sortDone: '排序完成。',
 		sortHelp: '上下拖拽項目或按一下列頭進行排序',
 		sortPleaseWait: ' 請稍後。項目正在排序，這需要一點時間。',
+		sortByFieldHeadline: '依欄位排序',
+		sortByFieldSentence: '將所有子項目依下列方式排序：',
+		sortByFieldDirectionLabel: '方向',
+		sortByFieldAscending: '升冪',
+		sortByFieldDescending: '降冪',
+		sortByFieldNameOption: '名稱',
+		sortByFieldCreateDateOption: '建立時間',
+		sortByFieldUpdateDateOption: '最後編輯',
+		sortIndividuallyHeadline: '個別排序',
+		sortByFieldCultureSentence: '語言：',
+		sortByFieldCultureLabel: '語言',
 	},
 	speechBubbles: {
 		validationFailedHeader: '驗證',
@@ -1068,5 +1083,10 @@ export default {
 	logViewer: {
 		selectAllLogLevelFilters: '全選',
 		deselectAllLogLevelFilters: '取消全選',
+	},
+	picker: {
+		browseTab: '瀏覽',
+		searchTab: '搜尋',
+		selectedCount: (count: number) => `已選取 ${count} 個項目`,
 	},
 } as UmbLocalizationDictionary;

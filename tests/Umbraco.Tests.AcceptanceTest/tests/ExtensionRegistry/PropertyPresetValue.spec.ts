@@ -69,7 +69,7 @@ test('can insert preset value into textstring property that vary by culture in s
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(secondLanguageName);
   await umbracoUi.content.enterContentName(secondContentName);
-  
+
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(variantPresetValue);
   await umbracoUi.content.clickSaveButtonForContent();
@@ -96,7 +96,6 @@ test('can insert preset value into textstring property that shared across segmen
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
@@ -105,7 +104,7 @@ test('can insert preset value into textstring property that shared across segmen
   await umbracoUi.content.doesTextStringHaveExpectedValue(initialPresetValue);
 });
 
-test('can insert preset value in textstring property that vary by segment in content that is enabled vary by segment', async ({umbracoApi, umbracoUi}) => {  
+test('can insert preset value in textstring property that vary by segment in content that is enabled vary by segment', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeVaryByCulture = false;
@@ -123,10 +122,9 @@ test('can insert preset value in textstring property that vary by segment in con
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
-  
+
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(expectedString);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();

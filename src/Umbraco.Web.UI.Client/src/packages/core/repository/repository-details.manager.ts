@@ -16,7 +16,6 @@ interface UmbRepositoryRequestStatus {
 }
 
 /**
- * @export
  * @class UmbRepositoryDetailsManager
  * @augments {UmbControllerBase}
  * @template DetailType
@@ -128,7 +127,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 
 	/**
 	 * Set the uniques in the manager
-	 * @param {(string[] | undefined)} uniques
+	 * @param {(string[] | undefined)} uniques - The uniques to set.
 	 * @memberof UmbRepositoryDetailsManager
 	 */
 	setUniques(uniques: Array<string> | undefined): void {
@@ -137,7 +136,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 
 	/**
 	 * Add a unique to the manager
-	 * @param {string} unique
+	 * @param {string} unique - The unique to add.
 	 * @memberof UmbRepositoryDetailsManager
 	 */
 	addUnique(unique: string): void {
@@ -145,8 +144,10 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 	}
 
 	/**
-	 * Add an entry to the manager
-	 * @param {DetailType} data
+	 * Add an entry to the manager. Once added, the entry follows the repository store, if the repository
+	 * provides one, so the data passed in is replaced when the store emits the same entry. An empty store
+	 * value keeps the entry as it is.
+	 * @param {DetailType} data - The entry to add.
 	 * @memberof UmbRepositoryDetailsManager
 	 */
 	addEntry(data: DetailType): void {
@@ -161,7 +162,24 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 			unique,
 		});
 		this.#uniques.appendOne(unique);
-		// Notice in this case we do not have a observable from the repo, but it should maybe be fine that we just listen for ACTION EVENTS.
+		void this.#observeAddedEntry(unique);
+	}
+
+	// Follows the store so a change saved elsewhere in this client is reflected right away, rather than only after
+	// the entity-updated event has re-requested it. The entry was not loaded through the store, so it may not be there:
+	async #observeAddedEntry(unique: string): Promise<void> {
+		await this.#init;
+		const observable = await this.repository?.byUnique?.(unique);
+		if (!observable || !this.getUniques().includes(unique)) return;
+		this.observe(
+			observable,
+			(data) => {
+				if (data) {
+					this.#entries.updateOne(unique, data);
+				}
+			},
+			'observeEntry_' + unique,
+		);
 	}
 
 	/**
@@ -175,7 +193,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 
 	/**
 	 * Get an entry observable by unique
-	 * @param {string} unique
+	 * @param {string} unique - The unique of the entry.
 	 * @returns {Observable<DetailType | undefined>} - The entry observable.
 	 * @memberof UmbRepositoryDetailsManager
 	 */

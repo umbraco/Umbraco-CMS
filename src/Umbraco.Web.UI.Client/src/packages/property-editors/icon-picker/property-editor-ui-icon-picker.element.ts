@@ -1,4 +1,4 @@
-import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -109,6 +109,12 @@ export class UmbPropertyEditorUIIconPickerElement
 			</uui-button>
 		`;
 	}
+
+	static override styles = css`
+		uui-button {
+			min-width: var(--uui-size-11);
+		}
+	`;
 }
 
 export default UmbPropertyEditorUIIconPickerElement;

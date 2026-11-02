@@ -32,7 +32,7 @@ public static class FormCollectionExtensions
             builder.Append($"{key}={value}&");
         }
 
-        return builder.ToString().TrimEnd(Constants.CharArrays.Ampersand);
+        return builder.ToString().TrimEnd('&');
     }
 
     /// <summary>

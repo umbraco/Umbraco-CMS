@@ -23,6 +23,7 @@ test('can add language', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.language.clickLanguageCreateButton();
   await umbracoUi.language.chooseLanguageByName(languageName);
   await umbracoUi.language.clickSaveButtonAndWaitForLanguageToBeCreated();
+  await umbracoApi.language.waitUntilNameExists(languageName);
 
   // Assert
   await umbracoUi.language.clickLanguagesMenu();

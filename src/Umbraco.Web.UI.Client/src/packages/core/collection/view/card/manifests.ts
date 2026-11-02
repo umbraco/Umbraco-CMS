@@ -1,5 +1,5 @@
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbCardCollectionViewElement } from './card-collection-view.element.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -13,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			element: UmbCardCollectionViewElement,
 			weight: 800,
 			meta: {
-				label: 'Cards',
+				label: '#collection_cardViewLabel',
 				icon: 'icon-grid',
 				pathName: 'cards',
 			},

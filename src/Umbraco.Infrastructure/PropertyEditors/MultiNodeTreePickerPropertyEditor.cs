@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -58,8 +59,11 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                     ["type"] = new JsonObject
                     {
                         ["type"] = "string",
-                        ["enum"] = new JsonArray("content", "media", "member"),
-                        ["description"] = "Entity type (content, media, or member)",
+                        ["enum"] = new JsonArray(
+                            Constants.UdiEntityType.Document,
+                            Constants.UdiEntityType.Media,
+                            Constants.UdiEntityType.Member),
+                        ["description"] = "UDI entity type of the selected entity",
                     },
                     ["unique"] = new JsonObject
                     {
@@ -135,6 +139,9 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                 new ObjectTypeValidator(localizedTextService, coreScopeProvider, entityService),
                 new ContentTypeValidator(localizedTextService, coreScopeProvider, contentService, mediaService, memberService)));
         }
+
+        /// <inheritdoc/>
+        public override IValueRequiredValidator RequiredValidator => new MultiNodeTreePickerRequiredValidator(_jsonSerializer);
 
         /// <inheritdoc/>
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
@@ -213,7 +220,44 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
         /// </summary>
         internal const string MemberObjectType = "member";
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// A custom <see cref="IValueRequiredValidator" /> that treats a value holding no entity references as no value.
+        /// </summary>
+        /// <remarks>
+        /// The editor value is a JSON array of entity references, which the default validator cannot detect as empty
+        /// because the value is stored as text. The persisted value is a comma separated list of UDIs, which is already
+        /// handled by the default validator.
+        /// </remarks>
+        internal sealed class MultiNodeTreePickerRequiredValidator : RequiredValidator
+        {
+            private readonly IJsonSerializer _jsonSerializer;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MultiNodeTreePickerRequiredValidator"/> class.
+            /// </summary>
+            /// <param name="jsonSerializer">The JSON serializer.</param>
+            public MultiNodeTreePickerRequiredValidator(IJsonSerializer jsonSerializer) => _jsonSerializer = jsonSerializer;
+
+            /// <inheritdoc/>
+            public override IEnumerable<ValidationResult> ValidateRequired(object? value, string? valueType)
+            {
+                IEnumerable<ValidationResult> validationResults = base.ValidateRequired(value, valueType);
+
+                if (value is null)
+                {
+                    return validationResults;
+                }
+
+                if (_jsonSerializer.TryDeserialize(value, out EditorEntityReference[]? entityReferences)
+                    && entityReferences.Length == 0)
+                {
+                    validationResults = validationResults.Append(new ValidationResult(Constants.Validation.ErrorMessages.Properties.Empty, ["value"]));
+                }
+
+                return validationResults;
+            }
+        }
+
         /// <summary>
         /// Validates the min/max configuration for the multi-node tree picker property editor.
         /// </summary>
@@ -240,7 +284,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                     return validationResults;
                 }
 
-                if (configuration.MinNumber > 0 && (entityReferences is null || entityReferences.Length < configuration.MinNumber))
+                if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(entityReferences?.Length ?? 0, configuration.MinNumber))
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize(

@@ -13,7 +13,7 @@ public class AllDictionaryControllerTests : ManagementApiUserGroupTestBase<AllDi
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var dictionaryItem = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
         await DictionaryItemService.CreateAsync(dictionaryItem, Constants.Security.SuperUserKey);

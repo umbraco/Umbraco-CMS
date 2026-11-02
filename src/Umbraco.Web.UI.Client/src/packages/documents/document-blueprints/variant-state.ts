@@ -1,1 +1,1 @@
-export { DocumentVariantStateModel as UmbDocumentBlueprintVariantState } from '@umbraco-cms/backoffice/external/backend-api';
+export { UmbPublishableVariantState as UmbDocumentBlueprintVariantState } from '@umbraco-cms/backoffice/variant';

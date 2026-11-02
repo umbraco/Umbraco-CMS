@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Reflection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -17,6 +19,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter]
 public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
+    private static readonly ConcurrentDictionary<Type, ConstructorInvoker> _mediaWithCropsFactories = new();
+
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
@@ -134,9 +138,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
 
                 localCrops.ApplyConfiguration(configuration);
 
-                // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
-                Type mediaWithCropsType = typeof(MediaWithCrops<>).MakeGenericType(mediaItem.GetType());
-                var mediaWithCrops = (MediaWithCrops)Activator.CreateInstance(mediaWithCropsType, mediaItem, _publishedValueFallback, localCrops)!;
+                MediaWithCrops mediaWithCrops = CreateMediaWithCrops(mediaItem, _publishedValueFallback, localCrops);
 
                 mediaItems.Add(mediaWithCrops);
 
@@ -201,7 +203,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         }
         if (isMultiple == false && converted is MediaWithCrops mediaWithCrops)
         {
-            return new [] { ToApiMedia(mediaWithCrops) };
+            return new[] { ToApiMedia(mediaWithCrops) };
         }
 
         return Array.Empty<IApiMediaWithCrops>();
@@ -209,4 +211,21 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
 
     private bool IsMultipleDataType(PublishedDataType dataType) =>
         dataType.ConfigurationAs<MediaPicker3Configuration>()?.Multiple ?? false;
+
+    private static MediaWithCrops CreateMediaWithCrops(
+        IPublishedContent mediaItem,
+        IPublishedValueFallback publishedValueFallback,
+        ImageCropperValue localCrops)
+    {
+        ConstructorInvoker factory =
+            _mediaWithCropsFactories.GetOrAdd(mediaItem.GetType(), static mediaType =>
+            {
+                Type closedType = typeof(MediaWithCrops<>).MakeGenericType(mediaType);
+                ConstructorInfo ctor = closedType.GetConstructor(
+                    [mediaType, typeof(IPublishedValueFallback), typeof(ImageCropperValue)])!;
+                return ConstructorInvoker.Create(ctor);
+            });
+
+        return (MediaWithCrops)factory.Invoke(mediaItem, publishedValueFallback, localCrops);
+    }
 }

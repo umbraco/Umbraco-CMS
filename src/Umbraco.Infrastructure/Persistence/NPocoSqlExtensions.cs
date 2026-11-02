@@ -1641,7 +1641,7 @@ namespace Umbraco.Extensions
             // then GetAliased for "[umbracoNode].[nodeId]" returns "[umbracoNode__nodeId]"
 
             MatchCollection matches = sql.SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
-            Match? match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(field));
+            Match? match = matches.FirstOrDefault(m => m.Groups[1].ValueSpan.Equals(field, StringComparison.InvariantCultureIgnoreCase));
             return match == null ? field : match.Groups[2].Value;
         }
 

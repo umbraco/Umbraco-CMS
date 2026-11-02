@@ -78,7 +78,6 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the document link to be selected
   await umbracoUi.content.clickButtonWithName('Choose');
   await umbracoUi.content.clickLinkPickerAddButton();
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
@@ -177,7 +176,6 @@ test('can add multiple links in the content', {tag: '@release'}, async ({umbraco
   await umbracoUi.content.selectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickLinkPickerAddButton();
-  await umbracoUi.waitForTimeout(500); // Wait for the media link to be added
   // Add external link
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickManualLinkButton();
@@ -438,4 +436,34 @@ test('can select a media file inside a folder as a media link', async ({umbracoA
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
+});
+
+test('can navigate away from content with a multi url picker value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, dataTypeName, link, linkTitle);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed multi url picker value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, dataTypeName, link, linkTitle);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.removeUrlPickerByName(linkTitle);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
 });

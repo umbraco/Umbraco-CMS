@@ -256,6 +256,13 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         /// <inheritdoc/>
         public void CacheReferencedEntities(IEnumerable<object> values)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (CacheReferencedEntitiesSuppression.IsSuppressed)
+            {
+                return;
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+
             var mediaKeys = values
                 .SelectMany(value => Deserialize(_jsonSerializer, value))
                 .Select(dto => dto.MediaKey)
@@ -542,8 +549,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
                         ["value"]));
                 }
 
-                if (mediaPickerConfiguration.ValidationLimit.Min is not null
-                    && mediaWithCropsDtos.Count < mediaPickerConfiguration.ValidationLimit.Min)
+                if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(mediaWithCropsDtos.Count, mediaPickerConfiguration.ValidationLimit.Min))
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize(

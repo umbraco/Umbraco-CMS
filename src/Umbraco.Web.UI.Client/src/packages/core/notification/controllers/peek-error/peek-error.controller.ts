@@ -26,8 +26,8 @@ export class UmbPeekErrorController extends UmbControllerBase {
 
 /**
  *
- * @param host {UmbControllerHost} - The host controller
- * @param args {UmbPeekErrorArgs} - The data to pass to the notification
+ * @param {UmbControllerHost} host - The host controller
+ * @param {UmbPeekErrorArgs} args - The data to pass to the notification
  * @returns {UmbPeekErrorController} The notification peek controller instance
  */
 export function umbPeekError(host: UmbControllerHost, args: UmbPeekErrorArgs) {

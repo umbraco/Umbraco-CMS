@@ -70,6 +70,7 @@ const treeItemMapper = (model: UmbMockDataTypeModel): DataTypeTreeItemResponseMo
 		id: model.id,
 		parent: model.parent,
 		isFolder: model.isFolder,
+		editorUiAlias: model.editorUiAlias,
 		isDeletable: model.isDeletable,
 		flags: model.flags,
 	};
@@ -124,6 +125,7 @@ const itemResponseMapper = (item: UmbMockDataTypeModel): DataTypeItemResponseMod
 		id: item.id,
 		name: item.name,
 		editorAlias: item.editorAlias,
+		editorUiAlias: item.editorUiAlias,
 		isDeletable: item.isDeletable,
 		flags: item.flags,
 	};

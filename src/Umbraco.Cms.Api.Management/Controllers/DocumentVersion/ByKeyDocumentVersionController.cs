@@ -1,12 +1,19 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentVersion;
 
@@ -18,18 +25,39 @@ public class ByKeyDocumentVersionController : DocumentVersionControllerBase
 {
     private readonly IContentVersionService _contentVersionService;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.DocumentVersion.ByKeyDocumentVersionController"/> class.
     /// </summary>
     /// <param name="contentVersionService">An instance of <see cref="IContentVersionService"/> used to manage content versions.</param>
     /// <param name="umbracoMapper">An instance of <see cref="IUmbracoMapper"/> used for mapping Umbraco objects.</param>
+    /// <param name="authorizationService">Service for handling authorization checks for the current user.</param>
+    [ActivatorUtilitiesConstructor]
     public ByKeyDocumentVersionController(
         IContentVersionService contentVersionService,
-        IUmbracoMapper umbracoMapper)
+        IUmbracoMapper umbracoMapper,
+        IAuthorizationService authorizationService)
     {
         _contentVersionService = contentVersionService;
         _umbracoMapper = umbracoMapper;
+        _authorizationService = authorizationService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.DocumentVersion.ByKeyDocumentVersionController"/> class.
+    /// </summary>
+    /// <param name="contentVersionService">An instance of <see cref="IContentVersionService"/> used to manage content versions.</param>
+    /// <param name="umbracoMapper">An instance of <see cref="IUmbracoMapper"/> used for mapping Umbraco objects.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public ByKeyDocumentVersionController(
+        IContentVersionService contentVersionService,
+        IUmbracoMapper umbracoMapper)
+        : this(
+            contentVersionService,
+            umbracoMapper,
+            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
+    {
     }
 
     /// <summary>
@@ -52,9 +80,22 @@ public class ByKeyDocumentVersionController : DocumentVersionControllerBase
     {
         Attempt<IContent?, ContentVersionOperationStatus> attempt =
             await _contentVersionService.GetAsync(id);
+        if (attempt.Success is false || attempt.Result is null)
+        {
+            return MapFailure(attempt.Status);
+        }
 
-        return attempt.Success
-            ? Ok(_umbracoMapper.Map<DocumentVersionResponseModel>(attempt.Result))
-            : MapFailure(attempt.Status);
+        IContent content = attempt.Result;
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionBrowse.ActionLetter, content.Key),
+            AuthorizationPolicies.ContentPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
+        return Ok(_umbracoMapper.Map<DocumentVersionResponseModel>(content));
     }
 }

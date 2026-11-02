@@ -84,7 +84,7 @@ for (const testCase of descriptionTestCases) {
     // Assert
     expect(userGroupId).toBeTruthy();
     expect(await umbracoApi.userGroup.doesExist(userGroupId!)).toBe(true);
-    // Checks if the user group was created in the UI as well
+    // Verify it appears in the collection UI too.
     await umbracoUi.userGroup.clickUserGroupsButton();
     await umbracoUi.userGroup.isUserGroupWithNameVisible(userGroupName);
     await umbracoUi.userGroup.doesUserGroupHaveDescription(userGroupName, testCase.description);

@@ -178,6 +178,32 @@ describe('UmbVariantId', () => {
 		});
 	});
 
+	describe('oneOf', () => {
+		it('is true when an equal variant id is in the list', () => {
+			const id = new UmbVariantId('en', 'xmas');
+			expect(id.oneOf([new UmbVariantId('da'), new UmbVariantId('en', 'xmas')])).to.be.true;
+		});
+
+		it('is false when only the culture matches', () => {
+			const id = new UmbVariantId('en', 'xmas');
+			expect(id.oneOf([new UmbVariantId('en')])).to.be.false;
+		});
+
+		it('is false when only the segment matches', () => {
+			const id = new UmbVariantId('en', 'xmas');
+			expect(id.oneOf([new UmbVariantId('da', 'xmas')])).to.be.false;
+		});
+
+		it('matches the invariant variant id', () => {
+			expect(UmbVariantId.INVARIANT.oneOf([new UmbVariantId('en'), new UmbVariantId(UMB_INVARIANT_CULTURE)])).to.be
+				.true;
+		});
+
+		it('is false for an empty list', () => {
+			expect(new UmbVariantId('en').oneOf([])).to.be.false;
+		});
+	});
+
 	describe('toString', () => {
 		it('renders "invariant" when culture is null', () => {
 			expect(new UmbVariantId(null, null).toString()).to.equal('invariant');

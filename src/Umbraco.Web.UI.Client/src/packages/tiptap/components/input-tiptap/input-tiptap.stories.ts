@@ -1,5 +1,5 @@
-import type { UmbInputTiptapElement } from './input-tiptap.element.js';
 import { manifests as tiptapManifests } from '../../umbraco-package.js';
+import type { UmbInputTiptapElement } from './input-tiptap.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -16,6 +16,9 @@ import './input-tiptap.element.js';
 
 // One-time manifest registration (Storybook keeps the registry alive across stories).
 let manifestsRegistered = false;
+/**
+ *
+ */
 function ensureManifestsRegistered() {
 	if (manifestsRegistered) return;
 	umbExtensionsRegistry.registerMany(tiptapManifests);

@@ -30,7 +30,7 @@ export class UmbUserGroupEntityTypePermissionGroupsElement extends UmbLitElement
 					})
 					.sort((a, b) => a.headline.localeCompare(b.headline));
 			},
-			'umbUserPermissionsObserver',
+			null,
 		);
 
 		this.#observeGranularPermissionsWithNoEntityType();

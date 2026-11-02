@@ -108,7 +108,7 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .Build()),
                 ContentTypeOperationStatus.NameTooLong => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Name was too long")
-                    .WithDetail("Name cannot be more than 255 characters in length.")
+                    .WithDetail($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.")
                     .Build()),
                 ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")

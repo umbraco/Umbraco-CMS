@@ -1,4 +1,4 @@
-import type { UmbApiError, UmbCancelError } from './umb-error.js';
+import type { UmbApiError, UmbCancelError, UmbError } from './umb-error.js';
 export type * from './data-api/types.js';
 
 // TODO: Rename this to `UmbXhrRequestOptions` in a future version.
@@ -25,6 +25,11 @@ export interface UmbProblemDetails {
 	operationStatus?: string;
 	extensions?: Record<string, unknown>;
 	errors?: Record<string, string[]>;
+	/**
+	 * Set by the backoffice, not the server: true when the failed response also carried notifications from the
+	 * server (the `Umb-Notifications` header), which have been shown to the user.
+	 */
+	notifiedByServer?: boolean;
 }
 
 export interface UmbTryExecuteOptions {
@@ -35,13 +40,15 @@ export interface UmbTryExecuteOptions {
 	disableNotifications?: boolean;
 
 	/**
-	 * Signal object to cancel the request.
+	 * Signal that cancels the request. When it aborts, the call resolves straight away with an `UmbCancelError`
+	 * and shows no notification. A promise with a `cancel()` method, such as an `UmbCancelablePromise`, is cancelled too.
+	 * To also stop a fetch request, pass the same signal to the request.
 	 */
 	abortSignal?: AbortSignal;
 }
 
 export type UmbApiWithErrorResponse = {
-	error?: UmbApiError | UmbCancelError;
+	error?: UmbError | UmbApiError | UmbCancelError;
 };
 
 /**

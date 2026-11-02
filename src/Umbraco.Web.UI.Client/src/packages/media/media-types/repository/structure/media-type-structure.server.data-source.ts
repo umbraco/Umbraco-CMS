@@ -5,6 +5,8 @@ import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backof
 import type { AllowedMediaTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
+import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @class UmbMediaTypeStructureServerDataSource
@@ -21,11 +23,11 @@ export class UmbMediaTypeStructureServerDataSource
 	}
 
 	getMediaTypesOfFileExtension({ fileExtension, skip, take }: { fileExtension: string; skip: number; take: number }) {
-		return getAllowedMediaTypesOfExtension({ fileExtension, skip, take });
+		return getAllowedMediaTypesOfExtension(this.#host, { fileExtension, skip, take });
 	}
 
 	getMediaTypesOfFolders({ skip, take }: { skip: number; take: number }) {
-		return getAllowedMediaTypesOfFolders({ skip, take });
+		return getAllowedMediaTypesOfFolders(this.#host, { skip, take });
 	}
 
 	async getAllowedParentsOf(unique: string) {
@@ -47,16 +49,22 @@ export class UmbMediaTypeStructureServerDataSource
 	}
 }
 
-const getAllowedChildrenOf = (unique: string | null, parentContentUnique: string | null) => {
+const getAllowedChildrenOf = (
+	unique: string | null,
+	parentContentUnique: string | null,
+	paging?: UmbOffsetPaginationRequestModel,
+) => {
 	if (unique) {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return MediaTypeService.getMediaTypeByIdAllowedChildren({
 			path: { id: unique },
-			query: { parentContentKey: parentContentUnique ?? undefined },
+			query: { parentContentKey: parentContentUnique ?? undefined, skip: paging?.skip, take: paging?.take },
 		});
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return MediaTypeService.getMediaTypeAllowedAtRoot({});
+		return MediaTypeService.getMediaTypeAllowedAtRoot({
+			query: { skip: paging?.skip, take: paging?.take },
+		});
 	}
 };
 
@@ -70,25 +78,41 @@ const mapper = (item: AllowedMediaTypeModel): UmbAllowedMediaTypeModel => {
 	};
 };
 
-const getAllowedMediaTypesOfFolders = async ({ skip, take }: { skip: number; take: number }) => {
-	// eslint-disable-next-line local-rules/no-direct-api-import
-	const { data } = await MediaTypeService.getItemMediaTypeFolders({ query: { skip, take } });
-	return data.items.map((item) => mapper(item));
+const getAllowedMediaTypesOfFolders = async (
+	host: UmbControllerHost,
+	{ skip, take }: { skip: number; take: number },
+): Promise<UmbDataSourceResponse<UmbPagedModel<UmbAllowedMediaTypeModel>>> => {
+	const { data, error } = await tryExecute(
+		host,
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		MediaTypeService.getItemMediaTypeFolders({ query: { skip, take } }),
+	);
+
+	if (!data) {
+		return { error };
+	}
+
+	return { data: { items: data.items.map((item) => mapper(item)), total: data.total } };
 };
 
-const getAllowedMediaTypesOfExtension = async ({
-	fileExtension,
-	skip,
-	take,
-}: {
-	fileExtension: string;
-	skip: number;
-	take: number;
-}) => {
-	// eslint-disable-next-line local-rules/no-direct-api-import
-	const { data } = await MediaTypeService.getItemMediaTypeAllowed({ query: { fileExtension, skip, take } });
-	return data.items.map((item) => ({
-		...mapper(item),
-		matchedFileExtension: item.matchedFileExtension,
-	}));
+const getAllowedMediaTypesOfExtension = async (
+	host: UmbControllerHost,
+	{ fileExtension, skip, take }: { fileExtension: string; skip: number; take: number },
+): Promise<UmbDataSourceResponse<UmbPagedModel<UmbAllowedMediaTypeModel>>> => {
+	const { data, error } = await tryExecute(
+		host,
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		MediaTypeService.getItemMediaTypeAllowed({ query: { fileExtension, skip, take } }),
+	);
+
+	if (!data) {
+		return { error };
+	}
+
+	return {
+		data: {
+			items: data.items.map((item) => ({ ...mapper(item), matchedFileExtension: item.matchedFileExtension })),
+			total: data.total,
+		},
+	};
 };

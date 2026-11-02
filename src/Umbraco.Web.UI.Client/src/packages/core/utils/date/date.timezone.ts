@@ -33,7 +33,6 @@ export function getTimeZoneList(filter: Array<string> | undefined = undefined): 
 
 /**
  * Retrieves the client's time zone information.
- * @param {DateTime} [selectedDate] - An optional Luxon DateTime object to format the offset of the time zone.
  * @returns {UmbTimeZone} An object containing the client's time zone name and value.
  */
 export function getClientTimeZone(): UmbTimeZone {
@@ -46,8 +45,8 @@ export function getClientTimeZone(): UmbTimeZone {
 
 /**
  * Returns the time zone offset for a given time zone ID and date.
- * @param timeZoneId - The time zone identifier (e.g., 'America/New_York').
- * @param date - The Luxon DateTime object for which to get the offset.
+ * @param {string} timeZoneId - The time zone identifier (e.g., 'America/New_York').
+ * @param {DateTime} date - The Luxon DateTime object for which to get the offset.
  * @returns {string} The time zone offset
  */
 export function getTimeZoneOffset(timeZoneId: string, date: DateTime): string {

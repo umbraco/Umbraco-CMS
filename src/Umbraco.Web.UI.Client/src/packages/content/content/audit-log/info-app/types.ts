@@ -10,8 +10,7 @@ export interface MetaWorkspaceInfoAppAuditLogKind extends MetaWorkspaceInfoApp {
 	auditLogRepositoryAlias: string;
 }
 
-export interface ManifestWorkspaceInfoAppAuditLogKind
-	extends ManifestWorkspaceInfoApp<MetaWorkspaceInfoAppAuditLogKind> {
+export interface ManifestWorkspaceInfoAppAuditLogKind extends ManifestWorkspaceInfoApp<MetaWorkspaceInfoAppAuditLogKind> {
 	type: 'workspaceInfoApp';
 	kind: 'auditLog';
 }

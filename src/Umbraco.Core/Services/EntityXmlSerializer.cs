@@ -28,6 +28,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
+    private readonly ITemplateService _templateService;
     private readonly IUserService _userService;
 
     /// <summary>
@@ -43,6 +44,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     /// <param name="shortStringHelper">The helper for string operations.</param>
     /// <param name="propertyEditors">The collection of property editors.</param>
     /// <param name="configurationEditorJsonSerializer">The serializer for configuration data.</param>
+    /// <param name="templateService">The template service for template lookups.</param>
     public EntityXmlSerializer(
         IContentService contentService,
         IMediaService mediaService,
@@ -53,7 +55,8 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         UrlSegmentProviderCollection urlSegmentProviders,
         IShortStringHelper shortStringHelper,
         PropertyEditorCollection propertyEditors,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
+        ITemplateService templateService)
     {
         _contentTypeService = contentTypeService;
         _mediaService = mediaService;
@@ -65,6 +68,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         _shortStringHelper = shortStringHelper;
         _propertyEditors = propertyEditors;
         _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
+        _templateService = templateService;
     }
 
     /// <inheritdoc />
@@ -78,6 +82,11 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             throw new ArgumentNullException(nameof(content));
         }
 
+        return Serialize(content, published, withDescendants, new Dictionary<int, ITemplate?>());
+    }
+
+    private XElement Serialize(IContent content, bool published, bool withDescendants, Dictionary<int, ITemplate?> templateCache)
+    {
         var nodeName = content.ContentType.Alias.ToSafeAlias(_shortStringHelper);
 
         XElement xml = SerializeContentBase(content, content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders), nodeName, published);
@@ -93,6 +102,15 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
 
         xml.Add(new XAttribute("template", content.TemplateId?.ToString(CultureInfo.InvariantCulture) ?? string.Empty));
 
+        ITemplate? assignedTemplate = null;
+        if (content.TemplateId.HasValue && !templateCache.TryGetValue(content.TemplateId.Value, out assignedTemplate))
+        {
+            assignedTemplate = _templateService.GetAsync(content.TemplateId.Value).GetAwaiter().GetResult();
+            templateCache[content.TemplateId.Value] = assignedTemplate;
+        }
+
+        xml.Add(new XAttribute("templateAlias", assignedTemplate?.Alias ?? string.Empty));
+
         xml.Add(new XAttribute("isPublished", content.Published));
 
         if (withDescendants)
@@ -104,7 +122,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             {
                 IEnumerable<IContent> children =
                     _contentService.GetPagedChildren(content.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
-                SerializeChildren(children, xml, published);
+                SerializeChildren(children, xml, published, templateCache);
             }
         }
 
@@ -711,12 +729,12 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     /// <param name="children">The child content items to serialize.</param>
     /// <param name="xml">The parent XML element to add children to.</param>
     /// <param name="published">Whether to serialize the published version.</param>
-    private void SerializeChildren(IEnumerable<IContent> children, XElement xml, bool published)
+    private void SerializeChildren(IEnumerable<IContent> children, XElement xml, bool published, Dictionary<int, ITemplate?> templateCache)
     {
         foreach (IContent child in children)
         {
             // add the child xml
-            XElement childXml = Serialize(child, published);
+            XElement childXml = Serialize(child, published, false, templateCache);
             xml.Add(childXml);
 
             const int pageSize = 500;
@@ -728,7 +746,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
                     _contentService.GetPagedChildren(child.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
 
                 // recurse
-                SerializeChildren(grandChildren, childXml, published);
+                SerializeChildren(grandChildren, childXml, published, templateCache);
             }
         }
     }

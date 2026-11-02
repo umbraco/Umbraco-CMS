@@ -4,9 +4,13 @@ import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbDocumentServerDataSource } from '../../repository/detail/document-detail.server.data-source.js';
 import { UmbDocumentPublishingServerDataSource } from './document-publishing.server.data-source.js';
+import { resetMockHandlers } from '../../../../../../mocks/index.js';
+import { useServerAssignedDocumentKey } from '../../../../../../mocks/msw-handlers/document/server-assigned-key.js';
 
+const SERVER_ASSIGNED_KEY = 'a0000000-0000-4000-8000-000000000001';
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
 const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 
@@ -30,6 +34,7 @@ describe('UmbDocumentPublishingServerDataSource (create/update-and-publish)', ()
 
 	afterEach(() => {
 		document.body.innerHTML = '';
+		resetMockHandlers();
 	});
 
 	describe('createAndPublish', () => {
@@ -47,6 +52,26 @@ describe('UmbDocumentPublishingServerDataSource (create/update-and-publish)', ()
 			const { data: created } = await detailDataSource.read(newId);
 			const daVariant = created!.variants.find((v) => v.culture === 'da');
 			expect(daVariant?.state, 'the requested culture (da) is Published').to.equal('Published');
+		});
+
+		it('returns the key of the created document', async () => {
+			const { data: template } = await detailDataSource.read(VARIANT_DOCUMENT_ID);
+			const newId = UmbId.new();
+			const da = UmbVariantId.Create({ culture: 'da', segment: null });
+
+			const { data } = await publishingDataSource.createAndPublish({ ...template!, unique: newId }, [da], null);
+
+			expect(data).to.equal(newId);
+		});
+
+		it('returns the key the server assigned when it differs from the requested one', async () => {
+			useServerAssignedDocumentKey(SERVER_ASSIGNED_KEY);
+			const { data: template } = await detailDataSource.read(VARIANT_DOCUMENT_ID);
+			const da = UmbVariantId.Create({ culture: 'da', segment: null });
+
+			const { data } = await publishingDataSource.createAndPublish({ ...template!, unique: UmbId.new() }, [da], null);
+
+			expect(data).to.equal(SERVER_ASSIGNED_KEY);
 		});
 	});
 
@@ -94,5 +119,72 @@ describe('UmbDocumentPublishingServerDataSource (create/update-and-publish)', ()
 			const variant = updated!.variants.find((v) => v.culture === null);
 			expect(variant?.state, 'the invariant variant is Published').to.equal('Published');
 		});
+	});
+});
+
+describe('UmbDocumentPublishingServerDataSource (ancestorVariantStates)', () => {
+	let hostElement: UmbTestHostElement;
+	let publishingDataSource: UmbDocumentPublishingServerDataSource;
+	const originalAncestors = DocumentService.getItemDocumentAncestors;
+
+	const makeAncestor = (id: string, variants: Array<{ culture: string | null; state: string }>) => ({
+		id,
+		documentType: { id: `dt-${id}`, icon: 'icon-folder', collection: null },
+		hasChildren: true,
+		isProtected: false,
+		isTrashed: false,
+		parent: null,
+		variants: variants.map((variant) => ({ ...variant, name: id, flags: [] })),
+		flags: [],
+	});
+
+	beforeEach(() => {
+		hostElement = new UmbTestHostElement();
+		document.body.appendChild(hostElement);
+		publishingDataSource = new UmbDocumentPublishingServerDataSource(hostElement);
+	});
+
+	afterEach(() => {
+		(DocumentService as any).getItemDocumentAncestors = originalAncestors;
+		hostElement.remove();
+	});
+
+	it('maps each ancestor to the culture and state of its variants', async () => {
+		(DocumentService as any).getItemDocumentAncestors = () =>
+			Promise.resolve({
+				data: [
+					{
+						id: 'child',
+						ancestors: [
+							makeAncestor('grandparent', [{ culture: null, state: 'Published' }]),
+							makeAncestor('parent', [
+								{ culture: 'en-US', state: 'Published' },
+								{ culture: 'da-DK', state: 'Draft' },
+							]),
+						],
+					},
+				],
+			});
+
+		const { data, error } = await publishingDataSource.ancestorVariantStates('child');
+
+		expect(error).to.be.undefined;
+		expect(data).to.deep.equal([
+			{ variants: [{ culture: null, state: 'Published' }] },
+			{
+				variants: [
+					{ culture: 'en-US', state: 'Published' },
+					{ culture: 'da-DK', state: 'Draft' },
+				],
+			},
+		]);
+	});
+
+	it('returns no ancestors when the response has no entry for the document', async () => {
+		(DocumentService as any).getItemDocumentAncestors = () => Promise.resolve({ data: [] });
+
+		const { data } = await publishingDataSource.ancestorVariantStates('child');
+
+		expect(data).to.deep.equal([]);
 	});
 });

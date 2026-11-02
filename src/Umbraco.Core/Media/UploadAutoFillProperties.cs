@@ -130,7 +130,7 @@ public class UploadAutoFillProperties
 
     private void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath, Stream filestream, string? culture, string? segment)
     {
-        var extension = (Path.GetExtension(filepath) ?? string.Empty).TrimStart(Constants.CharArrays.Period);
+        var extension = (Path.GetExtension(filepath) ?? string.Empty).TrimStart('.');
 
         Size? size = _imageDimensionExtractor.IsSupportedImageFormat(extension)
             ? _imageDimensionExtractor.GetDimensions(filestream) ?? new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize)

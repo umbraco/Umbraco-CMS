@@ -1,6 +1,7 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
 import { UmbChangeUserPasswordServerDataSource } from './change-user-password.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbChangeUserPasswordRepository extends UmbUserRepositoryBase {
 	#changePasswordSource: UmbChangeUserPasswordServerDataSource;
@@ -10,12 +11,12 @@ export class UmbChangeUserPasswordRepository extends UmbUserRepositoryBase {
 		this.#changePasswordSource = new UmbChangeUserPasswordServerDataSource(host);
 	}
 
-	async changePassword(userId: string, newPassword: string) {
+	async changePassword(userId: string, newPassword: string): Promise<UmbDataSourceErrorResponse> {
 		if (!userId) throw new Error('User id is missing');
 		if (!newPassword) throw new Error('New password is missing');
 		await this.init;
 
-		const { data, error } = await this.#changePasswordSource.changePassword(userId, newPassword);
+		const { error } = await this.#changePasswordSource.changePassword(userId, newPassword);
 
 		if (!error) {
 			const notification = { data: { message: `Password changed` } };
@@ -25,7 +26,7 @@ export class UmbChangeUserPasswordRepository extends UmbUserRepositoryBase {
 			this.notificationContext?.peek('danger', notification);
 		}
 
-		return { data, error };
+		return { error };
 	}
 }
 

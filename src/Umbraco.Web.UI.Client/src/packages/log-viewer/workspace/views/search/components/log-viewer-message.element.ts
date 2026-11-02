@@ -72,9 +72,15 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 				icon: 'icon-umbraco',
 			},
 			{
+				label: this.localize.term('logViewer_searchUmbracoDocs'),
+				title: this.localize.term('logViewer_searchThisMessageInUmbracoDocs'),
+				href: () => `https://docs.umbraco.com/?q=${this.renderedMessage}`,
+				icon: 'icon-book-alt',
+			},
+			{
 				label: this.localize.term('logViewer_searchOurUmbracoWithGoogle'),
 				title: this.localize.term('logViewer_searchOurUmbracoForumsUsingGoogle'),
-				href: () => `https://www.google.com/?q=site:forum.umbraco.com%20${this.renderedMessage}`,
+				href: () => `https://www.google.com/search?q=site:forum.umbraco.com%20${this.renderedMessage}`,
 				icon: 'icon-google',
 			},
 			{
@@ -135,7 +141,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 					<div id="machine">${this.properties.find((property) => property.name === 'MachineName')?.value}</div>
 					<div id="message"><uui-scroll-container>${this.renderedMessage}</uui-scroll-container></div>
 				</summary>
-				${this.exception ? html`<pre id="exception">${this.exception}</pre>` : ''}
+				${this.exception ? html`<pre id="exception" dir="ltr">${this.exception}</pre>` : ''}
 				<ul id="properties-list">
 					<li class="property">
 						<div class="property-name"><umb-localize key="logViewer_timestamp">Timestamp</umb-localize></div>

@@ -61,4 +61,27 @@ public static class ContentTypeChangeExtensions
     /// <returns><c>true</c> if the change has non-structural impact; otherwise, <c>false</c>.</returns>
     public static bool IsNonStructuralChange(this ContentTypeChangeTypes change) =>
         change.HasType(ContentTypeChangeTypes.RefreshOther) && !change.HasType(ContentTypeChangeTypes.RefreshMain);
+
+    /// <summary>
+    ///     Determines whether the change requires the raw database cache (<c>cmsContentNu</c>) to be rebuilt.
+    /// </summary>
+    /// <param name="change">The change to check.</param>
+    /// <returns>
+    ///     <c>true</c> for a structural change unless it is flagged <see cref="ContentTypeChangeTypes.RawDataUnaffected"/>
+    ///     (e.g. a property removal), in which case the stored blob stays valid and only the converted cache needs clearing.
+    /// </returns>
+    public static bool RequiresRawDataRebuild(this ContentTypeChangeTypes change) =>
+        change.IsStructuralChange() && !change.HasType(ContentTypeChangeTypes.RawDataUnaffected);
+
+    /// <summary>
+    ///     Determines whether the change only requires the converted (in-memory) content cache to be cleared,
+    ///     leaving the stored database cache (<c>cmsContentNu</c>) and HybridCache entries valid.
+    /// </summary>
+    /// <param name="change">The change to check.</param>
+    /// <returns>
+    ///     <c>true</c> for a non-structural change, or a structural change flagged
+    ///     <see cref="ContentTypeChangeTypes.RawDataUnaffected"/> (e.g. a property removal).
+    /// </returns>
+    public static bool RequiresConvertedCacheClearOnly(this ContentTypeChangeTypes change) =>
+        change.IsNonStructuralChange() || (change.IsStructuralChange() && change.HasType(ContentTypeChangeTypes.RawDataUnaffected));
 }

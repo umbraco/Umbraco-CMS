@@ -5,7 +5,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the OEmbed that fetches data from a given URL.
  * @class UmbOEmbedServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbOEmbedServerDataSource {
 	#host: UmbControllerHost;
@@ -21,7 +20,7 @@ export class UmbOEmbedServerDataSource {
 
 	/**
 	 * Fetches markup for the given URL.
-	 * @param {string} unique
+	 * @param {string} unique The URL to fetch OEmbed markup for.
 	 * @memberof UmbOEmbedServerDataSource
 	 */
 	async getOEmbedQuery({ url, maxWidth, maxHeight }: { url?: string; maxWidth?: number; maxHeight?: number }) {

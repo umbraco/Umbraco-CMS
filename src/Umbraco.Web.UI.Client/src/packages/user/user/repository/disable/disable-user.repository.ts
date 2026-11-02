@@ -25,7 +25,9 @@ export class UmbDisableUserRepository extends UmbUserRepositoryBase {
 			const { data: items } = await this.#userItemRepository.requestItems(ids);
 			if (!items) throw new Error('Could not load user item');
 
-			// TODO: get state from item when available
+			// TODO: `enable-user.repository.ts` re-reads the server-computed state via `UmbUserDetailRepository.requestByUniques`
+			// instead of assuming a fixed state (see #22786). Disabled is deterministic so this hardcoded state is safe today,
+			// but consider aligning this repository with the same pattern for consistency.
 			ids.forEach((id) => {
 				this.detailStore?.updateItem(id, { state: UserStateModel.DISABLED });
 			});

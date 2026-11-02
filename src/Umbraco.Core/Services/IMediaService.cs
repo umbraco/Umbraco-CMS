@@ -194,6 +194,33 @@ public interface IMediaService : IContentServiceBase<IMedia>
     Attempt<OperationResult?> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Moves an <see cref="IMedia" /> object to a new location, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="media">The <see cref="IMedia" /> to move.</param>
+    /// <param name="parentId">Id of the Media's new Parent.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the media along with it. When restoring media out of the recycle bin
+    ///     this can be set to <c>false</c> to restore only the media item itself, leaving its descendants in the
+    ///     recycle bin as top-level bin items.
+    /// </param>
+    /// <param name="userId">Id of the User moving the Media.</param>
+    /// <returns>True if moving succeeded, otherwise False.</returns>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
+    Attempt<OperationResult?> Move(IMedia media, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
+    {
+        // Only the whole-tree move can be satisfied by delegating to the existing method; there is no way to honour
+        // includeDescendants: false without the concrete implementation, so fail fast rather than silently move
+        // the descendants after all.
+        if (includeDescendants is false)
+        {
+            throw new NotImplementedException("This IMediaService implementation does not support moving without descendants. Override the Move overload that takes an includeDescendants parameter to support it.");
+        }
+
+        return Move(media, parentId, userId);
+    }
+
+    /// <summary>
     ///     Deletes an <see cref="IMedia" /> object by moving it to the Recycle Bin
     /// </summary>
     /// <param name="media">The <see cref="IMedia" /> to delete</param>

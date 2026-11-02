@@ -1,6 +1,6 @@
-import { UMB_DUPLICATE_TO_MODAL } from './modal/duplicate-to-modal.token.js';
-import type { MetaEntityActionDuplicateToKind, UmbDuplicateToRepository } from './types.js';
+import { UMB_TREE_PICKER_MODAL } from '../../tree-picker-modal/index.js';
 import type { UmbTreeRepository } from '../../data/tree-repository.interface.js';
+import type { MetaEntityActionDuplicateToKind, UmbDuplicateToRepository } from './types.js';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
@@ -14,17 +14,21 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 
 		const ancestors = await this.#requestAncestors();
 
-		const value = await umbOpenModal(this, UMB_DUPLICATE_TO_MODAL, {
+		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
-				unique: this.args.unique,
-				entityType: this.args.entityType,
+				headline: '#actions_copyTo',
+				confirmLabel: '#general_copy',
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
+				expandTreeRoot: true,
 				treeExpansion: ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined,
 			},
-		});
+		}).catch(() => undefined);
 
-		const destinationUnique = value.destination.unique;
+		// The modal was cancelled.
+		if (!value) return;
+
+		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
 
 		const duplicateRepository = await createExtensionApiByAlias<UmbDuplicateToRepository>(
@@ -47,7 +51,10 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 
 	async #requestAncestors() {
 		try {
-			const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.args.meta.treeRepositoryAlias);
+			const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(
+				this,
+				this.args.meta.treeRepositoryAlias,
+			);
 			const { data } =
 				(await treeRepository?.requestTreeItemAncestors({
 					treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },

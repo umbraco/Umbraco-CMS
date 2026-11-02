@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ServerEvents;
+using Umbraco.Cms.Api.Management.ServerEvents.AccessFilters;
 using Umbraco.Cms.Api.Management.ServerEvents.Authorizers;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
@@ -13,6 +14,7 @@ internal static class ServerEventExtensions
     internal static IUmbracoBuilder AddServerEvents(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
+        builder.Services.AddSingleton<IServerEventAccessService, ServerEventAccessService>();
         builder.Services.AddSingleton<IServerEventRouter, ServerEventRouter>();
         builder.Services.AddSingleton<IServerEventUserManager, ServerEventUserManager>();
         builder.Services.AddSingleton<IServerEventAuthorizationService, ServerEventAuthorizationService>();
@@ -20,7 +22,8 @@ internal static class ServerEventExtensions
 
         builder
             .AddEvents()
-            .AddAuthorizers();
+            .AddAuthorizers()
+            .AddAccessFilters();
 
         return builder;
     }
@@ -108,6 +111,14 @@ internal static class ServerEventExtensions
             .Append<UserGroupEventAuthorizer>()
             .Append<UserEventAuthorizer>()
             .Append<WebhookEventAuthorizer>();
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddAccessFilters(this IUmbracoBuilder builder)
+    {
+        builder.ServerEventAccessFilters()
+            .Append<DocumentServerEventAccessFilter>()
+            .Append<MediaServerEventAccessFilter>();
         return builder;
     }
 }

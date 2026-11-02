@@ -11,9 +11,9 @@ export const copyHandlers = [
 
 		const requestBody = (await request.json()) as CopyDataTypeRequestModel;
 		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
-		if (!requestBody.target?.id) return new HttpResponse(null, { status: 400, statusText: 'no targetId found' });
 
-		const newIds = umbDataTypeMockDb.tree.copy([id], requestBody.target.id);
+		// A missing/null target means "copy to the tree root" — target isn't required.
+		const newIds = umbDataTypeMockDb.tree.copy([id], requestBody.target?.id ?? null);
 
 		return new HttpResponse(null, { status: 201, headers: { Location: newIds[0] } });
 	}),

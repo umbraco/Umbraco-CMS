@@ -1,7 +1,6 @@
 import type { ManifestPropertyAction, MetaPropertyAction } from '@umbraco-cms/backoffice/property-action';
 
-export interface ManifestPropertyActionCopyToClipboardKind
-	extends ManifestPropertyAction<MetaPropertyActionCopyToClipboardKind> {
+export interface ManifestPropertyActionCopyToClipboardKind extends ManifestPropertyAction<MetaPropertyActionCopyToClipboardKind> {
 	type: 'propertyAction';
 	kind: 'copyToClipboard';
 }

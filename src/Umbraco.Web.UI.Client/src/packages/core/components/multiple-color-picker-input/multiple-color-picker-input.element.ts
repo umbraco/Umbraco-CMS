@@ -7,6 +7,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
+import { isAboveZeroAndBelowMinimum } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-multiple-color-picker-input
@@ -42,12 +43,12 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -60,11 +61,11 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	/**
@@ -105,7 +106,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this._items.length < this.min,
+			() => isAboveZeroAndBelowMinimum(this._items.length, this.min),
 		);
 		this.addValidator(
 			'rangeOverflow',

@@ -1,5 +1,5 @@
-import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { MenuAliasConditionConfig } from './types.js';
+import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	ManifestCondition,

@@ -25,7 +25,7 @@ public class GuidUdi : Udi
     public GuidUdi(Uri uriValue)
         : base(uriValue)
     {
-        if (Guid.TryParse(uriValue.AbsolutePath.TrimStart(Constants.CharArrays.ForwardSlash), out Guid guid) == false)
+        if (Guid.TryParse(uriValue.AbsolutePath.AsSpan().TrimStart('/'), out Guid guid) == false)
         {
             throw new FormatException("URI \"" + uriValue + "\" is not a GUID entity ID.");
         }

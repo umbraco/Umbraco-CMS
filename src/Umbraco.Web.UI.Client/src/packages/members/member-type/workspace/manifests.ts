@@ -20,7 +20,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: '#general_design',
 			pathname: 'design',
-			icon: 'icon-member-dashed-line',
+			icon: 'icon-document-dashed-line',
 			compositionRepositoryAlias: UMB_MEMBER_TYPE_COMPOSITION_REPOSITORY_ALIAS,
 		},
 		conditions: [

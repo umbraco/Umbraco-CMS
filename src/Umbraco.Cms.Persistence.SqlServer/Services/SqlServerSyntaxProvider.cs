@@ -359,7 +359,7 @@ where tbl.[name]=@0 and col.[name]=@1;",
                 break;
             }
 
-            s = SqlInspector.GetSqlRhs(sql);
+            s = SqlInspector.GetSqlRhs(s);
         }
 
         if (updated)

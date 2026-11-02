@@ -26,7 +26,7 @@ public sealed class ApiDocumentUrlService : IApiDocumentUrlService
         {
             var index = route.IndexOf('/');
 
-            if (index > -1 && int.TryParse(route.Substring(0, index), out var nodeId))
+            if (index > -1 && int.TryParse(route.AsSpan(0, index), out var nodeId))
             {
                 documentStartNodeId = nodeId;
                 route = route.Substring(index);

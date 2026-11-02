@@ -197,7 +197,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
             }
 
             var creator = new BlockListPropertyValueCreator(_blockConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache, _languageService);
-            return creator.CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks).GetAwaiter().GetResult();
+            return creator.CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, BlockPropertyVariance.OwningPropertyCulture(_variationContextAccessor, owner, propertyType), configuration.Blocks).GetAwaiter().GetResult();
         }
     }
 }

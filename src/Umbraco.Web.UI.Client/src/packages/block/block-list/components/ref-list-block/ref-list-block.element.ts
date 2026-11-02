@@ -1,16 +1,16 @@
+import { UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
 import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
-
-import '@umbraco-cms/backoffice/ufm';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
+/**
+ * @element umb-ref-list-block
+ * @slot name - Content rendered in the block's primary label area (the `name` slot of the inner `uui-ref-node`). The expected projection is a `<umb-ufm-render>` element owned by the parent block-list entry.
+ */
 @customElement('umb-ref-list-block')
-export class UmbRefListBlockElement extends UmbLitElement {
+export class UmbRefListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElement) {
 	//
-	@property({ type: String, reflect: false })
-	label?: string;
-
 	@property({ type: String, reflect: false })
 	icon?: string;
 
@@ -37,7 +37,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 				.readonly=${!(this.config?.showContentEdit ?? false)}
 				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
+				${this.renderNameSlot(blockValue, 'name')}
 				${when(
 					this.unpublished,
 					() => html`
@@ -50,7 +50,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: block;
@@ -68,12 +68,14 @@ export class UmbRefListBlockElement extends UmbLitElement {
 				vertical-align: text-top;
 			}
 
-			umb-ufm-render {
+			umb-ufm-render,
+			::slotted([slot='name']) {
 				user-select: none;
 			}
 
 			:host([unpublished]) umb-icon,
-			:host([unpublished]) umb-ufm-render {
+			:host([unpublished]) umb-ufm-render,
+			:host([unpublished]) ::slotted([slot='name']) {
 				opacity: 0.6;
 			}
 

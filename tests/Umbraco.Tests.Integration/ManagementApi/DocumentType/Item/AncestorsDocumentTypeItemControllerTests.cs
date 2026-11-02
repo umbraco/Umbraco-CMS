@@ -15,7 +15,7 @@ public class AncestorsDocumentTypeItemControllerTests : ManagementApiUserGroupTe
     private Guid _documentTypeKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         _documentTypeKey = Guid.NewGuid();
         await ContentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _documentTypeKey, Name = Guid.NewGuid().ToString(), Alias = Guid.NewGuid().ToString() }, Constants.Security.SuperUserKey);

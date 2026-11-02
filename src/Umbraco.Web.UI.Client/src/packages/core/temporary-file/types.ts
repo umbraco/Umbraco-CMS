@@ -16,7 +16,7 @@ export interface UmbTemporaryFileModel {
 	onProgress?: (progress: number) => void;
 	/**
 	 * The abort signal used to cancel the upload.
-	 * @deprecated Use {@link abortController} instead.
+	 * @deprecated Use {@link UmbTemporaryFileModel#abortController} instead.
 	 */
 	abortSignal?: AbortSignal;
 	/**

@@ -8,9 +8,9 @@ import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 /**
- *
- * @param manifest
- * @returns
+ * Builds the args passed to a workspace action's extension API.
+ * @param {ManifestWorkspaceAction<MetaWorkspaceAction>} manifest - the workspace action manifest.
+ * @returns {[UmbWorkspaceActionArgs<MetaWorkspaceAction>]} the args for the workspace action.
  */
 function ExtensionApiArgsMethod(
 	manifest: ManifestWorkspaceAction<MetaWorkspaceAction>,
@@ -57,7 +57,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 				${this._modalContext
 					? html`<uui-button
 							slot="actions"
-							label=${this._isNew ? 'Cancel' : 'Close'}
+							label=${this.localize.term(this._isNew ? 'general_cancel' : 'general_close')}
 							@click=${this.#rejectModal}></uui-button>`
 					: ''}
 

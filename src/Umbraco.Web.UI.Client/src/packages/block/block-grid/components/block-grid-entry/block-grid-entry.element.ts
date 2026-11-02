@@ -4,6 +4,7 @@ import { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { renderHiddenUfm, renderUfm } from '@umbraco-cms/backoffice/ufm';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
@@ -14,6 +15,7 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '../../../block/action/block-action-list.element.js';
 
@@ -51,11 +53,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			'observeMessagesForContent',
 		);
 	}
-	private _contentKey?: string | undefined;
+	private _contentKey: string | undefined;
 
-	#context = new UmbBlockGridEntryContext(this);
+	readonly #context = new UmbBlockGridEntryContext(this);
 	#renderTimeout: number | undefined;
-	#layoutContainerResizeObserver = new ResizeObserver(() => this.#callUpdateInlineCreateButtons());
+	readonly #layoutContainerResizeObserver = new ResizeObserver(() => this.#callUpdateInlineCreateButtons());
 
 	@state()
 	private _contentTypeAlias?: string;
@@ -100,6 +102,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	private _isSortMode?: boolean;
+
+	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
+	private _name?: string;
 
 	@state()
 	private _canScale?: boolean;
@@ -211,6 +216,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
+		this.observe(this.#context.name, (name) => (this._name = name), null);
 
 		// Data:
 		this.observe(
@@ -370,16 +376,36 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		}
 	}
 
-	#expose = () => {
+	readonly #expose = () => {
 		this.#context.expose();
 	};
+
+	readonly #onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		this.#context.setName(event.detail.text);
+	};
+
+	get #blockValue() {
+		return {
+			...this._blockViewProps.content,
+			$settings: this._blockViewProps.settings,
+			$index: this.index,
+		};
+	}
+
+	#renderUfm() {
+		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved, 'name');
+	}
+
+	#renderHiddenUfm() {
+		return renderHiddenUfm(this._label, this.#blockValue, this.#onUfmResolved);
+	}
 
 	#callUpdateInlineCreateButtons() {
 		clearTimeout(this.#renderTimeout);
 		this.#renderTimeout = setTimeout(this.#updateInlineCreateButtons, 100) as unknown as number;
 	}
 
-	#updateInlineCreateButtons = () => {
+	readonly #updateInlineCreateButtons = () => {
 		// TODO: Could we optimize this, so it wont break?, cause currently we trust blindly that parentElement is '.umb-block-grid__layout-container' [NL]
 		const layoutContainer = this.parentElement;
 		if (!layoutContainer) return;
@@ -409,7 +435,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		}
 	};
 
-	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
+	readonly #extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
 		if (!this._contentTypeAlias) {
 			// accept no extensions if we don't have a content type alias
 			return false;
@@ -430,22 +456,23 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		return true;
 	};
 
-	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+	readonly #extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		if (ext.component) {
 			ext.component.classList.add('umb-block-grid__block--view');
 			ext.component.setAttribute('part', 'component');
 		}
-		if (this._exposed || this._isReadOnly) {
-			return ext.component;
-		} else {
-			return html`
+		return html`${this.#renderHiddenUfm()}
+		${when(
+			this._exposed || this._isReadOnly,
+			() => ext.component,
+			() => html`
 				<div>
 					${ext.component}
 					<umb-block-overlay-expose-button .contentTypeName=${this._contentTypeName} @click=${this.#expose}>
 					</umb-block-overlay-expose-button>
 				</div>
-			`;
-		}
+			`,
+		)}`;
 	};
 
 	override render() {
@@ -476,7 +503,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						this._invalidLocation,
 						() => html`
 							<uui-tag id="invalidLocation" color="danger">
-								<umb-localize key="blockEditor_invalidDropPosition" .args=${[this._label]}></umb-localize>
+								<umb-localize
+									key="blockEditor_invalidDropPosition"
+									.args=${[
+										this._contentTypeName ?? this.localize.term('blockEditor_unsupportedBlockName'),
+									]}></umb-localize>
 							</uui-tag>
 						`,
 					)}
@@ -494,7 +525,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		);
 	}
 
-	#renderBuiltinBlockView = () => {
+	readonly #renderBuiltinBlockView = () => {
 		if (this._unsupported) {
 			return this.#renderUnsupportedBlock();
 		}
@@ -508,6 +539,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#renderUnsupportedBlock() {
 		return html`
+			${this.#renderHiddenUfm()}
 			<umb-block-grid-block-unsupported
 				class="umb-block-grid__block--view"
 				.config=${this._blockViewProps.config}
@@ -522,7 +554,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		return html`
 			<umb-block-grid-block-inline
 				class="umb-block-grid__block--view"
-				.label=${this._label}
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
@@ -530,6 +561,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
 				${umbDestroyOnDisconnect()}>
+				${this.#renderUfm()}
 			</umb-block-grid-block-inline>
 		`;
 	}
@@ -538,7 +570,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		return html`
 			<umb-block-grid-block
 				class="umb-block-grid__block--view ${this._isSortMode ? 'sortable' : ''}"
-				.label=${this._label}
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
@@ -546,6 +577,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
 				${umbDestroyOnDisconnect()}>
+				${this.#renderUfm()}
 			</umb-block-grid-block>
 		`;
 	}
@@ -583,7 +615,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_GRID}></umb-block-action-list>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UUIBlinkKeyframes,
 		css`
 			:host {
@@ -695,6 +727,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			uui-badge {
 				z-index: 2;
+			}
+
+			.umb-block-grid__block {
+				--umb-block-scale-handler-opacity: 0;
+
+				&:hover,
+				&:focus-within {
+					--umb-block-scale-handler-opacity: 1;
+				}
 			}
 		`,
 	];

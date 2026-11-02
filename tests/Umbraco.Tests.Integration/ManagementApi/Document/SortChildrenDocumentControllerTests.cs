@@ -23,7 +23,7 @@ public class SortChildrenDocumentControllerTests : ManagementApiUserGroupTestBas
     private Guid _parentKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);

@@ -1,6 +1,7 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
 import { Div } from './html-tag-div.tiptap-extension.js';
+import { DivContainer } from './html-tag-div-container.tiptap-extension.js';
 
 export default class UmbTiptapHtmlTagDivExtensionApi extends UmbTiptapExtensionApiBase {
-	getTiptapExtensions = () => [Div];
+	getTiptapExtensions = () => [Div, DivContainer];
 }

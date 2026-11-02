@@ -111,7 +111,12 @@ class UmbBubbleMenuPluginView implements PluginView {
 	}
 }
 
-/** @deprecated No longer used internally. This will be removed in Umbraco 19. [LK] */
+/**
+ * @param {Editor} editor - The Tiptap editor instance
+ * @param {UmbTiptapBubbleMenuPluginProps} props - The bubble menu plugin options
+ * @returns {Plugin} The ProseMirror plugin
+ * @deprecated No longer used internally. This will be removed in Umbraco 19. [LK]
+ */
 export const UmbBubbleMenuPlugin = (editor: Editor, props: UmbTiptapBubbleMenuPluginProps) => {
 	return new Plugin({
 		view(editorView) {

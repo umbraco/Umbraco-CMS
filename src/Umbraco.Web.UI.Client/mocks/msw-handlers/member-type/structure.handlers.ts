@@ -4,8 +4,12 @@ import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const structureHandlers = [
-	http.get(umbracoPath(`${UMB_SLUG}/allowed-at-root`), () => {
-		const response = umbMemberTypeMockDb.getAllowedAtRoot();
+	http.get(umbracoPath(`${UMB_SLUG}/allowed-at-root`), ({ request }) => {
+		const url = new URL(request.url);
+		const skip = Number(url.searchParams.get('skip')) || 0;
+		const take = Number(url.searchParams.get('take')) || 100;
+
+		const response = umbMemberTypeMockDb.getAllowedAtRoot(skip, take);
 		return HttpResponse.json(response);
 	}),
 ];
