@@ -12,6 +12,7 @@ const NAMESPACE = {
 	block: 9,
 	area: 10,
 	pickerItem: 11,
+	layout: 12,
 } as const;
 
 type UmbMbcsNamespace = keyof typeof NAMESPACE;

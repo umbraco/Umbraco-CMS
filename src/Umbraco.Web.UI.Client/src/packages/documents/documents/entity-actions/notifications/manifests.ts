@@ -10,8 +10,9 @@ const actionManifests: Array<ManifestEntityAction> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Document.Notifications',
+		separatorBefore: true,
 		name: 'Notifications',
-		weight: 100,
+		weight: 101,
 		api: () => import('./document-notifications.action.js'),
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
