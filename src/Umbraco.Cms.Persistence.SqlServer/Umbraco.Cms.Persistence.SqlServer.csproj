@@ -23,6 +23,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!--
+      Not referenced from code: Microsoft.Data.SqlClient discovers this assembly at runtime and registers the
+      Microsoft Entra ID authentication providers (e.g. "Active Directory Managed Identity") from it. Without it,
+      connection strings using those authentication modes fail. Guarded by EntraIdAuthenticationProviderTests.
+    -->
     <PackageReference Include="Microsoft.Data.SqlClient.Extensions.Azure" />
     <PackageReference Include="NPoco.SqlServer" />
   </ItemGroup>
