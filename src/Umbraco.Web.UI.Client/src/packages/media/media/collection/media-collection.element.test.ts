@@ -153,22 +153,43 @@ describe('UmbMediaCollectionElement', () => {
 		expect(context.statusCalls).to.deep.include({ unique: item.unique, status: UmbFileDropzoneItemStatus.ERROR });
 	});
 
-	// Inside a property the collection gets little height of its own, unlike in a workspace where it fills the view.
-	it('keeps the empty state below the toolbar and within the collection when given little height', async () => {
-		const host = element.parentElement!;
-		host.style.display = 'block';
-		host.style.height = '120px';
+	async function measure() {
 		await aTimeout(0);
-
 		const emptyState = element.shadowRoot!.querySelector<HTMLElement>('umb-empty-media-state')!;
 		const toolbar = element.shadowRoot!.querySelector<HTMLElement>('umb-collection-toolbar')!;
 		await (emptyState as HTMLElement & { updateComplete?: Promise<unknown> }).updateComplete;
+		return {
+			emptyState,
+			collectionRect: element.getBoundingClientRect(),
+			emptyStateRect: emptyState.getBoundingClientRect(),
+			toolbarRect: toolbar.getBoundingClientRect(),
+		};
+	}
 
-		const collectionRect = element.getBoundingClientRect();
-		const emptyStateRect = emptyState.getBoundingClientRect();
+	// Inside a property the collection has no height of its own, so it takes the height of its content.
+	it('grows to contain the empty state, below the toolbar, when its parent has no height', async () => {
+		const host = element.parentElement!;
+		host.style.display = 'block';
+		host.style.height = 'auto';
+
+		const { emptyState, collectionRect, emptyStateRect, toolbarRect } = await measure();
 
 		expect(emptyStateRect.height, 'empty state height').to.be.at.least(emptyState.scrollHeight);
-		expect(emptyStateRect.top, 'empty state top').to.be.at.least(toolbar.getBoundingClientRect().bottom);
+		expect(emptyStateRect.top, 'empty state top').to.be.at.least(toolbarRect.bottom);
 		expect(emptyStateRect.bottom, 'empty state bottom').to.be.at.most(collectionRect.bottom);
+	});
+
+	// In a workspace the collection fills the view, and the empty state fills the collection.
+	it('fills the available height with the empty state, below the toolbar, when its parent has a height', async () => {
+		const host = element.parentElement!;
+		host.style.display = 'block';
+		host.style.height = '800px';
+
+		const { collectionRect, emptyStateRect, toolbarRect } = await measure();
+
+		expect(collectionRect.height, 'collection height').to.be.at.least(800);
+		expect(emptyStateRect.top, 'empty state top').to.be.at.least(toolbarRect.bottom);
+		expect(emptyStateRect.bottom, 'empty state bottom').to.be.at.most(collectionRect.bottom);
+		expect(emptyStateRect.height, 'empty state height').to.be.greaterThan(600);
 	});
 });
