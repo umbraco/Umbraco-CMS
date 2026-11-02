@@ -17,6 +17,8 @@ test('blocks every change to a member group in the backoffice', async ({umbracoU
   });
 
   await test.step('Root', async () => {
+    // The root has no actions left to check first, so a sibling's action shows the sidebar's actions have rendered.
+    await umbracoUi.memberGroup.isInlineEntityActionVisibleForName('Members', 'Create');
     await umbracoUi.memberGroup.isInlineEntityActionVisibleForName('Member Groups', 'Create', false);
   });
 

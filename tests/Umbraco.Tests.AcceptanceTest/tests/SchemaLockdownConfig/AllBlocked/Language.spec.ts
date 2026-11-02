@@ -18,6 +18,8 @@ test('blocks every change to a language in the backoffice', async ({umbracoUi}) 
   });
 
   await test.step('Root', async () => {
+    // The root has no actions left to check first, so a sibling's action shows the sidebar's actions have rendered.
+    await umbracoUi.language.isInlineEntityActionVisibleForName('Document Types', 'ReloadChildrenOf');
     await umbracoUi.language.isInlineEntityActionVisibleForName('Languages', 'Create', false);
   });
 
