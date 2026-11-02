@@ -24,7 +24,7 @@ new UmbContextToken<BaseType, ResultType>(contextAlias, apiAlias?, discriminator
 
 ## One Instance, Many Tokens
 
-Tokens sharing a `contextAlias` resolve to the **same instance**, differing only in how specific a view they take. About 50 tokens share `'UmbWorkspaceContext'`:
+Tokens sharing `contextAlias` and `apiAlias` resolve to the **same instance**, differing only in how specific a view they take. About 50 tokens share `'UmbWorkspaceContext'`:
 
 ```typescript
 UMB_WORKSPACE_CONTEXT                // any workspace
