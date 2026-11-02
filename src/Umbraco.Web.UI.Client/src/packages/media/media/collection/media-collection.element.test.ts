@@ -153,11 +153,10 @@ describe('UmbMediaCollectionElement', () => {
 		expect(context.statusCalls).to.deep.include({ unique: item.unique, status: UmbFileDropzoneItemStatus.ERROR });
 	});
 
-	// Inside a property the collection gets little height of its own, unlike in a workspace where it fills the view.
-	it('keeps the empty state below the toolbar and within the collection when given little height', async () => {
-		const host = element.parentElement!;
-		host.style.display = 'block';
-		host.style.height = '120px';
+	// Inside a property the collection has no height of its own, unlike in a workspace where it fills the view.
+	it('keeps the empty state below the toolbar and within the collection when it has no height of its own', async () => {
+		// A flex container sizes the collection to its content, as the property layout does.
+		element.parentElement!.style.display = 'flex';
 		await aTimeout(0);
 
 		const emptyState = element.shadowRoot!.querySelector<HTMLElement>('umb-empty-media-state')!;
