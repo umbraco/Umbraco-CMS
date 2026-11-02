@@ -2,7 +2,10 @@ import { useMockHandlers, resetMockHandlers } from '../../../../mocks/index.js';
 import { UmbSchemaLockdownContext } from './schema-lockdown.context.js';
 import { aTimeout, expect, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type { ServerSchemaLockdownResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
@@ -98,6 +101,22 @@ describe('UmbSchemaLockdownContext', () => {
 		const context = await createLoadedContext();
 
 		expect(context.isAllowed('document-type', 'update')).to.be.true;
+	});
+
+	it('requests the restrictions once the user is authorized', async () => {
+		respondWith({ restrictedEntityTypes: [] });
+		const isAuthorized = new UmbBooleanState<boolean>(false);
+		new UmbContextProviderController(host, UMB_AUTH_CONTEXT, {
+			isAuthorized: isAuthorized.asObservable(),
+			getHostElement: () => host,
+		} as never);
+		new UmbSchemaLockdownContext(host);
+		await aTimeout(50);
+		expect(requested, 'the restrictions were requested before the user was authorized').to.be.false;
+
+		isAuthorized.setValue(true);
+
+		await waitUntil(() => requested, 'the restrictions were not requested');
 	});
 
 	it('requests the restrictions again for the next observer after a failed request', async () => {

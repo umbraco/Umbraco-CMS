@@ -3,6 +3,7 @@ import { toSchemaEntityType } from './entity-type-map.js';
 import type { UmbSchemaOperation } from './types.js';
 import { ServerService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { ServerSchemaLockdownResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -19,7 +20,8 @@ export class UmbSchemaLockdownContext extends UmbContextBase {
 	#requested = false;
 
 	/**
-	 * The schema lockdown restrictions. They're requested from the server once, when this is first observed.
+	 * The schema lockdown restrictions. They're requested from the server once the user is authorized, and again by the
+	 * next observer if that request failed.
 	 */
 	public readonly state = defer(() => {
 		this.#request();
@@ -28,6 +30,13 @@ export class UmbSchemaLockdownContext extends UmbContextBase {
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_SCHEMA_LOCKDOWN_CONTEXT);
+
+		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+			this.observe(authContext?.isAuthorized, (isAuthorized) => {
+				if (!isAuthorized) return;
+				this.#request();
+			});
+		});
 	}
 
 	#request() {
