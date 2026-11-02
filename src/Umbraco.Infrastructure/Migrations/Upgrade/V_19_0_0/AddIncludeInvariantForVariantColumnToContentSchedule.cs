@@ -1,5 +1,8 @@
+using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 
@@ -32,9 +35,7 @@ public class AddIncludeInvariantForVariantColumnToContentSchedule : AsyncMigrati
 
         AddColumn<ContentScheduleDto>(Constants.DatabaseSchema.Tables.ContentSchedule, ColumnName);
 
-        var table = SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentSchedule);
-        var column = SqlSyntax.GetQuotedColumnName(ColumnName);
-        Database.Execute($"UPDATE {table} SET {column} = 1");
+        Database.Execute(Sql().Update<ContentScheduleDto>(x => x.Set(c => c.IncludeInvariantForVariant, true)));
 
         return Task.CompletedTask;
     }

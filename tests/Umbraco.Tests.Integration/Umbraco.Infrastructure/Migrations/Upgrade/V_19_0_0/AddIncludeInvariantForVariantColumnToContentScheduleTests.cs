@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -15,6 +16,7 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -41,9 +43,9 @@ internal sealed class AddIncludeInvariantForVariantColumnToContentScheduleTests 
         await ExecutePlanAsync(new UmbracoPremigrationPlan(), PremigrationStateBeforeColumn);
 
         using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
-        var table = scope.SqlContext.SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentSchedule);
-        var column = scope.SqlContext.SqlSyntax.GetQuotedColumnName(ColumnName);
-        Assert.DoesNotThrow(() => scope.Database.ExecuteScalar<int>($"SELECT COUNT({column}) FROM {table}"));
+        Assert.DoesNotThrow(() => scope.Database.ExecuteScalar<int>(scope.Database.SqlContext.Sql()
+            .SelectCount<ContentScheduleDto>(c => c.IncludeInvariantForVariant)
+            .From<ContentScheduleDto>()));
     }
 
     [Test]
