@@ -73,8 +73,23 @@ public interface IUserStartNodeTreeFilterService
     /// The entities at or below a user start node, which the user has access to, and those above one, which the user
     /// can only navigate through. Entities in neither position are omitted.
     /// </returns>
+    /// <remarks>
+    /// The default implementation resolves each entity on its own through
+    /// <see cref="GetFilteredSiblingEntities"/>, so an implementation that does not override this method applies its
+    /// existing access decisions, at the cost of a lookup per entity.
+    /// </remarks>
     // TODO (V20): Remove the default implementation.
-    UserAccessEntity[] GetFilteredEntities(IEnumerable<IEntitySlim> entities) => [];
+    UserAccessEntity[] GetFilteredEntities(IEnumerable<IEntitySlim> entities)
+        => entities
+            .SelectMany(entity => GetFilteredSiblingEntities(
+                    entity.Key,
+                    0,
+                    0,
+                    Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.SortOrderColumnName),
+                    out _,
+                    out _)
+                .Where(userAccessEntity => userAccessEntity.Entity.Key == entity.Key))
+            .ToArray();
 
     /// <summary>
     /// Maps entities to tree item view models, applying access filtering using the provided access map.
