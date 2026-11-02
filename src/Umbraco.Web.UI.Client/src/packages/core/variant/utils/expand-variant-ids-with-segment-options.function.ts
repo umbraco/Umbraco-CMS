@@ -1,5 +1,5 @@
-import { UmbVariantId } from './variant-id.class.js';
-import type { UmbEntityVariantOptionModel } from './types.js';
+import { UmbVariantId } from '../variant-id.class.js';
+import type { UmbEntityVariantOptionModel } from '../types.js';
 
 /**
  * Expands a variant id selection so that every selected culture (including the invariant

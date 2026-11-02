@@ -1,4 +1,5 @@
 import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../../types.js';
+import type { UmbAncestorForCoverage } from '../utils.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import {
 	umbMapDocumentCreateRequestBody,
@@ -15,7 +16,7 @@ import type {
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { umbVariantIdsToCultures, type UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
@@ -96,7 +97,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * @returns {Array<string>} The distinct culture codes to publish
 	 */
 	#mapCulturesToPublish(variantIds: Array<UmbVariantId>): Array<string> {
-		return [...new Set(variantIds.filter((x) => !x.isCultureInvariant()).map((x) => x.toCultureString()))];
+		return umbVariantIdsToCultures(variantIds).filter((x): x is string => x !== null);
 	}
 
 	/**
@@ -261,5 +262,35 @@ export class UmbDocumentPublishingServerDataSource {
 		};
 
 		return { data: document };
+	}
+
+	/**
+	 * Get the variant states of each ancestor of a Document
+	 * @param {string} unique - Document unique
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbAncestorForCoverage>>>} The ancestors, with the culture and state of each of their variants
+	 * @memberof UmbDocumentPublishingServerDataSource
+	 */
+	async ancestorVariantStates(unique: string): Promise<UmbDataSourceResponse<Array<UmbAncestorForCoverage>>> {
+		if (!unique) throw new Error('Unique is missing');
+
+		const { data, error } = await tryExecute(
+			this.#host,
+			DocumentService.getItemDocumentAncestors({ query: { id: [unique] } }),
+			{ disableNotifications: true },
+		);
+
+		if (error || !data) {
+			return { error };
+		}
+
+		const ancestors = data.find((entry) => entry.id === unique)?.ancestors ?? [];
+		return {
+			data: ancestors.map((ancestor) => ({
+				variants: ancestor.variants.map((variant) => ({
+					culture: variant.culture || null,
+					state: variant.state,
+				})),
+			})),
+		};
 	}
 }

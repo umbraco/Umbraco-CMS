@@ -2682,10 +2682,6 @@ export type SecurityConfigurationResponseModel = {
 export type SegmentResponseModel = {
     name: string;
     alias: string;
-    /**
-     * @deprecated
-     */
-    cultures?: null | Array<string>;
 };
 
 export type ServerConfigurationItemResponseModel = {
@@ -5117,44 +5113,6 @@ export type GetDocumentByIdAuditLogResponses = {
 };
 
 export type GetDocumentByIdAuditLogResponse = GetDocumentByIdAuditLogResponses[keyof GetDocumentByIdAuditLogResponses];
-
-export type GetDocumentByIdAvailableSegmentOptionsData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: {
-        skip?: number;
-        take?: number;
-    };
-    url: '/umbraco/management/api/v1/document/{id}/available-segment-options';
-};
-
-export type GetDocumentByIdAvailableSegmentOptionsErrors = {
-    /**
-     * Bad Request
-     */
-    400: ProblemDetails;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-};
-
-export type GetDocumentByIdAvailableSegmentOptionsError = GetDocumentByIdAvailableSegmentOptionsErrors[keyof GetDocumentByIdAvailableSegmentOptionsErrors];
-
-export type GetDocumentByIdAvailableSegmentOptionsResponses = {
-    /**
-     * OK
-     */
-    200: PagedSegmentResponseModel;
-};
-
-export type GetDocumentByIdAvailableSegmentOptionsResponse = GetDocumentByIdAvailableSegmentOptionsResponses[keyof GetDocumentByIdAvailableSegmentOptionsResponses];
 
 export type PostDocumentByIdCopyData = {
     body: CopyDocumentRequestModel;
@@ -10466,6 +10424,7 @@ export type GetImagingResizeUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
         height?: number;
         width?: number;
         mode?: ImageCropModeModel;
@@ -11840,6 +11799,7 @@ export type GetMediaUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/media/urls';
 };

@@ -615,6 +615,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			.umb-block-list__block {
 				--umb-entity-frame-opacity: 0;
 				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+				--umb-entity-frame-contrast-color: var(--uui-color-interactive-contrast);
 
 				&:hover,
 				&:focus-within {

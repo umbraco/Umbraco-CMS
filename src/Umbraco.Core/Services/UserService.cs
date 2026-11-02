@@ -580,6 +580,7 @@ internal partial class UserService : RepositoryService, IUserService
             null,
             null,
             null,
+            null,
             userGroups.Select(x => x.Alias));
 
         if (authorizationAttempt.Success is false)
@@ -737,6 +738,7 @@ internal partial class UserService : RepositoryService, IUserService
 
         Attempt<string?> authorizationAttempt = _userEditorAuthorizationHelper.IsAuthorized(
             performingUser,
+            null,
             null,
             null,
             null,
@@ -1009,6 +1011,7 @@ internal partial class UserService : RepositoryService, IUserService
             existingUser,
             startContentIds,
             startMediaIds,
+            startElementIds,
             startDocumentBlueprintIds,
             userGroups.Select(x => x.Alias));
 

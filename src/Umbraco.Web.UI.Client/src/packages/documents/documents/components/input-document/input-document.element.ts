@@ -95,6 +95,12 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
+	/**
+	 * Multiple nodes to start the picker tree from. Takes precedence over `startNode`.
+	 */
+	@property({ type: Array, attribute: false })
+	startNodes?: Array<UmbTreeStartNode>;
+
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
@@ -192,6 +198,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 			{
 				hideTreeRoot: true,
 				startNode: this.startNode,
+				startNodes: this.startNodes,
 			},
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({

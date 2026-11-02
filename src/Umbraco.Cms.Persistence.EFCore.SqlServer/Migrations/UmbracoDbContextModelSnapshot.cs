@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "11.0.0-rc.2.26504.105")
+                .HasAnnotation("ProductVersion", "11.0.0-rc.3.26522.148")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);

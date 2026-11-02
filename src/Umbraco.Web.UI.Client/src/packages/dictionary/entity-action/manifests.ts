@@ -21,6 +21,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Dictionary.Export',
+		separatorBefore: true,
 		name: 'Export Dictionary Entity Action',
 		weight: 400,
 		api: () => import('./export/export.action.js'),

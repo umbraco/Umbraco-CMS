@@ -821,6 +821,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				--umb-block-scale-handler-opacity: 0;
 				--umb-entity-frame-opacity: 0;
 				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+				--umb-entity-frame-contrast-color: var(--uui-color-interactive-contrast);
 
 				height: 100%;
 

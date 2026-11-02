@@ -12,7 +12,8 @@ export const manifest: UmbExtensionManifestKind = {
 		type: 'entityAction',
 		kind: 'folderDelete',
 		api: UmbDeleteFolderEntityAction,
-		weight: 700,
+		weight: 799,
+		separatorBefore: true,
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-trash',

@@ -78,23 +78,12 @@ export class UmbDocumentSegmentProvider extends UmbControllerBase {
 		});
 	}
 
-	// TODO (V20): Remove the filtering by cultures together with the deprecated `cultures` property.
 	#getVaryByCultureSegmentOptions(segments: UmbSegmentModel[], languages: UmbLanguageDetailModel[]) {
-		return languages.flatMap((language) =>
-			this.#createOptions(
-				// eslint-disable-next-line @typescript-eslint/no-deprecated
-				segments.filter((s) => !s.cultures || s.cultures.includes(language.unique)),
-				language.unique,
-			),
-		);
+		return languages.flatMap((language) => this.#createOptions(segments, language.unique));
 	}
 
 	#getNotCultureSegmentOptions(segments: UmbSegmentModel[]) {
-		return this.#createOptions(
-			// eslint-disable-next-line @typescript-eslint/no-deprecated
-			segments.filter((s) => !s.cultures),
-			null,
-		);
+		return this.#createOptions(segments, null);
 	}
 
 	#onIncomingData: UmbParallelHookMethod<UmbEntityDetailIncomingDataHookMeta> = async () => {

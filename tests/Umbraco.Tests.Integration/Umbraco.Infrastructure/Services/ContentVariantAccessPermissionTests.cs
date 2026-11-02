@@ -329,6 +329,119 @@ public class ContentVariantAccessPermissionTests : UmbracoIntegrationTest
 
     private static string InitialValueFor(string culture) => culture == EnglishCulture ? "Initial EN value" : "Initial DA value";
 
+    [Test]
+    public async Task Scheduled_Publish_Excludes_Pending_Invariant_Change_When_Scheduled_Without_Invariant_Access()
+    {
+        var contentKey = await SetupBaselineContentAsync();
+        await MakePendingInvariantEditAsync(contentKey);
+        var restrictedUser = await CreateRestrictedUserAsync(
+            hasAccessToAllLanguages: true,
+            allowedCultures: [],
+            hasAccessToInvariantForVariant: false,
+            suffix: "NoInvariantSchedule");
+
+        await SchedulePublishAsync(contentKey, restrictedUser.Key, EnglishCulture);
+        ReleaseScheduledContent();
+
+        var content = ContentService.GetById(contentKey)!;
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Initial invariant value", content.GetValue<string>("invariantValue", published: true));
+            Assert.AreEqual("Pending invariant value", content.GetValue<string>("invariantValue", published: false));
+        });
+    }
+
+    [Test]
+    public async Task Scheduled_Publish_Includes_Pending_Invariant_Change_When_Scheduled_With_Invariant_Access()
+    {
+        var contentKey = await SetupBaselineContentAsync();
+        await MakePendingInvariantEditAsync(contentKey);
+        var user = await CreateRestrictedUserAsync(
+            hasAccessToAllLanguages: true,
+            allowedCultures: [],
+            hasAccessToInvariantForVariant: true,
+            suffix: "InvariantSchedule");
+
+        await SchedulePublishAsync(contentKey, user.Key, EnglishCulture);
+        ReleaseScheduledContent();
+
+        var content = ContentService.GetById(contentKey)!;
+        Assert.AreEqual("Pending invariant value", content.GetValue<string>("invariantValue", published: true));
+    }
+
+    [Test]
+    public async Task Scheduled_Publish_Includes_Pending_Invariant_Change_When_Any_Released_Culture_Was_Scheduled_With_Invariant_Access()
+    {
+        var contentKey = await SetupBaselineContentAsync();
+        await MakePendingInvariantEditAsync(contentKey);
+        var restrictedUser = await CreateRestrictedUserAsync(
+            hasAccessToAllLanguages: true,
+            allowedCultures: [],
+            hasAccessToInvariantForVariant: false,
+            suffix: "NoInvariantScheduleMixed");
+        var user = await CreateRestrictedUserAsync(
+            hasAccessToAllLanguages: true,
+            allowedCultures: [],
+            hasAccessToInvariantForVariant: true,
+            suffix: "InvariantScheduleMixed");
+
+        await SchedulePublishAsync(contentKey, restrictedUser.Key, DanishCulture);
+        await SchedulePublishAsync(contentKey, user.Key, EnglishCulture);
+        ReleaseScheduledContent();
+
+        var content = ContentService.GetById(contentKey)!;
+        Assert.AreEqual("Pending invariant value", content.GetValue<string>("invariantValue", published: true));
+    }
+
+    [Test]
+    public async Task Scheduled_Publish_Includes_Pending_Invariant_Change_When_Scheduled_Without_A_User()
+    {
+        var contentKey = await SetupBaselineContentAsync();
+        await MakePendingInvariantEditAsync(contentKey);
+
+        var content = ContentService.GetById(contentKey)!;
+        ContentService.PersistContentSchedule(
+            content,
+            ContentScheduleCollection.CreateWithEntry(EnglishCulture, DateTime.UtcNow.AddDays(1), null));
+        ReleaseScheduledContent();
+
+        content = ContentService.GetById(contentKey)!;
+        Assert.AreEqual("Pending invariant value", content.GetValue<string>("invariantValue", published: true));
+    }
+
+    private async Task MakePendingInvariantEditAsync(Guid contentKey)
+    {
+        var updateResult = await ContentEditingService.UpdateAsync(
+            contentKey,
+            new ContentUpdateModel
+            {
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "variantValue", Value = "Initial EN value", Culture = EnglishCulture },
+                    new PropertyValueModel { Alias = "variantValue", Value = "Initial DA value", Culture = DanishCulture },
+                    new PropertyValueModel { Alias = "invariantValue", Value = "Pending invariant value" },
+                ],
+            },
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateResult.Success);
+    }
+
+    private async Task SchedulePublishAsync(Guid contentKey, Guid userKey, string culture)
+    {
+        var scheduleResult = await ContentPublishingService.PublishAsync(
+            contentKey,
+            [new CulturePublishScheduleModel { Culture = culture, Schedule = new ContentScheduleModel { PublishDate = DateTimeOffset.UtcNow.AddDays(1) } }],
+            userKey);
+        Assert.IsTrue(scheduleResult.Success, $"Could not schedule publishing: {scheduleResult.Status}");
+    }
+
+    private void ReleaseScheduledContent()
+    {
+        var results = ContentService.PerformScheduledPublish(DateTime.UtcNow.AddDays(2)).ToArray();
+        Assert.IsNotEmpty(results);
+        Assert.IsTrue(results.All(result => result.Success), string.Join(", ", results.Select(result => result.Result)));
+    }
+
     private async Task EditBothCulturesAndInvariantAsync(Guid contentKey, Guid userKey, string englishValue, string danishValue, string invariantValue)
     {
         var updateResult = await ContentEditingService.UpdateAsync(

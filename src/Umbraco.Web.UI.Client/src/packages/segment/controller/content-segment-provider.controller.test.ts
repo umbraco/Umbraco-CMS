@@ -11,11 +11,6 @@ import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbrac
 import { UmbWorkspaceVariantOptionsController } from '@umbraco-cms/backoffice/workspace';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 
-// The segments of the "documents" mock set:
-// - s1 is not limited to any culture (cultures: null)
-// - s2 is not limited to any culture (no cultures)
-// - s-da is limited to the "da" culture
-
 const createLanguage = (unique: string, isDefault = false): UmbLanguageDetailModel => ({
 	entityType: 'language',
 	unique,
@@ -99,19 +94,13 @@ describe('UmbDocumentSegmentProvider', () => {
 			await loadWith(true, true);
 		});
 
-		it('adds a segment that is not limited to any culture to every culture', () => {
-			expect(segmentOptionUniques()).to.include.members(['en-US_s1', 'da_s1', 'en-US_s2', 'da_s2']);
-		});
-
-		it('adds a segment that is limited to cultures only to those cultures', () => {
-			const uniques = segmentOptionUniques();
-			expect(uniques).to.include('da_s-da');
-			expect(uniques).to.not.include('en-US_s-da');
+		it('adds every segment to every culture', () => {
+			expect(segmentOptionUniques()).to.have.members(['en-US_s1', 'da_s1', 'en-US_s2', 'da_s2']);
 		});
 	});
 
 	describe('when the content varies by segment only', () => {
-		it('adds only the segments that are not limited to any culture, without a culture', async () => {
+		it('adds every segment without a culture', async () => {
 			await loadWith(false, true);
 			expect(segmentOptionUniques()).to.have.members(['invariant_s1', 'invariant_s2']);
 		});

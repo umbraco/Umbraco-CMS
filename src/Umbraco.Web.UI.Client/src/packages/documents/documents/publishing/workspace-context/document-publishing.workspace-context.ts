@@ -6,9 +6,11 @@ import type {
 } from '../../types.js';
 import { UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
+import { computeAncestorPublishCoverage } from '../utils.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/repository/constants.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/repository/constants.js';
+import type { UmbDocumentAncestorPublishCoverageModel } from '../schedule-publish/types.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
 import { UmbDocumentUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../constants.js';
@@ -164,8 +166,11 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const unique = this.#documentWorkspaceContext.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
-		const { options, selected } = await this.#determineVariantOptions();
-		const entitiesNeedingAttention = await this.#resolveEntitiesNeedingAttention();
+		const [{ options, selected }, entitiesNeedingAttention, ancestorPublishCoverage] = await Promise.all([
+			this.#determineVariantOptions(),
+			this.#resolveEntitiesNeedingAttention(),
+			this.#getAncestorPublishCoverage(unique),
+		]);
 
 		const result = await umbOpenModal(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
 			data: {
@@ -184,6 +189,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 				referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
 				entitiesNeedingAttention,
+				ancestorPublishCoverage,
 			},
 		}).catch(() => undefined);
 
@@ -692,6 +698,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const persistedUnique = this.#documentWorkspaceContext.getUnique() ?? unique;
 		const event = new UmbRequestReloadStructureForEntityEvent({ unique: persistedUnique, entityType });
 		this.#eventContext?.dispatchEvent(event);
+	}
+
+	async #getAncestorPublishCoverage(unique: string): Promise<UmbDocumentAncestorPublishCoverageModel | undefined> {
+		const { data, error } = await this.#publishingRepository.ancestorVariantStates(unique);
+		if (error || !data) return undefined;
+		return computeAncestorPublishCoverage(data);
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {

@@ -371,6 +371,7 @@ export class UmbBlockGridEntryContext
 
 		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
+			thumbnail: this.getThumbnailUrl(),
 			name: entryName,
 			propertyValue,
 			propertyEditorUiAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,

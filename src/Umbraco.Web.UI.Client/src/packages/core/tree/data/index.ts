@@ -10,4 +10,7 @@ export type {
 	UmbTreeRootItemsRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeItemsRequestArgs,
 } from './types.js';
+
+export { UmbTreeItemsNotSupportedError } from './tree-items-not-supported.error.js';

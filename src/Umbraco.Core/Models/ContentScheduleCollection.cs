@@ -151,14 +151,14 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         // but the bool won't indicate which date was in error, maybe have 2 diff methods to schedule start/end?
         if (releaseDate.HasValue)
         {
-            var entry = new ContentSchedule(culture, releaseDate.Value, ContentScheduleAction.Release);
+            var entry = new ContentSchedule(culture, releaseDate.Value, ContentScheduleAction.Release, includeInvariantForVariant: true);
             changes.Add(releaseDate.Value, entry);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
         }
 
         if (expireDate.HasValue)
         {
-            var entry = new ContentSchedule(culture, expireDate.Value, ContentScheduleAction.Expire);
+            var entry = new ContentSchedule(culture, expireDate.Value, ContentScheduleAction.Expire, includeInvariantForVariant: true);
             changes.Add(expireDate.Value, entry);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
         }
@@ -208,7 +208,10 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// <param name="culture">The culture for the schedule.</param>
     /// <param name="dateTime">The date and time for the scheduled action.</param>
     /// <param name="action">The action type (release or expire).</param>
-    public void AddOrUpdate(string culture, DateTime dateTime, ContentScheduleAction action)
+    /// <param name="includeInvariantForVariant">
+    ///     Whether a scheduled release of variant content includes its invariant properties.
+    /// </param>
+    public void AddOrUpdate(string culture, DateTime dateTime, ContentScheduleAction action, bool includeInvariantForVariant)
     {
         // we need to remove the old one as ContentSchedule.Date is immutable
         ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(change =>
@@ -220,7 +223,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
             Remove(changeToRemove);
         }
 
-        Add(new ContentSchedule(culture, dateTime, action));
+        Add(new ContentSchedule(culture, dateTime, action, includeInvariantForVariant));
     }
 
     /// <summary>

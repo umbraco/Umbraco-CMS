@@ -138,6 +138,8 @@ test('can find a media type in a sibling nested folder', async ({umbracoApi}) =>
   // Assert
   expect(mediaTypeData).toBeTruthy();
   expect(mediaTypeData.id).toBe(targetMediaTypeId);
+  const secondChildFolderChildren = await umbracoApi.mediaType.getChildren(secondChildFolderId);
+  expect(secondChildFolderChildren.map(child => child.id)).toContain(targetMediaTypeId);
 });
 
 test('can move a media type folder to another media type folder', async ({umbracoApi, umbracoUi}) => {

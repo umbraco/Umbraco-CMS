@@ -10,6 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceActionMenuItem',
 		kind: 'default',
 		alias: 'Umb.Document.WorkspaceActionMenuItem.Unpublish',
+		separatorBefore: true,
 		name: 'Unpublish',
 		weight: 0,
 		api: () => import('./unpublish.action.js'),

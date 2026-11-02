@@ -32,6 +32,21 @@ public class RichTextParsingRegexesTests
         Assert.IsFalse(match.Success);
     }
 
+    [TestCase("umb-rte-block", "")]
+    [TestCase("umb-rte-block", $" data-key=\"{LayoutKey}\"")]
+    [TestCase("umb-rte-block-inline", $" data-key=\"{LayoutKey}\"")]
+    public void Matches_Each_Block_Separately(string tagName, string extraAttributes)
+    {
+        const string secondContentKey = "6a0a8a2e-6a3b-4d6b-9a3f-2f7f2b5c1d4e";
+        var markup =
+            $"<p>First</p><{tagName}{extraAttributes} data-content-key=\"{ContentKey}\"><!--Umbraco-Block--></{tagName}>" +
+            $"<p>Second</p><{tagName} data-content-key=\"{secondContentKey}\"{extraAttributes}></{tagName}><p>Third</p>";
+
+        var result = RichTextParsingRegexes.BlockRegex().Replace(markup, match => $"[{match.Groups["key"].Value}]");
+
+        Assert.AreEqual($"<p>First</p>[{ContentKey}]<p>Second</p>[{secondContentKey}]<p>Third</p>", result);
+    }
+
     [TestCase($"<umb-rte-block data-content-key=\"{ContentKey}\">some text</umb-rte-block>")]
     [TestCase($"<umb-rte-block data-content-key=\"{ContentKey}\"><p>nested</p></umb-rte-block>")]
     public void Cannot_Match_Block_With_Inner_Content(string markup)

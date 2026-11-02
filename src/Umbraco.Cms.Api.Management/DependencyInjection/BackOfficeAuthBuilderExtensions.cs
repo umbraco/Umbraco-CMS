@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using OpenIddict.Server;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
 using Umbraco.Cms.Api.Management.Handlers;
@@ -30,6 +31,7 @@ public static class BackOfficeAuthBuilderExtensions
         builder.AddNotificationAsyncHandler<UserSavedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserDeletedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserLoginSuccessNotification, RevokeUserAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UserLogoutSuccessNotification, RevokeUserAuthenticationTokensNotificationHandler>();
 
         return builder;
     }
@@ -84,6 +86,23 @@ public static class BackOfficeAuthBuilderExtensions
         builder.Services.AddScoped<IBackOfficeUserClientCredentialsManager, BackOfficeUserClientCredentialsManager>();
         builder.Services.AddSingleton<BackOfficeAuthorizationInitializationMiddleware>();
         builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new BackofficePipelineFilter("Backoffice")));
+
+        builder.Services.AddSingleton<BackOfficeRedirectUriValidationHandler>();
+        builder.Services.Configure<OpenIddictServerOptions>(options =>
+        {
+            options.Handlers.Add(
+                OpenIddictServerHandlerDescriptor
+                    .CreateBuilder<OpenIddictServerEvents.ValidateAuthorizationRequestContext>()
+                    .UseSingletonHandler<BackOfficeRedirectUriValidationHandler>()
+                    .SetOrder(OpenIddictServerHandlers.Authentication.ValidateRedirectUriParameter.Descriptor.Order + 1)
+                    .Build());
+            options.Handlers.Add(
+                OpenIddictServerHandlerDescriptor
+                    .CreateBuilder<OpenIddictServerEvents.ValidateEndSessionRequestContext>()
+                    .UseSingletonHandler<BackOfficeRedirectUriValidationHandler>()
+                    .SetOrder(OpenIddictServerHandlers.Session.ValidatePostLogoutRedirectUriParameter.Descriptor.Order + 1)
+                    .Build());
+        });
 
         return builder;
     }
