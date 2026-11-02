@@ -16,7 +16,6 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
-	UmbTreeItemsRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 
@@ -279,10 +278,10 @@ export class UmbManagementApiTreeDataRequestManager<
 	/**
 	 * Gets the tree items with the given uniques, in the requested order. Large requests are split into several
 	 * smaller ones, so that no single request URL becomes too long.
-	 * @param {UmbTreeItemsRequestArgs} args - The uniques to request, along with any additional request arguments
+	 * @param {BatchRequestArgsType} args - The uniques to request, along with any additional request arguments
 	 * @returns {Promise<UmbApiResponse<{ data?: Array<TreeItemType> }>>} The tree items that could be found
 	 */
-	async getBatch(args: UmbTreeItemsRequestArgs): Promise<UmbApiResponse<{ data?: Array<TreeItemType> }>> {
+	async getBatch(args: BatchRequestArgsType): Promise<UmbApiResponse<{ data?: Array<TreeItemType> }>> {
 		const getBatch = this.#getBatch;
 		if (!getBatch) {
 			return { data: undefined, error: new UmbError('Requesting tree items by unique is not supported.') };
@@ -290,7 +289,7 @@ export class UmbManagementApiTreeDataRequestManager<
 
 		const controller = new UmbItemDataApiGetRequestController(this, {
 			api: async ({ uniques }) => {
-				const response = await getBatch({ ...args, uniques } as BatchRequestArgsType);
+				const response = await getBatch({ ...args, uniques });
 				return { data: response.data?.items ?? [] };
 			},
 			uniques: args.uniques,

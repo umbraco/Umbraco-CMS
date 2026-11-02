@@ -123,16 +123,23 @@ describe('UmbManagementApiTreeDataRequestManager', () => {
 				getBatch,
 			});
 
+		let batchManager: ReturnType<typeof createBatchManager> | undefined;
+
+		afterEach(() => {
+			batchManager?.destroy();
+			batchManager = undefined;
+		});
+
 		it('requests at most 40 uniques at a time and returns the items in the requested order', async () => {
 			const requestedChunks: Array<Array<string>> = [];
 			const uniques = Array.from({ length: 85 }, (_, index) => `item-${index}`);
-			manager = createBatchManager(async (args) => {
+			batchManager = createBatchManager(async (args) => {
 				requestedChunks.push(args.uniques);
 				const items = args.uniques.map((unique) => ({ id: unique, parent: null }));
 				return { data: { items, total: items.length } };
 			});
 
-			const { data, error } = await manager.getBatch({ uniques });
+			const { data, error } = await batchManager.getBatch({ uniques });
 
 			expect(error).to.be.undefined;
 			expect(requestedChunks.map((chunk) => chunk.length)).to.deep.equal([40, 40, 5]);
@@ -141,24 +148,24 @@ describe('UmbManagementApiTreeDataRequestManager', () => {
 
 		it('passes additional request arguments through to every request', async () => {
 			const requests: Array<TestBatchRequestArgs> = [];
-			manager = createBatchManager(async (args) => {
+			batchManager = createBatchManager(async (args) => {
 				requests.push(args);
 				return { data: { items: [], total: 0 } };
 			});
 
-			await manager.getBatch({
+			await batchManager.getBatch({
 				uniques: Array.from({ length: 41 }, (_, index) => `item-${index}`),
 				dataType: { unique: 'data-type' },
-			} as TestBatchRequestArgs);
+			});
 
 			expect(requests).to.have.length(2);
 			expect(requests.every((request) => request.dataType?.unique === 'data-type')).to.be.true;
 		});
 
 		it('returns an error when no batch request is configured', async () => {
-			manager = createBatchManager();
+			batchManager = createBatchManager();
 
-			const { data, error } = await manager.getBatch({ uniques: ['item-0'] });
+			const { data, error } = await batchManager.getBatch({ uniques: ['item-0'] });
 
 			expect(data).to.be.undefined;
 			expect(error).to.not.be.undefined;
