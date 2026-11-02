@@ -10,25 +10,24 @@ namespace Umbraco.Cms.Api.Management.OpenApi;
 /// </summary>
 public class RequireNonNullablePropertiesSchemaFilter : ISchemaFilter
 {
-    // Resolved on first use, as the resolver depends on the schema generator options, which construct this filter.
-    private readonly Lazy<ISerializerDataContractResolver> _dataContractResolver;
+    private readonly ISerializerDataContractResolver _dataContractResolver;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RequireNonNullablePropertiesSchemaFilter"/> class.
     /// </summary>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public RequireNonNullablePropertiesSchemaFilter()
-        : this(StaticServiceProvider.Instance)
+        : this(StaticServiceProvider.Instance.GetRequiredService<ISerializerDataContractResolver>())
     {
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RequireNonNullablePropertiesSchemaFilter"/> class.
     /// </summary>
-    /// <param name="serviceProvider">The service provider used to resolve the <see cref="ISerializerDataContractResolver"/>.</param>
+    /// <param name="dataContractResolver">The resolver used to read the declared nullability of members.</param>
     [ActivatorUtilitiesConstructor]
-    public RequireNonNullablePropertiesSchemaFilter(IServiceProvider serviceProvider)
-        => _dataContractResolver = new Lazy<ISerializerDataContractResolver>(serviceProvider.GetRequiredService<ISerializerDataContractResolver>);
+    public RequireNonNullablePropertiesSchemaFilter(ISerializerDataContractResolver dataContractResolver)
+        => _dataContractResolver = dataContractResolver;
 
     /// <summary>
     /// Add to model.Required all properties that are not nullable.
@@ -81,5 +80,5 @@ public class RequireNonNullablePropertiesSchemaFilter : ISchemaFilter
         => schemas?.Any(s => s.Type == JsonSchemaType.Null) is true;
 
     private Dictionary<string, DataProperty> GetDataProperties(Type type)
-        => _dataContractResolver.Value.GetDataContractForType(type).ObjectProperties?.ToDictionary(p => p.Name) ?? [];
+        => _dataContractResolver.GetDataContractForType(type).ObjectProperties?.ToDictionary(p => p.Name) ?? [];
 }

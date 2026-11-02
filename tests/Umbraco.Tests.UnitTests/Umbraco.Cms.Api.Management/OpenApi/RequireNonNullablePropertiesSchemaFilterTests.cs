@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Management.OpenApi;
@@ -68,11 +67,7 @@ internal sealed class RequireNonNullablePropertiesSchemaFilterTests
         // The resolver needs the generator options too, otherwise it ignores nullable reference type annotations.
         var dataContractResolver = new JsonSerializerDataContractResolver(new JsonSerializerOptions(JsonSerializerDefaults.Web), options);
 
-        // The filter resolves the data contract resolver from the service provider, as it does when Swashbuckle creates it.
-        IServiceProvider serviceProvider = new ServiceCollection()
-            .AddSingleton<ISerializerDataContractResolver>(dataContractResolver)
-            .BuildServiceProvider();
-        options.SchemaFilters.Add(new RequireNonNullablePropertiesSchemaFilter(serviceProvider));
+        options.SchemaFilters.Add(new RequireNonNullablePropertiesSchemaFilter(dataContractResolver));
 
         var schemaRepository = new SchemaRepository();
         new SchemaGenerator(options, dataContractResolver).GenerateSchema(typeof(T), schemaRepository);
