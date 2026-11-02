@@ -17,8 +17,8 @@ import {
  *
  * Runs `onInit` once the user is authorized AND the session's current user has loaded, so extensions
  * can rely on `UMB_CURRENT_USER_CONTEXT` being populated. Runs `onUnload` when the session ends
- * (sign-out or timeout) or the extension is unregistered. If the user authorizes again, `onInit`
- * runs again — potentially for a different user.
+ * (sign-out or timeout) or the extension is unregistered. If the same user signs in again, `onInit`
+ * runs again. A different user gets a new page, where `onInit` runs for that user.
  */
 export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializerBase<
 	'userEntryPoint',
