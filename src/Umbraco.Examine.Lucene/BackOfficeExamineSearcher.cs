@@ -36,7 +36,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
     private readonly IUmbracoTreeSearcherFields _treeSearcherFields;
     private readonly IOptionsMonitor<IndexCreatorSettings> _indexCreatorSettings;
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public BackOfficeExamineSearcher(
         IExamineManager examineManager,
         ILanguageService languageService,
