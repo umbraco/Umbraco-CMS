@@ -138,7 +138,8 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     ///     <see cref="HttpStatusCode.Unauthorized"/>, so that rejected credentials surface as a failure rather than as
     ///     a resource that is not embeddable.
     /// </remarks>
-    // TODO (V20): Take the status code rather than an exception once DownloadResponseAsync and GetXmlResponseAsync return null for these responses.
+    // TODO (V20): Change the parameter to HttpStatusCode and call this from DownloadResponseAsync to decide when to
+    // return null, replacing the HttpRequestException catches in the callers.
     protected virtual bool IsNotEmbeddableResponse(HttpRequestException exception)
         => exception.StatusCode is HttpStatusCode statusCode && _notEmbeddableStatusCodes.Contains(statusCode);
 
