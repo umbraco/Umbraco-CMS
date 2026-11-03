@@ -46,6 +46,7 @@ public static class BackOfficeAuthBuilderExtensions
         builder.AddNotificationAsyncHandler<UserSavedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserDeletedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserLoginSuccessNotification, RevokeUserAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UserLogoutSuccessNotification, RevokeUserAuthenticationTokensNotificationHandler>();
 
         return builder;
     }
@@ -118,6 +119,23 @@ public static class BackOfficeAuthBuilderExtensions
                 OpenIddictServerHandlerDescriptor
                     .CreateBuilder<OpenIddictServerEvents.ApplyRevocationResponseContext>()
                     .UseSingletonHandler<ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler>()
+                    .Build());
+        });
+
+        builder.Services.AddSingleton<BackOfficeRedirectUriValidationHandler>();
+        builder.Services.Configure<OpenIddictServerOptions>(options =>
+        {
+            options.Handlers.Add(
+                OpenIddictServerHandlerDescriptor
+                    .CreateBuilder<OpenIddictServerEvents.ValidateAuthorizationRequestContext>()
+                    .UseSingletonHandler<BackOfficeRedirectUriValidationHandler>()
+                    .SetOrder(OpenIddictServerHandlers.Authentication.ValidateRedirectUriParameter.Descriptor.Order + 1)
+                    .Build());
+            options.Handlers.Add(
+                OpenIddictServerHandlerDescriptor
+                    .CreateBuilder<OpenIddictServerEvents.ValidateEndSessionRequestContext>()
+                    .UseSingletonHandler<BackOfficeRedirectUriValidationHandler>()
+                    .SetOrder(OpenIddictServerHandlers.Session.ValidatePostLogoutRedirectUriParameter.Descriptor.Order + 1)
                     .Build());
         });
 

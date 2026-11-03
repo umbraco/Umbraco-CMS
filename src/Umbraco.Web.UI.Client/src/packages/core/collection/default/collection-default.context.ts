@@ -27,6 +27,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbPaginationManager, UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -107,6 +108,7 @@ export class UmbDefaultCollectionContext<
 	#defaultViewAlias: string;
 	#defaultFilter: Partial<FilterModelType>;
 	#pageNumberToRestore?: number;
+	#latestRequestId = 0;
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -337,17 +339,34 @@ export class UmbDefaultCollectionContext<
 		if (!this._configured) this._configure();
 		if (!this._repository) throw new Error(`Missing repository for ${this._manifest}`);
 
+		const requestId = ++this.#latestRequestId;
 		this._loading.setValue(true);
 
-		const filter = this._filter.getValue();
-		const { data } = await this._repository.requestCollection(filter);
+		try {
+			const filter = this._filter.getValue();
+			const { data } = await this._repository.requestCollection(filter);
 
-		if (data) {
-			this._items.setValue(data.items);
-			this._setTotalItems(data.total);
+			if (requestId !== this.#latestRequestId) return;
+
+			if (data) {
+				this._setCollectionData(data);
+			}
+		} finally {
+			if (requestId === this.#latestRequestId) {
+				this._loading.setValue(false);
+			}
 		}
+	}
 
-		this._loading.setValue(false);
+	/**
+	 * Applies the response of the latest collection request. Responses superseded by a newer request are never applied.
+	 * Override to transform or merge the items before they are set.
+	 * @param {UmbPagedModel<CollectionItemType>} data - The paged items returned by the repository.
+	 * @memberof UmbCollectionContext
+	 */
+	protected _setCollectionData(data: UmbPagedModel<CollectionItemType>) {
+		this._items.setValue(data.items);
+		this._setTotalItems(data.total);
 	}
 
 	/**

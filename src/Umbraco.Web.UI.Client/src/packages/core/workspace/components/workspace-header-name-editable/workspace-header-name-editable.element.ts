@@ -26,6 +26,7 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 	 * The readonly state of the inner input.
 	 * @attr
 	 */
+	@property({ type: Boolean })
 	readonly = false;
 
 	@state()
