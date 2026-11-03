@@ -551,7 +551,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _, propertyAliases: null, filter: null, ordering: null);
 
         await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendants)
         {
@@ -584,7 +584,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _, propertyAliases: null, filter: null, ordering: null);
         await CreateOrUpdateUrlSegmentsInternalAsync(new List<IContent>(descendants) { item }, skipDatabaseWrite: true);
     }
 

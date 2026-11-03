@@ -7,7 +7,7 @@
   <!-- Global packages (private, build-time packages for all projects) -->
   <ItemGroup>
     <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.10.94" />
-    <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.3.149-beta" />
+    <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.3.151-beta" />
     <!-- TODO (V18): Bump Umbraco.Code to 3.0.0 stable before release of 18.0.0 -->
     <GlobalPackageReference Include="Umbraco.Code" Version="3.0.0-beta" />
     <GlobalPackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.2.0" />
@@ -51,14 +51,14 @@
     <PackageVersion Include="Examine.Core" Version="4.0.1" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.13.1" />
     <PackageVersion Include="K4os.Compression.LZ4" Version="1.3.8" />
-    <PackageVersion Include="MailKit" Version="4.18.1" />
-    <PackageVersion Include="Markdig" Version="1.4.2" />
+    <PackageVersion Include="MailKit" Version="4.18.2" />
+    <PackageVersion Include="Markdig" Version="1.5.1" />
     <PackageVersion Include="MessagePack" Version="3.1.12" />
     <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
     <PackageVersion Include="MiniProfiler.Shared" Version="4.5.4" />
     <PackageVersion Include="ncrontab" Version="3.4.0" />
-    <PackageVersion Include="NPoco" Version="6.3.0" />
-    <PackageVersion Include="NPoco.SqlServer" Version="6.3.0" />
+    <PackageVersion Include="NPoco" Version="6.4.0" />
+    <PackageVersion Include="NPoco.SqlServer" Version="6.4.0" />
     <PackageVersion Include="OpenIddict.Abstractions" Version="7.7.2" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="7.7.2" />
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.7.2" />
