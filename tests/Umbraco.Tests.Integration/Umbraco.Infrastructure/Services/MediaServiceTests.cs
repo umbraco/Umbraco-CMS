@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
@@ -72,6 +73,47 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
             Assert.That(MediaService.GetById(keys[2]).SortOrder, Is.EqualTo(1));
             Assert.That(MediaService.GetById(keys[0]).SortOrder, Is.EqualTo(2));
         });
+    }
+
+    public static void ConfigureSortingNotificationRecording(IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<SortingNotificationRecorder>();
+        builder.AddNotificationHandler<MediaSavingNotification, SortingRecordingMediaSavingHandler>();
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureSortingNotificationRecording))]
+    public async Task Sort_Publishes_Saving_Notification_Flagged_As_Sorting()
+    {
+        var mediaType = await CreateMediaType();
+        IMedia first = MediaBuilder.CreateSimpleMedia(mediaType, "First", -1);
+        IMedia second = MediaBuilder.CreateSimpleMedia(mediaType, "Second", -1);
+        MediaService.Save(first);
+        MediaService.Save(second);
+
+        var recorder = GetRequiredService<SortingNotificationRecorder>();
+        Assert.That(recorder.IsSortingValues, Is.EqualTo(new[] { false, false }));
+        recorder.IsSortingValues.Clear();
+
+        Assert.That(MediaService.Sort(new[] { second, first }), Is.True);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(recorder.IsSortingValues, Is.EqualTo(new[] { true }));
+            Assert.That(MediaService.GetById(second.Id)!.SortOrder, Is.EqualTo(0));
+            Assert.That(MediaService.GetById(first.Id)!.SortOrder, Is.EqualTo(1));
+        });
+    }
+
+    internal sealed class SortingNotificationRecorder
+    {
+        public List<bool> IsSortingValues { get; } = new();
+    }
+
+    internal sealed class SortingRecordingMediaSavingHandler(SortingNotificationRecorder recorder)
+        : INotificationHandler<MediaSavingNotification>
+    {
+        public void Handle(MediaSavingNotification notification) => recorder.IsSortingValues.Add(notification.IsSorting);
     }
 
     [Test]
