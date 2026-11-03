@@ -120,6 +120,25 @@ public class WebhookFiringTests
         _webhookRequestService.Verify(x => x.DeleteAsync(request), Times.Once);
     }
 
+    [Test]
+    public async Task Request_For_Deleted_Webhook_Is_Removed_Without_Sending()
+    {
+        var request = new WebhookRequest
+        {
+            WebhookKey = Guid.NewGuid(),
+            EventAlias = Constants.WebhookEvents.Aliases.ContentPublish,
+            RequestObject = "{}",
+        };
+        _webhookRequestService.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { request });
+        _webhookService.Setup(x => x.GetAsync(request.WebhookKey)).ReturnsAsync((IWebhook?)null);
+
+        await CreateJob().ExecuteAsync();
+
+        Assert.That(_handler.CallCount, Is.EqualTo(0));
+        _webhookRequestService.Verify(x => x.DeleteAsync(request), Times.Once);
+        _webhookLogService.Verify(x => x.CreateAsync(It.IsAny<WebhookLog>()), Times.Never);
+    }
+
     private WebhookRequest SetupQueuedRequest(IDictionary<string, string> headers)
     {
         var webhook = new Webhook("https://example.com/webhook", true, headers: headers) { Key = Guid.NewGuid() };

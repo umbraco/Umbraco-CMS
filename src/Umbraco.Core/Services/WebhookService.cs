@@ -134,6 +134,7 @@ public class WebhookService : IWebhookService
             return Attempt.FailWithStatus<IWebhook?, WebhookOperationStatus>(WebhookOperationStatus.CancelledByNotification, webhook);
         }
 
+        scope.WriteLock(Constants.Locks.WebhookRequest);
         await _webhookRepository.DeleteAsync(webhook);
         scope.Notifications.Publish(new WebhookDeletedNotification(webhook, eventMessages).WithStateFrom(deletingNotification));
 

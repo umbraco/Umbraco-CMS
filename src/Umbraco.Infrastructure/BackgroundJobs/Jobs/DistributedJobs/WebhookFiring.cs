@@ -90,6 +90,7 @@ internal class WebhookFiring : IDistributedBackgroundJob
                     IWebhook? webhook = await _webHookService.GetAsync(request.WebhookKey);
                     if (webhook is null)
                     {
+                        await _webhookRequestService.DeleteAsync(request);
                         return;
                     }
 
