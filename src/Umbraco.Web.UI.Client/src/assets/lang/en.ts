@@ -1920,6 +1920,9 @@ export default {
 			'A Document Type cannot be changed to an Element Type once it has been used to create one or more content items.',
 		elementDoesNotSupport: 'This is not applicable for an Element Type',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
+		confirmPropertyAliasChangeHeadline: 'Changing the alias may cause data loss',
+		confirmPropertyAliasChangeMessage:
+			'Existing content for <strong>%0%</strong> will be removed where it is used as embedded content, such as in a local Block.',
 		displaySettingsHeadline: 'Appearance',
 		displaySettingsLabelOnLeft: 'Label to the left',
 		displaySettingsLabelOnTop: 'Label above (full-width)',
