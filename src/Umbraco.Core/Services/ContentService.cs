@@ -462,7 +462,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 20.")]
     public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
         => GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter: filter, ordering: ordering);
 
