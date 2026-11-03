@@ -13,7 +13,7 @@ test('blocks every change to a template in the backoffice', async ({umbracoUi}) 
     await umbracoUi.template.isInlineEntityActionVisibleForName('Templates', 'ReloadChildrenOf');
     await umbracoUi.template.isSidebarActionsMenuVisibleForName('Templates', false);
     await umbracoUi.template.clickRootFolderCaretButton();
-    await umbracoUi.template.isInlineEntityActionVisibleForName('Templates', 'ReloadChildrenOf');
+    await umbracoUi.template.isTreeItemVisible(templateName);
     await umbracoUi.template.isSidebarActionsMenuVisibleForName(templateName, false);
   });
 
