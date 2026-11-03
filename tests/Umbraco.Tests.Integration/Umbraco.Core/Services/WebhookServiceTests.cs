@@ -13,6 +13,8 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
 {
     private IWebhookService WebhookService => GetRequiredService<IWebhookService>();
 
+    private IWebhookRequestService WebhookRequestService => GetRequiredService<IWebhookRequestService>();
+
     [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentPublish, "00000000-0000-0000-0000-010000000000")]
     [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentDelete, "00000000-0000-0000-0000-000200000000")]
     [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentUnpublish, "00000000-0000-0000-0000-300000000000")]
@@ -111,6 +113,21 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
         await WebhookService.DeleteAsync(webhook.Key);
         var deletedWebhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
         Assert.IsNull(deletedWebhook);
+    }
+
+    [Test]
+    public async Task Can_Delete_With_Queued_Requests()
+    {
+        var webhookToDelete = await WebhookService.CreateAsync(new Webhook("https://example.com", true, [Guid.NewGuid()], [Constants.WebhookEvents.Aliases.ContentPublish]));
+        var webhookToKeep = await WebhookService.CreateAsync(new Webhook("https://example.org", true, [Guid.NewGuid()], [Constants.WebhookEvents.Aliases.ContentPublish]));
+        await WebhookRequestService.CreateAsync(webhookToDelete.Result.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
+        await WebhookRequestService.CreateAsync(webhookToDelete.Result.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
+        var keptRequest = await WebhookRequestService.CreateAsync(webhookToKeep.Result.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
+
+        await WebhookService.DeleteAsync(webhookToDelete.Result.Key);
+
+        var remaining = await WebhookRequestService.GetAllAsync();
+        Assert.That(remaining.Select(x => x.Id), Is.EqualTo(new[] { keptRequest.Id }));
     }
 
     [Test]
