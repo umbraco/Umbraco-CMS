@@ -104,6 +104,10 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
     await this.containsText(this.page.locator(`umb-property-layout[label="${propertyName}"] .info-message`) , 'This is not applicable for an Element Type.');
   }
 
+  async isElementTypeOnlyAllowedInLibraryMessageForPropertyWithNameVisible(propertyName: string) {
+    await this.containsText(this.page.locator(`umb-property-layout[label="${propertyName}"] .info-message`), 'This is only applicable for an Element Type that is allowed in the Library.');
+  }
+
   async reloadDocumentTypeTree() {
     await this.reloadTree('Document Types');
   }

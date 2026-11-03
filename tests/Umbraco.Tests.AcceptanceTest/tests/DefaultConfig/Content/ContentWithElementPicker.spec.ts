@@ -135,7 +135,7 @@ test('can not publish a mandatory element picker with an empty value', async ({u
   await umbracoUi.content.goToContentWithName(contentName);
   // Do not pick any element and the validation error appears
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Pick an element and the validation error disappears
   await umbracoUi.content.addElementPicker(elementName);

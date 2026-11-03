@@ -95,19 +95,17 @@
     0: ['Accepted types', 'Limit to specific types'],
     1: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
     2: ['Start node', ''],
-    3: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
-    4: ['Enable Focal Point', ''],
-    5: ['Image Crops', 'Local crops, stored on document'],
-    6: ['Ignore User Start Nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
+    3: ['Enable Focal Point', ''],
+    4: ['Image Crops', 'Local crops, stored on document'],
+    5: ['Ignore User Start Nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
   }
 
   public static readonly singleMediaPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
     1: ['Start node', ''],
-    2: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
-    3: ['Enable Focal Point', ''],
-    4: ['Image Crops', 'Local crops, stored on document'],
-    5: ['Ignore User Start Nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
+    2: ['Enable Focal Point', ''],
+    3: ['Image Crops', 'Local crops, stored on document'],
+    4: ['Ignore User Start Nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
   }
 
   public static readonly labelSettings = {
@@ -238,8 +236,9 @@
   public static readonly userGroupAssignAccessSettings = {
     0: ['Sections', 'Add sections to give users access'],
     1: ['Languages', 'Limit the languages users have access to edit'],
-    2: ['Select content start node', 'Limit the content tree to a specific start node'],
-    3: ['Select media start node', 'Limit the media library to a specific start node']
+    2: ['Allow editing shared content', 'Allows editing of content shared across languages. Does not apply to culture-invariant content.'],
+    3: ['Select content start node', 'Limit the content tree to a specific start node'],
+    4: ['Select media start node', 'Limit the media library to a specific start node']
   }
 
   public static readonly userGroupDefaultPermissionsSettings = {

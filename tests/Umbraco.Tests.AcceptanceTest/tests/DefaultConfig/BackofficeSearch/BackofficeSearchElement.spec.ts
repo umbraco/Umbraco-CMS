@@ -51,13 +51,14 @@ test('can see Elements provider auto-selected when opening search from the Libra
   await umbracoUi.backofficeSearch.isSearchProviderActive('Elements');
 });
 
+// Search matches whole terms and term prefixes, not arbitrary substrings, so each keyword is a word or the start of one.
 const elementNameCases = [
   {label: 'a basic name', name: 'BackofficeSearchElementItem', searchKeyword: 'Back'},
   {label: 'a short name', name: 'Bse', searchKeyword: 'Bse'},
-  {label: 'a long name', name: 'BackofficeSearchElementWithAVeryLongNameToTestBoundaryHandlingOfElementNameFieldsInSearchResults', searchKeyword: 'VeryLongName'},
+  {label: 'a long name', name: 'BackofficeSearchElementWithAVeryLongNameToTestBoundaryHandlingOfElementNameFieldsInSearchResults', searchKeyword: 'BackofficeSearchElementWithAVeryLongName'},
   {label: 'a name with spaces', name: 'Backoffice Search Element With Spaces', searchKeyword: 'Spaces'},
-  {label: 'a name with numbers', name: 'BackofficeSearchElement1234567890', searchKeyword: '1234567890'},
-  {label: 'a name with special characters', name: 'BackofficeSearchElement , . ! ? # $ % & * @ é ü ă đ 漢字', searchKeyword: ', . ! ? # $ % & * @ é ü ă đ 漢字'},
+  {label: 'a name with numbers', name: 'BackofficeSearchElement1234567890', searchKeyword: 'BackofficeSearchElement12345'},
+  {label: 'a name with special characters', name: 'BackofficeSearchElement , . ! ? # $ % & * @ é ü ă đ 漢字', searchKeyword: 'é ü ă đ'},
   {label: 'a name with Unicode characters', name: 'BackofficeSearchElement Æøå', searchKeyword: 'Æøå'},
 ];
 for (const elementNameCase of elementNameCases) {
@@ -172,7 +173,7 @@ test('can see the variant name matching the current app language', async ({umbra
     'EN text',
     'DA text',
   );
-  await umbracoApi.element.waitUntilIndexed('BackofficeSearchElementVariant', variantElementId);
+  await umbracoApi.element.waitUntilIndexed('BackofficeSearchElementVariant', variantElementId, 'en-US');
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act

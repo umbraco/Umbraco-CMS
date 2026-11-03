@@ -547,9 +547,10 @@ export class ContentUiHelper extends UiBaseLocators {
     // The alias suffix (Classic/Table) is stable across entity types, but the entity segment isn't, so match on suffix only.
     this.treeViewClassicOptionBtnInPickerModal = this.sidebarModal.locator('[data-mark^="tree:switch-view:"][data-mark$=".Classic"]');
     this.treeViewTableOptionBtnInPickerModal = this.sidebarModal.locator('[data-mark^="tree:switch-view:"][data-mark$=".Table"]');
-    this.treeTableViewInPickerModal = this.sidebarModal.locator('umb-table-tree-view');
-    this.treeTableRowInPickerModal = this.sidebarModal.locator('umb-table-tree-view uui-table-row');
-    this.selectableTreeTableRowInPickerModal = this.sidebarModal.locator('umb-table-tree-view uui-table-row[selectable]');
+    // Trees may render the table view through their own element extending the base one.
+    this.treeTableViewInPickerModal = this.sidebarModal.locator('umb-table-tree-view, umb-document-table-tree-view');
+    this.treeTableRowInPickerModal = this.treeTableViewInPickerModal.locator('uui-table-row');
+    this.selectableTreeTableRowInPickerModal = this.treeTableViewInPickerModal.locator('uui-table-row[selectable]');
     // Public Access
     this.containerSetupBtn = this.container.getByLabel('Setup');
     this.containerEditBtn = this.container.getByLabel('Edit');

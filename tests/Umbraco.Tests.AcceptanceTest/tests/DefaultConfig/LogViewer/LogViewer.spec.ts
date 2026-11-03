@@ -3,6 +3,8 @@ import {expect} from "@playwright/test";
 
 let startTelemetryLevel = '';
 
+const oneYearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.logViewer.goToSettingsTreeItem('Log Viewer');
@@ -123,17 +125,18 @@ test('can delete a saved search', async ({umbracoApi, umbracoUi}) => {
 
 test('can expand a log entry', async ({umbracoUi}) => {
   // Arrange
-  const search = "StartsWith(@MessageTemplate, 'The token')";
+  const search = "StartsWith(@MessageTemplate, 'Acquiring MainDom')";
 
   // Act
   await umbracoUi.logViewer.clickSearchButton();
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
+  await umbracoUi.logViewer.setStartDate(oneYearAgo);
   await umbracoUi.logViewer.enterSearchKeyword(search);
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
   await umbracoUi.logViewer.clickFirstLogSearchResult();
 
   // Assert
-  await umbracoUi.logViewer.doesDetailedLogHaveText('The token');
+  await umbracoUi.logViewer.doesDetailedLogHaveText('Acquiring MainDom');
 });
 
 // Currently only works if the user is using the locale 'en-US' otherwise it will fail
@@ -183,7 +186,7 @@ test.skip('can use pagination', async ({umbracoApi, umbracoUi}) => {
 test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const searchName = 'TestSearch';
-  const search = "StartsWith(@MessageTemplate, 'The token')";
+  const search = "StartsWith(@MessageTemplate, 'Acquiring MainDom')";
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
   await umbracoApi.logViewer.createSavedSearch(searchName, search);
   await umbracoUi.logViewer.goToSettingsTreeItem('Log Viewer');
@@ -192,6 +195,7 @@ test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
   // Saved searches live in the "Saved searches" dropdown on the Search view, so open Search first.
   await umbracoUi.logViewer.clickSearchButton();
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
+  await umbracoUi.logViewer.setStartDate(oneYearAgo);
   await umbracoUi.logViewer.clickSavedSearchByName(searchName);
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
 
@@ -199,7 +203,7 @@ test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
   // Checks if the search has the correct search value
   await umbracoUi.logViewer.doesSearchBoxHaveValue(search);
   // Checks if the saved search found the correct logs
-  await umbracoUi.logViewer.doesFirstLogHaveMessage('The token');
+  await umbracoUi.logViewer.doesFirstLogHaveMessage('Acquiring MainDom');
 
   // Clean
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
