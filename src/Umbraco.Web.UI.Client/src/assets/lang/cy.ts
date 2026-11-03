@@ -2484,6 +2484,7 @@ export default {
 		detailedLevelDescription: '\n          Byddwn yn anfon:\n          ',
 	},
 	elements: {
+		confirmPublishDescription: "Bydd cyhoeddi yn gwneud hyn ar gael i'r cyhoedd.",
 		confirmBulkPublishDescription: "Bydd cyhoeddi yn gwneud yr eitemau a ddewiswyd ar gael i'r cyhoedd.",
 		confirmBulkUnpublishDescription: "Ni fydd yr eitemau a ddewiswyd ar gael i'r cyhoedd mwyach.",
 	},

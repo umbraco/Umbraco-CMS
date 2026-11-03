@@ -1959,6 +1959,7 @@ export default {
 		selectedCount: (count: number) => `${count} ${count > 1 ? 'éléments sélectionnés' : 'élément sélectionné'}`,
 	},
 	elements: {
+		confirmPublishDescription: 'La publication rendra ceci accessible publiquement.',
 		confirmBulkPublishDescription: 'La publication rendra les éléments sélectionnés accessibles publiquement.',
 		confirmBulkUnpublishDescription: 'Les éléments sélectionnés ne seront plus accessibles publiquement.',
 	},

@@ -1967,6 +1967,7 @@ export default {
 		selectedCount: (count: number) => `${count} öğe seçildi`,
 	},
 	elements: {
+		confirmPublishDescription: 'Yayınlama, bunu herkese açık hale getirir.',
 		confirmBulkPublishDescription: 'Yayınlama, seçili öğeleri herkese açık hale getirir.',
 		confirmBulkUnpublishDescription: 'Seçili öğeler artık herkese açık olmayacak.',
 	},

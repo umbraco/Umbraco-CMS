@@ -1905,6 +1905,7 @@ export default {
 			'Vytvářejte formuláře pomocí intuitivního rozhraní drag and drop. Od jednoduchých kontaktních formulářů, které odesílají e-maily, až po pokročilé dotazníky, které se integrují do systémů CRM. Vaši klienti to budou milovat!',
 	},
 	elements: {
+		confirmPublishDescription: 'Publikování toto zpřístupní veřejnosti.',
 		confirmBulkPublishDescription: 'Publikování zpřístupní vybrané položky veřejnosti.',
 		confirmBulkUnpublishDescription: 'Vybrané položky již nebudou veřejně dostupné.',
 	},

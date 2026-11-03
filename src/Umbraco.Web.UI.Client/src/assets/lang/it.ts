@@ -2300,6 +2300,7 @@ export default {
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento selezionato' : 'elementi selezionati'}`,
 	},
 	elements: {
+		confirmPublishDescription: 'La pubblicazione renderà questo disponibile pubblicamente.',
 		confirmBulkPublishDescription: 'La pubblicazione renderà gli oggetti selezionati disponibili pubblicamente.',
 		confirmBulkUnpublishDescription: 'Gli oggetti selezionati non saranno più disponibili pubblicamente.',
 	},

@@ -10,11 +10,12 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { escapeHTML, truncateString } from '@umbraco-cms/backoffice/utils';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
-const MAX_NOTIFICATION_NAME_LENGTH = 20;
+const MAX_NOTIFICATION_NAME_LENGTH = 30;
 
 /**
  * @description - Shared entity action for publishing content-like entities (Document, Element, ...).
@@ -194,37 +195,28 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 
 		// If the content is invariant, we need to show a different notification
 		const isInvariant = options.length === 1 && options[0].culture === null;
+		const publishedVariants = isInvariant
+			? detailData.variants
+			: detailData.variants.filter((variant) => selection.includes(variant.culture!));
+		const namedVariant = publishedVariants.find((v) => v.culture === appCulture) ?? publishedVariants[0];
 
-		if (isInvariant) {
-			notificationContext?.peek('positive', {
-				data: {
-					headline,
-					message: localize.string(
-						this.args.meta.publishedNotificationMessage || '#publish_publishedNotificationDescription',
-						this.#truncateName(detailData.variants[0]?.name),
-					),
-				},
-			});
-		} else {
-			const publishedVariants = detailData.variants.filter((variant) => selection.includes(variant.culture!));
-			const namedVariant = publishedVariants.find((v) => v.culture === appCulture) ?? publishedVariants[0];
-			notificationContext?.peek('positive', {
-				data: {
-					headline,
-					message: localize.string(
-						this.args.meta.variantPublishedNotificationMessage || '#publish_publishedVariantNotificationDescription',
-						localize.list(publishedVariants.map((v) => new UmbVariantId(v.culture, null).toString() ?? v.name)),
-						this.#truncateName(namedVariant?.name),
-					),
-				},
-			});
-		}
-	}
+		const name = truncateString(namedVariant?.name, MAX_NOTIFICATION_NAME_LENGTH);
+		const cultures = isInvariant
+			? undefined
+			: localize.list(publishedVariants.map((v) => new UmbVariantId(v.culture, null).toString() ?? v.name));
+		const term = isInvariant
+			? this.args.meta.publishedNotificationMessage || '#publish_publishedNotificationDescription'
+			: this.args.meta.variantPublishedNotificationMessage || '#publish_publishedVariantNotificationDescription';
+		const format = (formattedName: string, formattedCultures: string | undefined) =>
+			isInvariant ? localize.string(term, formattedName) : localize.string(term, formattedCultures, formattedName);
 
-	#truncateName(name: string | undefined): string {
-		if (!name) return '';
-		if (name.length <= MAX_NOTIFICATION_NAME_LENGTH) return name;
-		return `${name.slice(0, MAX_NOTIFICATION_NAME_LENGTH)}…`;
+		notificationContext?.peek('positive', {
+			data: {
+				headline,
+				message: format(name, cultures),
+				htmlMessage: format(`<strong>${escapeHTML(name)}</strong>`, escapeHTML(cultures)),
+			},
+		});
 	}
 
 	async #dispatchReloadEvent(unique: string): Promise<void> {

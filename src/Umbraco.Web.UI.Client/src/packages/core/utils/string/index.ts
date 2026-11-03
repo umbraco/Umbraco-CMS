@@ -6,3 +6,4 @@ export * from './string-or-string-array-contains/index.js';
 export * from './to-camel-case/index.js';
 export * from './fuzzy/index.js';
 export * from './levenshtein/index.js';
+export * from './truncate-string/index.js';

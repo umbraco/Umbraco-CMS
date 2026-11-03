@@ -2208,6 +2208,7 @@ export default {
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} geselecteerd`,
 	},
 	elements: {
+		confirmPublishDescription: 'Publiceren maakt dit openbaar beschikbaar.',
 		confirmBulkPublishDescription: 'Publiceren maakt de geselecteerde items openbaar beschikbaar.',
 		confirmBulkUnpublishDescription: 'De geselecteerde items zijn niet langer openbaar beschikbaar.',
 	},

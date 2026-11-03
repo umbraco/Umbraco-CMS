@@ -1350,6 +1350,7 @@ export default {
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
 	},
 	elements: {
+		confirmPublishDescription: 'Publisering vil gjøre dette offentlig tilgjengelig.',
 		confirmBulkPublishDescription: 'Publisering vil gjøre de valgte elementene offentlig tilgjengelige.',
 		confirmBulkUnpublishDescription: 'De valgte elementene vil ikke lenger være offentlig tilgjengelige.',
 	},

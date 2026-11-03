@@ -2461,6 +2461,7 @@ export default {
 		wordWrapConfigDescription: 'تفعيل تغليف الكلمات في محرر الأكواد.',
 	},
 	elements: {
+		confirmPublishDescription: 'النشر سيجعل هذا متاحًا للعامة.',
 		confirmBulkPublishDescription: 'النشر سيجعل العناصر المحددة متاحة للعامة.',
 		confirmBulkUnpublishDescription: 'لن تكون العناصر المحددة متاحة للعامة بعد الآن.',
 	},

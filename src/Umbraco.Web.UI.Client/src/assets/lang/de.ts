@@ -2110,6 +2110,7 @@ export default {
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'Element' : 'Elemente'} ausgewählt`,
 	},
 	elements: {
+		confirmPublishDescription: 'Durch das Veröffentlichen wird dies öffentlich verfügbar.',
 		confirmBulkPublishDescription: 'Durch das Veröffentlichen werden die ausgewählten Einträge öffentlich verfügbar.',
 		confirmBulkUnpublishDescription: 'Die ausgewählten Einträge sind nicht mehr öffentlich verfügbar.',
 	},

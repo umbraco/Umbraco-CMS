@@ -2280,6 +2280,7 @@ export default {
 		searchResults: 'stavke vraćene',
 	},
 	elements: {
+		confirmPublishDescription: 'Objavljivanjem će ovo postati javno dostupno.',
 		confirmBulkPublishDescription: 'Objavljivanjem će odabrane stavke postati javno dostupne.',
 		confirmBulkUnpublishDescription: 'Odabrane stavke više neće biti javno dostupne.',
 	},

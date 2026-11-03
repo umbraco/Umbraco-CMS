@@ -2342,6 +2342,7 @@ export default {
 			'\n          Poslat ćemo:\n          <ul>\n            <li>Anonimni ID web-mjesta, verziju Umbraco-a i instalirane pakete.</li>\n            <li>Broj: korijenskih čvorova, čvorova sadržaja, makroa, medija, vrsta dokumenata, predložaka, jezika, domena, korisničkih grupa, korisnika, članova, vanjskih pružatelja prijave u Backoffice-u i uređivača svojstava u upotrebi.</li>\n            <li>Informacije o sustavu: web poslužitelj, operativni sustav poslužitelja, okvir poslužitelja, jezik operativnog sustava poslužitelja i pružatelj baze podataka.</li>\n            <li>Postavke konfiguracije: način Modelsbuilder-a, postoji li prilagođena putanja Umbraco-a, ASP okolina, je li omogućen dostavni API, dopušta li javni pristup i je li u načinu rada za otklanjanje pogrešaka.</li>\n          </ul>\n          <em>Moguće je da ćemo u budućnosti promijeniti podatke koje šaljemo na Detaljnoj razini. Ako se to dogodi, bit će navedeno iznad.\n          <br>Odabirom "Detaljno" pristajete na prikupljanje trenutnih i budućih anonimiziranih informacija.</em>\n       ',
 	},
 	elements: {
+		confirmPublishDescription: 'Objavljivanjem će ovo postati javno dostupno.',
 		confirmBulkPublishDescription: 'Objavljivanjem će odabrane stavke postati javno dostupne.',
 		confirmBulkUnpublishDescription: 'Odabrane stavke više neće biti javno dostupne.',
 	},
