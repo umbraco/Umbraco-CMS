@@ -28,6 +28,10 @@ public abstract class WebhookControllerBase : ManagementApiControllerBase
                 .WithTitle("No events specified")
                 .WithDetail("The webhook must be configured to listen to at least one event.")
                 .Build()),
+            WebhookOperationStatus.InvalidHeaders => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid headers")
+                .WithDetail("Header names must be valid HTTP header names, header values cannot contain line breaks, and the headers Host, Content-Length, Transfer-Encoding, Connection, Umb-Webhook-Event and Umb-Webhook-RetryCount cannot be set.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown webhook operation status.")
                 .Build()),

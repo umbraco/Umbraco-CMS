@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -148,4 +149,43 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
         Assert.IsNotEmpty(result);
         Assert.AreEqual(2, result.Count());
     }
+
+    [TestCase("Content-Type", "application/vnd.custom+json")]
+    [TestCase("X-Custom-Header", "value")]
+    [TestCase("Authorization", "Bearer token")]
+    public async Task Can_Create_With_Valid_Header(string name, string value)
+    {
+        var result = await WebhookService.CreateAsync(CreateWebhookWithHeader(name, value));
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(WebhookOperationStatus.Success, result.Status);
+    }
+
+    [TestCase("", "value")]
+    [TestCase("Invalid Header", "value")]
+    [TestCase("Invalid:Header", "value")]
+    [TestCase("X-Custom-Header", "line\r\nbreak")]
+    [TestCase("Host", "example.com")]
+    [TestCase("content-length", "10")]
+    [TestCase("Transfer-Encoding", "chunked")]
+    [TestCase("Connection", "close")]
+    [TestCase(Constants.WebhookEvents.HeaderNames.EventName, "value")]
+    [TestCase(Constants.WebhookEvents.HeaderNames.RetryCount, "1")]
+    public async Task Cannot_Create_Or_Update_With_Invalid_Header(string name, string value)
+    {
+        var createResult = await WebhookService.CreateAsync(CreateWebhookWithHeader(name, value));
+
+        var existing = await WebhookService.CreateAsync(CreateWebhookWithHeader("X-Custom-Header", "value"));
+        existing.Result.Headers = new Dictionary<string, string> { [name] = value };
+        var updateResult = await WebhookService.UpdateAsync(existing.Result);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(WebhookOperationStatus.InvalidHeaders, createResult.Status);
+            Assert.AreEqual(WebhookOperationStatus.InvalidHeaders, updateResult.Status);
+        });
+    }
+
+    private static Webhook CreateWebhookWithHeader(string name, string value)
+        => new("https://example.com", true, events: [Constants.WebhookEvents.Aliases.ContentPublish], headers: new Dictionary<string, string> { [name] = value });
 }

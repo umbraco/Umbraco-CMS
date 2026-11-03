@@ -12,6 +12,17 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class WebhookService : IWebhookService
 {
+    // Headers controlled by the HTTP transport or by Umbraco itself when a webhook request is sent.
+    private static readonly HashSet<string> ReservedHeaderNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Host",
+        "Content-Length",
+        "Transfer-Encoding",
+        "Connection",
+        Constants.WebhookEvents.HeaderNames.EventName,
+        Constants.WebhookEvents.HeaderNames.RetryCount,
+    };
+
     private readonly ICoreScopeProvider _provider;
     private readonly IWebhookRepository _webhookRepository;
     private readonly IEventMessagesFactory _eventMessagesFactory;
@@ -41,8 +52,22 @@ public class WebhookService : IWebhookService
             return WebhookOperationStatus.NoEvents;
         }
 
+        if (webhook.Headers.Any(header => IsValidHeader(header.Key, header.Value) is false))
+        {
+            return WebhookOperationStatus.InvalidHeaders;
+        }
+
         return WebhookOperationStatus.Success;
     }
+
+    private static bool IsValidHeader(string name, string value)
+        => IsHttpToken(name)
+           && ReservedHeaderNames.Contains(name) is false
+           && value.IndexOfAny(['\r', '\n', '\0']) < 0;
+
+    // RFC 9110 section 5.6.2: a field name is a token of visible characters excluding delimiters.
+    private static bool IsHttpToken(string value)
+        => value.Length > 0 && value.All(c => char.IsAsciiLetterOrDigit(c) || "!#$%&'*+-.^_`|~".Contains(c));
 
     /// <inheritdoc />
     public async Task<Attempt<IWebhook, WebhookOperationStatus>> CreateAsync(IWebhook webhook)
