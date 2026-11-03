@@ -31,29 +31,31 @@ export class UmbThemeContext extends UmbContextBase {
 		this.#theme.setValue(themeAlias);
 
 		this.#themeObserver?.destroy();
-		if (themeAlias) {
-			localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
-			this.#themeObserver = this.observe(
-				umbExtensionsRegistry.byTypeAndFilter('theme', (extension) => extension.alias === themeAlias),
-				async (themes) => {
-					if (themes.length > 0 && themes[0].css) {
-						await this.#attachTheme(themes[0]);
-					} else {
-						// We could not load a theme for this alias, so we remove the theme.
-						// Themes from packages can be registered after this context is created, so only forget
-						// the stored alias when the theme is registered without CSS (e.g. the Light theme).
-						if (themes.length > 0) {
-							localStorage.removeItem(LOCAL_STORAGE_KEY);
-						}
-						this.#detachTheme();
-					}
-				},
-			);
-		} else {
+		if (!themeAlias) {
 			// Super clean, we got a falsy value, so we remove the theme.
 			localStorage.removeItem(LOCAL_STORAGE_KEY);
 			this.#detachTheme();
+			return;
 		}
+
+		localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
+		this.#themeObserver = this.observe(
+			umbExtensionsRegistry.byTypeAndFilter('theme', (extension) => extension.alias === themeAlias),
+			async (themes) => {
+				const theme = themes[0];
+				if (theme?.css) {
+					await this.#attachTheme(theme);
+					return;
+				}
+				// We could not load a theme for this alias, so we remove the theme.
+				// Themes from packages can be registered after this context is created, so only forget
+				// the stored alias when the theme is registered without CSS (e.g. the Light theme).
+				if (theme) {
+					localStorage.removeItem(LOCAL_STORAGE_KEY);
+				}
+				this.#detachTheme();
+			},
+		);
 	}
 
 	async #attachTheme(theme: ManifestTheme) {
