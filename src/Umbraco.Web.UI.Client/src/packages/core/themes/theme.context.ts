@@ -36,53 +36,53 @@ export class UmbThemeContext extends UmbContextBase {
 			this.#themeObserver = this.observe(
 				umbExtensionsRegistry.byTypeAndFilter('theme', (extension) => extension.alias === themeAlias),
 				async (themes) => {
-					this.#styleElement?.remove();
 					if (themes.length > 0 && themes[0].css) {
-						const activeTheme = themes[0];
-						if (typeof activeTheme.css === 'function') {
-							this.#styleElement = document.createElement('style') as HTMLStyleElement;
-							// We store the current style element so we can check if it has been replaced by another theme in between.
-							const currentStyleEl = this.#styleElement;
-							currentStyleEl.setAttribute('type', 'text/css');
-
-							const result = await loadManifestPlainCss(activeTheme.css);
-							// Checking that this is still our styleElement, it has not been replaced with another theme in between.
-							if (result && currentStyleEl === this.#styleElement) {
-								currentStyleEl.appendChild(document.createTextNode(result));
-								document.head.appendChild(currentStyleEl);
-							}
-						} else if (typeof activeTheme.css === 'string') {
-							this.#styleElement = document.createElement('link');
-							this.#styleElement.setAttribute('rel', 'stylesheet');
-							this.#styleElement.setAttribute('href', activeTheme.css);
-							document.head.appendChild(this.#styleElement);
-						}
+						await this.#attachTheme(themes[0]);
 					} else {
 						// We could not load a theme for this alias, so we remove the theme.
-						this.#forgetStoredThemeIfRegistered(themes);
-						this.#styleElement?.childNodes.forEach((node) => node.remove());
-						this.#styleElement?.setAttribute('href', '');
-						this.#styleElement = null;
+						// Themes from packages can be registered after this context is created, so only forget
+						// the stored alias when the theme is registered without CSS (e.g. the Light theme).
+						if (themes.length > 0) {
+							localStorage.removeItem(LOCAL_STORAGE_KEY);
+						}
+						this.#detachTheme();
 					}
 				},
 			);
 		} else {
 			// Super clean, we got a falsy value, so we remove the theme.
-
 			localStorage.removeItem(LOCAL_STORAGE_KEY);
-			this.#styleElement?.remove();
-			this.#styleElement?.childNodes.forEach((node) => node.remove());
-			this.#styleElement?.setAttribute('href', '');
-			this.#styleElement = null;
+			this.#detachTheme();
 		}
 	}
 
-	// Only forget the stored alias if the theme is registered without CSS (e.g. the Light theme).
-	// Themes from packages can be registered after this context is created, so keep the alias until then.
-	#forgetStoredThemeIfRegistered(themes: ManifestTheme[]) {
-		if (themes.length > 0) {
-			localStorage.removeItem(LOCAL_STORAGE_KEY);
+	async #attachTheme(theme: ManifestTheme) {
+		this.#styleElement?.remove();
+		if (typeof theme.css === 'function') {
+			this.#styleElement = document.createElement('style') as HTMLStyleElement;
+			// We store the current style element so we can check if it has been replaced by another theme in between.
+			const currentStyleEl = this.#styleElement;
+			currentStyleEl.setAttribute('type', 'text/css');
+
+			const result = await loadManifestPlainCss(theme.css);
+			// Checking that this is still our styleElement, it has not been replaced with another theme in between.
+			if (result && currentStyleEl === this.#styleElement) {
+				currentStyleEl.appendChild(document.createTextNode(result));
+				document.head.appendChild(currentStyleEl);
+			}
+		} else if (typeof theme.css === 'string') {
+			this.#styleElement = document.createElement('link');
+			this.#styleElement.setAttribute('rel', 'stylesheet');
+			this.#styleElement.setAttribute('href', theme.css);
+			document.head.appendChild(this.#styleElement);
 		}
+	}
+
+	#detachTheme() {
+		this.#styleElement?.remove();
+		this.#styleElement?.childNodes.forEach((node) => node.remove());
+		this.#styleElement?.setAttribute('href', '');
+		this.#styleElement = null;
 	}
 }
 
