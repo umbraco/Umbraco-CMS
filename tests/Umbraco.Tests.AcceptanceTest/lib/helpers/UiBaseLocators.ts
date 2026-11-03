@@ -1922,6 +1922,7 @@ export class UiBaseLocators extends BasePage {
 
   async isEntityActionVisibleInCollectionRowForName(rowName: string, actionName: string, isVisible = true) {
     const row = this.page.locator("uui-table-row").filter({ has: this.page.getByText(rowName, { exact: true }) });
+    await this.isVisible(row);
     await this.isVisible(row.getByTestId(new RegExp(`^entity-action:.*${actionName}$`)), isVisible);
   }
 
