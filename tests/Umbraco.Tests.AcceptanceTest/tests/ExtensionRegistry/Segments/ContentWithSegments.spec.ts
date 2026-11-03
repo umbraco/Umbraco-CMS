@@ -226,4 +226,34 @@ test.describe('content with segment-only variations', () => {
     expect(vipValue).toBeTruthy();
     expect(vipValue.value).toBe(updatedVipSegmentValue);
   });
+
+  test('can clear VIP segment value without affecting the default segment value', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    await umbracoApi.document.createDocumentWithMultipleSegmentValues(
+      contentName,
+      documentTypeId,
+      dataTypeName,
+      editorAlias,
+      [
+        {value: defaultSegmentValue, segment: null},
+        {value: vipSegmentValue, segment: vipMemberSegmentAlias},
+      ]
+    );
+    await umbracoUi.content.goToContentWithName(contentName);
+    await umbracoUi.content.clickSelectVariantButton();
+    await umbracoUi.content.clickSegmentVariantButton(vipMemberSegment);
+
+    // Act
+    await umbracoUi.content.enterTextstring('');
+    await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+    // Assert
+    const [defaultValue, vipValue] = await umbracoApi.document.getValuesByCultureAndSegmentForDocument(contentName, [
+      {culture: null, segment: null},
+      {culture: null, segment: vipMemberSegmentAlias},
+    ]);
+    expect(defaultValue).toBeTruthy();
+    expect(defaultValue.value).toBe(defaultSegmentValue);
+    expect(vipValue?.value).toBeFalsy();
+  });
 });

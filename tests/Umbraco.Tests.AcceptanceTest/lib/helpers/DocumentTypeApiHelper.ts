@@ -756,6 +756,34 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
+  async createDefaultElementTypeWithVaryBySegment(elementName: string, groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, elementTypeVaryBySegment: boolean = true, dataTypeVaryBySegment: boolean = true) {
+    await this.ensureNameNotExists(elementName);
+
+    const crypto = require('crypto');
+    const containerId = crypto.randomUUID();
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(elementName)
+      .withAlias(AliasHelper.toAlias(elementName))
+      .withIsElement(true)
+      .withAllowedInLibrary(true)
+      .withVariesBySegment(elementTypeVaryBySegment)
+      .addContainer()
+        .withName(groupName)
+        .withId(containerId)
+        .withType("Group")
+        .done()
+      .addProperty()
+        .withContainerId(containerId)
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withName(dataTypeName)
+        .withDataTypeId(dataTypeId)
+        .withVariesBySegment(dataTypeVaryBySegment)
+        .done()
+      .build();
+    return await this.create(documentType);
+  }
+
   async createElementTypeWithRegexValidation(elementName: string, groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, regex: string) {
     await this.ensureNameNotExists(elementName);
 

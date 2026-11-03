@@ -2298,4 +2298,10 @@ export class UiBaseLocators extends BasePage {
       await expect(this.uiCultureInput).toHaveAttribute('value', language.toLowerCase(), {timeout: ConstantHelper.timeout.short});
     }).toPass({timeout: ConstantHelper.timeout.medium});
   }
+
+  async clickSegmentVariantButton(segmentName: string) {
+    const segmentVariant = this.page.locator('.variant.segment-variant').filter({has: this.page.getByText(segmentName, {exact: true})});
+    await this.click(segmentVariant.locator('button.switch-button'));
+    await expect(segmentVariant).toContainClass('selected');
+  }
 }

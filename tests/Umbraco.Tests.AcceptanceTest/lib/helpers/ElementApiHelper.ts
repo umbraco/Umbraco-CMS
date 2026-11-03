@@ -276,6 +276,51 @@ export class ElementApiHelper {
     return await this.create(element);
   }
 
+  async createElementWithMultipleSegmentValues(elementName: string, elementTypeId: string, dataTypeName: string, values: {value: string, segment: string | null}[]) {
+    await this.ensureNameNotExists(elementName);
+
+    const elementBuilder = new ElementBuilder()
+      .withDocumentTypeId(elementTypeId)
+      .addVariant()
+        .withName(elementName)
+        .done();
+
+    for (const value of values) {
+      const valueBuilder = elementBuilder.addValue()
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withValue(value.value);
+      if (value.segment !== null) {
+        valueBuilder.withSegment(value.segment);
+      }
+      valueBuilder.done();
+    }
+
+    return await this.create(elementBuilder.build());
+  }
+
+  async getPublished(id: string) {
+    const response = await this.api.get(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.element}/${id}/published`);
+    return await response.json();
+  }
+
+  async getValuesByCultureAndSegmentForElement(elementName: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
+    const elementData = await this.getByName(elementName);
+    if (!elementData) {
+      throw new Error(`Element '${elementName}' was not found`);
+    }
+    return culturesAndSegments.map(cs =>
+      elementData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
+    );
+  }
+
+  async getPublishedValuesByCultureAndSegmentForElement(elementId: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
+    const publishedData = await this.getPublished(elementId);
+    const values = Array.isArray(publishedData.values) ? publishedData.values : [];
+    return culturesAndSegments.map(cs =>
+      values.find(v => v.culture === cs.culture && v.segment === cs.segment)
+    );
+  }
+
   async createDefaultElementWithParent(elementName: string, elementTypeId: string, parentId: string) {
     await this.ensureNameNotExists(elementName);
 
