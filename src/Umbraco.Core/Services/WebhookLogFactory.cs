@@ -21,9 +21,7 @@ public class WebhookLogFactory : IWebhookLogFactory
             WebhookKey = webhook.Key,
             RetryCount = retryCount,
             RequestHeaders = $"{requestMessage.Content?.Headers}{requestMessage.Headers}",
-            RequestBody = requestMessage.Content is null
-                ? string.Empty
-                : await requestMessage.Content.ReadAsStringAsync(cancellationToken),
+            RequestBody = await ReadBodyAsync(requestMessage.Content, cancellationToken),
             ExceptionOccured = exception is not null,
         };
 
@@ -32,7 +30,7 @@ public class WebhookLogFactory : IWebhookLogFactory
             log.StatusCode = MapStatusCodeToMessage(httpResponseMessage.StatusCode);
             log.IsSuccessStatusCode = httpResponseMessage.IsSuccessStatusCode;
             log.ResponseHeaders = $"{httpResponseMessage.Content.Headers}{httpResponseMessage.Headers}";
-            log.ResponseBody = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
+            log.ResponseBody = await ReadBodyAsync(httpResponseMessage.Content, cancellationToken);
         }
         else if (exception is HttpRequestException httpRequestException)
         {
@@ -53,6 +51,41 @@ public class WebhookLogFactory : IWebhookLogFactory
         }
 
         return log;
+    }
+
+    /// <summary>
+    ///     Reads a request or response body as text for logging.
+    /// </summary>
+    /// <remarks>
+    ///     Unlike <see cref="HttpContent.ReadAsStringAsync()" />, this does not throw when the content declares a
+    ///     charset that can't be resolved; the body is decoded as UTF-8 instead.
+    /// </remarks>
+    private static async Task<string> ReadBodyAsync(HttpContent? content, CancellationToken cancellationToken)
+    {
+        if (content is null)
+        {
+            return string.Empty;
+        }
+
+        byte[] bytes = await content.ReadAsByteArrayAsync(cancellationToken);
+        return GetEncoding(content.Headers.ContentType?.CharSet).GetString(bytes);
+    }
+
+    private static Encoding GetEncoding(string? charset)
+    {
+        if (string.IsNullOrWhiteSpace(charset))
+        {
+            return Encoding.UTF8;
+        }
+
+        try
+        {
+            return Encoding.GetEncoding(charset.Trim('"'));
+        }
+        catch (ArgumentException)
+        {
+            return Encoding.UTF8;
+        }
     }
 
     /// <summary>
