@@ -22,8 +22,10 @@ namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 /// controller replaces the inherited one.
 /// </para>
 /// <para>
-/// It's a filter, not an authorization requirement, so it only runs once the request has passed authorization, and a
-/// denial always means schema lockdown was the reason.
+/// It's a filter, not an authorization requirement, so it runs after the endpoint's authorization policies have
+/// passed. Permission checks an action makes itself through <see cref="IAuthorizationService"/> run later, so when
+/// both would refuse a request, schema lockdown answers. A denial carries the
+/// <see cref="Constants.Headers.SchemaLockdown"/> header, which tells it apart from any other 403.
 /// </para>
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class, Inherited = true)]
