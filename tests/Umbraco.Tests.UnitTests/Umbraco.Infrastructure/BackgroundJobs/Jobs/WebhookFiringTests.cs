@@ -3,6 +3,7 @@
 
 using System.Data;
 using System.Net;
+using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -76,6 +77,49 @@ public class WebhookFiringTests
         _webhookRequestService.Verify(x => x.DeleteAsync(It.IsAny<WebhookRequest>()), Times.Never);
     }
 
+    [TestCase("X-Custom", "value\r\nX-Injected: yes")]
+    [TestCase("Content-Language", "en\nX-Injected: yes")]
+    [TestCase("X-Custom", "value\0")]
+    public async Task Header_Value_With_Line_Break_Is_Not_Sent(string name, string value)
+    {
+        WebhookRequest request = SetupQueuedRequest(new Dictionary<string, string> { [name] = value });
+
+        await CreateJob().ExecuteAsync();
+
+        Assert.That(_handler.CallCount, Is.EqualTo(0));
+        _webhookLogService.Verify(x => x.CreateAsync(It.Is<WebhookLog>(l => l.ExceptionOccured)), Times.Once);
+        _webhookRequestService.Verify(x => x.UpdateAsync(It.Is<WebhookRequest>(r => r == request && r.RetryCount == 1)), Times.Once);
+    }
+
+    [Test]
+    public async Task Content_Type_With_Unknown_Charset_Is_Sent_And_Logged()
+    {
+        WebhookRequest request = SetupQueuedRequest(new Dictionary<string, string>
+        {
+            ["Content-Type"] = "application/json; charset=not-a-real-encoding",
+        });
+
+        await CreateJob().ExecuteAsync();
+
+        Assert.That(_handler.CallCount, Is.EqualTo(1));
+        _webhookLogService.Verify(x => x.CreateAsync(It.Is<WebhookLog>(l => l.RequestBody == "{}")), Times.Once);
+        _webhookRequestService.Verify(x => x.DeleteAsync(request), Times.Once);
+    }
+
+    [Test]
+    public async Task Request_Is_Deleted_After_Successful_Send_Even_When_Logging_Fails()
+    {
+        WebhookRequest request = SetupQueuedRequest(new Dictionary<string, string>());
+        _webhookLogService
+            .Setup(x => x.CreateAsync(It.IsAny<WebhookLog>()))
+            .ThrowsAsync(new InvalidOperationException("Logging failed."));
+
+        await CreateJob().ExecuteAsync();
+
+        Assert.That(_handler.CallCount, Is.EqualTo(1));
+        _webhookRequestService.Verify(x => x.DeleteAsync(request), Times.Once);
+    }
+
     private WebhookRequest SetupQueuedRequest(IDictionary<string, string> headers)
     {
         var webhook = new Webhook("https://example.com/webhook", true, headers: headers) { Key = Guid.NewGuid() };
@@ -145,7 +189,7 @@ public class WebhookFiringTests
                 ContentTypeValues = request.Content.Headers.TryGetValues("Content-Type", out IEnumerable<string>? values)
                     ? values.ToArray()
                     : [];
-                Body = await request.Content.ReadAsStringAsync(cancellationToken);
+                Body = Encoding.UTF8.GetString(await request.Content.ReadAsByteArrayAsync(cancellationToken));
             }
 
             return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(string.Empty) };

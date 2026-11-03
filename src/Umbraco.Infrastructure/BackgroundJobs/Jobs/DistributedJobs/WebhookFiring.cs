@@ -132,7 +132,6 @@ internal class WebhookFiring : IDistributedBackgroundJob
                 AddCustomHeader(request, header.Key, header.Value);
             }
 
-
             response = await httpClient.SendAsync(request, cancellationToken);
         }
         catch (Exception ex)
@@ -141,14 +140,29 @@ internal class WebhookFiring : IDistributedBackgroundJob
             _logger.LogError(ex, "Error while sending webhook request for webhook {WebhookKey}.", webhook.Key);
         }
 
-        WebhookLog log = await _webhookLogFactory.CreateAsync(eventName, request, response, retryCount, exception, webhook, cancellationToken);
-        await _webhookLogService.CreateAsync(log);
+        // A failure to log the delivery must not stop the caller from deleting or retrying the request.
+        try
+        {
+            WebhookLog log = await _webhookLogFactory.CreateAsync(eventName, request, response, retryCount, exception, webhook, cancellationToken);
+            await _webhookLogService.CreateAsync(log);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while logging webhook request for webhook {WebhookKey}.", webhook.Key);
+        }
 
         return response;
     }
 
     private static void AddCustomHeader(HttpRequestMessage request, string name, string value)
     {
+        // Headers are added without validation so content headers can be routed to the content collection,
+        // which means line breaks in a value would otherwise be written to the wire as extra header lines.
+        if (value.AsSpan().IndexOfAny('\r', '\n', '\0') >= 0)
+        {
+            throw new InvalidOperationException($"The value of webhook header '{name}' contains a line break or NUL character.");
+        }
+
         if (request.Headers.TryAddWithoutValidation(name, value))
         {
             return;
