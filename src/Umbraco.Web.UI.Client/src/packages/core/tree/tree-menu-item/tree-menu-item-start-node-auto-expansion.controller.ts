@@ -77,7 +77,7 @@ export class UmbTreeMenuItemStartNodeAutoExpansionController extends UmbControll
 		if (!treeRepository || run !== this.#expansionRun) return;
 
 		for (const startNode of startNodes) {
-			if (startNode.unique === null) continue;
+			if (startNode.unique === null || this.#isExpanded(startNode)) continue;
 
 			try {
 				const { data: ancestors } = await treeRepository.requestTreeItemAncestors({
@@ -93,6 +93,11 @@ export class UmbTreeMenuItemStartNodeAutoExpansionController extends UmbControll
 				// A start node that can't be resolved is skipped so the remaining start nodes can still expand.
 			}
 		}
+	}
+
+	#isExpanded(startNode: UmbEntityModel): boolean {
+		const expansion = this.#menuItemContext?.expansion.getExpansion() ?? [];
+		return expansion.some((entry) => entry.entityType === startNode.entityType && entry.unique === startNode.unique);
 	}
 
 	async #createTreeRepository(alias: string): Promise<UmbTreeRepository | undefined> {

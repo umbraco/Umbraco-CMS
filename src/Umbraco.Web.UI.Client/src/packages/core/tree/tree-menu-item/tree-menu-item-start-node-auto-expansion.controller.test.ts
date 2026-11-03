@@ -23,6 +23,7 @@ class UmbTestTreeRepository {
 	static ancestors: Record<string, Array<UmbEntityModel>> = {};
 	static failingUniques: Array<string> = [];
 	static ancestorsGate?: Promise<void>;
+	static requestedUniques: Array<string> = [];
 
 	destroyed = false;
 
@@ -31,6 +32,7 @@ class UmbTestTreeRepository {
 		UmbTestTreeRepository.ancestors = {};
 		UmbTestTreeRepository.failingUniques = [];
 		UmbTestTreeRepository.ancestorsGate = undefined;
+		UmbTestTreeRepository.requestedUniques = [];
 	}
 
 	constructor() {
@@ -38,6 +40,7 @@ class UmbTestTreeRepository {
 	}
 
 	async requestTreeItemAncestors(args: { treeItem: { unique: string; entityType: string } }) {
+		UmbTestTreeRepository.requestedUniques.push(args.treeItem.unique);
 		await UmbTestTreeRepository.ancestorsGate;
 		if (UmbTestTreeRepository.failingUniques.includes(args.treeItem.unique)) {
 			throw new Error(`Failed to request ancestors of ${args.treeItem.unique}`);
@@ -57,6 +60,7 @@ class UmbTestMenuItemContext extends UmbContextBase {
 		expandItems: (entries: Array<UmbMenuItemExpansionEntryModel>) => {
 			this.expandedEntries.push(...entries);
 		},
+		getExpansion: () => this.expandedEntries,
 	};
 
 	constructor(host: UmbControllerHost) {
@@ -170,6 +174,36 @@ describe('UmbTreeMenuItemStartNodeAutoExpansionController', () => {
 			await waitUntil(() => menuItemContext.expandedEntries.length === 1);
 			await aTimeout(0);
 			expect(menuItemContext.expandedEntries).to.deep.equal([{ ...entity('c'), menuItemAlias: MENU_ITEM_ALIAS }]);
+		});
+
+		it('does not request the ancestors of start nodes that are already expanded', async () => {
+			menuItemContext.expandedEntries.push({ ...entity('b'), menuItemAlias: MENU_ITEM_ALIAS });
+			controller.setTreeRepositoryAlias(TREE_REPOSITORY_ALIAS);
+			controller.setStartNodes([entity('b'), entity('c')]);
+
+			await waitUntil(() => menuItemContext.expandedEntries.length === 2);
+			await aTimeout(0);
+			expect(UmbTestTreeRepository.requestedUniques).to.deep.equal(['c']);
+			expect(menuItemContext.expandedEntries).to.deep.equal([
+				{ ...entity('b'), menuItemAlias: MENU_ITEM_ALIAS },
+				{ ...entity('c'), menuItemAlias: MENU_ITEM_ALIAS },
+			]);
+		});
+
+		it('expands a start node again once it is no longer expanded', async () => {
+			controller.setTreeRepositoryAlias(TREE_REPOSITORY_ALIAS);
+			controller.setStartNodes([entity('c')]);
+			await waitUntil(() => menuItemContext.expandedEntries.length === 1);
+
+			controller.setStartNodes([entity('c')]);
+			await aTimeout(0);
+			expect(UmbTestTreeRepository.requestedUniques).to.deep.equal(['c']);
+
+			menuItemContext.expandedEntries = [];
+			controller.setStartNodes([entity('c')]);
+
+			await waitUntil(() => menuItemContext.expandedEntries.length === 1);
+			expect(UmbTestTreeRepository.requestedUniques).to.deep.equal(['c', 'c']);
 		});
 
 		it('does not throw when the repository alias is not registered', async () => {
