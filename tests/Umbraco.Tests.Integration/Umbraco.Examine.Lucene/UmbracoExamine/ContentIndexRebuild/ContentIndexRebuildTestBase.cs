@@ -66,35 +66,51 @@ internal abstract partial class ContentIndexRebuildTestBase : UmbracoIntegration
     /// <summary>
     ///     Rebuilds a capturing index through <see cref="ContentIndexPopulator" /> and returns what it received.
     /// </summary>
+    /// <param name="publishedValuesOnly">Whether to rebuild an index of published values only.</param>
+    /// <param name="batchSize">The number of documents to index at a time.</param>
+    /// <param name="onBatch">Called with each batch the index receives.</param>
+    /// <param name="validator">
+    ///     The validator of the index, applied to each value set before it is captured. If <c>null</c>, the index has no
+    ///     validator.
+    /// </param>
+    /// <param name="loadOnlyPropertiesForIncludedFields">The value of <see cref="IndexingSettings.LoadOnlyPropertiesForIncludedFields" />.</param>
     /// <returns>The value sets the index received, in batches.</returns>
-    protected CapturedIndex Rebuild(bool publishedValuesOnly, int batchSize, Action<CapturedBatch>? onBatch = null)
+    protected CapturedIndex Rebuild(bool publishedValuesOnly, int batchSize, Action<CapturedBatch>? onBatch = null, IValueSetValidator? validator = null, bool loadOnlyPropertiesForIncludedFields = false)
     {
         IValueSetBuilder<IContent> valueSetBuilder = publishedValuesOnly
             ? GetRequiredService<IPublishedContentValueSetBuilder>()
             : GetRequiredService<IContentValueSetBuilder>();
 
+        var captured = new CapturedIndex();
         var populator = new ContentIndexPopulator(
             GetRequiredService<ILogger<ContentIndexPopulator>>(),
             publishedValuesOnly,
             null,
             ContentService,
             GetRequiredService<IUmbracoDatabaseFactory>(),
-            valueSetBuilder,
-            new TestOptionsMonitor<IndexingSettings>(new IndexingSettings { BatchSize = batchSize }));
+            new RecordingValueSetBuilder(valueSetBuilder, captured.LoadedContent),
+            new TestOptionsMonitor<IndexingSettings>(new IndexingSettings { BatchSize = batchSize, LoadOnlyPropertiesForIncludedFields = loadOnlyPropertiesForIncludedFields }));
 
-        var captured = new CapturedIndex();
+        void Capture(IEnumerable<ValueSet> valueSets)
+        {
+            // Materialise the whole batch at once, as a remote index provider buffering a batch for upload does.
+            var batch = new CapturedBatch(valueSets.ToList());
+            captured.Batches.Add(batch);
+            onBatch?.Invoke(batch);
+        }
+
+        if (validator is not null)
+        {
+            populator.Populate(new ValidatingCapturingIndex(publishedValuesOnly, validator, Capture));
+            return captured;
+        }
+
         var index = new Mock<IUmbracoContentIndex>();
         index.SetupGet(x => x.Name).Returns("CapturingIndex");
         index.SetupGet(x => x.PublishedValuesOnly).Returns(publishedValuesOnly);
         index
             .Setup(x => x.IndexItems(It.IsAny<IEnumerable<ValueSet>>()))
-            .Callback<IEnumerable<ValueSet>>(valueSets =>
-            {
-                // Materialise the whole batch at once, as a remote index provider buffering a batch for upload does.
-                var batch = new CapturedBatch(valueSets.ToList());
-                captured.Batches.Add(batch);
-                onBatch?.Invoke(batch);
-            });
+            .Callback<IEnumerable<ValueSet>>(Capture);
 
         populator.Populate(index.Object);
         return captured;
@@ -201,6 +217,11 @@ internal abstract partial class ContentIndexRebuildTestBase : UmbracoIntegration
     protected sealed class CapturedIndex
     {
         public List<CapturedBatch> Batches { get; } = [];
+
+        /// <summary>
+        ///     Gets the content the value sets were built from, as loaded by the populator.
+        /// </summary>
+        public List<IContent> LoadedContent { get; } = [];
 
         public IEnumerable<ValueSet> ValueSets => Batches.SelectMany(x => x.ValueSets);
     }
