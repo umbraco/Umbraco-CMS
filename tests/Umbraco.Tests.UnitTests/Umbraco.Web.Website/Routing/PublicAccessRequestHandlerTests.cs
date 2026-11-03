@@ -205,6 +205,23 @@ public class PublicAccessRequestHandlerTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual(NotFoundPageId, result!.PublishedRequest.PublishedContent?.Id);
+        Assert.AreEqual(StatusCodes.Status404NotFound, result.PublishedRequest.ResponseStatusCode);
+    }
+
+    [TestCase(PublicAccessStatus.NotLoggedIn)]
+    [TestCase(PublicAccessStatus.AccessDenied)]
+    public async Task Not_Found_Page_Within_Protected_Branch_Is_Not_Served(PublicAccessStatus status)
+    {
+        IPublishedContent notFoundPage = CreateContent(NotFoundPageId, $"-1,{ProtectedPageId},{NotFoundPageId}");
+        _accessStatuses[ProtectedPageId] = status;
+        _accessStatuses[NotFoundPageId] = status;
+        _notFoundContentResolver = _ => notFoundPage;
+
+        UmbracoRouteValues? result = await RewriteAsync(CreateContent(ProtectedPageId));
+
+        Assert.IsNotNull(result);
+        Assert.IsNull(result!.PublishedRequest.PublishedContent);
+        Assert.AreEqual(StatusCodes.Status404NotFound, result.PublishedRequest.ResponseStatusCode);
     }
 
     private Task<UmbracoRouteValues?> RewriteAsync(IPublishedContent content)
