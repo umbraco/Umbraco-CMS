@@ -132,8 +132,14 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     ///     <c>true</c> if the status code is one the oEmbed specification uses to report that the resource is not found,
     ///     not embeddable, or not available in the requested format; otherwise, <c>false</c>.
     /// </returns>
-    // TODO (V20): Obsolete once DownloadResponseAsync and GetXmlResponseAsync return null for these responses.
-    protected static bool IsNotEmbeddableResponse(HttpRequestException exception)
+    /// <remarks>
+    ///     Responses identified here produce no markup and are not reported as errors. A provider that authenticates
+    ///     its requests, for example with an access token in <see cref="RequestParams"/>, can override this to exclude
+    ///     <see cref="HttpStatusCode.Unauthorized"/>, so that rejected credentials surface as a failure rather than as
+    ///     a resource that is not embeddable.
+    /// </remarks>
+    // TODO (V20): Take the status code rather than an exception once DownloadResponseAsync and GetXmlResponseAsync return null for these responses.
+    protected virtual bool IsNotEmbeddableResponse(HttpRequestException exception)
         => exception.StatusCode is HttpStatusCode statusCode && _notEmbeddableStatusCodes.Contains(statusCode);
 
     /// <summary>

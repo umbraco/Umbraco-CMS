@@ -84,6 +84,18 @@ public class OEmbedProviderResponseStatusTests
     }
 
     [Test]
+    public void Provider_Can_Treat_Unauthorized_As_A_Failure()
+    {
+        using var httpClient = CreateHttpClient(HttpStatusCode.Unauthorized, "Unauthorized");
+        var provider = new AuthenticatingTestOEmbedProvider(httpClient);
+
+        HttpRequestException? exception = Assert.ThrowsAsync<HttpRequestException>(
+            () => provider.GetJsonBasedMarkupAsync(Url, null, null, CancellationToken.None));
+
+        Assert.That(exception!.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+    }
+
+    [Test]
     public async Task Json_Based_Markup_Is_Returned_For_Success_Status()
     {
         using var httpClient = CreateHttpClient(HttpStatusCode.OK, """{"type":"video","html":"<iframe></iframe>"}""");
@@ -149,7 +161,18 @@ public class OEmbedProviderResponseStatusTests
             });
     }
 
-    private sealed class TestOEmbedProvider : OEmbedProviderBase
+    private sealed class AuthenticatingTestOEmbedProvider : TestOEmbedProvider
+    {
+        public AuthenticatingTestOEmbedProvider(HttpClient httpClient)
+            : base(httpClient)
+        {
+        }
+
+        protected override bool IsNotEmbeddableResponse(HttpRequestException exception)
+            => exception.StatusCode != HttpStatusCode.Unauthorized && base.IsNotEmbeddableResponse(exception);
+    }
+
+    private class TestOEmbedProvider : OEmbedProviderBase
     {
         private readonly HttpClient _httpClient;
 
