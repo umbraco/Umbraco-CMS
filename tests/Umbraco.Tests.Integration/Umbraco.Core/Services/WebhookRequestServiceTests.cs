@@ -64,4 +64,19 @@ internal sealed class WebhookRequestServiceTests : UmbracoIntegrationTest
             Assert.IsNull(webhook);
         });
     }
+
+    [Test]
+    public async Task Deleting_Webhook_Deletes_Its_Queued_Requests()
+    {
+        var webhookToDelete = await WebhookService.CreateAsync(new Webhook("https://example.com", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.Aliases.ContentPublish }));
+        var webhookToKeep = await WebhookService.CreateAsync(new Webhook("https://example.org", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.Aliases.ContentPublish }));
+        await WebhookRequestService.CreateAsync(webhookToDelete.Result.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
+        await WebhookRequestService.CreateAsync(webhookToDelete.Result.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
+        var keptRequest = await WebhookRequestService.CreateAsync(webhookToKeep.Result.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
+
+        await WebhookService.DeleteAsync(webhookToDelete.Result.Key);
+
+        var remaining = (await WebhookRequestService.GetAllAsync()).ToArray();
+        Assert.That(remaining.Select(x => x.Id), Is.EqualTo(new[] { keptRequest.Id }));
+    }
 }
