@@ -13,6 +13,16 @@ public abstract class OEmbedProviderBase : IEmbedProvider
 {
     private static readonly TimeSpan _requestTimeout = TimeSpan.FromSeconds(20);
 
+    // The oEmbed specification (section 2.3.4) defines these status codes as answers rather than failures: the
+    // provider has no response for the URL (404), the resource is private or not embeddable (401), or the
+    // requested format is not supported (501).
+    private static readonly HashSet<HttpStatusCode> _notEmbeddableStatusCodes =
+    [
+        HttpStatusCode.NotFound,
+        HttpStatusCode.Unauthorized,
+        HttpStatusCode.NotImplemented,
+    ];
+
     private readonly IJsonSerializer _jsonSerializer;
 
     /// <summary>
@@ -97,6 +107,8 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     /// <param name="url">The URL to download from.</param>
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
     /// <returns>A task that represents the asynchronous operation, containing the response content as a string.</returns>
+    /// <exception cref="HttpRequestException">The provider responded with a non-success status code.</exception>
+    // TODO (V20): Return Task<string?>, with null for responses the oEmbed specification defines as not embeddable, rather than throwing.
     public virtual async Task<string> DownloadResponseAsync(string url, CancellationToken cancellationToken)
     {
         // The timeout is applied per request rather than via HttpClient.Timeout, as the client is shared
@@ -107,8 +119,22 @@ public abstract class OEmbedProviderBase : IEmbedProvider
 
         using var request = new HttpRequestMessage(HttpMethod.Get, url);
         using HttpResponseMessage response = await GetHttpClient().SendAsync(request, timeoutCancellation.Token);
+        response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync(timeoutCancellation.Token);
     }
+
+    /// <summary>
+    ///     Determines whether an exception raised for a non-success response represents a provider reporting that
+    ///     there is nothing to embed, as opposed to a failure.
+    /// </summary>
+    /// <param name="exception">The exception raised for the response.</param>
+    /// <returns>
+    ///     <c>true</c> if the status code is one the oEmbed specification uses to report that the resource is not found,
+    ///     not embeddable, or not available in the requested format; otherwise, <c>false</c>.
+    /// </returns>
+    // TODO (V20): Obsolete once DownloadResponseAsync and GetXmlResponseAsync return null for these responses.
+    protected static bool IsNotEmbeddableResponse(HttpRequestException exception)
+        => exception.StatusCode is HttpStatusCode statusCode && _notEmbeddableStatusCodes.Contains(statusCode);
 
     /// <summary>
     ///     Gets the JSON response from the specified URL and deserializes it to the specified type.
@@ -116,11 +142,24 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     /// <typeparam name="T">The type to deserialize the response to.</typeparam>
     /// <param name="url">The URL to download from.</param>
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
-    /// <returns>A task that represents the asynchronous operation, containing the deserialized response or <c>null</c>.</returns>
+    /// <returns>
+    ///     A task that represents the asynchronous operation, containing the deserialized response, or <c>null</c> if
+    ///     the provider reports that the resource is not embeddable.
+    /// </returns>
     public virtual async Task<T?> GetJsonResponseAsync<T>(string url, CancellationToken cancellationToken)
         where T : class
     {
-        var response = await DownloadResponseAsync(url, cancellationToken);
+        string response;
+        try
+        {
+            response = await DownloadResponseAsync(url, cancellationToken);
+        }
+        catch (HttpRequestException ex) when (IsNotEmbeddableResponse(ex))
+        {
+            // TODO (V20): Replace with a null check once DownloadResponseAsync returns a nullable type.
+            return null;
+        }
+
         return _jsonSerializer.Deserialize<T>(response);
     }
 
@@ -130,6 +169,8 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     /// <param name="url">The URL to download from.</param>
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
     /// <returns>A task that represents the asynchronous operation, containing the response as an <see cref="XmlDocument"/>.</returns>
+    /// <exception cref="HttpRequestException">The provider responded with a non-success status code.</exception>
+    // TODO (V20): Return Task<XmlDocument?>, with null when the provider reports that the resource is not embeddable.
     public virtual async Task<XmlDocument> GetXmlResponseAsync(string url, CancellationToken cancellationToken)
     {
         // Parse via an XmlReader configured to prohibit DTD processing and disable entity/resource
@@ -184,7 +225,10 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     /// <param name="maxHeight">The maximum height, or <c>null</c> for no constraint.</param>
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
     /// <param name="property">The XPath expression to select the HTML property. Defaults to "/oembed/html".</param>
-    /// <returns>A task that represents the asynchronous operation, containing the HTML markup or <c>null</c>.</returns>
+    /// <returns>
+    ///     A task that represents the asynchronous operation, containing the HTML markup, or <c>null</c> if the provider
+    ///     reports that the resource is not embeddable.
+    /// </returns>
     public virtual async Task<string?> GetXmlBasedMarkupAsync(
         string url,
         int? maxWidth,
@@ -193,7 +237,16 @@ public abstract class OEmbedProviderBase : IEmbedProvider
         string property = "/oembed/html")
     {
         var requestUrl = GetEmbedProviderUrl(url, maxWidth, maxHeight);
-        XmlDocument xmlDocument = await GetXmlResponseAsync(requestUrl, cancellationToken);
+        XmlDocument xmlDocument;
+        try
+        {
+            xmlDocument = await GetXmlResponseAsync(requestUrl, cancellationToken);
+        }
+        catch (HttpRequestException ex) when (IsNotEmbeddableResponse(ex))
+        {
+            // TODO (V20): Replace with a null check once GetXmlResponseAsync returns a nullable type.
+            return null;
+        }
 
         return GetXmlProperty(xmlDocument, property);
     }
