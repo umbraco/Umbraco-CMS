@@ -72,12 +72,11 @@ export class UmbElementPublishEntityBulkAction extends UmbEntityBulkActionBase<o
 
 		// If there is only one language available, we can skip the modal and publish directly:
 		if (options.length === 1) {
-			const localizationController = new UmbLocalizationController(this._host);
 			const confirm = await umbConfirmModal(this, {
-				headline: localizationController.term('content_readyToPublish'),
-				content: localizationController.term('elements_confirmBulkPublishDescription'),
+				headline: '#content_readyToPublish',
+				content: '#elements_confirmBulkPublishDescription',
 				color: 'positive',
-				confirmLabel: localizationController.term('actions_publish'),
+				confirmLabel: '#actions_publish',
 			}).catch(() => false);
 
 			if (confirm !== false) {

@@ -72,12 +72,11 @@ export class UmbElementUnpublishEntityBulkAction extends UmbEntityBulkActionBase
 
 		// If there is only one language available, we can skip the modal and unpublish directly:
 		if (options.length === 1) {
-			const localizationController = new UmbLocalizationController(this._host);
 			const confirm = await umbConfirmModal(this, {
-				headline: localizationController.term('actions_unpublish'),
-				content: localizationController.term('elements_confirmBulkUnpublishDescription'),
+				headline: '#actions_unpublish',
+				content: '#elements_confirmBulkUnpublishDescription',
 				color: 'warning',
-				confirmLabel: localizationController.term('actions_unpublish'),
+				confirmLabel: '#actions_unpublish',
 			}).catch(() => false);
 
 			if (confirm !== false) {
