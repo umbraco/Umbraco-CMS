@@ -58,6 +58,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 				entityType: UMB_DICTIONARY_ENTITY_TYPE,
 				operation: 'create',
 			},
+			{
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_DICTIONARY_ENTITY_TYPE,
+				operation: 'update',
+			},
 		],
 	},
 	{
