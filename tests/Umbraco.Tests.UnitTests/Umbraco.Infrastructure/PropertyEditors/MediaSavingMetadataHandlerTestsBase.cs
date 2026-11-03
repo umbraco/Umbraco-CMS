@@ -17,9 +17,12 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
+/// <summary>
+///     Shared tests for <see cref="MediaSavingNotification"/> handlers that populate media file metadata,
+///     verifying that metadata is read from the file on save but left untouched while sorting.
+/// </summary>
 public abstract class MediaSavingMetadataHandlerTestsBase
 {
-    private Mock<IFileSystem> _fileSystem = null!;
     private IMedia _media = null!;
 
     protected abstract string EditorAlias { get; }
@@ -29,6 +32,8 @@ public abstract class MediaSavingMetadataHandlerTestsBase
     protected virtual string MediaTypeAlias => "document";
 
     protected virtual int PopulatedBytes => 50;
+
+    protected Mock<IFileSystem> FileSystem { get; private set; } = null!;
 
     protected MediaFileManager FileManager { get; private set; } = null!;
 
@@ -51,22 +56,30 @@ public abstract class MediaSavingMetadataHandlerTestsBase
     {
         var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
         _media = CreateMedia(helper);
-        _fileSystem = new Mock<IFileSystem>();
-        _fileSystem.Setup(x => x.GetRelativePath(It.IsAny<string>())).Returns(FileName);
-        _fileSystem.Setup(x => x.FileExists(FileName)).Returns(true);
-        _fileSystem.Setup(x => x.OpenFile(FileName)).Returns(() => new MemoryStream(new byte[50]));
+        FileSystem = new Mock<IFileSystem>();
+        FileSystem.Setup(x => x.GetRelativePath(It.IsAny<string>())).Returns(FileName);
+        FileSystem.Setup(x => x.FileExists(FileName)).Returns(true);
+        FileSystem.Setup(x => x.OpenFile(FileName)).Returns(() => new MemoryStream(new byte[50]));
         Dimensions = new Mock<IImageDimensionExtractor>();
-        Dimensions.SetupGet(x => x.SupportedImageFileTypes).Returns(new[] { FileExtension });
+        Dimensions.SetupGet(x => x.SupportedImageFileTypes).Returns([FileExtension]);
         Dimensions.Setup(x => x.GetDimensions(It.IsAny<Stream>())).Returns(new Size(100, 200));
         SvgDimensions = new Mock<ISvgDimensionExtractor>();
         SvgDimensions.Setup(x => x.GetDimensions(It.IsAny<Stream>())).Returns(new Size(100, 200));
-        FileManager = new MediaFileManager(_fileSystem.Object, Mock.Of<IMediaPathScheme>(), NullLogger<MediaFileManager>.Instance,
-            helper, Mock.Of<IServiceProvider>(), new Lazy<ICoreScopeProvider>(() => Mock.Of<ICoreScopeProvider>()));
+        FileManager = new MediaFileManager(
+            FileSystem.Object,
+            Mock.Of<IMediaPathScheme>(),
+            NullLogger<MediaFileManager>.Instance,
+            helper,
+            Mock.Of<IServiceProvider>(),
+            new Lazy<ICoreScopeProvider>(() => Mock.Of<ICoreScopeProvider>()));
         var options = new Mock<IOptionsMonitor<ContentSettings>>();
         options.SetupGet(x => x.CurrentValue).Returns(new ContentSettings());
         Settings = options.Object;
         Serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
-        AutoFill = new UploadAutoFillProperties(FileManager, NullLogger<UploadAutoFillProperties>.Instance, Dimensions.Object);
+        AutoFill = new UploadAutoFillProperties(
+            FileManager,
+            NullLogger<UploadAutoFillProperties>.Instance,
+            Dimensions.Object);
     }
 
     [Test]
@@ -74,7 +87,7 @@ public abstract class MediaSavingMetadataHandlerTestsBase
     {
         CreateHandler().Handle(new MediaSavingNotification(_media, new EventMessages()) { IsSorting = true });
 
-        _fileSystem.Verify(x => x.OpenFile(It.IsAny<string>()), Times.Never());
+        FileSystem.Verify(x => x.OpenFile(It.IsAny<string>()), Times.Never());
         Dimensions.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never());
         SvgDimensions.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never());
         AssertMetadata(10, 20, 30);
@@ -85,7 +98,7 @@ public abstract class MediaSavingMetadataHandlerTestsBase
     {
         CreateHandler().Handle(new MediaSavingNotification(_media, new EventMessages()));
 
-        _fileSystem.Verify(x => x.OpenFile(It.IsAny<string>()), Times.Once());
+        FileSystem.Verify(x => x.OpenFile(It.IsAny<string>()), Times.Once());
         VerifyDimensions(Times.Once());
         AssertMetadata(100, 200, PopulatedBytes);
     }
@@ -99,10 +112,20 @@ public abstract class MediaSavingMetadataHandlerTestsBase
     private IMedia CreateMedia(IShortStringHelper helper)
     {
         var mediaType = new MediaType(helper, -1) { Alias = MediaTypeAlias };
-        mediaType.AddPropertyType(new PropertyType(helper, EditorAlias, ValueStorageType.Ntext, Constants.Conventions.Media.File));
-        foreach (var alias in new[] { Constants.Conventions.Media.Width, Constants.Conventions.Media.Height, Constants.Conventions.Media.Bytes, Constants.Conventions.Media.Extension })
+        mediaType.AddPropertyType(
+            new PropertyType(helper, EditorAlias, ValueStorageType.Ntext, Constants.Conventions.Media.File));
+
+        string[] metadataAliases =
+        [
+            Constants.Conventions.Media.Width,
+            Constants.Conventions.Media.Height,
+            Constants.Conventions.Media.Bytes,
+            Constants.Conventions.Media.Extension,
+        ];
+        foreach (var alias in metadataAliases)
         {
-            mediaType.AddPropertyType(new PropertyType(helper, Constants.PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, alias));
+            mediaType.AddPropertyType(
+                new PropertyType(helper, Constants.PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, alias));
         }
 
         var media = new global::Umbraco.Cms.Core.Models.Media("Document", -1, mediaType) { Id = 123 };
@@ -116,13 +139,11 @@ public abstract class MediaSavingMetadataHandlerTestsBase
     }
 
     private void AssertMetadata(int width, int height, int bytes)
-    {
-        Assert.Multiple(() =>
-        {
-            Assert.That(_media.GetValue<int>(Constants.Conventions.Media.Width), Is.EqualTo(width));
-            Assert.That(_media.GetValue<int>(Constants.Conventions.Media.Height), Is.EqualTo(height));
-            Assert.That(_media.GetValue<int>(Constants.Conventions.Media.Bytes), Is.EqualTo(bytes));
-            Assert.That(_media.GetValue<string>(Constants.Conventions.Media.Extension), Is.EqualTo(FileExtension));
-        });
-    }
+        => Assert.Multiple(() =>
+            {
+                Assert.That(_media.GetValue<int>(Constants.Conventions.Media.Width), Is.EqualTo(width));
+                Assert.That(_media.GetValue<int>(Constants.Conventions.Media.Height), Is.EqualTo(height));
+                Assert.That(_media.GetValue<int>(Constants.Conventions.Media.Bytes), Is.EqualTo(bytes));
+                Assert.That(_media.GetValue<string>(Constants.Conventions.Media.Extension), Is.EqualTo(FileExtension));
+            });
 }

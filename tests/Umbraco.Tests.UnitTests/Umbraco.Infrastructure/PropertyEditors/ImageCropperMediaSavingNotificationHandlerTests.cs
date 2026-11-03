@@ -16,6 +16,13 @@ public class ImageCropperMediaSavingNotificationHandlerTests : MediaSavingMetada
     protected override string EditorAlias => Constants.PropertyEditors.Aliases.ImageCropper;
 
     protected override INotificationHandler<MediaSavingNotification> CreateHandler() =>
-        new ImageCropperPropertyEditor(Mock.Of<IDataValueEditorFactory>(), NullLoggerFactory.Instance, FileManager, Settings,
-            Mock.Of<IIOHelper>(), AutoFill, Mock.Of<IContentService>(), Serializer);
+        new ImageCropperPropertyEditor(
+            Mock.Of<IDataValueEditorFactory>(),
+            NullLoggerFactory.Instance,
+            FileManager,
+            Settings,
+            Mock.Of<IIOHelper>(),
+            AutoFill,
+            Mock.Of<IContentService>(),
+            Serializer);
 }

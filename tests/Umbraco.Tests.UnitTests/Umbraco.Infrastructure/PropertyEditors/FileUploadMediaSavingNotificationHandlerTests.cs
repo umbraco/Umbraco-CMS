@@ -14,5 +14,10 @@ public class FileUploadMediaSavingNotificationHandlerTests : MediaSavingMetadata
     protected override string EditorAlias => Constants.PropertyEditors.Aliases.UploadField;
 
     protected override INotificationHandler<MediaSavingNotification> CreateHandler() =>
-        new FileUploadMediaSavingNotificationHandler(Serializer, FileManager, Mock.Of<IBlockEditorElementTypeCache>(), Settings, AutoFill);
+        new FileUploadMediaSavingNotificationHandler(
+            Serializer,
+            FileManager,
+            Mock.Of<IBlockEditorElementTypeCache>(),
+            Settings,
+            AutoFill);
 }
