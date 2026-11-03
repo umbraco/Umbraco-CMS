@@ -21,7 +21,9 @@ public class WebhookLogFactory : IWebhookLogFactory
             WebhookKey = webhook.Key,
             RetryCount = retryCount,
             RequestHeaders = $"{requestMessage.Content?.Headers}{requestMessage.Headers}",
-            RequestBody = await requestMessage.Content?.ReadAsStringAsync(cancellationToken)!,
+            RequestBody = requestMessage.Content is null
+                ? string.Empty
+                : await requestMessage.Content.ReadAsStringAsync(cancellationToken),
             ExceptionOccured = exception is not null,
         };
 
