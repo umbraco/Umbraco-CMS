@@ -17,35 +17,46 @@ internal static class SchemaOperationResolver
         => httpMethod is null ? SchemaOperation.Unknown : FromVerb(httpMethod);
 
     /// <summary>
-    /// Resolves the operation each of an action's entity types is subject to.
+    /// Resolves the operations each of an action's entity types is subject to.
     /// </summary>
     /// <param name="entityTypes">The entity types the action's controller manages.</param>
     /// <param name="declared">The operations the action declares.</param>
     /// <param name="httpMethod">The HTTP method the action responds to.</param>
-    /// <returns>Each entity type the controller declared, paired with its operation.</returns>
+    /// <returns>Each entity type the controller declared, paired with each of its operations.</returns>
     /// <remarks>
-    /// A declaration naming the entity type wins, then a declaration naming none, then the HTTP verb. Both enforcement
-    /// and the OpenAPI document use this, so they can't disagree.
+    /// Declarations naming the entity type win, then declarations naming none, then the HTTP verb. An entity type's
+    /// operations are ordered by value, so which denial is reported doesn't depend on the order attributes are read in.
+    /// Both enforcement and the OpenAPI document use this, so they can't disagree.
     /// </remarks>
     public static (string EntityType, SchemaOperation Operation)[] Resolve(
         IReadOnlyList<string> entityTypes,
         IReadOnlyList<SchemaOperationAttribute> declared,
         string? httpMethod)
         => entityTypes
-            .Select(entityType => (EntityType: entityType, Operation: For(entityType, declared, httpMethod)))
+            .SelectMany(entityType => For(entityType, declared, httpMethod)
+                .Select(operation => (EntityType: entityType, Operation: operation)))
             .ToArray();
 
-    private static SchemaOperation For(
+    private static SchemaOperation[] For(
         string entityType,
         IReadOnlyList<SchemaOperationAttribute> declared,
         string? httpMethod)
     {
-        SchemaOperationAttribute? match =
-            declared.FirstOrDefault(x => string.Equals(x.EntityType, entityType, StringComparison.OrdinalIgnoreCase))
-            ?? declared.FirstOrDefault(x => x.EntityType is null);
+        SchemaOperation[] named =
+            Operations(declared, x => string.Equals(x.EntityType, entityType, StringComparison.OrdinalIgnoreCase));
+        if (named.Length > 0)
+        {
+            return named;
+        }
 
-        return match?.Operation ?? Resolve(httpMethod);
+        SchemaOperation[] general = Operations(declared, x => x.EntityType is null);
+        return general.Length > 0 ? general : [Resolve(httpMethod)];
     }
+
+    private static SchemaOperation[] Operations(
+        IReadOnlyList<SchemaOperationAttribute> declared,
+        Func<SchemaOperationAttribute, bool> applies)
+        => declared.Where(applies).Select(x => x.Operation).Distinct().Order().ToArray();
 
     private static SchemaOperation FromVerb(string httpMethod)
     {

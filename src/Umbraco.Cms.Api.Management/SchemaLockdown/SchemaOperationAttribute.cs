@@ -3,11 +3,15 @@ using Umbraco.Cms.Core.SchemaLockdown;
 namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 
 /// <summary>
-/// Declares the operation an action performs when its HTTP verb doesn't match it, for example a POST that only reads.
+/// Declares an operation an action performs when its HTTP verb doesn't match it, for example a POST that only reads.
 /// </summary>
 /// <remarks>
 /// Name an entity type when the action does different things to each one: creating a template for a document type
 /// creates the template and updates the document type. Entity types without a declaration fall back to the HTTP verb.
+/// <para>
+/// Declare several operations when the action can perform more than one, for example an import that creates new items
+/// and updates existing ones. Every one of them has to be permitted.
+/// </para>
 /// </remarks>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public sealed class SchemaOperationAttribute : Attribute

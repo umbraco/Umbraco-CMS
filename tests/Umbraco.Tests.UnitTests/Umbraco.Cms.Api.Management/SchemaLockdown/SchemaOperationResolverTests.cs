@@ -86,6 +86,63 @@ public class SchemaOperationResolverTests
             }));
 
     [Test]
+    public void Every_Operation_Declared_For_An_Entity_Type_Applies()
+        => Assert.That(
+            Resolve(
+                HttpMethods.Post,
+                new SchemaOperationAttribute(DocumentType, SchemaOperation.Create),
+                new SchemaOperationAttribute(DocumentType, SchemaOperation.Update)),
+            Is.EqualTo(new[]
+            {
+                (DocumentType, SchemaOperation.Create),
+                (DocumentType, SchemaOperation.Update),
+                (Template, SchemaOperation.Create),
+            }));
+
+    [Test]
+    public void Every_Operation_Declared_For_All_Entity_Types_Applies()
+        => Assert.That(
+            Resolve(
+                HttpMethods.Post,
+                new SchemaOperationAttribute(SchemaOperation.Create),
+                new SchemaOperationAttribute(SchemaOperation.Update)),
+            Is.EqualTo(new[]
+            {
+                (DocumentType, SchemaOperation.Create),
+                (DocumentType, SchemaOperation.Update),
+                (Template, SchemaOperation.Create),
+                (Template, SchemaOperation.Update),
+            }));
+
+    [Test]
+    public void Operations_Are_Ordered_By_Value_Whatever_The_Declaration_Order()
+        => Assert.That(
+            Resolve(
+                HttpMethods.Post,
+                new SchemaOperationAttribute(SchemaOperation.Update),
+                new SchemaOperationAttribute(SchemaOperation.Create)),
+            Is.EqualTo(new[]
+            {
+                (DocumentType, SchemaOperation.Create),
+                (DocumentType, SchemaOperation.Update),
+                (Template, SchemaOperation.Create),
+                (Template, SchemaOperation.Update),
+            }));
+
+    [Test]
+    public void An_Operation_Declared_Twice_Applies_Once()
+        => Assert.That(
+            Resolve(
+                HttpMethods.Post,
+                new SchemaOperationAttribute(SchemaOperation.Update),
+                new SchemaOperationAttribute(SchemaOperation.Update)),
+            Is.EqualTo(new[]
+            {
+                (DocumentType, SchemaOperation.Update),
+                (Template, SchemaOperation.Update),
+            }));
+
+    [Test]
     public void A_Declaration_Matches_Its_Entity_Type_Whatever_The_Casing()
         => Assert.That(
             Resolve(HttpMethods.Post, new SchemaOperationAttribute("Document-Type", SchemaOperation.Update)),
