@@ -38,7 +38,7 @@ export function mergeObservables<
 	memoizationFunction?: MemoizationFunction<R>,
 ): Observable<R> {
 	// Stateful observables can be released when nobody listens, since a later subscriber gets their current values again.
-	const refCount = sources.every((source) => umbIsStatefulObservable(source));
+	const refCount = sources.length > 0 && sources.every((source) => umbIsStatefulObservable(source));
 	const merged = combineLatest(sources).pipe(
 		map(mergeFunction as MappingFunction<unknown[], R>),
 		distinctUntilChanged(memoizationFunction ?? defaultMemoization),

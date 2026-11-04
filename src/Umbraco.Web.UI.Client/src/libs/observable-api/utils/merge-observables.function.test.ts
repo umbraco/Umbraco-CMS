@@ -51,4 +51,16 @@ describe('mergeObservables', () => {
 			expect(umbIsStatefulObservable(merged)).to.be.false;
 		});
 	});
+
+	describe('without sources', () => {
+		it('is not a stateful observable, since it completes without a value', () => {
+			const merged = mergeObservables([], () => 'never');
+			const received: Array<string> = [];
+
+			merged.subscribe({ next: () => received.push('value'), complete: () => received.push('complete') });
+
+			expect(received).to.deep.equal(['complete']);
+			expect(umbIsStatefulObservable(merged)).to.be.false;
+		});
+	});
 });
