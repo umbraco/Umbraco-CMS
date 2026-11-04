@@ -1936,6 +1936,23 @@ export class UiBaseLocators extends BasePage {
     await this.clickEntityActionWithName("Create");
   }
 
+  // Action Group Methods
+  async doesOpenActionMenuHaveActionGroups(groupAliases: string[]) {
+    const groups = this.page.locator("#action-modal[open]").getByTestId(/^action-group:/);
+    await this.hasCount(groups, groupAliases.length);
+    for (const [index, alias] of groupAliases.entries()) {
+      await this.hasAttribute(groups.nth(index), "data-mark", "action-group:" + alias);
+    }
+  }
+
+  async isEntityActionInActionGroup(actionName: string, groupLabel: string, isInGroup: boolean = true) {
+    const action = this.page
+      .locator("#action-modal[open]")
+      .getByRole("group", { name: groupLabel, exact: true })
+      .getByTestId(new RegExp(`^entity-action:.*${actionName}$`));
+    await this.isVisible(action, isInGroup);
+  }
+
   async clickTrashActionMenuOption() {
     await this.clickEntityActionWithName("Trash");
   }

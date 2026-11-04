@@ -136,6 +136,24 @@ test('can delete content with delete permission enabled', {tag: '@release'}, asy
   await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName);
 });
 
+test('keeps move to in the structure group with delete permission disabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveToDocumentPermission(userGroupName);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
+
+  // Assert
+  await umbracoUi.content.isEntityActionInActionGroup('Trash', 'Structure', false);
+  await umbracoUi.content.isEntityActionInActionGroup('MoveTo', 'Structure');
+  await umbracoUi.content.isEntityActionInActionGroup('MoveTo', 'Create', false);
+  await umbracoUi.content.isEntityActionInActionGroup('Create', 'Create');
+});
+
 test('can not delete content with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteDocumentPermission(userGroupName, false);
