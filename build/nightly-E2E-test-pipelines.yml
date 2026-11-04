@@ -596,6 +596,43 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
+            # SchemaLockdownConfig
+            LinuxSchemaLockdownCreateBlocked:
+              vmImage: "ubuntu-latest"
+              testFolder: "SchemaLockdownConfig"
+              port: ''
+              testCommand: "npx playwright test --project=schemaLockdownCreateBlocked"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              SCHEMALOCKDOWNTEST__BLOCKEDOPERATIONS: Create
+              additionalEnvironmentVariables: false
+            LinuxSchemaLockdownUpdateBlocked:
+              vmImage: "ubuntu-latest"
+              testFolder: "SchemaLockdownConfig"
+              port: ''
+              testCommand: "npx playwright test --project=schemaLockdownUpdateBlocked"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              SCHEMALOCKDOWNTEST__BLOCKEDOPERATIONS: Update
+              additionalEnvironmentVariables: false
+            LinuxSchemaLockdownDeleteBlocked:
+              vmImage: "ubuntu-latest"
+              testFolder: "SchemaLockdownConfig"
+              port: ''
+              testCommand: "npx playwright test --project=schemaLockdownDeleteBlocked"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              SCHEMALOCKDOWNTEST__BLOCKEDOPERATIONS: Delete
+              additionalEnvironmentVariables: false
+            LinuxSchemaLockdownAllBlocked:
+              vmImage: "ubuntu-latest"
+              testFolder: "SchemaLockdownConfig"
+              port: ''
+              testCommand: "npx playwright test --project=schemaLockdownAllBlocked"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              SCHEMALOCKDOWNTEST__BLOCKEDOPERATIONS: Create,Update,Delete
+              additionalEnvironmentVariables: false
             # SMTP
             LinuxSMTP:
               vmImage: "ubuntu-latest"

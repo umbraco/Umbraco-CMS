@@ -938,6 +938,34 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.filterChooseBtn);
   }
 
+  // Read-only Workspace Methods
+  async isSaveButtonVisible(isVisible: boolean = true) {
+    await this.isVisible(this.page.getByTestId(/^workspace-action:.*Save$/), isVisible);
+  }
+
+  async isWorkspaceNameEditable(isEditable: boolean = true) {
+    await expect(this.enterAName).toBeEditable({ editable: isEditable, timeout: ConstantHelper.timeout.medium });
+  }
+
+  async isPropertyTypeEditable(name: string, isEditable: boolean = true) {
+    const propertyType = this.page.getByTestId(`property-type:${name}`);
+    await this.isVisible(propertyType);
+    await this.isVisible(propertyType.getByTestId("action:editor-settings"), isEditable);
+    await this.isVisible(propertyType.getByTestId("action:delete"), isEditable);
+  }
+
+  async isAddPropertyButtonVisible(isVisible: boolean = true) {
+    await this.isVisible(this.addPropertyBtn, isVisible);
+  }
+
+  async isReadOnlyTagVisible(isVisible: boolean = true) {
+    await this.isVisible(this.page.locator("#read-only-tag"), isVisible);
+  }
+
+  async isEntityDetailForbiddenVisible(isVisible: boolean = true) {
+    await this.isVisible(this.page.locator("umb-entity-detail-forbidden"), isVisible);
+  }
+
   // Success State Methods
   async isSuccessStateVisibleForSaveButton(isVisible: boolean = true) {
     const regex = new RegExp(`^workspace-action:.*Save$`);
@@ -1275,11 +1303,16 @@ export class UiBaseLocators extends BasePage {
     await this.enterText(this.enterPropertyEditorDescriptionTxt, description);
   }
 
-  async isPropertyEditorUiWithNameReadOnly(name: string) {
+  async isPropertyEditorUiWithNameReadOnly(name: string, isReadOnly: boolean = true) {
     const propertyEditorUiLocator = this.page.locator(
       "umb-property-editor-ui-" + name,
     );
-    await this.hasAttribute(propertyEditorUiLocator, "readonly", "");
+    if (isReadOnly) {
+      await this.hasAttribute(propertyEditorUiLocator, "readonly", "");
+    } else {
+      await this.isVisible(propertyEditorUiLocator);
+      await expect(propertyEditorUiLocator).not.toHaveAttribute("readonly");
+    }
   }
 
   async isPropertyEditorUiWithNameVisible(
@@ -1868,6 +1901,35 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
+  async isEntityActionWithNameVisible(name: string, isVisible = true) {
+    const regex = new RegExp(`^entity-action:.*${name}$`);
+    await this.isVisible(this.openEntityAction.getByTestId(regex), isVisible);
+  }
+
+  // A menu item with a single action shows it inline. Scoped to the sidebar, as a workspace can list the same item.
+  async isInlineEntityActionVisibleForName(name: string, actionName: string, isVisible = true) {
+    const menuItem = this.sectionSidebar.locator(`uui-menu-item[label="${name}"]`);
+    await this.hover(menuItem.locator("#menu-item").first(), { force: true });
+    await this.isVisible(menuItem.getByTestId(new RegExp(`^entity-action:.*${actionName}$`)), isVisible);
+  }
+
+  // Check an item before expanding it, as the actions menus of its children would match too.
+  async isSidebarActionsMenuVisibleForName(name: string, isVisible = true) {
+    const menuItem = this.sectionSidebar.locator(`uui-menu-item[label="${name}"]`);
+    await this.hover(menuItem.locator("#menu-item").first(), { force: true });
+    await this.isVisible(menuItem.locator("#action-modal").first(), isVisible);
+  }
+
+  async isEntityActionVisibleInCollectionRowForName(rowName: string, actionName: string, isVisible = true) {
+    const row = this.page.locator("uui-table-row").filter({ has: this.page.getByText(rowName, { exact: true }) });
+    await this.isVisible(row);
+    await this.isVisible(row.getByTestId(new RegExp(`^entity-action:.*${actionName}$`)), isVisible);
+  }
+
+  async isCollectionActionWithNameVisible(name: string, isVisible = true) {
+    await this.isVisible(this.page.getByTestId(new RegExp(`^collection-action:.*${name}$`)), isVisible);
+  }
+
   async clickCreateActionMenuOption() {
     await this.clickEntityActionWithName("Create");
   }
@@ -1975,6 +2037,28 @@ export class UiBaseLocators extends BasePage {
     await this.pressKey(this.monacoEditor, "Control+A");
     await this.pressKey(this.monacoEditor, "Backspace");
     await this.page.keyboard.insertText(value);
+  }
+
+  // Monaco doesn't mark its input read-only, so these type into the editor without saving and check whether the text
+  // was accepted.
+  async isMonacoEditorEditable() {
+    const typedText = "editable-check";
+    await expect(async () => {
+      await this.monacoEditor.click();
+      await this.page.keyboard.type(typedText);
+      await expect(this.monacoEditor).toContainText(typedText, { timeout: ConstantHelper.wait.medium });
+    }).toPass({ timeout: ConstantHelper.timeout.long });
+  }
+
+  async isMonacoEditorReadOnly() {
+    const typedText = "read-only-check";
+    const readOnlyMessage = this.monacoEditor.getByText("Cannot edit in read-only editor");
+    await expect(async () => {
+      await this.monacoEditor.click();
+      await this.page.keyboard.type(typedText);
+      await expect(readOnlyMessage).toBeVisible({ timeout: ConstantHelper.wait.medium });
+    }).toPass({ timeout: ConstantHelper.timeout.long });
+    await expect(this.monacoEditor).not.toContainText(typedText);
   }
 
   // Loader Methods
