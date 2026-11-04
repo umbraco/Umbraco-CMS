@@ -3140,4 +3140,9 @@ export default {
 		'zh-tw': '中文（正體，台灣）',
 		vi: 'Tiếng Việt',
 	},
+	schemaLockdown: {
+		locked: 'Locked',
+		lockedDescription:
+			'Changes to this item are locked in this environment. Make the change where this item is managed, or contact your developer or administrator.',
+	},
 } as UmbLocalizationDictionary;

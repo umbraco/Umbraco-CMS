@@ -2,13 +2,15 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 import { umbInfoModal } from '@umbraco-cms/backoffice/modal';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
 
-export class UmbTemplatingProductionModeWorkspaceActionApi extends UmbWorkspaceActionBase {
-	#localize = new UmbLocalizationController(this);
+export class UmbSchemaLockdownWorkspaceActionApi extends UmbWorkspaceActionBase {
+	readonly #localize = new UmbLocalizationController(this);
 
 	public override async execute(): Promise<void> {
 		await umbInfoModal(this, {
-			headline: this.#localize.term('template_productionMode'),
-			content: this.#localize.term('template_runtimeModeProduction'),
+			headline: this.#localize.term('schemaLockdown_locked'),
+			content: this.#localize.term('schemaLockdown_lockedDescription'),
 		}).catch(() => undefined);
 	}
 }
+
+export { UmbSchemaLockdownWorkspaceActionApi as api };

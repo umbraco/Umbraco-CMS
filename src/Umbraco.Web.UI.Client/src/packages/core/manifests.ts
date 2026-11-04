@@ -20,6 +20,7 @@ import { manifests as propertySortModeManifests } from './property-sort-mode/man
 import { manifests as propertyManifests } from './property/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as routerManifests } from './router/manifests.js';
+import { manifests as schemaLockdownManifests } from './schema-lockdown/manifests.js';
 import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as sectionManifests } from './section/manifests.js';
 import { manifests as serverManifests } from './server/manifests.js';
@@ -55,6 +56,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...propertyManifests,
 	...recycleBinManifests,
 	...routerManifests,
+	...schemaLockdownManifests,
 	...searchManifests,
 	...sectionManifests,
 	...serverManifests,

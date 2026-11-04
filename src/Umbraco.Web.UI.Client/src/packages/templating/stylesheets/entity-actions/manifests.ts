@@ -2,6 +2,7 @@ import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
 import { UMB_STYLESHEET_DETAIL_REPOSITORY_ALIAS, UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as renameManifests } from './rename/manifests.js';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -14,6 +15,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 			detailRepositoryAlias: UMB_STYLESHEET_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS,
 		},
+		conditions: [
+			{
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_STYLESHEET_ENTITY_TYPE,
+				operation: 'delete',
+			},
+		],
 	},
 	...createManifests,
 	...renameManifests,
