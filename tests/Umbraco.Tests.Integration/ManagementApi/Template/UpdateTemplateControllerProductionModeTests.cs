@@ -41,7 +41,7 @@ public class UpdateTemplateControllerProductionModeTests : ManagementApiTest<Upd
     }
 
     [Test]
-    public async Task Content_Change_Returns_Bad_Request()
+    public async Task Content_Change_Returns_Forbidden()
     {
         UpdateTemplateRequestModel updateModel = new()
         {
@@ -52,11 +52,14 @@ public class UpdateTemplateControllerProductionModeTests : ManagementApiTest<Upd
 
         var response = await Client.PutAsync(Url, JsonContent.Create(updateModel));
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.That(
+            response.Headers.GetValues(Constants.Headers.SchemaLockdown),
+            Is.EqualTo(new[] { $"{Constants.UdiEntityType.Template}:update" }));
     }
 
     [Test]
-    public async Task Metadata_Change_Returns_Ok()
+    public async Task Metadata_Change_Returns_Forbidden()
     {
         // Re-fetch the template to get the actual resolved content (lazy-loaded from disk).
         var current = await TemplateService.GetAsync(_template.Key);
@@ -70,6 +73,9 @@ public class UpdateTemplateControllerProductionModeTests : ManagementApiTest<Upd
 
         var response = await Client.PutAsync(Url, JsonContent.Create(updateModel));
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.That(
+            response.Headers.GetValues(Constants.Headers.SchemaLockdown),
+            Is.EqualTo(new[] { $"{Constants.UdiEntityType.Template}:update" }));
     }
 }
