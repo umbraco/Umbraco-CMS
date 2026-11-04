@@ -6,20 +6,20 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
- * An action rendered by `<umb-grouped-action-list>`: a groupable action and its element.
+ * An action rendered by `<umb-action-group-list>`: a groupable action and its element.
  */
-export interface UmbGroupedActionListItem extends UmbGroupableAction {
+export interface UmbActionGroupListItem extends UmbGroupableAction {
 	component?: HTMLElement;
 }
 
 /**
- * @element umb-grouped-action-list
+ * @element umb-action-group-list
  * @description Renders the actions of a menu in blocks: one per registered action group, ordered by the group's
  * weight, then one with the actions that have no registered group. A line separates the blocks, and an action with
  * `separatorBefore` starts a new line inside its block. A group is exposed to assistive technology by its label.
  */
-@customElement('umb-grouped-action-list')
-export class UmbGroupedActionListElement extends UmbLitElement {
+@customElement('umb-action-group-list')
+export class UmbActionGroupListElement extends UmbLitElement {
 	/**
 	 * The extension type of the action groups, for example `entityActionGroup`.
 	 * @attr group-type
@@ -31,12 +31,12 @@ export class UmbGroupedActionListElement extends UmbLitElement {
 	 * The visible actions with their elements, in any order.
 	 */
 	@property({ attribute: false })
-	actions: Array<UmbGroupedActionListItem> = [];
+	actions: Array<UmbActionGroupListItem> = [];
 
 	@state()
 	private _groups: Array<ManifestActionGroupBase> = [];
 
-	#blocks: Array<UmbActionGroupBlock<UmbGroupedActionListItem>> = [];
+	#blocks: Array<UmbActionGroupBlock<UmbActionGroupListItem>> = [];
 
 	override focus(options?: FocusOptions) {
 		this.#blocks[0]?.actions[0]?.component?.focus(options);
@@ -87,8 +87,8 @@ export class UmbGroupedActionListElement extends UmbLitElement {
 		);
 	}
 
-	#renderActions(actions: Array<UmbGroupedActionListItem>) {
-		const segments = actions.reduce<Array<Array<UmbGroupedActionListItem>>>(
+	#renderActions(actions: Array<UmbActionGroupListItem>) {
+		const segments = actions.reduce<Array<Array<UmbActionGroupListItem>>>(
 			(segments, action, index) => {
 				if (index > 0 && action.manifest?.separatorBefore) segments.push([]);
 				segments.at(-1)!.push(action);
@@ -104,7 +104,7 @@ export class UmbGroupedActionListElement extends UmbLitElement {
 		);
 	}
 
-	#renderSegment(actions: Array<UmbGroupedActionListItem>) {
+	#renderSegment(actions: Array<UmbActionGroupListItem>) {
 		return repeat(
 			actions,
 			(action) => action.alias,
@@ -131,6 +131,6 @@ export class UmbGroupedActionListElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-grouped-action-list': UmbGroupedActionListElement;
+		'umb-action-group-list': UmbActionGroupListElement;
 	}
 }

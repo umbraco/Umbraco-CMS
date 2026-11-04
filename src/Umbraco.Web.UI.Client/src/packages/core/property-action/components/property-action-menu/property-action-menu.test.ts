@@ -5,7 +5,7 @@ import { expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { readGroupedActionList } from '@umbraco-cms/internal/test-utils';
+import { readActionGroupList } from '@umbraco-cms/internal/test-utils';
 
 @customElement('umb-test-property-action-menu-action')
 class UmbTestPropertyActionElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -43,7 +43,7 @@ describe('UmbPropertyActionMenuElement', () => {
 			html`<umb-property-action-menu .propertyEditorUiAlias=${PROPERTY_EDITOR_UI_ALIAS}></umb-property-action-menu>`,
 		);
 		const read = () =>
-			readGroupedActionList(element.shadowRoot?.querySelector('umb-grouped-action-list'), (child) =>
+			readActionGroupList(element.shadowRoot?.querySelector('umb-action-group-list'), (child) =>
 				child instanceof UmbTestPropertyActionElement ? (child as any).manifest.alias : child.tagName,
 			);
 		await waitUntil(() => read().filter((entry) => aliases.includes(entry)).length === actions.length);

@@ -3,7 +3,7 @@ import type { ManifestWorkspaceActionMenuItem } from '../../extensions/types.js'
 import { expect, fixture, fixtureCleanup, html, waitUntil } from '@open-wc/testing';
 import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { readGroupedActionList } from '@umbraco-cms/internal/test-utils';
+import { readActionGroupList } from '@umbraco-cms/internal/test-utils';
 
 function item(alias: string, separatorBefore?: boolean, weight?: number, group?: string) {
 	const component = document.createElement('div');
@@ -30,8 +30,8 @@ async function renderSequence(items: Array<UmbExtensionElementAndApiInitializer<
 		html`<umb-workspace-action-menu .items=${items}></umb-workspace-action-menu>`,
 	);
 	const read = () =>
-		readGroupedActionList(
-			element.shadowRoot!.querySelector('umb-grouped-action-list'),
+		readActionGroupList(
+			element.shadowRoot!.querySelector('umb-action-group-list'),
 			(child) => (child as HTMLElement).dataset.alias!,
 		);
 	await waitUntil(() => read().filter((x) => x !== '|' && !x.startsWith('[') && x !== ']').length === items.length);

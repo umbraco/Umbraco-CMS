@@ -7,7 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
-import { readGroupedActionList } from '@umbraco-cms/internal/test-utils';
+import { readActionGroupList } from '@umbraco-cms/internal/test-utils';
 
 @customElement('umb-test-entity-action-list-action')
 class UmbTestEntityActionElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -54,12 +54,12 @@ function registerActions(actions: Array<TestAction>) {
 }
 
 /**
- * Reads the rendered list as a sequence, see `readGroupedActionList`.
+ * Reads the rendered list as a sequence, see `readActionGroupList`.
  * @param {UmbEntityActionListElement} element - The rendered entity action list.
  * @returns {Array<string>} The sequence.
  */
 function readSequence(element: UmbEntityActionListElement): Array<string> {
-	return readGroupedActionList(element.shadowRoot?.querySelector('umb-grouped-action-list'), (child) =>
+	return readActionGroupList(element.shadowRoot?.querySelector('umb-action-group-list'), (child) =>
 		child instanceof UmbTestEntityActionElement ? (child as any).manifest.alias : child.tagName,
 	);
 }
@@ -99,7 +99,7 @@ describe('UmbEntityActionListElement', () => {
 	it('renders the test action element', async () => {
 		const element = await renderList([{ alias: 'a', weight: 1 }]);
 		await expectSequence(element, ['[', 'a', ']']);
-		const list = element.shadowRoot!.querySelector('umb-grouped-action-list')!;
+		const list = element.shadowRoot!.querySelector('umb-action-group-list')!;
 		expect(list.shadowRoot!.querySelector('.block')!.firstElementChild).to.be.instanceOf(UmbTestEntityActionElement);
 	});
 

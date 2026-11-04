@@ -54,7 +54,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			</uui-button>
 			<uui-popover-container id="property-action-popover">
 				<umb-popover-layout>
-					<umb-grouped-action-list group-type="propertyActionGroup" .actions=${this._actions}></umb-grouped-action-list>
+					<umb-action-group-list group-type="propertyActionGroup" .actions=${this._actions}></umb-action-group-list>
 				</umb-popover-layout>
 			</uui-popover-container>
 		`;

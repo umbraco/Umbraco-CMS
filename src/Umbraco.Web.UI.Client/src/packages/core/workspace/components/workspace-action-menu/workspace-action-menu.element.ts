@@ -69,9 +69,9 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				@click=${this._onPopoverClickCapture}>
 				<umb-popover-layout id="workspace-action-popover-layout">
 					<uui-scroll-container>
-						<umb-grouped-action-list
+						<umb-action-group-list
 							group-type="workspaceActionMenuItemGroup"
-							.actions=${this.items}></umb-grouped-action-list>
+							.actions=${this.items}></umb-action-group-list>
 					</uui-scroll-container>
 				</umb-popover-layout>
 			</uui-popover-container>

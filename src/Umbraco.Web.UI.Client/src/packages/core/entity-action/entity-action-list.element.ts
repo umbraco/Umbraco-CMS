@@ -56,8 +56,8 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	@state()
 	private _actions: Array<UmbExtensionElementAndApiInitializer<ManifestEntityAction>> = [];
 
-	@query('umb-grouped-action-list')
-	private _actionList?: HTMLElementTagNameMap['umb-grouped-action-list'];
+	@query('umb-action-group-list')
+	private _actionList?: HTMLElementTagNameMap['umb-action-group-list'];
 
 	#fallbackEntityContext?: UmbEntityContext;
 
@@ -124,9 +124,9 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-grouped-action-list
+		return html`<umb-action-group-list
 			group-type="entityActionGroup"
-			.actions=${this._actions}></umb-grouped-action-list>`;
+			.actions=${this._actions}></umb-action-group-list>`;
 	}
 
 	static override styles = [

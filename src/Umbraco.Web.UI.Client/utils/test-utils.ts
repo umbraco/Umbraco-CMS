@@ -27,14 +27,14 @@ export function ignoreResizeObserverLoopErrors(): () => void {
 }
 
 /**
- * Reads the blocks rendered by `<umb-grouped-action-list>` as a sequence: '[label' for a group, '[Other' for the
+ * Reads the blocks rendered by `<umb-action-group-list>` as a sequence: '[label' for a group, '[Other' for the
  * named block of actions without a group or '[' when that block has no name, then the actions with '|' marking a line
  * inside the block, then ']'.
- * @param {Element | null | undefined} list - The `<umb-grouped-action-list>` element.
+ * @param {Element | null | undefined} list - The `<umb-action-group-list>` element.
  * @param {(action: Element) => string} readAction - Reads one action element.
  * @returns {Array<string>} The sequence.
  */
-export function readGroupedActionList(list: Element | null | undefined, readAction: (action: Element) => string) {
+export function readActionGroupList(list: Element | null | undefined, readAction: (action: Element) => string) {
 	const readActions = (children: Iterable<Element>): Array<string> =>
 		Array.from(children).flatMap((child, index) =>
 			child.classList.contains('segment')

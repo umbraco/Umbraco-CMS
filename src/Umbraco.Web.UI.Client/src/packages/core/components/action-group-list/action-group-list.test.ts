@@ -1,31 +1,31 @@
-import { UmbGroupedActionListElement } from './grouped-action-list.element.js';
-import type { UmbGroupedActionListItem } from './grouped-action-list.element.js';
+import { UmbActionGroupListElement } from './action-group-list.element.js';
+import type { UmbActionGroupListItem } from './action-group-list.element.js';
 import { expect, fixture, fixtureCleanup, html, waitUntil } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { readGroupedActionList } from '@umbraco-cms/internal/test-utils';
+import { readActionGroupList } from '@umbraco-cms/internal/test-utils';
 
 const GROUP_TYPE = 'entityActionGroup';
-const GROUPS = ['Umb.Test.GroupedActionList.First', 'Umb.Test.GroupedActionList.Second'];
+const GROUPS = ['Umb.Test.ActionGroupList.First', 'Umb.Test.ActionGroupList.Second'];
 
-function item(alias: string, weight: number, group?: string, separatorBefore?: boolean): UmbGroupedActionListItem {
+function item(alias: string, weight: number, group?: string, separatorBefore?: boolean): UmbActionGroupListItem {
 	const component = document.createElement('div');
 	component.dataset.alias = alias;
 	component.tabIndex = 0;
 	return { alias, weight, manifest: { group, separatorBefore }, component };
 }
 
-const read = (element: UmbGroupedActionListElement) =>
-	readGroupedActionList(element, (action) => (action as HTMLElement).dataset.alias!);
+const read = (element: UmbActionGroupListElement) =>
+	readActionGroupList(element, (action) => (action as HTMLElement).dataset.alias!);
 
-async function render(actions: Array<UmbGroupedActionListItem>) {
-	const element = await fixture<UmbGroupedActionListElement>(
-		html`<umb-grouped-action-list group-type=${GROUP_TYPE} .actions=${actions}></umb-grouped-action-list>`,
+async function render(actions: Array<UmbActionGroupListItem>) {
+	const element = await fixture<UmbActionGroupListElement>(
+		html`<umb-action-group-list group-type=${GROUP_TYPE} .actions=${actions}></umb-action-group-list>`,
 	);
 	await element.updateComplete;
 	return element;
 }
 
-describe('UmbGroupedActionListElement', () => {
+describe('UmbActionGroupListElement', () => {
 	beforeEach(() => {
 		umbExtensionsRegistry.registerMany([
 			{ type: GROUP_TYPE, alias: GROUPS[0], name: GROUPS[0], weight: 200, meta: { label: 'First' } },
@@ -39,7 +39,7 @@ describe('UmbGroupedActionListElement', () => {
 	});
 
 	it('is defined with its class', () => {
-		expect(document.createElement('umb-grouped-action-list')).to.be.instanceOf(UmbGroupedActionListElement);
+		expect(document.createElement('umb-action-group-list')).to.be.instanceOf(UmbActionGroupListElement);
 	});
 
 	it('renders each group as a labelled block, ordered by the group weight', async () => {
@@ -89,19 +89,19 @@ describe('UmbGroupedActionListElement', () => {
 	});
 
 	it('moves the actions into their group once the group is registered', async () => {
-		const element = await render([item('late', 1, 'Umb.Test.GroupedActionList.Late'), item('a', 0, GROUPS[0])]);
+		const element = await render([item('late', 1, 'Umb.Test.ActionGroupList.Late'), item('a', 0, GROUPS[0])]);
 		expect(read(element)).to.deep.equal(['[First', 'a', ']', '[Other', 'late', ']']);
 
 		umbExtensionsRegistry.register({
 			type: GROUP_TYPE,
-			alias: 'Umb.Test.GroupedActionList.Late',
+			alias: 'Umb.Test.ActionGroupList.Late',
 			name: 'Late',
 			weight: 300,
 			meta: { label: 'Late' },
 		});
 		await waitUntil(() => read(element)[0] === '[Late');
 		expect(read(element)).to.deep.equal(['[Late', 'late', ']', '[First', 'a', ']']);
-		umbExtensionsRegistry.unregister('Umb.Test.GroupedActionList.Late');
+		umbExtensionsRegistry.unregister('Umb.Test.ActionGroupList.Late');
 	});
 
 	it('focuses the first action of the first block', async () => {
