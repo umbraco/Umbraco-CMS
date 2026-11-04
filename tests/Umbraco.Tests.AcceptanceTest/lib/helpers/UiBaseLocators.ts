@@ -50,6 +50,7 @@ export class UiBaseLocators extends BasePage {
 
   // Navigation & Menu
   public readonly breadcrumbBtn: Locator;
+  public readonly workspaceBreadcrumbItem: Locator;
   public readonly leftArrowBtn: Locator;
   public readonly caretBtn: Locator;
   public readonly modalCaretBtn: Locator;
@@ -333,6 +334,9 @@ export class UiBaseLocators extends BasePage {
 
     // Navigation & Menu
     this.breadcrumbBtn = page.getByLabel("Breadcrumb");
+    this.workspaceBreadcrumbItem = page
+      .locator("umb-workspace-breadcrumb, umb-workspace-variant-menu-breadcrumb")
+      .locator("uui-breadcrumb-item");
     this.leftArrowBtn = page.locator('[name="icon-arrow-left"] svg');
     this.caretBtn = page.locator("#caret-button");
     this.modalCaretBtn = page
@@ -864,6 +868,29 @@ export class UiBaseLocators extends BasePage {
   async clickBreadcrumbButton() {
     await this.click(this.breadcrumbBtn);
     await this.waitForTimeout(ConstantHelper.wait.short);
+  }
+
+  /** Expects a single workspace on the page; a sidebar-modal workspace on top would add a second breadcrumb. */
+  async doesWorkspaceBreadcrumbHaveItems(itemNames: string[]) {
+    await expect(this.workspaceBreadcrumbItem).toHaveText(itemNames, {timeout: ConstantHelper.timeout.long});
+  }
+
+  async clickWorkspaceBreadcrumbItemWithName(itemName: string) {
+    const escapedName = itemName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    await this.click(this.workspaceBreadcrumbItem.filter({hasText: new RegExp(`^${escapedName}$`)}));
+  }
+
+  async isWorkspaceBreadcrumbVisible(isVisible: boolean = true) {
+    await this.isVisible(this.workspaceBreadcrumbItem.first(), isVisible);
+  }
+
+  async isWorkspaceOpenForEntity(entityType: string, unique?: string) {
+    const path = unique ? `/workspace/${entityType}/edit/${unique}` : `/workspace/${entityType}(/|$)`;
+    await expect(this.page).toHaveURL(new RegExp(path), {timeout: ConstantHelper.timeout.long});
+  }
+
+  async isSectionOpenWithoutWorkspace(sectionPathname: string) {
+    await expect(this.page).toHaveURL(new RegExp(`/section/${sectionPathname}(?!.*/workspace/)`), {timeout: ConstantHelper.timeout.long});
   }
 
   async clickLeftArrowButton() {
