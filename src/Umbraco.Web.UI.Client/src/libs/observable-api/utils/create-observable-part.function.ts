@@ -1,6 +1,7 @@
 import type { MemoizationFunction } from '../types/memoization-function.type.js';
 import type { MappingFunction } from '../types/mapping-function.type.js';
 import { defaultMemoization } from './default-memoization.function.js';
+import { umbIsStatefulObservable, umbMarkAsStatefulObservable } from './stateful-observable.function.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { distinctUntilChanged, map, shareReplay } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -21,9 +22,12 @@ export function createObservablePart<R, T>(
 	mappingFunction: MappingFunction<T, R>,
 	memoizationFunction?: MemoizationFunction<R>,
 ): Observable<R> {
-	return source.pipe(
+	// A stateful observable can be released when nobody listens, since a later subscriber gets its current value again.
+	const refCount = umbIsStatefulObservable(source);
+	const part = source.pipe(
 		map(mappingFunction),
 		distinctUntilChanged(memoizationFunction || defaultMemoization),
-		shareReplay(1),
+		shareReplay({ bufferSize: 1, refCount }),
 	);
+	return refCount ? umbMarkAsStatefulObservable(part) : part;
 }

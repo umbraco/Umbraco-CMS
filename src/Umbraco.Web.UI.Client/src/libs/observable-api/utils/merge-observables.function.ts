@@ -1,6 +1,7 @@
 import type { MemoizationFunction } from '../types/memoization-function.type.js';
 import type { MappingFunction } from '../types/mapping-function.type.js';
 import { defaultMemoization } from './default-memoization.function.js';
+import { umbIsStatefulObservable, umbMarkAsStatefulObservable } from './stateful-observable.function.js';
 import { type Observable, combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { distinctUntilChanged, map, shareReplay } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -36,9 +37,12 @@ export function mergeObservables<
 	mergeFunction: MappingFunction<SourceTypeArray, R>,
 	memoizationFunction?: MemoizationFunction<R>,
 ): Observable<R> {
-	return combineLatest(sources).pipe(
+	// Stateful observables can be released when nobody listens, since a later subscriber gets their current values again.
+	const refCount = sources.every((source) => umbIsStatefulObservable(source));
+	const merged = combineLatest(sources).pipe(
 		map(mergeFunction as MappingFunction<unknown[], R>),
 		distinctUntilChanged(memoizationFunction ?? defaultMemoization),
-		shareReplay(1),
+		shareReplay({ bufferSize: 1, refCount }),
 	);
+	return refCount ? umbMarkAsStatefulObservable(merged) : merged;
 }

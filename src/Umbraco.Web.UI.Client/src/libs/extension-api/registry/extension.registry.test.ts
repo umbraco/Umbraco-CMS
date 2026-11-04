@@ -8,6 +8,7 @@ import type {
 } from '../types/index.js';
 import { UmbExtensionRegistry } from './extension.registry.js';
 import { expect } from '@open-wc/testing';
+import { createObservablePart, umbIsStatefulObservable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 interface TestManifestWithMeta extends ManifestBase {
@@ -805,5 +806,48 @@ describe('Add Conditions', () => {
 				}
 			})
 			.unsubscribe();
+	});
+});
+
+describe('UmbExtensionRegistry observables', () => {
+	let extensionRegistry: UmbExtensionRegistry<ManifestBase>;
+
+	const subscriberCount = () =>
+		(extensionRegistry as unknown as { _extensions: { _subject: { observers: Array<unknown> } } })._extensions._subject
+			.observers.length;
+
+	beforeEach(() => {
+		extensionRegistry = new UmbExtensionRegistry();
+		extensionRegistry.register({ type: 'section', alias: 'Umb.Test.Section', name: 'Test Section' });
+	});
+
+	it('are stateful observables', () => {
+		const observables = [
+			extensionRegistry.byAlias('Umb.Test.Section'),
+			extensionRegistry.byType('section'),
+			extensionRegistry.byTypes(['section']),
+			extensionRegistry.byTypeAndAlias('section', 'Umb.Test.Section'),
+			extensionRegistry.byTypeAndAliases('section', ['Umb.Test.Section']),
+			extensionRegistry.byTypeAndFilter('section', () => true),
+			extensionRegistry.byTypesAndFilter(['section'], () => true),
+		];
+		for (const observable of observables) {
+			expect(umbIsStatefulObservable(observable)).to.be.true;
+		}
+	});
+
+	it('are released by parts derived from them once those parts have no subscribers left', () => {
+		const before = subscriberCount();
+
+		for (let i = 0; i < 10; i++) {
+			createObservablePart(
+				extensionRegistry.byTypeAndFilter('section', () => true),
+				(x) => x[0]?.alias,
+			)
+				.subscribe()
+				.unsubscribe();
+		}
+
+		expect(subscriberCount()).to.equal(before);
 	});
 });

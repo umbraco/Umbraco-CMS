@@ -2,6 +2,7 @@ import type { MappingFunction } from '../types/mapping-function.type.js';
 import type { MemoizationFunction } from '../types/memoization-function.type.js';
 import { createObservablePart } from '../utils/create-observable-part.function.js';
 import { strictEqualityMemoization } from '../utils/strict-equality-memoization.function.js';
+import { umbMarkAsStatefulObservable } from '../utils/stateful-observable.function.js';
 import { BehaviorSubject, type Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
@@ -13,7 +14,7 @@ export class UmbBasicState<T> {
 	protected _subject: BehaviorSubject<T>;
 
 	constructor(initialData: T) {
-		this._subject = new BehaviorSubject(initialData);
+		this._subject = umbMarkAsStatefulObservable(new BehaviorSubject(initialData));
 	}
 
 	/**
@@ -26,7 +27,7 @@ export class UmbBasicState<T> {
 	 * this.observe(myState, (latestStateValue) => console.log("Value is: ", latestStateValue));
 	 */
 	public asObservable(): Observable<T> {
-		return this._subject.asObservable();
+		return umbMarkAsStatefulObservable(this._subject.asObservable());
 	}
 
 	/**
