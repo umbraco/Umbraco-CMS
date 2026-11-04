@@ -58,7 +58,7 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
     /// <param name="factory">The cache refresher notification factory.</param>
     /// <param name="documentPublishStatusManagementService">The document publish status management service.</param>
     /// <param name="elementPublishStatusManagementService">The element publish status management service.</param>
-    /// <param name="publishStatusManagementService">The document publish status management service.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public LanguageCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -67,14 +67,14 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
         ICacheRefresherNotificationFactory factory,
         IDocumentPublishStatusManagementService documentPublishStatusManagementService,
         IElementPublishStatusManagementService elementPublishStatusManagementService)
-        IPublishStatusManagementService publishStatusManagementService)
         : this(
             appCaches,
             serializer,
             eventAggregator,
             domainCache,
             factory,
-            publishStatusManagementService,
+            documentPublishStatusManagementService,
+            elementPublishStatusManagementService,
             StaticServiceProvider.Instance.GetRequiredService<IDefaultCultureAccessor>())
     {
     }
