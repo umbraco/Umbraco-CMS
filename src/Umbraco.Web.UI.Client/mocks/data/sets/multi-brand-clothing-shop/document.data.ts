@@ -27,6 +27,7 @@ import {
 	decimalValue,
 	documentPickerValue,
 	dropdownValue,
+	elementPickerValue,
 	integerValue,
 	invariantTextValue,
 	mediaPickerValue,
@@ -40,7 +41,16 @@ import {
 	type UmbMbcsBlock,
 	type UmbMbcsValue,
 } from './document-values.js';
-import { AREA_KEYS, CULTURES, CULTURE_DA, CULTURE_EN, DATA_TYPE_IDS, DOCUMENT_TYPE_IDS, mbcsId } from './ids.js';
+import {
+	AREA_KEYS,
+	CULTURES,
+	CULTURE_DA,
+	CULTURE_EN,
+	DATA_TYPE_IDS,
+	DOCUMENT_TYPE_IDS,
+	ELEMENT_IDS,
+	mbcsId,
+} from './ids.js';
 import { BABY_SIZES_TEASER, babySizesMarkup } from './article-bodies.js';
 import { getMaterial, getProductMaterials, type UmbMbcsMaterial } from './materials.js';
 import { getAboutUsCopy } from './about-us-copy.js';
@@ -222,6 +232,16 @@ const productSizes = (site: UmbMbcsSiteCode, categoryIndex: number, tags: Array<
 	return UNISEX_SIZES;
 };
 
+const SIZE_GUIDE_IDS: Record<UmbMbcsSiteCode, string> = {
+	LO: ELEMENT_IDS.sizeGuideKids,
+	GU: ELEMENT_IDS.sizeGuideOutdoor,
+};
+
+const PROMOTION_IDS: Record<UmbMbcsSiteCode, Array<string>> = {
+	LO: [ELEMENT_IDS.backToSchool, ELEMENT_IDS.winterSale],
+	GU: [ELEMENT_IDS.freeDeliveryWeekend],
+};
+
 const buildProducts = (
 	site: UmbMbcsSiteCode,
 	rows: Array<UmbMbcsProductRow>,
@@ -258,6 +278,7 @@ const buildProducts = (
 				...invariantTextValue('sku', sku),
 				...tagsValue('tags', tags),
 				...blockListValue('materials', getProductMaterials(site, categoryIndex, tags, number).map(materialBlock)),
+				...elementPickerValue('sizeGuide', [SIZE_GUIDE_IDS[site]]),
 				...checkboxListValue('sizes', productSizes(site, categoryIndex, tags)),
 				...textValue('colour', colour),
 				...textValue('material', material),
@@ -778,6 +799,7 @@ const buildPages = (
 						...textValue('title', entry.name),
 						...textareaValue('intro', intro),
 						...mediaPickerValue('heroImage', heroMediaId(site)),
+						...(isProducts ? elementPickerValue('promotions', PROMOTION_IDS[site].slice(-1)) : []),
 						...blockGridValue('content', [heroBlock(site, entry.name, intro)]),
 						...seoValues(siteName, entry.name, intro),
 					],
@@ -841,6 +863,7 @@ const buildSite = (site: UmbMbcsSiteCode, pages: Array<UmbMbcsPage>): Array<UmbM
 			values: [
 				...textValue('siteName', name),
 				...mediaPickerValue('logo', logoMediaId(site)),
+				...elementPickerValue('promotions', PROMOTION_IDS[site]),
 				...blockGridValue('content', homeBlocks(site)),
 				...seoValues(name, name, `Welcome to ${name}. Quality clothing, made to last.`, {
 					ogImageId: heroMediaId(site),
