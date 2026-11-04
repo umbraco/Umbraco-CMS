@@ -1,5 +1,6 @@
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using NPoco;
 using StackExchange.Profiling.Data;
@@ -261,6 +262,20 @@ public static partial class NPocoDatabaseExtensions
     /// <returns>The underlying typed connection.</returns>
     public static TConnection GetTypedConnection<TConnection>(IDbConnection? connection)
         where TConnection : class, IDbConnection
+        => TryGetTypedConnection(connection, out TConnection? typed)
+            ? typed
+            : throw new NotSupportedException(connection?.GetType().FullName);
+
+    /// <summary>
+    ///     Attempts to unwrap a connection to the underlying typed connection, through profiling and any
+    ///     <see cref="IWrappedDbConnection" /> decorators.
+    /// </summary>
+    /// <typeparam name="TConnection">The type of connection to unwrap to.</typeparam>
+    /// <param name="connection">The database connection to unwrap.</param>
+    /// <param name="typedConnection">The underlying typed connection, when found.</param>
+    /// <returns><c>true</c> if a connection of the requested type was found; otherwise <c>false</c>.</returns>
+    public static bool TryGetTypedConnection<TConnection>(IDbConnection? connection, [NotNullWhen(true)] out TConnection? typedConnection)
+        where TConnection : class, IDbConnection
     {
         IDbConnection? c = connection;
         for (; ;)
@@ -268,15 +283,17 @@ public static partial class NPocoDatabaseExtensions
             switch (c)
             {
                 case TConnection ofType:
-                    return ofType;
-                case RetryDbConnection retry:
-                    c = retry.Inner;
+                    typedConnection = ofType;
+                    return true;
+                case IWrappedDbConnection wrapped:
+                    c = wrapped.Inner;
                     break;
                 case ProfiledDbConnection profiled:
                     c = profiled.WrappedConnection;
                     break;
                 default:
-                    throw new NotSupportedException(connection?.GetType().FullName);
+                    typedConnection = null;
+                    return false;
             }
         }
     }

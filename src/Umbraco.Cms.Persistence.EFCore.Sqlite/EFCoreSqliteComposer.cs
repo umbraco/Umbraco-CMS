@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
+using Umbraco.Cms.Persistence.EFCore.Scoping;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 
@@ -15,5 +16,6 @@ public class EFCoreSqliteComposer : IComposer
     {
         builder.Services.AddSingleton<IMigrationProvider, SqliteMigrationProvider>();
         builder.Services.AddSingleton<IMigrationProviderSetup, SqliteMigrationProviderSetup>();
+        builder.Services.AddSingleton<IEFCoreSharedConnectionInitializer, SqliteSharedConnectionInitializer>();
     }
 }
