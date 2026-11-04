@@ -13,6 +13,10 @@ const statefulObservables = new WeakSet<Observable<unknown>>();
  *
  * Only mark an Observable that gives every new subscriber its current value. Marking an Observable that only emits
  * values as they happen makes a subscriber that arrives after a release miss values until the next emission.
+ *
+ * `pipe(...)` returns a new Observable that is not marked. Prefer `createObservablePart` and `mergeObservables`, which
+ * keep the mark. Only mark a piped Observable yourself if it still gives every new subscriber its current value
+ * straight away; `map` keeps that, while `filter` or `debounceTime` may not.
  * @param {Observable} observable - An Observable that gives every new subscriber its current value.
  * @returns {Observable} The same Observable.
  * @example
