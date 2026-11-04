@@ -1,6 +1,7 @@
 import type {
 	UmbMockDocumentModel,
 	UmbMockDocumentTypeModel,
+	UmbMockElementModel,
 	UmbMockMediaModel,
 	UmbMockMediaTypeModel,
 	UmbMockTrackedReferenceItemModel,
@@ -8,6 +9,7 @@ import type {
 
 export interface UmbBuildReferencedByMapArgs {
 	document?: Array<UmbMockDocumentModel>;
+	element?: Array<UmbMockElementModel>;
 	media?: Array<UmbMockMediaModel>;
 	documentType?: Array<UmbMockDocumentTypeModel>;
 	mediaType?: Array<UmbMockMediaTypeModel>;
@@ -30,13 +32,20 @@ function collectMatchingIds(value: unknown, knownIds: ReadonlySet<string>, found
  * @param args The mock entities to scan and to look type information up in.
  * @returns The referencing items, keyed by the id of the item they reference.
  */
-export function buildReferencedByMap(args: UmbBuildReferencedByMapArgs): Record<string, Array<UmbMockTrackedReferenceItemModel>> {
+export function buildReferencedByMap(
+	args: UmbBuildReferencedByMapArgs,
+): Record<string, Array<UmbMockTrackedReferenceItemModel>> {
 	const documents = args.document ?? [];
+	const elements = (args.element ?? []).filter((x) => !x.isFolder && !x.isTrashed);
 	const media = args.media ?? [];
 	const documentTypes = new Map((args.documentType ?? []).map((x) => [x.id, x]));
 	const mediaTypes = new Map((args.mediaType ?? []).map((x) => [x.id, x]));
 
-	const knownIds = new Set<string>([...documents.map((x) => x.id), ...media.map((x) => x.id)]);
+	const knownIds = new Set<string>([
+		...documents.map((x) => x.id),
+		...elements.map((x) => x.id),
+		...media.map((x) => x.id),
+	]);
 	const map: Record<string, Array<UmbMockTrackedReferenceItemModel>> = {};
 
 	for (const doc of documents) {
@@ -52,7 +61,38 @@ export function buildReferencedByMap(args: UmbBuildReferencedByMapArgs): Record<
 			name: doc.variants[0]?.name,
 			published: doc.variants.some((v) => v.state === 'Published'),
 			documentType: { id: doc.documentType.id, icon: doc.documentType.icon, alias: type?.alias, name: type?.name },
-			variants: doc.variants.map((v) => ({ id: v.id, flags: v.flags, state: v.state, name: v.name, culture: v.culture })),
+			variants: doc.variants.map((v) => ({
+				id: v.id,
+				flags: v.flags,
+				state: v.state,
+				name: v.name,
+				culture: v.culture,
+			})),
+		};
+
+		for (const targetId of targetIds) (map[targetId] ??= []).push(item);
+	}
+
+	for (const el of elements) {
+		const targetIds = new Set<string>();
+		collectMatchingIds(el.values, knownIds, targetIds);
+		targetIds.delete(el.id);
+		if (!targetIds.size || !el.documentType) continue;
+
+		const type = documentTypes.get(el.documentType.id);
+		const item: UmbMockTrackedReferenceItemModel = {
+			$type: 'ElementReferenceResponseModel',
+			id: el.id,
+			name: el.name,
+			published: el.variants.some((v) => v.state === 'Published'),
+			documentType: { id: el.documentType.id, icon: el.documentType.icon, alias: type?.alias, name: type?.name },
+			variants: el.variants.map((v) => ({
+				id: v.id,
+				flags: v.flags,
+				state: v.state,
+				name: v.name,
+				culture: v.culture,
+			})),
 		};
 
 		for (const targetId of targetIds) (map[targetId] ??= []).push(item);

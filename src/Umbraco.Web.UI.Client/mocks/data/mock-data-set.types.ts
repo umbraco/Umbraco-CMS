@@ -97,6 +97,7 @@ import type {
 	// Tracked Reference
 	IReferenceResponseModelDefaultReferenceResponseModel,
 	IReferenceResponseModelDocumentReferenceResponseModel,
+	IReferenceResponseModelElementReferenceResponseModel,
 	IReferenceResponseModelMediaReferenceResponseModel,
 	IReferenceResponseModelMemberReferenceResponseModel,
 	// News
@@ -202,6 +203,7 @@ export type UmbMockAuditLogModel = AuditLogResponseModel;
 export type UmbMockTrackedReferenceItemModel =
 	| IReferenceResponseModelDefaultReferenceResponseModel
 	| IReferenceResponseModelDocumentReferenceResponseModel
+	| IReferenceResponseModelElementReferenceResponseModel
 	| IReferenceResponseModelMediaReferenceResponseModel
 	| IReferenceResponseModelMemberReferenceResponseModel;
 

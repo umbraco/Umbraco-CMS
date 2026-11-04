@@ -2,6 +2,7 @@ const { http, HttpResponse } = window.MockServiceWorker;
 import { umbElementMockDb } from '../../db/element.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import { getReferencedDescendantsPage } from '../referenced-by.utils.js';
 import type {
 	CreateFolderRequestModel,
 	UpdateFolderResponseModel,
@@ -30,6 +31,12 @@ export const folderHandlers = [
 		const response = umbElementMockDb.folder.read(id);
 		if (!response) return new HttpResponse(null, { status: 404 });
 		return HttpResponse.json(response);
+	}),
+
+	http.get(umbracoPath(`${UMB_SLUG}/folder/:id/referenced-descendants`), ({ request, params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
+		return HttpResponse.json(getReferencedDescendantsPage(id, request, umbElementMockDb.getAll()));
 	}),
 
 	http.put<{ id: string }, UpdateFolderResponseModel>(

@@ -5,13 +5,13 @@ import { UMB_SLUG } from './slug.js';
 import type {
 	CreateAndPublishElementRequestModel,
 	CreateElementRequestModel,
-	IReferenceResponseModel,
 	PagedIReferenceResponseModel,
 	PagedReferenceByIdModel,
 	UpdateAndPublishElementRequestModel,
 	UpdateElementRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import { getAreReferencedPage, getReferencedByPage } from '../referenced-by.utils.js';
 
 function getReferenceData() {
 	return umbMockManager.getDataSet().trackedReferenceItems ?? [];
@@ -52,11 +52,8 @@ export const detailHandlers = [
 		return HttpResponse.json(umbElementMockDb.getConfiguration());
 	}),
 
-	http.get(umbracoPath(`${UMB_SLUG}/are-referenced`), () => {
-		const response: PagedReferenceByIdModel = {
-			total: 0,
-			items: [],
-		};
+	http.get(umbracoPath(`${UMB_SLUG}/are-referenced`), ({ request }) => {
+		const response: PagedReferenceByIdModel = getAreReferencedPage(request);
 
 		return HttpResponse.json(response);
 	}),
@@ -69,21 +66,9 @@ export const detailHandlers = [
 			return new HttpResponse(null, { status: 403 });
 		}
 
-		const url = new URL(request.url);
-		const query = url.searchParams;
-		const skip = query.get('skip') ? parseInt(query.get('skip') as string, 10) : 0;
-		const take = query.get('take') ? parseInt(query.get('take') as string, 10) : 100;
-
-		let data: Array<IReferenceResponseModel> = [];
-
-		if (id === 'simple-element-id') {
-			data = getReferenceData();
-		}
-
-		const pagedTrackedReference: PagedIReferenceResponseModel = {
-			total: data.length,
-			items: data.slice(skip, skip + take),
-		};
+		const pagedTrackedReference: PagedIReferenceResponseModel = getReferencedByPage(id, request, () =>
+			id === 'simple-element-id' ? getReferenceData() : [],
+		);
 
 		return HttpResponse.json(pagedTrackedReference);
 	}),
