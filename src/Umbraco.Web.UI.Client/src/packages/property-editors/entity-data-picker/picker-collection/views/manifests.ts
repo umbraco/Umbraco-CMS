@@ -23,7 +23,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'card',
 		alias: UMB_ENTITY_DATA_PICKER_CARD_COLLECTION_VIEW_ALIAS,
 		name: 'Entity Data Picker Card Collection View',
-		weight: 700,
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,

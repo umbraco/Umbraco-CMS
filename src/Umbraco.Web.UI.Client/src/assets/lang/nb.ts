@@ -80,10 +80,10 @@ export default {
 		edit: 'Rediger',
 		importExport: 'Import og eksport',
 		notifications: 'Varslinger',
+		other: 'Annet',
 		publishing: 'Publisering',
 		routing: 'Ruting',
 		structure: 'Struktur',
-		unregistered: 'Handlingsgruppe "%0%"',
 	},
 	assignDomain: {
 		permissionDenied: 'Ingen tilgang.',

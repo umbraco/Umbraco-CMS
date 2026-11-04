@@ -1,15 +1,12 @@
 import type { UmbEntityActionArgs } from './types.js';
 import type { ManifestEntityAction, MetaEntityAction } from './entity-action.extension.js';
 import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { umbOrderActionsByGroup, umbRenderActionMenu } from '@umbraco-cms/backoffice/action';
-import type { ManifestActionGroupBase } from '@umbraco-cms/backoffice/action';
-import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { html, customElement, property, query, state, css } from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type {
-	UmbApiConstructorArgumentsMethodType,
-	UmbExtensionElementAndApiInitializer,
-} from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
@@ -54,32 +51,27 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	}
 
 	@state()
-	private _filter?: (extension: ManifestEntityAction<MetaEntityAction>) => boolean;
-
-	@state()
 	private _props: Partial<UmbEntityActionArgs<unknown>> = {};
 
 	@state()
-	private _apiArgs?: UmbApiConstructorArgumentsMethodType<
-		ManifestEntityAction<MetaEntityAction>,
-		[UmbEntityActionArgs<MetaEntityAction>]
-	>;
+	private _actions: Array<UmbExtensionElementAndApiInitializer<ManifestEntityAction>> = [];
 
-	@state()
-	private _renderActions?: (extensions: Array<UmbExtensionElementAndApiInitializer<ManifestEntityAction>>) => unknown;
+	@query('umb-grouped-action-list')
+	private _actionList?: HTMLElementTagNameMap['umb-grouped-action-list'];
 
 	#fallbackEntityContext?: UmbEntityContext;
 
+	// Actions appear as their conditions resolve, so the first action keeps focus until the user takes over.
+	#followFirstAction = false;
+
+	#stopFollowingFirstAction = () => {
+		this.#followFirstAction = false;
+	};
+
 	constructor() {
 		super();
-
-		this.observe(
-			umbExtensionsRegistry.byType('entityActionGroup'),
-			(groups) => {
-				this._renderActions = (extensions) => this.#renderEntityActions(extensions, groups);
-			},
-			null,
-		);
+		this.addEventListener('keydown', this.#stopFollowingFirstAction);
+		this.addEventListener('pointerdown', this.#stopFollowingFirstAction);
 
 		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
 			if (!context) return;
@@ -100,55 +92,37 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	}
 
 	#generateApiArgs() {
-		if (!this._props.entityType || this._props.unique === undefined) return;
+		const { entityType, unique } = this._props;
+		if (!entityType || unique === undefined) return;
 
-		this._filter = (extension: ManifestEntityAction<MetaEntityAction>) =>
-			extension.forEntityTypes.includes(this._props.entityType!);
-		this.#hasRenderedOnce = false;
-
-		this._apiArgs = (manifest: ManifestEntityAction<MetaEntityAction>) => {
-			return [{ entityType: this._props.entityType!, unique: this._props.unique!, meta: manifest.meta }];
-		};
+		this.#followFirstAction = true;
+		const initializer = new UmbExtensionsElementAndApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			'entityAction',
+			(manifest: ManifestEntityAction<MetaEntityAction>) => [{ entityType, unique, meta: manifest.meta }],
+			(manifest: ManifestEntityAction<MetaEntityAction>) => manifest.forEntityTypes.includes(entityType),
+			(actions) => (this._actions = actions),
+			'umbEntityActionsInitializer',
+		);
+		initializer.elementProperties = { entityType, unique };
 	}
 
 	override focus() {
-		this.#firstEntityAction?.focus();
+		this._actionList?.focus();
 	}
 
-	#firstEntityAction?: HTMLElement;
-
-	#hasRenderedOnce?: boolean;
-
-	#renderEntityActions(
-		extensions: Array<UmbExtensionElementAndApiInitializer<ManifestEntityAction>>,
-		groups: Array<ManifestActionGroupBase>,
-	) {
-		const items = umbOrderActionsByGroup(extensions, groups, 'entityAction');
-
-		if (!this.#hasRenderedOnce) {
-			this.#firstEntityAction = items[0]?.actions[0]?.action.component;
-			this.#firstEntityAction?.focus();
-			this.#hasRenderedOnce = true;
-		}
-
-		return umbRenderActionMenu(items, (ext) => ext.component, this.localize);
+	protected override async updated(changedProperties: PropertyValues) {
+		super.updated(changedProperties);
+		if (!this.#followFirstAction || !changedProperties.has('_actions') || !this._actionList) return;
+		await this._actionList.updateComplete;
+		if (this.#followFirstAction) this._actionList.focus();
 	}
 
 	override render() {
-		return this._filter && this._renderActions
-			? html`
-					<umb-extension-with-api-slot
-						type="entityAction"
-						.filter=${this._filter}
-						.elementProps=${this._props}
-						.apiArgs=${this._apiArgs}
-						.listRenderMethod=${
-							// A new callback on every render, so the slot also re-renders when the group labels are localized.
-							(extensions: Array<UmbExtensionElementAndApiInitializer<ManifestEntityAction>>) =>
-								this._renderActions?.(extensions)
-						}></umb-extension-with-api-slot>
-				`
-			: '';
+		return html`<umb-grouped-action-list
+			group-type="entityActionGroup"
+			.actions=${this._actions}></umb-grouped-action-list>`;
 	}
 
 	static override styles = [

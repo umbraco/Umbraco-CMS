@@ -88,10 +88,10 @@ export default {
 		edit: 'Edit',
 		importExport: 'Import and export',
 		notifications: 'Notifications',
+		other: 'Other',
 		publishing: 'Publishing',
 		routing: 'Routing',
 		structure: 'Structure',
-		unregistered: 'Action group "%0%"',
 	},
 	actionCategories: {
 		content: 'Content',

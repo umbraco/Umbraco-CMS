@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'tree',
 		alias: UMB_PARTIAL_VIEW_MENU_ITEM_ALIAS,
 		name: 'Partial View Menu Item',
-		weight: 30,
+		weight: 40,
 		meta: {
 			label: 'Partial Views',
 			treeAlias: UMB_PARTIAL_VIEW_TREE_ALIAS,

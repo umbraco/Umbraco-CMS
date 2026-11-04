@@ -75,10 +75,10 @@ export default {
 		edit: 'Bearbeiten',
 		importExport: 'Import und Export',
 		notifications: 'Benachrichtigungen',
+		other: 'Sonstiges',
 		publishing: 'Veröffentlichung',
 		routing: 'Routing',
 		structure: 'Struktur',
-		unregistered: 'Aktionsgruppe "%0%"',
 	},
 	actionCategories: {
 		content: 'Inhalt',

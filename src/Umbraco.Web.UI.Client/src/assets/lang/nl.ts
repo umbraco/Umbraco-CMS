@@ -70,10 +70,10 @@ export default {
 		edit: 'Bewerken',
 		importExport: 'Importeren en exporteren',
 		notifications: 'Meldingen',
+		other: 'Overig',
 		publishing: 'Publicatie',
 		routing: 'Routering',
 		structure: 'Structuur',
-		unregistered: 'Actiegroep "%0%"',
 	},
 	actionCategories: {
 		content: 'Inhoud',

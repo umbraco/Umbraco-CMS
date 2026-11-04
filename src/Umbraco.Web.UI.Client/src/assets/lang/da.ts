@@ -87,10 +87,10 @@ export default {
 		edit: 'Rediger',
 		importExport: 'Import og eksport',
 		notifications: 'Notificeringer',
+		other: 'Andet',
 		publishing: 'Udgivelse',
 		routing: 'Routing',
 		structure: 'Struktur',
-		unregistered: 'Handlingsgruppe "%0%"',
 	},
 	actionCategories: {
 		content: 'Indhold',

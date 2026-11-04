@@ -151,8 +151,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	async #updateFirstAction(onlyWhenChanged = false) {
 		this._numberOfActions = this.#actions.length;
 		// The inline action is the first action of the menu, so it follows the action groups.
-		const [firstItem] = umbOrderActionsByGroup(this.#actions, this.#groups, 'entityAction');
-		const manifest = firstItem?.actions[0].action.manifest as ManifestEntityActionDefaultKind | undefined;
+		const [firstBlock] = umbOrderActionsByGroup(this.#actions, this.#groups);
+		const manifest = firstBlock?.actions[0].manifest as ManifestEntityActionDefaultKind | undefined;
 		if (onlyWhenChanged && manifest === this.#requestedFirstActionManifest) return;
 		this.#requestedFirstActionManifest = manifest;
 		const request = ++this.#firstActionRequest;

@@ -65,10 +65,10 @@ export default {
 		edit: 'Redigera',
 		importExport: 'Import och export',
 		notifications: 'Meddelanden',
+		other: 'Övrigt',
 		publishing: 'Publicering',
 		routing: 'Routning',
 		structure: 'Struktur',
-		unregistered: 'Åtgärdsgrupp "%0%"',
 	},
 	actionCategories: {
 		administration: 'Administration',

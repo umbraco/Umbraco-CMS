@@ -3,6 +3,7 @@ import type { ManifestWorkspaceActionMenuItem } from '../../extensions/types.js'
 import { expect, fixture, fixtureCleanup, html, waitUntil } from '@open-wc/testing';
 import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { readGroupedActionList } from '@umbraco-cms/internal/test-utils';
 
 function item(alias: string, separatorBefore?: boolean, weight?: number, group?: string) {
 	const component = document.createElement('div');
@@ -28,15 +29,11 @@ async function renderSequence(items: Array<UmbExtensionElementAndApiInitializer<
 	const element = await fixture<UmbWorkspaceActionMenuElement>(
 		html`<umb-workspace-action-menu .items=${items}></umb-workspace-action-menu>`,
 	);
-	const readChildren = (children: Iterable<Element>): Array<string> =>
-		Array.from(children).flatMap((child) =>
-			child.getAttribute('role') === 'separator'
-				? ['|']
-				: child.getAttribute('role') === 'group'
-					? [`[${child.getAttribute('aria-label')}`, ...readChildren(child.children), ']']
-					: [(child as HTMLElement).dataset.alias!],
+	const read = () =>
+		readGroupedActionList(
+			element.shadowRoot!.querySelector('umb-grouped-action-list'),
+			(child) => (child as HTMLElement).dataset.alias!,
 		);
-	const read = () => readChildren(element.shadowRoot!.querySelector('uui-scroll-container')!.children);
 	await waitUntil(() => read().filter((x) => x !== '|' && !x.startsWith('[') && x !== ']').length === items.length);
 	return read();
 }
@@ -48,11 +45,18 @@ describe('UmbWorkspaceActionMenuElement', () => {
 	});
 
 	it('renders no separators when no item sets separatorBefore', async () => {
-		expect(await renderSequence([item('a'), item('b')])).to.deep.equal(['a', 'b']);
+		expect(await renderSequence([item('a'), item('b')])).to.deep.equal(['[', 'a', 'b', ']']);
 	});
 
-	it('renders a separator above each item that sets separatorBefore, except the first', async () => {
-		expect(await renderSequence([item('a', true), item('b'), item('c', true)])).to.deep.equal(['a', 'b', '|', 'c']);
+	it('starts a new line for each item that sets separatorBefore, except the first', async () => {
+		expect(await renderSequence([item('a', true), item('b'), item('c', true)])).to.deep.equal([
+			'[',
+			'a',
+			'b',
+			'|',
+			'c',
+			']',
+		]);
 	});
 
 	describe('action groups', () => {
@@ -82,24 +86,27 @@ describe('UmbWorkspaceActionMenuElement', () => {
 			umbExtensionsRegistry.unregisterMany(GROUPS);
 		});
 
-		it('renders the groups by their weight and separatorBefore inside a group', async () => {
+		it('renders the groups by their weight, separatorBefore inside a group and the ungrouped items last', async () => {
 			expect(
 				await renderSequence([
 					item('schedule', false, 20, GROUPS[1]),
 					item('descendants', false, 10, GROUPS[1]),
 					item('unpublish', true, 0, GROUPS[1]),
 					item('transfer', false, 95, GROUPS[0]),
+					item('ungrouped', false, 500),
 				]),
 			).to.deep.equal([
 				'[Deployment',
 				'transfer',
 				']',
-				'|',
 				'[Publishing',
 				'schedule',
 				'descendants',
 				'|',
 				'unpublish',
+				']',
+				'[Other',
+				'ungrouped',
 				']',
 			]);
 		});

@@ -184,29 +184,6 @@ describe('UmbExtensionRegistry', () => {
 				.unsubscribe();
 		});
 
-		it('should order extensions with equal weights by alias', (done) => {
-			extensionRegistry.register({
-				type: 'section',
-				name: 'test-section-4',
-				alias: 'Umb.Test.Section.0',
-				weight: 25,
-				meta: { label: 'Test Section 4', pathname: 'test-section-4' },
-			});
-
-			extensionRegistry
-				.byType(type)
-				.subscribe((extensions) => {
-					expect(extensions.map((x) => x.alias)).to.deep.equal([
-						'Umb.Test.Section.2',
-						'Umb.Test.Section.0',
-						'Umb.Test.Section.3',
-						'Umb.Test.Section.1',
-					]);
-					done();
-				})
-				.unsubscribe();
-		});
-
 		it('should only trigger observable when changes made to the scope of it', (done) => {
 			let amountOfTimesTriggered = -1;
 			let lastAmount = 0;

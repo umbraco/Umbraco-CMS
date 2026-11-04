@@ -29,7 +29,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'searchIndexDetailBox',
 		alias: 'Umb.SearchIndexDetailBox.Search',
 		name: 'Search Index Search Box',
-		weight: 90,
+		weight: 100,
 		element: () => import('./search-index-search-box.element.js'),
 		meta: {
 			label: '#searchManagement_searchBox',

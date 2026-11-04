@@ -70,10 +70,10 @@ declare global {
 		actionGroups_edit: string;
 		actionGroups_importExport: string;
 		actionGroups_notifications: string;
+		actionGroups_other: string;
 		actionGroups_publishing: string;
 		actionGroups_routing: string;
 		actionGroups_structure: string;
-		actionGroups_unregistered: string;
 		actions_assigndomain: string;
 		actions_auditTrail: string;
 		actions_browse: string;
