@@ -296,6 +296,10 @@ export default {
 		otherElements: 'Properties',
 		parentNotPublished: "This document is published but is not visible because the parent '%0%' is unpublished",
 		parentCultureNotPublished: "This culture is published but is not visible because it is unpublished on parent '%0%'",
+		ancestorNotPublishedScheduleWarning:
+			"An ancestor isn't published. The scheduled publish will fail unless every ancestor is published by then.",
+		ancestorCultureNotPublishedScheduleWarning:
+			"An ancestor isn't published in this language. The scheduled publish will fail unless every ancestor is published in this language by then.",
 		parentNotPublishedAnomaly: 'This document is published but is not in the cache',
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',
@@ -2002,6 +2006,9 @@ export default {
 		elementDoesNotSupport: 'This is not applicable for an Element Type.',
 		elementTypeOnlySupport: 'This is only applicable for an Element Type.',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
+		confirmPropertyAliasChangeHeadline: 'Changing the alias may cause data loss',
+		confirmPropertyAliasChangeMessage:
+			'Existing content for <strong>%0%</strong> will be removed where it is used as embedded content, such as in a local Block.',
 		displaySettingsHeadline: 'Appearance',
 		displaySettingsLabelOnLeft: 'Label to the left',
 		displaySettingsLabelOnTop: 'Label above (full-width)',
@@ -2484,6 +2491,7 @@ export default {
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
 		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
+		itemMissingValueMessage: 'Item %0% is missing a value',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
 		minimumOnlyWhenInUse:
 			'The minimum applies once items have been added. To require a value, mark the property as mandatory.',

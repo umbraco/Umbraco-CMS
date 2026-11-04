@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -45,11 +46,31 @@ public class UserEditorAuthorizationHelper
     /// <param name="startMediaIds">The start media ids of the user being saved (can be null or empty)</param>
     /// <param name="userGroupAliases">The user aliases of the user being saved (can be null or empty)</param>
     /// <returns></returns>
+    [Obsolete("Use the non-obsolete overload instead. Scheduled for removal in Umbraco 20.")]
     public Attempt<string?> IsAuthorized(
         IUser? currentUser,
         IUser? savingUser,
         IEnumerable<int>? startContentIds,
         IEnumerable<int>? startMediaIds,
+        IEnumerable<string>? userGroupAliases)
+        => IsAuthorized(currentUser, savingUser, startContentIds, startMediaIds, null, userGroupAliases);
+
+    /// <summary>
+    ///     Checks if the current user has access to save the user data
+    /// </summary>
+    /// <param name="currentUser">The current user trying to save user data</param>
+    /// <param name="savingUser">The user instance being saved (can be null if it's a new user)</param>
+    /// <param name="startContentIds">The start content ids of the user being saved (can be null or empty)</param>
+    /// <param name="startMediaIds">The start media ids of the user being saved (can be null or empty)</param>
+    /// <param name="startElementIds">The start element ids of the user being saved (can be null or empty)</param>
+    /// <param name="userGroupAliases">The user aliases of the user being saved (can be null or empty)</param>
+    /// <returns></returns>
+    public Attempt<string?> IsAuthorized(
+        IUser? currentUser,
+        IUser? savingUser,
+        IEnumerable<int>? startContentIds,
+        IEnumerable<int>? startMediaIds,
+        IEnumerable<int>? startElementIds,
         IEnumerable<string>? userGroupAliases)
     {
         var currentIsAdmin = currentUser?.IsAdmin() ?? false;
@@ -78,9 +99,14 @@ public class UserEditorAuthorizationHelper
             : startMediaIds == null || savingUser.StartMediaIds is null
                 ? null
                 : startMediaIds.Except(savingUser.StartMediaIds).ToArray();
+        IEnumerable<int>? changedStartElementIds = savingUser == null
+            ? startElementIds
+            : startElementIds == null || savingUser.StartElementIds is null
+                ? null
+                : startElementIds.Except(savingUser.StartElementIds).ToArray();
         Attempt<string?> pathResult = currentUser is null
             ? Attempt<string?>.Fail()
-            : AuthorizePath(currentUser, changedStartContentIds, changedStartMediaIds);
+            : AuthorizePath(currentUser, changedStartContentIds, changedStartMediaIds, changedStartElementIds);
         if (pathResult == false)
         {
             return pathResult;
@@ -115,15 +141,20 @@ public class UserEditorAuthorizationHelper
     }
 
     /// <summary>
-    /// Authorizes that the current user has access to the specified start content and media paths.
+    /// Authorizes that the current user has access to the specified start content, media and element paths.
     /// </summary>
     /// <param name="currentUser">The current user attempting the operation.</param>
     /// <param name="startContentIds">The content start node IDs to authorize.</param>
     /// <param name="startMediaIds">The media start node IDs to authorize.</param>
+    /// <param name="startElementIds">The element start node IDs to authorize.</param>
     /// <returns>
     /// A successful attempt if the user has access to all paths; otherwise, a failed attempt with an error message.
     /// </returns>
-    private Attempt<string?> AuthorizePath(IUser currentUser, IEnumerable<int>? startContentIds, IEnumerable<int>? startMediaIds)
+    private Attempt<string?> AuthorizePath(
+        IUser currentUser,
+        IEnumerable<int>? startContentIds,
+        IEnumerable<int>? startMediaIds,
+        IEnumerable<int>? startElementIds)
     {
         if (startContentIds != null)
         {
@@ -131,11 +162,7 @@ public class UserEditorAuthorizationHelper
             {
                 if (contentId == Constants.System.Root)
                 {
-                    var hasAccess = ContentPermissions.HasPathAccess(
-                        "-1",
-                        currentUser.CalculateContentStartNodeIds(_entityService, _appCaches),
-                        Constants.System.RecycleBinContent);
-                    if (hasAccess == false)
+                    if (currentUser.HasContentRootAccess(_entityService, _appCaches) == false)
                     {
                         return Attempt.Fail("The current user does not have access to the content root");
                     }
@@ -164,11 +191,7 @@ public class UserEditorAuthorizationHelper
             {
                 if (mediaId == Constants.System.Root)
                 {
-                    var hasAccess = ContentPermissions.HasPathAccess(
-                        "-1",
-                        currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches),
-                        Constants.System.RecycleBinMedia);
-                    if (hasAccess == false)
+                    if (currentUser.HasMediaRootAccess(_entityService, _appCaches) == false)
                     {
                         return Attempt.Fail("The current user does not have access to the media root");
                     }
@@ -185,6 +208,33 @@ public class UserEditorAuthorizationHelper
                     if (hasAccess == false)
                     {
                         return Attempt.Fail("The current user does not have access to the media path " + media.Path);
+                    }
+                }
+            }
+        }
+
+        if (startElementIds != null)
+        {
+            foreach (var elementId in startElementIds)
+            {
+                if (elementId == Constants.System.Root)
+                {
+                    if (currentUser.HasElementRootAccess(_entityService, _appCaches) == false)
+                    {
+                        return Attempt.Fail("The current user does not have access to the element root");
+                    }
+                }
+                else
+                {
+                    IEntitySlim? container = _entityService.Get(elementId, UmbracoObjectTypes.ElementContainer);
+                    if (container == null)
+                    {
+                        continue;
+                    }
+
+                    if (currentUser.HasElementPathAccess(container, _entityService, _appCaches) == false)
+                    {
+                        return Attempt.Fail("The current user does not have access to the element path " + container.Path);
                     }
                 }
             }

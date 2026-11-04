@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -27,7 +28,7 @@ public class MediaPermissionServiceTests
         entityServiceMock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.Is<Guid[]>(keys => keys.Contains(mediaKey))))
             .Returns([Mock.Of<TreeEntityPath>(entity => entity.Key == mediaKey && entity.Path == "-1,1234,5678")]);
-        IMediaPermissionService sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled);
+        IMediaPermissionService sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, Mock.Of<IDataTypeService>());
 
         // Act
         var result = await sut.AuthorizeAccessAsync(user, mediaKey);
@@ -46,7 +47,7 @@ public class MediaPermissionServiceTests
         entityServiceMock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<Guid[]>()))
             .Returns([]);
-        IMediaPermissionService sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled);
+        IMediaPermissionService sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, Mock.Of<IDataTypeService>());
 
         // Act
         var result = await sut.AuthorizeAccessAsync(user, mediaKey);
@@ -68,7 +69,7 @@ public class MediaPermissionServiceTests
         entityServiceMock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns([Mock.Of<TreeEntityPath>(entity => entity.Id == 9876 && entity.Path == "-1,9876")]);
-        IMediaPermissionService sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled);
+        IMediaPermissionService sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, Mock.Of<IDataTypeService>());
 
         // Act
         var result = await sut.AuthorizeAccessAsync(user, mediaKey);
@@ -83,7 +84,7 @@ public class MediaPermissionServiceTests
         // Arrange
         var user = CreateUser();
         var entityServiceMock = new Mock<IEntityService>();
-        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled);
+        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, Mock.Of<IDataTypeService>());
 
         // Act
         var result = await sut.AuthorizeRootAccessAsync(user);
@@ -101,7 +102,7 @@ public class MediaPermissionServiceTests
         entityServiceMock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns([Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234")]);
-        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled);
+        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, Mock.Of<IDataTypeService>());
 
         // Act
         var result = await sut.AuthorizeRootAccessAsync(user);
@@ -116,7 +117,7 @@ public class MediaPermissionServiceTests
         // Arrange
         var user = CreateUser();
         var entityServiceMock = new Mock<IEntityService>();
-        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled);
+        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, Mock.Of<IDataTypeService>());
 
         // Act
         var result = await sut.AuthorizeBinAccessAsync(user);
@@ -134,7 +135,7 @@ public class MediaPermissionServiceTests
         entityServiceMock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns([Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234")]);
-        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled);
+        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, Mock.Of<IDataTypeService>());
 
         // Act
         var result = await sut.AuthorizeBinAccessAsync(user);
@@ -149,7 +150,7 @@ public class MediaPermissionServiceTests
         // Arrange
         var user = CreateUser(9);
         var entityServiceMock = new Mock<IEntityService>();
-        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled);
+        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, Mock.Of<IDataTypeService>());
 
         // Act
         var result = await sut.AuthorizeAccessAsync(user, []);
@@ -173,7 +174,7 @@ public class MediaPermissionServiceTests
                 Mock.Of<TreeEntityPath>(entity => entity.Key == keyA && entity.Path == "-1,1234"),
                 Mock.Of<TreeEntityPath>(entity => entity.Key == keyB && entity.Path == "-1,5678"),
             ]);
-        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled);
+        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, Mock.Of<IDataTypeService>());
 
         // Act
         var result = await sut.AuthorizeAccessAsync(user, [keyA, keyB]);
@@ -200,7 +201,7 @@ public class MediaPermissionServiceTests
         entityServiceMock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns([Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234")]);
-        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled);
+        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, Mock.Of<IDataTypeService>());
 
         // Act
         var result = await sut.AuthorizeAccessAsync(user, [keyA, keyB]);
@@ -227,7 +228,7 @@ public class MediaPermissionServiceTests
         entityServiceMock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns([Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234")]);
-        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled);
+        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, Mock.Of<IDataTypeService>());
 
         // Act
         var result = await sut.FilterAuthorizedAccessAsync(user, [keyA, keyB]);
@@ -242,13 +243,95 @@ public class MediaPermissionServiceTests
         // Arrange
         var user = CreateUser(9);
         var entityServiceMock = new Mock<IEntityService>();
-        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled);
+        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, Mock.Of<IDataTypeService>());
 
         // Act
         var result = await sut.FilterAuthorizedAccessAsync(user, []);
 
         // Assert
         Assert.IsEmpty(result);
+    }
+
+    [Test]
+    public async Task Filter_Authorized_Access_With_Data_Type_Ignoring_Start_Nodes_Returns_All_Keys()
+    {
+        // Arrange
+        var user = CreateUser(9, 1234);
+        var keyA = Guid.NewGuid();
+        var keyB = Guid.NewGuid();
+        var dataTypeKey = Guid.NewGuid();
+        var entityServiceMock = new Mock<IEntityService>();
+        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, CreateDataTypeService(dataTypeKey, ignoreUserStartNodes: true));
+
+        // Act
+        var result = await sut.FilterAuthorizedAccessAsync(user, [keyA, keyB], dataTypeKey);
+
+        // Assert
+        CollectionAssert.AreEquivalent(new[] { keyA, keyB }, result);
+        entityServiceMock.Verify(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<Guid[]>()), Times.Never);
+    }
+
+    [Test]
+    public async Task Filter_Authorized_Access_With_Data_Type_Not_Ignoring_Start_Nodes_Returns_Only_Accessible_Keys()
+    {
+        // Arrange
+        var user = CreateUser(9, 1234);
+        var keyA = Guid.NewGuid();
+        var keyB = Guid.NewGuid();
+        var dataTypeKey = Guid.NewGuid();
+        var entityServiceMock = CreateEntityServiceWithOneAccessibleKey(keyA, keyB);
+        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, CreateDataTypeService(dataTypeKey, ignoreUserStartNodes: false));
+
+        // Act
+        var result = await sut.FilterAuthorizedAccessAsync(user, [keyA, keyB], dataTypeKey);
+
+        // Assert
+        CollectionAssert.AreEquivalent(new[] { keyA }, result);
+    }
+
+    [Test]
+    public async Task Filter_Authorized_Access_Without_Data_Type_Returns_Only_Accessible_Keys()
+    {
+        // Arrange
+        var user = CreateUser(9, 1234);
+        var keyA = Guid.NewGuid();
+        var keyB = Guid.NewGuid();
+        var entityServiceMock = CreateEntityServiceWithOneAccessibleKey(keyA, keyB);
+        var dataTypeServiceMock = new Mock<IDataTypeService>();
+        var sut = new MediaPermissionService(entityServiceMock.Object, AppCaches.Disabled, dataTypeServiceMock.Object);
+
+        // Act
+        var result = await sut.FilterAuthorizedAccessAsync(user, [keyA, keyB], null);
+
+        // Assert
+        CollectionAssert.AreEquivalent(new[] { keyA }, result);
+        dataTypeServiceMock.Verify(x => x.GetAsync(It.IsAny<Guid>()), Times.Never);
+    }
+
+    private static Mock<IEntityService> CreateEntityServiceWithOneAccessibleKey(Guid accessibleKey, Guid inaccessibleKey)
+    {
+        var entityServiceMock = new Mock<IEntityService>();
+        entityServiceMock
+            .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<Guid[]>()))
+            .Returns(
+            [
+                Mock.Of<TreeEntityPath>(entity => entity.Key == accessibleKey && entity.Path == "-1,1234,5678"),
+                Mock.Of<TreeEntityPath>(entity => entity.Key == inaccessibleKey && entity.Path == "-1,9999"),
+            ]);
+        entityServiceMock
+            .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+            .Returns([Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234")]);
+        return entityServiceMock;
+    }
+
+    private static IDataTypeService CreateDataTypeService(Guid dataTypeKey, bool ignoreUserStartNodes)
+    {
+        var dataTypeServiceMock = new Mock<IDataTypeService>();
+        dataTypeServiceMock
+            .Setup(x => x.GetAsync(dataTypeKey))
+            .ReturnsAsync(Mock.Of<IDataType>(dataType =>
+                dataType.ConfigurationObject == Mock.Of<IIgnoreUserStartNodesConfig>(config => config.IgnoreUserStartNodes == ignoreUserStartNodes)));
+        return dataTypeServiceMock.Object;
     }
 
     private static IUser CreateUser(int id = 0, int? startMediaId = null) =>

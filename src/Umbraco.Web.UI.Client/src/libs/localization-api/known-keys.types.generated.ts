@@ -469,6 +469,8 @@ declare global {
 		content_alternativeTextHelp: string;
 		content_alternativeUrls: string;
 		content_altTextOptional: string;
+		content_ancestorCultureNotPublishedScheduleWarning: string;
+		content_ancestorNotPublishedScheduleWarning: string;
 		content_captionTextOptional: string;
 		content_childItems: string;
 		content_clickToEdit: string;
@@ -652,6 +654,8 @@ declare global {
 		contentTypeEditor_confirmDeletePropertyMessage: string;
 		contentTypeEditor_confirmDeleteTabMessage: string;
 		contentTypeEditor_confirmDeleteTabNotice: string;
+		contentTypeEditor_confirmPropertyAliasChangeHeadline: string;
+		contentTypeEditor_confirmPropertyAliasChangeMessage: string;
 		contentTypeEditor_convertToTab: string;
 		contentTypeEditor_copiedUnderneath: string;
 		contentTypeEditor_cultureAndVariantInvariantLabel: string;
@@ -2686,6 +2690,7 @@ declare global {
 		validation_invalidUserGroupName: string;
 		validation_invalidUsername: string;
 		validation_invalidValue: string;
+		validation_itemMissingValueMessage: string;
 		validation_items: string;
 		validation_itemsSelected: string;
 		validation_legacyOption: string;

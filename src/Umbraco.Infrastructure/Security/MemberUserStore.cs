@@ -232,9 +232,11 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
+            // Read outside the write scope to avoid a read-to-write lock deadlock (see #24309).
+            IMember? found = _memberService.GetById(asInt);
+
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-            IMember? found = _memberService.GetById(asInt);
             if (found != null)
             {
                 // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.

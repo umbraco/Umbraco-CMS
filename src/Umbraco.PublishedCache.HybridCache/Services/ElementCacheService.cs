@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -26,6 +27,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
     private readonly IEnumerable<IElementSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPreviewService _previewService;
+    private readonly IPreviewAccessEvaluator _previewAccessEvaluator;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<ElementCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
@@ -77,7 +79,8 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         IPreviewService previewService,
         IOptions<CacheSettings> cacheSettings,
         ILogger<ElementCacheService> logger,
-        IConvertedPublishedContentCacheFactory cacheFactory)
+        IConvertedPublishedContentCacheFactory cacheFactory,
+        IPreviewAccessEvaluator previewAccessEvaluator)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _scopeProvider = scopeProvider;
@@ -87,6 +90,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
         _previewService = previewService;
+        _previewAccessEvaluator = previewAccessEvaluator;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
         _publishedElementCache = cacheFactory.Create<string, IPublishedElement>(_cacheSettings.Entry.Element.MaximumLocalCacheItems, CacheName);
@@ -104,7 +108,13 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
     public async Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null)
     {
         bool calculatedPreview = preview ?? _previewService.IsInPreview();
-        return await GetNodeAsync(key, calculatedPreview);
+        IPublishedElement? element = await GetNodeAsync(key, calculatedPreview);
+
+        // As for documents (see DocumentCacheService), a draft is only handed out when the preview user may browse
+        // the element; otherwise it resolves as it would outside preview: its published version, or nothing.
+        return calculatedPreview && element is not null && _previewAccessEvaluator.CanPreviewElement(element) is false
+            ? await GetNodeAsync(key, false)
+            : element;
     }
 
     public bool TryGetCached(Guid key, bool preview, out IPublishedElement? element)

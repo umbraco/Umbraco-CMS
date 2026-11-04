@@ -16682,6 +16682,14 @@
             }
           },
           {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "height",
             "in": "query",
             "schema": {
@@ -20177,6 +20185,14 @@
                 "type": "string",
                 "format": "uuid"
               }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -34956,7 +34972,7 @@
           "User"
         ],
         "summary": "Gets a filtered collection of users.",
-        "description": "Filters users based on the provided criteria with support for pagination.",
+        "description": "Returns a paged collection of users matching the provided criteria — user groups, user states, user kinds (default or API users) and a name/username search term.",
         "operationId": "GetFilterUser",
         "parameters": [
           {

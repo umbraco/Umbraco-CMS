@@ -205,11 +205,15 @@ internal sealed class PublishedProperty : PublishedPropertyBase
                 // cache within the property object itself, ie within the content object
                 cacheValues = _cacheValues ??= new CacheValues();
                 break;
+            case PropertyCacheLevel.Elements when _isPreviewing:
+                // a preview value depends on who is previewing (unpublished content they may not access
+                // resolves to its published version), so it can't be shared with other requests through
+                // the elements cache; cache within the property object itself instead
+                cacheValues = _cacheValues ??= new CacheValues();
+                break;
             case PropertyCacheLevel.Elements:
-                // cache within the elements cache, unless previewing, then use the snapshot or
-                // elements cache (if we don't want to pollute the elements cache with short-lived
-                // data) depending on settings
-                // for members, always cache in the snapshot cache - never pollute elements cache
+                // cache within the elements cache
+                // for members, never cache - never pollute elements cache
                 cache = _isMember == false ? _elementsCache : null;
                 cacheValues = GetCacheValues(cache);
                 break;
