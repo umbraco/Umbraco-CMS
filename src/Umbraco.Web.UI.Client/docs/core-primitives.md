@@ -58,6 +58,8 @@ this.observe(
 
 ### Retrieve a Context
 
+Tokens can share an alias and resolve to the same instance; see [Context API](./context-api.md#one-instance-many-tokens).
+
 **Default to `consumeContext`.** Use it whenever a controller or element needs the context at setup time — both for ongoing observation of values and for one-time reads on resolve. The callback runs as soon as the context is available and re-runs if the context is replaced; cleanup is tied to the controller lifecycle.
 
 **Use `getContext` only when the context is not needed until a user action runs.** Typical cases: an event handler, a property action's `execute()`, an entity action's `execute()`, a modal-open handler. Inside these, awaiting `getContext` keeps the call site flat and avoids registering a long-lived consumer for a one-off operation.
@@ -94,7 +96,7 @@ async #handleClick() {
 
 ### Provide a Context
 
-Make a context instance available to all descendant elements by extending UmbContextBase.
+Make a context instance available to all descendant elements by extending UmbContextBase. See [Context API](./context-api.md#creating-a-context).
 
 ```typescript
 class UmbMyContext extends UmbContextBase {
@@ -144,66 +146,7 @@ For per-type comparison details, change-detection caveats (`UmbBasicState` holdi
 
 ## Context API
 
-Framework-agnostic dependency injection via DOM events. Contexts flow **down** the DOM tree from provider to consumer.
-
-### UmbContextToken
-
-Type-safe identifier for a context. The generic parameters flow through to `consumeContext()` and `getContext()` return types.
-
-```typescript
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-
-// Simple token
-export const UMB_MY_CONTEXT = new UmbContextToken<UmbMyContext>('UmbMyContext');
-
-// Token with discriminator (for type narrowing)
-export const UMB_MY_SPECIFIC_CONTEXT = new UmbContextToken<UmbMyBaseContext, UmbMySpecificContext>(
-	'UmbMyContext',          // contextAlias — matches the provider alias
-	'UmbMySpecificContext',  // apiAlias — distinguishes variant
-	(context): context is UmbMySpecificContext => context instanceof UmbMySpecificContext,
-);
-```
-
-**The `.TYPE` property** gives you the resolved type for variable declarations:
-
-```typescript
-#myContext?: typeof UMB_MY_CONTEXT.TYPE;
-```
-
-### How It Works
-
-1. **Provider** registers a context instance on a host element
-2. **Consumer** dispatches a DOM event that bubbles up the tree
-3. When the event reaches a provider with a matching alias, the provider calls back with the instance
-4. The consumer's callback fires with the typed context
-
-### Creating a Context
-
-```typescript
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-
-export const UMB_MY_CONTEXT = new UmbContextToken<UmbMyContext>('UmbMyContext');
-
-export class UmbMyContext extends UmbContextBase<UmbMyContext> {
-	// State, observables, methods...
-
-	constructor(host: UmbControllerHost) {
-		super(host, UMB_MY_CONTEXT);
-	}
-}
-```
-
-`UmbContextBase` automatically calls `provideContext()` in its constructor, making the context available to descendants.
-
-### Common Built-in Contexts
-
-```typescript
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-```
+Providers expose contexts to descendant elements; consumers request them with a typed `UmbContextToken`. Tokens can share an alias and resolve to the same instance. See **[Context API](./context-api.md)**.
 
 ---
 

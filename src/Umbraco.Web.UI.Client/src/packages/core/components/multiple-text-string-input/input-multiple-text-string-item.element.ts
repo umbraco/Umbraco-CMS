@@ -4,6 +4,8 @@ import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/back
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-input-multiple-text-string-item
@@ -33,10 +35,10 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 
 	async #onDelete() {
 		await umbConfirmModal(this, {
-			headline: `Delete ${this.value || 'item'}`,
-			content: 'Are you sure you want to delete this item?',
+			headline: this.localize.term('actions_delete'),
+			content: this.localize.term('defaultdialogs_confirmdelete', escapeHTML(this.value)),
 			color: 'danger',
-			confirmLabel: 'Delete',
+			confirmLabel: this.localize.term('actions_delete'),
 		});
 
 		this.dispatchEvent(new UmbDeleteEvent());
@@ -90,7 +92,7 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 			<umb-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<uui-input
 					id="input"
-					label="Value"
+					label=${this.localize.term('general_value')}
 					value=${this.value}
 					@keydown=${this.#onKeydown}
 					@input=${this.#onInput}
@@ -98,7 +100,7 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 					?disabled=${this.disabled}
 					?readonly=${this.readonly}
 					required=${this.required}
-					required-message="Value is missing"></uui-input>
+					required-message=${UMB_VALIDATION_EMPTY_LOCALIZATION_KEY}></uui-input>
 			</umb-form-validation-message>
 
 			${when(
