@@ -112,7 +112,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         (entities, _) = await FilterTreeEntities(entities, entities.Length);
 
-        Dictionary<int, Guid> parentKeysById = GetParentKeysById(entities);
+        IDictionary<int, Guid> parentKeysById = GetBatchParentKeys(entities);
         TItem[] treeItemViewModels = OrderByRequestedIds(entities, ids)
             .SelectMany(entity => MapTreeItemViewModels(
                 parentKeysById.TryGetValue(entity.ParentId, out Guid parentKey) ? parentKey : null,
@@ -283,7 +283,12 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
 
-    private Dictionary<int, Guid> GetParentKeysById(IEntitySlim[] entities)
+    /// <summary>
+    /// Gets the keys of the parents of the provided entities.
+    /// </summary>
+    /// <param name="entities">The entities whose parents to resolve.</param>
+    /// <returns>The parent keys by parent ID. Entities at the root of the tree have no entry.</returns>
+    protected virtual IDictionary<int, Guid> GetBatchParentKeys(IEntitySlim[] entities)
     {
         var parentIds = entities
             .Select(entity => entity.ParentId)
@@ -292,7 +297,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             .ToArray();
 
         return parentIds.Length == 0
-            ? []
+            ? new Dictionary<int, Guid>()
             : EntityService.GetAll(ItemObjectType, parentIds).ToDictionary(parent => parent.Id, parent => parent.Key);
     }
 

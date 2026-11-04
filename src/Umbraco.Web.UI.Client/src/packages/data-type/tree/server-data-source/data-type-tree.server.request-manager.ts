@@ -61,6 +61,13 @@ export class UmbManagementApiDataTypeTreeDataRequestManager extends UmbManagemen
 						after: args.paging.takeAfter,
 					},
 				}),
+
+			getBatch: (args) =>
+				DataTypeService.getTreeDataTypeBatch({
+					query: {
+						id: args.uniques,
+					},
+				}),
 		});
 	}
 }
