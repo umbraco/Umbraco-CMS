@@ -12,7 +12,7 @@ export interface ManifestAuthProvider extends ManifestElement {
 
 	/**
 	 * The provider name that this provider is for.
-	 * @examples 'Umbraco.Github'
+	 * @examples ["Umbraco.Github"]
 	 */
 	forProviderName: string;
 
@@ -32,7 +32,7 @@ export interface MetaAuthProvider {
 	defaultView?: {
 		/**
 		 * The icon of the provider that is shown to the user.
-		 * @examples ['icon-cloud', 'icon-github', 'icon-google', 'icon-facebook', 'icon-twitter', 'icon-x', 'icon-microsoft']
+		 * @examples ["icon-cloud", "icon-github", "icon-google", "icon-facebook", "icon-twitter", "icon-x", "icon-microsoft"]
 		 * @default 'icon-cloud'
 		 */
 		icon?: string;
