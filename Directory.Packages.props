@@ -19,6 +19,13 @@
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="11.0.0-rc.3.26522.148" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.9.0" />
+    <!--
+      Microsoft.Data.SqlClient 7 ships the Microsoft Entra ID authentication providers (e.g. "Active Directory
+      Managed Identity") in Microsoft.Data.SqlClient.Extensions.Azure rather than in the core package. Keep the
+      two packages on the same version.
+    -->
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.1" />
+    <PackageVersion Include="Microsoft.Data.SqlClient.Extensions.Azure" Version="7.1.1" />
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="11.0.0-rc.3.26522.148" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="11.0.0-rc.3.26522.148" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="11.0.0-rc.3.26522.148" />
@@ -57,8 +64,8 @@
     <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
     <PackageVersion Include="MiniProfiler.Shared" Version="4.5.4" />
     <PackageVersion Include="ncrontab" Version="3.4.0" />
-    <PackageVersion Include="NPoco" Version="6.3.0" />
-    <PackageVersion Include="NPoco.SqlServer" Version="6.3.0" />
+    <PackageVersion Include="NPoco" Version="6.4.0" />
+    <PackageVersion Include="NPoco.SqlServer" Version="6.4.1" />
     <PackageVersion Include="OpenIddict.Abstractions" Version="7.7.2" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="7.7.2" />
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.7.2" />
