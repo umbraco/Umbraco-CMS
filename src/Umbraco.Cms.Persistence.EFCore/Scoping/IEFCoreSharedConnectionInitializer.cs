@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 /// scope, so a <see cref="DbContext" /> can use it as if EF Core had opened the connection itself.
 /// </summary>
 /// <remarks>
-/// The initializer whose <see cref="ProviderName" /> matches the Umbraco database provider is invoked each time
+/// Every initializer whose <see cref="ProviderName" /> matches the Umbraco database provider is invoked each time
 /// a scope attaches the shared connection to a context, so implementations should be cheap when called again
 /// for a connection they have already prepared.
 /// </remarks>

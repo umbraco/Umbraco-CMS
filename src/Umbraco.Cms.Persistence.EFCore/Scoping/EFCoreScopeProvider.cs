@@ -69,8 +69,8 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     /// <param name="scopeProvider">The scope provider.</param>
     /// <param name="dbContextFactory">The DbContext factory.</param>
     /// <param name="scopeConfiguration">The per-DbContext scope configuration.</param>
-    /// <param name="sharedConnectionInitializers">The initializers that prepare a shared connection for the DbContext, one per database provider.</param>
-    /// <param name="connectionStrings">The connection strings, used to select the initializer for the Umbraco database provider.</param>
+    /// <param name="sharedConnectionInitializers">The initializers that prepare a shared connection for the DbContext.</param>
+    /// <param name="connectionStrings">The connection strings, used to select the initializers for the Umbraco database provider.</param>
     internal EFCoreScopeProvider(
         IAmbientEFCoreScopeStack<TDbContext> ambientEfCoreScopeStack,
         ILoggerFactory loggerFactory,
@@ -250,9 +250,11 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     internal void InitializeSharedConnection(TDbContext dbContext, DbConnection connection)
     {
         string? providerName = _connectionStrings.CurrentValue.ProviderName;
-        _sharedConnectionInitializers
-            .FirstOrDefault(x => x.ProviderName.CompareProviderNames(providerName))
-            ?.Initialize(dbContext, connection);
+        foreach (IEFCoreSharedConnectionInitializer initializer in _sharedConnectionInitializers
+            .Where(x => x.ProviderName.CompareProviderNames(providerName)))
+        {
+            initializer.Initialize(dbContext, connection);
+        }
     }
 
     /// <summary>
