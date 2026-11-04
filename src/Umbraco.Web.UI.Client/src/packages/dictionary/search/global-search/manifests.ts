@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Dictionary Global Search',
 		alias: UMB_DICTIONARY_GLOBAL_SEARCH_ALIAS,
 		type: 'globalSearch',
-		weight: 590,
+		weight: 600,
 		meta: {
 			label: '#treeHeaders_dictionary',
 			searchProviderAlias: UMB_DICTIONARY_SEARCH_PROVIDER_ALIAS,

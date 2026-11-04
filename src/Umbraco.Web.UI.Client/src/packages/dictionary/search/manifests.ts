@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_DICTIONARY_SEARCH_PROVIDER_ALIAS,
 		type: 'searchProvider',
 		api: () => import('./dictionary.search-provider.js'),
-		weight: 580,
+		weight: 590,
 		meta: {
 			label: 'Dictionary',
 		},
