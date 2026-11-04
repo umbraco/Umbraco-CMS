@@ -34,7 +34,7 @@ public class AddIncludeInvariantForVariantColumnToContentSchedule : AsyncMigrati
 
         var table = SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentSchedule);
         var column = SqlSyntax.GetQuotedColumnName(ColumnName);
-        Database.Execute($"UPDATE {table} SET {column} = 1");
+        Database.Execute($"UPDATE {table} SET {column} = @0", true);
 
         return Task.CompletedTask;
     }
