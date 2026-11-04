@@ -5,7 +5,7 @@ import { UmbClassState } from './class-state.js';
 import { UmbObjectState } from './object-state.js';
 import { UmbStringState } from './string-state.js';
 import { expect } from '@open-wc/testing';
-import type { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
+import type { BehaviorSubject, Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 class UmbTestClassStateData {
 	constructor(public value: string) {}
@@ -34,6 +34,35 @@ describe('Observables of States', () => {
 				part.subscribe().unsubscribe();
 
 				expect(subjectOf(state).observed).to.be.false;
+			});
+
+			describe('when the state is destroyed', () => {
+				const subscribeLate = (part: Observable<unknown>) => {
+					const received: Array<string> = [];
+					part.subscribe({ next: () => received.push('value'), complete: () => received.push('complete') });
+					return received;
+				};
+
+				it('completes a released part without a value', () => {
+					const state = create();
+					const part = state.asObservablePart((x) => x);
+					part.subscribe().unsubscribe();
+
+					state.destroy();
+
+					expect(subscribeLate(part)).to.deep.equal(['complete']);
+				});
+
+				it('gives later subscribers the last value of a part that was still observed', () => {
+					const state = create();
+					const part = state.asObservablePart((x) => x);
+					const subscription = part.subscribe();
+
+					state.destroy();
+					subscription.unsubscribe();
+
+					expect(subscribeLate(part)).to.deep.equal(['value', 'complete']);
+				});
 			});
 
 			it('provides stateful observables', () => {
