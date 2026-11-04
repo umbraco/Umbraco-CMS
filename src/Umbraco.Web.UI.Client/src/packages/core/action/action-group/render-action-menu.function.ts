@@ -7,6 +7,7 @@ const separator = () => html`<umb-separator></umb-separator>`;
 /**
  * Renders menu items ordered by `umbOrderActionsByGroup`: each group is wrapped in an element with the `group` role and
  * the group's label as its accessible name, and separators render where the items say so.
+ * @template T - The type of the actions.
  * @param {Array<UmbActionMenuItem<T>>} items - The ordered menu items.
  * @param {(action: T) => unknown} renderAction - Renders one action.
  * @param {UmbLocalizationController} localize - Localizes the group labels.

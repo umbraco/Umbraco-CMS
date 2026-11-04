@@ -53,6 +53,7 @@ const warnedUnresolvedGroups = new Set<string>();
  * own weight, then by alias. Actions that reference an unregistered group are kept together in a fallback group per
  * alias, after everything else. Every group gets a separator on both edges; `separatorBefore` adds one before its
  * action, also inside a group. There is never a separator first, last or twice in a row.
+ * @template T - The type of the actions.
  * @param {ReadonlyArray<T>} actions - The visible actions of the menu.
  * @param {ReadonlyArray<ManifestActionGroupBase>} groups - The registered groups of the menu's action type.
  * @param {string} actionType - The extension type of the actions, used in the warning for an unregistered group.
