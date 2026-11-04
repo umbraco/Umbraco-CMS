@@ -870,7 +870,6 @@ export class UiBaseLocators extends BasePage {
     await this.waitForTimeout(ConstantHelper.wait.short);
   }
 
-  /** Expects a single workspace on the page; a sidebar-modal workspace on top would add a second breadcrumb. */
   async doesWorkspaceBreadcrumbHaveItems(itemNames: string[]) {
     await expect(this.workspaceBreadcrumbItem).toHaveText(itemNames, {timeout: ConstantHelper.timeout.long});
   }
