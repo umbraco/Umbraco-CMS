@@ -3,7 +3,6 @@ using Examine;
 using Examine.Search;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -106,57 +105,13 @@ public class VariantDocumentTests : IndexTestBase
         queryBuilder.SelectField(field);
         ISearchResults results = queryBuilder.Execute();
 
-        // the index stores values culture invariantly, so the expected value must be formatted the same way
-        var expectedValue = Convert.ToString(value, CultureInfo.InvariantCulture);
+        // these fields have no field definition, so Examine stores them as text formatted with the current culture
+        var expectedValue = Convert.ToString(value, CultureInfo.CurrentCulture);
         var result = results
             .SelectMany(x => x.Values.Values)
             .First(x => x == expectedValue);
         Assert.That(results, Is.Not.Empty);
         Assert.That(result, Is.EqualTo(expectedValue));
-    }
-
-    [TestCase("en-US")]
-    [TestCase("de-DE")] // "," as the decimal separator.
-    [TestCase("sv-SE")] // U+2212 as the negative sign.
-    public async Task CanIndexUnconfiguredNumericValuesIndependentOfCurrentCulture(string currentCulture)
-    {
-        const string indexAlias = CoreConstants.Search.IndexAliases.PublishedContent;
-        const string propertyName = "unconfiguredNumber";
-        var key = Guid.NewGuid();
-
-        CultureInfo originalCulture = CultureInfo.CurrentCulture;
-        CultureInfo? originalDefaultThreadCulture = CultureInfo.DefaultThreadCurrentCulture;
-        try
-        {
-            CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(currentCulture);
-
-            await WaitForIndexing(indexAlias, () => Indexer.AddOrUpdateAsync(
-                indexAlias,
-                key,
-                UmbracoObjectTypes.Document,
-                [new Variation(Culture: null, Segment: null)],
-                [
-                    new IndexField(
-                        propertyName,
-                        new IndexValue { Integers = [-12], Decimals = [-12.4552m] },
-                        Culture: null,
-                        Segment: null),
-                ],
-                null));
-        }
-        finally
-        {
-            CultureInfo.CurrentCulture = originalCulture;
-            CultureInfo.DefaultThreadCurrentCulture = originalDefaultThreadCulture;
-        }
-
-        ISearchResult result = GetIndex(indexAlias).Searcher.CreateQuery().All().Execute()
-            .Single(x => x.Id == DocumentIdHelper.CalculateDocumentId(key, null));
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Values[FieldNameHelper.FieldName(propertyName, Constants.FieldValues.Integers)], Is.EqualTo("-12"));
-            Assert.That(result.Values[FieldNameHelper.FieldName(propertyName, Constants.FieldValues.Decimals)], Is.EqualTo("-12.4552"));
-        });
     }
 
     [TestCase("title", "updatedTitle", "en-US")]

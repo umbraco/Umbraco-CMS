@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Examine;
+﻿using Examine;
 using Examine.Search;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Extensions;
@@ -77,7 +76,7 @@ public class Indexer : IExamineIndexer
             valuesToIndex.Add(new ValueSet(
                 indexKey,
                 objectType.ToString(),
-                MapToDictionary(index, fieldsToMap, variationGroup.Key, protection)));
+                MapToDictionary(fieldsToMap, variationGroup.Key, protection)));
         }
 
         index.IndexItems(valuesToIndex);
@@ -250,7 +249,7 @@ public class Indexer : IExamineIndexer
         return Task.CompletedTask;
     }
 
-    private Dictionary<string, IEnumerable<object>> MapToDictionary(IIndex index, IEnumerable<IndexField> fields, string? culture, ContentProtection? protection)
+    private Dictionary<string, IEnumerable<object>> MapToDictionary(IEnumerable<IndexField> fields, string? culture, ContentProtection? protection)
     {
         var result = new Dictionary<string, IEnumerable<object>>();
 
@@ -264,8 +263,8 @@ public class Indexer : IExamineIndexer
         {
             if (field.Value.Integers?.Any() ?? false)
             {
-                var fieldName = FieldNameHelper.FieldName(field, Constants.FieldValues.Integers);
-                result.Add(fieldName, NumericValues(index, fieldName, field.Value.Integers));
+                var integers = field.Value.Integers.Cast<object>().ToList();
+                result.Add(FieldNameHelper.FieldName(field, Constants.FieldValues.Integers), integers);
             }
 
             if (field.Value.Keywords?.Any() ?? false)
@@ -284,8 +283,8 @@ public class Indexer : IExamineIndexer
 
             if (field.Value.Decimals?.Any() ?? false)
             {
-                var fieldName = FieldNameHelper.FieldName(field, Constants.FieldValues.Decimals);
-                result.Add(fieldName, NumericValues(index, fieldName, field.Value.Decimals));
+                var decimals = field.Value.Decimals.Cast<object>().ToList();
+                result.Add(FieldNameHelper.FieldName(field, Constants.FieldValues.Decimals), decimals);
             }
 
             if (field.Value.DateTimeOffsets?.Any() ?? false)
@@ -335,13 +334,6 @@ public class Indexer : IExamineIndexer
 
         return result;
     }
-
-    // A field without a definition is indexed as text, and Examine converts the values with the current culture.
-    private static List<object> NumericValues<T>(IIndex index, string fieldName, IEnumerable<T> values)
-        where T : IFormattable
-        => index.FieldDefinitions.TryGetValue(fieldName, out _)
-            ? values.Cast<object>().ToList()
-            : values.Select(value => (object)value.ToString(null, CultureInfo.InvariantCulture)).ToList();
 
     private static void AddToAggregatedTexts(Dictionary<string, List<string>> aggregatedTextsBySegment, string? segment, IEnumerable<string> texts)
     {
