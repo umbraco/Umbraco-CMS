@@ -812,10 +812,6 @@ describe('Add Conditions', () => {
 describe('UmbExtensionRegistry observables', () => {
 	let extensionRegistry: UmbExtensionRegistry<ManifestBase>;
 
-	const subscriberCount = () =>
-		(extensionRegistry as unknown as { _extensions: { _subject: { observers: Array<unknown> } } })._extensions._subject
-			.observers.length;
-
 	beforeEach(() => {
 		extensionRegistry = new UmbExtensionRegistry();
 		extensionRegistry.register({ type: 'section', alias: 'Umb.Test.Section', name: 'Test Section' });
@@ -836,18 +832,38 @@ describe('UmbExtensionRegistry observables', () => {
 		}
 	});
 
-	it('are released by parts derived from them once those parts have no subscribers left', () => {
-		const before = subscriberCount();
+	it('evaluate their filter for parts derived from them while those parts are observed', () => {
+		let filterCalls = 0;
+		const part = createObservablePart(
+			extensionRegistry.byTypeAndFilter('section', () => {
+				filterCalls++;
+				return true;
+			}),
+			(x) => x[0]?.alias,
+		);
+		const subscription = part.subscribe();
+		filterCalls = 0;
 
-		for (let i = 0; i < 10; i++) {
-			createObservablePart(
-				extensionRegistry.byTypeAndFilter('section', () => true),
-				(x) => x[0]?.alias,
-			)
-				.subscribe()
-				.unsubscribe();
-		}
+		extensionRegistry.register({ type: 'section', alias: 'Umb.Test.Section.Another', name: 'Another Test Section' });
+		subscription.unsubscribe();
 
-		expect(subscriberCount()).to.equal(before);
+		expect(filterCalls).to.be.greaterThan(0);
+	});
+
+	it('stop evaluating their filter once parts derived from them have no subscribers left', () => {
+		let filterCalls = 0;
+		const part = createObservablePart(
+			extensionRegistry.byTypeAndFilter('section', () => {
+				filterCalls++;
+				return true;
+			}),
+			(x) => x[0]?.alias,
+		);
+		part.subscribe().unsubscribe();
+		filterCalls = 0;
+
+		extensionRegistry.register({ type: 'section', alias: 'Umb.Test.Section.Another', name: 'Another Test Section' });
+
+		expect(filterCalls).to.equal(0);
 	});
 });

@@ -2,6 +2,7 @@ import type { UmbTreeContext } from '../tree.context.interface.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
 import { UmbTreeItemActiveManager } from '../active-manager/tree-active-manager.js';
 import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
+import type { ManifestTreeItem } from '../extensions/types.js';
 import { UmbTreeItemElement } from './tree-item.element.js';
 import { aTimeout, expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -15,10 +16,6 @@ class UmbTestTreeItemHostElement extends UmbElementMixin(HTMLElement) {}
 
 describe('UmbTreeItemElement', () => {
 	let host: UmbTestTreeItemHostElement;
-
-	const registrySubscriberCount = () =>
-		(umbExtensionsRegistry as unknown as { _extensions: { _subject: { observers: Array<unknown> } } })._extensions
-			._subject.observers.length;
 
 	beforeEach(() => {
 		host = new UmbTestTreeItemHostElement();
@@ -53,7 +50,29 @@ describe('UmbTreeItemElement', () => {
 		expect(document.createElement('umb-tree-item')).to.be.instanceOf(UmbTreeItemElement);
 	});
 
-	async function renderAndRemove(index: number) {
+	// A tree item manifest for another entity type: the test items never match it, so they keep rendering the default
+	// tree item, but every tree item that observes the registry reads its `forEntityTypes` when the registry changes.
+	let forEntityTypesReads = 0;
+	const observedManifest = {
+		type: 'treeItem',
+		alias: 'Umb.Test.TreeItem.OtherEntityType',
+		name: 'Test Tree Item For Another Entity Type',
+		get forEntityTypes() {
+			forEntityTypesReads++;
+			return ['test-other-entity-type'];
+		},
+	};
+	const registryChangeAlias = 'Umb.Test.Section.RegistryChange';
+
+	beforeEach(() => {
+		umbExtensionsRegistry.register(observedManifest as unknown as ManifestTreeItem);
+	});
+
+	afterEach(() => {
+		umbExtensionsRegistry.unregisterMany([observedManifest.alias, registryChangeAlias]);
+	});
+
+	async function render(index: number) {
 		const element = document.createElement('umb-tree-item');
 		element.entityType = 'test-entity-type';
 		element.props = {
@@ -69,19 +88,31 @@ describe('UmbTreeItemElement', () => {
 		host.appendChild(element);
 		// TODO: remove this wait once #24445 is merged; removing an item mid-load leaves subscriptions behind until then.
 		await aTimeout(50);
-		element.remove();
-		await aTimeout(0);
+		return element;
 	}
 
-	it('holds no subscriptions on the extension registry once removed', async () => {
-		// The first tree item sets up shared, session-wide observations.
-		await renderAndRemove(0);
-		const before = registrySubscriberCount();
+	function changeRegistry() {
+		forEntityTypesReads = 0;
+		umbExtensionsRegistry.register({ type: 'section', alias: registryChangeAlias, name: 'Registry Change' } as never);
+	}
 
-		for (let i = 1; i <= 10; i++) {
-			await renderAndRemove(i);
+	it('evaluates tree item manifests on registry changes while connected', async () => {
+		const element = await render(0);
+
+		changeRegistry();
+		element.remove();
+
+		expect(forEntityTypesReads).to.be.greaterThan(0);
+	});
+
+	it('stops evaluating tree item manifests once removed', async () => {
+		for (let i = 0; i < 10; i++) {
+			(await render(i)).remove();
 		}
+		await aTimeout(0);
 
-		expect(registrySubscriberCount()).to.equal(before);
+		changeRegistry();
+
+		expect(forEntityTypesReads).to.equal(0);
 	});
 });
