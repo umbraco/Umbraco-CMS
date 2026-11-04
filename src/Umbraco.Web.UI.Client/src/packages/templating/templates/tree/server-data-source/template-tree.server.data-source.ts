@@ -7,6 +7,7 @@ import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeDataSource,
+	UmbTreeItemsRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 
@@ -48,6 +49,14 @@ export class UmbTemplateTreeServerDataSource
 
 	async getAncestorsOf(args: UmbTreeAncestorsOfRequestArgs) {
 		const { data, error } = await this.#treeRequestManager.getAncestorsOf(args);
+
+		const mappedData = data?.map((item) => this.#mapItem(item));
+
+		return { data: mappedData, error };
+	}
+
+	async getItems(args: UmbTreeItemsRequestArgs) {
+		const { data, error } = await this.#treeRequestManager.getBatch(args);
 
 		const mappedData = data?.map((item) => this.#mapItem(item));
 

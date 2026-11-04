@@ -63,6 +63,13 @@ export class UmbManagementApiDocumentBlueprintTreeDataRequestManager extends Umb
 						after: args.paging.takeAfter,
 					},
 				}),
+
+			getBatch: (args) =>
+				DocumentBlueprintService.getTreeDocumentBlueprintBatch({
+					query: {
+						id: args.uniques,
+					},
+				}),
 		});
 	}
 }

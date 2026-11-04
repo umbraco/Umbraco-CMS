@@ -168,6 +168,42 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         return Task.FromResult(ancestors.OrderBy(item => item.Level).ToArray());
     }
 
+    /// <inheritdoc />
+    protected override IEntitySlim[] GetBatchEntities(Guid[] keys)
+    {
+        IEntitySlim[] items = base.GetBatchEntities(keys);
+        var itemKeys = items.Select(item => item.Key).ToHashSet();
+
+        // EntityService.GetAll() doesn't support container object types, so folders are resolved one by one.
+        IEnumerable<IEntitySlim> folders = keys
+            .Where(key => itemKeys.Contains(key) is false)
+            .Select(key => EntityService.Get(key, FolderObjectType))
+            .WhereNotNull();
+
+        return [.. items, .. folders];
+    }
+
+    /// <inheritdoc />
+    protected override IDictionary<int, Guid> GetBatchParentKeys(IEntitySlim[] entities)
+    {
+        IDictionary<int, Guid> parentKeys = base.GetBatchParentKeys(entities);
+
+        IEnumerable<int> folderParentIds = entities
+            .Select(entity => entity.ParentId)
+            .Where(parentId => parentId > 0 && parentKeys.ContainsKey(parentId) is false)
+            .Distinct();
+        foreach (var folderParentId in folderParentIds)
+        {
+            IEntitySlim? folder = EntityService.Get(folderParentId, FolderObjectType);
+            if (folder is not null)
+            {
+                parentKeys[folderParentId] = folder.Key;
+            }
+        }
+
+        return parentKeys;
+    }
+
     private IEntitySlim[] GetEntities(Guid? parentKey, int skip, int take, out long totalItems)
     {
         totalItems = 0;
