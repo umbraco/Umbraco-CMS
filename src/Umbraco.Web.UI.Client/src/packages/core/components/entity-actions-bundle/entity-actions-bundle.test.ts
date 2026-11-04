@@ -68,4 +68,23 @@ describe('UmbEntityActionsBundleElement', () => {
 		const button = bundle.shadowRoot!.querySelector('uui-button[data-mark^="entity-action:"]')!;
 		expect(button.getAttribute('data-mark')).to.equal(`entity-action:${aliases[1]}`);
 	});
+
+	it('updates the inline action when actions appear after the first render', async () => {
+		const late = 'Umb.Test.EntityActionsBundle.Late';
+		const host = await fixture(html`<umb-test-entity-actions-bundle-host></umb-test-entity-actions-bundle-host>`);
+		const bundle = host.shadowRoot!.querySelector('umb-entity-actions-bundle') as UmbEntityActionsBundleElement;
+		const inlineAlias = () =>
+			bundle.shadowRoot?.querySelector('uui-button[data-mark^="entity-action:"]')?.getAttribute('data-mark');
+		await waitUntil(() => inlineAlias() === `entity-action:${aliases[1]}`);
+
+		umbExtensionsRegistry.register(action(late, 2, GROUP));
+		await waitUntil(
+			() => inlineAlias() === `entity-action:${late}`,
+			'the inline action did not follow the new first action',
+		);
+		expect(bundle.shadowRoot!.querySelectorAll('uui-button[data-mark^="entity-action:"]')).to.have.lengthOf(1);
+
+		umbExtensionsRegistry.unregister(late);
+		await waitUntil(() => inlineAlias() === `entity-action:${aliases[1]}`, 'the inline action did not fall back');
+	});
 });
