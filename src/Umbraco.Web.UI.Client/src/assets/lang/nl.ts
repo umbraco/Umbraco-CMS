@@ -64,6 +64,17 @@ export default {
 		createblueprint: 'Inhoudssjabloon aanmaken',
 		resendInvite: 'Uitnodiging opnieuw versturen',
 	},
+	actionGroups: {
+		clipboard: 'Klembord',
+		create: 'Aanmaken',
+		edit: 'Bewerken',
+		importExport: 'Importeren en exporteren',
+		notifications: 'Meldingen',
+		publishing: 'Publicatie',
+		routing: 'Routering',
+		structure: 'Structuur',
+		unregistered: 'Actiegroep "%0%"',
+	},
 	actionCategories: {
 		content: 'Inhoud',
 		administration: 'Administratie',

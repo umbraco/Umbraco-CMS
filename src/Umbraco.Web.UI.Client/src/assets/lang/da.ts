@@ -81,6 +81,17 @@ export default {
 		loadMore: 'Indlæs flere',
 		showMore: 'Vis flere',
 	},
+	actionGroups: {
+		clipboard: 'Udklipsholder',
+		create: 'Opret',
+		edit: 'Rediger',
+		importExport: 'Import og eksport',
+		notifications: 'Notificeringer',
+		publishing: 'Udgivelse',
+		routing: 'Routing',
+		structure: 'Struktur',
+		unregistered: 'Handlingsgruppe "%0%"',
+	},
 	actionCategories: {
 		content: 'Indhold',
 		administration: 'Administration',
