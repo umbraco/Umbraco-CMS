@@ -40,7 +40,6 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'actionDescriptions_update',
 	'actionGroups_clipboard',
 	'actionGroups_create',
-	'actionGroups_deployment',
 	'actionGroups_edit',
 	'actionGroups_importExport',
 	'actionGroups_notifications',

@@ -1,6 +1,5 @@
 import {
 	UMB_ENTITY_ACTION_GROUP_CREATE,
-	UMB_ENTITY_ACTION_GROUP_DEPLOYMENT,
 	UMB_ENTITY_ACTION_GROUP_IMPORT_EXPORT,
 	UMB_ENTITY_ACTION_GROUP_NOTIFICATIONS,
 	UMB_ENTITY_ACTION_GROUP_PUBLISHING,
@@ -36,14 +35,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Routing Entity Action Group',
 		weight: 400,
 		meta: { label: '#actionGroups_routing' },
-	},
-	{
-		// Empty in core, for packages that deploy or synchronize entities between environments.
-		type: 'entityActionGroup',
-		alias: UMB_ENTITY_ACTION_GROUP_DEPLOYMENT,
-		name: 'Deployment Entity Action Group',
-		weight: 250,
-		meta: { label: '#actionGroups_deployment' },
 	},
 	{
 		type: 'entityActionGroup',

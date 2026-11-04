@@ -67,7 +67,6 @@ declare global {
 		actionDescriptions_update: string;
 		actionGroups_clipboard: string;
 		actionGroups_create: string;
-		actionGroups_deployment: string;
 		actionGroups_edit: string;
 		actionGroups_importExport: string;
 		actionGroups_notifications: string;

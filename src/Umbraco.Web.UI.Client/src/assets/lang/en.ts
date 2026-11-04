@@ -85,7 +85,6 @@ export default {
 	actionGroups: {
 		clipboard: 'Clipboard',
 		create: 'Create',
-		deployment: 'Deployment',
 		edit: 'Edit',
 		importExport: 'Import and export',
 		notifications: 'Notifications',
