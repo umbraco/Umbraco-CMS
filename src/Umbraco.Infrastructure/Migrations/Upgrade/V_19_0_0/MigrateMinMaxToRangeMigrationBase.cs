@@ -106,7 +106,7 @@ internal abstract class MigrateMinMaxToRangeMigrationBase : AsyncMigrationBase
             }
 
             Database.Execute(Database.SqlContext.Sql()
-                 .Update<DataTypeDto>(x => x.Set(x => x.Configuration, configuration.ToJsonString()))
+                 .Update<DataTypeDto>(u => u.Set(x => x.Configuration, configuration.ToJsonString()))
                  .Where<DataTypeDto>(x => x.NodeId == dataTypeDto.NodeId));
 
             migrated++;
