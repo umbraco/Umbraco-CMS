@@ -91,7 +91,7 @@ export class UmbGroupedActionListElement extends UmbLitElement {
 		const segments = actions.reduce<Array<Array<UmbGroupedActionListItem>>>(
 			(segments, action, index) => {
 				if (index > 0 && action.manifest?.separatorBefore) segments.push([]);
-				segments[segments.length - 1].push(action);
+				segments.at(-1)!.push(action);
 				return segments;
 			},
 			[[]],

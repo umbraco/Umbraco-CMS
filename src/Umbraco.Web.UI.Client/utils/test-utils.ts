@@ -41,9 +41,13 @@ export function readGroupedActionList(list: Element | null | undefined, readActi
 				? [...(index > 0 ? ['|'] : []), ...readActions(child.children)]
 				: [readAction(child)],
 		);
-	return Array.from(list?.shadowRoot?.querySelectorAll('.block') ?? []).flatMap((block) => {
-		const isGroup = block.getAttribute('role') === 'group';
-		const name = isGroup ? (block.hasAttribute('data-mark') ? block.getAttribute('aria-label') : 'Other') : '';
-		return [`[${name}`, ...readActions(block.children), ']'];
-	});
+	const readName = (block: HTMLElement) => {
+		if (block.getAttribute('role') !== 'group') return '';
+		return block.dataset.mark ? block.getAttribute('aria-label') : 'Other';
+	};
+	return Array.from(list?.shadowRoot?.querySelectorAll<HTMLElement>('.block') ?? []).flatMap((block) => [
+		`[${readName(block)}`,
+		...readActions(block.children),
+		']',
+	]);
 }

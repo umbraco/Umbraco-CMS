@@ -112,9 +112,13 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		this._actionList?.focus();
 	}
 
-	protected override async updated(changedProperties: PropertyValues) {
+	protected override updated(changedProperties: PropertyValues) {
 		super.updated(changedProperties);
-		if (!this.#followFirstAction || !changedProperties.has('_actions') || !this._actionList) return;
+		if (changedProperties.has('_actions')) void this.#focusFirstAction();
+	}
+
+	async #focusFirstAction() {
+		if (!this.#followFirstAction || !this._actionList) return;
 		await this._actionList.updateComplete;
 		if (this.#followFirstAction) this._actionList.focus();
 	}
