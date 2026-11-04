@@ -29,6 +29,7 @@ public class DefaultCultureAccessor : IDefaultCultureAccessor
         ICoreScopeProvider scopeProvider,
         IOptionsMonitor<GlobalSettings> options)
     {
+        _languageService = languageService;
         _runtimeState = runtimeState;
         _scopeProvider = scopeProvider;
         _options = options.CurrentValue;

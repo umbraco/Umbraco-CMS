@@ -158,7 +158,7 @@ public class DefaultCultureAccessorBenchmarks
             Mock.Of<IDistributedLockingMechanismFactory>(),
             Mock.Of<IUmbracoDatabaseFactory>(),
             fileSystems,
-            Mock.Of<IOptionsMonitor<CoreDebugSettings>>(x => x.CurrentValue == new CoreDebugSettings()),
+            Mock.Of<IOptionsMonitor<DebugSettings>>(x => x.CurrentValue == new DebugSettings()),
             mediaFileManager,
             loggerFactory,
             Mock.Of<IEventAggregator>());
