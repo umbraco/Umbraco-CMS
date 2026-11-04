@@ -113,11 +113,19 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         (entities, _) = await FilterTreeEntities(entities, entities.Length);
 
         IDictionary<int, Guid> parentKeysById = GetBatchParentKeys(entities);
-        TItem[] treeItemViewModels = OrderByRequestedIds(entities, ids)
-            .SelectMany(entity => MapTreeItemViewModels(
-                parentKeysById.TryGetValue(entity.ParentId, out Guid parentKey) ? parentKey : null,
-                [entity]))
-            .ToArray();
+        Dictionary<Guid, TItem> treeItemViewModelsByKey = entities
+            .GroupBy(entity => entity.ParentId)
+            .SelectMany(siblings => MapTreeItemViewModels(
+                parentKeysById.TryGetValue(siblings.Key, out Guid parentKey) ? parentKey : null,
+                [.. siblings]))
+            .ToDictionary(treeItemViewModel => treeItemViewModel.Id);
+        TItem[] treeItemViewModels =
+        [
+            .. ids
+                .Distinct()
+                .Where(treeItemViewModelsByKey.ContainsKey)
+                .Select(id => treeItemViewModelsByKey[id]),
+        ];
 
         await PopulateFlags(treeItemViewModels);
 
