@@ -963,7 +963,12 @@ public class ContentService : RepositoryService, IContentService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
+        => GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter: filter, ordering: ordering);
+
+    /// <inheritdoc />
+    public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering)
     {
         ordering ??= Ordering.By("Path");
 
@@ -978,14 +983,14 @@ public class ContentService : RepositoryService, IContentService
                     _entityRepository.GetAllPaths(Constants.ObjectTypes.Document, id).ToArray();
                 if (contentPath.Length == 0)
                 {
-                    totalChildren = 0;
+                    totalRecords = 0;
                     return Enumerable.Empty<IContent>();
                 }
 
-                return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
+                return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalRecords, filter, ordering, propertyAliases);
             }
 
-            return GetPagedLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
+            return GetPagedLocked(null, pageIndex, pageSize, out totalRecords, filter, ordering, propertyAliases);
         }
     }
 
@@ -1000,7 +1005,7 @@ public class ContentService : RepositoryService, IContentService
         return query;
     }
 
-    private IEnumerable<IContent> GetPagedLocked(IQuery<IContent>? query, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter, Ordering? ordering)
+    private IEnumerable<IContent> GetPagedLocked(IQuery<IContent>? query, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter, Ordering? ordering, string[]? propertyAliases = null)
     {
         if (pageIndex < 0)
         {
@@ -1017,7 +1022,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(ordering));
         }
 
-        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
+        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases, filter, ordering);
     }
 
     /// <summary>
@@ -2520,7 +2525,7 @@ public class ContentService : RepositoryService, IContentService
 
                 // important to order by Path ASC so make it explicit in case defaults change
                 // ReSharper disable once RedundantArgumentDefaultValue
-                foreach (IContent d in GetPagedDescendants(document.Id, page, pageSize, out _, ordering: Ordering.By("Path", Direction.Ascending)))
+                foreach (IContent d in GetPagedDescendants(document.Id, page, pageSize, out _, propertyAliases: null, filter: null, ordering: Ordering.By("Path", Direction.Ascending)))
                 {
                     count++;
 
@@ -2719,7 +2724,7 @@ public class ContentService : RepositoryService, IContentService
         while (total > 0)
         {
             // get descendants - ordered from deepest to shallowest
-            IEnumerable<IContent> descendants = GetPagedDescendants(content.Id, 0, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
+            IEnumerable<IContent> descendants = GetPagedDescendants(content.Id, 0, pageSize, out total, propertyAliases: null, filter: null, ordering: Ordering.By("Path", Direction.Descending));
             foreach (IContent c in descendants)
             {
                 DoDelete(c);
@@ -3280,7 +3285,7 @@ public class ContentService : RepositoryService, IContentService
                 while (page * pageSize < total)
                 {
                     IEnumerable<IContent> descendants =
-                        GetPagedDescendants(content.Id, page++, pageSize, out total);
+                        GetPagedDescendants(content.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
                     foreach (IContent descendant in descendants)
                     {
                         // when copying a branch into itself, the copy of a root would be seen as a descendant
