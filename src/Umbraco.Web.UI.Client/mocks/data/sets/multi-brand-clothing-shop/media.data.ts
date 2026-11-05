@@ -9,7 +9,7 @@ import {
 	productImageId,
 	type UmbMbcsSiteCode,
 } from './catalog.js';
-import { MEDIA_TYPE_IDS } from './ids.js';
+import { DATA_TYPE_IDS, MEDIA_TYPE_IDS } from './ids.js';
 
 const PHOTO_FILE_NAMES = new Set([
 	'material-red-gold',
@@ -46,7 +46,11 @@ const folder = (id: string, name: string, hasChildren = true): UmbMockMediaModel
 	hasChildren,
 	noAccess: false,
 	isTrashed: false,
-	mediaType: { id: MEDIA_TYPE_IDS.folder, icon: 'icon-folder' },
+	mediaType: {
+		id: MEDIA_TYPE_IDS.folder,
+		icon: 'icon-folder',
+		collection: { id: DATA_TYPE_IDS.mediaCollection },
+	},
 	values: [],
 	variants: [
 		{
