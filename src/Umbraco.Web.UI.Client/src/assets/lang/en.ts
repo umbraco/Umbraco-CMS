@@ -498,6 +498,9 @@ export default {
 		noMediaTypesWithNoSettingsAccess:
 			"The selected media in the tree doesn't allow for any other media to be created below it.",
 		noMediaTypesEditPermissions: 'Edit permissions for this Media Type',
+		noMediaTypesAllowedAtRoot:
+			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow at root</strong> option under <strong>Structure</strong>.',
+		noMediaTypesAllowedAtRootWithNoSettingsAccess: 'There are no Media Types allowed for creating media at the root.',
 		documentTypeWithoutTemplate: 'Document Type without a template',
 		documentTypeWithTemplate: 'Document Type with Template',
 		documentTypeWithTemplateDescription:
