@@ -113,13 +113,12 @@ export class UmbDropdownElement extends UmbLitElement {
 				.placement=${this.placement}
 				@toggle=${this.#onToggle}
 				@click=${this._onPopoverClickCapture}>
-				<umb-popover-layout>
-					<slot></slot>
-				</umb-popover-layout>
+				<slot></slot>
 			</uui-popover-container>
 		`;
 	}
 
+	// TODO: Remove background color when UUI is corrected. [NL]
 	static override styles = [
 		UmbTextStyles,
 		css`
@@ -133,6 +132,10 @@ export class UmbDropdownElement extends UmbLitElement {
 
 			:host(:not([compact])) #symbol-expand {
 				margin-left: var(--uui-size-space-2);
+			}
+
+			#dropdown-popover {
+				background-color: var(--uui-color-surface);
 			}
 		`,
 	];

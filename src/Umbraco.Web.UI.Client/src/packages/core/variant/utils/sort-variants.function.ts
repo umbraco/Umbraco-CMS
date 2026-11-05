@@ -1,5 +1,5 @@
-import { UmbPublishableVariantState } from './constants.js';
-import type { UmbEntityVariantOptionModel } from './types.js';
+import { UmbPublishableVariantState } from '../constants.js';
+import type { UmbEntityVariantOptionModel } from '../types.js';
 
 const variantStatesOrder: Record<string, number> = {
 	[UmbPublishableVariantState.PUBLISHED_PENDING_CHANGES]: 1,

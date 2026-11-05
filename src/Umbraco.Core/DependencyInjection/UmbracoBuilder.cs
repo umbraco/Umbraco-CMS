@@ -379,6 +379,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IPreviewTokenGenerator, NoopPreviewTokenGenerator>();
 #pragma warning restore CS0618 // Type or member is obsolete
             Services.AddUnique<IPreviewService, PreviewService>();
+            Services.AddUnique<IPreviewAccessEvaluator, PreviewAccessEvaluator>();
             Services.AddUnique<DocumentNavigationService, DocumentNavigationService>();
             Services.AddUnique<IDocumentNavigationQueryService>(x => x.GetRequiredService<DocumentNavigationService>());
             Services.AddUnique<IDocumentNavigationManagementService>(x => x.GetRequiredService<DocumentNavigationService>());

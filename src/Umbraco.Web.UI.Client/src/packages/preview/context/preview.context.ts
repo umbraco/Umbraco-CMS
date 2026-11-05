@@ -1,5 +1,6 @@
 import { attachLinkInterceptor } from '../utils/index.js';
 import { UmbPreviewRepository } from '../repository/index.js';
+import { UmbPreviewSessionRenewalController } from '../controllers/preview-session-renewal.controller.js';
 import { UMB_PREVIEW_CONTEXT } from './preview.context-token.js';
 import { HubConnectionBuilder, HttpTransportType } from '@umbraco-cms/backoffice/external/signalr';
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
@@ -37,6 +38,7 @@ export class UmbPreviewContext extends UmbContextBase {
 	#serverUrl: string = '';
 
 	#previewRepository = new UmbPreviewRepository(this);
+	#previewSessionRenewal = new UmbPreviewSessionRenewalController(this, this.#previewRepository);
 
 	#localize = new UmbLocalizationController(this);
 
@@ -91,6 +93,10 @@ export class UmbPreviewContext extends UmbContextBase {
 		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
 			this.#authContext = authContext;
 			this.#initHubConnection();
+
+			if (authContext) {
+				this.#previewSessionRenewal.observeSession(authContext.session$, () => this.#getPreviewSessionArgs());
+			}
 		});
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
@@ -143,8 +149,9 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		const connection = this.#connection;
 
-		this.#connection.on('refreshed', (payload) => {
+		this.#connection.on('refreshed', async (payload) => {
 			if (payload === this.#unique.getValue()) {
+				await this.#previewSessionRenewal.renew(this.#getPreviewSessionArgs());
 				this.#setPreviewUrl({ rnd: Math.random() });
 			}
 		});
@@ -194,6 +201,14 @@ export class UmbPreviewContext extends UmbContextBase {
 				},
 			});
 		}
+	}
+
+	#getPreviewSessionArgs() {
+		return {
+			unique: this.#unique.getValue(),
+			culture: this.#culture.getValue(),
+			segment: this.#segment.getValue(),
+		};
 	}
 
 	async #getPublishedUrl(): Promise<string | null> {

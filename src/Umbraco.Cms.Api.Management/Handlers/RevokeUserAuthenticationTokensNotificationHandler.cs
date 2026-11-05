@@ -3,6 +3,7 @@ using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
@@ -15,10 +16,12 @@ namespace Umbraco.Cms.Api.Management.Handlers;
 internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         INotificationAsyncHandler<UserSavedNotification>,
         INotificationAsyncHandler<UserDeletedNotification>,
-        INotificationAsyncHandler<UserLoginSuccessNotification>
+        INotificationAsyncHandler<UserLoginSuccessNotification>,
+        INotificationAsyncHandler<UserLogoutSuccessNotification>
 {
     private readonly IUserService _userService;
     private readonly IOpenIddictTokenManager _tokenManager;
+    private readonly IOpenIddictApplicationManager _applicationManager;
     private readonly ILogger<RevokeUserAuthenticationTokensNotificationHandler> _logger;
     private readonly SecuritySettings _securitySettings;
 
@@ -27,16 +30,19 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
     /// </summary>
     /// <param name="userService">The <see cref="IUserService"/> used to manage user-related operations.</param>
     /// <param name="tokenManager">The <see cref="IOpenIddictTokenManager"/> used to manage OpenIddict tokens.</param>
+    /// <param name="applicationManager">The <see cref="IOpenIddictApplicationManager"/> used to resolve OpenIddict applications.</param>
     /// <param name="logger">The <see cref="ILogger{RevokeUserAuthenticationTokensNotificationHandler}"/> instance used for logging.</param>
     /// <param name="securitySettingsOptions">The <see cref="IOptions{SecuritySettings}"/> providing security configuration options.</param>
     public RevokeUserAuthenticationTokensNotificationHandler(
         IUserService userService,
         IOpenIddictTokenManager tokenManager,
+        IOpenIddictApplicationManager applicationManager,
         ILogger<RevokeUserAuthenticationTokensNotificationHandler> logger,
         IOptions<SecuritySettings> securitySettingsOptions)
     {
         _userService = userService;
         _tokenManager = tokenManager;
+        _applicationManager = applicationManager;
         _logger = logger;
         _securitySettings = securitySettingsOptions.Value;
     }
@@ -104,11 +110,37 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         }
     }
 
+    /// <summary>
+    /// Handles a <see cref="UserLogoutSuccessNotification"/> by revoking the back-office authentication tokens of the user that logged out.
+    /// </summary>
+    /// <param name="notification">The notification containing information about the logout.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public async Task HandleAsync(UserLogoutSuccessNotification notification, CancellationToken cancellationToken)
+    {
+        var userId = notification.AffectedUserId;
+        IUser? user = userId is not null ? await FindUserFromString(userId) : null;
+
+        if (user is null)
+        {
+            return;
+        }
+
+        await RevokeBackOfficeTokensAsync(user);
+    }
+
     private async Task RevokeTokensAsync(IUser user)
     {
         _logger.LogInformation("Revoking active tokens for user with ID {id} (key {userKey})", user.Id, user.Key);
 
         await _tokenManager.RevokeUmbracoUserTokens(user.Key);
+    }
+
+    private async Task RevokeBackOfficeTokensAsync(IUser user)
+    {
+        _logger.LogInformation("Revoking active back-office tokens for user with ID {id} (key {userKey})", user.Id, user.Key);
+
+        await _tokenManager.RevokeUmbracoUserTokens(_applicationManager, user.Key, Constants.OAuthClientIds.BackOffice);
     }
 
     private async Task<IUser?> FindUserFromString(string userId)

@@ -73,6 +73,10 @@ export class UmbBodyLayoutElement extends LitElement {
 		this._scrollContainer?.removeEventListener('scroll', this.#onScroll);
 	}
 
+	getScrollContainer(): HTMLElement | undefined {
+		return this._scrollContainer;
+	}
+
 	#onScroll = () => {
 		if (!this._scrollContainer) return;
 		this.toggleAttribute('scrolling', this._scrollContainer.scrollTop > 0);

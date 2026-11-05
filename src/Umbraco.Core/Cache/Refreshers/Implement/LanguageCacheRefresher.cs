@@ -19,6 +19,7 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
 {
     private readonly IDomainCacheService _domainCacheService;
     private readonly IPublishStatusManagementService _publishStatusManagementService;
+    private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="LanguageCacheRefresher" /> class.
@@ -41,7 +42,8 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
             eventAggregator,
             domainCache,
             factory,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusManagementService>())
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusManagementService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDefaultCultureAccessor>())
     {
     }
 
@@ -54,6 +56,7 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
     /// <param name="domainCache">The domain cache service.</param>
     /// <param name="factory">The cache refresher notification factory.</param>
     /// <param name="publishStatusManagementService">The document publish status management service.</param>
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public LanguageCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -61,10 +64,40 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
         IDomainCacheService domainCache,
         ICacheRefresherNotificationFactory factory,
         IPublishStatusManagementService publishStatusManagementService)
+        : this(
+            appCaches,
+            serializer,
+            eventAggregator,
+            domainCache,
+            factory,
+            publishStatusManagementService,
+            StaticServiceProvider.Instance.GetRequiredService<IDefaultCultureAccessor>())
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LanguageCacheRefresher" /> class.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="domainCache">The domain cache service.</param>
+    /// <param name="factory">The cache refresher notification factory.</param>
+    /// <param name="publishStatusManagementService">The document publish status management service.</param>
+    /// <param name="defaultCultureAccessor">The default culture accessor.</param>
+    public LanguageCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IDomainCacheService domainCache,
+        ICacheRefresherNotificationFactory factory,
+        IPublishStatusManagementService publishStatusManagementService,
+        IDefaultCultureAccessor defaultCultureAccessor)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _domainCacheService = domainCache;
         _publishStatusManagementService = publishStatusManagementService;
+        _defaultCultureAccessor = defaultCultureAccessor;
     }
 
     private static bool AffectsContent(JsonPayload[] payloads)
@@ -165,6 +198,7 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
 
         // clear all no matter what type of payload
         ClearAllIsolatedCacheByEntityType<ILanguage>();
+        _defaultCultureAccessor.ClearCache();
 
         foreach (JsonPayload payload in payloads)
         {
