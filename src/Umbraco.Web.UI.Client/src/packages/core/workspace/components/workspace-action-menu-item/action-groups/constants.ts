@@ -1,0 +1,1 @@
+export const UMB_WORKSPACE_ACTION_MENU_ITEM_GROUP_PUBLISHING = 'Umb.WorkspaceActionMenuItemGroup.Publishing';
