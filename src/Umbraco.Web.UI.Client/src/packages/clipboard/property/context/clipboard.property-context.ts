@@ -27,6 +27,7 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { mergeObservables, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbThumbnailModel } from '@umbraco-cms/backoffice/models';
 
 /**
  * Clipboard context for managing clipboard entries for property values
@@ -147,6 +148,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 	 * @param {string} [args.name] - The name of the clipboard entry. Defaults to the location of the property
 	 * @param {string} [args.itemName] - The label of a single item within the property value, appended to the derived name
 	 * @param {string} [args.icon] - The icon of the clipboard entry. Defaults to the icon of the property editor
+	 * @param {UmbThumbnailModel} [args.thumbnail] - The thumbnail of the clipboard entry
 	 * @param {string} [args.propertyEditorUiAlias] - The alias of the property editor to match. Defaults to the surrounding property editor
 	 * @returns { Promise<UmbClipboardEntryDetailModel | undefined> }
 	 */
@@ -155,6 +157,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 		name?: string;
 		itemName?: string;
 		icon?: string;
+		thumbnail?: UmbThumbnailModel;
 		propertyEditorUiAlias?: string;
 	}): Promise<UmbClipboardEntryDetailModel | undefined> {
 		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
@@ -171,6 +174,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 			name: args.name ?? (await this.#deriveEntryName(args.itemName)),
 			values,
 			icon: args.icon ?? this.#propertyContext?.getEditorManifest()?.meta.icon,
+			thumbnail: args.thumbnail,
 		};
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);

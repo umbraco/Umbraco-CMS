@@ -1,4 +1,6 @@
 import { UmbPropertyEditorUIMediaPickerElement } from './property-editor-ui-media-picker.element.js';
+import { manifests } from './manifests.js';
+import type { UmbInputRichMediaElement } from '../../components/input-rich-media/input-rich-media.element.js';
 import type { UmbMediaPickerValueModel } from '../types.js';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
@@ -138,6 +140,31 @@ describe('UmbPropertyEditorUIMediaPickerElement', () => {
 				expect(element.value?.[0].crops).to.deep.equal(crops);
 				expect(element.value?.[0].focalPoint).to.deep.equal({ left: 0.25, top: 0.75 });
 			});
+		});
+	});
+
+	describe('clear', () => {
+		it('should register a clear property action for the media picker', () => {
+			const clearAction = manifests.find(
+				(manifest) =>
+					manifest.type === 'propertyAction' &&
+					'kind' in manifest &&
+					manifest.kind === 'clear' &&
+					'forPropertyEditorUis' in manifest &&
+					manifest.forPropertyEditorUis.includes('Umb.PropertyEditorUi.MediaPicker'),
+			);
+			expect(clearAction).to.not.be.undefined;
+		});
+
+		it('should show no items once the value is cleared', async () => {
+			element.value = [{ key: 'entry-1', mediaKey: 'media-1', mediaTypeAlias: 'Image', focalPoint: null, crops: [] }];
+			await element.updateComplete;
+
+			element.value = undefined;
+			await element.updateComplete;
+
+			const input = element.shadowRoot!.querySelector<UmbInputRichMediaElement>('umb-input-rich-media')!;
+			expect(input.value).to.deep.equal([]);
 		});
 	});
 });

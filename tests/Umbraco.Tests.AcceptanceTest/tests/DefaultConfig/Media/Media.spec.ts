@@ -26,7 +26,7 @@ test('can not create a empty media file', {tag: '@release'}, async ({umbracoApi,
 
   // Assert
   await umbracoUi.media.isFailedStateButtonVisible();
-  await umbracoUi.media.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.media.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   await umbracoUi.media.isMediaTreeItemVisible(mediaFileName, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
 });
@@ -331,7 +331,7 @@ test('can move a media item to a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.media.clickActionsMenuForName(mediaFileName);
   await umbracoUi.media.clickMoveToActionMenuOption();
-  await umbracoUi.media.openCaretButtonForName('Media', true);
+  await umbracoUi.media.clickModalCaretButtonForName('Media');
   await umbracoUi.media.clickModalTextByName(folderName);
   await umbracoUi.media.clickChooseModalButtonAndWaitForMediaWithIdsToBeMoved([mediaFileId]);
 
@@ -353,7 +353,7 @@ test('cannot move a media item to another media item', async ({umbracoApi, umbra
   // Act
   await umbracoUi.media.clickActionsMenuForName(mediaFileName);
   await umbracoUi.media.clickMoveToActionMenuOption();
-  await umbracoUi.media.openCaretButtonForName('Media', true);
+  await umbracoUi.media.clickModalCaretButtonForName('Media');
 
   // Assert
   await umbracoUi.media.isModalMenuItemWithNameDisabled(secondMediaFileName);

@@ -23,6 +23,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Controllers;
 public class MaintenanceModeActionFilterAttributeTests
 {
     private const string CustomUpgradingViewPath = "~/Views/CustomUpgrading.cshtml";
+    private const string CustomMaintenanceViewPath = "~/Views/CustomMaintenance.cshtml";
 
     [Test]
     public void OnActionExecuting_MvcController_WhenUpgradingAndMaintenanceEnabled_SetsMaintenanceResultWithUpgradingViewPath()
@@ -31,12 +32,14 @@ public class MaintenanceModeActionFilterAttributeTests
         {
             ShowMaintenancePageWhenInUpgradeState = true,
             UpgradingViewPath = CustomUpgradingViewPath,
+            MaintenanceViewPath = CustomMaintenanceViewPath,
         };
         var context = CreateMvcControllerContext();
 
         InvokeFilter(RuntimeLevel.Upgrading, settings, context);
 
         Assert.That(context.Result, Is.InstanceOf<MaintenanceResult>());
+        Assert.That(((MaintenanceResult)context.Result!).ViewName, Is.EqualTo(CustomUpgradingViewPath));
     }
 
     [Test]
@@ -51,14 +54,20 @@ public class MaintenanceModeActionFilterAttributeTests
     }
 
     [Test]
-    public void OnActionExecuting_MvcController_WhenUpgradeAndMaintenanceEnabled_SetsMaintenanceResult()
+    public void OnActionExecuting_MvcController_WhenUpgradeAndMaintenanceEnabled_SetsMaintenanceResultWithMaintenanceViewPath()
     {
-        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
+        var settings = new GlobalSettings
+        {
+            ShowMaintenancePageWhenInUpgradeState = true,
+            UpgradingViewPath = CustomUpgradingViewPath,
+            MaintenanceViewPath = CustomMaintenanceViewPath,
+        };
         var context = CreateMvcControllerContext();
 
         InvokeFilter(RuntimeLevel.Upgrade, settings, context);
 
         Assert.That(context.Result, Is.InstanceOf<MaintenanceResult>());
+        Assert.That(((MaintenanceResult)context.Result!).ViewName, Is.EqualTo(CustomMaintenanceViewPath));
     }
 
     [Test]

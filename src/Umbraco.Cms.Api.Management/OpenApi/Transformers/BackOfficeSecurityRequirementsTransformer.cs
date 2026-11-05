@@ -31,9 +31,9 @@ internal class BackOfficeSecurityRequirementsTransformer : IOpenApiOperationTran
             return Task.CompletedTask;
         }
 
-        if (description.MethodInfo.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) ||
-            description.MethodInfo.DeclaringType?.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) ==
-            true)
+        IList<object> endpointMetadata = description.EndpointMetadata;
+
+        if (endpointMetadata.Any(x => x is AllowAnonymousAttribute))
         {
             // Explicitly clear security on anonymous operations so they override the document-level
             // security requirement added below. Without this, OpenAPI consumers (including the
@@ -57,9 +57,7 @@ internal class BackOfficeSecurityRequirementsTransformer : IOpenApiOperationTran
         // If an endpoint has more than the base number of AuthorizeAttributes (defined on ManagementApiControllerBase),
         // or if the controller injects IAuthorizationService for programmatic authorization checks, there's a
         // possibility the user may be authenticated but not authorized.
-        var numberOfAuthorizeAttributes =
-            description.MethodInfo.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute)
-            + description.MethodInfo.DeclaringType?.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute);
+        var numberOfAuthorizeAttributes = endpointMetadata.Count(x => x is AuthorizeAttribute);
 
         if (numberOfAuthorizeAttributes > BaseAuthorizeAttributeCount ||
             InjectsAuthorizationService(description.MethodInfo.DeclaringType))

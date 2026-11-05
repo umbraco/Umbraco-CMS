@@ -314,6 +314,8 @@ export default {
 		isSensitiveValue:
 			'Dieser Wert ist verborgen.\n      Wenn Sie diesen Wert einsehen müssen, wenden Sie sich bitte an einen Administrator.\n    ',
 		isSensitiveValue_short: 'Dieser Wert ist verborgen.',
+		isSensitiveValueNotice:
+			'Wenn Sie die verborgenen Werte einsehen müssen, wenden Sie sich bitte an einen Administrator.',
 		languagesToPublish: 'Welche Sprache möchten Sie veröffentlichen?',
 		languagesToSendForApproval: 'Welche Sprachen möchten Sie zur Freigabe schicken?',
 		languagesToSchedule: 'Welche Sprachen möchten Sie zu einer bestimmten Zeit veröffentlichen?',
@@ -1100,6 +1102,7 @@ export default {
 			'Hoppla! Wir konnten Sie nicht anmelden. Bitte überprüfen Sie Ihre Anmeldeinformationen und versuchen Sie es erneut.',
 		userLockedOut: 'Ihr Konto wurde gesperrt. Bitte versuchen Sie es später erneut.',
 		receivedErrorFromServer: 'Der Server hat einen Fehler gemeldet',
+		passwordResetUnavailable: 'Das Zurücksetzen des Kennworts ist derzeit leider nicht verfügbar. Bitte versuchen Sie es später erneut oder wenden Sie sich an Ihren Administrator.',
 		userInviteWelcomeMessage:
 			'Hallo und Willkommen bei Umbraco! In nur einer Minute sind Sie bereit loszulegen, Sie müssen nur ein Kennwort festlegen.',
 		userInviteExpiredMessage:
@@ -1357,6 +1360,17 @@ export default {
 		sortHelp: 'Ziehen Sie die Elemente an ihre gewünschte neue Position.',
 		sortPleaseWait: 'Bitte warten, die Seiten werden sortiert. Das kann einen Moment dauern.',
 		sortEmptyState: 'Dieser Knoten hat keine Unterknoten zum Sortieren',
+		sortByFieldHeadline: 'Nach Feld sortieren',
+		sortByFieldSentence: 'Alle untergeordneten Elemente sortieren nach',
+		sortByFieldDirectionLabel: 'Richtung',
+		sortByFieldAscending: 'Aufsteigend',
+		sortByFieldDescending: 'Absteigend',
+		sortByFieldNameOption: 'Name',
+		sortByFieldCreateDateOption: 'Erstellt',
+		sortByFieldUpdateDateOption: 'Zuletzt bearbeitet',
+		sortIndividuallyHeadline: 'Einzeln sortieren',
+		sortByFieldCultureSentence: 'in',
+		sortByFieldCultureLabel: 'Sprache',
 	},
 	speechBubbles: {
 		editMultiContentPublishedPartialText: '%0% von %1% Dokumenten veröffentlicht.',
@@ -1899,11 +1913,12 @@ export default {
 		stateLockedOut: 'Ausgeschlossen',
 		stateInvited: 'Eingeladen',
 		stateInactive: 'Nicht aktiv',
+		type: 'Typ',
 		sortNameAscending: 'Name (A-Z)',
 		sortNameDescending: 'Name (Z-A)',
-		sortCreateDateAscending: 'Oldest',
-		sortCreateDateDescending: 'Newest',
-		sortLastLoginDateDescending: 'Last login',
+		sortCreateDateAscending: 'Älteste',
+		sortCreateDateDescending: 'Neueste',
+		sortLastLoginDateDescending: 'Letzte Anmeldung',
 	},
 	validation: {
 		validation: 'Validierung',

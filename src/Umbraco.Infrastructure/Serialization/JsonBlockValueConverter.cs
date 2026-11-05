@@ -291,8 +291,11 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                     throw new JsonException($"Expected to find the beginning of an array of layout items for block editor alias: {blockEditorAlias}, got: {reader.TokenType}. This happened while attempting to deserialize type: {typeToConvert.FullName}.");
                 }
 
-                // did we encounter the concrete block value?
-                if (blockValue.SupportsBlockLayoutAlias(blockEditorAlias))
+                // did we encounter the concrete block value? a layout stored under the alias of the concrete block value
+                // takes precedence over one stored under any other supported alias, regardless of their order.
+                var isOwnLayout = blockEditorAlias.Equals(blockValue.PropertyEditorAlias);
+                if (blockValue.SupportsBlockLayoutAlias(blockEditorAlias)
+                    && (isOwnLayout || blockValue.Layout.ContainsKey(blockValue.PropertyEditorAlias) is false))
                 {
                     // yes, deserialize the block layout items as their concrete type (list of layoutItemType)
                     var layoutItems = JsonSerializer.Deserialize(ref reader, layoutItemsType, options);

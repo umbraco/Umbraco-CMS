@@ -49,10 +49,19 @@ internal sealed class ElementNavigationService :
     }
 
     /// <inheritdoc />
+    protected override int TreeLockId => Constants.Locks.ElementTree;
+
+    /// <inheritdoc />
+    protected override Guid ObjectTypeKey => Constants.ObjectTypes.Element;
+
+    /// <inheritdoc />
+    protected override IEnumerable<Guid> ObjectTypeKeys => ElementObjectTypes;
+
+    /// <inheritdoc />
     public override async Task RebuildAsync()
-        => await HandleRebuildAsync(Constants.Locks.ElementTree, ElementObjectTypes, false);
+        => await HandleRebuildAsync(trashed: false);
 
     /// <inheritdoc />
     public override async Task RebuildBinAsync()
-        => await HandleRebuildAsync(Constants.Locks.ElementTree, ElementObjectTypes, true);
+        => await HandleRebuildAsync(trashed: true);
 }

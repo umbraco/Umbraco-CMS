@@ -7,7 +7,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_WORKSPACE_EDIT_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_EDIT_PATH_PATTERN, UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
 import { debounce, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbEntityContext, UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
@@ -72,6 +72,15 @@ export abstract class UmbTreeItemApiContextBase<
 
 	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
 
+	protected readonly _drillable = new UmbBooleanState(false);
+	/**
+	 * Whether opening this item takes the user into it, as answered by the tree — it is a property of the tree's host,
+	 * the same for every item in it.
+	 *
+	 * False until the tree says otherwise, so a host that cannot is never mistaken for one that can.
+	 */
+	readonly drillable = this._drillable.asObservable();
+
 	/**
 	 * @returns {Observable<boolean>} True if any entity action is registered for this entity type
 	 * @deprecated Deprecated since v17. This only tells whether a manifest exists for the entity type, it does not
@@ -125,6 +134,7 @@ export abstract class UmbTreeItemApiContextBase<
 			this._observeIsSelectable();
 			this._observeIsSelected();
 			this._observeSelectOnly();
+			this._observeDrillable();
 			if (context) this._onTreeContextChanged(context);
 		});
 		this.#gotTreeContext = this._treeContextConsumer.asPromise();
@@ -133,6 +143,15 @@ export abstract class UmbTreeItemApiContextBase<
 			this.#sectionContext = instance;
 			this.#observeSectionPath();
 		});
+	}
+
+	/**
+	 * Returns whether opening this item takes the user into it.
+	 * @returns {boolean} True when the tree's host enters opened items.
+	 * @memberof UmbTreeItemApiContextBase
+	 */
+	getDrillable(): boolean {
+		return this._drillable.getValue();
 	}
 
 	setTreeItem(item: TreeItemType | undefined): void {
@@ -205,6 +224,12 @@ export abstract class UmbTreeItemApiContextBase<
 			},
 			'_observeIsSelected',
 		);
+	}
+
+	protected _observeDrillable() {
+		const ctx = this._treeContext;
+		if (!ctx) return;
+		this.observe(ctx.drillable, (value) => this._drillable.setValue(value ?? false), '_observeDrillable');
 	}
 
 	protected _observeSelectOnly() {
@@ -322,10 +347,16 @@ export abstract class UmbTreeItemApiContextBase<
 	}
 
 	constructPath(pathname: string, entityType: string, unique: string | null): string {
+		// A `null` unique means this tree item is the tree's root pseudo-entity, not a real, persisted item — it
+		// has no `edit/:unique` page of its own, so link to the workspace's bare path instead.
+		if (unique === null) {
+			return UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({ sectionName: pathname, entityType });
+		}
+
 		return UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
 			sectionName: pathname,
 			entityType,
-			unique: unique ?? 'null',
+			unique,
 		});
 	}
 }

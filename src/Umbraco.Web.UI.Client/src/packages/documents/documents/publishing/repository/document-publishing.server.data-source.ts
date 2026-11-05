@@ -1,4 +1,5 @@
 import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../../types.js';
+import type { UmbAncestorForCoverage } from '../utils.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import {
 	umbMapDocumentCreateRequestBody,
@@ -46,7 +47,7 @@ export class UmbDocumentPublishingServerDataSource {
 		model: UmbDocumentDetailModel,
 		variantIds: Array<UmbVariantId>,
 		parentUnique: string | null = null,
-	) {
+	): Promise<UmbDataSourceResponse<string>> {
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 
@@ -58,7 +59,11 @@ export class UmbDocumentPublishingServerDataSource {
 		// 201 Created returns only the key (no document body). The workspace reloads after this to refresh
 		// its state, so we deliberately do NOT re-read the full document here — that would be a redundant
 		// round-trip on top of the reload.
-		return tryExecute(this.#host, DocumentService.postDocumentCreateAndPublish({ body }));
+		const { data, error } = await tryExecute(this.#host, DocumentService.postDocumentCreateAndPublish({ body }));
+
+		// The generated response type is `unknown` (Swagger has no schema for the empty 201 body), but the
+		// Umb-Generated-Resource interceptor rewrites it to the created document's key at runtime.
+		return { data: data as string | undefined, error };
 	}
 
 	/**
@@ -258,5 +263,35 @@ export class UmbDocumentPublishingServerDataSource {
 		};
 
 		return { data: document };
+	}
+
+	/**
+	 * Get the variant states of each ancestor of a Document
+	 * @param {string} unique - Document unique
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbAncestorForCoverage>>>} The ancestors, with the culture and state of each of their variants
+	 * @memberof UmbDocumentPublishingServerDataSource
+	 */
+	async ancestorVariantStates(unique: string): Promise<UmbDataSourceResponse<Array<UmbAncestorForCoverage>>> {
+		if (!unique) throw new Error('Unique is missing');
+
+		const { data, error } = await tryExecute(
+			this.#host,
+			DocumentService.getItemDocumentAncestors({ query: { id: [unique] } }),
+			{ disableNotifications: true },
+		);
+
+		if (error || !data) {
+			return { error };
+		}
+
+		const ancestors = data.find((entry) => entry.id === unique)?.ancestors ?? [];
+		return {
+			data: ancestors.map((ancestor) => ({
+				variants: ancestor.variants.map((variant) => ({
+					culture: variant.culture || null,
+					state: variant.state,
+				})),
+			})),
+		};
 	}
 }

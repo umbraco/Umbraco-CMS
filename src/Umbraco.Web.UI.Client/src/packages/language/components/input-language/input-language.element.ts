@@ -7,6 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import { isAboveZeroAndBelowMinimum } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-language')
 export class UmbInputLanguageElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
@@ -19,6 +20,7 @@ export class UmbInputLanguageElement extends UUIFormControlWithBasicsMixin(UmbLi
 		},
 		identifier: 'Umb.SorterIdentifier.InputLanguage',
 		itemSelector: 'umb-entity-item-ref',
+		disabledItemSelector: '[error]',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -58,6 +60,7 @@ export class UmbInputLanguageElement extends UUIFormControlWithBasicsMixin(UmbLi
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerContext.max;
@@ -105,13 +108,17 @@ export class UmbInputLanguageElement extends UUIFormControlWithBasicsMixin(UmbLi
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 
 	@state()
 	private _items: Array<UmbLanguageItemModel> = [];
@@ -127,7 +134,7 @@ export class UmbInputLanguageElement extends UUIFormControlWithBasicsMixin(UmbLi
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(
@@ -177,7 +184,9 @@ export class UmbInputLanguageElement extends UUIFormControlWithBasicsMixin(UmbLi
 			<uui-ref-list>
 				${repeat(
 					this._statuses,
-					(status) => status.unique,
+					// Re-key on error state so the sorter re-evaluates `disabledItemSelector` when an item settles
+					// into "not found" — the sorter only checks this when an element is first mounted.
+					(status) => `${status.unique}:${status.state.type === 'error'}`,
 					(status) => {
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
@@ -189,7 +198,7 @@ export class UmbInputLanguageElement extends UUIFormControlWithBasicsMixin(UmbLi
 								?error=${isError}
 								.errorMessage=${status.state.error}
 								.errorDetail=${isError ? unique : undefined}
-								?readonly=${this.readonly}
+								?readonly=${this.readonly || isError}
 								?standalone=${this.max === 1}>
 								${when(
 									!this.readonly,

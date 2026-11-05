@@ -453,7 +453,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
-	#onPageChange(event: UUIPaginationEvent) {
+	async #onPageChange(event: UUIPaginationEvent) {
 		event.stopPropagation();
 		const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
 
@@ -466,7 +466,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		paginationManager.setCurrentPageNumber(event.target.current);
 		this.#pagingMap.set(key, paginationManager);
 
-		this.#loadChildrenOfCurrentMediaItem();
+		await this.#loadChildrenOfCurrentMediaItem();
+		this.shadowRoot?.querySelector('umb-body-layout')?.getScrollContainer()?.scrollTo({ top: 0, behavior: 'instant' });
 	}
 
 	#allowNavigateToMedia(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel): boolean {
@@ -716,7 +717,11 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
 				?selectable=${selectable}
 				?select-only=${this._isSelectionMode || canNavigate === false}>
-				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
+				<umb-media-thumbnail
+					unique=${item.unique}
+					alt=${item.name}
+					icon=${item.mediaType.icon}
+					file-ext=${ifDefined(item.extension)}></umb-media-thumbnail>
 			</uui-card-media>
 		`;
 	}

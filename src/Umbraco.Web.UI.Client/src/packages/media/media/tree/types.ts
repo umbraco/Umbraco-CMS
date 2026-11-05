@@ -11,6 +11,15 @@ export interface UmbMediaTreeItemModel extends UmbTreeItemModel {
 	entityType: UmbMediaEntityType;
 	noAccess: boolean;
 	isTrashed: boolean;
+	// TODO (V20): make `contentType` required when the deprecated `mediaType` field is removed.
+	contentType?: {
+		unique: string;
+		icon: string;
+		collection: UmbReferenceByUnique | null;
+	};
+	/**
+	 * @deprecated Use `contentType` instead. This field will be removed in v20.
+	 */
 	mediaType: {
 		unique: string;
 		icon: string;
@@ -18,6 +27,8 @@ export interface UmbMediaTreeItemModel extends UmbTreeItemModel {
 	};
 	variants: Array<UmbMediaTreeItemVariantModel>;
 	createDate: string;
+	/** The file extension, without the leading dot and in lowercase. Undefined when the item holds no file. */
+	extension?: string;
 }
 
 export interface UmbMediaTreeRootModel extends UmbTreeRootModel {

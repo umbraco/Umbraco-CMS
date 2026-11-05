@@ -8,7 +8,9 @@ export interface ManifestCollectionView
 
 export interface MetaCollectionView {
 	/**
-	 * The friendly name of the collection view
+	 * The friendly name of the collection view.
+	 * Core collection views use localization keys prefixed with `#` (e.g. `"#collection_tableViewLabel"`).
+	 * @example ["#collection_tableViewLabel", "Table"]
 	 */
 	label: string;
 
@@ -20,6 +22,8 @@ export interface MetaCollectionView {
 
 	/**
 	 * The URL pathname for this collection view that can be deep linked to by sharing the url
+	 * @deprecated Deprecated since v18. Collection views are no longer routed, so this pathname is unused. Scheduled
+	 * for removal in Umbraco 20.
 	 */
 	pathName: string;
 }

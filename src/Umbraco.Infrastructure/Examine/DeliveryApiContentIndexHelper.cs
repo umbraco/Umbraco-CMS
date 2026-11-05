@@ -73,7 +73,7 @@ internal sealed class DeliveryApiContentIndexHelper : IDeliveryApiContentIndexHe
         do
         {
             descendants = _contentService
-                .GetPagedDescendants(rootContentId, itemIndex / pageSize, pageSize, out total, query, Ordering.By("Path"))
+                .GetPagedDescendants(rootContentId, itemIndex / pageSize, pageSize, out total, propertyAliases: null, filter: query, ordering: Ordering.By("Path"))
                 .Where(descendant => _deliveryApiSettings.IsAllowedContentType(descendant.ContentType.Alias))
                 .ToArray();
 

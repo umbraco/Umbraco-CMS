@@ -7,6 +7,7 @@ import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboar
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+
 export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT.TYPE,
@@ -76,6 +77,7 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 
 		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
+			thumbnail: this.getThumbnailUrl(),
 			name: entryName,
 			propertyValue: this.#buildPropertyValue(),
 			propertyEditorUiAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,

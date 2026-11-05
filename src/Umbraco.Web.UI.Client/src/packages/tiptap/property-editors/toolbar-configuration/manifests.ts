@@ -7,6 +7,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		name: 'Tiptap Toolbar Property Editor UI',
 		element: () => import('./property-editor-ui-tiptap-toolbar-configuration.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Tiptap Toolbar Configuration',
 			icon: 'icon-autofill',
 			group: '#propertyEditorUIGroups_common',

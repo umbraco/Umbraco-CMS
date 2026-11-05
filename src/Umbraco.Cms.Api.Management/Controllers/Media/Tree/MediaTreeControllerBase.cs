@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 
@@ -128,6 +129,7 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
 
             responseModel.Variants = _mediaPresentationFactory.CreateVariantsItemResponseModels(mediaEntitySlim);
             responseModel.MediaType = _mediaPresentationFactory.CreateMediaTypeReferenceResponseModel(mediaEntitySlim);
+            responseModel.Extension = mediaEntitySlim.GetFileExtension();
         }
 
         return responseModel;

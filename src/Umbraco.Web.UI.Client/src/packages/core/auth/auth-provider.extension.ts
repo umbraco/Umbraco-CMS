@@ -12,7 +12,7 @@ export interface ManifestAuthProvider extends ManifestElement {
 
 	/**
 	 * The provider name that this provider is for.
-	 * @examples 'Umbraco.Github'
+	 * @examples ["Umbraco.Github"]
 	 */
 	forProviderName: string;
 
@@ -32,20 +32,20 @@ export interface MetaAuthProvider {
 	defaultView?: {
 		/**
 		 * The icon of the provider that is shown to the user.
-		 * @examples ['icon-cloud', 'icon-github', 'icon-google', 'icon-facebook', 'icon-twitter', 'icon-x', 'icon-microsoft']
-		 * @default 'icon-cloud'
+		 * @examples ["icon-cloud", "icon-github", "icon-google", "icon-facebook", "icon-twitter", "icon-x", "icon-microsoft"]
+		 * @default "icon-cloud"
 		 */
 		icon?: string;
 
 		/**
 		 * The color of the provider that is shown to the user.
-		 * @default 'secondary'
+		 * @default "secondary"
 		 */
 		color?: UUIInterfaceColor;
 
 		/**
 		 * The look of the provider that is shown to the user.
-		 * @default 'default'
+		 * @default "default"
 		 */
 		look?: UUIInterfaceLook;
 	};
@@ -62,14 +62,14 @@ export interface MetaAuthProvider {
 
 		/**
 		 * The target of the popup that is opened when the user logs in.
-		 * @default 'umbracoAuthPopup'
+		 * @default "umbracoAuthPopup"
 		 * @remarks This is the name of the window that is opened when the user logs in, use `_blank` to open in a new tab.
 		 */
 		popupTarget?: string;
 
 		/**
 		 * The features of the popup that is opened when the user logs in.
-		 * @default 'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no'
+		 * @default "width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no"
 		 * @remarks This is the features of the window that is opened when the user logs in.
 		 * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/open#features
 		 */

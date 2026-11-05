@@ -1,4 +1,6 @@
 import { UmbPropertyEditorUIContentPickerElement } from './property-editor-ui-content-picker.element.js';
+import { manifests } from './manifests.js';
+import type { UmbInputContentElement } from './components/input-content/index.js';
 import type { UmbContentPickerSource } from './types.js';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
@@ -150,6 +152,31 @@ describe('UmbPropertyEditorUIContentPickerElement', () => {
 				// As when picking: the selection may exceed the configured maximum, and validation reports it.
 				expect(element.value?.map((x) => x.unique)).to.deep.equal(['media-a', 'media-b', 'media-c']);
 			});
+		});
+	});
+
+	describe('clear', () => {
+		it('should register a clear property action for the content picker', () => {
+			const clearAction = manifests.find(
+				(manifest) =>
+					manifest.type === 'propertyAction' &&
+					'kind' in manifest &&
+					manifest.kind === 'clear' &&
+					'forPropertyEditorUis' in manifest &&
+					manifest.forPropertyEditorUis.includes('Umb.PropertyEditorUi.ContentPicker'),
+			);
+			expect(clearAction).to.not.be.undefined;
+		});
+
+		it('should show no items once the value is cleared', async () => {
+			element.value = [{ type: 'document', unique: 'document-1' }];
+			await element.updateComplete;
+
+			element.value = undefined;
+			await element.updateComplete;
+
+			const input = element.shadowRoot!.querySelector<UmbInputContentElement>('umb-input-content')!;
+			expect(input.selection).to.deep.equal([]);
 		});
 	});
 });

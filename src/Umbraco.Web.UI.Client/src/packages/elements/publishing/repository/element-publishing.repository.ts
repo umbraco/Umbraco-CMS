@@ -12,7 +12,7 @@ export class UmbElementPublishingRepository extends UmbRepositoryBase {
 	 * @param {UmbElementDetailModel} model - The Element to create
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after creating
 	 * @param {string | null} parentUnique - The unique of the parent to create under
-	 * @returns {*}
+	 * @returns {Promise<UmbRepositoryResponse<string>>} The key of the created Element, which may differ from the one submitted
 	 * @memberof UmbElementPublishingRepository
 	 */
 	async createAndPublish(

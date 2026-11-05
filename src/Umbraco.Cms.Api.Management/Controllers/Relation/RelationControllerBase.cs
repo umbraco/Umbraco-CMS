@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Relation;
 /// </summary>
 [VersionedApiBackOfficeRoute("relation")]
 [ApiExplorerSettings(GroupName = "Relation")]
-[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessRelationTypes)]
 public abstract class RelationControllerBase : ManagementApiControllerBase
 {
     protected IActionResult RelationOperationStatusResult(RelationOperationStatus status) =>

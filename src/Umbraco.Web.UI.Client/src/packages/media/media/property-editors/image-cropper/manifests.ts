@@ -8,6 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Image Cropper Property Editor UI',
 		element: () => import('./property-editor-ui-image-cropper.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Image Cropper',
 			icon: 'icon-crop',
 			group: '#propertyEditorUIGroups_media',

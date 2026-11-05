@@ -925,6 +925,17 @@ export default {
 		sortHelp:
 			'Arrastra las diferentes páginas debajo para colocarlas como deberían estar o haz clic en las cabeceras de las columnas para ordenar todas las páginas',
 		sortPleaseWait: 'Espera por favor, las páginas están siendo ordenadas. El proceso puede durar un poco.',
+		sortByFieldHeadline: 'Ordenar por campo',
+		sortByFieldSentence: 'Ordenar todos los elementos secundarios por',
+		sortByFieldDirectionLabel: 'Dirección',
+		sortByFieldAscending: 'Ascendente',
+		sortByFieldDescending: 'Descendente',
+		sortByFieldNameOption: 'Nombre',
+		sortByFieldCreateDateOption: 'Creado',
+		sortByFieldUpdateDateOption: 'Última edición',
+		sortIndividuallyHeadline: 'Ordenar individualmente',
+		sortByFieldCultureSentence: 'en',
+		sortByFieldCultureLabel: 'Idioma',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validación',
@@ -1362,6 +1373,7 @@ export default {
 		userCreatedSuccessHelp:
 			'Se ha creado el nuevo usuario con éxito. Para acceder a Umbraco usa la contraseña siguiente.',
 		userManagement: 'Administración de usuario',
+		type: 'Tipo',
 		username: 'Nombre de usuario',
 		userPermissions: 'Permisos de usuarios',
 		usergroup: 'Grupo de usuario',

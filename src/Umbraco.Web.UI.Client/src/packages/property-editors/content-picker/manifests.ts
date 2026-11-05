@@ -7,12 +7,15 @@ import { manifests as conditionManifests } from './conditions/manifests.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
+const propertyEditorUiAlias = 'Umb.PropertyEditorUi.ContentPicker';
+
 const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
-	alias: 'Umb.PropertyEditorUi.ContentPicker',
+	alias: propertyEditorUiAlias,
 	name: 'Content Picker Property Editor UI',
 	element: () => import('./property-editor-ui-content-picker.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Content Picker',
 		icon: 'icon-page-add',
 		group: '#propertyEditorUIGroups_pickers',
@@ -40,6 +43,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 	schemaManifest,
 	...dynamicRootManifests,
 	...valueSummaryManifests,
+	{
+		type: 'propertyAction',
+		kind: 'clear',
+		alias: 'Umb.PropertyAction.ContentPicker.Clear',
+		name: 'Clear Content Picker Property Action',
+		forPropertyEditorUis: [propertyEditorUiAlias],
+	},
 	...clipboardManifests,
 	...conditionManifests,
 ];

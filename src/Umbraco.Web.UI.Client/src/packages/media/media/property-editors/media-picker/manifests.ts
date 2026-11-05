@@ -2,13 +2,16 @@ import { manifest as schemaManifest } from './Umbraco.MediaPicker.js';
 import { manifests as clipboardManifests } from './clipboard/manifests.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
+const propertyEditorUiAlias = 'Umb.PropertyEditorUi.MediaPicker';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.MediaPicker',
+		alias: propertyEditorUiAlias,
 		name: 'Media Picker Property Editor UI',
 		element: () => import('./property-editor-ui-media-picker.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Media Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MediaPicker3',
 			icon: 'icon-picture',
@@ -34,5 +37,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	schemaManifest,
 	...valueSummaryManifests,
+	{
+		type: 'propertyAction',
+		kind: 'clear',
+		alias: 'Umb.PropertyAction.MediaPicker.Clear',
+		name: 'Clear Media Picker Property Action',
+		forPropertyEditorUis: [propertyEditorUiAlias],
+	},
 	...clipboardManifests,
 ];

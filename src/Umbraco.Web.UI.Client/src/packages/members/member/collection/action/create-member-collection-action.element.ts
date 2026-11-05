@@ -23,7 +23,7 @@ export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
 	}
 
 	async #retrieveAllowedMemberTypes() {
-		const { data } = await this.#memberTypeStructureRepository.requestAllowedChildrenOf(null, null);
+		const { data } = await this.#memberTypeStructureRepository.requestAllAllowedChildrenOf(null, null);
 		if (data && data.items) {
 			this._allowedMemberTypes = data.items;
 		}

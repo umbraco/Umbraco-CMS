@@ -233,7 +233,7 @@ public class MemberPresentationFactoryTests
         _mockExternalMemberService.Setup(x => x.GetRolesAsync(member.Key)).ReturnsAsync(Enumerable.Empty<string>());
 
         // Act
-        MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
+        MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member, CreateMockUser(true).Object);
 
         // Assert
         Assert.AreEqual(MemberKind.ExternalOnly, result.Kind);
@@ -247,7 +247,7 @@ public class MemberPresentationFactoryTests
         _mockExternalMemberService.Setup(x => x.GetRolesAsync(member.Key)).ReturnsAsync(Enumerable.Empty<string>());
 
         // Act
-        MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
+        MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member, CreateMockUser(true).Object);
 
         // Assert
         Assert.AreEqual(member.Key, result.Id);
@@ -265,7 +265,7 @@ public class MemberPresentationFactoryTests
         _mockExternalMemberService.Setup(x => x.GetRolesAsync(member.Key)).ReturnsAsync(Enumerable.Empty<string>());
 
         // Act
-        MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
+        MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member, CreateMockUser(true).Object);
 
         // Assert — one variant with the member name, but no content values.
         Assert.AreEqual(1, result.Variants.Count());
@@ -286,7 +286,7 @@ public class MemberPresentationFactoryTests
         _mockMemberGroupService.Setup(x => x.GetByName("TestGroup")).Returns(mockGroup.Object);
 
         // Act
-        MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
+        MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member, CreateMockUser(true).Object);
 
         // Assert
         Assert.That(result.Groups.ToList(), Does.Contain(groupKey));
@@ -300,7 +300,7 @@ public class MemberPresentationFactoryTests
         _mockExternalMemberService.Setup(x => x.GetRolesAsync(member.Key)).ReturnsAsync(Enumerable.Empty<string>());
 
         // Act
-        MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
+        MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member, CreateMockUser(true).Object);
 
         // Assert
         Assert.IsFalse(result.IsTwoFactorEnabled);
@@ -326,12 +326,38 @@ public class MemberPresentationFactoryTests
         _mockExternalMemberService.Setup(x => x.GetRolesAsync(member.Key)).ReturnsAsync(Enumerable.Empty<string>());
 
         // Act
-        MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
+        MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member, CreateMockUser(true).Object);
 
         // Assert
         Assert.AreEqual(loginDate, result.LastLoginDate!.Value.UtcDateTime);
         Assert.AreEqual(lockoutDate, result.LastLockoutDate!.Value.UtcDateTime);
         Assert.IsNull(result.LastPasswordChangeDate);
+    }
+
+    [Test]
+    public async Task CreateExternalMemberResponseModel_Withholds_Account_State_Without_Sensitive_Access()
+    {
+        // Arrange
+        var member = new ExternalMemberIdentity
+        {
+            Key = Guid.NewGuid(),
+            Email = "dates@test.com",
+            UserName = "dates@test.com",
+            Name = "Dates Test",
+            IsApproved = true,
+            IsLockedOut = true,
+            CreateDate = DateTime.UtcNow,
+            LastLoginDate = new DateTime(2026, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+            LastLockoutDate = new DateTime(2026, 1, 10, 8, 0, 0, DateTimeKind.Utc),
+        };
+        _mockExternalMemberService.Setup(x => x.GetRolesAsync(member.Key)).ReturnsAsync(Enumerable.Empty<string>());
+
+        // Act
+        MemberResponseModel result =
+            await _sut.CreateExternalMemberResponseModelAsync(member, CreateMockUser(false).Object);
+
+        // Assert
+        AssertAccountStateIsWithheld(result);
     }
 
     private static Mock<IMember> CreateMockMember(Guid key, string email, string username)
@@ -385,7 +411,7 @@ public class MemberPresentationFactoryTests
         };
 
         // Act
-        MemberResponseModel result = _sut.CreateFilterItemResponseModel(item);
+        MemberResponseModel result = _sut.CreateFilterItemResponseModel(item, CreateMockUser(true).Object);
 
         // Assert
         Assert.AreEqual(item.Key, result.Id);
@@ -394,6 +420,27 @@ public class MemberPresentationFactoryTests
         Assert.AreEqual(memberTypeKey, result.MemberType.Id);
         Assert.AreEqual("icon-user", result.MemberType.Icon);
         Assert.AreEqual("Filter Content", result.Variants.First().Name);
+    }
+
+    [Test]
+    public void CreateFilterItemResponseModel_Maps_Group_Keys()
+    {
+        // Arrange
+        var groupKey = Guid.NewGuid();
+        var item = new MemberFilterItem
+        {
+            Key = Guid.NewGuid(),
+            Email = "filter-grouped@test.com",
+            UserName = "filter-grouped",
+            Kind = MemberKind.Default,
+            Groups = [groupKey],
+        };
+
+        // Act
+        MemberResponseModel result = _sut.CreateFilterItemResponseModel(item, CreateMockUser(true).Object);
+
+        // Assert
+        Assert.That(result.Groups.ToList(), Does.Contain(groupKey));
     }
 
     [Test]
@@ -414,7 +461,7 @@ public class MemberPresentationFactoryTests
         };
 
         // Act
-        MemberResponseModel result = _sut.CreateFilterItemResponseModel(item);
+        MemberResponseModel result = _sut.CreateFilterItemResponseModel(item, CreateMockUser(true).Object);
 
         // Assert
         Assert.AreEqual(item.Key, result.Id);
@@ -422,6 +469,45 @@ public class MemberPresentationFactoryTests
         Assert.AreEqual(Guid.Empty, result.MemberType.Id);
         Assert.AreEqual(string.Empty, result.MemberType.Icon);
     }
+
+    [Test]
+    public void CreateFilterItemResponseModel_Withholds_Account_State_Without_Sensitive_Access()
+    {
+        // Arrange
+        var item = new MemberFilterItem
+        {
+            Key = Guid.NewGuid(),
+            Email = "filter-content@test.com",
+            UserName = "filter-content",
+            Name = "Filter Content",
+            IsApproved = true,
+            IsLockedOut = true,
+            Kind = MemberKind.Default,
+            LastLoginDate = new DateTime(2026, 1, 15, 10, 30, 0, DateTimeKind.Utc),
+            LastLockoutDate = new DateTime(2026, 1, 10, 8, 0, 0, DateTimeKind.Utc),
+            LastPasswordChangeDate = new DateTime(2026, 1, 5, 8, 0, 0, DateTimeKind.Utc),
+        };
+
+        // Act
+        MemberResponseModel result = _sut.CreateFilterItemResponseModel(item, CreateMockUser(false).Object);
+
+        // Assert — the member is still listed, but without any of its account state.
+        Assert.AreEqual(item.Key, result.Id);
+        Assert.AreEqual("filter-content@test.com", result.Email);
+        AssertAccountStateIsWithheld(result);
+    }
+
+    private static void AssertAccountStateIsWithheld(MemberResponseModel result) =>
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.IsApproved);
+            Assert.IsFalse(result.IsLockedOut);
+            Assert.IsFalse(result.IsTwoFactorEnabled);
+            Assert.AreEqual(0, result.FailedPasswordAttempts);
+            Assert.IsNull(result.LastLoginDate);
+            Assert.IsNull(result.LastLockoutDate);
+            Assert.IsNull(result.LastPasswordChangeDate);
+        });
 
     private static ExternalMemberIdentity CreateExternalMember() => new()
     {

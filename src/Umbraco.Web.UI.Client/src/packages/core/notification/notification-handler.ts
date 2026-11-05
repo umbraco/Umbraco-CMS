@@ -42,6 +42,7 @@ export class UmbNotificationHandler {
 
 		notification.color = this.color;
 		notification.autoClose = this.duration;
+		notification.addEventListener('closed', () => this._closeResolver(), { once: true });
 
 		const element: any = document.createElement(this._elementName);
 		element.data = this._data;
@@ -62,7 +63,7 @@ export class UmbNotificationHandler {
 	}
 
 	/**
-	 * @returns {Promise<unknown>} A promise that resolves when the notification is closed
+	 * @returns {Promise<unknown>} A promise that resolves once the notification closes, whether through `close()`, the user dismissing it, or its duration running out. It resolves with the value given to `close()`, if any.
 	 * @memberof UmbNotificationHandler
 	 */
 	public onClose(): Promise<any> {

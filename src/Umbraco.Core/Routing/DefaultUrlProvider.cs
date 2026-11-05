@@ -193,7 +193,7 @@ public class DefaultUrlProvider : IUrlProvider
 
         // will not use cache if previewing
 
-        return GetUrlFromRoute(route, content.Id, current, mode, culture);
+        return GetUrlFromRoute(route, content.Id, current, mode, culture, content.Key);
     }
 
     /// <summary>
@@ -204,15 +204,26 @@ public class DefaultUrlProvider : IUrlProvider
         int id,
         Uri current,
         UrlMode mode,
-        string? culture)
+        string? culture,
+        Guid? key = null)
     {
         if (string.IsNullOrWhiteSpace(route) || route.Equals(Constants.Routing.Unroutable))
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
+                // Callers with only the integer id (via IPublishedUrlProvider.GetUrlFromRoute) can't supply the key,
+                // so resolve it here. Kept inside the log level check so it costs nothing when debug isn't enabled.
+                Guid? nodeKey = key;
+                if (nodeKey is null)
+                {
+                    Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+                    nodeKey = keyAttempt.Success ? keyAttempt.Result : null;
+                }
+
                 _logger.LogDebug(
-                "Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.",
-                id);
+                    "Couldn't find any page with nodeId={NodeId}, nodeKey={NodeKey}. This is most likely caused by the page not being published.",
+                    id,
+                    nodeKey);
             }
             return null;
         }

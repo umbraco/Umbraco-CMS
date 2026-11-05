@@ -50,7 +50,7 @@
     <key alias="parentNotPublished">Ten dokument jest opublikowany, ale jest niewidoczny, ponieważ jego rodzic '%0%' nie jest opublikowany</key>
     <key alias="parentNotPublishedAnomaly">Ten dokument jest opublikowany, ale nie jest w cache.</key>
     <key alias="getUrlException">Nie znaleziono URL</key>
-    <key alias="routeError">Ten dokument jest opublikowany ale jego URL kolidowałby z elementem treści %0%</key>
+    <key alias="routeError">Ten dokument jest opublikowany ale jego URL kolidowałby z elementem treści '%0%'</key>
   </area>
   <area alias="member">
   </area>

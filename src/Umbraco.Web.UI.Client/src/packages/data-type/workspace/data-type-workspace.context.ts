@@ -1,5 +1,8 @@
 import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../types.js';
 import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_DATA_TYPE_ENTITY_TYPE } from '../constants.js';
+import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../entity.js';
+import { UMB_DATA_TYPE_ROOT_WORKSPACE_PATH, UMB_EDIT_DATA_TYPE_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_EDIT_DATA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN } from '../tree/folder/workspace/paths.js';
 import type { UmbDataTypeDetailRepository } from '../repository/index.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import { UMB_DATA_TYPE_WORKSPACE_ALIAS } from './constants.js';
@@ -15,12 +18,14 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type {
 	PropertyEditorSettingsDefaultData,
 	PropertyEditorSettingsProperty,
 } from '@umbraco-cms/backoffice/property-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
+import { UmbValidationCleanUpByUniqueManager } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDataTypeDetailModel;
 
@@ -60,6 +65,7 @@ export class UmbDataTypeWorkspaceContext
 		(a, b) => (a.weight || 0) - (b.weight || 0),
 	);
 	readonly properties = this.#properties.asObservable();
+	readonly #propertyAliases = this.#properties.asObservablePart((x) => x.map((y) => y.alias));
 
 	#propertyEditorSchemaSettingsDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
 	#propertyEditorUISettingsDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
@@ -90,6 +96,16 @@ export class UmbDataTypeWorkspaceContext
 		this.#observePropertyEditorUIAlias();
 		this.#observePropertyEditorDataSourceAlias();
 
+		// Clean up validation messages for config properties that are no longer part of the Property
+		// Editor UI's schema, e.g. when the user switches to a different Property Editor UI. [NL]
+		new UmbValidationCleanUpByUniqueManager(
+			this,
+			this.validationContext,
+			'$.values',
+			this.#propertyAliases,
+			(queryParams) => queryParams.alias,
+		);
+
 		this.routes.setRoutes([
 			{
 				path: 'create/parent/:entityType/:parentUnique',
@@ -115,6 +131,14 @@ export class UmbDataTypeWorkspaceContext
 				},
 			},
 		]);
+	}
+
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) return UMB_DATA_TYPE_ROOT_WORKSPACE_PATH;
+		if (entity.entityType === UMB_DATA_TYPE_FOLDER_ENTITY_TYPE) {
+			return UMB_EDIT_DATA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+		}
+		return UMB_EDIT_DATA_TYPE_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
 	override resetState() {

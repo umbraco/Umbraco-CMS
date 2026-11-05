@@ -55,6 +55,16 @@ export class UmbDefaultTreeContext<
 	#isMenu = new UmbBooleanState(undefined);
 	public readonly isMenu = this.#isMenu.asObservable();
 
+	#drillable = new UmbBooleanState(false);
+	/**
+	 * Whether opening an item takes the user into it. A property of the host, so it is the same for every item in the
+	 * tree.
+	 *
+	 * Off unless the host declares otherwise: a tree that can do no more than expand and collapse is the common case,
+	 * and the one where offering to drill into an item would strand everything below it.
+	 */
+	public readonly drillable = this.#drillable.asObservable();
+
 	#expandTreeRoot = new UmbBooleanState(undefined);
 	public readonly expandTreeRoot = this.#expandTreeRoot.asObservable();
 
@@ -65,6 +75,7 @@ export class UmbDefaultTreeContext<
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
 	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
 	public readonly startNode = this.#treeItemChildrenManager.startNode;
+	public readonly startNodes = this.#treeItemChildrenManager.startNodes;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly additionalRequestArgs = this.#treeItemChildrenManager.additionalRequestArgs;
 	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
@@ -202,7 +213,7 @@ export class UmbDefaultTreeContext<
 	async #debouncedLoadTree(reload = false) {
 		await this.#init;
 
-		const hasStartNode = this.getStartNode();
+		const hasStartNode = this.getStartNode() !== undefined || this.getStartNodes().length > 0;
 		const hideTreeRoot = this.getHideTreeRoot();
 
 		// Always load the tree root entity, even when the root node is hidden or we are drilled
@@ -272,6 +283,24 @@ export class UmbDefaultTreeContext<
 	}
 
 	/**
+	 * Sets whether opening an item takes the user into it.
+	 * @param {boolean} value - True when the host acts on `UmbTreeItemOpenEvent`.
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setDrillable(value: boolean) {
+		this.#drillable.setValue(value);
+	}
+
+	/**
+	 * Returns whether opening an item takes the user into it.
+	 * @returns {boolean} True when the host acts on `UmbTreeItemOpenEvent`.
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getDrillable(): boolean {
+		return this.#drillable.getValue();
+	}
+
+	/**
 	 * Sets the hideTreeRoot config
 	 * @param {boolean} hideTreeRoot - Whether to hide the tree root
 	 * @memberof UmbDefaultTreeContext
@@ -319,6 +348,37 @@ export class UmbDefaultTreeContext<
 	 */
 	getStartNode(): UmbTreeStartNode | undefined {
 		return this.#treeItemChildrenManager.getStartNode();
+	}
+
+	/**
+	 * Sets the startNodes config. Only two or more nodes make the tree present the nodes themselves as its top
+	 * level. The single start node is configured separately, through `setStartNode`.
+	 * @param {Array<UmbTreeStartNode> | undefined} startNodes - The start nodes
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setStartNodes(startNodes: Array<UmbTreeStartNode> | undefined) {
+		const current = this.getStartNodes();
+		const next = startNodes ?? [];
+		const isUnchanged =
+			current.length === next.length &&
+			current.every(
+				(startNode, index) =>
+					startNode.unique === next[index].unique && startNode.entityType === next[index].entityType,
+			);
+		if (isUnchanged) return;
+
+		this.#treeItemChildrenManager.setStartNodes(next);
+		this.#clearTree();
+		this.loadTree();
+	}
+
+	/**
+	 * Gets the startNodes config
+	 * @returns {Array<UmbTreeStartNode>} - The start nodes
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getStartNodes(): Array<UmbTreeStartNode> {
+		return this.#treeItemChildrenManager.getStartNodes();
 	}
 
 	/**

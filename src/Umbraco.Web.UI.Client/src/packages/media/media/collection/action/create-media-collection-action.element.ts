@@ -46,7 +46,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	}
 
 	async #retrieveAllowedMediaTypesOf(unique: string | null, parentContentUnique: string | null) {
-		const { data } = await this.#mediaTypeStructureRepository.requestAllowedChildrenOf(unique, parentContentUnique);
+		const { data } = await this.#mediaTypeStructureRepository.requestAllAllowedChildrenOf(unique, parentContentUnique);
 		if (data && data.items) {
 			this._allowedMediaTypes = data.items;
 		}

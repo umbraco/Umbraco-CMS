@@ -229,6 +229,8 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
             throw new Exception($"Can't find a provider factory for provider name \"{ProviderName}\".");
         }
 
+        WarnOnDeprecatedCommandTimeoutFromConnectTimeout();
+
         _databaseType = DatabaseType.Resolve(DbProviderFactory.GetType().Name, ProviderName);
         if (_databaseType == null)
         {
@@ -287,6 +289,23 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
     // gets initialized poco data builders
     private InitializedPocoDataBuilder GetPocoDataFactoryResolver(Type type, IPocoDataFactory factory)
         => new UmbracoPocoDataBuilder(type, _pocoMappers, _upgrading).Init();
+
+    // TODO (V19): remove with the connect timeout fallback in UmbracoDatabase.
+    private void WarnOnDeprecatedCommandTimeoutFromConnectTimeout()
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        if (CommandTimeoutResolver.TryGetDeprecatedConnectTimeout(DbProviderFactory, ConnectionString, out var commandTimeout, out var keyword))
+#pragma warning restore CS0618 // Type or member is obsolete
+        {
+            _logger.LogWarning(
+                "The connection string sets \"{Keyword}\", which Umbraco also applies as the command timeout ({Timeout} seconds). "
+                + "Set \"Command Timeout\" in the connection string, or configure {CommandTimeoutSetting}, instead; deriving the "
+                + "command timeout from the connect timeout is deprecated and will be removed in Umbraco 19.",
+                keyword,
+                commandTimeout,
+                "Umbraco:CMS:Global:DatabaseCommandTimeout");
+        }
+    }
 
     // method used by NPoco's UmbracoDatabaseFactory to actually create the database instance
     private UmbracoDatabase? CreateDatabaseInstance()

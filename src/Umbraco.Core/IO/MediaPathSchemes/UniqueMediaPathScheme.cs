@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.IO.MediaPathSchemes;
 /// <remarks>
 ///     <para>This scheme provides deterministic short paths, with potential collisions.</para>
 /// </remarks>
-public class UniqueMediaPathScheme : IMediaPathScheme
+public class UniqueMediaPathScheme : MediaPathSchemeBase, IMediaPathScheme
 {
     private const int DirectoryLength = 8;
 
@@ -53,4 +53,8 @@ public class UniqueMediaPathScheme : IMediaPathScheme
 
         return directory;
     }
+
+    /// <inheritdoc />
+    public bool IsFilePathOwnedBy(MediaFileManager fileManager, string filepath, Guid itemGuid, Guid propertyGuid)
+        => IsFilePathOwnedByInternal(fileManager, filepath, itemGuid, propertyGuid);
 }

@@ -7,8 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList
 /// Handles the migration logic for converting or updating single block list data structures
 /// as part of the upgrade process to version 18.0.0.
 /// </summary>
-/// <remarks>Available in v17, activated in v18. Migration needs to work on LTS to LTS 17=>21</remarks>
-[Obsolete("Scheduled for removal in Umbraco 22.")]
+[Obsolete("Only used by the obsolete MigrateSingleBlockList, which is no longer part of the upgrade plan. Scheduled for removal in Umbraco 20.")]
 public class SingleBlockListProcessor
 {
     private readonly IEnumerable<ITypedSingleBlockListProcessor> _processors;
@@ -44,10 +43,23 @@ public class SingleBlockListProcessor
     /// Should only be called by a core processor after verifying the input is in single block mode.
     /// </summary>
     /// <param name="blockListValue">The <see cref="BlockListValue"/> to convert.</param>
-    /// <returns>The resulting <see cref="SingleBlockValue"/> representing the single block.</returns>
+    /// <returns>
+    /// The resulting <see cref="SingleBlockValue"/> representing the single block, or the unchanged
+    /// <paramref name="blockListValue"/> if it holds no block to convert.
+    /// </returns>
     public BlockValue ConvertBlockListToSingleBlock(BlockListValue blockListValue)
     {
-        IBlockLayoutItem blockListLayoutItem = blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].First();
+        IBlockLayoutItem? blockListLayoutItem = blockListValue
+            .Layout
+            .TryGetValue(Constants.PropertyEditors.Aliases.BlockList, out IEnumerable<IBlockLayoutItem>? layoutItems)
+            ? layoutItems.FirstOrDefault()
+            : null;
+
+        if (blockListLayoutItem is null)
+        {
+            // Nothing to convert; the value is left as-is rather than failing the upgrade.
+            return blockListValue;
+        }
 
         var singleBlockLayoutItem = new SingleBlockLayoutItem
         {

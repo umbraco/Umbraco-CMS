@@ -27,6 +27,7 @@ public static class MethodInfoApiCommonExtensions
     /// </summary>
     /// <param name="methodInfo">The method info to inspect.</param>
     /// <returns>The API name if the attribute is present; otherwise, <c>null</c>.</returns>
+    [Obsolete("Use ActionDescriptorApiCommonExtensions.HasMapToApiAttribute instead, which also takes a MapToApiAttribute added at runtime into account. Scheduled for removal in Umbraco 19.")]
     public static string? GetMapToApiAttributeValue(this MethodInfo methodInfo)
     {
         MapToApiAttribute[] mapToApis = (methodInfo.DeclaringType?.GetCustomAttributes(typeof(MapToApiAttribute), inherit: true) ?? Array.Empty<object>()).Cast<MapToApiAttribute>().ToArray();
@@ -43,9 +44,12 @@ public static class MethodInfoApiCommonExtensions
     ///     <c>true</c> if the attribute is present and matches the specified API name,
     ///     or if the attribute is not present and the API name matches the default API name; otherwise, <c>false</c>.
     /// </returns>
+    [Obsolete("Use ActionDescriptorApiCommonExtensions.HasMapToApiAttribute instead, which also takes a MapToApiAttribute added at runtime into account. Scheduled for removal in Umbraco 19.")]
     public static bool HasMapToApiAttribute(this MethodInfo methodInfo, string apiName)
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var value = methodInfo.GetMapToApiAttributeValue();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         return value == apiName
                || (value is null && apiName == DefaultApiConfiguration.ApiName);

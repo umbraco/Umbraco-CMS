@@ -73,6 +73,10 @@ export class UmbBodyLayoutElement extends LitElement {
 		this._scrollContainer?.removeEventListener('scroll', this.#onScroll);
 	}
 
+	getScrollContainer(): HTMLElement | undefined {
+		return this._scrollContainer;
+	}
+
 	#onScroll = () => {
 		if (!this._scrollContainer) return;
 		this.toggleAttribute('scrolling', this._scrollContainer.scrollTop > 0);
@@ -182,6 +186,7 @@ export class UmbBodyLayoutElement extends LitElement {
 			#header-slot {
 				padding: 0 var(--uui-size-layout-1);
 				flex-grow: 1;
+				flex-basis: 0;
 			}
 			:host([header-no-padding]) #header-slot {
 				padding: 0;

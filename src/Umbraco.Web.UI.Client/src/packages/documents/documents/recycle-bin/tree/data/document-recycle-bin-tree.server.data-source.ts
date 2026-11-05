@@ -71,6 +71,12 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	});
 
 const mapper = (item: DocumentRecycleBinItemResponseModel): UmbDocumentRecycleBinTreeItemModel => {
+	const contentType = {
+		unique: item.documentType.id,
+		icon: item.documentType.icon,
+		collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
+	};
+
 	return {
 		unique: item.id,
 		parent: {
@@ -82,11 +88,9 @@ const mapper = (item: DocumentRecycleBinItemResponseModel): UmbDocumentRecycleBi
 		isTrashed: true,
 		hasChildren: item.hasChildren,
 		isProtected: false,
-		documentType: {
-			unique: item.documentType.id,
-			icon: item.documentType.icon,
-			collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
-		},
+		contentType,
+		// TODO (V20): remove when the deprecated `documentType` field is removed.
+		documentType: contentType,
 		variants: item.variants.map((variant) => {
 			return {
 				name: variant.name,

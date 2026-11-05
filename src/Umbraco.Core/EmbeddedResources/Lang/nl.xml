@@ -68,8 +68,12 @@
       serverfout)
     </key>
     <key alias="getUrlException">Kan de URL niet ophalen</key>
-    <key alias="routeError">Dit document is gepubliceerd maar de URL conflicteert met %0%</key>
+    <key alias="routeError">Dit document is gepubliceerd maar de URL conflicteert met '%0%'</key>
     <key alias="routeErrorCannotRoute">Dit document is gepubliceerd maar de URL kan niet worden gerouteerd</key>
+    <key alias="unroutableContentWarningHeader">Inhoud gepubliceerd</key>
+    <key alias="unroutableContentWarning">Het document heeft geen URL. Meer details zijn te vinden onder "Info".</key>
+    <key alias="unroutableContentWarningWithReason">Het document heeft geen URL. %0% Meer details zijn te vinden onder "Info".</key>
+    <key alias="routeErrorNoDomainForCulture">Dit document is gepubliceerd in '%0%' maar heeft geen URL omdat dit niet de standaardtaal is en er geen hostnaam aan is toegewezen</key>
   </area>
   <area alias="member">
   </area>

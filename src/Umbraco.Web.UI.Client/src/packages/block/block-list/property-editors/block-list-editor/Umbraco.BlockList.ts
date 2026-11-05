@@ -12,13 +12,12 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'blocks',
 					label: 'Available Blocks',
-					description: 'Define the available blocks.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockListTypeConfiguration',
 				},
 				{
 					alias: 'validationLimit',
 					label: 'Amount',
-					description: 'Set a required range of blocks',
+					description: '{#validation_minimumOnlyWhenInUse}',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
 					config: [{ alias: 'validationRange', value: { min: 0 } }],
 				},
