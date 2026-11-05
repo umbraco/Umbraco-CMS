@@ -65,6 +65,15 @@ declare global {
 		actionDescriptions_translate: string;
 		actionDescriptions_unpublish: string;
 		actionDescriptions_update: string;
+		actionGroups_clipboard: string;
+		actionGroups_create: string;
+		actionGroups_edit: string;
+		actionGroups_importExport: string;
+		actionGroups_notifications: string;
+		actionGroups_other: string;
+		actionGroups_publishing: string;
+		actionGroups_routing: string;
+		actionGroups_structure: string;
 		actions_assigndomain: string;
 		actions_auditTrail: string;
 		actions_browse: string;
@@ -494,6 +503,8 @@ declare global {
 		content_alternativeTextHelp: string;
 		content_alternativeUrls: string;
 		content_altTextOptional: string;
+		content_ancestorCultureNotPublishedScheduleWarning: string;
+		content_ancestorNotPublishedScheduleWarning: string;
 		content_captionTextOptional: string;
 		content_childItems: string;
 		content_clickToEdit: string;
@@ -679,6 +690,8 @@ declare global {
 		contentTypeEditor_confirmDeletePropertyMessage: string;
 		contentTypeEditor_confirmDeleteTabMessage: string;
 		contentTypeEditor_confirmDeleteTabNotice: string;
+		contentTypeEditor_confirmPropertyAliasChangeHeadline: string;
+		contentTypeEditor_confirmPropertyAliasChangeMessage: string;
 		contentTypeEditor_convertToTab: string;
 		contentTypeEditor_copiedUnderneath: string;
 		contentTypeEditor_cultureAndVariantInvariantLabel: string;
@@ -2758,6 +2771,7 @@ declare global {
 		validation_invalidUserGroupName: string;
 		validation_invalidUsername: string;
 		validation_invalidValue: string;
+		validation_itemMissingValueMessage: string;
 		validation_items: string;
 		validation_itemsSelected: string;
 		validation_legacyOption: string;
