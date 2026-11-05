@@ -1353,7 +1353,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     public bool HasAny()
     {
         ThrowIfNotInitialized();
-        return _documentUrlCache.Any();
+        return _documentUrlCache.IsEmpty is false;
     }
 
     private bool TryGetPrimaryUrlSegment(Guid documentKey, string culture, bool isDraft, [NotNullWhen(true)] out string? segment)
