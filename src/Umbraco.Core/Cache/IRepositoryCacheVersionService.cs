@@ -80,4 +80,44 @@ public interface IRepositoryCacheVersionService
     // TODO (V19): Remove the default implementation, along with the comment above describing it.
     Task SetCachesSyncedAsync(IEnumerable<RepositoryCacheVersion> cacheVersions)
         => throw new NotImplementedException($"{GetType().FullName} must implement {nameof(GetCacheVersionsAsync)} and {nameof(SetCachesSyncedAsync)}({nameof(IEnumerable<RepositoryCacheVersion>)}).");
+
+    /// <summary>
+    /// Validates if the cache is synced with the database without leaving the calling thread.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of the cached entity.</typeparam>
+    /// <returns>True if cache is synced, false if cache needs fast-forwarding.</returns>
+    /// <remarks>
+    /// Repository reads call this while their scope may hold a distributed lock. Until the lock wait and the
+    /// notification pipeline are asynchronous, awaiting the version read there hands the continuation to another
+    /// thread-pool thread and, on a starved pool, stretches the time the lock is held. Implementations should make
+    /// this genuinely synchronous.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    bool IsCacheSynced<TEntity>()
+        where TEntity : class
+        => IsCacheSyncedAsync<TEntity>().GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Registers a cache update for the specified entity type without leaving the calling thread.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of the cached entity.</typeparam>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void SetCacheUpdated<TEntity>()
+        where TEntity : class
+        => SetCacheUpdatedAsync<TEntity>().GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Publishes the deferred cache updates without leaving the calling thread.
+    /// </summary>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void FlushCacheUpdates()
+        => FlushCacheUpdatesAsync().GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Gets the cache versions currently published for all entity types without leaving the calling thread.
+    /// </summary>
+    /// <returns>The published cache versions.</returns>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    IReadOnlyCollection<RepositoryCacheVersion> GetCacheVersions()
+        => GetCacheVersionsAsync().GetAwaiter().GetResult();
 }
