@@ -119,6 +119,13 @@ async function waitForDebouncedNotify() {
 	);
 }
 
+// Permit the extension with the given condition key and wait until the change is exposed.
+async function permitAndSettle(uniqueKey: string) {
+	conditionByUnique.get(uniqueKey)!.flipTo(true);
+	await wait(UmbSlowGoodController.goodDelayMs + 50);
+	await waitForDebouncedNotify();
+}
+
 describe('UmbBaseExtensionsInitializer — condition-flip race', () => {
 	let hostElement: UmbControllerHostElement;
 	let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
@@ -509,6 +516,27 @@ describe('UmbBaseExtensionsInitializer — condition-flip race', () => {
 			finalState,
 			`final exposed should include extension. history: ${JSON.stringify(changes)}`,
 		).to.deep.equal([manifest.alias]);
+
+		plural.destroy();
+	});
+
+	// Equal weights must not keep the order in which the conditions happened to resolve.
+	it('orders equal weights by alias, whichever condition resolves first', async () => {
+		extensionRegistry.registerMany([
+			makeManifest('Umb.Test.Plural.Race.A', 'A'),
+			makeManifest('Umb.Test.Plural.Race.B', 'B'),
+		]);
+
+		let exposed: Array<string> = [];
+		const plural = new UmbTestPluralController(hostElement, extensionRegistry, (permitted) => {
+			exposed = permitted.map((p) => p.alias);
+		});
+
+		await wait(0);
+		await permitAndSettle('B');
+		await permitAndSettle('A');
+
+		expect(exposed).to.deep.equal(['Umb.Test.Plural.Race.A', 'Umb.Test.Plural.Race.B']);
 
 		plural.destroy();
 	});
