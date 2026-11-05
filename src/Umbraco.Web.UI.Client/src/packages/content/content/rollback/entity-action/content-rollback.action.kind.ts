@@ -1,4 +1,7 @@
-import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST,
+	UMB_ENTITY_ACTION_GROUP_PUBLISHING,
+} from '@umbraco-cms/backoffice/entity-action';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_ENTITY_ACTION_CONTENT_ROLLBACK_KIND_MANIFEST: UmbExtensionManifestKind = {
@@ -9,6 +12,7 @@ export const UMB_ENTITY_ACTION_CONTENT_ROLLBACK_KIND_MANIFEST: UmbExtensionManif
 	manifest: {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
+		group: UMB_ENTITY_ACTION_GROUP_PUBLISHING,
 		kind: 'contentRollback',
 		api: () => import('./content-rollback.action.js'),
 		weight: 450,
