@@ -31,6 +31,18 @@ public class QuerySearcherControllerAccessTests : ManagementApiTest<QuerySearche
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
+    [TestCase(Constants.UmbracoIndexes.InternalIndexName)]
+    [TestCase(Constants.UmbracoIndexes.ExternalIndexName)]
+    [TestCase(Constants.UmbracoIndexes.MembersIndexName)]
+    public async Task Can_Query_Searcher_With_Admin_Access(string searcherName)
+    {
+        await AuthenticateClientAsync(Client, "admin@umbraco.com", UserPassword, true);
+
+        HttpResponseMessage response = await Client.GetAsync(QueryUrl(searcherName, "umbraco"));
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+    }
+
     [Test]
     public async Task Can_List_Searchers_Without_Admin_Access()
     {
