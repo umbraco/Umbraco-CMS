@@ -1,3 +1,5 @@
+import { umbMockServerEvents } from '../server-events.js';
+
 const { http, HttpResponse, ws } = window.MockServiceWorker;
 
 const HUB_PATH = '/umbraco/serverEventHub';
@@ -20,12 +22,19 @@ export const handlers = [
 	serverEventHub.addEventListener('connection', ({ client }) => {
 		const pingInterval = setInterval(() => client.send(PING_MESSAGE), PING_INTERVAL_MS);
 
+		const unsubscribe = umbMockServerEvents.subscribe((serverEvent) => {
+			client.send(`${JSON.stringify({ type: 1, target: 'notify', arguments: [serverEvent] })}${RECORD_SEPARATOR}`);
+		});
+
 		client.addEventListener('message', (event) => {
 			if (typeof event.data === 'string' && event.data.includes('"protocol"')) {
 				client.send(`{}${RECORD_SEPARATOR}`);
 			}
 		});
 
-		client.addEventListener('close', () => clearInterval(pingInterval));
+		client.addEventListener('close', () => {
+			clearInterval(pingInterval);
+			unsubscribe();
+		});
 	}),
 ];
