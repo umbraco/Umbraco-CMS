@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_ELEMENT_SEARCH_PROVIDER_ALIAS,
 		type: 'searchProvider',
 		api: () => import('./element.search-provider.js'),
-		weight: 700,
+		weight: 690,
 		meta: {
 			label: 'Elements',
 		},

@@ -14,6 +14,7 @@ import type {
 } from './workspace-view.model.js';
 import type { ManifestWorkspace, ManifestWorkspaceRoutableKind } from './workspace.model.js';
 
+export type * from './workspace-action-menu-item-group.model.js';
 export type * from './workspace-action-menu-item.model.js';
 export type * from './workspace-action.model.js';
 export type * from './workspace-context.model.js';
