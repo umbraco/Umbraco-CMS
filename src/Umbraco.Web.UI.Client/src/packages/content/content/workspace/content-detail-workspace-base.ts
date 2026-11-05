@@ -17,7 +17,7 @@ import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import {
 	notifyWorkspaceActionStarting,
 	UmbEntityDetailWorkspaceContextBase,
@@ -124,8 +124,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		UmbContentCollectionWorkspaceContext<ContentTypeDetailModelType>
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
-
-	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
 	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);

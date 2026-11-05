@@ -168,7 +168,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	#renderAddButton() {
-		if (this.max > 0 && this.selection.length >= this.max) return nothing;
+		if (this.readonly || (this.max > 0 && this.selection.length >= this.max)) return nothing;
 		return html`
 			<uui-button
 				id="btn-add"
