@@ -361,7 +361,9 @@ internal sealed class ContentEditingService
         try
         {
             var currentUserId = await GetUserIdAsync(userKey);
-            OperationResult saveResult = ContentService.Save(content, currentUserId);
+            OperationResult saveResult = await ContentWriteGate.Shared.RunAsync(
+                () => ContentService.Save(content, currentUserId),
+                callerIsInScope: CoreScopeProvider.Context is not null);
             return saveResult.Result switch
             {
                 // these are the only result states currently expected from Save
@@ -393,7 +395,9 @@ internal sealed class ContentEditingService
         try
         {
             var currentUserId = await GetUserIdAsync(userKey);
-            PublishResult publishResult = ContentService.SaveAndPublish(content, culturesToPublish.ToArray(), userId: currentUserId);
+            PublishResult publishResult = await ContentWriteGate.Shared.RunAsync(
+                () => ContentService.SaveAndPublish(content, culturesToPublish.ToArray(), userId: currentUserId),
+                callerIsInScope: CoreScopeProvider.Context is not null);
             if (publishResult.Success)
             {
                 return (
