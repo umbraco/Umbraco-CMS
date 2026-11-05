@@ -6,6 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Rendering;
 
+[Obsolete("Superseded by RequestContextOutputExpansionStrategyV2. Scheduled for removal in Umbraco 21.")]
 internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionStrategy
 {
     private readonly IApiPropertyRenderer _propertyRenderer;
