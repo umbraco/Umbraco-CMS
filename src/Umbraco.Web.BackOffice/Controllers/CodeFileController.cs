@@ -96,6 +96,9 @@ public class CodeFileController : BackOfficeNotificationsController
     {
     }
 
+    private const string PartialViewFileExtension = ".cshtml";
+    private const string ScriptFileExtension = ".js";
+
     /// <summary>
     ///     Used to create a brand new file
     /// </summary>
@@ -119,6 +122,11 @@ public class CodeFileController : BackOfficeNotificationsController
         switch (type)
         {
             case Constants.Trees.PartialViews:
+                if (HasValidFileExtension(display.VirtualPath, PartialViewFileExtension) is false)
+                {
+                    return InvalidFileExtensionProblem(PartialViewFileExtension);
+                }
+
                 var view = new PartialView(PartialViewType.PartialView, display.VirtualPath ?? string.Empty)
                 {
                     Content = display.Content,
@@ -132,6 +140,11 @@ public class CodeFileController : BackOfficeNotificationsController
                 return ValidationProblem(result.Exception?.Message);
 
             case Constants.Trees.PartialViewMacros:
+                if (HasValidFileExtension(display.VirtualPath, PartialViewFileExtension) is false)
+                {
+                    return InvalidFileExtensionProblem(PartialViewFileExtension);
+                }
+
                 var viewMacro = new PartialView(PartialViewType.PartialViewMacro, display.VirtualPath ?? string.Empty)
                 {
                     Content = display.Content,
@@ -146,6 +159,11 @@ public class CodeFileController : BackOfficeNotificationsController
                 return ValidationProblem(resultMacro.Exception?.Message);
 
             case Constants.Trees.Scripts:
+                if (HasValidFileExtension(display.VirtualPath, ScriptFileExtension) is false)
+                {
+                    return InvalidFileExtensionProblem(ScriptFileExtension);
+                }
+
                 var script = new Script(display.VirtualPath ?? string.Empty);
                 _fileService.SaveScript(script, currentUser?.Id);
                 return Ok();
@@ -816,6 +834,19 @@ public class CodeFileController : BackOfficeNotificationsController
 
         return virtualPath;
     }
+
+    /// <summary>
+    ///     Checks whether the provided path has the expected file extension.
+    /// </summary>
+    /// <param name="path">The path of the file.</param>
+    /// <param name="extension">The expected extension, including the leading dot.</param>
+    /// <returns>True if the path ends with the expected extension; otherwise false.</returns>
+    internal static bool HasValidFileExtension(string? path, string extension)
+        => string.IsNullOrWhiteSpace(path) is false
+           && string.Equals(Path.GetExtension(path), extension, StringComparison.OrdinalIgnoreCase);
+
+    private ActionResult InvalidFileExtensionProblem(string extension)
+        => ValidationProblem($"The file must have the '{extension}' extension.");
 
     private string? EnsureCorrectFileExtension(string? value, string extension)
     {
