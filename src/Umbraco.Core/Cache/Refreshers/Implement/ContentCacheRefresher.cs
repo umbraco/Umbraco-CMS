@@ -265,7 +265,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             }
 
             HandleNavigation(payload);
-            HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
+            HandlePublished(payload);
 
             HandleMemoryCache(payload);
 
@@ -321,7 +321,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
-            _documentCacheService.RefreshMemoryCacheAsync(key).GetAwaiter().GetResult();
+            _documentCacheService.RefreshMemoryCache(key);
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
@@ -345,7 +345,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                         continue;
                     }
 
-                    _documentCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
+                    _documentCacheService.RefreshMemoryCache(branchKey);
                 }
             }
         }
@@ -512,11 +512,14 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private bool ExistsInNavigationBin(Guid contentKey) => _documentNavigationQueryService.TryGetParentKeyInBin(contentKey, out _);
 
-    private async Task HandlePublishedAsync(JsonPayload payload, CancellationToken cancellationToken)
+    // Runs on the saving thread after the commit. The per-document reads are synchronous so they do not need a
+    // second thread-pool thread; the full reload and the removal stay as they are (rare, and in-memory respectively).
+    // TODO (V20): await the async members once locks and notification publishing are asynchronous.
+    private void HandlePublished(JsonPayload payload)
     {
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
-            await _publishStatusManagementService.InitializeAsync(cancellationToken);
+            _publishStatusManagementService.InitializeAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
 
         if (payload.Key.HasValue is false)
@@ -526,15 +529,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
         {
-            await _publishStatusManagementService.RemoveAsync(payload.Key.Value, cancellationToken);
+            _publishStatusManagementService.RemoveAsync(payload.Key.Value, CancellationToken.None).GetAwaiter().GetResult();
         }
         else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) && HasPublishStatusUpdates(payload))
         {
-            await _publishStatusManagementService.AddOrUpdateStatusAsync(payload.Key.Value, cancellationToken);
+            _publishStatusManagementService.AddOrUpdateStatus(payload.Key.Value);
         }
         else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && HasPublishStatusUpdates(payload))
         {
-            await _publishStatusManagementService.AddOrUpdateStatusWithDescendantsAsync(payload.Key.Value, cancellationToken);
+            _publishStatusManagementService.AddOrUpdateStatusWithDescendants(payload.Key.Value);
         }
     }
 

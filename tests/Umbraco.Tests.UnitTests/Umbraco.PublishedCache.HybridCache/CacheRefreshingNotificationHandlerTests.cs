@@ -383,4 +383,36 @@ public class CacheRefreshingNotificationHandlerTests
         mock.Setup(x => x.Id).Returns(id);
         return mock.Object;
     }
+
+    /// <summary>
+    ///     The refresh notifications are published from inside the content transaction, under the content tree lock,
+    ///     so the registered (synchronous) handler must use the synchronous service members.
+    /// </summary>
+    [Test]
+    public void Content_Refresh_Uses_The_Synchronous_Service_Member()
+    {
+        IContent content = Mock.Of<IContent>();
+        _documentCacheService.Setup(x => x.RefreshContent(content));
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        _handler.Handle(new ContentRefreshNotification(content, new EventMessages()));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        _documentCacheService.Verify(x => x.RefreshContent(content), Times.Once);
+        _documentCacheService.Verify(x => x.RefreshContentAsync(It.IsAny<IContent>()), Times.Never);
+    }
+
+    [Test]
+    public void Media_Refresh_Uses_The_Synchronous_Service_Member()
+    {
+        IMedia media = Mock.Of<IMedia>();
+        _mediaCacheService.Setup(x => x.RefreshMedia(media));
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        _handler.Handle(new MediaRefreshNotification(media, new EventMessages()));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        _mediaCacheService.Verify(x => x.RefreshMedia(media), Times.Once);
+        _mediaCacheService.Verify(x => x.RefreshMediaAsync(It.IsAny<IMedia>()), Times.Never);
+    }
 }
