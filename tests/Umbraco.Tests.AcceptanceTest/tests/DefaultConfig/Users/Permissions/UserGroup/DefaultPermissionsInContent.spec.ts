@@ -148,10 +148,10 @@ test('keeps move to in the structure group with delete permission disabled', {ta
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
 
   // Assert
-  await umbracoUi.content.isEntityActionInActionGroup('Trash', 'Structure', false);
+  await umbracoUi.content.isEntityActionInActionGroup('Create', 'Create');
   await umbracoUi.content.isEntityActionInActionGroup('MoveTo', 'Structure');
   await umbracoUi.content.isEntityActionInActionGroup('MoveTo', 'Create', false);
-  await umbracoUi.content.isEntityActionInActionGroup('Create', 'Create');
+  await umbracoUi.content.isEntityActionInOpenActionMenuVisible('Trash', false);
 });
 
 test('can not delete content with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
