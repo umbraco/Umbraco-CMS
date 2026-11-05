@@ -134,6 +134,7 @@ test('can stay on the content with its unsaved changes when leaving through the 
   await umbracoUi.content.clickStayOnPageButton();
 
   // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
   await umbracoUi.content.isWorkspaceOpenForEntity('document', childContentId);
   await umbracoUi.content.doesWorkspaceBreadcrumbHaveItems([contentSectionName, rootContentName, updatedChildContentName]);
 });

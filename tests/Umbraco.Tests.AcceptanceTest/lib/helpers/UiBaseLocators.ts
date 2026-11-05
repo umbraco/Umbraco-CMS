@@ -875,8 +875,7 @@ export class UiBaseLocators extends BasePage {
   }
 
   async clickWorkspaceBreadcrumbItemWithName(itemName: string) {
-    const escapedName = itemName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    await this.click(this.workspaceBreadcrumbItem.filter({hasText: new RegExp(`^${escapedName}$`)}));
+    await this.click(this.workspaceBreadcrumbItem.filter({has: this.page.getByText(itemName, {exact: true})}));
   }
 
   async isWorkspaceBreadcrumbVisible(isVisible: boolean = true) {
