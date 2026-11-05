@@ -742,6 +742,8 @@ export default {
 		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
 		iIndexPopulator: 'IIndexPopulator',
 		noResults: 'No results were found',
+		searchNotAllowed:
+			'You do not have permission to search this index. By default, only administrators can search indexes.',
 		searchResultsFound: 'Showing %0% - %1% of %2% result(s) - Page %3% of %4%',
 		corruptStatus: 'Possible corrupt index detected',
 		corruptErrorDescription: 'Error received when evaluating the index:',

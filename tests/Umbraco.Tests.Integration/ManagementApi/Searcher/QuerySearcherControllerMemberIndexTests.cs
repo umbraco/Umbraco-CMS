@@ -1,18 +1,32 @@
 using System.Linq.Expressions;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Searcher;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Searcher;
 
 /// <summary>
 /// Verifies that querying a member index requires access to the members section, on top of the
-/// settings section access required by <see cref="SearcherControllerBase" />.
+/// settings section access required by <see cref="SearcherControllerBase" />, when the
+/// <see cref="AuthorizationPolicies.SearcherQueryAccess" /> policy is relaxed to settings section access.
 /// </summary>
 public class QuerySearcherControllerMemberIndexTests : ManagementApiTest<QuerySearcherController>
 {
     protected override Expression<Func<QuerySearcherController, object>> MethodSelector { get; set; }
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        base.CustomTestSetup(builder);
+        builder.Services.PostConfigure<AuthorizationOptions>(options =>
+            options.AddPolicy(
+                AuthorizationPolicies.SearcherQueryAccess,
+                options.GetPolicy(AuthorizationPolicies.SectionAccessSettings)!));
+    }
 
     [Test]
     public async Task Cannot_Query_Member_Index_Without_Members_Section_Access()
