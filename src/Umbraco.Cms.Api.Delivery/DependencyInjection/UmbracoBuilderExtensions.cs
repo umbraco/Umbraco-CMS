@@ -50,7 +50,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddScoped<IRequestStartItemProvider, RequestStartItemProvider>();
         builder.Services.AddScoped<RequestContextOutputExpansionStrategyV2>();
 
-        builder.Services.AddUnique<IOutputExpansionStrategy, RequestContextOutputExpansionStrategyV2>();
+        builder.Services.AddScoped<IOutputExpansionStrategy, RequestContextOutputExpansionStrategyV2>();
 
         builder.Services.AddSingleton<IRequestCultureService, RequestCultureService>();
         builder.Services.AddSingleton<IRequestSegmentService, RequestSegmentService>();
