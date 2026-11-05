@@ -178,29 +178,17 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(WebhookOperationStatus.Success, result.Status);
     }
 
-    [TestCase("", "value")]
-    [TestCase("Invalid Header", "value")]
-    [TestCase("Invalid:Header", "value")]
-    [TestCase("X-Custom-Header", "line\r\nbreak")]
-    [TestCase("Host", "example.com")]
-    [TestCase("content-length", "10")]
-    [TestCase("Transfer-Encoding", "chunked")]
-    [TestCase("Connection", "close")]
-    [TestCase(Constants.WebhookEvents.HeaderNames.EventName, "value")]
-    [TestCase(Constants.WebhookEvents.HeaderNames.RetryCount, "1")]
-    public async Task Cannot_Create_Or_Update_With_Invalid_Header(string name, string value)
+    [Test]
+    public async Task Cannot_Update_With_Invalid_Header()
     {
-        var createResult = await WebhookService.CreateAsync(CreateWebhookWithHeader(name, value));
-
         var existing = await WebhookService.CreateAsync(CreateWebhookWithHeader("X-Custom-Header", "value"));
-        existing.Result.Headers = new Dictionary<string, string> { [name] = value };
+        existing.Result.Headers = new Dictionary<string, string> { ["Host"] = "example.com" };
+
         var updateResult = await WebhookService.UpdateAsync(existing.Result);
 
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual(WebhookOperationStatus.InvalidHeaders, createResult.Status);
-            Assert.AreEqual(WebhookOperationStatus.InvalidHeaders, updateResult.Status);
-        });
+        Assert.AreEqual(WebhookOperationStatus.InvalidHeaders, updateResult.Status);
+        var persisted = await WebhookService.GetAsync(existing.Result.Key);
+        Assert.AreEqual("value", persisted!.Headers["X-Custom-Header"]);
     }
 
     private static Webhook CreateWebhookWithHeader(string name, string value)

@@ -12,17 +12,6 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class WebhookService : IWebhookService
 {
-    // Headers controlled by the HTTP transport or by Umbraco itself when a webhook request is sent.
-    private static readonly HashSet<string> ReservedHeaderNames = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "Host",
-        "Content-Length",
-        "Transfer-Encoding",
-        "Connection",
-        Constants.WebhookEvents.HeaderNames.EventName,
-        Constants.WebhookEvents.HeaderNames.RetryCount,
-    };
-
     private readonly ICoreScopeProvider _provider;
     private readonly IWebhookRepository _webhookRepository;
     private readonly IEventMessagesFactory _eventMessagesFactory;
@@ -60,14 +49,21 @@ public class WebhookService : IWebhookService
         return WebhookOperationStatus.Success;
     }
 
-    private static bool IsValidHeader(string name, string value)
+    // Values arrive from deserialized JSON, where a dictionary value can be null despite the annotation.
+    private static bool IsValidHeader(string name, string? value)
         => IsHttpToken(name)
-           && ReservedHeaderNames.Contains(name) is false
-           && value.IndexOfAny(['\r', '\n', '\0']) < 0;
+           && Constants.WebhookEvents.ReservedHeaderNames.Contains(name) is false
+           && value is not null
+           && IsSendableHeaderValue(value);
 
     // RFC 9110 section 5.6.2: a field name is a token of visible characters excluding delimiters.
     private static bool IsHttpToken(string value)
         => value.Length > 0 && value.All(c => char.IsAsciiLetterOrDigit(c) || "!#$%&'*+-.^_`|~".Contains(c));
+
+    // HttpClient only sends ASCII request header values unless a header encoding is configured, so the value is
+    // limited to visible ASCII, space and horizontal tab (which also excludes CR, LF and NUL).
+    private static bool IsSendableHeaderValue(string value)
+        => value.All(c => c == '\t' || (c >= ' ' && c <= '~'));
 
     /// <inheritdoc />
     public async Task<Attempt<IWebhook, WebhookOperationStatus>> CreateAsync(IWebhook webhook)
