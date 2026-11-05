@@ -491,6 +491,8 @@ export default {
 		noDocumentTypesCreateNew: 'Create a new Document Type',
 		noDocumentTypesAllowedAtRoot:
 			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Structure</strong>.',
+		noDocumentTypesAllowedAtRootWithNoSettingsAccess:
+			'There are no Document Types allowed for creating content at the root.',
 		noMediaTypes:
 			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Structure</strong>.',
 		noMediaTypesWithNoSettingsAccess:
