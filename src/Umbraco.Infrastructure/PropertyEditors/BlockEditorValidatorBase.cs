@@ -97,17 +97,18 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
             .Select(layout => layout.SettingsKey!.Value)
             .ToArray();
 
+        // The JSON paths must point at the position of an item in the submitted data, so the position is captured before the exposure filter is applied.
         var itemDataGroups = new[]
         {
-            new { Path = ContentDataGroupJsonPath, Items = blockEditorData.BlockValue.ContentData.Where(cd => exposedContentKeys.Contains(cd.Key)).ToArray() },
-            new { Path = SettingsDataGroupJsonPath, Items = blockEditorData.BlockValue.SettingsData.Where(sd => exposedSettingsKeys.Contains(sd.Key)).ToArray() }
+            new { Path = ContentDataGroupJsonPath, Items = GetExposedItems(blockEditorData.BlockValue.ContentData, exposedContentKeys) },
+            new { Path = SettingsDataGroupJsonPath, Items = GetExposedItems(blockEditorData.BlockValue.SettingsData, exposedSettingsKeys) }
         };
 
         var valuesJsonPathPart = nameof(BlockItemData.Values).ToFirstLowerInvariant();
 
         foreach (var group in itemDataGroups)
         {
-            Guid[] elementTypeKeys = group.Items.Select(x => x.ContentTypeKey).ToArray();
+            Guid[] elementTypeKeys = group.Items.Select(x => x.Item.ContentTypeKey).ToArray();
             if (elementTypeKeys.Length == 0)
             {
                 continue;
@@ -115,9 +116,8 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
 
             var allElementTypes = _elementTypeCache.GetMany(elementTypeKeys).ToDictionary(x => x.Key);
 
-            for (var i = 0; i < group.Items.Length; i++)
+            foreach ((BlockItemData item, int i) in group.Items)
             {
-                BlockItemData item = group.Items[i];
                 if (!allElementTypes.TryGetValue(item.ContentTypeKey, out IContentType? elementType))
                 {
                     throw new InvalidOperationException($"No element type found with key {item.ContentTypeKey}");
@@ -181,4 +181,10 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
             }
         }
     }
+
+    private static (BlockItemData Item, int Index)[] GetExposedItems(IEnumerable<BlockItemData> items, Guid[] exposedKeys)
+        => items
+            .Select((item, index) => (Item: item, Index: index))
+            .Where(x => exposedKeys.Contains(x.Item.Key))
+            .ToArray();
 }
