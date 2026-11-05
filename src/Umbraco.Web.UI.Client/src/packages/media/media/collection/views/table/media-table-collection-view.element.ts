@@ -1,7 +1,6 @@
 import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from '../../types.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
-import { UMB_MEDIA_ENTITY_TYPE } from '../../../entity.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -92,13 +91,21 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			this.#rowContexts.set(row.id, rowContexts);
 		}
 
-		const mediaTypeUnique = this._items?.find((x) => x.unique === row.id)?.contentType?.unique;
+		this.#syncRowContexts(row.id);
+	};
 
-		rowContexts.entityContext.setEntityType(row.entityType);
-		rowContexts.entityContext.setUnique(row.id);
+	#syncRowContexts(unique: string) {
+		const rowContexts = this.#rowContexts.get(unique);
+		if (!rowContexts) return;
+
+		const item = this._items?.find((x) => x.unique === unique);
+		const mediaTypeUnique = item?.contentType?.unique;
+
+		rowContexts.entityContext.setEntityType(item?.entityType);
+		rowContexts.entityContext.setUnique(unique);
 		rowContexts.entityContentTypeContext.setEntityType(mediaTypeUnique ? UMB_MEDIA_TYPE_ENTITY_TYPE : undefined);
 		rowContexts.entityContentTypeContext.setUnique(mediaTypeUnique);
-	};
+	}
 
 	constructor() {
 		super();
@@ -208,14 +215,17 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			return {
 				id: item.unique,
 				icon: item.icon,
-				entityType: UMB_MEDIA_ENTITY_TYPE,
+				entityType: item.entityType,
 				data: data,
 			};
 		});
 
 		const currentIds = new Set(this._tableItems.map((row) => row.id));
 		for (const [id, rowContexts] of this.#rowContexts) {
-			if (!currentIds.has(id)) {
+			if (currentIds.has(id)) {
+				// Retained rows are not re-rendered by the table, so their contexts are refreshed here.
+				this.#syncRowContexts(id);
+			} else {
 				rowContexts.host.destroy();
 				this.#rowContexts.delete(id);
 			}

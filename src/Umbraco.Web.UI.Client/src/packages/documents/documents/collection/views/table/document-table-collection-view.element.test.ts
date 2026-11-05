@@ -20,24 +20,36 @@ class UmbTestDocumentTableCollectionHostElement extends UmbElementMixin(HTMLElem
 
 @customElement('test-document-table-row-context-consumer')
 class UmbTestRowContextConsumerElement extends UmbControllerHostElementMixin(HTMLElement) {
-	entityType?: string;
-	unique?: string | null;
-	contentTypeEntityType?: string;
-	contentTypeUnique?: string;
-	ancestors?: Array<UmbEntityModel>;
+	entityContext?: typeof UMB_ENTITY_CONTEXT.TYPE;
+	entityContentTypeContext?: typeof UMB_ENTITY_CONTENT_TYPE_ENTITY_CONTEXT.TYPE;
+	ancestorsContext?: typeof UMB_ANCESTORS_ENTITY_CONTEXT.TYPE;
+
+	get entityType() {
+		return this.entityContext?.getEntityType();
+	}
+	get unique() {
+		return this.entityContext?.getUnique();
+	}
+	get contentTypeEntityType() {
+		return this.entityContentTypeContext?.getEntityType();
+	}
+	get contentTypeUnique() {
+		return this.entityContentTypeContext?.getUnique();
+	}
+	get ancestors(): Array<UmbEntityModel> | undefined {
+		return this.ancestorsContext?.getAncestors();
+	}
 
 	constructor() {
 		super();
 		new UmbContextConsumerController(this, UMB_ENTITY_CONTEXT, (context) => {
-			this.entityType = context?.getEntityType();
-			this.unique = context?.getUnique();
+			this.entityContext = context;
 		});
 		new UmbContextConsumerController(this, UMB_ENTITY_CONTENT_TYPE_ENTITY_CONTEXT, (context) => {
-			this.contentTypeEntityType = context?.getEntityType();
-			this.contentTypeUnique = context?.getUnique();
+			this.entityContentTypeContext = context;
 		});
 		new UmbContextConsumerController(this, UMB_ANCESTORS_ENTITY_CONTEXT, (context) => {
-			this.ancestors = context?.getAncestors();
+			this.ancestorsContext = context;
 		});
 	}
 }
@@ -102,6 +114,22 @@ describe('UmbDocumentTableCollectionViewElement', () => {
 			expect(consumer.unique).to.equal('item-1');
 			expect(consumer.contentTypeEntityType).to.equal(UMB_DOCUMENT_TYPE_ENTITY_TYPE);
 			expect(consumer.contentTypeUnique).to.equal('document-type-1');
+			expect(consumer.ancestors).to.deep.equal(ancestors);
+		});
+
+		it('updates the contexts of a retained row when its item changes', async () => {
+			setCollectionItems([
+				makeItem('item-1', 'document-type-1', [{ unique: 'parent-1', entityType: UMB_DOCUMENT_ENTITY_TYPE }]),
+			]);
+			await aTimeout(0);
+			const consumer = await consumeFromRow('item-1');
+
+			const ancestors = [{ unique: 'parent-2', entityType: UMB_DOCUMENT_ENTITY_TYPE }];
+			setCollectionItems([makeItem('item-1', 'document-type-2', ancestors)]);
+			await aTimeout(0);
+			await getTable().updateComplete;
+
+			expect(consumer.contentTypeUnique).to.equal('document-type-2');
 			expect(consumer.ancestors).to.deep.equal(ancestors);
 		});
 	});

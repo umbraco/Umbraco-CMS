@@ -2,7 +2,7 @@ import './media-table-collection-view.element.js';
 import type { UmbMediaTableCollectionViewElement } from './media-table-collection-view.element.js';
 import { UmbMediaCollectionContext } from '../../media-collection.context.js';
 import type { UmbMediaCollectionItemModel } from '../../types.js';
-import { UMB_MEDIA_ENTITY_TYPE } from '../../../entity.js';
+import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../../../entity.js';
 import type { UmbTableElement } from '@umbraco-cms/backoffice/components';
 import { expect, fixture, html, aTimeout } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -20,20 +20,29 @@ class UmbTestMediaTableCollectionHostElement extends UmbElementMixin(HTMLElement
 
 @customElement('test-media-table-row-context-consumer')
 class UmbTestRowContextConsumerElement extends UmbControllerHostElementMixin(HTMLElement) {
-	entityType?: string;
-	unique?: string | null;
-	contentTypeEntityType?: string;
-	contentTypeUnique?: string;
+	entityContext?: typeof UMB_ENTITY_CONTEXT.TYPE;
+	entityContentTypeContext?: typeof UMB_ENTITY_CONTENT_TYPE_ENTITY_CONTEXT.TYPE;
+
+	get entityType() {
+		return this.entityContext?.getEntityType();
+	}
+	get unique() {
+		return this.entityContext?.getUnique();
+	}
+	get contentTypeEntityType() {
+		return this.entityContentTypeContext?.getEntityType();
+	}
+	get contentTypeUnique() {
+		return this.entityContentTypeContext?.getUnique();
+	}
 
 	constructor() {
 		super();
 		new UmbContextConsumerController(this, UMB_ENTITY_CONTEXT, (context) => {
-			this.entityType = context?.getEntityType();
-			this.unique = context?.getUnique();
+			this.entityContext = context;
 		});
 		new UmbContextConsumerController(this, UMB_ENTITY_CONTENT_TYPE_ENTITY_CONTEXT, (context) => {
-			this.contentTypeEntityType = context?.getEntityType();
-			this.contentTypeUnique = context?.getUnique();
+			this.entityContentTypeContext = context;
 		});
 	}
 }
@@ -50,6 +59,18 @@ function makeItem(unique: string, mediaTypeUnique: string): UmbMediaCollectionIt
 		updateDate: date,
 		flags: [],
 	};
+}
+
+function makePlaceholder(unique: string): UmbMediaCollectionItemModel {
+	const date = new Date();
+	return {
+		unique,
+		entityType: UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE,
+		name: `Upload ${unique}`,
+		createDate: date,
+		updateDate: date,
+		flags: [],
+	} as unknown as UmbMediaCollectionItemModel;
 }
 
 describe('UmbMediaTableCollectionViewElement', () => {
@@ -95,6 +116,30 @@ describe('UmbMediaTableCollectionViewElement', () => {
 
 			expect(consumer.entityType).to.equal(UMB_MEDIA_ENTITY_TYPE);
 			expect(consumer.unique).to.equal('item-1');
+			expect(consumer.contentTypeEntityType).to.equal(UMB_MEDIA_TYPE_ENTITY_TYPE);
+			expect(consumer.contentTypeUnique).to.equal('media-type-1');
+		});
+
+		it('provides the entity type of the item, not a fixed one', async () => {
+			setCollectionItems([makePlaceholder('item-1')]);
+			await aTimeout(0);
+
+			const consumer = await consumeFromRow('item-1');
+
+			expect(consumer.entityType).to.equal(UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE);
+			expect(consumer.contentTypeUnique).to.be.undefined;
+		});
+
+		it('updates the contexts of a retained row when its item changes', async () => {
+			setCollectionItems([makePlaceholder('item-1')]);
+			await aTimeout(0);
+			const consumer = await consumeFromRow('item-1');
+
+			setCollectionItems([makeItem('item-1', 'media-type-1')]);
+			await aTimeout(0);
+			await getTable().updateComplete;
+
+			expect(consumer.entityType).to.equal(UMB_MEDIA_ENTITY_TYPE);
 			expect(consumer.contentTypeEntityType).to.equal(UMB_MEDIA_TYPE_ENTITY_TYPE);
 			expect(consumer.contentTypeUnique).to.equal('media-type-1');
 		});

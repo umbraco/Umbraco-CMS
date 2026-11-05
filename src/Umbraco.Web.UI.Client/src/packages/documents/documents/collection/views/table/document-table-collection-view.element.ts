@@ -94,15 +94,22 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 			this.#rowContexts.set(row.id, rowContexts);
 		}
 
-		const item = this._items.find((x) => x.unique === row.id);
+		this.#syncRowContexts(row.id);
+	};
+
+	#syncRowContexts(unique: string) {
+		const rowContexts = this.#rowContexts.get(unique);
+		if (!rowContexts) return;
+
+		const item = this._items.find((x) => x.unique === unique);
 		const documentTypeUnique = item?.contentType?.unique;
 
-		rowContexts.entityContext.setEntityType(row.entityType);
-		rowContexts.entityContext.setUnique(row.id);
+		rowContexts.entityContext.setEntityType(item?.entityType);
+		rowContexts.entityContext.setUnique(unique);
 		rowContexts.entityContentTypeContext.setEntityType(documentTypeUnique ? UMB_DOCUMENT_TYPE_ENTITY_TYPE : undefined);
 		rowContexts.entityContentTypeContext.setUnique(documentTypeUnique);
 		rowContexts.ancestorsContext.setAncestors(item?.ancestors ?? []);
-	};
+	}
 
 	constructor() {
 		super();
@@ -249,7 +256,10 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 
 		const currentIds = new Set(this._tableItems.map((row) => row.id));
 		for (const [id, rowContexts] of this.#rowContexts) {
-			if (!currentIds.has(id)) {
+			if (currentIds.has(id)) {
+				// Retained rows are not re-rendered by the table, so their contexts are refreshed here.
+				this.#syncRowContexts(id);
+			} else {
 				rowContexts.host.destroy();
 				this.#rowContexts.delete(id);
 			}
