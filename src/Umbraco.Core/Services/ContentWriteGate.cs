@@ -14,6 +14,11 @@ namespace Umbraco.Cms.Core.Services;
 /// Admission is re-entrant: work started inside an admitted operation, such as a notification handler that saves
 /// related content, runs without waiting again.
 /// </para>
+/// <para>
+/// A caller that is already inside a scope is not gated. It may hold the content tree lock, so a waiter admitted
+/// ahead of it would block on that lock while the caller waits for the gate, and neither could finish until the
+/// waiter's lock wait failed. Such a caller blocks a thread while it waits for the lock, as it did before the gate.
+/// </para>
 /// </remarks>
 // TODO (V20): Remove once the content tree lock can be awaited, so that waiting for it no longer holds a thread.
 internal sealed class ContentWriteGate
@@ -31,10 +36,11 @@ internal sealed class ContentWriteGate
     /// </summary>
     /// <typeparam name="TResult">The type of the operation's result.</typeparam>
     /// <param name="operation">The operation to run while admitted.</param>
+    /// <param name="callerIsInScope">Whether the caller is already inside a scope, in which case it is not gated.</param>
     /// <returns>A task that completes with the operation's result once it has run.</returns>
-    public async Task<TResult> RunAsync<TResult>(Func<TResult> operation)
+    public async Task<TResult> RunAsync<TResult>(Func<TResult> operation, bool callerIsInScope)
     {
-        if (_admitted.Value)
+        if (callerIsInScope || _admitted.Value)
         {
             return operation();
         }
@@ -57,10 +63,11 @@ internal sealed class ContentWriteGate
     /// </summary>
     /// <typeparam name="TResult">The type of the operation's result.</typeparam>
     /// <param name="operation">The operation to run while admitted.</param>
+    /// <param name="callerIsInScope">Whether the caller is already inside a scope, in which case it is not gated.</param>
     /// <returns>A task that completes with the operation's result once it has run.</returns>
-    public async Task<TResult> RunAsync<TResult>(Func<Task<TResult>> operation)
+    public async Task<TResult> RunAsync<TResult>(Func<Task<TResult>> operation, bool callerIsInScope)
     {
-        if (_admitted.Value)
+        if (callerIsInScope || _admitted.Value)
         {
             return await operation();
         }

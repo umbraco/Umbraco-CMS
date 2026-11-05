@@ -15,15 +15,17 @@ public class ContentWriteGateTests
         var firstEntered = new TaskCompletionSource();
         var releaseFirst = new TaskCompletionSource();
 
-        Task<int> first = gate.RunAsync(async () =>
-        {
-            firstEntered.SetResult();
-            await releaseFirst.Task;
-            return 1;
-        });
+        Task<int> first = gate.RunAsync(
+            async () =>
+            {
+                firstEntered.SetResult();
+                await releaseFirst.Task;
+                return 1;
+            },
+            callerIsInScope: false);
         await firstEntered.Task.WaitAsync(Patience);
 
-        Task<int> second = gate.RunAsync(() => 2);
+        Task<int> second = gate.RunAsync(() => 2, callerIsInScope: false);
 
         Assert.That(second.IsCompleted, Is.False, "The second caller must wait while the first is admitted.");
 
@@ -38,28 +40,56 @@ public class ContentWriteGateTests
     {
         var gate = new ContentWriteGate();
 
-        var result = await gate.RunAsync(async () => await gate.RunAsync(() => 1).WaitAsync(Patience));
+        var result = await gate.RunAsync(
+            async () => await gate.RunAsync(() => 1, callerIsInScope: false).WaitAsync(Patience),
+            callerIsInScope: false);
 
         Assert.That(result, Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task A_Caller_Inside_A_Scope_Is_Not_Gated()
+    {
+        var gate = new ContentWriteGate();
+        var holderEntered = new TaskCompletionSource();
+        var releaseHolder = new TaskCompletionSource();
+        Task<int> holder = gate.RunAsync(
+            async () =>
+            {
+                holderEntered.SetResult();
+                await releaseHolder.Task;
+                return 1;
+            },
+            callerIsInScope: false);
+        await holderEntered.Task.WaitAsync(Patience);
+
+        Task<int> scoped = gate.RunAsync(() => 2, callerIsInScope: true);
+
+        Assert.That(await scoped.WaitAsync(Patience), Is.EqualTo(2), "A caller inside a scope must not wait for the admitted operation.");
+
+        releaseHolder.SetResult();
+        await holder.WaitAsync(Patience);
     }
 
     [Test]
     public async Task The_Admission_Does_Not_Outlive_The_Operation()
     {
         var gate = new ContentWriteGate();
-        await gate.RunAsync(() => 0);
+        await gate.RunAsync(() => 0, callerIsInScope: false);
 
         var holderEntered = new TaskCompletionSource();
         var releaseHolder = new TaskCompletionSource();
-        Task<int> holder = gate.RunAsync(async () =>
-        {
-            holderEntered.SetResult();
-            await releaseHolder.Task;
-            return 1;
-        });
+        Task<int> holder = gate.RunAsync(
+            async () =>
+            {
+                holderEntered.SetResult();
+                await releaseHolder.Task;
+                return 1;
+            },
+            callerIsInScope: false);
         await holderEntered.Task.WaitAsync(Patience);
 
-        Task<int> next = gate.RunAsync(() => 2);
+        Task<int> next = gate.RunAsync(() => 2, callerIsInScope: false);
 
         Assert.That(next.IsCompleted, Is.False, "A completed operation must not leave its caller admitted.");
 
@@ -74,8 +104,8 @@ public class ContentWriteGateTests
         var gate = new ContentWriteGate();
         Func<int> failing = () => throw new InvalidOperationException();
 
-        Assert.ThrowsAsync<InvalidOperationException>(() => gate.RunAsync(failing));
+        Assert.ThrowsAsync<InvalidOperationException>(() => gate.RunAsync(failing, callerIsInScope: false));
 
-        Assert.That(await gate.RunAsync(() => 1).WaitAsync(Patience), Is.EqualTo(1));
+        Assert.That(await gate.RunAsync(() => 1, callerIsInScope: false).WaitAsync(Patience), Is.EqualTo(1));
     }
 }
