@@ -29,6 +29,9 @@ import type { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
  */
 const TOKEN_EXPIRY_MULTIPLIER = 4;
 
+/** Delays (in ms) before each attempt to look up the user behind a new sign-in. */
+const SIGNED_IN_USER_LOOKUP_DELAYS_MS = [0, 500, 1500];
+
 export interface UmbAuthSession {
 	/** When the access token expires (issuedAt + expiresIn). Used to decide when to refresh. */
 	accessTokenExpiresAt: number;
@@ -52,9 +55,10 @@ export class UmbAuthContext extends UmbContextBase {
 	#session = new UmbObjectState<UmbAuthSession | undefined>(undefined);
 	readonly session$ = this.#session.asObservable();
 
-	// Set when a refresh was definitively rejected by the server (e.g. invalid_grant).
-	// Distinguishes "no session yet" from "session is dead" so concurrent and subsequent
-	// API requests don't each fire their own doomed /token call. Cleared when a new
+	// Set when the session has ended: a refresh was definitively rejected by the server
+	// (e.g. invalid_grant), the user timed out, or sign-out started. Distinguishes "no session
+	// yet" from "session is dead" so concurrent and subsequent API requests neither fire their
+	// own doomed /token call nor make the ended session active again. Cleared when a new
 	// session is established (login, peer tab, completed re-authentication).
 	#sessionDead = false;
 
@@ -66,6 +70,16 @@ export class UmbAuthContext extends UmbContextBase {
 
 	// Cross-tab coordination
 	#channel: BroadcastChannel;
+
+	// The user the client state of this page belongs to, see bindUser().
+	#boundUser?: string;
+	// Set once the session has passed to another user. The page holds the previous user's state, so no
+	// session is applied to it from then on.
+	#hasUserChanged = false;
+	// Applies the newest session that waits for the user behind it to be confirmed.
+	#heldSession?: () => void;
+	#confirmingUser?: Promise<void>;
+	#userChanged = new Subject<void>();
 
 	// Popup management
 	#authWindowProxy?: WindowProxy | null;
@@ -118,6 +132,19 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @remarks It will only emit when the authorization state changes.
 	 */
 	readonly isAuthorized = this.#isAuthorized.asObservable().pipe(distinctUntilChanged());
+
+	/**
+	 * Emits when the session has passed to a different user than the one the page is bound to
+	 * (see `bindUser()`), or to a user who could not be determined. The new session is not applied:
+	 * the page holds client state that belongs to the previous user, so it has to start over rather than
+	 * show that state to the user who is signed in now. From then on no session is applied to the page, so
+	 * the host has to start it over, or the page stays unauthorized. The app shell handles this by reloading
+	 * the backoffice. A sign-in while the page is still open emits again, so the host can try once more.
+	 * A user who cannot be determined (every lookup failed) is treated as a different user on purpose, so the
+	 * page also starts over, and discards unsaved work, when it is in fact the same user.
+	 * @internal
+	 */
+	readonly userChanged = this.#userChanged.asObservable();
 
 	/**
 	 * Observable that acts as a signal and emits when the user has timed out, i.e. the token has expired.
@@ -601,6 +628,24 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
+	 * Binds the page to the user it has loaded client state for. A sign-in that happens after this, in this
+	 * tab or another one, is held until the user behind it is known: the same user resumes the page as it
+	 * is, so unsaved work survives; any other user is reported through {@link userChanged} instead.
+	 * Binding a different user later is reported the same way. The app shell calls this with the user it has loaded.
+	 * @internal
+	 * @param {string} unique The unique of the user the page has loaded.
+	 */
+	bindUser(unique: string): void {
+		if (!this.#boundUser) {
+			this.#boundUser = unique;
+			return;
+		}
+		if (unique !== this.#boundUser) {
+			this.#onUserChanged();
+		}
+	}
+
+	/**
 	 * Clears the in-memory session state.
 	 * @memberof UmbAuthContext
 	 */
@@ -613,9 +658,12 @@ export class UmbAuthContext extends UmbContextBase {
 	/**
 	 * Handles the case where the user has timed out, i.e. the token has expired.
 	 * This will clear the token storage and set the user as unauthorized.
+	 * The session stays ended until the user signs in again: requests made after this
+	 * point do not refresh the token.
 	 * @memberof UmbAuthContext
 	 */
 	timeOut() {
+		this.#sessionDead = true;
 		this.#session.setValue(undefined);
 		this.#isAuthorized.setValue(false);
 		this.#isTimeout.next();
@@ -626,6 +674,9 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @memberof UmbAuthContext
 	 */
 	async signOut(): Promise<void> {
+		// The session ends here: requests made while signing out must not refresh the token
+		this.#sessionDead = true;
+
 		// Revoke the token (best-effort)
 		await this.#client.revokeToken().catch(() => {});
 
@@ -867,25 +918,30 @@ export class UmbAuthContext extends UmbContextBase {
 		switch (evt.data?.type) {
 			case 'authorized': {
 				// Apply locally — do NOT call #updateSession which would re-broadcast.
-				this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
-				this.#authorizationSignal.next();
+				this.#applyPeerSession(true, () => {
+					this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
+					this.#authorizationSignal.next();
+				});
 				break;
 			}
 			case 'sessionUpdate':
-				// Peer broadcast already-computed timestamps, so set the session
-				// directly. We still go through the `#inSessionUpdateCallback` guard
-				// so observers triggered re-entrantly skip a redundant /token call.
-				this.#sessionDead = false;
-				this.#inSessionUpdateCallback = true;
-				try {
-					this.#session.setValue({
-						accessTokenExpiresAt: evt.data.accessTokenExpiresAt,
-						expiresAt: evt.data.expiresAt,
-					});
-					this.#isAuthorized.setValue(true);
-				} finally {
-					this.#inSessionUpdateCallback = false;
-				}
+				// A session this tab no longer holds is re-established, possibly by a sign-in it missed.
+				this.#applyPeerSession(!this.#session.getValue(), () => {
+					// Peer broadcast already-computed timestamps, so set the session
+					// directly. We still go through the `#inSessionUpdateCallback` guard
+					// so observers triggered re-entrantly skip a redundant /token call.
+					this.#sessionDead = false;
+					this.#inSessionUpdateCallback = true;
+					try {
+						this.#session.setValue({
+							accessTokenExpiresAt: evt.data.accessTokenExpiresAt,
+							expiresAt: evt.data.expiresAt,
+						});
+						this.#isAuthorized.setValue(true);
+					} finally {
+						this.#inSessionUpdateCallback = false;
+					}
+				});
 				break;
 			case 'sessionCleared':
 				this.#session.setValue(undefined);
@@ -908,6 +964,74 @@ export class UmbAuthContext extends UmbContextBase {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Applies a session received from another tab. A session from a sign-in can belong to another user
+	 * than the one the page is bound to, so it is held until that user is known. Sessions arriving while
+	 * a sign-in is held wait behind it, so the newest one is applied once the user is confirmed.
+	 * @param {boolean} fromSignIn Whether the session may come from a sign-in rather than a refresh of the session in hand.
+	 * @param {() => void} apply Applies the session.
+	 */
+	#applyPeerSession(fromSignIn: boolean, apply: () => void) {
+		if (this.#hasUserChanged) {
+			// The page is still open, so it has not started over yet: a further sign-in reports the change again
+			if (fromSignIn) this.#userChanged.next();
+			return;
+		}
+		if (this.#isBypassed || !this.#boundUser || (!fromSignIn && !this.#confirmingUser)) {
+			apply();
+			return;
+		}
+
+		this.#heldSession = apply;
+		this.#confirmingUser ??= this.#confirmSignedInUser();
+	}
+
+	async #confirmSignedInUser(): Promise<void> {
+		const signedInUser = await this.#lookUpSignedInUser();
+		const apply = this.#heldSession;
+		this.#heldSession = undefined;
+		this.#confirmingUser = undefined;
+
+		if (signedInUser !== undefined && signedInUser === this.#boundUser) {
+			apply?.();
+			return;
+		}
+
+		this.#onUserChanged();
+	}
+
+	/**
+	 * Looks up the user behind the session cookie, retrying failed attempts.
+	 * Deliberately not through the configured API clients: their interceptors hold a request that is
+	 * rejected for authorization until the user is signed in, which is what is being decided here.
+	 * @returns {Promise<string | undefined>} The unique of the signed-in user, or undefined if it could not be determined.
+	 */
+	async #lookUpSignedInUser(): Promise<string | undefined> {
+		for (const delay of SIGNED_IN_USER_LOOKUP_DELAYS_MS) {
+			if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+			try {
+				const response = await fetch(`${this.#serverUrl}/umbraco/management/api/v1/user/current`, {
+					credentials: 'include',
+					headers: { Authorization: 'Bearer [redacted]' },
+				});
+				if (response.ok) {
+					const user = await response.json();
+					if (typeof user?.id === 'string') return user.id;
+				}
+			} catch {
+				// A network error may be transient, so try again
+			}
+		}
+		return undefined;
+	}
+
+	#onUserChanged() {
+		if (this.#hasUserChanged) return;
+		this.#hasUserChanged = true;
+		this.#heldSession = undefined;
+		this.#userChanged.next();
 	}
 
 	/**

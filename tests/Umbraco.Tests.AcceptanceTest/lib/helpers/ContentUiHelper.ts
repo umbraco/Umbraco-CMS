@@ -32,6 +32,8 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly textAreaTxt: Locator;
   private readonly plusIconBtn: Locator;
   private readonly enterTagTxt: Locator;
+  private readonly documentMenuItem: Locator;
+  private readonly documentRecycleBinMenuItem: Locator;
   private readonly menuItemTree: Locator;
   private readonly hostnameComboBox: Locator;
   private readonly confirmToUnpublishBtn: Locator;
@@ -238,7 +240,9 @@ export class ContentUiHelper extends UiBaseLocators {
     this.textAreaTxt = page.locator('umb-property-editor-ui-textarea textarea');
     this.plusIconBtn = page.locator('#icon-add svg');
     this.enterTagTxt = page.getByPlaceholder('Enter tag');
-    this.menuItemTree = page.locator('umb-menu-item-tree-default');
+    this.documentMenuItem = page.locator('[data-mark="menu-item:Umb.MenuItem.Document"]');
+    this.documentRecycleBinMenuItem = page.locator('[data-mark="menu-item:Umb.MenuItem.Document.RecycleBin"]');
+    this.menuItemTree = this.documentMenuItem.or(this.documentRecycleBinMenuItem);
     this.confirmToUnpublishBtn = page.locator('umb-content-unpublish-modal').getByLabel('Unpublish');
     this.confirmToPublishBtn = page.locator('umb-content-publish-modal').getByLabel('Publish');
     this.dropdown = page.locator('select#native');
