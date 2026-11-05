@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -331,6 +332,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     {
         var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
         await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
+        var reporter = (IMemoryCacheSizeReporter)_documentCacheService;
+        long convertedCountBefore = reporter.GetApproximateCount();
 
         IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync([Textpage.Key], true);
         Assert.AreEqual(1, result.Count);
@@ -345,7 +348,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         _mockDatabaseCacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Never);
 
         // Drafts are held in the HybridCache only; the converted (L0) cache stays published-only.
-        Assert.IsFalse(_documentCacheService.TryGetCached(Textpage.Key, true, out _));
+        Assert.AreEqual(convertedCountBefore, reporter.GetApproximateCount());
     }
 
     [Test]
