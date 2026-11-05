@@ -1,5 +1,8 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/property-action';
+import {
+	UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST,
+	UMB_PROPERTY_ACTION_GROUP_CLIPBOARD,
+} from '@umbraco-cms/backoffice/property-action';
 
 export const UMB_PROPERTY_ACTION_PASTE_FROM_CLIPBOARD_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -9,6 +12,7 @@ export const UMB_PROPERTY_ACTION_PASTE_FROM_CLIPBOARD_KIND_MANIFEST: UmbExtensio
 	manifest: {
 		...UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'propertyAction',
+		group: UMB_PROPERTY_ACTION_GROUP_CLIPBOARD,
 		kind: 'pasteFromClipboard',
 		api: () => import('./paste-from-clipboard.property-action.js'),
 		weight: 1190,

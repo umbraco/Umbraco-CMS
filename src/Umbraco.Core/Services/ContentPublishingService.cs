@@ -78,6 +78,16 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// Documents are admitted one request per process into the content write path; see <see cref="ContentWriteGate"/>.
+    /// Elements write under their own lock and are not gated.
+    /// </remarks>
+    protected override Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> RunInWritePathAsync(
+        Func<Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>>> publish,
+        bool callerIsInScope)
+        => ContentWriteGate.Shared.RunAsync(publish, callerIsInScope);
+
+    /// <inheritdoc />
     public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(
         Guid key,
         IEnumerable<string> cultures,
