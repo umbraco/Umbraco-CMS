@@ -65,15 +65,16 @@ test.describe('scheduled publishing with segment variations', () => {
     const contentData = await umbracoApi.document.get(documentId);
     expect(contentData.variants[0].state).toBe('PublishedPendingChanges');
     expect(contentData.variants[0].scheduledPublishDate).toBeTruthy();
-    const [draftVip] = await umbracoApi.document.getValuesByCultureAndSegmentForDocument(contentName, [
-      {culture: null, segment: vipMemberSegmentAlias},
-    ]);
+    const draftVip = contentData.values.find(value => value.culture === null && value.segment === vipMemberSegmentAlias);
+    expect(draftVip).toBeTruthy();
     expect(draftVip.value).toBe(updatedVipSegmentValue);
     const [publishedDefault, publishedVip] = await umbracoApi.document.getPublishedValuesByCultureAndSegmentForDocument(documentId, [
       {culture: null, segment: null},
       {culture: null, segment: vipMemberSegmentAlias},
     ]);
+    expect(publishedDefault).toBeTruthy();
     expect(publishedDefault.value).toBe(defaultSegmentValue);
+    expect(publishedVip).toBeTruthy();
     expect(publishedVip.value).toBe(vipSegmentValue);
   });
 
@@ -105,15 +106,16 @@ test.describe('scheduled publishing with segment variations', () => {
     const elementData = await umbracoApi.element.get(elementId);
     expect(elementData.variants[0].state).toBe('PublishedPendingChanges');
     expect(elementData.variants[0].scheduledPublishDate).toBeTruthy();
-    const [draftVip] = await umbracoApi.element.getValuesByCultureAndSegmentForElement(elementName, [
-      {culture: null, segment: vipMemberSegmentAlias},
-    ]);
+    const draftVip = elementData.values.find(value => value.culture === null && value.segment === vipMemberSegmentAlias);
+    expect(draftVip).toBeTruthy();
     expect(draftVip.value).toBe(updatedVipSegmentValue);
     const [publishedDefault, publishedVip] = await umbracoApi.element.getPublishedValuesByCultureAndSegmentForElement(elementId, [
       {culture: null, segment: null},
       {culture: null, segment: vipMemberSegmentAlias},
     ]);
+    expect(publishedDefault).toBeTruthy();
     expect(publishedDefault.value).toBe(defaultSegmentValue);
+    expect(publishedVip).toBeTruthy();
     expect(publishedVip.value).toBe(vipSegmentValue);
   });
 });

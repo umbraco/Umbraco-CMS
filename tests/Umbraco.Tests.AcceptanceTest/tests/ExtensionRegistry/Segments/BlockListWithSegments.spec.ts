@@ -63,7 +63,7 @@ test.describe('block list with segment variations', () => {
     expect(defaultBlockListValue?.value?.contentData ?? []).toHaveLength(0);
   });
 
-  test('cannot create a block without its mandatory value in the VIP segment of a block list that varies by segment', async ({umbracoApi, umbracoUi}) => {
+  test('can only create a block in the VIP segment of a block list that varies by segment once its mandatory value is filled in', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const textstringDataType = await umbracoApi.dataType.getByName(textstringDataTypeName);
     const blockElementTypeId = await umbracoApi.documentType.createDefaultElementType(blockElementTypeName, 'BlockGroup', textstringDataTypeName, textstringDataType.id, true);

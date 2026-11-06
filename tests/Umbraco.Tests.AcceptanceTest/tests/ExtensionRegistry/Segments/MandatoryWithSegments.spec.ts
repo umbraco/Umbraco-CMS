@@ -46,7 +46,7 @@ test.describe('mandatory property with segment-only variations', () => {
     expect(await umbracoApi.document.isDocumentPublished(documentId)).toBeFalsy();
   });
 
-  test('can publish segment-only content with a mandatory property when the VIP segment value is empty', async ({umbracoApi, umbracoUi}) => {
+  test('can publish segment-only content with a mandatory property without a VIP segment value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const documentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, defaultSegmentValue, dataTypeName);
     await umbracoUi.content.goToContentWithName(contentName);

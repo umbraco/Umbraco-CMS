@@ -254,6 +254,7 @@ test.describe('content with segment-only variations', () => {
     ]);
     expect(defaultValue).toBeTruthy();
     expect(defaultValue.value).toBe(defaultSegmentValue);
-    expect(vipValue?.value).toBeFalsy();
+    expect(vipValue).toBeTruthy();
+    expect(vipValue.value).toBe('');
   });
 });
