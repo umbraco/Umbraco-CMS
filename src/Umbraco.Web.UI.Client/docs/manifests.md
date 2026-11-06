@@ -28,6 +28,33 @@ Most extension types add further properties on top of `ManifestBase`:
 - **`conditions`** — declarative rules for when the extension is active
 - **`overwrites`** — alias(es) of extensions this one replaces
 
+### Element + API Extensions
+
+When an extension type extends `ManifestElementAndApi` (workspace, collection, tree, tree item, section, entity action, workspace action, value summary, facet filter, …), the element and the API are **one unit**: an instance of the extension *is* the pair.
+
+How the initializer creates them (`createExtensionElementWithApi`, `UmbExtensionElementAndApiInitializer`):
+
+- The API is constructed with **the element as its host** (`new Api(element, ...constructorArgs)`).
+- Both get `manifest`; the element gets `api`.
+- Each rendering of the extension creates its own pair. An entity action shown in a tree item and in a workspace header is two independent pairs.
+- The pair is destroyed together when the extension's conditions stop being met or its initializer is destroyed.
+
+Because the element hosts the API, the API sits at the element's place in the DOM. It consumes contexts from the element's ancestors, and anything it provides is visible to the element's descendants only. The API plays one of two roles:
+
+| Role | The API… | Reached by | Examples |
+|------|----------|------------|----------|
+| **View controller** | extends `UmbControllerBase`; holds the element's state and behaviour | the element, via `this.api` | entity action, workspace action, value summary, facet filter |
+| **Scoped context** | extends `UmbContextBase` with a token; provides itself on the element | the element's descendants, via `consumeContext(TOKEN)` | workspace (`UMB_WORKSPACE_CONTEXT`), collection (`UMB_COLLECTION_CONTEXT`), tree (`UMB_TREE_CONTEXT`), tree item (`UMB_TREE_ITEM_CONTEXT`) |
+
+In both roles the API belongs to **that rendering**. So:
+
+- **Don't share an API instance between renderings**, and don't hand it to elements outside the extension's subtree. A sibling or ancestor that needs the same data can't reach the API, so the API isn't the right owner for that data.
+- **Don't keep state in the API that must outlive the element**, or that several renderings must agree on. It disappears when the element does.
+- **Put shared state one level up:** in a context provided by a common ancestor (for example a manager on the collection context), or in a repository or store for entity data. The pairs read from it, and each one still owns its own view state.
+- **Behaviour the extension contributes beyond its view** (for example how its values are resolved for display elsewhere) is a separate, non-view API on the manifest, created by the owner of the shared state. For example, `valueResolver` on `valueSummary` is created once by the value summary coordinator, not by each table cell.
+
+When designing an element + API extension, ask *who besides this element needs this?* If the answer is only the element and its descendants, it belongs in the API. Otherwise it belongs in a context above the renderings.
+
 ### Minimal Example
 
 ```typescript

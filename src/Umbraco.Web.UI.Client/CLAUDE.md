@@ -57,6 +57,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 | Write or modify tests                         | [docs/testing.md](./docs/testing.md)                                                                                          |
 | Work with auth or security                    | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                           |
 | Scaffold a new package or module              | [docs/package-development.md](./docs/package-development.md)                                                                  |
+| Design an element + API extension, or decide where its state lives | [docs/manifests.md](./docs/manifests.md#element--api-extensions) — the API is per rendering, hosted by the element; shared state goes in a context above |
 | Consume or provide a context, or create a context token | [docs/context-api.md](./docs/context-api.md) — tokens can share an alias; consume the most specific one once |
 | Write or change observers / `Umb*State` usage | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards           |
 
