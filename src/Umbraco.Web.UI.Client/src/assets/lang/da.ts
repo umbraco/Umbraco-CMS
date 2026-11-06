@@ -711,6 +711,7 @@ export default {
 		iIndexPopulator: 'IIndexPopulator',
 		contentInIndex: 'Indhold i indeks',
 		noResults: 'Ingen resultater blev fundet',
+		searchNotAllowed: 'Du har ikke adgang til at søge i dette indeks.',
 		searchResultsFound: 'Viser %0% - %1% af %2% resultat(er) - Side %3% af %4%',
 		corruptStatus: 'Mulig korrupt indeks opdaget',
 		corruptErrorDescription: 'Fejl modtaget ved evaluering af indekset:',
