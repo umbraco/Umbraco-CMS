@@ -1,4 +1,4 @@
-import { css, html, customElement, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -166,6 +166,11 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 		this.#pickerContext?.requestRemoveItem(item.unique);
 	}
 
+	#renderReplaceAction() {
+		if (this.max !== 1) return nothing;
+		return html`<uui-button label=${this.localize.term('actions_replace')} @click=${this.#openPicker}></uui-button>`;
+	}
+
 	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
@@ -201,6 +206,7 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 			<uui-ref-node name=${item.name ?? getItemFallbackName(item)} id=${item.unique}>
 				${when(icon, () => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
 				<uui-action-bar slot="actions">
+					${this.#renderReplaceAction()}
 					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
