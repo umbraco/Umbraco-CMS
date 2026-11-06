@@ -273,7 +273,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     ///     Attributes the schedule entries that are neither persisted nor attributed to a user, to the specified user.
     /// </summary>
     /// <param name="userId">The identifier of the user scheduling the entries.</param>
-    public void AttributeUnattributedEntries(int userId)
+    internal void AttributeUnattributedEntries(int userId)
     {
         foreach (ContentSchedule entry in FullSchedule.Where(x => x.Id == Guid.Empty && x.UserId is null).ToList())
         {
