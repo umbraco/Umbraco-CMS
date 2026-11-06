@@ -597,6 +597,7 @@ export type DataTypeTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    parentIsFolder: boolean;
     editorUiAlias?: string | null;
     isDeletable: boolean;
 };
@@ -705,6 +706,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    parentIsFolder: boolean;
     documentType?: DocumentTypeReferenceResponseModel | null;
     variants: Array<DocumentVariantItemResponseModel>;
 };
@@ -931,6 +933,7 @@ export type DocumentTypeTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    parentIsFolder: boolean;
     isElement: boolean;
     icon: string;
 };
@@ -1518,6 +1521,7 @@ export type MediaTypeTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    parentIsFolder: boolean;
     icon: string;
     isDeletable: boolean;
 };
@@ -1711,6 +1715,7 @@ export type MemberTypeTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    parentIsFolder: boolean;
     icon: string;
 };
 
@@ -3331,6 +3336,7 @@ export type DocumentBlueprintTreeItemResponseModelWritable = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    parentIsFolder: boolean;
     documentType?: DocumentTypeReferenceResponseModel | null;
     variants: Array<DocumentVariantItemResponseModelWritable>;
 };
