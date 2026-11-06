@@ -36,8 +36,7 @@ test.describe('document blueprints with segment-only variations', () => {
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   });
 
-  // Skip this test due to this issue: ContentService.CreateBlueprintFromContent copies values per culture only,
-  // so segment values are dropped from the blueprint. TODO: link the GitHub issue once filed [AZ]
+  // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/24479
   test.skip('can create a document blueprint from segment-only content with a VIP segment value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.document.createDocumentWithMultipleSegmentValues(contentName, documentTypeId, dataTypeName, editorAlias, [
