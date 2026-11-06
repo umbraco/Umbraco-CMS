@@ -1,6 +1,7 @@
 import type { Editor } from '../../externals.js';
-import { css, customElement, html, map, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, join, map, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-tiptap-statusbar-element-path')
 export class UmbTiptapStatusbarElementPathElement extends UmbLitElement {
@@ -58,10 +59,14 @@ export class UmbTiptapStatusbarElementPathElement extends UmbLitElement {
 
 	override render() {
 		if (!this._path) return nothing;
-		return map(this._path, (item) => html`<code>${item}</code>`);
+		return join(
+			map(this._path, (item) => html`<code>${item}</code>`),
+			html`<span>&gt;</span>`,
+		);
 	}
 
 	static override readonly styles = [
+		UmbTextStyles,
 		css`
 			:host {
 				display: flex;
@@ -69,11 +74,6 @@ export class UmbTiptapStatusbarElementPathElement extends UmbLitElement {
 
 				font-size: var(--uui-type-small-size);
 				color: var(--uui-color-text-alt);
-			}
-
-			code:not(:last-of-type)::after {
-				content: '>';
-				margin-left: 0.5rem;
 			}
 		`,
 	];

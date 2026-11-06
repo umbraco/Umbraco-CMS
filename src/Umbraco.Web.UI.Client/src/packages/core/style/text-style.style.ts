@@ -16,4 +16,9 @@ export const UmbTextStyles = css`
 		border: 0;
 		border-top: 1px solid var(--uui-color-border);
 	}
+
+	code {
+		direction: ltr;
+		unicode-bidi: isolate;
+	}
 `;
