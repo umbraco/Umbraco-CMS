@@ -999,6 +999,8 @@ export default {
 		publishAll: 'Опубликовать документ %0% и все его дочерние документы',
 		publishHelp:
 			'Нажмите кнопку <em>Опубликовать</em> для публикации документа <strong>%0%</strong>.\n\t\tТем самым Вы сделаете содержимое документа доступным для просмотра.<br /><br />\n\t\tВы можете опубликовать этот документ и все его дочерние документы, отметив опцию <em>Опубликовать все дочерние документы</em>.\n\t\tЧтобы опубликовать ранее неопубликованные документы среди дочерних, отметьте опцию <em>Включая неопубликованные дочерние документы</em>.\n\t\t',
+		publishedNotificationTitle: 'Опубликовано',
+		publishedNotificationDescription: '%0% теперь общедоступен',
 	},
 	redirectUrls: {
 		disableUrlTracker: 'Остановить отслеживание URL',
@@ -1130,6 +1132,7 @@ export default {
 		dictionaryItemSaved: 'Статья в словаре сохранена',
 		editContentPublishedFailedByParent: 'Публикация не завершена, так как родительский документ не опубликован',
 		editContentPublishedHeader: 'Документ опубликован',
+		editElementPublishedHeader: 'Элемент опубликован',
 		editContentPublishedText: 'и является видимым',
 		editContentSavedHeader: 'Документ сохранен',
 		editContentSavedText: 'Не забудьте опубликовать, чтобы сделать видимым',

@@ -331,6 +331,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 			const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
+					description: '#elements_confirmPublishDescription',
 					options,
 					pickableFilter: (option) => this.#publishableVariantsFilter(option as UmbElementVariantOptionModel),
 					unique,

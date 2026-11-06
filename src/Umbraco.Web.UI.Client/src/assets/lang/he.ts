@@ -523,6 +523,8 @@ export default {
 		publishAll: 'פרסם את העמוד %0% ואת כל תתי העמודים',
 		publishHelp:
 			'לחץ <em>ok</em> כדי לפרסם <strong>%0%</strong> ולהפוך תוכן זה זמין לציבור הרחב<br/><br />\n      הינך יכולה לפרסם את כל תתי העמודים על ידי סימון  <em>פרסם את העמוד את כל תתי העמודים</em> למטה.\n      ',
+		publishedNotificationTitle: 'פורסם',
+		publishedNotificationDescription: '%0% זמין כעת לציבור',
 	},
 	relatedlinks: {
 		addExternal: 'הוסף קישור חיצוני',
@@ -605,6 +607,7 @@ export default {
 		dictionaryItemSaved: 'פריט במילון נשמר',
 		editContentPublishedFailedByParent: 'הפירסום נכשל, עמוד האב לא מפורסם',
 		editContentPublishedHeader: 'התוכן פורסם',
+		editElementPublishedHeader: 'האלמנט פורסם',
 		editContentPublishedText: 'ומוצג לצפיה באתר',
 		editContentSavedHeader: 'תוכן נשמר',
 		editContentSavedText: 'זכור לפרסם את התוכן על מנת שהשינויים יוצגו',

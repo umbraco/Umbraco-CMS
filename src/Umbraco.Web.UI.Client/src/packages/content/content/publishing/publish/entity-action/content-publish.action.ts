@@ -10,9 +10,12 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { escapeHTML, truncateString } from '@umbraco-cms/backoffice/utils';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+
+const MAX_NOTIFICATION_NAME_LENGTH = 30;
 
 /**
  * @description - Shared entity action for publishing content-like entities (Document, Element, ...).
@@ -37,6 +40,7 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 		const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 			data: {
 				confirmLabel: '#actions_publish',
+				description: this.args.meta.publishConfirmationMessage,
 				options,
 				pickableFilter: (option) =>
 					this.#isLanguagePickable(option, currentUserAllowedLanguages, currentUserHasAccessToAllLanguages),
@@ -55,7 +59,7 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 		if (!publishableVariantIds.length) return;
 
 		await this.#publish(unique, publishableVariantIds);
-		await this.#notifyPublished(options, detailData, result.selection);
+		await this.#notifyPublished(options, detailData, result.selection, appCulture);
 		await this.#dispatchReloadEvent(unique);
 	}
 
@@ -180,34 +184,39 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 		options: Array<UmbEntityVariantOptionModel>,
 		detailData: UmbContentDetailModel,
 		selection: Array<string>,
+		appCulture: string | undefined,
 	): Promise<void> {
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		const localize = new UmbLocalizationController(this);
 
+		const headline = localize.string(
+			this.args.meta.publishedNotificationHeadline || '#publish_publishedNotificationTitle',
+		);
+
 		// If the content is invariant, we need to show a different notification
 		const isInvariant = options.length === 1 && options[0].culture === null;
+		const publishedVariants = isInvariant
+			? detailData.variants
+			: detailData.variants.filter((variant) => selection.includes(variant.culture!));
+		const namedVariant = publishedVariants.find((v) => v.culture === appCulture) ?? publishedVariants[0];
 
-		if (isInvariant) {
-			notificationContext?.peek('positive', {
-				data: {
-					headline: localize.term('speechBubbles_editContentPublishedHeader'),
-					message: localize.string(
-						this.args.meta.publishedNotificationMessage || '#speechBubbles_editContentPublishedText',
-					),
-				},
-			});
-		} else {
-			const publishedVariants = detailData.variants.filter((variant) => selection.includes(variant.culture!));
-			notificationContext?.peek('positive', {
-				data: {
-					headline: localize.term('speechBubbles_editContentPublishedHeader'),
-					message: localize.string(
-						this.args.meta.variantPublishedNotificationMessage || '#speechBubbles_editVariantPublishedText',
-						localize.list(publishedVariants.map((v) => new UmbVariantId(v.culture, null).toString() ?? v.name)),
-					),
-				},
-			});
-		}
+		const name = truncateString(namedVariant?.name, MAX_NOTIFICATION_NAME_LENGTH);
+		const cultures = isInvariant
+			? undefined
+			: localize.list(publishedVariants.map((v) => new UmbVariantId(v.culture, null).toString() ?? v.name));
+		const term = isInvariant
+			? this.args.meta.publishedNotificationMessage || '#publish_publishedNotificationDescription'
+			: this.args.meta.variantPublishedNotificationMessage || '#publish_publishedVariantNotificationDescription';
+		const format = (formattedName: string, formattedCultures: string | undefined) =>
+			isInvariant ? localize.string(term, formattedName) : localize.string(term, formattedCultures, formattedName);
+
+		notificationContext?.peek('positive', {
+			data: {
+				headline,
+				message: format(name, cultures),
+				htmlMessage: format(`<strong>${escapeHTML(name)}</strong>`, escapeHTML(cultures)),
+			},
+		});
 	}
 
 	async #dispatchReloadEvent(unique: string): Promise<void> {

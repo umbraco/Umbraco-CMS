@@ -351,6 +351,8 @@ export default {
 		publishAll: 'Publicar %0% e todoas suas sub-páginas',
 		publishHelp:
 			'Clique em <em>ok</em> para publicar <strong>%0%</strong> e assim fazer com que seu conteúdo se torne disponível. <br /><br />\nVocê pode publicar esta página e todas suas sub-páginas ao selecionar <em>publicar todos filhos</em> abaixo.',
+		publishedNotificationTitle: 'Publicado',
+		publishedNotificationDescription: '%0% agora está disponível publicamente',
 	},
 	relatedlinks: {
 		addExternal: 'Adicionar link externo',
@@ -427,6 +429,7 @@ export default {
 		dictionaryItemSaved: 'Item de Dicionário salvo',
 		editContentPublishedFailedByParent: 'Publicação falhou porque a página pai não está publicada',
 		editContentPublishedHeader: 'Conteúdo publicado',
+		editElementPublishedHeader: 'Elemento publicado',
 		editContentPublishedText: 'e visível no website',
 		editContentSavedHeader: 'Conteúdo salvo',
 		editContentSavedText: 'Lembre-se de publicar para tornar as mudanças visíveis',

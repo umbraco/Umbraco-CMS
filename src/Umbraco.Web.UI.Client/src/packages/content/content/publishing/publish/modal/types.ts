@@ -6,6 +6,8 @@ export interface UmbContentPublishModalData<
 	VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel,
 > extends UmbContentVariantPickerData<VariantOptionModelType> {
 	headline?: string;
+	/** The confirmation text shown above the variant picker. Use a localization key, e.g. `#prompt_confirmPublish`. */
+	description?: string;
 	confirmLabel?: string;
 	unique?: string;
 	itemRepositoryAlias?: string;

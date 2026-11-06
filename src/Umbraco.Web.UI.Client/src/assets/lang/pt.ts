@@ -1260,6 +1260,9 @@ export default {
 			'Permissões de utilizador insuficientes para publicar todos os documentos descendentes',
 		contentPublishedFailedReqCultureValidationError:
 			"Falha na validação para o idioma obrigatório '%0%'. Este idioma foi guardado mas não publicado.",
+		publishedNotificationTitle: 'Publicado',
+		publishedNotificationDescription: '%0% está agora publicamente disponível',
+		publishedVariantNotificationDescription: '%1% está agora publicamente disponível em %0%',
 	},
 	colorpicker: {
 		noColors: 'Não configurou nenhuma cor aprovada',
@@ -1459,6 +1462,7 @@ export default {
 		editContentPublishedFailedByValidation: 'O documento não pôde ser publicado, mas guardámo-lo para si',
 		editContentPublishedFailedByParent: 'O documento não pôde ser publicado, porque uma página pai não está publicada',
 		editContentPublishedHeader: 'Documento publicado',
+		editElementPublishedHeader: 'Elemento publicado',
 		editContentPublishedText: 'e está visível no website',
 		editContentUnpublishedHeader: 'Documento despublicado',
 		editContentUnpublishedText: 'e já não está visível no website',
@@ -2852,5 +2856,10 @@ export default {
 		browseTab: 'Procurar',
 		searchTab: 'Pesquisar',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
+	},
+	elements: {
+		confirmPublishDescription: 'A publicação tornará isto publicamente disponível.',
+		confirmBulkPublishDescription: 'A publicação tornará os itens selecionados publicamente disponíveis.',
+		confirmBulkUnpublishDescription: 'Os itens selecionados deixarão de estar publicamente disponíveis.',
 	},
 } as UmbLocalizationDictionary;
