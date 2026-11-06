@@ -256,10 +256,6 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 			#btn-add {
 				display: block;
 			}
-
-			umb-entity-item-ref[drag-placeholder] {
-				opacity: 0.2;
-			}
 		`,
 	];
 }
