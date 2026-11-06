@@ -110,6 +110,8 @@ export class UmbFigureCardElement extends UUICardElement {
 		...UUICardElement.styles,
 		css`
 			:host {
+				/* Contain the internal z-index layers so they never compete with surrounding overlays. */
+				isolation: isolate;
 				height: 100%;
 				flex-direction: column;
 				justify-content: flex-start;

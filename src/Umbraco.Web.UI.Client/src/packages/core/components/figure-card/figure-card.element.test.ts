@@ -142,3 +142,31 @@ describe('UmbFigureCardElement click targets', () => {
 		}
 	});
 });
+
+describe('UmbFigureCardElement stacking', () => {
+	it('keeps its layers below a z-index: 1 overlay that follows it', async () => {
+		const wrapper = await fixture<HTMLDivElement>(html`
+			<div style="position: relative; width: 240px; height: 320px;">
+				<umb-figure-card name="Card Name" description="Card description" selectable>
+					<div style="width: 80px; height: 80px;"></div>
+				</umb-figure-card>
+				<div id="overlay" style="position: absolute; inset: 0; z-index: 1;"></div>
+			</div>
+		`);
+		const card = wrapper.querySelector<UmbFigureCardElement>('umb-figure-card')!;
+		await card.updateComplete;
+		const overlay = wrapper.querySelector('#overlay');
+
+		const cardRect = card.getBoundingClientRect();
+		const nameRect = card.shadowRoot!.querySelector('#name')!.getBoundingClientRect();
+		const points = [
+			{ label: 'name', x: nameRect.left + 4, y: nameRect.top + nameRect.height / 2 },
+			{ label: 'portrait centre', x: cardRect.left + cardRect.width / 2, y: cardRect.top + 60 },
+			{ label: 'bottom edge', x: cardRect.left + cardRect.width / 2, y: cardRect.bottom - 4 },
+		];
+		for (const { label, x, y } of points) {
+			const hit = document.elementFromPoint(x, y);
+			expect(hit === overlay, `${hit?.tagName.toLowerCase()} is painted above the overlay at the ${label}`).to.be.true;
+		}
+	});
+});
