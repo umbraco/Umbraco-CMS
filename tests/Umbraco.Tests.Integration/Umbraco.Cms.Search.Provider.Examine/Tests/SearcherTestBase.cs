@@ -24,6 +24,8 @@ public abstract class SearcherTestBase
     protected const string FieldSingleValue = "fieldSingleValues";
     protected const string FieldMultiSorting = "FieldThree";
     protected const string FieldTextRelevance = "FieldFour";
+    protected const int StopWordsDocumentNumber = 7;
+    protected const string StopWordsPhrase = "probe for the member";
 
     protected Dictionary<int, Guid> DocumentIds { get; } = [];
 
@@ -34,6 +36,7 @@ public abstract class SearcherTestBase
         serviceCollection
             .AddExamineSearchProviderServicesForTest<TestIndex, TestInMemoryDirectoryFactory>()
             .AddLogging();
+        ConfigureServices(serviceCollection);
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -76,7 +79,14 @@ public abstract class SearcherTestBase
                                 StartDate().AddDays(i),
                                 StartDate().AddDays(i * 2)
                             ],
-                            Texts = ["all", i % 2 == 0 ? "even" : "odd", $"single{i}", $"phrase search single{i}"]
+                            Texts =
+                            [
+                                "all",
+                                i % 2 == 0 ? "even" : "odd",
+                                $"single{i}",
+                                $"phrase search single{i}",
+                                .. i == StopWordsDocumentNumber ? new[] { StopWordsPhrase } : [],
+                            ]
                         },
                         Culture: null,
                         Segment: null),
@@ -130,6 +140,10 @@ public abstract class SearcherTestBase
         {
             disposableServiceProvider.Dispose();
         }
+    }
+
+    protected virtual void ConfigureServices(IServiceCollection services)
+    {
     }
 
     protected async Task<SearchResult> SearchAsync(

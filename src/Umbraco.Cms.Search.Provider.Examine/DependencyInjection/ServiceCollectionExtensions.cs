@@ -37,6 +37,10 @@ internal static class ServiceCollectionExtensions
         services.AddTransient<IIndexer, Indexer>();
         services.AddTransient<ISearcher, Searcher>();
 
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddUnique<IStopWordDetector, StopWordDetector>();
+#pragma warning restore CS0618 // Type or member is obsolete
+
         services.Configure<IndexOptions>(options =>
         {
             options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftContent, UmbracoObjectTypes.Document);
