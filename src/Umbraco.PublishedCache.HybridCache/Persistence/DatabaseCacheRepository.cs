@@ -125,9 +125,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
-    {
-        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(GetContentSourceSql(key));
+        => CreateContentSourceNode(await Database.FirstOrDefaultAsync<ContentSourceDto>(GetContentSourceSql(key)), preview);
 
+    /// <inheritdoc/>
+    public ContentCacheNode? GetContentSource(Guid key, bool preview = false)
+        => CreateContentSourceNode(Database.FirstOrDefault<ContentSourceDto>(GetContentSourceSql(key)), preview);
+
+    private ContentCacheNode? CreateContentSourceNode(ContentSourceDto? dto, bool preview)
+    {
         if (dto is null)
         {
             return null;
@@ -142,7 +147,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         {
             _logger.LogWarning(
                 "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
-                key);
+                dto.Key);
             return null;
         }
 
@@ -192,6 +197,12 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             .Append(SqlWhereNodeKey(SqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
+    private Sql<ISqlContext> GetContentSourcesSql(IEnumerable<Guid> keys)
+        => SqlContentSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
     private ContentCacheNode? CreateContentNodeKit(bool preview, ContentSourceDto dto)
     {
         IContentCacheDataSerializer serializer =
@@ -208,14 +219,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         var dtos = new List<ContentSourceDto>(keysArray.Length);
         foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
-            Sql<ISqlContext>? sql = SqlContentSourcesSelect()
-                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-                .WhereIn<NodeDto>(x => x.UniqueId, group)
-                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(sql));
+            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(GetContentSourcesSql(group)));
         }
 
+        return CreateContentSourceNodes(dtos, preview);
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<ContentCacheNode> GetContentSources(IEnumerable<Guid> keys, bool preview = false)
+    {
+        // Batch the WHERE IN to stay within SQL Server's parameter limit, as GetContentSourcesAsync does.
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        var dtos = new List<ContentSourceDto>(keysArray.Length);
+        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            dtos.AddRange(Database.Fetch<ContentSourceDto>(GetContentSourcesSql(group)));
+        }
+
+        return CreateContentSourceNodes(dtos, preview);
+    }
+
+    private IEnumerable<ContentCacheNode> CreateContentSourceNodes(List<ContentSourceDto> dtos, bool preview)
+    {
         var filtered = dtos
             .Where(x => x is not null)
             .Where(x => preview || ((x.PubDataRaw is not null || x.PubData is not null) && (!x.Published || x.PubName is not null)))
@@ -360,14 +385,26 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetMediaSourceAsync(Guid key)
-    {
-        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
+        => CreateMediaSourceNode(await Database.FirstOrDefaultAsync<ContentSourceDto>(GetMediaSourceSql(key)));
+
+    /// <inheritdoc/>
+    public ContentCacheNode? GetMediaSource(Guid key)
+        => CreateMediaSourceNode(Database.FirstOrDefault<ContentSourceDto>(GetMediaSourceSql(key)));
+
+    private Sql<ISqlContext> GetMediaSourceSql(Guid key)
+        => SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
             .Append(SqlWhereNodeKey(SqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
-        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
+    private Sql<ISqlContext> GetMediaSourcesSql(IEnumerable<Guid> keys)
+        => SqlMediaSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
+    private ContentCacheNode? CreateMediaSourceNode(ContentSourceDto? dto)
+    {
         if (dto is null)
         {
             return null;
@@ -387,14 +424,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         var dtos = new List<ContentSourceDto>(keysArray.Length);
         foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
-            Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
-                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-                .WhereIn<NodeDto>(x => x.UniqueId, group)
-                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(sql));
+            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(GetMediaSourcesSql(group)));
         }
 
+        return CreateMediaSourceNodes(dtos);
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<ContentCacheNode> GetMediaSources(IEnumerable<Guid> keys)
+    {
+        // Batch the WHERE IN to stay within SQL Server's parameter limit, as GetMediaSourcesAsync does.
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        var dtos = new List<ContentSourceDto>(keysArray.Length);
+        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            dtos.AddRange(Database.Fetch<ContentSourceDto>(GetMediaSourcesSql(group)));
+        }
+
+        return CreateMediaSourceNodes(dtos);
+    }
+
+    private IEnumerable<ContentCacheNode> CreateMediaSourceNodes(List<ContentSourceDto> dtos)
+    {
         var filtered = dtos
             .Where(x => x is not null)
             .ToList();
