@@ -83,12 +83,12 @@ export class UmbPropertyValuePresetBuilderController<
 
 		const apis = (
 			await Promise.all(
-				manifests.map((x) =>
-					createExtensionApi(this, x).then((x) => {
-						if (x) {
-							(x as any).manifest = x;
+				manifests.map((m) =>
+					createExtensionApi(this, m).then((api) => {
+						if (api) {
+							(api as any).manifest = m;
 						}
-						return x;
+						return api;
 					}),
 				),
 			)
