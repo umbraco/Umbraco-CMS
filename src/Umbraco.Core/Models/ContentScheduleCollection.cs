@@ -123,12 +123,12 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     public bool Add(DateTime? releaseDate, DateTime? expireDate) => Add(Constants.System.InvariantCulture, releaseDate, expireDate);
 
     /// <summary>
-    ///     Adds a new schedule for invariant content
+    ///     Adds a new schedule for invariant content.
     /// </summary>
     /// <param name="releaseDate">The release date, or null if no release is scheduled.</param>
     /// <param name="expireDate">The expiration date, or null if no expiration is scheduled.</param>
     /// <param name="userId">The identifier of the user scheduling the entry, or <c>null</c> if not known.</param>
-    /// <returns>true if successfully added, false if validation fails</returns>
+    /// <returns>true if successfully added, false if validation fails.</returns>
     public bool Add(DateTime? releaseDate, DateTime? expireDate, int? userId)
         => Add(Constants.System.InvariantCulture, releaseDate, expireDate, userId);
 
@@ -143,13 +143,13 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         => Add(culture, releaseDate, expireDate, null);
 
     /// <summary>
-    ///     Adds a new schedule for a culture
+    ///     Adds a new schedule for a culture.
     /// </summary>
     /// <param name="culture">The culture for the schedule.</param>
     /// <param name="releaseDate">The release date, or null if no release is scheduled.</param>
     /// <param name="expireDate">The expiration date, or null if no expiration is scheduled.</param>
     /// <param name="userId">The identifier of the user scheduling the entry, or <c>null</c> if not known.</param>
-    /// <returns>true if successfully added, false if validation fails</returns>
+    /// <returns>true if successfully added, false if validation fails.</returns>
     public bool Add(string? culture, DateTime? releaseDate, DateTime? expireDate, int? userId)
     {
         if (culture == null)

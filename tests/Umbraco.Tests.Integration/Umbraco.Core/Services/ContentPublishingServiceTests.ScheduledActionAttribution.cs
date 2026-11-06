@@ -280,5 +280,4 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
     private async Task<IAuditItem> GetAuditItemAsync(int contentId, AuditType auditType)
         => (await GetAuditItemsAsync(contentId, auditType)).Single();
-
 }

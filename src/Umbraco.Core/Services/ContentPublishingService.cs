@@ -100,7 +100,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             }
             else
             {
-                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.PublishDate.Value.UtcDateTime, ContentScheduleAction.Release, schedulingUserId);
+                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule.PublishDate.Value.UtcDateTime, ContentScheduleAction.Release, schedulingUserId);
             }
 
             if (cultureToSchedule.Schedule!.UnpublishDate is null)
@@ -109,7 +109,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             }
             else
             {
-                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.UnpublishDate.Value.UtcDateTime, ContentScheduleAction.Expire, schedulingUserId);
+                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule.UnpublishDate.Value.UtcDateTime, ContentScheduleAction.Expire, schedulingUserId);
             }
         }
 

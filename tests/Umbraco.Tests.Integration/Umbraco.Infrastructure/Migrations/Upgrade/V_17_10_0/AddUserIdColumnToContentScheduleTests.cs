@@ -50,7 +50,7 @@ internal sealed class AddUserIdColumnToContentScheduleTests : UmbracoIntegration
     {
         IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        IContent content = ContentBuilder.CreateBasicContent(contentType);
+        var content = ContentBuilder.CreateBasicContent(contentType);
         ContentService.Save(content);
         var release = DateTime.UtcNow.AddDays(1).TruncateTo(DateTimeExtensions.DateTruncate.Second);
         var expire = DateTime.UtcNow.AddDays(2).TruncateTo(DateTimeExtensions.DateTruncate.Second);
