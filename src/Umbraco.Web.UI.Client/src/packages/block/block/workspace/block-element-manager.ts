@@ -62,7 +62,10 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 	// The variant limited to what this element type varies by; a property composed from a varying type cannot vary further than its owner.
 	readonly #ownerVariantId = mergeObservables(
 		[this.variantId, this.structure.variesByCulture, this.structure.variesBySegment],
-		([variantId, variesByCulture, variesBySegment]) => variantId?.toVariant(variesByCulture, variesBySegment),
+		([variantId, variesByCulture, variesBySegment]) =>
+			variantId && variesByCulture !== undefined && variesBySegment !== undefined
+				? variantId.toVariant(variesByCulture, variesBySegment)
+				: undefined,
 	);
 
 	// The values resolved to a single entry per property, matching the current variant. [NL]

@@ -264,7 +264,10 @@ export abstract class UmbBlockEntryContext<
 	#variantIdOf(structure: UmbContentTypeStructureManager) {
 		return mergeObservables(
 			[this._variantId, structure.variesByCulture, structure.variesBySegment],
-			([variantId, variesByCulture, variesBySegment]) => variantId?.toVariant(variesByCulture, variesBySegment),
+			([variantId, variesByCulture, variesBySegment]) =>
+				variantId && variesByCulture !== undefined && variesBySegment !== undefined
+					? variantId.toVariant(variesByCulture, variesBySegment)
+					: undefined,
 		);
 	}
 
