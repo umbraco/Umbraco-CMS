@@ -38,7 +38,9 @@ internal sealed class ConfigureOpenIddictServerCredentials : IConfigureOptions<O
     /// <summary>
     ///     The delay before retrying to load the persisted server credentials after a failure.
     /// </summary>
+#pragma warning disable IDE1006 // Naming Styles - keeping naming style aligned with other constants in this class.
     internal static readonly TimeSpan PersistedCredentialsRetryDelay = TimeSpan.FromMinutes(1);
+#pragma warning restore IDE1006 // Naming Styles
 
     private const int SigningKeySizeInBits = 2048;
     private const int EncryptionKeySizeInBytes = 32;
