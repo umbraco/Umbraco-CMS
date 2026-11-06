@@ -6,6 +6,7 @@ import { html, customElement, state, nothing, ifDefined, css, query } from '@umb
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbPickerSearchFieldElement } from '@umbraco-cms/backoffice/picker';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-collection-item-picker-modal')
 export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
@@ -49,6 +50,20 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 		);
 		this.#observePickerSelection();
 		this.#observeSearch();
+	}
+
+	protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.willUpdate(_changedProperties);
+
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		if (_changedProperties.has('data') && this.data?.filter) {
+			new UmbDeprecation({
+				deprecated:
+					'The `filter` option of UmbCollectionItemPickerModalData is not applied by the built-in collection menu.',
+				removeInVersion: '21.0.0',
+				solution: 'Use `pickableFilter` to prevent items from being picked instead.',
+			}).warn();
+		}
 	}
 
 	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
@@ -210,6 +225,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 					.props=${{
 						selectionConfiguration: this._selectionConfiguration,
 						filterArgs: this.data?.collection?.filterArgs,
+						// eslint-disable-next-line @typescript-eslint/no-deprecated
 						filter: this.data?.filter,
 						selectableFilter: this.data?.pickableFilter,
 					}}

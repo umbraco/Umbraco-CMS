@@ -68,7 +68,7 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 	override render() {
 		return html`
 			<umb-input-static-file
-				.pickableFilter=${this.pickableFilter}
+				.browsePickableFilter=${this.pickableFilter}
 				.selection=${this._value ? (Array.isArray(this._value) ? this._value : [this._value]) : []}
 				.min=${this._limitMin ?? 0}
 				.max=${this._limitMax ?? Infinity}

@@ -1,7 +1,7 @@
 import type { UmbLanguageItemModel } from '../../types.js';
 import { UmbLanguagePickerInputContext } from './input-language.context.js';
 import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { splitStringToArray, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -75,8 +75,33 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
+	#hasWarnedFilterDeprecation = false;
+
+	/**
+	 * @deprecated Deprecated since v17. Use `browsePickableFilter` to prevent languages from being picked instead. Scheduled for removal in Umbraco 21.
+	 */
 	@property({ type: Object, attribute: false })
-	public filter: (language: UmbLanguageItemModel) => boolean = () => true;
+	public set filter(value: ((language: UmbLanguageItemModel) => boolean) | undefined) {
+		if (value && !this.#hasWarnedFilterDeprecation) {
+			this.#hasWarnedFilterDeprecation = true;
+			new UmbDeprecation({
+				deprecated: 'The `filter` property of umb-input-language',
+				removeInVersion: '21.0.0',
+				solution: 'Use `browsePickableFilter` to prevent languages from being picked instead.',
+			}).warn();
+		}
+		this.#filter = value;
+	}
+	public get filter(): (language: UmbLanguageItemModel) => boolean {
+		return this.#filter ?? (() => true);
+	}
+	#filter?: (language: UmbLanguageItemModel) => boolean;
+
+	/**
+	 * Prevents items from being picked while browsing. Items for which this returns false are shown but cannot be picked.
+	 */
+	@property({ type: Object, attribute: false })
+	public browsePickableFilter?: (language: UmbLanguageItemModel) => boolean;
 
 	@property({ type: Array })
 	public set selection(uniques: Array<string>) {
@@ -154,7 +179,8 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 
 	#openPicker() {
 		this.#pickerContext.openPicker({
-			filter: this.filter,
+			filter: this.#filter,
+			pickableFilter: this.browsePickableFilter,
 			multiple: this.max > 1 ? true : false,
 		});
 	}
