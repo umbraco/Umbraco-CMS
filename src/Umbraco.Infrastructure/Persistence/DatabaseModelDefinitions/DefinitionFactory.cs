@@ -82,6 +82,13 @@ public static class DefinitionFactory
             }
         }
 
+        // Index attributes name their columns as text, which can differ in case from the declared column names.
+        // Databases with case-sensitive identifiers only accept the declared names.
+        foreach (IndexColumnDefinition indexColumn in tableDefinition.Indexes.SelectMany(x => x.Columns.Concat(x.IncludeColumns)))
+        {
+            indexColumn.Name = tableDefinition.Columns.FirstOrDefault(x => x.Name.InvariantEquals(indexColumn.Name))?.Name ?? indexColumn.Name;
+        }
+
         return tableDefinition;
     }
 
