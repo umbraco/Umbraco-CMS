@@ -52,6 +52,7 @@ export class UmbModalContext<
 	public readonly key: string;
 	public readonly data: ModalData;
 	public readonly type: UmbModalType = 'dialog';
+	public readonly isReference?: boolean;
 	public readonly element?: ElementLoaderProperty<UUIModalElement>;
 	public readonly backdropBackground?: string;
 	public readonly router: IRouterSlot | null = null;
@@ -85,6 +86,7 @@ export class UmbModalContext<
 			size = this.alias.getDefaultModal()?.size ?? size;
 			this.element = this.alias.getDefaultModal()?.element || this.element;
 			this.backdropBackground = this.alias.getDefaultModal()?.backdropBackground || this.backdropBackground;
+			this.isReference = this.alias.getDefaultModal()?.isReference || this.isReference;
 			title = this.alias.getDefaultModal()?.title ?? undefined;
 		}
 
@@ -94,6 +96,7 @@ export class UmbModalContext<
 		size = args.modal?.size ?? size;
 		this.element = args.modal?.element || this.element;
 		this.backdropBackground = args.modal?.backdropBackground || this.backdropBackground;
+		this.isReference = args.modal?.isReference || this.isReference;
 
 		this.#size.setValue(size);
 

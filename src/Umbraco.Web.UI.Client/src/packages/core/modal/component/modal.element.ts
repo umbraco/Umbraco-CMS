@@ -3,8 +3,6 @@ import { UMB_MODAL_CONTEXT } from '../context/modal.context-token.js';
 import type { ManifestModal } from '../extensions/types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBasicState, type UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
@@ -73,6 +71,10 @@ export class UmbModalElement extends UmbLitElement {
 			},
 		);
 
+		if (this.#modalContext.isReference) {
+			const referenceBar = document.createElement('umb-reference-bar');
+			this.element.appendChild(referenceBar);
+		}
 		/**
 		 *
 		 * Maybe we could just get a Modal Router Slot. But it needs to have the ability to actually inject via slot. so the modal inner element can be within.
@@ -198,8 +200,6 @@ export class UmbModalElement extends UmbLitElement {
 		}
 		super.destroy();
 	}
-
-	static override styles: CSSResultGroup = [UmbTextStyles];
 }
 
 declare global {

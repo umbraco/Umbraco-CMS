@@ -92,7 +92,7 @@ export class UmbDocumentItemRefElement extends UmbEntityItemRefFrameMixin(UmbLit
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addUniquePaths(['unique'])
 			.onSetup(() => {
-				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
+				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} }, modal: { isReference: true } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editPath = routeBuilder({});
