@@ -29,6 +29,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	private _variantOptions: Array<VariantOptionModelType> = [];
 
 	@state()
+	private _hasMoreThanOneVariantOption = false;
+
+	@state()
 	private _cultureVariantOptions: Array<VariantOptionModelType> = [];
 
 	@state()
@@ -144,6 +147,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			(variantOptions) => {
 				this._variantOptions = ((variantOptions ?? []) as VariantOptionModelType[]).sort(this._variantSorter);
 				this._cultureVariantOptions = this._variantOptions.filter((variant) => variant.segment === null);
+				this._hasMoreThanOneVariantOption = this._variantOptions.length > 1;
 			},
 			'_observeVariantOptions',
 		);
@@ -244,18 +248,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#isCreateMode(variantOption: VariantOptionModelType, variantId: UmbVariantId) {
 		return !variantOption.variant && !this.#isVariantActive(variantId);
-	}
-
-	#selectorIsEnabled() {
-		// only varies by segment
-		if (!this._variesByCulture && this._variesBySegment) {
-			return (
-				this._cultureVariantOptions.length > 1 ||
-				(this._variantOptions.length > 1 && this._variantOptions[0].variant?.state)
-			);
-		}
-
-		return this._variantOptions.length > 1;
 	}
 
 	#observeReadOnlyCultures(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
@@ -386,7 +378,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				this.#isSegmentVariantOption(this._activeVariant)}
 				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
 				${ref(this.#focusInput)}>
-				${this.#selectorIsEnabled()
+				${this._hasMoreThanOneVariantOption
 					? html`
 							<uui-button
 								id="toggle"
@@ -413,7 +405,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					: html`<span id="read-only-tag" slot="append"> ${this.#renderReadOnlyTag(null)} </span>`}
 			</uui-input>
 
-			${this.#selectorIsEnabled()
+			${this._hasMoreThanOneVariantOption
 				? html`
 						<uui-popover-container id="popover" @beforetoggle=${this.#onPopoverToggle} placement="bottom-end">
 							<div id="dropdown">
