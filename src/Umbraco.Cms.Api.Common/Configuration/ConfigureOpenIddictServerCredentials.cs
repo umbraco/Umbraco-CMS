@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Server;
+using OpenIddict.Validation;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -34,6 +35,11 @@ internal sealed class ConfigureOpenIddictServerCredentials : IConfigureOptions<O
     /// </summary>
     internal const string DataProtectionPurpose = "Umbraco.OpenIddict.ServerCredentials";
 
+    /// <summary>
+    ///     The delay before retrying to load the persisted server credentials after a failure.
+    /// </summary>
+    internal static readonly TimeSpan PersistedCredentialsRetryDelay = TimeSpan.FromMinutes(1);
+
     private const int SigningKeySizeInBits = 2048;
     private const int EncryptionKeySizeInBytes = 32;
 
@@ -42,6 +48,9 @@ internal sealed class ConfigureOpenIddictServerCredentials : IConfigureOptions<O
     private readonly IKeyValueService _keyValueService;
     private readonly IDataProtectionProvider _dataProtectionProvider;
     private readonly ILogger<ConfigureOpenIddictServerCredentials> _logger;
+    private readonly IOptionsMonitorCache<OpenIddictServerOptions> _serverOptionsCache;
+    private readonly IOptionsMonitorCache<OpenIddictValidationOptions> _validationOptionsCache;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ConfigureOpenIddictServerCredentials"/> class.
@@ -51,25 +60,34 @@ internal sealed class ConfigureOpenIddictServerCredentials : IConfigureOptions<O
     /// <param name="keyValueService">The key-value service used to persist the credentials.</param>
     /// <param name="dataProtectionProvider">The Data Protection provider used to protect the persisted credentials.</param>
     /// <param name="logger">The logger.</param>
+    /// <param name="serverOptionsCache">The cache of the OpenIddict server options, cleared to retry after a failure.</param>
+    /// <param name="validationOptionsCache">The cache of the OpenIddict validation options, which copy the server credentials.</param>
+    /// <param name="timeProvider">The time provider used to delay the retry.</param>
     public ConfigureOpenIddictServerCredentials(
         IRuntimeState runtimeState,
         ICoreScopeProvider scopeProvider,
         IKeyValueService keyValueService,
         IDataProtectionProvider dataProtectionProvider,
-        ILogger<ConfigureOpenIddictServerCredentials> logger)
+        ILogger<ConfigureOpenIddictServerCredentials> logger,
+        IOptionsMonitorCache<OpenIddictServerOptions> serverOptionsCache,
+        IOptionsMonitorCache<OpenIddictValidationOptions> validationOptionsCache,
+        TimeProvider timeProvider)
     {
         _runtimeState = runtimeState;
         _scopeProvider = scopeProvider;
         _keyValueService = keyValueService;
         _dataProtectionProvider = dataProtectionProvider;
         _logger = logger;
+        _serverOptionsCache = serverOptionsCache;
+        _validationOptionsCache = validationOptionsCache;
+        _timeProvider = timeProvider;
     }
 
     /// <inheritdoc/>
     public void Configure(OpenIddictServerOptions options)
     {
         ServerCredentials credentials = _runtimeState.Level is RuntimeLevel.Run or RuntimeLevel.Upgrade or RuntimeLevel.Upgrading
-            ? GetOrCreatePersistedCredentials()
+            ? GetPersistedCredentialsOrFallback()
             : ServerCredentials.Create();
 
         var rsa = RSA.Create();
@@ -84,6 +102,32 @@ internal sealed class ConfigureOpenIddictServerCredentials : IConfigureOptions<O
                 new SymmetricSecurityKey(credentials.EncryptionKey),
                 SecurityAlgorithms.Aes256KW,
                 SecurityAlgorithms.Aes256CbcHmacSha512));
+    }
+
+    private ServerCredentials GetPersistedCredentialsOrFallback()
+    {
+        try
+        {
+            return GetOrCreatePersistedCredentials();
+        }
+        catch (Exception ex)
+        {
+            // The options cache keeps a failed build for the lifetime of the application, so a transient database
+            // error must not escape. Use ephemeral credentials for now, and rebuild the options later to retry.
+            _logger.LogError(
+                ex,
+                "The persisted OpenIddict server credentials could not be loaded, so ephemeral credentials are used until the next attempt in {RetryDelay}.",
+                PersistedCredentialsRetryDelay);
+            _ = ResetOptionsAfterDelayAsync();
+            return ServerCredentials.Create();
+        }
+    }
+
+    private async Task ResetOptionsAfterDelayAsync()
+    {
+        await Task.Delay(PersistedCredentialsRetryDelay, _timeProvider);
+        _serverOptionsCache.TryRemove(Options.DefaultName);
+        _validationOptionsCache.TryRemove(Options.DefaultName);
     }
 
     private ServerCredentials GetOrCreatePersistedCredentials()

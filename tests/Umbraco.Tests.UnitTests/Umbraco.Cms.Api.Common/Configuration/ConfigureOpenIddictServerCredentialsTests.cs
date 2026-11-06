@@ -1,10 +1,13 @@
 using System.Data;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 using NUnit.Framework;
 using OpenIddict.Server;
+using OpenIddict.Validation;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
@@ -20,6 +23,9 @@ internal class ConfigureOpenIddictServerCredentialsTests
     private Mock<IKeyValueService> _keyValueService = null!;
     private Mock<ICoreScope> _scope = null!;
     private Mock<ICoreScopeProvider> _scopeProvider = null!;
+    private Mock<IOptionsMonitorCache<OpenIddictServerOptions>> _serverOptionsCache = null!;
+    private Mock<IOptionsMonitorCache<OpenIddictValidationOptions>> _validationOptionsCache = null!;
+    private FakeTimeProvider _timeProvider = null!;
 
     [SetUp]
     public void SetUp()
@@ -46,6 +52,59 @@ internal class ConfigureOpenIddictServerCredentialsTests
                 It.IsAny<bool>(),
                 It.IsAny<bool>()))
             .Returns(_scope.Object);
+
+        _serverOptionsCache = new Mock<IOptionsMonitorCache<OpenIddictServerOptions>>();
+        _validationOptionsCache = new Mock<IOptionsMonitorCache<OpenIddictValidationOptions>>();
+        _timeProvider = new FakeTimeProvider();
+    }
+
+    [Test]
+    public void Ephemeral_Credentials_Are_Used_When_Persisted_Credentials_Cannot_Be_Loaded()
+    {
+        _keyValueService
+            .Setup(x => x.GetValue(It.IsAny<string>()))
+            .Throws(new InvalidOperationException("Database unavailable."));
+
+        OpenIddictServerOptions options = Configure(RuntimeLevel.Run, new EphemeralDataProtectionProvider());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(options.SigningCredentials, Has.Count.EqualTo(1));
+            Assert.That(options.EncryptionCredentials, Has.Count.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public async Task Options_Are_Rebuilt_After_A_Delay_When_Persisted_Credentials_Cannot_Be_Loaded()
+    {
+        _keyValueService
+            .Setup(x => x.GetValue(It.IsAny<string>()))
+            .Throws(new InvalidOperationException("Database unavailable."));
+        var validationOptionsReset = new TaskCompletionSource();
+        _validationOptionsCache
+            .Setup(x => x.TryRemove(Options.DefaultName))
+            .Callback(() => validationOptionsReset.TrySetResult())
+            .Returns(true);
+
+        Configure(RuntimeLevel.Run, new EphemeralDataProtectionProvider());
+
+        _timeProvider.Advance(ConfigureOpenIddictServerCredentials.PersistedCredentialsRetryDelay - TimeSpan.FromSeconds(1));
+        _serverOptionsCache.Verify(x => x.TryRemove(It.IsAny<string>()), Times.Never);
+
+        _timeProvider.Advance(TimeSpan.FromSeconds(1));
+        await validationOptionsReset.Task.WaitAsync(TimeSpan.FromSeconds(10));
+        _serverOptionsCache.Verify(x => x.TryRemove(Options.DefaultName), Times.Once);
+    }
+
+    [Test]
+    public void Options_Are_Not_Rebuilt_When_Persisted_Credentials_Are_Loaded()
+    {
+        Configure(RuntimeLevel.Run, new EphemeralDataProtectionProvider());
+
+        _timeProvider.Advance(ConfigureOpenIddictServerCredentials.PersistedCredentialsRetryDelay);
+
+        _serverOptionsCache.Verify(x => x.TryRemove(It.IsAny<string>()), Times.Never);
+        _validationOptionsCache.Verify(x => x.TryRemove(It.IsAny<string>()), Times.Never);
     }
 
     [Test]
@@ -149,7 +208,10 @@ internal class ConfigureOpenIddictServerCredentialsTests
             _scopeProvider.Object,
             _keyValueService.Object,
             dataProtectionProvider,
-            NullLogger<ConfigureOpenIddictServerCredentials>.Instance);
+            NullLogger<ConfigureOpenIddictServerCredentials>.Instance,
+            _serverOptionsCache.Object,
+            _validationOptionsCache.Object,
+            _timeProvider);
 
         var options = new OpenIddictServerOptions();
         sut.Configure(options);
