@@ -9,6 +9,15 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 @customElement('umb-test-property-action-menu-action')
 class UmbTestPropertyActionElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
+// Stops the click from propagating, as `umb-property-action` does when it executes its action.
+@customElement('umb-test-property-action-menu-stopping-action')
+class UmbTestStoppingPropertyActionElement extends UmbControllerHostElementMixin(HTMLElement) {
+	constructor() {
+		super();
+		this.addEventListener('click', (event) => event.stopPropagation());
+	}
+}
+
 class UmbTestPropertyActionApi extends UmbPropertyActionBase {
 	override async execute() {}
 }
@@ -71,5 +80,34 @@ describe('UmbPropertyActionMenuElement', () => {
 				{ alias: 'c', weight: 1, separatorBefore: true },
 			]),
 		).to.deep.equal(['a', 'b', '|', 'c']);
+	});
+
+	it('closes the menu once an action is clicked, even when the action stops the click from propagating', async () => {
+		aliases = ['stopping-action'];
+		umbExtensionsRegistry.register({
+			type: 'propertyAction',
+			alias: 'stopping-action',
+			name: 'stopping-action',
+			forPropertyEditorUis: [PROPERTY_EDITOR_UI_ALIAS],
+			elementName: 'umb-test-property-action-menu-stopping-action',
+			api: UmbTestPropertyActionApi,
+			meta: {},
+		} as ManifestPropertyAction);
+		const element = await fixture<UmbPropertyActionMenuElement>(
+			html`<umb-property-action-menu .propertyEditorUiAlias=${PROPERTY_EDITOR_UI_ALIAS}></umb-property-action-menu>`,
+		);
+		const findAction = () =>
+			element.shadowRoot?.querySelector<UmbTestStoppingPropertyActionElement>(
+				'umb-test-property-action-menu-stopping-action',
+			);
+		await waitUntil(() => !!findAction(), 'action was not rendered');
+
+		const popover = element.shadowRoot!.querySelector<HTMLElement>('#property-action-popover')!;
+		element.shadowRoot!.querySelector<HTMLElement>('#popover-trigger')!.click();
+		await waitUntil(() => popover.matches(':popover-open'), 'menu did not open');
+
+		findAction()!.click();
+
+		await waitUntil(() => !popover.matches(':popover-open'), 'menu is still open after the action was clicked');
 	});
 });
