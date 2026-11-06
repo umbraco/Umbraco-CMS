@@ -1,4 +1,4 @@
-import type { UmbAuthContext } from '../auth.context.js';
+import type { UmbAuthContext, UmbAuthSession } from '../auth.context.js';
 import { UMB_MODAL_AUTH_TIMEOUT } from '../modals/umb-auth-timeout-modal.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
@@ -11,6 +11,9 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
  */
 const EXPIRY_SAFETY_MARGIN_IN_SECONDS = 5;
 
+/** Delay (in seconds) before a keep-alive refresh that failed transiently (network error, 5xx) is retried. */
+const KEEP_ALIVE_RETRY_IN_SECONDS = 10;
+
 /** Maximum delay (in ms) that setTimeout supports (2^31 - 1). Larger delays fire immediately in browsers. */
 const MAX_TIMEOUT_MS = 2_147_483_647;
 
@@ -18,6 +21,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	#host: UmbAuthContext;
 	#timeoutId?: ReturnType<typeof setTimeout>;
 	#scheduledExpiresAt?: number;
+	#session?: UmbAuthSession;
 
 	constructor(host: UmbAuthContext) {
 		super(host, 'UmbAuthSessionTimeoutController');
@@ -30,6 +34,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			host.session$,
 			(session) => {
 				this.#clearScheduledCheck();
+				this.#session = session;
 
 				if (session) {
 					// Session refreshed — close any open timeout modal and schedule next check.
@@ -123,7 +128,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 		if (this.#host.keepUserLoggedIn) {
 			console.log('[Auth] Session expiring, auto-refreshing (keepUserLoggedIn=true)');
-			await this.#tryValidateToken();
+			await this.#keepAlive();
 			return;
 		}
 
@@ -140,6 +145,35 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 		// Show timeout modal
 		await this.#openTimeoutModal(secondsRemaining);
+	}
+
+	/**
+	 * Refreshes the session ahead of expiry when the user is kept logged in.
+	 * A definitive rejection has already ended the session in the auth context. A transient
+	 * failure (network error, 5xx) leaves the session in place and retries, so the user is
+	 * only timed out once the session itself has expired.
+	 */
+	async #keepAlive() {
+		const refreshed = await this.#host.validateToken().catch((error) => {
+			console.error('[Auth] Error validating token:', error);
+			return false;
+		});
+		const session = this.#session;
+		if (refreshed || !session) return;
+
+		const secondsRemaining = session.expiresAt - Math.floor(Date.now() / 1000) - EXPIRY_SAFETY_MARGIN_IN_SECONDS;
+		if (secondsRemaining <= 0) {
+			console.log('[Auth] Session fully expired');
+			this.#host.timeOut();
+			return;
+		}
+
+		console.log(`[Auth] Keep-alive refresh failed, retrying in ${KEEP_ALIVE_RETRY_IN_SECONDS}s`);
+		this.#clearScheduledCheck();
+		this.#timeoutId = setTimeout(
+			() => this.#keepAlive(),
+			Math.min(KEEP_ALIVE_RETRY_IN_SECONDS, secondsRemaining) * 1000,
+		);
 	}
 
 	async #closeTimeoutModal() {

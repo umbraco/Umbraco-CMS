@@ -52,6 +52,7 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 								(item) => item.alias,
 								(item) => html`
 									<umb-ref-item
+										max-detail-lines="2"
 										name=${ifDefined(item.meta.label)}
 										detail=${ifDefined(item.meta.description)}
 										icon=${ifDefined(item.meta.icon)}

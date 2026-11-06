@@ -3,12 +3,14 @@ import { umbMockDbRegistry } from '../mock-db-registry.js';
 
 export abstract class UmbMockDBBase<T> {
 	protected data: Array<T> = [];
+	protected readonly dataKey: keyof UmbMockDataSet;
 
 	/**
 	 * @param dataKey - The key in UmbMockDataSet this DB corresponds to (used for auto-registration)
 	 * @param data - Initial data array
 	 */
 	constructor(dataKey: keyof UmbMockDataSet, data: Array<T>) {
+		this.dataKey = dataKey;
 		this.data = structuredClone(data);
 		// Auto-register with the registry
 		umbMockDbRegistry.register(dataKey, this);

@@ -1,9 +1,11 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -14,6 +16,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
 {
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
+
+    private IUserService UserService => GetRequiredService<IUserService>();
+
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    private IContentService ContentService => GetRequiredService<IContentService>();
+
+    private IMediaService MediaService => GetRequiredService<IMediaService>();
 
     [Test]
     public async Task Can_Create_User_Group()
@@ -278,4 +288,155 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
         Assert.AreEqual(result.Result,UserGroupOperationStatus.Success);
     }
+
+    [Test]
+    public async Task Cannot_Create_User_Group_With_Root_Content_Start_Node_Without_Root_Access()
+    {
+        StartNodeScenario scenario = await CreateStartNodeScenarioAsync();
+
+        var result = await UserGroupService.CreateAsync(
+            BuildUserGroup(startContentId: Constants.System.Root),
+            scenario.RestrictedUser.Key);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.Unauthorized, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Create_User_Group_With_Root_Media_Start_Node_Without_Root_Access()
+    {
+        StartNodeScenario scenario = await CreateStartNodeScenarioAsync();
+
+        var result = await UserGroupService.CreateAsync(
+            BuildUserGroup(startMediaId: Constants.System.Root),
+            scenario.RestrictedUser.Key);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.Unauthorized, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Create_User_Group_With_Start_Nodes_Within_Own_Start_Nodes()
+    {
+        StartNodeScenario scenario = await CreateStartNodeScenarioAsync();
+
+        var result = await UserGroupService.CreateAsync(
+            BuildUserGroup(startContentId: scenario.AllowedContentChild.Id, startMediaId: scenario.AllowedMediaChild.Id),
+            scenario.RestrictedUser.Key);
+
+        Assert.IsTrue(result.Success, $"Could not create the user group: {result.Status}");
+    }
+
+    [Test]
+    public async Task Cannot_Update_Own_User_Group_To_Root_Content_Start_Node_Without_Root_Access()
+    {
+        StartNodeScenario scenario = await CreateStartNodeScenarioAsync();
+        var userGroup = await UserGroupService.GetAsync(scenario.RestrictedUserGroup.Key);
+        var originalStartContentId = userGroup!.StartContentId;
+        userGroup.StartContentId = Constants.System.Root;
+
+        var result = await UserGroupService.UpdateAsync(userGroup, scenario.RestrictedUser.Key);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.Unauthorized, result.Status);
+        Assert.AreEqual(originalStartContentId, (await UserGroupService.GetAsync(userGroup.Key))!.StartContentId);
+    }
+
+    [Test]
+    public async Task Cannot_Update_Own_User_Group_To_Root_Media_Start_Node_Without_Root_Access()
+    {
+        StartNodeScenario scenario = await CreateStartNodeScenarioAsync();
+        var userGroup = await UserGroupService.GetAsync(scenario.RestrictedUserGroup.Key);
+        var originalStartMediaId = userGroup!.StartMediaId;
+        userGroup.StartMediaId = Constants.System.Root;
+
+        var result = await UserGroupService.UpdateAsync(userGroup, scenario.RestrictedUser.Key);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.Unauthorized, result.Status);
+        Assert.AreEqual(originalStartMediaId, (await UserGroupService.GetAsync(userGroup.Key))!.StartMediaId);
+    }
+
+    [Test]
+    public async Task Can_Update_User_Group_With_Unchanged_Root_Start_Nodes_Without_Root_Access()
+    {
+        StartNodeScenario scenario = await CreateStartNodeScenarioAsync();
+        var rootAccessUserGroup = new UserGroupBuilder()
+            .WithAlias("rootAccess")
+            .WithName("Root Access")
+            .WithAllowedSections([Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Users])
+            .WithStartContentId(Constants.System.Root)
+            .WithStartMediaId(Constants.System.Root)
+            .Build();
+        var createResult = await UserGroupService.CreateAsync(rootAccessUserGroup, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success, $"Could not create the user group: {createResult.Status}");
+
+        var narrowedMember = UserService.CreateUserWithIdentity("narrowed", "narrowed@umbraco.com");
+        narrowedMember.AddGroup(createResult.Result.ToReadOnlyGroup());
+        narrowedMember.StartContentIds = [scenario.AllowedContentChild.Id];
+        narrowedMember.StartMediaIds = [scenario.AllowedMediaChild.Id];
+        UserService.Save(narrowedMember);
+
+        var userGroup = await UserGroupService.GetAsync(createResult.Result.Key);
+        userGroup!.Description = "Updated description";
+
+        var result = await UserGroupService.UpdateAsync(userGroup, narrowedMember.Key);
+
+        Assert.IsTrue(result.Success, $"Could not update the user group: {result.Status}");
+        Assert.AreEqual("Updated description", (await UserGroupService.GetAsync(userGroup.Key))!.Description);
+    }
+
+    private async Task<StartNodeScenario> CreateStartNodeScenarioAsync()
+    {
+        var contentType = ContentTypeBuilder.CreateSimpleContentType();
+        contentType.AllowedTemplates = null;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var allowedContent = ContentBuilder.CreateSimpleContent(contentType, "allowed");
+        ContentService.Save(allowedContent);
+        var allowedContentChild = ContentBuilder.CreateSimpleContent(contentType, "allowed child", allowedContent.Id);
+        ContentService.Save(allowedContentChild);
+
+        var allowedMedia = MediaService.CreateMedia("allowed", Constants.System.Root, Constants.Conventions.MediaTypes.Folder);
+        MediaService.Save(allowedMedia);
+        var allowedMediaChild = MediaService.CreateMedia("allowed child", allowedMedia.Id, Constants.Conventions.MediaTypes.Folder);
+        MediaService.Save(allowedMediaChild);
+
+        var userGroup = new UserGroupBuilder()
+            .WithAlias("restricted")
+            .WithName("Restricted")
+            .WithAllowedSections([Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Users])
+            .WithStartContentId(allowedContent.Id)
+            .WithStartMediaId(allowedMedia.Id)
+            .Build();
+        var userGroupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+        Assert.IsTrue(userGroupResult.Success, $"Could not create the user group: {userGroupResult.Status}");
+
+        var user = UserService.CreateUserWithIdentity("restricted", "restricted@umbraco.com");
+        user.AddGroup(userGroupResult.Result.ToReadOnlyGroup());
+        UserService.Save(user);
+
+        return new StartNodeScenario(userGroupResult.Result, user, allowedContentChild, allowedMediaChild);
+    }
+
+    private IUserGroup BuildUserGroup(int? startContentId = null, int? startMediaId = null)
+    {
+        var alias = $"group{Guid.NewGuid():N}";
+        IUserGroup userGroup = new UserGroupBuilder()
+            .WithAlias(alias)
+            .WithName(alias)
+            .WithAllowedSections([Constants.Applications.Content])
+            .Build();
+
+        userGroup.StartContentId = startContentId;
+        userGroup.StartMediaId = startMediaId;
+
+        return userGroup;
+    }
+
+    private sealed record StartNodeScenario(
+        IUserGroup RestrictedUserGroup,
+        IUser RestrictedUser,
+        IContent AllowedContentChild,
+        IMedia AllowedMediaChild);
 }

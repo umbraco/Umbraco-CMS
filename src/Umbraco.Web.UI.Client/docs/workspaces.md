@@ -384,6 +384,8 @@ Files: `src/packages/core/workspace/conditions/`
 
 Every routable workspace exposes a typed context token so views, actions, and workspace context extensions can consume it with type safety. The token uses `UmbContextToken` with two generics: the base interface (`UmbSubmittableWorkspaceContext`) and the concrete context class. The context string is always `'UmbWorkspaceContext'`, and a discriminator function checks `getEntityType()` to find the right workspace context in the DOM tree.
 
+Workspace tokens share that alias and resolve to the same instance; consume once with the most specific one ([Context API](./context-api.md#one-instance-many-tokens)).
+
 Re-export the token from `constants.ts` for the public API. Default workspaces don't need a custom context token — they use `UMB_WORKSPACE_CONTEXT` from core.
 
 ---

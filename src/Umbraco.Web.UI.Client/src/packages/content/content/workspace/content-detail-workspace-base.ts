@@ -11,6 +11,7 @@ import type { UmbContentWorkspaceContext } from './content-workspace-context.int
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
 import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
+import { UmbContentTypeVarianceChangeRedirectController } from './content-type-variance-change-redirect.controller.js';
 import { mergeObservables, observeMultiple, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -158,6 +159,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	/* Split View */
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
+	/**
+	 * Keeps the workspace on an existing variant when the content type's variance is changed from within the workspace.
+	 * @internal
+	 */
+	readonly contentTypeVarianceChangeRedirect: UmbContentTypeVarianceChangeRedirectController;
+
 	readonly collection: UmbContentCollectionManager;
 
 	readonly #collectionConfiguration = new UmbContentCollectionConfigurationContext(this);
@@ -254,6 +261,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		new UmbContentDetailWorkspaceTypeTransformController(this as any, this._data);
+		this.contentTypeVarianceChangeRedirect = new UmbContentTypeVarianceChangeRedirectController(this);
 
 		this.variantOptions = mergeObservables(
 			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments.asObservable()],
@@ -904,10 +912,23 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
 		if (variantsWithoutAName.length > 0) {
 			variantsWithoutAName.forEach((variant) => {
+				const variantId = UmbVariantId.Create(variant);
+				const key = 'umbMissingVariantName_' + variantId.toString();
+				// 'client' messages are owned by the form control, so this check owns its message and removes it once a name is set.
 				this.validationContext.messages.addMessage(
-					'client',
+					'custom',
 					`$.variants[${UmbDataPathVariantQuery(variant)}].name`,
 					UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+					key,
+				);
+				this.observe(
+					this.name(variantId),
+					(name) => {
+						if (!name) return;
+						this.validationContext.messages.removeMessageByKey(key);
+						this.removeUmbControllerByAlias(key);
+					},
+					key,
 				);
 			});
 			throw new Error(
