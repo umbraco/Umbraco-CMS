@@ -38,6 +38,11 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
     private readonly IConvertedPublishedContentCache<Guid> _publishedContentCache;
 
+    private readonly MediaSourceReader _readMediaSourceAsync;
+    private readonly MediaSourceReader _readMediaSource;
+    private readonly MediaSourcesReader _readMediaSourcesAsync;
+    private readonly MediaSourcesReader _readMediaSources;
+
     // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
     // GetNodeAsync captures it before reading the backing store and re-checks it before writing
     // back, so a snapshot read before a concurrent refresh is never written over the refreshed
@@ -114,7 +119,18 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
         _publishedContentCache = cacheFactory.Create<Guid>(_cacheSettings.Entry.Media.MaximumLocalCacheItems, CacheName);
+
+        _readMediaSourceAsync = _databaseCacheRepository.GetMediaSourceAsync;
+        _readMediaSource = key => Task.FromResult(_databaseCacheRepository.GetMediaSource(key));
+        _readMediaSourcesAsync = _databaseCacheRepository.GetMediaSourcesAsync;
+        _readMediaSources = keys => Task.FromResult(_databaseCacheRepository.GetMediaSources(keys));
     }
+
+    // Reads media sources from the database. The synchronous members pass readers that read synchronously and
+    // return completed tasks, so the shared read logic only awaits what HybridCache itself has to wait for.
+    private delegate Task<ContentCacheNode?> MediaSourceReader(Guid key);
+
+    private delegate Task<IEnumerable<ContentCacheNode>> MediaSourcesReader(IEnumerable<Guid> keys);
 
     /// <inheritdoc />
     public string CacheName => "Published media (converted, L0)";
@@ -125,8 +141,19 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     /// <inheritdoc />
     public long? GetApproximateBytes() => _publishedContentCache.ApproximateSizeInBytes;
 
+    // The synchronous members return an L0 hit directly, and otherwise run the same read logic as the asynchronous
+    // ones with a synchronous database reader. The returned task has then already completed, unless HybridCache
+    // itself had to wait (an L2 round trip, or a concurrent read of the same key), so synchronous callers do not
+    // block on asynchronous I/O.
+
     /// <inheritdoc />
-    public Task<IPublishedContent?> GetByKeyAsync(Guid key) => GetNodeAsync(key);
+    public Task<IPublishedContent?> GetByKeyAsync(Guid key) => GetNodeAsync(key, _readMediaSourceAsync);
+
+    /// <inheritdoc />
+    public IPublishedContent? GetByKey(Guid key)
+        => TryGetCached(key, out IPublishedContent? cached)
+            ? cached
+            : GetNodeAsync(key, _readMediaSource).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     public async Task<IPublishedContent?> GetByIdAsync(int id)
@@ -137,13 +164,30 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
             return null;
         }
 
-        Guid key = keyAttempt.Result;
-
-        return await GetNodeAsync(key);
+        return await GetNodeAsync(keyAttempt.Result, _readMediaSourceAsync);
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys)
+    public IPublishedContent? GetById(int id)
+    {
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
+        if (keyAttempt.Success is false)
+        {
+            return null;
+        }
+
+        return GetByKey(keyAttempt.Result);
+    }
+
+    /// <inheritdoc />
+    public Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys)
+        => GetByKeysCoreAsync(keys, _readMediaSourcesAsync);
+
+    /// <inheritdoc />
+    public IReadOnlyList<IPublishedContent> GetByKeys(IReadOnlyCollection<Guid> keys)
+        => GetByKeysCoreAsync(keys, _readMediaSources).GetAwaiter().GetResult();
+
+    private async Task<IReadOnlyList<IPublishedContent>> GetByKeysCoreAsync(IReadOnlyCollection<Guid> keys, MediaSourcesReader readMediaSources)
     {
         // Capture the generation once before any backing-store read so a concurrent refresh landing
         // mid-fetch makes us skip the write-back rather than clobber fresher entries — applied once
@@ -163,7 +207,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
         if (pending.Count > 0)
         {
-            await ReadFromDatabaseAsync(pending, generation, resolved);
+            await ReadFromDatabaseAsync(pending, generation, resolved, readMediaSources);
         }
 
         // Return in input order; keys that resolved to nothing (missing) are omitted. A key repeated in
@@ -247,12 +291,12 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
     // The single batched database read for whatever L0 and L1/L2 missed. Once resolved, a
     // database-read node is promoted into L1 — an L1/L2 hit is already there.
-    private async Task ReadFromDatabaseAsync(List<Guid> keys, long generation, Dictionary<Guid, IPublishedContent> resolved)
+    private async Task ReadFromDatabaseAsync(List<Guid> keys, long generation, Dictionary<Guid, IPublishedContent> resolved, MediaSourcesReader readMediaSources)
     {
         IReadOnlyCollection<ContentCacheNode> coldNodes;
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            coldNodes = (await _databaseCacheRepository.GetMediaSourcesAsync(keys)).ToArray();
+            coldNodes = (await readMediaSources(keys)).ToArray();
             scope.Complete();
         }
 
@@ -305,7 +349,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         return false;
     }
 
-    private async Task<IPublishedContent?> GetNodeAsync(Guid key)
+    private async Task<IPublishedContent?> GetNodeAsync(Guid key, MediaSourceReader readMediaSource)
     {
         if (_publishedContentCache.TryGet(key, out IPublishedContent? cached))
         {
@@ -369,7 +413,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
         {
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
-            ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
+            ContentCacheNode? mediaCacheNode = await readMediaSource(key);
             scope.Complete();
             return mediaCacheNode;
         }
