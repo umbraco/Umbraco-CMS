@@ -1,4 +1,4 @@
-import { property, nothing, ifDefined, html, css } from '@umbraco-cms/backoffice/external/lit';
+import { property, state, nothing, ifDefined, html, css } from '@umbraco-cms/backoffice/external/lit';
 import { defineElement, UUICardElement } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -26,6 +26,9 @@ export class UmbFigureCardElement extends UUICardElement {
 	 */
 	@property({ type: String })
 	description?: string;
+
+	@state()
+	private _hasSlottedDescription = false;
 
 	@property({ type: String, attribute: 'background-color' })
 	public get backgroundColor(): string | undefined {
@@ -89,9 +92,13 @@ export class UmbFigureCardElement extends UUICardElement {
           ${this.#renderChildrenIndicator()}
           <span title="${this.name}" id="name">${this.name}</span>
         </span>
-        <small title="${ifDefined(this.description)}">${this.description}<slot name="description"></slot></small>
+        <small title="${ifDefined(this.description)}" ?hidden=${!this.description && !this._hasSlottedDescription}>${this.description}<slot name="description" @slotchange=${this.#onDescriptionSlotChange}></slot></small>
       </div></div>
     `;
+	}
+
+	#onDescriptionSlotChange(event: Event) {
+		this._hasSlottedDescription = (event.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
 	}
 
 	#renderChildrenIndicator() {
@@ -207,6 +214,10 @@ export class UmbFigureCardElement extends UUICardElement {
 				-webkit-line-clamp: 4;
 				font-size: var(--uui-type-small-size);
 				margin-top: var(--uui-size-space-1);
+			}
+
+			#open-part small[hidden] {
+				display: none;
 			}
 
 			#name-part {
