@@ -30,11 +30,12 @@ export class MockSetHeaderAppElement extends UmbLitElement {
 				<umb-popover-layout>
 					<div class="mock-set-list">
 						${umbMockManager.availableSets.map(
-							({ alias, label }) => html`
+							({ alias, label, icon }) => html`
 								<uui-menu-item
 									label=${label}
 									?active=${alias === this._currentSet}
 									@click=${() => this.#onSetSelected(alias)}>
+									${icon ? html`<umb-icon slot="icon" name=${icon}></umb-icon>` : nothing}
 								</uui-menu-item>
 							`,
 						)}

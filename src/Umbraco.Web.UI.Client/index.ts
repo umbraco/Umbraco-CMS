@@ -1,6 +1,15 @@
+import { manifests as mockSetManifests } from './mocks/data/sets/manifests.js';
+import { getSelectedExampleNames } from './mocks/examples.js';
 import { startMockServiceWorker } from './mocks/index.js';
 import { UmbAppElement } from '@umbraco-cms/backoffice/app';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+
+function getExamplePaths(mockSet?: string): Array<string> {
+	const mockSetExamples = mockSetManifests.find((manifest) => manifest.alias === mockSet)?.examples ?? [];
+	const names = [...getSelectedExampleNames(), ...mockSetExamples];
+	const paths = [import.meta.env.VITE_EXAMPLE_PATH, ...names.map((name) => `examples/${name}`)];
+	return [...new Set(paths.filter(Boolean))];
+}
 
 /**
  *
@@ -9,10 +18,11 @@ async function bootstrap() {
 	const appElement = new UmbAppElement();
 	appElement.backofficePath = '/';
 
+	let mockSet: string | undefined;
 	if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
 		appElement.bypassAuth = true;
 
-		const mockSet = localStorage.getItem('umb:mockSet') || import.meta.env.VITE_MOCK_SET || 'default';
+		mockSet = localStorage.getItem('umb:mockSet') || import.meta.env.VITE_MOCK_SET || 'default';
 		await startMockServiceWorker({
 			mockSet,
 			useCustomServiceWorker: true,
@@ -31,8 +41,10 @@ async function bootstrap() {
 	document.body.append(appElement);
 
 	// Example injector:
-	if (import.meta.env.VITE_EXAMPLE_PATH) {
-		import(/* @vite-ignore */ './' + import.meta.env.VITE_EXAMPLE_PATH + '/index.ts').then((js) => {
+	const examplePaths = getExamplePaths(mockSet);
+	Promise.allSettled(
+		examplePaths.map(async (path) => {
+			const js = await import(/* @vite-ignore */ './' + path + '/index.ts');
 			if (js) {
 				Object.keys(js).forEach((key) => {
 					const value = js[key];
@@ -44,8 +56,14 @@ async function bootstrap() {
 					}
 				});
 			}
+		}),
+	).then((results) => {
+		results.forEach((result, index) => {
+			if (result.status === 'rejected') {
+				console.warn(`Example "${examplePaths[index]}" failed to load`, result.reason);
+			}
 		});
-	}
+	});
 	//#endregion
 }
 
