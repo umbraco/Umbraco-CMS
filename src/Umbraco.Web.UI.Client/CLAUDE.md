@@ -18,6 +18,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 - **[Package Development](./docs/package-development.md)** - Package & module structure, folder structure conventions, localization, organizational rules
 - **[Value Type](./docs/value-type.md)** - Compile-time type map (`UmbValueTypeMap`); declaring typed value type constants via declaration merging
 - **[Value Summary](./docs/value-summary.md)** - `valueSummary` extension type; rendering compact values in collection views, batch resolver pattern, coordinator
+- **[Clipboard](./docs/clipboard.md)** - Copy/paste between property editors; entry value types as interop formats, copy/paste value translators, where clipboard work belongs
 
 ### Development
 
@@ -59,6 +60,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 | Scaffold a new package or module                        | [docs/package-development.md](./docs/package-development.md)                                                                   |
 | Consume or provide a context, or create a context token | [docs/context-api.md](./docs/context-api.md) — tokens can share an alias; consume the most specific one once                   |
 | Write or change observers / `Umb*State` usage           | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards            |
+| Add clipboard copy/paste to a property editor           | [docs/clipboard.md](./docs/clipboard.md) — then use the `general-add-clipboard-support` skill                                  |
 | Add, rename, or remove a key in `src/assets/lang/en.ts` | [docs/package-development.md](./docs/package-development.md#type-safe-localization-keys)                                       |
 
 This is not optional. Skipping these leads to convention violations that are caught in review.
