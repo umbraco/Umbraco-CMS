@@ -205,7 +205,7 @@ export class UmbFigureCardElement extends UUICardElement {
 			#open-part #name,
 			#open-part small {
 				display: -webkit-box;
-				-webkit-line-clamp: 1;
+				-webkit-line-clamp: 2;
 				-webkit-box-orient: vertical;
 				overflow: hidden;
 				text-overflow: ellipsis;
