@@ -97,6 +97,7 @@ import type {
 	// Tracked Reference
 	IReferenceResponseModelDefaultReferenceResponseModel,
 	IReferenceResponseModelDocumentReferenceResponseModel,
+	IReferenceResponseModelElementReferenceResponseModel,
 	IReferenceResponseModelMediaReferenceResponseModel,
 	IReferenceResponseModelMemberReferenceResponseModel,
 	// News
@@ -142,6 +143,8 @@ export type UmbMockElementModel = Omit<ElementResponseModel, 'documentType'> &
 		createDate: string;
 		documentType: DocumentTypeReferenceResponseModel | null;
 		variants: Array<ElementVariantResponseModel>;
+		/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
+		originalParent?: { id: string } | null;
 	};
 
 export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseModel;
@@ -202,6 +205,7 @@ export type UmbMockAuditLogModel = AuditLogResponseModel;
 export type UmbMockTrackedReferenceItemModel =
 	| IReferenceResponseModelDefaultReferenceResponseModel
 	| IReferenceResponseModelDocumentReferenceResponseModel
+	| IReferenceResponseModelElementReferenceResponseModel
 	| IReferenceResponseModelMediaReferenceResponseModel
 	| IReferenceResponseModelMemberReferenceResponseModel;
 
@@ -276,6 +280,8 @@ export interface UmbMockDataSet {
 
 	// Tracked references
 	trackedReferenceItems?: Array<UmbMockTrackedReferenceItemModel>;
+	/** The items referencing each target, keyed by the target's id. When set, the reference endpoints use it instead of `trackedReferenceItems`. */
+	referencedBy?: Record<string, Array<UmbMockTrackedReferenceItemModel>>;
 
 	// News
 	news?: Array<NewsDashboardItemResponseModel>;

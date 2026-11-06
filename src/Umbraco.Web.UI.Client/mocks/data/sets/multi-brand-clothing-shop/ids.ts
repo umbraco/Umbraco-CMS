@@ -12,6 +12,7 @@ const NAMESPACE = {
 	block: 9,
 	area: 10,
 	pickerItem: 11,
+	element: 13,
 } as const;
 
 type UmbMbcsNamespace = keyof typeof NAMESPACE;
@@ -57,6 +58,10 @@ export const DATA_TYPE_IDS = {
 	productDocumentCategory: mbcsId('dataType', 27),
 	integer: mbcsId('dataType', 28),
 	productDocumentLanguages: mbcsId('dataType', 29),
+	promotionsPicker: mbcsId('dataType', 30),
+	sizeGuidePicker: mbcsId('dataType', 31),
+	/** The Collection Data Type that the media root collection view is hardcoded to use. */
+	mediaCollection: '3a0156c4-3b8c-4803-bdc1-6871faa83fff',
 } as const;
 
 export const DOCUMENT_TYPE_IDS = {
@@ -81,6 +86,31 @@ export const DOCUMENT_TYPE_IDS = {
 	textBlock: mbcsId('documentType', 14),
 	productTeaserBlock: mbcsId('documentType', 15),
 	articleTeaserBlock: mbcsId('documentType', 16),
+	promoBanner: mbcsId('documentType', 22),
+	sizeGuide: mbcsId('documentType', 23),
+} as const;
+
+export const ELEMENT_FOLDER_IDS = {
+	shared: mbcsId('element', 1),
+	littleOnes: mbcsId('element', 2),
+	littleOnesPromotions: mbcsId('element', 3),
+	littleOnesHeroes: mbcsId('element', 4),
+	outdoorShop: mbcsId('element', 5),
+	outdoorShopPromotions: mbcsId('element', 6),
+	outdoorShopHeroes: mbcsId('element', 7),
+} as const;
+
+export const ELEMENT_IDS = {
+	sizeGuideKids: mbcsId('element', 101),
+	sizeGuideOutdoor: mbcsId('element', 102),
+	deliveryAndReturns: mbcsId('element', 103),
+	backToSchool: mbcsId('element', 111),
+	winterSale: mbcsId('element', 112),
+	littleOnesHero: mbcsId('element', 113),
+	summerClearance: mbcsId('element', 114),
+	freeDeliveryWeekend: mbcsId('element', 121),
+	springTrailKit: mbcsId('element', 122),
+	outdoorShopHero: mbcsId('element', 123),
 } as const;
 
 export const MEDIA_TYPE_IDS = {
