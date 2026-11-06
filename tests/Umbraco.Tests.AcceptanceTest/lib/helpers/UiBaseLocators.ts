@@ -883,12 +883,17 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isWorkspaceOpenForEntity(entityType: string, unique?: string) {
-    const path = unique ? `/workspace/${entityType}/edit/${unique}` : `/workspace/${entityType}(/|$)`;
+    const entityTypePattern = this.escapeForRegExp(entityType);
+    const path = unique ? `/workspace/${entityTypePattern}/edit/${this.escapeForRegExp(unique)}` : `/workspace/${entityTypePattern}(/|$)`;
     await expect(this.page).toHaveURL(new RegExp(path), {timeout: ConstantHelper.timeout.long});
   }
 
   async isSectionOpenWithoutWorkspace(sectionPathname: string) {
-    await expect(this.page).toHaveURL(new RegExp(`/section/${sectionPathname}(?!.*/workspace/)`), {timeout: ConstantHelper.timeout.long});
+    await expect(this.page).toHaveURL(new RegExp(`/section/${this.escapeForRegExp(sectionPathname)}(?!.*/workspace/)`), {timeout: ConstantHelper.timeout.long});
+  }
+
+  private escapeForRegExp(value: string) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   async clickLeftArrowButton() {
