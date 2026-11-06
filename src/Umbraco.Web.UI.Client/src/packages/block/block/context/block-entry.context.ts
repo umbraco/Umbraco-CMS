@@ -260,9 +260,20 @@ export abstract class UmbBlockEntryContext<
 		});
 	}
 
+	// The entry variant follows the content type; settings may vary differently, so limit it by the given element type as well.
+	#variantIdOf(structure: UmbContentTypeStructureManager) {
+		return mergeObservables(
+			[this._variantId, structure.variesByCulture, structure.variesBySegment],
+			([variantId, variesByCulture, variesBySegment]) =>
+				variantId && variesByCulture !== undefined && variesBySegment !== undefined
+					? variantId.toVariant(variesByCulture, variesBySegment)
+					: undefined,
+		);
+	}
+
 	async propertyVariantId(structure: UmbContentTypeStructureManager, propertyAlias: string) {
 		return mergeObservables(
-			[await structure.propertyStructureByAlias(propertyAlias), this._variantId],
+			[await structure.propertyStructureByAlias(propertyAlias), this.#variantIdOf(structure)],
 			([property, variantId]) =>
 				property && variantId ? this.#createPropertyVariantId(property, variantId) : undefined,
 		);
@@ -347,7 +358,11 @@ export abstract class UmbBlockEntryContext<
 		await this.#settingsStructurePromise;
 		if (!this.#settingsValuesObservable) {
 			this.#settingsValuesObservable = mergeObservables(
-				[this._settingsValueArray, this.#settingsStructure!.contentTypeProperties, this._variantId],
+				[
+					this._settingsValueArray,
+					this.#settingsStructure!.contentTypeProperties,
+					this.#variantIdOf(this.#settingsStructure!),
+				],
 				this.#propertyValuesToObjectCallback,
 			);
 		}

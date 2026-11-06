@@ -12,9 +12,10 @@ import {
 	classEqualMemoization,
 	createObservablePart,
 	mergeObservables,
+	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantContext, UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 type UmbPropertyVariantIdMapType = Array<{ alias: string; variantId: UmbVariantId }>;
@@ -84,9 +85,18 @@ export abstract class UmbElementPropertyDatasetContext<
 
 		// TODO: Refactor this into a separate manager/controller of some sort? [NL]
 		this.observe(
-			this._dataOwner.structure.contentTypeProperties,
-			(props: UmbPropertyTypeModel[]) => {
-				const map = props.map((prop) => ({ alias: prop.alias, variantId: this.#createPropertyVariantId(prop) }));
+			observeMultiple([
+				this._dataOwner.structure.contentTypeProperties,
+				this._dataOwner.structure.variesByCulture,
+				this._dataOwner.structure.variesBySegment,
+			]),
+			([props, variesByCulture, variesBySegment]) => {
+				// A property cannot vary further than the content type that owns it, even when composed from one that varies.
+				const ownerVariantId = this.#variantId.toVariant(variesByCulture, variesBySegment);
+				const map = props.map((prop) => ({
+					alias: prop.alias,
+					variantId: ownerVariantId.toVariant(prop.variesByCulture, prop.variesBySegment),
+				}));
 				this.#propertyVariantIdMap.setValue(map);
 				// Resolve promise, to let the once waiting on this know.
 				if (this.#propertyVariantIdPromiseResolver) {
@@ -97,13 +107,6 @@ export abstract class UmbElementPropertyDatasetContext<
 			},
 			null,
 		);
-	}
-
-	#createPropertyVariantId(property: UmbPropertyTypeModel) {
-		return UmbVariantId.Create({
-			culture: property.variesByCulture ? this.#variantId.culture : null,
-			segment: property.variesBySegment ? this.#variantId.segment : null,
-		});
 	}
 
 	#propertiesObservable?: Observable<ContentModel['values']>;
