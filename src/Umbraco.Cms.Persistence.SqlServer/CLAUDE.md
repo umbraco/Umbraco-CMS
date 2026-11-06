@@ -136,7 +136,7 @@ Detects transient Azure SQL errors for retry:
 SQL Server version detection and syntax generation:
 
 - **Engine editions**: Desktop, Standard, Enterprise, Express, Azure (lines 23-31)
-- **SQL Server versions**: V7 through V2019, plus Azure (lines 33-47)
+- **SQL Server versions**: V7 through V2025, plus Azure (lines 33-47)
 - **Default isolation**: `ReadCommitted` (line 69)
 - **Azure detection**: `ServerVersion?.IsAzure` determines `DbProvider` (line 67)
 - **Version detection**: Populated via `GetDbProviderManifest()` by querying SQL Server metadata
