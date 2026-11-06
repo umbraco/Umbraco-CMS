@@ -74,6 +74,17 @@ export default {
 		wasDeleted: 'ble slettet',
 		wasMovedTo: 'ble flyttet til',
 	},
+	actionGroups: {
+		clipboard: 'Utklippstavle',
+		create: 'Opprett',
+		edit: 'Rediger',
+		importExport: 'Import og eksport',
+		notifications: 'Varslinger',
+		other: 'Annet',
+		publishing: 'Publisering',
+		routing: 'Ruting',
+		structure: 'Struktur',
+	},
 	assignDomain: {
 		permissionDenied: 'Ingen tilgang.',
 		addNew: 'Legg til domene',

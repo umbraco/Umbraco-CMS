@@ -46,7 +46,7 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
             factory.GetRequiredService<IMachineInfoFactory>()));
         builder.AddNotificationHandler<UmbracoApplicationStartingNotification, DatabaseServerMessengerNotificationHandler>();
-        builder.AddNotificationAsyncHandler<UmbracoRequestEndNotification, DatabaseServerMessengerNotificationHandler>();
+        builder.AddNotificationHandler<UmbracoRequestEndNotification, DatabaseServerMessengerNotificationHandler>();
         return builder;
     }
 

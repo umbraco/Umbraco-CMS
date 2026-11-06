@@ -33,7 +33,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.User.Enable',
 		separatorBefore: true,
 		name: 'Enable User Entity Action',
-		weight: 800,
+		weight: 700,
 		api: () => import('./enable/enable-user.action.js'),
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
