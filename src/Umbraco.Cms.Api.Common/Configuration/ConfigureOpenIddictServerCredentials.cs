@@ -174,7 +174,7 @@ internal sealed class ConfigureOpenIddictServerCredentials : IConfigureOptions<O
             {
                 _logger.LogWarning(
                     ex,
-                    "The persisted OpenIddict server credentials could not be read, so new ones will be created. In a load balanced setup, all servers must share the same Data Protection key ring and application name.");
+                    "The persisted OpenIddict server credentials could not be decrypted, so new ones will be created. This happens when the Data Protection key ring or application name has changed since they were stored. In a load balanced setup, make sure all servers share the same key ring and application name, otherwise they will not use the same credentials.");
             }
 
             return false;
