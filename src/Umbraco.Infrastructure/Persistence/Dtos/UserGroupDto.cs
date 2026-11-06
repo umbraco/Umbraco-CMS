@@ -16,6 +16,8 @@ public class UserGroupDto
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
     public const string KeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameKey;
+    internal const string StartElementIdColumnName = "startElementId";
+    internal const string StartElementIdForeignKeyName = "FK_startElementId_umbracoNode_id";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserGroupDto"/> class with default values.
@@ -131,9 +133,9 @@ public class UserGroupDto
     /// <summary>
     /// Gets or sets the identifier of the element node that defines the starting point for media access for the user group.
     /// </summary>
-    [Column("startElementId")]
+    [Column(StartElementIdColumnName)]
     [NullSetting(NullSetting = NullSettings.Null)]
-    [ForeignKey(typeof(NodeDto), Name = "FK_startElementId_umbracoNode_id")]
+    [ForeignKey(typeof(NodeDto), Name = StartElementIdForeignKeyName)]
     public int? StartElementId { get; set; }
 
     /// <summary>
