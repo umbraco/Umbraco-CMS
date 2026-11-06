@@ -103,7 +103,15 @@ export class UmbFigureCardElement extends UUICardElement {
 		...UUICardElement.styles,
 		css`
 			:host {
+				height: 100%;
+				flex-direction: column;
+				justify-content: flex-start;
 				background-color: var(--uui-color-surface-alt);
+			}
+
+			:host([disabled]) {
+				background: var(--uui-color-disabled);
+				color: var(--uui-color-contrast-disabled);
 			}
 
 			slot[name='tag'] {
@@ -132,12 +140,11 @@ export class UmbFigureCardElement extends UUICardElement {
 			}
 
 			#portrait {
+				flex: none;
 				display: flex;
 				justify-content: center;
-				min-height: 150px;
-				max-height: 150px;
+				height: var(--uui-size-40);
 				width: 100%;
-				margin-bottom: var(--uui-size-layout-2);
 			}
 
 			slot:not([name])::slotted(*) {
@@ -150,20 +157,33 @@ export class UmbFigureCardElement extends UUICardElement {
 			}
 
 			#open-part {
-				position: absolute;
-				z-index: 1;
-				inset: 0;
+				flex: 1 0 auto;
+				display: flex;
 				color: var(--uui-color-interactive);
 				border: none;
 				cursor: pointer;
-				display: flex;
-				flex-direction: column;
-				justify-content: flex-end;
+			}
+
+			/* Stretch the click target over the whole card while the text stays in flow below the portrait. */
+			#open-part::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				inset: 0;
+				border-radius: var(--uui-border-radius-2);
+			}
+
+			#open-part:focus {
+				outline: none;
+			}
+
+			#open-part:focus-visible::after {
+				outline: var(--uui-card-border-width) solid var(--uui-color-focus);
+				outline-offset: var(--uui-card-border-width);
 			}
 
 			:host([disabled]) #open-part {
 				pointer-events: none;
-				background: var(--uui-color-disabled);
 				color: var(--uui-color-contrast-disabled);
 			}
 
@@ -183,6 +203,12 @@ export class UmbFigureCardElement extends UUICardElement {
 				overflow-wrap: anywhere;
 			}
 
+			#open-part small {
+				-webkit-line-clamp: 4;
+				font-size: var(--uui-type-small-size);
+				margin-top: var(--uui-size-space-1);
+			}
+
 			#name-part {
 				display: flex;
 				align-items: center;
@@ -193,64 +219,28 @@ export class UmbFigureCardElement extends UUICardElement {
 				flex: none;
 			}
 
-			:host([image]:not([image=''])) #open-part {
-				transition: opacity 0.5s 0.5s;
-				opacity: 0;
-			}
-
 			#content {
 				position: relative;
+				z-index: 2;
 				display: flex;
 				flex-direction: column;
 				width: 100%;
 				font-family: inherit;
-				font-size: var(--uui-type-small-size);
 				box-sizing: border-box;
 				text-align: left;
 				word-break: break-word;
-				padding-top: var(--uui-size-space-3);
-			}
-
-			#content::before {
-				content: '';
-				position: absolute;
-				inset: 0;
-				z-index: -1;
-				border-top: 1px solid var(--uui-color-divider);
-				border-radius: 0 0 var(--uui-border-radius) var(--uui-border-radius);
-				background-color: var(--uui-color-surface);
-				pointer-events: none;
-				opacity: 0.96;
-			}
-
-			:host(:focus) slot[name='actions'],
-			:host(:focus-within) slot[name='actions'],
-			:host(:hover) slot[name='actions'] {
-				opacity: 1;
-			}
-
-			:host(
-					[image]:not([image='']):hover,
-					[image]:not([image='']):focus,
-					[image]:not([image='']):focus-within,
-					[selected][image]:not([image='']),
-					[error][image]:not([image=''])
-				)
-				#open-part {
-				opacity: 1;
-				transition-duration: 120ms;
-				transition-delay: 0s;
-			}
-
-			:host([selectable]) #open-part {
-				inset: var(--uui-size-space-3) var(--uui-size-space-4);
-			}
-			:host(:not([selectable])) #content {
 				padding: var(--uui-size-space-3) var(--uui-size-space-4);
+				border-top: 1px solid var(--uui-color-divider);
+				border-radius: 0 0 var(--uui-border-radius-2) var(--uui-border-radius-2);
+				background-color: var(--uui-color-surface);
 			}
-			:host([selectable]) #content::before {
-				inset: calc(var(--uui-size-space-3) * -1) calc(var(--uui-size-space-4) * -1);
-				top: 0;
+
+			:host([disabled]) #content {
+				background-color: transparent;
+			}
+
+			:host([selectable]) #open-part::after {
+				inset: var(--uui-size-space-3) var(--uui-size-space-4);
 			}
 		`,
 	];
