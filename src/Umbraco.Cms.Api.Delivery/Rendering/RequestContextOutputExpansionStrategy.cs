@@ -11,6 +11,7 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
     private readonly IApiPropertyRenderer _propertyRenderer;
     private readonly bool _expandAll;
     private readonly string[] _expandAliases;
+    private readonly HashSet<Guid> _mappingElementKeys = new();
 
     private ExpansionState _state;
 
@@ -24,9 +25,24 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
     }
 
     public IDictionary<string, object?> MapElementProperties(IPublishedElement element)
-        => element.Properties.ToDictionary(
-            p => p.Alias,
-            p => GetPropertyValue(p, _state == ExpansionState.Expanding));
+    {
+        if (_mappingElementKeys.Contains(element.Key))
+        {
+            return new Dictionary<string, object?>();
+        }
+
+        _mappingElementKeys.Add(element.Key);
+        try
+        {
+            return element.Properties.ToDictionary(
+                p => p.Alias,
+                p => GetPropertyValue(p, _state == ExpansionState.Expanding));
+        }
+        finally
+        {
+            _mappingElementKeys.Remove(element.Key);
+        }
+    }
 
     public IDictionary<string, object?> MapContentProperties(IPublishedContent content)
         => content.ItemType == PublishedItemType.Content
