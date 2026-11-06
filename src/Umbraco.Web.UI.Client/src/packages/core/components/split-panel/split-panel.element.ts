@@ -103,6 +103,15 @@ export class UmbSplitPanelElement extends UmbLitElement {
 		this.dividerTouchAreaElement.setAttribute('aria-valuetext', ariaText);
 	}
 
+	#isRightToLeft() {
+		return getComputedStyle(this.mainElement).direction === 'rtl';
+	}
+
+	#distanceFromInlineStart(clientX: number) {
+		const { left, right } = this.mainElement.getBoundingClientRect();
+		return this.#isRightToLeft() ? right - clientX : clientX - left;
+	}
+
 	#updateSplit() {
 		// If lock is none
 		let maxStartWidth = this.position;
@@ -128,9 +137,8 @@ export class UmbSplitPanelElement extends UmbLitElement {
 		event.preventDefault();
 
 		const move = (event: PointerEvent) => {
-			const { clientX } = event;
-			const { left, width } = this.mainElement.getBoundingClientRect();
-			const localPos = clamp(clientX - left, 0, width);
+			const { width } = this.mainElement.getBoundingClientRect();
+			const localPos = clamp(this.#distanceFromInlineStart(event.clientX), 0, width);
 			const mappedPos = mapXAxisToSnap(localPos, width);
 
 			this.#lockedPanelWidth = this.lock === 'start' ? mappedPos : width - mappedPos;
@@ -199,8 +207,8 @@ export class UmbSplitPanelElement extends UmbLitElement {
 		await new Promise((resolve) => requestAnimationFrame(resolve));
 
 		const { left: dividerLeft } = this.shadowRoot!.querySelector('#divider')!.getBoundingClientRect();
-		const { left: mainLeft, width: mainWidth } = this.mainElement.getBoundingClientRect();
-		const percentagePos = ((dividerLeft - mainLeft) / mainWidth) * 100;
+		const { width: mainWidth } = this.mainElement.getBoundingClientRect();
+		const percentagePos = (this.#distanceFromInlineStart(dividerLeft) / mainWidth) * 100;
 		this.position = `${percentagePos}%`;
 	}
 
@@ -230,11 +238,12 @@ export class UmbSplitPanelElement extends UmbLitElement {
 			const { width } = this.mainElement.getBoundingClientRect();
 			const divider = this.dividerElement.getBoundingClientRect();
 
-			const dividerPos = divider.left - this.mainElement.getBoundingClientRect().left;
+			const dividerPos = this.#distanceFromInlineStart(divider.left);
 			const percentageFromWidth = (dividerPos / width) * 100;
 
 			const multiplier = event.shiftKey ? 10 : 1;
-			const step = 1 * multiplier * (event.key === 'ArrowLeft' ? -1 : 1);
+			const towardsStart = event.key === (this.#isRightToLeft() ? 'ArrowRight' : 'ArrowLeft');
+			const step = 1 * multiplier * (towardsStart ? -1 : 1);
 
 			const newPercent = percentageFromWidth + step;
 			const toPixels = (newPercent / 100) * this.mainElement.getBoundingClientRect().width;
@@ -297,7 +306,7 @@ export class UmbSplitPanelElement extends UmbLitElement {
 		#divider-touch-area {
 			position: absolute;
 			top: 0;
-			left: -1px;
+			inset-inline-start: -1px;
 			height: 100%;
 			width: var(--umb-split-panel-divider-touch-area-width);
 			cursor: col-resize;
