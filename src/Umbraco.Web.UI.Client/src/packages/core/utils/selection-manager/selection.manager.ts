@@ -53,7 +53,8 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	}
 
 	/**
-	 * Sets the current selection.
+	 * Sets the current selection. Every other method that changes the selection applies it through this one.
+	 * Items not already selected must pass the allow limitation.
 	 * @param {Array<ValueType>} value - The new selection.
 	 * @memberof UmbSelectionManager
 	 */
@@ -61,8 +62,9 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 		if (this.getSelectable() === false) return;
 		if (value === undefined) throw new Error('Value cannot be undefined');
 
+		const current = this.getSelection();
 		value.forEach((unique) => {
-			if (this.#allow(unique) === false) {
+			if (!current.includes(unique) && this.#allow(unique) === false) {
 				throw new Error(`${unique} is now allowed to be selected`);
 			}
 		});
@@ -122,8 +124,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 		if (this.#allow(unique) === false) {
 			throw new Error('The item is now allowed to be selected');
 		}
-		const newSelection = this.getMultiple() ? [...this.getSelection(), unique] : [unique];
-		this.#selection.setValue(newSelection);
+		this.setSelection(this.getMultiple() ? [...this.getSelection(), unique] : [unique]);
 		this.getHostElement().dispatchEvent(new UmbSelectedEvent(unique));
 		this.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
@@ -135,8 +136,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	 */
 	public deselect(unique: ValueType) {
 		if (this.getSelectable() === false) return;
-		const newSelection = this.getSelection().filter((x) => x !== unique);
-		this.#selection.setValue(newSelection);
+		this.setSelection(this.getSelection().filter((x) => x !== unique));
 		this.getHostElement().dispatchEvent(new UmbDeselectedEvent(unique));
 		this.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
@@ -157,7 +157,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	 */
 	public clearSelection() {
 		if (this.getSelectable() === false) return;
-		this.#selection.setValue([]);
+		this.setSelection([]);
 	}
 
 	/**
