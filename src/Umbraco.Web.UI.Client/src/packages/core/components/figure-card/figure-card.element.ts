@@ -253,6 +253,16 @@ export class UmbFigureCardElement extends UUICardElement {
 			:host([selectable]) #open-part::after {
 				inset: var(--uui-size-space-3) var(--uui-size-space-4);
 			}
+
+			/* Let clicks on the card's outer edge reach the host, so they select instead of open. */
+			:host([selectable]) #open-part,
+			:host([selectable]) #content {
+				pointer-events: none;
+			}
+			:host([selectable]:not([select-only])) #open-part::after,
+			:host([selectable]:not([select-only])) #content > * {
+				pointer-events: auto;
+			}
 		`,
 	];
 }
