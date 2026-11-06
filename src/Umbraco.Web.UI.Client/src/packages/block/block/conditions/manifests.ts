@@ -7,6 +7,7 @@ import UmbBlockEntryHasSettingsCondition from './block-entry-has-settings.condit
 import UmbBlockEntryIsExposedCondition from './block-entry-is-exposed.condition.js';
 import UmbBlockEntryIsReadOnlyCondition from './block-entry-is-read-only.condition.js';
 import UmbBlockEntryShowContentEditCondition from './block-entry-show-content-edit.condition.js';
+import UmbBlockWorkspaceHasContentPropertiesCondition from './block-workspace-has-content-properties.condition.js';
 import UmbBlockWorkspaceHasSettingsCondition from './block-workspace-has-settings.condition.js';
 import UmbBlockWorkspaceIsExposedCondition from './block-workspace-is-exposed.condition.js';
 import UmbBlockWorkspaceIsReadOnlyCondition from './block-workspace-is-readonly.condition.js';
@@ -18,6 +19,12 @@ export const manifests: Array<ManifestCondition> = [
 		name: 'Block Has Settings Condition',
 		alias: 'Umb.Condition.BlockWorkspaceHasSettings',
 		api: UmbBlockWorkspaceHasSettingsCondition,
+	},
+	{
+		type: 'condition',
+		name: 'Block Workspace Has Content Properties Condition',
+		alias: 'Umb.Condition.BlockWorkspaceHasContentProperties',
+		api: UmbBlockWorkspaceHasContentPropertiesCondition,
 	},
 	{
 		type: 'condition',
