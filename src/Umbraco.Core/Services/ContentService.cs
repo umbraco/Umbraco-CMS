@@ -1253,6 +1253,11 @@ public class ContentService : RepositoryService, IContentService
                 return OperationResult.Cancel(eventMessages);
             }
 
+            if (userId.HasValue)
+            {
+                contentSchedule?.AttributeUnattributedEntries(userId.Value);
+            }
+
             userId ??= Constants.Security.SuperUserId;
 
             if (content.HasIdentity == false)
@@ -2139,6 +2144,7 @@ public class ContentService : RepositoryService, IContentService
             foreach (IContent d in _documentRepository.GetContentForExpiration(date))
             {
                 ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(d.Id);
+                var userId = GetSchedulingUserId(contentSchedule, ContentScheduleAction.Expire, date, d.WriterId);
                 if (d.ContentType.VariesByCulture())
                 {
                     // find which cultures have pending schedules
@@ -2169,7 +2175,7 @@ public class ContentService : RepositoryService, IContentService
                     }
 
                     _documentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                    PublishResult result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, userId);
                     if (result.Success == false)
                     {
                         _logger.LogError(null, "Failed to publish document id={DocumentId}, key={DocumentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
@@ -2182,7 +2188,7 @@ public class ContentService : RepositoryService, IContentService
                     // Clear this schedule for this culture
                     contentSchedule.Clear(ContentScheduleAction.Expire, date);
                     _documentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = Unpublish(d, userId: d.WriterId);
+                    PublishResult result = Unpublish(d, userId: userId);
                     if (result.Success == false)
                     {
                         _logger.LogError(null, "Failed to unpublish document id={DocumentId}, key={DocumentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
@@ -2211,6 +2217,7 @@ public class ContentService : RepositoryService, IContentService
             foreach (IContent d in _documentRepository.GetContentForRelease(date))
             {
                 ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(d.Id);
+                var userId = GetSchedulingUserId(contentSchedule, ContentScheduleAction.Release, date, d.WriterId);
                 if (d.ContentType.VariesByCulture())
                 {
                     // find which cultures have pending schedules
@@ -2276,7 +2283,7 @@ public class ContentService : RepositoryService, IContentService
                     else
                     {
                         _documentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                        result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, userId);
                     }
 
                     if (result.Success == false)
@@ -2300,7 +2307,7 @@ public class ContentService : RepositoryService, IContentService
                     else
                     {
                         _documentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = Publish(d, d.AvailableCultures.ToArray(), userId: d.WriterId);
+                        result = Publish(d, d.AvailableCultures.ToArray(), userId: userId);
                     }
 
                     if (result.Success == false)
@@ -2316,6 +2323,31 @@ public class ContentService : RepositoryService, IContentService
         }
 
         scope.Complete();
+    }
+
+    /// <summary>
+    ///     Gets the user to perform a document's due scheduled action on behalf of.
+    /// </summary>
+    /// <param name="contentSchedule">The schedule of the document.</param>
+    /// <param name="action">The scheduled action being performed.</param>
+    /// <param name="date">The date the scheduled action is being performed for.</param>
+    /// <param name="fallbackUserId">The user to use when the due action isn't attributed to a single user.</param>
+    /// <returns>The user who scheduled the due action, or <paramref name="fallbackUserId" />.</returns>
+    /// <remarks>
+    ///     All of a document's cultures due in the same run are published or unpublished in a single commit, as rules such
+    ///     as mandatory languages apply across cultures, so the commit can only be attributed to one user. In the edge case
+    ///     of the due cultures having been scheduled by different users (or only some of them attributed to a user), the
+    ///     fallback user is used.
+    /// </remarks>
+    private static int GetSchedulingUserId(ContentScheduleCollection contentSchedule, ContentScheduleAction action, DateTime date, int fallbackUserId)
+    {
+        int?[] userIds = contentSchedule.GetPending(action, date)
+            .Where(x => x.Action == action)
+            .Select(x => x.UserId)
+            .Distinct()
+            .ToArray();
+
+        return userIds is [int userId] ? userId : fallbackUserId;
     }
 
     // utility 'PublishCultures' func used by SaveAndPublishBranch
