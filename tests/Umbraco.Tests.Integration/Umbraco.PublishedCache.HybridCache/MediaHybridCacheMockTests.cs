@@ -133,6 +133,33 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Never);
     }
 
+    // The synchronous members block on these tasks, so with no distributed cache to wait for they must have
+    // completed by the time they are returned. A task that has not means some step of the shared read logic
+    // awaited asynchronous work, and synchronous callers are blocking on it again.
+    [Test]
+    public async Task Synchronous_Read_Logic_Completes_Synchronously_On_A_Cache_Miss()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{_mediaItem.Key}");
+
+        Task<IPublishedContent?> task = ((MediaCacheService)_mediaCacheService).GetByKeyWithSynchronousReadsAsync(_mediaItem.Key);
+
+        Assert.IsTrue(task.IsCompleted);
+        Assert.AreEqual(_mediaItem.Key, (await task)?.Key);
+    }
+
+    [Test]
+    public async Task Synchronous_Batched_Read_Logic_Completes_Synchronously_On_A_Cache_Miss()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{_mediaItem.Key}");
+
+        Task<IReadOnlyList<IPublishedContent>> task = ((MediaCacheService)_mediaCacheService).GetByKeysWithSynchronousReadsAsync([_mediaItem.Key]);
+
+        Assert.IsTrue(task.IsCompleted);
+        Assert.AreEqual(_mediaItem.Key, (await task).Single().Key);
+    }
+
     [Test]
     public async Task GetByKeysAsync_BatchesDatabaseRead_AndNeverCallsSinglePerItem()
     {

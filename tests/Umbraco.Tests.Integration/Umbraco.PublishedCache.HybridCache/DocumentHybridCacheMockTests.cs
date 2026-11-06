@@ -223,11 +223,90 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     [Test]
     public async Task Synchronous_Batched_Preview_Lookup_Rereads_Refused_Drafts_Synchronously()
     {
+        DocumentCacheService refusingCacheService = CreateDraftRefusingCacheService();
+
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        IReadOnlyList<IPublishedContent> result = refusingCacheService.GetByKeys([Textpage.Key], true);
+
+        // The refused draft is replaced by the published version, and both reads stay synchronous.
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(Textpage.Key, result[0].Key);
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSources(It.IsAny<IEnumerable<Guid>>(), true), Times.Once);
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSources(It.IsAny<IEnumerable<Guid>>(), false), Times.Once);
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    // The synchronous members block on these tasks, so with no distributed cache to wait for they must have
+    // completed by the time they are returned. A task that has not means some step of the shared read logic
+    // awaited asynchronous work, and synchronous callers are blocking on it again.
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Synchronous_Read_Logic_Completes_Synchronously_On_A_Cache_Miss(bool preview)
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        Task<IPublishedContent?> task = ((DocumentCacheService)_documentCacheService).GetByKeyWithSynchronousReadsAsync(Textpage.Key, preview);
+
+        Assert.IsTrue(task.IsCompleted);
+        Assert.AreEqual(Textpage.Key, (await task)?.Key);
+    }
+
+    [Test]
+    public async Task Synchronous_Read_Logic_Completes_Synchronously_When_Rereading_A_Refused_Draft()
+    {
+        DocumentCacheService refusingCacheService = CreateDraftRefusingCacheService();
+
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        Task<IPublishedContent?> task = refusingCacheService.GetByKeyWithSynchronousReadsAsync(Textpage.Key, true);
+
+        Assert.IsTrue(task.IsCompleted);
+        Assert.AreEqual(Textpage.Key, (await task)?.Key);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Synchronous_Batched_Read_Logic_Completes_Synchronously_On_A_Cache_Miss(bool preview)
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        Task<IReadOnlyList<IPublishedContent>> task = ((DocumentCacheService)_documentCacheService).GetByKeysWithSynchronousReadsAsync([Textpage.Key], preview);
+
+        Assert.IsTrue(task.IsCompleted);
+        Assert.AreEqual(Textpage.Key, (await task).Single().Key);
+    }
+
+    [Test]
+    public async Task Synchronous_Batched_Read_Logic_Completes_Synchronously_When_Rereading_Refused_Drafts()
+    {
+        DocumentCacheService refusingCacheService = CreateDraftRefusingCacheService();
+
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        Task<IReadOnlyList<IPublishedContent>> task = refusingCacheService.GetByKeysWithSynchronousReadsAsync([Textpage.Key], true);
+
+        Assert.IsTrue(task.IsCompleted);
+        Assert.AreEqual(Textpage.Key, (await task).Single().Key);
+    }
+
+    private DocumentCacheService CreateDraftRefusingCacheService()
+    {
         var mockedPublishedStatusService = new Mock<IPublishStatusQueryService>();
         mockedPublishedStatusService.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
         mockedPublishedStatusService.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>())).Returns(true);
 
-        var refusingCacheService = new DocumentCacheService(
+        return new DocumentCacheService(
             _mockDatabaseCacheRepository.Object,
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ICoreScopeProvider>(),
@@ -242,19 +321,6 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
             Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>()) == false));
-
-        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
-        await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
-        await hybridCache.RemoveAsync($"{Textpage.Key}");
-
-        IReadOnlyList<IPublishedContent> result = refusingCacheService.GetByKeys([Textpage.Key], true);
-
-        // The refused draft is replaced by the published version, and both reads stay synchronous.
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual(Textpage.Key, result[0].Key);
-        _mockDatabaseCacheRepository.Verify(x => x.GetContentSources(It.IsAny<IEnumerable<Guid>>(), true), Times.Once);
-        _mockDatabaseCacheRepository.Verify(x => x.GetContentSources(It.IsAny<IEnumerable<Guid>>(), false), Times.Once);
-        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()), Times.Never);
     }
 
     [Test]

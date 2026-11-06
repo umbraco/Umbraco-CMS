@@ -153,7 +153,19 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     public IPublishedContent? GetByKey(Guid key)
         => TryGetCached(key, out IPublishedContent? cached)
             ? cached
-            : GetNodeAsync(key, _readMediaSource).GetAwaiter().GetResult();
+            : GetByKeyWithSynchronousReadsAsync(key).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Runs the read logic behind <see cref="GetByKey"/>, reading the database synchronously on a cache miss.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="GetByKey"/> blocks on the returned task, which only avoids sync-over-async if the task has already
+    /// completed when it is returned. That holds only while every await in the shared read logic completes
+    /// synchronously, so it is kept as a separate method for tests to assert on directly; the public member can't
+    /// show whether it blocked. It is internal because it exists only to verify that guarantee, not as an API.
+    /// </remarks>
+    internal Task<IPublishedContent?> GetByKeyWithSynchronousReadsAsync(Guid key)
+        => GetNodeAsync(key, _readMediaSource);
 
     /// <inheritdoc />
     public async Task<IPublishedContent?> GetByIdAsync(int id)
@@ -185,7 +197,14 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
     /// <inheritdoc />
     public IReadOnlyList<IPublishedContent> GetByKeys(IReadOnlyCollection<Guid> keys)
-        => GetByKeysCoreAsync(keys, _readMediaSources).GetAwaiter().GetResult();
+        => GetByKeysWithSynchronousReadsAsync(keys).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Runs the read logic behind <see cref="GetByKeys"/>, reading the database synchronously on a cache miss.
+    /// </summary>
+    /// <remarks>See <see cref="GetByKeyWithSynchronousReadsAsync"/>.</remarks>
+    internal Task<IReadOnlyList<IPublishedContent>> GetByKeysWithSynchronousReadsAsync(IReadOnlyCollection<Guid> keys)
+        => GetByKeysCoreAsync(keys, _readMediaSources);
 
     private async Task<IReadOnlyList<IPublishedContent>> GetByKeysCoreAsync(IReadOnlyCollection<Guid> keys, MediaSourcesReader readMediaSources)
     {

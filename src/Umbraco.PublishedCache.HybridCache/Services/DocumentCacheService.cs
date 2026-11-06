@@ -171,8 +171,20 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         bool calculatedPreview = preview ?? GetPreview();
         return TryGetCached(key, calculatedPreview, out IPublishedContent? cached)
             ? cached
-            : GetAccessibleNodeAsync(key, calculatedPreview, _readContentSource).GetAwaiter().GetResult();
+            : GetByKeyWithSynchronousReadsAsync(key, calculatedPreview).GetAwaiter().GetResult();
     }
+
+    /// <summary>
+    /// Runs the read logic behind <see cref="GetByKey"/>, reading the database synchronously on a cache miss.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="GetByKey"/> blocks on the returned task, which only avoids sync-over-async if the task has already
+    /// completed when it is returned. That holds only while every await in the shared read logic completes
+    /// synchronously, so it is kept as a separate method for tests to assert on directly; the public member can't
+    /// show whether it blocked. It is internal because it exists only to verify that guarantee, not as an API.
+    /// </remarks>
+    internal Task<IPublishedContent?> GetByKeyWithSynchronousReadsAsync(Guid key, bool preview)
+        => GetAccessibleNodeAsync(key, preview, _readContentSource);
 
     /// <inheritdoc />
     public async Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null)
@@ -204,7 +216,14 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
     /// <inheritdoc />
     public IReadOnlyList<IPublishedContent> GetByKeys(IReadOnlyCollection<Guid> keys, bool? preview = null)
-        => GetByKeysCoreAsync(keys, preview, _readContentSources).GetAwaiter().GetResult();
+        => GetByKeysWithSynchronousReadsAsync(keys, preview).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Runs the read logic behind <see cref="GetByKeys"/>, reading the database synchronously on a cache miss.
+    /// </summary>
+    /// <remarks>See <see cref="GetByKeyWithSynchronousReadsAsync"/>.</remarks>
+    internal Task<IReadOnlyList<IPublishedContent>> GetByKeysWithSynchronousReadsAsync(IReadOnlyCollection<Guid> keys, bool? preview)
+        => GetByKeysCoreAsync(keys, preview, _readContentSources);
 
     private async Task<IReadOnlyList<IPublishedContent>> GetByKeysCoreAsync(IReadOnlyCollection<Guid> keys, bool? preview, ContentSourcesReader readContentSources)
     {
