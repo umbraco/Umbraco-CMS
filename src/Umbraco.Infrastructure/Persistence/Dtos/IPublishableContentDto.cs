@@ -28,6 +28,11 @@ internal interface IPublishableContentDto<TContentVersionDto> : INodeDto
         /// The column name for the edited flag.
         /// </summary>
         internal const string Edited = ICultureVariationDto.Columns.Edited;
+
+        /// <summary>
+        /// The column name for the invariant-edited flag.
+        /// </summary>
+        internal const string InvariantEdited = "invariantEdited";
     }
 
     /// <summary>
@@ -41,6 +46,12 @@ internal interface IPublishableContentDto<TContentVersionDto> : INodeDto
     /// </summary>
     [Column(Columns.Edited)]
     bool Edited { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether an invariant property has been edited since last publish.
+    /// </summary>
+    [Column(Columns.InvariantEdited)]
+    bool InvariantEdited { get; set; }
 
     /// <summary>
     /// Gets the <see cref="Dtos.ContentDto"/> containing the core content data.
