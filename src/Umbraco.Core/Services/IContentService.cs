@@ -155,6 +155,10 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     /// <param name="content">The content to persist the schedule for.</param>
     /// <param name="contentSchedule">The content schedule collection.</param>
+    /// <remarks>
+    ///     Each scheduled action is persisted with the user it's attributed to, and is performed on behalf of that user.
+    ///     Scheduled actions that aren't attributed to a user are performed on behalf of the last user to save the content.
+    /// </remarks>
     void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule);
 
     /// <summary>
@@ -424,6 +428,11 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="userId">The identifier of the user performing the action.</param>
     /// <param name="contentSchedule">The content schedule collection.</param>
     /// <returns>The operation result.</returns>
+    /// <remarks>
+    ///     When a user is specified, the scheduled actions added to <paramref name="contentSchedule" /> that aren't yet
+    ///     attributed to a user are attributed to that user, so they are performed on behalf of that user. Scheduled actions
+    ///     that aren't attributed to a user are performed on behalf of the last user to save the content.
+    /// </remarks>
     OperationResult Save(IContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null);
 
     /// <summary>

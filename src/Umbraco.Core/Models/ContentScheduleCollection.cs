@@ -78,11 +78,17 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// <param name="expire">The expiration date, or null if no expiration is scheduled.</param>
     /// <returns>A new content schedule collection with the specified entry.</returns>
     public static ContentScheduleCollection CreateWithEntry(DateTime? release, DateTime? expire)
-    {
-        var schedule = new ContentScheduleCollection();
-        schedule.Add(Constants.System.InvariantCulture, release, expire);
-        return schedule;
-    }
+        => CreateWithEntry(release, expire, null);
+
+    /// <summary>
+    ///     Creates a new <see cref="ContentScheduleCollection" /> with a schedule entry for invariant content.
+    /// </summary>
+    /// <param name="release">The release date, or null if no release is scheduled.</param>
+    /// <param name="expire">The expiration date, or null if no expiration is scheduled.</param>
+    /// <param name="userId">The identifier of the user scheduling the entry, or <c>null</c> if not known.</param>
+    /// <returns>A new content schedule collection with the specified entry.</returns>
+    public static ContentScheduleCollection CreateWithEntry(DateTime? release, DateTime? expire, int? userId)
+        => CreateWithEntry(Constants.System.InvariantCulture, release, expire, userId);
 
     /// <summary>
     ///     Clears all <see cref="CollectionChanged" /> event handlers
@@ -117,6 +123,16 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     public bool Add(DateTime? releaseDate, DateTime? expireDate) => Add(Constants.System.InvariantCulture, releaseDate, expireDate);
 
     /// <summary>
+    ///     Adds a new schedule for invariant content.
+    /// </summary>
+    /// <param name="releaseDate">The release date, or null if no release is scheduled.</param>
+    /// <param name="expireDate">The expiration date, or null if no expiration is scheduled.</param>
+    /// <param name="userId">The identifier of the user scheduling the entry, or <c>null</c> if not known.</param>
+    /// <returns>true if successfully added, false if validation fails.</returns>
+    public bool Add(DateTime? releaseDate, DateTime? expireDate, int? userId)
+        => Add(Constants.System.InvariantCulture, releaseDate, expireDate, userId);
+
+    /// <summary>
     ///     Adds a new schedule for a culture
     /// </summary>
     /// <param name="culture"></param>
@@ -124,6 +140,17 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// <param name="expireDate"></param>
     /// <returns>true if successfully added, false if validation fails</returns>
     public bool Add(string? culture, DateTime? releaseDate, DateTime? expireDate)
+        => Add(culture, releaseDate, expireDate, null);
+
+    /// <summary>
+    ///     Adds a new schedule for a culture.
+    /// </summary>
+    /// <param name="culture">The culture for the schedule.</param>
+    /// <param name="releaseDate">The release date, or null if no release is scheduled.</param>
+    /// <param name="expireDate">The expiration date, or null if no expiration is scheduled.</param>
+    /// <param name="userId">The identifier of the user scheduling the entry, or <c>null</c> if not known.</param>
+    /// <returns>true if successfully added, false if validation fails.</returns>
+    public bool Add(string? culture, DateTime? releaseDate, DateTime? expireDate, int? userId)
     {
         if (culture == null)
         {
@@ -151,14 +178,14 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         // but the bool won't indicate which date was in error, maybe have 2 diff methods to schedule start/end?
         if (releaseDate.HasValue)
         {
-            var entry = new ContentSchedule(culture, releaseDate.Value, ContentScheduleAction.Release);
+            var entry = new ContentSchedule(culture, releaseDate.Value, ContentScheduleAction.Release, userId);
             changes.Add(releaseDate.Value, entry);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
         }
 
         if (expireDate.HasValue)
         {
-            var entry = new ContentSchedule(culture, expireDate.Value, ContentScheduleAction.Expire);
+            var entry = new ContentSchedule(culture, expireDate.Value, ContentScheduleAction.Expire, userId);
             changes.Add(expireDate.Value, entry);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
         }
@@ -209,18 +236,50 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// <param name="dateTime">The date and time for the scheduled action.</param>
     /// <param name="action">The action type (release or expire).</param>
     public void AddOrUpdate(string culture, DateTime dateTime, ContentScheduleAction action)
+        => AddOrUpdate(culture, dateTime, action, null);
+
+    /// <summary>
+    ///     Adds or updates a schedule entry for the specified culture and action.
+    /// </summary>
+    /// <param name="culture">The culture for the schedule.</param>
+    /// <param name="dateTime">The date and time for the scheduled action.</param>
+    /// <param name="action">The action type (release or expire).</param>
+    /// <param name="userId">The identifier of the user scheduling the entry, or <c>null</c> if not known.</param>
+    /// <remarks>
+    ///     An existing entry for the same date is kept as it is, so it remains attributed to the user who scheduled it.
+    ///     Only an existing entry that isn't attributed to a user is replaced, so it is attributed to the specified user.
+    /// </remarks>
+    public void AddOrUpdate(string culture, DateTime dateTime, ContentScheduleAction action, int? userId)
     {
-        // we need to remove the old one as ContentSchedule.Date is immutable
-        ContentSchedule? changeToRemove = FullSchedule.FirstOrDefault(change =>
+        ContentSchedule? existing = FullSchedule.FirstOrDefault(change =>
             change.Culture == culture
             && change.Action == action);
 
-        if (changeToRemove is not null)
+        if (existing is not null)
         {
-            Remove(changeToRemove);
+            if (existing.Date == dateTime && (existing.UserId is not null || userId is null))
+            {
+                return;
+            }
+
+            // we need to remove the old one as ContentSchedule.Date is immutable
+            Remove(existing);
         }
 
-        Add(new ContentSchedule(culture, dateTime, action));
+        Add(new ContentSchedule(culture, dateTime, action, userId));
+    }
+
+    /// <summary>
+    ///     Attributes the schedule entries that are neither persisted nor attributed to a user, to the specified user.
+    /// </summary>
+    /// <param name="userId">The identifier of the user scheduling the entries.</param>
+    internal void AttributeUnattributedEntries(int userId)
+    {
+        foreach (ContentSchedule entry in FullSchedule.Where(x => x.Id == Guid.Empty && x.UserId is null).ToList())
+        {
+            Remove(entry);
+            Add(new ContentSchedule(entry.Culture, entry.Date, entry.Action, userId));
+        }
     }
 
     /// <summary>
@@ -309,9 +368,20 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// <param name="expire">The expiration date, or null if no expiration is scheduled.</param>
     /// <returns>A new content schedule collection with the specified entry.</returns>
     public static ContentScheduleCollection CreateWithEntry(string culture, DateTime? release, DateTime? expire)
+        => CreateWithEntry(culture, release, expire, null);
+
+    /// <summary>
+    ///     Creates a new <see cref="ContentScheduleCollection" /> with a schedule entry for a specific culture.
+    /// </summary>
+    /// <param name="culture">The culture for the schedule.</param>
+    /// <param name="release">The release date, or null if no release is scheduled.</param>
+    /// <param name="expire">The expiration date, or null if no expiration is scheduled.</param>
+    /// <param name="userId">The identifier of the user scheduling the entry, or <c>null</c> if not known.</param>
+    /// <returns>A new content schedule collection with the specified entry.</returns>
+    public static ContentScheduleCollection CreateWithEntry(string culture, DateTime? release, DateTime? expire, int? userId)
     {
         var schedule = new ContentScheduleCollection();
-        schedule.Add(culture, release, expire);
+        schedule.Add(culture, release, expire, userId);
         return schedule;
     }
 
