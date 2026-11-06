@@ -109,6 +109,42 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
+    public async Task Automatically_Track_Relations_For_Every_Item_In_A_Batch_Persisted_Over_Several_Transactions()
+    {
+        var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
+        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
+        var media = MediaBuilder.CreateSimpleMedia(mt, "media", -1);
+        MediaService.Save(media);
+
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
+        ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
+
+        // Relations for a batch are persisted in chunks of 200 items, each in its own transaction, so the batch must
+        // span more than one chunk with a partial final chunk.
+        var contents = Enumerable.Range(1, 401)
+            .Select(i =>
+            {
+                var content = ContentBuilder.CreateTextpageContent(ct, $"content {i}", -1);
+                content.Properties["bodyText"]!.SetValue(
+                    "<p><img src='/media/1.jpg' data-udi='umb://media/" + media.Key.ToString("N") + "' /></p>");
+                return content;
+            })
+            .ToArray();
+
+        ContentService.Save(contents);
+
+        var contentIdsWithRelation = RelationService.GetByChildId(media.Id)
+            .Where(r => r.RelationType.Alias == Constants.Conventions.RelationTypes.RelatedMediaAlias)
+            .Select(r => r.ParentId)
+            .ToArray();
+        Assert.That(contentIdsWithRelation, Is.EquivalentTo(contents.Select(c => c.Id)));
+    }
+
+    [Test]
+    [LongRunning]
     public async Task Automatic_Relations_Publish_Saved_Notification()
     {
         var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");

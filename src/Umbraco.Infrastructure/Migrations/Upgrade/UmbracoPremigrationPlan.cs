@@ -81,5 +81,10 @@ public class UmbracoPremigrationPlan : MigrationPlan
         To<V_17_0_0.AddCacheVersionDatabaseLock>("{1DC39DC7-A88A-4912-8E60-4FD36246E8D1}");
         To<V_17_0_0.AddRepositoryCacheVersionTable>("{A1B3F5D6-4C8B-4E7A-9F8C-1D2B3E4F5A6B}");
         To<V_17_0_0.AddLastSyncedTable>("{72894BCA-9FAD-4CC3-B0D0-D6CDA2FFA636}");
+
+        // To 17.10.0
+        // The lock is required to persist relations after content is saved or trashed, and migrations in the main
+        // plan do so, so it has to exist before that plan runs.
+        To<V_17_10_0.AddRelationsLock>("{D7B2148A-85F4-415C-8574-4A5D8CC10DE1}");
     }
 }
