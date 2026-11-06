@@ -1,12 +1,17 @@
 /* eslint-disable local-rules/no-direct-api-import */
 
-import type { UmbDocumentTreeChildrenOfRequestArgs, UmbDocumentTreeRootItemsRequestArgs } from '../types.js';
+import type {
+	UmbDocumentTreeChildrenOfRequestArgs,
+	UmbDocumentTreeItemsRequestArgs,
+	UmbDocumentTreeRootItemsRequestArgs,
+} from '../types.js';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import {
 	UmbManagementApiInFlightRequestCache,
 	UmbManagementApiTreeDataRequestManager,
 } from '@umbraco-cms/backoffice/management-api';
 import type {
+	BatchResponseModelDocumentTreeItemResponseModel,
 	DocumentTreeItemResponseModel,
 	PagedDocumentTreeItemResponseModel,
 	SubsetDocumentTreeItemResponseModel,
@@ -14,6 +19,7 @@ import type {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbManagementApiTreeAncestorsOfRequestArgs,
+	UmbManagementApiTreeBatchRequestArgs,
 	UmbManagementApiTreeChildrenOfRequestArgs,
 	UmbManagementApiTreeRootItemsRequestArgs,
 	UmbManagementApiTreeSiblingsFromRequestArgs,
@@ -31,6 +37,9 @@ interface UmbManagementApiDocumentTreeSiblingsFromRequestArgs extends UmbManagem
 	};
 }
 
+interface UmbManagementApiDocumentTreeBatchRequestArgs
+	extends UmbManagementApiTreeBatchRequestArgs, Pick<UmbDocumentTreeItemsRequestArgs, 'dataType'> {}
+
 export class UmbManagementApiDocumentTreeDataRequestManager extends UmbManagementApiTreeDataRequestManager<
 	DocumentTreeItemResponseModel,
 	UmbManagementApiDocumentTreeRootItemsRequestArgs,
@@ -40,7 +49,9 @@ export class UmbManagementApiDocumentTreeDataRequestManager extends UmbManagemen
 	UmbManagementApiTreeAncestorsOfRequestArgs,
 	Array<DocumentTreeItemResponseModel>,
 	UmbManagementApiDocumentTreeSiblingsFromRequestArgs,
-	SubsetDocumentTreeItemResponseModel
+	SubsetDocumentTreeItemResponseModel,
+	UmbManagementApiDocumentTreeBatchRequestArgs,
+	BatchResponseModelDocumentTreeItemResponseModel
 > {
 	static #inflightRequestCache = new UmbManagementApiInFlightRequestCache<unknown>();
 
@@ -79,6 +90,14 @@ export class UmbManagementApiDocumentTreeDataRequestManager extends UmbManagemen
 						target: args.paging.target.unique,
 						before: args.paging.takeBefore,
 						after: args.paging.takeAfter,
+					},
+				}),
+
+			getBatch: (args) =>
+				DocumentService.getTreeDocumentBatch({
+					query: {
+						id: args.uniques,
+						dataTypeId: args.dataType?.unique,
 					},
 				}),
 

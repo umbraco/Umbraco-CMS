@@ -97,6 +97,11 @@ export type BatchResponseModelDataTypeResponseModel = {
     items: Array<DataTypeResponseModel>;
 };
 
+export type BatchResponseModelDocumentTreeItemResponseModel = {
+    total: number;
+    items: Array<DocumentTreeItemResponseModel>;
+};
+
 export type BatchResponseModelDocumentTypeResponseModel = {
     total: number;
     items: Array<DocumentTypeResponseModel>;
@@ -3298,6 +3303,11 @@ export type WebhookResponseModel = {
     };
     id: string;
     events: Array<WebhookEventResponseModel>;
+};
+
+export type BatchResponseModelDocumentTreeItemResponseModelWritable = {
+    total: number;
+    items: Array<DocumentTreeItemResponseModelWritable>;
 };
 
 export type DataTypeSchemaItemResponseModelWritable = {
@@ -8276,6 +8286,36 @@ export type GetTreeDocumentAncestorsResponses = {
 };
 
 export type GetTreeDocumentAncestorsResponse = GetTreeDocumentAncestorsResponses[keyof GetTreeDocumentAncestorsResponses];
+
+export type GetTreeDocumentBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+        dataTypeId?: string;
+    };
+    url: '/umbraco/management/api/v1/tree/document/batch';
+};
+
+export type GetTreeDocumentBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDocumentBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelDocumentTreeItemResponseModel;
+};
+
+export type GetTreeDocumentBatchResponse = GetTreeDocumentBatchResponses[keyof GetTreeDocumentBatchResponses];
 
 export type GetTreeDocumentChildrenData = {
     body?: never;

@@ -4,6 +4,7 @@ import {
 	tryExecute,
 	UmbError,
 	type UmbApiError,
+	type UmbApiResponse,
 	type UmbCancelError,
 	type UmbDataApiResponse,
 } from '@umbraco-cms/backoffice/resources';
@@ -35,15 +36,21 @@ export class UmbItemDataApiGetRequestController<
 			const chunks = batchArray<string>(this.#uniques, this.#batchSize);
 			const results = await batchTryExecute(this, chunks, (chunk) => this.#apiCallback({ uniques: chunk }));
 
-			const errors = results.filter((promiseResult) => promiseResult.status === 'rejected');
+			// batchTryExecute runs each chunk through tryExecute, which resolves a failed chunk with an error rather than
+			// rejecting it.
+			const responses = results.map((promiseResult) =>
+				promiseResult.status === 'fulfilled'
+					? (promiseResult.value as UmbApiResponse<ResponseModelType>)
+					: ({ error: promiseResult.reason } as UmbApiResponse<ResponseModelType>),
+			);
+
+			const errors = responses.filter((response) => response.error).map((response) => response.error);
 
 			if (errors.length > 0) {
 				error = await this.#getAndHandleErrorResult(errors);
 			}
 
-			data = results
-				.filter((promiseResult) => promiseResult.status === 'fulfilled')
-				.flatMap((promiseResult) => promiseResult.value.data);
+			data = responses.filter((response) => !response.error).flatMap((response) => response.data);
 		} else {
 			const result = await tryExecute(this, this.#apiCallback({ uniques: this.#uniques }));
 			data = result.data;
@@ -53,7 +60,7 @@ export class UmbItemDataApiGetRequestController<
 		return { data, error };
 	}
 
-	async #getAndHandleErrorResult(errors: Array<PromiseRejectedResult>) {
+	async #getAndHandleErrorResult(errors: Array<unknown>) {
 		// TODO: We currently expect all the errors to be the same, but we should handle this better in the future.
 		const error = errors[0];
 		await umbPeekError(this, {
@@ -61,6 +68,6 @@ export class UmbItemDataApiGetRequestController<
 			message: 'An error occurred while fetching items.',
 		});
 
-		return new UmbError(error.reason);
+		return new UmbError(error instanceof Error ? error.message : String(error));
 	}
 }
