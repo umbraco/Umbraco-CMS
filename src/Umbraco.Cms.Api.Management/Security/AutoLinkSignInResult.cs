@@ -36,6 +36,12 @@ public class AutoLinkSignInResult : SignInResult
     public static AutoLinkSignInResult FailedNoName { get; } = new() { Succeeded = false };
 
     /// <summary>
+    /// Gets a result indicating the auto-link sign-in failed because the user matched on the external login's email
+    /// address is of a kind that is not permitted to sign in to the back office.
+    /// </summary>
+    public static AutoLinkSignInResult FailedUnsupportedUserKind { get; } = new() { Succeeded = false };
+
+    /// <summary>
     /// Gets the collection of error messages related to the auto-link sign-in process.
     /// </summary>
     public IReadOnlyCollection<string> Errors { get; } = Array.Empty<string>();
