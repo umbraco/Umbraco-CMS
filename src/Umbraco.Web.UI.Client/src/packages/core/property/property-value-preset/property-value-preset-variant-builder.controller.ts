@@ -80,27 +80,30 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 			: this.#buildVariantOptionsFromCulturesAndSegments(propertyType);
 
 		// Generate values for each variant option
-		const values: Array<ReturnType> = [];
-		for (const variantId of variantOptionsToUse) {
-			const value = await this._generatePropertyValue(
-				apis,
-				propertyType,
-				this.#makeArgsFor(propertyType.alias, variantId.culture, variantId.segment),
-			);
-			if (value) {
+		// Variants are generated in parallel; Promise.all keeps the result in variant option order.
+		const results = await Promise.all(
+			variantOptionsToUse.map(async (variantId) => {
+				const value = await this._generatePropertyValue(
+					apis,
+					propertyType,
+					this.#makeArgsFor(propertyType.alias, variantId.culture, variantId.segment),
+				);
+				if (!value) {
+					return undefined;
+				}
 				// Reconstruct with consistent key ordering (editorAlias, culture, segment, alias, value)
 				// to match the data source format. JSON.stringify respects insertion order, so mismatched
 				// key ordering causes false-positive pending change detection.
-				values.push({
+				return {
 					editorAlias: value.editorAlias,
 					culture: variantId.culture,
 					segment: variantId.segment,
 					alias: value.alias,
 					value: value.value,
-				} as ReturnType);
-			}
-		}
-		return values;
+				} as ReturnType;
+			}),
+		);
+		return results.filter((x): x is ReturnType => x !== undefined);
 	}
 
 	/**
