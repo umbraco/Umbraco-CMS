@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Server;
 using OpenIddict.Validation;
-using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
@@ -23,13 +24,25 @@ public class ProcessRequestContextHandler
     ///     Initializes a new instance of the <see cref="ProcessRequestContextHandler"/> class.
     /// </summary>
     /// <param name="httpContextAccessor">The HTTP context accessor.</param>
+    [Obsolete("Please use the constructor that accepts all parameters. Scheduled for removal in Umbraco 19.")]
     public ProcessRequestContextHandler(IHttpContextAccessor httpContextAccessor)
+        : this(
+              httpContextAccessor,
+              StaticServiceProvider.Instance.GetRequiredService<IOpenIddictPathsToHandleProvider>())
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ProcessRequestContextHandler"/> class.
+    /// </summary>
+    /// <param name="httpContextAccessor">The HTTP context accessor.</param>
+    /// <param name="pathsToHandleProvider">The provider for the request paths that OpenIddict should handle.</param>
+    public ProcessRequestContextHandler(
+        IHttpContextAccessor httpContextAccessor,
+        IOpenIddictPathsToHandleProvider pathsToHandleProvider)
     {
         _httpContextAccessor = httpContextAccessor;
-        var backOfficePathSegment = Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.Tilde)
-            .EnsureStartsWith('/')
-            .EnsureEndsWith('/');
-        _pathsToHandle = [backOfficePathSegment, "/.well-known/openid-configuration", "/.well-known/jwks"];
+        _pathsToHandle = pathsToHandleProvider.GetPathsToHandle().ToArray();
     }
 
     /// <summary>
