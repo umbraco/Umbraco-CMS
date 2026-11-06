@@ -1,6 +1,7 @@
 import type { UmbUserGroupInputElement } from '../../../../user-group/components/input-user-group/user-group-input.element.js';
 import { UmbInviteUserRepository } from '../../repository/invite-user.repository.js';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbUserConfigRepository } from '../../../repository/config/index.js';
+import { css, html, customElement, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
@@ -8,6 +9,19 @@ import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 @customElement('umb-invite-user-modal')
 export class UmbInviteUserModalElement extends UmbModalBaseElement {
 	#inviteUserRepository = new UmbInviteUserRepository(this);
+	#userConfigRepository = new UmbUserConfigRepository(this);
+
+	@state()
+	private _usernameIsEmail = true;
+
+	constructor() {
+		super();
+		this.observe(
+			this.#userConfigRepository.part('usernameIsEmail'),
+			(usernameIsEmail) => (this._usernameIsEmail = usernameIsEmail ?? true),
+			null,
+		);
+	}
 
 	async #onSubmit(e: Event) {
 		e.preventDefault();
@@ -31,11 +45,10 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 
 		const message = formData.get('message') as string;
 
-		// TODO: figure out when to use email or username
 		const { error } = await this.#inviteUserRepository.invite({
 			name,
 			email,
-			userName: email,
+			userName: this._usernameIsEmail ? email : (formData.get('username') as string),
 			message,
 			userGroupUniques,
 		});
@@ -77,6 +90,7 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 						</uui-label>
 						<uui-input id="email" label="email" type="email" name="email" required></uui-input>
 					</uui-form-layout-item>
+					${this.#renderUsername()}
 					<uui-form-layout-item>
 						<uui-label id="userGroupsLabel" slot="label" for="userGroups" required>
 							<umb-localize key="user_usergroups"></umb-localize>
@@ -94,6 +108,23 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 					</uui-form-layout-item>
 				</form>
 			</uui-form>`;
+	}
+
+	#renderUsername() {
+		if (this._usernameIsEmail) return nothing;
+		return html`<uui-form-layout-item>
+			<uui-label id="usernameLabel" slot="label" for="username" required>
+				<umb-localize key="user_loginname"></umb-localize>
+			</uui-label>
+			<uui-input
+				id="username"
+				label=${this.localize.term('user_loginname')}
+				type="text"
+				name="username"
+				autocomplete="off"
+				required
+				required-message=${this.localize.term('user_loginnameRequired')}></uui-input>
+		</uui-form-layout-item>`;
 	}
 
 	static override styles = [
