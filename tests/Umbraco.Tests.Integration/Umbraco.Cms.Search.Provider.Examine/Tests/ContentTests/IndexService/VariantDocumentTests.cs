@@ -105,8 +105,8 @@ public class VariantDocumentTests : IndexTestBase
         queryBuilder.SelectField(field);
         ISearchResults results = queryBuilder.Execute();
 
-        // the index stores values culture invariantly, so the expected value must be formatted the same way
-        var expectedValue = Convert.ToString(value, CultureInfo.InvariantCulture);
+        // these fields have no field definition, so Examine stores them as text formatted with the current culture
+        var expectedValue = Convert.ToString(value, CultureInfo.CurrentCulture);
         var result = results
             .SelectMany(x => x.Values.Values)
             .First(x => x == expectedValue);
