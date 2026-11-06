@@ -35,7 +35,16 @@ public class Flickr : OEmbedProviderBase
     public override async Task<string?> GetMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
     {
         var requestUrl = GetEmbedProviderUrl(url, maxWidth, maxHeight);
-        XmlDocument xmlDocument = await GetXmlResponseAsync(requestUrl, cancellationToken);
+        XmlDocument xmlDocument;
+        try
+        {
+            xmlDocument = await GetXmlResponseAsync(requestUrl, cancellationToken);
+        }
+        catch (HttpRequestException ex) when (IsNotEmbeddableResponse(ex))
+        {
+            // TODO (V20): Replace with a null check once GetXmlResponseAsync returns a nullable type.
+            return null;
+        }
 
         return BuildMarkup(xmlDocument);
     }
