@@ -127,6 +127,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	/**
 	 * Override mandatory validation to filter out variants without a name before validating.
 	 * Blueprints allow partial variant data and users may only provide a name for some cultures.
+	 * When no variant has a name, nothing would be saved, so the names are validated as usual and the name is marked as required.
 	 * @param {ContentModel} saveData - The data to validate.
 	 * @param {Array<UmbVariantId>} variantIds - The variant ids to validate.
 	 * @returns {Promise<void>}
@@ -136,6 +137,9 @@ export class UmbDocumentBlueprintWorkspaceContext
 		variantIds: Array<UmbVariantId> = [],
 	): Promise<void> {
 		const namedVariants = saveData.variants.filter((v) => v.name);
+		if (namedVariants.length === 0) {
+			return super.runMandatoryValidationForSaveData(saveData, variantIds);
+		}
 		const filteredVariantIds = variantIds.filter((variantId) => namedVariants.some((v) => variantId.compare(v)));
 		return super.runMandatoryValidationForSaveData({ ...saveData, variants: namedVariants }, filteredVariantIds);
 	}
