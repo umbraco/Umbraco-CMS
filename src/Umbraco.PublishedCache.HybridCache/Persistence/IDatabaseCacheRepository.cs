@@ -156,6 +156,13 @@ internal interface IDatabaseCacheRepository
     Task<ContentCacheNode?> GetElementSourceAsync(Guid key, bool preview = false);
 
     /// <summary>
+    /// Gets a single cache node for an element key, synchronously.
+    /// </summary>
+    /// <param name="key">The element key.</param>
+    /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
+    ContentCacheNode? GetElementSource(Guid key, bool preview = false);
+
+    /// <summary>
     /// Gets both draft and published cache nodes for an element key in a single query.
     /// </summary>
     /// <param name="key">The element key.</param>

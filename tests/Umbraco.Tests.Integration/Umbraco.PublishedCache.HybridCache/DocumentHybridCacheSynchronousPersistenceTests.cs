@@ -251,6 +251,9 @@ internal sealed class DocumentHybridCacheSynchronousPersistenceTests : UmbracoIn
         public Task<ContentCacheNode?> GetElementSourceAsync(Guid key, bool preview = false)
             => _inner.GetElementSourceAsync(key, preview);
 
+        public ContentCacheNode? GetElementSource(Guid key, bool preview = false)
+            => _inner.GetElementSource(key, preview);
+
         public Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetElementSourceForPublishStatesAsync(Guid key)
             => _inner.GetElementSourceForPublishStatesAsync(key);
 

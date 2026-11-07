@@ -97,9 +97,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetElementSourceAsync(Guid key, bool preview = false)
-    {
-        ContentSourceDto? dto = await GetElementSourceDto(key);
+        => CreateElementSourceNode(await GetElementSourceDto(key), preview);
 
+    /// <inheritdoc/>
+    public ContentCacheNode? GetElementSource(Guid key, bool preview = false)
+        => CreateElementSourceNode(Database.FirstOrDefault<ContentSourceDto>(GetElementSourceSql(key)), preview);
+
+    private ContentCacheNode? CreateElementSourceNode(ContentSourceDto? dto, bool preview)
+    {
         if (dto is null)
         {
             return null;
@@ -114,7 +119,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         {
             _logger.LogWarning(
                 "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
-                key);
+                dto.Key);
             return null;
         }
 
@@ -154,14 +159,13 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     private async Task<ContentSourceDto?> GetElementSourceDto(Guid key)
-    {
-        Sql<ISqlContext>? sql = SqlElementSourcesSelect()
+        => await Database.FirstOrDefaultAsync<ContentSourceDto>(GetElementSourceSql(key));
+
+    private Sql<ISqlContext> GetElementSourceSql(Guid key)
+        => SqlElementSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Element))
             .Append(SqlWhereNodeKey(SqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-        return await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
-    }
 
     private ContentCacheNode? CreateElementNodeKit(bool preview, ContentSourceDto dto)
     {
