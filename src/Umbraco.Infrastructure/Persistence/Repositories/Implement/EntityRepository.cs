@@ -1070,7 +1070,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     private string GetNodeColumnName(string orderBy)
         => SqlContext.PocoDataFactory.ForType(typeof(NodeDto)).Columns.Keys
             .FirstOrDefault(column => column.InvariantEquals(orderBy))
-           ?? orderBy;
+           ?? throw new ArgumentException(
+               $"Cannot order entities by '{orderBy}', which is not a column of the {NodeDto.TableName} table.",
+               nameof(orderBy));
 
     private void ApplyOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
     {
