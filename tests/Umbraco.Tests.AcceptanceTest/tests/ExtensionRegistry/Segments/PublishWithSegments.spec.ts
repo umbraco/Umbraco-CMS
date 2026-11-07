@@ -43,6 +43,7 @@ test.describe('publish content with segment-only variations', () => {
       {value: vipSegmentValue, segment: vipMemberSegmentAlias},
     ]);
     await umbracoApi.document.publish(documentId);
+    expect(await umbracoApi.document.isDocumentPublished(documentId)).toBeTruthy();
     await umbracoUi.content.goToContentWithName(contentName);
     await umbracoUi.content.clickSelectVariantButton();
     await umbracoUi.content.clickSegmentVariantButton(vipMemberSegment);

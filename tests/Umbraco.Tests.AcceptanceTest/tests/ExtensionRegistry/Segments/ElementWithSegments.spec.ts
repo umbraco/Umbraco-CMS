@@ -60,6 +60,7 @@ test.describe('Library elements with segment-only variations', () => {
       {value: vipSegmentValue, segment: vipMemberSegmentAlias},
     ]);
     await umbracoApi.element.publish(elementId);
+    expect(await umbracoApi.element.isElementPublished(elementId)).toBeTruthy();
     await umbracoUi.goToBackOffice();
     await umbracoUi.library.goToSection(ConstantHelper.sections.library);
     await umbracoUi.library.goToElementWithName(elementName);
