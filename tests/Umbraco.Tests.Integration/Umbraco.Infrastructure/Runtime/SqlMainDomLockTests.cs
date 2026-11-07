@@ -52,6 +52,9 @@ internal sealed class SqlMainDomLockTests : UmbracoIntegrationTest
 
             // The running application notices the booting one, stops listening and, as MainDom does, releases its lock.
             Assert.That(await Task.WhenAny(listening, Task.Delay(timeout)), Is.SameAs(listening), "The running application didn't notice the booting one.");
+
+            // Disposing releases the lock to the booting application, which is what this test covers; the call in the
+            // finally block only cleans up when an earlier assertion fails.
             running.Dispose();
 
             Assert.That(await acquiring, Is.True);
