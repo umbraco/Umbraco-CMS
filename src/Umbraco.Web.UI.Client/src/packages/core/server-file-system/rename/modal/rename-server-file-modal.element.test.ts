@@ -115,4 +115,33 @@ describe('UmbRenameModalElement', () => {
 		await new Promise((resolve) => setTimeout(resolve));
 		expect(renamed).to.have.lengthOf(1);
 	});
+
+	function getInput() {
+		return element.shadowRoot!.querySelector<UUIInputElement>('#name')!;
+	}
+
+	async function itemHasLoaded() {
+		await waitUntil(() => itemLookups > 0, 'the file was never looked up');
+		await new Promise((resolve) => setTimeout(resolve));
+		await element.updateComplete;
+	}
+
+	it('shows the current name once the file has loaded', async () => {
+		releaseRenameRepository();
+		await itemHasLoaded();
+
+		expect(getInput().value).to.equal('Original name');
+	});
+
+	it('keeps a name typed before the file has loaded', async () => {
+		await element.updateComplete;
+		const input = getInput();
+		input.value = 'typed.js';
+		input.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+
+		releaseRenameRepository();
+		await itemHasLoaded();
+
+		expect(getInput().value).to.equal('typed.js');
+	});
 });

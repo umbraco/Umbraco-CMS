@@ -8,6 +8,7 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-rename-modal')
 export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalData, UmbRenameServerFileModalValue> {
@@ -16,6 +17,8 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 	#renameRepository?: UmbRenameServerFileRepository<any>;
 	#init?: Promise<unknown>;
 	#submitting = false;
+	// A name typed before the file has loaded wins over the loaded one.
+	#typedName?: string;
 
 	@state()
 	private _name = '';
@@ -108,6 +111,10 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 		}
 	}
 
+	#onNameInput(event: UUIInputEvent) {
+		this.#typedName = event.target.value as string;
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${'Rename'}>
@@ -120,7 +127,8 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 									type="text"
 									id="name"
 									name="name"
-									value=${this._name}
+									value=${this.#typedName ?? this._name}
+									@input=${this.#onNameInput}
 									placeholder="Enter new name..."
 									required
 									required-message="Name is required"

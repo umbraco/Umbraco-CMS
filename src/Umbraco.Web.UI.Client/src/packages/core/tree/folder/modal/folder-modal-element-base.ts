@@ -6,6 +6,7 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 export abstract class UmbFolderModalElementBase<
 	FolderModalDataType extends { folderRepositoryAlias: string },
@@ -19,6 +20,8 @@ export abstract class UmbFolderModalElementBase<
 	#repositoryReady?: Promise<void>;
 	#init?: void | Promise<void>;
 	#submitting = false;
+	// A name typed before the folder has loaded wins over the loaded one.
+	#typedName?: string;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -70,6 +73,10 @@ export abstract class UmbFolderModalElementBase<
 		}
 	}
 
+	#onNameInput(event: UUIInputEvent) {
+		this.#typedName = event.target.value as string;
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term(this._isNew ? 'actions_folderCreate' : 'actions_folderRename')}>
@@ -85,7 +92,8 @@ export abstract class UmbFolderModalElementBase<
 									id="name"
 									name="name"
 									.label=${this.localize.term('create_enterFolderName')}
-									.value="${this.value?.folder?.name || ''}"
+									.value=${this.#typedName ?? (this.value?.folder?.name || '')}
+									@input=${this.#onNameInput}
 									required
 									${umbFocus()}></uui-input>
 							</uui-form-layout-item>
